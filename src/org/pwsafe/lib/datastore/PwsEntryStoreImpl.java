@@ -209,7 +209,7 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 		if (index >= sparseEntries.size()) {
 			throw new IndexOutOfBoundsException("record index too big - no record with index " + index);
 		}
-		PwsRecord theRecord = pwsFile.getRecord(index);
+		pwsFile.getRecord(index);
 		//TODO: Check if this Record is the same
 		boolean result = pwsFile.removeRecord(index);
 		

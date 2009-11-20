@@ -39,7 +39,7 @@ public class TwofishPws {
 		
     	byte[]  out = new byte[input.length];
 
-        int len1 = cipher.processBlock(input, 0, out, 0);
+        cipher.processBlock(input, 0, out, 0);
         
         return out;
 		
@@ -56,7 +56,7 @@ public class TwofishPws {
         
         try
         {
-            int len2 = cipher.doFinal(out, len1);
+            cipher.doFinal(out, len1);
         }
         catch (CryptoException e)
         {

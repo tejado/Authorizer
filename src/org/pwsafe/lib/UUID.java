@@ -20,9 +20,13 @@ import java.util.TimeZone;
  * 
  * @author Kevin Preece
  */
-public class UUID implements Comparable, Serializable
+public class UUID implements Comparable<Object>, Serializable
 {
-	private final byte []		TheUUID	= new byte[ 16 ];
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private final byte []		TheUUID	= new byte[ 16 ];
 
 	/**
 	 * Construct the object, generating a new UUID.

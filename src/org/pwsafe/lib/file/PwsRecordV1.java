@@ -19,9 +19,14 @@ import org.pwsafe.lib.exception.EndOfFileException;
  * 
  * @author Kevin Preece
  */
-public class PwsRecordV1 extends PwsRecord implements Comparable
+public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 {
-	private static final int		DEFAULT_TYPE	= 0;
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    private static final int		DEFAULT_TYPE	= 0;
 
 	/**
 	 * The string that, if present in the title, indicates that the default username is

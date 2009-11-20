@@ -18,6 +18,11 @@ import org.pwsafe.lib.Util;
 public class PwsUnknownField extends PwsField
 {
 	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
 	 * Constructor
 	 * 
 	 * @param type  the field's type.

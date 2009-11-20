@@ -546,7 +546,7 @@ public class PwsRecordV3 extends PwsRecord
 
 		sb.append( "{ " );
 		
-		for ( Iterator iter = getFields(); iter.hasNext(); )
+		for ( Iterator<?> iter = getFields(); iter.hasNext(); )
 		{
 			Integer	key;
 			String	value;

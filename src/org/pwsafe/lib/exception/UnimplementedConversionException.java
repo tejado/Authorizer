@@ -18,6 +18,11 @@ public class UnimplementedConversionException extends RuntimeException
 {
 
 	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
 	 * 
 	 */
 	public UnimplementedConversionException()

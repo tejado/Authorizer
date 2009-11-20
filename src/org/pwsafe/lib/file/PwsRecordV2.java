@@ -24,7 +24,12 @@ import org.pwsafe.lib.exception.UnimplementedConversionException;
  */
 public class PwsRecordV2 extends PwsRecord
 {
-	private static final Log LOG = Log.getInstance(PwsRecordV2.class.getPackage().getName());
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    private static final Log LOG = Log.getInstance(PwsRecordV2.class.getPackage().getName());
 
 	/**
 	 * Constant for the version 2 ID string field.
@@ -313,7 +318,7 @@ public class PwsRecordV2 extends PwsRecord
 	throws IOException
 	{
 		LOG.debug2( "----- START OF RECORD -----" );
-		for ( Iterator iter = getFields(); iter.hasNext(); )
+		for ( Iterator<?> iter = getFields(); iter.hasNext(); )
 		{
 			int			type;
 			PwsField	value;
@@ -345,7 +350,7 @@ public class PwsRecordV2 extends PwsRecord
 
 		sb.append( "{ " );
 		
-		for ( Iterator iter = getFields(); iter.hasNext(); )
+		for ( Iterator<?> iter = getFields(); iter.hasNext(); )
 		{
 			Integer	key;
 			String	value;

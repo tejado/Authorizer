@@ -17,6 +17,11 @@ package org.pwsafe.lib.exception;
 public class PasswordSafeException extends Exception
 {
 	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
 	 * 
 	 */
 	public PasswordSafeException()

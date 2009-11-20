@@ -44,7 +44,12 @@ import org.pwsafe.lib.exception.EndOfFileException;
  */
 public class PwsFileHeaderV3 implements Serializable
 {
-	private static final Log LOG = Log.getInstance(PwsFileHeaderV3.class.getPackage().getName());
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    private static final Log LOG = Log.getInstance(PwsFileHeaderV3.class.getPackage().getName());
 
 	private byte [] tag 			= new byte[4];
 	private final byte [] salt		= new byte[32];

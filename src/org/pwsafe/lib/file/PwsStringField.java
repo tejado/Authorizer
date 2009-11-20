@@ -17,6 +17,11 @@ import java.io.UnsupportedEncodingException;
 public class PwsStringField extends PwsField
 {
 	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
 	 * Constructor
 	 * 
 	 * @param type  the field's type.

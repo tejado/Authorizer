@@ -21,6 +21,11 @@ import org.pwsafe.lib.Util;
 public class PwsIntegerField extends PwsField
 {
 	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
 	 * Constructs the object 
 	 * 
 	 * @param type  the field type.  Values depend on the version of the file being read.

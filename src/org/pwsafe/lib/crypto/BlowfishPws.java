@@ -27,7 +27,6 @@ import org.pwsafe.lib.exception.PasswordSafeException;
  */
 public class BlowfishPws
 { 
-	private boolean cbc;
 	private BlockCipher decipher;
 	private BlockCipher encipher;
 	private ParametersWithIV div;
@@ -82,7 +81,6 @@ public class BlowfishPws
 	 */
 	BlowfishPws( byte[] bfkey, byte[] ivBytes, boolean cbc )
 	{
-		this.cbc = cbc;
 		byte[] riv = Util.cloneByteArray(ivBytes);
 		Util.bytesToLittleEndian(riv);
 		if (cbc) {

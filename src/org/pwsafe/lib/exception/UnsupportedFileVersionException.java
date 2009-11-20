@@ -19,6 +19,11 @@ public class UnsupportedFileVersionException extends Exception
 {
 
 	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
 	 * 
 	 */
 	public UnsupportedFileVersionException()

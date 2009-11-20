@@ -47,9 +47,14 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  * 
  * @author Kevin Preece
  */
-public abstract class PwsRecord implements Comparable, Serializable, Cloneable {
+public abstract class PwsRecord implements Comparable<Object>, Serializable, Cloneable {
 
-	private static final Log LOG = Log.getInstance(PwsRecord.class.getPackage().getName());
+	/**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    private static final Log LOG = Log.getInstance(PwsRecord.class.getPackage().getName());
 
 	/**
 	 * The default character set used for <code>byte[]</code> to
@@ -459,7 +464,7 @@ public abstract class PwsRecord implements Comparable, Serializable, Cloneable {
 		// try a shortcut first
 		if (theType < ValidTypes.length) { 
 			if (((Integer) ((Object[]) ValidTypes[theType])[0]).intValue() == theType) {
-				Class cl = value.getClass();
+				Class<? extends PwsField> cl = value.getClass();
 
 				if (cl == (((Object[]) ValidTypes[theType])[2])) {
 					attributes.put(Integer.valueOf(theType), value);
@@ -475,7 +480,7 @@ public abstract class PwsRecord implements Comparable, Serializable, Cloneable {
 			vType = ((Integer) ((Object[]) ValidTypes[ii])[0]).intValue();
 
 			if (vType == theType) {
-				Class cl = value.getClass();
+				Class<? extends PwsField> cl = value.getClass();
 
 				if (cl == (((Object[]) ValidTypes[ii])[2])) {
 					attributes.put(Integer.valueOf(theType), value);
