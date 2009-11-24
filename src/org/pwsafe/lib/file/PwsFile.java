@@ -389,7 +389,7 @@ public abstract class PwsFile
 	 *
 	 * @return An <code>Iterator</code> over the records.
 	 */
-	public Iterator<? extends PwsRecord> getRecords()
+	public Iterator<PwsRecord> getRecords()
 	{
 		return new FileIterator( this, sealedRecords.iterator() );
 	}
