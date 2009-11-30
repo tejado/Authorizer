@@ -4,14 +4,21 @@
       android:versionCode="1"
       android:versionName="1.0">
     <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".PasswdSafe"
+        <activity android:name=".FileList"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".PasswdSafe"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="com.jefftharris.passwdsafe.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="file"/>
+            </intent-filter>
+        </activity>
     </application>
     <uses-sdk android:minSdkVersion="5" />
 
