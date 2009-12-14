@@ -1,14 +1,12 @@
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-//import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.pwsafe.lib.file.PwsField;
+import java.util.TreeMap;
 import org.pwsafe.lib.file.PwsFile;
 import org.pwsafe.lib.file.PwsFileFactory;
 import org.pwsafe.lib.file.PwsFileV3;
@@ -18,6 +16,7 @@ import org.pwsafe.lib.file.PwsRecordV3;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ExpandableListActivity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,12 +26,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.SimpleExpandableListAdapter;
-import android.widget.TextView;
 
 public class PasswdSafe extends ExpandableListActivity {
     private static final String TAG = "PasswdSafe";
 
     private static final int DIALOG_GET_PASSWD = 0;
+    private static final int DIALOG_LOADING = 1;
 
     private static final String GROUP = "group";
     private static final String TITLE = "title";
@@ -64,6 +63,7 @@ public class PasswdSafe extends ExpandableListActivity {
                 final View passwdView = factory.inflate(R.layout.passwd_entry,
                                                         null);
 
+                // TODO: click Ok when enter pressed
                 AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle("Enter Password")
                 .setMessage("Password:")
@@ -88,6 +88,10 @@ public class PasswdSafe extends ExpandableListActivity {
                 dialog = alert.create();
                 break;
             }
+            case DIALOG_LOADING:
+            {
+                dialog = ProgressDialog.show(this, "", "Loading...", true);
+            }
         }
         return dialog;
     }
@@ -95,49 +99,58 @@ public class PasswdSafe extends ExpandableListActivity {
     private void showFile(String passwd)
     {
         Intent intent = getIntent();
+        showDialog(DIALOG_LOADING);
 
         try {
             // TODO: on pause, close file, clear password, etc.
             // TODO: Remember last file used somewhere?
+            Log.i(TAG, "before load file");
             itsPwsFile =
                 PwsFileFactory.loadFile(intent.getData().getPath(),
                                         new StringBuilder(passwd));
+            Log.i(TAG, "after load file");
 
-            List<Map<String, String>> groupData =
+            ArrayList<Map<String, String>> groupData =
                 new ArrayList<Map<String, String>>();
-            List<List<Map<String, Object>>> childData =
-                new ArrayList<List<Map<String, Object>>>();
+            ArrayList<ArrayList<HashMap<String, Object>>> childData =
+                new ArrayList<ArrayList<HashMap<String, Object>>>();
 
-            Map<String, List<PwsRecord>> recsByGroup =
-                new HashMap<String, List<PwsRecord>>();
+            TreeMap<String, ArrayList<PwsRecord>> recsByGroup =
+                new TreeMap<String, ArrayList<PwsRecord>>();
             Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
             while (recIter.hasNext()) {
                 PwsRecord rec = recIter.next();
                 String group = getGroup(rec);
-                List<PwsRecord> groupList = recsByGroup.get(group);
+                ArrayList<PwsRecord> groupList = recsByGroup.get(group);
                 if (groupList == null) {
                     groupList = new ArrayList<PwsRecord>();
                     recsByGroup.put(group, groupList);
                 }
                 groupList.add(rec);
             }
-            // TODO sort group lists
+            Log.i(TAG, "groups sorted");
 
-            for (Map.Entry<String, List<PwsRecord>> entry : recsByGroup.entrySet()) {
-                Map<String, String> groupInfo = new HashMap<String, String>();
-                groupInfo.put(GROUP, entry.getKey());
+            RecordMapComparator comp = new RecordMapComparator();
+            for (Map.Entry<String, ArrayList<PwsRecord>> entry :
+                    recsByGroup.entrySet()) {
+                Log.i(TAG, "process group:" + entry.getKey());
+                Map<String, String> groupInfo =
+                    Collections.singletonMap(GROUP, entry.getKey());
                 groupData.add(groupInfo);
 
-                List<Map<String, Object>> children =
-                    new ArrayList<Map<String, Object>>();
+                ArrayList<HashMap<String, Object>> children =
+                    new ArrayList<HashMap<String, Object>>();
                 for (PwsRecord rec : entry.getValue()) {
-                    Map<String, Object> recInfo = new HashMap<String, Object>();
+                    HashMap<String, Object> recInfo = new HashMap<String, Object>();
                     recInfo.put(TITLE, getTitle(rec));
                     recInfo.put(RECORD, rec);
                     children.add(recInfo);
                 }
+
+                Collections.sort(children, comp);
                 childData.add(children);
             }
+            Log.i(TAG, "adapter data created");
 
             ExpandableListAdapter adapter =
                 new SimpleExpandableListAdapter(this,
@@ -150,7 +163,7 @@ public class PasswdSafe extends ExpandableListActivity {
                                                 new String[] { TITLE },
                                                 new int[] { android.R.id.text1 });
             setListAdapter(adapter);
-
+            Log.i(TAG, "adapter set");
 
 
         } catch (Exception e) {
@@ -164,24 +177,12 @@ public class PasswdSafe extends ExpandableListActivity {
                 }
             })
             .show();
+        } finally {
+            dismissDialog(DIALOG_LOADING);
         }
-//      PwsFile pwsfile =
-//      PwsFileFactory.loadFile("/sdcard/test.psafe3",
-//                              new StringBuilder("test123"));
-//
-//  Iterator<PwsRecord> iter = pwsfile.getRecords();
-//  while (iter.hasNext()){
-//      PwsRecord rec = iter.next();
-//
-//      Iterator<Integer> fielditer = rec.getFields();
-//      while (fielditer.hasNext()) {
-//          PwsField field = rec.getField(fielditer.next());
-//          text.append(field.getType() + ": " + field + "\n");
-//      }
-//  }
     }
 
-    private String getGroup(PwsRecord rec)
+    private final String getGroup(PwsRecord rec)
     {
         switch (itsPwsFile.getFileVersionMajor()) {
             case PwsFileV3.VERSION:
@@ -191,13 +192,26 @@ public class PasswdSafe extends ExpandableListActivity {
         }
     }
 
-    private String getTitle(PwsRecord rec)
+    private final String getTitle(PwsRecord rec)
     {
         switch (itsPwsFile.getFileVersionMajor()) {
             case PwsFileV3.VERSION:
                 return rec.getField(PwsRecordV3.TITLE).toString();
             default:
                 return "TODO";
+        }
+    }
+
+
+    private static final class RecordMapComparator implements
+                    Comparator<HashMap<String, Object>>
+    {
+        public int compare(HashMap<String, Object> arg0,
+                           HashMap<String, Object> arg1)
+        {
+            String title0 = arg0.get(TITLE).toString();
+            String title1 = arg1.get(TITLE).toString();
+            return title0.compareTo(title1);
         }
     }
 }
