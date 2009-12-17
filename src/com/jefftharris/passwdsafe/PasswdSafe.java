@@ -27,13 +27,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 
 public class PasswdSafe extends ExpandableListActivity {
     private static final String TAG = "PasswdSafe";
 
     private static final int DIALOG_GET_PASSWD = 0;
-    private static final int DIALOG_LOADING = 1;
 
     private static final String GROUP = "group";
     private static final String TITLE = "title";
@@ -41,14 +41,60 @@ public class PasswdSafe extends ExpandableListActivity {
 
     public static final String INTENT = "com.jefftharris.passwdsafe.action.VIEW";
 
+    private LoadFileData itsFileData = null;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Log.i(TAG, "onCreate bundle:" + savedInstanceState + ", intent:" +
-              getIntent());
-        showDialog(DIALOG_GET_PASSWD);
+              getIntent() + ", data:" + itsFileData);
+        if (itsFileData == null) {
+            showDialog(DIALOG_GET_PASSWD);
+        } else {
+            showFileData();
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onDestroy()
+     */
+    @Override
+    protected void onDestroy()
+    {
+        Log.i(TAG, "onDestroy");
+        super.onDestroy();
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
+    @Override
+    protected void onPause()
+    {
+        Log.i(TAG, "onPause");
+        super.onPause();
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
+    @Override
+    protected void onResume()
+    {
+        Log.i(TAG, "onResume");
+        super.onResume();
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        Log.i(TAG, "onSaveInstanceState state:" + outState);
+        super.onSaveInstanceState(outState);
     }
 
     /* (non-Javadoc)
@@ -57,71 +103,80 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     protected Dialog onCreateDialog(int id)
     {
+        Log.i(TAG, "onCreateDialog id:" + id);
         Dialog dialog = null;
         switch (id) {
-            case DIALOG_GET_PASSWD:
-            {
-                LayoutInflater factory = LayoutInflater.from(this);
-                final View passwdView = factory.inflate(R.layout.passwd_entry,
-                                                        null);
+        case DIALOG_GET_PASSWD:
+        {
+            LayoutInflater factory = LayoutInflater.from(this);
+            final View passwdView =
+                factory.inflate(R.layout.passwd_entry, null);
 
-                // TODO: click Ok when enter pressed
-                AlertDialog.Builder alert = new AlertDialog.Builder(this)
+            // TODO: click Ok when enter pressed
+            AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle("Enter Password")
                 .setMessage("Password:")
                 .setView(passwdView)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener()
+                .setPositiveButton("Ok",
+                                   new DialogInterface.OnClickListener()
                 {
-                    public void onClick(DialogInterface dialog, int which)
+                    public void onClick(DialogInterface dialog,
+                                        int which)
                     {
-                        EditText passwdInput =
-                            (EditText)passwdView.findViewById(R.id.passwd_edit);
-                        dialog.dismiss();
+                        EditText passwdInput = (EditText) passwdView
+                            .findViewById(R.id.passwd_edit);
+                        PasswdSafe.this.removeDialog(DIALOG_GET_PASSWD);
                         showFile(passwdInput.getText().toString());
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                .setNegativeButton("Cancel",
+                                   new DialogInterface.OnClickListener()
                 {
-                    public void onClick(DialogInterface dialog, int which)
+                    public void onClick(DialogInterface dialog,
+                                        int which)
                     {
                         PasswdSafe.this.finish();
                     }
                 });
-                dialog = alert.create();
-                break;
-            }
-            case DIALOG_LOADING:
-            {
-                dialog = ProgressDialog.show(this, "", "Loading...", true);
-            }
+            dialog = alert.create();
+            break;
+        }
         }
         return dialog;
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.ExpandableListActivity#onChildClick(android.widget.ExpandableListView, android.view.View, int, int, long)
+     */
+    @Override
+    public boolean onChildClick(ExpandableListView parent,
+                                View v,
+                                int groupPosition,
+                                int childPosition,
+                                long id)
+    {
+        ArrayList<HashMap<String, Object>> groupChildren =
+            itsFileData.itsChildData.get(groupPosition);
+        HashMap<String, Object> child = groupChildren.get(childPosition);
+
+        Log.i(TAG, "selected child:" + child.get(TITLE));
+
+        return true;
     }
 
     private void showFile(String passwd)
     {
         Intent intent = getIntent();
-        showDialog(DIALOG_LOADING);
+        final ProgressDialog progress =
+            ProgressDialog.show(this, "", "Loading...", true);
 
         final Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                dismissDialog(DIALOG_LOADING);
+                progress.dismiss();
                 if (msg.what == LoadFileThread.RESULT_DATA) {
-                    LoadFileData data = (LoadFileData)msg.obj;
-                    ExpandableListAdapter adapter =
-                        new SimpleExpandableListAdapter(PasswdSafe.this,
-                                                        data.itsGroupData,
-                                                        android.R.layout.simple_expandable_list_item_1,
-                                                        new String[] { GROUP },
-                                                        new int[] { android.R.id.text1 },
-                                                        data.itsChildData,
-                                                        android.R.layout.simple_expandable_list_item_1,
-                                                        new String[] { TITLE },
-                                                        new int[] { android.R.id.text1 });
-                    setListAdapter(adapter);
-                    Log.i(TAG, "adapter set");
-
+                    itsFileData = (LoadFileData)msg.obj;
+                    showFileData();
                 } else {
                     Exception e = (Exception)msg.obj;
                     new AlertDialog.Builder(PasswdSafe.this)
@@ -141,6 +196,22 @@ public class PasswdSafe extends ExpandableListActivity {
                                                 new StringBuilder(passwd),
                                                 handler);
         thr.start();
+    }
+
+    private void showFileData()
+    {
+        ExpandableListAdapter adapter =
+            new SimpleExpandableListAdapter(PasswdSafe.this,
+                                            itsFileData.itsGroupData,
+                                            android.R.layout.simple_expandable_list_item_1,
+                                            new String[] { GROUP },
+                                            new int[] { android.R.id.text1 },
+                                            itsFileData.itsChildData,
+                                            android.R.layout.simple_expandable_list_item_1,
+                                            new String[] { TITLE },
+                                            new int[] { android.R.id.text1 });
+        setListAdapter(adapter);
+        Log.i(TAG, "adapter set");
     }
 
     private static final String getGroup(PwsRecord rec, PwsFile file)
@@ -166,12 +237,15 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private static final class LoadFileData
     {
+        public final PwsFile itsPwsFile;
         public final ArrayList<Map<String, String>> itsGroupData;
         public final ArrayList<ArrayList<HashMap<String, Object>>> itsChildData;
 
-        public LoadFileData(ArrayList<Map<String, String>> groupData,
+        public LoadFileData(PwsFile pwsFile,
+                            ArrayList<Map<String, String>> groupData,
                             ArrayList<ArrayList<HashMap<String, Object>>> childData)
         {
+            itsPwsFile = pwsFile;
             itsGroupData = groupData;
             itsChildData = childData;
         }
@@ -247,7 +321,7 @@ public class PasswdSafe extends ExpandableListActivity {
                     childData.add(children);
                 }
                 Log.i(TAG, "adapter data created");
-                data = new LoadFileData(groupData, childData);
+                data = new LoadFileData(pwsfile, groupData, childData);
             } catch (Exception e) {
                 Log.e(TAG, "Exception", e);
                 resultException = e;
