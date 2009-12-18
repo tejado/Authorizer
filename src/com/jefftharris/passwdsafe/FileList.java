@@ -31,6 +31,9 @@ public class FileList extends ListActivity
     {
         super.onCreate(savedInstanceState);
 
+        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        app.setFileData(null);
+
         File dir = new File("/sdcard");
         File[] files = dir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String filename) {

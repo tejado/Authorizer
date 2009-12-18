@@ -1,17 +1,6 @@
 package com.jefftharris.passwdsafe;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import org.pwsafe.lib.file.PwsFile;
-import org.pwsafe.lib.file.PwsFileFactory;
-import org.pwsafe.lib.file.PwsFileV3;
 import org.pwsafe.lib.file.PwsRecord;
-import org.pwsafe.lib.file.PwsRecordV3;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -19,6 +8,7 @@ import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,13 +25,10 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private static final int DIALOG_GET_PASSWD = 0;
 
-    private static final String GROUP = "group";
-    private static final String TITLE = "title";
-    private static final String RECORD = "record";
-
     public static final String INTENT = "com.jefftharris.passwdsafe.action.VIEW";
 
-    private LoadFileData itsFileData = null;
+    private String itsFileName;
+    private PasswdFileData itsFileData;
 
     /** Called when the activity is first created. */
     @Override
@@ -49,7 +36,11 @@ public class PasswdSafe extends ExpandableListActivity {
         super.onCreate(savedInstanceState);
 
         Log.i(TAG, "onCreate bundle:" + savedInstanceState + ", intent:" +
-              getIntent() + ", data:" + itsFileData);
+              getIntent());
+        itsFileName = getIntent().getData().getPath();
+
+        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        itsFileData = app.getFileData(itsFileName);
         if (itsFileData == null) {
             showDialog(DIALOG_GET_PASSWD);
         } else {
@@ -126,7 +117,7 @@ public class PasswdSafe extends ExpandableListActivity {
                         EditText passwdInput = (EditText) passwdView
                             .findViewById(R.id.passwd_edit);
                         PasswdSafe.this.removeDialog(DIALOG_GET_PASSWD);
-                        showFile(passwdInput.getText().toString());
+                        openFile(passwdInput.getText().toString());
                     }
                 })
                 .setNegativeButton("Cancel",
@@ -135,6 +126,7 @@ public class PasswdSafe extends ExpandableListActivity {
                     public void onClick(DialogInterface dialog,
                                         int which)
                     {
+                        PasswdSafe.this.removeDialog(DIALOG_GET_PASSWD);
                         PasswdSafe.this.finish();
                     }
                 });
@@ -155,18 +147,20 @@ public class PasswdSafe extends ExpandableListActivity {
                                 int childPosition,
                                 long id)
     {
-        ArrayList<HashMap<String, Object>> groupChildren =
-            itsFileData.itsChildData.get(groupPosition);
-        HashMap<String, Object> child = groupChildren.get(childPosition);
+        PwsRecord rec = itsFileData.getRecord(groupPosition, childPosition);
+        Log.i(TAG, "selected child:" + itsFileData.getTitle(rec));
 
-        Log.i(TAG, "selected child:" + child.get(TITLE));
-
+        Uri.Builder builder = getIntent().getData().buildUpon();
+        builder.appendQueryParameter("rec",
+                                     itsFileData.getUUID(rec).toString());
+        Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
+                                   this, RecordView.class);
+        startActivity(intent);
         return true;
     }
 
-    private void showFile(String passwd)
+    private void openFile(String passwd)
     {
-        Intent intent = getIntent();
         final ProgressDialog progress =
             ProgressDialog.show(this, "", "Loading...", true);
 
@@ -175,7 +169,9 @@ public class PasswdSafe extends ExpandableListActivity {
             public void handleMessage(Message msg) {
                 progress.dismiss();
                 if (msg.what == LoadFileThread.RESULT_DATA) {
-                    itsFileData = (LoadFileData)msg.obj;
+                    itsFileData = (PasswdFileData)msg.obj;
+                    PasswdSafeApp app = (PasswdSafeApp)getApplication();
+                    app.setFileData(itsFileData);
                     showFileData();
                 } else {
                     Exception e = (Exception)msg.obj;
@@ -192,7 +188,7 @@ public class PasswdSafe extends ExpandableListActivity {
             }
         };
 
-        LoadFileThread thr = new LoadFileThread(intent.getData().getPath(),
+        LoadFileThread thr = new LoadFileThread(itsFileName,
                                                 new StringBuilder(passwd),
                                                 handler);
         thr.start();
@@ -204,51 +200,14 @@ public class PasswdSafe extends ExpandableListActivity {
             new SimpleExpandableListAdapter(PasswdSafe.this,
                                             itsFileData.itsGroupData,
                                             android.R.layout.simple_expandable_list_item_1,
-                                            new String[] { GROUP },
+                                            new String[] { PasswdFileData.GROUP },
                                             new int[] { android.R.id.text1 },
                                             itsFileData.itsChildData,
                                             android.R.layout.simple_expandable_list_item_1,
-                                            new String[] { TITLE },
+                                            new String[] { PasswdFileData.TITLE },
                                             new int[] { android.R.id.text1 });
         setListAdapter(adapter);
         Log.i(TAG, "adapter set");
-    }
-
-    private static final String getGroup(PwsRecord rec, PwsFile file)
-    {
-        switch (file.getFileVersionMajor()) {
-            case PwsFileV3.VERSION:
-                return rec.getField(PwsRecordV3.GROUP).toString();
-            default:
-                return "TODO";
-        }
-    }
-
-    private static final String getTitle(PwsRecord rec, PwsFile file)
-    {
-        switch (file.getFileVersionMajor()) {
-            case PwsFileV3.VERSION:
-                return rec.getField(PwsRecordV3.TITLE).toString();
-            default:
-                return "TODO";
-        }
-    }
-
-
-    private static final class LoadFileData
-    {
-        public final PwsFile itsPwsFile;
-        public final ArrayList<Map<String, String>> itsGroupData;
-        public final ArrayList<ArrayList<HashMap<String, Object>>> itsChildData;
-
-        public LoadFileData(PwsFile pwsFile,
-                            ArrayList<Map<String, String>> groupData,
-                            ArrayList<ArrayList<HashMap<String, Object>>> childData)
-        {
-            itsPwsFile = pwsFile;
-            itsGroupData = groupData;
-            itsChildData = childData;
-        }
     }
 
     private static final class LoadFileThread extends Thread
@@ -270,58 +229,11 @@ public class PasswdSafe extends ExpandableListActivity {
 
         @Override
         public void run() {
-            LoadFileData data = null;
+            PasswdFileData data = null;
             Exception resultException = null;
             try {
                 // TODO: on pause, close file, clear password, etc.
-                // TODO: Remember last file used somewhere?
-                Log.i(TAG, "before load file");
-                PwsFile pwsfile = PwsFileFactory.loadFile(itsFile, itsPasswd);
-                itsPasswd = null;
-                Log.i(TAG, "after load file");
-
-                ArrayList<Map<String, String>> groupData =
-                    new ArrayList<Map<String, String>>();
-                ArrayList<ArrayList<HashMap<String, Object>>> childData =
-                    new ArrayList<ArrayList<HashMap<String, Object>>>();
-
-                TreeMap<String, ArrayList<PwsRecord>> recsByGroup =
-                    new TreeMap<String, ArrayList<PwsRecord>>();
-                Iterator<PwsRecord> recIter = pwsfile.getRecords();
-                while (recIter.hasNext()) {
-                    PwsRecord rec = recIter.next();
-                    String group = getGroup(rec, pwsfile);
-                    ArrayList<PwsRecord> groupList = recsByGroup.get(group);
-                    if (groupList == null) {
-                        groupList = new ArrayList<PwsRecord>();
-                        recsByGroup.put(group, groupList);
-                    }
-                    groupList.add(rec);
-                }
-                Log.i(TAG, "groups sorted");
-
-                RecordMapComparator comp = new RecordMapComparator();
-                for (Map.Entry<String, ArrayList<PwsRecord>> entry :
-                        recsByGroup.entrySet()) {
-                    Log.i(TAG, "process group:" + entry.getKey());
-                    Map<String, String> groupInfo =
-                        Collections.singletonMap(GROUP, entry.getKey());
-                    groupData.add(groupInfo);
-
-                    ArrayList<HashMap<String, Object>> children =
-                        new ArrayList<HashMap<String, Object>>();
-                    for (PwsRecord rec : entry.getValue()) {
-                        HashMap<String, Object> recInfo = new HashMap<String, Object>();
-                        recInfo.put(TITLE, getTitle(rec, pwsfile));
-                        recInfo.put(RECORD, rec);
-                        children.add(recInfo);
-                    }
-
-                    Collections.sort(children, comp);
-                    childData.add(children);
-                }
-                Log.i(TAG, "adapter data created");
-                data = new LoadFileData(pwsfile, groupData, childData);
+                data = new PasswdFileData(itsFile, itsPasswd);
             } catch (Exception e) {
                 Log.e(TAG, "Exception", e);
                 resultException = e;
@@ -335,19 +247,6 @@ public class PasswdSafe extends ExpandableListActivity {
                                      resultException);
             }
             itsMsgHandler.sendMessage(msg);
-        }
-    }
-
-
-    private static final class RecordMapComparator implements
-                    Comparator<HashMap<String, Object>>
-    {
-        public int compare(HashMap<String, Object> arg0,
-                           HashMap<String, Object> arg1)
-        {
-            String title0 = arg0.get(TITLE).toString();
-            String title1 = arg1.get(TITLE).toString();
-            return title0.compareTo(title1);
         }
     }
 }
