@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
+import org.pwsafe.lib.file.PwsField;
 import org.pwsafe.lib.file.PwsFile;
 import org.pwsafe.lib.file.PwsFileFactory;
 import org.pwsafe.lib.file.PwsFileV3;
@@ -29,6 +30,8 @@ public class PasswdFileData
         new ArrayList<Map<String, String>>();
     public final ArrayList<ArrayList<HashMap<String, Object>>> itsChildData =
         new ArrayList<ArrayList<HashMap<String, Object>>>();
+    private final HashMap<String, PwsRecord> itsRecordsByUUID =
+        new HashMap<String, PwsRecord>();
 
     static final String RECORD = "record";
     static final String TITLE = "title";
@@ -49,6 +52,7 @@ public class PasswdFileData
         itsPwsFile.dispose();
         itsGroupData.clear();
         itsChildData.clear();
+        itsRecordsByUUID.clear();
     }
 
     public PwsRecord getRecord(int groupPos, int childPos)
@@ -59,47 +63,61 @@ public class PasswdFileData
         return (PwsRecord)child.get(RECORD);
     }
 
+    public PwsRecord getRecord(String uuid)
+    {
+        return itsRecordsByUUID.get(uuid);
+    }
+
+    public final String getEmail(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.EMAIL);
+    }
+
     public final String getGroup(PwsRecord rec)
     {
-        if (itsPwsFile != null) {
-            switch (itsPwsFile.getFileVersionMajor()) {
-            case PwsFileV3.VERSION:
-                return rec.getField(PwsRecordV3.GROUP).toString();
-            default:
-                return "TODO";
-            }
-        } else {
-            return "";
-        }
-        // TODO: Fill in other versions
+        return getField(rec, PwsRecordV3.GROUP);
     }
 
     public final String getTitle(PwsRecord rec)
     {
-        if (itsPwsFile != null) {
-            switch (itsPwsFile.getFileVersionMajor()) {
-            case PwsFileV3.VERSION:
-                return rec.getField(PwsRecordV3.TITLE).toString();
-            default:
-                return "TODO";
-            }
-        } else {
-            return "";
-        }
+        return getField(rec, PwsRecordV3.TITLE);
+    }
+
+    public final String getUsername(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.USERNAME);
+    }
+
+    public final String getURL(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.URL);
     }
 
     public final String getUUID(PwsRecord rec)
     {
-        if (itsPwsFile != null) {
-            switch (itsPwsFile.getFileVersionMajor()) {
-            case PwsFileV3.VERSION:
-                return rec.getField(PwsRecordV3.UUID).toString();
-            default:
-                return "TODO";
-            }
-        } else {
+        return getField(rec, PwsRecordV3.UUID);
+    }
+
+    private final String getField(PwsRecord rec, int fieldId)
+    {
+        if (itsPwsFile == null) {
             return "";
         }
+
+        if (itsPwsFile.getFileVersionMajor() != PwsFileV3.VERSION) {
+            // TODO: convert field id
+            fieldId = -1;
+        }
+
+        if (fieldId == -1) {
+            return "(unsupported)";
+        }
+
+        PwsField field = rec.getField(fieldId);
+        if (field == null) {
+            return "";
+        }
+        return field.toString();
     }
 
     private void loadFile(StringBuilder passwd)
@@ -125,6 +143,9 @@ public class PasswdFileData
                 recsByGroup.put(group, groupList);
             }
             groupList.add(rec);
+
+            String uuid = getUUID(rec);
+            itsRecordsByUUID.put(uuid, rec);
         }
         Log.i(TAG, "groups sorted");
 

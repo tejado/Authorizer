@@ -1,6 +1,6 @@
 /*
  * $Id: PwsRecordV2.java 561 2005-07-26 10:00:19 +0000 (Tue, 26 Jul 2005) glen_a_smith $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -21,7 +21,7 @@ import org.pwsafe.lib.exception.EndOfFileException;
 
 /**
  * Support for new v3 Record type.
- * 
+ *
  * @author Glen Smith (based on Kevin's code for V2 records)
  */
 public class PwsRecordV3 extends PwsRecord
@@ -36,7 +36,7 @@ public class PwsRecordV3 extends PwsRecord
 	public static final int		V3_ID_STRING		= 0;
 
 	/**
-	 * Constant for the Universally Unique ID (UUID) field. 
+	 * Constant for the Universally Unique ID (UUID) field.
 	 */
 	public static final int		UUID				= 1;
 
@@ -94,34 +94,38 @@ public class PwsRecordV3 extends PwsRecord
 	 * Constant for the last modification time field.
 	 */
 	public static final int		LAST_MOD_TIME	= 12;
-	
+
 	/**
 	 * Constant for URL related to this entry.
 	 */
 	public static final int		URL	= 13;
-	
+
 	/**
 	 * Constant for Autotype information related to this entry.
 	 */
 	public static final int		AUTOTYPE	= 14;
-	
+
 	/**
 	 * History of recently used passwords.
 	 */
 	public static final int     	PASSWORD_HISTORY = 15;
-	
+
 	/**
 	 * Constant for the password policy field.
 	 */
 	public static final int     	PASSWORD_POLICY = 16;
-	
-	
+
+
 	/**
 	 * History of recently used passwords.
 	 */
 	public static final int  		PASSWORD_EXPIRY_INTERVAL = 17;
 
-	
+	/**
+	 * Email
+	 */
+	public static final int EMAIL = 20;
+
 	/**
 	 * Constant for the end of record marker field.
 	 */
@@ -151,7 +155,7 @@ public class PwsRecordV3 extends PwsRecord
 		new Object [] { Integer.valueOf(PASSWORD_POLICY),	"PASSWORD_POLICY",		PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(PASSWORD_EXPIRY_INTERVAL),	"PASSWORD_EXPIRY_INTERVAL",		PwsStringUnicodeField.class },
 	};
-	
+
 
 	/**
 	 * Create a new record with all mandatory fields given their default value.
@@ -164,14 +168,14 @@ public class PwsRecordV3 extends PwsRecord
 		setField( new PwsStringUnicodeField(PwsFieldTypeV3.TITLE,    "") );
 		setField( new PwsStringUnicodeField(PwsFieldTypeV3.PASSWORD, "") );
 		setField( new PwsTimeField(PwsFieldTypeV3.CREATION_TIME, new Date()) );
-	       
+
 	}
-	
+
 	/**
 	 * Create a new record by reading it from <code>file</code>.
-	 * 
+	 *
 	 * @param file the file to read data from.
-	 * 
+	 *
 	 * @throws EndOfFileException If end of file is reached
 	 * @throws IOException        If a read error occurs.
 	 */
@@ -180,11 +184,11 @@ public class PwsRecordV3 extends PwsRecord
 	{
 		super( file, VALID_TYPES );
 	}
-	
+
 	/**
 	 * A special version which reads and ignores all headers since they have different
 	 * ids to standard types.
-	 * 
+	 *
 	 * @param file the file to read data from.
 	 * @param validTypes the types allowable in the incoming data
 	 * @throws EndOfFileException If end of file is reached
@@ -197,7 +201,7 @@ public class PwsRecordV3 extends PwsRecord
 
 	/**
 	 * Creates a new record that is a copy <code>base</code>.
-	 * 
+	 *
 	 * @param base the record to copy.
 	 */
 	PwsRecordV3( PwsRecord base )
@@ -205,10 +209,10 @@ public class PwsRecordV3 extends PwsRecord
 		super(base);
 	}
 
-	
+
 	/**
 	 * The V3 format allows and requires the ability to add formerly unknown fields.
-	 * 
+	 *
 	 * @return true
 	 */
 	@Override
@@ -218,7 +222,7 @@ public class PwsRecordV3 extends PwsRecord
 
 	/**
 	 * Creates a deep clone of this record.
-	 * 
+	 *
 	 * @return the new record.
 	 */
 	@Override
@@ -227,20 +231,20 @@ public class PwsRecordV3 extends PwsRecord
 		return new PwsRecordV3( this );
 	}
 
-	
+
 	/**
 	 * Compares this record to another returning a value that is less than zero if
 	 * this record is "less than" <code>other</code>, zero if they are "equal", or
-	 * greater than zero if this record is "greater than" <code>other</code>. 
-	 * 
+	 * greater than zero if this record is "greater than" <code>other</code>.
+	 *
 	 * @param other the record to compare this record to.
-	 * 
+	 *
 	 * @return A value &lt; zero if this record is "less than" <code>other</code>,
 	 *         zero if they're equal and &gt; zero if this record is "greater than"
 	 *         <code>other</code>.
-	 * 
+	 *
 	 * @throws ClassCastException If <code>other</code> is not a <code>PwsRecordV1</code>.
-	 * 
+	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
@@ -253,12 +257,12 @@ public class PwsRecordV3 extends PwsRecord
 	/**
 	 * Compares this record to another returning <code>true</code> if they're equal
 	 * and <code>false</code> if they're unequal.
-	 * 
+	 *
 	 * @param that the record this one is compared to.
-	 * 
-	 * @return <code>true</code> if the records are equal, <code>false</code> if 
+	 *
+	 * @return <code>true</code> if the records are equal, <code>false</code> if
 	 *         they're unequal.
-	 * 
+	 *
 	 * @throws ClassCastException if <code>that</code> is not a <code>PwsRecordV1</code>.
 	 */
 	@Override
@@ -281,8 +285,8 @@ public class PwsRecordV3 extends PwsRecord
 	 * Checks to see whether this record is one that we should display to the user
 	 * or not. The header record is the only one we suppress, and we determine
 	 * the header record by checking for the presence of the type 0 field which
-	 * represents the file format version. 
-	 * 
+	 * represents the file format version.
+	 *
 	 * @return <code>true</code> if it's valid or <code>false</code> if unequal.
 	 */
 	@Override
@@ -290,14 +294,14 @@ public class PwsRecordV3 extends PwsRecord
 	{
 		//TODO Ignore those records we read from the header....
 		PwsField idField = getField(V3_ID_STRING);
-		
+
 		if ( idField != null ) {
 			LOG.debug1( "Ignoring record " + this.toString() );
 			return false;
 		}
 		return true;
 	}
-	
+
 	protected boolean isHeaderRecord() {
 
 		PwsField idField = getField(V3_ID_STRING);
@@ -308,9 +312,9 @@ public class PwsRecordV3 extends PwsRecord
 		}
 		return false;
 	}
-	
+
 	static byte[] EOF_BYTES_RAW = "PWS3-EOFPWS3-EOF".getBytes();
-	
+
 	protected class ItemV3 extends Item {
 		public ItemV3( PwsFileV3 file )
 		throws EndOfFileException, IOException
@@ -328,7 +332,7 @@ public class PwsRecordV3 extends PwsRecord
 				}
 				throw eofe;
 			}
-			
+
 			length	= Util.getIntFromByteArray( rawData, 0 );
 			type = rawData[4] & 0x000000ff; // rest of header is now random data
 			data    = new byte[length];
@@ -338,12 +342,12 @@ public class PwsRecordV3 extends PwsRecord
 			} else if (length > 11) {
 				int bytesToRead = length - 11;
 				int blocksToRead = bytesToRead / file.getBlockSize();
-				
-				// if blocksToRead doesn't fit neatly into current block 
+
+				// if blocksToRead doesn't fit neatly into current block
 				// size, add an extra block for the remaining bytes
 				if (bytesToRead % file.getBlockSize() != 0)
 					blocksToRead++;
-				
+
 				byte[] remainingRecords = new byte[0];
 				for (int i = 0; i < blocksToRead; i++) {
 					byte[] nextBlock = new byte[file.getBlockSize()];
@@ -358,15 +362,15 @@ public class PwsRecordV3 extends PwsRecord
 			}
 			byte[] dataToHash = data;
 			file.hasher.digest(dataToHash);
-		
+
 		}
 	}
-	
+
 	/**
 	 * Initialises this record by reading its data from <code>file</code>.
-	 * 
+	 *
 	 * @param file the file to read the data from.
-	 * 
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 */
@@ -376,7 +380,7 @@ public class PwsRecordV3 extends PwsRecord
 	{
 		Item		item;
 		PwsField	itemVal	= null;
-		
+
 		for ( ;; )
 		{
 			item = new ItemV3( (PwsFileV3)file );
@@ -386,24 +390,24 @@ public class PwsRecordV3 extends PwsRecord
 				LOG.debug2( "-- END OF RECORD --" );
 				break; // out of the for loop
 			}
-			
+
 			if (ignoreFieldTypes) {
 				// header record has no valid types...
 				itemVal = new PwsUnknownField(item.getType(), item.getByteData());
 				attributes.put( new Integer(item.getType()), itemVal );
 			} else {
-				
+
 				switch ( item.getType() )
 				{
 					case V3_ID_STRING :
 						//itemVal	= new PwsIntegerField( item.getType(), new byte[] {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} );
 						itemVal	= new PwsVersionField( item.getType(), item.getByteData() );
 						break;
-						
+
 					case UUID :
 						itemVal = new PwsUUIDField( item.getType(), item.getByteData() );
 						break;
-				
+
 					case GROUP :
 					case TITLE :
 					case USERNAME :
@@ -415,22 +419,22 @@ public class PwsRecordV3 extends PwsRecord
 					case AUTOTYPE :
 						itemVal	= new PwsStringUnicodeField( item.getType(), item.getByteData() );
 						break;
-	
+
 					case CREATION_TIME :
 					case PASSWORD_MOD_TIME :
 					case LAST_ACCESS_TIME :
-					case LAST_MOD_TIME : 
+					case LAST_MOD_TIME :
 						itemVal	= new PwsTimeField( item.getType(), item.getByteData() );
 						break;
-	
+
 					case PASSWORD_LIFETIME :
 						itemVal	= new PwsTimeField( item.getType(), item.getByteData() );
 						break;
-	
+
 //					case PASSWORD_EXPIRY_INTERVAL :
 //						break;
-//					
-					
+//
+
 					default :
 						itemVal = new PwsUnknownField(item.getType(), item.getByteData());
 						break;
@@ -444,11 +448,11 @@ public class PwsRecordV3 extends PwsRecord
 
 	/**
 	 * Saves this record to <code>file</code>.
-	 * 
+	 *
 	 * @param file the file that the record will be written to.
-	 * 
+	 *
 	 * @throws IOException if a write error occurs.
-	 * 
+	 *
 	 * @see org.pwsafe.lib.file.PwsRecord#saveRecord(org.pwsafe.lib.file.PwsFile)
 	 */
 	@Override
@@ -467,7 +471,7 @@ public class PwsRecordV3 extends PwsRecord
 			if ( LOG.isDebug2Enabled() ) LOG.debug2( "Writing field " + type + " (" + ((Object[])VALID_TYPES[type])[1] + ") : \"" + value.toString() + "\"" );
 
 			writeField( file, value );
-			
+
 			PwsFileV3 fileV3 = (PwsFileV3) file;
 			fileV3.hasher.digest(value.getBytes());
 		}
@@ -477,7 +481,7 @@ public class PwsRecordV3 extends PwsRecord
 
 	/**
 	 * Sets a field on this record from <code>item</code>.
-	 * 
+	 *
 	 * @param item the <code>Item</code> containg the field's data.
 	 */
 	@Override
@@ -486,14 +490,14 @@ public class PwsRecordV3 extends PwsRecord
 		setField( new PwsStringUnicodeField( item.getType(), item.getData() ) );
 	}
 
-	
+
 	/**
 	 * Writes a single field to the file.
-	 * 
+	 *
 	 * @param file  the file to write the field to.
 	 * @param field the field to be written.
-	 * @param type  the type to write to the file instead of <code>field.getType()</code> 
-	 * 
+	 * @param type  the type to write to the file instead of <code>field.getType()</code>
+	 *
 	 * @throws IOException
 	 */
 	@Override
@@ -505,7 +509,7 @@ public class PwsRecordV3 extends PwsRecord
 
 		lenBlock	= new byte[ 5 ];
 		dataBlock	= field.getBytes();
-		
+
 		Util.putIntToByteArray( lenBlock, dataBlock.length, 0 );
 		//Util.putIntToByteArray( lenBlock, type, 4 );
 		lenBlock[4] = (byte) type;
@@ -516,23 +520,23 @@ public class PwsRecordV3 extends PwsRecord
 		if (calcWriteLen % 16 != 0) {
 			bytesToPad = 16 - (calcWriteLen % 16);
 		}
-		
+
 		// TODO put random bytes here
 		dataBlock	= Util.cloneByteArray( dataBlock, dataBlock.length + bytesToPad );
 
 		//file.writeBytes(lenBlock);
 		byte[] dataToWrite = Util.mergeBytes(lenBlock, dataBlock);
-		
+
 		for (int i = 0; i < (dataToWrite.length / 16); i++) {
 			byte[] nextBlock = Util.getBytes(dataToWrite, i * 16, 16);
 			file.writeEncryptedBytes(nextBlock);
 		}
-		
+
 	}
 
 	/**
 	 * Returns a string representation of this record.
-	 * 
+	 *
 	 * @return A string representation of this object.
 	 */
 	@Override
@@ -545,7 +549,7 @@ public class PwsRecordV3 extends PwsRecord
 		sb		= new StringBuffer();
 
 		sb.append( "{ " );
-		
+
 		for ( Iterator<?> iter = getFields(); iter.hasNext(); )
 		{
 			Integer	key;
@@ -560,7 +564,12 @@ public class PwsRecordV3 extends PwsRecord
 			}
 			first	= false;
 
-			sb.append( ((Object[])VALID_TYPES[key.intValue()])[1] );
+			int i = key.intValue();
+			if (i <= VALID_TYPES.length) {
+			    sb.append( ((Object[])VALID_TYPES[i])[1] );
+			} else {
+			    sb.append(key);
+			}
 			sb.append( "=" );
 			sb.append( value );
 		}
@@ -568,6 +577,6 @@ public class PwsRecordV3 extends PwsRecord
 
 		return sb.toString();
 	}
-	
-	
+
+
 }

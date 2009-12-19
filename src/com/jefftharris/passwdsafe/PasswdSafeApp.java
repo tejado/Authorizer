@@ -1,6 +1,9 @@
 package com.jefftharris.passwdsafe;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.content.DialogInterface;
 import android.util.Log;
 
 public class PasswdSafeApp extends Application
@@ -38,6 +41,19 @@ public class PasswdSafeApp extends Application
     {
         closeFileData();
         itsFileData = fileData;
+    }
+
+    public static void showFatalMsg(String msg, final Activity activity)
+    {
+        new AlertDialog.Builder(activity)
+        .setMessage(msg)
+        .setCancelable(false)
+        .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                activity.finish();
+            }
+        })
+        .show();
     }
 
     private void closeFileData()

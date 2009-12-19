@@ -66,6 +66,9 @@ public class PasswdSafe extends ExpandableListActivity {
     {
         Log.i(TAG, "onPause");
         super.onPause();
+
+        removeDialog(DIALOG_GET_PASSWD);
+        // TODO: what if interrupted while loading data??
     }
 
     /* (non-Javadoc)
@@ -84,8 +87,8 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-        Log.i(TAG, "onSaveInstanceState state:" + outState);
         super.onSaveInstanceState(outState);
+        Log.i(TAG, "onSaveInstanceState state:" + outState);
     }
 
     /* (non-Javadoc)
@@ -175,15 +178,7 @@ public class PasswdSafe extends ExpandableListActivity {
                     showFileData();
                 } else {
                     Exception e = (Exception)msg.obj;
-                    new AlertDialog.Builder(PasswdSafe.this)
-                    .setMessage(e.toString())
-                    .setCancelable(false)
-                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            PasswdSafe.this.finish();
-                        }
-                    })
-                    .show();
+                    PasswdSafeApp.showFatalMsg(e.toString(), PasswdSafe.this);
                 }
             }
         };

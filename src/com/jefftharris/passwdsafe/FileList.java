@@ -55,6 +55,17 @@ public class FileList extends ListActivity
     }
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        app.setFileData(null);
+    }
+
+    /* (non-Javadoc)
      * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
      */
     @Override
