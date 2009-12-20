@@ -42,6 +42,7 @@ public class PasswdSafe extends ExpandableListActivity {
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         itsFileData = app.getFileData(itsFileName);
         if (itsFileData == null) {
+            // TODO: what if user hits back button when password dialog shown
             showDialog(DIALOG_GET_PASSWD);
         } else {
             showFileData();
