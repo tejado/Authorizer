@@ -101,8 +101,8 @@ public class RecordView extends Activity
                                     ContextMenuInfo menuInfo)
     {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Password");
-        menu.add(0, ID_COPY_CLIPBOARD, 0, "Copy to Clipboard");
+        menu.setHeaderTitle(R.string.password);
+        menu.add(0, ID_COPY_CLIPBOARD, 0, R.string.copy_clipboard);
     }
 
     private final void setText(int id, String text)

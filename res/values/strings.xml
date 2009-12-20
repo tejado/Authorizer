@@ -2,4 +2,6 @@
 <resources>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">Passwd Safe</string>
+    <string name="copy_clipboard">Copy to Clipboard</string>
+    <string name="password">Password</string>
 </resources>
