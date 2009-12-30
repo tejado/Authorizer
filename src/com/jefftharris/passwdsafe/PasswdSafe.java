@@ -88,6 +88,7 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
+        removeDialog(DIALOG_GET_PASSWD);
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState state:" + outState);
     }
@@ -115,8 +116,7 @@ public class PasswdSafe extends ExpandableListActivity {
                 .setPositiveButton("Ok",
                                    new DialogInterface.OnClickListener()
                 {
-                    public void onClick(DialogInterface dialog,
-                                        int which)
+                    public void onClick(DialogInterface dialog, int which)
                     {
                         EditText passwdInput = (EditText) passwdView
                             .findViewById(R.id.passwd_edit);
@@ -127,11 +127,16 @@ public class PasswdSafe extends ExpandableListActivity {
                 .setNegativeButton("Cancel",
                                    new DialogInterface.OnClickListener()
                 {
-                    public void onClick(DialogInterface dialog,
-                                        int which)
+                    public void onClick(DialogInterface dialog, int which)
                     {
-                        PasswdSafe.this.removeDialog(DIALOG_GET_PASSWD);
-                        PasswdSafe.this.finish();
+                        cancelFileOpen();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener()
+                {
+                    public void onCancel(DialogInterface dialog)
+                    {
+                        cancelFileOpen();
                     }
                 });
             dialog = alert.create();
@@ -204,6 +209,12 @@ public class PasswdSafe extends ExpandableListActivity {
                                             new int[] { android.R.id.text1 });
         setListAdapter(adapter);
         Log.i(TAG, "adapter set");
+    }
+
+    private final void cancelFileOpen()
+    {
+        removeDialog(DIALOG_GET_PASSWD);
+        finish();
     }
 
     private static final class LoadFileThread extends Thread
