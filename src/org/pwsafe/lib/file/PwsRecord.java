@@ -1,6 +1,6 @@
 /*
  * $Id: PwsRecord.java 400 2009-09-07 21:37:16Z roxon $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -44,13 +44,13 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  * file3.add( (PwsRecord) rec.clone() );</pre>
  * </tt>
  * </p>
- * 
+ *
  * @author Kevin Preece
  */
 public abstract class PwsRecord implements Comparable<Object>, Serializable, Cloneable {
 
 	/**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -87,9 +87,9 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 		/**
 		 * Reads a single item of data from the file.
-		 * 
+		 *
 		 * @param file the file the data should be read from.
-		 * 
+		 *
 		 * @throws EndOfFileException
 		 * @throws IOException
 		 */
@@ -99,13 +99,13 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 			//type	= Util.getIntFromByteArray( RawData, 4 );
 			type = rawData[4] & 0x000000ff; // rest of header is now random data
 			data	= PwsFile.allocateBuffer( length );
-			
+
 			file.readDecryptedBytes( data );
 		}
 
 		/**
 		 * Gets this items data as an array of bytes.
-		 * 
+		 *
 		 * @return This items data as an array of bytes.
 		 */
 		public byte[] getByteData() {
@@ -119,7 +119,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 		 * Gets this items data as a <code>String</code>. The byte array is
 		 * converted to a <code>String</code> using <code>DEFAULT_CHARSET</code>
 		 * as the encoding.
-		 * 
+		 *
 		 * @return The item data as a <code>String</code>.
 		 */
 		public String getData() {
@@ -141,7 +141,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 		/**
 		 * Returns this items type. For V1 files this will always be zero.
-		 * 
+		 *
 		 * @return This items type.
 		 */
 		public int getType() {
@@ -151,7 +151,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 		/**
 		 * Returns details about this field as a <code>String</code> suitable
 		 * for debugging.
-		 * 
+		 *
 		 * @return A <code>String</code> representation of this object.
 		 */
 		@Override
@@ -171,7 +171,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Simple constructor. Used when creating a new record to add to a file.
-	 * 
+	 *
 	 * @param validTypes
 	 *            an array of valid field types.
 	 */
@@ -183,13 +183,13 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * This constructor is called when a record is to be read from the database.
-	 * 
+	 *
 	 * @param owner
 	 *            the file that data is to be read from and which "owns" this
 	 *            record.
 	 * @param validTypes
 	 *            an array of valid field types.
-	 * 
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 */
@@ -206,7 +206,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Special constructor for use when ignoring field types.
-	 * 
+	 *
 	 * @param owner
 	 *            the file that data is to be read from and which "owns" this
 	 *            record.
@@ -214,7 +214,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 *            an array of valid field types.
 	 * @param ignoreFieldTypes
 	 *            true if all fields types should be ignored, false otherwise
-	 * 
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 */
@@ -232,7 +232,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	}
 
 	/**
-	 * 
+	 *
 	 * @param base
 	 */
 	PwsRecord(PwsRecord base) {
@@ -251,9 +251,9 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Returns a clone of this record that is a deep copy of it.
-	 * 
+	 *
 	 * @return A clone of this record.
-	 * 
+	 *
 	 */
 	@Override
 	public abstract Object clone();
@@ -263,14 +263,14 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 * if this record is "less than" <code>other</code>, zero if they are
 	 * "equal", or greater than zero if this record is "greater than"
 	 * <code>other</code>.
-	 * 
+	 *
 	 * @param other
 	 *            the record to compare this record to.
-	 * 
+	 *
 	 * @return A value &lt; zero if this record is "less than"
 	 *         <code>other</code>, zero if they're equal and &gt; zero if this
 	 *         record is "greater than" <code>other</code>.
-	 * 
+	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public abstract int compareTo(Object other);
@@ -278,10 +278,10 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	/**
 	 * Compares this record to another returning <code>true</code> if they're
 	 * equal and <code>false</code> if they're unequal.
-	 * 
+	 *
 	 * @param other
 	 *            the record this one is compared to.
-	 * 
+	 *
 	 * @return <code>true</code> if the records are equal, <code>false</code> if
 	 *         they're unequal.
 	 */
@@ -291,17 +291,17 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	/**
 	 * Validates the record, returning <code>true</code> if it's valid or
 	 * <code>false</code> if unequal.
-	 * 
+	 *
 	 * @return <code>true</code> if it's valid or <code>false</code> if unequal.
 	 */
 	protected abstract boolean isValid();
 
 	/**
 	 * Loads this record from <code>file</code>.
-	 * 
+	 *
 	 * @param file
 	 *            the file to load the record from.
-	 * 
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 */
@@ -310,10 +310,10 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Saves this record to <code>file</code>.
-	 * 
+	 *
 	 * @param file
 	 *            the file to save the record to.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	protected abstract void saveRecord(PwsFile file) throws IOException;
@@ -323,7 +323,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	/**
 	 * Provide subclasses a means to handle unknown field values not included in
 	 * ValidTypes. Used by PWSRecordV3. Defaults to false.
-	 * 
+	 *
 	 * @return false
 	 */
 	protected boolean allowUnknownFieldTypes() {
@@ -336,21 +336,21 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Wipes any information from memory.
-	 * 
+	 *
 	 */
 	public void dispose () {
 		for (PwsField field : attributes.values()) {
 			field.dispose ();
 		}
 	}
-	
+
 	/**
 	 * Gets the value of a field. See the subclass documentation for valid
 	 * values for <code>type</code>.
-	 * 
+	 *
 	 * @param aType
 	 *            the field to get.
-	 * 
+	 *
 	 * @return The value of the field.
 	 */
 	public PwsField getField(PwsFieldType aType) {
@@ -360,9 +360,9 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	/**
 	 * Gets the value of a field. See the subclass documentation for valid
 	 * values for <code>type</code>.
-	 * 
+	 *
 	 * @param aType the field to get.
-	 * 
+	 *
 	 * @return The value of the field.
 	 */
 	public PwsField getField(int aType) {
@@ -372,10 +372,10 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	/**
 	 * Gets the value of a field. See the subclass documentation for valid
 	 * values for <code>type</code>.
-	 * 
+	 *
 	 * @param aType
 	 *            the field to get.
-	 * 
+	 *
 	 * @return The value of the field.
 	 */
 	public PwsField getField(Integer aType) {
@@ -387,7 +387,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 * the values) that have been stored. Use one of the <code>getField</code>
 	 * methods to get the value. The iterators <code>next()</code> method
 	 * returns an <code>Integer</code>
-	 * 
+	 *
 	 * @return An <code>Iterator</code> over the stored field codes.
 	 */
 	public Iterator<Integer> getFields() {
@@ -397,7 +397,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	/**
 	 * Returns <code>true</code> if the record has been modified or
 	 * <code>false</code> if not.
-	 * 
+	 *
 	 * @return <code>true</code> if the record has been modified or
 	 *         <code>false</code> if not.
 	 */
@@ -407,11 +407,11 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Read a record from the given file.
-	 * 
+	 *
 	 * @param file the file to read the record from.
-	 * 
+	 *
 	 * @return The record that was read.
-	 * 
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
@@ -440,7 +440,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Sets a field on this record from <code>item</code>.
-	 * 
+	 *
 	 * @param item
 	 *            the <code>Item</code> containg the field's data.
 	 */
@@ -450,10 +450,10 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Sets a field on this record from <code>value</code>.
-	 * 
+	 *
 	 * @param value
 	 *            the field to set
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 *             if value is not the correct type for the file.
 	 */
@@ -462,7 +462,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 		theType = value.getType();
 		// try a shortcut first
-		if (theType < ValidTypes.length) { 
+		if (theType < ValidTypes.length) {
 			if (((Integer) ((Object[]) ValidTypes[theType])[0]).intValue() == theType) {
 				Class<? extends PwsField> cl = value.getClass();
 
@@ -491,7 +491,9 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 		}
 		// before giving up, check if unknown fields are allowed
 		if (allowUnknownFieldTypes()) {
-			LOG.warn("Adding unknown field of type " + theType  + " - maybe a new version is needed?");
+			LOG.warn("Adding unknown field of type " + theType  +
+			         ", class " + value.getClass() +
+			         " - maybe a new version is needed?");
 			attributes.put (Integer.valueOf(theType), value);
 			setModified();
 			return;
@@ -514,11 +516,11 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Writes a single field to the file.
-	 * 
+	 *
 	 * @param file  the file to write the field to.
 	 * @param field the field to be written.
-	 * @param aType  the type to write to the file instead of <code>field.getType()</code> 
-	 * 
+	 * @param aType  the type to write to the file instead of <code>field.getType()</code>
+	 *
 	 * @throws IOException
 	 */
 	protected void writeField(PwsFile file, PwsField field, int aType)
@@ -542,10 +544,10 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	/**
 	 * Writes a single field to the file.
-	 * 
+	 *
 	 * @param file  the file to write the field to.
 	 * @param field the field to be written.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	protected void writeField(PwsFile file, PwsField field) throws IOException {

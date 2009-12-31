@@ -122,6 +122,16 @@ public class PwsRecordV3 extends PwsRecord
 	public static final int  		PASSWORD_EXPIRY_INTERVAL = 17;
 
 	/**
+	 * Unknown 18
+	 */
+	public static final int UNKNOWN18 = 18;
+
+    /**
+     * Unknown 19
+     */
+    public static final int UNKNOWN19 = 19;
+
+	/**
 	 * Email
 	 */
 	public static final int EMAIL = 20;
@@ -154,6 +164,9 @@ public class PwsRecordV3 extends PwsRecord
 		new Object [] { Integer.valueOf(PASSWORD_HISTORY),	"PASSWORD_HISTORY",		PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(PASSWORD_POLICY),	"PASSWORD_POLICY",		PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(PASSWORD_EXPIRY_INTERVAL),	"PASSWORD_EXPIRY_INTERVAL",		PwsStringUnicodeField.class },
+        new Object [] { Integer.valueOf(UNKNOWN18),         "UNKNOWN18",            PwsStringUnicodeField.class },
+        new Object [] { Integer.valueOf(UNKNOWN19),         "UNKNOWN19",            PwsStringUnicodeField.class },
+        new Object [] { Integer.valueOf(EMAIL),             "EMAIL",                PwsStringUnicodeField.class },
 	};
 
 
@@ -417,6 +430,7 @@ public class PwsRecordV3 extends PwsRecord
 					case PASSWORD_HISTORY :
 					case URL :
 					case AUTOTYPE :
+					case EMAIL :
 						itemVal	= new PwsStringUnicodeField( item.getType(), item.getByteData() );
 						break;
 

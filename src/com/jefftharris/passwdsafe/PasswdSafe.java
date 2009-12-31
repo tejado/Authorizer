@@ -9,9 +9,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,11 +23,13 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final String TAG = "PasswdSafe";
 
     private static final int DIALOG_GET_PASSWD = 0;
+    private static final int DIALOG_PROGRESS = 1;
 
     public static final String INTENT = "com.jefftharris.passwdsafe.action.VIEW";
 
     private String itsFileName;
     private PasswdFileData itsFileData;
+    private LoadTask itsLoadTask;
 
     /** Called when the activity is first created. */
     @Override
@@ -42,7 +43,6 @@ public class PasswdSafe extends ExpandableListActivity {
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         itsFileData = app.getFileData(itsFileName);
         if (itsFileData == null) {
-            // TODO: what if user hits back button when password dialog shown
             showDialog(DIALOG_GET_PASSWD);
         } else {
             showFileData();
@@ -69,7 +69,8 @@ public class PasswdSafe extends ExpandableListActivity {
         super.onPause();
 
         removeDialog(DIALOG_GET_PASSWD);
-        // TODO: what if interrupted while loading data??
+        if (itsLoadTask != null)
+            itsLoadTask.cancel(true);
     }
 
     /* (non-Javadoc)
@@ -89,6 +90,7 @@ public class PasswdSafe extends ExpandableListActivity {
     protected void onSaveInstanceState(Bundle outState)
     {
         removeDialog(DIALOG_GET_PASSWD);
+        removeDialog(DIALOG_PROGRESS);
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState state:" + outState);
     }
@@ -120,8 +122,8 @@ public class PasswdSafe extends ExpandableListActivity {
                     {
                         EditText passwdInput = (EditText) passwdView
                             .findViewById(R.id.passwd_edit);
-                        PasswdSafe.this.removeDialog(DIALOG_GET_PASSWD);
-                        openFile(passwdInput.getText().toString());
+                        openFile(
+                            new StringBuilder(passwdInput.getText().toString()));
                     }
                 })
                 .setNegativeButton("Cancel",
@@ -140,6 +142,14 @@ public class PasswdSafe extends ExpandableListActivity {
                     }
                 });
             dialog = alert.create();
+            break;
+        }
+        case DIALOG_PROGRESS:
+        {
+            ProgressDialog dlg = new ProgressDialog(this);
+            dlg.setMessage("Loading...");
+            dlg.setIndeterminate(true);
+            dialog = dlg;
             break;
         }
         }
@@ -168,31 +178,12 @@ public class PasswdSafe extends ExpandableListActivity {
         return true;
     }
 
-    private void openFile(String passwd)
+    private void openFile(StringBuilder passwd)
     {
-        final ProgressDialog progress =
-            ProgressDialog.show(this, "", "Loading...", true);
-
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                progress.dismiss();
-                if (msg.what == LoadFileThread.RESULT_DATA) {
-                    itsFileData = (PasswdFileData)msg.obj;
-                    PasswdSafeApp app = (PasswdSafeApp)getApplication();
-                    app.setFileData(itsFileData);
-                    showFileData();
-                } else {
-                    Exception e = (Exception)msg.obj;
-                    PasswdSafeApp.showFatalMsg(e.toString(), PasswdSafe.this);
-                }
-            }
-        };
-
-        LoadFileThread thr = new LoadFileThread(itsFileName,
-                                                new StringBuilder(passwd),
-                                                handler);
-        thr.start();
+        removeDialog(DIALOG_GET_PASSWD);
+        showDialog(DIALOG_PROGRESS);
+        itsLoadTask = new LoadTask(passwd);
+        itsLoadTask.execute();
     }
 
     private void showFileData()
@@ -213,47 +204,67 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private final void cancelFileOpen()
     {
+        removeDialog(DIALOG_PROGRESS);
         removeDialog(DIALOG_GET_PASSWD);
         finish();
     }
 
-    private static final class LoadFileThread extends Thread
+
+    private final class LoadTask extends AsyncTask<Void, Void, Object>
     {
-        private final String itsFile;
-        private StringBuilder itsPasswd;
-        private final Handler itsMsgHandler;
+        private final StringBuilder itsPasswd;
 
-        public static final int RESULT_DATA = 0;
-        public static final int RESULT_EXCEPTION = 1;
-
-        public LoadFileThread(String file,
-                              StringBuilder passwd,
-                              Handler msgHandler) {
-            itsFile = file;
+        private LoadTask(StringBuilder passwd)
+        {
             itsPasswd = passwd;
-            itsMsgHandler = msgHandler;
         }
 
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
         @Override
-        public void run() {
-            PasswdFileData data = null;
-            Exception resultException = null;
+        protected Object doInBackground(Void... params)
+        {
             try {
-                // TODO: on pause, close file, clear password, etc.
-                data = new PasswdFileData(itsFile, itsPasswd);
+                return new PasswdFileData(itsFileName, itsPasswd);
             } catch (Exception e) {
-                Log.e(TAG, "Exception", e);
-                resultException = e;
+                return e;
             }
+        }
 
-            Message msg;
-            if (data != null) {
-                msg = Message.obtain(itsMsgHandler, RESULT_DATA, data);
-            } else {
-                msg = Message.obtain(itsMsgHandler, RESULT_EXCEPTION,
-                                     resultException);
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onCancelled()
+         */
+        @Override
+        protected void onCancelled()
+        {
+            Log.i(TAG, "LoadTask cancelled");
+            itsLoadTask = null;
+            cancelFileOpen();
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Object result)
+        {
+            if (isCancelled()) {
+                onCancelled();
+                return;
             }
-            itsMsgHandler.sendMessage(msg);
+            Log.i(TAG, "LoadTask post execute");
+            dismissDialog(DIALOG_PROGRESS);
+            itsLoadTask = null;
+            if (result instanceof PasswdFileData) {
+                itsFileData = (PasswdFileData)result;
+                PasswdSafeApp app = (PasswdSafeApp)getApplication();
+                app.setFileData(itsFileData);
+                showFileData();
+            } else if (result instanceof Exception) {
+                Exception e = (Exception)result;
+                PasswdSafeApp.showFatalMsg(e.toString(), PasswdSafe.this);
+            }
         }
     }
 }
