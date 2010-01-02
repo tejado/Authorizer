@@ -14,7 +14,7 @@ public class BCProvider extends Provider
     private static final long serialVersionUID = 1L;
 
     public BCProvider() {
-        super("BC", 1.00, "foobar");
+        super("BC", 1.00, "Replacement BC provider with Blowfish");
 
         put("Cipher.BLOWFISH",
             "org.bouncycastle.jce.provider.JCEBlockCipher$Blowfish");
