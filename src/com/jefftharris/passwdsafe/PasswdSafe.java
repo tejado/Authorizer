@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.IOException;
+
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.AlertDialog;
@@ -270,7 +272,13 @@ public class PasswdSafe extends ExpandableListActivity {
                 showFileData();
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
-                PasswdSafeApp.showFatalMsg(e.toString(), PasswdSafe.this);
+                String str;
+                if ((e instanceof IOException) &&
+                                (e.getMessage().equals("Invalid password")))
+                    str = e.getMessage();
+                else
+                    str = e.toString();
+                PasswdSafeApp.showFatalMsg(str, PasswdSafe.this);
             }
         }
     }
