@@ -85,6 +85,11 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.GROUP);
     }
 
+    public final String getNotes(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.NOTES);
+    }
+
     public final String getPassword(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.PASSWORD);

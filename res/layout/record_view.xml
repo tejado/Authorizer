@@ -1,6 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
-              android:id="@+id/LinearLayout01"
+              android:id="@+id/record_view"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
               
@@ -15,57 +15,73 @@
           android:layout_height="2dip"
           android:background="#FF909090"/>
               
-    <TableLayout android:layout_width="fill_parent"
-                 android:layout_height="fill_parent"
-                 android:stretchColumns="1"
-                 >
-        <TableRow>
-            <TextView android:text="Group:"
-                      android:padding="3dip"/>
-            <TextView android:id="@+id/group"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:padding="3dip"/>
-        </TableRow>
-
-        <TableRow>
-            <TextView android:text="URL:"
-                      android:padding="3dip"/>
-            <TextView android:id="@+id/url"
-                      android:autoLink="web"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:padding="3dip"/>
-        </TableRow>
-
-        <TableRow>
-            <TextView android:text="Email:"
-                      android:padding="3dip"/>
-            <TextView android:id="@+id/email"
-                      android:autoLink="email"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:padding="3dip"/>
-        </TableRow>
-
-        <TableRow>
-            <TextView android:text="User name:"
-                      android:padding="3dip"/>
-            <TextView android:id="@+id/user"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:padding="3dip"/>
-        </TableRow>
-
-        <TableRow>
-            <TextView android:text="Password:"
-                      android:padding="3dip"/>
-            <TextView android:id="@+id/password"
-                      android:text="*****"
-                      android:clickable="true"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:padding="3dip"/>
-        </TableRow>
-    </TableLayout>                                 
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+      
+        <TableLayout android:layout_width="fill_parent"
+                     android:layout_height="fill_parent"
+                     android:stretchColumns="1"
+                     android:shrinkColumns="1"
+                     >
+            <TableRow>
+                <TextView android:text="Group:"
+                          android:padding="3dip"/>
+                <TextView android:id="@+id/group"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow>
+                <TextView android:text="URL:"
+                          android:padding="3dip"/>
+                <TextView android:id="@+id/url"
+                          android:autoLink="web"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow>
+                <TextView android:text="Email:"
+                          android:padding="3dip"/>
+                <TextView android:id="@+id/email"
+                          android:autoLink="email"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow>
+                <TextView android:text="User name:"
+                          android:padding="3dip"/>
+                <TextView android:id="@+id/user"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow>
+                <TextView android:text="Password:"
+                          android:padding="3dip"/>
+                <TextView android:id="@+id/password"
+                          android:text="*****"
+                          android:clickable="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow>
+                <TextView android:text="Notes:"
+                          android:padding="3dip"/>
+                <TextView android:id="@+id/notes"
+                          android:autoLink="all"
+                          android:clickable="false"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+        </TableLayout>       
+    </ScrollView>                          
 </LinearLayout>

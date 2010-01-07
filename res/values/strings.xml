@@ -3,5 +3,10 @@
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">Passwd Safe</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
+    <string name="copy_notes">Copy Notes</string>
+    <string name="copy_password">Copy Password</string>
+    <string name="hide_password">Hide Password</string>
     <string name="password">Password</string>
+    <string name="show_password">Show Password</string>
+    <string name="toggle_word_wrap">Toggle Word Wrap</string>
 </resources>
