@@ -195,7 +195,8 @@ public class FileList extends ListActivity implements OnClickListener
 
         File[] files = dir.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String filename) {
-                return filename.endsWith(".psafe3");
+                return filename.endsWith(".psafe3") ||
+                    filename.endsWith(".dat");
             }
         });
         FileData[] data;
