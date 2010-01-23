@@ -27,8 +27,6 @@ import org.pwsafe.lib.file.PwsFileV3;
 import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV3;
 
-import android.util.Log;
-
 public class PasswdFileData
 {
     public String itsFileName;
@@ -142,11 +140,11 @@ public class PasswdFileData
             EndOfFileException, InvalidPassphraseException,
             UnsupportedFileVersionException
     {
-        Log.i(TAG, "before load file");
+        PasswdSafeApp.dbginfo(TAG, "before load file");
         itsPwsFile = PwsFileFactory.loadFile(itsFileName, passwd);
         passwd.delete(0, passwd.length());
         passwd = null;
-        Log.i(TAG, "after load file");
+        PasswdSafeApp.dbginfo(TAG, "after load file");
 
         TreeMap<String, ArrayList<PwsRecord>> recsByGroup =
             new TreeMap<String, ArrayList<PwsRecord>>();
@@ -164,12 +162,11 @@ public class PasswdFileData
             String uuid = getUUID(rec);
             itsRecordsByUUID.put(uuid, rec);
         }
-        Log.i(TAG, "groups sorted");
+        PasswdSafeApp.dbginfo(TAG, "groups sorted");
 
         RecordMapComparator comp = new RecordMapComparator();
         for (Map.Entry<String, ArrayList<PwsRecord>> entry :
                 recsByGroup.entrySet()) {
-            Log.i(TAG, "process group:" + entry.getKey());
             Map<String, String> groupInfo =
                 Collections.singletonMap(GROUP, entry.getKey());
             itsGroupData.add(groupInfo);
@@ -186,7 +183,7 @@ public class PasswdFileData
             Collections.sort(children, comp);
             itsChildData.add(children);
         }
-        Log.i(TAG, "file loaded");
+        PasswdSafeApp.dbginfo(TAG, "file loaded");
     }
 
     static final class RecordMapComparator implements

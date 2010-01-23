@@ -20,7 +20,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -44,7 +43,7 @@ public class PasswdSafe extends ExpandableListActivity {
     {
         super.onCreate(savedInstanceState);
 
-        Log.i(TAG, "onCreate intent:" + getIntent());
+        PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + getIntent());
         itsFileName = getIntent().getData().getPath();
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
@@ -62,7 +61,7 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     protected void onDestroy()
     {
-        Log.i(TAG, "onDestroy");
+        PasswdSafeApp.dbginfo(TAG, "onDestroy");
         super.onDestroy();
     }
 
@@ -241,7 +240,7 @@ public class PasswdSafe extends ExpandableListActivity {
         @Override
         protected void onCancelled()
         {
-            Log.i(TAG, "LoadTask cancelled");
+            PasswdSafeApp.dbginfo(TAG, "LoadTask cancelled");
             itsLoadTask = null;
             cancelFileOpen();
         }
@@ -256,7 +255,7 @@ public class PasswdSafe extends ExpandableListActivity {
                 onCancelled();
                 return;
             }
-            Log.i(TAG, "LoadTask post execute");
+            PasswdSafeApp.dbginfo(TAG, "LoadTask post execute");
             dismissDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {

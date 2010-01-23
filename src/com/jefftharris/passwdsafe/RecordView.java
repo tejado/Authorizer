@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.ClipboardManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,7 +48,7 @@ public class RecordView extends Activity
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        Log.i(TAG, "onCreate intent:" + getIntent());
+        PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + getIntent());
 
         String fileName = intent.getData().getPath();
         String uuid = intent.getData().getQueryParameter("rec");
