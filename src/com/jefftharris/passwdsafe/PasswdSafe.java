@@ -34,8 +34,6 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
 
-    public static final String INTENT = "com.jefftharris.passwdsafe.action.VIEW";
-
     private String itsFileName;
     private PasswdFileData itsFileData;
     private LoadTask itsLoadTask;
@@ -50,7 +48,7 @@ public class PasswdSafe extends ExpandableListActivity {
         itsFileName = getIntent().getData().getPath();
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsFileData = app.getFileData(itsFileName);
+        itsFileData = app.getFileData(itsFileName, this);
         if (itsFileData == null) {
             showDialog(DIALOG_GET_PASSWD);
         } else {
@@ -268,7 +266,7 @@ public class PasswdSafe extends ExpandableListActivity {
             if (result instanceof PasswdFileData) {
                 itsFileData = (PasswdFileData)result;
                 PasswdSafeApp app = (PasswdSafeApp)getApplication();
-                app.setFileData(itsFileData);
+                app.setFileData(itsFileData, PasswdSafe.this);
                 showFileData();
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;

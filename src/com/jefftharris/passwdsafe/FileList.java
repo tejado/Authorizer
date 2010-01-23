@@ -59,7 +59,7 @@ public class FileList extends ListActivity implements OnClickListener
         dirBtn.setOnClickListener(this);
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        app.setFileData(null);
+        app.setFileData(null, null);
 
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         itsCurrDirName =
@@ -76,7 +76,7 @@ public class FileList extends ListActivity implements OnClickListener
     {
         super.onResume();
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        app.setFileData(null);
+        app.setFileData(null, null);
     }
 
     /* (non-Javadoc)
@@ -88,7 +88,7 @@ public class FileList extends ListActivity implements OnClickListener
         FileData file = (FileData) l.getItemAtPosition(position);
         Log.d(TAG, "Open file: " + file.itsFile);
 
-        startActivity(new Intent(PasswdSafe.INTENT,
+        startActivity(new Intent(PasswdSafeApp.VIEW_INTENT,
                                  Uri.fromFile(file.itsFile)));
     }
 

@@ -53,7 +53,7 @@ public class RecordView extends Activity
         String uuid = intent.getData().getQueryParameter("rec");
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        PasswdFileData fileData = app.getFileData(fileName);
+        PasswdFileData fileData = app.getFileData(fileName, this);
         if (fileData == null) {
             PasswdSafeApp.showFatalMsg("File not open: " + fileName, this);
             return;
