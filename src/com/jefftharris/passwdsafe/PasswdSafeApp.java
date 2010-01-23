@@ -149,7 +149,7 @@ public class PasswdSafeApp extends Application
                                            new Intent(FILE_TIMEOUT_INTENT), 0);
             dbginfo(TAG, "register adding timer");
             itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
-                            SystemClock.elapsedRealtime() + 30*1000,
+                            SystemClock.elapsedRealtime() + 300*1000,
                             itsCloseIntent);
         }
     }
