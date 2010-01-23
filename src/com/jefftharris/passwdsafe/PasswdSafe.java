@@ -35,21 +35,21 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final int DIALOG_PROGRESS = 1;
 
     private String itsFileName;
-    private PasswdFileData itsFileData;
+    private ActivityPasswdFile itsFile;
     private LoadTask itsLoadTask;
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
-        Log.i(TAG, "onCreate bundle:" + savedInstanceState + ", intent:" +
-              getIntent());
+        Log.i(TAG, "onCreate intent:" + getIntent());
         itsFileName = getIntent().getData().getPath();
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsFileData = app.getFileData(itsFileName, this);
-        if (itsFileData == null) {
+        itsFile = app.accessPasswdFile(itsFileName, this);
+        if (!itsFile.isOpen()) {
             showDialog(DIALOG_GET_PASSWD);
         } else {
             showFileData();
@@ -72,7 +72,6 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     protected void onPause()
     {
-        Log.i(TAG, "onPause");
         super.onPause();
 
         removeDialog(DIALOG_GET_PASSWD);
@@ -86,8 +85,8 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     protected void onResume()
     {
-        Log.i(TAG, "onResume");
         super.onResume();
+        itsFile.touch();
     }
 
     /* (non-Javadoc)
@@ -99,7 +98,6 @@ public class PasswdSafe extends ExpandableListActivity {
         removeDialog(DIALOG_GET_PASSWD);
         removeDialog(DIALOG_PROGRESS);
         super.onSaveInstanceState(outState);
-        Log.i(TAG, "onSaveInstanceState state:" + outState);
     }
 
     /* (non-Javadoc)
@@ -108,7 +106,6 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     protected Dialog onCreateDialog(int id)
     {
-        Log.i(TAG, "onCreateDialog id:" + id);
         Dialog dialog = null;
         switch (id) {
         case DIALOG_GET_PASSWD:
@@ -173,12 +170,11 @@ public class PasswdSafe extends ExpandableListActivity {
                                 int childPosition,
                                 long id)
     {
-        PwsRecord rec = itsFileData.getRecord(groupPosition, childPosition);
-        Log.i(TAG, "selected child:" + itsFileData.getTitle(rec));
+        PasswdFileData fileData = itsFile.getFileData();
+        PwsRecord rec = fileData.getRecord(groupPosition, childPosition);
 
         Uri.Builder builder = getIntent().getData().buildUpon();
-        builder.appendQueryParameter("rec",
-                                     itsFileData.getUUID(rec).toString());
+        builder.appendQueryParameter("rec", fileData.getUUID(rec).toString());
         Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
                                    this, RecordView.class);
         startActivity(intent);
@@ -195,18 +191,18 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private void showFileData()
     {
+        PasswdFileData fileData = itsFile.getFileData();
         ExpandableListAdapter adapter =
             new SimpleExpandableListAdapter(PasswdSafe.this,
-                                            itsFileData.itsGroupData,
+                                            fileData.itsGroupData,
                                             android.R.layout.simple_expandable_list_item_1,
                                             new String[] { PasswdFileData.GROUP },
                                             new int[] { android.R.id.text1 },
-                                            itsFileData.itsChildData,
+                                            fileData.itsChildData,
                                             android.R.layout.simple_expandable_list_item_1,
                                             new String[] { PasswdFileData.TITLE },
                                             new int[] { android.R.id.text1 });
         setListAdapter(adapter);
-        Log.i(TAG, "adapter set");
     }
 
     private final void cancelFileOpen()
@@ -264,9 +260,7 @@ public class PasswdSafe extends ExpandableListActivity {
             dismissDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {
-                itsFileData = (PasswdFileData)result;
-                PasswdSafeApp app = (PasswdSafeApp)getApplication();
-                app.setFileData(itsFileData, PasswdSafe.this);
+                itsFile.setFileData((PasswdFileData)result);
                 showFileData();
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;

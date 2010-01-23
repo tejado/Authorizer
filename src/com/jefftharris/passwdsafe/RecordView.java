@@ -37,13 +37,15 @@ public class RecordView extends Activity
     private static final int MENU_COPY_NOTES = 3;
     private static final int MENU_TOGGLE_WRAP_NOTES = 4;
 
+    private ActivityPasswdFile itsFile;
     private boolean isPasswordShown = false;
     private String itsPassword = null;
     private boolean isWordWrap = true;
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
@@ -53,7 +55,8 @@ public class RecordView extends Activity
         String uuid = intent.getData().getQueryParameter("rec");
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        PasswdFileData fileData = app.getFileData(fileName, this);
+        itsFile = app.accessPasswdFile(fileName, this);
+        PasswdFileData fileData = itsFile.getFileData();
         if (fileData == null) {
             PasswdSafeApp.showFatalMsg("File not open: " + fileName, this);
             return;
@@ -92,6 +95,16 @@ public class RecordView extends Activity
         registerForContextMenu(passwordField);
 
         setWordWrap();
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onResume()
+     */
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        itsFile.touch();
     }
 
     /* (non-Javadoc)

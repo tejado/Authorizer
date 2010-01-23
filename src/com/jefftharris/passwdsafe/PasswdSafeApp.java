@@ -24,6 +24,32 @@ import android.util.Log;
 
 public class PasswdSafeApp extends Application
 {
+    public class AppActivityPasswdFile extends ActivityPasswdFile
+    {
+        public AppActivityPasswdFile(PasswdFileData fileData, Activity activity)
+        {
+            super(fileData, activity);
+        }
+
+        @Override
+        protected void doSetFileData(PasswdFileData fileData)
+        {
+            PasswdSafeApp.this.setFileData(fileData, itsActivity);
+        }
+
+        @Override
+        public void touch()
+        {
+            touchFileData(itsActivity);
+        }
+
+        @Override
+        protected void doClose()
+        {
+            PasswdSafeApp.this.setFileData(null, itsActivity);
+        }
+    }
+
     public static class FileTimeoutReceiver extends BroadcastReceiver
     {
         @Override
@@ -37,18 +63,21 @@ public class PasswdSafeApp extends Application
 
     public static final boolean DEBUG = false;
 
+    public static final String VIEW_INTENT =
+        "com.jefftharris.passwdsafe.action.VIEW";
+    public static final String FILE_TIMEOUT_INTENT =
+        "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
+
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
     private AlarmManager itsAlarmMgr;
     private PendingIntent itsCloseIntent;
 
-    public static final String VIEW_INTENT =
-        "com.jefftharris.passwdsafe.action.VIEW";
-    public static final String FILE_TIMEOUT_INTENT =
-        "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
-
+    private static final Intent FILE_TIMEOUT_INTENT_OBJ =
+        new Intent(FILE_TIMEOUT_INTENT);
     private static final String TAG = "PasswdSafeApp";
+    private static final int FILE_CLOSE_TIMEOUT = 300*1000;
 
     public PasswdSafeApp()
     {
@@ -74,27 +103,16 @@ public class PasswdSafeApp extends Application
         super.onTerminate();
     }
 
-    public synchronized PasswdFileData getFileData(String fileName,
-                                                   Activity activity)
+    public synchronized ActivityPasswdFile accessPasswdFile(String fileName,
+                                                            Activity activity)
     {
         if ((itsFileData == null) || (itsFileData.itsFileName == null) ||
             (!itsFileData.itsFileName.equals(fileName))) {
             closeFileData();
         }
 
-        dbginfo(TAG, "getFileData fileName:" + fileName +
-                ", data:" + itsFileData);
-        registerActivityForFileData(activity);
-
-        return itsFileData;
-    }
-
-    public synchronized void setFileData(PasswdFileData fileData,
-                                         Activity activity)
-    {
-        closeFileData();
-        itsFileData = fileData;
-        registerActivityForFileData(activity);
+        dbginfo(TAG, "access file name:" + fileName + ", data:" + itsFileData);
+        return new AppActivityPasswdFile(itsFileData, activity);
     }
 
     public static void showFatalMsg(String msg, final Activity activity)
@@ -116,7 +134,32 @@ public class PasswdSafeApp extends Application
             Log.i(tag, msg);
     }
 
-    private synchronized void closeFileData()
+    private synchronized final void touchFileData(Activity activity)
+    {
+        dbginfo(TAG, "touch activity:" + activity + ", data:" + itsFileData);
+        if (itsFileData != null) {
+            itsFileDataActivities.put(activity, null);
+            if (itsCloseIntent == null) {
+                itsCloseIntent =
+                    PendingIntent.getBroadcast(this, 0,
+                                               FILE_TIMEOUT_INTENT_OBJ, 0);
+            }
+            dbginfo(TAG, "register adding timer");
+            itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
+                            SystemClock.elapsedRealtime() + FILE_CLOSE_TIMEOUT,
+                            itsCloseIntent);
+        }
+    }
+
+    private synchronized final void setFileData(PasswdFileData fileData,
+                                                Activity activity)
+    {
+        closeFileData();
+        itsFileData = fileData;
+        touchFileData(activity);
+    }
+
+    private synchronized final void closeFileData()
     {
         dbginfo(TAG, "closeFileData data:" + itsFileData);
         if (itsFileData != null) {
@@ -134,23 +177,6 @@ public class PasswdSafeApp extends Application
         if (itsCloseIntent != null) {
             itsAlarmMgr.cancel(itsCloseIntent);
             itsCloseIntent = null;
-        }
-    }
-
-    private synchronized void registerActivityForFileData(Activity activity)
-    {
-        dbginfo(TAG, "register activity:" + activity + ", data:" + itsFileData);
-        if (itsFileData != null) {
-            itsFileDataActivities.put(activity, null);
-            if (itsCloseIntent != null)
-                itsAlarmMgr.cancel(itsCloseIntent);
-            itsCloseIntent =
-                PendingIntent.getBroadcast(this, 0,
-                                           new Intent(FILE_TIMEOUT_INTENT), 0);
-            dbginfo(TAG, "register adding timer");
-            itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
-                            SystemClock.elapsedRealtime() + 300*1000,
-                            itsCloseIntent);
         }
     }
 }
