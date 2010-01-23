@@ -21,7 +21,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -88,7 +87,7 @@ public class FileList extends ListActivity implements OnClickListener
     protected void onListItemClick(ListView l, View v, int position, long id)
     {
         FileData file = (FileData) l.getItemAtPosition(position);
-        Log.d(TAG, "Open file: " + file.itsFile);
+        PasswdSafeApp.dbginfo(TAG, "Open file: " + file.itsFile);
 
         startActivity(new Intent(PasswdSafeApp.VIEW_INTENT,
                                  Uri.fromFile(file.itsFile)));
