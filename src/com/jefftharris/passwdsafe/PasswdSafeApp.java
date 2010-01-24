@@ -19,7 +19,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Environment;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class PasswdSafeApp extends Application
@@ -68,6 +71,22 @@ public class PasswdSafeApp extends Application
     public static final String FILE_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
 
+    public static final String PREF_FILE_DIR = "fileDirPref";
+    public static final String PREF_FILE_DIR_DEF =
+        Environment.getExternalStorageDirectory().toString();
+
+    /*
+    public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
+    public static final String[] PREF_FILE_CLOSE_ENTRIES =
+    {
+        "None", "30 seconds", "5 minutes", "15 minutes", "1 hour"
+    };
+    public static final String[] PREF_FILE_CLOSE_ENTRY_VALUES =
+    {
+        "", "30", "300", "900", "3600"
+    };
+    */
+
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
@@ -91,6 +110,25 @@ public class PasswdSafeApp extends Application
     {
         super.onCreate();
         itsAlarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+
+        // Move the fileDirPref from the FileList class to the preferences
+        String dirPrefName = "dir";
+        SharedPreferences fileListPrefs = getSharedPreferences("FileList",
+                                                               MODE_PRIVATE);
+        if ((fileListPrefs != null) && fileListPrefs.contains(dirPrefName)) {
+            String dirPref = fileListPrefs.getString(dirPrefName, "");
+            dbginfo(TAG, "Moving dir pref \"" + dirPref + "\" to main");
+
+            SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+
+            SharedPreferences.Editor fileListEdit = fileListPrefs.edit();
+            SharedPreferences.Editor prefsEdit = prefs.edit();
+            fileListEdit.remove(dirPrefName);
+            prefsEdit.putString(PREF_FILE_DIR, dirPref);
+            fileListEdit.commit();
+            prefsEdit.commit();
+        }
     }
 
     /* (non-Javadoc)

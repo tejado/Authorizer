@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:key="top_prefs">
+    <EditTextPreference android:name="FileDir Pref"
+                        android:title="Directory for files"
+                        android:summary="/sdcard"
+                        android:defaultValue="/sdcard"
+                        android:key="fileDirPref"/>
+
+<!--
+    <ListPreference android:name="fileTimeout Pref"
+                    android:title="File close timeout"
+                    android:key="fileCloseTimeoutPref"/>
+-->
+</PreferenceScreen>
