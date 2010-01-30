@@ -26,6 +26,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class PasswdSafeApp extends Application
+    implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     public class AppActivityPasswdFile extends ActivityPasswdFile
     {
@@ -75,8 +76,8 @@ public class PasswdSafeApp extends Application
     public static final String PREF_FILE_DIR_DEF =
         Environment.getExternalStorageDirectory().toString();
 
-    /*
     public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
+    public static final String PREF_FILE_CLOSE_TIMEOUT_DEF = "300";
     public static final String[] PREF_FILE_CLOSE_ENTRIES =
     {
         "None", "30 seconds", "5 minutes", "15 minutes", "1 hour"
@@ -85,18 +86,17 @@ public class PasswdSafeApp extends Application
     {
         "", "30", "300", "900", "3600"
     };
-    */
 
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
     private AlarmManager itsAlarmMgr;
     private PendingIntent itsCloseIntent;
+    private int itsFileCloseTimeout = 300*1000;
 
     private static final Intent FILE_TIMEOUT_INTENT_OBJ =
         new Intent(FILE_TIMEOUT_INTENT);
     private static final String TAG = "PasswdSafeApp";
-    private static final int FILE_CLOSE_TIMEOUT = 300*1000;
 
     public PasswdSafeApp()
     {
@@ -111,6 +111,10 @@ public class PasswdSafeApp extends Application
         super.onCreate();
         itsAlarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
         // Move the fileDirPref from the FileList class to the preferences
         String dirPrefName = "dir";
         SharedPreferences fileListPrefs = getSharedPreferences("FileList",
@@ -119,9 +123,6 @@ public class PasswdSafeApp extends Application
             String dirPref = fileListPrefs.getString(dirPrefName, "");
             dbginfo(TAG, "Moving dir pref \"" + dirPref + "\" to main");
 
-            SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-
             SharedPreferences.Editor fileListEdit = fileListPrefs.edit();
             SharedPreferences.Editor prefsEdit = prefs.edit();
             fileListEdit.remove(dirPrefName);
@@ -129,6 +130,8 @@ public class PasswdSafeApp extends Application
             fileListEdit.commit();
             prefsEdit.commit();
         }
+
+        updateFileCloseTimeoutPref(prefs);
     }
 
     /* (non-Javadoc)
@@ -141,6 +144,18 @@ public class PasswdSafeApp extends Application
         super.onTerminate();
     }
 
+    /* (non-Javadoc)
+     * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
+     */
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                          String key)
+    {
+        dbginfo(TAG, "Preference change: " + key);
+        if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
+            updateFileCloseTimeoutPref(sharedPreferences);
+        }
+    }
+
     public synchronized ActivityPasswdFile accessPasswdFile(String fileName,
                                                             Activity activity)
     {
@@ -151,6 +166,12 @@ public class PasswdSafeApp extends Application
 
         dbginfo(TAG, "access file name:" + fileName + ", data:" + itsFileData);
         return new AppActivityPasswdFile(itsFileData, activity);
+    }
+
+    public static String getFileCloseTimeoutPref(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_FILE_CLOSE_TIMEOUT,
+                               PREF_FILE_CLOSE_TIMEOUT_DEF);
     }
 
     public static void showFatalMsg(String msg, final Activity activity)
@@ -172,11 +193,35 @@ public class PasswdSafeApp extends Application
             Log.i(tag, msg);
     }
 
-    private synchronized final void touchFileData(Activity activity)
+    private synchronized final
+    void updateFileCloseTimeoutPref(SharedPreferences prefs)
     {
-        dbginfo(TAG, "touch activity:" + activity + ", data:" + itsFileData);
-        if (itsFileData != null) {
-            itsFileDataActivities.put(activity, null);
+        String timeoutStr = getFileCloseTimeoutPref(prefs);
+        dbginfo(TAG, "new file close timeout: " + timeoutStr);
+        if (timeoutStr.length() == 0) {
+            cancelFileDataTimer();
+            itsFileCloseTimeout = 0;
+        } else {
+            try {
+                itsFileCloseTimeout = Integer.parseInt(timeoutStr) * 1000;
+                touchFileDataTimer();
+            } catch (NumberFormatException e) {
+            }
+        }
+    }
+
+    private synchronized final void cancelFileDataTimer()
+    {
+        if (itsCloseIntent != null) {
+            itsAlarmMgr.cancel(itsCloseIntent);
+            itsCloseIntent = null;
+        }
+    }
+
+    private synchronized final void touchFileDataTimer()
+    {
+        dbginfo(TAG, "touch timer timeout: " + itsFileCloseTimeout);
+        if ((itsFileData != null) && (itsFileCloseTimeout != 0)) {
             if (itsCloseIntent == null) {
                 itsCloseIntent =
                     PendingIntent.getBroadcast(this, 0,
@@ -184,8 +229,17 @@ public class PasswdSafeApp extends Application
             }
             dbginfo(TAG, "register adding timer");
             itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
-                            SystemClock.elapsedRealtime() + FILE_CLOSE_TIMEOUT,
+                            SystemClock.elapsedRealtime() + itsFileCloseTimeout,
                             itsCloseIntent);
+        }
+    }
+
+    private synchronized final void touchFileData(Activity activity)
+    {
+        dbginfo(TAG, "touch activity:" + activity + ", data:" + itsFileData);
+        if (itsFileData != null) {
+            itsFileDataActivities.put(activity, null);
+            touchFileDataTimer();
         }
     }
 
@@ -211,10 +265,6 @@ public class PasswdSafeApp extends Application
             entry.getKey().finish();
         }
         itsFileDataActivities.clear();
-
-        if (itsCloseIntent != null) {
-            itsAlarmMgr.cancel(itsCloseIntent);
-            itsCloseIntent = null;
-        }
+        cancelFileDataTimer();
     }
 }

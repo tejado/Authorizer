@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
@@ -20,7 +21,11 @@ import android.preference.PreferenceManager;
  * @author Jeff Harris
  */
 public class Preferences extends PreferenceActivity
+    implements SharedPreferences.OnSharedPreferenceChangeListener
 {
+    private Preference itsFileDirPref;
+    private ListPreference itsFileClosePref;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -30,28 +35,57 @@ public class Preferences extends PreferenceActivity
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
 
-        Preference pref = findPreference(PasswdSafeApp.PREF_FILE_DIR);
-        pref.setDefaultValue(PasswdSafeApp.PREF_FILE_DIR_DEF);
-        pref.setSummary(prefs.getString(PasswdSafeApp.PREF_FILE_DIR,
-                                        PasswdSafeApp.PREF_FILE_DIR_DEF));
-        pref.setOnPreferenceChangeListener(
-            new Preference.OnPreferenceChangeListener()
-        {
-            public boolean onPreferenceChange(Preference preference,
-                                              Object newValue)
-            {
-                // TODO jeff: reset to default on empty string??
-                preference.setSummary(newValue.toString());
-                return true;
-            }
-        });
+        itsFileDirPref = findPreference(PasswdSafeApp.PREF_FILE_DIR);
+        itsFileDirPref.setDefaultValue(PasswdSafeApp.PREF_FILE_DIR_DEF);
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_DIR);
 
-        /*
-        ListPreference listPref = (ListPreference)
+        itsFileClosePref = (ListPreference)
             findPreference(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
-        listPref.setEntries(PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES);
-        listPref.setEntryValues(PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES);
-        */
+        itsFileClosePref.setEntries(PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES);
+        itsFileClosePref.setEntryValues(
+            PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES);
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
+    }
+
+    /* (non-Javadoc)
+     * @see android.preference.PreferenceActivity#onDestroy()
+     */
+    @Override
+    protected void onDestroy()
+    {
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+        super.onDestroy();
+    }
+
+    /* (non-Javadoc)
+     * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
+     */
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    {
+        if (key.equals(PasswdSafeApp.PREF_FILE_DIR)) {
+            itsFileDirPref.setSummary(
+                prefs.getString(PasswdSafeApp.PREF_FILE_DIR,
+                                PasswdSafeApp.PREF_FILE_DIR_DEF));
+        } else if (key.equals(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT)) {
+            itsFileClosePref.setSummary(
+                fileCloseValueToEntry(
+                    PasswdSafeApp.getFileCloseTimeoutPref(prefs)));
+        }
+    }
+
+    private static String fileCloseValueToEntry(String value)
+    {
+        for (int i = 0;
+             i < PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES.length;
+             ++i) {
+            if (PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES[i].equals(value)) {
+                return PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES[i];
+            }
+        }
+        return "Unknown";
     }
 }

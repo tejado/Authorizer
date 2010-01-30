@@ -7,9 +7,7 @@
                         android:defaultValue="/sdcard"
                         android:key="fileDirPref"/>
 
-<!--
     <ListPreference android:name="fileTimeout Pref"
                     android:title="File close timeout"
                     android:key="fileCloseTimeoutPref"/>
--->
 </PreferenceScreen>
