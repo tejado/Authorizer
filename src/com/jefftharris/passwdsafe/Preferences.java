@@ -67,9 +67,16 @@ public class Preferences extends PreferenceActivity
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
         if (key.equals(PasswdSafeApp.PREF_FILE_DIR)) {
-            itsFileDirPref.setSummary(
-                prefs.getString(PasswdSafeApp.PREF_FILE_DIR,
-                                PasswdSafeApp.PREF_FILE_DIR_DEF));
+            String pref = prefs.getString(PasswdSafeApp.PREF_FILE_DIR,
+                                          PasswdSafeApp.PREF_FILE_DIR_DEF);
+            if (pref.length() == 0) {
+                pref = PasswdSafeApp.PREF_FILE_DIR_DEF;
+                SharedPreferences.Editor edit = prefs.edit();
+                edit.putString(PasswdSafeApp.PREF_FILE_DIR, pref);
+                edit.commit();
+            }
+
+            itsFileDirPref.setSummary(pref);
         } else if (key.equals(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT)) {
             itsFileClosePref.setSummary(
                 fileCloseValueToEntry(
