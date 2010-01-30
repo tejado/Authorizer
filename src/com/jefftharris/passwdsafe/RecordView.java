@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.File;
+
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.Activity;
@@ -50,14 +52,14 @@ public class RecordView extends Activity
         Intent intent = getIntent();
         PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + getIntent());
 
-        String fileName = intent.getData().getPath();
+        File file = new File(intent.getData().getPath());
         String uuid = intent.getData().getQueryParameter("rec");
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsFile = app.accessPasswdFile(fileName, this);
+        itsFile = app.accessPasswdFile(file, this);
         PasswdFileData fileData = itsFile.getFileData();
         if (fileData == null) {
-            PasswdSafeApp.showFatalMsg("File not open: " + fileName, this);
+            PasswdSafeApp.showFatalMsg("File not open: " + file, this);
             return;
         }
 

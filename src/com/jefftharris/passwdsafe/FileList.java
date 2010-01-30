@@ -37,6 +37,44 @@ public class FileList extends ListActivity
     private static final int MENU_PREFERENCES = 1;
 
     private TextView itsHeader;
+    private boolean isFirstResume = true;
+
+    public static final class FileData
+    {
+        public final File itsFile;
+        public FileData(File f)
+        {
+            itsFile = f;
+        }
+        @Override
+        public final String toString()
+        {
+            return itsFile.getName();
+        }
+    }
+
+    public static FileData[] getFiles(File dir)
+    {
+         File[] files = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String filename) {
+                return filename.endsWith(".psafe3") ||
+                    filename.endsWith(".dat");
+            }
+        });
+
+        FileData[] data;
+        if (files != null) {
+            Arrays.sort(files);
+            data = new FileData[files.length];
+            for (int i = 0; i < files.length; ++i) {
+                data[i] = new FileData(files[i]);
+            }
+        } else {
+            data = new FileData[0];
+        }
+
+        return data;
+    }
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -61,7 +99,23 @@ public class FileList extends ListActivity
         ActivityPasswdFile file = app.accessPasswdFile(null, this);
         file.close();
 
-        showFiles();
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        String dirName = PasswdSafeApp.getFileDirPref(prefs);
+        File dir = new File(dirName);
+        itsHeader.setText("Password files in " + dir);
+        FileData[] data = getFiles(dir);
+        setListAdapter(new ArrayAdapter<FileData>(
+                        this, android.R.layout.simple_list_item_1, data));
+
+        if (isFirstResume) {
+            isFirstResume = false;
+            String defFileName = PasswdSafeApp.getDefFilePref(prefs);
+            File defFile = new File(dir, defFileName);
+            if (defFile.isFile() && defFile.canRead()) {
+                openFile(defFile);
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -75,9 +129,7 @@ public class FileList extends ListActivity
             return;
         }
         PasswdSafeApp.dbginfo(TAG, "Open file: " + file.itsFile);
-
-        startActivity(new Intent(PasswdSafeApp.VIEW_INTENT,
-                                 Uri.fromFile(file.itsFile)));
+        openFile(file.itsFile);
     }
 
     /* (non-Javadoc)
@@ -93,49 +145,9 @@ public class FileList extends ListActivity
         return true;
     }
 
-    private void showFiles()
+    private final void openFile(File file)
     {
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        String dirName = prefs.getString(PasswdSafeApp.PREF_FILE_DIR,
-                                         PasswdSafeApp.PREF_FILE_DIR_DEF);
-        File dir = new File(dirName);
-        itsHeader.setText("Password files in " + dir);
-
-        File[] files = dir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                return filename.endsWith(".psafe3") ||
-                    filename.endsWith(".dat");
-            }
-        });
-        FileData[] data;
-        if (files != null) {
-            Arrays.sort(files);
-            data = new FileData[files.length];
-            for (int i = 0; i < files.length; ++i) {
-                data[i] = new FileData(files[i]);
-            }
-        } else {
-            data = new FileData[0];
-        }
-
-        setListAdapter(new ArrayAdapter<FileData>(
-                        this, android.R.layout.simple_list_item_1, data));
-    }
-
-    private static final class FileData
-    {
-        public final File itsFile;
-
-        public FileData(File f)
-        {
-            itsFile = f;
-        }
-
-        @Override
-        public final String toString()
-        {
-            return itsFile.getName();
-        }
+        startActivity(new Intent(PasswdSafeApp.VIEW_INTENT,
+                                 Uri.fromFile(file)));
     }
 }

@@ -6,6 +6,10 @@
                         android:summary="/sdcard"
                         android:defaultValue="/sdcard"
                         android:key="fileDirPref"/>
+                        
+    <ListPreference android:name="defaultFile Pref"
+                    android:title="Default file to open"
+                    android:key="defFilePref"/>
 
     <ListPreference android:name="fileTimeout Pref"
                     android:title="File close timeout"

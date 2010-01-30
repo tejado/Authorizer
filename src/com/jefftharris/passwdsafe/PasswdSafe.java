@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -33,8 +34,8 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
 
-    private String itsFileName;
-    private ActivityPasswdFile itsFile;
+    private File itsFile;
+    private ActivityPasswdFile itsPasswdFile;
     private LoadTask itsLoadTask;
 
     /** Called when the activity is first created. */
@@ -44,11 +45,11 @@ public class PasswdSafe extends ExpandableListActivity {
         super.onCreate(savedInstanceState);
 
         PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + getIntent());
-        itsFileName = getIntent().getData().getPath();
+        itsFile = new File(getIntent().getData().getPath());
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsFile = app.accessPasswdFile(itsFileName, this);
-        if (!itsFile.isOpen()) {
+        itsPasswdFile = app.accessPasswdFile(itsFile, this);
+        if (!itsPasswdFile.isOpen()) {
             showDialog(DIALOG_GET_PASSWD);
         } else {
             showFileData();
@@ -85,7 +86,7 @@ public class PasswdSafe extends ExpandableListActivity {
     protected void onResume()
     {
         super.onResume();
-        itsFile.touch();
+        itsPasswdFile.touch();
     }
 
     /* (non-Javadoc)
@@ -115,8 +116,8 @@ public class PasswdSafe extends ExpandableListActivity {
 
             // TODO: click Ok when enter pressed
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle("Enter Password")
-                .setMessage("Password:")
+                .setTitle("Open " + itsFile.getName())
+                .setMessage("Enter password:")
                 .setView(passwdView)
                 .setPositiveButton("Ok",
                                    new DialogInterface.OnClickListener()
@@ -169,7 +170,7 @@ public class PasswdSafe extends ExpandableListActivity {
                                 int childPosition,
                                 long id)
     {
-        PasswdFileData fileData = itsFile.getFileData();
+        PasswdFileData fileData = itsPasswdFile.getFileData();
         PwsRecord rec = fileData.getRecord(groupPosition, childPosition);
 
         Uri.Builder builder = getIntent().getData().buildUpon();
@@ -190,7 +191,7 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private void showFileData()
     {
-        PasswdFileData fileData = itsFile.getFileData();
+        PasswdFileData fileData = itsPasswdFile.getFileData();
         ExpandableListAdapter adapter =
             new SimpleExpandableListAdapter(PasswdSafe.this,
                                             fileData.itsGroupData,
@@ -228,7 +229,7 @@ public class PasswdSafe extends ExpandableListActivity {
         protected Object doInBackground(Void... params)
         {
             try {
-                return new PasswdFileData(itsFileName, itsPasswd);
+                return new PasswdFileData(itsFile, itsPasswd);
             } catch (Exception e) {
                 return e;
             }
@@ -259,7 +260,7 @@ public class PasswdSafe extends ExpandableListActivity {
             dismissDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {
-                itsFile.setFileData((PasswdFileData)result);
+                itsPasswdFile.setFileData((PasswdFileData)result);
                 showFileData();
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;

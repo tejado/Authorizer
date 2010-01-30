@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.File;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -65,7 +66,7 @@ public class PasswdSafeApp extends Application
 
     }
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     public static final String VIEW_INTENT =
         "com.jefftharris.passwdsafe.action.VIEW";
@@ -86,6 +87,10 @@ public class PasswdSafeApp extends Application
     {
         "", "30", "300", "900", "3600"
     };
+
+    public static final String PREF_DEF_FILE = "defFilePref";
+    public static final String PREF_DEF_FILE_DEF = "";
+    public static final String PREF_DEF_FILE_NONE = "None";
 
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
@@ -147,24 +152,25 @@ public class PasswdSafeApp extends Application
     /* (non-Javadoc)
      * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
      */
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-                                          String key)
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
-        dbginfo(TAG, "Preference change: " + key);
+        dbginfo(TAG, "Preference change: " + key + ", value: " +
+                prefs.getAll().get(key));
+
         if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
-            updateFileCloseTimeoutPref(sharedPreferences);
+            updateFileCloseTimeoutPref(prefs);
         }
     }
 
-    public synchronized ActivityPasswdFile accessPasswdFile(String fileName,
+    public synchronized ActivityPasswdFile accessPasswdFile(File file,
                                                             Activity activity)
     {
-        if ((itsFileData == null) || (itsFileData.itsFileName == null) ||
-            (!itsFileData.itsFileName.equals(fileName))) {
+        if ((itsFileData == null) || (itsFileData.itsFile == null) ||
+            (!itsFileData.itsFile.equals(file))) {
             closeFileData();
         }
 
-        dbginfo(TAG, "access file name:" + fileName + ", data:" + itsFileData);
+        dbginfo(TAG, "access file:" + file+ ", data:" + itsFileData);
         return new AppActivityPasswdFile(itsFileData, activity);
     }
 
@@ -172,6 +178,18 @@ public class PasswdSafeApp extends Application
     {
         return prefs.getString(PREF_FILE_CLOSE_TIMEOUT,
                                PREF_FILE_CLOSE_TIMEOUT_DEF);
+    }
+
+    public static String getFileDirPref(SharedPreferences prefs)
+    {
+        return prefs.getString(PasswdSafeApp.PREF_FILE_DIR,
+                               PasswdSafeApp.PREF_FILE_DIR_DEF);
+    }
+
+    public static String getDefFilePref(SharedPreferences prefs)
+    {
+        return prefs.getString(PasswdSafeApp.PREF_DEF_FILE,
+                               PasswdSafeApp.PREF_DEF_FILE_DEF);
     }
 
     public static void showFatalMsg(String msg, final Activity activity)

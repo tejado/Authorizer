@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import org.pwsafe.lib.file.PwsRecordV3;
 
 public class PasswdFileData
 {
-    public String itsFileName;
+    public File itsFile;
     public PwsFile itsPwsFile;
     public final ArrayList<Map<String, String>> itsGroupData =
         new ArrayList<Map<String, String>>();
@@ -44,16 +45,16 @@ public class PasswdFileData
 
     private static final String TAG = "PasswdFileData";
 
-    public PasswdFileData(String fileName, StringBuilder passwd)
+    public PasswdFileData(File file, StringBuilder passwd)
         throws Exception
     {
-        itsFileName = fileName;
+        itsFile= file;
         loadFile(passwd);
    }
 
     public void close()
     {
-        itsFileName = null;
+        itsFile= null;
         itsPwsFile.dispose();
         itsGroupData.clear();
         itsChildData.clear();
@@ -141,7 +142,7 @@ public class PasswdFileData
             UnsupportedFileVersionException
     {
         PasswdSafeApp.dbginfo(TAG, "before load file");
-        itsPwsFile = PwsFileFactory.loadFile(itsFileName, passwd);
+        itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
         passwd.delete(0, passwd.length());
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");

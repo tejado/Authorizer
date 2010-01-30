@@ -7,12 +7,15 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.File;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * The Preferences class defines the activity for managing preferences on the
@@ -23,7 +26,8 @@ import android.preference.PreferenceManager;
 public class Preferences extends PreferenceActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
-    private Preference itsFileDirPref;
+    private EditTextPreference itsFileDirPref;
+    private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
 
     /** Called when the activity is first created. */
@@ -37,12 +41,18 @@ public class Preferences extends PreferenceActivity
             PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        itsFileDirPref = findPreference(PasswdSafeApp.PREF_FILE_DIR);
-        itsFileDirPref.setDefaultValue(PasswdSafeApp.PREF_FILE_DIR_DEF);
-        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_DIR);
-
+        itsFileDirPref = (EditTextPreference)
+            findPreference(PasswdSafeApp.PREF_FILE_DIR);
+        itsDefFilePref = (ListPreference)
+            findPreference(PasswdSafeApp.PREF_DEF_FILE);
         itsFileClosePref = (ListPreference)
             findPreference(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
+
+        itsFileDirPref.setDefaultValue(PasswdSafeApp.PREF_FILE_DIR_DEF);
+        updateFileDirPrefs(PasswdSafeApp.getFileDirPref(prefs), prefs);
+
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_DEF_FILE);
+
         itsFileClosePref.setEntries(PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES);
         itsFileClosePref.setEntryValues(
             PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES);
@@ -66,22 +76,43 @@ public class Preferences extends PreferenceActivity
      */
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
+        Log.i("foo", "pref changed key: " + key);
         if (key.equals(PasswdSafeApp.PREF_FILE_DIR)) {
-            String pref = prefs.getString(PasswdSafeApp.PREF_FILE_DIR,
-                                          PasswdSafeApp.PREF_FILE_DIR_DEF);
+            String pref = PasswdSafeApp.getFileDirPref(prefs);
             if (pref.length() == 0) {
                 pref = PasswdSafeApp.PREF_FILE_DIR_DEF;
-                SharedPreferences.Editor edit = prefs.edit();
-                edit.putString(PasswdSafeApp.PREF_FILE_DIR, pref);
-                edit.commit();
+                itsFileDirPref.setText(pref);
             }
-
-            itsFileDirPref.setSummary(pref);
+            itsDefFilePref.setValue(PasswdSafeApp.PREF_DEF_FILE_DEF);
+            updateFileDirPrefs(pref, prefs);
+        } else if (key.equals(PasswdSafeApp.PREF_DEF_FILE)) {
+            itsDefFilePref.setSummary(
+                defFileValueToEntry(PasswdSafeApp.getDefFilePref(prefs)));
         } else if (key.equals(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT)) {
             itsFileClosePref.setSummary(
                 fileCloseValueToEntry(
                     PasswdSafeApp.getFileCloseTimeoutPref(prefs)));
         }
+    }
+
+    private final void updateFileDirPrefs(String summary,
+                                          SharedPreferences prefs)
+    {
+        itsFileDirPref.setSummary(summary);
+
+        File fileDir = new File(PasswdSafeApp.getFileDirPref(prefs));
+        FileList.FileData[] files = FileList.getFiles(fileDir);
+        String[] entries = new String[files.length + 1];
+        String[] entryValues = new String[files.length + 1];
+        entries[0] = PasswdSafeApp.PREF_DEF_FILE_NONE;
+        entryValues[0] = PasswdSafeApp.PREF_DEF_FILE_DEF;
+        for (int i = 0; i < files.length; ++i) {
+            entries[i + 1] = files[i].toString();
+            entryValues[i + 1] = entries[i + 1];
+        }
+
+        itsDefFilePref.setEntries(entries);
+        itsDefFilePref.setEntryValues(entryValues);
     }
 
     private static String fileCloseValueToEntry(String value)
@@ -94,5 +125,14 @@ public class Preferences extends PreferenceActivity
             }
         }
         return "Unknown";
+    }
+
+    private static String defFileValueToEntry(String value)
+    {
+        if (value.equals(PasswdSafeApp.PREF_DEF_FILE_DEF)) {
+            return PasswdSafeApp.PREF_DEF_FILE_NONE;
+        } else {
+            return value;
+        }
     }
 }
