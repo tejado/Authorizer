@@ -174,7 +174,10 @@ public class PasswdSafe extends ExpandableListActivity {
         PwsRecord rec = fileData.getRecord(groupPosition, childPosition);
 
         Uri.Builder builder = getIntent().getData().buildUpon();
-        builder.appendQueryParameter("rec", fileData.getUUID(rec).toString());
+        String uuid = fileData.getUUID(rec);
+        if (uuid != null) {
+            builder.appendQueryParameter("rec", uuid.toString());
+        }
         Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
                                    this, RecordView.class);
         startActivity(intent);

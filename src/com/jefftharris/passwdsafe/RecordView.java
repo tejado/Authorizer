@@ -54,6 +54,11 @@ public class RecordView extends Activity
 
         File file = new File(intent.getData().getPath());
         String uuid = intent.getData().getQueryParameter("rec");
+        if (uuid == null) {
+            PasswdSafeApp.showFatalMsg("No record chosen for file: " + file,
+                                       this);
+            return;
+        }
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         itsFile = app.accessPasswdFile(file, this);
@@ -74,27 +79,35 @@ public class RecordView extends Activity
 
         setContentView(R.layout.record_view);
 
-        setText(R.id.title, fileData.getTitle(rec));
-        setText(R.id.group, fileData.getGroup(rec));
-        setText(R.id.url, fileData.getURL(rec));
-        setText(R.id.email, fileData.getEmail(rec));
-        setText(R.id.user, fileData.getUsername(rec));
-        setText(R.id.password_expiry, fileData.getPasswdExpiryTime(rec));
-        setText(R.id.notes,
-                fileData.getNotes(rec).replace("\r\n", "\n"));
+        setText(R.id.title, View.NO_ID, fileData.getTitle(rec));
+        setText(R.id.group, R.id.group_row, fileData.getGroup(rec));
+        setText(R.id.url, R.id.url_row, fileData.getURL(rec));
+        setText(R.id.email, R.id.email_row, fileData.getEmail(rec));
+        setText(R.id.user, R.id.user_row, fileData.getUsername(rec));
+        setText(R.id.expiration, R.id.expiration_row,
+                fileData.getPasswdExpiryTime(rec));
+
+        String notes = fileData.getNotes(rec);
+        if (notes != null) {
+            notes = notes.replace("\r\n", "\n");
+        }
+        setText(R.id.notes, R.id.notes_row, notes);
 
         isPasswordShown = false;
         itsPassword = fileData.getPassword(rec);
-        TextView passwordField = (TextView)findViewById(R.id.password);
-        passwordField.setText(HIDDEN_PASSWORD);
-        passwordField.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
+        TextView passwordField =
+            setText(R.id.password, R.id.password_row,
+                    (itsPassword == null ? null : HIDDEN_PASSWORD));
+        if (passwordField != null) {
+            passwordField.setOnClickListener(new View.OnClickListener()
             {
-                togglePasswordShown();
-            }
-        });
-        registerForContextMenu(passwordField);
+                public void onClick(View v)
+                {
+                    togglePasswordShown();
+                }
+            });
+            registerForContextMenu(passwordField);
+        }
 
         setWordWrap();
     }
@@ -225,9 +238,18 @@ public class RecordView extends Activity
         clipMgr.setText(str);
     }
 
-    private final void setText(int id, String text)
+    private final TextView setText(int id, int rowId, String text)
     {
-        TextView tv = (TextView)findViewById(id);
-        tv.setText(text);
+        TextView tv = null;
+        if (text == null) {
+            View row = findViewById(rowId);
+            if (row != null) {
+                row.setVisibility(View.GONE);
+            }
+        } else {
+            tv = (TextView)findViewById(id);
+            tv.setText(text);
+        }
+        return tv;
     }
 }

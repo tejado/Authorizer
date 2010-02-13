@@ -23,8 +23,8 @@
                      android:stretchColumns="1"
                      android:shrinkColumns="1"
                      >
-            <TableRow>
-                <TextView android:text="Group:"
+            <TableRow android:id="@+id/group_row">
+                <TextView android:text="Group"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/group"
                           android:layout_width="wrap_content"
@@ -32,8 +32,8 @@
                           android:padding="3dip"/>
             </TableRow>
     
-            <TableRow>
-                <TextView android:text="URL:"
+            <TableRow android:id="@+id/url_row">
+                <TextView android:text="URL"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/url"
                           android:autoLink="web"
@@ -42,8 +42,8 @@
                           android:padding="3dip"/>
             </TableRow>
     
-            <TableRow>
-                <TextView android:text="Email:"
+            <TableRow android:id="@+id/email_row">
+                <TextView android:text="Email"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/email"
                           android:autoLink="email"
@@ -52,8 +52,8 @@
                           android:padding="3dip"/>
             </TableRow>
     
-            <TableRow>
-                <TextView android:text="User name:"
+            <TableRow android:id="@+id/user_row">
+                <TextView android:text="User name"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/user"
                           android:layout_width="wrap_content"
@@ -61,8 +61,8 @@
                           android:padding="3dip"/>
             </TableRow>
     
-            <TableRow>
-                <TextView android:text="Password:"
+            <TableRow android:id="@+id/password_row">
+                <TextView android:text="Password"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/password"
                           android:text="*****"
@@ -72,17 +72,17 @@
                           android:padding="3dip"/>
             </TableRow>
     
-            <TableRow>
-                <TextView android:text="Expiration:"
+            <TableRow android:id="@+id/expiration_row">
+                <TextView android:text="Expiration"
                           android:padding="3dip"/>
-                <TextView android:id="@+id/password_expiry"
+                <TextView android:id="@+id/expiration"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:padding="3dip"/>
             </TableRow>
     
-            <TableRow>
-                <TextView android:text="Notes:"
+            <TableRow android:id="@+id/notes_row">
+                <TextView android:text="Notes"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/notes"
                           android:autoLink="all"

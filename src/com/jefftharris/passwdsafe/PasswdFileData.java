@@ -136,7 +136,7 @@ public class PasswdFileData
 
         PwsField field = rec.getField(fieldId);
         if (field == null) {
-            return "";
+            return null;
         }
         return field.toString();
     }
@@ -158,6 +158,9 @@ public class PasswdFileData
         while (recIter.hasNext()) {
             PwsRecord rec = recIter.next();
             String group = getGroup(rec);
+            if (group == null) {
+                group = "No Group";
+            }
             ArrayList<PwsRecord> groupList = recsByGroup.get(group);
             if (groupList == null) {
                 groupList = new ArrayList<PwsRecord>();
@@ -166,7 +169,9 @@ public class PasswdFileData
             groupList.add(rec);
 
             String uuid = getUUID(rec);
-            itsRecordsByUUID.put(uuid, rec);
+            if (uuid != null) {
+                itsRecordsByUUID.put(uuid, rec);
+            }
         }
         PasswdSafeApp.dbginfo(TAG, "groups sorted");
 
@@ -181,7 +186,11 @@ public class PasswdFileData
                 new ArrayList<HashMap<String, Object>>();
             for (PwsRecord rec : entry.getValue()) {
                 HashMap<String, Object> recInfo = new HashMap<String, Object>();
-                recInfo.put(TITLE, getTitle(rec));
+                String title = getTitle(rec);
+                if (title == null) {
+                    title = "Untitled";
+                }
+                recInfo.put(TITLE, title);
                 recInfo.put(RECORD, rec);
                 children.add(recInfo);
             }
