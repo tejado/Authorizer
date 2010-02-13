@@ -37,7 +37,6 @@ public class FileList extends ListActivity
     private static final int MENU_PREFERENCES = 1;
 
     private TextView itsHeader;
-    private boolean isFirstResume = true;
 
     public static final class FileData
     {
@@ -108,8 +107,7 @@ public class FileList extends ListActivity
         setListAdapter(new ArrayAdapter<FileData>(
                         this, android.R.layout.simple_list_item_1, data));
 
-        if (isFirstResume) {
-            isFirstResume = false;
+        if (app.checkOpenDefault()) {
             String defFileName = PasswdSafeApp.getDefFilePref(prefs);
             File defFile = new File(dir, defFileName);
             if (defFile.isFile() && defFile.canRead()) {

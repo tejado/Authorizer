@@ -61,7 +61,7 @@ public class PasswdSafeApp extends Application
         public void onReceive(Context context, Intent intent) {
             Log.i(TAG, "File timeout");
             PasswdSafeApp app = (PasswdSafeApp)context.getApplicationContext();
-            app.closeFileData();
+            app.closeFileData(true);
         }
 
     }
@@ -98,6 +98,7 @@ public class PasswdSafeApp extends Application
     private AlarmManager itsAlarmMgr;
     private PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout = 300*1000;
+    private boolean itsIsOpenDefault = true;
 
     private static final Intent FILE_TIMEOUT_INTENT_OBJ =
         new Intent(FILE_TIMEOUT_INTENT);
@@ -145,7 +146,7 @@ public class PasswdSafeApp extends Application
     @Override
     public void onTerminate()
     {
-        closeFileData();
+        closeFileData(false);
         super.onTerminate();
     }
 
@@ -162,12 +163,22 @@ public class PasswdSafeApp extends Application
         }
     }
 
+    public boolean checkOpenDefault()
+    {
+        if (itsIsOpenDefault) {
+            itsIsOpenDefault = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public synchronized ActivityPasswdFile accessPasswdFile(File file,
                                                             Activity activity)
     {
         if ((itsFileData == null) || (itsFileData.itsFile == null) ||
             (!itsFileData.itsFile.equals(file))) {
-            closeFileData();
+            closeFileData(false);
         }
 
         dbginfo(TAG, "access file:" + file+ ", data:" + itsFileData);
@@ -264,18 +275,24 @@ public class PasswdSafeApp extends Application
     private synchronized final void setFileData(PasswdFileData fileData,
                                                 Activity activity)
     {
-        closeFileData();
+        closeFileData(false);
         itsFileData = fileData;
         touchFileData(activity);
     }
 
-    private synchronized final void closeFileData()
+    private synchronized final void closeFileData(boolean isTimeout)
     {
         dbginfo(TAG, "closeFileData data:" + itsFileData);
         if (itsFileData != null) {
             itsFileData.close();
             itsFileData = null;
+
+            if (isTimeout) {
+                itsIsOpenDefault = true;
+            }
         }
+
+        cancelFileDataTimer();
 
         for (Map.Entry<Activity, Object> entry :
             itsFileDataActivities.entrySet()) {
@@ -283,6 +300,5 @@ public class PasswdSafeApp extends Application
             entry.getKey().finish();
         }
         itsFileDataActivities.clear();
-        cancelFileDataTimer();
     }
 }
