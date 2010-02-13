@@ -73,6 +73,15 @@
             </TableRow>
     
             <TableRow>
+                <TextView android:text="Expiration:"
+                          android:padding="3dip"/>
+                <TextView android:id="@+id/password_expiry"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow>
                 <TextView android:text="Notes:"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/notes"

@@ -79,6 +79,7 @@ public class RecordView extends Activity
         setText(R.id.url, fileData.getURL(rec));
         setText(R.id.email, fileData.getEmail(rec));
         setText(R.id.user, fileData.getUsername(rec));
+        setText(R.id.password_expiry, fileData.getPasswdExpiryTime(rec));
         setText(R.id.notes,
                 fileData.getNotes(rec).replace("\r\n", "\n"));
 

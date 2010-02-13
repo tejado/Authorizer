@@ -114,6 +114,11 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.UUID);
     }
 
+    public final String getPasswdExpiryTime(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+    }
+
     private final String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
