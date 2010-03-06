@@ -92,6 +92,9 @@ public class PasswdSafeApp extends Application
     public static final String PREF_DEF_FILE_DEF = "";
     public static final String PREF_DEF_FILE_NONE = "None";
 
+    public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
+    public static final boolean PREF_GROUP_RECORDS_DEF = true;
+
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
@@ -201,6 +204,11 @@ public class PasswdSafeApp extends Application
     {
         return prefs.getString(PasswdSafeApp.PREF_DEF_FILE,
                                PasswdSafeApp.PREF_DEF_FILE_DEF);
+    }
+
+    public static boolean getGroupRecordsPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GROUP_RECORDS, PREF_GROUP_RECORDS_DEF);
     }
 
     public static void showFatalMsg(String msg, final Activity activity)

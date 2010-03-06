@@ -9,6 +9,12 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -18,9 +24,11 @@ import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -34,9 +42,19 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
 
+    private static final String RECORD = "record";
+    private static final String TITLE = "title";
+    private static final String GROUP = "group";
+
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
     private LoadTask itsLoadTask;
+    private boolean itsGroupRecords = true;
+
+    private final ArrayList<Map<String, String>> itsGroupData =
+        new ArrayList<Map<String, String>>();
+    private final ArrayList<ArrayList<HashMap<String, Object>>> itsChildData =
+        new ArrayList<ArrayList<HashMap<String, Object>>>();
 
     /** Called when the activity is first created. */
     @Override
@@ -48,6 +66,11 @@ public class PasswdSafe extends ExpandableListActivity {
         itsFile = new File(getIntent().getData().getPath());
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
+
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        itsGroupRecords = PasswdSafeApp.getGroupRecordsPref(prefs);
+
         itsPasswdFile = app.accessPasswdFile(itsFile, this);
         if (!itsPasswdFile.isOpen()) {
             showDialog(DIALOG_GET_PASSWD);
@@ -171,7 +194,11 @@ public class PasswdSafe extends ExpandableListActivity {
                                 long id)
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
-        PwsRecord rec = fileData.getRecord(groupPosition, childPosition);
+
+        PwsRecord rec = (PwsRecord)
+            itsChildData.get(groupPosition).
+            get(childPosition).
+            get(RECORD);
 
         Uri.Builder builder = getIntent().getData().buildUpon();
         String uuid = fileData.getUUID(rec);
@@ -195,17 +222,85 @@ public class PasswdSafe extends ExpandableListActivity {
     private void showFileData()
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
+        HashMap<String, PwsRecord> records = fileData.getRecordsByUUID();
+        RecordMapComparator comp = new RecordMapComparator();
+
+        if (itsGroupRecords) {
+            TreeMap<String, ArrayList<PwsRecord>> recsByGroup =
+                new TreeMap<String, ArrayList<PwsRecord>>();
+            for (Map.Entry<String, PwsRecord> entry: records.entrySet()) {
+                PwsRecord rec = entry.getValue();
+                String group = fileData.getGroup(rec);
+                if (group == null) {
+                    group = "No Group";
+                }
+                ArrayList<PwsRecord> groupList = recsByGroup.get(group);
+                if (groupList == null) {
+                    groupList = new ArrayList<PwsRecord>();
+                    recsByGroup.put(group, groupList);
+                }
+                groupList.add(rec);
+            }
+
+            for (Map.Entry<String, ArrayList<PwsRecord>> entry :
+                recsByGroup.entrySet()) {
+                Map<String, String> groupInfo =
+                    Collections.singletonMap(GROUP, entry.getKey());
+                itsGroupData.add(groupInfo);
+
+                ArrayList<HashMap<String, Object>> children =
+                    new ArrayList<HashMap<String, Object>>();
+                for (PwsRecord rec : entry.getValue()) {
+                    HashMap<String, Object> recInfo =
+                        new HashMap<String, Object>();
+                    String title = fileData.getTitle(rec);
+                    if (title == null) {
+                        title = "Untitled";
+                    }
+                    recInfo.put(TITLE, title);
+                    recInfo.put(RECORD, rec);
+                    children.add(recInfo);
+                }
+                Collections.sort(children, comp);
+                itsChildData.add(children);
+            }
+        } else {
+            Map<String, String> groupInfo =
+                Collections.singletonMap(GROUP, "Records");
+            itsGroupData.add(groupInfo);
+
+            ArrayList<HashMap<String, Object>> children =
+                new ArrayList<HashMap<String, Object>>();
+            for (Map.Entry<String, PwsRecord> entry: records.entrySet()) {
+                PwsRecord rec = entry.getValue();
+                HashMap<String, Object> recInfo = new HashMap<String, Object>();
+                String title = fileData.getTitle(rec);
+                if (title == null) {
+                    title = "Untitled";
+                }
+                recInfo.put(TITLE, title);
+                recInfo.put(RECORD, rec);
+                children.add(recInfo);
+            }
+            Collections.sort(children, comp);
+            itsChildData.add(children);
+        }
+
         ExpandableListAdapter adapter =
             new SimpleExpandableListAdapter(PasswdSafe.this,
-                                            fileData.itsGroupData,
+                                            itsGroupData,
                                             android.R.layout.simple_expandable_list_item_1,
-                                            new String[] { PasswdFileData.GROUP },
+                                            new String[] { GROUP },
                                             new int[] { android.R.id.text1 },
-                                            fileData.itsChildData,
+                                            itsChildData,
                                             android.R.layout.simple_expandable_list_item_1,
-                                            new String[] { PasswdFileData.TITLE },
+                                            new String[] { TITLE },
                                             new int[] { android.R.id.text1 });
         setListAdapter(adapter);
+
+        if (!itsGroupRecords) {
+            getExpandableListView().expandGroup(0);
+        }
     }
 
     private final void cancelFileOpen()
@@ -275,6 +370,18 @@ public class PasswdSafe extends ExpandableListActivity {
                     str = e.toString();
                 PasswdSafeApp.showFatalMsg(str, PasswdSafe.this);
             }
+        }
+    }
+
+    private static final class RecordMapComparator implements
+                    Comparator<HashMap<String, Object>>
+    {
+        public int compare(HashMap<String, Object> arg0,
+                           HashMap<String, Object> arg1)
+        {
+            String title0 = arg0.get(TITLE).toString();
+            String title1 = arg1.get(TITLE).toString();
+            return title0.compareTo(title1);
         }
     }
 }

@@ -10,13 +10,8 @@ package com.jefftharris.passwdsafe;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
@@ -32,16 +27,8 @@ public class PasswdFileData
 {
     public File itsFile;
     public PwsFile itsPwsFile;
-    public final ArrayList<Map<String, String>> itsGroupData =
-        new ArrayList<Map<String, String>>();
-    public final ArrayList<ArrayList<HashMap<String, Object>>> itsChildData =
-        new ArrayList<ArrayList<HashMap<String, Object>>>();
     private final HashMap<String, PwsRecord> itsRecordsByUUID =
         new HashMap<String, PwsRecord>();
-
-    static final String RECORD = "record";
-    static final String TITLE = "title";
-    static final String GROUP = "group";
 
     private static final String TAG = "PasswdFileData";
 
@@ -56,17 +43,12 @@ public class PasswdFileData
     {
         itsFile= null;
         itsPwsFile.dispose();
-        itsGroupData.clear();
-        itsChildData.clear();
         itsRecordsByUUID.clear();
     }
 
-    public PwsRecord getRecord(int groupPos, int childPos)
+    public HashMap<String, PwsRecord> getRecordsByUUID()
     {
-        ArrayList<HashMap<String, Object>> groupChildren =
-            itsChildData.get(groupPos);
-        HashMap<String, Object> child = groupChildren.get(childPos);
-        return (PwsRecord)child.get(RECORD);
+        return itsRecordsByUUID;
     }
 
     public PwsRecord getRecord(String uuid)
@@ -152,64 +134,16 @@ public class PasswdFileData
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");
 
-        TreeMap<String, ArrayList<PwsRecord>> recsByGroup =
-            new TreeMap<String, ArrayList<PwsRecord>>();
         Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
         while (recIter.hasNext()) {
             PwsRecord rec = recIter.next();
-            String group = getGroup(rec);
-            if (group == null) {
-                group = "No Group";
-            }
-            ArrayList<PwsRecord> groupList = recsByGroup.get(group);
-            if (groupList == null) {
-                groupList = new ArrayList<PwsRecord>();
-                recsByGroup.put(group, groupList);
-            }
-            groupList.add(rec);
-
             String uuid = getUUID(rec);
             if (uuid != null) {
                 itsRecordsByUUID.put(uuid, rec);
             }
         }
-        PasswdSafeApp.dbginfo(TAG, "groups sorted");
 
-        RecordMapComparator comp = new RecordMapComparator();
-        for (Map.Entry<String, ArrayList<PwsRecord>> entry :
-                recsByGroup.entrySet()) {
-            Map<String, String> groupInfo =
-                Collections.singletonMap(GROUP, entry.getKey());
-            itsGroupData.add(groupInfo);
-
-            ArrayList<HashMap<String, Object>> children =
-                new ArrayList<HashMap<String, Object>>();
-            for (PwsRecord rec : entry.getValue()) {
-                HashMap<String, Object> recInfo = new HashMap<String, Object>();
-                String title = getTitle(rec);
-                if (title == null) {
-                    title = "Untitled";
-                }
-                recInfo.put(TITLE, title);
-                recInfo.put(RECORD, rec);
-                children.add(recInfo);
-            }
-
-            Collections.sort(children, comp);
-            itsChildData.add(children);
-        }
         PasswdSafeApp.dbginfo(TAG, "file loaded");
     }
 
-    static final class RecordMapComparator implements
-                    Comparator<HashMap<String, Object>>
-    {
-        public int compare(HashMap<String, Object> arg0,
-                           HashMap<String, Object> arg1)
-        {
-            String title0 = arg0.get(TITLE).toString();
-            String title1 = arg1.get(TITLE).toString();
-            return title0.compareTo(title1);
-        }
-    }
 }

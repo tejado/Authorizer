@@ -14,4 +14,9 @@
     <ListPreference android:name="fileTimeout Pref"
                     android:title="File close timeout"
                     android:key="fileCloseTimeoutPref"/>
+                    
+    <CheckBoxPreference android:name="groupRecords Pref"
+                        android:title="Group records"
+                        android:key="groupRecordsPref"
+                        android:defaultValue="true"/>
 </PreferenceScreen>
