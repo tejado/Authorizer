@@ -31,16 +31,17 @@ public class RecordView extends Activity
 
     private static final String WORD_WRAP_PREF = "wordwrap";
 
-    private static final int ID_COPY_CLIPBOARD = 1;
-
     private static final int MENU_TOGGLE_PASSWORD = 1;
-    private static final int MENU_COPY_PASSWORD = 2;
-    private static final int MENU_COPY_NOTES = 3;
-    private static final int MENU_TOGGLE_WRAP_NOTES = 4;
+    private static final int MENU_COPY_USER = 2;
+    private static final int MENU_COPY_PASSWORD = 3;
+    private static final int MENU_COPY_NOTES = 4;
+    private static final int MENU_TOGGLE_WRAP_NOTES = 5;
 
     private ActivityPasswdFile itsFile;
+    private TextView itsUserView;
     private boolean isPasswordShown = false;
-    private String itsPassword = null;
+    private String itsPassword;
+    private TextView itsPasswordView;
     private boolean isWordWrap = true;
 
     /** Called when the activity is first created. */
@@ -83,7 +84,13 @@ public class RecordView extends Activity
         setText(R.id.group, R.id.group_row, fileData.getGroup(rec));
         setText(R.id.url, R.id.url_row, fileData.getURL(rec));
         setText(R.id.email, R.id.email_row, fileData.getEmail(rec));
-        setText(R.id.user, R.id.user_row, fileData.getUsername(rec));
+
+        itsUserView =
+            setText(R.id.user, R.id.user_row, fileData.getUsername(rec));
+        if (itsUserView != null) {
+            registerForContextMenu(itsUserView);
+        }
+
         setText(R.id.expiration, R.id.expiration_row,
                 fileData.getPasswdExpiryTime(rec));
 
@@ -95,18 +102,18 @@ public class RecordView extends Activity
 
         isPasswordShown = false;
         itsPassword = fileData.getPassword(rec);
-        TextView passwordField =
+        itsPasswordView =
             setText(R.id.password, R.id.password_row,
                     (itsPassword == null ? null : HIDDEN_PASSWORD));
-        if (passwordField != null) {
-            passwordField.setOnClickListener(new View.OnClickListener()
+        if (itsPasswordView != null) {
+            itsPasswordView.setOnClickListener(new View.OnClickListener()
             {
                 public void onClick(View v)
                 {
                     togglePasswordShown();
                 }
             });
-            registerForContextMenu(passwordField);
+            registerForContextMenu(itsPasswordView);
         }
 
         setWordWrap();
@@ -129,9 +136,15 @@ public class RecordView extends Activity
     public boolean onContextItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
-        case ID_COPY_CLIPBOARD:
+        case MENU_COPY_PASSWORD:
         {
             copyToClipboard(itsPassword);
+            return true;
+        }
+        case MENU_COPY_USER:
+        {
+            TextView tv = (TextView)findViewById(R.id.user);
+            copyToClipboard(tv.getText().toString());
             return true;
         }
         default:
@@ -148,8 +161,13 @@ public class RecordView extends Activity
                                     ContextMenuInfo menuInfo)
     {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle(R.string.password);
-        menu.add(0, ID_COPY_CLIPBOARD, 0, R.string.copy_clipboard);
+        if (v == itsUserView) {
+            menu.setHeaderTitle(R.string.username);
+            menu.add(0, MENU_COPY_USER, 0, R.string.copy_clipboard);
+        } else if (v == itsPasswordView) {
+            menu.setHeaderTitle(R.string.password);
+            menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_clipboard);
+        }
     }
 
     /* (non-Javadoc)
@@ -159,6 +177,7 @@ public class RecordView extends Activity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
+        menu.add(0, MENU_COPY_USER, 0, R.string.copy_user);
         menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_password);
         menu.add(0, MENU_COPY_NOTES, 0, R.string.copy_notes);
         menu.add(0, MENU_TOGGLE_WRAP_NOTES, 0, R.string.toggle_word_wrap);
@@ -189,6 +208,12 @@ public class RecordView extends Activity
         case MENU_TOGGLE_PASSWORD:
         {
             togglePasswordShown();
+            return true;
+        }
+        case MENU_COPY_USER:
+        {
+            TextView tv = (TextView)findViewById(R.id.user);
+            copyToClipboard(tv.getText().toString());
             return true;
         }
         case MENU_COPY_PASSWORD:

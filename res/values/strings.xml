@@ -5,10 +5,12 @@
     <string name="copy_clipboard">Copy to Clipboard</string>
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
+    <string name="copy_user">Copy User Name</string>
     <string name="hide_password">Hide Password</string>
     <string name="password">Password</string>
     <string name="preferences">Preferences</string>
     <string name="pref_file_dir">Directory for Files</string>
     <string name="show_password">Show Password</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
+    <string name="username">User Name</string>
 </resources>
