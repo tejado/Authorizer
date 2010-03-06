@@ -196,14 +196,12 @@ public class PasswdSafeApp extends Application
 
     public static String getFileDirPref(SharedPreferences prefs)
     {
-        return prefs.getString(PasswdSafeApp.PREF_FILE_DIR,
-                               PasswdSafeApp.PREF_FILE_DIR_DEF);
+        return prefs.getString(PREF_FILE_DIR, PREF_FILE_DIR_DEF);
     }
 
     public static String getDefFilePref(SharedPreferences prefs)
     {
-        return prefs.getString(PasswdSafeApp.PREF_DEF_FILE,
-                               PasswdSafeApp.PREF_DEF_FILE_DEF);
+        return prefs.getString(PREF_DEF_FILE, PREF_DEF_FILE_DEF);
     }
 
     public static boolean getGroupRecordsPref(SharedPreferences prefs)
