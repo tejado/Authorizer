@@ -19,8 +19,12 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 import org.pwsafe.lib.file.PwsField;
 import org.pwsafe.lib.file.PwsFile;
 import org.pwsafe.lib.file.PwsFileFactory;
+import org.pwsafe.lib.file.PwsFileV1;
+import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
 import org.pwsafe.lib.file.PwsRecord;
+import org.pwsafe.lib.file.PwsRecordV1;
+import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
 
 public class PasswdFileData
@@ -31,6 +35,9 @@ public class PasswdFileData
         new HashMap<String, PwsRecord>();
 
     private static final String TAG = "PasswdFileData";
+
+    private static final int FIELD_UNSUPPORTED = -1;
+    private static final int FIELD_NOT_PRESENT = -2;
 
     public PasswdFileData(File file, StringBuilder passwd)
         throws Exception
@@ -76,6 +83,11 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.PASSWORD);
     }
 
+    public final String getPasswdExpiryTime(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+    }
+
     public final String getTitle(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.TITLE);
@@ -96,31 +108,134 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.UUID);
     }
 
-    public final String getPasswdExpiryTime(PwsRecord rec)
-    {
-        return getField(rec, PwsRecordV3.PASSWORD_LIFETIME);
-    }
-
     private final String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
             return "";
         }
 
-        if (itsPwsFile.getFileVersionMajor() != PwsFileV3.VERSION) {
-            // TODO: convert field id
-            fieldId = -1;
+        switch (itsPwsFile.getFileVersionMajor())
+        {
+        case PwsFileV3.VERSION:
+        {
+            break;
+        }
+        case PwsFileV2.VERSION:
+        {
+            switch (fieldId)
+            {
+            case PwsRecordV3.GROUP:
+            {
+                fieldId = PwsRecordV2.GROUP;
+                break;
+            }
+            case PwsRecordV3.NOTES:
+            {
+                fieldId = PwsRecordV2.NOTES;
+                break;
+            }
+            case PwsRecordV3.PASSWORD:
+            {
+                fieldId = PwsRecordV2.PASSWORD;
+                break;
+            }
+            case PwsRecordV3.PASSWORD_LIFETIME:
+            {
+                fieldId = PwsRecordV2.PASSWORD_LIFETIME;
+                break;
+            }
+            case PwsRecordV3.TITLE:
+            {
+                fieldId = PwsRecordV2.TITLE;
+                break;
+            }
+            case PwsRecordV3.USERNAME:
+            {
+                fieldId = PwsRecordV2.USERNAME;
+                break;
+            }
+            case PwsRecordV3.UUID:
+            {
+                fieldId = PwsRecordV2.UUID;
+                break;
+            }
+            case PwsRecordV3.EMAIL:
+            case PwsRecordV3.URL:
+            {
+                fieldId = FIELD_NOT_PRESENT;
+                break;
+            }
+            }
+            break;
+        }
+        case PwsFileV1.VERSION:
+        {
+            switch (fieldId)
+            {
+            case PwsRecordV3.NOTES:
+            {
+                fieldId = PwsRecordV1.NOTES;
+                break;
+            }
+            case PwsRecordV3.PASSWORD:
+            {
+                fieldId = PwsRecordV1.PASSWORD;
+                break;
+            }
+            case PwsRecordV3.TITLE:
+            {
+                fieldId = PwsRecordV1.TITLE;
+                break;
+            }
+            case PwsRecordV3.USERNAME:
+            {
+                fieldId = PwsRecordV1.USERNAME;
+                break;
+            }
+            case PwsRecordV3.UUID:
+            {
+                // No real UUID field for V1, so just use the title which
+                // should be unique
+                fieldId = PwsRecordV1.TITLE;
+                break;
+            }
+            case PwsRecordV3.EMAIL:
+            case PwsRecordV3.GROUP:
+            case PwsRecordV3.PASSWORD_LIFETIME:
+            case PwsRecordV3.URL:
+            {
+                fieldId = FIELD_NOT_PRESENT;
+                break;
+            }
+            }
+            break;
+        }
+        default:
+        {
+            fieldId = FIELD_UNSUPPORTED;
+            break;
+        }
         }
 
-        if (fieldId == -1) {
+        switch (fieldId)
+        {
+        case FIELD_UNSUPPORTED:
+        {
             return "(unsupported)";
         }
-
-        PwsField field = rec.getField(fieldId);
-        if (field == null) {
+        case FIELD_NOT_PRESENT:
+        {
             return null;
         }
-        return field.toString();
+        default:
+        {
+            PwsField field = rec.getField(fieldId);
+            if (field == null) {
+                return null;
+            }
+            return field.toString();
+        }
+        }
     }
 
     private void loadFile(StringBuilder passwd)

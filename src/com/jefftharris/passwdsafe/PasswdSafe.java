@@ -46,6 +46,8 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final String TITLE = "title";
     private static final String GROUP = "group";
 
+    private static final String NO_GROUP_GROUP = "Records";
+
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
     private LoadTask itsLoadTask;
@@ -232,7 +234,7 @@ public class PasswdSafe extends ExpandableListActivity {
                 PwsRecord rec = entry.getValue();
                 String group = fileData.getGroup(rec);
                 if (group == null) {
-                    group = "No Group";
+                    group = NO_GROUP_GROUP;
                 }
                 ArrayList<PwsRecord> groupList = recsByGroup.get(group);
                 if (groupList == null) {
@@ -266,7 +268,7 @@ public class PasswdSafe extends ExpandableListActivity {
             }
         } else {
             Map<String, String> groupInfo =
-                Collections.singletonMap(GROUP, "Records");
+                Collections.singletonMap(GROUP, NO_GROUP_GROUP);
             itsGroupData.add(groupInfo);
 
             ArrayList<HashMap<String, Object>> children =
@@ -298,7 +300,7 @@ public class PasswdSafe extends ExpandableListActivity {
                                             new int[] { android.R.id.text1 });
         setListAdapter(adapter);
 
-        if (!itsGroupRecords) {
+        if (itsGroupData.size() == 1) {
             getExpandableListView().expandGroup(0);
         }
     }
