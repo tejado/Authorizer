@@ -52,6 +52,7 @@ public class PasswdSafe extends ExpandableListActivity {
     private ActivityPasswdFile itsPasswdFile;
     private LoadTask itsLoadTask;
     private boolean itsGroupRecords = true;
+    private boolean itsIsSortCaseSensitive = true;
 
     private final ArrayList<Map<String, String>> itsGroupData =
         new ArrayList<Map<String, String>>();
@@ -72,6 +73,7 @@ public class PasswdSafe extends ExpandableListActivity {
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
         itsGroupRecords = PasswdSafeApp.getGroupRecordsPref(prefs);
+        itsIsSortCaseSensitive = PasswdSafeApp.getSortCaseSensitivePref(prefs);
 
         itsPasswdFile = app.accessPasswdFile(itsFile, this);
         if (!itsPasswdFile.isOpen()) {
@@ -225,11 +227,18 @@ public class PasswdSafe extends ExpandableListActivity {
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
         HashMap<String, PwsRecord> records = fileData.getRecordsByUUID();
-        RecordMapComparator comp = new RecordMapComparator();
+        RecordMapComparator comp =
+            new RecordMapComparator(itsIsSortCaseSensitive);
 
         if (itsGroupRecords) {
-            TreeMap<String, ArrayList<PwsRecord>> recsByGroup =
-                new TreeMap<String, ArrayList<PwsRecord>>();
+            TreeMap<String, ArrayList<PwsRecord>> recsByGroup;
+            if (itsIsSortCaseSensitive) {
+                recsByGroup = new TreeMap<String, ArrayList<PwsRecord>>();
+            } else {
+                recsByGroup = new TreeMap<String, ArrayList<PwsRecord>>(
+                                String.CASE_INSENSITIVE_ORDER);
+            }
+
             for (Map.Entry<String, PwsRecord> entry: records.entrySet()) {
                 PwsRecord rec = entry.getValue();
                 String group = fileData.getGroup(rec);
@@ -378,12 +387,24 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final class RecordMapComparator implements
                     Comparator<HashMap<String, Object>>
     {
+        private boolean itsIsSortCaseSensitive;
+
+        public RecordMapComparator(boolean sortCaseSensitive)
+        {
+            itsIsSortCaseSensitive = sortCaseSensitive;
+        }
+
         public int compare(HashMap<String, Object> arg0,
                            HashMap<String, Object> arg1)
         {
             String title0 = arg0.get(TITLE).toString();
             String title1 = arg1.get(TITLE).toString();
-            return title0.compareTo(title1);
+
+            if (itsIsSortCaseSensitive) {
+                return title0.compareTo(title1);
+            } else {
+                return title0.compareToIgnoreCase(title1);
+            }
         }
     }
 }

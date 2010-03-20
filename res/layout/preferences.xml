@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:key="top_prefs">
+    <CheckBoxPreference android:name="sortCaseSensitive Pref"
+                        android:title="Case-sensitive sorting"
+                        android:key="sortCaseSensitivePref"
+                        android:defaultValue="true"/>
+                    
     <EditTextPreference android:name="FileDir Pref"
                         android:title="Directory for files"
                         android:summary="/sdcard"
@@ -14,7 +19,7 @@
     <ListPreference android:name="fileTimeout Pref"
                     android:title="File close timeout"
                     android:key="fileCloseTimeoutPref"/>
-                    
+
     <CheckBoxPreference android:name="groupRecords Pref"
                         android:title="Group records"
                         android:key="groupRecordsPref"
