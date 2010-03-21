@@ -1,24 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="PasswdSafe" basedir=".">
-	
-<target name="genRev">
-    <exec dir="${basedir}" executable="hg" outputproperty="buildId">
-        <arg value="id"/>
-    </exec>
-    <tstamp>
-        <format property="buildDate" pattern="dd/MM/yyyy HH:mm:ss Z"/>
-    </tstamp>
+    <property name="rev.dir" value="${basedir}/gen/com/jefftharris/passwdsafe"/>
+    <property name="rev.file" value="${rev.dir}/Rev.java"/>
     
-    <echo file="${basedir}/src/com/jefftharris/passwdsafe/Rev.java">
-    package com.jefftharris.passwdsafe;
-    public class Rev
-    {
-        public static final String BUILD_ID="${buildId}";
-        public static final String BUILD_DATE="${buildDate}";
-    }
-    </echo>
-</target>          
+    <target name="genRev" depends="checkGenRev" unless="genRevUptodate">
+        <exec dir="${basedir}" executable="hg" outputproperty="buildId">
+            <arg value="id"/>
+        </exec>
+        <tstamp>
+            <format property="buildDate" pattern="MM/dd/yyyy HH:mm:ss Z"/>
+        </tstamp>
     
-<target name="null"/>
+        <mkdir dir="${rev.dir}"/>
+        <echo message="Update ${rev.file}"/>
+        <echo file="${rev.file}">
+package com.jefftharris.passwdsafe;
+public class Rev
+{
+    public static final String BUILD_ID="${buildId}";
+    public static final String BUILD_DATE="${buildDate}";
+}
+        </echo>
+    </target>
+    
+    <target name="checkGenRev">
+        <uptodate property="genRevUptodate" targetfile="${rev.file}">
+            <srcfiles dir="${basedir}/src"/>
+            <srcfiles dir="${basedir}/res"/>
+            <srcfiles dir="${basedir}/lib"/>
+            <srcfiles dir="${basedir}"
+                      includes="AndroidManifest.xml,build.xml"/>
+        </uptodate>
+    </target>
+    
+    <target name="clean">
+        <delete file="${rev.file}"/>
+    </target>
 </project>
