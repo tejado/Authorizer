@@ -12,9 +12,14 @@ import java.io.FilenameFilter;
 import java.security.Security;
 import java.util.Arrays;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -35,6 +40,9 @@ public class FileList extends ListActivity
     private static final String TAG = "FileList";
 
     private static final int MENU_PREFERENCES = 1;
+    private static final int MENU_ABOUT = 2;
+
+    private static final int DIALOG_ABOUT = 1;
 
     private TextView itsHeader;
 
@@ -140,7 +148,71 @@ public class FileList extends ListActivity
         item = menu.add(0, MENU_PREFERENCES, 0, R.string.preferences);
         item.setIcon(android.R.drawable.ic_menu_preferences);
         item.setIntent(new Intent(this, Preferences.class));
+
+        item = menu.add(0, MENU_ABOUT, 0, R.string.about);
+        item.setIcon(android.R.drawable.ic_menu_info_details);
         return true;
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case MENU_ABOUT:
+        {
+            showDialog(DIALOG_ABOUT);
+            return true;
+        }
+        default:
+        {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateDialog(int)
+     */
+    @Override
+    protected Dialog onCreateDialog(int id)
+    {
+        Dialog dialog = null;
+        switch (id) {
+        case DIALOG_ABOUT:
+        {
+            String version;
+            try {
+                PackageManager pkgMgr = getPackageManager();
+                PackageInfo pkgInfo = pkgMgr.getPackageInfo(getPackageName(),
+                                                            0);
+                version = pkgInfo.versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                version = "Unknown";
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setIcon(android.R.drawable.ic_menu_info_details)
+                .setMessage("Version: " + version +
+                            "\n\nBuild ID: " + Rev.BUILD_ID +
+                            "\n\nBuild Date: " + Rev.BUILD_DATE)
+                .setPositiveButton("Close",
+                                   new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+            dialog = builder.create();
+            break;
+        }
+        }
+
+        return dialog;
     }
 
     private final void openFile(File file)
