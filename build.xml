@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="PasswdSafe" basedir=".">
+	
+<target name="genRev">
+    <exec dir="${basedir}" executable="hg" outputproperty="buildId">
+        <arg value="id"/>
+    </exec>
+    <tstamp>
+        <format property="buildDate" pattern="dd/MM/yyyy HH:mm:ss Z"/>
+    </tstamp>
+    
+    <echo file="${basedir}/src/com/jefftharris/passwdsafe/Rev.java">
+    package com.jefftharris.passwdsafe;
+    public class Rev
+    {
+        public static final String BUILD_ID="${buildId}";
+        public static final String BUILD_DATE="${buildDate}";
+    }
+    </echo>
+</target>          
+    
+<target name="null"/>
+</project>

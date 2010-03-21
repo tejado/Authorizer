@@ -3,4 +3,5 @@ changes.txt
 gen
 lib/.old
 PasswdSafe.apk
+src/com/jefftharris/passwdsafe/Rev.java
 test/*.ibak
