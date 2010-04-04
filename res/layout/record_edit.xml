@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:id="@+id/record_edit"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+              
+    <TextView android:id="@+id/title"
+              android:gravity="center"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textSize="24sp"
+              />
+              
+    <View android:layout_width="fill_parent"
+          android:layout_height="2dip"
+          android:background="#FF909090"/>
+              
+    <View android:layout_width="fill_parent"
+          android:layout_height="2dip"
+          android:background="#FF909090"/>
+
+    <LinearLayout android:orientation="horizontal"
+                  android:layout_height="wrap_content"
+                  android:layout_width="fill_parent">
+        <Button android:id="@+id/done_btn"
+                android:text="Done" 
+                android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+
+        <Button android:id="@+id/cancel_btn"
+                android:text="Cancel"
+                android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+    </LinearLayout>              
+</LinearLayout>

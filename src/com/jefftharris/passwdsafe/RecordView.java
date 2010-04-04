@@ -31,11 +31,12 @@ public class RecordView extends Activity
 
     private static final String WORD_WRAP_PREF = "wordwrap";
 
-    private static final int MENU_TOGGLE_PASSWORD = 1;
-    private static final int MENU_COPY_USER = 2;
-    private static final int MENU_COPY_PASSWORD = 3;
-    private static final int MENU_COPY_NOTES = 4;
-    private static final int MENU_TOGGLE_WRAP_NOTES = 5;
+    private static final int MENU_EDIT = 1;
+    private static final int MENU_TOGGLE_PASSWORD = 2;
+    private static final int MENU_COPY_USER = 3;
+    private static final int MENU_COPY_PASSWORD = 4;
+    private static final int MENU_COPY_NOTES = 5;
+    private static final int MENU_TOGGLE_WRAP_NOTES = 6;
 
     private ActivityPasswdFile itsFile;
     private TextView itsUserView;
@@ -176,6 +177,9 @@ public class RecordView extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        MenuItem mi = menu.add(0, MENU_EDIT, 0, R.string.edit);
+        mi.setIcon(android.R.drawable.ic_menu_edit);
+
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
         menu.add(0, MENU_COPY_USER, 0, R.string.copy_user);
         menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_password);
@@ -205,6 +209,14 @@ public class RecordView extends Activity
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
+        case MENU_EDIT:
+        {
+            // TODO How to handle refresh after edit finished?
+            // Close and reopen activity?
+            startActivity(new Intent(Intent.ACTION_EDIT, getIntent().getData(),
+                                     this, RecordEditActivity.class));
+            return true;
+        }
         case MENU_TOGGLE_PASSWORD:
         {
             togglePasswordShown();
