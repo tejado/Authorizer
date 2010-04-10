@@ -5,7 +5,7 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent">
               
-    <TextView android:id="@+id/title"
+    <TextView android:id="@+id/rec_title"
               android:gravity="center"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
@@ -15,12 +15,89 @@
     <View android:layout_width="fill_parent"
           android:layout_height="2dip"
           android:background="#FF909090"/>
+          
+    <LinearLayout android:orientation="vertical"
+                  android:layout_weight="0"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+                  
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_weight="0"
+                android:layout_height="fill_parent">
+                
+        <TableLayout android:layout_width="fill_parent"
+                     android:layout_height="wrap_content"
+                     android:stretchColumns="1"
+                     android:shrinkColumns="1">
+            <TableRow android:id="@+id/title_row">
+                <TextView android:text="Title"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/title"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/group_row">
+                <TextView android:text="Group"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/group"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+
+            <TableRow android:id="@+id/url_row">
+                <TextView android:text="URL"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/url"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/email_row">
+                <TextView android:text="Email"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/email"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/user_row">
+                <TextView android:text="User name"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/user"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/notes_row">
+                <TextView android:text="Notes"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/notes"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+        </TableLayout>
+    
+    </ScrollView>
+    </LinearLayout>
               
     <View android:layout_width="fill_parent"
           android:layout_height="2dip"
           android:background="#FF909090"/>
 
     <LinearLayout android:orientation="horizontal"
+                  android:layout_weight="1"
                   android:layout_height="wrap_content"
                   android:layout_width="fill_parent">
         <Button android:id="@+id/done_btn"

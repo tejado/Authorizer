@@ -94,12 +94,7 @@ public class RecordView extends Activity
 
         setText(R.id.expiration, R.id.expiration_row,
                 fileData.getPasswdExpiryTime(rec));
-
-        String notes = fileData.getNotes(rec);
-        if (notes != null) {
-            notes = notes.replace("\r\n", "\n");
-        }
-        setText(R.id.notes, R.id.notes_row, notes);
+        setText(R.id.notes, R.id.notes_row, fileData.getNotes(rec));
 
         isPasswordShown = false;
         itsPassword = fileData.getPassword(rec);

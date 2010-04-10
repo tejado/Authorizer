@@ -75,7 +75,11 @@ public class PasswdFileData
 
     public final String getNotes(PwsRecord rec)
     {
-        return getField(rec, PwsRecordV3.NOTES);
+        String s = getField(rec, PwsRecordV3.NOTES);
+        if (s != null) {
+            s = s.replace("\r\n", "\n");
+        }
+        return s;
     }
 
     public final String getPassword(PwsRecord rec)
