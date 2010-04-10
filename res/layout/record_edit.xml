@@ -9,22 +9,15 @@
               android:gravity="center"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
-              android:textSize="24sp"
-              />
+              android:textSize="24sp"/>
               
     <View android:layout_width="fill_parent"
           android:layout_height="2dip"
           android:background="#FF909090"/>
           
-    <LinearLayout android:orientation="vertical"
-                  android:layout_weight="0"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content">
-                  
-    <ScrollView android:layout_width="fill_parent"
-                android:layout_weight="0"
+    <ScrollView android:layout_weight="1"
+                android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
-                
         <TableLayout android:layout_width="fill_parent"
                      android:layout_height="wrap_content"
                      android:stretchColumns="1"
@@ -88,16 +81,13 @@
                           android:padding="3dip"/>
             </TableRow>
         </TableLayout>
-    
     </ScrollView>
-    </LinearLayout>
-              
+
     <View android:layout_width="fill_parent"
           android:layout_height="2dip"
           android:background="#FF909090"/>
 
     <LinearLayout android:orientation="horizontal"
-                  android:layout_weight="1"
                   android:layout_height="wrap_content"
                   android:layout_width="fill_parent">
         <Button android:id="@+id/done_btn"
