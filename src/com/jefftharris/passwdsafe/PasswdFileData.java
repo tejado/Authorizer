@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -26,6 +27,7 @@ import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
+import org.pwsafe.lib.file.PwsStringUnicodeField;
 
 public class PasswdFileData
 {
@@ -44,7 +46,16 @@ public class PasswdFileData
     {
         itsFile= file;
         loadFile(passwd);
-   }
+    }
+
+    public void save()
+        throws IOException, NoSuchAlgorithmException,
+               ConcurrentModificationException
+    {
+        if (itsPwsFile != null) {
+            itsPwsFile.save();
+        }
+    }
 
     public void close()
     {
@@ -80,6 +91,12 @@ public class PasswdFileData
             s = s.replace("\r\n", "\n");
         }
         return s;
+    }
+
+    public final void setNotes(String str, PwsRecord rec)
+    {
+        str = str.replace("\n", "\r\n");
+        setField(str, rec, PwsRecordV3.NOTES);
     }
 
     public final String getPassword(PwsRecord rec)
@@ -239,6 +256,35 @@ public class PasswdFileData
             }
             return field.toString();
         }
+        }
+    }
+
+    private final void setField(String str, PwsRecord rec, int fieldId)
+    {
+        // TODO v1 and v2
+        PwsField field = null;
+        switch (itsPwsFile.getFileVersionMajor())
+        {
+        case PwsFileV3.VERSION:
+        {
+            switch (fieldId)
+            {
+            case PwsRecordV3.NOTES:
+            {
+                field = new PwsStringUnicodeField(fieldId, str);
+                break;
+            }
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+
+        if (field != null) {
+            rec.setField(field);
         }
     }
 
