@@ -1,6 +1,6 @@
 /*
  * $Id: PwsIntegerField.java 373 2009-04-19 17:22:46Z roxon $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -15,22 +15,22 @@ import org.pwsafe.lib.Util;
  * Provides a wrapper for fields that hold an integer value such as the date
  * and time fields.  Integer values are stored in the database in little-endian
  * order and are converted to and from this format on writing and reading.
- * 
+ *
  * @author Kevin Preece
  */
 public class PwsIntegerField extends PwsField
 {
 	/**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
     /**
-	 * Constructs the object 
-	 * 
+	 * Constructs the object
+	 *
 	 * @param type  the field type.  Values depend on the version of the file being read.
 	 * @param value the byte array holding the integer value.
-	 * 
+	 *
 	 * @throws IndexOutOfBoundsException If <code>value.length</code> &lt; 4.
 	 */
 	public PwsIntegerField( int type, byte [] value )
@@ -39,11 +39,11 @@ public class PwsIntegerField extends PwsField
 	}
 
 	/**
-	 * Constructs the object 
-	 * 
+	 * Constructs the object
+	 *
 	 * @param type  the field type.  Values depend on the version of the file being read.
 	 * @param value the byte array holding the integer value.
-	 * 
+	 *
 	 * @throws IndexOutOfBoundsException If <code>value.length</code> &lt; 4.
 	 */
 	public PwsIntegerField( PwsFieldType type, byte [] value )
@@ -55,9 +55,9 @@ public class PwsIntegerField extends PwsField
 	 * Returns this integer as an array of bytes.  The returned array will have
 	 * a length of PwsFile.BLOCK_LENGTH and is thus suitable to be written to the
 	 * database.
-	 * 
+	 *
 	 * @return a byte array containing the field's integer value.
-	 * 
+	 *
 	 * @see org.pwsafe.lib.file.PwsField#getBytes()
 	 */
 	@Override
@@ -67,7 +67,8 @@ public class PwsIntegerField extends PwsField
 		byte	retval[];
 
 		value	= ((Integer) super.getValue()).intValue();
-		retval	= PwsFile.allocateBuffer( 4 );
+        // Force a size of 4, otherwise it would be set to a size of blocklength
+		retval	= new byte[4];
 
 		Util.putIntToByteArray( retval, value, 0 );
 
@@ -79,14 +80,14 @@ public class PwsIntegerField extends PwsField
 	 * value is less than zero if this is less than <code>other</code>, zero if
 	 * they are equal and greater than zero if this is greater than
 	 * <code>other</code>.
-	 * 
+	 *
 	 * @param other the other field to compare to.
-	 * 
+	 *
 	 * @return An integer indicating whether this field's value is &lt;, = or &gt;
 	 *         <code>other</code>'s value.
-	 * 
-	 * @throws ClassCastException if <code>other</code> is not a <code>PwsIntegerField</code>.  
-	 * 
+	 *
+	 * @throws ClassCastException if <code>other</code> is not a <code>PwsIntegerField</code>.
+	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo( Object other )
@@ -98,14 +99,14 @@ public class PwsIntegerField extends PwsField
 	 * Compares this field's value to another <code>PwsIntegerField</code> or an
 	 * Integer.  It returns <code>true</code> if they are equal and <code>false</code>
 	 * if they're unequal.
-	 * 
+	 *
 	 * @param arg0 the object to compare with.
-	 * 
+	 *
 	 * @return <code>true</code> if the values of this and arg0 are equal,
 	 *         <code>false</code> if they're unequal.
-	 * 
+	 *
 	 * @throws ClassCastException if <code>other</code> is neither a <code>PwsIntegerField</code>
-	 *         nor an <code>Integer</code>.  
+	 *         nor an <code>Integer</code>.
 	 */
 	@Override
 	public boolean equals( Object arg0 )
@@ -122,17 +123,17 @@ public class PwsIntegerField extends PwsField
 	}
 
 	/**
-	 * Compares this field's value to another <code>PwsIntegerField</code>.  It 
+	 * Compares this field's value to another <code>PwsIntegerField</code>.  It
 	 * returns <code>true</code> if they are equal and <code>false</code>
 	 * if they're unequal.
-	 * 
+	 *
 	 * @param arg0 the <code>PwsIntegerField</code> to compare to.
-	 * 
+	 *
 	 * @return <code>true</code> if the values of this and arg0 are equal,
 	 *         <code>false</code> if they're unequal.
-	 * 
+	 *
 	 * @throws ClassCastException if <code>other</code> is neither a <code>PwsIntegerField</code>
-	 *         nor an <code>Integer</code>.  
+	 *         nor an <code>Integer</code>.
 	 */
 	public boolean equals( PwsIntegerField arg0 )
 	{
@@ -140,17 +141,17 @@ public class PwsIntegerField extends PwsField
 	}
 
 	/**
-	 * Compares this field's value to an <code>Integer</code>.  It returns 
+	 * Compares this field's value to an <code>Integer</code>.  It returns
 	 * <code>true</code> if they are equal and <code>false</code>
 	 * if they're unequal.
-	 * 
+	 *
 	 * @param arg0 the <code>Integer</code> to compare to.
-	 * 
+	 *
 	 * @return <code>true</code> if the values of this and arg0 are equal,
 	 *         <code>false</code> if they're unequal.
-	 * 
+	 *
 	 * @throws ClassCastException if <code>other</code> is neither a <code>PwsIntegerField</code>
-	 *         nor an <code>Integer</code>.  
+	 *         nor an <code>Integer</code>.
 	 */
 	public boolean equals( Integer arg0 )
 	{

@@ -65,7 +65,8 @@ public class PwsShortField extends PwsField
         byte    retval[];
 
         value   = ((Short) super.getValue()).shortValue();
-        retval  = PwsFile.allocateBuffer( 2 );
+        // Force a size of 2, otherwise it would be set to a size of blocklength
+        retval  = new byte[2];
 
         Util.putShortToByteArray( retval, value, 0 );
 
