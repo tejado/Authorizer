@@ -226,7 +226,7 @@ public class PasswdSafe extends ExpandableListActivity {
     private void showFileData()
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
-        HashMap<String, PwsRecord> records = fileData.getRecordsByUUID();
+        ArrayList<PwsRecord> records = fileData.getRecords();
         RecordMapComparator comp =
             new RecordMapComparator(itsIsSortCaseSensitive);
 
@@ -239,8 +239,7 @@ public class PasswdSafe extends ExpandableListActivity {
                                 String.CASE_INSENSITIVE_ORDER);
             }
 
-            for (Map.Entry<String, PwsRecord> entry: records.entrySet()) {
-                PwsRecord rec = entry.getValue();
+            for (PwsRecord rec : records) {
                 String group = fileData.getGroup(rec);
                 if (group == null) {
                     group = NO_GROUP_GROUP;
@@ -282,8 +281,7 @@ public class PasswdSafe extends ExpandableListActivity {
 
             ArrayList<HashMap<String, Object>> children =
                 new ArrayList<HashMap<String, Object>>();
-            for (Map.Entry<String, PwsRecord> entry: records.entrySet()) {
-                PwsRecord rec = entry.getValue();
+            for (PwsRecord rec : records) {
                 HashMap<String, Object> recInfo = new HashMap<String, Object>();
                 String title = fileData.getTitle(rec);
                 if (title == null) {

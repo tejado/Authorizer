@@ -115,26 +115,29 @@ public class RecordEditActivity extends Activity
             return;
         }
 
-        boolean recordChanged = false;
         String currStr = fileData.getNotes(record);
+        if (currStr == null) {
+            currStr = "";
+        }
         TextView tv = (TextView)findViewById(R.id.notes);
         String newStr = tv.getText().toString();
         if (!newStr.equals(currStr)) {
-            recordChanged = true;
+            // TODO remove empty fields, if possible
             fileData.setNotes(newStr, record);
         }
 
-        Log.e("RecordEditActivity", record.toString());
-        if (recordChanged) {
+        if (record.isModified()) {
+            Log.e("RecordEditActivity saving: ", record.toString());
             try {
                 // TODO Save in background
                 // TODO Need to reload prev record view
+                // TODO update header fields for last save info??
                 fileData.save();
-                finish();
             } catch (Exception e) {
                 PasswdSafeApp.showFatalMsg(e.toString(), this);
             }
         }
+        finish();
     }
 
     private final void setText(int id, String text)

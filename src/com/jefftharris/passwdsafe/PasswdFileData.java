@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,10 +32,23 @@ import org.pwsafe.lib.file.PwsStringUnicodeField;
 
 public class PasswdFileData
 {
+    private static class Record
+    {
+        public PwsRecord itsRecord;
+        public int itsIndex;
+
+        public Record(PwsRecord rec, int index)
+        {
+            itsRecord = rec;
+            itsIndex = index;
+        }
+    }
+
     public File itsFile;
     public PwsFile itsPwsFile;
-    private final HashMap<String, PwsRecord> itsRecordsByUUID =
-        new HashMap<String, PwsRecord>();
+    private final HashMap<String, Record> itsRecordsByUUID =
+        new HashMap<String, Record>();
+    private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
 
     private static final String TAG = "PasswdFileData";
 
@@ -53,6 +67,15 @@ public class PasswdFileData
                ConcurrentModificationException
     {
         if (itsPwsFile != null) {
+            for (int idx = 0; idx < itsRecords.size(); ++idx) {
+                PwsRecord rec = itsRecords.get(idx);
+                if (rec.isModified()) {
+                    PasswdSafeApp.dbginfo(TAG, "Updating idx: " + idx);
+                    itsPwsFile.set(idx, rec);
+                    rec.resetModified();
+                }
+            }
+
             itsPwsFile.save();
         }
     }
@@ -62,16 +85,21 @@ public class PasswdFileData
         itsFile= null;
         itsPwsFile.dispose();
         itsRecordsByUUID.clear();
+        itsRecords.clear();
     }
 
-    public HashMap<String, PwsRecord> getRecordsByUUID()
+    public ArrayList<PwsRecord> getRecords()
     {
-        return itsRecordsByUUID;
+        return itsRecords;
     }
 
     public PwsRecord getRecord(String uuid)
     {
-        return itsRecordsByUUID.get(uuid);
+        Record rec = itsRecordsByUUID.get(uuid);
+        if (rec != null) {
+            return rec.itsRecord;
+        }
+        return null;
     }
 
     public final String getEmail(PwsRecord rec)
@@ -300,11 +328,13 @@ public class PasswdFileData
         PasswdSafeApp.dbginfo(TAG, "after load file");
 
         Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
-        while (recIter.hasNext()) {
+        for (int idx = 0; recIter.hasNext(); ++idx) {
             PwsRecord rec = recIter.next();
+            itsRecords.add(rec);
+
             String uuid = getUUID(rec);
             if (uuid != null) {
-                itsRecordsByUUID.put(uuid, rec);
+                itsRecordsByUUID.put(uuid, new Record(rec, idx));
             }
         }
 

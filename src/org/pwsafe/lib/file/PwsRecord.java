@@ -434,7 +434,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	/**
 	 * Resets the modified flag.
 	 */
-	void resetModified() {
+	public void resetModified() {
 		modified = false;
 	}
 
