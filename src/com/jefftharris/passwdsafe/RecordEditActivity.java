@@ -210,11 +210,6 @@ public class RecordEditActivity extends Activity
                 for (PasswdFileData file : params) {
                     file.save();
                 }
-                if (false) {
-                    PasswdSafeApp.dbginfo(TAG, "Sleeping");
-                    Thread.sleep(60*1000);
-                    PasswdSafeApp.dbginfo(TAG, "Sleep done");
-                }
                 // Block file close timer while saving
                 return null;
             } catch (Exception e) {
