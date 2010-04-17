@@ -80,6 +80,7 @@ public class RecordView extends Activity
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
 
         setContentView(R.layout.record_view);
+        setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
 
         setText(R.id.title, View.NO_ID, fileData.getTitle(rec));
         setText(R.id.group, R.id.group_row, fileData.getGroup(rec));

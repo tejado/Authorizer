@@ -76,6 +76,8 @@ public class PasswdSafe extends ExpandableListActivity {
         itsIsSortCaseSensitive = PasswdSafeApp.getSortCaseSensitivePref(prefs);
 
         itsPasswdFile = app.accessPasswdFile(itsFile, this);
+        setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
+
         if (!itsPasswdFile.isOpen()) {
             showDialog(DIALOG_GET_PASSWD);
         } else {
@@ -177,11 +179,12 @@ public class PasswdSafe extends ExpandableListActivity {
         }
         case DIALOG_PROGRESS:
         {
-            dialog =
-                ProgressDialog.show(this,
-                                    PasswdSafeApp.getAppFileTitle(
-                                        itsFile.getName(), this),
-                                    "Loading...", true, true);
+            ProgressDialog dlg = new ProgressDialog(this);
+            dlg.setTitle(PasswdSafeApp.getAppTitle(this));
+            dlg.setMessage("Loading " + itsFile.getName() + "...");
+            dlg.setIndeterminate(true);
+            dlg.setCancelable(true);
+            dialog = dlg;
             break;
         }
         }

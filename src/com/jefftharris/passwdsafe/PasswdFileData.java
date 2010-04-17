@@ -102,9 +102,9 @@ public class PasswdFileData
         return null;
     }
 
-    public final String getFileName()
+    public final File getFile()
     {
-        return itsFile.getName();
+        return itsFile;
     }
 
     public final String getEmail(PwsRecord rec)

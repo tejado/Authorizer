@@ -66,6 +66,7 @@ public class RecordEditActivity extends Activity
         }
 
         setContentView(R.layout.record_edit);
+        setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
 
         // TODO hide fields that aren't valid for version
 
@@ -136,10 +137,13 @@ public class RecordEditActivity extends Activity
         switch (id) {
         case DIALOG_PROGRESS:
         {
-            dialog = ProgressDialog.show(this,
-                                         PasswdSafeApp.getAppFileTitle(itsFile,
-                                                                       this),
-                                         "Saving...", true, false);
+            ProgressDialog dlg = new ProgressDialog(this);
+            dlg.setTitle(PasswdSafeApp.getAppTitle(this));
+            dlg.setMessage("Saving " +
+                           itsFile.getFileData().getFile().getName() + "...");
+            dlg.setIndeterminate(true);
+            dlg.setCancelable(false);
+            dialog = dlg;
             break;
         }
         default:
