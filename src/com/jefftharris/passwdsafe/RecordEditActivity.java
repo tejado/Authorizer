@@ -12,7 +12,10 @@ import java.io.File;
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,8 +27,11 @@ public class RecordEditActivity extends Activity
 {
     private static final String TAG = "RecordEditActivity";
 
+    private static final int DIALOG_PROGRESS = 0;
+
     private ActivityPasswdFile itsFile;
     private String itsUUID;
+    private SaveTask itsSaveTask;
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -92,6 +98,25 @@ public class RecordEditActivity extends Activity
     }
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onPause()
+     */
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        PasswdSafeApp.dbginfo(TAG, "onPause");
+        if (itsSaveTask != null) {
+            try {
+                itsSaveTask.get();
+            } catch (Exception e) {
+                PasswdSafeApp.showFatalMsg(e.toString(), this);
+            }
+            itsSaveTask = null;
+            removeDialog(DIALOG_PROGRESS);
+        }
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onResume()
      */
     @Override
@@ -99,6 +124,31 @@ public class RecordEditActivity extends Activity
     {
         super.onResume();
         itsFile.touch();
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateDialog(int)
+     */
+    @Override
+    protected Dialog onCreateDialog(int id)
+    {
+        Dialog dialog = null;
+        switch (id) {
+        case DIALOG_PROGRESS:
+        {
+            dialog = ProgressDialog.show(this,
+                                         PasswdSafeApp.getAppFileTitle(itsFile,
+                                                                       this),
+                                         "Saving...", true, false);
+            break;
+        }
+        default:
+        {
+            dialog = super.onCreateDialog(id);
+            break;
+        }
+        }
+        return dialog;
     }
 
     private final void saveRecord()
@@ -127,17 +177,16 @@ public class RecordEditActivity extends Activity
         }
 
         if (record.isModified()) {
-            Log.e("RecordEditActivity saving: ", record.toString());
-            try {
-                // TODO Save in background
+            Log.e("RecordEditActivity", "saving");
                 // TODO Need to reload prev record view
                 // TODO update header fields for last save info??
-                fileData.save();
-            } catch (Exception e) {
-                PasswdSafeApp.showFatalMsg(e.toString(), this);
-            }
+                // TODO save unknown fields/records
+            showDialog(DIALOG_PROGRESS);
+            itsSaveTask = new SaveTask();
+            itsSaveTask.execute(fileData);
+        } else {
+            finish();
         }
-        finish();
     }
 
     private final void setText(int id, String text)
@@ -145,6 +194,43 @@ public class RecordEditActivity extends Activity
         if (text != null) {
             TextView tv = (TextView)findViewById(id);
             tv.setText(text);
+        }
+    }
+
+    private final class SaveTask extends AsyncTask<PasswdFileData, Void, Object>
+    {
+        @Override
+        protected Object doInBackground(PasswdFileData... params)
+        {
+            try {
+                for (PasswdFileData file : params) {
+                    file.save();
+                }
+                if (false) {
+                    PasswdSafeApp.dbginfo(TAG, "Sleeping");
+                    Thread.sleep(60*1000);
+                    PasswdSafeApp.dbginfo(TAG, "Sleep done");
+                }
+                // Block file close timer while saving
+                return null;
+            } catch (Exception e) {
+                return e;
+            }
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Object result)
+        {
+            removeDialog(DIALOG_PROGRESS);
+            if (result instanceof Exception) {
+                PasswdSafeApp.showFatalMsg(((Exception)result).toString(),
+                                           RecordEditActivity.this);
+            }
+            itsSaveTask = null;
+            finish();
         }
     }
 }

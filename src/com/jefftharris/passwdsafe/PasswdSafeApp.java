@@ -219,6 +219,31 @@ public class PasswdSafeApp extends Application
                                 PREF_SORT_CASE_SENSITIVE_DEF);
     }
 
+    public static final String getAppFileTitle(ActivityPasswdFile file,
+                                               Context ctx)
+    {
+        String fileName = null;
+        if (file != null) {
+            PasswdFileData fileData = file.getFileData();
+            if (fileData != null) {
+                fileName = fileData.getFileName();
+            }
+        }
+        return getAppFileTitle(fileName, ctx);
+    }
+
+    public static final String getAppFileTitle(String file, Context ctx)
+    {
+        StringBuilder builder =
+            new StringBuilder(ctx.getString(R.string.app_name));
+        if (file != null) {
+            builder.append(" - ");
+            builder.append(file);
+        }
+        return builder.toString();
+
+    }
+
     public static void showFatalMsg(String msg, final Activity activity)
     {
         new AlertDialog.Builder(activity)

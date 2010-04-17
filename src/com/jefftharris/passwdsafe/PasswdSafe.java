@@ -177,10 +177,11 @@ public class PasswdSafe extends ExpandableListActivity {
         }
         case DIALOG_PROGRESS:
         {
-            ProgressDialog dlg = new ProgressDialog(this);
-            dlg.setMessage("Loading...");
-            dlg.setIndeterminate(true);
-            dialog = dlg;
+            dialog =
+                ProgressDialog.show(this,
+                                    PasswdSafeApp.getAppFileTitle(
+                                        itsFile.getName(), this),
+                                    "Loading...", true, true);
             break;
         }
         }
