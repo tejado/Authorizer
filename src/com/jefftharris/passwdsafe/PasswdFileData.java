@@ -35,6 +35,7 @@ public class PasswdFileData
     private static class Record
     {
         public PwsRecord itsRecord;
+        // TODO itsIndex needed??
         public int itsIndex;
 
         public Record(PwsRecord rec, int index)
@@ -115,6 +116,11 @@ public class PasswdFileData
     public final String getGroup(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.GROUP);
+    }
+
+    public final void setGroup(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.GROUP);
     }
 
     public final String getNotes(PwsRecord rec)
@@ -302,6 +308,7 @@ public class PasswdFileData
         {
             switch (fieldId)
             {
+            case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
             {
                 field = new PwsStringUnicodeField(fieldId, str);

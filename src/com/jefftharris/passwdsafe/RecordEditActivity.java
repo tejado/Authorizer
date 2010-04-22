@@ -169,15 +169,17 @@ public class RecordEditActivity extends Activity
             return;
         }
 
-        String currStr = fileData.getNotes(record);
-        if (currStr == null) {
-            currStr = "";
+        // TODO remove empty fields, if possible
+        String updateStr;
+
+        updateStr = getUpdatedField(fileData.getGroup(record), R.id.group);
+        if (updateStr != null) {
+            fileData.setGroup(updateStr, record);
         }
-        TextView tv = (TextView)findViewById(R.id.notes);
-        String newStr = tv.getText().toString();
-        if (!newStr.equals(currStr)) {
-            // TODO remove empty fields, if possible
-            fileData.setNotes(newStr, record);
+
+        updateStr = getUpdatedField(fileData.getNotes(record), R.id.notes);
+        if (updateStr != null) {
+            fileData.setNotes(updateStr, record);
         }
 
         if (record.isModified()) {
@@ -190,6 +192,21 @@ public class RecordEditActivity extends Activity
         } else {
             finish();
         }
+    }
+
+    private final String getUpdatedField(String currStr, int viewId)
+    {
+        if (currStr == null) {
+            currStr = "";
+        }
+
+        TextView tv = (TextView)findViewById(viewId);
+        String newStr = tv.getText().toString();
+        if (newStr.equals(currStr)) {
+            newStr = null;
+        }
+
+        return newStr;
     }
 
     private final void setText(int id, String text)
