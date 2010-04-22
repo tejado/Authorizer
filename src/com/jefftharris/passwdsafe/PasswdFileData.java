@@ -113,6 +113,11 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.EMAIL);
     }
 
+    public final void setEmail(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.EMAIL);
+    }
+
     public final String getGroup(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.GROUP);
@@ -158,9 +163,19 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.USERNAME);
     }
 
+    public final void setUsername(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.USERNAME);
+    }
+
     public final String getURL(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.URL);
+    }
+
+    public final void setURL(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.URL);
     }
 
     public final String getUUID(PwsRecord rec)
@@ -308,8 +323,11 @@ public class PasswdFileData
         {
             switch (fieldId)
             {
+            case PwsRecordV3.EMAIL:
             case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
+            case PwsRecordV3.URL:
+            case PwsRecordV3.USERNAME:
             {
                 field = new PwsStringUnicodeField(fieldId, str);
                 break;

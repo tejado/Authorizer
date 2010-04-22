@@ -78,6 +78,7 @@ public class RecordEditActivity extends Activity
         setText(R.id.email, fileData.getEmail(record));
         setText(R.id.user, fileData.getUsername(record));
         setText(R.id.notes, fileData.getNotes(record));
+        // TODO password edit
 
         Button button = (Button)findViewById(R.id.done_btn);
         button.setOnClickListener(new OnClickListener()
@@ -169,12 +170,27 @@ public class RecordEditActivity extends Activity
             return;
         }
 
-        // TODO remove empty fields, if possible
+        // TODO remove empty fields, if possible??
         String updateStr;
 
         updateStr = getUpdatedField(fileData.getGroup(record), R.id.group);
         if (updateStr != null) {
             fileData.setGroup(updateStr, record);
+        }
+
+        updateStr = getUpdatedField(fileData.getGroup(record), R.id.url);
+        if (updateStr != null) {
+            fileData.setURL(updateStr, record);
+        }
+
+        updateStr = getUpdatedField(fileData.getGroup(record), R.id.email);
+        if (updateStr != null) {
+            fileData.setEmail(updateStr, record);
+        }
+
+        updateStr = getUpdatedField(fileData.getGroup(record), R.id.user);
+        if (updateStr != null) {
+            fileData.setUsername(updateStr, record);
         }
 
         updateStr = getUpdatedField(fileData.getNotes(record), R.id.notes);
