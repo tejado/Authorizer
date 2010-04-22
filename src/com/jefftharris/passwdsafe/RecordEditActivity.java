@@ -182,7 +182,6 @@ public class RecordEditActivity extends Activity
 
         if (record.isModified()) {
             Log.e("RecordEditActivity", "saving");
-                // TODO Need to reload prev record view
                 // TODO update header fields for last save info??
                 // TODO save unknown fields/records
             showDialog(DIALOG_PROGRESS);
@@ -210,7 +209,7 @@ public class RecordEditActivity extends Activity
                 for (PasswdFileData file : params) {
                     file.save();
                 }
-                // Block file close timer while saving
+                // TODO Block file close timer while saving
                 return null;
             } catch (Exception e) {
                 return e;
@@ -227,6 +226,8 @@ public class RecordEditActivity extends Activity
             if (result instanceof Exception) {
                 PasswdSafeApp.showFatalMsg(((Exception)result).toString(),
                                            RecordEditActivity.this);
+            } else {
+                setResult(PasswdSafeApp.RESULT_MODIFIED);
             }
             itsSaveTask = null;
             finish();

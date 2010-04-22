@@ -48,6 +48,8 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private static final String NO_GROUP_GROUP = "Records";
 
+    private static final int RECORD_VIEW_REQUEST = 0;
+
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
     private LoadTask itsLoadTask;
@@ -127,6 +129,23 @@ public class PasswdSafe extends ExpandableListActivity {
         removeDialog(DIALOG_GET_PASSWD);
         removeDialog(DIALOG_PROGRESS);
         super.onSaveInstanceState(outState);
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        PasswdSafeApp.dbginfo(TAG,
+                              "onActivityResult req: " + requestCode +
+                              ", rc: " + resultCode);
+         if ((requestCode == RECORD_VIEW_REQUEST) &&
+             (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {
+             showFileData();
+         } else {
+             super.onActivityResult(requestCode, resultCode, data);
+         }
     }
 
     /* (non-Javadoc)
@@ -215,7 +234,7 @@ public class PasswdSafe extends ExpandableListActivity {
         }
         Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
                                    this, RecordView.class);
-        startActivity(intent);
+        startActivityForResult(intent, RECORD_VIEW_REQUEST);
         return true;
     }
 
@@ -229,6 +248,9 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private void showFileData()
     {
+        itsGroupData.clear();
+        itsChildData.clear();
+
         PasswdFileData fileData = itsPasswdFile.getFileData();
         ArrayList<PwsRecord> records = fileData.getRecords();
         RecordMapComparator comp =

@@ -73,6 +73,8 @@ public class PasswdSafeApp extends Application
     public static final String FILE_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
 
+    public static final int RESULT_MODIFIED = Activity.RESULT_FIRST_USER;
+
     public static final String PREF_FILE_DIR = "fileDirPref";
     public static final String PREF_FILE_DIR_DEF =
         Environment.getExternalStorageDirectory().toString();
