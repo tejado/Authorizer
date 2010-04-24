@@ -187,11 +187,6 @@ public class RecordEditActivity extends Activity
                 errorMsg = "Empty title";
                 break;
             }
-
-            if (getTextViewStr(R.id.group).length() == 0) {
-                errorMsg = "Empty group";
-                break;
-            }
         } while(false);
 
         TextView errorMsgView = (TextView)findViewById(R.id.error_msg);
