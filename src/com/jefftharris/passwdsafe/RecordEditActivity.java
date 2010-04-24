@@ -99,7 +99,10 @@ public class RecordEditActivity extends Activity
         setText(R.id.email, fileData.getEmail(record));
         setText(R.id.user, fileData.getUsername(record));
         setText(R.id.notes, fileData.getNotes(record));
-        // TODO password edit
+
+        String password = fileData.getPassword(record);
+        setText(R.id.password, password);
+        setText(R.id.password_confirm, password);
 
         Button button = (Button)findViewById(R.id.done_btn);
         button.setOnClickListener(new OnClickListener()
@@ -187,6 +190,11 @@ public class RecordEditActivity extends Activity
                 errorMsg = "Empty title";
                 break;
             }
+
+            if (!getTextViewStr(R.id.password).equals(
+                 getTextViewStr(R.id.password_confirm))) {
+                errorMsg = "Passwords do not match";
+            }
         } while(false);
 
         TextView errorMsgView = (TextView)findViewById(R.id.error_msg);
@@ -228,6 +236,7 @@ public class RecordEditActivity extends Activity
 
         updateStr = getUpdatedField(fileData.getGroup(record), R.id.group);
         if (updateStr != null) {
+            // TODO null group vs. empty string group
             fileData.setGroup(updateStr, record);
         }
 
@@ -244,6 +253,12 @@ public class RecordEditActivity extends Activity
         updateStr = getUpdatedField(fileData.getUsername(record), R.id.user);
         if (updateStr != null) {
             fileData.setUsername(updateStr, record);
+        }
+
+        updateStr = getUpdatedField(fileData.getPassword(record),
+                                    R.id.password);
+        if (updateStr != null) {
+            fileData.setPassword(updateStr, record);
         }
 
         updateStr = getUpdatedField(fileData.getNotes(record), R.id.notes);
@@ -292,8 +307,10 @@ public class RecordEditActivity extends Activity
 
         switch (id)
         {
-        case R.id.title:
         case R.id.group:
+        case R.id.password:
+        case R.id.password_confirm:
+        case R.id.title:
             tv.addTextChangedListener(itsTextWatcher);
             break;
         }

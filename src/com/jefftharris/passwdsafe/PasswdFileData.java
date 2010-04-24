@@ -148,6 +148,11 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.PASSWORD);
     }
 
+    public final void setPassword(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.PASSWORD);
+    }
+
     public final String getPasswdExpiryTime(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.PASSWORD_LIFETIME);
@@ -331,6 +336,7 @@ public class PasswdFileData
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
+            case PwsRecordV3.PASSWORD:
             case PwsRecordV3.TITLE:
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:

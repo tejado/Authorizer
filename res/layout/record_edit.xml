@@ -72,6 +72,28 @@
                           android:padding="3dip"/>
             </TableRow>
     
+            <TableRow android:id="@+id/password_row">
+                <TextView android:text="Password"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/password"
+                          android:singleLine="true"
+                          android:password="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/password_confirm_row">
+                <TextView android:text="Confirm"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/password_confirm"
+                          android:singleLine="true"
+                          android:password="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
             <TableRow android:id="@+id/notes_row">
                 <TextView android:text="Notes"
                           android:padding="3dip"/>
