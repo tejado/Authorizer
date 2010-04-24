@@ -8,6 +8,7 @@
     <string name="copy_password">Copy Password</string>
     <string name="copy_user">Copy User Name</string>
     <string name="edit">Edit</string>
+    <string name="error_msg">&lt;b&gt;&lt;i&gt;Error&lt;/i&gt;&lt;/b&gt; - %1$s</string>
     <string name="hide_password">Hide Password</string>
     <string name="password">Password</string>
     <string name="preferences">Preferences</string>

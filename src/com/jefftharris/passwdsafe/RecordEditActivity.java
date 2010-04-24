@@ -17,6 +17,9 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Html;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,6 +35,24 @@ public class RecordEditActivity extends Activity
     private ActivityPasswdFile itsFile;
     private String itsUUID;
     private SaveTask itsSaveTask;
+
+    private TextWatcher itsTextWatcher = new TextWatcher()
+    {
+        public void afterTextChanged(Editable s)
+        {
+            validate();
+        }
+
+        public void beforeTextChanged(CharSequence s, int start,
+                                      int count, int after)
+        {
+        }
+
+        public void onTextChanged(CharSequence s, int start,
+                                  int before, int count)
+        {
+        }
+    };
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -97,6 +118,8 @@ public class RecordEditActivity extends Activity
                 finish();
             }
         });
+
+        validate();
     }
 
     /* (non-Javadoc)
@@ -156,6 +179,36 @@ public class RecordEditActivity extends Activity
         return dialog;
     }
 
+    private final void validate()
+    {
+        String errorMsg = null;
+        do {
+            if (getTextViewStr(R.id.title).length() == 0) {
+                errorMsg = "Empty title";
+                break;
+            }
+
+            if (getTextViewStr(R.id.group).length() == 0) {
+                errorMsg = "Empty group";
+                break;
+            }
+        } while(false);
+
+        TextView errorMsgView = (TextView)findViewById(R.id.error_msg);
+        if (errorMsg == null) {
+            errorMsgView.setVisibility(View.GONE);
+        } else {
+            errorMsgView.setVisibility(View.VISIBLE);
+
+            String errorFmt = getResources().getString(R.string.error_msg);
+            errorMsgView.setText(
+                Html.fromHtml(String.format(errorFmt, errorMsg)));
+        }
+
+        View doneBtn = findViewById(R.id.done_btn);
+        doneBtn.setEnabled(errorMsg == null);
+    }
+
     private final void saveRecord()
     {
         PasswdFileData fileData = itsFile.getFileData();
@@ -173,7 +226,6 @@ public class RecordEditActivity extends Activity
         // TODO remove empty fields, if possible??
         String updateStr;
 
-        // TODO validate non-empty title and group
         updateStr = getUpdatedField(fileData.getTitle(record), R.id.title);
         if (updateStr != null) {
             fileData.setTitle(updateStr, record);
@@ -222,8 +274,7 @@ public class RecordEditActivity extends Activity
             currStr = "";
         }
 
-        TextView tv = (TextView)findViewById(viewId);
-        String newStr = tv.getText().toString();
+        String newStr = getTextViewStr(viewId);
         if (newStr.equals(currStr)) {
             newStr = null;
         }
@@ -231,11 +282,25 @@ public class RecordEditActivity extends Activity
         return newStr;
     }
 
+    private final String getTextViewStr(int viewId)
+    {
+        TextView tv = (TextView)findViewById(viewId);
+        return tv.getText().toString();
+    }
+
     private final void setText(int id, String text)
     {
+        TextView tv = (TextView)findViewById(id);
         if (text != null) {
-            TextView tv = (TextView)findViewById(id);
             tv.setText(text);
+        }
+
+        switch (id)
+        {
+        case R.id.title:
+        case R.id.group:
+            tv.addTextChangedListener(itsTextWatcher);
+            break;
         }
     }
 
