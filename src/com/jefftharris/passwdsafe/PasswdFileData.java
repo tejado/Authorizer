@@ -158,6 +158,11 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.TITLE);
     }
 
+    public final void setTitle(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.TITLE);
+    }
+
     public final String getUsername(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.USERNAME);
@@ -326,6 +331,7 @@ public class PasswdFileData
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
+            case PwsRecordV3.TITLE:
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
             {

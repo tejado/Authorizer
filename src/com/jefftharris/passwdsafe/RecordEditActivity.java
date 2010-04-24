@@ -173,22 +173,28 @@ public class RecordEditActivity extends Activity
         // TODO remove empty fields, if possible??
         String updateStr;
 
+        // TODO validate non-empty title and group
+        updateStr = getUpdatedField(fileData.getTitle(record), R.id.title);
+        if (updateStr != null) {
+            fileData.setTitle(updateStr, record);
+        }
+
         updateStr = getUpdatedField(fileData.getGroup(record), R.id.group);
         if (updateStr != null) {
             fileData.setGroup(updateStr, record);
         }
 
-        updateStr = getUpdatedField(fileData.getGroup(record), R.id.url);
+        updateStr = getUpdatedField(fileData.getURL(record), R.id.url);
         if (updateStr != null) {
             fileData.setURL(updateStr, record);
         }
 
-        updateStr = getUpdatedField(fileData.getGroup(record), R.id.email);
+        updateStr = getUpdatedField(fileData.getEmail(record), R.id.email);
         if (updateStr != null) {
             fileData.setEmail(updateStr, record);
         }
 
-        updateStr = getUpdatedField(fileData.getGroup(record), R.id.user);
+        updateStr = getUpdatedField(fileData.getUsername(record), R.id.user);
         if (updateStr != null) {
             fileData.setUsername(updateStr, record);
         }
