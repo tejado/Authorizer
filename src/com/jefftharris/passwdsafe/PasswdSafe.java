@@ -267,7 +267,7 @@ public class PasswdSafe extends ExpandableListActivity {
 
             for (PwsRecord rec : records) {
                 String group = fileData.getGroup(rec);
-                if (group == null) {
+                if ((group == null) || (group.length() == 0)) {
                     group = NO_GROUP_GROUP;
                 }
                 ArrayList<PwsRecord> groupList = recsByGroup.get(group);

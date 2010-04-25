@@ -341,7 +341,14 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
             {
-                field = new PwsStringUnicodeField(fieldId, str);
+                if ((str != null) && (str.length() != 0)) {
+                    field = new PwsStringUnicodeField(fieldId, str);
+                }
+                break;
+            }
+            default:
+            {
+                fieldId = FIELD_UNSUPPORTED;
                 break;
             }
             }
@@ -349,12 +356,17 @@ public class PasswdFileData
         }
         default:
         {
+            fieldId = FIELD_UNSUPPORTED;
             break;
         }
         }
 
-        if (field != null) {
-            rec.setField(field);
+        if (fieldId != FIELD_UNSUPPORTED) {
+            if (field != null) {
+                rec.setField(field);
+            } else {
+                rec.removeField(fieldId);
+            }
         }
     }
 

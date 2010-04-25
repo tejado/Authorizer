@@ -505,6 +505,18 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	}
 
 	/**
+	 * Remove a field from this record
+	 * @param type The type of field to remove
+	 */
+	public void removeField(int type)
+	{
+	    PwsField field = attributes.remove(type);
+	    if (field != null) {
+	        setModified();
+	    }
+	}
+
+	/**
 	 * Sets the modified flag on this record, and also on the file this record
 	 * belongs to.
 	 */

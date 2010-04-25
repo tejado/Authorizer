@@ -226,7 +226,6 @@ public class RecordEditActivity extends Activity
             return;
         }
 
-        // TODO remove empty fields, if possible??
         String updateStr;
 
         updateStr = getUpdatedField(fileData.getTitle(record), R.id.title);
@@ -236,7 +235,6 @@ public class RecordEditActivity extends Activity
 
         updateStr = getUpdatedField(fileData.getGroup(record), R.id.group);
         if (updateStr != null) {
-            // TODO null group vs. empty string group
             fileData.setGroup(updateStr, record);
         }
 
