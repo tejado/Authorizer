@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -265,12 +264,12 @@ public class RecordEditActivity extends Activity
         }
 
         if (record.isModified()) {
-            Log.e("RecordEditActivity", "saving");
+            PasswdSafeApp.dbginfo(TAG, "saving");
                 // TODO update header fields for last save info??
                 // TODO save unknown fields/records
             showDialog(DIALOG_PROGRESS);
             itsSaveTask = new SaveTask();
-            itsSaveTask.execute(fileData);
+            itsSaveTask.execute();
         } else {
             finish();
         }
@@ -314,16 +313,13 @@ public class RecordEditActivity extends Activity
         }
     }
 
-    private final class SaveTask extends AsyncTask<PasswdFileData, Void, Object>
+    private final class SaveTask extends AsyncTask<Void, Void, Object>
     {
         @Override
-        protected Object doInBackground(PasswdFileData... params)
+        protected Object doInBackground(Void... params)
         {
             try {
-                for (PasswdFileData file : params) {
-                    file.save();
-                }
-                // TODO Block file close timer while saving
+                itsFile.save();
                 return null;
             } catch (Exception e) {
                 return e;

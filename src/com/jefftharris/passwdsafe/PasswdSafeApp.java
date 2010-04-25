@@ -8,6 +8,9 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -29,29 +32,83 @@ import android.util.Log;
 public class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
-    public class AppActivityPasswdFile extends ActivityPasswdFile
+    public class AppActivityPasswdFile implements ActivityPasswdFile
     {
+        /// The file data
+        PasswdFileData itsFileData;
+
+        /// The activity
+        Activity itsActivity;
+
         public AppActivityPasswdFile(PasswdFileData fileData, Activity activity)
         {
-            super(fileData, activity);
+            itsFileData = fileData;
+            itsActivity = activity;
+
+            touch();
         }
 
-        @Override
-        protected void doSetFileData(PasswdFileData fileData)
+        /**
+         * @return the fileData
+         */
+        public final PasswdFileData getFileData()
         {
-            PasswdSafeApp.this.setFileData(fileData, itsActivity);
+            synchronized (PasswdSafeApp.this) {
+                touch();
+                return itsFileData;
+            }
         }
 
-        @Override
-        public void touch()
+        public final boolean isOpen()
         {
+            synchronized (PasswdSafeApp.this) {
+                return (itsFileData != null);
+            }
+        }
+
+        public final void setFileData(PasswdFileData fileData)
+        {
+            synchronized (PasswdSafeApp.this) {
+                PasswdSafeApp.this.setFileData(fileData, itsActivity);
+                itsFileData = fileData;
+            }
+        }
+
+        /**
+         * Save the file.  Will likely be called in a background thread.
+         * @throws IOException
+         * @throws ConcurrentModificationException
+         * @throws NoSuchAlgorithmException
+         */
+        public final void save()
+            throws NoSuchAlgorithmException, ConcurrentModificationException,
+                   IOException
+        {
+            synchronized (PasswdSafeApp.this) {
+                if (itsFileData != null) {
+                    cancelFileDataTimer();
+                    try {
+                        itsFileData.save();
+                    } finally {
+                        touchFileDataTimer();
+                    }
+                }
+            }
+        }
+
+        public final void touch()
+        {
+            // TODO release activity when file is no longer used, i.e.
+            // when activity is destroyed
             touchFileData(itsActivity);
         }
 
-        @Override
-        protected void doClose()
+        public final void close()
         {
-            PasswdSafeApp.this.setFileData(null, itsActivity);
+            synchronized (PasswdSafeApp.this) {
+                PasswdSafeApp.this.setFileData(null, itsActivity);
+                itsFileData = null;
+            }
         }
     }
 
