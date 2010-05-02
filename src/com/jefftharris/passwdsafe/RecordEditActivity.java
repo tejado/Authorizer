@@ -66,10 +66,6 @@ public class RecordEditActivity extends Activity
 
         File file = new File(intent.getData().getPath());
         itsUUID = intent.getData().getQueryParameter("rec");
-        if (itsUUID == null) {
-            // TODO edit new entry
-            return;
-        }
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         itsFile = app.accessPasswdFile(file, this);
@@ -79,29 +75,39 @@ public class RecordEditActivity extends Activity
             return;
         }
 
-        PwsRecord record = fileData.getRecord(itsUUID);
-        if (record == null) {
-            PasswdSafeApp.showFatalMsg("Unknown record: " + itsUUID, this);
-            return;
-        }
-
         setContentView(R.layout.record_edit);
         setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
 
-        // TODO hide fields that aren't valid for version
-
-        setText(R.id.rec_title, "Edit " + fileData.getTitle(record));
-        setText(R.id.title, fileData.getTitle(record));
         // TODO editable combo-box for groups??
-        setText(R.id.group, fileData.getGroup(record));
-        setText(R.id.url, fileData.getURL(record));
-        setText(R.id.email, fileData.getEmail(record));
-        setText(R.id.user, fileData.getUsername(record));
-        setText(R.id.notes, fileData.getNotes(record));
+        if (itsUUID != null) {
+            PwsRecord record = fileData.getRecord(itsUUID);
+            if (record == null) {
+                PasswdSafeApp.showFatalMsg("Unknown record: " + itsUUID, this);
+                return;
+            }
 
-        String password = fileData.getPassword(record);
-        setText(R.id.password, password);
-        setText(R.id.password_confirm, password);
+            setText(R.id.rec_title, "Edit " + fileData.getTitle(record));
+            setText(R.id.title, fileData.getTitle(record));
+            setText(R.id.group, fileData.getGroup(record));
+            setText(R.id.url, fileData.getURL(record));
+            setText(R.id.email, fileData.getEmail(record));
+            setText(R.id.user, fileData.getUsername(record));
+            setText(R.id.notes, fileData.getNotes(record));
+
+            String password = fileData.getPassword(record);
+            setText(R.id.password, password);
+            setText(R.id.password_confirm, password);
+        } else {
+            setText(R.id.rec_title, "New Record");
+            setText(R.id.title, null);
+            setText(R.id.group, null);
+            setText(R.id.url, null);
+            setText(R.id.email, null);
+            setText(R.id.user, null);
+            setText(R.id.notes, null);
+            setText(R.id.password, null);
+            setText(R.id.password_confirm, null);
+        }
 
         Button button = (Button)findViewById(R.id.done_btn);
         button.setOnClickListener(new OnClickListener()
@@ -218,15 +224,26 @@ public class RecordEditActivity extends Activity
         PasswdFileData fileData = itsFile.getFileData();
         if (fileData == null) {
             PasswdSafeApp.showFatalMsg("File closed", this);
+            finish();
             return;
         }
 
-        PwsRecord record = fileData.getRecord(itsUUID);
+        PwsRecord record = null;
+        boolean newRecord = false;
+        if (itsUUID != null) {
+            record = fileData.getRecord(itsUUID);
+        } else {
+            newRecord = true;
+            record = fileData.createRecord();
+        }
         if (record == null) {
             PasswdSafeApp.showFatalMsg("Unknown record: " + itsUUID, this);
+            finish();
             return;
         }
 
+        // TODO for v3 (at least) title,group, and user are primary keys for
+        // entries
         String updateStr;
 
         updateStr = getUpdatedField(fileData.getTitle(record), R.id.title);
@@ -265,7 +282,17 @@ public class RecordEditActivity extends Activity
             fileData.setNotes(updateStr, record);
         }
 
-        if (record.isModified()) {
+        try {
+            if (newRecord) {
+                fileData.addRecord(record);
+            }
+        } catch (Exception e) {
+            PasswdSafeApp.showFatalMsg("Error saving record: " + e, this);
+            finish();
+            return;
+        }
+
+        if (newRecord || record.isModified()) {
             PasswdSafeApp.dbginfo(TAG, "saving");
                 // TODO update header fields for last save info??
                 // TODO save unknown fields/records

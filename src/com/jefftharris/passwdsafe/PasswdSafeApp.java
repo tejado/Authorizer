@@ -133,7 +133,7 @@ public class PasswdSafeApp extends Application
 
     }
 
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     public static final String VIEW_INTENT =
         "com.jefftharris.passwdsafe.action.VIEW";

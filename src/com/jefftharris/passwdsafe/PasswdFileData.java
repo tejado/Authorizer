@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
+import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 import org.pwsafe.lib.file.PwsField;
 import org.pwsafe.lib.file.PwsFile;
@@ -59,7 +60,7 @@ public class PasswdFileData
     public PasswdFileData(File file, StringBuilder passwd)
         throws Exception
     {
-        itsFile= file;
+        itsFile = file;
         loadFile(passwd);
     }
 
@@ -83,8 +84,9 @@ public class PasswdFileData
 
     public void close()
     {
-        itsFile= null;
+        itsFile = null;
         itsPwsFile.dispose();
+        itsPwsFile = null;
         itsRecordsByUUID.clear();
         itsRecords.clear();
     }
@@ -101,6 +103,24 @@ public class PasswdFileData
             return rec.itsRecord;
         }
         return null;
+    }
+
+    public PwsRecord createRecord()
+    {
+        if (itsPwsFile != null) {
+            return itsPwsFile.newRecord();
+        } else {
+            return null;
+        }
+    }
+
+    public void addRecord(PwsRecord rec)
+        throws PasswordSafeException
+    {
+        if (itsPwsFile != null) {
+            itsPwsFile.add(rec);
+            indexRecords();
+        }
     }
 
     public final File getFile()
@@ -325,7 +345,7 @@ public class PasswdFileData
 
     private final void setField(String str, PwsRecord rec, int fieldId)
     {
-        // TODO v1 and v2
+        // TODO v1 and v2 - hide fields that aren't valid for version
         PwsField field = null;
         switch (itsPwsFile.getFileVersionMajor())
         {
@@ -380,7 +400,14 @@ public class PasswdFileData
         passwd.delete(0, passwd.length());
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");
+        indexRecords();
+        PasswdSafeApp.dbginfo(TAG, "file loaded");
+    }
 
+    private final void indexRecords()
+    {
+        itsRecords.clear();
+        itsRecordsByUUID.clear();
         Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
         for (int idx = 0; recIter.hasNext(); ++idx) {
             PwsRecord rec = recIter.next();
@@ -391,8 +418,5 @@ public class PasswdFileData
                 itsRecordsByUUID.put(uuid, new Record(rec, idx));
             }
         }
-
-        PasswdSafeApp.dbginfo(TAG, "file loaded");
     }
-
 }

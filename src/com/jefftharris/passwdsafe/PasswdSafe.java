@@ -30,6 +30,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
@@ -42,6 +44,8 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
 
+    private static final int MENU_ADD_RECORD = 1;
+
     private static final String RECORD = "record";
     private static final String TITLE = "title";
     private static final String GROUP = "group";
@@ -49,6 +53,7 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final String NO_GROUP_GROUP = "Records";
 
     private static final int RECORD_VIEW_REQUEST = 0;
+    private static final int RECORD_ADD_REQUEST = 1;
 
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
@@ -132,6 +137,37 @@ public class PasswdSafe extends ExpandableListActivity {
     }
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuItem mi = menu.add(0, MENU_ADD_RECORD, 0, R.string.add_record);
+        mi.setIcon(android.R.drawable.ic_menu_add);
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case MENU_ADD_RECORD:
+        {
+            startActivityForResult(
+                new Intent(Intent.ACTION_INSERT, getIntent().getData(),
+                           this, RecordEditActivity.class),
+                RECORD_ADD_REQUEST);
+            return true;
+        }
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
      */
     @Override
@@ -140,7 +176,8 @@ public class PasswdSafe extends ExpandableListActivity {
         PasswdSafeApp.dbginfo(TAG,
                               "onActivityResult req: " + requestCode +
                               ", rc: " + resultCode);
-         if ((requestCode == RECORD_VIEW_REQUEST) &&
+         if (((requestCode == RECORD_VIEW_REQUEST) ||
+              (requestCode == RECORD_ADD_REQUEST)) &&
              (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {
              showFileData();
          } else {
@@ -162,7 +199,6 @@ public class PasswdSafe extends ExpandableListActivity {
             final View passwdView =
                 factory.inflate(R.layout.passwd_entry, null);
 
-            // TODO: click Ok when enter pressed
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle("Open " + itsFile.getName())
                 .setMessage("Enter password:")
