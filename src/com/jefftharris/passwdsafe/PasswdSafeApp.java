@@ -110,6 +110,16 @@ public class PasswdSafeApp extends Application
                 itsFileData = null;
             }
         }
+
+        public final void pauseFileTimer()
+        {
+            PasswdSafeApp.this.pauseFileTimer();
+        }
+
+        public final void resumeFileTimer()
+        {
+            PasswdSafeApp.this.resumeFileTimer();
+        }
     }
 
     public static class FileTimeoutReceiver extends BroadcastReceiver
@@ -165,6 +175,7 @@ public class PasswdSafeApp extends Application
     private PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout = 300*1000;
     private boolean itsIsOpenDefault = true;
+    private boolean itsFileTimerPaused = false;
 
     private static final Intent FILE_TIMEOUT_INTENT_OBJ =
         new Intent(FILE_TIMEOUT_INTENT);
@@ -343,6 +354,18 @@ public class PasswdSafeApp extends Application
         }
     }
 
+    private synchronized final void pauseFileTimer()
+    {
+        cancelFileDataTimer();
+        itsFileTimerPaused = true;
+    }
+
+    private synchronized final void resumeFileTimer()
+    {
+        itsFileTimerPaused = false;
+        touchFileDataTimer();
+    }
+
     private synchronized final void cancelFileDataTimer()
     {
         if (itsCloseIntent != null) {
@@ -354,7 +377,8 @@ public class PasswdSafeApp extends Application
     private synchronized final void touchFileDataTimer()
     {
         dbginfo(TAG, "touch timer timeout: " + itsFileCloseTimeout);
-        if ((itsFileData != null) && (itsFileCloseTimeout != 0)) {
+        if ((itsFileData != null) && (itsFileCloseTimeout != 0) &&
+            !itsFileTimerPaused) {
             if (itsCloseIntent == null) {
                 itsCloseIntent =
                     PendingIntent.getBroadcast(this, 0,

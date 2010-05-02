@@ -141,6 +141,7 @@ public class RecordEditActivity extends Activity
             itsSaveTask = null;
             removeDialog(DIALOG_PROGRESS);
         }
+        itsFile.resumeFileTimer();
     }
 
     /* (non-Javadoc)
@@ -150,7 +151,8 @@ public class RecordEditActivity extends Activity
     protected void onResume()
     {
         super.onResume();
-        itsFile.touch();
+        PasswdSafeApp.dbginfo(TAG, "onResume");
+        itsFile.pauseFileTimer();
     }
 
     /* (non-Javadoc)

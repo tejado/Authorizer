@@ -42,4 +42,7 @@ public interface ActivityPasswdFile
     public void touch();
 
     public void close();
+
+    public void pauseFileTimer();
+    public void resumeFileTimer();
 }
