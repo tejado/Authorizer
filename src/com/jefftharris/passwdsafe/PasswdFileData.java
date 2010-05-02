@@ -33,23 +33,10 @@ import org.pwsafe.lib.file.PwsStringUnicodeField;
 
 public class PasswdFileData
 {
-    private static class Record
-    {
-        public PwsRecord itsRecord;
-        // TODO itsIndex needed??
-        public int itsIndex;
-
-        public Record(PwsRecord rec, int index)
-        {
-            itsRecord = rec;
-            itsIndex = index;
-        }
-    }
-
     public File itsFile;
     public PwsFile itsPwsFile;
-    private final HashMap<String, Record> itsRecordsByUUID =
-        new HashMap<String, Record>();
+    private final HashMap<String, PwsRecord> itsRecordsByUUID =
+        new HashMap<String, PwsRecord>();
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
 
     private static final String TAG = "PasswdFileData";
@@ -98,11 +85,7 @@ public class PasswdFileData
 
     public PwsRecord getRecord(String uuid)
     {
-        Record rec = itsRecordsByUUID.get(uuid);
-        if (rec != null) {
-            return rec.itsRecord;
-        }
-        return null;
+        return itsRecordsByUUID.get(uuid);
     }
 
     public PwsRecord createRecord()
@@ -415,7 +398,7 @@ public class PasswdFileData
 
             String uuid = getUUID(rec);
             if (uuid != null) {
-                itsRecordsByUUID.put(uuid, new Record(rec, idx));
+                itsRecordsByUUID.put(uuid, rec);
             }
         }
     }
