@@ -8,6 +8,8 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -22,7 +24,9 @@ import android.text.Html;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public class RecordEditActivity extends Activity
@@ -78,7 +82,7 @@ public class RecordEditActivity extends Activity
         setContentView(R.layout.record_edit);
         setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
 
-        // TODO editable combo-box for groups??
+        String group = null;
         if (itsUUID != null) {
             PwsRecord record = fileData.getRecord(itsUUID);
             if (record == null) {
@@ -88,7 +92,7 @@ public class RecordEditActivity extends Activity
 
             setText(R.id.rec_title, "Edit " + fileData.getTitle(record));
             setText(R.id.title, fileData.getTitle(record));
-            setText(R.id.group, fileData.getGroup(record));
+            group = fileData.getGroup(record);
             setText(R.id.url, fileData.getURL(record));
             setText(R.id.email, fileData.getEmail(record));
             setText(R.id.user, fileData.getUsername(record));
@@ -98,9 +102,8 @@ public class RecordEditActivity extends Activity
             setText(R.id.password, password);
             setText(R.id.password_confirm, password);
         } else {
-            setText(R.id.rec_title, "New Record");
+            setText(R.id.rec_title, "New Entry");
             setText(R.id.title, null);
-            setText(R.id.group, null);
             setText(R.id.url, null);
             setText(R.id.email, null);
             setText(R.id.user, null);
@@ -108,6 +111,8 @@ public class RecordEditActivity extends Activity
             setText(R.id.password, null);
             setText(R.id.password_confirm, null);
         }
+
+        initGroup(fileData, group);
 
         Button button = (Button)findViewById(R.id.done_btn);
         button.setOnClickListener(new OnClickListener()
@@ -189,6 +194,47 @@ public class RecordEditActivity extends Activity
         return dialog;
     }
 
+    private final void initGroup(PasswdFileData fileData, String group)
+    {
+        TreeSet<String> groupSet =
+            new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        ArrayList<PwsRecord> records = fileData.getRecords();
+        for (PwsRecord rec : records) {
+            String grp = fileData.getGroup(rec);
+            if ((grp != null) && (grp.length() != 0)) {
+                groupSet.add(grp);
+            }
+        }
+
+        ArrayList<String> groupList =
+            new ArrayList<String>(groupSet.size() + 2);
+        groupList.add("");
+        int pos = 1;
+        int groupPos = 0;
+        for (String grp : groupSet) {
+            if (grp.equals(group)) {
+                groupPos = pos;
+            }
+            groupList.add(grp);
+            ++pos;
+        }
+        // TODO handle new group item to prompt for value
+        groupList.add("(new group)");
+
+        ArrayAdapter<String> groupAdapter =
+            new ArrayAdapter<String>(this,
+                                     android.R.layout.simple_spinner_item,
+                                     groupList);
+        groupAdapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item);
+
+        Spinner s = (Spinner)findViewById(R.id.group);
+        s.setAdapter(groupAdapter);
+        if (groupPos != 0) {
+            s.setSelection(groupPos);
+        }
+    }
+
     private final void validate()
     {
         String errorMsg = null;
@@ -251,7 +297,8 @@ public class RecordEditActivity extends Activity
             fileData.setTitle(updateStr, record);
         }
 
-        updateStr = getUpdatedField(fileData.getGroup(record), R.id.group);
+        updateStr = getUpdatedSpinnerField(fileData.getGroup(record),
+                                           R.id.group);
         if (updateStr != null) {
             fileData.setGroup(updateStr, record);
         }
@@ -306,22 +353,32 @@ public class RecordEditActivity extends Activity
 
     private final String getUpdatedField(String currStr, int viewId)
     {
-        if (currStr == null) {
-            currStr = "";
-        }
-
-        String newStr = getTextViewStr(viewId);
-        if (newStr.equals(currStr)) {
-            newStr = null;
-        }
-
-        return newStr;
+        return getUpdatedField(currStr, getTextViewStr(viewId));
     }
 
     private final String getTextViewStr(int viewId)
     {
         TextView tv = (TextView)findViewById(viewId);
         return tv.getText().toString();
+    }
+
+    private final String getUpdatedSpinnerField(String currStr, int viewId)
+    {
+        Spinner s = (Spinner)findViewById(viewId);
+        return getUpdatedField(currStr, s.getSelectedItem().toString());
+    }
+
+    private final String getUpdatedField(String currStr, String newStr)
+    {
+        if (currStr == null) {
+            currStr = "";
+        }
+
+        if (newStr.equals(currStr)) {
+            newStr = null;
+        }
+
+        return newStr;
     }
 
     private final void setText(int id, String text)
@@ -333,7 +390,6 @@ public class RecordEditActivity extends Activity
 
         switch (id)
         {
-        case R.id.group:
         case R.id.password:
         case R.id.password_confirm:
         case R.id.title:

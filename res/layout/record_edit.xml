@@ -35,11 +35,11 @@
             <TableRow android:id="@+id/group_row">
                 <TextView android:text="Group"
                           android:padding="3dip"/>
-                <EditText android:id="@+id/group"
-                          android:singleLine="true"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:padding="3dip"/>
+                <Spinner android:id="@+id/group"
+                         android:drawSelectorOnTop="true"
+                         android:prompt="@string/choose_group"
+                         android:layout_width="fill_parent"
+                         android:layout_height="wrap_content"/>
             </TableRow>
 
             <TableRow android:id="@+id/url_row">
