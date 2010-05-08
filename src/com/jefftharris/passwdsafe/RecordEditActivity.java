@@ -14,30 +14,41 @@ import java.util.TreeSet;
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 public class RecordEditActivity extends Activity
 {
     private static final String TAG = "RecordEditActivity";
 
     private static final int DIALOG_PROGRESS = 0;
+    private static final int DIALOG_NEW_GROUP = 1;
 
     private ActivityPasswdFile itsFile;
     private String itsUUID;
     private SaveTask itsSaveTask;
+    private TreeSet<String> itsGroups =
+        new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    private String itsPrevGroup;
 
     private TextWatcher itsTextWatcher = new TextWatcher()
     {
@@ -185,6 +196,41 @@ public class RecordEditActivity extends Activity
             dialog = dlg;
             break;
         }
+        case DIALOG_NEW_GROUP:
+        {
+            LayoutInflater factory = LayoutInflater.from(this);
+            final View view = factory.inflate(R.layout.new_group, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(PasswdSafeApp.getAppTitle(this))
+                .setMessage("Enter new group:")
+                .setView(view)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        EditText newGroup = (EditText)
+                           view.findViewById(R.id.new_group);
+                        setGroup(newGroup.getText().toString());
+                    }
+                })
+                .setNegativeButton("Cancel",
+                                   new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        setGroup(itsPrevGroup);
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener()
+                {
+                    public void onCancel(DialogInterface dialog)
+                    {
+                        setGroup(itsPrevGroup);
+                    }
+                });
+            dialog = builder.create();
+            break;
+        }
         default:
         {
             dialog = super.onCreateDialog(id);
@@ -196,38 +242,67 @@ public class RecordEditActivity extends Activity
 
     private final void initGroup(PasswdFileData fileData, String group)
     {
-        TreeSet<String> groupSet =
-            new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         ArrayList<PwsRecord> records = fileData.getRecords();
         for (PwsRecord rec : records) {
             String grp = fileData.getGroup(rec);
             if ((grp != null) && (grp.length() != 0)) {
-                groupSet.add(grp);
+                itsGroups.add(grp);
             }
         }
 
+        itsPrevGroup = group;
+        updateGroups(group);
+        Spinner s = (Spinner)findViewById(R.id.group);
+        s.setOnItemSelectedListener(new OnItemSelectedListener()
+        {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id)
+            {
+                Adapter adapter = parent.getAdapter();
+                if (position == (adapter.getCount() - 1)) {
+                    showDialog(DIALOG_NEW_GROUP);
+                } else {
+                    itsPrevGroup = parent.getSelectedItem().toString();
+                }
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0)
+            {
+            }
+        });
+    }
+
+    private final void setGroup(String newGroup)
+    {
+        if ((newGroup != null) && (newGroup.length() != 0)) {
+            itsGroups.add(newGroup);
+        }
+        itsPrevGroup = newGroup;
+        updateGroups(newGroup);
+    }
+
+    private final void updateGroups(String selGroup)
+    {
         ArrayList<String> groupList =
-            new ArrayList<String>(groupSet.size() + 2);
+            new ArrayList<String>(itsGroups.size() + 2);
         groupList.add("");
         int pos = 1;
         int groupPos = 0;
-        for (String grp : groupSet) {
-            if (grp.equals(group)) {
+        for (String grp : itsGroups) {
+            if (grp.equals(selGroup)) {
                 groupPos = pos;
             }
             groupList.add(grp);
             ++pos;
         }
-        // TODO handle new group item to prompt for value
-        groupList.add("(new group)");
 
+        groupList.add("New group...");
         ArrayAdapter<String> groupAdapter =
             new ArrayAdapter<String>(this,
                                      android.R.layout.simple_spinner_item,
                                      groupList);
         groupAdapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item);
-
         Spinner s = (Spinner)findViewById(R.id.group);
         s.setAdapter(groupAdapter);
         if (groupPos != 0) {
