@@ -414,7 +414,6 @@ public class RecordEditActivity extends Activity
         if (newRecord || record.isModified()) {
             PasswdSafeApp.dbginfo(TAG, "saving");
                 // TODO update header fields for last save info??
-                // TODO save unknown fields/records
             showDialog(DIALOG_PROGRESS);
             itsSaveTask = new SaveTask();
             itsSaveTask.execute();
