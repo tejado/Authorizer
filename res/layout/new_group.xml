@@ -5,5 +5,7 @@
               android:layout_height="wrap_content">
     <EditText android:id="@+id/new_group"
               android:layout_width="fill_parent"
-              android:layout_height="wrap_content"/>
+              android:layout_height="wrap_content"
+              android:singleLine="true"
+              />
 </LinearLayout>
