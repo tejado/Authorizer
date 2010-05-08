@@ -200,34 +200,31 @@ public class RecordEditActivity extends Activity
         {
             LayoutInflater factory = LayoutInflater.from(this);
             final View view = factory.inflate(R.layout.new_group, null);
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+            {
+                @Override
+                public void onOkClicked(DialogInterface dialog)
+                {
+                    EditText newGroup = (EditText)
+                        view.findViewById(R.id.new_group);
+                    setGroup(newGroup.getText().toString());
+                }
+
+                @Override
+                public void onCancelClicked(DialogInterface dialog)
+                {
+                    setGroup(itsPrevGroup);
+                }
+            };
+
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(PasswdSafeApp.getAppTitle(this))
                 .setMessage("Enter new group:")
                 .setView(view)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        EditText newGroup = (EditText)
-                           view.findViewById(R.id.new_group);
-                        setGroup(newGroup.getText().toString());
-                    }
-                })
-                .setNegativeButton("Cancel",
-                                   new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        setGroup(itsPrevGroup);
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener()
-                {
-                    public void onCancel(DialogInterface dialog)
-                    {
-                        setGroup(itsPrevGroup);
-                    }
-                });
+                .setPositiveButton("Ok", dlgClick)
+                .setNegativeButton("Cancel", dlgClick)
+                .setOnCancelListener(dlgClick);
             dialog = builder.create();
             break;
         }

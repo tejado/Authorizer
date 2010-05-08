@@ -198,37 +198,32 @@ public class PasswdSafe extends ExpandableListActivity {
             LayoutInflater factory = LayoutInflater.from(this);
             final View passwdView =
                 factory.inflate(R.layout.passwd_entry, null);
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+            {
+                @Override
+                public void onOkClicked(DialogInterface dialog)
+                {
+                    EditText passwdInput = (EditText) passwdView
+                        .findViewById(R.id.passwd_edit);
+                    openFile(
+                         new StringBuilder(passwdInput.getText().toString()));
+                }
+
+                @Override
+                public void onCancelClicked(DialogInterface dialog)
+                {
+                    cancelFileOpen();
+                }
+            };
 
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle("Open " + itsFile.getName())
                 .setMessage("Enter password:")
                 .setView(passwdView)
-                .setPositiveButton("Ok",
-                                   new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        EditText passwdInput = (EditText) passwdView
-                            .findViewById(R.id.passwd_edit);
-                        openFile(
-                            new StringBuilder(passwdInput.getText().toString()));
-                    }
-                })
-                .setNegativeButton("Cancel",
-                                   new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        cancelFileOpen();
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener()
-                {
-                    public void onCancel(DialogInterface dialog)
-                    {
-                        cancelFileOpen();
-                    }
-                });
+                .setPositiveButton("Ok", dlgClick)
+                .setNegativeButton("Cancel", dlgClick)
+                .setOnCancelListener(dlgClick);
             dialog = alert.create();
             break;
         }
