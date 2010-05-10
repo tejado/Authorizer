@@ -40,7 +40,7 @@ public interface ActivityPasswdFile
                IOException;
 
     public void touch();
-
+    public void release();
     public void close();
 
     public void pauseFileTimer();

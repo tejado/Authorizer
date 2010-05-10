@@ -100,6 +100,9 @@ public class PasswdSafe extends ExpandableListActivity {
     {
         PasswdSafeApp.dbginfo(TAG, "onDestroy");
         super.onDestroy();
+        if (itsPasswdFile != null) {
+            itsPasswdFile.release();
+        }
     }
 
     /* (non-Javadoc)

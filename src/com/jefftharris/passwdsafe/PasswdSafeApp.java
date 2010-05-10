@@ -98,9 +98,12 @@ public class PasswdSafeApp extends Application
 
         public final void touch()
         {
-            // TODO release activity when file is no longer used, i.e.
-            // when activity is destroyed
             touchFileData(itsActivity);
+        }
+
+        public final void release()
+        {
+            releaseFileData(itsActivity);
         }
 
         public final void close()
@@ -398,6 +401,12 @@ public class PasswdSafeApp extends Application
             itsFileDataActivities.put(activity, null);
             touchFileDataTimer();
         }
+    }
+
+    private synchronized final void releaseFileData(Activity activity)
+    {
+        dbginfo(TAG, "release activity:" + activity);
+        itsFileDataActivities.remove(activity);
     }
 
     private synchronized final void setFileData(PasswdFileData fileData,

@@ -43,7 +43,7 @@ public class RecordEditActivity extends Activity
     private static final int DIALOG_PROGRESS = 0;
     private static final int DIALOG_NEW_GROUP = 1;
 
-    private ActivityPasswdFile itsFile;
+    private ActivityPasswdFile itsPasswdFile;
     private String itsUUID;
     private SaveTask itsSaveTask;
     private TreeSet<String> itsGroups =
@@ -83,15 +83,15 @@ public class RecordEditActivity extends Activity
         itsUUID = intent.getData().getQueryParameter("rec");
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsFile = app.accessPasswdFile(file, this);
-        PasswdFileData fileData = itsFile.getFileData();
+        itsPasswdFile = app.accessPasswdFile(file, this);
+        PasswdFileData fileData = itsPasswdFile.getFileData();
         if (fileData == null) {
             PasswdSafeApp.showFatalMsg("File not open: " + file, this);
             return;
         }
 
         setContentView(R.layout.record_edit);
-        setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
+        setTitle(PasswdSafeApp.getAppFileTitle(itsPasswdFile, this));
 
         String group = null;
         if (itsUUID != null) {
@@ -147,6 +147,19 @@ public class RecordEditActivity extends Activity
     }
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onDestroy()
+     */
+    @Override
+    protected void onDestroy()
+    {
+        PasswdSafeApp.dbginfo(TAG, "onDestroy");
+        super.onDestroy();
+        if (itsPasswdFile != null) {
+            itsPasswdFile.release();
+        }
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onPause()
      */
     @Override
@@ -163,7 +176,7 @@ public class RecordEditActivity extends Activity
             itsSaveTask = null;
             removeDialog(DIALOG_PROGRESS);
         }
-        itsFile.resumeFileTimer();
+        itsPasswdFile.resumeFileTimer();
     }
 
     /* (non-Javadoc)
@@ -174,7 +187,7 @@ public class RecordEditActivity extends Activity
     {
         super.onResume();
         PasswdSafeApp.dbginfo(TAG, "onResume");
-        itsFile.pauseFileTimer();
+        itsPasswdFile.pauseFileTimer();
     }
 
     /* (non-Javadoc)
@@ -190,7 +203,7 @@ public class RecordEditActivity extends Activity
             ProgressDialog dlg = new ProgressDialog(this);
             dlg.setTitle(PasswdSafeApp.getAppTitle(this));
             dlg.setMessage("Saving " +
-                           itsFile.getFileData().getFile().getName() + "...");
+                           itsPasswdFile.getFileData().getFile().getName() + "...");
             dlg.setIndeterminate(true);
             dlg.setCancelable(false);
             dialog = dlg;
@@ -339,7 +352,7 @@ public class RecordEditActivity extends Activity
 
     private final void saveRecord()
     {
-        PasswdFileData fileData = itsFile.getFileData();
+        PasswdFileData fileData = itsPasswdFile.getFileData();
         if (fileData == null) {
             PasswdSafeApp.showFatalMsg("File closed", this);
             finish();
@@ -475,7 +488,7 @@ public class RecordEditActivity extends Activity
         protected Object doInBackground(Void... params)
         {
             try {
-                itsFile.save();
+                itsPasswdFile.save();
                 return null;
             } catch (Exception e) {
                 return e;

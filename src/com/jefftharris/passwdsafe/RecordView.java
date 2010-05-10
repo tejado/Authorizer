@@ -78,6 +78,19 @@ public class RecordView extends Activity
     }
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onDestroy()
+     */
+    @Override
+    protected void onDestroy()
+    {
+        PasswdSafeApp.dbginfo(TAG, "onDestroy");
+        super.onDestroy();
+        if (itsPasswdFile != null) {
+            itsPasswdFile.release();
+        }
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onResume()
      */
     @Override
