@@ -169,6 +169,12 @@ public class RecordView extends Activity
             item.setTitle(isPasswordShown ?
                 R.string.hide_password : R.string.show_password);
         }
+
+        item = menu.findItem(MENU_EDIT);
+        if (item != null) {
+            item.setEnabled(itsPasswdFile.getFileData().isEditSupported());
+        }
+
         return true;
     }
 

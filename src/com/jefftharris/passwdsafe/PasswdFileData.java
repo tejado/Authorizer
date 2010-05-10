@@ -111,6 +111,12 @@ public class PasswdFileData
         return itsFile;
     }
 
+    public final boolean isEditSupported()
+    {
+        return (itsPwsFile != null) &&
+               (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
+    }
+
     public final String getEmail(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.EMAIL);

@@ -151,6 +151,19 @@ public class PasswdSafe extends ExpandableListActivity {
     }
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem mi = menu.findItem(MENU_ADD_RECORD);
+        if (mi != null) {
+            mi.setEnabled(itsPasswdFile.getFileData().isEditSupported());
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
      */
     @Override
