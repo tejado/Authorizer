@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -49,6 +50,7 @@ public class RecordEditActivity extends Activity
     private TreeSet<String> itsGroups =
         new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     private String itsPrevGroup;
+    private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
 
     private TextWatcher itsTextWatcher = new TextWatcher()
     {
@@ -93,9 +95,10 @@ public class RecordEditActivity extends Activity
         setContentView(R.layout.record_edit);
         setTitle(PasswdSafeApp.getAppFileTitle(itsPasswdFile, this));
 
+        PwsRecord record = null;
         String group = null;
         if (itsUUID != null) {
-            PwsRecord record = fileData.getRecord(itsUUID);
+            record = fileData.getRecord(itsUUID);
             if (record == null) {
                 PasswdSafeApp.showFatalMsg("Unknown record: " + itsUUID, this);
                 return;
@@ -123,7 +126,7 @@ public class RecordEditActivity extends Activity
             setText(R.id.password_confirm, null);
         }
 
-        initGroup(fileData, group);
+        initGroup(fileData, record, group);
 
         Button button = (Button)findViewById(R.id.done_btn);
         button.setOnClickListener(new OnClickListener()
@@ -250,13 +253,20 @@ public class RecordEditActivity extends Activity
         return dialog;
     }
 
-    private final void initGroup(PasswdFileData fileData, String group)
+    private final void initGroup(PasswdFileData fileData, PwsRecord editRecord, 
+	    			 String group)
     {
         ArrayList<PwsRecord> records = fileData.getRecords();
         for (PwsRecord rec : records) {
             String grp = fileData.getGroup(rec);
             if ((grp != null) && (grp.length() != 0)) {
                 itsGroups.add(grp);
+            }
+            
+            if (rec != editRecord) {
+                V3Key key = new V3Key(fileData.getTitle(rec), grp,
+                                      fileData.getUsername(rec));
+                itsRecordKeys.add(key);
             }
         }
 
@@ -273,6 +283,7 @@ public class RecordEditActivity extends Activity
                     showDialog(DIALOG_NEW_GROUP);
                 } else {
                     itsPrevGroup = parent.getSelectedItem().toString();
+                    validate();
                 }
             }
 
@@ -289,6 +300,7 @@ public class RecordEditActivity extends Activity
         }
         itsPrevGroup = newGroup;
         updateGroups(newGroup);
+        validate();
     }
 
     private final void updateGroups(String selGroup)
@@ -324,14 +336,23 @@ public class RecordEditActivity extends Activity
     {
         String errorMsg = null;
         do {
-            if (getTextViewStr(R.id.title).length() == 0) {
+            String title = getTextViewStr(R.id.title);
+            if (title.length() == 0) {
                 errorMsg = "Empty title";
                 break;
+            }
+            
+            V3Key key = new V3Key(title, getSpinnerStr(R.id.group),
+        	    		  getTextViewStr(R.id.user));
+            if (itsRecordKeys.contains(key)) {
+        	errorMsg = "Duplicate entry";
+        	break;
             }
 
             if (!getTextViewStr(R.id.password).equals(
                  getTextViewStr(R.id.password_confirm))) {
                 errorMsg = "Passwords do not match";
+                break;
             }
         } while(false);
 
@@ -373,10 +394,7 @@ public class RecordEditActivity extends Activity
             return;
         }
 
-        // TODO for v3 (at least) title,group, and user are primary keys for
-        // entries
         String updateStr;
-
         updateStr = getUpdatedField(fileData.getTitle(record), R.id.title);
         if (updateStr != null) {
             fileData.setTitle(updateStr, record);
@@ -445,11 +463,16 @@ public class RecordEditActivity extends Activity
         TextView tv = (TextView)findViewById(viewId);
         return tv.getText().toString();
     }
+    
+    private final String getSpinnerStr(int viewId)
+    {
+        Spinner s = (Spinner)findViewById(viewId);
+        return s.getSelectedItem().toString();
+    }
 
     private final String getUpdatedSpinnerField(String currStr, int viewId)
     {
-        Spinner s = (Spinner)findViewById(viewId);
-        return getUpdatedField(currStr, s.getSelectedItem().toString());
+        return getUpdatedField(currStr, getSpinnerStr(viewId));
     }
 
     private final String getUpdatedField(String currStr, String newStr)
@@ -477,6 +500,7 @@ public class RecordEditActivity extends Activity
         case R.id.password:
         case R.id.password_confirm:
         case R.id.title:
+        case R.id.user:
             tv.addTextChangedListener(itsTextWatcher);
             break;
         }
@@ -511,5 +535,37 @@ public class RecordEditActivity extends Activity
             itsSaveTask = null;
             finish();
         }
+    }
+    
+    private static class V3Key
+    {
+	private String itsTitle;
+	private String itsGroup;
+	private String itsUser;
+	
+	public V3Key(String title, String group, String user)
+	{
+	    itsTitle = (title != null) ? title : "";
+	    itsGroup = (group != null) ? group : "";
+	    itsUser = (user != null) ? user : "";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+	    if (o instanceof V3Key) {
+		V3Key key = (V3Key)o;
+		return itsTitle.equals(key.itsTitle) && 
+			itsGroup.equals(key.itsGroup) &&
+			itsUser.equals(key.itsUser);
+	    } else {
+		return false;
+	    }
+	}
+
+	@Override
+	public int hashCode() {
+	    return itsTitle.hashCode() ^ itsGroup.hashCode() ^ 
+	    	itsUser.hashCode();
+	}
     }
 }
