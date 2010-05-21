@@ -5,7 +5,7 @@
     <property name="rev.file" value="${rev.dir}/Rev.java"/>
     
     <target name="genRev" depends="checkGenRev" unless="genRevUptodate">
-        <exec dir="${basedir}" executable="hg" outputproperty="buildId">
+        <exec dir="${basedir}" executable="hg.exe" outputproperty="buildId">
             <arg value="id"/>
         </exec>
         <tstamp>
