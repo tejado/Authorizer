@@ -30,6 +30,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
@@ -42,11 +44,16 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
 
+    private static final int MENU_ADD_RECORD = 1;
+
     private static final String RECORD = "record";
     private static final String TITLE = "title";
     private static final String GROUP = "group";
 
     private static final String NO_GROUP_GROUP = "Records";
+
+    private static final int RECORD_VIEW_REQUEST = 0;
+    private static final int RECORD_ADD_REQUEST = 1;
 
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
@@ -76,6 +83,8 @@ public class PasswdSafe extends ExpandableListActivity {
         itsIsSortCaseSensitive = PasswdSafeApp.getSortCaseSensitivePref(prefs);
 
         itsPasswdFile = app.accessPasswdFile(itsFile, this);
+        setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
+
         if (!itsPasswdFile.isOpen()) {
             showDialog(DIALOG_GET_PASSWD);
         } else {
@@ -91,6 +100,9 @@ public class PasswdSafe extends ExpandableListActivity {
     {
         PasswdSafeApp.dbginfo(TAG, "onDestroy");
         super.onDestroy();
+        if (itsPasswdFile != null) {
+            itsPasswdFile.release();
+        }
     }
 
     /* (non-Javadoc)
@@ -128,6 +140,68 @@ public class PasswdSafe extends ExpandableListActivity {
     }
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuItem mi = menu.add(0, MENU_ADD_RECORD, 0, R.string.add_record);
+        mi.setIcon(android.R.drawable.ic_menu_add);
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem mi = menu.findItem(MENU_ADD_RECORD);
+        if (mi != null) {
+            mi.setEnabled(itsPasswdFile.getFileData().isEditSupported());
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case MENU_ADD_RECORD:
+        {
+            startActivityForResult(
+                new Intent(Intent.ACTION_INSERT, getIntent().getData(),
+                           this, RecordEditActivity.class),
+                RECORD_ADD_REQUEST);
+            return true;
+        }
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        PasswdSafeApp.dbginfo(TAG,
+                              "onActivityResult req: " + requestCode +
+                              ", rc: " + resultCode);
+         if (((requestCode == RECORD_VIEW_REQUEST) ||
+              (requestCode == RECORD_ADD_REQUEST)) &&
+             (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {
+             showFileData();
+         } else {
+             super.onActivityResult(requestCode, resultCode, data);
+         }
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onCreateDialog(int)
      */
     @Override
@@ -140,46 +214,42 @@ public class PasswdSafe extends ExpandableListActivity {
             LayoutInflater factory = LayoutInflater.from(this);
             final View passwdView =
                 factory.inflate(R.layout.passwd_entry, null);
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+            {
+                @Override
+                public void onOkClicked(DialogInterface dialog)
+                {
+                    EditText passwdInput = (EditText) passwdView
+                        .findViewById(R.id.passwd_edit);
+                    openFile(
+                         new StringBuilder(passwdInput.getText().toString()));
+                }
 
-            // TODO: click Ok when enter pressed
+                @Override
+                public void onCancelClicked(DialogInterface dialog)
+                {
+                    cancelFileOpen();
+                }
+            };
+
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle("Open " + itsFile.getName())
                 .setMessage("Enter password:")
                 .setView(passwdView)
-                .setPositiveButton("Ok",
-                                   new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        EditText passwdInput = (EditText) passwdView
-                            .findViewById(R.id.passwd_edit);
-                        openFile(
-                            new StringBuilder(passwdInput.getText().toString()));
-                    }
-                })
-                .setNegativeButton("Cancel",
-                                   new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        cancelFileOpen();
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener()
-                {
-                    public void onCancel(DialogInterface dialog)
-                    {
-                        cancelFileOpen();
-                    }
-                });
+                .setPositiveButton("Ok", dlgClick)
+                .setNegativeButton("Cancel", dlgClick)
+                .setOnCancelListener(dlgClick);
             dialog = alert.create();
             break;
         }
         case DIALOG_PROGRESS:
         {
             ProgressDialog dlg = new ProgressDialog(this);
-            dlg.setMessage("Loading...");
+            dlg.setTitle(PasswdSafeApp.getAppTitle(this));
+            dlg.setMessage("Loading " + itsFile.getName() + "...");
             dlg.setIndeterminate(true);
+            dlg.setCancelable(true);
             dialog = dlg;
             break;
         }
@@ -211,7 +281,7 @@ public class PasswdSafe extends ExpandableListActivity {
         }
         Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
                                    this, RecordView.class);
-        startActivity(intent);
+        startActivityForResult(intent, RECORD_VIEW_REQUEST);
         return true;
     }
 
@@ -225,8 +295,11 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private void showFileData()
     {
+        itsGroupData.clear();
+        itsChildData.clear();
+
         PasswdFileData fileData = itsPasswdFile.getFileData();
-        HashMap<String, PwsRecord> records = fileData.getRecordsByUUID();
+        ArrayList<PwsRecord> records = fileData.getRecords();
         RecordMapComparator comp =
             new RecordMapComparator(itsIsSortCaseSensitive);
 
@@ -239,10 +312,9 @@ public class PasswdSafe extends ExpandableListActivity {
                                 String.CASE_INSENSITIVE_ORDER);
             }
 
-            for (Map.Entry<String, PwsRecord> entry: records.entrySet()) {
-                PwsRecord rec = entry.getValue();
+            for (PwsRecord rec : records) {
                 String group = fileData.getGroup(rec);
-                if (group == null) {
+                if ((group == null) || (group.length() == 0)) {
                     group = NO_GROUP_GROUP;
                 }
                 ArrayList<PwsRecord> groupList = recsByGroup.get(group);
@@ -282,8 +354,7 @@ public class PasswdSafe extends ExpandableListActivity {
 
             ArrayList<HashMap<String, Object>> children =
                 new ArrayList<HashMap<String, Object>>();
-            for (Map.Entry<String, PwsRecord> entry: records.entrySet()) {
-                PwsRecord rec = entry.getValue();
+            for (PwsRecord rec : records) {
                 HashMap<String, Object> recInfo = new HashMap<String, Object>();
                 String title = fileData.getTitle(rec);
                 if (title == null) {

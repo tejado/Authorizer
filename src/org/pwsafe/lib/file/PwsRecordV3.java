@@ -122,14 +122,14 @@ public class PwsRecordV3 extends PwsRecord
 	public static final int  		PASSWORD_EXPIRY_INTERVAL = 17;
 
 	/**
-	 * Unknown 18
+	 * Run Command
 	 */
-	public static final int UNKNOWN18 = 18;
+	public static final int RUN_COMMAND = 18;
 
     /**
-     * Unknown 19
+     * Double-Click action
      */
-    public static final int UNKNOWN19 = 19;
+    public static final int DOUBLE_CLICK_ACTION = 19;
 
 	/**
 	 * Email
@@ -163,9 +163,9 @@ public class PwsRecordV3 extends PwsRecord
 		new Object [] { Integer.valueOf(AUTOTYPE),			"AUTOTYPE",				PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(PASSWORD_HISTORY),	"PASSWORD_HISTORY",		PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(PASSWORD_POLICY),	"PASSWORD_POLICY",		PwsStringUnicodeField.class },
-		new Object [] { Integer.valueOf(PASSWORD_EXPIRY_INTERVAL),	"PASSWORD_EXPIRY_INTERVAL",		PwsShortField.class },
-        new Object [] { Integer.valueOf(UNKNOWN18),         "UNKNOWN18",            PwsStringUnicodeField.class },
-        new Object [] { Integer.valueOf(UNKNOWN19),         "UNKNOWN19",            PwsStringUnicodeField.class },
+		new Object [] { Integer.valueOf(PASSWORD_EXPIRY_INTERVAL),	"PASSWORD_EXPIRY_INTERVAL",		PwsIntegerField.class },
+        new Object [] { Integer.valueOf(RUN_COMMAND),         "RUN_COMMAND",        PwsStringUnicodeField.class },
+        new Object [] { Integer.valueOf(DOUBLE_CLICK_ACTION), "DOUBLE_CLICK_ACTION", PwsShortField.class },
         new Object [] { Integer.valueOf(EMAIL),             "EMAIL",                PwsStringUnicodeField.class },
 	};
 
@@ -430,6 +430,7 @@ public class PwsRecordV3 extends PwsRecord
 					case PASSWORD_HISTORY :
 					case URL :
 					case AUTOTYPE :
+					case RUN_COMMAND:
 					case EMAIL :
 						itemVal	= new PwsStringUnicodeField( item.getType(), item.getByteData() );
 						break;
@@ -446,9 +447,12 @@ public class PwsRecordV3 extends PwsRecord
 						break;
 
 					case PASSWORD_EXPIRY_INTERVAL :
-					    itemVal = new PwsShortField(item.getType(), item.getByteData() );
+					    itemVal = new PwsIntegerField(item.getType(), item.getByteData() );
 						break;
 
+					case DOUBLE_CLICK_ACTION:
+					    itemVal = new PwsShortField(item.getType(), item.getByteData());
+					    break;
 
 					default :
 						itemVal = new PwsUnknownField(item.getType(), item.getByteData());

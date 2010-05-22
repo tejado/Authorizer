@@ -31,13 +31,18 @@ public class RecordView extends Activity
 
     private static final String WORD_WRAP_PREF = "wordwrap";
 
-    private static final int MENU_TOGGLE_PASSWORD = 1;
-    private static final int MENU_COPY_USER = 2;
-    private static final int MENU_COPY_PASSWORD = 3;
-    private static final int MENU_COPY_NOTES = 4;
-    private static final int MENU_TOGGLE_WRAP_NOTES = 5;
+    private static final int MENU_EDIT = 1;
+    private static final int MENU_TOGGLE_PASSWORD = 2;
+    private static final int MENU_COPY_USER = 3;
+    private static final int MENU_COPY_PASSWORD = 4;
+    private static final int MENU_COPY_NOTES = 5;
+    private static final int MENU_TOGGLE_WRAP_NOTES = 6;
 
-    private ActivityPasswdFile itsFile;
+    private static final int EDIT_RECORD_REQUEST = 0;
+
+    private File itsFile;
+    private String itsUUID;
+    private ActivityPasswdFile itsPasswdFile;
     private TextView itsUserView;
     private boolean isPasswordShown = false;
     private String itsPassword;
@@ -53,70 +58,36 @@ public class RecordView extends Activity
         Intent intent = getIntent();
         PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + getIntent());
 
-        File file = new File(intent.getData().getPath());
-        String uuid = intent.getData().getQueryParameter("rec");
-        if (uuid == null) {
-            PasswdSafeApp.showFatalMsg("No record chosen for file: " + file,
+        itsFile = new File(intent.getData().getPath());
+        itsUUID = intent.getData().getQueryParameter("rec");
+        if (itsUUID == null) {
+            PasswdSafeApp.showFatalMsg("No record chosen for file: " + itsFile,
                                        this);
             return;
         }
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsFile = app.accessPasswdFile(file, this);
-        PasswdFileData fileData = itsFile.getFileData();
-        if (fileData == null) {
-            PasswdSafeApp.showFatalMsg("File not open: " + file, this);
-            return;
-        }
-
-        PwsRecord rec = fileData.getRecord(uuid);
-        if (rec == null) {
-            PasswdSafeApp.showFatalMsg("Unknown record: " + uuid, this);
-            return;
-        }
+        itsPasswdFile = app.accessPasswdFile(itsFile, this);
 
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
 
         setContentView(R.layout.record_view);
+        setTitle(PasswdSafeApp.getAppFileTitle(itsPasswdFile, this));
+        refresh();
+    }
 
-        setText(R.id.title, View.NO_ID, fileData.getTitle(rec));
-        setText(R.id.group, R.id.group_row, fileData.getGroup(rec));
-        setText(R.id.url, R.id.url_row, fileData.getURL(rec));
-        setText(R.id.email, R.id.email_row, fileData.getEmail(rec));
-
-        itsUserView =
-            setText(R.id.user, R.id.user_row, fileData.getUsername(rec));
-        if (itsUserView != null) {
-            registerForContextMenu(itsUserView);
+    /* (non-Javadoc)
+     * @see android.app.Activity#onDestroy()
+     */
+    @Override
+    protected void onDestroy()
+    {
+        PasswdSafeApp.dbginfo(TAG, "onDestroy");
+        super.onDestroy();
+        if (itsPasswdFile != null) {
+            itsPasswdFile.release();
         }
-
-        setText(R.id.expiration, R.id.expiration_row,
-                fileData.getPasswdExpiryTime(rec));
-
-        String notes = fileData.getNotes(rec);
-        if (notes != null) {
-            notes = notes.replace("\r\n", "\n");
-        }
-        setText(R.id.notes, R.id.notes_row, notes);
-
-        isPasswordShown = false;
-        itsPassword = fileData.getPassword(rec);
-        itsPasswordView =
-            setText(R.id.password, R.id.password_row,
-                    (itsPassword == null ? null : HIDDEN_PASSWORD));
-        if (itsPasswordView != null) {
-            itsPasswordView.setOnClickListener(new View.OnClickListener()
-            {
-                public void onClick(View v)
-                {
-                    togglePasswordShown();
-                }
-            });
-            registerForContextMenu(itsPasswordView);
-        }
-
-        setWordWrap();
     }
 
     /* (non-Javadoc)
@@ -126,7 +97,7 @@ public class RecordView extends Activity
     protected void onResume()
     {
         super.onResume();
-        itsFile.touch();
+        itsPasswdFile.touch();
     }
 
     /* (non-Javadoc)
@@ -176,6 +147,9 @@ public class RecordView extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        MenuItem mi = menu.add(0, MENU_EDIT, 0, R.string.edit);
+        mi.setIcon(android.R.drawable.ic_menu_edit);
+
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
         menu.add(0, MENU_COPY_USER, 0, R.string.copy_user);
         menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_password);
@@ -195,6 +169,12 @@ public class RecordView extends Activity
             item.setTitle(isPasswordShown ?
                 R.string.hide_password : R.string.show_password);
         }
+
+        item = menu.findItem(MENU_EDIT);
+        if (item != null) {
+            item.setEnabled(itsPasswdFile.getFileData().isEditSupported());
+        }
+
         return true;
     }
 
@@ -205,6 +185,14 @@ public class RecordView extends Activity
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
+        case MENU_EDIT:
+        {
+            startActivityForResult(
+                new Intent(Intent.ACTION_EDIT, getIntent().getData(),
+                           this, RecordEditActivity.class),
+                EDIT_RECORD_REQUEST);
+            return true;
+        }
         case MENU_TOGGLE_PASSWORD:
         {
             togglePasswordShown();
@@ -243,6 +231,67 @@ public class RecordView extends Activity
         }
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        PasswdSafeApp.dbginfo(TAG,
+                              "onActivityResult req: " + requestCode +
+                              ", rc: " + resultCode);
+        if ((requestCode == EDIT_RECORD_REQUEST) &&
+            (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {
+            setResult(PasswdSafeApp.RESULT_MODIFIED);
+            refresh();
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private final void refresh()
+    {
+        PasswdFileData fileData = itsPasswdFile.getFileData();
+        if (fileData == null) {
+            PasswdSafeApp.showFatalMsg("File not open: " + itsFile, this);
+            return;
+        }
+        PwsRecord rec = fileData.getRecord(itsUUID);
+        if (rec == null) {
+            PasswdSafeApp.showFatalMsg("Unknown record: " + itsUUID, this);
+            return;
+        }
+
+        setText(R.id.title, View.NO_ID, fileData.getTitle(rec));
+        setText(R.id.group, R.id.group_row, fileData.getGroup(rec));
+        setText(R.id.url, R.id.url_row, fileData.getURL(rec));
+        setText(R.id.email, R.id.email_row, fileData.getEmail(rec));
+        itsUserView =
+            setText(R.id.user, R.id.user_row, fileData.getUsername(rec));
+        if (itsUserView != null) {
+            registerForContextMenu(itsUserView);
+        }
+        setText(R.id.expiration, R.id.expiration_row,
+                fileData.getPasswdExpiryTime(rec));
+        setText(R.id.notes, R.id.notes_row, fileData.getNotes(rec));
+        isPasswordShown = false;
+        itsPassword = fileData.getPassword(rec);
+        itsPasswordView =
+            setText(R.id.password, R.id.password_row,
+                    (itsPassword == null ? null : HIDDEN_PASSWORD));
+        if (itsPasswordView != null) {
+            itsPasswordView.setOnClickListener(new View.OnClickListener()
+            {
+                public void onClick(View v)
+                {
+                    togglePasswordShown();
+                }
+            });
+            registerForContextMenu(itsPasswordView);
+        }
+        setWordWrap();
+    }
+
     private final void togglePasswordShown()
     {
         TextView passwordField = (TextView)findViewById(R.id.password);
@@ -265,13 +314,13 @@ public class RecordView extends Activity
 
     private final TextView setText(int id, int rowId, String text)
     {
+        View row = findViewById(rowId);
+        if (row != null) {
+            row.setVisibility((text != null) ? View.VISIBLE : View.GONE);
+        }
+
         TextView tv = null;
-        if (text == null) {
-            View row = findViewById(rowId);
-            if (row != null) {
-                row.setVisibility(View.GONE);
-            }
-        } else {
+        if (text != null) {
             tv = (TextView)findViewById(id);
             tv.setText(text);
         }

@@ -8,7 +8,9 @@
 
 package com.jefftharris.passwdsafe;
 
-import android.app.Activity;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ConcurrentModificationException;
 
 /**
  * The ActivityPasswdFile interface provides access to the password file data
@@ -16,52 +18,31 @@ import android.app.Activity;
  *
  * @author Jeff Harris
  */
-public abstract class ActivityPasswdFile
+public interface ActivityPasswdFile
 {
-    /// The file data
-    PasswdFileData itsFileData;
-
-    /// The activity
-    Activity itsActivity;
-
-    /// Constructor
-    public ActivityPasswdFile(PasswdFileData fileData,
-                              Activity activity)
-    {
-        itsFileData = fileData;
-        itsActivity = activity;
-
-        touch();
-    }
-
     /**
      * @return the fileData
      */
-    public final PasswdFileData getFileData()
-    {
-        touch();
-        return itsFileData;
-    }
+    public PasswdFileData getFileData();
 
-    public final boolean isOpen()
-    {
-        return (itsFileData != null);
-    }
+    public boolean isOpen();
 
-    public final void setFileData(PasswdFileData fileData)
-    {
-        doSetFileData(fileData);
-        itsFileData = fileData;
-    }
+    public void setFileData(PasswdFileData fileData);
 
-    public abstract void touch();
+    /**
+     * Save the file.  Will likely be called in a background thread.
+     * @throws IOException
+     * @throws ConcurrentModificationException
+     * @throws NoSuchAlgorithmException
+     */
+    public void save()
+        throws NoSuchAlgorithmException, ConcurrentModificationException,
+               IOException;
 
-    public final void close()
-    {
-        doClose();
-        itsFileData = null;
-    }
+    public void touch();
+    public void release();
+    public void close();
 
-    protected abstract void doSetFileData(PasswdFileData fileData);
-    protected abstract void doClose();
+    public void pauseFileTimer();
+    public void resumeFileTimer();
 }

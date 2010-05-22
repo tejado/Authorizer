@@ -10,11 +10,14 @@ package com.jefftharris.passwdsafe;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
+import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 import org.pwsafe.lib.file.PwsField;
 import org.pwsafe.lib.file.PwsFile;
@@ -26,6 +29,7 @@ import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
+import org.pwsafe.lib.file.PwsStringUnicodeField;
 
 public class PasswdFileData
 {
@@ -33,6 +37,7 @@ public class PasswdFileData
     public PwsFile itsPwsFile;
     private final HashMap<String, PwsRecord> itsRecordsByUUID =
         new HashMap<String, PwsRecord>();
+    private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
 
     private static final String TAG = "PasswdFileData";
 
@@ -42,20 +47,40 @@ public class PasswdFileData
     public PasswdFileData(File file, StringBuilder passwd)
         throws Exception
     {
-        itsFile= file;
+        itsFile = file;
         loadFile(passwd);
-   }
+    }
+
+    public void save()
+        throws IOException, NoSuchAlgorithmException,
+               ConcurrentModificationException
+    {
+        if (itsPwsFile != null) {
+            for (int idx = 0; idx < itsRecords.size(); ++idx) {
+                PwsRecord rec = itsRecords.get(idx);
+                if (rec.isModified()) {
+                    PasswdSafeApp.dbginfo(TAG, "Updating idx: " + idx);
+                    itsPwsFile.set(idx, rec);
+                    rec.resetModified();
+                }
+            }
+
+            itsPwsFile.save();
+        }
+    }
 
     public void close()
     {
-        itsFile= null;
+        itsFile = null;
         itsPwsFile.dispose();
+        itsPwsFile = null;
         itsRecordsByUUID.clear();
+        itsRecords.clear();
     }
 
-    public HashMap<String, PwsRecord> getRecordsByUUID()
+    public ArrayList<PwsRecord> getRecords()
     {
-        return itsRecordsByUUID;
+        return itsRecords;
     }
 
     public PwsRecord getRecord(String uuid)
@@ -63,9 +88,43 @@ public class PasswdFileData
         return itsRecordsByUUID.get(uuid);
     }
 
+    public PwsRecord createRecord()
+    {
+        if (itsPwsFile != null) {
+            return itsPwsFile.newRecord();
+        } else {
+            return null;
+        }
+    }
+
+    public void addRecord(PwsRecord rec)
+        throws PasswordSafeException
+    {
+        if (itsPwsFile != null) {
+            itsPwsFile.add(rec);
+            indexRecords();
+        }
+    }
+
+    public final File getFile()
+    {
+        return itsFile;
+    }
+
+    public final boolean isEditSupported()
+    {
+        return (itsPwsFile != null) &&
+               (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
+    }
+
     public final String getEmail(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.EMAIL);
+    }
+
+    public final void setEmail(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.EMAIL);
     }
 
     public final String getGroup(PwsRecord rec)
@@ -73,14 +132,34 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.GROUP);
     }
 
+    public final void setGroup(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.GROUP);
+    }
+
     public final String getNotes(PwsRecord rec)
     {
-        return getField(rec, PwsRecordV3.NOTES);
+        String s = getField(rec, PwsRecordV3.NOTES);
+        if (s != null) {
+            s = s.replace("\r\n", "\n");
+        }
+        return s;
+    }
+
+    public final void setNotes(String str, PwsRecord rec)
+    {
+        str = str.replace("\n", "\r\n");
+        setField(str, rec, PwsRecordV3.NOTES);
     }
 
     public final String getPassword(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.PASSWORD);
+    }
+
+    public final void setPassword(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.PASSWORD);
     }
 
     public final String getPasswdExpiryTime(PwsRecord rec)
@@ -93,14 +172,29 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.TITLE);
     }
 
+    public final void setTitle(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.TITLE);
+    }
+
     public final String getUsername(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.USERNAME);
     }
 
+    public final void setUsername(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.USERNAME);
+    }
+
     public final String getURL(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.URL);
+    }
+
+    public final void setURL(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.URL);
     }
 
     public final String getUUID(PwsRecord rec)
@@ -238,6 +332,53 @@ public class PasswdFileData
         }
     }
 
+    private final void setField(String str, PwsRecord rec, int fieldId)
+    {
+        // TODO v1 and v2 - hide fields that aren't valid for version
+        PwsField field = null;
+        switch (itsPwsFile.getFileVersionMajor())
+        {
+        case PwsFileV3.VERSION:
+        {
+            switch (fieldId)
+            {
+            case PwsRecordV3.EMAIL:
+            case PwsRecordV3.GROUP:
+            case PwsRecordV3.NOTES:
+            case PwsRecordV3.PASSWORD:
+            case PwsRecordV3.TITLE:
+            case PwsRecordV3.URL:
+            case PwsRecordV3.USERNAME:
+            {
+                if ((str != null) && (str.length() != 0)) {
+                    field = new PwsStringUnicodeField(fieldId, str);
+                }
+                break;
+            }
+            default:
+            {
+                fieldId = FIELD_UNSUPPORTED;
+                break;
+            }
+            }
+            break;
+        }
+        default:
+        {
+            fieldId = FIELD_UNSUPPORTED;
+            break;
+        }
+        }
+
+        if (fieldId != FIELD_UNSUPPORTED) {
+            if (field != null) {
+                rec.setField(field);
+            } else {
+                rec.removeField(fieldId);
+            }
+        }
+    }
+
     private void loadFile(StringBuilder passwd)
         throws IOException, NoSuchAlgorithmException,
             EndOfFileException, InvalidPassphraseException,
@@ -248,17 +389,23 @@ public class PasswdFileData
         passwd.delete(0, passwd.length());
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");
+        indexRecords();
+        PasswdSafeApp.dbginfo(TAG, "file loaded");
+    }
 
+    private final void indexRecords()
+    {
+        itsRecords.clear();
+        itsRecordsByUUID.clear();
         Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
-        while (recIter.hasNext()) {
+        for (int idx = 0; recIter.hasNext(); ++idx) {
             PwsRecord rec = recIter.next();
+            itsRecords.add(rec);
+
             String uuid = getUUID(rec);
             if (uuid != null) {
                 itsRecordsByUUID.put(uuid, rec);
             }
         }
-
-        PasswdSafeApp.dbginfo(TAG, "file loaded");
     }
-
 }

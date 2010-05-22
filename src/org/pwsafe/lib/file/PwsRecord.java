@@ -434,7 +434,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	/**
 	 * Resets the modified flag.
 	 */
-	void resetModified() {
+	public void resetModified() {
 		modified = false;
 	}
 
@@ -502,6 +502,18 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 					I18nHelper.getInstance().formatMessage("E00003",
 							new Object[] { Integer.valueOf(theType) }));
 		}
+	}
+
+	/**
+	 * Remove a field from this record
+	 * @param type The type of field to remove
+	 */
+	public void removeField(int type)
+	{
+	    PwsField field = attributes.remove(type);
+	    if (field != null) {
+	        setModified();
+	    }
 	}
 
 	/**

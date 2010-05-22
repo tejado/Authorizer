@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:id="@+id/record_edit"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent">
+              
+    <TextView android:id="@+id/rec_title"
+              android:gravity="center"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textSize="24sp"/>
+              
+    <View android:layout_width="fill_parent"
+          android:layout_height="2dip"
+          android:background="#FF909090"/>
+          
+    <ScrollView android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+        <TableLayout android:layout_width="fill_parent"
+                     android:layout_height="wrap_content"
+                     android:stretchColumns="1"
+                     android:shrinkColumns="1">
+            <TableRow android:id="@+id/title_row">
+                <TextView android:text="Title"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/title"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/group_row">
+                <TextView android:text="Group"
+                          android:padding="3dip"/>
+                <Spinner android:id="@+id/group"
+                         android:drawSelectorOnTop="true"
+                         android:prompt="@string/choose_group"
+                         android:layout_width="fill_parent"
+                         android:layout_height="wrap_content"/>
+            </TableRow>
+
+            <TableRow android:id="@+id/url_row">
+                <TextView android:text="URL"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/url"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/email_row">
+                <TextView android:text="Email"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/email"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/user_row">
+                <TextView android:text="User name"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/user"
+                          android:singleLine="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/password_row">
+                <TextView android:text="Password"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/password"
+                          android:singleLine="true"
+                          android:password="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/password_confirm_row">
+                <TextView android:text="Confirm"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/password_confirm"
+                          android:singleLine="true"
+                          android:password="true"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
+            <TableRow android:id="@+id/notes_row">
+                <TextView android:text="Notes"
+                          android:padding="3dip"/>
+                <EditText android:id="@+id/notes"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+    <View android:layout_width="fill_parent"
+          android:layout_height="2dip"
+          android:background="#FF909090"/>
+          
+    <TextView android:id="@+id/error_msg"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"/> 
+
+    <LinearLayout android:orientation="horizontal"
+                  android:layout_height="wrap_content"
+                  android:layout_width="fill_parent">
+        <Button android:id="@+id/done_btn"
+                android:text="Done" 
+                android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+
+        <Button android:id="@+id/cancel_btn"
+                android:text="Cancel"
+                android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+    </LinearLayout>              
+</LinearLayout>

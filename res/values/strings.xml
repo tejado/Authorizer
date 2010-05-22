@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">About</string>
+    <string name="add_record">Add Record</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">Passwd Safe</string>
+    <string name="choose_group">Choose Group</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
     <string name="copy_user">Copy User Name</string>
+    <string name="edit">Edit</string>
+    <string name="error_msg">&lt;b&gt;&lt;i&gt;Error&lt;/i&gt;&lt;/b&gt; - %1$s</string>
     <string name="hide_password">Hide Password</string>
     <string name="password">Password</string>
     <string name="preferences">Preferences</string>

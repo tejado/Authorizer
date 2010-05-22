@@ -8,6 +8,9 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -29,29 +32,96 @@ import android.util.Log;
 public class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
-    public class AppActivityPasswdFile extends ActivityPasswdFile
+    public class AppActivityPasswdFile implements ActivityPasswdFile
     {
+        /// The file data
+        PasswdFileData itsFileData;
+
+        /// The activity
+        Activity itsActivity;
+
         public AppActivityPasswdFile(PasswdFileData fileData, Activity activity)
         {
-            super(fileData, activity);
+            itsFileData = fileData;
+            itsActivity = activity;
+
+            touch();
         }
 
-        @Override
-        protected void doSetFileData(PasswdFileData fileData)
+        /**
+         * @return the fileData
+         */
+        public final PasswdFileData getFileData()
         {
-            PasswdSafeApp.this.setFileData(fileData, itsActivity);
+            synchronized (PasswdSafeApp.this) {
+                touch();
+                return itsFileData;
+            }
         }
 
-        @Override
-        public void touch()
+        public final boolean isOpen()
+        {
+            synchronized (PasswdSafeApp.this) {
+                return (itsFileData != null);
+            }
+        }
+
+        public final void setFileData(PasswdFileData fileData)
+        {
+            synchronized (PasswdSafeApp.this) {
+                PasswdSafeApp.this.setFileData(fileData, itsActivity);
+                itsFileData = fileData;
+            }
+        }
+
+        /**
+         * Save the file.  Will likely be called in a background thread.
+         * @throws IOException
+         * @throws ConcurrentModificationException
+         * @throws NoSuchAlgorithmException
+         */
+        public final void save()
+            throws NoSuchAlgorithmException, ConcurrentModificationException,
+                   IOException
+        {
+            synchronized (PasswdSafeApp.this) {
+                if (itsFileData != null) {
+                    cancelFileDataTimer();
+                    try {
+                        itsFileData.save();
+                    } finally {
+                        touchFileDataTimer();
+                    }
+                }
+            }
+        }
+
+        public final void touch()
         {
             touchFileData(itsActivity);
         }
 
-        @Override
-        protected void doClose()
+        public final void release()
         {
-            PasswdSafeApp.this.setFileData(null, itsActivity);
+            releaseFileData(itsActivity);
+        }
+
+        public final void close()
+        {
+            synchronized (PasswdSafeApp.this) {
+                PasswdSafeApp.this.setFileData(null, itsActivity);
+                itsFileData = null;
+            }
+        }
+
+        public final void pauseFileTimer()
+        {
+            PasswdSafeApp.this.pauseFileTimer();
+        }
+
+        public final void resumeFileTimer()
+        {
+            PasswdSafeApp.this.resumeFileTimer();
         }
     }
 
@@ -72,6 +142,8 @@ public class PasswdSafeApp extends Application
         "com.jefftharris.passwdsafe.action.VIEW";
     public static final String FILE_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
+
+    public static final int RESULT_MODIFIED = Activity.RESULT_FIRST_USER;
 
     public static final String PREF_FILE_DIR = "fileDirPref";
     public static final String PREF_FILE_DIR_DEF =
@@ -106,6 +178,7 @@ public class PasswdSafeApp extends Application
     private PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout = 300*1000;
     private boolean itsIsOpenDefault = true;
+    private boolean itsFileTimerPaused = false;
 
     private static final Intent FILE_TIMEOUT_INTENT_OBJ =
         new Intent(FILE_TIMEOUT_INTENT);
@@ -219,6 +292,35 @@ public class PasswdSafeApp extends Application
                                 PREF_SORT_CASE_SENSITIVE_DEF);
     }
 
+    public static final String getAppFileTitle(ActivityPasswdFile actFile,
+                                               Context ctx)
+    {
+        File file = null;
+        if (actFile != null) {
+            PasswdFileData fileData = actFile.getFileData();
+            if (fileData != null) {
+                file= fileData.getFile();
+            }
+        }
+        return getAppFileTitle(file, ctx);
+    }
+
+    public static final String getAppFileTitle(File file, Context ctx)
+    {
+        StringBuilder builder = new StringBuilder(getAppTitle(ctx));
+        if (file != null) {
+            builder.append(" - ");
+            builder.append(file.getName());
+        }
+        return builder.toString();
+
+    }
+
+    public static final String getAppTitle(Context ctx)
+    {
+        return ctx.getString(R.string.app_name);
+    }
+
     public static void showFatalMsg(String msg, final Activity activity)
     {
         new AlertDialog.Builder(activity)
@@ -255,6 +357,18 @@ public class PasswdSafeApp extends Application
         }
     }
 
+    private synchronized final void pauseFileTimer()
+    {
+        cancelFileDataTimer();
+        itsFileTimerPaused = true;
+    }
+
+    private synchronized final void resumeFileTimer()
+    {
+        itsFileTimerPaused = false;
+        touchFileDataTimer();
+    }
+
     private synchronized final void cancelFileDataTimer()
     {
         if (itsCloseIntent != null) {
@@ -266,7 +380,8 @@ public class PasswdSafeApp extends Application
     private synchronized final void touchFileDataTimer()
     {
         dbginfo(TAG, "touch timer timeout: " + itsFileCloseTimeout);
-        if ((itsFileData != null) && (itsFileCloseTimeout != 0)) {
+        if ((itsFileData != null) && (itsFileCloseTimeout != 0) &&
+            !itsFileTimerPaused) {
             if (itsCloseIntent == null) {
                 itsCloseIntent =
                     PendingIntent.getBroadcast(this, 0,
@@ -286,6 +401,12 @@ public class PasswdSafeApp extends Application
             itsFileDataActivities.put(activity, null);
             touchFileDataTimer();
         }
+    }
+
+    private synchronized final void releaseFileData(Activity activity)
+    {
+        dbginfo(TAG, "release activity:" + activity);
+        itsFileDataActivities.remove(activity);
     }
 
     private synchronized final void setFileData(PasswdFileData fileData,
