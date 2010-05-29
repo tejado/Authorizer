@@ -85,6 +85,7 @@ public class PasswdSafe extends ExpandableListActivity {
         itsPasswdFile = app.accessPasswdFile(itsFile, this);
         setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
 
+        // TODO: Handle read-only files
         if (!itsPasswdFile.isOpen()) {
             showDialog(DIALOG_GET_PASSWD);
         } else {
