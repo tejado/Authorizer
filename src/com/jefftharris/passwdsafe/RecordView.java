@@ -97,7 +97,9 @@ public class RecordView extends Activity
     protected void onResume()
     {
         super.onResume();
-        itsPasswdFile.touch();
+        if (itsPasswdFile != null) {
+            itsPasswdFile.touch();
+        }
     }
 
     /* (non-Javadoc)
