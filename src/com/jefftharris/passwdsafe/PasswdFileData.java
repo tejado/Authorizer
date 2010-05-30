@@ -111,10 +111,12 @@ public class PasswdFileData
         return itsFile;
     }
 
-    public final boolean isEditSupported()
+    public final boolean canEdit()
     {
-        return (itsPwsFile != null) &&
-               (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
+        return
+            (itsPwsFile != null) &&
+            !itsPwsFile.isReadOnly() &&
+            (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
     }
 
     public final String getEmail(PwsRecord rec)
@@ -386,6 +388,9 @@ public class PasswdFileData
     {
         PasswdSafeApp.dbginfo(TAG, "before load file");
         itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
+        if (!itsFile.canWrite()) {
+            itsPwsFile.setReadOnly(true);
+        }
         passwd.delete(0, passwd.length());
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");

@@ -174,7 +174,7 @@ public class RecordView extends Activity
 
         item = menu.findItem(MENU_EDIT);
         if (item != null) {
-            item.setEnabled(itsPasswdFile.getFileData().isEditSupported());
+            item.setEnabled(itsPasswdFile.getFileData().canEdit());
         }
 
         return true;

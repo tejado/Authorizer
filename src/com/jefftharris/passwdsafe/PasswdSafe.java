@@ -159,7 +159,7 @@ public class PasswdSafe extends ExpandableListActivity {
     {
         MenuItem mi = menu.findItem(MENU_ADD_RECORD);
         if (mi != null) {
-            mi.setEnabled(itsPasswdFile.getFileData().isEditSupported());
+            mi.setEnabled(itsPasswdFile.getFileData().canEdit());
         }
         return super.onPrepareOptionsMenu(menu);
     }
