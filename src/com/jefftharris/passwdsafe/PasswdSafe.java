@@ -234,7 +234,7 @@ public class PasswdSafe extends ExpandableListActivity {
             };
 
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle("Open " + itsFile.getName())
+                .setTitle("Open " + itsFile.getPath())
                 .setMessage("Enter password:")
                 .setView(passwdView)
                 .setPositiveButton("Ok", dlgClick)
