@@ -18,6 +18,42 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:scheme="file"/>
             </intent-filter>
+            
+            <!--  Web browser -->
+            <!-- 
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:host="*"/>
+                <data android:pathPattern=".*\\.psafe3"/>
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:scheme="http"/>
+                <data android:scheme="https"/>
+            </intent-filter>
+            -->
+
+            <!-- Dropbox, Astro -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data scheme="file"/>
+                <data android:pathPattern=".*\\.psafe3"/>
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:mimeType="application/octet-stream"/>
+                <data android:mimeType="application/x-psafe3"/>
+                <data android:mimeType="application/x-psafe"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data scheme="file"/>
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:mimeType="application/x-ns-proxy-autoconfig"/>
+            </intent-filter>
         </activity>
         
         <activity android:name=".Preferences"
