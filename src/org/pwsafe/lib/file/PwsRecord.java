@@ -439,6 +439,14 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	}
 
 	/**
+	 * Mark the record as loaded
+	 */
+	public final void setLoaded()
+	{
+	    isLoaded = true;
+	}
+
+	/**
 	 * Sets a field on this record from <code>item</code>.
 	 *
 	 * @param item

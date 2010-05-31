@@ -400,6 +400,7 @@ public class RecordEditActivity extends Activity
         } else {
             newRecord = true;
             record = fileData.createRecord();
+            record.setLoaded();
         }
         if (record == null) {
             PasswdSafeApp.showFatalMsg("Unknown record: " + itsUUID, this);
