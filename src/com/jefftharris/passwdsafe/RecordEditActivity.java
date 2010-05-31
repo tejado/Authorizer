@@ -107,23 +107,35 @@ public class RecordEditActivity extends Activity
             setText(R.id.rec_title, "Edit " + fileData.getTitle(record));
             setText(R.id.title, fileData.getTitle(record));
             group = fileData.getGroup(record);
-            setText(R.id.url, fileData.getURL(record));
-            setText(R.id.email, fileData.getEmail(record));
             setText(R.id.user, fileData.getUsername(record));
             setText(R.id.notes, fileData.getNotes(record));
 
             String password = fileData.getPassword(record);
             setText(R.id.password, password);
             setText(R.id.password_confirm, password);
+
+            if (fileData.isV3()) {
+                setText(R.id.url, fileData.getURL(record));
+                setText(R.id.email, fileData.getEmail(record));
+            } else {
+                hideRow(R.id.url_row);
+                hideRow(R.id.email_row);
+            }
         } else {
             setText(R.id.rec_title, "New Entry");
             setText(R.id.title, null);
-            setText(R.id.url, null);
-            setText(R.id.email, null);
             setText(R.id.user, null);
-            setText(R.id.notes, null);
             setText(R.id.password, null);
             setText(R.id.password_confirm, null);
+            setText(R.id.notes, null);
+
+            if (fileData.isV3()) {
+                setText(R.id.url, null);
+                setText(R.id.email, null);
+            } else {
+                hideRow(R.id.url_row);
+                hideRow(R.id.email_row);
+            }
         }
 
         initGroup(fileData, record, group);
@@ -253,7 +265,7 @@ public class RecordEditActivity extends Activity
         return dialog;
     }
 
-    private final void initGroup(PasswdFileData fileData, PwsRecord editRecord, 
+    private final void initGroup(PasswdFileData fileData, PwsRecord editRecord,
 	    			 String group)
     {
         ArrayList<PwsRecord> records = fileData.getRecords();
@@ -262,7 +274,7 @@ public class RecordEditActivity extends Activity
             if ((grp != null) && (grp.length() != 0)) {
                 itsGroups.add(grp);
             }
-            
+
             if (rec != editRecord) {
                 V3Key key = new V3Key(fileData.getTitle(rec), grp,
                                       fileData.getUsername(rec));
@@ -341,7 +353,7 @@ public class RecordEditActivity extends Activity
                 errorMsg = "Empty title";
                 break;
             }
-            
+
             V3Key key = new V3Key(title, getSpinnerStr(R.id.group),
         	    		  getTextViewStr(R.id.user));
             if (itsRecordKeys.contains(key)) {
@@ -406,16 +418,6 @@ public class RecordEditActivity extends Activity
             fileData.setGroup(updateStr, record);
         }
 
-        updateStr = getUpdatedField(fileData.getURL(record), R.id.url);
-        if (updateStr != null) {
-            fileData.setURL(updateStr, record);
-        }
-
-        updateStr = getUpdatedField(fileData.getEmail(record), R.id.email);
-        if (updateStr != null) {
-            fileData.setEmail(updateStr, record);
-        }
-
         updateStr = getUpdatedField(fileData.getUsername(record), R.id.user);
         if (updateStr != null) {
             fileData.setUsername(updateStr, record);
@@ -430,6 +432,18 @@ public class RecordEditActivity extends Activity
         updateStr = getUpdatedField(fileData.getNotes(record), R.id.notes);
         if (updateStr != null) {
             fileData.setNotes(updateStr, record);
+        }
+
+        if (fileData.isV3()) {
+            updateStr = getUpdatedField(fileData.getURL(record), R.id.url);
+            if (updateStr != null) {
+                fileData.setURL(updateStr, record);
+            }
+
+            updateStr = getUpdatedField(fileData.getEmail(record), R.id.email);
+            if (updateStr != null) {
+                fileData.setEmail(updateStr, record);
+            }
         }
 
         try {
@@ -463,7 +477,7 @@ public class RecordEditActivity extends Activity
         TextView tv = (TextView)findViewById(viewId);
         return tv.getText().toString();
     }
-    
+
     private final String getSpinnerStr(int viewId)
     {
         Spinner s = (Spinner)findViewById(viewId);
@@ -506,6 +520,12 @@ public class RecordEditActivity extends Activity
         }
     }
 
+    private final void hideRow(int rowId)
+    {
+        View row = findViewById(rowId);
+        row.setVisibility(View.GONE);
+    }
+
     private final class SaveTask extends AsyncTask<Void, Void, Object>
     {
         @Override
@@ -536,36 +556,38 @@ public class RecordEditActivity extends Activity
             finish();
         }
     }
-    
+
     private static class V3Key
     {
-	private String itsTitle;
-	private String itsGroup;
-	private String itsUser;
-	
-	public V3Key(String title, String group, String user)
-	{
-	    itsTitle = (title != null) ? title : "";
-	    itsGroup = (group != null) ? group : "";
-	    itsUser = (user != null) ? user : "";
-	}
+        private String itsTitle;
+        private String itsGroup;
+        private String itsUser;
 
-	@Override
-	public boolean equals(Object o) {
-	    if (o instanceof V3Key) {
-		V3Key key = (V3Key)o;
-		return itsTitle.equals(key.itsTitle) && 
-			itsGroup.equals(key.itsGroup) &&
-			itsUser.equals(key.itsUser);
-	    } else {
-		return false;
-	    }
-	}
+        public V3Key(String title, String group, String user)
+        {
+            itsTitle = (title != null) ? title : "";
+            itsGroup = (group != null) ? group : "";
+            itsUser = (user != null) ? user : "";
+        }
 
-	@Override
-	public int hashCode() {
-	    return itsTitle.hashCode() ^ itsGroup.hashCode() ^ 
-	    	itsUser.hashCode();
-	}
+        @Override
+        public boolean equals(Object o)
+        {
+            if (o instanceof V3Key) {
+                V3Key key = (V3Key)o;
+                return itsTitle.equals(key.itsTitle) &&
+                    itsGroup.equals(key.itsGroup) &&
+                    itsUser.equals(key.itsUser);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return itsTitle.hashCode() ^ itsGroup.hashCode() ^
+            itsUser.hashCode();
+        }
     }
 }

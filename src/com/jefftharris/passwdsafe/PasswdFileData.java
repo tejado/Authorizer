@@ -29,6 +29,7 @@ import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
+import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 
 public class PasswdFileData
@@ -113,9 +114,15 @@ public class PasswdFileData
 
     public final boolean canEdit()
     {
-        return
-            (itsPwsFile != null) &&
-            !itsPwsFile.isReadOnly() &&
+        return (itsPwsFile != null) &&
+               !itsPwsFile.isReadOnly() &&
+               ((itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION) ||
+                (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION));
+    }
+
+    public final boolean isV3()
+    {
+        return (itsPwsFile != null) &&
             (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
     }
 
@@ -336,7 +343,7 @@ public class PasswdFileData
 
     private final void setField(String str, PwsRecord rec, int fieldId)
     {
-        // TODO v1 and v2 - hide fields that aren't valid for version
+        // TODO v1 - hide fields that aren't valid for version
         PwsField field = null;
         switch (itsPwsFile.getFileVersionMajor())
         {
@@ -364,6 +371,28 @@ public class PasswdFileData
             }
             }
             break;
+        }
+        case PwsFileV2.VERSION:
+        {
+            switch (fieldId)
+            {
+            case PwsRecordV3.GROUP:
+            case PwsRecordV3.NOTES:
+            case PwsRecordV3.PASSWORD:
+            case PwsRecordV3.TITLE:
+            case PwsRecordV3.USERNAME:
+            {
+                if ((str != null) && (str.length() != 0)) {
+                    field = new PwsStringField(fieldId, str);
+                }
+                break;
+            }
+            default:
+            {
+                fieldId = FIELD_UNSUPPORTED;
+                break;
+            }
+            }
         }
         default:
         {
