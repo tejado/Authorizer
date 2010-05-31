@@ -339,6 +339,7 @@ public class RecordEditActivity extends Activity
             android.R.layout.simple_spinner_dropdown_item);
         Spinner s = (Spinner)findViewById(R.id.group);
         s.setAdapter(groupAdapter);
+        groupAdapter.notifyDataSetChanged();
         if (groupPos != 0) {
             s.setSelection(groupPos);
         }
