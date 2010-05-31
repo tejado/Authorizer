@@ -343,7 +343,6 @@ public class PasswdFileData
 
     private final void setField(String str, PwsRecord rec, int fieldId)
     {
-        // TODO v1 - hide fields that aren't valid for version
         PwsField field = null;
         switch (itsPwsFile.getFileVersionMajor())
         {
