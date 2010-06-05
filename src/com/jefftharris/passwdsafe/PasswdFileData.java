@@ -15,11 +15,14 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.pwsafe.lib.UUID;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 import org.pwsafe.lib.file.PwsField;
+import org.pwsafe.lib.file.PwsFieldTypeV2;
+import org.pwsafe.lib.file.PwsFieldTypeV3;
 import org.pwsafe.lib.file.PwsFile;
 import org.pwsafe.lib.file.PwsFileFactory;
 import org.pwsafe.lib.file.PwsFileV1;
@@ -31,6 +34,7 @@ import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
+import org.pwsafe.lib.file.PwsUUIDField;
 
 public class PasswdFileData
 {
@@ -124,6 +128,12 @@ public class PasswdFileData
     {
         return (itsPwsFile != null) &&
             (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
+    }
+
+    public final boolean isV2()
+    {
+        return (itsPwsFile != null) &&
+            (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION);
     }
 
     public final String getEmail(PwsRecord rec)
@@ -434,12 +444,24 @@ public class PasswdFileData
         Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
         for (int idx = 0; recIter.hasNext(); ++idx) {
             PwsRecord rec = recIter.next();
-            itsRecords.add(rec);
-
             String uuid = getUUID(rec);
-            if (uuid != null) {
-                itsRecordsByUUID.put(uuid, rec);
+            if (uuid == null) {
+                // Add a UUID field for records without one.  The record will
+                // not be marked as modified unless the user manually edits it.
+                PwsUUIDField uuidField =
+                    new PwsUUIDField(isV2() ?
+                                     PwsFieldTypeV2.UUID : PwsFieldTypeV3.UUID,
+                                     new UUID());
+                boolean modified = rec.isModified();
+                rec.setField(uuidField);
+                if (!modified) {
+                    rec.resetModified();
+                }
+                uuid = uuidField.toString();
             }
+
+            itsRecords.add(rec);
+            itsRecordsByUUID.put(uuid, rec);
         }
     }
 }
