@@ -25,6 +25,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnClickListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,14 +38,17 @@ import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.TextView;
 
 public class PasswdSafe extends ExpandableListActivity {
     private static final String TAG = "PasswdSafe";
 
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
+    private static final int DIALOG_DETAILS = 2;
 
     private static final int MENU_ADD_RECORD = 1;
+    private static final int MENU_DETAILS = 2;
 
     private static final String RECORD = "record";
     private static final String TITLE = "title";
@@ -147,6 +151,9 @@ public class PasswdSafe extends ExpandableListActivity {
     {
         MenuItem mi = menu.add(0, MENU_ADD_RECORD, 0, R.string.add_record);
         mi.setIcon(android.R.drawable.ic_menu_add);
+
+        mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
+        mi.setIcon(android.R.drawable.ic_menu_info_details);
         return true;
     }
 
@@ -177,6 +184,10 @@ public class PasswdSafe extends ExpandableListActivity {
                            this, RecordEditActivity.class),
                 RECORD_ADD_REQUEST);
             return true;
+        }
+        case MENU_DETAILS:
+        {
+            showDialog(DIALOG_DETAILS);
         }
         default:
             return super.onOptionsItemSelected(item);
@@ -253,8 +264,57 @@ public class PasswdSafe extends ExpandableListActivity {
             dialog = dlg;
             break;
         }
+        case DIALOG_DETAILS:
+        {
+            LayoutInflater factory = LayoutInflater.from(this);
+            final View detailsView =
+                factory.inflate(R.layout.file_details, null);
+            AlertDialog.Builder alert = new AlertDialog.Builder(this)
+                .setTitle(itsFile.getName())
+                .setView(detailsView)
+                .setNeutralButton(R.string.close, new OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+            dialog = alert.create();
+            break;
+        }
         }
         return dialog;
+    }
+
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog)
+    {
+        super.onPrepareDialog(id, dialog);
+        switch (id)
+        {
+        case DIALOG_DETAILS:
+        {
+            TextView tv;
+            tv = (TextView)dialog.findViewById(R.id.file);
+            tv.setText(itsFile.getPath());
+
+            PasswdFileData fileData = itsPasswdFile.getFileData();
+            tv = (TextView)dialog.findViewById(R.id.permissions);
+            tv.setText(fileData.canEdit() ?
+                       R.string.read_write : R.string.read_only);
+
+            tv = (TextView)dialog.findViewById(R.id.num_groups);
+            tv.setText(Integer.toString(itsGroupData.size()));
+
+            tv = (TextView)dialog.findViewById(R.id.num_records);
+            tv.setText(Integer.toString(fileData.getRecords().size()));
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
     }
 
     /* (non-Javadoc)

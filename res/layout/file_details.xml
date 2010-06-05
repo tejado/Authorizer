@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             android:stretchColumns="1"
+             android:shrinkColumns="1"
+             android:padding="3dip"
+             >
+    <TableRow>
+        <TextView android:text="File:"/>
+        <TextView android:id="@+id/file"
+                  android:layout_width="wrap_content"/>
+    </TableRow>
+    <TableRow>
+        <TextView android:text="Permissions:"/>
+        <TextView android:id="@+id/permissions"
+                  android:layout_width="wrap_content"/>
+    </TableRow>
+    <TableRow>
+        <TextView android:text="Number of Groups:"/>
+        <TextView android:id="@+id/num_groups"
+                  android:layout_width="wrap_content"/>
+    </TableRow>
+    <TableRow>
+        <TextView android:text="Number of Records:"/>
+        <TextView android:id="@+id/num_records"
+                  android:layout_width="wrap_content"/>
+    </TableRow>
+</TableLayout>
