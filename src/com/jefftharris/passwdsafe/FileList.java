@@ -9,7 +9,6 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.security.Security;
 import java.util.Arrays;
 
 import android.app.AlertDialog;
@@ -32,11 +31,6 @@ import android.widget.TextView;
 
 public class FileList extends ListActivity
 {
-    static {
-        Security.removeProvider("BC");
-        Security.addProvider(new BCProvider());
-    }
-
     private static final String TAG = "FileList";
 
     private static final int MENU_PREFERENCES = 1;
