@@ -12,7 +12,10 @@ import java.io.File;
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -31,12 +34,15 @@ public class RecordView extends Activity
 
     private static final String WORD_WRAP_PREF = "wordwrap";
 
+    private static final int DIALOG_DELETE = 0;
+
     private static final int MENU_EDIT = 1;
-    private static final int MENU_TOGGLE_PASSWORD = 2;
-    private static final int MENU_COPY_USER = 3;
-    private static final int MENU_COPY_PASSWORD = 4;
-    private static final int MENU_COPY_NOTES = 5;
-    private static final int MENU_TOGGLE_WRAP_NOTES = 6;
+    private static final int MENU_DELETE = 2;
+    private static final int MENU_TOGGLE_PASSWORD = 3;
+    private static final int MENU_COPY_USER = 4;
+    private static final int MENU_COPY_PASSWORD = 5;
+    private static final int MENU_COPY_NOTES = 6;
+    private static final int MENU_TOGGLE_WRAP_NOTES = 7;
 
     private static final int EDIT_RECORD_REQUEST = 0;
 
@@ -152,6 +158,9 @@ public class RecordView extends Activity
         MenuItem mi = menu.add(0, MENU_EDIT, 0, R.string.edit);
         mi.setIcon(android.R.drawable.ic_menu_edit);
 
+        mi = menu.add(0, MENU_DELETE, 0, R.string.delete);
+        mi.setIcon(android.R.drawable.ic_menu_delete);
+
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
         menu.add(0, MENU_COPY_USER, 0, R.string.copy_user);
         menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_password);
@@ -195,6 +204,11 @@ public class RecordView extends Activity
                 EDIT_RECORD_REQUEST);
             return true;
         }
+        case MENU_DELETE:
+        {
+            showDialog(DIALOG_DELETE);
+            return true;
+        }
         case MENU_TOGGLE_PASSWORD:
         {
             togglePasswordShown();
@@ -231,6 +245,42 @@ public class RecordView extends Activity
         default:
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id)
+    {
+        Dialog dialog = null;
+        switch (id) {
+        case DIALOG_DELETE:
+        {
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+                {
+                    @Override
+                    public void onOkClicked(DialogInterface dialog)
+                    {
+                        deleteRecord();
+                    }
+                };
+
+            TextView tv = (TextView)findViewById(R.id.title);
+            AlertDialog.Builder alert = new AlertDialog.Builder(this)
+                .setTitle("Delete Record?")
+                .setMessage("Delete record \"" + tv.getText() + "\"?")
+                .setPositiveButton("Ok", dlgClick)
+                .setNegativeButton("Cancel", dlgClick)
+                .setOnCancelListener(dlgClick);
+            dialog = alert.create();
+            break;
+        }
+        default:
+        {
+            dialog = super.onCreateDialog(id);
+            break;
+        }
+        }
+        return dialog;
     }
 
     /* (non-Javadoc)
@@ -292,6 +342,26 @@ public class RecordView extends Activity
             registerForContextMenu(itsPasswordView);
         }
         setWordWrap();
+    }
+
+    private final void deleteRecord()
+    {
+        do {
+            PasswdFileData fileData = itsPasswdFile.getFileData();
+            if (fileData == null) {
+                break;
+            }
+            // TODO right logic for failures??
+
+            PwsRecord rec = fileData.getRecord(itsUUID);
+            if (rec == null) {
+                break;
+            }
+
+            boolean removed = fileData.removeRecord(rec);
+            // TODO save!!!!
+        } while(false);
+        finishActivity(PasswdSafeApp.RESULT_MODIFIED);
     }
 
     private final void togglePasswordShown()

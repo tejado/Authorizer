@@ -32,5 +32,8 @@ public abstract class AbstractDialogClickListener
     }
 
     public abstract void onOkClicked(DialogInterface dialog);
-    public abstract void onCancelClicked(DialogInterface dialog);
+
+    public void onCancelClicked(DialogInterface dialog)
+    {
+    }
 }

@@ -102,13 +102,36 @@ public class PasswdFileData
         }
     }
 
-    public void addRecord(PwsRecord rec)
+    public final void addRecord(PwsRecord rec)
         throws PasswordSafeException
     {
         if (itsPwsFile != null) {
             itsPwsFile.add(rec);
             indexRecords();
         }
+    }
+
+    public final boolean removeRecord(PwsRecord rec)
+    {
+        if (itsPwsFile != null) {
+            String recuuid = getUUID(rec);
+            if (recuuid == null) {
+                return false;
+            }
+
+            for (int i = 0; i < itsRecords.size(); ++i) {
+                PwsRecord r = itsRecords.get(i);
+                String ruuid = getUUID(r);
+                if (recuuid.equals(ruuid)) {
+                    boolean rc = itsPwsFile.removeRecord(i);
+                    if (rc) {
+                        indexRecords();
+                    }
+                    return rc;
+                }
+            }
+        }
+        return false;
     }
 
     public final File getFile()
