@@ -21,6 +21,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -100,20 +101,27 @@ public class FileList extends ListActivity
         ActivityPasswdFile file = app.accessPasswdFile(null, this);
         file.close();
 
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        String dirName = PasswdSafeApp.getFileDirPref(prefs);
-        File dir = new File(dirName);
-        itsHeader.setText("Password files in " + dir);
-        FileData[] data = getFiles(dir);
-        setListAdapter(new ArrayAdapter<FileData>(
-                        this, android.R.layout.simple_list_item_1, data));
+        String state = Environment.getExternalStorageState();
+        if (!Environment.MEDIA_MOUNTED.equals(state) &&
+            !Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            itsHeader.setText(R.string.ext_storage_not_mounted);
+            setListAdapter(null);
+        } else {
+            SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+            String dirName = PasswdSafeApp.getFileDirPref(prefs);
+            File dir = new File(dirName);
+            itsHeader.setText("Password files in " + dir);
+            FileData[] data = getFiles(dir);
+            setListAdapter(new ArrayAdapter<FileData>(
+                            this, android.R.layout.simple_list_item_1, data));
 
-        if (app.checkOpenDefault()) {
-            String defFileName = PasswdSafeApp.getDefFilePref(prefs);
-            File defFile = new File(dir, defFileName);
-            if (defFile.isFile() && defFile.canRead()) {
-                openFile(defFile);
+            if (app.checkOpenDefault()) {
+                String defFileName = PasswdSafeApp.getDefFilePref(prefs);
+                File defFile = new File(dir, defFileName);
+                if (defFile.isFile() && defFile.canRead()) {
+                    openFile(defFile);
+                }
             }
         }
     }
