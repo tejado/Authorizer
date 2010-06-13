@@ -329,6 +329,7 @@ public class PasswdSafeApp extends Application
 
     public static void showFatalMsg(String msg, final Activity activity)
     {
+        // TODO: set a dialog click listener
         new AlertDialog.Builder(activity)
         .setMessage(msg)
         .setCancelable(false)

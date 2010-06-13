@@ -7,11 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
-
 import org.pwsafe.lib.file.PwsRecord;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -27,14 +24,14 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.TextView;
 
-public class RecordView extends Activity
+public class RecordView extends AbstractRecordActivity
 {
     private static final String TAG = "RecordView";
     private static final String HIDDEN_PASSWORD = "***** (click to show)";
 
     private static final String WORD_WRAP_PREF = "wordwrap";
 
-    private static final int DIALOG_DELETE = 0;
+    private static final int DIALOG_DELETE = MAX_DIALOG + 1;
 
     private static final int MENU_EDIT = 1;
     private static final int MENU_DELETE = 2;
@@ -46,9 +43,6 @@ public class RecordView extends Activity
 
     private static final int EDIT_RECORD_REQUEST = 0;
 
-    private File itsFile;
-    private String itsUUID;
-    private ActivityPasswdFile itsPasswdFile;
     private TextView itsUserView;
     private boolean isPasswordShown = false;
     private String itsPassword;
@@ -60,40 +54,21 @@ public class RecordView extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        Intent intent = getIntent();
-        PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + getIntent());
-
-        itsFile = new File(intent.getData().getPath());
-        itsUUID = intent.getData().getQueryParameter("rec");
-        if (itsUUID == null) {
-            PasswdSafeApp.showFatalMsg("No record chosen for file: " + itsFile,
-                                       this);
+        if (isFinishing()) {
             return;
         }
 
-        PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsPasswdFile = app.accessPasswdFile(itsFile, this);
+        if (getUUID() == null) {
+            PasswdSafeApp.showFatalMsg("No record chosen for file: " + getFile(),
+                                       this);
+            return;
+        }
 
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
 
         setContentView(R.layout.record_view);
-        setTitle(PasswdSafeApp.getAppFileTitle(itsPasswdFile, this));
         refresh();
-    }
-
-    /* (non-Javadoc)
-     * @see android.app.Activity#onDestroy()
-     */
-    @Override
-    protected void onDestroy()
-    {
-        PasswdSafeApp.dbginfo(TAG, "onDestroy");
-        super.onDestroy();
-        if (itsPasswdFile != null) {
-            itsPasswdFile.release();
-        }
     }
 
     /* (non-Javadoc)
@@ -103,8 +78,9 @@ public class RecordView extends Activity
     protected void onResume()
     {
         super.onResume();
-        if (itsPasswdFile != null) {
-            itsPasswdFile.touch();
+        ActivityPasswdFile passwdFile = getPasswdFile();
+        if (passwdFile != null) {
+            passwdFile.touch();
         }
     }
 
@@ -183,7 +159,9 @@ public class RecordView extends Activity
 
         item = menu.findItem(MENU_EDIT);
         if (item != null) {
-            item.setEnabled(itsPasswdFile.getFileData().canEdit());
+            ActivityPasswdFile passwdFile = getPasswdFile();
+            item.setEnabled((passwdFile != null) &&
+                            passwdFile.getFileData().canEdit());
         }
 
         return true;
@@ -303,14 +281,11 @@ public class RecordView extends Activity
 
     private final void refresh()
     {
-        PasswdFileData fileData = itsPasswdFile.getFileData();
-        if (fileData == null) {
-            PasswdSafeApp.showFatalMsg("File not open: " + itsFile, this);
-            return;
-        }
-        PwsRecord rec = fileData.getRecord(itsUUID);
+        PasswdFileData fileData = getPasswdFile().getFileData();
+        String uuid = getUUID();
+        PwsRecord rec = fileData.getRecord(uuid);
         if (rec == null) {
-            PasswdSafeApp.showFatalMsg("Unknown record: " + itsUUID, this);
+            PasswdSafeApp.showFatalMsg("Unknown record: " + uuid, this);
             return;
         }
 
@@ -347,13 +322,13 @@ public class RecordView extends Activity
     private final void deleteRecord()
     {
         do {
-            PasswdFileData fileData = itsPasswdFile.getFileData();
+            PasswdFileData fileData = getPasswdFile().getFileData();
             if (fileData == null) {
                 break;
             }
             // TODO right logic for failures??
 
-            PwsRecord rec = fileData.getRecord(itsUUID);
+            PwsRecord rec = fileData.getRecord(getUUID());
             if (rec == null) {
                 break;
             }
