@@ -321,22 +321,24 @@ public class RecordView extends AbstractRecordActivity
 
     private final void deleteRecord()
     {
+        boolean removed = false;
         do {
             PasswdFileData fileData = getPasswdFile().getFileData();
             if (fileData == null) {
                 break;
             }
-            // TODO right logic for failures??
 
             PwsRecord rec = fileData.getRecord(getUUID());
             if (rec == null) {
                 break;
             }
 
-            boolean removed = fileData.removeRecord(rec);
-            // TODO save!!!!
+            removed = fileData.removeRecord(rec);
         } while(false);
-        finishActivity(PasswdSafeApp.RESULT_MODIFIED);
+
+        if (removed) {
+            saveFile();
+        }
     }
 
     private final void togglePasswordShown()
