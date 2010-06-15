@@ -329,15 +329,26 @@ public class PasswdSafeApp extends Application
 
     public static void showFatalMsg(String msg, final Activity activity)
     {
-        // TODO: set a dialog click listener
+        AbstractDialogClickListener dlgClick = new AbstractDialogClickListener()
+        {
+            @Override
+            public final void onOkClicked(DialogInterface dialog)
+            {
+                activity.finish();
+            }
+
+            @Override
+            public final void onCancelClicked(DialogInterface dialog)
+            {
+                activity.finish();
+            }
+        };
+
         new AlertDialog.Builder(activity)
         .setMessage(msg)
         .setCancelable(false)
-        .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                activity.finish();
-            }
-        })
+        .setPositiveButton("Close", dlgClick)
+        .setOnCancelListener(dlgClick)
         .show();
     }
 
