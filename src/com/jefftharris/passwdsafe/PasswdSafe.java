@@ -34,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -46,9 +47,11 @@ public class PasswdSafe extends ExpandableListActivity {
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
     private static final int DIALOG_DETAILS = 2;
+    private static final int DIALOG_CHANGE_PASSWD = 3;
 
     private static final int MENU_ADD_RECORD = 1;
     private static final int MENU_DETAILS = 2;
+    private static final int MENU_CHANGE_PASSWD = 3;
 
     private static final String RECORD = "record";
     private static final String TITLE = "title";
@@ -154,6 +157,9 @@ public class PasswdSafe extends ExpandableListActivity {
 
         mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
         mi.setIcon(android.R.drawable.ic_menu_info_details);
+
+        mi = menu.add(0, MENU_CHANGE_PASSWD, 0, R.string.change_password);
+        mi.setIcon(android.R.drawable.ic_menu_edit);
         return true;
     }
 
@@ -181,6 +187,7 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        boolean rc = true;
         switch (item.getItemId()) {
         case MENU_ADD_RECORD:
         {
@@ -188,15 +195,25 @@ public class PasswdSafe extends ExpandableListActivity {
                 new Intent(Intent.ACTION_INSERT, getIntent().getData(),
                            this, RecordEditActivity.class),
                 RECORD_ADD_REQUEST);
-            return true;
+            break;
         }
         case MENU_DETAILS:
         {
             showDialog(DIALOG_DETAILS);
+            break;
+        }
+        case MENU_CHANGE_PASSWD:
+        {
+            showDialog(DIALOG_CHANGE_PASSWD);
+            break;
         }
         default:
-            return super.onOptionsItemSelected(item);
+        {
+            rc = super.onOptionsItemSelected(item);
+            break;
         }
+        }
+        return rc;
     }
 
     /* (non-Javadoc)
@@ -287,6 +304,39 @@ public class PasswdSafe extends ExpandableListActivity {
             dialog = alert.create();
             break;
         }
+        case DIALOG_CHANGE_PASSWD:
+        {
+            LayoutInflater factory = LayoutInflater.from(this);
+            View passwdView = factory.inflate(R.layout.change_passwd, null);
+            final EditText passwdEdit = (EditText)
+                passwdView.findViewById(R.id.password);
+            final EditText confirmEdit = (EditText)
+                passwdView.findViewById(R.id.password_confirm);
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+                {
+                    @Override
+                    public void onOkClicked(DialogInterface dialog)
+                    {
+                        StringBuilder passwdText =
+                            new StringBuilder(passwdEdit.getText().toString());
+                        dialog.dismiss();
+                        changePasswd(passwdText);
+                    }
+                };
+            AlertDialog.Builder alert = new AlertDialog.Builder(this)
+                .setTitle(itsFile.getName())
+                .setView(passwdView)
+                .setPositiveButton("Ok", dlgClick)
+                .setNegativeButton("Cancel", dlgClick)
+                .setOnCancelListener(dlgClick);
+            AlertDialog alertDialog = alert.create();
+            final Button okButton =
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+
+            dialog = alertDialog;
+            break;
+        }
         }
         return dialog;
     }
@@ -350,7 +400,7 @@ public class PasswdSafe extends ExpandableListActivity {
         return true;
     }
 
-    private void openFile(StringBuilder passwd)
+    private final void openFile(StringBuilder passwd)
     {
         removeDialog(DIALOG_GET_PASSWD);
         showDialog(DIALOG_PROGRESS);
@@ -358,7 +408,12 @@ public class PasswdSafe extends ExpandableListActivity {
         itsLoadTask.execute();
     }
 
-    private void showFileData()
+    private final void changePasswd(StringBuilder passwd)
+    {
+        // TODO fill...
+    }
+
+    private final void showFileData()
     {
         itsGroupData.clear();
         itsChildData.clear();
