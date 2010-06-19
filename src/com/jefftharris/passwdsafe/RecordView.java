@@ -157,11 +157,18 @@ public class RecordView extends AbstractRecordActivity
                 R.string.hide_password : R.string.show_password);
         }
 
+        ActivityPasswdFile passwdFile = getPasswdFile();
+        boolean canEdit = (passwdFile != null) &&
+            passwdFile.getFileData().canEdit();
+
         item = menu.findItem(MENU_EDIT);
         if (item != null) {
-            ActivityPasswdFile passwdFile = getPasswdFile();
-            item.setEnabled((passwdFile != null) &&
-                            passwdFile.getFileData().canEdit());
+            item.setEnabled(canEdit);
+        }
+
+        item = menu.findItem(MENU_DELETE);
+        if (item != null) {
+            item.setEnabled(canEdit);
         }
 
         return true;
