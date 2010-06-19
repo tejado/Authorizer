@@ -564,13 +564,11 @@ public class PasswdSafe extends ExpandableListActivity {
                 showFileData();
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
-                String str;
                 if ((e instanceof IOException) &&
                                 (e.getMessage().equals("Invalid password")))
-                    str = e.getMessage();
+                    PasswdSafeApp.showFatalMsg(e.getMessage(), PasswdSafe.this);
                 else
-                    str = e.toString();
-                PasswdSafeApp.showFatalMsg(str, PasswdSafe.this);
+                    PasswdSafeApp.showFatalMsg(e, PasswdSafe.this);
             }
         }
     }

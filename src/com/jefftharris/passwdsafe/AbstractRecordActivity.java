@@ -91,7 +91,7 @@ public abstract class AbstractRecordActivity extends Activity
             try {
                 itsSaveTask.get();
             } catch (Exception e) {
-                PasswdSafeApp.showFatalMsg(e.toString(), this);
+                PasswdSafeApp.showFatalMsg(e, this);
             }
             itsSaveTask = null;
             removeDialog(DIALOG_PROGRESS);
@@ -153,7 +153,7 @@ public abstract class AbstractRecordActivity extends Activity
         {
             removeDialog(DIALOG_PROGRESS);
             if (result instanceof Exception) {
-                PasswdSafeApp.showFatalMsg(((Exception)result).toString(),
+                PasswdSafeApp.showFatalMsg(((Exception)result),
                                            AbstractRecordActivity.this);
             } else {
                 setResult(PasswdSafeApp.RESULT_MODIFIED);

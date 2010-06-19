@@ -9,6 +9,8 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.ConcurrentModificationException;
@@ -325,6 +327,19 @@ public class PasswdSafeApp extends Application
     public static final String getAppTitle(Context ctx)
     {
         return ctx.getString(R.string.app_name);
+    }
+
+    public static void showFatalMsg(Throwable t, Activity activity)
+    {
+        showFatalMsg(t, t.toString(), activity);
+    }
+
+    public static void showFatalMsg(Throwable t, String msg, Activity activity)
+    {
+        StringWriter writer = new StringWriter();
+        t.printStackTrace(new PrintWriter(writer));
+        Log.e(TAG, writer.toString());
+        showFatalMsg(msg, activity);
     }
 
     public static void showFatalMsg(String msg, final Activity activity)

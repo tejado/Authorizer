@@ -407,7 +407,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 fileData.addRecord(record);
             }
         } catch (Exception e) {
-            PasswdSafeApp.showFatalMsg("Error saving record: " + e, this);
+            PasswdSafeApp.showFatalMsg(e, "Error saving record: " + e, this);
             finish();
             return;
         }
