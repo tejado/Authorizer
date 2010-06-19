@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.AlertDialog;
@@ -564,9 +565,11 @@ public class PasswdSafe extends ExpandableListActivity {
                 showFileData();
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
-                if ((e instanceof IOException) &&
-                                (e.getMessage().equals("Invalid password")))
-                    PasswdSafeApp.showFatalMsg(e.getMessage(), PasswdSafe.this);
+                if (((e instanceof IOException) &&
+                     e.getMessage().equals("Invalid password")) ||
+                    (e instanceof InvalidPassphraseException))
+                    PasswdSafeApp.showFatalMsg("Invalid password",
+                                               PasswdSafe.this);
                 else
                     PasswdSafeApp.showFatalMsg(e, PasswdSafe.this);
             }
