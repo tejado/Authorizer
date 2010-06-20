@@ -17,9 +17,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.Html;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,24 +39,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     private String itsPrevGroup;
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
-
-    private TextWatcher itsTextWatcher = new TextWatcher()
-    {
-        public void afterTextChanged(Editable s)
-        {
-            validate();
-        }
-
-        public void beforeTextChanged(CharSequence s, int start,
-                                      int count, int after)
-        {
-        }
-
-        public void onTextChanged(CharSequence s, int start,
-                                  int before, int count)
-        {
-        }
-    };
+    private DialogValidator itsValidator = new Validator();
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -139,7 +119,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         });
 
-        validate();
+        itsValidator.validate();
     }
 
     /* (non-Javadoc)
@@ -248,7 +228,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                     showDialog(DIALOG_NEW_GROUP);
                 } else {
                     itsPrevGroup = parent.getSelectedItem().toString();
-                    validate();
+                    itsValidator.validate();
                 }
             }
 
@@ -265,7 +245,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
         itsPrevGroup = newGroup;
         updateGroups(newGroup);
-        validate();
+        itsValidator.validate();
     }
 
     private final void updateGroups(String selGroup)
@@ -296,45 +276,6 @@ public class RecordEditActivity extends AbstractRecordActivity
         if (groupPos != 0) {
             s.setSelection(groupPos);
         }
-    }
-
-    private final void validate()
-    {
-        String errorMsg = null;
-        do {
-            String title = getTextViewStr(R.id.title);
-            if (title.length() == 0) {
-                errorMsg = "Empty title";
-                break;
-            }
-
-            V3Key key = new V3Key(title, getSpinnerStr(R.id.group),
-        	    		  getTextViewStr(R.id.user));
-            if (itsRecordKeys.contains(key)) {
-        	errorMsg = "Duplicate entry";
-        	break;
-            }
-
-            if (!getTextViewStr(R.id.password).equals(
-                 getTextViewStr(R.id.password_confirm))) {
-                errorMsg = "Passwords do not match";
-                break;
-            }
-        } while(false);
-
-        TextView errorMsgView = (TextView)findViewById(R.id.error_msg);
-        if (errorMsg == null) {
-            errorMsgView.setVisibility(View.GONE);
-        } else {
-            errorMsgView.setVisibility(View.VISIBLE);
-
-            String errorFmt = getResources().getString(R.string.error_msg);
-            errorMsgView.setText(
-                Html.fromHtml(String.format(errorFmt, errorMsg)));
-        }
-
-        View doneBtn = findViewById(R.id.done_btn);
-        doneBtn.setEnabled(errorMsg == null);
     }
 
     private final void saveRecord()
@@ -421,24 +362,14 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private final String getUpdatedField(String currStr, int viewId)
     {
-        return getUpdatedField(currStr, getTextViewStr(viewId));
-    }
-
-    private final String getTextViewStr(int viewId)
-    {
-        TextView tv = (TextView)findViewById(viewId);
-        return tv.getText().toString();
-    }
-
-    private final String getSpinnerStr(int viewId)
-    {
-        Spinner s = (Spinner)findViewById(viewId);
-        return s.getSelectedItem().toString();
+        return getUpdatedField(currStr,
+                               GuiUtils.getTextViewStr(this, viewId));
     }
 
     private final String getUpdatedSpinnerField(String currStr, int viewId)
     {
-        return getUpdatedField(currStr, getSpinnerStr(viewId));
+        return getUpdatedField(currStr,
+                               GuiUtils.getSpinnerStr(this, viewId));
     }
 
     private final String getUpdatedField(String currStr, String newStr)
@@ -467,7 +398,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         case R.id.password_confirm:
         case R.id.title:
         case R.id.user:
-            tv.addTextChangedListener(itsTextWatcher);
+            itsValidator.registerTextView(tv);
             break;
         }
     }
@@ -476,6 +407,36 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         View row = findViewById(rowId);
         row.setVisibility(View.GONE);
+    }
+
+    private class Validator extends DialogValidator
+    {
+        public Validator()
+        {
+            super(RecordEditActivity.this);
+        }
+
+        @Override
+        protected final String doValidation()
+        {
+            String title =
+                GuiUtils.getTextViewStr(RecordEditActivity.this, R.id.title);
+            if (title.length() == 0) {
+                return "Empty title";
+            }
+
+            V3Key key =
+                new V3Key(title,
+                          GuiUtils.getSpinnerStr(RecordEditActivity.this,
+                                                 R.id.group),
+                          GuiUtils.getTextViewStr(RecordEditActivity.this,
+                                                  R.id.user));
+            if (itsRecordKeys.contains(key)) {
+                return "Duplicate entry";
+            }
+
+            return super.doValidation();
+        }
     }
 
     private static class V3Key
@@ -492,7 +453,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         @Override
-        public boolean equals(Object o)
+        public final boolean equals(Object o)
         {
             if (o instanceof V3Key) {
                 V3Key key = (V3Key)o;
@@ -505,7 +466,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         @Override
-        public int hashCode()
+        public final int hashCode()
         {
             return itsTitle.hashCode() ^ itsGroup.hashCode() ^
             itsUser.hashCode();

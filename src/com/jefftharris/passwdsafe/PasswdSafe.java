@@ -334,7 +334,7 @@ public class PasswdSafe extends ExpandableListActivity {
             AlertDialog alertDialog = alert.create();
             final Button okButton =
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-
+            // TODO: Validation
             dialog = alertDialog;
             break;
         }
