@@ -39,7 +39,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     private String itsPrevGroup;
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
-    private DialogValidator itsValidator = new Validator();
+    private DialogValidator itsValidator;
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -53,6 +53,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         setContentView(R.layout.record_edit);
+        itsValidator = new Validator();
 
         PasswdFileData fileData = getPasswdFile().getFileData();
         PwsRecord record = null;
@@ -394,8 +395,6 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         switch (id)
         {
-        case R.id.password:
-        case R.id.password_confirm:
         case R.id.title:
         case R.id.user:
             itsValidator.registerTextView(tv);
@@ -414,6 +413,12 @@ public class RecordEditActivity extends AbstractRecordActivity
         public Validator()
         {
             super(RecordEditActivity.this);
+        }
+
+        @Override
+        protected final View getDoneButton()
+        {
+            return RecordEditActivity.this.findViewById(R.id.done_btn);
         }
 
         @Override

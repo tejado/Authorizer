@@ -16,28 +16,46 @@ import android.widget.TextView;
 
 public abstract class DialogValidator
 {
-    private Activity itsActivity;
+    private TextView itsPassword;
+    private TextView itsPasswordConfirm;
+    private TextView itsErrorMsgView;
+    private String itsErrorFmt;
     private TextWatcher itsTextWatcher = new TextWatcher()
     {
-        public void afterTextChanged(Editable s)
+        public final void afterTextChanged(Editable s)
         {
             validate();
         }
 
-        public void beforeTextChanged(CharSequence s, int start,
-                                      int count, int after)
+        public final void beforeTextChanged(CharSequence s, int start,
+                                            int count, int after)
         {
         }
 
-        public void onTextChanged(CharSequence s, int start,
-                                  int before, int count)
+        public final void onTextChanged(CharSequence s, int start,
+                                        int before, int count)
         {
         }
     };
 
     public DialogValidator(Activity act)
     {
-        itsActivity = act;
+        itsPassword = (TextView) act.findViewById(R.id.password);
+        registerTextView(itsPassword);
+        itsPasswordConfirm = (TextView)act.findViewById(R.id.password_confirm);
+        registerTextView(itsPasswordConfirm);
+        itsErrorMsgView = (TextView)act.findViewById(R.id.error_msg);
+        itsErrorFmt = act.getResources().getString(R.string.error_msg);
+    }
+
+    public DialogValidator(View view)
+    {
+        itsPassword = (TextView) view.findViewById(R.id.password);
+        registerTextView(itsPassword);
+        itsPasswordConfirm = (TextView)view.findViewById(R.id.password_confirm);
+        registerTextView(itsPasswordConfirm);
+        itsErrorMsgView = (TextView)view.findViewById(R.id.error_msg);
+        itsErrorFmt = view.getResources().getString(R.string.error_msg);
     }
 
     public final void registerTextView(TextView tv)
@@ -45,31 +63,39 @@ public abstract class DialogValidator
         tv.addTextChangedListener(itsTextWatcher);
     }
 
+    public final void reset()
+    {
+        itsPassword.setText("");
+        itsPasswordConfirm.setText("");
+        validate();
+    }
+
     public final void validate()
     {
         String errorMsg = doValidation();
 
-        TextView errorMsgView =
-            (TextView)itsActivity.findViewById(R.id.error_msg);
         if (errorMsg == null) {
-            errorMsgView.setVisibility(View.GONE);
+            itsErrorMsgView.setVisibility(View.GONE);
         } else {
-            errorMsgView.setVisibility(View.VISIBLE);
-
-            String errorFmt =
-                itsActivity.getResources().getString(R.string.error_msg);
-            errorMsgView.setText(
-                Html.fromHtml(String.format(errorFmt, errorMsg)));
+            itsErrorMsgView.setVisibility(View.VISIBLE);
+            itsErrorMsgView.setText(
+                Html.fromHtml(String.format(itsErrorFmt, errorMsg)));
         }
 
-        View doneBtn = itsActivity.findViewById(R.id.done_btn);
-        doneBtn.setEnabled(errorMsg == null);
+        getDoneButton().setEnabled(errorMsg == null);
+    }
+
+    protected abstract View getDoneButton();
+
+    protected final TextView getPassword()
+    {
+        return itsPassword;
     }
 
     protected String doValidation()
     {
-        if (!GuiUtils.getTextViewStr(itsActivity, R.id.password).equals(
-                GuiUtils.getTextViewStr(itsActivity, R.id.password_confirm))) {
+        if (!itsPassword.getText().toString().equals(
+             itsPasswordConfirm.getText().toString())) {
             return "Passwords do not match";
         }
         return null;

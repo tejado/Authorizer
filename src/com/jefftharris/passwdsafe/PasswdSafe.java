@@ -35,7 +35,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -68,6 +67,7 @@ public class PasswdSafe extends ExpandableListActivity {
     private LoadTask itsLoadTask;
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
+    private DialogValidator itsChangePasswdValidator;
 
     private final ArrayList<Map<String, String>> itsGroupData =
         new ArrayList<Map<String, String>>();
@@ -308,17 +308,16 @@ public class PasswdSafe extends ExpandableListActivity {
         case DIALOG_CHANGE_PASSWD:
         {
             LayoutInflater factory = LayoutInflater.from(this);
-            View passwdView = factory.inflate(R.layout.change_passwd, null);
-            final EditText passwdEdit = (EditText)
-                passwdView.findViewById(R.id.password);
-            final EditText confirmEdit = (EditText)
-                passwdView.findViewById(R.id.password_confirm);
+            final View passwdView =
+                factory.inflate(R.layout.change_passwd, null);
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
                 {
                     @Override
                     public void onOkClicked(DialogInterface dialog)
                     {
+                        EditText passwdEdit = (EditText)
+                            passwdView.findViewById(R.id.password);
                         StringBuilder passwdText =
                             new StringBuilder(passwdEdit.getText().toString());
                         dialog.dismiss();
@@ -331,10 +330,24 @@ public class PasswdSafe extends ExpandableListActivity {
                 .setPositiveButton("Ok", dlgClick)
                 .setNegativeButton("Cancel", dlgClick)
                 .setOnCancelListener(dlgClick);
-            AlertDialog alertDialog = alert.create();
-            final Button okButton =
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            // TODO: Validation
+            final AlertDialog alertDialog = alert.create();
+            itsChangePasswdValidator = new DialogValidator(passwdView)
+            {
+                @Override
+                protected final View getDoneButton()
+                {
+                    return alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                }
+
+                @Override
+                protected final String doValidation()
+                {
+                    if (getPassword().getText().length() == 0) {
+                        return "Empty password";
+                    }
+                    return super.doValidation();
+                }
+            };
             dialog = alertDialog;
             break;
         }
@@ -364,6 +377,11 @@ public class PasswdSafe extends ExpandableListActivity {
 
             tv = (TextView)dialog.findViewById(R.id.num_records);
             tv.setText(Integer.toString(fileData.getRecords().size()));
+            break;
+        }
+        case DIALOG_CHANGE_PASSWD:
+        {
+            itsChangePasswdValidator.reset();
             break;
         }
         default:

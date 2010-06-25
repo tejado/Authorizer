@@ -289,6 +289,10 @@ public class RecordView extends AbstractRecordActivity
     private final void refresh()
     {
         PasswdFileData fileData = getPasswdFile().getFileData();
+        if (fileData == null) {
+            return;
+        }
+
         String uuid = getUUID();
         PwsRecord rec = fileData.getRecord(uuid);
         if (rec == null) {
