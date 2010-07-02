@@ -35,18 +35,16 @@ import android.util.Log;
 public class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
-    public class AppActivityPasswdFile implements ActivityPasswdFile
+    public class AppActivityPasswdFile extends ActivityPasswdFile
     {
         /// The file data
         PasswdFileData itsFileData;
 
-        /// The activity
-        Activity itsActivity;
-
-        public AppActivityPasswdFile(PasswdFileData fileData, Activity activity)
+        public AppActivityPasswdFile(PasswdFileData fileData,
+                                     PasswdFileActivity activity)
         {
+            super(activity);
             itsFileData = fileData;
-            itsActivity = activity;
 
             touch();
         }
@@ -54,6 +52,7 @@ public class PasswdSafeApp extends Application
         /**
          * @return the fileData
          */
+        @Override
         public final PasswdFileData getFileData()
         {
             synchronized (PasswdSafeApp.this) {
@@ -62,6 +61,7 @@ public class PasswdSafeApp extends Application
             }
         }
 
+        @Override
         public final boolean isOpen()
         {
             synchronized (PasswdSafeApp.this) {
@@ -69,10 +69,11 @@ public class PasswdSafeApp extends Application
             }
         }
 
+        @Override
         public final void setFileData(PasswdFileData fileData)
         {
             synchronized (PasswdSafeApp.this) {
-                PasswdSafeApp.this.setFileData(fileData, itsActivity);
+                PasswdSafeApp.this.setFileData(fileData, getActivity());
                 itsFileData = fileData;
             }
         }
@@ -83,7 +84,8 @@ public class PasswdSafeApp extends Application
          * @throws ConcurrentModificationException
          * @throws NoSuchAlgorithmException
          */
-        public final void save()
+        @Override
+        protected final void doSave()
             throws NoSuchAlgorithmException, ConcurrentModificationException,
                    IOException
         {
@@ -99,29 +101,34 @@ public class PasswdSafeApp extends Application
             }
         }
 
+        @Override
         public final void touch()
         {
-            touchFileData(itsActivity);
+            touchFileData(getActivity());
         }
 
+        @Override
         public final void release()
         {
-            releaseFileData(itsActivity);
+            releaseFileData(getActivity());
         }
 
+        @Override
         public final void close()
         {
             synchronized (PasswdSafeApp.this) {
-                PasswdSafeApp.this.setFileData(null, itsActivity);
+                PasswdSafeApp.this.setFileData(null, getActivity());
                 itsFileData = null;
             }
         }
 
+        @Override
         public final void pauseFileTimer()
         {
             PasswdSafeApp.this.pauseFileTimer();
         }
 
+        @Override
         public final void resumeFileTimer()
         {
             PasswdSafeApp.this.resumeFileTimer();
@@ -261,11 +268,14 @@ public class PasswdSafeApp extends Application
         }
     }
 
-    public synchronized ActivityPasswdFile accessPasswdFile(File file,
-                                                            Activity activity)
+    public synchronized ActivityPasswdFile accessPasswdFile
+    (
+         File file,
+         PasswdFileActivity activity
+    )
     {
-        if ((itsFileData == null) || (itsFileData.itsFile == null) ||
-            (!itsFileData.itsFile.equals(file))) {
+        if ((itsFileData == null) || (itsFileData.getFile() == null) ||
+            (!itsFileData.getFile().equals(file))) {
             closeFileData(false);
         }
 

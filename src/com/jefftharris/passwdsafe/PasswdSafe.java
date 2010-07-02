@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ExpandableListActivity;
@@ -41,13 +42,16 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
-public class PasswdSafe extends ExpandableListActivity {
+public class PasswdSafe extends ExpandableListActivity
+    implements PasswdFileActivity
+{
     private static final String TAG = "PasswdSafe";
 
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
     private static final int DIALOG_DETAILS = 2;
     private static final int DIALOG_CHANGE_PASSWD = 3;
+    private static final int DIALOG_SAVE_PROGRESS = 4;
 
     private static final int MENU_ADD_RECORD = 1;
     private static final int MENU_DETAILS = 2;
@@ -101,6 +105,37 @@ public class PasswdSafe extends ExpandableListActivity {
     }
 
     /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#getActivity()
+     */
+    public Activity getActivity()
+    {
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#saveFinished(boolean)
+     */
+    public void saveFinished(boolean success)
+    {
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#showProgressDialog()
+     */
+    public void showProgressDialog()
+    {
+        showDialog(DIALOG_SAVE_PROGRESS);
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#removeProgressDialog()
+     */
+    public void removeProgressDialog()
+    {
+        removeDialog(DIALOG_SAVE_PROGRESS);
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onDestroy()
      */
     @Override
@@ -109,7 +144,7 @@ public class PasswdSafe extends ExpandableListActivity {
         PasswdSafeApp.dbginfo(TAG, "onDestroy");
         super.onDestroy();
         if (itsPasswdFile != null) {
-            itsPasswdFile.release();
+            itsPasswdFile.onActivityDestroy();
         }
     }
 
@@ -119,11 +154,17 @@ public class PasswdSafe extends ExpandableListActivity {
     @Override
     protected void onPause()
     {
+        PasswdSafeApp.dbginfo(TAG, "onPause");
         super.onPause();
 
         removeDialog(DIALOG_GET_PASSWD);
-        if (itsLoadTask != null)
+        if (itsLoadTask != null) {
             itsLoadTask.cancel(true);
+        }
+
+        if (itsPasswdFile != null) {
+            itsPasswdFile.onActivityPause();
+        }
     }
 
     /* (non-Javadoc)
@@ -144,6 +185,7 @@ public class PasswdSafe extends ExpandableListActivity {
     {
         removeDialog(DIALOG_GET_PASSWD);
         removeDialog(DIALOG_PROGRESS);
+        removeDialog(DIALOG_SAVE_PROGRESS);
         super.onSaveInstanceState(outState);
     }
 
@@ -351,6 +393,16 @@ public class PasswdSafe extends ExpandableListActivity {
             dialog = alertDialog;
             break;
         }
+        case DIALOG_SAVE_PROGRESS:
+        {
+            dialog = itsPasswdFile.createProgressDialog();
+            break;
+        }
+        default:
+        {
+            dialog = super.onCreateDialog(id);
+            break;
+        }
         }
         return dialog;
     }
@@ -429,7 +481,9 @@ public class PasswdSafe extends ExpandableListActivity {
 
     private final void changePasswd(StringBuilder passwd)
     {
-        // TODO fill...
+        PasswdFileData fileData = itsPasswdFile.getFileData();
+        fileData.changePasswd(passwd);
+        itsPasswdFile.save();
     }
 
     private final void showFileData()

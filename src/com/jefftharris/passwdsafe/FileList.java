@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -98,7 +99,26 @@ public class FileList extends ListActivity
     {
         super.onResume();
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        ActivityPasswdFile file = app.accessPasswdFile(null, this);
+        ActivityPasswdFile file =
+            app.accessPasswdFile(null, new PasswdFileActivity()
+            {
+                public void showProgressDialog()
+                {
+                }
+
+                public void removeProgressDialog()
+                {
+                }
+
+                public void saveFinished(boolean success)
+                {
+                }
+
+                public Activity getActivity()
+                {
+                    return FileList.this;
+                }
+            });
         file.close();
 
         String state = Environment.getExternalStorageState();

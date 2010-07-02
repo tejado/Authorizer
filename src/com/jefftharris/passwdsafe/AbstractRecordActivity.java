@@ -11,12 +11,11 @@ import java.io.File;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 public abstract class AbstractRecordActivity extends Activity
+    implements PasswdFileActivity
 {
     private static final String TAG = "AbstractRecordActivity";
 
@@ -26,7 +25,42 @@ public abstract class AbstractRecordActivity extends Activity
     private File itsFile;
     private String itsUUID;
     private ActivityPasswdFile itsPasswdFile;
-    private SaveTask itsSaveTask;
+
+
+    public final Activity getActivity()
+    {
+        return this;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#showProgressDialog()
+     */
+    public final void showProgressDialog()
+    {
+        showDialog(DIALOG_PROGRESS);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#removeProgressDialog()
+     */
+    public void removeProgressDialog()
+    {
+        removeDialog(DIALOG_PROGRESS);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#saveFinished(boolean)
+     */
+    public void saveFinished(boolean success)
+    {
+        if (success) {
+            setResult(PasswdSafeApp.RESULT_MODIFIED);
+        }
+        finish();
+    }
 
 
     protected final File getFile()
@@ -75,7 +109,7 @@ public abstract class AbstractRecordActivity extends Activity
         PasswdSafeApp.dbginfo(TAG, "onDestroy");
         super.onDestroy();
         if (itsPasswdFile != null) {
-            itsPasswdFile.release();
+            itsPasswdFile.onActivityDestroy();
         }
     }
 
@@ -87,16 +121,21 @@ public abstract class AbstractRecordActivity extends Activity
     {
         super.onPause();
         PasswdSafeApp.dbginfo(TAG, "onPause");
-        if (itsSaveTask != null) {
-            try {
-                itsSaveTask.get();
-            } catch (Exception e) {
-                PasswdSafeApp.showFatalMsg(e, this);
-            }
-            itsSaveTask = null;
-            removeDialog(DIALOG_PROGRESS);
+        if (itsPasswdFile != null) {
+            itsPasswdFile.onActivityPause();
         }
     }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        removeDialog(DIALOG_PROGRESS);
+        super.onSaveInstanceState(outState);
+    }
+
 
     @Override
     protected Dialog onCreateDialog(int id)
@@ -106,12 +145,7 @@ public abstract class AbstractRecordActivity extends Activity
         {
         case DIALOG_PROGRESS:
         {
-            ProgressDialog dlg = new ProgressDialog(this);
-            dlg.setTitle(PasswdSafeApp.getAppTitle(this));
-            dlg.setMessage("Saving " + itsFile.getName() + "...");
-            dlg.setIndeterminate(true);
-            dlg.setCancelable(false);
-            dialog = dlg;
+            dialog = itsPasswdFile.createProgressDialog();
             break;
         }
         default:
@@ -125,42 +159,7 @@ public abstract class AbstractRecordActivity extends Activity
 
     protected final void saveFile()
     {
-        PasswdSafeApp.dbginfo(TAG, "saving");
-        // TODO update header fields for last save info??
-        showDialog(DIALOG_PROGRESS);
-        itsSaveTask = new SaveTask();
-        itsSaveTask.execute();
-    }
-
-    private final class SaveTask extends AsyncTask<Void, Void, Object>
-    {
-        @Override
-        protected Object doInBackground(Void... params)
-        {
-            try {
-                itsPasswdFile.save();
-                return null;
-            } catch (Exception e) {
-                return e;
-            }
-        }
-
-        /* (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(Object result)
-        {
-            removeDialog(DIALOG_PROGRESS);
-            if (result instanceof Exception) {
-                PasswdSafeApp.showFatalMsg(((Exception)result),
-                                           AbstractRecordActivity.this);
-            } else {
-                setResult(PasswdSafeApp.RESULT_MODIFIED);
-            }
-            itsSaveTask = null;
-            finish();
-        }
+        itsPasswdFile.save();
     }
 
 }

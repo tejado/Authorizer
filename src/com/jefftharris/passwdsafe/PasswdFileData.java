@@ -38,8 +38,8 @@ import org.pwsafe.lib.file.PwsUUIDField;
 
 public class PasswdFileData
 {
-    public File itsFile;
-    public PwsFile itsPwsFile;
+    private File itsFile;
+    private PwsFile itsPwsFile;
     private final HashMap<String, PwsRecord> itsRecordsByUUID =
         new HashMap<String, PwsRecord>();
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
@@ -132,6 +132,11 @@ public class PasswdFileData
             }
         }
         return false;
+    }
+
+    public final void changePasswd(StringBuilder passwd)
+    {
+        itsPwsFile.setPassphrase(passwd);
     }
 
     public final File getFile()
