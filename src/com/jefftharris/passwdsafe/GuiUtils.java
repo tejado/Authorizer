@@ -22,6 +22,7 @@ public final class GuiUtils
     public static String getSpinnerStr(Activity act, int viewId)
     {
         Spinner s = (Spinner)act.findViewById(viewId);
-        return s.getSelectedItem().toString();
+        Object obj = s.getSelectedItem();
+        return (obj == null) ? null : obj.toString();
     }
 }
