@@ -131,7 +131,7 @@ public class FileList extends ListActivity
                 PreferenceManager.getDefaultSharedPreferences(this);
             String dirName = PasswdSafeApp.getFileDirPref(prefs);
             File dir = new File(dirName);
-            itsHeader.setText("Password files in " + dir);
+            itsHeader.setText(getString(R.string.file_list_header, dir));
             FileData[] data = getFiles(dir);
             setListAdapter(new ArrayAdapter<FileData>(
                             this, android.R.layout.simple_list_item_1, data));

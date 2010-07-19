@@ -17,6 +17,7 @@
     <string name="edit">Edit</string>
     <string name="error_msg">&lt;b&gt;&lt;i&gt;Problem&lt;/i&gt;&lt;/b&gt; - %1$s</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
+    <string name="file_list_header">Select password file to open in %1$s.</string>
     <string name="hide_password">Hide Password</string>
     <string name="password">Password</string>
     <string name="preferences">Preferences</string>
