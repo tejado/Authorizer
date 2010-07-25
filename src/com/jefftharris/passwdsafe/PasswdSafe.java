@@ -32,6 +32,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,6 +53,7 @@ public class PasswdSafe extends ExpandableListActivity
     private static final int DIALOG_DETAILS = 2;
     private static final int DIALOG_CHANGE_PASSWD = 3;
     private static final int DIALOG_SAVE_PROGRESS = 4;
+    private static final int DIALOG_FILE_NEW = 5;
 
     private static final int MENU_ADD_RECORD = 1;
     private static final int MENU_DETAILS = 2;
@@ -83,24 +85,22 @@ public class PasswdSafe extends ExpandableListActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + getIntent());
-        itsFile = new File(getIntent().getData().getPath());
-
-        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        Intent intent = getIntent();
+        PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + intent);
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
         itsGroupRecords = PasswdSafeApp.getGroupRecordsPref(prefs);
         itsIsSortCaseSensitive = PasswdSafeApp.getSortCaseSensitivePref(prefs);
 
-        itsPasswdFile = app.accessPasswdFile(itsFile, this);
-        setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
-
-        if (!itsPasswdFile.isOpen()) {
-            showDialog(DIALOG_GET_PASSWD);
+        String action = intent.getAction();
+        if (action.equals(PasswdSafeApp.VIEW_INTENT)) {
+            onCreateView(intent);
+        } else if (action.equals(PasswdSafeApp.NEW_INTENT)) {
+            onCreateNew(intent);
         } else {
-            showFileData();
+            Log.e(TAG, "Unknown action for intent: " + intent);
+            finish();
         }
     }
 
@@ -174,7 +174,9 @@ public class PasswdSafe extends ExpandableListActivity
     protected void onResume()
     {
         super.onResume();
-        itsPasswdFile.touch();
+        if (itsPasswdFile != null) {
+            itsPasswdFile.touch();
+        }
     }
 
     /* (non-Javadoc)
@@ -369,8 +371,8 @@ public class PasswdSafe extends ExpandableListActivity
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(itsFile.getName())
                 .setView(passwdView)
-                .setPositiveButton("Ok", dlgClick)
-                .setNegativeButton("Cancel", dlgClick)
+                .setPositiveButton(R.string.ok, dlgClick)
+                .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
             final AlertDialog alertDialog = alert.create();
             itsChangePasswdValidator = new DialogValidator(passwdView)
@@ -396,6 +398,39 @@ public class PasswdSafe extends ExpandableListActivity
         case DIALOG_SAVE_PROGRESS:
         {
             dialog = itsPasswdFile.createProgressDialog();
+            break;
+        }
+        case DIALOG_FILE_NEW:
+        {
+            LayoutInflater factory = LayoutInflater.from(this);
+            final View fileNewView = factory.inflate(R.layout.file_new, null);
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+            {
+                @Override
+                public final void onOkClicked(DialogInterface dialog)
+                {
+                    // TODO: Implement me
+                }
+
+                @Override
+                public final void onCancelClicked(DialogInterface dialog)
+                {
+                    dialog.dismiss();
+                    finish();
+                }
+            };
+            AlertDialog.Builder alert = new AlertDialog.Builder(this)
+                .setTitle(R.string.new_file)
+                .setView(fileNewView)
+                .setPositiveButton(R.string.ok, dlgClick)
+                .setNegativeButton(R.string.cancel, dlgClick)
+                .setOnCancelListener(dlgClick);
+            final AlertDialog alertDialog = alert.create();
+            // TODO: Existing file validation
+            // TODO: .psafe3 extension
+            // TODO: Validations
+            dialog = alertDialog;
             break;
         }
         default:
@@ -469,6 +504,27 @@ public class PasswdSafe extends ExpandableListActivity
                                    this, RecordView.class);
         startActivityForResult(intent, RECORD_VIEW_REQUEST);
         return true;
+    }
+
+
+    private final void onCreateView(Intent intent)
+    {
+        itsFile = new File(intent.getData().getPath());
+        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        itsPasswdFile = app.accessPasswdFile(itsFile, this);
+        setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
+
+        if (!itsPasswdFile.isOpen()) {
+            showDialog(DIALOG_GET_PASSWD);
+        } else {
+            showFileData();
+        }
+    }
+
+    private final void onCreateNew(Intent intent)
+    {
+        itsFile = new File(intent.getData().getPath());
+        showDialog(DIALOG_FILE_NEW);
     }
 
     private final void openFile(StringBuilder passwd)

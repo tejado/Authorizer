@@ -35,12 +35,14 @@ public class FileList extends ListActivity
 {
     private static final String TAG = "FileList";
 
-    private static final int MENU_PREFERENCES = 1;
-    private static final int MENU_ABOUT = 2;
+    private static final int MENU_FILE_NEW = 1;
+    private static final int MENU_PREFERENCES = 2;
+    private static final int MENU_ABOUT = 3;
 
     private static final int DIALOG_ABOUT = 1;
 
     private TextView itsHeader;
+    private File itsDir;
 
     public static final class FileData
     {
@@ -130,15 +132,15 @@ public class FileList extends ListActivity
             SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
             String dirName = PasswdSafeApp.getFileDirPref(prefs);
-            File dir = new File(dirName);
-            itsHeader.setText(getString(R.string.file_list_header, dir));
-            FileData[] data = getFiles(dir);
+            itsDir = new File(dirName);
+            itsHeader.setText(getString(R.string.file_list_header, itsDir));
+            FileData[] data = getFiles(itsDir);
             setListAdapter(new ArrayAdapter<FileData>(
                             this, android.R.layout.simple_list_item_1, data));
 
             if (app.checkOpenDefault()) {
                 String defFileName = PasswdSafeApp.getDefFilePref(prefs);
-                File defFile = new File(dir, defFileName);
+                File defFile = new File(itsDir, defFileName);
                 if (defFile.isFile() && defFile.canRead()) {
                     openFile(defFile);
                 }
@@ -167,6 +169,10 @@ public class FileList extends ListActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuItem item;
+
+        item = menu.add(0, MENU_FILE_NEW, 0, R.string.new_file);
+        item.setIcon(android.R.drawable.ic_menu_add);
+
         item = menu.add(0, MENU_PREFERENCES, 0, R.string.preferences);
         item.setIcon(android.R.drawable.ic_menu_preferences);
         item.setIntent(new Intent(this, Preferences.class));
@@ -183,6 +189,14 @@ public class FileList extends ListActivity
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
+        case MENU_FILE_NEW:
+        {
+            if (itsDir != null) {
+                startActivity(new Intent(PasswdSafeApp.NEW_INTENT,
+                                         Uri.fromFile(itsDir)));
+            }
+            return true;
+        }
         case MENU_ABOUT:
         {
             showDialog(DIALOG_ABOUT);

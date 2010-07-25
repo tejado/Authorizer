@@ -19,6 +19,8 @@
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
     <string name="file_list_header">Select password file to open in %1$s.</string>
     <string name="hide_password">Hide Password</string>
+    <string name="new_file">New File</string>
+    <string name="ok">Ok</string>
     <string name="password">Password</string>
     <string name="preferences">Preferences</string>
     <string name="pref_file_dir">Directory for Files</string>

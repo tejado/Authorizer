@@ -153,6 +153,8 @@ public class PasswdSafeApp extends Application
 
     public static final boolean DEBUG = false;
 
+    public static final String NEW_INTENT =
+        "com.jefftharris.passwdsafe.action.NEW";
     public static final String VIEW_INTENT =
         "com.jefftharris.passwdsafe.action.VIEW";
     public static final String FILE_TIMEOUT_INTENT =
