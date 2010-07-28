@@ -74,6 +74,7 @@ public class PasswdSafe extends ExpandableListActivity
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
     private DialogValidator itsChangePasswdValidator;
+    private DialogValidator itsFileNewValidator;
 
     private final ArrayList<Map<String, String>> itsGroupData =
         new ArrayList<Map<String, String>>();
@@ -404,6 +405,8 @@ public class PasswdSafe extends ExpandableListActivity
         {
             LayoutInflater factory = LayoutInflater.from(this);
             final View fileNewView = factory.inflate(R.layout.file_new, null);
+            final TextView fileNameView =
+                (TextView)fileNewView.findViewById(R.id.file_name);
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
             {
@@ -427,9 +430,41 @@ public class PasswdSafe extends ExpandableListActivity
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
             final AlertDialog alertDialog = alert.create();
-            // TODO: Existing file validation
-            // TODO: .psafe3 extension
-            // TODO: Validations
+            itsFileNewValidator = new DialogValidator(fileNewView)
+            {
+                @Override
+                protected final View getDoneButton()
+                {
+                    return alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                }
+
+                @Override
+                protected final String doValidation()
+                {
+                    CharSequence fileName = fileNameView.getText();
+                    if (fileName.length() == 0) {
+                        return "Empty file name";
+                    }
+
+                    for (int i = 0; i < fileName.length(); ++i) {
+                        char c = fileName.charAt(i);
+                        if ((c == '/') || (c == '\\')) {
+                            return "Invalid file name";
+                        }
+                    }
+
+                    File f = new File(itsFile, fileName + ".psafe3");
+                    if (f.exists()) {
+                        return "File exists";
+                    }
+
+                    if (getPassword().getText().length() == 0) {
+                        return "Empty password";
+                    }
+                    return super.doValidation();
+                }
+            };
+            itsFileNewValidator.registerTextView(fileNameView);
             dialog = alertDialog;
             break;
         }
@@ -469,6 +504,11 @@ public class PasswdSafe extends ExpandableListActivity
         case DIALOG_CHANGE_PASSWD:
         {
             itsChangePasswdValidator.reset();
+            break;
+        }
+        case DIALOG_FILE_NEW:
+        {
+            itsFileNewValidator.reset();
             break;
         }
         default:

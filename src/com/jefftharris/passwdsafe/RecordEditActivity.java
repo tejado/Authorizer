@@ -17,7 +17,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.method.PasswordTransformationMethod;
+import android.text.method.SingleLineTransformationMethod;
+import android.text.method.TransformationMethod;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Adapter;
@@ -35,11 +40,14 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private static final int DIALOG_NEW_GROUP = MAX_DIALOG + 1;
 
+    private static final int MENU_TOGGLE_PASSWORD = 3;
+
     private TreeSet<String> itsGroups =
         new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     private String itsPrevGroup;
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
     private DialogValidator itsValidator;
+    private boolean isPasswordShown = false;
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -197,6 +205,51 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
         }
         return dialog;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem mi = menu.findItem(MENU_TOGGLE_PASSWORD);
+        if (mi != null) {
+            mi.setTitle(isPasswordShown ? R.string.hide_password :
+                        R.string.show_password);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case MENU_TOGGLE_PASSWORD:
+        {
+            isPasswordShown = !isPasswordShown;
+            TextView passwdField = (TextView)findViewById(R.id.password);
+            TextView confirmField =
+                (TextView)findViewById(R.id.password_confirm);
+            TransformationMethod tm;
+            if (isPasswordShown) {
+                tm = SingleLineTransformationMethod.getInstance();
+            } else {
+                tm = PasswordTransformationMethod.getInstance();
+            }
+            passwdField.setTransformationMethod(tm);
+            confirmField.setTransformationMethod(tm);
+            return true;
+        }
+        default:
+        {
+            return super.onOptionsItemSelected(item);
+        }
+        }
     }
 
     private final void initGroup(PasswdFileData fileData, PwsRecord editRecord,

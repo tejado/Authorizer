@@ -18,6 +18,8 @@
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
                           android:padding="3dip"/>
+                <TextView android:text=".psafe3"
+                          android:padding="3dip"/>
             </TableRow>
             <TableRow>
                 <TextView android:text="Password:"
