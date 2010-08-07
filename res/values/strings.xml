@@ -13,6 +13,9 @@
     <string name="copy_password">Copy Password</string>
     <string name="copy_user">Copy User Name</string>
     <string name="delete">Delete</string>
+    <string name="delete_file">Delete File</string>
+    <string name="delete_file_msg">Delete file &quot;%1$s&quot;?</string>
+    <string name="delete_file_title">Delete File?</string>
     <string name="details">Details</string>
     <string name="edit">Edit</string>
     <string name="error_msg">&lt;b&gt;&lt;i&gt;Problem&lt;/i&gt;&lt;/b&gt; - %1$s</string>

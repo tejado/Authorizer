@@ -54,10 +54,12 @@ public class PasswdSafe extends ExpandableListActivity
     private static final int DIALOG_CHANGE_PASSWD = 3;
     private static final int DIALOG_SAVE_PROGRESS = 4;
     private static final int DIALOG_FILE_NEW = 5;
+    private static final int DIALOG_DELETE = 6;
 
     private static final int MENU_ADD_RECORD = 1;
     private static final int MENU_DETAILS = 2;
     private static final int MENU_CHANGE_PASSWD = 3;
+    private static final int MENU_DELETE = 4;
 
     private static final String RECORD = "record";
     private static final String TITLE = "title";
@@ -206,6 +208,9 @@ public class PasswdSafe extends ExpandableListActivity
 
         mi = menu.add(0, MENU_CHANGE_PASSWD, 0, R.string.change_password);
         mi.setIcon(android.R.drawable.ic_menu_edit);
+
+        mi = menu.add(0, MENU_DELETE, 0, R.string.delete_file);
+        mi.setIcon(android.R.drawable.ic_menu_delete);
         return true;
     }
 
@@ -215,14 +220,24 @@ public class PasswdSafe extends ExpandableListActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        boolean addEnabled = false;
+        boolean deleteEnabled = false;
+        if (itsPasswdFile != null) {
+            PasswdFileData fileData = itsPasswdFile.getFileData();
+            if (fileData != null) {
+                addEnabled = fileData.canEdit();
+                deleteEnabled = fileData.getFile().canWrite();
+            }
+        }
+
         MenuItem mi = menu.findItem(MENU_ADD_RECORD);
         if (mi != null) {
-            boolean enabled = false;
-            if (itsPasswdFile != null) {
-                PasswdFileData fileData = itsPasswdFile.getFileData();
-                enabled = (fileData != null) && fileData.canEdit();
-            }
-            mi.setEnabled(enabled);
+            mi.setEnabled(addEnabled);
+        }
+
+        mi = menu.findItem(MENU_DELETE);
+        if (mi != null) {
+            mi.setEnabled(deleteEnabled);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -251,6 +266,11 @@ public class PasswdSafe extends ExpandableListActivity
         case MENU_CHANGE_PASSWD:
         {
             showDialog(DIALOG_CHANGE_PASSWD);
+            break;
+        }
+        case MENU_DELETE:
+        {
+            showDialog(DIALOG_DELETE);
             break;
         }
         default:
@@ -474,6 +494,27 @@ public class PasswdSafe extends ExpandableListActivity
             dialog = alertDialog;
             break;
         }
+        case DIALOG_DELETE:
+        {
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+                {
+                    @Override
+                    public final void onOkClicked(DialogInterface dialog)
+                    {
+                        deleteFile();
+                    }
+                };
+            AlertDialog.Builder alert = new AlertDialog.Builder(this)
+                .setTitle(R.string.delete_file_title)
+                .setMessage(getString(R.string.delete_file_msg,
+                                      itsFile.toString()))
+                .setPositiveButton(R.string.ok, dlgClick)
+                .setNegativeButton(R.string.cancel, dlgClick)
+                .setOnCancelListener(dlgClick);
+            dialog = alert.create();
+            break;
+        }
         default:
         {
             dialog = super.onCreateDialog(id);
@@ -599,6 +640,16 @@ public class PasswdSafe extends ExpandableListActivity
         } catch (Exception e) {
             PasswdSafeApp.showFatalMsg(e, "Can't create file: " + itsFile,
                                        this);
+            finish();
+        }
+    }
+
+    private final void deleteFile()
+    {
+        if (!itsFile.delete()) {
+            PasswdSafeApp.showFatalMsg("Could not delete file: " + itsFile,
+                                       this);
+        } else {
             finish();
         }
     }
