@@ -238,7 +238,7 @@ public class PasswdSafe extends ExpandableListActivity
         case MENU_ADD_RECORD:
         {
             startActivityForResult(
-                new Intent(Intent.ACTION_INSERT, getIntent().getData(),
+                new Intent(Intent.ACTION_INSERT, Uri.fromFile(itsFile),
                            this, RecordEditActivity.class),
                 RECORD_ADD_REQUEST);
             break;
@@ -541,7 +541,7 @@ public class PasswdSafe extends ExpandableListActivity
             get(childPosition).
             get(RECORD);
 
-        Uri.Builder builder = getIntent().getData().buildUpon();
+        Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
         String uuid = fileData.getUUID(rec);
         if (uuid != null) {
             builder.appendQueryParameter("rec", uuid.toString());
