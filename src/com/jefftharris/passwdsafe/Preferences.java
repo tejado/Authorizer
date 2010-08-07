@@ -101,7 +101,7 @@ public class Preferences extends PreferenceActivity
         itsFileDirPref.setSummary(summary);
 
         File fileDir = new File(PasswdSafeApp.getFileDirPref(prefs));
-        FileList.FileData[] files = FileList.getFiles(fileDir);
+        FileList.FileData[] files = FileList.getFiles(fileDir, false);
         String[] entries = new String[files.length + 1];
         String[] entryValues = new String[files.length + 1];
         entries[0] = PasswdSafeApp.PREF_DEF_FILE_NONE;

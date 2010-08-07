@@ -24,4 +24,9 @@
                         android:title="Group records"
                         android:key="groupRecordsPref"
                         android:defaultValue="true"/>
+
+    <CheckBoxPreference android:name="showBackupFiles Pref"
+                        android:title="Show backup files"
+                        android:key="showBackupFilesPref"
+                        android:defaultValue="false"/>
 </PreferenceScreen>

@@ -184,6 +184,9 @@ public class PasswdSafeApp extends Application
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     public static final boolean PREF_GROUP_RECORDS_DEF = true;
 
+    public static final String PREF_SHOW_BACKUP_FILES = "showBackupFilesPref";
+    public static final boolean PREF_SHOW_BACKUP_FILES_DEF = false;
+
     public static final String PREF_SORT_CASE_SENSITIVE =
         "sortCaseSensitivePref";
     public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
@@ -304,6 +307,12 @@ public class PasswdSafeApp extends Application
     public static boolean getGroupRecordsPref(SharedPreferences prefs)
     {
         return prefs.getBoolean(PREF_GROUP_RECORDS, PREF_GROUP_RECORDS_DEF);
+    }
+
+    public static boolean getShowBackupFilesPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SHOW_BACKUP_FILES,
+                                PREF_SHOW_BACKUP_FILES_DEF);
     }
 
     public static boolean getSortCaseSensitivePref(SharedPreferences prefs)

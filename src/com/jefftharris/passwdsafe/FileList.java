@@ -58,12 +58,19 @@ public class FileList extends ListActivity
         }
     }
 
-    public static FileData[] getFiles(File dir)
+    public static FileData[] getFiles(File dir, final boolean showBackupFiles)
     {
-         File[] files = dir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String filename) {
-                return filename.endsWith(".psafe3") ||
-                    filename.endsWith(".dat");
+        File[] files = dir.listFiles(new FilenameFilter() {
+            public final boolean accept(File dir, String filename) {
+                if (filename.endsWith(".psafe3") || filename.endsWith(".dat")) {
+                    return true;
+                }
+                if (showBackupFiles &&
+                    (filename.endsWith(".psafe3~") ||
+                     filename.endsWith(".dat~"))) {
+                    return true;
+                }
+                return false;
             }
         });
 
@@ -249,6 +256,15 @@ public class FileList extends ListActivity
         }
 
         return dialog;
+    }
+
+    private final FileData[] getFiles(File dir)
+    {
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        boolean showBackupFiles =
+            PasswdSafeApp.getShowBackupFilesPref(prefs);
+        return getFiles(dir, showBackupFiles);
     }
 
     private final void openFile(File file)
