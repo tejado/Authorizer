@@ -413,7 +413,13 @@ public class PasswdSafe extends ExpandableListActivity
                 @Override
                 public final void onOkClicked(DialogInterface dialog)
                 {
-                    // TODO: Implement me
+                    TextView passwdView = (TextView)
+                        fileNewView.findViewById(R.id.password);
+                    StringBuilder passwd =
+                        new StringBuilder(passwdView.getText());
+                    String fileName = fileNameView.getText().toString();
+                    dialog.dismiss();
+                    createNewFile(fileName, passwd);
                 }
 
                 @Override
@@ -575,6 +581,28 @@ public class PasswdSafe extends ExpandableListActivity
         itsLoadTask.execute();
     }
 
+    private final void createNewFile(String fileName, StringBuilder passwd)
+    {
+        try
+        {
+            File dir = itsFile;
+            itsFile = new File(dir, fileName + ".psafe3");
+
+            PasswdFileData fileData = new PasswdFileData(itsFile);
+            fileData.createNewFile(passwd);
+
+            PasswdSafeApp app = (PasswdSafeApp)getApplication();
+            itsPasswdFile = app.accessPasswdFile(itsFile, this);
+            itsPasswdFile.setFileData(fileData);
+            setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
+            showFileData();
+        } catch (Exception e) {
+            PasswdSafeApp.showFatalMsg(e, "Can't create file: " + itsFile,
+                                       this);
+            finish();
+        }
+    }
+
     private final void changePasswd(StringBuilder passwd)
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
@@ -698,7 +726,9 @@ public class PasswdSafe extends ExpandableListActivity
         protected Object doInBackground(Void... params)
         {
             try {
-                return new PasswdFileData(itsFile, itsPasswd);
+                PasswdFileData fileData = new PasswdFileData(itsFile);
+                fileData.load(itsPasswd);
+                return fileData;
             } catch (Exception e) {
                 return e;
             }

@@ -25,6 +25,7 @@ import org.pwsafe.lib.file.PwsFieldTypeV2;
 import org.pwsafe.lib.file.PwsFieldTypeV3;
 import org.pwsafe.lib.file.PwsFile;
 import org.pwsafe.lib.file.PwsFileFactory;
+import org.pwsafe.lib.file.PwsFileStorage;
 import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
@@ -49,11 +50,32 @@ public class PasswdFileData
     private static final int FIELD_UNSUPPORTED = -1;
     private static final int FIELD_NOT_PRESENT = -2;
 
-    public PasswdFileData(File file, StringBuilder passwd)
-        throws Exception
+    public PasswdFileData(File file)
     {
         itsFile = file;
-        loadFile(passwd);
+    }
+
+    public void load(StringBuilder passwd)
+        throws IOException, NoSuchAlgorithmException,
+            EndOfFileException, InvalidPassphraseException,
+            UnsupportedFileVersionException
+    {
+        PasswdSafeApp.dbginfo(TAG, "before load file");
+        itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
+        if (!itsFile.canWrite()) {
+            itsPwsFile.setReadOnly(true);
+        }
+        finishOpenFile(passwd);
+    }
+
+    public void createNewFile(StringBuilder passwd)
+        throws IOException, NoSuchAlgorithmException
+    {
+        itsPwsFile = PwsFileFactory.newFile();
+        itsPwsFile.setPassphrase(passwd);
+        itsPwsFile.setStorage(new PwsFileStorage(itsFile.getAbsolutePath()));
+        itsPwsFile.save();
+        finishOpenFile(passwd);
     }
 
     public void save()
@@ -448,16 +470,8 @@ public class PasswdFileData
         }
     }
 
-    private void loadFile(StringBuilder passwd)
-        throws IOException, NoSuchAlgorithmException,
-            EndOfFileException, InvalidPassphraseException,
-            UnsupportedFileVersionException
+    private final void finishOpenFile(StringBuilder passwd)
     {
-        PasswdSafeApp.dbginfo(TAG, "before load file");
-        itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
-        if (!itsFile.canWrite()) {
-            itsPwsFile.setReadOnly(true);
-        }
         passwd.delete(0, passwd.length());
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");
