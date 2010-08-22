@@ -97,7 +97,8 @@ public class PasswdSafe extends ExpandableListActivity
         itsIsSortCaseSensitive = PasswdSafeApp.getSortCaseSensitivePref(prefs);
 
         String action = intent.getAction();
-        if (action.equals(PasswdSafeApp.VIEW_INTENT)) {
+        if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
+            action.equals(Intent.ACTION_VIEW)) {
             onCreateView(intent);
         } else if (action.equals(PasswdSafeApp.NEW_INTENT)) {
             onCreateNew(intent);
