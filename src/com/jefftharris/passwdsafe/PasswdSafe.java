@@ -664,10 +664,38 @@ public class PasswdSafe extends ExpandableListActivity
 
     private final void showFileData()
     {
+        populateFileData();
+
+        ExpandableListAdapter adapter =
+            new SimpleExpandableListAdapter(PasswdSafe.this,
+                                            itsGroupData,
+                                            android.R.layout.simple_expandable_list_item_1,
+                                            new String[] { GROUP },
+                                            new int[] { android.R.id.text1 },
+                                            itsChildData,
+                                            android.R.layout.simple_expandable_list_item_1,
+                                            new String[] { TITLE },
+                                            new int[] { android.R.id.text1 });
+        setListAdapter(adapter);
+
+        if (itsGroupData.size() == 1) {
+            getExpandableListView().expandGroup(0);
+        }
+    }
+
+    private final void populateFileData()
+    {
         itsGroupData.clear();
         itsChildData.clear();
 
+        if (itsPasswdFile == null) {
+            return;
+        }
+
         PasswdFileData fileData = itsPasswdFile.getFileData();
+        if (fileData == null) {
+            return;
+        }
         ArrayList<PwsRecord> records = fileData.getRecords();
         RecordMapComparator comp =
             new RecordMapComparator(itsIsSortCaseSensitive);
@@ -735,22 +763,6 @@ public class PasswdSafe extends ExpandableListActivity
             }
             Collections.sort(children, comp);
             itsChildData.add(children);
-        }
-
-        ExpandableListAdapter adapter =
-            new SimpleExpandableListAdapter(PasswdSafe.this,
-                                            itsGroupData,
-                                            android.R.layout.simple_expandable_list_item_1,
-                                            new String[] { GROUP },
-                                            new int[] { android.R.id.text1 },
-                                            itsChildData,
-                                            android.R.layout.simple_expandable_list_item_1,
-                                            new String[] { TITLE },
-                                            new int[] { android.R.id.text1 });
-        setListAdapter(adapter);
-
-        if (itsGroupData.size() == 1) {
-            getExpandableListView().expandGroup(0);
         }
     }
 
