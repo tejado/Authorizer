@@ -11,7 +11,7 @@
                      android:stretchColumns="1"
                      android:shrinkColumns="1">
             <TableRow>
-                <TextView android:text="File Name:"
+                <TextView android:text="@string/file_name_label"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/file_name"
                           android:singleLine="true"
@@ -22,7 +22,7 @@
                           android:padding="3dip"/>
             </TableRow>
             <TableRow>
-                <TextView android:text="Password:"
+                <TextView android:text="@string/password_label"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/password"
                           android:singleLine="true"
@@ -32,7 +32,7 @@
                           android:padding="3dip"/>
             </TableRow>
             <TableRow>
-                <TextView android:text="Confirm:"
+                <TextView android:text="@string/confirm_label"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/password_confirm"
                           android:singleLine="true"

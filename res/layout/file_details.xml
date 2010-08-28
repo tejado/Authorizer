@@ -7,22 +7,22 @@
              android:padding="3dip"
              >
     <TableRow>
-        <TextView android:text="File:"/>
+        <TextView android:text="@string/file_label"/>
         <TextView android:id="@+id/file"
                   android:layout_width="wrap_content"/>
     </TableRow>
     <TableRow>
-        <TextView android:text="Permissions:"/>
+        <TextView android:text="@string/permissions_label"/>
         <TextView android:id="@+id/permissions"
                   android:layout_width="wrap_content"/>
     </TableRow>
     <TableRow>
-        <TextView android:text="Number of Groups:"/>
+        <TextView android:text="@string/num_groups_label"/>
         <TextView android:id="@+id/num_groups"
                   android:layout_width="wrap_content"/>
     </TableRow>
     <TableRow>
-        <TextView android:text="Number of Records:"/>
+        <TextView android:text="@string/num_records_label"/>
         <TextView android:id="@+id/num_records"
                   android:layout_width="wrap_content"/>
     </TableRow>
