@@ -65,6 +65,7 @@ public class PasswdSafe extends ExpandableListActivity
     private static final int MENU_DETAILS = 2;
     private static final int MENU_CHANGE_PASSWD = 3;
     private static final int MENU_DELETE = 4;
+    private static final int MENU_SEARCH = 5;
 
     private static final String RECORD = "record";
     private static final String TITLE = "title";
@@ -252,6 +253,9 @@ public class PasswdSafe extends ExpandableListActivity
 
         mi = menu.add(0, MENU_DELETE, 0, R.string.delete_file);
         mi.setIcon(android.R.drawable.ic_menu_delete);
+
+        mi = menu.add(0, MENU_SEARCH, 0, R.string.search);
+        mi.setIcon(android.R.drawable.ic_menu_search);
         return true;
     }
 
@@ -312,6 +316,11 @@ public class PasswdSafe extends ExpandableListActivity
         case MENU_DELETE:
         {
             showDialog(DIALOG_DELETE);
+            break;
+        }
+        case MENU_SEARCH:
+        {
+            onSearchRequested();
             break;
         }
         default:
