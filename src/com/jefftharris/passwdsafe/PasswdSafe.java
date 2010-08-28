@@ -731,6 +731,9 @@ public class PasswdSafe extends ExpandableListActivity
     {
         populateFileData();
 
+        int groupLayout = android.R.layout.simple_expandable_list_item_1;
+        String[] groupFrom = new String[] { GROUP };
+        int[] groupTo = new int[] { android.R.id.text1 };
         int childLayout;
         String[] childFrom;
         int[] childTo;
@@ -747,13 +750,9 @@ public class PasswdSafe extends ExpandableListActivity
         ExpandableListAdapter adapter =
             new SimpleExpandableListAdapter(PasswdSafe.this,
                                             itsGroupData,
-                                            android.R.layout.simple_expandable_list_item_1,
-                                            new String[] { GROUP },
-                                            new int[] { android.R.id.text1 },
+                                            groupLayout, groupFrom, groupTo,
                                             itsChildData,
-                                            childLayout,
-                                            childFrom,
-                                            childTo);
+                                            childLayout, childFrom, childTo);
         setListAdapter(adapter);
 
         if (itsGroupData.size() == 1) {
