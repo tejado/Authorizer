@@ -15,6 +15,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
@@ -24,6 +27,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ExpandableListActivity;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -77,6 +81,7 @@ public class PasswdSafe extends ExpandableListActivity
     private boolean itsIsSortCaseSensitive = true;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
+    private Pattern itsSearchQuery = null;
 
     private final ArrayList<Map<String, String>> itsGroupData =
         new ArrayList<Map<String, String>>();
@@ -106,6 +111,25 @@ public class PasswdSafe extends ExpandableListActivity
             Log.e(TAG, "Unknown action for intent: " + intent);
             finish();
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        itsSearchQuery = null;
+        if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            if (query.length() > 0) {
+                try {
+                    itsSearchQuery = Pattern.compile(
+                        query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+                } catch(PatternSyntaxException e) {
+                    itsSearchQuery = null;
+                }
+            }
+        }
+        showFileData();
     }
 
     /* (non-Javadoc)
@@ -710,6 +734,9 @@ public class PasswdSafe extends ExpandableListActivity
             }
 
             for (PwsRecord rec : records) {
+                if (!filterRecord(rec, fileData)) {
+                    continue;
+                }
                 String group = fileData.getGroup(rec);
                 if ((group == null) || (group.length() == 0)) {
                     group = NO_GROUP_GROUP;
@@ -752,6 +779,9 @@ public class PasswdSafe extends ExpandableListActivity
             ArrayList<HashMap<String, Object>> children =
                 new ArrayList<HashMap<String, Object>>();
             for (PwsRecord rec : records) {
+                if (!filterRecord(rec, fileData)) {
+                    continue;
+                }
                 HashMap<String, Object> recInfo = new HashMap<String, Object>();
                 String title = fileData.getTitle(rec);
                 if (title == null) {
@@ -764,6 +794,17 @@ public class PasswdSafe extends ExpandableListActivity
             Collections.sort(children, comp);
             itsChildData.add(children);
         }
+    }
+
+    private final boolean filterRecord(PwsRecord rec, PasswdFileData fileData)
+    {
+        if (itsSearchQuery == null) {
+            return true;
+        }
+
+        String title = fileData.getTitle(rec);
+        Matcher m = itsSearchQuery.matcher(title);
+        return m.matches();
     }
 
     private final void cancelFileOpen()
