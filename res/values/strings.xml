@@ -18,12 +18,14 @@
     <string name="delete_file_title">Delete File?</string>
     <string name="details">Details</string>
     <string name="edit">Edit</string>
+    <string name="email">Email</string>
     <string name="error_msg">&lt;b&gt;&lt;i&gt;Problem&lt;/i&gt;&lt;/b&gt; - %1$s</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
     <string name="file_list_header">Select password file to open in %1$s.</string>
     <string name="hide_password">Hide Password</string>
     <string name="new_file">New File</string>
     <string name="no_records">No Records</string>
+    <string name="notes">Notes</string>
     <string name="ok">Ok</string>
     <string name="password">Password</string>
     <string name="preferences">Preferences</string>
@@ -34,6 +36,8 @@
     <string name="search">Search</string>
     <string name="search_hint">Search PasswdSafe</string>
     <string name="show_password">Show Password</string>
+    <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
+    <string name="url">URL</string>
     <string name="username">User Name</string>
 </resources>

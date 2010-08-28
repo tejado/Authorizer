@@ -70,6 +70,7 @@ public class PasswdSafe extends ExpandableListActivity
     private static final String RECORD = "record";
     private static final String TITLE = "title";
     private static final String GROUP = "group";
+    private static final String MATCH = "match";
 
     private static final String NO_GROUP_GROUP = "Records";
 
@@ -83,12 +84,19 @@ public class PasswdSafe extends ExpandableListActivity
     private boolean itsIsSortCaseSensitive = true;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
-    private Pattern itsSearchQuery = null;
 
     private final ArrayList<Map<String, String>> itsGroupData =
         new ArrayList<Map<String, String>>();
     private final ArrayList<ArrayList<HashMap<String, Object>>> itsChildData =
         new ArrayList<ArrayList<HashMap<String, Object>>>();
+
+    private Pattern itsSearchQuery = null;
+    private static final String QUERY_MATCH = "";
+    private String QUERY_MATCH_TITLE;
+    private String QUERY_MATCH_USERNAME;
+    private String QUERY_MATCH_URL;
+    private String QUERY_MATCH_EMAIL;
+    private String QUERY_MATCH_NOTES;
 
     /** Called when the activity is first created. */
     @Override
@@ -134,6 +142,14 @@ public class PasswdSafe extends ExpandableListActivity
         itsSearchQuery = null;
         if (intent != null) {
             if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+                if (QUERY_MATCH_TITLE == null) {
+                    QUERY_MATCH_TITLE = getString(R.string.title);
+                    QUERY_MATCH_USERNAME = getString(R.string.username);
+                    QUERY_MATCH_URL = getString(R.string.url);
+                    QUERY_MATCH_EMAIL = getString(R.string.email);
+                    QUERY_MATCH_NOTES = getString(R.string.notes);
+                }
+
                 String query = intent.getStringExtra(SearchManager.QUERY);
                 if (query.length() > 0) {
                     try {
@@ -715,6 +731,19 @@ public class PasswdSafe extends ExpandableListActivity
     {
         populateFileData();
 
+        int childLayout;
+        String[] childFrom;
+        int[] childTo;
+        if (itsSearchQuery == null) {
+            childLayout = android.R.layout.simple_expandable_list_item_1;
+            childFrom = new String[] { TITLE };
+            childTo = new int[] { android.R.id.text1 };
+        } else {
+            childLayout = android.R.layout.simple_expandable_list_item_2;
+            childFrom = new String[] { TITLE, MATCH };
+            childTo = new int[] { android.R.id.text1, android.R.id.text2 };
+        }
+
         ExpandableListAdapter adapter =
             new SimpleExpandableListAdapter(PasswdSafe.this,
                                             itsGroupData,
@@ -722,9 +751,9 @@ public class PasswdSafe extends ExpandableListActivity
                                             new String[] { GROUP },
                                             new int[] { android.R.id.text1 },
                                             itsChildData,
-                                            android.R.layout.simple_expandable_list_item_1,
-                                            new String[] { TITLE },
-                                            new int[] { android.R.id.text1 });
+                                            childLayout,
+                                            childFrom,
+                                            childTo);
         setListAdapter(adapter);
 
         if (itsGroupData.size() == 1) {
@@ -756,31 +785,32 @@ public class PasswdSafe extends ExpandableListActivity
             new RecordMapComparator(itsIsSortCaseSensitive);
 
         if (itsGroupRecords) {
-            TreeMap<String, ArrayList<PwsRecord>> recsByGroup;
+            TreeMap<String, ArrayList<MatchPwsRecord>> recsByGroup;
             if (itsIsSortCaseSensitive) {
-                recsByGroup = new TreeMap<String, ArrayList<PwsRecord>>();
+                recsByGroup = new TreeMap<String, ArrayList<MatchPwsRecord>>();
             } else {
-                recsByGroup = new TreeMap<String, ArrayList<PwsRecord>>(
+                recsByGroup = new TreeMap<String, ArrayList<MatchPwsRecord>>(
                                 String.CASE_INSENSITIVE_ORDER);
             }
 
             for (PwsRecord rec : records) {
-                if (!filterRecord(rec, fileData)) {
+                String match = filterRecord(rec, fileData);
+                if (match == null) {
                     continue;
                 }
                 String group = fileData.getGroup(rec);
                 if ((group == null) || (group.length() == 0)) {
                     group = NO_GROUP_GROUP;
                 }
-                ArrayList<PwsRecord> groupList = recsByGroup.get(group);
+                ArrayList<MatchPwsRecord> groupList = recsByGroup.get(group);
                 if (groupList == null) {
-                    groupList = new ArrayList<PwsRecord>();
+                    groupList = new ArrayList<MatchPwsRecord>();
                     recsByGroup.put(group, groupList);
                 }
-                groupList.add(rec);
+                groupList.add(new MatchPwsRecord(rec, match));
             }
 
-            for (Map.Entry<String, ArrayList<PwsRecord>> entry :
+            for (Map.Entry<String, ArrayList<MatchPwsRecord>> entry :
                 recsByGroup.entrySet()) {
                 Map<String, String> groupInfo =
                     Collections.singletonMap(GROUP, entry.getKey());
@@ -788,15 +818,16 @@ public class PasswdSafe extends ExpandableListActivity
 
                 ArrayList<HashMap<String, Object>> children =
                     new ArrayList<HashMap<String, Object>>();
-                for (PwsRecord rec : entry.getValue()) {
+                for (MatchPwsRecord rec : entry.getValue()) {
                     HashMap<String, Object> recInfo =
                         new HashMap<String, Object>();
-                    String title = fileData.getTitle(rec);
+                    String title = fileData.getTitle(rec.itsRecord);
                     if (title == null) {
                         title = "Untitled";
                     }
                     recInfo.put(TITLE, title);
-                    recInfo.put(RECORD, rec);
+                    recInfo.put(RECORD, rec.itsRecord);
+                    recInfo.put(MATCH, rec.itsMatch);
                     children.add(recInfo);
                 }
                 Collections.sort(children, comp);
@@ -810,7 +841,8 @@ public class PasswdSafe extends ExpandableListActivity
             ArrayList<HashMap<String, Object>> children =
                 new ArrayList<HashMap<String, Object>>();
             for (PwsRecord rec : records) {
-                if (!filterRecord(rec, fileData)) {
+                String match = filterRecord(rec, fileData);
+                if (match == null) {
                     continue;
                 }
                 HashMap<String, Object> recInfo = new HashMap<String, Object>();
@@ -820,6 +852,7 @@ public class PasswdSafe extends ExpandableListActivity
                 }
                 recInfo.put(TITLE, title);
                 recInfo.put(RECORD, rec);
+                recInfo.put(MATCH, match);
                 children.add(recInfo);
             }
             Collections.sort(children, comp);
@@ -827,33 +860,33 @@ public class PasswdSafe extends ExpandableListActivity
         }
     }
 
-    private final boolean filterRecord(PwsRecord rec, PasswdFileData fileData)
+    private final String filterRecord(PwsRecord rec, PasswdFileData fileData)
     {
         if (itsSearchQuery == null) {
-            return true;
+            return QUERY_MATCH;
         }
 
         if (filterField(fileData.getTitle(rec))) {
-            return true;
+            return QUERY_MATCH_TITLE;
         }
 
         if (filterField(fileData.getUsername(rec))) {
-            return true;
+            return QUERY_MATCH_USERNAME;
         }
 
         if (filterField(fileData.getURL(rec))) {
-            return true;
+            return QUERY_MATCH_URL;
         }
 
         if (filterField(fileData.getEmail(rec))) {
-            return true;
+            return QUERY_MATCH_EMAIL;
         }
 
         if (filterField(fileData.getNotes(rec))) {
-            return true;
+            return QUERY_MATCH_NOTES;
         }
 
-        return false;
+        return null;
     }
 
     private final boolean filterField(String field)
@@ -972,6 +1005,18 @@ public class PasswdSafe extends ExpandableListActivity
             } else {
                 return title0.compareToIgnoreCase(title1);
             }
+        }
+    }
+
+    private static final class MatchPwsRecord
+    {
+        public final PwsRecord itsRecord;
+        public final String itsMatch;
+
+        public MatchPwsRecord(PwsRecord rec, String match)
+        {
+            itsRecord = rec;
+            itsMatch = match;
         }
     }
 }
