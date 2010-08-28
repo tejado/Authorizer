@@ -824,9 +824,37 @@ public class PasswdSafe extends ExpandableListActivity
             return true;
         }
 
-        String title = fileData.getTitle(rec);
-        Matcher m = itsSearchQuery.matcher(title);
-        return m.find();
+        if (filterField(fileData.getTitle(rec))) {
+            return true;
+        }
+
+        if (filterField(fileData.getUsername(rec))) {
+            return true;
+        }
+
+        if (filterField(fileData.getURL(rec))) {
+            return true;
+        }
+
+        if (filterField(fileData.getEmail(rec))) {
+            return true;
+        }
+
+        if (filterField(fileData.getNotes(rec))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private final boolean filterField(String field)
+    {
+        if (field != null) {
+            Matcher m = itsSearchQuery.matcher(field);
+            return m.find();
+        } else {
+            return false;
+        }
     }
 
     private final void updateQueryPanelVisibility()

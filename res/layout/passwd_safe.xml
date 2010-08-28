@@ -9,23 +9,29 @@
                         android:layout_weight="1"
                         android:drawSelectorOnTop="false"/>
 
-    <View android:layout_width="fill_parent"
-          android:layout_height="2dip"
-          android:background="#FF909090"/>
-          
     <LinearLayout android:id="@+id/query_panel"
-                  android:orientation="horizontal"
+                  android:orientation="vertical"
                   android:visible="false"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content">
-        <TextView android:id="@+id/query"
-                  android:text="query"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="1"/>
-        <Button android:id="@+id/query_clear_btn"
-                android:text="Clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+
+        <View android:layout_width="fill_parent"
+              android:layout_height="2dip"
+              android:background="#FF909090"/>
+          
+        <LinearLayout android:orientation="horizontal"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content">
+            <TextView android:id="@+id/query"
+                      android:text="query"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"/>
+            <Button android:id="@+id/query_clear_btn"
+                    android:text="Clear"
+                    android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
