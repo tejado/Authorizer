@@ -8,6 +8,14 @@
                         android:layout_height="fill_parent"
                         android:layout_weight="1"
                         android:drawSelectorOnTop="false"/>
+                        
+    <TextView android:id="@android:id/empty"
+              android:textSize="16sp"
+              android:textStyle="bold"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:layout_weight="1"
+              android:text="@string/no_records"/>
 
     <LinearLayout android:id="@+id/query_panel"
                   android:orientation="vertical"
@@ -24,6 +32,7 @@
                       android:layout_height="wrap_content">
             <TextView android:id="@+id/query"
                       android:text="query"
+                      android:textSize="16sp"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       android:layout_weight="1"/>
