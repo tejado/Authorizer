@@ -41,6 +41,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -93,6 +94,17 @@ public class PasswdSafe extends ExpandableListActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.passwd_safe);
+        updateQueryPanelVisibility();
+        Button button = (Button)findViewById(R.id.query_clear_btn);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public final void onClick(View v)
+            {
+                onNewIntent(null);
+            }
+        });
+
         Intent intent = getIntent();
         PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + intent);
 
@@ -116,19 +128,23 @@ public class PasswdSafe extends ExpandableListActivity
     @Override
     protected void onNewIntent(Intent intent)
     {
+        // TODO: Save query across screen orientation changes
         super.onNewIntent(intent);
         itsSearchQuery = null;
-        if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            if (query.length() > 0) {
-                try {
-                    itsSearchQuery = Pattern.compile(
-                        query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
-                } catch(PatternSyntaxException e) {
-                    itsSearchQuery = null;
+        if (intent != null) {
+            if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+                String query = intent.getStringExtra(SearchManager.QUERY);
+                if (query.length() > 0) {
+                    try {
+                        itsSearchQuery = Pattern.compile(
+                            query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+                    } catch(PatternSyntaxException e) {
+                        itsSearchQuery = null;
+                    }
                 }
             }
         }
+        updateQueryPanelVisibility();
         showFileData();
     }
 
@@ -704,6 +720,12 @@ public class PasswdSafe extends ExpandableListActivity
 
         if (itsGroupData.size() == 1) {
             getExpandableListView().expandGroup(0);
+        } else if (itsSearchQuery != null) {
+            int size = itsGroupData.size();
+            ExpandableListView view = getExpandableListView();
+            for (int i = 0; i < size; ++i) {
+                view.expandGroup(i);
+            }
         }
     }
 
@@ -804,7 +826,20 @@ public class PasswdSafe extends ExpandableListActivity
 
         String title = fileData.getTitle(rec);
         Matcher m = itsSearchQuery.matcher(title);
-        return m.matches();
+        return m.find();
+    }
+
+    private final void updateQueryPanelVisibility()
+    {
+        View panel = findViewById(R.id.query_panel);
+        if (itsSearchQuery != null) {
+            panel.setVisibility(View.VISIBLE);
+            TextView tv = (TextView)findViewById(R.id.query);
+            tv.setText(getString(R.string.query_label,
+                                 itsSearchQuery.pattern()));
+        } else {
+            panel.setVisibility(View.GONE);
+        }
     }
 
     private final void cancelFileOpen()
