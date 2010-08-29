@@ -77,6 +77,8 @@ public class PasswdSafe extends ExpandableListActivity
     private static final int RECORD_VIEW_REQUEST = 0;
     private static final int RECORD_ADD_REQUEST = 1;
 
+    private static final String BUNDLE_SEARCH_QUERY = "passwdsafe.searchQuery";
+
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
     private LoadTask itsLoadTask;
@@ -104,15 +106,20 @@ public class PasswdSafe extends ExpandableListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.passwd_safe);
-        updateQueryPanelVisibility();
         Button button = (Button)findViewById(R.id.query_clear_btn);
         button.setOnClickListener(new View.OnClickListener()
         {
             public final void onClick(View v)
             {
-                onNewIntent(null);
+                setSearchQuery(null);
             }
         });
+
+        String query = null;
+        if (savedInstanceState != null) {
+            query = savedInstanceState.getString(BUNDLE_SEARCH_QUERY);
+        }
+        setSearchQuery(query);
 
         Intent intent = getIntent();
         PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + intent);
@@ -137,32 +144,13 @@ public class PasswdSafe extends ExpandableListActivity
     @Override
     protected void onNewIntent(Intent intent)
     {
-        // TODO: Save query across screen orientation changes
         super.onNewIntent(intent);
-        itsSearchQuery = null;
-        if (intent != null) {
-            if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
-                if (QUERY_MATCH_TITLE == null) {
-                    QUERY_MATCH_TITLE = getString(R.string.title);
-                    QUERY_MATCH_USERNAME = getString(R.string.username);
-                    QUERY_MATCH_URL = getString(R.string.url);
-                    QUERY_MATCH_EMAIL = getString(R.string.email);
-                    QUERY_MATCH_NOTES = getString(R.string.notes);
-                }
-
-                String query = intent.getStringExtra(SearchManager.QUERY);
-                if (query.length() > 0) {
-                    try {
-                        itsSearchQuery = Pattern.compile(
-                            query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
-                    } catch(PatternSyntaxException e) {
-                        itsSearchQuery = null;
-                    }
-                }
-            }
+        String query = null;
+        if ((intent != null) &&
+            intent.getAction().equals(Intent.ACTION_SEARCH)) {
+            query = intent.getStringExtra(SearchManager.QUERY);
         }
-        updateQueryPanelVisibility();
-        showFileData();
+        setSearchQuery(query);
     }
 
     /* (non-Javadoc)
@@ -250,6 +238,11 @@ public class PasswdSafe extends ExpandableListActivity
         removeDialog(DIALOG_PROGRESS);
         removeDialog(DIALOG_SAVE_PROGRESS);
         super.onSaveInstanceState(outState);
+        String query = null;
+        if (itsSearchQuery != null) {
+            query = itsSearchQuery.pattern();
+        }
+        outState.putString(BUNDLE_SEARCH_QUERY, query);
     }
 
     /* (non-Javadoc)
@@ -859,6 +852,38 @@ public class PasswdSafe extends ExpandableListActivity
         }
     }
 
+    private final void setSearchQuery(String query)
+    {
+        itsSearchQuery = null;
+        if ((query != null) && (query.length() != 0)) {
+            if (QUERY_MATCH_TITLE == null) {
+                QUERY_MATCH_TITLE = getString(R.string.title);
+                QUERY_MATCH_USERNAME = getString(R.string.username);
+                QUERY_MATCH_URL = getString(R.string.url);
+                QUERY_MATCH_EMAIL = getString(R.string.email);
+                QUERY_MATCH_NOTES = getString(R.string.notes);
+            }
+
+            try {
+                itsSearchQuery = Pattern.compile(
+                    query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+            } catch(PatternSyntaxException e) {
+            }
+        }
+
+        View panel = findViewById(R.id.query_panel);
+        if (itsSearchQuery != null) {
+            panel.setVisibility(View.VISIBLE);
+            TextView tv = (TextView)findViewById(R.id.query);
+            tv.setText(getString(R.string.query_label,
+                                 itsSearchQuery.pattern()));
+        } else {
+            panel.setVisibility(View.GONE);
+        }
+
+        showFileData();
+    }
+
     private final String filterRecord(PwsRecord rec, PasswdFileData fileData)
     {
         if (itsSearchQuery == null) {
@@ -895,19 +920,6 @@ public class PasswdSafe extends ExpandableListActivity
             return m.find();
         } else {
             return false;
-        }
-    }
-
-    private final void updateQueryPanelVisibility()
-    {
-        View panel = findViewById(R.id.query_panel);
-        if (itsSearchQuery != null) {
-            panel.setVisibility(View.VISIBLE);
-            TextView tv = (TextView)findViewById(R.id.query);
-            tv.setText(getString(R.string.query_label,
-                                 itsSearchQuery.pattern()));
-        } else {
-            panel.setVisibility(View.GONE);
         }
     }
 
