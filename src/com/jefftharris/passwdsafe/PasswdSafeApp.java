@@ -184,6 +184,8 @@ public class PasswdSafeApp extends Application
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     public static final boolean PREF_GROUP_RECORDS_DEF = true;
 
+    public static final String PREF_PASSWD_ENCS = "passwordEncodingsPref";
+
     public static final String PREF_SHOW_BACKUP_FILES = "showBackupFilesPref";
     public static final boolean PREF_SHOW_BACKUP_FILES_DEF = false;
 

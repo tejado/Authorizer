@@ -9,6 +9,8 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 
+import org.pwsafe.lib.file.PwsFile;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -57,6 +59,13 @@ public class Preferences extends PreferenceActivity
         itsFileClosePref.setEntryValues(
             PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES);
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
+
+        ListPreference passwdEncs = (ListPreference)
+            findPreference(PasswdSafeApp.PREF_PASSWD_ENCS);
+        String[] charsets =
+            PwsFile.getPasswordCharsets().toArray(new String[0]);
+        passwdEncs.setEntries(charsets);
+        passwdEncs.setEntryValues(charsets);
     }
 
     /* (non-Javadoc)
