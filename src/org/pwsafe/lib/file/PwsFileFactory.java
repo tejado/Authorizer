@@ -12,6 +12,7 @@ package org.pwsafe.lib.file;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 
@@ -86,9 +87,23 @@ public class PwsFileFactory {
 				fudged[ii] = stuff[ii];
 			}
 			stuff	= null;
-			phash	= genRandHash( passphrase, fudged );
+			boolean validPassword = false;
+	        for (String charset : PwsFile.getPasswordCharsets()) {
+	            LOG.debug1("Trying " + charset);
+	            try {
+	                phash = genRandHash(passphrase, charset, fudged);
+	            } catch(UnsupportedEncodingException e) {
+	                // Skip this charset
+	                continue;
+	            }
 
-			if ( !Util.bytesAreEqual( fhash, phash ) )
+	            if (Util.bytesAreEqual(fhash, phash)) {
+	                validPassword = true;
+	                break;
+	            }
+	        }
+
+			if ( !validPassword )
 			{
 				LOG.debug1( "Password is incorrect - throwing InvalidPassphraseException" );
 				LOG.leaveMethod( "PwsFileFactory.checkPassword" );
@@ -136,15 +151,28 @@ public class PwsFileFactory {
 		LOG.leaveMethod( "PwsFileFactory.checkPassword" );
 	}
 
+	static final byte[] genRandHash(String passphrase, byte[] stuff)
+	{
+	    try {
+	        return genRandHash(passphrase, null, stuff);
+	    } catch (UnsupportedEncodingException e) {
+	        return new byte[0];
+	    }
+	}
+
 	/**
 	 * Generates a checksum from the passphrase and some random bytes.
 	 *
 	 * @param  passphrase the passphrase.
+	 * @param  charEnc    the passphrase charset encoding
 	 * @param  stuff      the random bytes.
 	 *
 	 * @return the generated checksum.
 	 */
-	static final byte [] genRandHash( String passphrase, byte [] stuff )
+	static final byte [] genRandHash( String passphrase,
+	                                  String charEnc,
+	                                  byte [] stuff )
+	    throws UnsupportedEncodingException
 	{
 		LOG.enterMethod( "PwsFileFactory.genRandHash" );
 
@@ -154,7 +182,8 @@ public class PwsFileFactory {
 		byte []			digest;
 		byte []			tmp;
 
-		pw	= passphrase.getBytes();
+		pw	= (charEnc == null) ?
+		    passphrase.getBytes() : passphrase.getBytes(charEnc);
 		md	= new SHA1();
 
 		md.update( stuff, 0, stuff.length );
