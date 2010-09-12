@@ -88,7 +88,7 @@ public class PwsFileFactory {
 			}
 			stuff	= null;
 			boolean validPassword = false;
-	        for (String charset : PwsFile.getPasswordCharsets()) {
+	        for (String charset : PwsFile.getPasswordEncodings()) {
 	            LOG.debug1("Trying " + charset);
 	            try {
 	                phash = genRandHash(passphrase, charset, fudged);

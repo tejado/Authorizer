@@ -144,7 +144,7 @@ public final class PwsFileV3 extends PwsFile {
 		int iter = theHeaderV3.getIter();
 		LOG.debug1("Using iterations: [" + iter + "]");
 		boolean validPassword = false;
-		for (String charset : PwsFile.getPasswordCharsets()) {
+		for (String charset : PwsFile.getPasswordEncodings()) {
 		    LOG.debug1("Trying " + charset);
 		    try {
 		        stretchedPassword =

@@ -31,6 +31,7 @@ public class Preferences extends PreferenceActivity
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
+    private ListPreference itsPasswdEncPref;
 
     /** Called when the activity is first created. */
     @Override
@@ -60,12 +61,14 @@ public class Preferences extends PreferenceActivity
             PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES);
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
 
-        ListPreference passwdEncs = (ListPreference)
-            findPreference(PasswdSafeApp.PREF_PASSWD_ENCS);
+        itsPasswdEncPref = (ListPreference)
+            findPreference(PasswdSafeApp.PREF_PASSWD_ENC);
         String[] charsets =
-            PwsFile.getPasswordCharsets().toArray(new String[0]);
-        passwdEncs.setEntries(charsets);
-        passwdEncs.setEntryValues(charsets);
+            PwsFile.ALL_PASSWORD_CHARSETS.toArray(new String[0]);
+        itsPasswdEncPref.setEntries(charsets);
+        itsPasswdEncPref.setEntryValues(charsets);
+        itsPasswdEncPref.setDefaultValue(PasswdSafeApp.PREF_PASSWD_ENC_DEF);
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_PASSWD_ENC);
     }
 
     /* (non-Javadoc)
@@ -101,6 +104,9 @@ public class Preferences extends PreferenceActivity
             itsFileClosePref.setSummary(
                 fileCloseValueToEntry(
                     PasswdSafeApp.getFileCloseTimeoutPref(prefs)));
+        } else if (key.equals(PasswdSafeApp.PREF_PASSWD_ENC)) {
+            itsPasswdEncPref.setSummary(
+                PasswdSafeApp.getPasswordEncodingPref(prefs));
         }
     }
 

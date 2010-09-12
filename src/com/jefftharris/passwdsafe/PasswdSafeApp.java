@@ -17,6 +17,8 @@ import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.pwsafe.lib.file.PwsFile;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -184,7 +186,9 @@ public class PasswdSafeApp extends Application
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     public static final boolean PREF_GROUP_RECORDS_DEF = true;
 
-    public static final String PREF_PASSWD_ENCS = "passwordEncodingsPref";
+    public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
+    public static final String PREF_PASSWD_ENC_DEF =
+        PwsFile.DEFAULT_PASSWORD_CHARSET;
 
     public static final String PREF_SHOW_BACKUP_FILES = "showBackupFilesPref";
     public static final boolean PREF_SHOW_BACKUP_FILES_DEF = false;
@@ -240,6 +244,7 @@ public class PasswdSafeApp extends Application
         }
 
         updateFileCloseTimeoutPref(prefs);
+        setPasswordEncodingPref(prefs);
     }
 
     /* (non-Javadoc)
@@ -262,6 +267,8 @@ public class PasswdSafeApp extends Application
 
         if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
             updateFileCloseTimeoutPref(prefs);
+        } else if (key.equals(PREF_PASSWD_ENC)) {
+            setPasswordEncodingPref(prefs);
         }
     }
 
@@ -309,6 +316,11 @@ public class PasswdSafeApp extends Application
     public static boolean getGroupRecordsPref(SharedPreferences prefs)
     {
         return prefs.getBoolean(PREF_GROUP_RECORDS, PREF_GROUP_RECORDS_DEF);
+    }
+
+    public static String getPasswordEncodingPref(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_PASSWD_ENC, PREF_PASSWD_ENC_DEF);
     }
 
     public static boolean getShowBackupFilesPref(SharedPreferences prefs)
@@ -411,6 +423,11 @@ public class PasswdSafeApp extends Application
             } catch (NumberFormatException e) {
             }
         }
+    }
+
+    private static void setPasswordEncodingPref(SharedPreferences prefs)
+    {
+        PwsFile.setPasswordEncoding(getPasswordEncodingPref(prefs));
     }
 
     private synchronized final void pauseFileTimer()

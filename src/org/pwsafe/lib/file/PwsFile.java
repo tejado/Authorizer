@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Iterator;
@@ -91,19 +92,27 @@ public abstract class PwsFile
 	public static final int BLOCK_LENGTH	= 8;
 
 
-	/** List of charset encodings to try when opening files */
-	private static final Collection<String> PASSWORD_CHARSETS;
+	/** Default encoding which should work with most Windows files */
+	public static final String DEFAULT_PASSWORD_CHARSET = "windows-1252";
+
+	/** List of all charset encodings to try when opening files */
+	public static final Collection<String> ALL_PASSWORD_CHARSETS;
 	static {
-	    PASSWORD_CHARSETS = new LinkedHashSet<String>();
-	    PASSWORD_CHARSETS.add(Charset.defaultCharset().name());
-        PASSWORD_CHARSETS.add("US-ASCII");
-        PASSWORD_CHARSETS.add("ISO-8859-1");
-        PASSWORD_CHARSETS.add("windows-1252");
-        PASSWORD_CHARSETS.add("UTF-8");
-        PASSWORD_CHARSETS.add("ISO-8859-2");
-        PASSWORD_CHARSETS.add("windows-1250");
-        PASSWORD_CHARSETS.add("UTF-16");
+	    ALL_PASSWORD_CHARSETS = new LinkedHashSet<String>();
+	    ALL_PASSWORD_CHARSETS.add(DEFAULT_PASSWORD_CHARSET);
+	    ALL_PASSWORD_CHARSETS.add(Charset.defaultCharset().name());
+	    ALL_PASSWORD_CHARSETS.add("US-ASCII");
+	    ALL_PASSWORD_CHARSETS.add("ISO-8859-1");
+	    ALL_PASSWORD_CHARSETS.add("UTF-8");
+	    ALL_PASSWORD_CHARSETS.add("ISO-8859-2");
+	    ALL_PASSWORD_CHARSETS.add("windows-1250");
+	    ALL_PASSWORD_CHARSETS.add("UTF-16");
+
+	    ALL_PASSWORD_CHARSETS.addAll(Charset.availableCharsets().keySet());
 	}
+
+	/** Encoding to use for the file's password */
+	private static String itsPasswordEncoding = DEFAULT_PASSWORD_CHARSET;
 
 
 	/** The storage implementation associated with this file */
@@ -736,9 +745,19 @@ public abstract class PwsFile
 	}
 
 
-	public static Collection<String> getPasswordCharsets()
+	public static synchronized List<String> getPasswordEncodings()
 	{
-	    return PASSWORD_CHARSETS;
+	    return Collections.singletonList(itsPasswordEncoding);
+	}
+
+	public static synchronized String getUpdatePasswordEncoding()
+	{
+	    return itsPasswordEncoding;
+	}
+
+	public static synchronized void setPasswordEncoding(String encoding)
+	{
+	    itsPasswordEncoding = encoding;
 	}
 
 

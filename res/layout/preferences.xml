@@ -25,10 +25,9 @@
                         android:key="groupRecordsPref"
                         android:defaultValue="true"/>
                         
-    <com.jefftharris.passwdsafe.MultiSelectListPreference 
-        android:name="passwordEncodings Pref"
-        android:title="Password encodings"
-        android:key="passwordEncodingsPref"/>
+    <ListPreference android:name="passwordEncoding Pref"
+                    android:title="Password encoding"
+                    android:key="passwordEncodingPref"/>
 
     <CheckBoxPreference android:name="showBackupFiles Pref"
                         android:title="Show backup files"
