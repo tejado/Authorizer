@@ -174,18 +174,19 @@ public abstract class PwsFile
 	 *
 	 * @param aStorage  the storage of the database to open.
 	 * @param aPassphrase the passphrase for the database.
+	 * @param encoding the passphrase encoding (if known)
 	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
 	 */
-	protected PwsFile( PwsStorage aStorage, String aPassphrase )
+	protected PwsFile( PwsStorage aStorage, String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
 		LOG.enterMethod( "PwsFile.PwsFile( String )" );
 		this.storage = aStorage;
-		open( aPassphrase );
+		open( aPassphrase, encoding );
 
 		LOG.leaveMethod( "PwsFile.PwsFile( String )" );
 	}
@@ -491,13 +492,14 @@ public abstract class PwsFile
 	 * Opens the database.
 	 *
 	 * @param aPassphrase the passphrase for the file.
+	 * @param encoding the passphrase encoding (if known)
 	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
 	 */
-	protected abstract void open( String aPassphrase )
+	protected abstract void open( String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException;
 
 	/**

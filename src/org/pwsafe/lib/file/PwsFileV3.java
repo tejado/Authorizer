@@ -107,7 +107,7 @@ public final class PwsFileV3 extends PwsFile {
 	public PwsFileV3( PwsStorage storage, String aPassphrase )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		super( storage, aPassphrase );
+		super( storage, aPassphrase, null );
 	}
 
 
@@ -125,8 +125,29 @@ public final class PwsFileV3 extends PwsFile {
 			Arrays.fill(decryptedRecordKey,(byte)0);
 	}
 
+	private final byte[] checkPassword(String aPassphrase,
+	                                   String encoding,
+	                                   PwsFileHeaderV3 headerV3,
+	                                   int iter)
+	{
+        LOG.debug1("Trying " + encoding);
+        try {
+            byte[] stretch =
+                Util.stretchPassphrase(aPassphrase.getBytes(encoding),
+                                       headerV3.getSalt(), iter);
+            if (Util.bytesAreEqual(headerV3.getPassword(),
+                                   SHA256Pws.digest(stretch))) {
+                return stretch;
+            }
+        } catch (UnsupportedEncodingException e) {
+            // Skip this charset
+        }
+
+        return null;
+	}
+
 	@Override
-	protected void open( String aPassphrase )
+	protected void open( String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException
 	{
 		LOG.enterMethod( "PwsFileV3.init" );
@@ -143,25 +164,24 @@ public final class PwsFileV3 extends PwsFile {
 
 		int iter = theHeaderV3.getIter();
 		LOG.debug1("Using iterations: [" + iter + "]");
-		boolean validPassword = false;
-		for (String charset : PwsFile.getPasswordEncodings()) {
-		    LOG.debug1("Trying " + charset);
-		    try {
+		stretchedPassword = null;
+
+		if (encoding != null) {
+		    stretchedPassword =
+		        checkPassword(aPassphrase, encoding, theHeaderV3, iter);
+		}
+
+		if (stretchedPassword == null) {
+		    for (String charset : PwsFile.getPasswordEncodings()) {
 		        stretchedPassword =
-		            Util.stretchPassphrase(aPassphrase.getBytes(charset),
-		                                   theHeaderV3.getSalt(), iter);
-		    } catch (UnsupportedEncodingException e) {
-		        // Skip this charset
-		        continue;
-		    }
-		    if (Util.bytesAreEqual(theHeaderV3.getPassword(),
-		                           SHA256Pws.digest(stretchedPassword))) {
-		        validPassword = true;
-		        break;
+		            checkPassword(aPassphrase, charset, theHeaderV3, iter);
+		        if (stretchedPassword != null) {
+		            break;
+		        }
 		    }
 		}
 
-		if (!validPassword) {
+		if (stretchedPassword == null) {
 			//try another method to avoid asymmetric encoding bug in V0.8 Beta1
 	        CharBuffer buf = CharBuffer.wrap(aPassphrase);
 			stretchedPassword = Util.stretchPassphrase(Charset.defaultCharset().encode(buf).array(), theHeaderV3.getSalt(), iter);

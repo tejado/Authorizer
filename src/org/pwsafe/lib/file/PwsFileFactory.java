@@ -54,12 +54,14 @@ public class PwsFileFactory {
 	 * @param filename   the name of the file to be opened.
 	 * @param passphrase the file's passphrase.
 	 *
+	 * @return the password encoding
+	 *
 	 * @throws InvalidPassphraseException If the passphrase is not the correct one for the file.
 	 * @throws FileNotFoundException      If the given file does not exist.
 	 * @throws IOException                If an error occurs whilst reading from the file.
 	 * @throws NoSuchAlgorithmException   If no SHA-1 implementation is found.
 	 */
-	private static final void checkPassword( String filename, String passphrase )
+	private static final String checkPassword( String filename, String passphrase )
 	throws InvalidPassphraseException, FileNotFoundException, IOException, NoSuchAlgorithmException
 	{
 		LOG.enterMethod( "PwsFileFactory.checkPassword" );
@@ -70,6 +72,7 @@ public class PwsFileFactory {
 		byte []			fhash;
 		byte []			phash;
 		boolean			handlingError	= false;
+		String encoding = null;
 
 		try
 		{
@@ -99,6 +102,7 @@ public class PwsFileFactory {
 
 	            if (Util.bytesAreEqual(fhash, phash)) {
 	                validPassword = true;
+	                encoding = charset;
 	                break;
 	            }
 	        }
@@ -149,6 +153,7 @@ public class PwsFileFactory {
 
 		LOG.debug1( "Password is OK" );
 		LOG.leaveMethod( "PwsFileFactory.checkPassword" );
+		return encoding;
 	}
 
 	static final byte[] genRandHash(String passphrase, byte[] stuff)
@@ -280,9 +285,9 @@ public class PwsFileFactory {
 
 		PwsRecordV1	rec;
 
-		checkPassword( filename, passphrase );
+		String encoding = checkPassword( filename, passphrase );
 
-		file	= new PwsFileV1( new PwsFileStorage(filename), passphrase );
+		file	= new PwsFileV1( new PwsFileStorage(filename), passphrase, encoding );
 		try {
 			rec		= (PwsRecordV1) file.readRecord();
 		} catch (PasswordSafeException e) {
@@ -297,10 +302,10 @@ public class PwsFileFactory {
 
 		if ( rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING) ) {
 			LOG.debug1( "This is a V2 format file." );
-			file = new PwsFileV2( new PwsFileStorage(filename), passphrase );
+			file = new PwsFileV2( new PwsFileStorage(filename), passphrase, encoding );
 		} else {
 			LOG.debug1( "This is a V1 format file." );
-			file = new PwsFileV1( new PwsFileStorage(filename), passphrase );
+			file = new PwsFileV1( new PwsFileStorage(filename), passphrase, encoding );
 		}
 		file.readAll();
 		file.close();
