@@ -101,7 +101,7 @@ public class PasswdSafe extends ExpandableListActivity
     private String QUERY_MATCH_EMAIL;
     private String QUERY_MATCH_NOTES;
 
-    private String itsCurrGroup = null;
+    private ArrayList<String> itsCurrGroups = new ArrayList<String>();
 
     /** Called when the activity is first created. */
     @Override
@@ -640,19 +640,23 @@ public class PasswdSafe extends ExpandableListActivity
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
 
-        PwsRecord rec = (PwsRecord)
-            itsChildData.get(groupPosition).
-            get(childPosition).
-            get(RECORD);
-
-        Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
-        String uuid = fileData.getUUID(rec);
-        if (uuid != null) {
-            builder.appendQueryParameter("rec", uuid.toString());
+        HashMap<String, Object> item =
+            itsChildData.get(groupPosition).get(childPosition);
+        PwsRecord rec = (PwsRecord)item.get(RECORD);
+        if (rec != null) {
+            Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
+            String uuid = fileData.getUUID(rec);
+            if (uuid != null) {
+                builder.appendQueryParameter("rec", uuid.toString());
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
+                                       this, RecordView.class);
+            startActivityForResult(intent, RECORD_VIEW_REQUEST);
+        } else {
+            Map<String, String> groupItem = itsGroupData.get(groupPosition);
+            itsCurrGroups.add(groupItem.get(GROUP));
+            showFileData();
         }
-        Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
-                                   this, RecordView.class);
-        startActivityForResult(intent, RECORD_VIEW_REQUEST);
         return true;
     }
 
@@ -823,15 +827,31 @@ public class PasswdSafe extends ExpandableListActivity
                 groupList.add(new MatchPwsRecord(rec, match));
             }
 
-            // TODO: find right group
+            // find right group
+            GroupNode node = root;
+            for (String group : itsCurrGroups) {
+                GroupNode childNode = node.itsGroups.get(group);
+                if (childNode == null) {
+                    break;
+                }
+                node = childNode;
+            }
+
             for (Map.Entry<String, GroupNode> entry:
-                root.itsGroups.entrySet()) {
+                node.itsGroups.entrySet()) {
                 Map<String, String> groupInfo =
                     Collections.singletonMap(GROUP, entry.getKey());
                 itsGroupData.add(groupInfo);
 
                 ArrayList<HashMap<String, Object>> children =
                     new ArrayList<HashMap<String, Object>>();
+                for (String childGroup : entry.getValue().itsGroups.keySet()) {
+                    HashMap<String, Object> recInfo =
+                        new HashMap<String, Object>();
+                    recInfo.put(TITLE, "(" + childGroup + ")");
+                    children.add(recInfo);
+                }
+
                 for (MatchPwsRecord rec : entry.getValue().itsRecords) {
                     HashMap<String, Object> recInfo =
                         new HashMap<String, Object>();
