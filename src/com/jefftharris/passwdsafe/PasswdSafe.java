@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -100,6 +101,8 @@ public class PasswdSafe extends ExpandableListActivity
     private String QUERY_MATCH_EMAIL;
     private String QUERY_MATCH_NOTES;
 
+    private ArrayList<String> itsCurrGroups = new ArrayList<String>();
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -118,6 +121,7 @@ public class PasswdSafe extends ExpandableListActivity
         String query = null;
         if (savedInstanceState != null) {
             query = savedInstanceState.getString(BUNDLE_SEARCH_QUERY);
+            // TODO: save/restore group query
         }
         setSearchQuery(query);
 
@@ -639,19 +643,23 @@ public class PasswdSafe extends ExpandableListActivity
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
 
-        PwsRecord rec = (PwsRecord)
-            itsChildData.get(groupPosition).
-            get(childPosition).
-            get(RECORD);
-
-        Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
-        String uuid = fileData.getUUID(rec);
-        if (uuid != null) {
-            builder.appendQueryParameter("rec", uuid.toString());
+        HashMap<String, Object> item =
+            itsChildData.get(groupPosition).get(childPosition);
+        PwsRecord rec = (PwsRecord)item.get(RECORD);
+        if (rec != null) {
+            Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
+            String uuid = fileData.getUUID(rec);
+            if (uuid != null) {
+                builder.appendQueryParameter("rec", uuid.toString());
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
+                                       this, RecordView.class);
+            startActivityForResult(intent, RECORD_VIEW_REQUEST);
+        } else {
+            Map<String, String> groupItem = itsGroupData.get(groupPosition);
+            itsCurrGroups.add(groupItem.get(GROUP));
+            showFileData();
         }
-        Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
-                                   this, RecordView.class);
-        startActivityForResult(intent, RECORD_VIEW_REQUEST);
         return true;
     }
 
@@ -780,13 +788,17 @@ public class PasswdSafe extends ExpandableListActivity
             new RecordMapComparator(itsIsSortCaseSensitive);
 
         if (itsGroupRecords) {
-            TreeMap<String, ArrayList<MatchPwsRecord>> recsByGroup;
+            Comparator<String> groupComp;
             if (itsIsSortCaseSensitive) {
-                recsByGroup = new TreeMap<String, ArrayList<MatchPwsRecord>>();
+                groupComp = new StringComparator();
             } else {
-                recsByGroup = new TreeMap<String, ArrayList<MatchPwsRecord>>(
-                                String.CASE_INSENSITIVE_ORDER);
+                groupComp = String.CASE_INSENSITIVE_ORDER;
             }
+            // TODO: remove...
+            TreeMap<String, ArrayList<MatchPwsRecord>> recsByGroup =
+                new TreeMap<String, ArrayList<MatchPwsRecord>>(groupComp);
+
+            GroupNode root = new GroupNode("(root)", groupComp);
 
             for (PwsRecord rec : records) {
                 String match = filterRecord(rec, fileData);
@@ -797,6 +809,19 @@ public class PasswdSafe extends ExpandableListActivity
                 if ((group == null) || (group.length() == 0)) {
                     group = NO_GROUP_GROUP;
                 }
+
+                String[] groups = group.split("\\.");
+                GroupNode node = root;
+                for (String g : groups) {
+                    GroupNode groupNode = node.itsGroups.get(g);
+                    if (groupNode == null) {
+                        groupNode = new GroupNode(g, groupComp);
+                        node.itsGroups.put(g, groupNode);
+                    }
+                    node = groupNode;
+                }
+                node.itsRecords.add(new MatchPwsRecord(rec, match));
+
                 ArrayList<MatchPwsRecord> groupList = recsByGroup.get(group);
                 if (groupList == null) {
                     groupList = new ArrayList<MatchPwsRecord>();
@@ -805,6 +830,47 @@ public class PasswdSafe extends ExpandableListActivity
                 groupList.add(new MatchPwsRecord(rec, match));
             }
 
+            // find right group
+            GroupNode node = root;
+            for (String group : itsCurrGroups) {
+                GroupNode childNode = node.itsGroups.get(group);
+                if (childNode == null) {
+                    break;
+                }
+                node = childNode;
+            }
+
+            for (Map.Entry<String, GroupNode> entry:
+                node.itsGroups.entrySet()) {
+                Map<String, String> groupInfo =
+                    Collections.singletonMap(GROUP, entry.getKey());
+                itsGroupData.add(groupInfo);
+
+                ArrayList<HashMap<String, Object>> children =
+                    new ArrayList<HashMap<String, Object>>();
+                for (String childGroup : entry.getValue().itsGroups.keySet()) {
+                    HashMap<String, Object> recInfo =
+                        new HashMap<String, Object>();
+                    recInfo.put(TITLE, "(" + childGroup + ")");
+                    children.add(recInfo);
+                }
+
+                for (MatchPwsRecord rec : entry.getValue().itsRecords) {
+                    HashMap<String, Object> recInfo =
+                        new HashMap<String, Object>();
+                    String title = fileData.getTitle(rec.itsRecord);
+                    if (title == null) {
+                        title = "Untitled";
+                    }
+                    recInfo.put(TITLE, title);
+                    recInfo.put(RECORD, rec.itsRecord);
+                    recInfo.put(MATCH, rec.itsMatch);
+                    children.add(recInfo);
+                }
+                Collections.sort(children, comp);
+                itsChildData.add(children);
+            }
+            /*
             for (Map.Entry<String, ArrayList<MatchPwsRecord>> entry :
                 recsByGroup.entrySet()) {
                 Map<String, String> groupInfo =
@@ -828,6 +894,7 @@ public class PasswdSafe extends ExpandableListActivity
                 Collections.sort(children, comp);
                 itsChildData.add(children);
             }
+            */
         } else {
             Map<String, String> groupInfo =
                 Collections.singletonMap(GROUP, NO_GROUP_GROUP);
@@ -1022,6 +1089,14 @@ public class PasswdSafe extends ExpandableListActivity
         }
     }
 
+    private static final class StringComparator implements Comparator<String>
+    {
+        public int compare(String arg0, String arg1)
+        {
+            return arg0.compareTo(arg1);
+        }
+    }
+
     private static final class MatchPwsRecord
     {
         public final PwsRecord itsRecord;
@@ -1031,6 +1106,20 @@ public class PasswdSafe extends ExpandableListActivity
         {
             itsRecord = rec;
             itsMatch = match;
+        }
+    }
+
+    private static final class GroupNode
+    {
+        public final String itsGroup;
+        public final List<MatchPwsRecord> itsRecords;
+        public final TreeMap<String, GroupNode> itsGroups;
+
+        public GroupNode(String group, Comparator<String> comp)
+        {
+            itsGroup = group;
+            itsRecords = new ArrayList<MatchPwsRecord>();
+            itsGroups = new TreeMap<String, GroupNode>(comp);
         }
     }
 }
