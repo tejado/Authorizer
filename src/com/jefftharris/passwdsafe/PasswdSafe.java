@@ -605,6 +605,9 @@ public class PasswdSafe extends ExpandableListActivity
 
             tv = (TextView)dialog.findViewById(R.id.num_records);
             tv.setText(Integer.toString(fileData.getRecords().size()));
+
+            tv = (TextView)dialog.findViewById(R.id.password_encoding);
+            tv.setText(fileData.getOpenPasswordEncoding());
             break;
         }
         case DIALOG_CHANGE_PASSWD:

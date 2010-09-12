@@ -40,6 +40,7 @@
     <string name="num_records_label">Number of Records:</string>
     <string name="ok">Ok</string>
     <string name="password">Password</string>
+    <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_label">Password:</string>
     <string name="permissions_label">Permissions:</string>
     <string name="preferences">Preferences</string>

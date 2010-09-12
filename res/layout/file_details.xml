@@ -26,4 +26,9 @@
         <TextView android:id="@+id/num_records"
                   android:layout_width="wrap_content"/>
     </TableRow>
+    <TableRow>
+        <TextView android:text="@string/password_encoding_label"/>
+        <TextView android:id="@+id/password_encoding"
+                  android:layout_width="wrap_content"/>
+    </TableRow>
 </TableLayout>

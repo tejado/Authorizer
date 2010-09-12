@@ -186,6 +186,12 @@ public class PasswdFileData
             (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION);
     }
 
+    public final String getOpenPasswordEncoding()
+    {
+        return (itsPwsFile != null) ? itsPwsFile.getOpenPasswordEncoding() :
+            null;
+    }
+
     public final String getEmail(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.EMAIL);

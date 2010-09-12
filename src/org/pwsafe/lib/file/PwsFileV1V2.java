@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -156,6 +157,10 @@ public abstract class PwsFileV1V2 extends PwsFile {
 		algorithm		= makeBlowfish(aPassphrase, encoding);
 
 		readExtraHeader( this );
+
+		setOpenPasswordEncoding(
+		    (encoding == null) ? Charset.defaultCharset().name() : encoding);
+
 
 		LOG.leaveMethod( "PwsFile.init" );
 	}

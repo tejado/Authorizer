@@ -161,6 +161,9 @@ public abstract class PwsFile
 	private InMemoryKey			memoryKey;
 	private byte[] 				memoryIv;
 
+	/** The password encoding which was used to open the file */
+	private String itsOpenPasswordEncoding;
+
 	/**
 	 * Constructs and initialises a new, empty PasswordSafe database in memory.
 	 */
@@ -744,6 +747,16 @@ public abstract class PwsFile
 	 */
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
+	}
+
+	protected void setOpenPasswordEncoding(String encoding)
+	{
+	    itsOpenPasswordEncoding = encoding;
+	}
+
+	public String getOpenPasswordEncoding()
+	{
+	    return itsOpenPasswordEncoding;
 	}
 
 
