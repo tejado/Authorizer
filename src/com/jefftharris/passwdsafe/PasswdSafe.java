@@ -37,6 +37,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -102,6 +103,7 @@ public class PasswdSafe extends ExpandableListActivity
     private String QUERY_MATCH_NOTES;
 
     private ArrayList<String> itsCurrGroups = new ArrayList<String>();
+    private String itsSelChildGroup = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -115,6 +117,20 @@ public class PasswdSafe extends ExpandableListActivity
             public final void onClick(View v)
             {
                 setSearchQuery(null);
+            }
+        });
+
+        button = (Button)findViewById(R.id.sub_group_up_btn);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public final void onClick(View v)
+            {
+                int size = itsCurrGroups.size();
+                if (size > 0) {
+                    itsCurrGroups.remove(size - 1);
+                    itsSelChildGroup = null;
+                    showFileData();
+                }
             }
         });
 
@@ -658,6 +674,8 @@ public class PasswdSafe extends ExpandableListActivity
         } else {
             Map<String, String> groupItem = itsGroupData.get(groupPosition);
             itsCurrGroups.add(groupItem.get(GROUP));
+            String childTitle = (String)item.get(TITLE);
+            itsSelChildGroup = childTitle.substring(1, childTitle.length() - 1);
             showFileData();
         }
         return true;
@@ -735,6 +753,16 @@ public class PasswdSafe extends ExpandableListActivity
     {
         populateFileData();
 
+        View panel = findViewById(R.id.sub_group_panel);
+        if (itsCurrGroups.isEmpty()) {
+            panel.setVisibility(View.GONE);
+        } else {
+            panel.setVisibility(View.VISIBLE);
+            TextView tv = (TextView)findViewById(R.id.current_group);
+            tv.setText(getString(R.string.current_group_label,
+                                 TextUtils.join(" / ", itsCurrGroups)));
+        }
+
         int groupLayout = android.R.layout.simple_expandable_list_item_1;
         String[] groupFrom = new String[] { GROUP };
         int[] groupTo = new int[] { android.R.id.text1 };
@@ -759,13 +787,24 @@ public class PasswdSafe extends ExpandableListActivity
                                             childLayout, childFrom, childTo);
         setListAdapter(adapter);
 
+        ExpandableListView view = getExpandableListView();
         if (itsGroupData.size() == 1) {
-            getExpandableListView().expandGroup(0);
+            view.expandGroup(0);
         } else if (itsSearchQuery != null) {
             int size = itsGroupData.size();
-            ExpandableListView view = getExpandableListView();
             for (int i = 0; i < size; ++i) {
                 view.expandGroup(i);
+            }
+        }
+
+        if (itsSelChildGroup != null) {
+            int size = itsGroupData.size();
+            for (int i = 0; i < size; ++i) {
+                String group = itsGroupData.get(i).get(GROUP);
+                if (itsSelChildGroup.equals(group)) {
+                    view.expandGroup(i);
+                    break;
+                }
             }
         }
     }
@@ -795,8 +834,8 @@ public class PasswdSafe extends ExpandableListActivity
                 groupComp = String.CASE_INSENSITIVE_ORDER;
             }
             // TODO: remove...
-            TreeMap<String, ArrayList<MatchPwsRecord>> recsByGroup =
-                new TreeMap<String, ArrayList<MatchPwsRecord>>(groupComp);
+            //TreeMap<String, ArrayList<MatchPwsRecord>> recsByGroup =
+            //    new TreeMap<String, ArrayList<MatchPwsRecord>>(groupComp);
 
             GroupNode root = new GroupNode("(root)", groupComp);
 
@@ -822,12 +861,12 @@ public class PasswdSafe extends ExpandableListActivity
                 }
                 node.itsRecords.add(new MatchPwsRecord(rec, match));
 
-                ArrayList<MatchPwsRecord> groupList = recsByGroup.get(group);
-                if (groupList == null) {
-                    groupList = new ArrayList<MatchPwsRecord>();
-                    recsByGroup.put(group, groupList);
-                }
-                groupList.add(new MatchPwsRecord(rec, match));
+                //ArrayList<MatchPwsRecord> groupList = recsByGroup.get(group);
+                //if (groupList == null) {
+                //    groupList = new ArrayList<MatchPwsRecord>();
+                //    recsByGroup.put(group, groupList);
+                //}
+                //groupList.add(new MatchPwsRecord(rec, match));
             }
 
             // find right group
