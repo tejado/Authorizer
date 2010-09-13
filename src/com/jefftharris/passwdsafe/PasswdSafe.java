@@ -79,7 +79,12 @@ public class PasswdSafe extends ExpandableListActivity
     private static final int RECORD_VIEW_REQUEST = 0;
     private static final int RECORD_ADD_REQUEST = 1;
 
-    private static final String BUNDLE_SEARCH_QUERY = "passwdsafe.searchQuery";
+    private static final String BUNDLE_SEARCH_QUERY =
+        "passwdsafe.searchQuery";
+    private static final String BUNDLE_CURR_GROUPS =
+        "passwdsafe.currGroups";
+    private static final String BUNDLE_SEL_CHILD_GROUP =
+        "passwdsafe.selChildGroup";
 
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
@@ -137,7 +142,13 @@ public class PasswdSafe extends ExpandableListActivity
         String query = null;
         if (savedInstanceState != null) {
             query = savedInstanceState.getString(BUNDLE_SEARCH_QUERY);
-            // TODO: save/restore group query
+            ArrayList<String> currGroups =
+                savedInstanceState.getStringArrayList(BUNDLE_CURR_GROUPS);
+            if (currGroups != null) {
+                itsCurrGroups = new ArrayList<String>(currGroups);
+            }
+            itsSelChildGroup =
+                savedInstanceState.getString(BUNDLE_SEL_CHILD_GROUP);
         }
         setSearchQuery(query);
 
@@ -263,6 +274,8 @@ public class PasswdSafe extends ExpandableListActivity
             query = itsSearchQuery.pattern();
         }
         outState.putString(BUNDLE_SEARCH_QUERY, query);
+        outState.putStringArrayList(BUNDLE_CURR_GROUPS, itsCurrGroups);
+        outState.putString(BUNDLE_SEL_CHILD_GROUP, itsSelChildGroup);
     }
 
     /* (non-Javadoc)
@@ -833,12 +846,8 @@ public class PasswdSafe extends ExpandableListActivity
             } else {
                 groupComp = String.CASE_INSENSITIVE_ORDER;
             }
-            // TODO: remove...
-            //TreeMap<String, ArrayList<MatchPwsRecord>> recsByGroup =
-            //    new TreeMap<String, ArrayList<MatchPwsRecord>>(groupComp);
 
             GroupNode root = new GroupNode("(root)", groupComp);
-
             for (PwsRecord rec : records) {
                 String match = filterRecord(rec, fileData);
                 if (match == null) {
@@ -860,13 +869,6 @@ public class PasswdSafe extends ExpandableListActivity
                     node = groupNode;
                 }
                 node.itsRecords.add(new MatchPwsRecord(rec, match));
-
-                //ArrayList<MatchPwsRecord> groupList = recsByGroup.get(group);
-                //if (groupList == null) {
-                //    groupList = new ArrayList<MatchPwsRecord>();
-                //    recsByGroup.put(group, groupList);
-                //}
-                //groupList.add(new MatchPwsRecord(rec, match));
             }
 
             // find right group
@@ -909,31 +911,6 @@ public class PasswdSafe extends ExpandableListActivity
                 Collections.sort(children, comp);
                 itsChildData.add(children);
             }
-            /*
-            for (Map.Entry<String, ArrayList<MatchPwsRecord>> entry :
-                recsByGroup.entrySet()) {
-                Map<String, String> groupInfo =
-                    Collections.singletonMap(GROUP, entry.getKey());
-                itsGroupData.add(groupInfo);
-
-                ArrayList<HashMap<String, Object>> children =
-                    new ArrayList<HashMap<String, Object>>();
-                for (MatchPwsRecord rec : entry.getValue()) {
-                    HashMap<String, Object> recInfo =
-                        new HashMap<String, Object>();
-                    String title = fileData.getTitle(rec.itsRecord);
-                    if (title == null) {
-                        title = "Untitled";
-                    }
-                    recInfo.put(TITLE, title);
-                    recInfo.put(RECORD, rec.itsRecord);
-                    recInfo.put(MATCH, rec.itsMatch);
-                    children.add(recInfo);
-                }
-                Collections.sort(children, comp);
-                itsChildData.add(children);
-            }
-            */
         } else {
             Map<String, String> groupInfo =
                 Collections.singletonMap(GROUP, NO_GROUP_GROUP);
