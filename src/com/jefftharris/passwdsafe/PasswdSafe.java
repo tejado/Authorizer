@@ -132,8 +132,7 @@ public class PasswdSafe extends ExpandableListActivity
             {
                 int size = itsCurrGroups.size();
                 if (size > 0) {
-                    itsCurrGroups.remove(size - 1);
-                    itsSelChildGroup = null;
+                    itsSelChildGroup = itsCurrGroups.remove(size - 1);
                     showFileData();
                 }
             }
@@ -847,7 +846,7 @@ public class PasswdSafe extends ExpandableListActivity
                 groupComp = String.CASE_INSENSITIVE_ORDER;
             }
 
-            GroupNode root = new GroupNode("(root)", groupComp);
+            GroupNode root = new GroupNode();
             for (PwsRecord rec : records) {
                 String match = filterRecord(rec, fileData);
                 if (match == null) {
@@ -861,55 +860,65 @@ public class PasswdSafe extends ExpandableListActivity
                 String[] groups = group.split("\\.");
                 GroupNode node = root;
                 for (String g : groups) {
-                    GroupNode groupNode = node.itsGroups.get(g);
+                    GroupNode groupNode = node.getGroup(g);
                     if (groupNode == null) {
-                        groupNode = new GroupNode(g, groupComp);
-                        node.itsGroups.put(g, groupNode);
+                        groupNode = new GroupNode();
+                        node.putGroup(g, groupNode, groupComp);
                     }
                     node = groupNode;
                 }
-                node.itsRecords.add(new MatchPwsRecord(rec, match));
+                node.addRecord(new MatchPwsRecord(rec, match));
             }
 
             // find right group
             GroupNode node = root;
             for (String group : itsCurrGroups) {
-                GroupNode childNode = node.itsGroups.get(group);
+                GroupNode childNode = node.getGroup(group);
                 if (childNode == null) {
                     break;
                 }
                 node = childNode;
             }
 
-            for (Map.Entry<String, GroupNode> entry:
-                node.itsGroups.entrySet()) {
-                Map<String, String> groupInfo =
-                    Collections.singletonMap(GROUP, entry.getKey());
-                itsGroupData.add(groupInfo);
+            Map<String, GroupNode> nodeGroups = node.getGroups();
+            if (nodeGroups != null) {
+                for (Map.Entry<String, GroupNode> entry:
+                    nodeGroups.entrySet()) {
+                    Map<String, String> groupInfo =
+                        Collections.singletonMap(GROUP, entry.getKey());
+                    itsGroupData.add(groupInfo);
 
-                ArrayList<HashMap<String, Object>> children =
-                    new ArrayList<HashMap<String, Object>>();
-                for (String childGroup : entry.getValue().itsGroups.keySet()) {
-                    HashMap<String, Object> recInfo =
-                        new HashMap<String, Object>();
-                    recInfo.put(TITLE, "(" + childGroup + ")");
-                    children.add(recInfo);
-                }
-
-                for (MatchPwsRecord rec : entry.getValue().itsRecords) {
-                    HashMap<String, Object> recInfo =
-                        new HashMap<String, Object>();
-                    String title = fileData.getTitle(rec.itsRecord);
-                    if (title == null) {
-                        title = "Untitled";
+                    ArrayList<HashMap<String, Object>> children =
+                        new ArrayList<HashMap<String, Object>>();
+                    GroupNode entryGroup = entry.getValue();
+                    Map<String, GroupNode> entryGroups = entryGroup.getGroups();
+                    if (entryGroups != null) {
+                        for(String childGroup : entryGroups.keySet()) {
+                            HashMap<String, Object> recInfo =
+                                new HashMap<String, Object>();
+                            recInfo.put(TITLE, "(" + childGroup + ")");
+                            children.add(recInfo);
+                        }
                     }
-                    recInfo.put(TITLE, title);
-                    recInfo.put(RECORD, rec.itsRecord);
-                    recInfo.put(MATCH, rec.itsMatch);
-                    children.add(recInfo);
+
+                    List<MatchPwsRecord> entryRecs = entryGroup.getRecords();
+                    if (entryRecs != null) {
+                        for (MatchPwsRecord rec : entryRecs) {
+                            HashMap<String, Object> recInfo =
+                                new HashMap<String, Object>();
+                            String title = fileData.getTitle(rec.itsRecord);
+                            if (title == null) {
+                                title = "Untitled";
+                            }
+                            recInfo.put(TITLE, title);
+                            recInfo.put(RECORD, rec.itsRecord);
+                            recInfo.put(MATCH, rec.itsMatch);
+                            children.add(recInfo);
+                        }
+                    }
+                    Collections.sort(children, comp);
+                    itsChildData.add(children);
                 }
-                Collections.sort(children, comp);
-                itsChildData.add(children);
             }
         } else {
             Map<String, String> groupInfo =
@@ -1127,15 +1136,47 @@ public class PasswdSafe extends ExpandableListActivity
 
     private static final class GroupNode
     {
-        public final String itsGroup;
-        public final List<MatchPwsRecord> itsRecords;
-        public final TreeMap<String, GroupNode> itsGroups;
+        private List<MatchPwsRecord> itsRecords = null;
+        private TreeMap<String, GroupNode> itsGroups = null;
 
-        public GroupNode(String group, Comparator<String> comp)
+        public GroupNode()
         {
-            itsGroup = group;
-            itsRecords = new ArrayList<MatchPwsRecord>();
-            itsGroups = new TreeMap<String, GroupNode>(comp);
+        }
+
+        public final void addRecord(MatchPwsRecord rec)
+        {
+            if (itsRecords == null) {
+                itsRecords = new ArrayList<MatchPwsRecord>();
+            }
+            itsRecords.add(rec);
+        }
+
+        public final List<MatchPwsRecord> getRecords()
+        {
+            return itsRecords;
+        }
+
+        public final void putGroup(String name, GroupNode node,
+                                   Comparator<String> groupComp)
+        {
+            if (itsGroups == null) {
+                itsGroups = new TreeMap<String, GroupNode>(groupComp);
+            }
+            itsGroups.put(name, node);
+        }
+
+        public final GroupNode getGroup(String name)
+        {
+            if (itsGroups == null) {
+                return null;
+            } else {
+                return itsGroups.get(name);
+            }
+        }
+
+        public final Map<String, GroupNode> getGroups()
+        {
+            return itsGroups;
         }
     }
 }
