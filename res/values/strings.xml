@@ -31,6 +31,7 @@
     <string name="file_list_header">Select password file to open in %1$s.</string>
     <string name="file_label">File:</string>
     <string name="file_name_label">File Name:</string>
+    <string name="generate_password">Generate Password</string>
     <string name="group">Group</string>
     <string name="hide_password">Hide Password</string>
     <string name="new_file">New File</string>

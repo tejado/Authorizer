@@ -197,6 +197,21 @@ public class PasswdSafeApp extends Application
         "sortCaseSensitivePref";
     public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
 
+    public static final String PREF_GEN_LOWER = "passwdGenLower";
+    public static final boolean PREF_GEN_LOWER_DEF = true;
+    public static final String PREF_GEN_UPPER = "passwdGenUpper";
+    public static final boolean PREF_GEN_UPPER_DEF = true;
+    public static final String PREF_GEN_DIGITS = "passwdGenDigits";
+    public static final boolean PREF_GEN_DIGITS_DEF = true;
+    public static final String PREF_GEN_SYMBOLS = "passwdGenSymbols";
+    public static final boolean PREF_GEN_SYMBOLS_DEF = false;
+    public static final String PREF_GEN_EASY = "passwdGenEasy";
+    public static final boolean PREF_GEN_EASY_DEF = false;
+    public static final String PREF_GEN_HEX = "passwdGenHex";
+    public static final boolean PREF_GEN_HEX_DEF = false;
+    public static final String PREF_GEN_LENGTH = "passwdGenLength";
+    public static final int PREF_GEN_LENGTH_DEF = 8;
+
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
@@ -321,6 +336,41 @@ public class PasswdSafeApp extends Application
     public static String getPasswordEncodingPref(SharedPreferences prefs)
     {
         return prefs.getString(PREF_PASSWD_ENC, PREF_PASSWD_ENC_DEF);
+    }
+
+    public static boolean getPasswordGenLowerPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_LOWER, PREF_GEN_LOWER_DEF);
+    }
+
+    public static boolean getPasswordGenUpperPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_UPPER, PREF_GEN_UPPER_DEF);
+    }
+
+    public static boolean getPasswordGenDigitsPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_DIGITS, PREF_GEN_DIGITS_DEF);
+    }
+
+    public static boolean getPasswordGenSymbolsPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_SYMBOLS, PREF_GEN_SYMBOLS_DEF);
+    }
+
+    public static boolean getPasswordGenEasyPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_EASY, PREF_GEN_EASY_DEF);
+    }
+
+    public static boolean getPasswordGenHexPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF);
+    }
+
+    public static int getPasswordGenLengthPref(SharedPreferences prefs)
+    {
+        return prefs.getInt(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF);
     }
 
     public static boolean getShowBackupFilesPref(SharedPreferences prefs)
