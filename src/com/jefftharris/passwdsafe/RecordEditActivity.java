@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -21,9 +22,11 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.SingleLineTransformationMethod;
 import android.text.method.TransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -254,43 +257,43 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
         case MENU_GENERATE_PASSWORD:
         {
-            StringBuilder chars = new StringBuilder();
+            ArrayList<String> chars = new ArrayList<String>();
             SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
             if (PasswdSafeApp.getPasswordGenHexPref(prefs)) {
-                chars.append(DIGITS);
-                chars.append("abcdef");
+                chars.add(DIGITS + "abcdef");
             } else {
                 if (PasswdSafeApp.getPasswordGenEasyPref(prefs)) {
                     if (PasswdSafeApp.getPasswordGenLowerPref(prefs)) {
-                        chars.append(EASY_LOWER_CHARS);
+                        chars.add(EASY_LOWER_CHARS);
                     }
                     if (PasswdSafeApp.getPasswordGenUpperPref(prefs)) {
-                        chars.append(EASY_UPPER_CHARS);
+                        chars.add(EASY_UPPER_CHARS);
                     }
                     if (PasswdSafeApp.getPasswordGenDigitsPref(prefs)) {
-                        chars.append(EASY_DIGITS);
+                        chars.add(EASY_DIGITS);
                     }
                     if (PasswdSafeApp.getPasswordGenSymbolsPref(prefs)) {
-                        chars.append(EASY_SYMBOLS);
+                        chars.add(EASY_SYMBOLS);
                     }
                 } else {
                     if (PasswdSafeApp.getPasswordGenLowerPref(prefs)) {
-                        chars.append(LOWER_CHARS);
+                        chars.add(LOWER_CHARS);
                     }
                     if (PasswdSafeApp.getPasswordGenUpperPref(prefs)) {
-                        chars.append(UPPER_CHARS);
+                        chars.add(UPPER_CHARS);
                     }
                     if (PasswdSafeApp.getPasswordGenDigitsPref(prefs)) {
-                        chars.append(DIGITS);
+                        chars.add(DIGITS);
                     }
                     if (PasswdSafeApp.getPasswordGenSymbolsPref(prefs)) {
-                        chars.append(SYMBOLS);
+                        chars.add(SYMBOLS);
                     }
                 }
             }
 
-            String charsStr = chars.toString();
+            String charsStr =
+                TextUtils.concat(chars.toArray(new CharSequence[0])).toString();
             int numChars = charsStr.length();
             StringBuilder passwd = new StringBuilder();
             int passwdLen = PasswdSafeApp.getPasswordGenLengthPref(prefs);
@@ -298,12 +301,30 @@ public class RecordEditActivity extends AbstractRecordActivity
                 SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
                 random.nextBytes(new byte[passwdLen]);
 
-                for (int i = 0; i < passwdLen; ++i) {
-                    int charPos = random.nextInt(numChars);
-                    passwd.append(charsStr.charAt(charPos));
-                }
+                ArrayList<String> verifyChars = new ArrayList<String>();
+                do {
+                    verifyChars.clear();
+                    verifyChars.addAll(chars);
+                    passwd.delete(0, passwd.length());
+                    for (int i = 0; i < passwdLen; ++i) {
+                        int charPos = random.nextInt(numChars);
+                        char c = charsStr.charAt(charPos);
+                        passwd.append(c);
 
-                // TODO: Test for at least one char from all groups
+                        if (!verifyChars.isEmpty()) {
+                            Iterator<String> iter = verifyChars.iterator();
+                            while (iter.hasNext()) {
+                                String verifyStr = iter.next();
+                                if (verifyStr.indexOf(c) != -1) {
+                                    iter.remove();
+                                }
+                            }
+                        }
+                    }
+                } while (!verifyChars.isEmpty() &&
+                         (passwdLen > (chars.size() - verifyChars.size())));
+
+                // TODO: Test one selected group and passwd size of 1, 2, 3
                 // TODO: Prefs screen
 
                 TextView passwdField =
