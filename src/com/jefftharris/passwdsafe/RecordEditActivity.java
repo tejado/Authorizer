@@ -26,7 +26,6 @@ import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.SingleLineTransformationMethod;
 import android.text.method.TransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -324,7 +323,6 @@ public class RecordEditActivity extends AbstractRecordActivity
                 } while (!verifyChars.isEmpty() &&
                          (passwdLen > (chars.size() - verifyChars.size())));
 
-                // TODO: Test one selected group and passwd size of 1, 2, 3
                 // TODO: Prefs screen
 
                 TextView passwdField =
