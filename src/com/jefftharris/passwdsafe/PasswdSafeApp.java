@@ -210,7 +210,7 @@ public class PasswdSafeApp extends Application
     public static final String PREF_GEN_HEX = "passwdGenHex";
     public static final boolean PREF_GEN_HEX_DEF = false;
     public static final String PREF_GEN_LENGTH = "passwdGenLength";
-    public static final int PREF_GEN_LENGTH_DEF = 8;
+    public static final String PREF_GEN_LENGTH_DEF = "8";
 
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
@@ -370,7 +370,8 @@ public class PasswdSafeApp extends Application
 
     public static int getPasswordGenLengthPref(SharedPreferences prefs)
     {
-        return prefs.getInt(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF);
+        return Integer.parseInt(
+            prefs.getString(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF));
     }
 
     public static boolean getShowBackupFilesPref(SharedPreferences prefs)

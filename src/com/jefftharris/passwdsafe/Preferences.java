@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -69,6 +70,9 @@ public class Preferences extends PreferenceActivity
         itsPasswdEncPref.setEntryValues(charsets);
         itsPasswdEncPref.setDefaultValue(PasswdSafeApp.PREF_PASSWD_ENC_DEF);
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_PASSWD_ENC);
+
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_LENGTH);
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_HEX);
     }
 
     /* (non-Javadoc)
@@ -88,7 +92,6 @@ public class Preferences extends PreferenceActivity
      */
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
-        Log.i("foo", "pref changed key: " + key);
         if (key.equals(PasswdSafeApp.PREF_FILE_DIR)) {
             String pref = PasswdSafeApp.getFileDirPref(prefs);
             if (pref.length() == 0) {
@@ -107,6 +110,21 @@ public class Preferences extends PreferenceActivity
         } else if (key.equals(PasswdSafeApp.PREF_PASSWD_ENC)) {
             itsPasswdEncPref.setSummary(
                 PasswdSafeApp.getPasswordEncodingPref(prefs));
+        } else if (key.equals(PasswdSafeApp.PREF_GEN_LENGTH)) {
+            Preference pref = findPreference(PasswdSafeApp.PREF_GEN_LENGTH);
+            pref.setSummary(
+                Integer.toString(
+                    PasswdSafeApp.getPasswordGenLengthPref(prefs)));
+        } else if (key.equals(PasswdSafeApp.PREF_GEN_HEX)) {
+            boolean isHex = PasswdSafeApp.getPasswordGenHexPref(prefs);
+            for (String id: new String[] { PasswdSafeApp.PREF_GEN_LOWER,
+                                           PasswdSafeApp.PREF_GEN_UPPER,
+                                           PasswdSafeApp.PREF_GEN_DIGITS,
+                                           PasswdSafeApp.PREF_GEN_SYMBOLS,
+                                           PasswdSafeApp.PREF_GEN_EASY }) {
+                Preference pref = findPreference(id);
+                pref.setEnabled(!isHex);
+            }
         }
     }
 
