@@ -57,7 +57,7 @@
                                 android:defaultValue="true"/>
             <CheckBoxPreference android:name="passwdGenSymbols Pref"
                                 android:title="Use Symbols"
-                                android:summary="I.e. $, %, ^, etc."
+                                android:summary="$, %, ^, etc."
                                 android:key="passwdGenSymbols"
                                 android:defaultValue="false"/>
     
