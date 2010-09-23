@@ -44,6 +44,7 @@
     <string name="password">Password</string>
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_label">Password:</string>
+    <string name="password_preferences">Password Preferences</string>
     <string name="permissions_label">Permissions:</string>
     <string name="preferences">Preferences</string>
     <string name="pref_file_dir">Directory for Files</string>

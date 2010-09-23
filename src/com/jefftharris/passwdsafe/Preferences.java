@@ -11,6 +11,7 @@ import java.io.File;
 
 import org.pwsafe.lib.file.PwsFile;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -28,6 +29,9 @@ import android.preference.PreferenceManager;
 public class Preferences extends PreferenceActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
+    public static final String INTENT_SCREEN = "screen";
+    public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
+
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
@@ -72,6 +76,13 @@ public class Preferences extends PreferenceActivity
 
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_LENGTH);
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_HEX);
+
+        Intent intent = getIntent();
+        String screen = intent.getStringExtra(INTENT_SCREEN);
+        if (screen != null) {
+            Preference scr = findPreference(screen);
+            getPreferenceScreen().onItemClick(null, null, scr.getOrder(), 0);
+        }
     }
 
     /* (non-Javadoc)

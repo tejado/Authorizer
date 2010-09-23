@@ -25,7 +25,8 @@
                         android:key="groupRecordsPref"
                         android:defaultValue="true"/>
                         
-    <PreferenceScreen android:title="Password options">
+    <PreferenceScreen android:title="Password options"
+                      android:key="passwordOptions">
         <ListPreference android:name="passwordEncoding Pref"
                         android:title="File password encoding"
                         android:key="passwordEncodingPref"/>
