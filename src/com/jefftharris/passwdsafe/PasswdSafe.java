@@ -73,6 +73,7 @@ public class PasswdSafe extends ExpandableListActivity
     private static final String TITLE = "title";
     private static final String GROUP = "group";
     private static final String MATCH = "match";
+    private static final String USERNAME = "username";
 
     private static final String NO_GROUP_GROUP = "Records";
 
@@ -904,16 +905,7 @@ public class PasswdSafe extends ExpandableListActivity
                     List<MatchPwsRecord> entryRecs = entryGroup.getRecords();
                     if (entryRecs != null) {
                         for (MatchPwsRecord rec : entryRecs) {
-                            HashMap<String, Object> recInfo =
-                                new HashMap<String, Object>();
-                            String title = fileData.getTitle(rec.itsRecord);
-                            if (title == null) {
-                                title = "Untitled";
-                            }
-                            recInfo.put(TITLE, title);
-                            recInfo.put(RECORD, rec.itsRecord);
-                            recInfo.put(MATCH, rec.itsMatch);
-                            children.add(recInfo);
+                            children.add(createRecInfo(rec, fileData));
                         }
                     }
                     Collections.sort(children, comp);
@@ -932,19 +924,31 @@ public class PasswdSafe extends ExpandableListActivity
                 if (match == null) {
                     continue;
                 }
-                HashMap<String, Object> recInfo = new HashMap<String, Object>();
-                String title = fileData.getTitle(rec);
-                if (title == null) {
-                    title = "Untitled";
-                }
-                recInfo.put(TITLE, title);
-                recInfo.put(RECORD, rec);
-                recInfo.put(MATCH, match);
-                children.add(recInfo);
+                children.add(createRecInfo(new MatchPwsRecord(rec, match),
+                                           fileData));
             }
             Collections.sort(children, comp);
             itsChildData.add(children);
         }
+    }
+
+    private static final HashMap<String, Object>
+    createRecInfo(MatchPwsRecord rec, PasswdFileData fileData)
+    {
+        HashMap<String, Object> recInfo = new HashMap<String, Object>();
+        String title = fileData.getTitle(rec.itsRecord);
+        if (title == null) {
+            title = "Untitled";
+        }
+        String user = fileData.getUsername(rec.itsRecord);
+        if (TextUtils.isEmpty(user)) {
+            title += " [" + user + "]";
+        }
+        recInfo.put(TITLE, title);
+        recInfo.put(RECORD, rec.itsRecord);
+        recInfo.put(MATCH, rec.itsMatch);
+        recInfo.put(USERNAME, user);
+        return recInfo;
     }
 
     private final void setSearchQuery(String query)
@@ -1103,13 +1107,35 @@ public class PasswdSafe extends ExpandableListActivity
         public int compare(HashMap<String, Object> arg0,
                            HashMap<String, Object> arg1)
         {
-            String title0 = arg0.get(TITLE).toString();
-            String title1 = arg1.get(TITLE).toString();
+            int rc = compareField(arg0, arg1, TITLE);
+            if (rc == 0) {
+                rc = compareField(arg0, arg1, USERNAME);
+            }
+            return rc;
+        }
 
-            if (itsIsSortCaseSensitive) {
-                return title0.compareTo(title1);
+        private final int compareField(HashMap<String, Object> arg0,
+                                       HashMap<String, Object> arg1,
+                                       String field)
+        {
+            Object obj0 = arg0.get(field);
+            Object obj1 = arg1.get(field);
+
+            if ((obj0 == null) && (obj1 == null)) {
+                return 0;
+            } else if (obj0 == null) {
+                return -1;
+            } else if (obj1 == null) {
+                return 1;
             } else {
-                return title0.compareToIgnoreCase(title1);
+                String str0 = obj0.toString();
+                String str1 = obj1.toString();
+
+                if (itsIsSortCaseSensitive) {
+                    return str0.compareTo(str1);
+                } else {
+                    return str0.compareToIgnoreCase(str1);
+                }
             }
         }
     }
