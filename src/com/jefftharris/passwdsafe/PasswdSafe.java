@@ -783,13 +783,22 @@ public class PasswdSafe extends ExpandableListActivity
         String[] childFrom;
         int[] childTo;
         if (itsSearchQuery == null) {
-            childLayout = android.R.layout.simple_expandable_list_item_1;
-            childFrom = new String[] { TITLE };
-            childTo = new int[] { android.R.id.text1 };
-        } else {
-            childLayout = android.R.layout.simple_expandable_list_item_2;
-            childFrom = new String[] { TITLE, MATCH };
+//            childLayout = android.R.layout.simple_expandable_list_item_1;
+//            childFrom = new String[] { TITLE };
+//            childTo = new int[] { android.R.id.text1 };
+
+            childLayout = R.layout.passwdsafe_list_item;
+            childFrom = new String[] { TITLE, USERNAME };
             childTo = new int[] { android.R.id.text1, android.R.id.text2 };
+        } else {
+//            childLayout = android.R.layout.simple_expandable_list_item_2;
+//            childFrom = new String[] { TITLE, MATCH };
+//            childTo = new int[] { android.R.id.text1, android.R.id.text2 };
+
+            childLayout = R.layout.passwdsafe_list_item;
+            childFrom = new String[] { TITLE, USERNAME, MATCH };
+            childTo = new int[] { android.R.id.text1, android.R.id.text2,
+                                  R.id.match };
         }
 
         ExpandableListAdapter adapter =
@@ -941,8 +950,8 @@ public class PasswdSafe extends ExpandableListActivity
             title = "Untitled";
         }
         String user = fileData.getUsername(rec.itsRecord);
-        if (TextUtils.isEmpty(user)) {
-            title += " [" + user + "]";
+        if (!TextUtils.isEmpty(user)) {
+            user = "[" + user + "]";
         }
         recInfo.put(TITLE, title);
         recInfo.put(RECORD, rec.itsRecord);
