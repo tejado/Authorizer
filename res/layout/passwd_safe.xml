@@ -19,6 +19,7 @@
                       android:layout_weight="1"/>
             <Button android:id="@+id/sub_group_up_btn"
                     android:text="@string/up"
+                    android:drawableRight="@drawable/arrow_up"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
         </LinearLayout>
