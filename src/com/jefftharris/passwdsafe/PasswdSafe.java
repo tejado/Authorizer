@@ -92,6 +92,7 @@ public class PasswdSafe extends ExpandableListActivity
     private LoadTask itsLoadTask;
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
+    private boolean itsIsSearchRegex = false;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
 
@@ -159,6 +160,7 @@ public class PasswdSafe extends ExpandableListActivity
             PreferenceManager.getDefaultSharedPreferences(this);
         itsGroupRecords = PasswdSafeApp.getGroupRecordsPref(prefs);
         itsIsSortCaseSensitive = PasswdSafeApp.getSortCaseSensitivePref(prefs);
+        itsIsSearchRegex = PasswdSafeApp.getSearchRegexPref(prefs);
 
         String action = intent.getAction();
         if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
@@ -963,8 +965,11 @@ public class PasswdSafe extends ExpandableListActivity
             }
 
             try {
-                itsSearchQuery = Pattern.compile(
-                    query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+                int flags = Pattern.CASE_INSENSITIVE;
+                if (!itsIsSearchRegex) {
+                    flags |= Pattern.LITERAL;
+                }
+                itsSearchQuery = Pattern.compile(query, flags);
             } catch(PatternSyntaxException e) {
             }
         }

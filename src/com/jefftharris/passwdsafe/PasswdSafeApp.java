@@ -190,6 +190,9 @@ public class PasswdSafeApp extends Application
     public static final String PREF_PASSWD_ENC_DEF =
         PwsFile.DEFAULT_PASSWORD_CHARSET;
 
+    public static final String PREF_SEARCH_REGEX = "searchRegexPref";
+    public static final boolean PREF_SEARCH_REGEX_DEF = false;
+
     public static final String PREF_SHOW_BACKUP_FILES = "showBackupFilesPref";
     public static final boolean PREF_SHOW_BACKUP_FILES_DEF = false;
 
@@ -372,6 +375,11 @@ public class PasswdSafeApp extends Application
     {
         return Integer.parseInt(
             prefs.getString(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF));
+    }
+
+    public static boolean getSearchRegexPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SEARCH_REGEX, PREF_SEARCH_REGEX_DEF);
     }
 
     public static boolean getShowBackupFilesPref(SharedPreferences prefs)
