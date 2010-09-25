@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:key="top_prefs">
-    <CheckBoxPreference android:name="sortCaseSensitive Pref"
-                        android:title="Case-sensitive sorting"
-                        android:key="sortCaseSensitivePref"
-                        android:defaultValue="true"/>
-                    
-    <EditTextPreference android:name="FileDir Pref"
-                        android:title="Directory for files"
-                        android:summary="/sdcard"
-                        android:defaultValue="/sdcard"
-                        android:key="fileDirPref"/>
-                        
-    <ListPreference android:name="defaultFile Pref"
-                    android:title="Default file to open"
-                    android:key="defFilePref"/>
+    <PreferenceScreen android:title="File Settings"
+                      android:key="fileOptions">
+        <EditTextPreference android:name="FileDir Pref"
+                            android:title="Directory for files"
+                            android:summary="/sdcard"
+                            android:defaultValue="/sdcard"
+                            android:key="fileDirPref"/>
+                            
+        <ListPreference android:name="defaultFile Pref"
+                        android:title="Default file to open"
+                        android:key="defFilePref"/>
+    
+        <ListPreference android:name="fileTimeout Pref"
+                        android:title="File close timeout"
+                        android:key="fileCloseTimeoutPref"/>
 
-    <ListPreference android:name="fileTimeout Pref"
-                    android:title="File close timeout"
-                    android:key="fileCloseTimeoutPref"/>
+        <CheckBoxPreference android:name="showBackupFiles Pref"
+                            android:title="Show backup files"
+                            android:key="showBackupFilesPref"
+                            android:defaultValue="false"/>
+    </PreferenceScreen>
 
-    <CheckBoxPreference android:name="groupRecords Pref"
-                        android:title="Group records"
-                        android:key="groupRecordsPref"
-                        android:defaultValue="true"/>
-                        
-    <PreferenceScreen android:title="Password options"
+    <PreferenceScreen android:title="Password Settings"
                       android:key="passwordOptions">
         <ListPreference android:name="passwordEncoding Pref"
                         android:title="File password encoding"
@@ -69,9 +67,18 @@
                                 android:defaultValue="false"/>
         </PreferenceCategory>
     </PreferenceScreen>
+    
+    <PreferenceCategory android:title="Record Settings"
+                      android:key="recordOptions">
+        <CheckBoxPreference android:name="sortCaseSensitive Pref"
+                            android:title="Case-sensitive sorting"
+                            android:key="sortCaseSensitivePref"
+                            android:defaultValue="true"/>
 
-    <CheckBoxPreference android:name="showBackupFiles Pref"
-                        android:title="Show backup files"
-                        android:key="showBackupFilesPref"
-                        android:defaultValue="false"/>
+        <CheckBoxPreference android:name="groupRecords Pref"
+                            android:title="Group records"
+                            android:key="groupRecordsPref"
+                            android:defaultValue="true"/>
+                            
+    </PreferenceCategory>
 </PreferenceScreen>
