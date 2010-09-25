@@ -779,23 +779,13 @@ public class PasswdSafe extends ExpandableListActivity
         int groupLayout = android.R.layout.simple_expandable_list_item_1;
         String[] groupFrom = new String[] { GROUP };
         int[] groupTo = new int[] { android.R.id.text1 };
-        int childLayout;
+        int childLayout = R.layout.passwdsafe_list_item;
         String[] childFrom;
         int[] childTo;
         if (itsSearchQuery == null) {
-//            childLayout = android.R.layout.simple_expandable_list_item_1;
-//            childFrom = new String[] { TITLE };
-//            childTo = new int[] { android.R.id.text1 };
-
-            childLayout = R.layout.passwdsafe_list_item;
             childFrom = new String[] { TITLE, USERNAME };
             childTo = new int[] { android.R.id.text1, android.R.id.text2 };
         } else {
-//            childLayout = android.R.layout.simple_expandable_list_item_2;
-//            childFrom = new String[] { TITLE, MATCH };
-//            childTo = new int[] { android.R.id.text1, android.R.id.text2 };
-
-            childLayout = R.layout.passwdsafe_list_item;
             childFrom = new String[] { TITLE, USERNAME, MATCH };
             childTo = new int[] { android.R.id.text1, android.R.id.text2,
                                   R.id.match };
