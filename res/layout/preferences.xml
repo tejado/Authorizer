@@ -83,6 +83,10 @@
     
     <PreferenceCategory android:title="Search Settings"
                         android:key="searchOptions">
+        <CheckBoxPreference android:name="searchCaseSensitive Pref"
+                            android:title="Case sensitive"
+                            android:key="searchCaseSensitivePref"
+                            android:defaultValue="false"/>
                             
         <CheckBoxPreference android:name="searchRegex Pref"
                             android:title="Regular expression"
