@@ -223,7 +223,7 @@ public abstract class PwsFileV1V2 extends PwsFile {
 			header.save( this );
 
 			// Can only be created once the V1 header's been written.
-			//TODO: check whether this can be performed without toString
+			//TODOlib: check whether this can be performed without toString
 			algorithm	= makeBlowfish(getPassphrase().toString(),
 			         	               PwsFile.getUpdatePasswordEncoding());
 
@@ -245,10 +245,10 @@ public abstract class PwsFileV1V2 extends PwsFile {
 			}
 			else
 			{
-				// FIXME: I'm not sure what this message should be, but it should
+				// FIXMElib: I'm not sure what this message should be, but it should
 				// reflect the fact that storage failed, not anything about a temp file.
 				LOG.error( I18nHelper.getInstance().formatMessage("E00010", new Object [] { "Storage file" } ) );
-				// TODO Throw an exception here?
+				// TODOlib Throw an exception here?
 				return;
 			}
 		} catch (IOException e) {

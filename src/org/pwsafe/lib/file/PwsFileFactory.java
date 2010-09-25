@@ -267,7 +267,7 @@ public class PwsFileFactory {
 
 		PwsFile		file;
 
-		//TODO change to StringBuilder Constructors
+		//TODOlib change to StringBuilder Constructors
 		String passphrase = aPassphrase.toString();
 
 		// First check for a v3 file...
@@ -296,7 +296,7 @@ public class PwsFileFactory {
 
 		file.close();
 
-		// TODO what can we do about this?
+		// TODOlib what can we do about this?
 		// it will probably be fooled if someone is daft enough to create a V1 file with the
 		// title of the first record set to the value of PwsFileV2.ID_STRING!
 

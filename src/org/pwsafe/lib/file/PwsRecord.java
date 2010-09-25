@@ -128,7 +128,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 				// valid ASCII
 				// range.
 				//
-				// TODO This needs to be reviewed if the format ever changes to
+				// TODOlib This needs to be reviewed if the format ever changes to
 				// unicode
 
 				return new String(data, 0, length, DEFAULT_CHARSET);
@@ -553,7 +553,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 		Util.putIntToByteArray(lenBlock, dataBlock.length, 0);
 		Util.putIntToByteArray(lenBlock, aType, 4);
-		// TODO put random bytes here
+		// TODOlib put random bytes here
 
 		dataBlock = Util.cloneByteArray(dataBlock, PwsFile
 				.calcBlockLength(dataBlock.length));
