@@ -137,6 +137,21 @@ public class PwsRecordV3 extends PwsRecord
 	public static final int EMAIL = 20;
 
 	/**
+	 * Header last saved app
+	 */
+	public static final int HEADER_LAST_SAVE_WHAT = 6;
+
+	/**
+	 *  Header last saved by user
+	 */
+	public static final int HEADER_LAST_SAVE_USER = 7;
+
+	/**
+	 * Header last saved on host
+	 */
+	public static final int HEADER_LAST_SAVE_HOST = 8;
+
+	/**
 	 * Constant for the end of record marker field.
 	 */
 	public static final int		END_OF_RECORD		= 255;
