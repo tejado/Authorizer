@@ -45,8 +45,11 @@
                 <data android:pathPattern=".*\\.psafe3"/>
                 <data android:pathPattern=".*\\.dat"/>
                 <data android:mimeType="application/octet-stream"/>
-                <data android:mimeType="application/x-psafe3"/>
                 <data android:mimeType="application/x-psafe"/>
+                <data android:mimeType="application/x-psafe3"/>
+                <data android:mimeType="application/application/octet-string"/>
+                <data android:mimeType="application/application/x-psafe"/>
+                <data android:mimeType="application/application/x-psafe3"/>
             </intent-filter>
 
             <intent-filter>
