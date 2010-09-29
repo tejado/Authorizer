@@ -363,9 +363,8 @@ public class PasswdFileData
             }
             case PwsRecordV3.UUID:
             {
-                // No real UUID field for V1, so just use the title which
-                // should be unique
-                fieldId = PwsRecordV1.TITLE;
+                // No real UUID field for V1, so just use the phantom one
+                fieldId = PwsRecordV1.UUID;
                 break;
             }
             case PwsRecordV3.EMAIL:
