@@ -312,6 +312,11 @@ public final class PwsFileV3 extends PwsFile {
 		return new PwsRecordV3();
 	}
 
+	public PwsRecord getHeaderRecord()
+	{
+	    return headerRecord;
+	}
+
 	/**
 	 * Reads the extra header present in version 2 files.
 	 *

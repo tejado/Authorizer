@@ -277,6 +277,21 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.UUID);
     }
 
+    public final String getHdrLastSaveUser()
+    {
+        return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_USER);
+    }
+
+    public final String getHdrLastSaveHost()
+    {
+        return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_HOST);
+    }
+
+    public final String getHdrLastSaveApp()
+    {
+        return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_WHAT);
+    }
+
     private final String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
@@ -385,6 +400,44 @@ public class PasswdFileData
         }
         }
 
+        return doGetField(rec, fieldId);
+    }
+
+    private final String getHdrField(int fieldId)
+    {
+        if (itsPwsFile == null) {
+            return "";
+        }
+
+        switch (itsPwsFile.getFileVersionMajor())
+        {
+        case PwsFileV3.VERSION:
+        {
+            break;
+        }
+        case PwsFileV2.VERSION:
+        case PwsFileV1.VERSION:
+        {
+            fieldId = FIELD_NOT_PRESENT;
+            break;
+        }
+        default:
+        {
+            fieldId = FIELD_UNSUPPORTED;
+            break;
+        }
+        }
+
+        if (isV3()) {
+            return doGetField(((PwsFileV3)itsPwsFile).getHeaderRecord(),
+                              fieldId);
+        } else {
+            return null;
+        }
+    }
+
+    private final String doGetField(PwsRecord rec, int fieldId)
+    {
         switch (fieldId)
         {
         case FIELD_UNSUPPORTED:

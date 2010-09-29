@@ -641,6 +641,30 @@ public class PasswdSafe extends ExpandableListActivity
 
             tv = (TextView)dialog.findViewById(R.id.password_encoding);
             tv.setText(fileData.getOpenPasswordEncoding());
+
+            TextView lastSaveBy =
+                (TextView)dialog.findViewById(R.id.last_save_by);
+            TextView lastSaveApp =
+                (TextView)dialog.findViewById(R.id.last_save_app);
+            if (fileData.isV3()) {
+                // TODO version, UUID?, last save time
+                // TODO who performed last save field support...
+                StringBuilder build = new StringBuilder();
+                String str = fileData.getHdrLastSaveUser();
+                if (!TextUtils.isEmpty(str)) {
+                    build.append(str);
+                }
+                str = fileData.getHdrLastSaveHost();
+                if (!TextUtils.isEmpty(str)) {
+                    if (build.length() > 0) {
+                        build.append(" on ");
+                    }
+                    build.append(str);
+                }
+                lastSaveBy.setText(build);
+
+                lastSaveApp.setText(fileData.getHdrLastSaveApp());
+            }
             break;
         }
         case DIALOG_CHANGE_PASSWD:

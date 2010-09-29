@@ -31,4 +31,14 @@
         <TextView android:id="@+id/password_encoding"
                   android:layout_width="wrap_content"/>
     </TableRow>
+    <TableRow>
+        <TextView android:text="@string/last_save_by_label"/>
+        <TextView android:id="@+id/last_save_by"
+                  android:layout_width="wrap_content"/>
+    </TableRow>
+    <TableRow>
+        <TextView android:text="@string/last_save_app_label"/>
+        <TextView android:id="@+id/last_save_app"
+                  android:layout_width="wrap_content"/>
+    </TableRow>
 </TableLayout>
