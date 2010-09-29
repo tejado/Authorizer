@@ -1,6 +1,6 @@
 /*
  * $Id:$
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -40,29 +40,29 @@ public class PwsFileStorage implements PwsStorage {
 
 	/** The filename used for storage */
 	private final String filename;
-	
+
 	/*
-	 * Build an implementation given the filename for the underlying storage. 
+	 * Build an implementation given the filename for the underlying storage.
 	 */
 	public PwsFileStorage(String filename) throws IOException {
 		this.filename = filename;
 	}
-	
+
 	/** Grab all the bytes in the file */
 	public byte[] load() throws IOException {
 		File file = new File(filename);
         InputStream is = new BufferedInputStream(new FileInputStream(file));
-        
+
         // Get the size of the file
         long length = file.length();
-    
+
         if (length > Integer.MAX_VALUE) {
             // File is too large
         }
-    
+
         // Create the byte array to hold the data
         byte[] bytes = new byte[(int)length];
-    
+
         // Read in the bytes
         int offset = 0;
         int numRead = 0;
@@ -70,12 +70,12 @@ public class PwsFileStorage implements PwsStorage {
                && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
             offset += numRead;
         }
-    
+
         // Ensure all the bytes have been read in
         if (offset < bytes.length) {
             throw new IOException("Could not completely read file "+file.getName());
         }
-    
+
         // Close the input stream and return bytes
         is.close();
         return bytes;
@@ -83,7 +83,7 @@ public class PwsFileStorage implements PwsStorage {
 
 	/**
 	 * Takes the (encrypted) bytes and writes them out to the file.
-	 * 
+	 *
 	 * This particular method takes steps to make sure that the
 	 * original file is not overwritten or deleted until the
 	 * new file has been successfully saved.
@@ -101,7 +101,7 @@ public class PwsFileStorage implements PwsStorage {
 				OutputStream OutStream	= new FileOutputStream( file );
 
 				OutStream.write(data);
-				OutStream.close(); // TODO: needs a finally
+				OutStream.close(); // TODOlib: needs a finally
 				return true;
 			}
 			LOG.debug1("Original file path: "+file.getAbsolutePath());
@@ -117,11 +117,11 @@ public class PwsFileStorage implements PwsStorage {
 			File bakFile		= new File( FilePath, FileName + "~" );
 
 			if ( bakFile.exists() )
-			{	
+			{
 				if ( !bakFile.delete() )
 				{
 					LOG.error( I18nHelper.getInstance().formatMessage("E00012", new Object [] { bakFile.getCanonicalPath() } ) );
-					// TODO Throw an exception here
+					// TODOlib Throw an exception here
 					return false;
 				}
 			}
@@ -130,13 +130,13 @@ public class PwsFileStorage implements PwsStorage {
 			OutputStream OutStream	= new FileOutputStream( tempFile );
 
 			OutStream.write(data);
-			OutStream.close(); // TODO: needs a finally
+			OutStream.close(); // TODOlib: needs a finally
 
 			if (oldFile.exists()) {
 				if (!oldFile.renameTo(bakFile)) {
 					LOG.error(I18nHelper.getInstance().formatMessage("E00011",
 							new Object[] { tempFile.getCanonicalPath() }));
-					// TODO Throw an exception here?
+					// TODOlib Throw an exception here?
 					return false;
 				}
 				LOG.debug1("Old file successfully renamed to "
@@ -151,7 +151,7 @@ public class PwsFileStorage implements PwsStorage {
 			} else {
 				LOG.error(I18nHelper.getInstance().formatMessage("E00010",
 						new Object[] { tempFile.getCanonicalPath() }));
-				// TODO Throw an exception here?
+				// TODOlib Throw an exception here?
 				return false;
 			}
 		} catch (Exception e) {
@@ -159,15 +159,15 @@ public class PwsFileStorage implements PwsStorage {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * This method is *not* part of the storage interface but specific to
 	 * this particular implementation.
-	 * 
+	 *
 	 * @return Name of the file used for storage.
 	 */
 	public String getFilename() { return filename; }
-	
+
 	public void setPassphrase(String passphrase) {
 		/* Do nothing since there is no additional encrypted information associated
 		 * with this storage mechanism
@@ -177,8 +177,8 @@ public class PwsFileStorage implements PwsStorage {
 	public String getIdentifier() {
 		return this.filename;
 	}
-	
-	
+
+
 	public Date getModifiedDate() {
 		File file = new File(filename);
 		Date modified = null;
@@ -186,6 +186,6 @@ public class PwsFileStorage implements PwsStorage {
 			modified = new Date(file.lastModified());
 		return modified;
 	}
-	
-	
+
+
 }

@@ -161,7 +161,7 @@ public class FileConverter
 
 		if ( file.exists() )
 		{
-			// TODO generate a temporary filename
+			// TODOlib generate a temporary filename
 			throw new IllegalStateException("new File already exists: " + file.getAbsolutePath());
 		}
 

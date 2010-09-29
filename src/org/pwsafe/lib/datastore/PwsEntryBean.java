@@ -512,7 +512,7 @@ public class PwsEntryBean implements Cloneable {
             newEntry.setUsername(user);
 
             String password = getSafeValue(v3,PwsFieldTypeV3.PASSWORD);
-            newEntry.setPassword(new StringBuilder(password)); // TODO: change PwsRecord to StringBuilder as well?
+            newEntry.setPassword(new StringBuilder(password)); // TODOlib: change PwsRecord to StringBuilder as well?
 
             String notes = getSafeValue(v3,PwsFieldTypeV3.NOTES);
             newEntry.setNotes(notes);

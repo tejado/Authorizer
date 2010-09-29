@@ -1,6 +1,6 @@
 /*
  * $Id: PwsEntryStoreImpl.java 411 2009-09-25 18:19:34Z roxon $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -32,16 +32,16 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 	private static final EnumSet<PwsFieldTypeV1> DEFAULT_V1_SPARSE_FIELDS = EnumSet.of(PwsFieldTypeV1.TITLE, PwsFieldTypeV1.USERNAME);
 	private static final EnumSet<PwsFieldTypeV2> DEFAULT_V2_SPARSE_FIELDS = EnumSet.of(PwsFieldTypeV2.TITLE, PwsFieldTypeV2.GROUP, PwsFieldTypeV2.USERNAME, PwsFieldTypeV2.NOTES);
 	private static final EnumSet<PwsFieldTypeV3> DEFAULT_V3_SPARSE_FIELDS = EnumSet.of(PwsFieldTypeV3.TITLE, PwsFieldTypeV3.GROUP, PwsFieldTypeV3.USERNAME, PwsFieldTypeV3.NOTES, PwsFieldTypeV3.URL);
-	
+
 	PwsFile pwsFile;
 
 	/**
-	 * List of partly filled Entries. Used for overviews etc. 
+	 * List of partly filled Entries. Used for overviews etc.
 	 */
 	protected List<PwsEntryBean> sparseEntries;
 
 	private Set<? extends PwsFieldType> sparseFields;
-	
+
 	public PwsEntryStoreImpl (PwsFile aPwsFile) {
 		super();
 		pwsFile = aPwsFile;
@@ -55,18 +55,18 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 		sparseFields = someSparseFields;
 		init ();
 	}
-	
+
 	private void setDefaultSparseFields() {
-		if (pwsFile instanceof PwsFileV1) 
+		if (pwsFile instanceof PwsFileV1)
 			sparseFields = DEFAULT_V1_SPARSE_FIELDS.clone();
 		else if (pwsFile instanceof PwsFileV2)
 			sparseFields = DEFAULT_V2_SPARSE_FIELDS.clone();
-		else 
+		else
 			sparseFields = DEFAULT_V3_SPARSE_FIELDS.clone();
 	}
 
 	private void init() {
-    	
+
     	if (sparseEntries == null)
     		sparseEntries = new ArrayList<PwsEntryBean>();
     	refresh();
@@ -74,43 +74,43 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 
     private void refresh() {
     	sparseEntries.clear();
-    	
+
     	if (pwsFile == null) {
     		return;
     	}
     	Iterator<? extends PwsRecord> it = pwsFile.getRecords();
 		for(int i = 0; it.hasNext(); i++) {
 			PwsRecord r = it.next();
-			//TODO: more effective: only fill sparse fields
-			
+			//TODOlib: more effective: only fill sparse fields
+
 			PwsEntryBean theBean = sparsify(PwsEntryBean.fromPwsRecord(r,sparseFields));
 			theBean.setStoreIndex(i);
 			sparseEntries.add(theBean);
-		}	
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.pwsafe.lib.datastore.PwsEntryStore#addEntry(org.pwsafe.lib.datastore.PwsEntryBean)
 	 */
 	public boolean addEntry(PwsEntryBean anEntry) throws PasswordSafeException {
-		if (anEntry.isSparse()) 
+		if (anEntry.isSparse())
 			throw new IllegalArgumentException("Inserts only possible with filled entries");
-		
+
 		PwsRecord theRecord = pwsFile.newRecord();
 		anEntry.toPwsRecord(theRecord);
 
 		pwsFile.add(theRecord);
 
-		theRecord = pwsFile.getRecord(pwsFile.getRecordCount() -1); //TODO can this be made more robust?
-		
+		theRecord = pwsFile.getRecord(pwsFile.getRecordCount() -1); //TODOlib can this be made more robust?
+
 		anEntry = sparsify (PwsEntryBean.fromPwsRecord(theRecord,sparseFields));
 		anEntry.setStoreIndex(pwsFile.getRecordCount() - 1);
 		sparseEntries.add(anEntry);
-		
+
 		return true;
 	}
 
-	
+
 	/* (non-Javadoc)
 	 * @see org.pwsafe.lib.datastore.PwsEntryStore#clear()
 	 */
@@ -139,7 +139,7 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 	public PwsFile getPwsFile() {
 		return pwsFile;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.pwsafe.lib.datastore.PwsEntryStore#getSparseEntries()
 	 */
@@ -156,19 +156,19 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 	public void setPwsFile(PwsFile pwsFile) {
 		this.pwsFile = pwsFile;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.pwsafe.lib.datastore.PwsEntryStore#setSparseFields(java.util.Set)
 	 */
 	public void setSparseFields(Set<PwsFieldType> fieldTypes) {
-		
-		// if this is an update and it is less sparse than before -> refill the sparse list 
+
+		// if this is an update and it is less sparse than before -> refill the sparse list
 		if (sparseFields != null && ! sparseFields.containsAll(fieldTypes)) {
 			sparseFields = fieldTypes;
 			refresh();
-		} else 
+		} else
 			sparseFields = fieldTypes;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -176,9 +176,9 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 	 */
 	public boolean updateEntry(PwsEntryBean anEntry) {
 		final int index = anEntry.getStoreIndex();
-		if (anEntry.isSparse() || index < 0) 
+		if (anEntry.isSparse() || index < 0)
 			throw new IllegalArgumentException("Updates only possible with filled entries");
-		
+
 		if (index >= sparseEntries.size()) {
 			throw new IndexOutOfBoundsException("record index too big - no record with index " + index);
 		}
@@ -193,12 +193,12 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 		PwsEntryBean newEntry = PwsEntryBean.fromPwsRecord(theRecord,sparseFields);
 		newEntry.setStoreIndex(index);
 		sparseEntries.set(index, sparsify (newEntry));
-		
+
 		return true;
 	}
 
 	private PwsEntryBean sparsify(PwsEntryBean anEntry) {
-		
+
 		anEntry.setSparse(true);
 		return anEntry;
 	}
@@ -210,9 +210,9 @@ public class PwsEntryStoreImpl implements PwsEntryStore {
 			throw new IndexOutOfBoundsException("record index too big - no record with index " + index);
 		}
 		pwsFile.getRecord(index);
-		//TODO: Check if this Record is the same
+		//TODOlib: Check if this Record is the same
 		boolean result = pwsFile.removeRecord(index);
-		
+
 		refresh();
 		return result;
 	}

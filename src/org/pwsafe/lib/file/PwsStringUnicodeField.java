@@ -1,6 +1,6 @@
 /*
  * $Id: PwsStringField.java 294 2004-02-22 15:29:03Z preecek $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -20,23 +20,23 @@ public class PwsStringUnicodeField extends PwsField
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param type  the field's type.
 	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
 	public PwsStringUnicodeField( int type, byte[] value ) throws UnsupportedEncodingException
 	{
-		
+
 		super( type, new String(value, "UTF-8" ));
-	} 
-	
+	}
+
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param type  the field's type.
 	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
 	public PwsStringUnicodeField( int type, String value ) {
 		super( type, value);
@@ -44,34 +44,34 @@ public class PwsStringUnicodeField extends PwsField
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param type  the field's type.
 	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
 	public PwsStringUnicodeField( int type, StringBuilder value ) {
-		// TODO: allow StringBuilder or CharSequence as value further up.
+		// TODOlib: allow StringBuilder or CharSequence as value further up.
 		super( type, value != null ? value.toString() : null);
 	}
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param type  the field's type.
 	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
 	public PwsStringUnicodeField( PwsFieldType type, byte[] value ) throws UnsupportedEncodingException
 	{
 		super( type, new String(value, "UTF-8" ));
-	} 
-	
+	}
+
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param type  the field's type.
 	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException 
+	 * @throws UnsupportedEncodingException
 	 */
 	public PwsStringUnicodeField( PwsFieldType type, String value ) {
 		super( type, value);
@@ -79,9 +79,9 @@ public class PwsStringUnicodeField extends PwsField
 
 	/**
 	 * Returns the field's value as a byte array.
-	 * 
+	 *
 	 * @return A byte array containing the field's data.
-	 * 
+	 *
 	 * @see org.pwsafe.lib.file.PwsField#getBytes()
 	 */
 	@Override
@@ -98,9 +98,9 @@ public class PwsStringUnicodeField extends PwsField
 	 * Compares this <code>PwsStringField</code> to another returning a value less than zero if
 	 * <code>this</code> is "less than" <code>that</code>, zero if they're equal and greater
 	 * than zero if <code>this</code> is "greater than" <code>that</code>.
-	 * 
-	 * @param that the other field to compare to. 
-	 * 
+	 *
+	 * @param that the other field to compare to.
+	 *
 	 * @return A value less than zero if <code>this</code> is "less than" <code>that</code>,
 	 *         zero if they're equal and greater than zero if <code>this</code> is "greater
 	 *         than" <code>that</code>.
@@ -113,9 +113,9 @@ public class PwsStringUnicodeField extends PwsField
 	/**
 	 * Compares this object to another <code>PwsStringField</code> or <code>String</code> returning
 	 * <code>true</code> if they're equal or <code>false</code> otherwise.
-	 * 
+	 *
 	 * @param arg0 the other object to compare to.
-	 * 
+	 *
 	 * @return <code>true</code> if they're equal or <code>false</code> otherwise.
 	 */
 	@Override
@@ -135,9 +135,9 @@ public class PwsStringUnicodeField extends PwsField
 	/**
 	 * Compares this object to another <code>PwsStringField</code> returning
 	 * <code>true</code> if they're equal or <code>false</code> otherwise.
-	 * 
+	 *
 	 * @param arg0 the other object to compare to.
-	 * 
+	 *
 	 * @return <code>true</code> if they're equal or <code>false</code> otherwise.
 	 */
 	public boolean equals( PwsStringUnicodeField arg0 )
@@ -148,9 +148,9 @@ public class PwsStringUnicodeField extends PwsField
 	/**
 	 * Compares this object to a <code>String</code> returning <code>true</code> if they're equal
 	 * or <code>false</code> otherwise.
-	 * 
+	 *
 	 * @param arg0 the other object to compare to.
-	 * 
+	 *
 	 * @return <code>true</code> if they're equal or <code>false</code> otherwise.
 	 */
 	public boolean equals( String arg0 )

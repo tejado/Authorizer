@@ -216,7 +216,7 @@ public abstract class PwsFile
 
 	protected void add ( final PwsRecord rec, final Cipher aCipher ) {
 
-		// TODO validate the record before adding it
+		// TODOlib validate the record before adding it
 		try {
 			SealedObject sealedRecord = new SealedObject(rec, aCipher);
 	        sealedRecords.add(sealedRecord);
@@ -319,7 +319,7 @@ public abstract class PwsFile
     		memoryIv = new byte[8];
     		Util.newRandBytes(memoryIv);
     	}
-    	//TODO: use BouncyCastle Provider!
+    	//TODOlib: use BouncyCastle Provider!
         SecretKeySpec   key = new SecretKeySpec(getKeyBytes(), "Blowfish");
         IvParameterSpec ivSpec = new IvParameterSpec(memoryIv);
         Cipher cipher = null;
@@ -476,7 +476,7 @@ public abstract class PwsFile
      */
     public void set(int index, PwsRecord aRecord)
     {
-    	// TODO validate here as well
+    	// TODOlib validate here as well
         Cipher cipher = getCipher(true);
         SealedObject sealedRecord ;
 		try {
@@ -677,7 +677,7 @@ public abstract class PwsFile
 	 * @param pass
 	 */
 	public void setPassphrase( StringBuilder pass ) {
-	    // TODO: convert to byte[] first
+	    // TODOlib: convert to byte[] first
 		try {
 			passphrase	= new SealedObject(pass, getCipher(true));
 			// now overwrite given StringBuider

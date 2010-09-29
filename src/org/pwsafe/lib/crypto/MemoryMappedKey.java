@@ -84,7 +84,7 @@ public class MemoryMappedKey {
 
 		final byte[] content = new byte[8];
 
-		// TODO: use higher bits of short value for content rotate
+		// TODOlib: use higher bits of short value for content rotate
 		for (int i = 0; i < 8; i++) {
 			final short pos = access[i];
 			content[i] = buffer.get(Math.abs(pos) % BUFFER_SIZE);
@@ -116,7 +116,7 @@ public class MemoryMappedKey {
 			LOG.warn("Exception closing FileChannel: " + e);
 		}
 
-		// TODO: WHY IS TEMP NOT DELETED????
+		// TODOlib: WHY IS TEMP NOT DELETED????
 		if (tempFile != null && tempFile.exists()) {
 			final boolean isDeleted = tempFile.delete();
 			if (! isDeleted) {

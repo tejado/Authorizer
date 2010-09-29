@@ -266,9 +266,9 @@ public final class PwsFileV3 extends PwsFile {
 			}
 			else
 			{
-				// FIXME: What is the proper error code (see PwsFile::save).
+				// FIXMElib: What is the proper error code (see PwsFile::save).
 				LOG.error( I18nHelper.getInstance().formatMessage("E00010", new Object [] { "Storage" } ) );
-				// TODO Throw an exception here?
+				// TODOlib Throw an exception here?
 				return;
 			}
 		}
