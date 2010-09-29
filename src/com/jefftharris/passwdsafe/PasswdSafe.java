@@ -92,6 +92,8 @@ public class PasswdSafe extends ExpandableListActivity
     private LoadTask itsLoadTask;
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
+    private boolean itsIsSearchCaseSensitive = false;
+    private boolean itsIsSearchRegex = false;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
 
@@ -159,6 +161,9 @@ public class PasswdSafe extends ExpandableListActivity
             PreferenceManager.getDefaultSharedPreferences(this);
         itsGroupRecords = PasswdSafeApp.getGroupRecordsPref(prefs);
         itsIsSortCaseSensitive = PasswdSafeApp.getSortCaseSensitivePref(prefs);
+        itsIsSearchCaseSensitive =
+            PasswdSafeApp.getSearchCaseSensitivePref(prefs);
+        itsIsSearchRegex = PasswdSafeApp.getSearchRegexPref(prefs);
 
         String action = intent.getAction();
         if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
@@ -779,23 +784,13 @@ public class PasswdSafe extends ExpandableListActivity
         int groupLayout = android.R.layout.simple_expandable_list_item_1;
         String[] groupFrom = new String[] { GROUP };
         int[] groupTo = new int[] { android.R.id.text1 };
-        int childLayout;
+        int childLayout = R.layout.passwdsafe_list_item;
         String[] childFrom;
         int[] childTo;
         if (itsSearchQuery == null) {
-//            childLayout = android.R.layout.simple_expandable_list_item_1;
-//            childFrom = new String[] { TITLE };
-//            childTo = new int[] { android.R.id.text1 };
-
-            childLayout = R.layout.passwdsafe_list_item;
             childFrom = new String[] { TITLE, USERNAME };
             childTo = new int[] { android.R.id.text1, android.R.id.text2 };
         } else {
-//            childLayout = android.R.layout.simple_expandable_list_item_2;
-//            childFrom = new String[] { TITLE, MATCH };
-//            childTo = new int[] { android.R.id.text1, android.R.id.text2 };
-
-            childLayout = R.layout.passwdsafe_list_item;
             childFrom = new String[] { TITLE, USERNAME, MATCH };
             childTo = new int[] { android.R.id.text1, android.R.id.text2,
                                   R.id.match };
@@ -973,8 +968,15 @@ public class PasswdSafe extends ExpandableListActivity
             }
 
             try {
-                itsSearchQuery = Pattern.compile(
-                    query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+                int flags = 0;
+
+                if (!itsIsSearchCaseSensitive) {
+                    flags |= Pattern.CASE_INSENSITIVE;
+                }
+                if (!itsIsSearchRegex) {
+                    flags |= Pattern.LITERAL;
+                }
+                itsSearchQuery = Pattern.compile(query, flags);
             } catch(PatternSyntaxException e) {
             }
         }
