@@ -137,6 +137,11 @@ public class PwsRecordV3 extends PwsRecord
 	public static final int EMAIL = 20;
 
 	/**
+	 * Header database version
+	 */
+	public static final int HEADER_VERSION = 0;
+
+	/**
 	 * Header last saved app
 	 */
 	public static final int HEADER_LAST_SAVE_WHAT = 6;

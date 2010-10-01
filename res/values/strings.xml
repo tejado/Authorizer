@@ -17,6 +17,7 @@
     <string name="copy_password">Copy Password</string>
     <string name="copy_user">Copy User Name</string>
     <string name="current_group_label">Current group: %1$s</string>
+    <string name="database_version_label">Database version:</string>
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
     <string name="delete_file_msg">Delete file &quot;%1$s&quot;?</string>

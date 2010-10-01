@@ -32,6 +32,11 @@
                   android:layout_width="wrap_content"/>
     </TableRow>
     <TableRow>
+        <TextView android:text="@string/database_version_label"/>
+        <TextView android:id="@+id/database_version"
+                  android:layout_width="wrap_content"/>
+    </TableRow>
+    <TableRow>
         <TextView android:text="@string/last_save_by_label"/>
         <TextView android:id="@+id/last_save_by"
                   android:layout_width="wrap_content"/>
