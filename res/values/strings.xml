@@ -35,8 +35,9 @@
     <string name="generate_password">Generate Password</string>
     <string name="group">Group</string>
     <string name="hide_password">Hide Password</string>
-    <string name="last_save_by_label">Last saved by:</string>
     <string name="last_save_app_label">Last saved app:</string>
+    <string name="last_save_by_label">Last saved by:</string>
+    <string name="last_save_time_label">Last save time:</string>
     <string name="new_file">New File</string>
     <string name="new_password_label">New Password:</string>
     <string name="no_records">No Records</string>

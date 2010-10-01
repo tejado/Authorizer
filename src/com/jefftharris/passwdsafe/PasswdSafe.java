@@ -648,9 +648,11 @@ public class PasswdSafe extends ExpandableListActivity
                 (TextView)dialog.findViewById(R.id.last_save_by);
             TextView lastSaveApp =
                 (TextView)dialog.findViewById(R.id.last_save_app);
+            TextView lastSaveTime =
+                (TextView)dialog.findViewById(R.id.last_save_time);
             if (fileData.isV3()) {
                 // TODO cleanup for v1/v2
-                // TODO UUID?, last save time
+                // TODO UUID?
                 // TODO who performed last save field support...
                 StringBuilder build = new StringBuilder();
                 String str = fileData.getHdrLastSaveUser();
@@ -668,6 +670,7 @@ public class PasswdSafe extends ExpandableListActivity
 
                 version.setText(fileData.getHdrVersion());
                 lastSaveApp.setText(fileData.getHdrLastSaveApp());
+                lastSaveTime.setText(fileData.getHdrLastSaveTime());
             }
             break;
         }

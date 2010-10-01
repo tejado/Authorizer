@@ -142,6 +142,11 @@ public class PwsRecordV3 extends PwsRecord
 	public static final int HEADER_VERSION = 0;
 
 	/**
+	 * Header last save timestamp
+	 */
+	public static final int HEADER_LAST_SAVE_TIME = 4;
+
+	/**
 	 * Header last saved app
 	 */
 	public static final int HEADER_LAST_SAVE_WHAT = 6;

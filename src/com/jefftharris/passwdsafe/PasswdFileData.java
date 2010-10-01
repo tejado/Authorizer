@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.pwsafe.lib.UUID;
+import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.PasswordSafeException;
@@ -297,6 +299,11 @@ public class PasswdFileData
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_WHAT);
     }
 
+    public final String getHdrLastSaveTime()
+    {
+        return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME);
+    }
+
     private final String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
@@ -442,6 +449,25 @@ public class PasswdFileData
                 PwsField ver = doGetField(rec, fieldId);
                 byte[] bytes = ver.getBytes();
                 return String.format("%d.%02d", bytes[1], bytes[0]);
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_TIME:
+            {
+                // TODO test with newer passwd safe for 4 byte buffer
+                PwsField time = doGetField(rec, fieldId);
+                byte[] bytes = time.getBytes();
+                if (bytes.length == 8)
+                {
+                    int intbytes = 0;
+                    for (byte b : bytes) {
+                        intbytes <<= 4;
+                        intbytes |= Character.digit(b, 16);
+                    }
+                    byte[] binbytes = new byte[4];
+                    Util.putIntToByteArray(binbytes, intbytes, 0);
+                    bytes = binbytes;
+                }
+                Date d = new Date(Util.getMillisFromByteArray(bytes, 0));
+                return d.toString();
             }
             default:
             {
