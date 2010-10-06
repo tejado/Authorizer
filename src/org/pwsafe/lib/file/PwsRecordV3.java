@@ -147,6 +147,11 @@ public class PwsRecordV3 extends PwsRecord
 	public static final int HEADER_LAST_SAVE_TIME = 4;
 
 	/**
+	 * Header last saved by who (deprecated in db)
+	 */
+	public static final int HEADER_LAST_SAVE_WHO = 5;
+
+	/**
 	 * Header last saved app
 	 */
 	public static final int HEADER_LAST_SAVE_WHAT = 6;

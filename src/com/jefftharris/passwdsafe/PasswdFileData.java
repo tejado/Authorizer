@@ -39,6 +39,8 @@ import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 
+import android.util.Log;
+
 public class PasswdFileData
 {
     private File itsFile;
@@ -457,17 +459,32 @@ public class PasswdFileData
                 byte[] bytes = time.getBytes();
                 if (bytes.length == 8)
                 {
-                    int intbytes = 0;
-                    for (byte b : bytes) {
-                        intbytes <<= 4;
-                        intbytes |= Character.digit(b, 16);
-                    }
                     byte[] binbytes = new byte[4];
-                    Util.putIntToByteArray(binbytes, intbytes, 0);
+                    Util.putIntToByteArray(binbytes,
+                                           hexBytesToInt(bytes, bytes.length),
+                                           0);
                     bytes = binbytes;
                 }
                 Date d = new Date(Util.getMillisFromByteArray(bytes, 0));
                 return d.toString();
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_USER:
+            {
+                PwsField field = doGetField(rec, fieldId);
+                if (field != null) {
+                    return field.toString();
+                }
+
+                return getHdrLastSafeWhoField(rec, true);
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_HOST:
+            {
+                PwsField field = doGetField(rec, fieldId);
+                if (field != null) {
+                    return field.toString();
+                }
+
+                return getHdrLastSafeWhoField(rec, false);
             }
             default:
             {
@@ -502,7 +519,7 @@ public class PasswdFileData
         }
     }
 
-    private final PwsField doGetField(PwsRecord rec, int fieldId)
+    private static final PwsField doGetField(PwsRecord rec, int fieldId)
     {
         switch (fieldId)
         {
@@ -622,5 +639,43 @@ public class PasswdFileData
             itsRecords.add(rec);
             itsRecordsByUUID.put(uuid, rec);
         }
+    }
+
+    private static final String getHdrLastSafeWhoField(PwsRecord rec,
+                                                       boolean isUser)
+    {
+        PwsField field = doGetField(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO);
+        if (field == null) {
+            return null;
+        }
+
+        byte[] whoBytes = field.getBytes();
+        if (whoBytes.length < 4) {
+            Log.e(TAG, "Invalid who length: " + whoBytes.length);
+            return null;
+        }
+        int len = hexBytesToInt(whoBytes, 4);
+
+        if ((len + 4) > whoBytes.length) {
+            Log.e(TAG, "Invalid user length: " + (len + 4));
+            return null;
+        }
+
+        if (isUser) {
+            return new String(whoBytes, 4, len);
+        } else {
+            return new String(whoBytes, len + 4, whoBytes.length - len - 4);
+        }
+    }
+
+
+    private static final int hexBytesToInt(byte[] bytes, int len)
+    {
+        int i = 0;
+        for (int pos = 0; pos < len; ++pos) {
+            i <<= 4;
+            i |= Character.digit(bytes[pos], 16);
+        }
+        return i;
     }
 }

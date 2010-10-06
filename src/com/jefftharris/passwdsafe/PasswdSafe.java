@@ -653,7 +653,6 @@ public class PasswdSafe extends ExpandableListActivity
             if (fileData.isV3()) {
                 // TODO cleanup for v1/v2
                 // TODO UUID?
-                // TODO who performed last save field support...
                 StringBuilder build = new StringBuilder();
                 String str = fileData.getHdrLastSaveUser();
                 if (!TextUtils.isEmpty(str)) {
