@@ -454,7 +454,6 @@ public class PasswdFileData
             }
             case PwsRecordV3.HEADER_LAST_SAVE_TIME:
             {
-                // TODO test with newer passwd safe for 4 byte buffer
                 PwsField time = doGetField(rec, fieldId);
                 byte[] bytes = time.getBytes();
                 if (bytes.length == 8)

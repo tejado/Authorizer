@@ -642,16 +642,7 @@ public class PasswdSafe extends ExpandableListActivity
             tv = (TextView)dialog.findViewById(R.id.password_encoding);
             tv.setText(fileData.getOpenPasswordEncoding());
 
-            TextView version =
-                (TextView)dialog.findViewById(R.id.database_version);
-            TextView lastSaveBy =
-                (TextView)dialog.findViewById(R.id.last_save_by);
-            TextView lastSaveApp =
-                (TextView)dialog.findViewById(R.id.last_save_app);
-            TextView lastSaveTime =
-                (TextView)dialog.findViewById(R.id.last_save_time);
             if (fileData.isV3()) {
-                // TODO cleanup for v1/v2
                 // TODO UUID?
                 StringBuilder build = new StringBuilder();
                 String str = fileData.getHdrLastSaveUser();
@@ -665,11 +656,24 @@ public class PasswdSafe extends ExpandableListActivity
                     }
                     build.append(str);
                 }
-                lastSaveBy.setText(build);
+                tv = (TextView)dialog.findViewById(R.id.last_save_by);
+                tv.setText(build);
 
-                version.setText(fileData.getHdrVersion());
-                lastSaveApp.setText(fileData.getHdrLastSaveApp());
-                lastSaveTime.setText(fileData.getHdrLastSaveTime());
+                tv = (TextView)dialog.findViewById(R.id.database_version);
+                tv.setText(fileData.getHdrVersion());
+                tv = (TextView)dialog.findViewById(R.id.last_save_app);
+                tv.setText(fileData.getHdrLastSaveApp());
+                tv = (TextView)dialog.findViewById(R.id.last_save_time);
+                tv.setText(fileData.getHdrLastSaveTime());
+            } else {
+                dialog.findViewById(R.id.database_version_row).
+                    setVisibility(View.GONE);
+                dialog.findViewById(R.id.last_save_by_row).
+                    setVisibility(View.GONE);
+                dialog.findViewById(R.id.last_save_app_row).
+                    setVisibility(View.GONE);
+                dialog.findViewById(R.id.last_save_time_row).
+                    setVisibility(View.GONE);
             }
             break;
         }
