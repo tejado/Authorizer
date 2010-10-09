@@ -646,6 +646,40 @@ public class PasswdSafe extends ExpandableListActivity
 
             tv = (TextView)dialog.findViewById(R.id.password_encoding);
             tv.setText(fileData.getOpenPasswordEncoding());
+
+            if (fileData.isV3()) {
+                // TODO UUID?
+                StringBuilder build = new StringBuilder();
+                String str = fileData.getHdrLastSaveUser();
+                if (!TextUtils.isEmpty(str)) {
+                    build.append(str);
+                }
+                str = fileData.getHdrLastSaveHost();
+                if (!TextUtils.isEmpty(str)) {
+                    if (build.length() > 0) {
+                        build.append(" on ");
+                    }
+                    build.append(str);
+                }
+                tv = (TextView)dialog.findViewById(R.id.last_save_by);
+                tv.setText(build);
+
+                tv = (TextView)dialog.findViewById(R.id.database_version);
+                tv.setText(fileData.getHdrVersion());
+                tv = (TextView)dialog.findViewById(R.id.last_save_app);
+                tv.setText(fileData.getHdrLastSaveApp());
+                tv = (TextView)dialog.findViewById(R.id.last_save_time);
+                tv.setText(fileData.getHdrLastSaveTime());
+            } else {
+                dialog.findViewById(R.id.database_version_row).
+                    setVisibility(View.GONE);
+                dialog.findViewById(R.id.last_save_by_row).
+                    setVisibility(View.GONE);
+                dialog.findViewById(R.id.last_save_app_row).
+                    setVisibility(View.GONE);
+                dialog.findViewById(R.id.last_save_time_row).
+                    setVisibility(View.GONE);
+            }
             break;
         }
         case DIALOG_CHANGE_PASSWD:

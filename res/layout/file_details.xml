@@ -1,34 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
-             android:layout_height="fill_parent"
-             android:stretchColumns="1"
-             android:shrinkColumns="1"
-             android:padding="3dip"
-             >
-    <TableRow>
-        <TextView android:text="@string/file_label"/>
-        <TextView android:id="@+id/file"
-                  android:layout_width="wrap_content"/>
-    </TableRow>
-    <TableRow>
-        <TextView android:text="@string/permissions_label"/>
-        <TextView android:id="@+id/permissions"
-                  android:layout_width="wrap_content"/>
-    </TableRow>
-    <TableRow>
-        <TextView android:text="@string/num_groups_label"/>
-        <TextView android:id="@+id/num_groups"
-                  android:layout_width="wrap_content"/>
-    </TableRow>
-    <TableRow>
-        <TextView android:text="@string/num_records_label"/>
-        <TextView android:id="@+id/num_records"
-                  android:layout_width="wrap_content"/>
-    </TableRow>
-    <TableRow>
-        <TextView android:text="@string/password_encoding_label"/>
-        <TextView android:id="@+id/password_encoding"
-                  android:layout_width="wrap_content"/>
-    </TableRow>
-</TableLayout>
+             android:layout_height="fill_parent">
+    <TableLayout android:layout_width="fill_parent"
+                 android:layout_height="fill_parent"
+                 android:stretchColumns="1"
+                 android:shrinkColumns="1"
+                 android:padding="3dip"
+                 >
+        <TableRow>
+            <TextView android:text="@string/file_label"/>
+            <TextView android:id="@+id/file"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/permissions_label"/>
+            <TextView android:id="@+id/permissions"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/num_groups_label"/>
+            <TextView android:id="@+id/num_groups"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/num_records_label"/>
+            <TextView android:id="@+id/num_records"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow>
+            <TextView android:text="@string/password_encoding_label"/>
+            <TextView android:id="@+id/password_encoding"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow android:id="@+id/database_version_row">
+            <TextView android:text="@string/database_version_label"/>
+            <TextView android:id="@+id/database_version"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow android:id="@+id/last_save_by_row">
+            <TextView android:text="@string/last_save_by_label"/>
+            <TextView android:id="@+id/last_save_by"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow android:id="@+id/last_save_app_row">
+            <TextView android:text="@string/last_save_app_label"/>
+            <TextView android:id="@+id/last_save_app"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow android:id="@+id/last_save_time_row">
+            <TextView android:text="@string/last_save_time_label"/>
+            <TextView android:id="@+id/last_save_time"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+    </TableLayout>
+</ScrollView>
