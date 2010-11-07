@@ -38,6 +38,7 @@ import org.pwsafe.lib.file.PwsRecordV3;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
+import org.pwsafe.lib.file.PwsUnknownField;
 
 import android.util.Log;
 
@@ -301,9 +302,19 @@ public class PasswdFileData
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_WHAT);
     }
 
+    public final void setHdrLastSaveApp(String app)
+    {
+        setHdrField(PwsRecordV3.HEADER_LAST_SAVE_WHAT, app);
+    }
+
     public final String getHdrLastSaveTime()
     {
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME);
+    }
+
+    public final void setHdrLastSaveTime(Date date)
+    {
+        setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
 
     private final String getField(PwsRecord rec, int fieldId)
@@ -492,6 +503,50 @@ public class PasswdFileData
             }
         } else {
             return null;
+        }
+    }
+
+    private final void setHdrField(int fieldId, Object value)
+    {
+        if (itsPwsFile == null) {
+            return;
+        }
+
+        if (isV3()) {
+            PwsRecord rec = ((PwsFileV3)itsPwsFile).getHeaderRecord();
+            switch (fieldId)
+            {
+            case PwsRecordV3.HEADER_LAST_SAVE_TIME:
+            {
+                PwsField time = doGetField(rec, fieldId);
+                byte[] bytes = time.getBytes();
+                long timeVal = ((Date)value).getTime();
+                byte[] newbytes;
+                if (bytes.length == 8) {
+                    int secs = (int) (timeVal / 1000);
+                    String str = Integer.toHexString(secs);
+                    newbytes = str.getBytes();
+                } else {
+                    newbytes = new byte[4];
+                    Util.putMillisToByteArray(newbytes, timeVal, 0);
+                }
+
+                // TODO test length == 8
+                rec.setField(new PwsUnknownField(fieldId, newbytes));
+                break;
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            {
+                rec.setField(
+                    new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_WHAT,
+                                        value.toString().getBytes()));
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
         }
     }
 

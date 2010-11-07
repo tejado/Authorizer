@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -29,6 +30,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -95,6 +98,11 @@ public class PasswdSafeApp extends Application
                 if (itsFileData != null) {
                     cancelFileDataTimer();
                     try {
+                        itsFileData.setHdrLastSaveApp(
+                            PasswdSafeApp.getAppTitle(PasswdSafeApp.this) +
+                            " " +
+                            PasswdSafeApp.getAppVersion(PasswdSafeApp.this));
+                        itsFileData.setHdrLastSaveTime(new Date());
                         itsFileData.save();
                     } finally {
                         touchFileDataTimer();
@@ -430,6 +438,20 @@ public class PasswdSafeApp extends Application
     public static final String getAppTitle(Context ctx)
     {
         return ctx.getString(R.string.app_name);
+    }
+
+    public static final String getAppVersion(Context ctx)
+    {
+        String version;
+        try {
+            PackageManager pkgMgr = ctx.getPackageManager();
+            PackageInfo pkgInfo = pkgMgr.getPackageInfo(ctx.getPackageName(),
+                                                        0);
+            version = pkgInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            version = "Unknown";
+        }
+        return version;
     }
 
     public static void showFatalMsg(Throwable t, Activity activity)

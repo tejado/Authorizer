@@ -18,8 +18,6 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -226,16 +224,7 @@ public class FileList extends ListActivity
         switch (id) {
         case DIALOG_ABOUT:
         {
-            String version;
-            try {
-                PackageManager pkgMgr = getPackageManager();
-                PackageInfo pkgInfo = pkgMgr.getPackageInfo(getPackageName(),
-                                                            0);
-                version = pkgInfo.versionName;
-            } catch (PackageManager.NameNotFoundException e) {
-                version = "Unknown";
-            }
-
+            String version = PasswdSafeApp.getAppVersion(this);
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.app_name)
                 .setIcon(android.R.drawable.ic_menu_info_details)
