@@ -137,6 +137,36 @@ public class PwsRecordV3 extends PwsRecord
 	public static final int EMAIL = 20;
 
 	/**
+	 * Header database version
+	 */
+	public static final int HEADER_VERSION = 0;
+
+	/**
+	 * Header last save timestamp
+	 */
+	public static final int HEADER_LAST_SAVE_TIME = 4;
+
+	/**
+	 * Header last saved by who (deprecated in db)
+	 */
+	public static final int HEADER_LAST_SAVE_WHO = 5;
+
+	/**
+	 * Header last saved app
+	 */
+	public static final int HEADER_LAST_SAVE_WHAT = 6;
+
+	/**
+	 *  Header last saved by user
+	 */
+	public static final int HEADER_LAST_SAVE_USER = 7;
+
+	/**
+	 * Header last saved on host
+	 */
+	public static final int HEADER_LAST_SAVE_HOST = 8;
+
+	/**
 	 * Constant for the end of record marker field.
 	 */
 	public static final int		END_OF_RECORD		= 255;
@@ -263,7 +293,7 @@ public class PwsRecordV3 extends PwsRecord
 	@Override
 	public int compareTo( Object other )
 	{
-		// TODO Implement me
+		// TODOlib Implement me
 		return 0;
 	}
 
@@ -305,7 +335,7 @@ public class PwsRecordV3 extends PwsRecord
 	@Override
 	protected boolean isValid()
 	{
-		//TODO Ignore those records we read from the header....
+		//TODOlib Ignore those records we read from the header....
 		PwsField idField = getField(V3_ID_STRING);
 
 		if ( idField != null ) {
@@ -540,7 +570,7 @@ public class PwsRecordV3 extends PwsRecord
 			bytesToPad = 16 - (calcWriteLen % 16);
 		}
 
-		// TODO put random bytes here
+		// TODOlib put random bytes here
 		dataBlock	= Util.cloneByteArray( dataBlock, dataBlock.length + bytesToPad );
 
 		//file.writeBytes(lenBlock);

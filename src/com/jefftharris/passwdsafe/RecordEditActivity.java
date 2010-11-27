@@ -7,8 +7,11 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -16,7 +19,11 @@ import org.pwsafe.lib.file.PwsRecord;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.SingleLineTransformationMethod;
 import android.text.method.TransformationMethod;
@@ -41,6 +48,8 @@ public class RecordEditActivity extends AbstractRecordActivity
     private static final int DIALOG_NEW_GROUP = MAX_DIALOG + 1;
 
     private static final int MENU_TOGGLE_PASSWORD = 3;
+    private static final int MENU_GENERATE_PASSWORD = 4;
+    private static final int MENU_PASSWORD_PREFERENCES = 5;
 
     private TreeSet<String> itsGroups =
         new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
@@ -48,6 +57,15 @@ public class RecordEditActivity extends AbstractRecordActivity
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
     private DialogValidator itsValidator;
     private boolean isPasswordShown = false;
+
+    private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
+    private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
+    private static final String DIGITS = "0123456789";
+    private static final String SYMBOLS = "+-=_@#$%^&;:,.<>/~\\[](){}?!|";
+    private static final String EASY_LOWER_CHARS = "abcdefghijkmnopqrstuvwxyz";
+    private static final String EASY_UPPER_CHARS = "ABCDEFGHJKLMNPQRTUVWXY";
+    private static final String EASY_DIGITS = "346789";
+    private static final String EASY_SYMBOLS = "+-=_@#$%^&<>/~\\?";
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -210,7 +228,18 @@ public class RecordEditActivity extends AbstractRecordActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        MenuItem item;
+
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
+        menu.add(0, MENU_GENERATE_PASSWORD, 0, R.string.generate_password);
+
+        item = menu.add(0, MENU_PASSWORD_PREFERENCES, 0,
+                        R.string.password_preferences);
+        item.setIcon(android.R.drawable.ic_menu_preferences);
+        Intent intent = new Intent(this, Preferences.class);
+        intent.putExtra(Preferences.INTENT_SCREEN,
+                        Preferences.SCREEN_PASSWORD_OPTIONS);
+        item.setIntent(intent);
         return true;
     }
 
@@ -231,24 +260,120 @@ public class RecordEditActivity extends AbstractRecordActivity
         switch (item.getItemId()) {
         case MENU_TOGGLE_PASSWORD:
         {
-            isPasswordShown = !isPasswordShown;
-            TextView passwdField = (TextView)findViewById(R.id.password);
-            TextView confirmField =
-                (TextView)findViewById(R.id.password_confirm);
-            TransformationMethod tm;
-            if (isPasswordShown) {
-                tm = SingleLineTransformationMethod.getInstance();
-            } else {
-                tm = PasswordTransformationMethod.getInstance();
-            }
-            passwdField.setTransformationMethod(tm);
-            confirmField.setTransformationMethod(tm);
+            setPasswordVisibility(
+                !isPasswordShown,
+                (TextView)findViewById(R.id.password),
+                (TextView)findViewById(R.id.password_confirm));
+            return true;
+        }
+        case MENU_GENERATE_PASSWORD:
+        {
+            generatePassword();
             return true;
         }
         default:
         {
             return super.onOptionsItemSelected(item);
         }
+        }
+    }
+
+    private final void setPasswordVisibility(boolean visible,
+                                             TextView passwdField,
+                                             TextView confirmField)
+    {
+        isPasswordShown = visible;
+        TransformationMethod tm;
+        if (isPasswordShown) {
+            tm = SingleLineTransformationMethod.getInstance();
+        } else {
+            tm = PasswordTransformationMethod.getInstance();
+        }
+        passwdField.setTransformationMethod(tm);
+        confirmField.setTransformationMethod(tm);
+    }
+
+    private final void generatePassword()
+    {
+        ArrayList<String> chars = new ArrayList<String>();
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        if (PasswdSafeApp.getPasswordGenHexPref(prefs)) {
+            chars.add(DIGITS + "abcdef");
+        } else {
+            if (PasswdSafeApp.getPasswordGenEasyPref(prefs)) {
+                if (PasswdSafeApp.getPasswordGenLowerPref(prefs)) {
+                    chars.add(EASY_LOWER_CHARS);
+                }
+                if (PasswdSafeApp.getPasswordGenUpperPref(prefs)) {
+                    chars.add(EASY_UPPER_CHARS);
+                }
+                if (PasswdSafeApp.getPasswordGenDigitsPref(prefs)) {
+                    chars.add(EASY_DIGITS);
+                }
+                if (PasswdSafeApp.getPasswordGenSymbolsPref(prefs)) {
+                    chars.add(EASY_SYMBOLS);
+                }
+            } else {
+                if (PasswdSafeApp.getPasswordGenLowerPref(prefs)) {
+                    chars.add(LOWER_CHARS);
+                }
+                if (PasswdSafeApp.getPasswordGenUpperPref(prefs)) {
+                    chars.add(UPPER_CHARS);
+                }
+                if (PasswdSafeApp.getPasswordGenDigitsPref(prefs)) {
+                    chars.add(DIGITS);
+                }
+                if (PasswdSafeApp.getPasswordGenSymbolsPref(prefs)) {
+                    chars.add(SYMBOLS);
+                }
+            }
+        }
+
+        if (chars.isEmpty()) {
+            return;
+        }
+
+        String charsStr =
+            TextUtils.concat(chars.toArray(new CharSequence[0])).toString();
+        int numChars = charsStr.length();
+        StringBuilder passwd = new StringBuilder();
+        int passwdLen = PasswdSafeApp.getPasswordGenLengthPref(prefs);
+        try {
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+            random.nextBytes(new byte[passwdLen]);
+
+            ArrayList<String> verifyChars = new ArrayList<String>();
+            do {
+                verifyChars.clear();
+                verifyChars.addAll(chars);
+                passwd.delete(0, passwd.length());
+                for (int i = 0; i < passwdLen; ++i) {
+                    int charPos = random.nextInt(numChars);
+                    char c = charsStr.charAt(charPos);
+                    passwd.append(c);
+
+                    if (!verifyChars.isEmpty()) {
+                        Iterator<String> iter = verifyChars.iterator();
+                        while (iter.hasNext()) {
+                            String verifyStr = iter.next();
+                            if (verifyStr.indexOf(c) != -1) {
+                                iter.remove();
+                            }
+                        }
+                    }
+                }
+            } while (!verifyChars.isEmpty() &&
+                     (passwdLen > (chars.size() - verifyChars.size())));
+
+            TextView passwdField = (TextView)findViewById(R.id.password);
+            TextView confirmField =
+                (TextView)findViewById(R.id.password_confirm);
+            passwdField.setText(passwd);
+            confirmField.setText(passwd);
+            setPasswordVisibility(true, passwdField, confirmField);
+        } catch (NoSuchAlgorithmException e) {
+            PasswdSafeApp.showFatalMsg(e, this);
         }
     }
 

@@ -1,6 +1,6 @@
 /*
  * $Id: I18nHelperBase.java 317 2009-01-26 20:20:54Z ronys $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -35,12 +35,12 @@ public class I18nHelperBase
 	private static Locale			TheLocale	= Locale.getDefault();
 
 	/**
-	 * 
+	 *
 	 */
 	protected I18nHelperBase()
 	{
 		super();
-		// TODO Auto-generated constructor stub
+		// TODOlib Auto-generated constructor stub
 	}
 
 	static
@@ -52,10 +52,10 @@ public class I18nHelperBase
 	 * Returns the message with the given key from the <code>ResourceBundle</code>.  Where
 	 * paramaters are specified in the message they are replaced with the appropriate entry
 	 * from <code>args</code>.
-	 * 
+	 *
 	 * @param key  the message ID
 	 * @param args arguments for paramater substitutions.
-	 * 
+	 *
 	 * @return The message with parameters substituted.
 	 */
 	public String formatError( String key, Object [] args )
@@ -68,9 +68,9 @@ public class I18nHelperBase
 
 	/**
 	 * Returns the message with the given key from the <code>ResourceBundle</code>.
-	 * 
+	 *
 	 * @param key the ID of the message to retrieve.
-	 * 
+	 *
 	 * @return The message with the kiven key.
 	 */
 	public String formatMessage( String key )
@@ -82,10 +82,10 @@ public class I18nHelperBase
 	 * Returns the message with the given key from the <code>ResourceBundle</code>.  Where
 	 * paramaters are specified in the message they are replaced with the appropriate entry
 	 * from <code>args</code>.
-	 * 
+	 *
 	 * @param key  the message ID
 	 * @param args arguments for paramater substitutions.
-	 * 
+	 *
 	 * @return The message with parameters substituted.
 	 */
 	public String formatMessage( String key, Object [] args )
@@ -98,7 +98,7 @@ public class I18nHelperBase
 
 	/**
 	 * Loads the localised strings using the current locale.
-	 * 
+	 *
 	 * @return The localised <code>ResourceBundle</code>.
 	 */
 	private synchronized ResourceBundle getBundle()
@@ -109,7 +109,7 @@ public class I18nHelperBase
 		{
 			LOG.debug1( "Loading resource bundle for locale " + TheLocale.toString() );
 			TheBundle = ResourceBundle.getBundle( getFilename(), TheLocale );
-			// TODO handle the case where the file cannot be found
+			// TODOlib handle the case where the file cannot be found
 			// catch MissingResourceException
 		}
 
@@ -121,7 +121,7 @@ public class I18nHelperBase
 	/**
 	 * Returns the base name of the properties file that contains the localised
 	 * strings.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getFilename()
@@ -145,7 +145,7 @@ public class I18nHelperBase
 
 	/**
 	 * Sets the locale and forces the <code>ResourceBundle</code> to be reloaded.
-	 * 
+	 *
 	 * @param locale the locale.
 	 */
 	public synchronized void setLocale( Locale locale )

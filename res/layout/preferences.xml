@@ -1,32 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:key="top_prefs">
-    <CheckBoxPreference android:name="sortCaseSensitive Pref"
-                        android:title="Case-sensitive sorting"
-                        android:key="sortCaseSensitivePref"
-                        android:defaultValue="true"/>
+    <PreferenceScreen android:title="File Settings"
+                      android:key="fileOptions">
+        <EditTextPreference android:name="FileDir Pref"
+                            android:title="Directory for files"
+                            android:summary="/sdcard"
+                            android:defaultValue="/sdcard"
+                            android:key="fileDirPref"/>
+                            
+        <ListPreference android:name="defaultFile Pref"
+                        android:title="Default file to open"
+                        android:key="defFilePref"/>
+    
+        <ListPreference android:name="fileTimeout Pref"
+                        android:title="File close timeout"
+                        android:key="fileCloseTimeoutPref"/>
+
+        <CheckBoxPreference android:name="showBackupFiles Pref"
+                            android:title="Show backup files"
+                            android:key="showBackupFilesPref"
+                            android:defaultValue="false"/>
+    </PreferenceScreen>
+
+    <PreferenceScreen android:title="Password Settings"
+                      android:key="passwordOptions">
+        <ListPreference android:name="passwordEncoding Pref"
+                        android:title="File password encoding"
+                        android:key="passwordEncodingPref"/>
                     
-    <EditTextPreference android:name="FileDir Pref"
-                        android:title="Directory for files"
-                        android:summary="/sdcard"
-                        android:defaultValue="/sdcard"
-                        android:key="fileDirPref"/>
-                        
-    <ListPreference android:name="defaultFile Pref"
-                    android:title="Default file to open"
-                    android:key="defFilePref"/>
+        <PreferenceCategory android:title="Password generation">
+            <EditTextPreference android:name="passwdGenLength Pref"
+                                android:title="Password length"
+                                android:key="passwdGenLength"
+                                android:numeric="integer"
+                                android:defaultValue="8"/>
+                                
+            <CheckBoxPreference android:name="passwdGenHex Pref"
+                                android:title="Hexidecimal digits only"
+                                android:summary="0-9a-f"
+                                android:key="passwdGenHex"
+                                android:defaultValue="false"/>
+                                
+            <CheckBoxPreference android:name="passwdGenLower Pref"
+                                android:title="Use Lowercase letters"
+                                android:key="passwdGenLower"
+                                android:defaultValue="true"/>
+            <CheckBoxPreference android:name="passwdGenUpper Pref"
+                                android:title="Use Uppercase letters"
+                                android:key="passwdGenUpper"
+                                android:defaultValue="true"/>
+            <CheckBoxPreference android:name="passwdGenDigits Pref"
+                                android:title="Use Digits"
+                                android:key="passwdGenDigits"
+                                android:defaultValue="true"/>
+            <CheckBoxPreference android:name="passwdGenSymbols Pref"
+                                android:title="Use Symbols"
+                                android:summary="$, %, ^, etc."
+                                android:key="passwdGenSymbols"
+                                android:defaultValue="false"/>
+    
+            <CheckBoxPreference android:name="passwdGenEasy Pref"
+                                android:title="Easy-to-read characters"
+                                android:summary="No 1, l, etc."
+                                android:key="passwdGenEasy"
+                                android:defaultValue="false"/>
+        </PreferenceCategory>
+    </PreferenceScreen>
+    
+    <PreferenceCategory android:title="Record Settings"
+                        android:key="recordOptions">
+        <CheckBoxPreference android:name="sortCaseSensitive Pref"
+                            android:title="Case-sensitive sorting"
+                            android:key="sortCaseSensitivePref"
+                            android:defaultValue="true"/>
 
-    <ListPreference android:name="fileTimeout Pref"
-                    android:title="File close timeout"
-                    android:key="fileCloseTimeoutPref"/>
-
-    <CheckBoxPreference android:name="groupRecords Pref"
-                        android:title="Group records"
-                        android:key="groupRecordsPref"
-                        android:defaultValue="true"/>
-
-    <CheckBoxPreference android:name="showBackupFiles Pref"
-                        android:title="Show backup files"
-                        android:key="showBackupFilesPref"
-                        android:defaultValue="false"/>
+        <CheckBoxPreference android:name="groupRecords Pref"
+                            android:title="Group records"
+                            android:key="groupRecordsPref"
+                            android:defaultValue="true"/>
+    </PreferenceCategory>
+    
+    <PreferenceCategory android:title="Search Settings"
+                        android:key="searchOptions">
+        <CheckBoxPreference android:name="searchCaseSensitive Pref"
+                            android:title="Case sensitive"
+                            android:key="searchCaseSensitivePref"
+                            android:defaultValue="false"/>
+                            
+        <CheckBoxPreference android:name="searchRegex Pref"
+                            android:title="Regular expression"
+                            android:summary="Use a regular expression to search instead of a sub-string"
+                            android:key="searchRegexPref"
+                            android:defaultValue="false"/>
+    </PreferenceCategory>
 </PreferenceScreen>

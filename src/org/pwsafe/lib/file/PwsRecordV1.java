@@ -1,6 +1,6 @@
 /*
  * $Id: PwsRecordV1.java 401 2009-09-07 21:41:10Z roxon $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -16,13 +16,13 @@ import org.pwsafe.lib.exception.EndOfFileException;
 
 /**
  * Encapsulates a version 1 record.
- * 
+ *
  * @author Kevin Preece
  */
 public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 {
 	/**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 
@@ -36,9 +36,9 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 
 	/**
 	 * The string that separates the title from the username when both are present in the
-	 * title. 
+	 * title.
 	 */
-	private static String			SplitChar;
+	public static String			SplitChar;
 
 	/**
 	 * The string that separates the title and username when it is a composite field.
@@ -66,6 +66,11 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	public static final int			PASSWORD	= 6;
 
 	/**
+	 * Constant for the phantom UUID field comprised of the TITLE and USERNAME
+	 */
+	public static final int         UUID        = 7;
+
+	/**
 	 * All the valid type codes.
 	 */
 	private static final Object []	VALID_TYPES	= new Object []
@@ -73,7 +78,8 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 		new Object [] { new Integer(TITLE),		"TITLE",	PwsStringField.class },
 		new Object [] { new Integer(USERNAME),	"USERNAME",	PwsStringField.class },
 		new Object [] { new Integer(NOTES),		"NOTES",	PwsStringField.class },
-		new Object [] { new Integer(PASSWORD),	"PASSWORD",	PwsStringField.class }
+		new Object [] { new Integer(PASSWORD),	"PASSWORD",	PwsStringField.class },
+		new Object [] { new Integer(UUID),	    "UUID",	    PwsStringField.class }
 	};
 
 	static
@@ -84,8 +90,8 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 			// practice they won't unless the JVM implementation is wrong.
 
 			DefUserString	= new String( new byte[] { -96 }, PwsRecord.DEFAULT_CHARSET );
-			SplitChar		= new String( new byte[] { -83 }, PwsRecord.DEFAULT_CHARSET ); 
-			SplitString		= new String( new byte[] { 32, 32, -83, 32, 32 }, PwsRecord.DEFAULT_CHARSET ); 
+			SplitChar		= new String( new byte[] { -83 }, PwsRecord.DEFAULT_CHARSET );
+			SplitString		= new String( new byte[] { 32, 32, -83, 32, 32 }, PwsRecord.DEFAULT_CHARSET );
 		}
 		catch ( UnsupportedEncodingException e )
 		{
@@ -105,13 +111,14 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 		setField( new PwsStringField(PwsFieldTypeV1.USERNAME, "") );
 		setField( new PwsStringField(PwsFieldTypeV1.PASSWORD, "") );
 		setField( new PwsStringField(PwsFieldTypeV1.NOTES,    "") );
+		setField( new PwsStringField(PwsFieldTypeV1.UUID,     "") );
 	}
 
 	/**
 	 * Create a new record by reading it from <code>file</code>.
-	 * 
+	 *
 	 * @param file the file to read data from.
-	 * 
+	 *
 	 * @throws EndOfFileException If end of file is reached
 	 * @throws IOException        If a read error occurs.
 	 */
@@ -123,7 +130,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 
 	/**
 	 * Creates a new record that is a copy <code>base</code>.
-	 * 
+	 *
 	 * @param base the record to copy.
 	 */
 	PwsRecordV1( PwsRecordV1 base )
@@ -133,7 +140,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 
 	/**
 	 * Creates a deep clone of this record.
-	 * 
+	 *
 	 * @return the new record.
 	 */
 	@Override
@@ -145,16 +152,16 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	/**
 	 * Compares this record to another returning a value that is less than zero if
 	 * this record is "less than" <code>other</code>, zero if they are "equal", or
-	 * greater than zero if this record is "greater than" <code>other</code>. 
-	 * 
+	 * greater than zero if this record is "greater than" <code>other</code>.
+	 *
 	 * @param other the record to compare this record to.
-	 * 
+	 *
 	 * @return A value &lt; zero if this record is "less than" <code>other</code>,
 	 *         zero if they're equal and &gt; zero if this record is "greater than"
 	 *         <code>other</code>.
-	 * 
+	 *
 	 * @throws ClassCastException If <code>other</code> is not a <code>PwsRecordV1</code>.
-	 * 
+	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
@@ -166,20 +173,20 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	/**
 	 * Compares this record to another returning a value that is less than zero if
 	 * this record is "less than" <code>other</code>, zero if they are "equal", or
-	 * greater than zero if this record is "greater than" <code>other</code>. 
-	 * 
+	 * greater than zero if this record is "greater than" <code>other</code>.
+	 *
 	 * @param other the record to compare this record to.
-	 * 
+	 *
 	 * @return A value &lt; zero if this record is "less than" <code>other</code>,
 	 *         zero if they're equal and &gt; zero if this record is "greater than"
 	 *         <code>other</code>.
-	 * 
+	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	private int compareTo( PwsRecordV1 other )
 	{
 		int	retCode;
-		
+
 		if ( (retCode = getField(TITLE).compareTo(other.getField(TITLE))) == 0 )
 		{
 			if ( (retCode = getField(USERNAME).compareTo(other.getField(USERNAME))) == 0 )
@@ -193,12 +200,12 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	/**
 	 * Compares this record to another returning <code>true</code> if they're equal
 	 * and <code>false</code> if they're unequal.
-	 * 
+	 *
 	 * @param rec the record this one is compared to.
-	 * 
-	 * @return <code>true</code> if the records are equal, <code>false</code> if 
+	 *
+	 * @return <code>true</code> if the records are equal, <code>false</code> if
 	 *         they're unequal.
-	 * 
+	 *
 	 * @throws ClassCastException if <code>rec</code> is not a <code>PwsRecordV1</code>.
 	 */
 	@Override
@@ -209,16 +216,16 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 		} else {
 			return false;
 		}
-		
+
 	}
 
 	/**
 	 * Compares this record to another returning <code>true</code> if they're equal
 	 * and <code>false</code> if they're unequal.
-	 * 
+	 *
 	 * @param other the record this one is compared to.
-	 * 
-	 * @return <code>true</code> if the records are equal, <code>false</code> if 
+	 *
+	 * @return <code>true</code> if the records are equal, <code>false</code> if
 	 *         they're unequal.
 	 */
 	private boolean equals( PwsRecordV1 other )
@@ -232,7 +239,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	/**
 	 * Validates the record, returning <code>true</code> if it's valid or <code>false</code>
 	 * if unequal.
-	 * 
+	 *
 	 * @return <code>true</code> if it's valid or <code>false</code> if unequal.
 	 */
 	@Override
@@ -241,12 +248,12 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 		// All records should be added to the file.
 		return true;
 	}
-	
+
 	/**
 	 * Initialises this record by reading its data from <code>file</code>.
-	 * 
+	 *
 	 * @param file the file to read the data from.
-	 * 
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 */
@@ -256,9 +263,11 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	{
 		String	str;
 		int		pos;
-		
+
 		str	= new Item(file).getData();
-		
+
+		String title;
+		String username;
 		pos = str.indexOf( SplitChar );
 		if ( pos == -1 )
 		{
@@ -267,30 +276,40 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 			pos = str.indexOf( DefUserString );
 			if ( pos == -1 )
 			{
-				setField( new PwsStringField(TITLE, str) );
+			    title = str;
 			}
 			else
 			{
-				setField( new PwsStringField(TITLE, str.substring( 0, pos )) );
+			    title = str.substring( 0, pos );
 			}
-			setField( new PwsStringField(USERNAME, "") );
+			username = "";
 		}
 		else
 		{
-			setField( new PwsStringField(TITLE, str.substring( 0, pos ).trim()) );
-			setField( new PwsStringField(USERNAME, str.substring( pos + 1 ).trim()) );
+		    title = str.substring( 0, pos ).trim();
+			username = str.substring( pos + 1 ).trim();
 		}
+		setField(new PwsStringField(TITLE, title));
+		setField(new PwsStringField(USERNAME, username));
 		setField( new PwsStringField(PASSWORD, new Item(file).getData()) );
 		setField( new PwsStringField(NOTES, new Item(file).getData()) );
+
+		String uuid;
+		if (username.trim().length() == 0) {
+		    uuid = title;
+		} else {
+		    uuid = title + SplitString + username;
+		}
+		setField(new PwsStringField(UUID, uuid));
 	}
 
 	/**
 	 * Saves this record to <code>file</code>.
-	 * 
+	 *
 	 * @param file the file that the record will be written to.
-	 * 
+	 *
 	 * @throws IOException if a write error occurs.
-	 * 
+	 *
 	 * @see org.pwsafe.lib.file.PwsRecord#saveRecord(org.pwsafe.lib.file.PwsFile)
 	 */
 	@Override
@@ -303,7 +322,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 			title = getField(TITLE);
 		}
 		else
-		{	
+		{
 			title = new PwsStringField( TITLE, getField(TITLE).toString() + SplitString + getField(USERNAME).toString() );
 		}
 
@@ -314,7 +333,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 
 	/**
 	 * Returns a string representation of this record.
-	 * 
+	 *
 	 * @return A string representation of this object.
 	 */
 	@Override

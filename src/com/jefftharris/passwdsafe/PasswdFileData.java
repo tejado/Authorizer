@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.pwsafe.lib.UUID;
+import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.PasswordSafeException;
@@ -36,6 +38,9 @@ import org.pwsafe.lib.file.PwsRecordV3;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
+import org.pwsafe.lib.file.PwsUnknownField;
+
+import android.util.Log;
 
 public class PasswdFileData
 {
@@ -186,6 +191,12 @@ public class PasswdFileData
             (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION);
     }
 
+    public final String getOpenPasswordEncoding()
+    {
+        return (itsPwsFile != null) ? itsPwsFile.getOpenPasswordEncoding() :
+            null;
+    }
+
     public final String getEmail(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.EMAIL);
@@ -269,6 +280,41 @@ public class PasswdFileData
     public final String getUUID(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.UUID);
+    }
+
+    public final String getHdrVersion()
+    {
+        return getHdrField(PwsRecordV3.HEADER_VERSION);
+    }
+
+    public final String getHdrLastSaveUser()
+    {
+        return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_USER);
+    }
+
+    public final String getHdrLastSaveHost()
+    {
+        return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_HOST);
+    }
+
+    public final String getHdrLastSaveApp()
+    {
+        return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_WHAT);
+    }
+
+    public final void setHdrLastSaveApp(String app)
+    {
+        setHdrField(PwsRecordV3.HEADER_LAST_SAVE_WHAT, app);
+    }
+
+    public final String getHdrLastSaveTime()
+    {
+        return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME);
+    }
+
+    public final void setHdrLastSaveTime(Date date)
+    {
+        setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
 
     private final String getField(PwsRecord rec, int fieldId)
@@ -357,9 +403,8 @@ public class PasswdFileData
             }
             case PwsRecordV3.UUID:
             {
-                // No real UUID field for V1, so just use the title which
-                // should be unique
-                fieldId = PwsRecordV1.TITLE;
+                // No real UUID field for V1, so just use the phantom one
+                fieldId = PwsRecordV1.UUID;
                 break;
             }
             case PwsRecordV3.EMAIL:
@@ -380,6 +425,132 @@ public class PasswdFileData
         }
         }
 
+        return doGetFieldStr(rec, fieldId);
+    }
+
+    private final String getHdrField(int fieldId)
+    {
+        if (itsPwsFile == null) {
+            return "";
+        }
+
+        switch (itsPwsFile.getFileVersionMajor())
+        {
+        case PwsFileV3.VERSION:
+        {
+            break;
+        }
+        case PwsFileV2.VERSION:
+        case PwsFileV1.VERSION:
+        {
+            fieldId = FIELD_NOT_PRESENT;
+            break;
+        }
+        default:
+        {
+            fieldId = FIELD_UNSUPPORTED;
+            break;
+        }
+        }
+
+        if (isV3()) {
+            PwsRecord rec = ((PwsFileV3)itsPwsFile).getHeaderRecord();
+            switch (fieldId)
+            {
+            case PwsRecordV3.HEADER_VERSION:
+            {
+                PwsField ver = doGetField(rec, fieldId);
+                byte[] bytes = ver.getBytes();
+                return String.format("%d.%02d", bytes[1], bytes[0]);
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_TIME:
+            {
+                PwsField time = doGetField(rec, fieldId);
+                byte[] bytes = time.getBytes();
+                if (bytes.length == 8)
+                {
+                    byte[] binbytes = new byte[4];
+                    Util.putIntToByteArray(binbytes,
+                                           hexBytesToInt(bytes, bytes.length),
+                                           0);
+                    bytes = binbytes;
+                }
+                Date d = new Date(Util.getMillisFromByteArray(bytes, 0));
+                return d.toString();
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_USER:
+            {
+                PwsField field = doGetField(rec, fieldId);
+                if (field != null) {
+                    return field.toString();
+                }
+
+                return getHdrLastSafeWhoField(rec, true);
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_HOST:
+            {
+                PwsField field = doGetField(rec, fieldId);
+                if (field != null) {
+                    return field.toString();
+                }
+
+                return getHdrLastSafeWhoField(rec, false);
+            }
+            default:
+            {
+                return doGetFieldStr(rec , fieldId);
+            }
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private final void setHdrField(int fieldId, Object value)
+    {
+        if (itsPwsFile == null) {
+            return;
+        }
+
+        if (isV3()) {
+            PwsRecord rec = ((PwsFileV3)itsPwsFile).getHeaderRecord();
+            switch (fieldId)
+            {
+            case PwsRecordV3.HEADER_LAST_SAVE_TIME:
+            {
+                PwsField time = doGetField(rec, fieldId);
+                byte[] bytes = time.getBytes();
+                long timeVal = ((Date)value).getTime();
+                byte[] newbytes;
+                if (bytes.length == 8) {
+                    int secs = (int) (timeVal / 1000);
+                    String str = Integer.toHexString(secs);
+                    newbytes = str.getBytes();
+                } else {
+                    newbytes = new byte[4];
+                    Util.putMillisToByteArray(newbytes, timeVal, 0);
+                }
+
+                rec.setField(new PwsUnknownField(fieldId, newbytes));
+                break;
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            {
+                rec.setField(
+                    new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_WHAT,
+                                        value.toString().getBytes()));
+                break;
+            }
+            default:
+            {
+                break;
+            }
+            }
+        }
+    }
+
+    private final String doGetFieldStr(PwsRecord rec, int fieldId)
+    {
         switch (fieldId)
         {
         case FIELD_UNSUPPORTED:
@@ -397,6 +568,22 @@ public class PasswdFileData
                 return null;
             }
             return field.toString();
+        }
+        }
+    }
+
+    private static final PwsField doGetField(PwsRecord rec, int fieldId)
+    {
+        switch (fieldId)
+        {
+        case FIELD_UNSUPPORTED:
+        case FIELD_NOT_PRESENT:
+        {
+            return null;
+        }
+        default:
+        {
+            return rec.getField(fieldId);
         }
         }
     }
@@ -505,5 +692,43 @@ public class PasswdFileData
             itsRecords.add(rec);
             itsRecordsByUUID.put(uuid, rec);
         }
+    }
+
+    private static final String getHdrLastSafeWhoField(PwsRecord rec,
+                                                       boolean isUser)
+    {
+        PwsField field = doGetField(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO);
+        if (field == null) {
+            return null;
+        }
+
+        byte[] whoBytes = field.getBytes();
+        if (whoBytes.length < 4) {
+            Log.e(TAG, "Invalid who length: " + whoBytes.length);
+            return null;
+        }
+        int len = hexBytesToInt(whoBytes, 4);
+
+        if ((len + 4) > whoBytes.length) {
+            Log.e(TAG, "Invalid user length: " + (len + 4));
+            return null;
+        }
+
+        if (isUser) {
+            return new String(whoBytes, 4, len);
+        } else {
+            return new String(whoBytes, len + 4, whoBytes.length - len - 4);
+        }
+    }
+
+
+    private static final int hexBytesToInt(byte[] bytes, int len)
+    {
+        int i = 0;
+        for (int pos = 0; pos < len; ++pos) {
+            i <<= 4;
+            i |= Character.digit(bytes[pos], 16);
+        }
+        return i;
     }
 }

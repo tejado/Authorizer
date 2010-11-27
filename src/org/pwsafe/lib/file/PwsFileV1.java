@@ -1,6 +1,6 @@
 /*
  * $Id: PwsFileV1.java 373 2009-04-19 17:22:46Z roxon $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -16,11 +16,11 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 /**
  * Encapsulates version 1 PasswordSafe files.
- * 
+ *
  * @author Kevin Preece
  */
 public class PwsFileV1 extends PwsFileV1V2 {
-	
+
 	/**
 	 * File extension of the V1 password safe files.
 	 */
@@ -50,21 +50,22 @@ public class PwsFileV1 extends PwsFileV1V2 {
 	 * </p>
 	 * @param filename   the name of the database to read.
 	 * @param passphrase the passphrase needed to open the database.
-	 * 
+	 * @param encoding the password encoding
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
-	 * @throws NoSuchAlgorithmException 
+	 * @throws NoSuchAlgorithmException
 	 */
-	public PwsFileV1( PwsStorage storage, String passphrase )
+	public PwsFileV1( PwsStorage storage, String passphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		super( storage, passphrase );
+		super( storage, passphrase, encoding );
 	}
 
 	/**
 	 * Returns the major version number for the file.
-	 * 
+	 *
 	 * @return The file's major version number.
 	 */
 	@Override
@@ -76,9 +77,9 @@ public class PwsFileV1 extends PwsFileV1V2 {
 	/**
 	 * Allocates a new, empty record unowned by any file.  The record type is
 	 * {@link PwsRecordV1}.
-	 * 
+	 *
 	 * @return A new empty record
-	 * 
+	 *
 	 * @see org.pwsafe.lib.file.PwsFile#newRecord()
 	 */
 	@Override

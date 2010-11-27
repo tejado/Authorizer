@@ -14,8 +14,11 @@ import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.ConcurrentModificationException;
+import java.util.Date;
 import java.util.Map;
 import java.util.WeakHashMap;
+
+import org.pwsafe.lib.file.PwsFile;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -27,6 +30,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -93,6 +98,11 @@ public class PasswdSafeApp extends Application
                 if (itsFileData != null) {
                     cancelFileDataTimer();
                     try {
+                        itsFileData.setHdrLastSaveApp(
+                            PasswdSafeApp.getAppTitle(PasswdSafeApp.this) +
+                            " " +
+                            PasswdSafeApp.getAppVersion(PasswdSafeApp.this));
+                        itsFileData.setHdrLastSaveTime(new Date());
                         itsFileData.save();
                     } finally {
                         touchFileDataTimer();
@@ -184,12 +194,37 @@ public class PasswdSafeApp extends Application
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     public static final boolean PREF_GROUP_RECORDS_DEF = true;
 
+    public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
+    public static final String PREF_PASSWD_ENC_DEF =
+        PwsFile.DEFAULT_PASSWORD_CHARSET;
+
+    public static final String PREF_SEARCH_CASE_SENSITIVE =
+        "searchCaseSensitivePref";
+    public static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
+    public static final String PREF_SEARCH_REGEX = "searchRegexPref";
+    public static final boolean PREF_SEARCH_REGEX_DEF = false;
+
     public static final String PREF_SHOW_BACKUP_FILES = "showBackupFilesPref";
     public static final boolean PREF_SHOW_BACKUP_FILES_DEF = false;
 
     public static final String PREF_SORT_CASE_SENSITIVE =
         "sortCaseSensitivePref";
     public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
+
+    public static final String PREF_GEN_LOWER = "passwdGenLower";
+    public static final boolean PREF_GEN_LOWER_DEF = true;
+    public static final String PREF_GEN_UPPER = "passwdGenUpper";
+    public static final boolean PREF_GEN_UPPER_DEF = true;
+    public static final String PREF_GEN_DIGITS = "passwdGenDigits";
+    public static final boolean PREF_GEN_DIGITS_DEF = true;
+    public static final String PREF_GEN_SYMBOLS = "passwdGenSymbols";
+    public static final boolean PREF_GEN_SYMBOLS_DEF = false;
+    public static final String PREF_GEN_EASY = "passwdGenEasy";
+    public static final boolean PREF_GEN_EASY_DEF = false;
+    public static final String PREF_GEN_HEX = "passwdGenHex";
+    public static final boolean PREF_GEN_HEX_DEF = false;
+    public static final String PREF_GEN_LENGTH = "passwdGenLength";
+    public static final String PREF_GEN_LENGTH_DEF = "8";
 
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
@@ -238,6 +273,7 @@ public class PasswdSafeApp extends Application
         }
 
         updateFileCloseTimeoutPref(prefs);
+        setPasswordEncodingPref(prefs);
     }
 
     /* (non-Javadoc)
@@ -260,6 +296,8 @@ public class PasswdSafeApp extends Application
 
         if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
             updateFileCloseTimeoutPref(prefs);
+        } else if (key.equals(PREF_PASSWD_ENC)) {
+            setPasswordEncodingPref(prefs);
         }
     }
 
@@ -309,6 +347,58 @@ public class PasswdSafeApp extends Application
         return prefs.getBoolean(PREF_GROUP_RECORDS, PREF_GROUP_RECORDS_DEF);
     }
 
+    public static String getPasswordEncodingPref(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_PASSWD_ENC, PREF_PASSWD_ENC_DEF);
+    }
+
+    public static boolean getPasswordGenLowerPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_LOWER, PREF_GEN_LOWER_DEF);
+    }
+
+    public static boolean getPasswordGenUpperPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_UPPER, PREF_GEN_UPPER_DEF);
+    }
+
+    public static boolean getPasswordGenDigitsPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_DIGITS, PREF_GEN_DIGITS_DEF);
+    }
+
+    public static boolean getPasswordGenSymbolsPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_SYMBOLS, PREF_GEN_SYMBOLS_DEF);
+    }
+
+    public static boolean getPasswordGenEasyPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_EASY, PREF_GEN_EASY_DEF);
+    }
+
+    public static boolean getPasswordGenHexPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF);
+    }
+
+    public static int getPasswordGenLengthPref(SharedPreferences prefs)
+    {
+        return Integer.parseInt(
+            prefs.getString(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF));
+    }
+
+    public static boolean getSearchCaseSensitivePref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SEARCH_CASE_SENSITIVE,
+                                PREF_SEARCH_CASE_SENSITIVE_DEF);
+    }
+
+    public static boolean getSearchRegexPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SEARCH_REGEX, PREF_SEARCH_REGEX_DEF);
+    }
+
     public static boolean getShowBackupFilesPref(SharedPreferences prefs)
     {
         return prefs.getBoolean(PREF_SHOW_BACKUP_FILES,
@@ -348,6 +438,20 @@ public class PasswdSafeApp extends Application
     public static final String getAppTitle(Context ctx)
     {
         return ctx.getString(R.string.app_name);
+    }
+
+    public static final String getAppVersion(Context ctx)
+    {
+        String version;
+        try {
+            PackageManager pkgMgr = ctx.getPackageManager();
+            PackageInfo pkgInfo = pkgMgr.getPackageInfo(ctx.getPackageName(),
+                                                        0);
+            version = pkgInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            version = "Unknown";
+        }
+        return version;
     }
 
     public static void showFatalMsg(Throwable t, Activity activity)
@@ -409,6 +513,11 @@ public class PasswdSafeApp extends Application
             } catch (NumberFormatException e) {
             }
         }
+    }
+
+    private static void setPasswordEncodingPref(SharedPreferences prefs)
+    {
+        PwsFile.setPasswordEncoding(getPasswordEncodingPref(prefs));
     }
 
     private synchronized final void pauseFileTimer()

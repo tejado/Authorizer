@@ -1,6 +1,6 @@
 /*
  * $Id: PwsFieldTypeV1.java 401 2009-09-07 21:41:10Z roxon $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -15,7 +15,8 @@ public enum PwsFieldTypeV1 implements PwsFieldType {
 	TITLE	(3),
 	USERNAME (4),
 	NOTES	(5),
-	PASSWORD (6);
+	PASSWORD (6),
+	UUID     (7);
 
 	private int id;
 	private String name;
@@ -29,7 +30,7 @@ public enum PwsFieldTypeV1 implements PwsFieldType {
 		id = anId;
 		name = aName;
 	}
-	
+
 	public int getId() {
 		return id;
 	}

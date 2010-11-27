@@ -1,6 +1,6 @@
 /*
  * $Id$
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -12,6 +12,8 @@ package org.pwsafe.lib.file;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -27,7 +29,7 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 /**
  * Superclass for common functionality for V1 and V2 Files.
- * 
+ *
  * @author mueller
  *
  */
@@ -43,13 +45,13 @@ public abstract class PwsFileV1V2 extends PwsFile {
 
 	/**
 	 * The Blowfish object being used to encrypt or decrypt data as it is written to or
-	 * read from the file. 
+	 * read from the file.
 	 */
 	private BlowfishPws			algorithm;
 
 
 	/**
-	 * 
+	 *
 	 */
 	public PwsFileV1V2() {
 		super ();
@@ -59,18 +61,19 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	/**
 	 * @param storage
 	 * @param passphrase
+	 * @param encoding
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public PwsFileV1V2(PwsStorage storage, String passphrase)
+	public PwsFileV1V2(PwsStorage storage, String passphrase, String encoding)
 			throws EndOfFileException, IOException,
 			UnsupportedFileVersionException, NoSuchAlgorithmException {
-		super(storage, passphrase);
+		super(storage, passphrase, encoding);
 	}
 
-	
+
 	/* (non-Javadoc)
 	 * @see org.pwsafe.lib.file.PwsFile#close()
 	 */
@@ -90,7 +93,7 @@ public abstract class PwsFileV1V2 extends PwsFile {
 
 	/**
 	 * Returns the file header.
-	 * 
+	 *
 	 * @return The file header.
 	 */
 	PwsFileHeader getHeader()
@@ -101,20 +104,26 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	/**
 	 * Constructs and initialises the blowfish encryption routines ready to decrypt or
 	 * encrypt data.
-	 * 
+	 *
 	 * @param aPassphrase
-	 * 
+     * @param encoding the passphrase encoding (if known)
+	 *
 	 * @return A properly initialised {@link BlowfishPws} object.
+	 * @throws UnsupportedEncodingException
 	 */
-	private BlowfishPws makeBlowfish( byte [] aPassphrase )
+	private BlowfishPws makeBlowfish( String aPassphrase, String encoding )
+	    throws UnsupportedEncodingException
 	{
 		SHA1	sha1;
 		byte	salt[];
-		
+
 		sha1 = new SHA1();
 		salt = header.getSalt();
 
-		sha1.update( aPassphrase, 0, aPassphrase.length );
+		byte[] passwordBytes = (encoding == null) ?
+		    aPassphrase.getBytes() : aPassphrase.getBytes(encoding);
+
+		sha1.update( passwordBytes, 0, passwordBytes.length );
 		sha1.update( salt, 0, salt.length );
 		sha1.finalize();
 
@@ -123,30 +132,35 @@ public abstract class PwsFileV1V2 extends PwsFile {
 
 	/**
 	 * Opens the database.
-	 * 
+	 *
 	 * @param aPassphrase the passphrase for the file.
-	 * 
+     * @param encoding the passphrase encoding (if known)
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
 	 */
 	@Override
-	protected void open( String aPassphrase )
+	protected void open( String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
 		LOG.enterMethod( "PwsFile.init" );
 
 		setPassphrase(new StringBuilder(aPassphrase));
-		
+
 		if (storage!=null) {
 			inStream		= new ByteArrayInputStream(storage.load());
 			lastStorageChange = storage.getModifiedDate();
 		}
 		header			= new PwsFileHeader( this );
-		algorithm		= makeBlowfish( aPassphrase.getBytes() );
+		algorithm		= makeBlowfish(aPassphrase, encoding);
 
 		readExtraHeader( this );
+
+		setOpenPasswordEncoding(
+		    (encoding == null) ? Charset.defaultCharset().name() : encoding);
+
 
 		LOG.leaveMethod( "PwsFile.init" );
 	}
@@ -154,9 +168,9 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	/**
 	 * Reads bytes from the file and decryps them.  <code>buff</code> may be any length provided
 	 * that is a multiple of <code>getBlockSize()</code> bytes in length.
-	 * 
+	 *
 	 * @param buff the buffer to read the bytes into.
-	 * 
+	 *
 	 * @throws EndOfFileException If end of file has been reached.
 	 * @throws IOException If a read error occurs.
 	 * @throws IllegalArgumentException If <code>buff.length</code> is not an integral multiple of <code>BLOCK_LENGTH</code>.
@@ -178,13 +192,13 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	}
 
 	/**
-	 * Writes this file back to the filesystem.  If successful the modified flag is also 
+	 * Writes this file back to the filesystem.  If successful the modified flag is also
 	 * reset on the file and all records.
-	 * 
+	 *
 	 * @throws IOException if the attempt fails.
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
-	 * @throws ConcurrentModificationException if the underlying store was 
-	 * independently changed  
+	 * @throws ConcurrentModificationException if the underlying store was
+	 * independently changed
 	 */
 	@Override
 	public void save()
@@ -209,8 +223,9 @@ public abstract class PwsFileV1V2 extends PwsFile {
 			header.save( this );
 
 			// Can only be created once the V1 header's been written.
-			//TODO: check whether this can be performed without toString 
-			algorithm	= makeBlowfish(getPassphrase().toString().getBytes());
+			//TODOlib: check whether this can be performed without toString
+			algorithm	= makeBlowfish(getPassphrase().toString(),
+			         	               PwsFile.getUpdatePasswordEncoding());
 
 			writeExtraHeader( this );
 
@@ -218,22 +233,22 @@ public abstract class PwsFileV1V2 extends PwsFile {
 			for ( Iterator<? extends PwsRecord> iter = getRecords(); iter.hasNext(); )
 			{
 				rec = iter.next();
-	
+
 				rec.saveRecord( this );
 			}
-	
+
 			outStream.close();
-	
+
 			if (storage.save(baos.toByteArray())) {
 				modified = false;
 				lastStorageChange = storage.getModifiedDate();
 			}
 			else
 			{
-				// FIXME: I'm not sure what this message should be, but it should
+				// FIXMElib: I'm not sure what this message should be, but it should
 				// reflect the fact that storage failed, not anything about a temp file.
 				LOG.error( I18nHelper.getInstance().formatMessage("E00010", new Object [] { "Storage file" } ) );
-				// TODO Throw an exception here?
+				// TODOlib Throw an exception here?
 				return;
 			}
 		} catch (IOException e) {
@@ -251,9 +266,9 @@ public abstract class PwsFileV1V2 extends PwsFile {
 
 	/**
 	 * Encrypts then writes the contents of <code>buff</code> to the file.
-	 * 
+	 *
 	 * @param buff the data to be written.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Override
@@ -264,7 +279,7 @@ public abstract class PwsFileV1V2 extends PwsFile {
 		{
 			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00001") );
 		}
-		
+
 		byte [] temp = Util.cloneByteArray( buff );
 		try {
 			algorithm.encrypt( temp );

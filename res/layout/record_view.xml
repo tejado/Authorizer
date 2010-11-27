@@ -24,7 +24,7 @@
                      android:shrinkColumns="1"
                      >
             <TableRow android:id="@+id/group_row">
-                <TextView android:text="Group"
+                <TextView android:text="@string/group"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/group"
                           android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/url_row">
-                <TextView android:text="URL"
+                <TextView android:text="@string/url"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/url"
                           android:autoLink="web"
@@ -43,7 +43,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/email_row">
-                <TextView android:text="Email"
+                <TextView android:text="@string/email"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/email"
                           android:autoLink="email"
@@ -53,7 +53,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/user_row">
-                <TextView android:text="User name"
+                <TextView android:text="@string/username"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/user"
                           android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/password_row">
-                <TextView android:text="Password"
+                <TextView android:text="@string/password"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/password"
                           android:text="*****"
@@ -73,7 +73,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/expiration_row">
-                <TextView android:text="Expiration"
+                <TextView android:text="@string/expiration"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/expiration"
                           android:layout_width="wrap_content"
@@ -82,7 +82,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/notes_row">
-                <TextView android:text="Notes"
+                <TextView android:text="@string/notes"
                           android:padding="3dip"/>
                 <TextView android:id="@+id/notes"
                           android:autoLink="all"

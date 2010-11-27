@@ -23,7 +23,7 @@
                      android:stretchColumns="1"
                      android:shrinkColumns="1">
             <TableRow android:id="@+id/title_row">
-                <TextView android:text="Title"
+                <TextView android:text="@string/title"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/title"
                           android:singleLine="true"
@@ -35,7 +35,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/group_row">
-                <TextView android:text="Group"
+                <TextView android:text="@string/group"
                           android:padding="3dip"/>
                 <Spinner android:id="@+id/group"
                          android:drawSelectorOnTop="true"
@@ -45,7 +45,7 @@
             </TableRow>
 
             <TableRow android:id="@+id/url_row">
-                <TextView android:text="URL"
+                <TextView android:text="@string/url"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/url"
                           android:singleLine="true"
@@ -55,7 +55,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/email_row">
-                <TextView android:text="Email"
+                <TextView android:text="@string/email"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/email"
                           android:singleLine="true"
@@ -65,7 +65,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/user_row">
-                <TextView android:text="User name"
+                <TextView android:text="@string/username"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/user"
                           android:singleLine="true"
@@ -75,7 +75,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/password_row">
-                <TextView android:text="Password"
+                <TextView android:text="@string/password"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/password"
                           android:singleLine="true"
@@ -86,7 +86,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/password_confirm_row">
-                <TextView android:text="Confirm"
+                <TextView android:text="@string/confirm"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/password_confirm"
                           android:singleLine="true"
@@ -97,7 +97,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/notes_row">
-                <TextView android:text="Notes"
+                <TextView android:text="@string/notes"
                           android:padding="3dip"/>
                 <EditText android:id="@+id/notes"
                           android:autoText="true"
@@ -121,13 +121,13 @@
                   android:layout_height="wrap_content"
                   android:layout_width="fill_parent">
         <Button android:id="@+id/done_btn"
-                android:text="Done" 
+                android:text="@string/done" 
                 android:layout_weight="1"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"/>
 
         <Button android:id="@+id/cancel_btn"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:layout_weight="1"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"/>

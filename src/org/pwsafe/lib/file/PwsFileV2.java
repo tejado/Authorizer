@@ -1,6 +1,6 @@
 /*
  * $Id: PwsFileV2.java 373 2009-04-19 17:22:46Z roxon $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -17,11 +17,11 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 /**
  * Encapsulates version 2 PasswordSafe files.
- * 
+ *
  * @author Kevin Preece
  */
 public class PwsFileV2 extends PwsFileV1V2 {
-	
+
 	/**
 	 * File extension of the V2 password safe files.
 	 */
@@ -54,21 +54,22 @@ public class PwsFileV2 extends PwsFileV1V2 {
 	 * </p>
 	 * @param filename   the name of the database to open.
 	 * @param passphrase the passphrase for the database.
-	 * 
+	 * @param encoding the password encoding
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
-	 * @throws NoSuchAlgorithmException 
+	 * @throws NoSuchAlgorithmException
 	 */
-	public PwsFileV2( PwsStorage storage, String passphrase ) 
+	public PwsFileV2( PwsStorage storage, String passphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		super( storage, passphrase );
+		super( storage, passphrase, encoding );
 	}
 
 	/**
 	 * Returns the major version number for the file.
-	 * 
+	 *
 	 * @return The major version number for the file.
 	 */
 	@Override
@@ -80,9 +81,9 @@ public class PwsFileV2 extends PwsFileV1V2 {
 	/**
 	 * Allocates a new, empty record unowned by any file.  The record type is
 	 * {@link PwsRecordV2}.
-	 * 
+	 *
 	 * @return A new empty record
-	 * 
+	 *
 	 * @see org.pwsafe.lib.file.PwsFile#newRecord()
 	 */
 	@Override
@@ -90,14 +91,14 @@ public class PwsFileV2 extends PwsFileV1V2 {
 	{
 		return new PwsRecordV2();
 	}
-	
+
 	/**
 	 * Reads the extra header present in version 2 files.
-	 * 
+	 *
 	 * @param file the file to read the header from.
-	 * 
+	 *
 	 * @throws EndOfFileException If end of file is reached.
-	 * @throws IOException If an error occurs whilst reading. 
+	 * @throws IOException If an error occurs whilst reading.
 	 * @throws UnsupportedFileVersionException If the header is not a valid V2 header.
 	 */
 	@Override
@@ -117,10 +118,10 @@ public class PwsFileV2 extends PwsFileV1V2 {
 
 	/**
 	 * Writes the extra version 2 header.
-	 * 
+	 *
 	 * @param file the file to write the header to.
-	 * 
-	 * @throws IOException if an error occurs whilst writing the header. 
+	 *
+	 * @throws IOException if an error occurs whilst writing the header.
 	 */
 	@Override
 	protected void writeExtraHeader( PwsFile file )

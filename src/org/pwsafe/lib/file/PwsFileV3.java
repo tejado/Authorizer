@@ -1,6 +1,6 @@
 /*
  * $Id: PwsFileV2.java 944 2006-09-08 03:25:19 +0000 (Fri, 08 Sep 2006) glen_a_smith $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -12,6 +12,7 @@ package org.pwsafe.lib.file;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
@@ -35,11 +36,11 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 /**
  * Encapsulates version 3 PasswordSafe files.
- * 
+ *
  * @author Glen Smith (based on Kevin Preece's v2 implementation).
  */
 public final class PwsFileV3 extends PwsFile {
-	
+
 	/**
 	 * File extension of the V3 password safe files.
 	 */
@@ -61,18 +62,18 @@ public final class PwsFileV3 extends PwsFile {
 	 * The file's standard header.
 	 */
 	protected PwsFileHeaderV3	headerV3;
-	
+
 	private SealedObject sealedHeaderV3;
 
 	/**
 	 * End of File marker. HMAC follows this tag.
 	 */
 	static byte[] EOF_BYTES_RAW = "PWS3-EOFPWS3-EOF".getBytes();
-	
+
 	protected byte[] stretchedPassword;
 	protected byte[] decryptedRecordKey;
 	protected byte[] decryptedHmacKey;
-	
+
 	TwofishPws twofishCbc;
 	HmacPws hasher;
 	PwsRecordV3 headerRecord;
@@ -97,19 +98,19 @@ public final class PwsFileV3 extends PwsFile {
 	 * </p>
 	 * @param storage   the underlying storage to use to open the database.
 	 * @param aPassphrase the passphrase for the database.
-	 * 
+	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
-	 * @throws NoSuchAlgorithmException 
+	 * @throws NoSuchAlgorithmException
 	 */
-	public PwsFileV3( PwsStorage storage, String aPassphrase ) 
+	public PwsFileV3( PwsStorage storage, String aPassphrase )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		super( storage, aPassphrase );
+		super( storage, aPassphrase, null );
 	}
 
-	
+
 	/* (non-Javadoc)
 	 * @see org.pwsafe.lib.file.PwsFile#dispose()
 	 */
@@ -124,64 +125,104 @@ public final class PwsFileV3 extends PwsFile {
 			Arrays.fill(decryptedRecordKey,(byte)0);
 	}
 
+	private final byte[] checkPassword(String aPassphrase,
+	                                   String encoding,
+	                                   PwsFileHeaderV3 headerV3,
+	                                   int iter)
+	{
+        LOG.debug1("Trying " + encoding);
+        try {
+            byte[] stretch =
+                Util.stretchPassphrase(aPassphrase.getBytes(encoding),
+                                       headerV3.getSalt(), iter);
+            if (Util.bytesAreEqual(headerV3.getPassword(),
+                                   SHA256Pws.digest(stretch))) {
+                return stretch;
+            }
+        } catch (UnsupportedEncodingException e) {
+            // Skip this charset
+        }
+
+        return null;
+	}
+
 	@Override
-	protected void open( String aPassphrase )
+	protected void open( String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException
 	{
 		LOG.enterMethod( "PwsFileV3.init" );
 
 		setPassphrase(new StringBuilder(aPassphrase));
-		
+
 		if (storage!=null) {
 			inStream		= new ByteArrayInputStream(storage.load());
 			lastStorageChange = storage.getModifiedDate();
 		}
 		PwsFileHeaderV3 theHeaderV3		= new PwsFileHeaderV3( this );
-		
+
 		setHeaderV3(theHeaderV3);
-		
+
 		int iter = theHeaderV3.getIter();
 		LOG.debug1("Using iterations: [" + iter + "]");
-		stretchedPassword = Util.stretchPassphrase(aPassphrase.getBytes(), theHeaderV3.getSalt(), iter);
-		
-		if (!Util.bytesAreEqual(theHeaderV3.getPassword(), SHA256Pws.digest(stretchedPassword))) {
+		stretchedPassword = null;
+
+		if (encoding != null) {
+		    stretchedPassword =
+		        checkPassword(aPassphrase, encoding, theHeaderV3, iter);
+		}
+
+		if (stretchedPassword == null) {
+		    for (String charset : PwsFile.getPasswordEncodings()) {
+		        stretchedPassword =
+		            checkPassword(aPassphrase, charset, theHeaderV3, iter);
+		        if (stretchedPassword != null) {
+		            encoding = charset;
+		            break;
+		        }
+		    }
+		}
+
+		if (stretchedPassword == null) {
 			//try another method to avoid asymmetric encoding bug in V0.8 Beta1
 	        CharBuffer buf = CharBuffer.wrap(aPassphrase);
 			stretchedPassword = Util.stretchPassphrase(Charset.defaultCharset().encode(buf).array(), theHeaderV3.getSalt(), iter);
 			if (Util.bytesAreEqual(theHeaderV3.getPassword(), SHA256Pws.digest(stretchedPassword))) {
+			    encoding = Charset.defaultCharset().name();
 				LOG.warn("Succeeded workaround for asymmetric password encoding bug");
 			} else {
 				throw new IOException("Invalid password");
 			}
 		}
-		
+
+		setOpenPasswordEncoding(encoding);
+
 		try {
-			
+
 			byte[] rka = TwofishPws.processECB(stretchedPassword, false, theHeaderV3.getB1());
 			byte[] rkb = TwofishPws.processECB(stretchedPassword, false, theHeaderV3.getB2());
 			decryptedRecordKey = Util.mergeBytes(rka, rkb);
-			
+
 			byte[] hka = TwofishPws.processECB(stretchedPassword, false, theHeaderV3.getB3());
 			byte[] hkb = TwofishPws.processECB(stretchedPassword, false, theHeaderV3.getB4());
 			decryptedHmacKey = Util.mergeBytes(hka, hkb);
 			hasher = new HmacPws(decryptedHmacKey);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IOException("Error reading encrypted fields");
 		}
 		twofishCbc = new TwofishPws(decryptedRecordKey, false, theHeaderV3.getIV());
-		
+
 		readExtraHeader( this );
 
 		LOG.leaveMethod( "PwsFileV3.init" );
 	}
-	
-	
+
+
 	/**
-	 * Writes this file back to the filesystem.  If successful the modified flag is also 
+	 * Writes this file back to the filesystem.  If successful the modified flag is also
 	 * reset on the file and all records.
-	 * 
+	 *
 	 * @throws IOException if the attempt fails.
 	 */
 	@Override
@@ -206,34 +247,34 @@ public final class PwsFileV3 extends PwsFile {
 			twofishCbc = new TwofishPws(decryptedRecordKey, true, theHeaderV3.getIV());
 
 			writeExtraHeader( this );
-			
+
 			PwsRecordV3	rec;
 			for (Iterator<? extends PwsRecord> iter = getRecords(); iter.hasNext();) {
 				rec = (PwsRecordV3) iter.next();
 				if (!rec.isHeaderRecord())
 					rec.saveRecord(this);
 			}
-			
+
 			outStream.write(PwsRecordV3.EOF_BYTES_RAW);
 			outStream.write(hasher.doFinal());
-	
+
 			outStream.close();
-	
+
 			if (storage.save(baos.toByteArray())) {
 				modified = false;
 				lastStorageChange = storage.getModifiedDate();
 			}
 			else
 			{
-				// FIXME: What is the proper error code (see PwsFile::save).
+				// FIXMElib: What is the proper error code (see PwsFile::save).
 				LOG.error( I18nHelper.getInstance().formatMessage("E00010", new Object [] { "Storage" } ) );
-				// TODO Throw an exception here?
+				// TODOlib Throw an exception here?
 				return;
 			}
 		}
 		catch ( IOException e ) {
 			try {
-				if (outStream != null) { 
+				if (outStream != null) {
 					outStream.close();
 				}
 			} catch ( Exception e2 ) {
@@ -244,11 +285,11 @@ public final class PwsFileV3 extends PwsFile {
 			outStream	= null;
 		}
 	}
-	
+
 
 	/**
 	 * Returns the major version number for the file.
-	 * 
+	 *
 	 * @return The major version number for the file.
 	 */
 	@Override
@@ -260,9 +301,9 @@ public final class PwsFileV3 extends PwsFile {
 	/**
 	 * Allocates a new, empty record unowned by any file.  The record type is
 	 * {@link PwsRecordV2}.
-	 * 
+	 *
 	 * @return A new empty record
-	 * 
+	 *
 	 * @see org.pwsafe.lib.file.PwsFile#newRecord()
 	 */
 	@Override
@@ -270,14 +311,19 @@ public final class PwsFileV3 extends PwsFile {
 	{
 		return new PwsRecordV3();
 	}
-	
+
+	public PwsRecord getHeaderRecord()
+	{
+	    return headerRecord;
+	}
+
 	/**
 	 * Reads the extra header present in version 2 files.
-	 * 
+	 *
 	 * @param file the file to read the header from.
-	 * 
+	 *
 	 * @throws EndOfFileException If end of file is reached.
-	 * @throws IOException If an error occurs whilst reading. 
+	 * @throws IOException If an error occurs whilst reading.
 	 * @throws UnsupportedFileVersionException If the header is not a valid V2 header.
 	 */
 	@Override
@@ -290,10 +336,10 @@ public final class PwsFileV3 extends PwsFile {
 
 	/**
 	 * Writes the extra version 2 header.
-	 * 
+	 *
 	 * @param file the file to write the header to.
-	 * 
-	 * @throws IOException if an error occurs whilst writing the header. 
+	 *
+	 * @throws IOException if an error occurs whilst writing the header.
 	 */
 	@Override
 	protected void writeExtraHeader( PwsFile file )
@@ -301,13 +347,13 @@ public final class PwsFileV3 extends PwsFile {
 	{
 		headerRecord.saveRecord(this);
 	}
-	
+
 	/**
 	 * Reads bytes from the file and decrypts them.  <code>buff</code> may be any length provided
 	 * that is a multiple of <code>BLOCK_LENGTH</code> bytes in length.
-	 * 
+	 *
 	 * @param buff the buffer to read the bytes into.
-	 * 
+	 *
 	 * @throws EndOfFileException If end of file has been reached.
 	 * @throws IOException If a read error occurs.
 	 * @throws IllegalArgumentException If <code>buff.length</code> is not an integral multiple of <code>BLOCK_LENGTH</code>.
@@ -324,7 +370,7 @@ public final class PwsFileV3 extends PwsFile {
 		if (Util.bytesAreEqual(buff,  EOF_BYTES_RAW)) {
 			throw new EndOfFileException();
 		}
-		
+
 		byte[] decrypted;
 		try {
 			decrypted = twofishCbc.processCBC(buff);
@@ -335,12 +381,12 @@ public final class PwsFileV3 extends PwsFile {
 		Util.copyBytes(decrypted, buff);
 		//Algorithm.decrypt( buff );
 	}
-	
+
 	/**
 	 * Encrypts then writes the contents of <code>buff</code> to the file.
-	 * 
+	 *
 	 * @param buff the data to be written.
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	@Override
@@ -351,7 +397,7 @@ public final class PwsFileV3 extends PwsFile {
 		{
 			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00001") );
 		}
-		
+
 		byte [] temp; // = Util.cloneByteArray( buff );
 		try {
 			temp = twofishCbc.processCBC(buff);
@@ -368,12 +414,12 @@ public final class PwsFileV3 extends PwsFile {
 	protected int getBlockSize() {
 		return 16;
 	}
-	
+
 	/**
 	 * @return the headerV3
 	 */
 	private PwsFileHeaderV3 getHeaderV3() {
-		
+
 		try {
 			return (PwsFileHeaderV3) sealedHeaderV3.getObject(getCipher(false));
 		} catch (IllegalBlockSizeException e) {
@@ -398,7 +444,7 @@ public final class PwsFileV3 extends PwsFile {
 		} catch (IOException e) {
 			throw new MemoryKeyException(e);
 		}
-		
+
 	}
 
 }

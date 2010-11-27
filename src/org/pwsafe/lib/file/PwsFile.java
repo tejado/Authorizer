@@ -12,14 +12,18 @@ package org.pwsafe.lib.file;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -88,6 +92,29 @@ public abstract class PwsFile
 	public static final int BLOCK_LENGTH	= 8;
 
 
+	/** Default encoding which should work with most Windows files */
+	public static final String DEFAULT_PASSWORD_CHARSET = "windows-1252";
+
+	/** List of all charset encodings to try when opening files */
+	public static final Collection<String> ALL_PASSWORD_CHARSETS;
+	static {
+	    ALL_PASSWORD_CHARSETS = new LinkedHashSet<String>();
+	    ALL_PASSWORD_CHARSETS.add(DEFAULT_PASSWORD_CHARSET);
+	    ALL_PASSWORD_CHARSETS.add(Charset.defaultCharset().name());
+	    ALL_PASSWORD_CHARSETS.add("US-ASCII");
+	    ALL_PASSWORD_CHARSETS.add("ISO-8859-1");
+	    ALL_PASSWORD_CHARSETS.add("UTF-8");
+	    ALL_PASSWORD_CHARSETS.add("ISO-8859-2");
+	    ALL_PASSWORD_CHARSETS.add("windows-1250");
+	    ALL_PASSWORD_CHARSETS.add("UTF-16");
+
+	    ALL_PASSWORD_CHARSETS.addAll(Charset.availableCharsets().keySet());
+	}
+
+	/** Encoding to use for the file's password */
+	private static String itsPasswordEncoding = DEFAULT_PASSWORD_CHARSET;
+
+
 	/** The storage implementation associated with this file */
 	protected PwsStorage		storage;
 
@@ -134,6 +161,9 @@ public abstract class PwsFile
 	private InMemoryKey			memoryKey;
 	private byte[] 				memoryIv;
 
+	/** The password encoding which was used to open the file */
+	private String itsOpenPasswordEncoding;
+
 	/**
 	 * Constructs and initialises a new, empty PasswordSafe database in memory.
 	 */
@@ -147,18 +177,19 @@ public abstract class PwsFile
 	 *
 	 * @param aStorage  the storage of the database to open.
 	 * @param aPassphrase the passphrase for the database.
+	 * @param encoding the passphrase encoding (if known)
 	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
 	 */
-	protected PwsFile( PwsStorage aStorage, String aPassphrase )
+	protected PwsFile( PwsStorage aStorage, String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
 		LOG.enterMethod( "PwsFile.PwsFile( String )" );
 		this.storage = aStorage;
-		open( aPassphrase );
+		open( aPassphrase, encoding );
 
 		LOG.leaveMethod( "PwsFile.PwsFile( String )" );
 	}
@@ -185,7 +216,7 @@ public abstract class PwsFile
 
 	protected void add ( final PwsRecord rec, final Cipher aCipher ) {
 
-		// TODO validate the record before adding it
+		// TODOlib validate the record before adding it
 		try {
 			SealedObject sealedRecord = new SealedObject(rec, aCipher);
 	        sealedRecords.add(sealedRecord);
@@ -288,7 +319,7 @@ public abstract class PwsFile
     		memoryIv = new byte[8];
     		Util.newRandBytes(memoryIv);
     	}
-    	//TODO: use BouncyCastle Provider!
+    	//TODOlib: use BouncyCastle Provider!
         SecretKeySpec   key = new SecretKeySpec(getKeyBytes(), "Blowfish");
         IvParameterSpec ivSpec = new IvParameterSpec(memoryIv);
         Cipher cipher = null;
@@ -445,7 +476,7 @@ public abstract class PwsFile
      */
     public void set(int index, PwsRecord aRecord)
     {
-    	// TODO validate here as well
+    	// TODOlib validate here as well
         Cipher cipher = getCipher(true);
         SealedObject sealedRecord ;
 		try {
@@ -464,13 +495,14 @@ public abstract class PwsFile
 	 * Opens the database.
 	 *
 	 * @param aPassphrase the passphrase for the file.
+	 * @param encoding the passphrase encoding (if known)
 	 *
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
 	 */
-	protected abstract void open( String aPassphrase )
+	protected abstract void open( String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException;
 
 	/**
@@ -645,7 +677,7 @@ public abstract class PwsFile
 	 * @param pass
 	 */
 	public void setPassphrase( StringBuilder pass ) {
-	    // TODO: convert to byte[] first
+	    // TODOlib: convert to byte[] first
 		try {
 			passphrase	= new SealedObject(pass, getCipher(true));
 			// now overwrite given StringBuider
@@ -717,6 +749,31 @@ public abstract class PwsFile
 		this.readOnly = readOnly;
 	}
 
+	protected void setOpenPasswordEncoding(String encoding)
+	{
+	    itsOpenPasswordEncoding = encoding;
+	}
+
+	public String getOpenPasswordEncoding()
+	{
+	    return itsOpenPasswordEncoding;
+	}
+
+
+	public static synchronized List<String> getPasswordEncodings()
+	{
+	    return Collections.singletonList(itsPasswordEncoding);
+	}
+
+	public static synchronized String getUpdatePasswordEncoding()
+	{
+	    return itsPasswordEncoding;
+	}
+
+	public static synchronized void setPasswordEncoding(String encoding)
+	{
+	    itsPasswordEncoding = encoding;
+	}
 
 
 	/**

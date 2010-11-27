@@ -9,13 +9,16 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 
+import org.pwsafe.lib.file.PwsFile;
+
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 /**
  * The Preferences class defines the activity for managing preferences on the
@@ -26,9 +29,13 @@ import android.util.Log;
 public class Preferences extends PreferenceActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
+    public static final String INTENT_SCREEN = "screen";
+    public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
+
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
+    private ListPreference itsPasswdEncPref;
 
     /** Called when the activity is first created. */
     @Override
@@ -57,6 +64,25 @@ public class Preferences extends PreferenceActivity
         itsFileClosePref.setEntryValues(
             PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES);
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
+
+        itsPasswdEncPref = (ListPreference)
+            findPreference(PasswdSafeApp.PREF_PASSWD_ENC);
+        String[] charsets =
+            PwsFile.ALL_PASSWORD_CHARSETS.toArray(new String[0]);
+        itsPasswdEncPref.setEntries(charsets);
+        itsPasswdEncPref.setEntryValues(charsets);
+        itsPasswdEncPref.setDefaultValue(PasswdSafeApp.PREF_PASSWD_ENC_DEF);
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_PASSWD_ENC);
+
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_LENGTH);
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_HEX);
+
+        Intent intent = getIntent();
+        String screen = intent.getStringExtra(INTENT_SCREEN);
+        if (screen != null) {
+            Preference scr = findPreference(screen);
+            getPreferenceScreen().onItemClick(null, null, scr.getOrder(), 0);
+        }
     }
 
     /* (non-Javadoc)
@@ -76,7 +102,6 @@ public class Preferences extends PreferenceActivity
      */
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
-        Log.i("foo", "pref changed key: " + key);
         if (key.equals(PasswdSafeApp.PREF_FILE_DIR)) {
             String pref = PasswdSafeApp.getFileDirPref(prefs);
             if (pref.length() == 0) {
@@ -92,6 +117,24 @@ public class Preferences extends PreferenceActivity
             itsFileClosePref.setSummary(
                 fileCloseValueToEntry(
                     PasswdSafeApp.getFileCloseTimeoutPref(prefs)));
+        } else if (key.equals(PasswdSafeApp.PREF_PASSWD_ENC)) {
+            itsPasswdEncPref.setSummary(
+                PasswdSafeApp.getPasswordEncodingPref(prefs));
+        } else if (key.equals(PasswdSafeApp.PREF_GEN_LENGTH)) {
+            Preference pref = findPreference(PasswdSafeApp.PREF_GEN_LENGTH);
+            pref.setSummary(
+                Integer.toString(
+                    PasswdSafeApp.getPasswordGenLengthPref(prefs)));
+        } else if (key.equals(PasswdSafeApp.PREF_GEN_HEX)) {
+            boolean isHex = PasswdSafeApp.getPasswordGenHexPref(prefs);
+            for (String id: new String[] { PasswdSafeApp.PREF_GEN_LOWER,
+                                           PasswdSafeApp.PREF_GEN_UPPER,
+                                           PasswdSafeApp.PREF_GEN_DIGITS,
+                                           PasswdSafeApp.PREF_GEN_SYMBOLS,
+                                           PasswdSafeApp.PREF_GEN_EASY }) {
+                Preference pref = findPreference(id);
+                pref.setEnabled(!isHex);
+            }
         }
     }
 

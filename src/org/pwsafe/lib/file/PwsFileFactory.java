@@ -12,6 +12,7 @@ package org.pwsafe.lib.file;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 
@@ -53,12 +54,14 @@ public class PwsFileFactory {
 	 * @param filename   the name of the file to be opened.
 	 * @param passphrase the file's passphrase.
 	 *
+	 * @return the password encoding
+	 *
 	 * @throws InvalidPassphraseException If the passphrase is not the correct one for the file.
 	 * @throws FileNotFoundException      If the given file does not exist.
 	 * @throws IOException                If an error occurs whilst reading from the file.
 	 * @throws NoSuchAlgorithmException   If no SHA-1 implementation is found.
 	 */
-	private static final void checkPassword( String filename, String passphrase )
+	private static final String checkPassword( String filename, String passphrase )
 	throws InvalidPassphraseException, FileNotFoundException, IOException, NoSuchAlgorithmException
 	{
 		LOG.enterMethod( "PwsFileFactory.checkPassword" );
@@ -69,6 +72,7 @@ public class PwsFileFactory {
 		byte []			fhash;
 		byte []			phash;
 		boolean			handlingError	= false;
+		String encoding = null;
 
 		try
 		{
@@ -86,9 +90,24 @@ public class PwsFileFactory {
 				fudged[ii] = stuff[ii];
 			}
 			stuff	= null;
-			phash	= genRandHash( passphrase, fudged );
+			boolean validPassword = false;
+	        for (String charset : PwsFile.getPasswordEncodings()) {
+	            LOG.debug1("Trying " + charset);
+	            try {
+	                phash = genRandHash(passphrase, charset, fudged);
+	            } catch(UnsupportedEncodingException e) {
+	                // Skip this charset
+	                continue;
+	            }
 
-			if ( !Util.bytesAreEqual( fhash, phash ) )
+	            if (Util.bytesAreEqual(fhash, phash)) {
+	                validPassword = true;
+	                encoding = charset;
+	                break;
+	            }
+	        }
+
+			if ( !validPassword )
 			{
 				LOG.debug1( "Password is incorrect - throwing InvalidPassphraseException" );
 				LOG.leaveMethod( "PwsFileFactory.checkPassword" );
@@ -134,17 +153,31 @@ public class PwsFileFactory {
 
 		LOG.debug1( "Password is OK" );
 		LOG.leaveMethod( "PwsFileFactory.checkPassword" );
+		return encoding;
+	}
+
+	static final byte[] genRandHash(String passphrase, byte[] stuff)
+	{
+	    try {
+	        return genRandHash(passphrase, null, stuff);
+	    } catch (UnsupportedEncodingException e) {
+	        return new byte[0];
+	    }
 	}
 
 	/**
 	 * Generates a checksum from the passphrase and some random bytes.
 	 *
 	 * @param  passphrase the passphrase.
+	 * @param  charEnc    the passphrase charset encoding
 	 * @param  stuff      the random bytes.
 	 *
 	 * @return the generated checksum.
 	 */
-	static final byte [] genRandHash( String passphrase, byte [] stuff )
+	static final byte [] genRandHash( String passphrase,
+	                                  String charEnc,
+	                                  byte [] stuff )
+	    throws UnsupportedEncodingException
 	{
 		LOG.enterMethod( "PwsFileFactory.genRandHash" );
 
@@ -154,7 +187,8 @@ public class PwsFileFactory {
 		byte []			digest;
 		byte []			tmp;
 
-		pw	= passphrase.getBytes();
+		pw	= (charEnc == null) ?
+		    passphrase.getBytes() : passphrase.getBytes(charEnc);
 		md	= new SHA1();
 
 		md.update( stuff, 0, stuff.length );
@@ -233,7 +267,7 @@ public class PwsFileFactory {
 
 		PwsFile		file;
 
-		//TODO change to StringBuilder Constructors
+		//TODOlib change to StringBuilder Constructors
 		String passphrase = aPassphrase.toString();
 
 		// First check for a v3 file...
@@ -251,9 +285,9 @@ public class PwsFileFactory {
 
 		PwsRecordV1	rec;
 
-		checkPassword( filename, passphrase );
+		String encoding = checkPassword( filename, passphrase );
 
-		file	= new PwsFileV1( new PwsFileStorage(filename), passphrase );
+		file	= new PwsFileV1( new PwsFileStorage(filename), passphrase, encoding );
 		try {
 			rec		= (PwsRecordV1) file.readRecord();
 		} catch (PasswordSafeException e) {
@@ -262,16 +296,16 @@ public class PwsFileFactory {
 
 		file.close();
 
-		// TODO what can we do about this?
+		// TODOlib what can we do about this?
 		// it will probably be fooled if someone is daft enough to create a V1 file with the
 		// title of the first record set to the value of PwsFileV2.ID_STRING!
 
 		if ( rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING) ) {
 			LOG.debug1( "This is a V2 format file." );
-			file = new PwsFileV2( new PwsFileStorage(filename), passphrase );
+			file = new PwsFileV2( new PwsFileStorage(filename), passphrase, encoding );
 		} else {
 			LOG.debug1( "This is a V1 format file." );
-			file = new PwsFileV1( new PwsFileStorage(filename), passphrase );
+			file = new PwsFileV1( new PwsFileStorage(filename), passphrase, encoding );
 		}
 		file.readAll();
 		file.close();
