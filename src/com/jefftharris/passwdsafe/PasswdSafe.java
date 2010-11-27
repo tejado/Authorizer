@@ -648,7 +648,6 @@ public class PasswdSafe extends ExpandableListActivity
             tv.setText(fileData.getOpenPasswordEncoding());
 
             if (fileData.isV3()) {
-                // TODO UUID?
                 StringBuilder build = new StringBuilder();
                 String str = fileData.getHdrLastSaveUser();
                 if (!TextUtils.isEmpty(str)) {

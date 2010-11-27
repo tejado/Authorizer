@@ -531,7 +531,6 @@ public class PasswdFileData
                     Util.putMillisToByteArray(newbytes, timeVal, 0);
                 }
 
-                // TODO test length == 8
                 rec.setField(new PwsUnknownField(fieldId, newbytes));
                 break;
             }
