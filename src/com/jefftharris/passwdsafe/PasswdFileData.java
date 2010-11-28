@@ -292,9 +292,19 @@ public class PasswdFileData
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_USER);
     }
 
+    public final void setHdrLastSaveUser(String user)
+    {
+        setHdrField(PwsRecordV3.HEADER_LAST_SAVE_USER, user);
+    }
+
     public final String getHdrLastSaveHost()
     {
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_HOST);
+    }
+
+    public final void setHdrLastSaveHost(String host)
+    {
+        setHdrField(PwsRecordV3.HEADER_LAST_SAVE_HOST, host);
     }
 
     public final String getHdrLastSaveApp()
@@ -459,9 +469,7 @@ public class PasswdFileData
             {
             case PwsRecordV3.HEADER_VERSION:
             {
-                PwsField ver = doGetField(rec, fieldId);
-                byte[] bytes = ver.getBytes();
-                return String.format("%d.%02d", bytes[1], bytes[0]);
+                return String.format("%d.%02d", 3, getHdrMinorVersion(rec));
             }
             case PwsRecordV3.HEADER_LAST_SAVE_TIME:
             {
@@ -485,7 +493,7 @@ public class PasswdFileData
                     return field.toString();
                 }
 
-                return getHdrLastSafeWhoField(rec, true);
+                return getHdrLastSaveWhoField(rec, true);
             }
             case PwsRecordV3.HEADER_LAST_SAVE_HOST:
             {
@@ -494,11 +502,16 @@ public class PasswdFileData
                     return field.toString();
                 }
 
-                return getHdrLastSafeWhoField(rec, false);
+                return getHdrLastSaveWhoField(rec, false);
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_WHO:
+            case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            {
+                return doGetFieldStr(rec, fieldId);
             }
             default:
             {
-                return doGetFieldStr(rec , fieldId);
+                return null;
             }
             }
         } else {
@@ -524,7 +537,7 @@ public class PasswdFileData
                 byte[] newbytes;
                 if (bytes.length == 8) {
                     int secs = (int) (timeVal / 1000);
-                    String str = Integer.toHexString(secs);
+                    String str = String.format("%08x", secs);
                     newbytes = str.getBytes();
                 } else {
                     newbytes = new byte[4];
@@ -539,6 +552,33 @@ public class PasswdFileData
                 rec.setField(
                     new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_WHAT,
                                         value.toString().getBytes()));
+                break;
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_USER:
+            {
+                PwsField field = doGetField(rec, fieldId);
+                if (field != null) {
+                    rec.setField(
+                        new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_USER,
+                                            value.toString().getBytes()));
+                } else {
+                    setHdrLastSaveWhoField(rec, value.toString(),
+                                           getHdrLastSaveWhoField(rec, false));
+                }
+                break;
+            }
+            case PwsRecordV3.HEADER_LAST_SAVE_HOST:
+            {
+                PwsField field = doGetField(rec, fieldId);
+                if (field != null) {
+                    rec.setField(
+                        new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_HOST,
+                                            value.toString().getBytes()));
+                } else {
+                    setHdrLastSaveWhoField(rec,
+                                           getHdrLastSaveWhoField(rec, true),
+                                           value.toString());
+                }
                 break;
             }
             default:
@@ -694,7 +734,20 @@ public class PasswdFileData
         }
     }
 
-    private static final String getHdrLastSafeWhoField(PwsRecord rec,
+    private static final int getHdrMinorVersion(PwsRecord rec)
+    {
+        PwsField ver = doGetField(rec, PwsRecordV3.HEADER_VERSION);
+        if (ver == null) {
+            return -1;
+        }
+        byte[] bytes = ver.getBytes();
+        if ((bytes == null) || (bytes.length == 0)) {
+            return -1;
+        }
+        return bytes[0];
+    }
+
+    private static final String getHdrLastSaveWhoField(PwsRecord rec,
                                                        boolean isUser)
     {
         PwsField field = doGetField(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO);
@@ -719,6 +772,18 @@ public class PasswdFileData
         } else {
             return new String(whoBytes, len + 4, whoBytes.length - len - 4);
         }
+    }
+
+
+    private static final void setHdrLastSaveWhoField(PwsRecord rec,
+                                                     String user, String host)
+    {
+        StringBuilder who = new StringBuilder();
+        who.append(String.format("%04x", user.length()));
+        who.append(user);
+        who.append(host);
+        rec.setField(new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_WHO,
+                                         who.toString().getBytes()));
     }
 
 

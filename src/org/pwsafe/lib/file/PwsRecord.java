@@ -469,6 +469,13 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 		int theType;
 
 		theType = value.getType();
+
+		if (ignoreFieldTypes) {
+	        attributes.put(Integer.valueOf(theType), value);
+	        setModified();
+	        return;
+	    }
+
 		// try a shortcut first
 		if (theType < ValidTypes.length) {
 			if (((Integer) ((Object[]) ValidTypes[theType])[0]).intValue() == theType) {
