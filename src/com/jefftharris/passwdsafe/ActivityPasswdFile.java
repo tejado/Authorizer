@@ -67,7 +67,6 @@ public abstract class ActivityPasswdFile
     public final void save()
     {
         PasswdSafeApp.dbginfo(TAG, "saving");
-        // TODO update header fields for last save info??
         itsActivity.showProgressDialog();
         itsSaveTask = new SaveTask();
         itsSaveTask.execute();

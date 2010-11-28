@@ -141,6 +141,11 @@ public class PwsRecordV3 extends PwsRecord
 	 */
 	public static final int HEADER_VERSION = 0;
 
+    /**
+     * Header UUID
+     */
+    public static final int HEADER_UUID = 1;
+
 	/**
 	 * Header last save timestamp
 	 */
@@ -212,6 +217,18 @@ public class PwsRecordV3 extends PwsRecord
 		setField( new PwsStringUnicodeField(PwsFieldTypeV3.PASSWORD, "") );
 		setField( new PwsTimeField(PwsFieldTypeV3.CREATION_TIME, new Date()) );
 
+	}
+
+	/**
+	 * A special version for header records
+	 *
+	 * @param isHeader Marker for header record
+	 */
+	PwsRecordV3(boolean isHeader)
+	{
+	    super(VALID_TYPES, true);
+	    setField(new PwsVersionField(HEADER_VERSION, new byte[] { 7, 3 }));
+	    setField(new PwsUUIDField(HEADER_UUID, new UUID()));
 	}
 
 	/**

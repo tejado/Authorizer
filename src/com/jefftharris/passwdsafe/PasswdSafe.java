@@ -769,7 +769,7 @@ public class PasswdSafe extends ExpandableListActivity
             itsFile = new File(dir, fileName + ".psafe3");
 
             PasswdFileData fileData = new PasswdFileData(itsFile);
-            fileData.createNewFile(passwd);
+            fileData.createNewFile(passwd, this);
 
             PasswdSafeApp app = (PasswdSafeApp)getApplication();
             itsPasswdFile = app.accessPasswdFile(itsFile, this);

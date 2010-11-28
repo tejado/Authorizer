@@ -231,6 +231,22 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 
 	}
 
+    /**
+     * Special constructor for use when ignoring field types.
+     *
+     * @param validTypes
+     *            an array of valid field types.
+     * @param ignoreFieldTypes
+     *            true if all fields types should be ignored, false otherwise
+     */
+    public PwsRecord(Object[] validTypes,
+                     boolean ignoreFieldTypes) {
+        super();
+
+        ValidTypes = validTypes;
+        this.ignoreFieldTypes = ignoreFieldTypes;
+    }
+
 	/**
 	 *
 	 * @param base

@@ -14,7 +14,6 @@ import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.ConcurrentModificationException;
-import java.util.Date;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -32,7 +31,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -99,15 +97,7 @@ public class PasswdSafeApp extends Application
                 if (itsFileData != null) {
                     cancelFileDataTimer();
                     try {
-                        // TODO: FIELDS SET ON NEW FILES!!!!
-                        itsFileData.setHdrLastSaveApp(
-                            PasswdSafeApp.getAppTitle(PasswdSafeApp.this) +
-                            " " +
-                            PasswdSafeApp.getAppVersion(PasswdSafeApp.this));
-                        itsFileData.setHdrLastSaveUser("User");
-                        itsFileData.setHdrLastSaveHost(Build.MODEL);
-                        itsFileData.setHdrLastSaveTime(new Date());
-                        itsFileData.save();
+                        itsFileData.save(PasswdSafeApp.this);
                     } finally {
                         touchFileDataTimer();
                     }

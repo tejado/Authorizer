@@ -40,6 +40,8 @@ import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
+import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 public class PasswdFileData
@@ -73,17 +75,18 @@ public class PasswdFileData
         finishOpenFile(passwd);
     }
 
-    public void createNewFile(StringBuilder passwd)
+    public void createNewFile(StringBuilder passwd, Context context)
         throws IOException, NoSuchAlgorithmException
     {
         itsPwsFile = PwsFileFactory.newFile();
         itsPwsFile.setPassphrase(passwd);
         itsPwsFile.setStorage(new PwsFileStorage(itsFile.getAbsolutePath()));
+        setSaveHdrFields(context);
         itsPwsFile.save();
         finishOpenFile(passwd);
     }
 
-    public void save()
+    public void save(Context context)
         throws IOException, NoSuchAlgorithmException,
                ConcurrentModificationException
     {
@@ -97,6 +100,7 @@ public class PasswdFileData
                 }
             }
 
+            setSaveHdrFields(context);
             itsPwsFile.save();
         }
     }
@@ -327,6 +331,17 @@ public class PasswdFileData
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
 
+    private final void setSaveHdrFields(Context context)
+    {
+        setHdrLastSaveApp(PasswdSafeApp.getAppTitle(context) +
+                          " " +
+                          PasswdSafeApp.getAppVersion(context));
+        setHdrLastSaveUser("User");
+        setHdrLastSaveHost(Build.MODEL);
+        setHdrLastSaveTime(new Date());
+
+    }
+
     private final String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
@@ -531,19 +546,17 @@ public class PasswdFileData
             {
             case PwsRecordV3.HEADER_LAST_SAVE_TIME:
             {
-                PwsField time = doGetField(rec, fieldId);
-                byte[] bytes = time.getBytes();
                 long timeVal = ((Date)value).getTime();
                 byte[] newbytes;
-                if (bytes.length == 8) {
+                int minor = getHdrMinorVersion(rec);
+                if (minor >= 2) {
+                    newbytes = new byte[4];
+                    Util.putMillisToByteArray(newbytes, timeVal, 0);
+                } else {
                     int secs = (int) (timeVal / 1000);
                     String str = String.format("%08x", secs);
                     newbytes = str.getBytes();
-                } else {
-                    newbytes = new byte[4];
-                    Util.putMillisToByteArray(newbytes, timeVal, 0);
                 }
-
                 rec.setField(new PwsUnknownField(fieldId, newbytes));
                 break;
             }
@@ -556,8 +569,8 @@ public class PasswdFileData
             }
             case PwsRecordV3.HEADER_LAST_SAVE_USER:
             {
-                PwsField field = doGetField(rec, fieldId);
-                if (field != null) {
+                int minor = getHdrMinorVersion(rec);
+                if (minor >= 2) {
                     rec.setField(
                         new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_USER,
                                             value.toString().getBytes()));
@@ -569,8 +582,8 @@ public class PasswdFileData
             }
             case PwsRecordV3.HEADER_LAST_SAVE_HOST:
             {
-                PwsField field = doGetField(rec, fieldId);
-                if (field != null) {
+                int minor = getHdrMinorVersion(rec);
+                if (minor >= 2) {
                     rec.setField(
                         new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_HOST,
                                             value.toString().getBytes()));
@@ -699,6 +712,9 @@ public class PasswdFileData
 
     private final void finishOpenFile(StringBuilder passwd)
     {
+        for (int i = 0; i < passwd.length(); ++i) {
+            passwd.setCharAt(i, '\0');
+        }
         passwd.delete(0, passwd.length());
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");
