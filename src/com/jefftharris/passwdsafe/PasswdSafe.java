@@ -796,8 +796,13 @@ public class PasswdSafe extends ExpandableListActivity
     private final void changePasswd(StringBuilder passwd)
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
-        fileData.changePasswd(passwd);
-        itsPasswdFile.save();
+        if (fileData != null) {
+            fileData.changePasswd(passwd);
+            itsPasswdFile.save();
+        } else {
+            PasswdSafeApp.showFatalMsg(
+                "Could not change password on closed file: " + itsFile, this);
+        }
     }
 
     private final void showFileData()
