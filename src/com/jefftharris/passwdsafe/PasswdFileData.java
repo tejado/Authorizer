@@ -489,6 +489,9 @@ public class PasswdFileData
             case PwsRecordV3.HEADER_LAST_SAVE_TIME:
             {
                 PwsField time = doGetField(rec, fieldId);
+                if (time == null) {
+                    return null;
+                }
                 byte[] bytes = time.getBytes();
                 if (bytes.length == 8)
                 {
