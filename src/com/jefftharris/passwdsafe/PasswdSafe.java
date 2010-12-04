@@ -27,6 +27,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ExpandableListActivity;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.DialogInterface;
@@ -47,10 +48,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
-public class PasswdSafe extends ExpandableListActivity
+public class PasswdSafe extends ListActivity
     implements PasswdFileActivity
 {
     private static final String TAG = "PasswdSafe";
@@ -97,10 +101,8 @@ public class PasswdSafe extends ExpandableListActivity
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
 
-    private final ArrayList<Map<String, String>> itsGroupData =
-        new ArrayList<Map<String, String>>();
-    private final ArrayList<ArrayList<HashMap<String, Object>>> itsChildData =
-        new ArrayList<ArrayList<HashMap<String, Object>>>();
+    private final ArrayList<HashMap<String, Object>> itsListData =
+        new ArrayList<HashMap<String, Object>>();
 
     private Pattern itsSearchQuery = null;
     private static final String QUERY_MATCH = "";
@@ -639,7 +641,8 @@ public class PasswdSafe extends ExpandableListActivity
                        R.string.read_write : R.string.read_only);
 
             tv = (TextView)dialog.findViewById(R.id.num_groups);
-            tv.setText(Integer.toString(itsGroupData.size()));
+            // TODO: FIX
+            //tv.setText(Integer.toString(itsGroupData.size()));
 
             tv = (TextView)dialog.findViewById(R.id.num_records);
             tv.setText(Integer.toString(fileData.getRecords().size()));
@@ -699,19 +702,14 @@ public class PasswdSafe extends ExpandableListActivity
     }
 
     /* (non-Javadoc)
-     * @see android.app.ExpandableListActivity#onChildClick(android.widget.ExpandableListView, android.view.View, int, int, long)
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
      */
     @Override
-    public boolean onChildClick(ExpandableListView parent,
-                                View v,
-                                int groupPosition,
-                                int childPosition,
-                                long id)
+    protected void onListItemClick(ListView l, View v, int position, long id)
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
 
-        HashMap<String, Object> item =
-            itsChildData.get(groupPosition).get(childPosition);
+        HashMap<String, Object> item = itsListData.get(position);
         PwsRecord rec = (PwsRecord)item.get(RECORD);
         if (rec != null) {
             Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
@@ -723,15 +721,16 @@ public class PasswdSafe extends ExpandableListActivity
                                        this, RecordView.class);
             startActivityForResult(intent, RECORD_VIEW_REQUEST);
         } else {
+            // TODO: group selected, launch activity for new group
+            /*
             Map<String, String> groupItem = itsGroupData.get(groupPosition);
             itsCurrGroups.add(groupItem.get(GROUP));
             String childTitle = (String)item.get(TITLE);
             itsSelChildGroup = childTitle.substring(1, childTitle.length() - 1);
             showFileData();
+            */
         }
-        return true;
     }
-
 
     private final void onCreateView(Intent intent)
     {
@@ -819,56 +818,27 @@ public class PasswdSafe extends ExpandableListActivity
                                  TextUtils.join(" / ", itsCurrGroups)));
         }
 
-        int groupLayout = android.R.layout.simple_expandable_list_item_1;
-        String[] groupFrom = new String[] { GROUP };
-        int[] groupTo = new int[] { android.R.id.text1 };
-        int childLayout = R.layout.passwdsafe_list_item;
-        String[] childFrom;
-        int[] childTo;
+        int layout = R.layout.passwdsafe_list_item;
+        String[] from;
+        int[] to;
         if (itsSearchQuery == null) {
-            childFrom = new String[] { TITLE, USERNAME };
-            childTo = new int[] { android.R.id.text1, android.R.id.text2 };
+            from = new String[] { TITLE, USERNAME };
+            to = new int[] { android.R.id.text1, android.R.id.text2 };
         } else {
-            childFrom = new String[] { TITLE, USERNAME, MATCH };
-            childTo = new int[] { android.R.id.text1, android.R.id.text2,
+            from = new String[] { TITLE, USERNAME, MATCH };
+            to = new int[] { android.R.id.text1, android.R.id.text2,
                                   R.id.match };
         }
 
-        ExpandableListAdapter adapter =
-            new SimpleExpandableListAdapter(PasswdSafe.this,
-                                            itsGroupData,
-                                            groupLayout, groupFrom, groupTo,
-                                            itsChildData,
-                                            childLayout, childFrom, childTo);
+        ListAdapter adapter = new SimpleAdapter(PasswdSafe.this,
+                                                itsListData, layout,
+                                                from, to);
         setListAdapter(adapter);
-
-        ExpandableListView view = getExpandableListView();
-        if (itsGroupData.size() == 1) {
-            view.expandGroup(0);
-        } else if (itsSearchQuery != null) {
-            int size = itsGroupData.size();
-            for (int i = 0; i < size; ++i) {
-                view.expandGroup(i);
-            }
-        }
-
-        if (itsSelChildGroup != null) {
-            int size = itsGroupData.size();
-            for (int i = 0; i < size; ++i) {
-                String group = itsGroupData.get(i).get(GROUP);
-                if (itsSelChildGroup.equals(group)) {
-                    view.expandGroup(i);
-                    break;
-                }
-            }
-        }
     }
 
     private final void populateFileData()
     {
-        itsGroupData.clear();
-        itsChildData.clear();
-
+        itsListData.clear();
         if (itsPasswdFile == null) {
             return;
         }
@@ -896,11 +866,10 @@ public class PasswdSafe extends ExpandableListActivity
                     continue;
                 }
                 String group = fileData.getGroup(rec);
-                if ((group == null) || (group.length() == 0)) {
-                    group = NO_GROUP_GROUP;
+                if (group == null) {
+                    group = "";
                 }
-
-                String[] groups = group.split("\\.");
+                String[] groups = TextUtils.split(group, "\\.");
                 GroupNode node = root;
                 for (String g : groups) {
                     GroupNode groupNode = node.getGroup(g);
@@ -923,54 +892,34 @@ public class PasswdSafe extends ExpandableListActivity
                 node = childNode;
             }
 
-            Map<String, GroupNode> nodeGroups = node.getGroups();
-            if (nodeGroups != null) {
-                for (Map.Entry<String, GroupNode> entry:
-                    nodeGroups.entrySet()) {
-                    Map<String, String> groupInfo =
-                        Collections.singletonMap(GROUP, entry.getKey());
-                    itsGroupData.add(groupInfo);
 
-                    ArrayList<HashMap<String, Object>> children =
-                        new ArrayList<HashMap<String, Object>>();
-                    GroupNode entryGroup = entry.getValue();
-                    Map<String, GroupNode> entryGroups = entryGroup.getGroups();
-                    if (entryGroups != null) {
-                        for(String childGroup : entryGroups.keySet()) {
-                            HashMap<String, Object> recInfo =
-                                new HashMap<String, Object>();
-                            recInfo.put(TITLE, "(" + childGroup + ")");
-                            children.add(recInfo);
-                        }
-                    }
-
-                    List<MatchPwsRecord> entryRecs = entryGroup.getRecords();
-                    if (entryRecs != null) {
-                        for (MatchPwsRecord rec : entryRecs) {
-                            children.add(createRecInfo(rec, fileData));
-                        }
-                    }
-                    Collections.sort(children, comp);
-                    itsChildData.add(children);
+            Map<String, GroupNode> entryGroups = node.getGroups();
+            if (entryGroups != null) {
+                for(String childGroup : entryGroups.keySet()) {
+                    HashMap<String, Object> recInfo =
+                        new HashMap<String, Object>();
+                    recInfo.put(TITLE, "(" + childGroup + ")");
+                    itsListData.add(recInfo);
                 }
             }
-        } else {
-            Map<String, String> groupInfo =
-                Collections.singletonMap(GROUP, NO_GROUP_GROUP);
-            itsGroupData.add(groupInfo);
 
-            ArrayList<HashMap<String, Object>> children =
-                new ArrayList<HashMap<String, Object>>();
+            List<MatchPwsRecord> entryRecs = node.getRecords();
+            if (entryRecs != null) {
+                for (MatchPwsRecord rec : entryRecs) {
+                    itsListData.add(createRecInfo(rec, fileData));
+                }
+            }
+            Collections.sort(itsListData, comp);
+        } else {
             for (PwsRecord rec : records) {
                 String match = filterRecord(rec, fileData);
                 if (match == null) {
                     continue;
                 }
-                children.add(createRecInfo(new MatchPwsRecord(rec, match),
-                                           fileData));
+                itsListData.add(createRecInfo(new MatchPwsRecord(rec, match),
+                                              fileData));
             }
-            Collections.sort(children, comp);
-            itsChildData.add(children);
+            Collections.sort(itsListData, comp);
         }
     }
 

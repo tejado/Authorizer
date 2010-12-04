@@ -30,12 +30,12 @@
           
     </LinearLayout>
               
-    <ExpandableListView android:id="@android:id/list"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:layout_weight="1"
-                        android:fastScrollEnabled="false"
-                        android:drawSelectorOnTop="false"/>
+    <ListView android:id="@android:id/list"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:layout_weight="1"
+              android:fastScrollEnabled="false"
+              android:drawSelectorOnTop="false"/>
                         
     <TextView android:id="@android:id/empty"
               android:textSize="16sp"
