@@ -174,11 +174,11 @@ public class PasswdSafeApp extends Application
     public static final String PREF_FILE_CLOSE_TIMEOUT_DEF = "300";
     public static final String[] PREF_FILE_CLOSE_ENTRIES =
     {
-        "None", "30 seconds", "5 minutes", "15 minutes", "1 hour"
+        "None", "30 seconds", "2 minutes", "5 minutes", "15 minutes", "1 hour"
     };
     public static final String[] PREF_FILE_CLOSE_ENTRY_VALUES =
     {
-        "", "30", "300", "900", "3600"
+        "", "30", "120", "300", "900", "3600"
     };
 
     public static final String PREF_DEF_FILE = "defFilePref";
