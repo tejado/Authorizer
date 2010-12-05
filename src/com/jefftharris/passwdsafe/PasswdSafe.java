@@ -721,14 +721,12 @@ public class PasswdSafe extends ListActivity
                                        this, RecordView.class);
             startActivityForResult(intent, RECORD_VIEW_REQUEST);
         } else {
-            // TODO: group selected, launch activity for new group
-            /*
-            Map<String, String> groupItem = itsGroupData.get(groupPosition);
-            itsCurrGroups.add(groupItem.get(GROUP));
+            // TODO: itsSelChildGroup needed?
             String childTitle = (String)item.get(TITLE);
-            itsSelChildGroup = childTitle.substring(1, childTitle.length() - 1);
+            childTitle = childTitle.substring(1, childTitle.length() - 1);
+            itsCurrGroups.add(childTitle);
+            itsSelChildGroup = childTitle;
             showFileData();
-            */
         }
     }
 
