@@ -40,6 +40,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -132,11 +133,7 @@ public class PasswdSafe extends ListActivity
         {
             public final void onClick(View v)
             {
-                int size = itsCurrGroups.size();
-                if (size > 0) {
-                    itsCurrGroups.remove(size - 1);
-                    showFileData();
-                }
+                doBackPressed();
             }
         });
 
@@ -722,6 +719,35 @@ public class PasswdSafe extends ListActivity
         }
     }
 
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if ((android.os.Build.VERSION.SDK_INT <
+                        android.os.Build.VERSION_CODES.ECLAIR)
+            && keyCode == KeyEvent.KEYCODE_BACK
+            && event.getRepeatCount() == 0) {
+            // Take care of calling this method on earlier versions of
+            // the platform where it doesn't exist.
+            if (doBackPressed()) {
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onBackPressed()
+     */
+    @Override
+    public void onBackPressed()
+    {
+        if (!doBackPressed()) {
+            finish();
+        }
+    }
+
+
     private final void onCreateView(Intent intent)
     {
         itsFile = new File(intent.getData().getPath());
@@ -1015,6 +1041,23 @@ public class PasswdSafe extends ListActivity
         removeDialog(DIALOG_PROGRESS);
         removeDialog(DIALOG_GET_PASSWD);
         finish();
+    }
+
+
+    /**
+     * @return true if a group was popped, false to use default behavior
+     */
+    private final boolean doBackPressed()
+    {
+        PasswdSafeApp.dbginfo(TAG, "doBackPressed");
+        int size = itsCurrGroups.size();
+        if (size != 0) {
+            itsCurrGroups.remove(size - 1);
+            showFileData();
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
