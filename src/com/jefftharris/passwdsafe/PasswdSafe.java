@@ -88,8 +88,6 @@ public class PasswdSafe extends ListActivity
         "passwdsafe.searchQuery";
     private static final String BUNDLE_CURR_GROUPS =
         "passwdsafe.currGroups";
-    private static final String BUNDLE_SEL_CHILD_GROUP =
-        "passwdsafe.selChildGroup";
 
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
@@ -113,7 +111,6 @@ public class PasswdSafe extends ListActivity
     private String QUERY_MATCH_NOTES;
 
     private ArrayList<String> itsCurrGroups = new ArrayList<String>();
-    private String itsSelChildGroup = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -137,7 +134,7 @@ public class PasswdSafe extends ListActivity
             {
                 int size = itsCurrGroups.size();
                 if (size > 0) {
-                    itsSelChildGroup = itsCurrGroups.remove(size - 1);
+                    itsCurrGroups.remove(size - 1);
                     showFileData();
                 }
             }
@@ -151,8 +148,6 @@ public class PasswdSafe extends ListActivity
             if (currGroups != null) {
                 itsCurrGroups = new ArrayList<String>(currGroups);
             }
-            itsSelChildGroup =
-                savedInstanceState.getString(BUNDLE_SEL_CHILD_GROUP);
         }
         setSearchQuery(query);
 
@@ -282,7 +277,6 @@ public class PasswdSafe extends ListActivity
         }
         outState.putString(BUNDLE_SEARCH_QUERY, query);
         outState.putStringArrayList(BUNDLE_CURR_GROUPS, itsCurrGroups);
-        outState.putString(BUNDLE_SEL_CHILD_GROUP, itsSelChildGroup);
     }
 
     /* (non-Javadoc)
@@ -721,11 +715,9 @@ public class PasswdSafe extends ListActivity
                                        this, RecordView.class);
             startActivityForResult(intent, RECORD_VIEW_REQUEST);
         } else {
-            // TODO: itsSelChildGroup needed?
             String childTitle = (String)item.get(TITLE);
             childTitle = childTitle.substring(1, childTitle.length() - 1);
             itsCurrGroups.add(childTitle);
-            itsSelChildGroup = childTitle;
             showFileData();
         }
     }
