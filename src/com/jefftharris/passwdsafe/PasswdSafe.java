@@ -29,6 +29,7 @@ import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,6 +49,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -839,9 +841,10 @@ public class PasswdSafe extends ListActivity
                                   R.id.match };
         }
 
-        ListAdapter adapter = new SimpleAdapter(PasswdSafe.this,
-                                                itsListData, layout,
-                                                from, to);
+        ListAdapter adapter = new SectionListAdapter(PasswdSafe.this,
+                                                     itsListData, layout,
+                                                     from, to,
+                                                     itsIsSortCaseSensitive);
         setListAdapter(adapter);
     }
 
@@ -1227,6 +1230,89 @@ public class PasswdSafe extends ListActivity
         public final Map<String, GroupNode> getGroups()
         {
             return itsGroups;
+        }
+    }
+
+
+    private static final class SectionListAdapter
+        extends SimpleAdapter implements SectionIndexer
+    {
+        private static final class Section
+        {
+            public final String itsName;
+            public final int itsPos;
+            public Section(String name, int pos)
+            {
+                itsName = name;
+                itsPos = pos;
+            }
+
+            @Override
+            public final String toString()
+            {
+                return itsName;
+            }
+        }
+
+        private Section[] itsSections;
+
+        public SectionListAdapter(Context context,
+                                  List<? extends Map<String, ?>> data,
+                                  int resource, String[] from, int[] to,
+                                  boolean caseSensitive)
+        {
+            super(context, data, resource, from, to);
+            ArrayList<Section> sections = new ArrayList<Section>();
+            char compChar = '\0';
+            char first;
+            char compFirst;
+            for (int i = 0; i < data.size(); ++i) {
+                String title = (String) data.get(i).get(TITLE);
+                if (TextUtils.isEmpty(title)) {
+                    first = ' ';
+                } else {
+                    first = title.charAt(0);
+                }
+
+                if (!caseSensitive) {
+                    compFirst = Character.toLowerCase(first);
+                } else {
+                    compFirst = first;
+                }
+                if (compChar != compFirst) {
+                    Section s = new Section(Character.toString(first), i);
+                    sections.add(s);
+                    compChar = compFirst;
+                }
+            }
+
+            itsSections = sections.toArray(new Section[sections.size()]);
+        }
+
+        public int getPositionForSection(int section)
+        {
+            if (section < itsSections.length) {
+                return itsSections[section].itsPos;
+            } else {
+                return 0;
+            }
+        }
+
+        public int getSectionForPosition(int position)
+        {
+            // Section positions in increasing order
+            for (int i = 0; i < itsSections.length; ++i) {
+                Section s = itsSections[i];
+                if (position <= s.itsPos) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
+        public Object[] getSections()
+        {
+            return itsSections;
         }
     }
 }
