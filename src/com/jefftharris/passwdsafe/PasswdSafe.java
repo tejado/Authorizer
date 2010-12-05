@@ -26,7 +26,6 @@ import org.pwsafe.lib.file.PwsRecord;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ExpandableListActivity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -47,12 +46,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
 public class PasswdSafe extends ListActivity
@@ -76,11 +72,8 @@ public class PasswdSafe extends ListActivity
 
     private static final String RECORD = "record";
     private static final String TITLE = "title";
-    private static final String GROUP = "group";
     private static final String MATCH = "match";
     private static final String USERNAME = "username";
-
-    private static final String NO_GROUP_GROUP = "Records";
 
     private static final int RECORD_VIEW_REQUEST = 0;
     private static final int RECORD_ADD_REQUEST = 1;
