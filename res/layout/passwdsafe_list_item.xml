@@ -3,18 +3,38 @@
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:paddingTop="2dip"
     android:paddingBottom="2dip"
-    android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
+    android:paddingLeft="6dip"
     android:mode="twoLine"
 >
+
+    <ImageView android:id="@+id/icon"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_centerVertical="true"
+               />
+               <!-- 
+               android:layout_alignBottom="@android:id/text1"
+               android:layout_alignTop="@android:id/text1"
+               android:layout_toLeftOf="@android:id/text1"
+               -->
 
     <TextView android:id="@android:id/text1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dip"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_toRightOf="@+id/icon"
     />
+
+    <!-- android:drawableLeft="@android:drawable/ic_notification_clear_all" 
+        -->    
+<!--               android:layout_toRightOf="@android:id/text1"
+        android:layout_alignTop="@+id/icon"
+               android:layout_alignTop="@android:id/text1"
+               android:layout_toLeftOf="@android:id/text1"
+               -->
     
-    <TextView android:id="@+id/match"
+    <TextView android:id="@android:id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@android:id/text1"
@@ -23,11 +43,11 @@
         android:textAppearance="?android:attr/textAppearanceSmall"/>
               
 
-    <TextView android:id="@android:id/text2"
+    <TextView android:id="@+id/match"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@android:id/text1"
-        android:layout_toRightOf="@id/match"
+        android:layout_toRightOf="@android:id/text2"
         android:gravity="right"
         android:paddingRight="6dip"
         android:ellipsize="end"

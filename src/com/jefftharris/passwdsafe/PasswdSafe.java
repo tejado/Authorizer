@@ -76,6 +76,7 @@ public class PasswdSafe extends ListActivity
     private static final String TITLE = "title";
     private static final String MATCH = "match";
     private static final String USERNAME = "username";
+    private static final String ICON = "icon";
 
     private static final int RECORD_VIEW_REQUEST = 0;
     private static final int RECORD_ADD_REQUEST = 1;
@@ -708,7 +709,6 @@ public class PasswdSafe extends ListActivity
             startActivityForResult(intent, RECORD_VIEW_REQUEST);
         } else {
             String childTitle = (String)item.get(TITLE);
-            childTitle = childTitle.substring(1, childTitle.length() - 1);
             itsCurrGroups.add(childTitle);
             showFileData();
         }
@@ -833,12 +833,12 @@ public class PasswdSafe extends ListActivity
         String[] from;
         int[] to;
         if (itsSearchQuery == null) {
-            from = new String[] { TITLE, USERNAME };
-            to = new int[] { android.R.id.text1, android.R.id.text2 };
+            from = new String[] { TITLE, USERNAME, ICON };
+            to = new int[] { android.R.id.text1, android.R.id.text2, R.id.icon };
         } else {
-            from = new String[] { TITLE, USERNAME, MATCH };
+            from = new String[] { TITLE, USERNAME, ICON, MATCH };
             to = new int[] { android.R.id.text1, android.R.id.text2,
-                                  R.id.match };
+                             R.id.icon, R.id.match };
         }
 
         ListAdapter adapter = new SectionListAdapter(PasswdSafe.this,
@@ -905,12 +905,20 @@ public class PasswdSafe extends ListActivity
             }
 
 
+            // TODO: Sort items so groups are first??
             Map<String, GroupNode> entryGroups = node.getGroups();
             if (entryGroups != null) {
-                for(String childGroup : entryGroups.keySet()) {
+                for(Map.Entry<String, GroupNode> entry :
+                        entryGroups.entrySet()) {
                     HashMap<String, Object> recInfo =
                         new HashMap<String, Object>();
-                    recInfo.put(TITLE, "(" + childGroup + ")");
+                    recInfo.put(TITLE, entry.getKey());
+                    recInfo.put(ICON,R.drawable.ic_menu_archive_rev);
+
+                    int items = entry.getValue().getNumRecords();
+                    String str = (items == 1) ? "item" : "items";
+                    recInfo.put(USERNAME, "[" + items + " " + str + "]");
+
                     itsListData.add(recInfo);
                 }
             }
@@ -951,6 +959,7 @@ public class PasswdSafe extends ListActivity
         recInfo.put(RECORD, rec.itsRecord);
         recInfo.put(MATCH, rec.itsMatch);
         recInfo.put(USERNAME, user);
+        recInfo.put(ICON, R.drawable.ic_menu_contact_rev);
         return recInfo;
     }
 
@@ -1230,6 +1239,20 @@ public class PasswdSafe extends ListActivity
         public final Map<String, GroupNode> getGroups()
         {
             return itsGroups;
+        }
+
+        public final int getNumRecords()
+        {
+            int num = 0;
+            if (itsRecords != null) {
+                num += itsRecords.size();
+            }
+            if (itsGroups != null) {
+                for (GroupNode child: itsGroups.values()) {
+                    num += child.getNumRecords();
+                }
+            }
+            return num;
         }
     }
 
