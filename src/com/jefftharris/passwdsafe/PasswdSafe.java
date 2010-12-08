@@ -959,6 +959,8 @@ public class PasswdSafe extends ListActivity
         recInfo.put(RECORD, rec.itsRecord);
         recInfo.put(MATCH, rec.itsMatch);
         recInfo.put(USERNAME, user);
+        // TODO: fix icon transparency
+        // TODO: update current group label (add icon??)
         recInfo.put(ICON, R.drawable.ic_menu_contact_rev);
         return recInfo;
     }
