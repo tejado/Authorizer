@@ -904,8 +904,6 @@ public class PasswdSafe extends ListActivity
                 node = childNode;
             }
 
-
-            // TODO: Sort items so groups are first??
             Map<String, GroupNode> entryGroups = node.getGroups();
             if (entryGroups != null) {
                 for(Map.Entry<String, GroupNode> entry :
@@ -918,7 +916,6 @@ public class PasswdSafe extends ListActivity
                     int items = entry.getValue().getNumRecords();
                     String str = (items == 1) ? "item" : "items";
                     recInfo.put(USERNAME, "[" + items + " " + str + "]");
-
                     itsListData.add(recInfo);
                 }
             }
@@ -929,7 +926,6 @@ public class PasswdSafe extends ListActivity
                     itsListData.add(createRecInfo(rec, fileData));
                 }
             }
-            Collections.sort(itsListData, comp);
         } else {
             for (PwsRecord rec : records) {
                 String match = filterRecord(rec, fileData);
@@ -939,8 +935,8 @@ public class PasswdSafe extends ListActivity
                 itsListData.add(createRecInfo(new MatchPwsRecord(rec, match),
                                               fileData));
             }
-            Collections.sort(itsListData, comp);
         }
+        Collections.sort(itsListData, comp);
     }
 
     private static final HashMap<String, Object>
@@ -1145,6 +1141,15 @@ public class PasswdSafe extends ListActivity
         public int compare(HashMap<String, Object> arg0,
                            HashMap<String, Object> arg1)
         {
+            // Sort groups first
+            Object rec0 = arg0.get(RECORD);
+            Object rec1 = arg1.get(RECORD);
+            if ((rec0 == null) && (rec1 != null)) {
+                return -1;
+            } else if ((rec0 != null) && (rec1 == null)) {
+                return 1;
+            }
+
             int rc = compareField(arg0, arg1, TITLE);
             if (rc == 0) {
                 rc = compareField(arg0, arg1, USERNAME);
