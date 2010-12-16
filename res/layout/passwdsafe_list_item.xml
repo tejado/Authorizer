@@ -8,32 +8,17 @@
 >
 
     <ImageView android:id="@+id/icon"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_centerVertical="true"
-               />
-               <!-- 
-               android:layout_alignBottom="@android:id/text1"
-               android:layout_alignTop="@android:id/text1"
-               android:layout_toLeftOf="@android:id/text1"
-               -->
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true" />
 
     <TextView android:id="@android:id/text1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dip"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_toRightOf="@+id/icon"
-    />
+        android:layout_toRightOf="@+id/icon"/>
 
-    <!-- android:drawableLeft="@android:drawable/ic_notification_clear_all" 
-        -->    
-<!--               android:layout_toRightOf="@android:id/text1"
-        android:layout_alignTop="@+id/icon"
-               android:layout_alignTop="@android:id/text1"
-               android:layout_toLeftOf="@android:id/text1"
-               -->
-    
     <TextView android:id="@android:id/text2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +26,6 @@
         android:layout_alignLeft="@android:id/text1"
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceSmall"/>
-              
 
     <TextView android:id="@+id/match"
         android:layout_width="fill_parent"
@@ -52,7 +36,6 @@
         android:paddingRight="6dip"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-    />
+        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
 </TwoLineListItem>
