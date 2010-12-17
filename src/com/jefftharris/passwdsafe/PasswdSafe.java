@@ -45,7 +45,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -115,8 +114,8 @@ public class PasswdSafe extends ListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.passwd_safe);
-        Button button = (Button)findViewById(R.id.query_clear_btn);
-        button.setOnClickListener(new View.OnClickListener()
+        View v = findViewById(R.id.query_clear_btn);
+        v.setOnClickListener(new View.OnClickListener()
         {
             public final void onClick(View v)
             {
@@ -124,8 +123,8 @@ public class PasswdSafe extends ListActivity
             }
         });
 
-        button = (Button)findViewById(R.id.sub_group_up_btn);
-        button.setOnClickListener(new View.OnClickListener()
+        v = findViewById(R.id.current_group);
+        v.setOnClickListener(new View.OnClickListener()
         {
             public final void onClick(View v)
             {
@@ -824,9 +823,8 @@ public class PasswdSafe extends ListActivity
             panel.setVisibility(View.GONE);
         } else {
             panel.setVisibility(View.VISIBLE);
-            TextView tv = (TextView)findViewById(R.id.current_group);
-            tv.setText(getString(R.string.current_group_label,
-                                 TextUtils.join(" / ", itsCurrGroups)));
+            TextView tv = (TextView)findViewById(R.id.current_group_label);
+            tv.setText(TextUtils.join(" / ", itsCurrGroups));
         }
 
         int layout = R.layout.passwdsafe_list_item;

@@ -9,19 +9,27 @@
                   android:visible="false"
                   android:layout_width="fill_parent"
                   android:layout_height="wrap_content">
-        <LinearLayout android:orientation="horizontal"
+                  
+        <LinearLayout android:id="@+id/current_group"
+                      android:orientation="horizontal"
+                      android:clickable="true"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content">
-            <TextView android:id="@+id/current_group"
+
+            <ImageView android:id="@+id/current_group_icon"
+                       android:src="@drawable/ic_menu_archive_rev"
+                       android:clickable="false"
+                       android:layout_width="24dp"
+                       android:layout_height="24dp"/>
+
+            <TextView android:id="@+id/current_group_label"
                       android:text="current group"
+                      android:clickable="false"
+                      android:gravity="center_vertical"
                       android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
+                      android:layout_height="fill_parent"
                       android:layout_weight="1"/>
-            <Button android:id="@+id/sub_group_up_btn"
-                    android:text="@string/up"
-                    android:drawableRight="@drawable/arrow_up"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+
         </LinearLayout>
 
         <View android:layout_width="fill_parent"
