@@ -70,6 +70,7 @@ public class PasswdSafe extends ListActivity
     private static final int MENU_CHANGE_PASSWD = 3;
     private static final int MENU_DELETE = 4;
     private static final int MENU_SEARCH = 5;
+    private static final int MENU_PARENT = 6;
 
     private static final String RECORD = "record";
     private static final String TITLE = "title";
@@ -291,6 +292,9 @@ public class PasswdSafe extends ListActivity
 
         mi = menu.add(0, MENU_SEARCH, 0, R.string.search);
         mi.setIcon(android.R.drawable.ic_menu_search);
+
+        mi = menu.add(0, MENU_PARENT, 0, R.string.parent_group);
+        mi.setIcon(R.drawable.arrow_up);
         return true;
     }
 
@@ -318,6 +322,11 @@ public class PasswdSafe extends ListActivity
         mi = menu.findItem(MENU_DELETE);
         if (mi != null) {
             mi.setEnabled(deleteEnabled);
+        }
+
+        mi = menu.findItem(MENU_PARENT);
+        if (mi != null) {
+            mi.setEnabled(itsCurrGroups.size() > 0);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -356,6 +365,11 @@ public class PasswdSafe extends ListActivity
         case MENU_SEARCH:
         {
             onSearchRequested();
+            break;
+        }
+        case MENU_PARENT:
+        {
+            doBackPressed();
             break;
         }
         default:
