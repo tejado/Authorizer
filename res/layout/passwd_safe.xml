@@ -4,39 +4,33 @@
               android:layout_height="fill_parent"
               android:orientation="vertical">
               
-    <LinearLayout android:id="@+id/sub_group_panel"
-                  android:orientation="vertical"
-                  android:visible="false"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content">
-                  
-        <LinearLayout android:id="@+id/current_group"
-                      android:orientation="horizontal"
-                      android:clickable="true"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content">
-
-            <ImageView android:id="@+id/current_group_icon"
-                       android:src="@drawable/ic_menu_archive_rev"
-                       android:clickable="false"
-                       android:layout_width="24dp"
-                       android:layout_height="24dp"/>
-
-            <TextView android:id="@+id/current_group_label"
+    <RelativeLayout android:id="@+id/current_group_panel"
+                    android:visible="false"
+                    android:clickable="true"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    
+        <ImageView android:id="@+id/current_group_icon"
+                   android:src="@drawable/ic_menu_archive_rev"
+                   android:layout_width="24dp"
+                   android:layout_height="24dp"
+                   />
+                   
+        <TextView android:id="@+id/current_group_label"
                       android:text="current group"
-                      android:clickable="false"
                       android:gravity="center_vertical"
+                      android:layout_marginBottom="2dp"
+                      android:layout_toRightOf="@id/current_group_icon"
                       android:layout_width="fill_parent"
-                      android:layout_height="fill_parent"
-                      android:layout_weight="1"/>
-
-        </LinearLayout>
+                      android:layout_height="wrap_content"/>
 
         <View android:layout_width="fill_parent"
               android:layout_height="2dip"
-              android:background="#FF909090"/>
-          
-    </LinearLayout>
+              android:layout_below="@id/current_group_label"
+              android:background="#FF909090"
+              />
+              
+    </RelativeLayout>
               
     <ListView android:id="@android:id/list"
               android:layout_width="fill_parent"
@@ -53,30 +47,33 @@
               android:layout_weight="1"
               android:text="@string/no_records"/>
 
-    <LinearLayout android:id="@+id/query_panel"
-                  android:orientation="vertical"
-                  android:visible="false"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content">
+    <RelativeLayout android:id="@+id/query_panel"
+                    android:visible="false"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
 
-        <View android:layout_width="fill_parent"
+        <View android:id="@+id/query_sep"
+              android:layout_width="fill_parent"
               android:layout_height="2dip"
               android:background="#FF909090"/>
           
-        <LinearLayout android:orientation="horizontal"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content">
-            <TextView android:id="@+id/query"
-                      android:text="query"
-                      android:textSize="16sp"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"/>
-            <Button android:id="@+id/query_clear_btn"
-                    android:text="@string/clear"
-                    android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-        </LinearLayout>
-    </LinearLayout>
+        <Button android:id="@+id/query_clear_btn"
+                android:text="@string/clear"
+                android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
+                android:layout_marginTop="2dp"
+                android:layout_below="@id/query_sep"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        <TextView android:id="@+id/query"
+                  android:text="query"
+                  android:textSize="16sp"
+                  android:gravity="center_vertical"
+                  android:layout_alignTop="@id/query_clear_btn"
+                  android:layout_alignBottom="@id/query_clear_btn"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
 </LinearLayout>

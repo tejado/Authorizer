@@ -123,7 +123,7 @@ public class PasswdSafe extends ListActivity
             }
         });
 
-        v = findViewById(R.id.current_group);
+        v = findViewById(R.id.current_group_panel);
         v.setOnClickListener(new View.OnClickListener()
         {
             public final void onClick(View v)
@@ -818,7 +818,7 @@ public class PasswdSafe extends ListActivity
     {
         populateFileData();
 
-        View panel = findViewById(R.id.sub_group_panel);
+        View panel = findViewById(R.id.current_group_panel);
         if (itsCurrGroups.isEmpty()) {
             panel.setVisibility(View.GONE);
         } else {
@@ -960,6 +960,7 @@ public class PasswdSafe extends ListActivity
 
     private final void setSearchQuery(String query)
     {
+        // TODO fix starting query when looking at sub-group breaking behavior
         itsSearchQuery = null;
         if ((query != null) && (query.length() != 0)) {
             if (QUERY_MATCH_TITLE == null) {
