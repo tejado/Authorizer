@@ -16,7 +16,6 @@
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
     <string name="copy_user">Copy User Name</string>
-    <string name="current_group_label">Current group: %1$s</string>
     <string name="database_version_label">Database version:</string>
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
@@ -45,6 +44,7 @@
     <string name="num_groups_label">Number of Groups:</string>
     <string name="num_records_label">Number of Records:</string>
     <string name="ok">Ok</string>
+    <string name="parent_group">Parent Group</string>
     <string name="password">Password</string>
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_label">Password:</string>

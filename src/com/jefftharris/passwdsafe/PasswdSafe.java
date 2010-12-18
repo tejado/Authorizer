@@ -26,9 +26,10 @@ import org.pwsafe.lib.file.PwsRecord;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ExpandableListActivity;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,18 +40,19 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.SimpleExpandableListAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SectionIndexer;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class PasswdSafe extends ExpandableListActivity
+public class PasswdSafe extends ListActivity
     implements PasswdFileActivity
 {
     private static final String TAG = "PasswdSafe";
@@ -68,14 +70,13 @@ public class PasswdSafe extends ExpandableListActivity
     private static final int MENU_CHANGE_PASSWD = 3;
     private static final int MENU_DELETE = 4;
     private static final int MENU_SEARCH = 5;
+    private static final int MENU_PARENT = 6;
 
     private static final String RECORD = "record";
     private static final String TITLE = "title";
-    private static final String GROUP = "group";
     private static final String MATCH = "match";
     private static final String USERNAME = "username";
-
-    private static final String NO_GROUP_GROUP = "Records";
+    private static final String ICON = "icon";
 
     private static final int RECORD_VIEW_REQUEST = 0;
     private static final int RECORD_ADD_REQUEST = 1;
@@ -84,8 +85,6 @@ public class PasswdSafe extends ExpandableListActivity
         "passwdsafe.searchQuery";
     private static final String BUNDLE_CURR_GROUPS =
         "passwdsafe.currGroups";
-    private static final String BUNDLE_SEL_CHILD_GROUP =
-        "passwdsafe.selChildGroup";
 
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
@@ -97,10 +96,8 @@ public class PasswdSafe extends ExpandableListActivity
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
 
-    private final ArrayList<Map<String, String>> itsGroupData =
-        new ArrayList<Map<String, String>>();
-    private final ArrayList<ArrayList<HashMap<String, Object>>> itsChildData =
-        new ArrayList<ArrayList<HashMap<String, Object>>>();
+    private final ArrayList<HashMap<String, Object>> itsListData =
+        new ArrayList<HashMap<String, Object>>();
 
     private Pattern itsSearchQuery = null;
     private static final String QUERY_MATCH = "";
@@ -111,7 +108,6 @@ public class PasswdSafe extends ExpandableListActivity
     private String QUERY_MATCH_NOTES;
 
     private ArrayList<String> itsCurrGroups = new ArrayList<String>();
-    private String itsSelChildGroup = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -119,8 +115,8 @@ public class PasswdSafe extends ExpandableListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.passwd_safe);
-        Button button = (Button)findViewById(R.id.query_clear_btn);
-        button.setOnClickListener(new View.OnClickListener()
+        View v = findViewById(R.id.query_clear_btn);
+        v.setOnClickListener(new View.OnClickListener()
         {
             public final void onClick(View v)
             {
@@ -128,16 +124,12 @@ public class PasswdSafe extends ExpandableListActivity
             }
         });
 
-        button = (Button)findViewById(R.id.sub_group_up_btn);
-        button.setOnClickListener(new View.OnClickListener()
+        v = findViewById(R.id.current_group_panel);
+        v.setOnClickListener(new View.OnClickListener()
         {
             public final void onClick(View v)
             {
-                int size = itsCurrGroups.size();
-                if (size > 0) {
-                    itsSelChildGroup = itsCurrGroups.remove(size - 1);
-                    showFileData();
-                }
+                doBackPressed();
             }
         });
 
@@ -149,8 +141,6 @@ public class PasswdSafe extends ExpandableListActivity
             if (currGroups != null) {
                 itsCurrGroups = new ArrayList<String>(currGroups);
             }
-            itsSelChildGroup =
-                savedInstanceState.getString(BUNDLE_SEL_CHILD_GROUP);
         }
         setSearchQuery(query);
 
@@ -280,7 +270,6 @@ public class PasswdSafe extends ExpandableListActivity
         }
         outState.putString(BUNDLE_SEARCH_QUERY, query);
         outState.putStringArrayList(BUNDLE_CURR_GROUPS, itsCurrGroups);
-        outState.putString(BUNDLE_SEL_CHILD_GROUP, itsSelChildGroup);
     }
 
     /* (non-Javadoc)
@@ -303,6 +292,9 @@ public class PasswdSafe extends ExpandableListActivity
 
         mi = menu.add(0, MENU_SEARCH, 0, R.string.search);
         mi.setIcon(android.R.drawable.ic_menu_search);
+
+        mi = menu.add(0, MENU_PARENT, 0, R.string.parent_group);
+        mi.setIcon(R.drawable.arrow_up);
         return true;
     }
 
@@ -330,6 +322,11 @@ public class PasswdSafe extends ExpandableListActivity
         mi = menu.findItem(MENU_DELETE);
         if (mi != null) {
             mi.setEnabled(deleteEnabled);
+        }
+
+        mi = menu.findItem(MENU_PARENT);
+        if (mi != null) {
+            mi.setEnabled(itsCurrGroups.size() > 0);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -368,6 +365,11 @@ public class PasswdSafe extends ExpandableListActivity
         case MENU_SEARCH:
         {
             onSearchRequested();
+            break;
+        }
+        case MENU_PARENT:
+        {
+            doBackPressed();
             break;
         }
         default:
@@ -639,7 +641,8 @@ public class PasswdSafe extends ExpandableListActivity
                        R.string.read_write : R.string.read_only);
 
             tv = (TextView)dialog.findViewById(R.id.num_groups);
-            tv.setText(Integer.toString(itsGroupData.size()));
+            // TODO: FIX
+            //tv.setText(Integer.toString(itsGroupData.size()));
 
             tv = (TextView)dialog.findViewById(R.id.num_records);
             tv.setText(Integer.toString(fileData.getRecords().size()));
@@ -699,19 +702,14 @@ public class PasswdSafe extends ExpandableListActivity
     }
 
     /* (non-Javadoc)
-     * @see android.app.ExpandableListActivity#onChildClick(android.widget.ExpandableListView, android.view.View, int, int, long)
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
      */
     @Override
-    public boolean onChildClick(ExpandableListView parent,
-                                View v,
-                                int groupPosition,
-                                int childPosition,
-                                long id)
+    protected void onListItemClick(ListView l, View v, int position, long id)
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
 
-        HashMap<String, Object> item =
-            itsChildData.get(groupPosition).get(childPosition);
+        HashMap<String, Object> item = itsListData.get(position);
         PwsRecord rec = (PwsRecord)item.get(RECORD);
         if (rec != null) {
             Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
@@ -723,13 +721,38 @@ public class PasswdSafe extends ExpandableListActivity
                                        this, RecordView.class);
             startActivityForResult(intent, RECORD_VIEW_REQUEST);
         } else {
-            Map<String, String> groupItem = itsGroupData.get(groupPosition);
-            itsCurrGroups.add(groupItem.get(GROUP));
             String childTitle = (String)item.get(TITLE);
-            itsSelChildGroup = childTitle.substring(1, childTitle.length() - 1);
+            itsCurrGroups.add(childTitle);
             showFileData();
         }
-        return true;
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if ((android.os.Build.VERSION.SDK_INT <
+                        android.os.Build.VERSION_CODES.ECLAIR)
+            && keyCode == KeyEvent.KEYCODE_BACK
+            && event.getRepeatCount() == 0) {
+            // Take care of calling this method on earlier versions of
+            // the platform where it doesn't exist.
+            if (doBackPressed()) {
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onBackPressed()
+     */
+    @Override
+    public void onBackPressed()
+    {
+        if (!doBackPressed()) {
+            finish();
+        }
     }
 
 
@@ -809,66 +832,37 @@ public class PasswdSafe extends ExpandableListActivity
     {
         populateFileData();
 
-        View panel = findViewById(R.id.sub_group_panel);
+        View panel = findViewById(R.id.current_group_panel);
         if (itsCurrGroups.isEmpty()) {
             panel.setVisibility(View.GONE);
         } else {
             panel.setVisibility(View.VISIBLE);
-            TextView tv = (TextView)findViewById(R.id.current_group);
-            tv.setText(getString(R.string.current_group_label,
-                                 TextUtils.join(" / ", itsCurrGroups)));
+            TextView tv = (TextView)findViewById(R.id.current_group_label);
+            tv.setText(TextUtils.join(" / ", itsCurrGroups));
         }
 
-        int groupLayout = android.R.layout.simple_expandable_list_item_1;
-        String[] groupFrom = new String[] { GROUP };
-        int[] groupTo = new int[] { android.R.id.text1 };
-        int childLayout = R.layout.passwdsafe_list_item;
-        String[] childFrom;
-        int[] childTo;
+        int layout = R.layout.passwdsafe_list_item;
+        String[] from;
+        int[] to;
         if (itsSearchQuery == null) {
-            childFrom = new String[] { TITLE, USERNAME };
-            childTo = new int[] { android.R.id.text1, android.R.id.text2 };
+            from = new String[] { TITLE, USERNAME, ICON };
+            to = new int[] { android.R.id.text1, android.R.id.text2, R.id.icon };
         } else {
-            childFrom = new String[] { TITLE, USERNAME, MATCH };
-            childTo = new int[] { android.R.id.text1, android.R.id.text2,
-                                  R.id.match };
+            from = new String[] { TITLE, USERNAME, ICON, MATCH };
+            to = new int[] { android.R.id.text1, android.R.id.text2,
+                             R.id.icon, R.id.match };
         }
 
-        ExpandableListAdapter adapter =
-            new SimpleExpandableListAdapter(PasswdSafe.this,
-                                            itsGroupData,
-                                            groupLayout, groupFrom, groupTo,
-                                            itsChildData,
-                                            childLayout, childFrom, childTo);
+        ListAdapter adapter = new SectionListAdapter(PasswdSafe.this,
+                                                     itsListData, layout,
+                                                     from, to,
+                                                     itsIsSortCaseSensitive);
         setListAdapter(adapter);
-
-        ExpandableListView view = getExpandableListView();
-        if (itsGroupData.size() == 1) {
-            view.expandGroup(0);
-        } else if (itsSearchQuery != null) {
-            int size = itsGroupData.size();
-            for (int i = 0; i < size; ++i) {
-                view.expandGroup(i);
-            }
-        }
-
-        if (itsSelChildGroup != null) {
-            int size = itsGroupData.size();
-            for (int i = 0; i < size; ++i) {
-                String group = itsGroupData.get(i).get(GROUP);
-                if (itsSelChildGroup.equals(group)) {
-                    view.expandGroup(i);
-                    break;
-                }
-            }
-        }
     }
 
     private final void populateFileData()
     {
-        itsGroupData.clear();
-        itsChildData.clear();
-
+        itsListData.clear();
         if (itsPasswdFile == null) {
             return;
         }
@@ -896,11 +890,10 @@ public class PasswdSafe extends ExpandableListActivity
                     continue;
                 }
                 String group = fileData.getGroup(rec);
-                if ((group == null) || (group.length() == 0)) {
-                    group = NO_GROUP_GROUP;
+                if (group == null) {
+                    group = "";
                 }
-
-                String[] groups = group.split("\\.");
+                String[] groups = TextUtils.split(group, "\\.");
                 GroupNode node = root;
                 for (String g : groups) {
                     GroupNode groupNode = node.getGroup(g);
@@ -915,63 +908,52 @@ public class PasswdSafe extends ExpandableListActivity
 
             // find right group
             GroupNode node = root;
-            for (String group : itsCurrGroups) {
+            for (int i = 0; i < itsCurrGroups.size(); ++i) {
+                String group = itsCurrGroups.get(i);
                 GroupNode childNode = node.getGroup(group);
                 if (childNode == null) {
+                    // Prune groups from current item in the stack on down
+                    for (int j = itsCurrGroups.size() - 1; j >= i; --j) {
+                        itsCurrGroups.remove(j);
+                    }
                     break;
                 }
                 node = childNode;
             }
 
-            Map<String, GroupNode> nodeGroups = node.getGroups();
-            if (nodeGroups != null) {
-                for (Map.Entry<String, GroupNode> entry:
-                    nodeGroups.entrySet()) {
-                    Map<String, String> groupInfo =
-                        Collections.singletonMap(GROUP, entry.getKey());
-                    itsGroupData.add(groupInfo);
+            Map<String, GroupNode> entryGroups = node.getGroups();
+            if (entryGroups != null) {
+                for(Map.Entry<String, GroupNode> entry :
+                        entryGroups.entrySet()) {
+                    HashMap<String, Object> recInfo =
+                        new HashMap<String, Object>();
+                    recInfo.put(TITLE, entry.getKey());
+                    recInfo.put(ICON,R.drawable.folder_rev);
 
-                    ArrayList<HashMap<String, Object>> children =
-                        new ArrayList<HashMap<String, Object>>();
-                    GroupNode entryGroup = entry.getValue();
-                    Map<String, GroupNode> entryGroups = entryGroup.getGroups();
-                    if (entryGroups != null) {
-                        for(String childGroup : entryGroups.keySet()) {
-                            HashMap<String, Object> recInfo =
-                                new HashMap<String, Object>();
-                            recInfo.put(TITLE, "(" + childGroup + ")");
-                            children.add(recInfo);
-                        }
-                    }
+                    int items = entry.getValue().getNumRecords();
+                    String str = (items == 1) ? "item" : "items";
+                    recInfo.put(USERNAME, "[" + items + " " + str + "]");
+                    itsListData.add(recInfo);
+                }
+            }
 
-                    List<MatchPwsRecord> entryRecs = entryGroup.getRecords();
-                    if (entryRecs != null) {
-                        for (MatchPwsRecord rec : entryRecs) {
-                            children.add(createRecInfo(rec, fileData));
-                        }
-                    }
-                    Collections.sort(children, comp);
-                    itsChildData.add(children);
+            List<MatchPwsRecord> entryRecs = node.getRecords();
+            if (entryRecs != null) {
+                for (MatchPwsRecord rec : entryRecs) {
+                    itsListData.add(createRecInfo(rec, fileData));
                 }
             }
         } else {
-            Map<String, String> groupInfo =
-                Collections.singletonMap(GROUP, NO_GROUP_GROUP);
-            itsGroupData.add(groupInfo);
-
-            ArrayList<HashMap<String, Object>> children =
-                new ArrayList<HashMap<String, Object>>();
             for (PwsRecord rec : records) {
                 String match = filterRecord(rec, fileData);
                 if (match == null) {
                     continue;
                 }
-                children.add(createRecInfo(new MatchPwsRecord(rec, match),
-                                           fileData));
+                itsListData.add(createRecInfo(new MatchPwsRecord(rec, match),
+                                              fileData));
             }
-            Collections.sort(children, comp);
-            itsChildData.add(children);
         }
+        Collections.sort(itsListData, comp);
     }
 
     private static final HashMap<String, Object>
@@ -990,6 +972,7 @@ public class PasswdSafe extends ExpandableListActivity
         recInfo.put(RECORD, rec.itsRecord);
         recInfo.put(MATCH, rec.itsMatch);
         recInfo.put(USERNAME, user);
+        recInfo.put(ICON, R.drawable.contact_rev);
         return recInfo;
     }
 
@@ -1079,6 +1062,23 @@ public class PasswdSafe extends ExpandableListActivity
     }
 
 
+    /**
+     * @return true if a group was popped, false to use default behavior
+     */
+    private final boolean doBackPressed()
+    {
+        PasswdSafeApp.dbginfo(TAG, "doBackPressed");
+        int size = itsCurrGroups.size();
+        if (size != 0) {
+            itsCurrGroups.remove(size - 1);
+            showFileData();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     private final class LoadTask extends AsyncTask<Void, Void, Object>
     {
         private final StringBuilder itsPasswd;
@@ -1156,6 +1156,15 @@ public class PasswdSafe extends ExpandableListActivity
         public int compare(HashMap<String, Object> arg0,
                            HashMap<String, Object> arg1)
         {
+            // Sort groups first
+            Object rec0 = arg0.get(RECORD);
+            Object rec1 = arg1.get(RECORD);
+            if ((rec0 == null) && (rec1 != null)) {
+                return -1;
+            } else if ((rec0 != null) && (rec1 == null)) {
+                return 1;
+            }
+
             int rc = compareField(arg0, arg1, TITLE);
             if (rc == 0) {
                 rc = compareField(arg0, arg1, USERNAME);
@@ -1252,6 +1261,103 @@ public class PasswdSafe extends ExpandableListActivity
         public final Map<String, GroupNode> getGroups()
         {
             return itsGroups;
+        }
+
+        public final int getNumRecords()
+        {
+            int num = 0;
+            if (itsRecords != null) {
+                num += itsRecords.size();
+            }
+            if (itsGroups != null) {
+                for (GroupNode child: itsGroups.values()) {
+                    num += child.getNumRecords();
+                }
+            }
+            return num;
+        }
+    }
+
+
+    private static final class SectionListAdapter
+        extends SimpleAdapter implements SectionIndexer
+    {
+        private static final class Section
+        {
+            public final String itsName;
+            public final int itsPos;
+            public Section(String name, int pos)
+            {
+                itsName = name;
+                itsPos = pos;
+            }
+
+            @Override
+            public final String toString()
+            {
+                return itsName;
+            }
+        }
+
+        private Section[] itsSections;
+
+        public SectionListAdapter(Context context,
+                                  List<? extends Map<String, ?>> data,
+                                  int resource, String[] from, int[] to,
+                                  boolean caseSensitive)
+        {
+            super(context, data, resource, from, to);
+            ArrayList<Section> sections = new ArrayList<Section>();
+            char compChar = '\0';
+            char first;
+            char compFirst;
+            for (int i = 0; i < data.size(); ++i) {
+                String title = (String) data.get(i).get(TITLE);
+                if (TextUtils.isEmpty(title)) {
+                    first = ' ';
+                } else {
+                    first = title.charAt(0);
+                }
+
+                if (!caseSensitive) {
+                    compFirst = Character.toLowerCase(first);
+                } else {
+                    compFirst = first;
+                }
+                if (compChar != compFirst) {
+                    Section s = new Section(Character.toString(first), i);
+                    sections.add(s);
+                    compChar = compFirst;
+                }
+            }
+
+            itsSections = sections.toArray(new Section[sections.size()]);
+        }
+
+        public int getPositionForSection(int section)
+        {
+            if (section < itsSections.length) {
+                return itsSections[section].itsPos;
+            } else {
+                return 0;
+            }
+        }
+
+        public int getSectionForPosition(int position)
+        {
+            // Section positions in increasing order
+            for (int i = 0; i < itsSections.length; ++i) {
+                Section s = itsSections[i];
+                if (position <= s.itsPos) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
+        public Object[] getSections()
+        {
+            return itsSections;
         }
     }
 }
