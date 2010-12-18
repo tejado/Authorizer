@@ -894,9 +894,14 @@ public class PasswdSafe extends ListActivity
 
             // find right group
             GroupNode node = root;
-            for (String group : itsCurrGroups) {
+            for (int i = 0; i < itsCurrGroups.size(); ++i) {
+                String group = itsCurrGroups.get(i);
                 GroupNode childNode = node.getGroup(group);
                 if (childNode == null) {
+                    // Prune groups from current item in the stack on down
+                    for (int j = itsCurrGroups.size() - 1; j >= i; --j) {
+                        itsCurrGroups.remove(j);
+                    }
                     break;
                 }
                 node = childNode;
@@ -959,7 +964,6 @@ public class PasswdSafe extends ListActivity
 
     private final void setSearchQuery(String query)
     {
-        // TODO fix starting query when looking at sub-group breaking behavior
         itsSearchQuery = null;
         if ((query != null) && (query.length() != 0)) {
             if (QUERY_MATCH_TITLE == null) {
