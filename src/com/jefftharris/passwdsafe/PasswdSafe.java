@@ -909,7 +909,7 @@ public class PasswdSafe extends ListActivity
                     HashMap<String, Object> recInfo =
                         new HashMap<String, Object>();
                     recInfo.put(TITLE, entry.getKey());
-                    recInfo.put(ICON,R.drawable.ic_menu_archive_rev);
+                    recInfo.put(ICON,R.drawable.folder_rev);
 
                     int items = entry.getValue().getNumRecords();
                     String str = (items == 1) ? "item" : "items";
@@ -953,8 +953,7 @@ public class PasswdSafe extends ListActivity
         recInfo.put(RECORD, rec.itsRecord);
         recInfo.put(MATCH, rec.itsMatch);
         recInfo.put(USERNAME, user);
-        // TODO: update current group label (add icon??)
-        recInfo.put(ICON, R.drawable.ic_menu_contact_rev);
+        recInfo.put(ICON, R.drawable.contact_rev);
         return recInfo;
     }
 
