@@ -11,7 +11,7 @@
                     android:layout_height="wrap_content">
                     
         <ImageView android:id="@+id/current_group_icon"
-                   android:src="@drawable/ic_menu_archive_rev"
+                   android:src="@drawable/folder_up_rev"
                    android:layout_width="24dp"
                    android:layout_height="24dp"
                    />
