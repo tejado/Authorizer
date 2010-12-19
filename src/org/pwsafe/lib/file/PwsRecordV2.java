@@ -92,6 +92,11 @@ public class PwsRecordV2 extends PwsRecord
 	public static final int		PASSWORD_POLICY		= 11;
 
 	/**
+	 * Constant for the last time any field in the record was changed.
+	 */
+	public static final int     LAST_MOD_TIME       = 12;
+
+	/**
 	 * Constant for the end of record marker field.
 	 */
 	public static final int		END_OF_RECORD		= 255;
@@ -110,7 +115,7 @@ public class PwsRecordV2 extends PwsRecord
 		field_map.put(PwsFieldTypeV2.LAST_ACCESS_TIME,		PwsTimeField.class);
 		field_map.put(PwsFieldTypeV2.PASSWORD_LIFETIME,		PwsIntegerField.class);
 		field_map.put(PwsFieldTypeV2.PASSWORD_POLICY,		PwsStringField.class);
-
+		field_map.put(PwsFieldTypeV2.LAST_MOD_TIME,         PwsTimeField.class);
 	}
 	/**
 	 * All the valid type codes.
@@ -128,7 +133,8 @@ public class PwsRecordV2 extends PwsRecord
 		new Object [] { new Integer(PASSWORD_MOD_TIME),	"PASSWORD_MOD_TIME",	PwsTimeField.class },
 		new Object [] { new Integer(LAST_ACCESS_TIME),	"LAST_ACCESS_TIME",		PwsTimeField.class },
 		new Object [] { new Integer(PASSWORD_LIFETIME),	"PASSWORD_LIFETIME",	PwsIntegerField.class },
-		new Object [] { new Integer(PASSWORD_POLICY),	"PASSWORD_POLICY",		PwsStringField.class }
+		new Object [] { new Integer(PASSWORD_POLICY),	"PASSWORD_POLICY",		PwsStringField.class },
+		new Object [] { new Integer(LAST_MOD_TIME),     "LAST_MOD_TIME",        PwsTimeField.class },
 	};
 
 	/**
@@ -286,6 +292,7 @@ public class PwsRecordV2 extends PwsRecord
 				case CREATION_TIME :
 				case PASSWORD_MOD_TIME :
 				case LAST_ACCESS_TIME :
+				case LAST_MOD_TIME :
 					itemVal	= new PwsTimeField( item.getType(), item.getByteData() );
 					break;
 
