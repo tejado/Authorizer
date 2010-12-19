@@ -25,7 +25,7 @@ import android.widget.TextView;
 public class RecordView extends AbstractRecordActivity
 {
     private static final String TAG = "RecordView";
-    private static final String HIDDEN_PASSWORD = "***** (click to show)";
+    private static final String HIDDEN_PASSWORD = "***** (tap to show)";
 
     private static final String WORD_WRAP_PREF = "wordwrap";
 
