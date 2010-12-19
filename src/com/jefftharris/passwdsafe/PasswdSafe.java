@@ -40,11 +40,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -71,6 +74,9 @@ public class PasswdSafe extends ListActivity
     private static final int MENU_DELETE = 4;
     private static final int MENU_SEARCH = 5;
     private static final int MENU_PARENT = 6;
+
+    private static final int CTXMENU_COPY_USER = 1;
+    private static final int CTXMENU_COPY_PASSWD = 2;
 
     private static final String RECORD = "record";
     private static final String TITLE = "title";
@@ -115,6 +121,7 @@ public class PasswdSafe extends ListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.passwd_safe);
+        registerForContextMenu(getListView());
         View v = findViewById(R.id.query_clear_btn);
         v.setOnClickListener(new View.OnClickListener()
         {
@@ -724,6 +731,64 @@ public class PasswdSafe extends ListActivity
             String childTitle = (String)item.get(TITLE);
             itsCurrGroups.add(childTitle);
             showFileData();
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu, android.view.View, android.view.ContextMenu.ContextMenuInfo)
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu,
+                                    View v,
+                                    ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo)menuInfo;
+        HashMap<String, Object> listItem = itsListData.get(info.position);
+        PwsRecord rec = (PwsRecord)listItem.get(RECORD);
+        if (rec != null) {
+            menu.setHeaderTitle((String)listItem.get(TITLE));
+            menu.add(0, CTXMENU_COPY_USER, 0, R.string.copy_user);
+            menu.add(0, CTXMENU_COPY_PASSWD, 0, R.string.copy_password);
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        AdapterContextMenuInfo info =
+            (AdapterContextMenuInfo)item.getMenuInfo();
+        PasswdFileData fileData = itsPasswdFile.getFileData();
+        HashMap<String, Object> listItem = itsListData.get(info.position);
+        PwsRecord rec = (PwsRecord)listItem.get(RECORD);
+
+        switch(item.getItemId()) {
+        case CTXMENU_COPY_USER:
+        {
+            if ((rec != null) && (fileData != null)) {
+                String str = fileData.getUsername(rec);
+                PasswdSafeApp.copyToClipboard(str, this);
+            }
+            return true;
+        }
+        case CTXMENU_COPY_PASSWD:
+        {
+            if ((rec != null) && (fileData != null)) {
+                String str = fileData.getPassword(rec);
+                PasswdSafeApp.copyToClipboard(str, this);
+            }
+            return true;
+        }
+        default:
+        {
+            return super.onContextItemSelected(item);
+        }
         }
     }
 

@@ -34,6 +34,7 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.text.ClipboardManager;
 import android.util.Log;
 
 public class PasswdSafeApp extends Application
@@ -446,6 +447,13 @@ public class PasswdSafeApp extends Application
             version = "Unknown";
         }
         return version;
+    }
+
+    public static void copyToClipboard(String str, Context ctx)
+    {
+        ClipboardManager clipMgr = (ClipboardManager)
+            ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+        clipMgr.setText(str);
     }
 
     public static void showFatalMsg(Throwable t, Activity activity)

@@ -11,12 +11,10 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.ClipboardManager;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,13 +91,13 @@ public class RecordView extends AbstractRecordActivity
         switch (item.getItemId()) {
         case MENU_COPY_PASSWORD:
         {
-            copyToClipboard(itsPassword);
+            PasswdSafeApp.copyToClipboard(itsPassword, this);
             return true;
         }
         case MENU_COPY_USER:
         {
             TextView tv = (TextView)findViewById(R.id.user);
-            copyToClipboard(tv.getText().toString());
+            PasswdSafeApp.copyToClipboard(tv.getText().toString(), this);
             return true;
         }
         default:
@@ -202,18 +200,18 @@ public class RecordView extends AbstractRecordActivity
         case MENU_COPY_USER:
         {
             TextView tv = (TextView)findViewById(R.id.user);
-            copyToClipboard(tv.getText().toString());
+            PasswdSafeApp.copyToClipboard(tv.getText().toString(), this);
             return true;
         }
         case MENU_COPY_PASSWORD:
         {
-            copyToClipboard(itsPassword);
+            PasswdSafeApp.copyToClipboard(itsPassword, this);
             return true;
         }
         case MENU_COPY_NOTES:
         {
             TextView tv = (TextView)findViewById(R.id.notes);
-            copyToClipboard(tv.getText().toString());
+            PasswdSafeApp.copyToClipboard(tv.getText().toString(), this);
             return true;
         }
         case MENU_TOGGLE_WRAP_NOTES:
@@ -363,13 +361,6 @@ public class RecordView extends AbstractRecordActivity
     {
         TextView tv = (TextView)findViewById(R.id.notes);
         tv.setHorizontallyScrolling(!isWordWrap);
-    }
-
-    private final void copyToClipboard(String str)
-    {
-        ClipboardManager clipMgr = (ClipboardManager)
-            getSystemService(Context.CLIPBOARD_SERVICE);
-        clipMgr.setText(str);
     }
 
     private final TextView setText(int id, int rowId, String text)
