@@ -647,10 +647,6 @@ public class PasswdSafe extends ListActivity
             tv.setText(fileData.canEdit() ?
                        R.string.read_write : R.string.read_only);
 
-            tv = (TextView)dialog.findViewById(R.id.num_groups);
-            // TODO: FIX
-            //tv.setText(Integer.toString(itsGroupData.size()));
-
             tv = (TextView)dialog.findViewById(R.id.num_records);
             tv.setText(Integer.toString(fileData.getRecords().size()));
 
