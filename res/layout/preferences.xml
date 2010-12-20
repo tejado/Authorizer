@@ -94,4 +94,8 @@
                             android:key="searchRegexPref"
                             android:defaultValue="false"/>
     </PreferenceCategory>
+
+    <ListPreference android:name="fontSize Pref"
+                    android:title="Font size"
+                    android:key="fontSizePref"/>
 </PreferenceScreen>

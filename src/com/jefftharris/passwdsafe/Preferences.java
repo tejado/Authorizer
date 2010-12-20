@@ -36,6 +36,7 @@ public class Preferences extends PreferenceActivity
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
     private ListPreference itsPasswdEncPref;
+    private ListPreference itsFontSizePref;
 
     /** Called when the activity is first created. */
     @Override
@@ -76,6 +77,12 @@ public class Preferences extends PreferenceActivity
 
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_LENGTH);
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_HEX);
+
+        itsFontSizePref = (ListPreference)
+            findPreference(PasswdSafeApp.PREF_FONT_SIZE);
+        itsFontSizePref.setEntries(PasswdSafeApp.PREF_FONT_SIZE_ENTRIES);
+        itsFontSizePref.setEntryValues(PasswdSafeApp.PREF_FONT_SIZE_VALUES);
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FONT_SIZE);
 
         Intent intent = getIntent();
         String screen = intent.getStringExtra(INTENT_SCREEN);
@@ -135,6 +142,9 @@ public class Preferences extends PreferenceActivity
                 Preference pref = findPreference(id);
                 pref.setEnabled(!isHex);
             }
+        } else if (key.equals(PasswdSafeApp.PREF_FONT_SIZE)) {
+            itsFontSizePref.setSummary(
+                fontSizeValueToEntry(PasswdSafeApp.getFontSizePref(prefs)));
         }
     }
 
@@ -165,6 +175,18 @@ public class Preferences extends PreferenceActivity
              ++i) {
             if (PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES[i].equals(value)) {
                 return PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES[i];
+            }
+        }
+        return "Unknown";
+    }
+
+    private static String fontSizeValueToEntry(String value)
+    {
+        for (int i = 0;
+             i < PasswdSafeApp.PREF_FONT_SIZE_VALUES.length;
+             ++i) {
+            if (PasswdSafeApp.PREF_FONT_SIZE_VALUES[i].equals(value)) {
+                return PasswdSafeApp.PREF_FONT_SIZE_ENTRIES[i];
             }
         }
         return "Unknown";

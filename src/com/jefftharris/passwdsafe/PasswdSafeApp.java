@@ -222,6 +222,15 @@ public class PasswdSafeApp extends Application
     public static final String PREF_GEN_LENGTH = "passwdGenLength";
     public static final String PREF_GEN_LENGTH_DEF = "8";
 
+    public static final String PREF_FONT_SIZE_NORMAL = "normal";
+    public static final String PREF_FONT_SIZE_SMALL = "small";
+    public static final String PREF_FONT_SIZE = "fontSizePref";
+    public static final String PREF_FONT_SIZE_DEF = PREF_FONT_SIZE_NORMAL;
+    public static final String[] PREF_FONT_SIZE_ENTRIES =
+        { "Normal", "Small" };
+    public static final String[] PREF_FONT_SIZE_VALUES =
+        { PREF_FONT_SIZE_NORMAL, PREF_FONT_SIZE_SMALL };
+
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
@@ -336,6 +345,11 @@ public class PasswdSafeApp extends Application
     public static String getDefFilePref(SharedPreferences prefs)
     {
         return prefs.getString(PREF_DEF_FILE, PREF_DEF_FILE_DEF);
+    }
+
+    public static String getFontSizePref(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_FONT_SIZE, PREF_FONT_SIZE_DEF);
     }
 
     public static boolean getGroupRecordsPref(SharedPreferences prefs)
