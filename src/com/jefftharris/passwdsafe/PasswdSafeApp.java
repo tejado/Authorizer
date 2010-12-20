@@ -157,6 +157,7 @@ public class PasswdSafeApp extends Application
     }
 
     public static final boolean DEBUG = false;
+    public static final boolean DEBUG_AUTOOPEN = false;
 
     public static final String NEW_INTENT =
         "com.jefftharris.passwdsafe.action.NEW";

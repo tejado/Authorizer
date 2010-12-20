@@ -96,6 +96,9 @@ public class FileList extends ListActivity
 
         itsHeader = new TextView(this);
         getListView().addHeaderView(itsHeader);
+        if (PasswdSafeApp.DEBUG_AUTOOPEN) {
+            openFile(new File("/sdcard/test.psafe3"));
+        }
     }
 
     /* (non-Javadoc)
