@@ -34,13 +34,13 @@ public class Preferences extends PreferenceActivity
 
     private static final String[] PREF_FONT_SIZE_ENTRIES =
     {
-        PasswdSafeApp.FontSizePref.NORMAL.getDisplayName(),
-        PasswdSafeApp.FontSizePref.SMALL.getDisplayName()
+        FontSizePref.NORMAL.getDisplayName(),
+        FontSizePref.SMALL.getDisplayName()
     };
     private static final String[] PREF_FONT_SIZE_VALUES =
     {
-        PasswdSafeApp.FontSizePref.NORMAL.toString(),
-        PasswdSafeApp.FontSizePref.SMALL.toString()
+        FontSizePref.NORMAL.toString(),
+        FontSizePref.SMALL.toString()
     };
 
     private EditTextPreference itsFileDirPref;

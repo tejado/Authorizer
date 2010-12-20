@@ -222,23 +222,6 @@ public class PasswdSafeApp extends Application
     public static final String PREF_GEN_LENGTH = "passwdGenLength";
     public static final String PREF_GEN_LENGTH_DEF = "8";
 
-    public enum FontSizePref
-    {
-        NORMAL ("Normal"),
-        SMALL ("Small");
-
-        private String itsDisplayName;
-
-        private FontSizePref(String displayName)
-        {
-            itsDisplayName = displayName;
-        }
-
-        public final String getDisplayName()
-        {
-            return itsDisplayName;
-        }
-    }
     public static final String PREF_FONT_SIZE = "fontSizePref";
     public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
 
