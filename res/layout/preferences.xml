@@ -68,7 +68,7 @@
         </PreferenceCategory>
     </PreferenceScreen>
     
-    <PreferenceCategory android:title="Record Settings"
+    <PreferenceScreen android:title="Record Settings"
                         android:key="recordOptions">
         <CheckBoxPreference android:name="sortCaseSensitive Pref"
                             android:title="Case-sensitive sorting"
@@ -79,9 +79,9 @@
                             android:title="Group records"
                             android:key="groupRecordsPref"
                             android:defaultValue="true"/>
-    </PreferenceCategory>
+    </PreferenceScreen>
     
-    <PreferenceCategory android:title="Search Settings"
+    <PreferenceScreen android:title="Search Settings"
                         android:key="searchOptions">
         <CheckBoxPreference android:name="searchCaseSensitive Pref"
                             android:title="Case sensitive"
@@ -93,7 +93,7 @@
                             android:summary="Use a regular expression to search instead of a sub-string"
                             android:key="searchRegexPref"
                             android:defaultValue="false"/>
-    </PreferenceCategory>
+    </PreferenceScreen>
 
     <ListPreference android:name="fontSize Pref"
                     android:title="Font size"
