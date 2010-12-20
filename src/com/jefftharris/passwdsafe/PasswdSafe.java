@@ -99,6 +99,7 @@ public class PasswdSafe extends ListActivity
     private boolean itsIsSortCaseSensitive = true;
     private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = false;
+    private FontSizePref itsFontSize = PasswdSafeApp.PREF_FONT_SIZE_DEF;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
 
@@ -161,6 +162,7 @@ public class PasswdSafe extends ListActivity
         itsIsSearchCaseSensitive =
             PasswdSafeApp.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = PasswdSafeApp.getSearchRegexPref(prefs);
+        itsFontSize = PasswdSafeApp.getFontSizePref(prefs);
 
         String action = intent.getAction();
         if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
@@ -911,11 +913,25 @@ public class PasswdSafe extends ListActivity
         }
 
         int layout = R.layout.passwdsafe_list_item;
+        switch (itsFontSize) {
+        case NORMAL:
+        {
+            // Default already set
+            break;
+        }
+        case SMALL:
+        {
+            layout = R.layout.passwdsafe_list_item_small;
+            break;
+        }
+        }
+
         String[] from;
         int[] to;
         if (itsSearchQuery == null) {
             from = new String[] { TITLE, USERNAME, ICON };
-            to = new int[] { android.R.id.text1, android.R.id.text2, R.id.icon };
+            to = new int[] { android.R.id.text1, android.R.id.text2,
+                             R.id.icon };
         } else {
             from = new String[] { TITLE, USERNAME, ICON, MATCH };
             to = new int[] { android.R.id.text1, android.R.id.text2,

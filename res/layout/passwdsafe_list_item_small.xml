@@ -1,0 +1,50 @@
+<TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="2dip"
+    android:paddingBottom="2dip"
+    android:paddingLeft="2dip"
+    android:mode="twoLine"
+>
+
+    <ImageView android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:scaleType="fitCenter" 
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@android:id/text2"
+        android:adjustViewBounds="true"
+        />
+
+    <TextView android:id="@android:id/text1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_toRightOf="@id/icon"
+        android:paddingRight="6dip"
+        />
+        
+    <TextView android:id="@android:id/text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@android:id/text1"
+        android:layout_alignLeft="@android:id/text1"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp"
+        />
+
+    <TextView android:id="@+id/match"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@android:id/text1"
+        android:layout_toRightOf="@android:id/text2"
+        android:gravity="right"
+        android:paddingRight="6dip"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="10sp"
+        />
+
+</TwoLineListItem>
