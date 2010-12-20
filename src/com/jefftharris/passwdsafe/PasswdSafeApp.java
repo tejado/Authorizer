@@ -222,14 +222,25 @@ public class PasswdSafeApp extends Application
     public static final String PREF_GEN_LENGTH = "passwdGenLength";
     public static final String PREF_GEN_LENGTH_DEF = "8";
 
-    public static final String PREF_FONT_SIZE_NORMAL = "normal";
-    public static final String PREF_FONT_SIZE_SMALL = "small";
+    public enum FontSizePref
+    {
+        NORMAL ("Normal"),
+        SMALL ("Small");
+
+        private String itsDisplayName;
+
+        private FontSizePref(String displayName)
+        {
+            itsDisplayName = displayName;
+        }
+
+        public final String getDisplayName()
+        {
+            return itsDisplayName;
+        }
+    }
     public static final String PREF_FONT_SIZE = "fontSizePref";
-    public static final String PREF_FONT_SIZE_DEF = PREF_FONT_SIZE_NORMAL;
-    public static final String[] PREF_FONT_SIZE_ENTRIES =
-        { "Normal", "Small" };
-    public static final String[] PREF_FONT_SIZE_VALUES =
-        { PREF_FONT_SIZE_NORMAL, PREF_FONT_SIZE_SMALL };
+    public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
 
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
@@ -347,9 +358,14 @@ public class PasswdSafeApp extends Application
         return prefs.getString(PREF_DEF_FILE, PREF_DEF_FILE_DEF);
     }
 
-    public static String getFontSizePref(SharedPreferences prefs)
+    public static FontSizePref getFontSizePref(SharedPreferences prefs)
     {
-        return prefs.getString(PREF_FONT_SIZE, PREF_FONT_SIZE_DEF);
+        try {
+            return FontSizePref.valueOf(
+                prefs.getString(PREF_FONT_SIZE, PREF_FONT_SIZE_DEF.toString()));
+        } catch (IllegalArgumentException e) {
+            return PREF_FONT_SIZE_DEF;
+        }
     }
 
     public static boolean getGroupRecordsPref(SharedPreferences prefs)

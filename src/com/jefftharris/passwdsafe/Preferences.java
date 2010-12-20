@@ -32,6 +32,17 @@ public class Preferences extends PreferenceActivity
     public static final String INTENT_SCREEN = "screen";
     public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
 
+    private static final String[] PREF_FONT_SIZE_ENTRIES =
+    {
+        PasswdSafeApp.FontSizePref.NORMAL.getDisplayName(),
+        PasswdSafeApp.FontSizePref.SMALL.getDisplayName()
+    };
+    private static final String[] PREF_FONT_SIZE_VALUES =
+    {
+        PasswdSafeApp.FontSizePref.NORMAL.toString(),
+        PasswdSafeApp.FontSizePref.SMALL.toString()
+    };
+
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
@@ -80,8 +91,8 @@ public class Preferences extends PreferenceActivity
 
         itsFontSizePref = (ListPreference)
             findPreference(PasswdSafeApp.PREF_FONT_SIZE);
-        itsFontSizePref.setEntries(PasswdSafeApp.PREF_FONT_SIZE_ENTRIES);
-        itsFontSizePref.setEntryValues(PasswdSafeApp.PREF_FONT_SIZE_VALUES);
+        itsFontSizePref.setEntries(PREF_FONT_SIZE_ENTRIES);
+        itsFontSizePref.setEntryValues(PREF_FONT_SIZE_VALUES);
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FONT_SIZE);
 
         Intent intent = getIntent();
@@ -144,7 +155,7 @@ public class Preferences extends PreferenceActivity
             }
         } else if (key.equals(PasswdSafeApp.PREF_FONT_SIZE)) {
             itsFontSizePref.setSummary(
-                fontSizeValueToEntry(PasswdSafeApp.getFontSizePref(prefs)));
+                PasswdSafeApp.getFontSizePref(prefs).getDisplayName());
         }
     }
 
@@ -175,18 +186,6 @@ public class Preferences extends PreferenceActivity
              ++i) {
             if (PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES[i].equals(value)) {
                 return PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES[i];
-            }
-        }
-        return "Unknown";
-    }
-
-    private static String fontSizeValueToEntry(String value)
-    {
-        for (int i = 0;
-             i < PasswdSafeApp.PREF_FONT_SIZE_VALUES.length;
-             ++i) {
-            if (PasswdSafeApp.PREF_FONT_SIZE_VALUES[i].equals(value)) {
-                return PasswdSafeApp.PREF_FONT_SIZE_ENTRIES[i];
             }
         }
         return "Unknown";
