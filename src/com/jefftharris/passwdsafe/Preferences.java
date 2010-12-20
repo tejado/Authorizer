@@ -32,10 +32,22 @@ public class Preferences extends PreferenceActivity
     public static final String INTENT_SCREEN = "screen";
     public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
 
+    private static final String[] PREF_FONT_SIZE_ENTRIES =
+    {
+        FontSizePref.NORMAL.getDisplayName(),
+        FontSizePref.SMALL.getDisplayName()
+    };
+    private static final String[] PREF_FONT_SIZE_VALUES =
+    {
+        FontSizePref.NORMAL.toString(),
+        FontSizePref.SMALL.toString()
+    };
+
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
     private ListPreference itsPasswdEncPref;
+    private ListPreference itsFontSizePref;
 
     /** Called when the activity is first created. */
     @Override
@@ -76,6 +88,12 @@ public class Preferences extends PreferenceActivity
 
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_LENGTH);
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_HEX);
+
+        itsFontSizePref = (ListPreference)
+            findPreference(PasswdSafeApp.PREF_FONT_SIZE);
+        itsFontSizePref.setEntries(PREF_FONT_SIZE_ENTRIES);
+        itsFontSizePref.setEntryValues(PREF_FONT_SIZE_VALUES);
+        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FONT_SIZE);
 
         Intent intent = getIntent();
         String screen = intent.getStringExtra(INTENT_SCREEN);
@@ -135,6 +153,9 @@ public class Preferences extends PreferenceActivity
                 Preference pref = findPreference(id);
                 pref.setEnabled(!isHex);
             }
+        } else if (key.equals(PasswdSafeApp.PREF_FONT_SIZE)) {
+            itsFontSizePref.setSummary(
+                PasswdSafeApp.getFontSizePref(prefs).getDisplayName());
         }
     }
 

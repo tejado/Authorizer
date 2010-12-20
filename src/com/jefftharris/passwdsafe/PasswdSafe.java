@@ -40,11 +40,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -72,6 +75,9 @@ public class PasswdSafe extends ListActivity
     private static final int MENU_SEARCH = 5;
     private static final int MENU_PARENT = 6;
 
+    private static final int CTXMENU_COPY_USER = 1;
+    private static final int CTXMENU_COPY_PASSWD = 2;
+
     private static final String RECORD = "record";
     private static final String TITLE = "title";
     private static final String MATCH = "match";
@@ -93,6 +99,7 @@ public class PasswdSafe extends ListActivity
     private boolean itsIsSortCaseSensitive = true;
     private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = false;
+    private FontSizePref itsFontSize = PasswdSafeApp.PREF_FONT_SIZE_DEF;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
 
@@ -115,6 +122,7 @@ public class PasswdSafe extends ListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.passwd_safe);
+        registerForContextMenu(getListView());
         View v = findViewById(R.id.query_clear_btn);
         v.setOnClickListener(new View.OnClickListener()
         {
@@ -154,6 +162,7 @@ public class PasswdSafe extends ListActivity
         itsIsSearchCaseSensitive =
             PasswdSafeApp.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = PasswdSafeApp.getSearchRegexPref(prefs);
+        itsFontSize = PasswdSafeApp.getFontSizePref(prefs);
 
         String action = intent.getAction();
         if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
@@ -640,10 +649,6 @@ public class PasswdSafe extends ListActivity
             tv.setText(fileData.canEdit() ?
                        R.string.read_write : R.string.read_only);
 
-            tv = (TextView)dialog.findViewById(R.id.num_groups);
-            // TODO: FIX
-            //tv.setText(Integer.toString(itsGroupData.size()));
-
             tv = (TextView)dialog.findViewById(R.id.num_records);
             tv.setText(Integer.toString(fileData.getRecords().size()));
 
@@ -728,6 +733,64 @@ public class PasswdSafe extends ListActivity
     }
 
 
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu, android.view.View, android.view.ContextMenu.ContextMenuInfo)
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu,
+                                    View v,
+                                    ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo)menuInfo;
+        HashMap<String, Object> listItem = itsListData.get(info.position);
+        PwsRecord rec = (PwsRecord)listItem.get(RECORD);
+        if (rec != null) {
+            menu.setHeaderTitle((String)listItem.get(TITLE));
+            menu.add(0, CTXMENU_COPY_USER, 0, R.string.copy_user);
+            menu.add(0, CTXMENU_COPY_PASSWD, 0, R.string.copy_password);
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        AdapterContextMenuInfo info =
+            (AdapterContextMenuInfo)item.getMenuInfo();
+        PasswdFileData fileData = itsPasswdFile.getFileData();
+        HashMap<String, Object> listItem = itsListData.get(info.position);
+        PwsRecord rec = (PwsRecord)listItem.get(RECORD);
+
+        switch(item.getItemId()) {
+        case CTXMENU_COPY_USER:
+        {
+            if ((rec != null) && (fileData != null)) {
+                String str = fileData.getUsername(rec);
+                PasswdSafeApp.copyToClipboard(str, this);
+            }
+            return true;
+        }
+        case CTXMENU_COPY_PASSWD:
+        {
+            if ((rec != null) && (fileData != null)) {
+                String str = fileData.getPassword(rec);
+                PasswdSafeApp.copyToClipboard(str, this);
+            }
+            return true;
+        }
+        default:
+        {
+            return super.onContextItemSelected(item);
+        }
+        }
+    }
+
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
         if ((android.os.Build.VERSION.SDK_INT <
@@ -761,10 +824,18 @@ public class PasswdSafe extends ListActivity
         itsFile = new File(intent.getData().getPath());
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         itsPasswdFile = app.accessPasswdFile(itsFile, this);
-        setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
+        String title = PasswdSafeApp.getAppFileTitle(itsFile, this);
+        if (PasswdSafeApp.DEBUG_AUTOOPEN) {
+            title += " - AUTOOPEN!!!!!";
+        }
+        setTitle(title);
 
         if (!itsPasswdFile.isOpen()) {
-            showDialog(DIALOG_GET_PASSWD);
+            if (PasswdSafeApp.DEBUG_AUTOOPEN) {
+                openFile(new StringBuilder("test123"));
+            } else {
+                showDialog(DIALOG_GET_PASSWD);
+            }
         } else {
             showFileData();
         }
@@ -842,11 +913,25 @@ public class PasswdSafe extends ListActivity
         }
 
         int layout = R.layout.passwdsafe_list_item;
+        switch (itsFontSize) {
+        case NORMAL:
+        {
+            // Default already set
+            break;
+        }
+        case SMALL:
+        {
+            layout = R.layout.passwdsafe_list_item_small;
+            break;
+        }
+        }
+
         String[] from;
         int[] to;
         if (itsSearchQuery == null) {
             from = new String[] { TITLE, USERNAME, ICON };
-            to = new int[] { android.R.id.text1, android.R.id.text2, R.id.icon };
+            to = new int[] { android.R.id.text1, android.R.id.text2,
+                             R.id.icon };
         } else {
             from = new String[] { TITLE, USERNAME, ICON, MATCH };
             to = new int[] { android.R.id.text1, android.R.id.text2,

@@ -34,6 +34,7 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.text.ClipboardManager;
 import android.util.Log;
 
 public class PasswdSafeApp extends Application
@@ -156,6 +157,7 @@ public class PasswdSafeApp extends Application
     }
 
     public static final boolean DEBUG = false;
+    public static final boolean DEBUG_AUTOOPEN = false;
 
     public static final String NEW_INTENT =
         "com.jefftharris.passwdsafe.action.NEW";
@@ -219,6 +221,9 @@ public class PasswdSafeApp extends Application
     public static final boolean PREF_GEN_HEX_DEF = false;
     public static final String PREF_GEN_LENGTH = "passwdGenLength";
     public static final String PREF_GEN_LENGTH_DEF = "8";
+
+    public static final String PREF_FONT_SIZE = "fontSizePref";
+    public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
 
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
@@ -336,6 +341,16 @@ public class PasswdSafeApp extends Application
         return prefs.getString(PREF_DEF_FILE, PREF_DEF_FILE_DEF);
     }
 
+    public static FontSizePref getFontSizePref(SharedPreferences prefs)
+    {
+        try {
+            return FontSizePref.valueOf(
+                prefs.getString(PREF_FONT_SIZE, PREF_FONT_SIZE_DEF.toString()));
+        } catch (IllegalArgumentException e) {
+            return PREF_FONT_SIZE_DEF;
+        }
+    }
+
     public static boolean getGroupRecordsPref(SharedPreferences prefs)
     {
         return prefs.getBoolean(PREF_GROUP_RECORDS, PREF_GROUP_RECORDS_DEF);
@@ -446,6 +461,13 @@ public class PasswdSafeApp extends Application
             version = "Unknown";
         }
         return version;
+    }
+
+    public static void copyToClipboard(String str, Context ctx)
+    {
+        ClipboardManager clipMgr = (ClipboardManager)
+            ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+        clipMgr.setText(str);
     }
 
     public static void showFatalMsg(Throwable t, Activity activity)

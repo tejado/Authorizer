@@ -19,11 +19,6 @@
                       android:layout_width="wrap_content"/>
         </TableRow>
         <TableRow>
-            <TextView android:text="@string/num_groups_label"/>
-            <TextView android:id="@+id/num_groups"
-                      android:layout_width="wrap_content"/>
-        </TableRow>
-        <TableRow>
             <TextView android:text="@string/num_records_label"/>
             <TextView android:id="@+id/num_records"
                       android:layout_width="wrap_content"/>
