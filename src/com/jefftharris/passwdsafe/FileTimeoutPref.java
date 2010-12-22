@@ -29,17 +29,17 @@ public enum FileTimeoutPref
     }
 
     /// Get timeout in milliseconds
-    public int getTimeout()
+    public final int getTimeout()
     {
         return itsTimeout;
     }
 
-    public String getValue()
+    public final String getValue()
     {
         return itsValue;
     }
 
-    public String getDisplayName()
+    public final String getDisplayName()
     {
         return itsDisplayName;
     }
