@@ -72,9 +72,8 @@ public class Preferences extends PreferenceActivity
 
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_DEF_FILE);
 
-        itsFileClosePref.setEntries(PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES);
-        itsFileClosePref.setEntryValues(
-            PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES);
+        itsFileClosePref.setEntries(FileTimeoutPref.getDisplayNames());
+        itsFileClosePref.setEntryValues(FileTimeoutPref.getValues());
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
 
         itsPasswdEncPref = (ListPreference)
@@ -133,8 +132,7 @@ public class Preferences extends PreferenceActivity
                 defFileValueToEntry(PasswdSafeApp.getDefFilePref(prefs)));
         } else if (key.equals(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT)) {
             itsFileClosePref.setSummary(
-                fileCloseValueToEntry(
-                    PasswdSafeApp.getFileCloseTimeoutPref(prefs)));
+                PasswdSafeApp.getFileCloseTimeoutPref(prefs).getDisplayName());
         } else if (key.equals(PasswdSafeApp.PREF_PASSWD_ENC)) {
             itsPasswdEncPref.setSummary(
                 PasswdSafeApp.getPasswordEncodingPref(prefs));
@@ -177,18 +175,6 @@ public class Preferences extends PreferenceActivity
 
         itsDefFilePref.setEntries(entries);
         itsDefFilePref.setEntryValues(entryValues);
-    }
-
-    private static String fileCloseValueToEntry(String value)
-    {
-        for (int i = 0;
-             i < PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES.length;
-             ++i) {
-            if (PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES[i].equals(value)) {
-                return PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES[i];
-            }
-        }
-        return "Unknown";
     }
 
     private static String defFileValueToEntry(String value)
