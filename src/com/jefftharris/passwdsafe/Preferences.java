@@ -32,17 +32,6 @@ public class Preferences extends PreferenceActivity
     public static final String INTENT_SCREEN = "screen";
     public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
 
-    private static final String[] PREF_FONT_SIZE_ENTRIES =
-    {
-        FontSizePref.NORMAL.getDisplayName(),
-        FontSizePref.SMALL.getDisplayName()
-    };
-    private static final String[] PREF_FONT_SIZE_VALUES =
-    {
-        FontSizePref.NORMAL.toString(),
-        FontSizePref.SMALL.toString()
-    };
-
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
@@ -90,8 +79,8 @@ public class Preferences extends PreferenceActivity
 
         itsFontSizePref = (ListPreference)
             findPreference(PasswdSafeApp.PREF_FONT_SIZE);
-        itsFontSizePref.setEntries(PREF_FONT_SIZE_ENTRIES);
-        itsFontSizePref.setEntryValues(PREF_FONT_SIZE_VALUES);
+        itsFontSizePref.setEntries(FontSizePref.getDisplayNames());
+        itsFontSizePref.setEntryValues(FontSizePref.getValues());
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FONT_SIZE);
 
         Intent intent = getIntent();

@@ -9,10 +9,11 @@ package com.jefftharris.passwdsafe;
 
 public enum FontSizePref
 {
-    NORMAL ("Normal"),
-    SMALL ("Small");
+    // Values in their display order
+    NORMAL  ("Normal"),
+    SMALL   ("Small");
 
-    private String itsDisplayName;
+    private final String itsDisplayName;
 
     private FontSizePref(String displayName)
     {
@@ -22,5 +23,25 @@ public enum FontSizePref
     public final String getDisplayName()
     {
         return itsDisplayName;
+    }
+
+    public static String[] getValues()
+    {
+        FontSizePref[] prefs = values();
+        String[] strs = new String[prefs.length];
+        for (int i = 0; i < prefs.length; ++i) {
+            strs[i] = prefs[i].toString();
+        }
+        return strs;
+    }
+
+    public static String[] getDisplayNames()
+    {
+        FontSizePref[] prefs = values();
+        String[] strs = new String[prefs.length];
+        for (int i = 0; i < prefs.length; ++i) {
+            strs[i] = prefs[i].getDisplayName();
+        }
+        return strs;
     }
 }
