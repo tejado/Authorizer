@@ -92,6 +92,18 @@ public class PasswdSafe extends ListActivity
     private static final String BUNDLE_CURR_GROUPS =
         "passwdsafe.currGroups";
 
+    private static final int SDK_VERSION;
+    static {
+        int sdk;
+        try {
+            sdk = Integer.parseInt(android.os.Build.VERSION.SDK);
+        } catch (NumberFormatException e) {
+            // Default back to android 1.5
+            sdk = 3;
+        }
+        SDK_VERSION = sdk;
+    }
+
     private File itsFile;
     private ActivityPasswdFile itsPasswdFile;
     private LoadTask itsLoadTask;
@@ -793,8 +805,7 @@ public class PasswdSafe extends ListActivity
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
-        if ((android.os.Build.VERSION.SDK_INT <
-                        android.os.Build.VERSION_CODES.ECLAIR)
+        if ((SDK_VERSION < android.os.Build.VERSION_CODES.ECLAIR)
             && keyCode == KeyEvent.KEYCODE_BACK
             && event.getRepeatCount() == 0) {
             // Take care of calling this method on earlier versions of
