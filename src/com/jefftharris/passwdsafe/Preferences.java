@@ -32,17 +32,6 @@ public class Preferences extends PreferenceActivity
     public static final String INTENT_SCREEN = "screen";
     public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
 
-    private static final String[] PREF_FONT_SIZE_ENTRIES =
-    {
-        FontSizePref.NORMAL.getDisplayName(),
-        FontSizePref.SMALL.getDisplayName()
-    };
-    private static final String[] PREF_FONT_SIZE_VALUES =
-    {
-        FontSizePref.NORMAL.toString(),
-        FontSizePref.SMALL.toString()
-    };
-
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
@@ -72,9 +61,8 @@ public class Preferences extends PreferenceActivity
 
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_DEF_FILE);
 
-        itsFileClosePref.setEntries(PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES);
-        itsFileClosePref.setEntryValues(
-            PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES);
+        itsFileClosePref.setEntries(FileTimeoutPref.getDisplayNames());
+        itsFileClosePref.setEntryValues(FileTimeoutPref.getValues());
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
 
         itsPasswdEncPref = (ListPreference)
@@ -91,8 +79,8 @@ public class Preferences extends PreferenceActivity
 
         itsFontSizePref = (ListPreference)
             findPreference(PasswdSafeApp.PREF_FONT_SIZE);
-        itsFontSizePref.setEntries(PREF_FONT_SIZE_ENTRIES);
-        itsFontSizePref.setEntryValues(PREF_FONT_SIZE_VALUES);
+        itsFontSizePref.setEntries(FontSizePref.getDisplayNames());
+        itsFontSizePref.setEntryValues(FontSizePref.getValues());
         onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FONT_SIZE);
 
         Intent intent = getIntent();
@@ -133,8 +121,7 @@ public class Preferences extends PreferenceActivity
                 defFileValueToEntry(PasswdSafeApp.getDefFilePref(prefs)));
         } else if (key.equals(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT)) {
             itsFileClosePref.setSummary(
-                fileCloseValueToEntry(
-                    PasswdSafeApp.getFileCloseTimeoutPref(prefs)));
+                PasswdSafeApp.getFileCloseTimeoutPref(prefs).getDisplayName());
         } else if (key.equals(PasswdSafeApp.PREF_PASSWD_ENC)) {
             itsPasswdEncPref.setSummary(
                 PasswdSafeApp.getPasswordEncodingPref(prefs));
@@ -177,18 +164,6 @@ public class Preferences extends PreferenceActivity
 
         itsDefFilePref.setEntries(entries);
         itsDefFilePref.setEntryValues(entryValues);
-    }
-
-    private static String fileCloseValueToEntry(String value)
-    {
-        for (int i = 0;
-             i < PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES.length;
-             ++i) {
-            if (PasswdSafeApp.PREF_FILE_CLOSE_ENTRY_VALUES[i].equals(value)) {
-                return PasswdSafeApp.PREF_FILE_CLOSE_ENTRIES[i];
-            }
-        }
-        return "Unknown";
     }
 
     private static String defFileValueToEntry(String value)

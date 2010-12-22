@@ -173,15 +173,8 @@ public class PasswdSafeApp extends Application
         Environment.getExternalStorageDirectory().toString();
 
     public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
-    public static final String PREF_FILE_CLOSE_TIMEOUT_DEF = "300";
-    public static final String[] PREF_FILE_CLOSE_ENTRIES =
-    {
-        "None", "30 seconds", "2 minutes", "5 minutes", "15 minutes", "1 hour"
-    };
-    public static final String[] PREF_FILE_CLOSE_ENTRY_VALUES =
-    {
-        "", "30", "120", "300", "900", "3600"
-    };
+    public static final FileTimeoutPref PREF_FILE_CLOSE_TIMEOUT_DEF =
+        FileTimeoutPref.TO_5_MIN;
 
     public static final String PREF_DEF_FILE = "defFilePref";
     public static final String PREF_DEF_FILE_DEF = "";
@@ -325,10 +318,15 @@ public class PasswdSafeApp extends Application
         return new AppActivityPasswdFile(itsFileData, activity);
     }
 
-    public static String getFileCloseTimeoutPref(SharedPreferences prefs)
+    public static FileTimeoutPref getFileCloseTimeoutPref(SharedPreferences prefs)
     {
-        return prefs.getString(PREF_FILE_CLOSE_TIMEOUT,
-                               PREF_FILE_CLOSE_TIMEOUT_DEF);
+        try {
+            return FileTimeoutPref.prefValueOf(
+                prefs.getString(PREF_FILE_CLOSE_TIMEOUT,
+                                PREF_FILE_CLOSE_TIMEOUT_DEF.getValue()));
+        } catch (IllegalArgumentException e) {
+            return PREF_FILE_CLOSE_TIMEOUT_DEF;
+        }
     }
 
     public static String getFileDirPref(SharedPreferences prefs)
@@ -517,17 +515,13 @@ public class PasswdSafeApp extends Application
     private synchronized final
     void updateFileCloseTimeoutPref(SharedPreferences prefs)
     {
-        String timeoutStr = getFileCloseTimeoutPref(prefs);
-        dbginfo(TAG, "new file close timeout: " + timeoutStr);
-        if (timeoutStr.length() == 0) {
+        FileTimeoutPref pref = getFileCloseTimeoutPref(prefs);
+        dbginfo(TAG, "new file close timeout: " + pref);
+        itsFileCloseTimeout = pref.getTimeout();
+        if (itsFileCloseTimeout == 0) {
             cancelFileDataTimer();
-            itsFileCloseTimeout = 0;
         } else {
-            try {
-                itsFileCloseTimeout = Integer.parseInt(timeoutStr) * 1000;
-                touchFileDataTimer();
-            } catch (NumberFormatException e) {
-            }
+            touchFileDataTimer();
         }
     }
 
