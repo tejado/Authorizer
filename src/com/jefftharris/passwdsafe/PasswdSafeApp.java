@@ -156,7 +156,7 @@ public class PasswdSafeApp extends Application
         Security.addProvider(new BCProvider());
     }
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     public static final boolean DEBUG_AUTOOPEN = false;
 
     public static final String NEW_INTENT =
