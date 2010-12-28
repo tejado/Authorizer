@@ -223,7 +223,7 @@ public class PasswdSafeApp extends Application
         new WeakHashMap<Activity, Object>();
     private AlarmManager itsAlarmMgr;
     private PendingIntent itsCloseIntent;
-    private int itsFileCloseTimeout = 300*1000;
+    private int itsFileCloseTimeout = PREF_FILE_CLOSE_TIMEOUT_DEF.getTimeout();
     private boolean itsIsOpenDefault = true;
     private boolean itsFileTimerPaused = false;
 
