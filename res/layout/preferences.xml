@@ -21,6 +21,11 @@
                             android:title="Show backup files"
                             android:key="showBackupFilesPref"
                             android:defaultValue="false"/>
+
+        <CheckBoxPreference android:name="fileCloseClearClipboard Pref"
+                            android:title="Clear clipboard on close"
+                            android:key="fileCloseClearClipboardPref"
+                            android:defaultValue="true"/>
     </PreferenceScreen>
 
     <PreferenceScreen android:title="Password Settings"

@@ -176,6 +176,10 @@ public class PasswdSafeApp extends Application
     public static final FileTimeoutPref PREF_FILE_CLOSE_TIMEOUT_DEF =
         FileTimeoutPref.TO_5_MIN;
 
+    public static final String PREF_FILE_CLOSE_CLEAR_CLIPBOARD =
+        "fileCloseClearClipboardPref";
+    public static final boolean PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF = true;
+
     public static final String PREF_DEF_FILE = "defFilePref";
     public static final String PREF_DEF_FILE_DEF = "";
     public static final String PREF_DEF_FILE_NONE = "None";
@@ -224,6 +228,8 @@ public class PasswdSafeApp extends Application
     private AlarmManager itsAlarmMgr;
     private PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout = PREF_FILE_CLOSE_TIMEOUT_DEF.getTimeout();
+    private boolean itsIsFileCloseClearClipboard =
+        PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF;
     private boolean itsIsOpenDefault = true;
     private boolean itsFileTimerPaused = false;
 
@@ -266,6 +272,7 @@ public class PasswdSafeApp extends Application
 
         updateFileCloseTimeoutPref(prefs);
         setPasswordEncodingPref(prefs);
+        setFileCloseClearClipboardPref(prefs);
     }
 
     /* (non-Javadoc)
@@ -290,6 +297,8 @@ public class PasswdSafeApp extends Application
             updateFileCloseTimeoutPref(prefs);
         } else if (key.equals(PREF_PASSWD_ENC)) {
             setPasswordEncodingPref(prefs);
+        } else if (key.equals(PREF_FILE_CLOSE_CLEAR_CLIPBOARD)) {
+            setFileCloseClearClipboardPref(prefs);
         }
     }
 
@@ -327,6 +336,12 @@ public class PasswdSafeApp extends Application
         } catch (IllegalArgumentException e) {
             return PREF_FILE_CLOSE_TIMEOUT_DEF;
         }
+    }
+
+    public static boolean getFileCloseClearClipboardPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_CLOSE_CLEAR_CLIPBOARD,
+                                PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF);
     }
 
     public static String getFileDirPref(SharedPreferences prefs)
@@ -530,6 +545,11 @@ public class PasswdSafeApp extends Application
         PwsFile.setPasswordEncoding(getPasswordEncodingPref(prefs));
     }
 
+    private final void setFileCloseClearClipboardPref(SharedPreferences prefs)
+    {
+        itsIsFileCloseClearClipboard = getFileCloseClearClipboardPref(prefs);
+    }
+
     private synchronized final void pauseFileTimer()
     {
         cancelFileDataTimer();
@@ -603,6 +623,10 @@ public class PasswdSafeApp extends Application
         }
 
         cancelFileDataTimer();
+
+        if (itsIsFileCloseClearClipboard) {
+            copyToClipboard("", this);
+        }
 
         for (Map.Entry<Activity, Object> entry :
             itsFileDataActivities.entrySet()) {
