@@ -21,12 +21,13 @@ public class SHA256Pws {
         SHA256Digest digest = new SHA256Digest();
         byte[] output = new byte[digest.getDigestSize()];
         byte[] input = new byte[digest.getDigestSize()];
+        byte[] t;
 
         digest.update(p, 0, p.length);
         digest.doFinal(output, 0);
 
         for (int i = 0; i < iter; ++i) {
-            byte[] t = input;
+            t = input;
             input = output;
             output = t;
 
