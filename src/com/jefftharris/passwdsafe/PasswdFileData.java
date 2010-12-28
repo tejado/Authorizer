@@ -42,7 +42,6 @@ import org.pwsafe.lib.file.PwsUnknownField;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.Debug;
 import android.util.Log;
 
 public class PasswdFileData
