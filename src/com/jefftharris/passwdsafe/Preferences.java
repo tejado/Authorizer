@@ -14,6 +14,7 @@ import org.pwsafe.lib.file.PwsFile;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -29,6 +30,60 @@ import android.preference.PreferenceManager;
 public class Preferences extends PreferenceActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
+    public static final String PREF_FILE_DIR = "fileDirPref";
+    public static final String PREF_FILE_DIR_DEF =
+        Environment.getExternalStorageDirectory().toString();
+
+    public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
+    public static final FileTimeoutPref PREF_FILE_CLOSE_TIMEOUT_DEF =
+        FileTimeoutPref.TO_5_MIN;
+
+    public static final String PREF_FILE_CLOSE_CLEAR_CLIPBOARD =
+        "fileCloseClearClipboardPref";
+    public static final boolean PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF = true;
+
+    public static final String PREF_DEF_FILE = "defFilePref";
+    public static final String PREF_DEF_FILE_DEF = "";
+    public static final String PREF_DEF_FILE_NONE = "None";
+
+    public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
+    public static final boolean PREF_GROUP_RECORDS_DEF = true;
+
+    public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
+    public static final String PREF_PASSWD_ENC_DEF =
+        PwsFile.DEFAULT_PASSWORD_CHARSET;
+
+    public static final String PREF_SEARCH_CASE_SENSITIVE =
+        "searchCaseSensitivePref";
+    public static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
+    public static final String PREF_SEARCH_REGEX = "searchRegexPref";
+    public static final boolean PREF_SEARCH_REGEX_DEF = false;
+
+    public static final String PREF_SHOW_BACKUP_FILES = "showBackupFilesPref";
+    public static final boolean PREF_SHOW_BACKUP_FILES_DEF = false;
+
+    public static final String PREF_SORT_CASE_SENSITIVE =
+        "sortCaseSensitivePref";
+    public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
+
+    public static final String PREF_GEN_LOWER = "passwdGenLower";
+    public static final boolean PREF_GEN_LOWER_DEF = true;
+    public static final String PREF_GEN_UPPER = "passwdGenUpper";
+    public static final boolean PREF_GEN_UPPER_DEF = true;
+    public static final String PREF_GEN_DIGITS = "passwdGenDigits";
+    public static final boolean PREF_GEN_DIGITS_DEF = true;
+    public static final String PREF_GEN_SYMBOLS = "passwdGenSymbols";
+    public static final boolean PREF_GEN_SYMBOLS_DEF = false;
+    public static final String PREF_GEN_EASY = "passwdGenEasy";
+    public static final boolean PREF_GEN_EASY_DEF = false;
+    public static final String PREF_GEN_HEX = "passwdGenHex";
+    public static final boolean PREF_GEN_HEX_DEF = false;
+    public static final String PREF_GEN_LENGTH = "passwdGenLength";
+    public static final String PREF_GEN_LENGTH_DEF = "8";
+
+    public static final String PREF_FONT_SIZE = "fontSizePref";
+    public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
+
     public static final String INTENT_SCREEN = "screen";
     public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
 
@@ -37,6 +92,114 @@ public class Preferences extends PreferenceActivity
     private ListPreference itsFileClosePref;
     private ListPreference itsPasswdEncPref;
     private ListPreference itsFontSizePref;
+
+
+    public static FileTimeoutPref getFileCloseTimeoutPref(SharedPreferences prefs)
+    {
+        try {
+            return FileTimeoutPref.prefValueOf(
+                prefs.getString(PREF_FILE_CLOSE_TIMEOUT,
+                                PREF_FILE_CLOSE_TIMEOUT_DEF.getValue()));
+        } catch (IllegalArgumentException e) {
+            return PREF_FILE_CLOSE_TIMEOUT_DEF;
+        }
+    }
+
+    public static boolean getFileCloseClearClipboardPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_CLOSE_CLEAR_CLIPBOARD,
+                                PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF);
+    }
+
+    public static String getFileDirPref(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_FILE_DIR, PREF_FILE_DIR_DEF);
+    }
+
+    public static String getDefFilePref(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_DEF_FILE, PREF_DEF_FILE_DEF);
+    }
+
+    public static FontSizePref getFontSizePref(SharedPreferences prefs)
+    {
+        try {
+            return FontSizePref.valueOf(
+                prefs.getString(PREF_FONT_SIZE, PREF_FONT_SIZE_DEF.toString()));
+        } catch (IllegalArgumentException e) {
+            return PREF_FONT_SIZE_DEF;
+        }
+    }
+
+    public static boolean getGroupRecordsPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GROUP_RECORDS, PREF_GROUP_RECORDS_DEF);
+    }
+
+    public static String getPasswordEncodingPref(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_PASSWD_ENC, PREF_PASSWD_ENC_DEF);
+    }
+
+    public static boolean getPasswordGenLowerPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_LOWER, PREF_GEN_LOWER_DEF);
+    }
+
+    public static boolean getPasswordGenUpperPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_UPPER, PREF_GEN_UPPER_DEF);
+    }
+
+    public static boolean getPasswordGenDigitsPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_DIGITS, PREF_GEN_DIGITS_DEF);
+    }
+
+    public static boolean getPasswordGenSymbolsPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_SYMBOLS, PREF_GEN_SYMBOLS_DEF);
+    }
+
+    public static boolean getPasswordGenEasyPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_EASY, PREF_GEN_EASY_DEF);
+    }
+
+    public static boolean getPasswordGenHexPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF);
+    }
+
+    public static int getPasswordGenLengthPref(SharedPreferences prefs)
+    {
+        return Integer.parseInt(
+            prefs.getString(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF));
+    }
+
+    public static boolean getSearchCaseSensitivePref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SEARCH_CASE_SENSITIVE,
+                                PREF_SEARCH_CASE_SENSITIVE_DEF);
+    }
+
+    public static boolean getSearchRegexPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SEARCH_REGEX, PREF_SEARCH_REGEX_DEF);
+    }
+
+    public static boolean getShowBackupFilesPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SHOW_BACKUP_FILES,
+                                PREF_SHOW_BACKUP_FILES_DEF);
+    }
+
+    public static boolean getSortCaseSensitivePref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SORT_CASE_SENSITIVE,
+                                PREF_SORT_CASE_SENSITIVE_DEF);
+    }
+
 
     /** Called when the activity is first created. */
     @Override
@@ -49,39 +212,35 @@ public class Preferences extends PreferenceActivity
             PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        itsFileDirPref = (EditTextPreference)
-            findPreference(PasswdSafeApp.PREF_FILE_DIR);
-        itsDefFilePref = (ListPreference)
-            findPreference(PasswdSafeApp.PREF_DEF_FILE);
+        itsFileDirPref = (EditTextPreference)findPreference(PREF_FILE_DIR);
+        itsDefFilePref = (ListPreference)findPreference(PREF_DEF_FILE);
         itsFileClosePref = (ListPreference)
-            findPreference(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
+            findPreference(PREF_FILE_CLOSE_TIMEOUT);
 
-        itsFileDirPref.setDefaultValue(PasswdSafeApp.PREF_FILE_DIR_DEF);
-        updateFileDirPrefs(PasswdSafeApp.getFileDirPref(prefs), prefs);
+        itsFileDirPref.setDefaultValue(PREF_FILE_DIR_DEF);
+        updateFileDirPrefs(getFileDirPref(prefs), prefs);
 
-        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_DEF_FILE);
+        onSharedPreferenceChanged(prefs, PREF_DEF_FILE);
 
         itsFileClosePref.setEntries(FileTimeoutPref.getDisplayNames());
         itsFileClosePref.setEntryValues(FileTimeoutPref.getValues());
-        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT);
+        onSharedPreferenceChanged(prefs, PREF_FILE_CLOSE_TIMEOUT);
 
-        itsPasswdEncPref = (ListPreference)
-            findPreference(PasswdSafeApp.PREF_PASSWD_ENC);
+        itsPasswdEncPref = (ListPreference)findPreference(PREF_PASSWD_ENC);
         String[] charsets =
             PwsFile.ALL_PASSWORD_CHARSETS.toArray(new String[0]);
         itsPasswdEncPref.setEntries(charsets);
         itsPasswdEncPref.setEntryValues(charsets);
-        itsPasswdEncPref.setDefaultValue(PasswdSafeApp.PREF_PASSWD_ENC_DEF);
-        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_PASSWD_ENC);
+        itsPasswdEncPref.setDefaultValue(PREF_PASSWD_ENC_DEF);
+        onSharedPreferenceChanged(prefs, PREF_PASSWD_ENC);
 
-        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_LENGTH);
-        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_GEN_HEX);
+        onSharedPreferenceChanged(prefs, PREF_GEN_LENGTH);
+        onSharedPreferenceChanged(prefs, PREF_GEN_HEX);
 
-        itsFontSizePref = (ListPreference)
-            findPreference(PasswdSafeApp.PREF_FONT_SIZE);
+        itsFontSizePref = (ListPreference) findPreference(PREF_FONT_SIZE);
         itsFontSizePref.setEntries(FontSizePref.getDisplayNames());
         itsFontSizePref.setEntryValues(FontSizePref.getValues());
-        onSharedPreferenceChanged(prefs, PasswdSafeApp.PREF_FONT_SIZE);
+        onSharedPreferenceChanged(prefs, PREF_FONT_SIZE);
 
         Intent intent = getIntent();
         String screen = intent.getStringExtra(INTENT_SCREEN);
@@ -108,41 +267,35 @@ public class Preferences extends PreferenceActivity
      */
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
-        if (key.equals(PasswdSafeApp.PREF_FILE_DIR)) {
-            String pref = PasswdSafeApp.getFileDirPref(prefs);
+        if (key.equals(PREF_FILE_DIR)) {
+            String pref = getFileDirPref(prefs);
             if (pref.length() == 0) {
-                pref = PasswdSafeApp.PREF_FILE_DIR_DEF;
+                pref = PREF_FILE_DIR_DEF;
                 itsFileDirPref.setText(pref);
             }
-            itsDefFilePref.setValue(PasswdSafeApp.PREF_DEF_FILE_DEF);
+            itsDefFilePref.setValue(PREF_DEF_FILE_DEF);
             updateFileDirPrefs(pref, prefs);
-        } else if (key.equals(PasswdSafeApp.PREF_DEF_FILE)) {
+        } else if (key.equals(PREF_DEF_FILE)) {
             itsDefFilePref.setSummary(
-                defFileValueToEntry(PasswdSafeApp.getDefFilePref(prefs)));
-        } else if (key.equals(PasswdSafeApp.PREF_FILE_CLOSE_TIMEOUT)) {
+                defFileValueToEntry(getDefFilePref(prefs)));
+        } else if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
             itsFileClosePref.setSummary(
-                PasswdSafeApp.getFileCloseTimeoutPref(prefs).getDisplayName());
-        } else if (key.equals(PasswdSafeApp.PREF_PASSWD_ENC)) {
-            itsPasswdEncPref.setSummary(
-                PasswdSafeApp.getPasswordEncodingPref(prefs));
-        } else if (key.equals(PasswdSafeApp.PREF_GEN_LENGTH)) {
-            Preference pref = findPreference(PasswdSafeApp.PREF_GEN_LENGTH);
-            pref.setSummary(
-                Integer.toString(
-                    PasswdSafeApp.getPasswordGenLengthPref(prefs)));
-        } else if (key.equals(PasswdSafeApp.PREF_GEN_HEX)) {
-            boolean isHex = PasswdSafeApp.getPasswordGenHexPref(prefs);
-            for (String id: new String[] { PasswdSafeApp.PREF_GEN_LOWER,
-                                           PasswdSafeApp.PREF_GEN_UPPER,
-                                           PasswdSafeApp.PREF_GEN_DIGITS,
-                                           PasswdSafeApp.PREF_GEN_SYMBOLS,
-                                           PasswdSafeApp.PREF_GEN_EASY }) {
+                getFileCloseTimeoutPref(prefs).getDisplayName());
+        } else if (key.equals(PREF_PASSWD_ENC)) {
+            itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
+        } else if (key.equals(PREF_GEN_LENGTH)) {
+            Preference pref = findPreference(PREF_GEN_LENGTH);
+            pref.setSummary(Integer.toString(getPasswordGenLengthPref(prefs)));
+        } else if (key.equals(PREF_GEN_HEX)) {
+            boolean isHex = getPasswordGenHexPref(prefs);
+            for (String id: new String[] { PREF_GEN_LOWER, PREF_GEN_UPPER,
+                                           PREF_GEN_DIGITS, PREF_GEN_SYMBOLS,
+                                           PREF_GEN_EASY }) {
                 Preference pref = findPreference(id);
                 pref.setEnabled(!isHex);
             }
-        } else if (key.equals(PasswdSafeApp.PREF_FONT_SIZE)) {
-            itsFontSizePref.setSummary(
-                PasswdSafeApp.getFontSizePref(prefs).getDisplayName());
+        } else if (key.equals(PREF_FONT_SIZE)) {
+            itsFontSizePref.setSummary(getFontSizePref(prefs).getDisplayName());
         }
     }
 
@@ -151,12 +304,12 @@ public class Preferences extends PreferenceActivity
     {
         itsFileDirPref.setSummary(summary);
 
-        File fileDir = new File(PasswdSafeApp.getFileDirPref(prefs));
+        File fileDir = new File(getFileDirPref(prefs));
         FileList.FileData[] files = FileList.getFiles(fileDir, false);
         String[] entries = new String[files.length + 1];
         String[] entryValues = new String[files.length + 1];
-        entries[0] = PasswdSafeApp.PREF_DEF_FILE_NONE;
-        entryValues[0] = PasswdSafeApp.PREF_DEF_FILE_DEF;
+        entries[0] = PREF_DEF_FILE_NONE;
+        entryValues[0] = PREF_DEF_FILE_DEF;
         for (int i = 0; i < files.length; ++i) {
             entries[i + 1] = files[i].toString();
             entryValues[i + 1] = entries[i + 1];
@@ -168,8 +321,8 @@ public class Preferences extends PreferenceActivity
 
     private static String defFileValueToEntry(String value)
     {
-        if (value.equals(PasswdSafeApp.PREF_DEF_FILE_DEF)) {
-            return PasswdSafeApp.PREF_DEF_FILE_NONE;
+        if (value.equals(PREF_DEF_FILE_DEF)) {
+            return PREF_DEF_FILE_NONE;
         } else {
             return value;
         }

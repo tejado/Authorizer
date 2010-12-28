@@ -31,7 +31,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
@@ -168,68 +167,15 @@ public class PasswdSafeApp extends Application
 
     public static final int RESULT_MODIFIED = Activity.RESULT_FIRST_USER;
 
-    public static final String PREF_FILE_DIR = "fileDirPref";
-    public static final String PREF_FILE_DIR_DEF =
-        Environment.getExternalStorageDirectory().toString();
-
-    public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
-    public static final FileTimeoutPref PREF_FILE_CLOSE_TIMEOUT_DEF =
-        FileTimeoutPref.TO_5_MIN;
-
-    public static final String PREF_FILE_CLOSE_CLEAR_CLIPBOARD =
-        "fileCloseClearClipboardPref";
-    public static final boolean PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF = true;
-
-    public static final String PREF_DEF_FILE = "defFilePref";
-    public static final String PREF_DEF_FILE_DEF = "";
-    public static final String PREF_DEF_FILE_NONE = "None";
-
-    public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
-    public static final boolean PREF_GROUP_RECORDS_DEF = true;
-
-    public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
-    public static final String PREF_PASSWD_ENC_DEF =
-        PwsFile.DEFAULT_PASSWORD_CHARSET;
-
-    public static final String PREF_SEARCH_CASE_SENSITIVE =
-        "searchCaseSensitivePref";
-    public static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
-    public static final String PREF_SEARCH_REGEX = "searchRegexPref";
-    public static final boolean PREF_SEARCH_REGEX_DEF = false;
-
-    public static final String PREF_SHOW_BACKUP_FILES = "showBackupFilesPref";
-    public static final boolean PREF_SHOW_BACKUP_FILES_DEF = false;
-
-    public static final String PREF_SORT_CASE_SENSITIVE =
-        "sortCaseSensitivePref";
-    public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
-
-    public static final String PREF_GEN_LOWER = "passwdGenLower";
-    public static final boolean PREF_GEN_LOWER_DEF = true;
-    public static final String PREF_GEN_UPPER = "passwdGenUpper";
-    public static final boolean PREF_GEN_UPPER_DEF = true;
-    public static final String PREF_GEN_DIGITS = "passwdGenDigits";
-    public static final boolean PREF_GEN_DIGITS_DEF = true;
-    public static final String PREF_GEN_SYMBOLS = "passwdGenSymbols";
-    public static final boolean PREF_GEN_SYMBOLS_DEF = false;
-    public static final String PREF_GEN_EASY = "passwdGenEasy";
-    public static final boolean PREF_GEN_EASY_DEF = false;
-    public static final String PREF_GEN_HEX = "passwdGenHex";
-    public static final boolean PREF_GEN_HEX_DEF = false;
-    public static final String PREF_GEN_LENGTH = "passwdGenLength";
-    public static final String PREF_GEN_LENGTH_DEF = "8";
-
-    public static final String PREF_FONT_SIZE = "fontSizePref";
-    public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
-
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
     private AlarmManager itsAlarmMgr;
     private PendingIntent itsCloseIntent;
-    private int itsFileCloseTimeout = PREF_FILE_CLOSE_TIMEOUT_DEF.getTimeout();
+    private int itsFileCloseTimeout =
+        Preferences.PREF_FILE_CLOSE_TIMEOUT_DEF.getTimeout();
     private boolean itsIsFileCloseClearClipboard =
-        PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF;
+        Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF;
     private boolean itsIsOpenDefault = true;
     private boolean itsFileTimerPaused = false;
 
@@ -265,7 +211,7 @@ public class PasswdSafeApp extends Application
             SharedPreferences.Editor fileListEdit = fileListPrefs.edit();
             SharedPreferences.Editor prefsEdit = prefs.edit();
             fileListEdit.remove(dirPrefName);
-            prefsEdit.putString(PREF_FILE_DIR, dirPref);
+            prefsEdit.putString(Preferences.PREF_FILE_DIR, dirPref);
             fileListEdit.commit();
             prefsEdit.commit();
         }
@@ -293,11 +239,11 @@ public class PasswdSafeApp extends Application
         dbginfo(TAG, "Preference change: " + key + ", value: " +
                 prefs.getAll().get(key));
 
-        if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
+        if (key.equals(Preferences.PREF_FILE_CLOSE_TIMEOUT)) {
             updateFileCloseTimeoutPref(prefs);
-        } else if (key.equals(PREF_PASSWD_ENC)) {
+        } else if (key.equals(Preferences.PREF_PASSWD_ENC)) {
             setPasswordEncodingPref(prefs);
-        } else if (key.equals(PREF_FILE_CLOSE_CLEAR_CLIPBOARD)) {
+        } else if (key.equals(Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD)) {
             setFileCloseClearClipboardPref(prefs);
         }
     }
@@ -325,112 +271,6 @@ public class PasswdSafeApp extends Application
 
         dbginfo(TAG, "access file:" + file+ ", data:" + itsFileData);
         return new AppActivityPasswdFile(itsFileData, activity);
-    }
-
-    public static FileTimeoutPref getFileCloseTimeoutPref(SharedPreferences prefs)
-    {
-        try {
-            return FileTimeoutPref.prefValueOf(
-                prefs.getString(PREF_FILE_CLOSE_TIMEOUT,
-                                PREF_FILE_CLOSE_TIMEOUT_DEF.getValue()));
-        } catch (IllegalArgumentException e) {
-            return PREF_FILE_CLOSE_TIMEOUT_DEF;
-        }
-    }
-
-    public static boolean getFileCloseClearClipboardPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_FILE_CLOSE_CLEAR_CLIPBOARD,
-                                PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF);
-    }
-
-    public static String getFileDirPref(SharedPreferences prefs)
-    {
-        return prefs.getString(PREF_FILE_DIR, PREF_FILE_DIR_DEF);
-    }
-
-    public static String getDefFilePref(SharedPreferences prefs)
-    {
-        return prefs.getString(PREF_DEF_FILE, PREF_DEF_FILE_DEF);
-    }
-
-    public static FontSizePref getFontSizePref(SharedPreferences prefs)
-    {
-        try {
-            return FontSizePref.valueOf(
-                prefs.getString(PREF_FONT_SIZE, PREF_FONT_SIZE_DEF.toString()));
-        } catch (IllegalArgumentException e) {
-            return PREF_FONT_SIZE_DEF;
-        }
-    }
-
-    public static boolean getGroupRecordsPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GROUP_RECORDS, PREF_GROUP_RECORDS_DEF);
-    }
-
-    public static String getPasswordEncodingPref(SharedPreferences prefs)
-    {
-        return prefs.getString(PREF_PASSWD_ENC, PREF_PASSWD_ENC_DEF);
-    }
-
-    public static boolean getPasswordGenLowerPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_LOWER, PREF_GEN_LOWER_DEF);
-    }
-
-    public static boolean getPasswordGenUpperPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_UPPER, PREF_GEN_UPPER_DEF);
-    }
-
-    public static boolean getPasswordGenDigitsPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_DIGITS, PREF_GEN_DIGITS_DEF);
-    }
-
-    public static boolean getPasswordGenSymbolsPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_SYMBOLS, PREF_GEN_SYMBOLS_DEF);
-    }
-
-    public static boolean getPasswordGenEasyPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_EASY, PREF_GEN_EASY_DEF);
-    }
-
-    public static boolean getPasswordGenHexPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF);
-    }
-
-    public static int getPasswordGenLengthPref(SharedPreferences prefs)
-    {
-        return Integer.parseInt(
-            prefs.getString(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF));
-    }
-
-    public static boolean getSearchCaseSensitivePref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_SEARCH_CASE_SENSITIVE,
-                                PREF_SEARCH_CASE_SENSITIVE_DEF);
-    }
-
-    public static boolean getSearchRegexPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_SEARCH_REGEX, PREF_SEARCH_REGEX_DEF);
-    }
-
-    public static boolean getShowBackupFilesPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_SHOW_BACKUP_FILES,
-                                PREF_SHOW_BACKUP_FILES_DEF);
-    }
-
-    public static boolean getSortCaseSensitivePref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_SORT_CASE_SENSITIVE,
-                                PREF_SORT_CASE_SENSITIVE_DEF);
     }
 
     public static final String getAppFileTitle(ActivityPasswdFile actFile,
@@ -530,7 +370,7 @@ public class PasswdSafeApp extends Application
     private synchronized final
     void updateFileCloseTimeoutPref(SharedPreferences prefs)
     {
-        FileTimeoutPref pref = getFileCloseTimeoutPref(prefs);
+        FileTimeoutPref pref = Preferences.getFileCloseTimeoutPref(prefs);
         dbginfo(TAG, "new file close timeout: " + pref);
         itsFileCloseTimeout = pref.getTimeout();
         if (itsFileCloseTimeout == 0) {
@@ -542,12 +382,13 @@ public class PasswdSafeApp extends Application
 
     private static void setPasswordEncodingPref(SharedPreferences prefs)
     {
-        PwsFile.setPasswordEncoding(getPasswordEncodingPref(prefs));
+        PwsFile.setPasswordEncoding(Preferences.getPasswordEncodingPref(prefs));
     }
 
     private final void setFileCloseClearClipboardPref(SharedPreferences prefs)
     {
-        itsIsFileCloseClearClipboard = getFileCloseClearClipboardPref(prefs);
+        itsIsFileCloseClearClipboard =
+            Preferences.getFileCloseClearClipboardPref(prefs);
     }
 
     private synchronized final void pauseFileTimer()

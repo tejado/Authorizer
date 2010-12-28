@@ -298,33 +298,33 @@ public class RecordEditActivity extends AbstractRecordActivity
         ArrayList<String> chars = new ArrayList<String>();
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
-        if (PasswdSafeApp.getPasswordGenHexPref(prefs)) {
+        if (Preferences.getPasswordGenHexPref(prefs)) {
             chars.add(DIGITS + "abcdef");
         } else {
-            if (PasswdSafeApp.getPasswordGenEasyPref(prefs)) {
-                if (PasswdSafeApp.getPasswordGenLowerPref(prefs)) {
+            if (Preferences.getPasswordGenEasyPref(prefs)) {
+                if (Preferences.getPasswordGenLowerPref(prefs)) {
                     chars.add(EASY_LOWER_CHARS);
                 }
-                if (PasswdSafeApp.getPasswordGenUpperPref(prefs)) {
+                if (Preferences.getPasswordGenUpperPref(prefs)) {
                     chars.add(EASY_UPPER_CHARS);
                 }
-                if (PasswdSafeApp.getPasswordGenDigitsPref(prefs)) {
+                if (Preferences.getPasswordGenDigitsPref(prefs)) {
                     chars.add(EASY_DIGITS);
                 }
-                if (PasswdSafeApp.getPasswordGenSymbolsPref(prefs)) {
+                if (Preferences.getPasswordGenSymbolsPref(prefs)) {
                     chars.add(EASY_SYMBOLS);
                 }
             } else {
-                if (PasswdSafeApp.getPasswordGenLowerPref(prefs)) {
+                if (Preferences.getPasswordGenLowerPref(prefs)) {
                     chars.add(LOWER_CHARS);
                 }
-                if (PasswdSafeApp.getPasswordGenUpperPref(prefs)) {
+                if (Preferences.getPasswordGenUpperPref(prefs)) {
                     chars.add(UPPER_CHARS);
                 }
-                if (PasswdSafeApp.getPasswordGenDigitsPref(prefs)) {
+                if (Preferences.getPasswordGenDigitsPref(prefs)) {
                     chars.add(DIGITS);
                 }
-                if (PasswdSafeApp.getPasswordGenSymbolsPref(prefs)) {
+                if (Preferences.getPasswordGenSymbolsPref(prefs)) {
                     chars.add(SYMBOLS);
                 }
             }
@@ -338,7 +338,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             TextUtils.concat(chars.toArray(new CharSequence[0])).toString();
         int numChars = charsStr.length();
         StringBuilder passwd = new StringBuilder();
-        int passwdLen = PasswdSafeApp.getPasswordGenLengthPref(prefs);
+        int passwdLen = Preferences.getPasswordGenLengthPref(prefs);
         try {
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
             random.nextBytes(new byte[passwdLen]);

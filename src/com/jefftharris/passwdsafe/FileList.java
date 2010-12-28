@@ -139,7 +139,7 @@ public class FileList extends ListActivity
         } else {
             SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
-            String dirName = PasswdSafeApp.getFileDirPref(prefs);
+            String dirName = Preferences.getFileDirPref(prefs);
             itsDir = new File(dirName);
             itsHeader.setText(getString(R.string.file_list_header, itsDir));
             FileData[] data = getFiles(itsDir);
@@ -147,7 +147,7 @@ public class FileList extends ListActivity
                             this, android.R.layout.simple_list_item_1, data));
 
             if (app.checkOpenDefault()) {
-                String defFileName = PasswdSafeApp.getDefFilePref(prefs);
+                String defFileName = Preferences.getDefFilePref(prefs);
                 File defFile = new File(itsDir, defFileName);
                 if (defFile.isFile() && defFile.canRead()) {
                     openFile(defFile);
@@ -255,7 +255,7 @@ public class FileList extends ListActivity
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
         boolean showBackupFiles =
-            PasswdSafeApp.getShowBackupFilesPref(prefs);
+            Preferences.getShowBackupFilesPref(prefs);
         return getFiles(dir, showBackupFiles);
     }
 
