@@ -843,7 +843,7 @@ public class PasswdSafe extends ListActivity
 
         if (!itsPasswdFile.isOpen()) {
             if (PasswdSafeApp.DEBUG_AUTOOPEN &&
-                (itsFile.getPath().equals("/sdcard/test.psafe3"))) {
+                (itsFile.getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
                 openFile(new StringBuilder("test123"));
             } else {
                 showDialog(DIALOG_GET_PASSWD);
