@@ -96,7 +96,7 @@ public class FileList extends ListActivity
 
         itsHeader = new TextView(this);
         getListView().addHeaderView(itsHeader);
-        if (PasswdSafeApp.DEBUG_AUTOOPEN) {
+        if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
             openFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE));
         }
     }
