@@ -80,13 +80,9 @@ public final class Util
 	 * @return first array appended with second array
 	 */
 	public static byte[] mergeBytes(byte[] a, byte[] b) {
-		byte[] p = new byte[a.length + b.length];
-		for (int i = 0; i < a.length; i++) {
-			p[i] = a[i];
-		}
-		for (int i = 0; i < b.length; i++) {
-			p[a.length + i] = b[i];
-		}
+	    final byte[] p = new byte[a.length + b.length];
+		System.arraycopy(a, 0, p, 0, a.length);
+		System.arraycopy(b, 0, p, a.length, b.length);
 		return p;
 	}
 
@@ -101,7 +97,7 @@ public final class Util
 	 */
 	public static byte[] getBytes(byte[] src, int offset, int length) {
 
-		byte[] output = new byte[length];
+		final byte[] output = new byte[length];
 		System.arraycopy(src, offset, output, 0, length);
 		return output;
 	}
@@ -129,12 +125,7 @@ public final class Util
 	 */
 	public static String byteToHex( byte b )
 	{
-		LOG.enterMethod( "Util.byteToHex(byte)" );
-
-		String str = new StringBuffer().append(HEX_CHARS[ (b >>> 4) & 0x0f ]).append(HEX_CHARS[ b & 0x0f ]).toString();
-
-		LOG.leaveMethod( "Util.byteToHex(byte)" );
-
+	    final String str = new StringBuffer().append(HEX_CHARS[ (b >>> 4) & 0x0f ]).append(HEX_CHARS[ b & 0x0f ]).toString();
 		return str;
 	}
 
@@ -147,13 +138,7 @@ public final class Util
 	 */
 	public static String bytesToHex( byte [] b )
 	{
-		LOG.enterMethod( "Util.bytesToHex(byte[])" );
-
-		String str = bytesToHex( b, 0, b.length );
-
-		LOG.leaveMethod( "Util.bytesToHex(byte[])" );
-
-		return str;
+	    return bytesToHex( b, 0, b.length );
 	}
 
 	/**
@@ -171,32 +156,19 @@ public final class Util
 	 */
 	public static String bytesToHex( byte [] b, int offset, int length )
 	{
-		LOG.enterMethod( "Util.bytesToHex(byte[],int,int)" );
-
-		if (LOG.isDebug2Enabled()) LOG.debug2( "offset = " + offset + ", length = " + length + ", byte array = " + bytesToString(b) );
-
-		StringBuffer	sb;
-		String			result;
-
 		if ( length < 0 )
 		{
-			LOG.error( I18nHelper.getInstance().formatMessage("E00008", new Object [] { new Integer(length) } ) );
-			LOG.leaveMethod( "Util.bytesToHex(byte[],int,int) - (by throwing IllegalArgumentException)" );
 			throw new IllegalArgumentException( "Lengh must be not be negative." );
 		}
 
-		sb = new StringBuffer( length << 1 );
+		final StringBuilder sb = new StringBuilder( length << 1 );
 
 		for ( int ii = offset; ii < (offset + length); ++ii )
 		{
-			sb.append( byteToHex(b[ii]) );
+		    sb.append(HEX_CHARS[(b[ii] >>> 4) & 0x0f]);
+		    sb.append(HEX_CHARS[b[ii] & 0x0f]);
 		}
-		result = sb.toString();
-
-		LOG.debug2( "Result is \"" + result + "\"" );
-		LOG.leaveMethod( "Util.bytesToHex(byte[],int,int)" );
-
-		return result;
+		return sb.toString();
 	}
 
 	/**
@@ -236,8 +208,6 @@ public final class Util
 	 */
 	public static void bytesToLittleEndian( byte [] src )
 	{
-		LOG.enterMethod( "Util.bytesToLittleEndian(byte[])" );
-
 		byte	temp;
 
 		if ( (src.length == 0) || ((src.length % 4) != 0) )
@@ -292,14 +262,8 @@ public final class Util
 	 */
 	public static byte [] cloneByteArray( byte [] src )
 	{
-		LOG.enterMethod( "Util.cloneByteArray(byte[])" );
-
-		byte []	dst = new byte[ src.length ];
-
+	    final byte []	dst = new byte[ src.length ];
 		System.arraycopy( src, 0, dst, 0, src.length );
-
-		LOG.leaveMethod( "Util.cloneByteArray(byte[])" );
-
 		return dst;
 	}
 
@@ -316,15 +280,10 @@ public final class Util
 	 */
 	public static byte [] cloneByteArray( byte [] src, int length )
 	{
-		LOG.enterMethod( "Util.cloneByteArray(byte[],int)" );
-
-		int		max	= (length < src.length) ? length : src.length;
-		byte []	dst = new byte[ length ];
+	    int		max	= (length < src.length) ? length : src.length;
+		final byte []	dst = new byte[ length ];
 
 		System.arraycopy( src, 0, dst, 0, max );
-
-		LOG.leaveMethod( "Util.cloneByteArray(byte[],int)" );
-
 		return dst;
 	}
 
@@ -341,16 +300,12 @@ public final class Util
 	 */
 	public static int getIntFromByteArray( byte [] buff, int offset )
 	{
-		LOG.enterMethod( "Util.cloneByteArray(byte[],int)" );
-
 		int result;
 
 		result = (buff[offset+0] & 0x000000ff)
 			| ((buff[offset+1] & 0x000000ff) << 8 )
 			| ((buff[offset+2] & 0x000000ff) << 16 )
 			| ((buff[offset+3] & 0x000000ff) << 24 );
-
-		LOG.leaveMethod( "Util.cloneByteArray(byte[],int)" );
 
 		return result;
 	}
@@ -368,14 +323,10 @@ public final class Util
      */
     public static short getShortFromByteArray( byte [] buff, int offset )
     {
-        LOG.enterMethod( "Util.cloneByteArray(byte[],int)" );
-
         short result;
 
         result = (short)((buff[offset+0] & 0x00ff)
                         | ((buff[offset+1] & 0x00ff) << 8 ));
-
-        LOG.leaveMethod( "Util.cloneByteArray(byte[],int)" );
 
         return result;
     }
@@ -417,14 +368,10 @@ public final class Util
 	 */
 	public static void putIntToByteArray( byte [] buff, int value, int offset )
 	{
-		LOG.enterMethod( "Util.putIntToByteArray" );
-
 		buff[offset+0]	= (byte)(value & 0xff);
 		buff[offset+1]	= (byte)((value & 0xff00) >>> 8);
 		buff[offset+2]	= (byte)((value & 0xff0000) >>> 16);
 		buff[offset+3]	= (byte)((value & 0xff000000) >>> 24);
-
-		LOG.leaveMethod( "Util.putIntToByteArray" );
 	}
 
     /**
@@ -437,12 +384,8 @@ public final class Util
      */
     public static void putShortToByteArray( byte [] buff, short value, int offset )
     {
-        LOG.enterMethod( "Util.putIntToByteArray" );
-
         buff[offset+0]  = (byte)(value & 0xff);
         buff[offset+1]  = (byte)((value & 0xff00) >>> 8);
-
-        LOG.leaveMethod( "Util.putIntToByteArray" );
     }
 
 	/**

@@ -54,7 +54,7 @@ public class Log
 	 *
 	 * @param msg the message to issue.
 	 */
-	public void debug1( String msg )
+	public final void debug1( String msg )
 	{
 		if ( isDebug1Enabled() )
 		{
@@ -67,7 +67,7 @@ public class Log
 	 *
 	 * @param msg the message to issue.
 	 */
-	public void debug2( String msg )
+	public final void debug2( String msg )
 	{
 		if ( isDebug2Enabled() )
 		{
@@ -80,7 +80,7 @@ public class Log
 	 *
 	 * @param msg the message to issue.
 	 */
-	public void debug3( String msg )
+	public final void debug3( String msg )
 	{
 		if ( isDebug3Enabled() )
 		{
@@ -93,7 +93,7 @@ public class Log
 	 *
 	 * @param msg the message to issue.
 	 */
-	public void debug4( String msg )
+	public final void debug4( String msg )
 	{
 		if ( isDebug4Enabled() )
 		{
@@ -106,7 +106,7 @@ public class Log
 	 *
 	 * @param msg the message to issue.
 	 */
-	public void debug5( String msg )
+	public final void debug5( String msg )
 	{
 		if ( isDebug5Enabled() )
 		{
@@ -119,7 +119,7 @@ public class Log
 	 *
 	 * @param method the method name.
 	 */
-	public void enterMethod( String method )
+	public final void enterMethod( String method )
 	{
 		if ( isDebug1Enabled() )
 		{
@@ -136,7 +136,7 @@ public class Log
 	 *
 	 * @param msg the message to issue.
 	 */
-	public void error( String msg )
+	public final void error( String msg )
 	{
 	    android.util.Log.e( itsTag, msg );
 	}
@@ -147,7 +147,7 @@ public class Log
 	 * @param msg    the message to issue.
 	 * @param except the exeption to be logged.
 	 */
-	public void error( String msg, Throwable except )
+	public final void error( String msg, Throwable except )
 	{
 	    android.util.Log.e( itsTag, msg, except );
 	}
@@ -157,7 +157,7 @@ public class Log
 	 *
 	 * @param except the <code>Exception</code> to log.
 	 */
-	public void error( Throwable except )
+	public final void error( Throwable except )
 	{
 		android.util.Log.e( itsTag, "An Exception has occurred", except );
 	}
@@ -167,7 +167,7 @@ public class Log
 	 *
 	 * @return Returns the debugLevel.
 	 */
-	public int getDebugLevel()
+	public final int getDebugLevel()
 	{
 		return DebugLevel;
 	}
@@ -177,7 +177,7 @@ public class Log
 	 *
 	 * @param msg the message to issue.
 	 */
-	public void info( String msg )
+	public final void info( String msg )
 	{
 	    android.util.Log.i( itsTag, msg );
 	}
@@ -187,7 +187,7 @@ public class Log
 	 *
 	 * @return <code>true</code> if debuuging at level 1 is enabled, <code>false</code> if it isn't.
 	 */
-	public boolean isDebug1Enabled()
+	public final boolean isDebug1Enabled()
 	{
 	    return android.util.Log.isLoggable(itsTag, android.util.Log.DEBUG);
 	}
@@ -197,7 +197,7 @@ public class Log
 	 *
 	 * @return <code>true</code> if debuuging at level 2 is enabled, <code>false</code> if it isn't.
 	 */
-	public boolean isDebug2Enabled()
+	public final boolean isDebug2Enabled()
 	{
 		return isDebug1Enabled() && (DebugLevel >= 2);
 	}
@@ -207,7 +207,7 @@ public class Log
 	 *
 	 * @return <code>true</code> if debuuging at level 3 is enabled, <code>false</code> if it isn't.
 	 */
-	public boolean isDebug3Enabled()
+	public final boolean isDebug3Enabled()
 	{
 		return isDebug1Enabled() && (DebugLevel >= 3);
 	}
@@ -217,7 +217,7 @@ public class Log
 	 *
 	 * @return <code>true</code> if debuuging at level 4 is enabled, <code>false</code> if it isn't.
 	 */
-	public boolean isDebug4Enabled()
+	public final boolean isDebug4Enabled()
 	{
 		return isDebug1Enabled() && (DebugLevel >= 4);
 	}
@@ -227,7 +227,7 @@ public class Log
 	 *
 	 * @return <code>true</code> if debuuging at level 5 is enabled, <code>false</code> if it isn't.
 	 */
-	public boolean isDebug5Enabled()
+	public final boolean isDebug5Enabled()
 	{
 		return isDebug1Enabled() && (DebugLevel >= 5);
 	}
@@ -237,7 +237,7 @@ public class Log
 	 *
 	 * @param method the method name.
 	 */
-	public void leaveMethod( String method )
+	public final void leaveMethod( String method )
 	{
 		if ( isDebug1Enabled() )
 		{
@@ -254,7 +254,7 @@ public class Log
 	 *
 	 * @param debugLevel The debugLevel to set.
 	 */
-	public void setDebugLevel( int debugLevel )
+	public final void setDebugLevel( int debugLevel )
 	{
 		if ( debugLevel < 1 )
 		{
@@ -272,7 +272,7 @@ public class Log
 	 *
 	 * @param msg the message to issue.
 	 */
-	public void warn( String msg )
+	public final void warn( String msg )
 	{
 	    android.util.Log.w( itsTag, msg );
 	}

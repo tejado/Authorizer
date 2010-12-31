@@ -369,7 +369,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 *
 	 * @return The value of the field.
 	 */
-	public PwsField getField(PwsFieldType aType) {
+	public final PwsField getField(PwsFieldType aType) {
 		return getField(Integer.valueOf(aType.getId()));
 	}
 
@@ -381,7 +381,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 *
 	 * @return The value of the field.
 	 */
-	public PwsField getField(int aType) {
+	public final PwsField getField(int aType) {
 		return getField(Integer.valueOf(aType));
 	}
 
@@ -394,7 +394,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 *
 	 * @return The value of the field.
 	 */
-	public PwsField getField(Integer aType) {
+	public final PwsField getField(Integer aType) {
 		return attributes.get(aType);
 	}
 

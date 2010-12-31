@@ -1,6 +1,6 @@
 /*
  * $Id: UUID.java 376 2009-04-21 23:30:19Z roxon $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -17,13 +17,13 @@ import java.util.TimeZone;
 
 /**
  * A naive implementation of a UUID class.
- * 
+ *
  * @author Kevin Preece
  */
 public class UUID implements Comparable<Object>, Serializable
 {
 	/**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private final byte []		TheUUID	= new byte[ 16 ];
@@ -47,7 +47,7 @@ public class UUID implements Comparable<Object>, Serializable
 
 		Util.putIntToByteArray( TheUUID, time_lo, 0 );
 		Util.putIntToByteArray( TheUUID, time_hi, 4 );
-		
+
 		TheUUID[0]	= Util.newRand();
 		TheUUID[1]	= Util.newRand();
 		TheUUID[2]	= (byte)(Util.newRand() & 0x07);
@@ -63,7 +63,7 @@ public class UUID implements Comparable<Object>, Serializable
 
 	/**
 	 * Construct the UUID from the 16 byte array <code>uuid</code>.
-	 *   
+	 *
 	 * @param uuid the 16 bytes to use as the UUID.
 	 */
 	public UUID( byte [] uuid )
@@ -76,11 +76,11 @@ public class UUID implements Comparable<Object>, Serializable
 	}
 
 	/**
-	 * Compares this <code>UUID</code> to another returning <code>true</code> if 
-	 * they're equal or <code>false</code> otherwise. 
-	 * 
+	 * Compares this <code>UUID</code> to another returning <code>true</code> if
+	 * they're equal or <code>false</code> otherwise.
+	 *
 	 * @param ob the other <code>UUID</code> to compare to.
-	 * 
+	 *
 	 * @return <code>true</code> if the <code>UUID</code>s are equal or <code>false</code> otherwise.
 	 */
 	@Override
@@ -94,11 +94,11 @@ public class UUID implements Comparable<Object>, Serializable
 	}
 
 	/**
-	 * Compares this <code>UUID</code> to another returning <code>true</code> if 
-	 * they're equal or <code>false</code> otherwise. 
-	 * 
+	 * Compares this <code>UUID</code> to another returning <code>true</code> if
+	 * they're equal or <code>false</code> otherwise.
+	 *
 	 * @param that the other <code>UUID</code> to compare to.
-	 * 
+	 *
 	 * @return <code>true</code> if the <code>UUID</code>s are equal or <code>false</code> otherwise.
 	 */
 	public boolean equals( UUID that ) {
@@ -106,7 +106,7 @@ public class UUID implements Comparable<Object>, Serializable
 			return true;
 		if (that == null)
 			return false;
-		
+
 		byte	b1[];
 		byte	b2[];
 
@@ -127,9 +127,9 @@ public class UUID implements Comparable<Object>, Serializable
 	 * Compares this <code>UUID</code> to another returning a value less than zero if
 	 * <code>this</code> is "less than" <code>other</code>, zero if they're equal and greater
 	 * than zero if <code>this</code> is "greater than" <code>other</code>.
-	 * 
-	 * @param other the other field to compare to. 
-	 * 
+	 *
+	 * @param other the other field to compare to.
+	 *
 	 * @return A value less than zero if <code>this</code> is "less than" <code>other</code>,
 	 *         zero if they're equal and greater than zero if <code>this</code> is "greater
 	 *         than" <code>other</code>.
@@ -143,9 +143,9 @@ public class UUID implements Comparable<Object>, Serializable
 	 * Compares this <code>UUID</code> to another returning a value less than zero if
 	 * <code>this</code> is "less than" <code>other</code>, zero if they're equal and greater
 	 * than zero if <code>this</code> is "greater than" <code>other</code>.
-	 * 
-	 * @param other the other field to compare to. 
-	 * 
+	 *
+	 * @param other the other field to compare to.
+	 *
 	 * @return A value less than zero if <code>this</code> is "less than" <code>other</code>,
 	 *         zero if they're equal and greater than zero if <code>this</code> is "greater
 	 *         than" <code>other</code>.
@@ -156,7 +156,7 @@ public class UUID implements Comparable<Object>, Serializable
 		{
 			int	b1 = this.TheUUID[ii] & 0x0ff;
 			int	b2 = other.TheUUID[ii] & 0x0ff;
-			
+
 			if ( b1 < b2 )
 			{
 				return -1;
@@ -171,7 +171,7 @@ public class UUID implements Comparable<Object>, Serializable
 
 	/**
 	 * Returns a byte array containing a copy of the 16 byte UUID.
-	 * 
+	 *
 	 * @return A byte array containing a copy of the 16 byte UUID.
 	 */
 	public byte [] getBytes()
@@ -182,7 +182,7 @@ public class UUID implements Comparable<Object>, Serializable
 	/**
 	 * Converts this UUID into human-readable form.  The string has the format:
 	 * {01234567-89ab-cdef-0123-456789abcdef}.
-	 * 
+	 *
 	 * @return A <code>String</code> representation of this <code>UUID</code>.
 	 */
 	@Override
@@ -194,9 +194,9 @@ public class UUID implements Comparable<Object>, Serializable
 	/**
 	 * Converts <code>uuid</code> into human-readable form.  The string has the format:
 	 * {01234567-89ab-cdef-0123-456789abcdef}.
-	 * 
-	 * @param uuid the 16 byte array to convert. 
-	 * 
+	 *
+	 * @param uuid the 16 byte array to convert.
+	 *
 	 * @return A <code>String</code> representation of this <code>UUID</code>.
 	 */
 	public static String toString( byte [] uuid )
@@ -206,9 +206,7 @@ public class UUID implements Comparable<Object>, Serializable
 			throw new IllegalArgumentException();
 		}
 
-		StringBuffer	sb;
-
-		sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append( '{' );
 		sb.append( Util.bytesToHex(uuid, 0, 4) );
@@ -221,7 +219,7 @@ public class UUID implements Comparable<Object>, Serializable
 		sb.append( '-' );
 		sb.append( Util.bytesToHex(uuid, 10, 6) );
 		sb.append( '}' );
-		
+
 		return sb.toString();
 	}
 }
