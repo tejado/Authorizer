@@ -340,10 +340,10 @@ public abstract class PwsFile
         try {
         	if (forWriting) {
         		cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
-        		//itsWriteCipher = cipher;
+        		itsWriteCipher = cipher;
         	} else {
         		cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
-        		//itsReadCipher = cipher;
+        		itsReadCipher = cipher;
         	}
 		} catch (InvalidKeyException e) {
 			throw new MemoryKeyException("memory key generation failed",e);
@@ -540,7 +540,7 @@ public abstract class PwsFile
 	 * @throws EndOfFileException If end of file occurs whilst reading the data.
 	 * @throws IOException        If an error occurs whilst reading the file.
 	 */
-	public void readBytes( byte [] bytes )
+	public final void readBytes( byte [] bytes )
 	throws IOException, EndOfFileException
 	{
 		int count;
@@ -557,7 +557,6 @@ public abstract class PwsFile
 			LOG.info( I18nHelper.getInstance().formatMessage("I00003", new Object [] { new Integer(bytes.length), new Integer(count) } ) );
 			throw new IOException( I18nHelper.getInstance().formatMessage("E00006") );
 		}
-		LOG.debug1( "Read " + count + " bytes" );
 	}
 
 	/**

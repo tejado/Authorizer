@@ -384,7 +384,7 @@ public class PwsEntryBean implements Cloneable {
 
 	@Override
 	public String toString() {
-		StringBuffer all = new StringBuffer (200);
+		StringBuilder all = new StringBuilder(200);
 		all.append("PwsEntryBean ").append(version).append(": ID ");
 		all.append(id != null ? id.toString() : null);
 		all.append(", Group ").append(group);

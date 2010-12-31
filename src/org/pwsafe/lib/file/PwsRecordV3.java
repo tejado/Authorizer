@@ -447,7 +447,7 @@ public class PwsRecordV3 extends PwsRecord
 
 			if ( item.getType() == END_OF_RECORD )
 			{
-				LOG.debug2( "-- END OF RECORD --" );
+				//LOG.debug2( "-- END OF RECORD --" );
 				break; // out of the for loop
 			}
 
@@ -506,7 +506,7 @@ public class PwsRecordV3 extends PwsRecord
 						break;
 						//throw new UnimplementedConversionException();
 				}
-				if ( LOG.isDebug2Enabled() ) LOG.debug2( "type=" + item.getType() + " (" + ((Object[])VALID_TYPES[item.getType()])[1] + "), value=\"" + itemVal.toString() + "\"" );
+				//if ( LOG.isDebug2Enabled() ) LOG.debug2( "type=" + item.getType() + " (" + ((Object[])VALID_TYPES[item.getType()])[1] + "), value=\"" + itemVal.toString() + "\"" );
 				setField( itemVal );
 			}
 		}
@@ -608,11 +608,8 @@ public class PwsRecordV3 extends PwsRecord
 	@Override
 	public String toString()
 	{
-		StringBuffer	sb;
-		boolean			first;
-
-		first	= true;
-		sb		= new StringBuffer();
+		boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append( "{ " );
 
