@@ -339,9 +339,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	@Override
 	public String toString()
 	{
-		StringBuffer	sb;
-
-		sb = new StringBuffer();
+	    final StringBuilder sb = new StringBuilder();
 		sb.append( "{ \"" );
 		sb.append( getField(TITLE) );
 		sb.append( "\", \"" );

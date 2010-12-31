@@ -125,8 +125,9 @@ public final class Util
 	 */
 	public static String byteToHex( byte b )
 	{
-	    final String str = new StringBuffer().append(HEX_CHARS[ (b >>> 4) & 0x0f ]).append(HEX_CHARS[ b & 0x0f ]).toString();
-		return str;
+	    return String.valueOf(new char[] {
+	        HEX_CHARS[(b >>> 4) & 0x0f], HEX_CHARS[b & 0x0f]
+	        });
 	}
 
 	/**
@@ -180,9 +181,7 @@ public final class Util
 	 */
 	public static String bytesToString( byte [] b )
 	{
-		StringBuffer	sb;
-
-		sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append( "{ " );
 		for ( int ii = 0; ii < b.length; ++ii )

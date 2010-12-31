@@ -349,11 +349,8 @@ public class PwsRecordV2 extends PwsRecord
 	@Override
 	public String toString()
 	{
-		StringBuffer	sb;
-		boolean			first;
-
-		first	= true;
-		sb		= new StringBuffer();
+		boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append( "{ " );
 

@@ -1,14 +1,14 @@
 package org.pwsafe.lib.crypto;
 
 /*
- * Copyright 1997-2005 Markus Hahn 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
- * you may not use this file except in compliance with the License. 
- * You may obtain a copy of the License at 
- * 
+ * Copyright 1997-2005 Markus Hahn
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -299,7 +299,8 @@ public class SHA1
 	 * @param data the data to add
 	 * @deprecated use update(byte[], int, int) instead
 	 */
-	public void update(
+	@Deprecated
+    public void update(
 		byte[] data)
 	{
 		update(data, 0, data.length);
@@ -330,7 +331,8 @@ public class SHA1
 	 * @deprecated don't use this method anymore (it's not clean), you might
 	 * want to try update(sData.getBytes()) instead
 	 */
-	public void update(
+	@Deprecated
+    public void update(
 		String sData)
 	{
 		for (int nI = 0, nC = sData.length(); nI < nC; nI++)
@@ -345,7 +347,8 @@ public class SHA1
 	/**
 	 * Finalizes the digest.
 	 */
-	public void finalize()
+	@Override
+    public void finalize()
 	{
 		int nI;
 		byte bits[] = new byte[8];
@@ -412,13 +415,11 @@ public class SHA1
 	 * makes a binhex string representation of the current digest
 	 * @return the string representation
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
 		int nI;
-		StringBuffer sbuf;
-
-
-		sbuf = new StringBuffer(DIGEST_SIZE << 1);
+		final StringBuilder sbuf = new StringBuilder(DIGEST_SIZE << 1);
 
 		for (nI = 0; nI < DIGEST_SIZE; nI++)
 		{
