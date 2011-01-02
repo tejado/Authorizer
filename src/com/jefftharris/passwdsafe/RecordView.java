@@ -43,8 +43,6 @@ public class RecordView extends AbstractRecordActivity
 
     private TextView itsUserView;
     private boolean isPasswordShown = false;
-    // TODO: remove itsPassword
-    private String itsPassword;
     private TextView itsPasswordView;
     private boolean isWordWrap = true;
 
@@ -92,7 +90,7 @@ public class RecordView extends AbstractRecordActivity
         switch (item.getItemId()) {
         case MENU_COPY_PASSWORD:
         {
-            PasswdSafeApp.copyToClipboard(itsPassword, this);
+            PasswdSafeApp.copyToClipboard(getPassword(), this);
             return true;
         }
         case MENU_COPY_USER:
@@ -150,10 +148,17 @@ public class RecordView extends AbstractRecordActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        boolean hasPassword = (itsPasswordView != null);
         MenuItem item = menu.findItem(MENU_TOGGLE_PASSWORD);
         if (item != null) {
             item.setTitle(isPasswordShown ?
                 R.string.hide_password : R.string.show_password);
+            item.setEnabled(hasPassword);
+        }
+
+        item = menu.findItem(MENU_COPY_PASSWORD);
+        if (item != null) {
+            item.setEnabled(hasPassword);
         }
 
         ActivityPasswdFile passwdFile = getPasswdFile();
@@ -206,7 +211,7 @@ public class RecordView extends AbstractRecordActivity
         }
         case MENU_COPY_PASSWORD:
         {
-            PasswdSafeApp.copyToClipboard(itsPassword, this);
+            PasswdSafeApp.copyToClipboard(getPassword(), this);
             return true;
         }
         case MENU_COPY_NOTES:
@@ -312,10 +317,9 @@ public class RecordView extends AbstractRecordActivity
                 fileData.getPasswdExpiryTime(rec));
         setText(R.id.notes, R.id.notes_row, fileData.getNotes(rec));
         isPasswordShown = false;
-        itsPassword = fileData.getPassword(rec);
         itsPasswordView =
             setText(R.id.password, R.id.password_row,
-                    (itsPassword == null ? null : HIDDEN_PASSWORD));
+                    (fileData.hasPassword(rec) ? HIDDEN_PASSWORD : null));
         if (itsPasswordView != null) {
             itsPasswordView.setOnClickListener(new View.OnClickListener()
             {
@@ -355,7 +359,21 @@ public class RecordView extends AbstractRecordActivity
     {
         TextView passwordField = (TextView)findViewById(R.id.password);
         isPasswordShown = !isPasswordShown;
-        passwordField.setText(isPasswordShown ? itsPassword : HIDDEN_PASSWORD);
+        passwordField.setText(
+            isPasswordShown ? getPassword() : HIDDEN_PASSWORD);
+    }
+
+    private final String getPassword()
+    {
+        String password = null;
+        PasswdFileData fileData = getPasswdFile().getFileData();
+        if (fileData != null) {
+            PwsRecord rec = fileData.getRecord(getUUID());
+            if (rec != null) {
+                password = fileData.getPassword(rec);
+            }
+        }
+        return password;
     }
 
     private final void setWordWrap()

@@ -247,6 +247,11 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.PASSWORD);
     }
 
+    public final boolean hasPassword(PwsRecord rec)
+    {
+        return hasField(rec, PwsRecordV3.PASSWORD);
+    }
+
     public final void setPassword(String str, PwsRecord rec)
     {
         setField(str, rec, PwsRecordV3.PASSWORD);
@@ -354,6 +359,20 @@ public class PasswdFileData
             return "";
         }
 
+        return doGetFieldStr(rec, getVersionFieldId(fieldId));
+    }
+
+    private final boolean hasField(PwsRecord rec, int fieldId)
+    {
+        return doGetField(rec, getVersionFieldId(fieldId)) != null;
+    }
+
+    private final int getVersionFieldId(int fieldId)
+    {
+        if (itsPwsFile == null) {
+            return FIELD_NOT_PRESENT;
+        }
+
         switch (itsPwsFile.getFileVersionMajor())
         {
         case PwsFileV3.VERSION:
@@ -456,8 +475,9 @@ public class PasswdFileData
         }
         }
 
-        return doGetFieldStr(rec, fieldId);
+        return fieldId;
     }
+
 
     private final String getHdrField(int fieldId)
     {
