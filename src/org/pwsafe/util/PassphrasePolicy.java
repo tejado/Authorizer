@@ -1,6 +1,6 @@
 /*
  * $Id: PassphrasePolicy.java 317 2009-01-26 20:20:54Z ronys $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -75,7 +75,7 @@ public class PassphrasePolicy
 	 * Checks that it is possible to generate a password using this policy.  Returns
 	 * <code>true</code> if at least one character category is selected and the password
 	 * length is equal to or greater than the number of classes selected.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isValid()
@@ -96,14 +96,13 @@ public class PassphrasePolicy
 
 	/**
 	 * Returns a <code>String</code> representation of the object.
-	 * 
+	 *
 	 * @return A <code>String</code> representation of the object.
 	 */
-	public String toString()
+	@Override
+    public String toString()
 	{
-		StringBuffer	sb;
-
-		sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append( "PassphrasePolicy{ Length=" );
 		sb.append( Length );

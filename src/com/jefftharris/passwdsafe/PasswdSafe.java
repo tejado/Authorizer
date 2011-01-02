@@ -836,13 +836,14 @@ public class PasswdSafe extends ListActivity
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         itsPasswdFile = app.accessPasswdFile(itsFile, this);
         String title = PasswdSafeApp.getAppFileTitle(itsFile, this);
-        if (PasswdSafeApp.DEBUG_AUTOOPEN) {
+        if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
             title += " - AUTOOPEN!!!!!";
         }
         setTitle(title);
 
         if (!itsPasswdFile.isOpen()) {
-            if (PasswdSafeApp.DEBUG_AUTOOPEN) {
+            if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
+                (itsFile.getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
                 openFile(new StringBuilder("test123"));
             } else {
                 showDialog(DIALOG_GET_PASSWD);

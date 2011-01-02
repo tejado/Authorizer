@@ -31,6 +31,8 @@ import org.pwsafe.lib.file.PwsFileStorage;
 import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
+import org.pwsafe.lib.file.PwsPasswdField;
+import org.pwsafe.lib.file.PwsPasswdUnicodeField;
 import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
@@ -42,6 +44,7 @@ import org.pwsafe.lib.file.PwsUnknownField;
 
 import android.content.Context;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class PasswdFileData
@@ -241,6 +244,11 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.PASSWORD);
     }
 
+    public final boolean hasPassword(PwsRecord rec)
+    {
+        return hasField(rec, PwsRecordV3.PASSWORD);
+    }
+
     public final void setPassword(String str, PwsRecord rec)
     {
         setField(str, rec, PwsRecordV3.PASSWORD);
@@ -348,6 +356,20 @@ public class PasswdFileData
             return "";
         }
 
+        return doGetFieldStr(rec, getVersionFieldId(fieldId));
+    }
+
+    private final boolean hasField(PwsRecord rec, int fieldId)
+    {
+        return doGetField(rec, getVersionFieldId(fieldId)) != null;
+    }
+
+    private final int getVersionFieldId(int fieldId)
+    {
+        if (itsPwsFile == null) {
+            return FIELD_NOT_PRESENT;
+        }
+
         switch (itsPwsFile.getFileVersionMajor())
         {
         case PwsFileV3.VERSION:
@@ -450,8 +472,9 @@ public class PasswdFileData
         }
         }
 
-        return doGetFieldStr(rec, fieldId);
+        return fieldId;
     }
+
 
     private final String getHdrField(int fieldId)
     {
@@ -656,13 +679,19 @@ public class PasswdFileData
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
-            case PwsRecordV3.PASSWORD:
             case PwsRecordV3.TITLE:
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
             {
-                if ((str != null) && (str.length() != 0)) {
+                if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringUnicodeField(fieldId, str);
+                }
+                break;
+            }
+            case PwsRecordV3.PASSWORD:
+            {
+                if (!TextUtils.isEmpty(str)) {
+                    field = new PwsPasswdUnicodeField(fieldId, str, itsPwsFile);
                 }
                 break;
             }
@@ -680,12 +709,18 @@ public class PasswdFileData
             {
             case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
-            case PwsRecordV3.PASSWORD:
             case PwsRecordV3.TITLE:
             case PwsRecordV3.USERNAME:
             {
-                if ((str != null) && (str.length() != 0)) {
+                if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringField(fieldId, str);
+                }
+                break;
+            }
+            case PwsRecordV3.PASSWORD:
+            {
+                if (!TextUtils.isEmpty(str)) {
+                    field = new PwsPasswdField(fieldId, str, itsPwsFile);
                 }
                 break;
             }
@@ -728,6 +763,7 @@ public class PasswdFileData
     private final void indexRecords()
     {
         itsRecords.clear();
+        itsRecords.ensureCapacity(itsPwsFile.getRecordCount());
         itsRecordsByUUID.clear();
         Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
         for (int idx = 0; recIter.hasNext(); ++idx) {

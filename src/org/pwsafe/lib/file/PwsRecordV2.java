@@ -10,9 +10,7 @@
 package org.pwsafe.lib.file;
 
 import java.io.IOException;
-import java.util.EnumMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.UUID;
@@ -101,22 +99,6 @@ public class PwsRecordV2 extends PwsRecord
 	 */
 	public static final int		END_OF_RECORD		= 255;
 
-	private static Map<PwsFieldTypeV2, Class<? extends PwsField>> field_map = new EnumMap<PwsFieldTypeV2, Class<? extends PwsField>>(PwsFieldTypeV2.class);
-	static {
-		field_map.put(PwsFieldTypeV2.V2_ID_STRING,			PwsStringField.class );
-		field_map.put(PwsFieldTypeV2.UUID,					PwsUUIDField.class);
-		field_map.put(PwsFieldTypeV2.GROUP,					PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.TITLE,					PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.USERNAME,				PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.NOTES,					PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.PASSWORD,				PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.CREATION_TIME,			PwsTimeField.class);
-		field_map.put(PwsFieldTypeV2.PASSWORD_MOD_TIME,		PwsTimeField.class);
-		field_map.put(PwsFieldTypeV2.LAST_ACCESS_TIME,		PwsTimeField.class);
-		field_map.put(PwsFieldTypeV2.PASSWORD_LIFETIME,		PwsIntegerField.class);
-		field_map.put(PwsFieldTypeV2.PASSWORD_POLICY,		PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.LAST_MOD_TIME,         PwsTimeField.class);
-	}
 	/**
 	 * All the valid type codes.
 	 */
@@ -128,7 +110,7 @@ public class PwsRecordV2 extends PwsRecord
 		new Object [] { new Integer(TITLE),				"TITLE",				PwsStringField.class },
 		new Object [] { new Integer(USERNAME),			"USERNAME",				PwsStringField.class },
 		new Object [] { new Integer(NOTES),				"NOTES",				PwsStringField.class },
-		new Object [] { new Integer(PASSWORD),			"PASSWORD",				PwsStringField.class },
+		new Object [] { new Integer(PASSWORD),			"PASSWORD",				PwsPasswdField.class },
 		new Object [] { new Integer(CREATION_TIME),		"CREATION_TIME",		PwsTimeField.class },
 		new Object [] { new Integer(PASSWORD_MOD_TIME),	"PASSWORD_MOD_TIME",	PwsTimeField.class },
 		new Object [] { new Integer(LAST_ACCESS_TIME),	"LAST_ACCESS_TIME",		PwsTimeField.class },
@@ -146,7 +128,7 @@ public class PwsRecordV2 extends PwsRecord
 
 		setField( new PwsUUIDField(PwsFieldTypeV2.UUID, new UUID()) );
 		setField( new PwsStringField(PwsFieldTypeV2.TITLE,    "") );
-		setField( new PwsStringField(PwsFieldTypeV2.PASSWORD, "") );
+		setField( new PwsPasswdField(PwsFieldTypeV2.PASSWORD) );
 	}
 
 	/**
@@ -271,7 +253,7 @@ public class PwsRecordV2 extends PwsRecord
 
 			if ( item.getType() == END_OF_RECORD )
 			{
-				LOG.debug2( "-- END OF RECORD --" );
+				//LOG.debug2( "-- END OF RECORD --" );
 				break; // out of the for loop
 			}
 			switch ( item.getType() )
@@ -285,8 +267,13 @@ public class PwsRecordV2 extends PwsRecord
 				case TITLE :
 				case USERNAME :
 				case NOTES :
-				case PASSWORD :
 					itemVal	= new PwsStringField( item.getType(), item.getData() );
+					break;
+
+				case PASSWORD :
+					itemVal	= new PwsPasswdField(item.getType(), item.getData(),
+					       	                     file);
+					item.clear();
 					break;
 
 				case CREATION_TIME :
@@ -306,7 +293,7 @@ public class PwsRecordV2 extends PwsRecord
 				default :
 					throw new UnimplementedConversionException();
 			}
-			if ( LOG.isDebug2Enabled() ) LOG.debug2( "type=" + item.getType() + " (" + ((Object[])VALID_TYPES[item.getType()])[1] + "), value=\"" + itemVal.toString() + "\"" );
+			//if ( LOG.isDebug2Enabled() ) LOG.debug2( "type=" + item.getType() + " (" + ((Object[])VALID_TYPES[item.getType()])[1] + "), value=\"" + itemVal.toString() + "\"" );
 			setField( itemVal );
 		}
 	}
@@ -349,11 +336,8 @@ public class PwsRecordV2 extends PwsRecord
 	@Override
 	public String toString()
 	{
-		StringBuffer	sb;
-		boolean			first;
-
-		first	= true;
-		sb		= new StringBuffer();
+		boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append( "{ " );
 

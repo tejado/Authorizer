@@ -1,6 +1,6 @@
 /*
  * $Id: PassphraseUtils.java 317 2009-01-26 20:20:54Z ronys $
- * 
+ *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -79,11 +79,11 @@ public class PassphraseUtils
 
 	/**
 	 * Generates a new random password according to the policy supplied.
-	 * 
+	 *
 	 * @param policy the {@link PassphrasePolicy} policy
-	 * 
+	 *
 	 * @return A new random password.
-	 * 
+	 *
 	 * @throws InvalidPassphrasePolicy
 	 */
 	public static String makePassword( PassphrasePolicy policy )
@@ -95,7 +95,7 @@ public class PassphraseUtils
 
 		char			allChars [][];
 		boolean			typesSeen[];
-		StringBuffer	password;
+		StringBuilder   password;
 		int				typeCount;
 
 		if ( !policy.isValid() )
@@ -104,7 +104,7 @@ public class PassphraseUtils
 			throw new InvalidPassphrasePolicy();
 		}
 
-		password	= new StringBuffer( policy.Length );
+		password	= new StringBuilder( policy.Length );
 		typeCount	= 0;
 
 		if ( policy.DigitChars )	++typeCount;
@@ -146,10 +146,10 @@ public class PassphraseUtils
 			for ( int ii = 0; ii < policy.Length; ++ii )
 			{
 				int	type;
-	
+
 				type				= Util.positiveRand() % typeCount;
 				typesSeen[ type ]	= false;
-	
+
 				password.append( allChars[type][ Util.positiveRand() % allChars[type].length ] );
 			}
 		}
@@ -172,9 +172,9 @@ public class PassphraseUtils
 	 *   <li>At least one uppercase character.
 	 *   <li>At least one digit or symbol character.
 	 * </ul>
-	 * 
+	 *
 	 * @param password the password to check.
-	 * 
+	 *
 	 * @return <code>true</code> if the password is considered to be weak,
 	 *         <code>false</code> otherwise.
 	 */

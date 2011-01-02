@@ -17,34 +17,34 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 /**
  * Twofish implementation wrapper. Current implementation uses
  * BouncyCastle provider.
- * 
+ *
  * @author Glen Smith
  */
 public class TwofishPws {
-	
+
 	CBCBlockCipher cipher;
-    
+
 	public TwofishPws(byte[] key, boolean forEncryption, byte[] IV) {
-		
+
 		TwofishEngine tfe = new TwofishEngine();
     	cipher = new CBCBlockCipher(tfe);
     	KeyParameter kp = new KeyParameter(key);
     	ParametersWithIV piv = new ParametersWithIV(kp, IV);
     	cipher.init(forEncryption, piv);
-		
+
 	}
-	
-	public byte[] processCBC(byte[] input) {
-		
-		
+
+	public final byte[] processCBC(byte[] input) {
+
+
     	byte[]  out = new byte[input.length];
 
         cipher.processBlock(input, 0, out, 0);
-        
+
         return out;
-		
+
 	}
-	
+
     public static byte[] processECB(byte[] key, boolean forEncryption, byte[] input) {
 
     	BufferedBlockCipher cipher = new BufferedBlockCipher(new TwofishEngine());
@@ -53,7 +53,7 @@ public class TwofishPws {
     	byte[]  out = new byte[input.length];
 
         int len1 = cipher.processBytes(input, 0, input.length, out, 0);
-        
+
         try
         {
             cipher.doFinal(out, len1);
@@ -64,6 +64,6 @@ public class TwofishPws {
         }
         return out;
     }
-    
+
 
 }

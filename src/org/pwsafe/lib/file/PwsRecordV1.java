@@ -78,7 +78,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 		new Object [] { new Integer(TITLE),		"TITLE",	PwsStringField.class },
 		new Object [] { new Integer(USERNAME),	"USERNAME",	PwsStringField.class },
 		new Object [] { new Integer(NOTES),		"NOTES",	PwsStringField.class },
-		new Object [] { new Integer(PASSWORD),	"PASSWORD",	PwsStringField.class },
+		new Object [] { new Integer(PASSWORD),	"PASSWORD",	PwsPasswdField.class },
 		new Object [] { new Integer(UUID),	    "UUID",	    PwsStringField.class }
 	};
 
@@ -109,7 +109,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 		// Set default values
 		setField( new PwsStringField(PwsFieldTypeV1.TITLE,    "") );
 		setField( new PwsStringField(PwsFieldTypeV1.USERNAME, "") );
-		setField( new PwsStringField(PwsFieldTypeV1.PASSWORD, "") );
+		setField( new PwsPasswdField(PwsFieldTypeV1.PASSWORD) );
 		setField( new PwsStringField(PwsFieldTypeV1.NOTES,    "") );
 		setField( new PwsStringField(PwsFieldTypeV1.UUID,     "") );
 	}
@@ -291,7 +291,9 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 		}
 		setField(new PwsStringField(TITLE, title));
 		setField(new PwsStringField(USERNAME, username));
-		setField( new PwsStringField(PASSWORD, new Item(file).getData()) );
+		Item item = new Item(file);
+		setField( new PwsPasswdField(PASSWORD, item.getData(), file));
+		item.clear();
 		setField( new PwsStringField(NOTES, new Item(file).getData()) );
 
 		String uuid;
@@ -339,9 +341,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	@Override
 	public String toString()
 	{
-		StringBuffer	sb;
-
-		sb = new StringBuffer();
+	    final StringBuilder sb = new StringBuilder();
 		sb.append( "{ \"" );
 		sb.append( getField(TITLE) );
 		sb.append( "\", \"" );

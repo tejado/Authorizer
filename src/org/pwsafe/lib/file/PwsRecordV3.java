@@ -187,7 +187,7 @@ public class PwsRecordV3 extends PwsRecord
 		new Object [] { Integer.valueOf(TITLE),				"TITLE",				PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(USERNAME),			"USERNAME",				PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(NOTES),				"NOTES",				PwsStringUnicodeField.class },
-		new Object [] { Integer.valueOf(PASSWORD),			"PASSWORD",				PwsStringUnicodeField.class },
+		new Object [] { Integer.valueOf(PASSWORD),			"PASSWORD",				PwsPasswdUnicodeField.class },
 		new Object [] { Integer.valueOf(CREATION_TIME),		"CREATION_TIME",		PwsTimeField.class },
 		new Object [] { Integer.valueOf(PASSWORD_MOD_TIME),	"PASSWORD_MOD_TIME",	PwsTimeField.class },
 		new Object [] { Integer.valueOf(LAST_ACCESS_TIME),	"LAST_ACCESS_TIME",		PwsTimeField.class },
@@ -214,7 +214,7 @@ public class PwsRecordV3 extends PwsRecord
 
 		setField( new PwsUUIDField(PwsFieldTypeV3.UUID, new UUID()) );
 		setField( new PwsStringUnicodeField(PwsFieldTypeV3.TITLE,    "") );
-		setField( new PwsStringUnicodeField(PwsFieldTypeV3.PASSWORD, "") );
+		setField( new PwsPasswdUnicodeField(PwsFieldTypeV3.PASSWORD) );
 		setField( new PwsTimeField(PwsFieldTypeV3.CREATION_TIME, new Date()) );
 
 	}
@@ -447,7 +447,7 @@ public class PwsRecordV3 extends PwsRecord
 
 			if ( item.getType() == END_OF_RECORD )
 			{
-				LOG.debug2( "-- END OF RECORD --" );
+				//LOG.debug2( "-- END OF RECORD --" );
 				break; // out of the for loop
 			}
 
@@ -472,7 +472,6 @@ public class PwsRecordV3 extends PwsRecord
 					case TITLE :
 					case USERNAME :
 					case NOTES :
-					case PASSWORD :
 					case PASSWORD_POLICY :
 					case PASSWORD_HISTORY :
 					case URL :
@@ -481,6 +480,13 @@ public class PwsRecordV3 extends PwsRecord
 					case EMAIL :
 						itemVal	= new PwsStringUnicodeField( item.getType(), item.getByteData() );
 						break;
+
+					case PASSWORD :
+					    itemVal = new PwsPasswdUnicodeField(item.getType(),
+					                                        item.getByteData(),
+					                                        file);
+					    item.clear();
+					    break;
 
 					case CREATION_TIME :
 					case PASSWORD_MOD_TIME :
@@ -506,7 +512,7 @@ public class PwsRecordV3 extends PwsRecord
 						break;
 						//throw new UnimplementedConversionException();
 				}
-				if ( LOG.isDebug2Enabled() ) LOG.debug2( "type=" + item.getType() + " (" + ((Object[])VALID_TYPES[item.getType()])[1] + "), value=\"" + itemVal.toString() + "\"" );
+				//if ( LOG.isDebug2Enabled() ) LOG.debug2( "type=" + item.getType() + " (" + ((Object[])VALID_TYPES[item.getType()])[1] + "), value=\"" + itemVal.toString() + "\"" );
 				setField( itemVal );
 			}
 		}
@@ -544,18 +550,6 @@ public class PwsRecordV3 extends PwsRecord
 		writeField( file, new PwsStringField( END_OF_RECORD, "" ) );
 		LOG.debug2( "----- END OF RECORD -----" );
 	}
-
-	/**
-	 * Sets a field on this record from <code>item</code>.
-	 *
-	 * @param item the <code>Item</code> containg the field's data.
-	 */
-	@Override
-	protected void setField( Item item )
-	{
-		setField( new PwsStringUnicodeField( item.getType(), item.getData() ) );
-	}
-
 
 	/**
 	 * Writes a single field to the file.
@@ -608,11 +602,8 @@ public class PwsRecordV3 extends PwsRecord
 	@Override
 	public String toString()
 	{
-		StringBuffer	sb;
-		boolean			first;
-
-		first	= true;
-		sb		= new StringBuffer();
+		boolean first = true;
+		final StringBuilder sb = new StringBuilder();
 
 		sb.append( "{ " );
 

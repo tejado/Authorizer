@@ -12,6 +12,7 @@ package org.pwsafe.lib.file;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -166,6 +167,14 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 			sb.append("\" }");
 
 			return sb.toString();
+		}
+
+		public final void clear() {
+		    Arrays.fill(data, (byte)0);
+		    Arrays.fill(rawData, (byte)0);
+		    data = new byte[0];
+		    rawData = new byte[0];
+		    length = 0;
 		}
 	}
 
@@ -369,7 +378,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 *
 	 * @return The value of the field.
 	 */
-	public PwsField getField(PwsFieldType aType) {
+	public final PwsField getField(PwsFieldType aType) {
 		return getField(Integer.valueOf(aType.getId()));
 	}
 
@@ -381,7 +390,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 *
 	 * @return The value of the field.
 	 */
-	public PwsField getField(int aType) {
+	public final PwsField getField(int aType) {
 		return getField(Integer.valueOf(aType));
 	}
 
@@ -394,7 +403,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	 *
 	 * @return The value of the field.
 	 */
-	public PwsField getField(Integer aType) {
+	public final PwsField getField(Integer aType) {
 		return attributes.get(aType);
 	}
 
@@ -460,16 +469,6 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 	public final void setLoaded()
 	{
 	    isLoaded = true;
-	}
-
-	/**
-	 * Sets a field on this record from <code>item</code>.
-	 *
-	 * @param item
-	 *            the <code>Item</code> containg the field's data.
-	 */
-	protected void setField(Item item) {
-		setField(new PwsStringField(item.getType(), item.getData()));
 	}
 
 	/**
