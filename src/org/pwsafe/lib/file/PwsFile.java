@@ -161,6 +161,9 @@ public abstract class PwsFile
 	private InMemoryKey			memoryKey;
 	private byte[] 				memoryIv;
 
+    private Cipher itsReadCipher;
+    private Cipher itsWriteCipher;
+
 	/** The password encoding which was used to open the file */
 	private String itsOpenPasswordEncoding;
 
@@ -305,10 +308,6 @@ public abstract class PwsFile
         }
     }
 
-    // TODO: refactor
-    private Cipher itsReadCipher;
-    private Cipher itsWriteCipher;
-
     final Cipher getReadCipher() {
         return getCipher(false);
     }
@@ -317,7 +316,7 @@ public abstract class PwsFile
         return getCipher(true);
     }
 
-    protected Cipher getCipher (boolean forWriting) {
+    private Cipher getCipher (boolean forWriting) {
     	if (memoryIv == null) {
     		memoryIv = new byte[8];
     		Util.newRandBytes(memoryIv);
@@ -399,7 +398,8 @@ public abstract class PwsFile
 	public String getPassphrase()
 	{
 		try {
-			return passphrase == null ? null : passphrase.getObject(getCipher(false)).toString();
+			return passphrase == null ?
+			    null : passphrase.getObject(getReadCipher()).toString();
 		} catch (IllegalBlockSizeException e) {
 			throw new RuntimeCryptoException(e.getMessage());
 		} catch (BadPaddingException e) {
@@ -666,7 +666,7 @@ public abstract class PwsFile
 	public void setPassphrase( StringBuilder pass ) {
 	    // TODOlib: convert to byte[] first
 		try {
-			passphrase	= new SealedObject(pass, getCipher(true));
+			passphrase	= new SealedObject(pass, getWriteCipher());
 			// now overwrite given StringBuider
 			Util.clear(pass);
 		} catch (IllegalBlockSizeException e) {

@@ -420,7 +420,7 @@ public final class PwsFileV3 extends PwsFile {
 	private PwsFileHeaderV3 getHeaderV3() {
 
 		try {
-			return (PwsFileHeaderV3) sealedHeaderV3.getObject(getCipher(false));
+			return (PwsFileHeaderV3) sealedHeaderV3.getObject(getReadCipher());
 		} catch (IllegalBlockSizeException e) {
 			throw new MemoryKeyException(e);
 		} catch (IOException e) {
@@ -437,7 +437,7 @@ public final class PwsFileV3 extends PwsFile {
 	 */
 	private void setHeaderV3(PwsFileHeaderV3 headerV3) {
 		try {
-			sealedHeaderV3 = new SealedObject(headerV3, getCipher(true));
+			sealedHeaderV3 = new SealedObject(headerV3, getWriteCipher());
 		} catch (IllegalBlockSizeException e) {
 			throw new MemoryKeyException(e);
 		} catch (IOException e) {
