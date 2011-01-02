@@ -10,9 +10,7 @@
 package org.pwsafe.lib.file;
 
 import java.io.IOException;
-import java.util.EnumMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.UUID;
@@ -101,23 +99,6 @@ public class PwsRecordV2 extends PwsRecord
 	 */
 	public static final int		END_OF_RECORD		= 255;
 
-	// TODO: remove
-	private static Map<PwsFieldTypeV2, Class<? extends PwsField>> field_map = new EnumMap<PwsFieldTypeV2, Class<? extends PwsField>>(PwsFieldTypeV2.class);
-	static {
-		field_map.put(PwsFieldTypeV2.V2_ID_STRING,			PwsStringField.class );
-		field_map.put(PwsFieldTypeV2.UUID,					PwsUUIDField.class);
-		field_map.put(PwsFieldTypeV2.GROUP,					PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.TITLE,					PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.USERNAME,				PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.NOTES,					PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.PASSWORD,				PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.CREATION_TIME,			PwsTimeField.class);
-		field_map.put(PwsFieldTypeV2.PASSWORD_MOD_TIME,		PwsTimeField.class);
-		field_map.put(PwsFieldTypeV2.LAST_ACCESS_TIME,		PwsTimeField.class);
-		field_map.put(PwsFieldTypeV2.PASSWORD_LIFETIME,		PwsIntegerField.class);
-		field_map.put(PwsFieldTypeV2.PASSWORD_POLICY,		PwsStringField.class);
-		field_map.put(PwsFieldTypeV2.LAST_MOD_TIME,         PwsTimeField.class);
-	}
 	/**
 	 * All the valid type codes.
 	 */
