@@ -44,7 +44,6 @@ import org.pwsafe.lib.file.PwsUnknownField;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.Debug;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -72,14 +71,11 @@ public class PasswdFileData
             UnsupportedFileVersionException
     {
         PasswdSafeApp.dbginfo(TAG, "before load file");
-        // TODO: remove
-        //Debug.startMethodTracing("passwdsafe");
         itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
         if (!itsFile.canWrite()) {
             itsPwsFile.setReadOnly(true);
         }
         finishOpenFile(passwd);
-        //Debug.stopMethodTracing();
     }
 
     public void createNewFile(StringBuilder passwd, Context context)

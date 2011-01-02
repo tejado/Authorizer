@@ -28,8 +28,6 @@ import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
-import android.os.Debug;
-
 /**
  * This is a singleton factory class used to load a PasswordSafe file.  It is able to
  * determine which version of the file format the file has and returns the correct
@@ -280,11 +278,8 @@ public class PwsFileFactory {
 		if (Util.bytesAreEqual("PWS3".getBytes(), first4Bytes)) {
 			LOG.debug1( "This is a V3 format file." );
 			file = new PwsFileV3(new PwsFileStorage(filename), passphrase);
-			//Debug.startMethodTracing("passwdsafe");
-			// TODO: remove
 			file.readAll();
 			file.close();
-			//Debug.stopMethodTracing();
 			return file;
 		}
 
