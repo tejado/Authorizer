@@ -553,19 +553,6 @@ public class PwsRecordV3 extends PwsRecord
 	}
 
 	/**
-	 * Sets a field on this record from <code>item</code>.
-	 *
-	 * @param item the <code>Item</code> containg the field's data.
-	 */
-	/// TODO: delete?
-	@Override
-	protected void setField( Item item )
-	{
-		setField( new PwsStringUnicodeField( item.getType(), item.getData() ) );
-	}
-
-
-	/**
 	 * Writes a single field to the file.
 	 *
 	 * @param file  the file to write the field to.
