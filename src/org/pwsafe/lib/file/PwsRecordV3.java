@@ -187,7 +187,7 @@ public class PwsRecordV3 extends PwsRecord
 		new Object [] { Integer.valueOf(TITLE),				"TITLE",				PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(USERNAME),			"USERNAME",				PwsStringUnicodeField.class },
 		new Object [] { Integer.valueOf(NOTES),				"NOTES",				PwsStringUnicodeField.class },
-		new Object [] { Integer.valueOf(PASSWORD),			"PASSWORD",				PwsStringUnicodeField.class },
+		new Object [] { Integer.valueOf(PASSWORD),			"PASSWORD",				PwsPasswdUnicodeField.class },
 		new Object [] { Integer.valueOf(CREATION_TIME),		"CREATION_TIME",		PwsTimeField.class },
 		new Object [] { Integer.valueOf(PASSWORD_MOD_TIME),	"PASSWORD_MOD_TIME",	PwsTimeField.class },
 		new Object [] { Integer.valueOf(LAST_ACCESS_TIME),	"LAST_ACCESS_TIME",		PwsTimeField.class },
@@ -214,7 +214,8 @@ public class PwsRecordV3 extends PwsRecord
 
 		setField( new PwsUUIDField(PwsFieldTypeV3.UUID, new UUID()) );
 		setField( new PwsStringUnicodeField(PwsFieldTypeV3.TITLE,    "") );
-		setField( new PwsStringUnicodeField(PwsFieldTypeV3.PASSWORD, "") );
+		// TODO: test new record
+		setField( new PwsPasswdUnicodeField(PwsFieldTypeV3.PASSWORD) );
 		setField( new PwsTimeField(PwsFieldTypeV3.CREATION_TIME, new Date()) );
 
 	}
@@ -472,7 +473,6 @@ public class PwsRecordV3 extends PwsRecord
 					case TITLE :
 					case USERNAME :
 					case NOTES :
-					case PASSWORD :
 					case PASSWORD_POLICY :
 					case PASSWORD_HISTORY :
 					case URL :
@@ -481,6 +481,13 @@ public class PwsRecordV3 extends PwsRecord
 					case EMAIL :
 						itemVal	= new PwsStringUnicodeField( item.getType(), item.getByteData() );
 						break;
+
+					case PASSWORD :
+					    itemVal = new PwsPasswdUnicodeField(item.getType(),
+					                                        item.getByteData(),
+					                                        file);
+					    item.clear();
+					    break;
 
 					case CREATION_TIME :
 					case PASSWORD_MOD_TIME :
@@ -550,6 +557,7 @@ public class PwsRecordV3 extends PwsRecord
 	 *
 	 * @param item the <code>Item</code> containg the field's data.
 	 */
+	/// TODO: delete?
 	@Override
 	protected void setField( Item item )
 	{

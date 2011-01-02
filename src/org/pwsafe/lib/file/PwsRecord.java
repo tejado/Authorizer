@@ -12,6 +12,7 @@ package org.pwsafe.lib.file;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -166,6 +167,14 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 			sb.append("\" }");
 
 			return sb.toString();
+		}
+
+		public final void clear() {
+		    Arrays.fill(data, (byte)0);
+		    Arrays.fill(rawData, (byte)0);
+		    data = new byte[0];
+		    rawData = new byte[0];
+		    length = 0;
 		}
 	}
 

@@ -43,6 +43,7 @@ public class RecordView extends AbstractRecordActivity
 
     private TextView itsUserView;
     private boolean isPasswordShown = false;
+    // TODO: remove itsPassword
     private String itsPassword;
     private TextView itsPasswordView;
     private boolean isWordWrap = true;

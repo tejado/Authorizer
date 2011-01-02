@@ -308,8 +308,17 @@ public abstract class PwsFile
         }
     }
 
+    // TODO: refactor
     private Cipher itsReadCipher;
     private Cipher itsWriteCipher;
+
+    final Cipher getReadCipher() {
+        return getCipher(false);
+    }
+
+    final Cipher getWriteCipher() {
+        return getCipher(true);
+    }
 
     protected Cipher getCipher (boolean forWriting) {
     	if (memoryIv == null) {

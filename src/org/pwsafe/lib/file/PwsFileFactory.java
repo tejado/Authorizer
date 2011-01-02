@@ -279,12 +279,12 @@ public class PwsFileFactory {
 		fis.close();
 		if (Util.bytesAreEqual("PWS3".getBytes(), first4Bytes)) {
 			LOG.debug1( "This is a V3 format file." );
-			//Debug.startMethodTracing("passwdsafe");
 			file = new PwsFileV3(new PwsFileStorage(filename), passphrase);
-			//Debug.stopMethodTracing();
+			//Debug.startMethodTracing("passwdsafe");
 			// TODO: remove
 			file.readAll();
 			file.close();
+			//Debug.stopMethodTracing();
 			return file;
 		}
 

@@ -31,6 +31,7 @@ import org.pwsafe.lib.file.PwsFileStorage;
 import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
+import org.pwsafe.lib.file.PwsPasswdUnicodeField;
 import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
@@ -43,6 +44,7 @@ import org.pwsafe.lib.file.PwsUnknownField;
 import android.content.Context;
 import android.os.Build;
 import android.os.Debug;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class PasswdFileData
@@ -660,13 +662,19 @@ public class PasswdFileData
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
-            case PwsRecordV3.PASSWORD:
             case PwsRecordV3.TITLE:
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
             {
-                if ((str != null) && (str.length() != 0)) {
+                if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringUnicodeField(fieldId, str);
+                }
+                break;
+            }
+            case PwsRecordV3.PASSWORD:
+            {
+                if (!TextUtils.isEmpty(str)) {
+                    field = new PwsPasswdUnicodeField(fieldId, str, itsPwsFile);
                 }
                 break;
             }
@@ -684,6 +692,7 @@ public class PasswdFileData
             {
             case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
+            // TODO: PwsPasswdField for v2
             case PwsRecordV3.PASSWORD:
             case PwsRecordV3.TITLE:
             case PwsRecordV3.USERNAME:
