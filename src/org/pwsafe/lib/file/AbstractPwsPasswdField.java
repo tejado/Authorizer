@@ -54,11 +54,58 @@ public abstract class AbstractPwsPasswdField extends PwsField
     }
 
 
-    // TODO: equals methods??
-
     public int compareTo(Object arg0)
     {
         return toString().compareTo(((AbstractPwsPasswdField)arg0).toString());
+    }
+
+
+    /**
+     * Compares this object to another <code>AbstractPwsPasswdField</code> or <code>String</code> returning
+     * <code>true</code> if they're equal or <code>false</code> otherwise.
+     *
+     * @param arg0 the other object to compare to.
+     *
+     * @return <code>true</code> if they're equal or <code>false</code> otherwise.
+     */
+    @Override
+    public boolean equals( Object arg0 )
+    {
+        if ( arg0 instanceof AbstractPwsPasswdField )
+        {
+            return equals( (AbstractPwsPasswdField) arg0 );
+        }
+        else if ( arg0 instanceof String )
+        {
+            return equals( (String) arg0 );
+        }
+        throw new ClassCastException();
+    }
+
+    /**
+     * Compares this object to another <code>AbstractPwsPasswdField</code> returning
+     * <code>true</code> if they're equal or <code>false</code> otherwise.
+     *
+     * @param arg0 the other object to compare to.
+     *
+     * @return <code>true</code> if they're equal or <code>false</code> otherwise.
+     */
+    public boolean equals( AbstractPwsPasswdField arg0 )
+    {
+        return toString().equals(arg0.toString());
+    }
+
+    /**
+     * Compares this object to a <code>String</code> returning <code>true</code> if they're equal
+     * or <code>false</code> otherwise.
+     *
+     * @param arg0 the other object to compare to.
+     *
+     * @return <code>true</code> if they're equal or <code>false</code> otherwise.
+     */
+    public boolean equals( String arg0 )
+    {
+        return toString().equals(arg0);
     }
 
 
