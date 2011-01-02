@@ -207,17 +207,14 @@ public abstract class PwsFile
 		if (isReadOnly())
 			LOG.error("Illegal add on read only file - saving won't be possible");
 
-		this.add(rec, getCipher(true));
-		//recordSet.add( rec );
+		this.doAdd(rec);
 		setModified();
 
 		LOG.leaveMethod( "PwsFile.add" );
 	}
 
-	protected void add ( final PwsRecord rec, final Cipher aCipher ) {
-
+	protected void doAdd(final PwsRecord rec) {
 		// TODOlib validate the record before adding it
-	    // TODO: remove method
 	    records.add(rec);
 	}
 
@@ -448,8 +445,6 @@ public abstract class PwsFile
      */
     public PwsRecord getRecord(int index)
     {
-        // TODO: need getCipher here?
-    	getCipher(true);
         return records.get(index);
     }
 
@@ -507,12 +502,11 @@ public abstract class PwsFile
 	 */
 	void readAll() throws IOException, UnsupportedFileVersionException {
 		try {
-			final Cipher c = getCipher(true);
 			for ( ;; ) {
 				final PwsRecord	rec = PwsRecord.read( this );
 
 				if ( rec.isValid() ){
-					this.add( rec, c );
+					this.doAdd(rec);
 				}
 			}
 		} catch ( EndOfFileException e ) {
