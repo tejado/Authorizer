@@ -23,7 +23,6 @@ public abstract class AbstractPwsPasswdField extends PwsField
 {
     private static final long serialVersionUID = -5633832199601878672L;
 
-    // TODO: store just encrypted bytes instead of SealedObject?
     private final Cipher itsReadCipher;
     private final String itsStrEncoding;
 
