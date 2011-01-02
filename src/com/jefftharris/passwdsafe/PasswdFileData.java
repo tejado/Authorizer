@@ -31,6 +31,7 @@ import org.pwsafe.lib.file.PwsFileStorage;
 import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
+import org.pwsafe.lib.file.PwsPasswdField;
 import org.pwsafe.lib.file.PwsPasswdUnicodeField;
 import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
@@ -712,13 +713,18 @@ public class PasswdFileData
             {
             case PwsRecordV3.GROUP:
             case PwsRecordV3.NOTES:
-            // TODO: PwsPasswdField for v2
-            case PwsRecordV3.PASSWORD:
             case PwsRecordV3.TITLE:
             case PwsRecordV3.USERNAME:
             {
-                if ((str != null) && (str.length() != 0)) {
+                if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringField(fieldId, str);
+                }
+                break;
+            }
+            case PwsRecordV3.PASSWORD:
+            {
+                if (!TextUtils.isEmpty(str)) {
+                    field = new PwsPasswdField(fieldId, str, itsPwsFile);
                 }
                 break;
             }
