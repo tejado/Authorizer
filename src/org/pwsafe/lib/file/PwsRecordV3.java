@@ -214,7 +214,6 @@ public class PwsRecordV3 extends PwsRecord
 
 		setField( new PwsUUIDField(PwsFieldTypeV3.UUID, new UUID()) );
 		setField( new PwsStringUnicodeField(PwsFieldTypeV3.TITLE,    "") );
-		// TODO: test new record
 		setField( new PwsPasswdUnicodeField(PwsFieldTypeV3.PASSWORD) );
 		setField( new PwsTimeField(PwsFieldTypeV3.CREATION_TIME, new Date()) );
 
