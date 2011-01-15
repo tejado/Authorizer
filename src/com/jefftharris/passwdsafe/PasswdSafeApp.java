@@ -330,16 +330,22 @@ public class PasswdSafeApp extends Application
         showFatalMsg(t, t.toString(), activity);
     }
 
-    public static void showFatalMsg(Throwable t, String msg, Activity activity)
-    {
-        StringWriter writer = new StringWriter();
-        t.printStackTrace(new PrintWriter(writer));
-        Log.e(TAG, writer.toString());
-        showFatalMsg(msg, activity);
-    }
-
     public static void showFatalMsg(String msg, final Activity activity)
     {
+        showFatalMsg(null, msg, activity);
+    }
+
+    public static void showFatalMsg(Throwable t, String msg,
+                                    final Activity activity)
+    {
+        if (t != null) {
+            StringWriter writer = new StringWriter();
+            t.printStackTrace(new PrintWriter(writer));
+            String trace = writer.toString();
+            Log.e(TAG, trace);
+            copyToClipboard(trace, activity);
+        }
+
         AbstractDialogClickListener dlgClick = new AbstractDialogClickListener()
         {
             @Override
@@ -355,12 +361,13 @@ public class PasswdSafeApp extends Application
             }
         };
 
-        new AlertDialog.Builder(activity)
+        AlertDialog.Builder dlg = new AlertDialog.Builder(activity)
+        .setTitle(getAppTitle(activity) + " - Error")
         .setMessage(msg)
         .setCancelable(false)
-        .setPositiveButton("Close", dlgClick)
-        .setOnCancelListener(dlgClick)
-        .show();
+        .setPositiveButton("Copy Trace and Close", dlgClick)
+        .setOnCancelListener(dlgClick);
+        dlg.show();
     }
 
     public static void dbginfo(String tag, String msg)
