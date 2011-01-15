@@ -15,7 +15,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Date;
 
 import org.pwsafe.lib.I18nHelper;
@@ -98,9 +97,10 @@ public class PwsFileStorage implements PwsStorage {
 				/* Original file doesn't exisit, just go ahead and write it
 				 * (no backup, temp files needed).
 				 */
-				OutputStream OutStream	= new FileOutputStream( file );
+				FileOutputStream OutStream	= new FileOutputStream( file );
 
 				OutStream.write(data);
+				OutStream.getFD().sync();
 				OutStream.close(); // TODOlib: needs a finally
 				return true;
 			}
@@ -127,9 +127,10 @@ public class PwsFileStorage implements PwsStorage {
 			}
 
 			File tempFile	= File.createTempFile( "pwsafe", null, new File(FilePath) );
-			OutputStream OutStream	= new FileOutputStream( tempFile );
+			FileOutputStream OutStream	= new FileOutputStream( tempFile );
 
 			OutStream.write(data);
+			OutStream.getFD().sync();
 			OutStream.close(); // TODOlib: needs a finally
 
 			if (oldFile.exists()) {
