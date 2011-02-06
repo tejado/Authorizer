@@ -42,13 +42,18 @@ public class PasswdHistory
             throw new IllegalArgumentException(
                 "Field too short: " + bytes.length);
         }
+
         itsIsEnabled = bytes[0] != 0;
-        itsMaxSize =
-            Character.digit(bytes[1], 16) << 8 |
-            Character.digit(bytes[2], 16);
-        int numEntries =
-            Character.digit(bytes[3], 16) << 8 |
-            Character.digit(bytes[4], 16);
+        itsMaxSize = Integer.valueOf(new String(bytes, 1, 2), 16);
+        if (itsMaxSize > 255) {
+            throw new IllegalArgumentException(
+                "Invalid max size: " + itsMaxSize);
+        }
+        int numEntries = Integer.valueOf(new String(bytes, 3, 2), 16);
+        if (numEntries > 255) {
+            throw new IllegalArgumentException(
+                "Invalid numEntries: " + numEntries);
+        }
 
         int pos = 5;
         while (pos < bytes.length)
