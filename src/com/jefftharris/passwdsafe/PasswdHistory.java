@@ -44,12 +44,12 @@ public class PasswdHistory
         }
 
         itsIsEnabled = bytes[0] != 0;
-        itsMaxSize = Integer.valueOf(new String(bytes, 1, 2), 16);
+        itsMaxSize = PasswdFileData.hexBytesToInt(bytes, 1, 2);
         if (itsMaxSize > 255) {
             throw new IllegalArgumentException(
                 "Invalid max size: " + itsMaxSize);
         }
-        int numEntries = Integer.valueOf(new String(bytes, 3, 2), 16);
+        int numEntries = PasswdFileData.hexBytesToInt(bytes, 3, 2);
         if (numEntries > 255) {
             throw new IllegalArgumentException(
                 "Invalid numEntries: " + numEntries);
@@ -62,6 +62,14 @@ public class PasswdHistory
                 break;
             }
 
+            long date = PasswdFileData.hexBytesToInt(bytes, pos, 8);
+            int passwdLen = PasswdFileData.hexBytesToInt(bytes, pos + 8, 4);
+            if (pos + 8 + 4 + passwdLen >= bytes.length) {
+                break;
+            }
+
+            String passwd = new String(bytes, pos + 8 + 4, passwdLen);
+            itsPasswds.add(new Entry(new Date(date * 1000L), passwd));
         }
     }
 }

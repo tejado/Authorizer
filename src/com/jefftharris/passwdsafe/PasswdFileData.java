@@ -339,6 +339,16 @@ public class PasswdFileData
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
 
+    public static final int hexBytesToInt(byte[] bytes, int pos, int len)
+    {
+        int i = 0;
+        for (int idx = pos; idx < (pos + len); ++idx) {
+            i <<= 4;
+            i |= Character.digit(bytes[idx], 16);
+        }
+        return i;
+    }
+
     private final void setSaveHdrFields(Context context)
     {
         setHdrLastSaveApp(PasswdSafeApp.getAppTitle(context) +
@@ -519,9 +529,8 @@ public class PasswdFileData
                 if (bytes.length == 8)
                 {
                     byte[] binbytes = new byte[4];
-                    Util.putIntToByteArray(binbytes,
-                                           hexBytesToInt(bytes, bytes.length),
-                                           0);
+                    Util.putIntToByteArray(
+                        binbytes, hexBytesToInt(bytes, 0, bytes.length), 0);
                     bytes = binbytes;
                 }
                 Date d = new Date(Util.getMillisFromByteArray(bytes, 0));
@@ -815,7 +824,7 @@ public class PasswdFileData
             Log.e(TAG, "Invalid who length: " + whoBytes.length);
             return null;
         }
-        int len = hexBytesToInt(whoBytes, 4);
+        int len = hexBytesToInt(whoBytes, 0, 4);
 
         if ((len + 4) > whoBytes.length) {
             Log.e(TAG, "Invalid user length: " + (len + 4));
@@ -839,16 +848,5 @@ public class PasswdFileData
         who.append(host);
         rec.setField(new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_WHO,
                                          who.toString().getBytes()));
-    }
-
-
-    private static final int hexBytesToInt(byte[] bytes, int len)
-    {
-        int i = 0;
-        for (int pos = 0; pos < len; ++pos) {
-            i <<= 4;
-            i |= Character.digit(bytes[pos], 16);
-        }
-        return i;
     }
 }
