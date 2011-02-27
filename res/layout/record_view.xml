@@ -81,6 +81,15 @@
                           android:padding="3dip"/>
             </TableRow>
     
+            <TableRow android:id="@+id/history_row">
+                <TextView android:text="@string/history"
+                          android:padding="3dip"/>
+                <TextView android:id="@+id/history"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:padding="3dip"/>
+            </TableRow>
+    
             <TableRow android:id="@+id/notes_row">
                 <TextView android:text="@string/notes"
                           android:padding="3dip"/>

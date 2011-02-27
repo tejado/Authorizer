@@ -1,6 +1,12 @@
 package com.jefftharris.passwdsafe;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +14,7 @@ import org.pwsafe.lib.file.PwsStringUnicodeField;
 
 public class PasswdHistory
 {
-    public static class Entry
+    public static class Entry implements Comparable<Entry>
     {
         private final Date itsDate;
         private final String itsPasswd;
@@ -27,6 +33,12 @@ public class PasswdHistory
         public String getPasswd()
         {
             return itsPasswd;
+        }
+
+        public int compareTo(Entry arg0)
+        {
+            // Sort descending
+            return -itsDate.compareTo(arg0.itsDate);
         }
     }
 
@@ -55,6 +67,10 @@ public class PasswdHistory
                 "Invalid numEntries: " + numEntries);
         }
 
+        Charset cs = Charset.forName("UTF-8");
+        CharsetDecoder csDecoder = cs.newDecoder();
+        ByteBuffer byteBuf = ByteBuffer.wrap(bytes, 0, bytes.length);
+
         int pos = 5;
         while (pos < bytes.length)
         {
@@ -64,12 +80,42 @@ public class PasswdHistory
 
             long date = PasswdFileData.hexBytesToInt(bytes, pos, 8);
             int passwdLen = PasswdFileData.hexBytesToInt(bytes, pos + 8, 4);
-            if (pos + 8 + 4 + passwdLen >= bytes.length) {
+            pos += 8 + 4;
+            if (pos + passwdLen > bytes.length) {
                 break;
             }
 
-            String passwd = new String(bytes, pos + 8 + 4, passwdLen);
+            CharBuffer passwdChars = CharBuffer.allocate(passwdLen);
+            byteBuf.position(pos);
+            csDecoder.reset();
+            CoderResult rc = csDecoder.decode(byteBuf, passwdChars, true);
+            String passwd = null;
+            if ((rc == CoderResult.OVERFLOW) ||
+                (passwdChars.position() == passwdLen)) {
+                passwdChars.rewind();
+                passwd = passwdChars.toString();
+            }
+            // TODO: errors....
+
             itsPasswds.add(new Entry(new Date(date * 1000L), passwd));
+            pos = byteBuf.position();
         }
+
+        Collections.sort(itsPasswds);
+    }
+
+    public boolean isEnabled()
+    {
+        return itsIsEnabled;
+    }
+
+    public int getMaxSize()
+    {
+        return itsMaxSize;
+    }
+
+    public List<Entry> getPasswds()
+    {
+        return itsPasswds;
     }
 }

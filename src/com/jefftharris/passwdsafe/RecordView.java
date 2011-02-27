@@ -316,6 +316,21 @@ public class RecordView extends AbstractRecordActivity
         setText(R.id.expiration, R.id.expiration_row,
                 fileData.getPasswdExpiryTime(rec));
         setText(R.id.notes, R.id.notes_row, fileData.getNotes(rec));
+
+        PasswdHistory history = fileData.getPasswdHistory(rec);
+        StringBuilder historyText = null;
+        if (history != null) {
+            historyText = new StringBuilder();
+            historyText.append("Enabled: ").append(history.isEnabled())
+                .append("\nMax size: ").append(history.getMaxSize());
+            for (PasswdHistory.Entry entry : history.getPasswds()) {
+                historyText.append("\n").append(entry.getPasswd())
+                    .append(" (").append(entry.getDate()).append(")");
+            }
+        }
+        setText(R.id.history, R.id.history_row,
+                (historyText == null) ? null : historyText.toString());
+
         isPasswordShown = false;
         itsPasswordView =
             setText(R.id.password, R.id.password_row,

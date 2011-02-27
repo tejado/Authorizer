@@ -259,6 +259,28 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.PASSWORD_LIFETIME);
     }
 
+    public final PasswdHistory getPasswdHistory(PwsRecord rec)
+    {
+        if (itsPwsFile == null) {
+            return null;
+        }
+
+        int fieldId = getVersionFieldId(PwsRecordV3.PASSWORD_HISTORY);
+        if ((fieldId == FIELD_NOT_PRESENT) ||
+            (fieldId == FIELD_UNSUPPORTED)) {
+            return null;
+        }
+
+        try {
+            PwsStringUnicodeField field =
+                (PwsStringUnicodeField)rec.getField(fieldId);
+            return new PasswdHistory(field);
+        } catch (Exception e) {
+            // TODO: log?
+            return null;
+        }
+    }
+
     public final String getTitle(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.TITLE);
@@ -427,6 +449,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.URL:
+            case PwsRecordV3.PASSWORD_HISTORY:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -468,6 +491,7 @@ public class PasswdFileData
             case PwsRecordV3.GROUP:
             case PwsRecordV3.PASSWORD_LIFETIME:
             case PwsRecordV3.URL:
+            case PwsRecordV3.PASSWORD_HISTORY:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
