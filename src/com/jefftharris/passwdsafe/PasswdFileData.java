@@ -276,7 +276,7 @@ public class PasswdFileData
                 (PwsStringUnicodeField)rec.getField(fieldId);
             return new PasswdHistory(field);
         } catch (Exception e) {
-            // TODO: log?
+            Log.e(TAG, "Error reading password history: " + e, e);
             return null;
         }
     }

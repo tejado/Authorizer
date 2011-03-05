@@ -52,7 +52,8 @@ public class PasswdHistory
         byte[] bytes = field.getBytes();
         if (bytes.length < 5) {
             throw new IllegalArgumentException(
-                "Field too short: " + bytes.length);
+                "Field length (" + bytes.length + ") too short: " +
+                5);
         }
 
         itsIsEnabled = bytes[0] != 0;
@@ -75,14 +76,18 @@ public class PasswdHistory
         while (pos < bytes.length)
         {
             if (pos + 8 + 4 >= bytes.length) {
-                break;
+                throw new IllegalArgumentException(
+                    "Field length (" + bytes.length + ") too short: " +
+                    pos + 8 + 4);
             }
 
             long date = PasswdFileData.hexBytesToInt(bytes, pos, 8);
             int passwdLen = PasswdFileData.hexBytesToInt(bytes, pos + 8, 4);
             pos += 8 + 4;
             if (pos + passwdLen > bytes.length) {
-                break;
+                throw new IllegalArgumentException(
+                    "Field length (" + bytes.length + ") too short: " +
+                    pos + passwdLen);
             }
 
             CharBuffer passwdChars = CharBuffer.allocate(passwdLen);
@@ -95,7 +100,6 @@ public class PasswdHistory
                 passwdChars.rewind();
                 passwd = passwdChars.toString();
             }
-            // TODO: errors....
 
             itsPasswds.add(new Entry(new Date(date * 1000L), passwd));
             pos = byteBuf.position();
