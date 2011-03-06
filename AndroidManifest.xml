@@ -95,6 +95,10 @@
                   android:label="@string/app_name" 
                   android:finishOnTaskLaunch="true"/>
     
+        <activity android:name=".RecordViewHistory"
+                  android:label="@string/app_name" 
+                  android:finishOnTaskLaunch="true"/>
+    
         <receiver android:name=".PasswdSafeApp$FileTimeoutReceiver">
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.FILE_TIMEOUT"/>
