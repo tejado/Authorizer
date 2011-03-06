@@ -267,24 +267,15 @@ public class PasswdFileData
 
     public final PasswdHistory getPasswdHistory(PwsRecord rec)
     {
-        if (itsPwsFile == null) {
-            return null;
+        String fieldStr = getField(rec, PwsRecordV3.PASSWORD_HISTORY);
+        if (!TextUtils.isEmpty(fieldStr)) {
+            try {
+                return new PasswdHistory(fieldStr);
+            } catch (Exception e) {
+                Log.e(TAG, "Error reading password history: " + e, e);
+            }
         }
-
-        int fieldId = getVersionFieldId(PwsRecordV3.PASSWORD_HISTORY);
-        if ((fieldId == FIELD_NOT_PRESENT) ||
-            (fieldId == FIELD_UNSUPPORTED)) {
-            return null;
-        }
-
-        try {
-            PwsStringUnicodeField field =
-                (PwsStringUnicodeField)rec.getField(fieldId);
-            return new PasswdHistory(field);
-        } catch (Exception e) {
-            Log.e(TAG, "Error reading password history: " + e, e);
-            return null;
-        }
+        return null;
     }
 
     public final void setPasswdHistory(PasswdHistory history, PwsRecord rec)

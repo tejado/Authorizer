@@ -1,16 +1,9 @@
 package com.jefftharris.passwdsafe;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CoderResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import org.pwsafe.lib.file.PwsStringUnicodeField;
 
 public class PasswdHistory
 {
@@ -47,65 +40,51 @@ public class PasswdHistory
     // Sorted with newest entry first
     private List<Entry> itsPasswds = new ArrayList<Entry>();
 
-    public PasswdHistory(PwsStringUnicodeField field)
+    public PasswdHistory(String historyStr)
         throws IllegalArgumentException
     {
-        byte[] bytes = field.getBytes();
-        if (bytes.length < 5) {
+        int historyLen = historyStr.length();
+        if (historyLen < 5) {
             throw new IllegalArgumentException(
-                "Field length (" + bytes.length + ") too short: " +
-                5);
+                "Field length (" + historyLen + ") too short: " + 5);
         }
 
-        itsIsEnabled = bytes[0] != 0;
-        itsMaxSize = PasswdFileData.hexBytesToInt(bytes, 1, 2);
+        itsIsEnabled = historyStr.charAt(0) != '0';
+        itsMaxSize = Integer.parseInt(historyStr.substring(1, 3), 16);
         if (itsMaxSize > 255) {
             throw new IllegalArgumentException(
                 "Invalid max size: " + itsMaxSize);
         }
-        int numEntries = PasswdFileData.hexBytesToInt(bytes, 3, 2);
+
+        int numEntries = Integer.parseInt(historyStr.substring(3, 5), 16);
         if (numEntries > 255) {
             throw new IllegalArgumentException(
                 "Invalid numEntries: " + numEntries);
         }
 
-        Charset cs = Charset.forName("UTF-8");
-        CharsetDecoder csDecoder = cs.newDecoder();
-        ByteBuffer byteBuf = ByteBuffer.wrap(bytes, 0, bytes.length);
-
         int pos = 5;
-        while (pos < bytes.length)
-        {
-            if (pos + 8 + 4 >= bytes.length) {
+        while (pos < historyLen) {
+            if (pos + 12 >= historyLen) {
                 throw new IllegalArgumentException(
-                    "Field length (" + bytes.length + ") too short: " +
-                    pos + 8 + 4);
+                    "Field length (" + historyLen + ") too short: " +
+                    (pos + 12));
             }
 
-            long date = PasswdFileData.hexBytesToInt(bytes, pos, 8);
-            int passwdLen = PasswdFileData.hexBytesToInt(bytes, pos + 8, 4);
-            pos += 8 + 4;
-            if (pos + passwdLen > bytes.length) {
+            long date = Long.parseLong(historyStr.substring(pos, pos + 8), 16);
+            int passwdLen =
+                Integer.parseInt(historyStr.substring(pos + 8, pos + 12), 16);
+            pos += 12;
+
+            if (pos + passwdLen > historyLen) {
                 throw new IllegalArgumentException(
-                    "Field length (" + bytes.length + ") too short: " +
-                    pos + passwdLen);
+                    "Field length (" + historyLen + ") too short: " +
+                    (pos + passwdLen));
             }
 
-            CharBuffer passwdChars = CharBuffer.allocate(passwdLen);
-            byteBuf.position(pos);
-            csDecoder.reset();
-            CoderResult rc = csDecoder.decode(byteBuf, passwdChars, true);
-            String passwd = null;
-            if ((rc == CoderResult.OVERFLOW) ||
-                (passwdChars.position() == passwdLen)) {
-                passwdChars.rewind();
-                passwd = passwdChars.toString();
-            }
-
+            String passwd = historyStr.substring(pos, pos + passwdLen);
             itsPasswds.add(new Entry(new Date(date * 1000L), passwd));
-            pos = byteBuf.position();
+            pos += passwdLen;
         }
-
         Collections.sort(itsPasswds);
     }
 
