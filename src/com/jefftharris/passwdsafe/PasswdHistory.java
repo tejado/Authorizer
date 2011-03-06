@@ -44,6 +44,7 @@ public class PasswdHistory
 
     private boolean itsIsEnabled;
     private int itsMaxSize;
+    // Sorted with newest entry first
     private List<Entry> itsPasswds = new ArrayList<Entry>();
 
     public PasswdHistory(PwsStringUnicodeField field)
@@ -121,5 +122,37 @@ public class PasswdHistory
     public List<Entry> getPasswds()
     {
         return itsPasswds;
+    }
+
+    public void addPasswd(String passwd)
+    {
+        if (itsIsEnabled && (itsMaxSize > 0)) {
+            if (itsPasswds.size() == itsMaxSize) {
+                // Remove oldest
+                itsPasswds.remove(itsPasswds.size() - 1);
+            }
+            itsPasswds.add(new Entry(new Date(), passwd));
+            Collections.sort(itsPasswds);
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder strbld = new StringBuilder();
+        String str = String.format("%1d%02x%02x", isEnabled() ? 1 : 0,
+                                   itsMaxSize, itsPasswds.size());
+        strbld.append(str);
+
+        for (Entry entry : itsPasswds) {
+            String passwd = entry.getPasswd();
+            str = String.format("%08x%04x",
+                                (int)(entry.getDate().getTime() / 1000),
+                                passwd.length());
+            strbld.append(str);
+            strbld.append(passwd);
+        }
+
+        return strbld.toString();
     }
 }

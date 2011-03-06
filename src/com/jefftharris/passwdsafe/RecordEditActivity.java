@@ -499,10 +499,10 @@ public class RecordEditActivity extends AbstractRecordActivity
             fileData.setUsername(updateStr, record);
         }
 
-        updateStr = getUpdatedField(fileData.getPassword(record),
-                                    R.id.password);
+        String currPasswd = fileData.getPassword(record);
+        updateStr = getUpdatedField(currPasswd, R.id.password);
         if (updateStr != null) {
-            fileData.setPassword(updateStr, record);
+            fileData.setPassword(currPasswd, updateStr, record);
         }
 
         updateStr = getUpdatedField(fileData.getNotes(record), R.id.notes);

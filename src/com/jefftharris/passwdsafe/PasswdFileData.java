@@ -249,9 +249,15 @@ public class PasswdFileData
         return hasField(rec, PwsRecordV3.PASSWORD);
     }
 
-    public final void setPassword(String str, PwsRecord rec)
+    public final void setPassword(String oldPasswd, String newPasswd,
+                                  PwsRecord rec)
     {
-        setField(str, rec, PwsRecordV3.PASSWORD);
+        PasswdHistory history = getPasswdHistory(rec);
+        if ((history != null) && !TextUtils.isEmpty(oldPasswd)) {
+            history.addPasswd(oldPasswd);
+            setPasswdHistory(history, rec);
+        }
+        setField(newPasswd, rec, PwsRecordV3.PASSWORD);
     }
 
     public final String getPasswdExpiryTime(PwsRecord rec)
@@ -279,6 +285,11 @@ public class PasswdFileData
             Log.e(TAG, "Error reading password history: " + e, e);
             return null;
         }
+    }
+
+    public final void setPasswdHistory(PasswdHistory history, PwsRecord rec)
+    {
+        setField(history.toString(), rec, PwsRecordV3.PASSWORD_HISTORY);
     }
 
     public final String getTitle(PwsRecord rec)
@@ -715,6 +726,7 @@ public class PasswdFileData
             case PwsRecordV3.TITLE:
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
+            case PwsRecordV3.PASSWORD_HISTORY:
             {
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringUnicodeField(fieldId, str);
