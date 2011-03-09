@@ -249,14 +249,38 @@ public class PasswdFileData
         return hasField(rec, PwsRecordV3.PASSWORD);
     }
 
-    public final void setPassword(String str, PwsRecord rec)
+    public final void setPassword(String oldPasswd, String newPasswd,
+                                  PwsRecord rec)
     {
-        setField(str, rec, PwsRecordV3.PASSWORD);
+        PasswdHistory history = getPasswdHistory(rec);
+        if ((history != null) && !TextUtils.isEmpty(oldPasswd)) {
+            history.addPasswd(oldPasswd);
+            setPasswdHistory(history, rec);
+        }
+        setField(newPasswd, rec, PwsRecordV3.PASSWORD);
     }
 
     public final String getPasswdExpiryTime(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+    }
+
+    public final PasswdHistory getPasswdHistory(PwsRecord rec)
+    {
+        String fieldStr = getField(rec, PwsRecordV3.PASSWORD_HISTORY);
+        if (!TextUtils.isEmpty(fieldStr)) {
+            try {
+                return new PasswdHistory(fieldStr);
+            } catch (Exception e) {
+                Log.e(TAG, "Error reading password history: " + e, e);
+            }
+        }
+        return null;
+    }
+
+    public final void setPasswdHistory(PasswdHistory history, PwsRecord rec)
+    {
+        setField(history.toString(), rec, PwsRecordV3.PASSWORD_HISTORY);
     }
 
     public final String getTitle(PwsRecord rec)
@@ -339,6 +363,16 @@ public class PasswdFileData
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
 
+    public static final int hexBytesToInt(byte[] bytes, int pos, int len)
+    {
+        int i = 0;
+        for (int idx = pos; idx < (pos + len); ++idx) {
+            i <<= 4;
+            i |= Character.digit(bytes[idx], 16);
+        }
+        return i;
+    }
+
     private final void setSaveHdrFields(Context context)
     {
         setHdrLastSaveApp(PasswdSafeApp.getAppTitle(context) +
@@ -417,6 +451,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.URL:
+            case PwsRecordV3.PASSWORD_HISTORY:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -458,6 +493,7 @@ public class PasswdFileData
             case PwsRecordV3.GROUP:
             case PwsRecordV3.PASSWORD_LIFETIME:
             case PwsRecordV3.URL:
+            case PwsRecordV3.PASSWORD_HISTORY:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -519,9 +555,8 @@ public class PasswdFileData
                 if (bytes.length == 8)
                 {
                     byte[] binbytes = new byte[4];
-                    Util.putIntToByteArray(binbytes,
-                                           hexBytesToInt(bytes, bytes.length),
-                                           0);
+                    Util.putIntToByteArray(
+                        binbytes, hexBytesToInt(bytes, 0, bytes.length), 0);
                     bytes = binbytes;
                 }
                 Date d = new Date(Util.getMillisFromByteArray(bytes, 0));
@@ -682,6 +717,7 @@ public class PasswdFileData
             case PwsRecordV3.TITLE:
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
+            case PwsRecordV3.PASSWORD_HISTORY:
             {
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringUnicodeField(fieldId, str);
@@ -815,7 +851,7 @@ public class PasswdFileData
             Log.e(TAG, "Invalid who length: " + whoBytes.length);
             return null;
         }
-        int len = hexBytesToInt(whoBytes, 4);
+        int len = hexBytesToInt(whoBytes, 0, 4);
 
         if ((len + 4) > whoBytes.length) {
             Log.e(TAG, "Invalid user length: " + (len + 4));
@@ -839,16 +875,5 @@ public class PasswdFileData
         who.append(host);
         rec.setField(new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_WHO,
                                          who.toString().getBytes()));
-    }
-
-
-    private static final int hexBytesToInt(byte[] bytes, int len)
-    {
-        int i = 0;
-        for (int pos = 0; pos < len; ++pos) {
-            i <<= 4;
-            i |= Character.digit(bytes[pos], 16);
-        }
-        return i;
     }
 }
