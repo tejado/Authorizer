@@ -11,29 +11,25 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.TabHost;
 import android.widget.TextView;
 
-public class RecordView extends TabActivity //AbstractRecordActivity
+public class RecordViewBasic extends AbstractRecordActivity
 {
     private static final String TAG = "RecordView";
     private static final String HIDDEN_PASSWORD = "***** (tap to show)";
 
     private static final String WORD_WRAP_PREF = "wordwrap";
 
-    //private static final int DIALOG_DELETE = MAX_DIALOG + 1;
-    private static final int DIALOG_DELETE = 1;
+    private static final int DIALOG_DELETE = MAX_DIALOG + 1;
 
     private static final int MENU_EDIT = 1;
     private static final int MENU_DELETE = 2;
@@ -59,40 +55,6 @@ public class RecordView extends TabActivity //AbstractRecordActivity
             return;
         }
 
-        setContentView(R.layout.record_view);
-
-        Resources res = getResources();
-        TabHost tabHost = getTabHost();
-        TabHost.TabSpec spec;
-
-        Intent intent = new Intent(getIntent());
-        intent.setClass(this, RecordViewBasic.class);
-        spec = tabHost.newTabSpec("basic")
-            .setIndicator("Basic", res.getDrawable(R.drawable.ic_tab_contact))
-            .setContent(R.id.foo);
-        tabHost.addTab(spec);
-
-        intent = new Intent(getIntent());
-        intent.setClass(this, RecordViewHistory.class);
-        spec = tabHost.newTabSpec("history")
-            .setIndicator("History",
-                          res.getDrawable(R.drawable.ic_tab_account_list))
-            .setContent(intent);
-        tabHost.addTab(spec);
-
-        intent = new Intent(getIntent());
-        intent.setClass(this, RecordViewBasic.class);
-        spec = tabHost.newTabSpec("notes")
-            .setIndicator("Notes",
-                          res.getDrawable(R.drawable.ic_tab_attachment))
-            .setContent(intent);
-        tabHost.addTab(spec);
-
-        tabHost.setCurrentTab(0);
-
-        // TODO: test activity result and refresh after editing...
-
-        /*
         if (getUUID() == null) {
             PasswdSafeApp.showFatalMsg("No record chosen for file: " + getFile(),
                                        this);
@@ -102,15 +64,13 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
 
-        setContentView(R.layout.record_view);
+        setContentView(R.layout.record_view_basic);
         refresh();
-        */
     }
 
     /* (non-Javadoc)
      * @see android.app.Activity#onResume()
      */
-    /*
     @Override
     protected void onResume()
     {
@@ -120,12 +80,10 @@ public class RecordView extends TabActivity //AbstractRecordActivity
             passwdFile.touch();
         }
     }
-    */
 
     /* (non-Javadoc)
      * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
      */
-    /*
     @Override
     public boolean onContextItemSelected(MenuItem item)
     {
@@ -145,12 +103,10 @@ public class RecordView extends TabActivity //AbstractRecordActivity
             return super.onContextItemSelected(item);
         }
     }
-    */
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu, android.view.View, android.view.ContextMenu.ContextMenuInfo)
      */
-    /*
     @Override
     public void onCreateContextMenu(ContextMenu menu,
                                     View v,
@@ -165,12 +121,10 @@ public class RecordView extends TabActivity //AbstractRecordActivity
             menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_clipboard);
         }
     }
-    */
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
-    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -187,12 +141,10 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         menu.add(0, MENU_TOGGLE_WRAP_NOTES, 0, R.string.toggle_word_wrap);
         return true;
     }
-     */
 
     /* (non-Javadoc)
      * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
      */
-    /*
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
@@ -222,14 +174,13 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         if (item != null) {
             item.setEnabled(canEdit);
         }
+
         return true;
     }
-     */
 
     /* (non-Javadoc)
      * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
      */
-    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -244,7 +195,7 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         }
         case MENU_DELETE:
         {
-            //showDialog(DIALOG_DELETE);
+            showDialog(DIALOG_DELETE);
             return true;
         }
         case MENU_TOGGLE_PASSWORD:
@@ -284,9 +235,7 @@ public class RecordView extends TabActivity //AbstractRecordActivity
             return super.onOptionsItemSelected(item);
         }
     }
-    */
 
-    /*
     @Override
     protected Dialog onCreateDialog(int id)
     {
@@ -322,12 +271,10 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         }
         return dialog;
     }
-    */
 
     /* (non-Javadoc)
      * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
      */
-    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -342,9 +289,7 @@ public class RecordView extends TabActivity //AbstractRecordActivity
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-    */
 
-    /*
     private final void refresh()
     {
         PasswdFileData fileData = getPasswdFile().getFileData();
@@ -402,9 +347,7 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         }
         setWordWrap();
     }
-    */
 
-    /*
     private final void deleteRecord()
     {
         boolean removed = false;
@@ -426,20 +369,18 @@ public class RecordView extends TabActivity //AbstractRecordActivity
             saveFile();
         }
     }
-     */
 
-/*    private final void togglePasswordShown()
+    private final void togglePasswordShown()
     {
         TextView passwordField = (TextView)findViewById(R.id.password);
         isPasswordShown = !isPasswordShown;
         passwordField.setText(
             isPasswordShown ? getPassword() : HIDDEN_PASSWORD);
     }
-*/
-/*    private final String getPassword()
+
+    private final String getPassword()
     {
         String password = null;
-
         PasswdFileData fileData = getPasswdFile().getFileData();
         if (fileData != null) {
             PwsRecord rec = fileData.getRecord(getUUID());
@@ -447,17 +388,16 @@ public class RecordView extends TabActivity //AbstractRecordActivity
                 password = fileData.getPassword(rec);
             }
         }
-
         return password;
     }
-*/
-/*    private final void setWordWrap()
+
+    private final void setWordWrap()
     {
         TextView tv = (TextView)findViewById(R.id.notes);
         tv.setHorizontallyScrolling(!isWordWrap);
     }
-*/
-/*    private final TextView setText(int id, int rowId, String text)
+
+    private final TextView setText(int id, int rowId, String text)
     {
         View row = findViewById(rowId);
         if (row != null) {
@@ -471,4 +411,4 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         }
         return tv;
     }
-*/}
+}
