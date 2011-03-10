@@ -69,7 +69,7 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         intent.setClass(this, RecordViewBasic.class);
         spec = tabHost.newTabSpec("basic")
             .setIndicator("Basic", res.getDrawable(R.drawable.ic_tab_contact))
-            .setContent(R.id.foo);
+            .setContent(R.id.basic_tab);
         tabHost.addTab(spec);
 
         intent = new Intent(getIntent());
@@ -77,7 +77,7 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         spec = tabHost.newTabSpec("history")
             .setIndicator("History",
                           res.getDrawable(R.drawable.ic_tab_account_list))
-            .setContent(intent);
+            .setContent(R.id.history_tab/*intent*/);
         tabHost.addTab(spec);
 
         intent = new Intent(getIntent());
@@ -85,13 +85,12 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         spec = tabHost.newTabSpec("notes")
             .setIndicator("Notes",
                           res.getDrawable(R.drawable.ic_tab_attachment))
-            .setContent(intent);
+            .setContent(R.id.notes_tab/*intent*/);
         tabHost.addTab(spec);
 
         tabHost.setCurrentTab(0);
 
         // TODO: test activity result and refresh after editing...
-
         /*
         if (getUUID() == null) {
             PasswdSafeApp.showFatalMsg("No record chosen for file: " + getFile(),
@@ -102,7 +101,7 @@ public class RecordView extends TabActivity //AbstractRecordActivity
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
 
-        setContentView(R.layout.record_view);
+        //setContentView(R.layout.record_view);
         refresh();
         */
     }
