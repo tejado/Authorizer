@@ -112,22 +112,18 @@
 
             </LinearLayout>
                      
-            <LinearLayout android:id="@+id/notes_tab"
-                          android:orientation="vertical"
-                          android:layout_width="fill_parent"
-                          android:layout_height="fill_parent">
-
-                <TextView android:text="@string/notes"
-                          android:layout_width="fill_parent"
-                          android:layout_height="wrap_content"/>
-                          
+            <ScrollView android:id="@+id/notes_tab"
+                        android:orientation="vertical"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent">
+                        
                 <TextView android:id="@+id/notes"
                           android:autoLink="all"
                           android:clickable="false"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
+                          android:layout_width="fill_parent"
+                          android:layout_height="fill_parent"/>
 
-            </LinearLayout>
+            </ScrollView>
 
         </FrameLayout>
     </LinearLayout>
