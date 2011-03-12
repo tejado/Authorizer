@@ -25,6 +25,7 @@
     <string name="done">Done</string>
     <string name="edit">Edit</string>
     <string name="email">Email</string>
+    <string name="enabled">Enabled</string>
     <string name="error_msg">&lt;b&gt;&lt;i&gt;Problem&lt;/i&gt;&lt;/b&gt; - %1$s</string>
     <string name="expiration">Expiration</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
@@ -38,6 +39,7 @@
     <string name="last_save_app_label">Last saved app:</string>
     <string name="last_save_by_label">Last saved by:</string>
     <string name="last_save_time_label">Last save time:</string>
+    <string name="max_size_label">Maximum size:</string>
     <string name="new_file">New File</string>
     <string name="new_password_label">New Password:</string>
     <string name="no_records">No Records</string>

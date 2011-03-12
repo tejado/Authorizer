@@ -33,6 +33,14 @@ public class PasswdHistory
             // Sort descending
             return -itsDate.compareTo(arg0.itsDate);
         }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder str = new StringBuilder(itsPasswd);
+            str.append(" [").append(itsDate).append("]");
+            return str.toString();
+        }
     }
 
     private boolean itsIsEnabled;

@@ -7,6 +7,10 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.AlertDialog;
@@ -21,6 +25,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.CheckBox;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -42,6 +50,9 @@ public class RecordView extends AbstractRecordTabActivity
     private static final int MENU_TOGGLE_WRAP_NOTES = 7;
 
     private static final int EDIT_RECORD_REQUEST = 0;
+
+    private static final String PASSWD = "passwd";
+    private static final String DATE = "date";
 
     private TextView itsUserView;
     private boolean isPasswordShown = false;
@@ -343,18 +354,36 @@ public class RecordView extends AbstractRecordTabActivity
         setText(R.id.notes, View.NO_ID, fileData.getNotes(rec));
 
         PasswdHistory history = fileData.getPasswdHistory(rec);
-        StringBuilder historyText = null;
+        CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
+        enabledCb.setClickable(false);
         if (history != null) {
-            historyText = new StringBuilder();
-            historyText.append("Enabled: ").append(history.isEnabled())
-                .append("\nMax size: ").append(history.getMaxSize());
+            enabledCb.setChecked(history.isEnabled());
+            setText(R.id.history_max_size, View.NO_ID,
+                    Integer.toString(history.getMaxSize()));
+
+            ArrayList<HashMap<String, Object>> histData =
+                new ArrayList<HashMap<String, Object>>();
+            DateFormat dateFormatter = DateFormat.getDateTimeInstance(
+                DateFormat.MEDIUM, DateFormat.MEDIUM);
             for (PasswdHistory.Entry entry : history.getPasswds()) {
-                historyText.append("\n").append(entry.getPasswd())
-                    .append(" (").append(entry.getDate()).append(")");
+                HashMap<String, Object> entryData =
+                    new HashMap<String, Object>();
+                entryData.put(PASSWD, entry.getPasswd());
+                entryData.put(DATE, dateFormatter.format(entry.getDate()));
+                histData.add(entryData);
             }
+
+            ListView histView = (ListView)findViewById(R.id.history);
+            ListAdapter adapter =
+                new SimpleAdapter(this, histData,
+                                  android.R.layout.simple_list_item_2,
+                                  new String[] { PASSWD, DATE },
+                                  new int[] { android.R.id.text1,
+                                              android.R.id.text2 });
+            histView.setAdapter(adapter);
+        } else {
+            enabledCb.setChecked(false);
         }
-        setText(R.id.history, View.NO_ID,
-                (historyText == null) ? null : historyText.toString());
 
         isPasswordShown = false;
         itsPasswordView =

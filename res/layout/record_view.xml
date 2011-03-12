@@ -97,20 +97,40 @@
                 </TableLayout>       
             </ScrollView>                          
 
-            <LinearLayout android:id="@+id/history_tab"
-                          android:orientation="vertical"
-                          android:layout_width="fill_parent"
-                          android:layout_height="fill_parent">
-
-                <TextView android:text="@string/history"
-                          android:layout_width="fill_parent"
-                          android:layout_height="wrap_content"/>
+            <RelativeLayout android:id="@+id/history_tab"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent">
                           
-                <TextView android:id="@+id/history"
+                <CheckBox android:id="@+id/history_enabled"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:text="@string/enabled"/>
+                          
+                <TextView android:id="@+id/history_max_size_label"
+                          android:text="@string/max_size_label"
                           android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
+                          android:layout_height="wrap_content"
+                          android:layout_below="@id/history_enabled"/>
+                          
+                <TextView android:id="@+id/history_max_size"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_alignTop="@id/history_max_size_label"
+                          android:layout_toRightOf="@id/history_max_size_label"
+                          android:layout_marginLeft="3dip"/>
 
-            </LinearLayout>
+                <View android:id="@+id/history_sep"
+                      android:layout_width="fill_parent"
+                      android:layout_height="2dip"
+                      android:layout_below="@id/history_max_size_label"
+                      android:background="#FF909090"/>
+
+                <ListView android:id="@+id/history"
+                          android:layout_width="fill_parent"
+                          android:layout_height="fill_parent"
+                          android:layout_below="@id/history_sep"/>
+
+            </RelativeLayout>
                      
             <ScrollView android:id="@+id/notes_tab"
                         android:orientation="vertical"
