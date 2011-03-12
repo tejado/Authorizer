@@ -353,7 +353,7 @@ public class RecordView extends AbstractRecordTabActivity
                     .append(" (").append(entry.getDate()).append(")");
             }
         }
-        setText(R.id.history, R.id.history_row,
+        setText(R.id.history, View.NO_ID,
                 (historyText == null) ? null : historyText.toString());
 
         isPasswordShown = false;
