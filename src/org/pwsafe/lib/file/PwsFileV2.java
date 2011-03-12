@@ -132,7 +132,7 @@ public class PwsFileV2 extends PwsFileV1V2 {
 		hdr = new PwsRecordV1();
 
 		hdr.setField( new PwsStringField( PwsRecordV1.TITLE, PwsFileV2.ID_STRING ) );
-		hdr.setField( new PwsStringField( PwsRecordV1.PASSWORD, "2.0" ) );
+		hdr.setField( new PwsPasswdField( PwsRecordV1.PASSWORD, "2.0", this ) );
 
 		hdr.saveRecord( file );
 	}
