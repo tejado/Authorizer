@@ -14,17 +14,15 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.TabHost;
 import android.widget.TextView;
 
-public class RecordView extends AbstractRecordTabActivity
+public class RecordViewHistory extends AbstractRecordActivity
 {
     private static final String TAG = "RecordView";
     private static final String HIDDEN_PASSWORD = "***** (tap to show)";
@@ -57,31 +55,6 @@ public class RecordView extends AbstractRecordTabActivity
             return;
         }
 
-        setContentView(R.layout.record_view);
-
-        Resources res = getResources();
-        TabHost tabHost = getTabHost();
-        TabHost.TabSpec spec;
-
-        spec = tabHost.newTabSpec("basic")
-            .setIndicator("Basic", res.getDrawable(R.drawable.ic_tab_contact))
-            .setContent(R.id.basic_tab);
-        tabHost.addTab(spec);
-
-        spec = tabHost.newTabSpec("history")
-            .setIndicator("History",
-                          res.getDrawable(R.drawable.ic_tab_account_list))
-            .setContent(R.id.history_tab);
-        tabHost.addTab(spec);
-
-        spec = tabHost.newTabSpec("notes")
-            .setIndicator("Notes",
-                          res.getDrawable(R.drawable.ic_tab_attachment))
-            .setContent(R.id.notes_tab);
-        tabHost.addTab(spec);
-
-        tabHost.setCurrentTab(0);
-
         if (getUUID() == null) {
             PasswdSafeApp.showFatalMsg("No record chosen for file: " + getFile(),
                                        this);
@@ -91,6 +64,7 @@ public class RecordView extends AbstractRecordTabActivity
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
 
+        setContentView(R.layout.record_view_history);
         refresh();
     }
 
@@ -151,6 +125,7 @@ public class RecordView extends AbstractRecordTabActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -167,7 +142,7 @@ public class RecordView extends AbstractRecordTabActivity
         menu.add(0, MENU_TOGGLE_WRAP_NOTES, 0, R.string.toggle_word_wrap);
         return true;
     }
-
+*/
     /* (non-Javadoc)
      * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
      */
@@ -200,6 +175,7 @@ public class RecordView extends AbstractRecordTabActivity
         if (item != null) {
             item.setEnabled(canEdit);
         }
+
         return true;
     }
 
@@ -340,7 +316,7 @@ public class RecordView extends AbstractRecordTabActivity
         }
         setText(R.id.expiration, R.id.expiration_row,
                 fileData.getPasswdExpiryTime(rec));
-        setText(R.id.notes, View.NO_ID, fileData.getNotes(rec));
+        setText(R.id.notes, R.id.notes_row, fileData.getNotes(rec));
 
         PasswdHistory history = fileData.getPasswdHistory(rec);
         StringBuilder historyText = null;
@@ -406,7 +382,6 @@ public class RecordView extends AbstractRecordTabActivity
     private final String getPassword()
     {
         String password = null;
-
         PasswdFileData fileData = getPasswdFile().getFileData();
         if (fileData != null) {
             PwsRecord rec = fileData.getRecord(getUUID());
@@ -414,7 +389,6 @@ public class RecordView extends AbstractRecordTabActivity
                 password = fileData.getPassword(rec);
             }
         }
-
         return password;
     }
 
@@ -426,11 +400,9 @@ public class RecordView extends AbstractRecordTabActivity
 
     private final TextView setText(int id, int rowId, String text)
     {
-        if (rowId != View.NO_ID) {
-            View row = findViewById(rowId);
-            if (row != null) {
-                row.setVisibility((text != null) ? View.VISIBLE : View.GONE);
-            }
+        View row = findViewById(rowId);
+        if (row != null) {
+            row.setVisibility((text != null) ? View.VISIBLE : View.GONE);
         }
 
         TextView tv = null;

@@ -11,52 +11,40 @@ import java.io.File;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.TabActivity;
 import android.os.Bundle;
 
-public abstract class AbstractRecordActivity extends Activity
-    implements PasswdFileActivity
+public class AbstractRecordTabActivity extends TabActivity implements
+                PasswdFileActivity
 {
     protected static final int MAX_DIALOG = RecordActivityHelper.MAX_DIALOG;
 
     private final RecordActivityHelper itsHelper;
 
-    public AbstractRecordActivity()
+    public AbstractRecordTabActivity()
     {
         itsHelper = new RecordActivityHelper(this);
     }
 
-    public final Activity getActivity()
+    public Activity getActivity()
     {
         return itsHelper.getActivity();
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdFileActivity#showProgressDialog()
-     */
-    public final void showProgressDialog()
+    public void showProgressDialog()
     {
         itsHelper.showProgressDialog();
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdFileActivity#removeProgressDialog()
-     */
     public void removeProgressDialog()
     {
         itsHelper.removeProgressDialog();
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdFileActivity#saveFinished(boolean)
-     */
     public void saveFinished(boolean success)
     {
         itsHelper.saveFinished(success);
     }
-
 
     protected final File getFile()
     {
@@ -124,5 +112,4 @@ public abstract class AbstractRecordActivity extends Activity
     {
         itsHelper.saveFile();
     }
-
 }
