@@ -58,8 +58,8 @@ public abstract class AbstractRecordActivity extends Activity
     {
         if (success) {
             setResult(PasswdSafeApp.RESULT_MODIFIED);
+            finish();
         }
-        finish();
     }
 
 
