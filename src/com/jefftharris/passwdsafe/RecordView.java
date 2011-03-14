@@ -51,6 +51,10 @@ public class RecordView extends AbstractRecordTabActivity
 
     private static final int EDIT_RECORD_REQUEST = 0;
 
+    private static final int TAB_BASIC = 0;
+    //private static final int TAB_HISTORY = 1;
+    private static final int TAB_NOTES = 2;
+
     private static final String PASSWD = "passwd";
     private static final String DATE = "date";
 
@@ -185,17 +189,36 @@ public class RecordView extends AbstractRecordTabActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        int tab = getTabHost().getCurrentTab();
+
         boolean hasPassword = (itsPasswordView != null);
         MenuItem item = menu.findItem(MENU_TOGGLE_PASSWORD);
         if (item != null) {
             item.setTitle(isPasswordShown ?
                 R.string.hide_password : R.string.show_password);
             item.setEnabled(hasPassword);
+            item.setVisible(tab == TAB_BASIC);
+        }
+
+        item = menu.findItem(MENU_COPY_USER);
+        if (item != null) {
+            item.setVisible(tab == TAB_BASIC);
         }
 
         item = menu.findItem(MENU_COPY_PASSWORD);
         if (item != null) {
             item.setEnabled(hasPassword);
+            item.setVisible(tab == TAB_BASIC);
+        }
+
+        item = menu.findItem(MENU_COPY_NOTES);
+        if (item != null) {
+            item.setVisible(tab == TAB_NOTES);
+        }
+
+        item = menu.findItem(MENU_TOGGLE_WRAP_NOTES);
+        if (item != null) {
+            item.setVisible(tab == TAB_NOTES);
         }
 
         ActivityPasswdFile passwdFile = getPasswdFile();
