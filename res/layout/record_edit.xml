@@ -58,8 +58,7 @@
             </TableRow>
     
             <TableRow android:id="@+id/user_row">
-                <TextView android:text="@string/username"
-                          android:padding="3dip"/>
+                <TextView android:text="@string/username"/>
                 <EditText android:id="@+id/user"
                           android:singleLine="true"
                           android:layout_width="wrap_content"
@@ -67,23 +66,27 @@
             </TableRow>
     
             <TableRow android:id="@+id/password_row">
-                <TextView android:text="@string/password"/>
-                <EditText android:id="@+id/password"
-                          android:singleLine="true"
-                          android:password="true"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
+                <TextView android:text="@string/password_and_confirm"
+                          android:gravity="center_vertical"
+                          android:layout_height="fill_parent"/>
+                <LinearLayout android:orientation="horizontal"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content">
+                    <EditText android:id="@+id/password"
+                              android:singleLine="true"
+                              android:password="true"
+                              android:layout_weight="1"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"/>
+                    <EditText android:id="@+id/password_confirm"
+                              android:singleLine="true"
+                              android:password="true"
+                              android:layout_weight="1"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"/>
+                </LinearLayout>
             </TableRow>
-    
-            <TableRow android:id="@+id/password_confirm_row">
-                <TextView android:text="@string/confirm"/>
-                <EditText android:id="@+id/password_confirm"
-                          android:singleLine="true"
-                          android:password="true"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
-            </TableRow>
-    
+
             <TableRow android:id="@+id/notes_row">
                 <TextView android:text="@string/notes"/>
                 <EditText android:id="@+id/notes"

@@ -48,6 +48,7 @@
     <string name="ok">Ok</string>
     <string name="parent_group">Parent Group</string>
     <string name="password">Password</string>
+    <string name="password_and_confirm">Password /\nConfirm</string>
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_label">Password:</string>
     <string name="password_preferences">Password Preferences</string>
