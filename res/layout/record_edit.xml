@@ -13,89 +13,101 @@
               
     <View android:layout_width="fill_parent"
           android:layout_height="1dip"
+          android:layout_marginTop="2dip"
+          android:layout_marginBottom="2dip"
           android:background="#FF909090"/>
           
     <ScrollView android:layout_weight="1"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
-        <TableLayout android:layout_width="fill_parent"
-                     android:layout_height="wrap_content"
-                     android:stretchColumns="1"
-                     android:shrinkColumns="1">
-            <TableRow android:id="@+id/title_row">
-                <TextView android:text="@string/title"/>
-                <EditText android:id="@+id/title"
-                          android:singleLine="true"
-                          android:autoText="true"
-                          android:capitalize="sentences"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
-            </TableRow>
-    
-            <TableRow android:id="@+id/group_row">
-                <TextView android:text="@string/group"/>
-                <Spinner android:id="@+id/group"
-                         android:drawSelectorOnTop="true"
-                         android:prompt="@string/choose_group"
-                         android:layout_width="fill_parent"
-                         android:layout_height="wrap_content"/>
-            </TableRow>
-
-            <TableRow android:id="@+id/url_row">
-                <TextView android:text="@string/url"/>
-                <EditText android:id="@+id/url"
-                          android:singleLine="true"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
-            </TableRow>
-    
-            <TableRow android:id="@+id/email_row">
-                <TextView android:text="@string/email"/>
-                <EditText android:id="@+id/email"
-                          android:singleLine="true"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
-            </TableRow>
-    
-            <TableRow android:id="@+id/user_row">
-                <TextView android:text="@string/username"/>
-                <EditText android:id="@+id/user"
-                          android:singleLine="true"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
-            </TableRow>
-    
-            <TableRow android:id="@+id/password_row">
-                <TextView android:text="@string/password_and_confirm"
-                          android:gravity="center_vertical"
-                          android:layout_height="fill_parent"/>
-                <LinearLayout android:orientation="horizontal"
-                              android:layout_width="fill_parent"
-                              android:layout_height="wrap_content">
-                    <EditText android:id="@+id/password"
+        <LinearLayout android:orientation="vertical"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content">
+            <TableLayout android:layout_width="fill_parent"
+                         android:layout_height="wrap_content"
+                         android:stretchColumns="1"
+                         android:shrinkColumns="1">
+                <TableRow android:id="@+id/title_row">
+                    <TextView android:text="@string/title"/>
+                    <EditText android:id="@+id/title"
                               android:singleLine="true"
-                              android:password="true"
-                              android:layout_weight="1"
-                              android:layout_width="fill_parent"
+                              android:autoText="true"
+                              android:capitalize="sentences"
+                              android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
-                    <EditText android:id="@+id/password_confirm"
+                </TableRow>
+        
+                <TableRow android:id="@+id/group_row">
+                    <TextView android:text="@string/group"/>
+                    <Spinner android:id="@+id/group"
+                             android:drawSelectorOnTop="true"
+                             android:prompt="@string/choose_group"
+                             android:layout_width="fill_parent"
+                             android:layout_height="wrap_content"/>
+                </TableRow>
+    
+                <TableRow android:id="@+id/url_row">
+                    <TextView android:text="@string/url"/>
+                    <EditText android:id="@+id/url"
                               android:singleLine="true"
-                              android:password="true"
-                              android:layout_weight="1"
-                              android:layout_width="fill_parent"
+                              android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
-                </LinearLayout>
-            </TableRow>
+                </TableRow>
+        
+                <TableRow android:id="@+id/email_row">
+                    <TextView android:text="@string/email"/>
+                    <EditText android:id="@+id/email"
+                              android:singleLine="true"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+        
+                <TableRow android:id="@+id/user_row">
+                    <TextView android:text="@string/username"/>
+                    <EditText android:id="@+id/user"
+                              android:singleLine="true"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+        
+                <TableRow android:id="@+id/password_row">
+                    <TextView android:text="@string/password_and_confirm"
+                              android:gravity="center_vertical"
+                              android:layout_height="fill_parent"/>
+                    <LinearLayout android:orientation="horizontal"
+                                  android:layout_width="fill_parent"
+                                  android:layout_height="wrap_content">
+                        <EditText android:id="@+id/password"
+                                  android:singleLine="true"
+                                  android:password="true"
+                                  android:layout_weight="1"
+                                  android:layout_width="fill_parent"
+                                  android:layout_height="wrap_content"/>
+                        <EditText android:id="@+id/password_confirm"
+                                  android:singleLine="true"
+                                  android:password="true"
+                                  android:layout_weight="1"
+                                  android:layout_width="fill_parent"
+                                  android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                </TableRow>
+            </TableLayout>
 
-            <TableRow android:id="@+id/notes_row">
-                <TextView android:text="@string/notes"/>
-                <EditText android:id="@+id/notes"
-                          android:autoText="true"
-                          android:capitalize="sentences"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
-            </TableRow>
-        </TableLayout>
+            <View android:layout_width="fill_parent"
+                  android:layout_height="1dip"
+                  android:layout_marginTop="2dip"
+                  android:layout_marginBottom="2dip"
+                  android:background="#FF909090"/>
+                  
+            <TextView android:text="@string/notes_label"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"/>
+            <EditText android:id="@+id/notes"
+                      android:autoText="true"
+                      android:capitalize="sentences"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"/>
+        </LinearLayout>
     </ScrollView>
 
     <View android:layout_width="fill_parent"
