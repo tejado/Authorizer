@@ -40,6 +40,7 @@
     <string name="last_save_by_label">Last saved by:</string>
     <string name="last_save_time_label">Last save time:</string>
     <string name="max_size_label">Maximum size:</string>
+    <string name="n_a">N/A</string>
     <string name="new_file">New File</string>
     <string name="new_password_label">New Password:</string>
     <string name="no_records">No Records</string>

@@ -103,8 +103,6 @@ public class RecordView extends AbstractRecordTabActivity
             return;
         }
 
-        // TODO: fixup UI when no passwd history is available
-
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
 
@@ -379,13 +377,12 @@ public class RecordView extends AbstractRecordTabActivity
         setText(R.id.notes, View.NO_ID, fileData.getNotes(rec));
 
         PasswdHistory history = fileData.getPasswdHistory(rec);
-        CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
-        enabledCb.setClickable(false);
-        if (history != null) {
-            enabledCb.setChecked(history.isEnabled());
-            setText(R.id.history_max_size, View.NO_ID,
-                    Integer.toString(history.getMaxSize()));
-
+        boolean historyExists = (history != null);
+        boolean historyEnabled = false;
+        String historyMaxSize;
+        if (historyExists) {
+            historyEnabled = history.isEnabled();
+            historyMaxSize = Integer.toString(history.getMaxSize());
             ArrayList<HashMap<String, Object>> histData =
                 new ArrayList<HashMap<String, Object>>();
             DateFormat dateFormatter = DateFormat.getDateTimeInstance(
@@ -407,8 +404,18 @@ public class RecordView extends AbstractRecordTabActivity
                                               android.R.id.text2 });
             histView.setAdapter(adapter);
         } else {
-            enabledCb.setChecked(false);
+            historyMaxSize = getString(R.string.n_a);
         }
+        CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
+        enabledCb.setClickable(false);
+        enabledCb.setChecked(historyEnabled);
+        enabledCb.setEnabled(historyExists);
+        TextView historyMaxSizeView =
+            (TextView)findViewById(R.id.history_max_size);
+        historyMaxSizeView.setText(historyMaxSize);
+        historyMaxSizeView.setEnabled(historyExists);
+        findViewById(R.id.history_max_size_label).setEnabled(historyExists);
+        findViewById(R.id.history_sep).setEnabled(historyExists);
 
         isPasswordShown = false;
         itsPasswordView =
