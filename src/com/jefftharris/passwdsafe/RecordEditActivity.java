@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,6 +28,8 @@ import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.SingleLineTransformationMethod;
 import android.text.method.TransformationMethod;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,7 +39,10 @@ import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -57,6 +63,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
     private DialogValidator itsValidator;
     private boolean isPasswordShown = false;
+    private PasswdHistory itsHistory;
 
     private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
@@ -109,6 +116,8 @@ public class RecordEditActivity extends AbstractRecordActivity
                 hideRow(R.id.url_row);
                 hideRow(R.id.email_row);
             }
+
+            itsHistory = fileData.getPasswdHistory(record);
         } else {
             setText(R.id.rec_title, "New Entry");
             setText(R.id.title, null);
@@ -127,6 +136,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         initGroup(fileData, record, group);
+        historyChanged();
 
         Button button = (Button)findViewById(R.id.done_btn);
         button.setOnClickListener(new OnClickListener()
@@ -276,6 +286,15 @@ public class RecordEditActivity extends AbstractRecordActivity
             return super.onOptionsItemSelected(item);
         }
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("foo");
+        menu.add(0, 0, 0, "bar");
     }
 
     private final void setPasswordVisibility(boolean visible,
@@ -454,6 +473,74 @@ public class RecordEditActivity extends AbstractRecordActivity
         groupAdapter.notifyDataSetChanged();
         if (groupPos != 0) {
             s.setSelection(groupPos);
+        }
+    }
+
+    private final void historyChanged()
+    {
+        boolean historyExists = (itsHistory != null);
+        int visibility = historyExists ? View.VISIBLE : View.GONE;
+        Button addRemoveBtn = (Button)findViewById(R.id.history_addremove);
+        addRemoveBtn.setText(
+            getString(historyExists ? R.string.remove : R.string.add));
+        addRemoveBtn.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                if (itsHistory == null) {
+                    itsHistory = new PasswdHistory();
+                } else {
+                    itsHistory = null;
+                }
+                historyChanged();
+            }
+        });
+
+        CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
+        enabledCb.setVisibility(visibility);
+        enabledCb.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                if (itsHistory != null) {
+                    itsHistory.setEnabled(!itsHistory.isEnabled());
+                }
+                historyChanged();
+            }
+        });
+
+        findViewById(R.id.history_max_size_group).setVisibility(visibility);
+        LinearLayout histView = (LinearLayout)findViewById(R.id.history);
+        histView.setVisibility(visibility);
+        histView.removeAllViews();
+
+        if (historyExists) {
+            boolean historyEnabled = itsHistory.isEnabled();
+            enabledCb.setChecked(historyEnabled);
+
+            TextView maxSize = (TextView)findViewById(R.id.history_max_size);
+            maxSize.setEnabled(historyEnabled);
+            maxSize.setText(Integer.toString(itsHistory.getMaxSize()));
+            // TODO: validation
+
+            LayoutInflater inflater = getLayoutInflater();
+            DateFormat dateFormatter = DateFormat.getDateTimeInstance(
+                DateFormat.MEDIUM, DateFormat.MEDIUM);
+            for (PasswdHistory.Entry entry : itsHistory.getPasswds()) {
+                View row = inflater.inflate(
+                     android.R.layout.simple_list_item_2, null);
+                TextView tv = (TextView)row.findViewById(android.R.id.text1);
+                tv.setText(entry.getPasswd());
+                tv = (TextView)row.findViewById(android.R.id.text2);
+                tv.setText(dateFormatter.format(entry.getDate()));
+                row.setEnabled(historyEnabled);
+                row.setLongClickable(true);
+                row.setClickable(true);
+                row.setFocusable(true);
+                registerForContextMenu(row);
+                histView.addView(row);
+            }
+            histView.setEnabled(historyEnabled);
         }
     }
 

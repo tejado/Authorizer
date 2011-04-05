@@ -96,9 +96,20 @@ public class PasswdHistory
         Collections.sort(itsPasswds);
     }
 
+    public PasswdHistory()
+    {
+        itsIsEnabled = true;
+        itsMaxSize = 5;
+    }
+
     public boolean isEnabled()
     {
         return itsIsEnabled;
+    }
+
+    public void setEnabled(boolean enabled)
+    {
+        itsIsEnabled = enabled;
     }
 
     public int getMaxSize()
