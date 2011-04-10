@@ -280,7 +280,8 @@ public class PasswdFileData
 
     public final void setPasswdHistory(PasswdHistory history, PwsRecord rec)
     {
-        setField(history.toString(), rec, PwsRecordV3.PASSWORD_HISTORY);
+        setField((history == null) ? null : history.toString(),
+                 rec, PwsRecordV3.PASSWORD_HISTORY);
     }
 
     public final String getTitle(PwsRecord rec)

@@ -371,14 +371,15 @@ public class RecordView extends AbstractRecordTabActivity
         boolean historyExists = (history != null);
         boolean historyEnabled = false;
         String historyMaxSize;
+        ListView histView = (ListView)findViewById(R.id.history);
         if (historyExists) {
             historyEnabled = history.isEnabled();
             historyMaxSize = Integer.toString(history.getMaxSize());
-            ListView histView = (ListView)findViewById(R.id.history);
             histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(history,
                                                                     this));
         } else {
             historyMaxSize = getString(R.string.n_a);
+            histView.setAdapter(null);
         }
         CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
         enabledCb.setClickable(false);
@@ -388,6 +389,7 @@ public class RecordView extends AbstractRecordTabActivity
             (TextView)findViewById(R.id.history_max_size);
         historyMaxSizeView.setText(historyMaxSize);
         historyMaxSizeView.setEnabled(historyExists);
+        histView.setEnabled(historyEnabled);
         findViewById(R.id.history_max_size_label).setEnabled(historyExists);
         findViewById(R.id.history_sep).setEnabled(historyExists);
 

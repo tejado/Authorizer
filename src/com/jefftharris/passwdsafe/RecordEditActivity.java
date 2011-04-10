@@ -12,6 +12,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -36,6 +37,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -54,6 +56,9 @@ public class RecordEditActivity extends AbstractRecordActivity
     private static final int MENU_TOGGLE_PASSWORD = 3;
     private static final int MENU_GENERATE_PASSWORD = 4;
     private static final int MENU_PASSWORD_PREFERENCES = 5;
+
+    private static final int CTXMENU_REMOVE = 1;
+    private static final int CTXMENU_SET_PASSWORD = 2;
 
     private TreeSet<String> itsGroups =
         new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
@@ -135,6 +140,10 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         initGroup(fileData, record, group);
         historyChanged();
+        TextView tv = (TextView)findViewById(R.id.history_max_size);
+        itsValidator.registerTextView(tv);
+        View view = findViewById(R.id.history);
+        registerForContextMenu(view);
 
         Button button = (Button)findViewById(R.id.done_btn);
         button.setOnClickListener(new OnClickListener()
@@ -317,8 +326,50 @@ public class RecordEditActivity extends AbstractRecordActivity
                                     ContextMenuInfo menuInfo)
     {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("foo");
-        menu.add(0, 0, 0, "bar");
+
+        ListView histView = (ListView)findViewById(R.id.history);
+        if (v == histView) {
+            AdapterContextMenuInfo info = (AdapterContextMenuInfo)menuInfo;
+            List<PasswdHistory.Entry> passwds = itsHistory.getPasswds();
+            if ((info.position >= 0) && (info.position < passwds.size())) {
+                menu.setHeaderTitle(passwds.get(info.position).getPasswd());
+                menu.add(0, CTXMENU_REMOVE, 0, R.string.remove);
+                menu.add(0, CTXMENU_SET_PASSWORD, 0, R.string.set_password);
+            }
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        AdapterContextMenuInfo info =
+            (AdapterContextMenuInfo)item.getMenuInfo();
+        switch (item.getItemId()) {
+        case CTXMENU_REMOVE:
+        {
+            List<PasswdHistory.Entry> passwds = itsHistory.getPasswds();
+            if ((info.position >= 0) && (info.position < passwds.size())) {
+                passwds.remove(info.position);
+                historyChanged();
+            }
+            return true;
+        }
+        case CTXMENU_SET_PASSWORD:
+        {
+            List<PasswdHistory.Entry> passwds = itsHistory.getPasswds();
+            if ((info.position >= 0) && (info.position < passwds.size())) {
+                setPassword(passwds.get(info.position).getPasswd());
+            }
+            return true;
+        }
+        default:
+        {
+            return super.onContextItemSelected(item);
+        }
+        }
     }
 
     private final void setPasswordVisibility(boolean visible,
@@ -409,15 +460,19 @@ public class RecordEditActivity extends AbstractRecordActivity
             } while (!verifyChars.isEmpty() &&
                      (passwdLen > (chars.size() - verifyChars.size())));
 
-            TextView passwdField = (TextView)findViewById(R.id.password);
-            TextView confirmField =
-                (TextView)findViewById(R.id.password_confirm);
-            passwdField.setText(passwd);
-            confirmField.setText(passwd);
-            setPasswordVisibility(true, passwdField, confirmField);
+            setPassword(passwd.toString());
         } catch (NoSuchAlgorithmException e) {
             PasswdSafeApp.showFatalMsg(e, this);
         }
+    }
+
+    private final void setPassword(String passwd)
+    {
+        TextView passwdField = (TextView)findViewById(R.id.password);
+        TextView confirmField = (TextView)findViewById(R.id.password_confirm);
+        passwdField.setText(passwd);
+        confirmField.setText(passwd);
+        setPasswordVisibility(true, passwdField, confirmField);
     }
 
     private final void initGroup(PasswdFileData fileData, PwsRecord editRecord,
@@ -524,12 +579,11 @@ public class RecordEditActivity extends AbstractRecordActivity
             maxSize.setEnabled(historyEnabled);
             maxSize.setText(Integer.toString(itsHistory.getMaxSize()));
             // TODO: spinner?
-            // TODO: validation
+            // TODO: hide history for not v3?
             histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(itsHistory,
                                                                     this));
             GuiUtils.setListViewHeightBasedOnChildren(histView);
             histView.setEnabled(historyEnabled);
-                // TODO: menu setup
         }
     }
 
@@ -575,12 +629,6 @@ public class RecordEditActivity extends AbstractRecordActivity
             fileData.setUsername(updateStr, record);
         }
 
-        String currPasswd = fileData.getPassword(record);
-        updateStr = getUpdatedField(currPasswd, R.id.password);
-        if (updateStr != null) {
-            fileData.setPassword(currPasswd, updateStr, record);
-        }
-
         updateStr = getUpdatedField(fileData.getNotes(record), R.id.notes);
         if (updateStr != null) {
             fileData.setNotes(updateStr, record);
@@ -596,6 +644,17 @@ public class RecordEditActivity extends AbstractRecordActivity
             if (updateStr != null) {
                 fileData.setEmail(updateStr, record);
             }
+
+            if (isPasswdHistoryUpdated(fileData.getPasswdHistory(record))) {
+                fileData.setPasswdHistory(itsHistory, record);
+            }
+        }
+
+        // Update password after history so update is shown in new history
+        String currPasswd = fileData.getPassword(record);
+        updateStr = getUpdatedField(currPasswd, R.id.password);
+        if (updateStr != null) {
+            fileData.setPassword(currPasswd, updateStr, record);
         }
 
         try {
@@ -638,6 +697,35 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         return newStr;
+    }
+
+    private final int getHistMaxSize()
+    {
+        String str = GuiUtils.getTextViewStr(this, R.id.history_max_size);
+        try {
+            int size = Integer.parseInt(str);
+            return size;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    private final boolean isPasswdHistoryUpdated(PasswdHistory currHistory)
+    {
+        if (itsHistory != null) {
+            CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
+            itsHistory.setEnabled(enabledCb.isChecked());
+            itsHistory.setMaxSize(getHistMaxSize());
+        }
+
+        if (((currHistory == null) && (itsHistory != null)) ||
+            ((currHistory != null) && (itsHistory == null))) {
+            return true;
+        } else if ((currHistory == null) && (itsHistory == null)) {
+            return false;
+        } else {
+            return !itsHistory.equals(currHistory);
+        }
     }
 
     private final void setText(int id, String text)
@@ -692,6 +780,12 @@ public class RecordEditActivity extends AbstractRecordActivity
                                                   R.id.user));
             if (itsRecordKeys.contains(key)) {
                 return "Duplicate entry";
+            }
+
+            int histMaxSize = getHistMaxSize();
+            if ((histMaxSize < PasswdHistory.MAX_SIZE_MIN) ||
+                (histMaxSize > PasswdHistory.MAX_SIZE_MAX)) {
+                return "Invalid history maximum size";
             }
 
             return super.doValidation();

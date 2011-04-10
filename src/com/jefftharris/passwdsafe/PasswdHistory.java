@@ -43,6 +43,9 @@ public class PasswdHistory
         }
     }
 
+    public static final int MAX_SIZE_MIN = 0;
+    public static final int MAX_SIZE_MAX = 255;
+
     private boolean itsIsEnabled;
     private int itsMaxSize;
     // Sorted with newest entry first
@@ -117,6 +120,18 @@ public class PasswdHistory
         return itsMaxSize;
     }
 
+    public void setMaxSize(int maxSize)
+    {
+        if (maxSize < 0) {
+            return;
+        }
+        while (maxSize < itsPasswds.size()) {
+            // Remove oldest
+            itsPasswds.remove(itsPasswds.size() - 1);
+        }
+        itsMaxSize = maxSize;
+    }
+
     public List<Entry> getPasswds()
     {
         return itsPasswds;
@@ -152,5 +167,35 @@ public class PasswdHistory
         }
 
         return strbld.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (super.equals(o)) {
+            return true;
+        } else if (!(o instanceof PasswdHistory)) {
+            return false;
+        } else {
+            PasswdHistory hist = (PasswdHistory)o;
+            if ((itsIsEnabled != hist.itsIsEnabled) ||
+                (itsMaxSize != hist.itsMaxSize) ||
+                (itsPasswds.size() != hist.itsPasswds.size())) {
+                return false;
+            } else {
+                for (int i = 0; i < itsPasswds.size(); ++i) {
+                    Entry e1 = itsPasswds.get(i);
+                    Entry e2 = hist.itsPasswds.get(i);
+                    if (!e1.getPasswd().equals(e2.getPasswd()) ||
+                        !e1.getDate().equals(e2.getDate())) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
     }
 }
