@@ -7,10 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.AlertDialog;
@@ -26,9 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.CheckBox;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -54,9 +48,6 @@ public class RecordView extends AbstractRecordTabActivity
     private static final int TAB_BASIC = 0;
     //private static final int TAB_HISTORY = 1;
     private static final int TAB_NOTES = 2;
-
-    private static final String PASSWD = "passwd";
-    private static final String DATE = "date";
 
     private TextView itsUserView;
     private boolean isPasswordShown = false;
@@ -383,26 +374,9 @@ public class RecordView extends AbstractRecordTabActivity
         if (historyExists) {
             historyEnabled = history.isEnabled();
             historyMaxSize = Integer.toString(history.getMaxSize());
-            ArrayList<HashMap<String, Object>> histData =
-                new ArrayList<HashMap<String, Object>>();
-            DateFormat dateFormatter = DateFormat.getDateTimeInstance(
-                DateFormat.MEDIUM, DateFormat.MEDIUM);
-            for (PasswdHistory.Entry entry : history.getPasswds()) {
-                HashMap<String, Object> entryData =
-                    new HashMap<String, Object>();
-                entryData.put(PASSWD, entry.getPasswd());
-                entryData.put(DATE, dateFormatter.format(entry.getDate()));
-                histData.add(entryData);
-            }
-
             ListView histView = (ListView)findViewById(R.id.history);
-            ListAdapter adapter =
-                new SimpleAdapter(this, histData,
-                                  android.R.layout.simple_list_item_2,
-                                  new String[] { PASSWD, DATE },
-                                  new int[] { android.R.id.text1,
-                                              android.R.id.text2 });
-            histView.setAdapter(adapter);
+            histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(history,
+                                                                    this));
         } else {
             historyMaxSize = getString(R.string.n_a);
         }

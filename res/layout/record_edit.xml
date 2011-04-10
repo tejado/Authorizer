@@ -142,12 +142,11 @@
                               android:minWidth="50dip"
                               />
                 </LinearLayout>
-                <LinearLayout android:id="@+id/history"
-                              android:orientation="vertical"
-                              android:layout_width="fill_parent"
-                              android:layout_height="wrap_content"
-                              android:layout_below="@id/history_max_size_group"
-                              />
+                <ListView android:id="@+id/history"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_below="@id/history_max_size_group"
+                          />
             </RelativeLayout>
 
             <View android:layout_width="fill_parent"

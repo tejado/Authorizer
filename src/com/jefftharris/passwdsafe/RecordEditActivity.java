@@ -9,7 +9,6 @@ package com.jefftharris.passwdsafe;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,7 +40,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -510,9 +508,8 @@ public class RecordEditActivity extends AbstractRecordActivity
         });
 
         findViewById(R.id.history_max_size_group).setVisibility(visibility);
-        LinearLayout histView = (LinearLayout)findViewById(R.id.history);
+        ListView histView = (ListView)findViewById(R.id.history);
         histView.setVisibility(visibility);
-        histView.removeAllViews();
 
         if (historyExists) {
             boolean historyEnabled = itsHistory.isEnabled();
@@ -521,26 +518,13 @@ public class RecordEditActivity extends AbstractRecordActivity
             TextView maxSize = (TextView)findViewById(R.id.history_max_size);
             maxSize.setEnabled(historyEnabled);
             maxSize.setText(Integer.toString(itsHistory.getMaxSize()));
+            // TODO: spinner?
             // TODO: validation
-
-            LayoutInflater inflater = getLayoutInflater();
-            DateFormat dateFormatter = DateFormat.getDateTimeInstance(
-                DateFormat.MEDIUM, DateFormat.MEDIUM);
-            for (PasswdHistory.Entry entry : itsHistory.getPasswds()) {
-                View row = inflater.inflate(
-                     android.R.layout.simple_list_item_2, null);
-                TextView tv = (TextView)row.findViewById(android.R.id.text1);
-                tv.setText(entry.getPasswd());
-                tv = (TextView)row.findViewById(android.R.id.text2);
-                tv.setText(dateFormatter.format(entry.getDate()));
-                row.setEnabled(historyEnabled);
-                row.setLongClickable(true);
-                row.setClickable(true);
-                row.setFocusable(true);
-                registerForContextMenu(row);
-                histView.addView(row);
-            }
+            histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(itsHistory,
+                                                                    this));
+            GuiUtils.setListViewHeightBasedOnChildren(histView);
             histView.setEnabled(historyEnabled);
+                // TODO: menu setup
         }
     }
 
