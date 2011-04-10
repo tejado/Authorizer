@@ -93,13 +93,15 @@
                 </TableRow>
             </TableLayout>
 
-            <View android:layout_width="fill_parent"
+            <View android:id="@+id/history_group_sep"
+                  android:layout_width="fill_parent"
                   android:layout_height="1dip"
                   android:layout_marginTop="2dip"
                   android:layout_marginBottom="2dip"
                   android:background="#FF909090"/>
 
-            <RelativeLayout android:layout_width="fill_parent"
+            <RelativeLayout android:id="@+id/history_group"
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             >
                 <Button android:id="@+id/history_addremove"

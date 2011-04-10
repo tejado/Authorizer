@@ -1,3 +1,10 @@
+/*
+ * Copyright (©) 2011 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
+ */
 package com.jefftharris.passwdsafe;
 
 import java.util.ArrayList;
@@ -125,11 +132,15 @@ public class PasswdHistory
         if (maxSize < 0) {
             return;
         }
-        while (maxSize < itsPasswds.size()) {
+        itsMaxSize = maxSize;
+    }
+
+    public void adjustEntriesToMaxSize()
+    {
+        while (itsMaxSize < itsPasswds.size()) {
             // Remove oldest
             itsPasswds.remove(itsPasswds.size() - 1);
         }
-        itsMaxSize = maxSize;
     }
 
     public List<Entry> getPasswds()

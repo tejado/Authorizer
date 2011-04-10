@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.SingleLineTransformationMethod;
@@ -139,11 +140,26 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         initGroup(fileData, record, group);
-        historyChanged();
-        TextView tv = (TextView)findViewById(R.id.history_max_size);
-        itsValidator.registerTextView(tv);
-        View view = findViewById(R.id.history);
-        registerForContextMenu(view);
+        if (fileData.isV3()) {
+            TextView tv = (TextView)findViewById(R.id.history_max_size);
+            tv.addTextChangedListener(new AbstractTextWatcher()
+            {
+                public void afterTextChanged(Editable s)
+                {
+                    if (itsHistory != null) {
+                        int maxSize = getHistMaxSize();
+                        itsHistory.setMaxSize(maxSize);
+                        historyChanged(false);
+                    }
+                }
+            });
+            View view = findViewById(R.id.history);
+            registerForContextMenu(view);
+            historyChanged(true);
+        } else {
+            findViewById(R.id.history_group_sep).setVisibility(View.GONE);
+            findViewById(R.id.history_group).setVisibility(View.GONE);
+        }
 
         Button button = (Button)findViewById(R.id.done_btn);
         button.setOnClickListener(new OnClickListener()
@@ -173,7 +189,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 } else {
                     itsHistory = null;
                 }
-                historyChanged();
+                historyChanged(true);
             }
         });
 
@@ -185,7 +201,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 if (itsHistory != null) {
                     itsHistory.setEnabled(!itsHistory.isEnabled());
                 }
-                historyChanged();
+                historyChanged(true);
             }
         });
 
@@ -353,7 +369,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             List<PasswdHistory.Entry> passwds = itsHistory.getPasswds();
             if ((info.position >= 0) && (info.position < passwds.size())) {
                 passwds.remove(info.position);
-                historyChanged();
+                historyChanged(true);
             }
             return true;
         }
@@ -555,7 +571,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
     }
 
-    private final void historyChanged()
+    private final void historyChanged(boolean updateMaxSize)
     {
         boolean historyExists = (itsHistory != null);
         int visibility = historyExists ? View.VISIBLE : View.GONE;
@@ -577,14 +593,17 @@ public class RecordEditActivity extends AbstractRecordActivity
 
             TextView maxSize = (TextView)findViewById(R.id.history_max_size);
             maxSize.setEnabled(historyEnabled);
-            maxSize.setText(Integer.toString(itsHistory.getMaxSize()));
+            if (updateMaxSize) {
+                maxSize.setText(Integer.toString(itsHistory.getMaxSize()));
+            }
             // TODO: spinner?
-            // TODO: hide history for not v3?
             histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(itsHistory,
                                                                     this));
             GuiUtils.setListViewHeightBasedOnChildren(histView);
             histView.setEnabled(historyEnabled);
         }
+
+        itsValidator.validate();
     }
 
     private final void saveRecord()
@@ -646,6 +665,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             if (isPasswdHistoryUpdated(fileData.getPasswdHistory(record))) {
+                itsHistory.adjustEntriesToMaxSize();
                 fileData.setPasswdHistory(itsHistory, record);
             }
         }
@@ -782,10 +802,12 @@ public class RecordEditActivity extends AbstractRecordActivity
                 return "Duplicate entry";
             }
 
-            int histMaxSize = getHistMaxSize();
-            if ((histMaxSize < PasswdHistory.MAX_SIZE_MIN) ||
-                (histMaxSize > PasswdHistory.MAX_SIZE_MAX)) {
-                return "Invalid history maximum size";
+            if (itsHistory != null) {
+                int histMaxSize = getHistMaxSize();
+                if ((histMaxSize < PasswdHistory.MAX_SIZE_MIN) ||
+                    (histMaxSize > PasswdHistory.MAX_SIZE_MAX)) {
+                    return "Invalid history maximum size";
+                }
             }
 
             return super.doValidation();
