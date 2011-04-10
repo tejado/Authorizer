@@ -154,6 +154,32 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         });
 
+        button = (Button)findViewById(R.id.history_addremove);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                if (itsHistory == null) {
+                    itsHistory = new PasswdHistory();
+                } else {
+                    itsHistory = null;
+                }
+                historyChanged();
+            }
+        });
+
+        button = (Button)findViewById(R.id.history_enabled);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                if (itsHistory != null) {
+                    itsHistory.setEnabled(!itsHistory.isEnabled());
+                }
+                historyChanged();
+            }
+        });
+
         itsValidator.validate();
     }
 
@@ -481,33 +507,12 @@ public class RecordEditActivity extends AbstractRecordActivity
         Button addRemoveBtn = (Button)findViewById(R.id.history_addremove);
         addRemoveBtn.setText(
             getString(historyExists ? R.string.remove : R.string.add));
-        addRemoveBtn.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                if (itsHistory == null) {
-                    itsHistory = new PasswdHistory();
-                } else {
-                    itsHistory = null;
-                }
-                historyChanged();
-            }
-        });
 
         CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
         enabledCb.setVisibility(visibility);
-        enabledCb.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                if (itsHistory != null) {
-                    itsHistory.setEnabled(!itsHistory.isEnabled());
-                }
-                historyChanged();
-            }
-        });
 
         findViewById(R.id.history_max_size_group).setVisibility(visibility);
+
         ListView histView = (ListView)findViewById(R.id.history);
         histView.setVisibility(visibility);
 
