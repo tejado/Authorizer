@@ -602,7 +602,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             if (updateMaxSize) {
                 maxSize.setText(Integer.toString(itsHistory.getMaxSize()));
             }
-            // TODO: spinner?
+
             ListAdapter histAdapter =
                 GuiUtils.createPasswdHistoryAdapter(itsHistory, this);
             histView.setAdapter(histAdapter);
