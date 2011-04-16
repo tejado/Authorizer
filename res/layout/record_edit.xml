@@ -111,43 +111,45 @@
                         android:layout_alignParentRight="true"
                         />
                 <TextView android:id="@+id/history_label"
-                          android:text="@string/history_label"
-                          android:textSize="20sp"
+                          android:text="@string/history"
+                          android:textSize="24sp"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_alignParentLeft="true"
                           android:layout_alignTop="@id/history_addremove"
+                          android:layout_alignBaseline="@id/history_addremove"
                           android:layout_alignBottom="@id/history_addremove"
-                          />                      
+                          />
                 <CheckBox android:id="@+id/history_enabled"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:text="@string/enabled"
                           android:layout_below="@id/history_label"
+                          android:layout_alignParentLeft="true"
                           />
-                <LinearLayout android:id="@+id/history_max_size_group"
-                              android:orientation="horizontal"
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:layout_below="@id/history_enabled">
-                              
-                    <TextView android:id="@+id/history_max_size_label"
-                              android:text="@string/max_size_label"
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              />
-                    <EditText android:id="@+id/history_max_size"
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:numeric="integer"
-                              android:singleLine="true"
-                              android:minWidth="50dip"
-                              />
-                </LinearLayout>
+                <EditText android:id="@+id/history_max_size"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:numeric="integer"
+                          android:singleLine="true"
+                          android:minWidth="50dip"
+                          android:layout_below="@id/history_label"
+                          android:layout_alignParentRight="true"
+                          />
+                <TextView android:id="@+id/history_max_size_label"
+                          android:text="@string/max_size_label"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_below="@id/history_label"
+                          android:layout_toLeftOf="@+id/history_max_size"
+                          android:layout_toRightOf="@+id/history_enabled"
+                          android:layout_alignBaseline="@+id/history_max_size"
+                          android:gravity="right"
+                          />
                 <ListView android:id="@+id/history"
                           android:layout_width="fill_parent"
                           android:layout_height="wrap_content"
-                          android:layout_below="@id/history_max_size_group"
+                          android:layout_below="@id/history_enabled"
                           />
             </RelativeLayout>
 
@@ -157,8 +159,8 @@
                   android:layout_marginBottom="2dip"
                   android:background="#FF909090"/>
                   
-            <TextView android:text="@string/notes_label"
-                      android:textSize="20sp"
+            <TextView android:text="@string/notes"
+                      android:textSize="24sp"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       />

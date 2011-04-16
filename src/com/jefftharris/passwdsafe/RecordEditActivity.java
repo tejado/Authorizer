@@ -43,6 +43,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -344,7 +345,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         super.onCreateContextMenu(menu, v, menuInfo);
 
         ListView histView = (ListView)findViewById(R.id.history);
-        if (v == histView) {
+        if ((v == histView) && histView.isEnabled()) {
             AdapterContextMenuInfo info = (AdapterContextMenuInfo)menuInfo;
             List<PasswdHistory.Entry> passwds = itsHistory.getPasswds();
             if ((info.position >= 0) && (info.position < passwds.size())) {
@@ -363,6 +364,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         AdapterContextMenuInfo info =
             (AdapterContextMenuInfo)item.getMenuInfo();
+
         switch (item.getItemId()) {
         case CTXMENU_REMOVE:
         {
@@ -582,7 +584,11 @@ public class RecordEditActivity extends AbstractRecordActivity
         CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
         enabledCb.setVisibility(visibility);
 
-        findViewById(R.id.history_max_size_group).setVisibility(visibility);
+
+        TextView maxSize = (TextView)findViewById(R.id.history_max_size);
+        maxSize.setVisibility(visibility);
+        View maxSizeLabel = findViewById(R.id.history_max_size_label);
+        maxSizeLabel.setVisibility(visibility);
 
         ListView histView = (ListView)findViewById(R.id.history);
         histView.setVisibility(visibility);
@@ -591,16 +597,20 @@ public class RecordEditActivity extends AbstractRecordActivity
             boolean historyEnabled = itsHistory.isEnabled();
             enabledCb.setChecked(historyEnabled);
 
-            TextView maxSize = (TextView)findViewById(R.id.history_max_size);
             maxSize.setEnabled(historyEnabled);
+            maxSizeLabel.setEnabled(historyEnabled);
             if (updateMaxSize) {
                 maxSize.setText(Integer.toString(itsHistory.getMaxSize()));
             }
             // TODO: spinner?
-            histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(itsHistory,
-                                                                    this));
+            ListAdapter histAdapter =
+                GuiUtils.createPasswdHistoryAdapter(itsHistory, this);
+            histView.setAdapter(histAdapter);
             GuiUtils.setListViewHeightBasedOnChildren(histView);
             histView.setEnabled(historyEnabled);
+            for (int i = 0; i < histAdapter.getCount(); ++i) {
+                histAdapter.getView(i, null, histView).setEnabled(historyEnabled);
+            }
         }
 
         itsValidator.validate();
