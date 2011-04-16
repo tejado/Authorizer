@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2010 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2011 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -14,15 +14,19 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.CheckBox;
+import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.TextView;
 
-public class RecordView extends AbstractRecordActivity
+public class RecordView extends AbstractRecordTabActivity
 {
     private static final String TAG = "RecordView";
     private static final String HIDDEN_PASSWORD = "***** (tap to show)";
@@ -41,6 +45,10 @@ public class RecordView extends AbstractRecordActivity
 
     private static final int EDIT_RECORD_REQUEST = 0;
 
+    private static final int TAB_BASIC = 0;
+    //private static final int TAB_HISTORY = 1;
+    private static final int TAB_NOTES = 2;
+
     private TextView itsUserView;
     private boolean isPasswordShown = false;
     private TextView itsPasswordView;
@@ -55,6 +63,31 @@ public class RecordView extends AbstractRecordActivity
             return;
         }
 
+        setContentView(R.layout.record_view);
+
+        Resources res = getResources();
+        TabHost tabHost = getTabHost();
+        TabHost.TabSpec spec;
+
+        spec = tabHost.newTabSpec("basic")
+            .setIndicator("Basic", res.getDrawable(R.drawable.ic_tab_contact))
+            .setContent(R.id.basic_tab);
+        tabHost.addTab(spec);
+
+        spec = tabHost.newTabSpec("history")
+            .setIndicator("History",
+                          res.getDrawable(R.drawable.ic_tab_account_list))
+            .setContent(R.id.history_tab);
+        tabHost.addTab(spec);
+
+        spec = tabHost.newTabSpec("notes")
+            .setIndicator("Notes",
+                          res.getDrawable(R.drawable.ic_tab_attachment))
+            .setContent(R.id.notes_tab);
+        tabHost.addTab(spec);
+
+        tabHost.setCurrentTab(0);
+
         if (getUUID() == null) {
             PasswdSafeApp.showFatalMsg("No record chosen for file: " + getFile(),
                                        this);
@@ -64,7 +97,6 @@ public class RecordView extends AbstractRecordActivity
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
 
-        setContentView(R.layout.record_view);
         refresh();
     }
 
@@ -148,17 +180,36 @@ public class RecordView extends AbstractRecordActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        int tab = getTabHost().getCurrentTab();
+
         boolean hasPassword = (itsPasswordView != null);
         MenuItem item = menu.findItem(MENU_TOGGLE_PASSWORD);
         if (item != null) {
             item.setTitle(isPasswordShown ?
                 R.string.hide_password : R.string.show_password);
             item.setEnabled(hasPassword);
+            item.setVisible(tab == TAB_BASIC);
+        }
+
+        item = menu.findItem(MENU_COPY_USER);
+        if (item != null) {
+            item.setVisible(tab == TAB_BASIC);
         }
 
         item = menu.findItem(MENU_COPY_PASSWORD);
         if (item != null) {
             item.setEnabled(hasPassword);
+            item.setVisible(tab == TAB_BASIC);
+        }
+
+        item = menu.findItem(MENU_COPY_NOTES);
+        if (item != null) {
+            item.setVisible(tab == TAB_NOTES);
+        }
+
+        item = menu.findItem(MENU_TOGGLE_WRAP_NOTES);
+        if (item != null) {
+            item.setVisible(tab == TAB_NOTES);
         }
 
         ActivityPasswdFile passwdFile = getPasswdFile();
@@ -174,7 +225,6 @@ public class RecordView extends AbstractRecordActivity
         if (item != null) {
             item.setEnabled(canEdit);
         }
-
         return true;
     }
 
@@ -315,21 +365,33 @@ public class RecordView extends AbstractRecordActivity
         }
         setText(R.id.expiration, R.id.expiration_row,
                 fileData.getPasswdExpiryTime(rec));
-        setText(R.id.notes, R.id.notes_row, fileData.getNotes(rec));
+        setText(R.id.notes, View.NO_ID, fileData.getNotes(rec));
 
         PasswdHistory history = fileData.getPasswdHistory(rec);
-        StringBuilder historyText = null;
-        if (history != null) {
-            historyText = new StringBuilder();
-            historyText.append("Enabled: ").append(history.isEnabled())
-                .append("\nMax size: ").append(history.getMaxSize());
-            for (PasswdHistory.Entry entry : history.getPasswds()) {
-                historyText.append("\n").append(entry.getPasswd())
-                    .append(" (").append(entry.getDate()).append(")");
-            }
+        boolean historyExists = (history != null);
+        boolean historyEnabled = false;
+        String historyMaxSize;
+        ListView histView = (ListView)findViewById(R.id.history);
+        if (historyExists) {
+            historyEnabled = history.isEnabled();
+            historyMaxSize = Integer.toString(history.getMaxSize());
+            histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(history,
+                                                                    this));
+        } else {
+            historyMaxSize = getString(R.string.n_a);
+            histView.setAdapter(null);
         }
-        setText(R.id.history, R.id.history_row,
-                (historyText == null) ? null : historyText.toString());
+        CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
+        enabledCb.setClickable(false);
+        enabledCb.setChecked(historyEnabled);
+        enabledCb.setEnabled(historyExists);
+        TextView historyMaxSizeView =
+            (TextView)findViewById(R.id.history_max_size);
+        historyMaxSizeView.setText(historyMaxSize);
+        historyMaxSizeView.setEnabled(historyExists);
+        histView.setEnabled(historyEnabled);
+        findViewById(R.id.history_max_size_label).setEnabled(historyExists);
+        findViewById(R.id.history_sep).setEnabled(historyExists);
 
         isPasswordShown = false;
         itsPasswordView =
@@ -381,6 +443,7 @@ public class RecordView extends AbstractRecordActivity
     private final String getPassword()
     {
         String password = null;
+
         PasswdFileData fileData = getPasswdFile().getFileData();
         if (fileData != null) {
             PwsRecord rec = fileData.getRecord(getUUID());
@@ -388,6 +451,7 @@ public class RecordView extends AbstractRecordActivity
                 password = fileData.getPassword(rec);
             }
         }
+
         return password;
     }
 
@@ -399,9 +463,11 @@ public class RecordView extends AbstractRecordActivity
 
     private final TextView setText(int id, int rowId, String text)
     {
-        View row = findViewById(rowId);
-        if (row != null) {
-            row.setVisibility((text != null) ? View.VISIBLE : View.GONE);
+        if (rowId != View.NO_ID) {
+            View row = findViewById(rowId);
+            if (row != null) {
+                row.setVisibility((text != null) ? View.VISIBLE : View.GONE);
+            }
         }
 
         TextView tv = null;

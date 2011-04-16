@@ -1,3 +1,10 @@
+/*
+ * Copyright (©) 2011 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
+ */
 package com.jefftharris.passwdsafe;
 
 import java.util.ArrayList;
@@ -33,7 +40,18 @@ public class PasswdHistory
             // Sort descending
             return -itsDate.compareTo(arg0.itsDate);
         }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder str = new StringBuilder(itsPasswd);
+            str.append(" [").append(itsDate).append("]");
+            return str.toString();
+        }
     }
+
+    public static final int MAX_SIZE_MIN = 0;
+    public static final int MAX_SIZE_MAX = 255;
 
     private boolean itsIsEnabled;
     private int itsMaxSize;
@@ -88,14 +106,41 @@ public class PasswdHistory
         Collections.sort(itsPasswds);
     }
 
+    public PasswdHistory()
+    {
+        itsIsEnabled = true;
+        itsMaxSize = 5;
+    }
+
     public boolean isEnabled()
     {
         return itsIsEnabled;
     }
 
+    public void setEnabled(boolean enabled)
+    {
+        itsIsEnabled = enabled;
+    }
+
     public int getMaxSize()
     {
         return itsMaxSize;
+    }
+
+    public void setMaxSize(int maxSize)
+    {
+        if (maxSize < 0) {
+            return;
+        }
+        itsMaxSize = maxSize;
+    }
+
+    public void adjustEntriesToMaxSize()
+    {
+        while (itsMaxSize < itsPasswds.size()) {
+            // Remove oldest
+            itsPasswds.remove(itsPasswds.size() - 1);
+        }
     }
 
     public List<Entry> getPasswds()
@@ -133,5 +178,35 @@ public class PasswdHistory
         }
 
         return strbld.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (super.equals(o)) {
+            return true;
+        } else if (!(o instanceof PasswdHistory)) {
+            return false;
+        } else {
+            PasswdHistory hist = (PasswdHistory)o;
+            if ((itsIsEnabled != hist.itsIsEnabled) ||
+                (itsMaxSize != hist.itsMaxSize) ||
+                (itsPasswds.size() != hist.itsPasswds.size())) {
+                return false;
+            } else {
+                for (int i = 0; i < itsPasswds.size(); ++i) {
+                    Entry e1 = itsPasswds.get(i);
+                    Entry e2 = hist.itsPasswds.get(i);
+                    if (!e1.getPasswd().equals(e2.getPasswd()) ||
+                        !e1.getDate().equals(e2.getDate())) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
     }
 }

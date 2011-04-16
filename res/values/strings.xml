@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">About</string>
+    <string name="add">Add</string>
     <string name="add_record">Add Record</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">Passwd Safe</string>
@@ -25,6 +26,7 @@
     <string name="done">Done</string>
     <string name="edit">Edit</string>
     <string name="email">Email</string>
+    <string name="enabled">Enabled</string>
     <string name="error_msg">&lt;b&gt;&lt;i&gt;Problem&lt;/i&gt;&lt;/b&gt; - %1$s</string>
     <string name="expiration">Expiration</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
@@ -35,17 +37,22 @@
     <string name="group">Group</string>
     <string name="hide_password">Hide Password</string>
     <string name="history">History</string>
+    <string name="history_label">History:</string>
     <string name="last_save_app_label">Last saved app:</string>
     <string name="last_save_by_label">Last saved by:</string>
     <string name="last_save_time_label">Last save time:</string>
+    <string name="max_size_label">Maximum size:</string>
+    <string name="n_a">N/A</string>
     <string name="new_file">New File</string>
     <string name="new_password_label">New Password:</string>
     <string name="no_records">No Records</string>
     <string name="notes">Notes</string>
+    <string name="notes_label">Notes:</string>
     <string name="num_records_label">Number of Records:</string>
     <string name="ok">Ok</string>
     <string name="parent_group">Parent Group</string>
     <string name="password">Password</string>
+    <string name="password_and_confirm">Password /\nConfirm</string>
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_label">Password:</string>
     <string name="password_preferences">Password Preferences</string>
@@ -55,8 +62,10 @@
     <string name="query_label">Search filter: %1$s</string>
     <string name="read_only">Read-only</string>
     <string name="read_write">Read-write</string>
+    <string name="remove">Remove</string>
     <string name="search">Search</string>
     <string name="search_hint">Search PasswdSafe</string>
+    <string name="set_password">Set Password</string>
     <string name="show_password">Show Password</string>
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>

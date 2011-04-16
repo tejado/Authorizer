@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2010 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2010-2011 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -20,21 +20,11 @@ public abstract class DialogValidator
     private TextView itsPasswordConfirm;
     private TextView itsErrorMsgView;
     private String itsErrorFmt;
-    private TextWatcher itsTextWatcher = new TextWatcher()
+    private TextWatcher itsTextWatcher = new AbstractTextWatcher()
     {
         public final void afterTextChanged(Editable s)
         {
             validate();
-        }
-
-        public final void beforeTextChanged(CharSequence s, int start,
-                                            int count, int after)
-        {
-        }
-
-        public final void onTextChanged(CharSequence s, int start,
-                                        int before, int count)
-        {
         }
     };
 
