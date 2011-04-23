@@ -100,7 +100,8 @@
                   android:finishOnTaskLaunch="true"/>
                   
         <activity android:name=".LauncherFileShortcuts"
-                  android:label="@string/password_file">
+                  android:label="@string/password_file"
+                  android:theme="@android:style/Theme.Dialog">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />
