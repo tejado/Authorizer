@@ -12,8 +12,8 @@
                     
         <ImageView android:id="@+id/current_group_icon"
                    android:src="@drawable/folder_up_rev"
-                   android:layout_width="24dp"
-                   android:layout_height="24dp"
+                   android:layout_width="36dp"
+                   android:layout_height="36dp"
                    />
                    
         <TextView android:id="@+id/current_group_label"
@@ -21,8 +21,11 @@
                       android:gravity="center_vertical"
                       android:layout_marginBottom="2dp"
                       android:layout_toRightOf="@id/current_group_icon"
+                      android:layout_alignTop="@id/current_group_icon"
+                      android:layout_alignBottom="@id/current_group_icon"
                       android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"/>
+                      android:layout_height="wrap_content"
+                      />
 
         <View android:layout_width="fill_parent"
               android:layout_height="2dip"
