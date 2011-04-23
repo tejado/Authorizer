@@ -86,6 +86,11 @@ public class FileList extends ListActivity
         return data;
     }
 
+    public static Intent createOpenIntent(File file)
+    {
+        return new Intent(PasswdSafeApp.VIEW_INTENT, Uri.fromFile(file));
+    }
+
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
      */
@@ -261,7 +266,6 @@ public class FileList extends ListActivity
 
     private final void openFile(File file)
     {
-        startActivity(new Intent(PasswdSafeApp.VIEW_INTENT,
-                                 Uri.fromFile(file)));
+        startActivity(createOpenIntent(file));
     }
 }

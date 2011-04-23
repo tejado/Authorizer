@@ -54,6 +54,7 @@
     <string name="password">Password</string>
     <string name="password_and_confirm">Password /\nConfirm</string>
     <string name="password_encoding_label">Password Encoding:</string>
+    <string name="password_file">Password file</string>
     <string name="password_label">Password:</string>
     <string name="password_preferences">Password Preferences</string>
     <string name="permissions_label">Permissions:</string>
@@ -66,6 +67,7 @@
     <string name="search">Search</string>
     <string name="search_hint">Search PasswdSafe</string>
     <string name="set_password">Set Password</string>
+    <string name="shortcut_choose_file">Choose password file for shortcut</string>
     <string name="show_password">Show Password</string>
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
