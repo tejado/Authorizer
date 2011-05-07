@@ -35,9 +35,10 @@ public class FileList extends ListActivity
     private static final String TAG = "FileList";
 
     private static final int MENU_FILE_NEW = 1;
-    private static final int MENU_PARENT = 2;
-    private static final int MENU_PREFERENCES = 3;
-    private static final int MENU_ABOUT = 4;
+    private static final int MENU_HOME = 2;
+    private static final int MENU_PARENT = 3;
+    private static final int MENU_PREFERENCES = 4;
+    private static final int MENU_ABOUT = 5;
 
     private static final int DIALOG_ABOUT = 1;
 
@@ -110,12 +111,24 @@ public class FileList extends ListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_list);
 
-        View v = findViewById(R.id.current_group_panel);
-        v.setOnClickListener(new View.OnClickListener()
+        View.OnClickListener backListener = new View.OnClickListener()
         {
             public final void onClick(View v)
             {
                 doBackPressed();
+            }
+        };
+        View v = findViewById(R.id.current_group_icon);
+        v.setOnClickListener(backListener);
+        v = findViewById(R.id.current_group_label);
+        v.setOnClickListener(backListener);
+
+        v = findViewById(R.id.home);
+        v.setOnClickListener(new View.OnClickListener()
+        {
+            public final void onClick(View v)
+            {
+                doHomePressed();
             }
         });
 
@@ -189,6 +202,9 @@ public class FileList extends ListActivity
         item = menu.add(0, MENU_FILE_NEW, 0, R.string.new_file);
         item.setIcon(android.R.drawable.ic_menu_add);
 
+        item = menu.add(0, MENU_HOME, 0, R.string.home);
+        item.setIcon(R.drawable.ic_menu_home);
+
         item = menu.add(0, MENU_PARENT, 0, R.string.parent_directory);
         item.setIcon(R.drawable.arrow_up);
 
@@ -229,6 +245,11 @@ public class FileList extends ListActivity
                 startActivity(new Intent(PasswdSafeApp.NEW_INTENT,
                                          Uri.fromFile(itsDir)));
             }
+            return true;
+        }
+        case MENU_HOME:
+        {
+            doHomePressed();
             return true;
         }
         case MENU_PARENT:
@@ -297,7 +318,8 @@ public class FileList extends ListActivity
 
     // TODO: add back key support
     // TODO: need to re-fetch prefs all the time?
-    // TODO: home button to goto /sdcard
+    // TODO: directory support in shortcut chooser
+    // TODO: hide 'private' directories - . and LOST.DIR
     private final void showFiles()
     {
         ListAdapter adapter = null;
@@ -348,6 +370,12 @@ public class FileList extends ListActivity
             return true;
         }
         return false;
+    }
+
+
+    private final void doHomePressed()
+    {
+        changeDir(Environment.getExternalStorageDirectory());
     }
 
 

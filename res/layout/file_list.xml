@@ -15,11 +15,18 @@
                    android:layout_width="36dp"
                    android:layout_height="36dp"
                    />
+        <ImageView android:id="@+id/home"
+                   android:src="@drawable/button_home"
+                   android:layout_width="36dp"
+                   android:layout_height="36dp"
+                   android:layout_alignParentRight="true"
+                   />
         <TextView android:id="@+id/current_group_label"
                       android:text="current group"
                       android:gravity="center_vertical"
                       android:layout_marginBottom="2dp"
                       android:layout_toRightOf="@id/current_group_icon"
+                      android:layout_toLeftOf="@id/home"
                       android:layout_alignTop="@id/current_group_icon"
                       android:layout_alignBottom="@id/current_group_icon"
                       android:layout_width="fill_parent"
