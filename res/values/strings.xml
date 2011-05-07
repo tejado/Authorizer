@@ -69,7 +69,7 @@
     <string name="search_hint">Search PasswdSafe</string>
     <string name="set_password">Set Password</string>
     <string name="shortcut_choose_file">Choose password file for shortcut</string>
-    <string name="shortcut_choose_record">Choose record for shortcut</string>
+    <string name="shortcut_choose_record">Choose password record for shortcut</string>
     <string name="show_password">Show Password</string>
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
