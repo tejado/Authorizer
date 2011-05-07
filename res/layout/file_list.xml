@@ -38,7 +38,13 @@
               android:background="#FF909090"
               />
     </RelativeLayout>
-              
+
+    <TextView android:id="@+id/select_file_label"
+              android:text="@string/select_file_label"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_margin="3dp"
+              />
     <ListView android:id="@android:id/list"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
@@ -53,6 +59,6 @@
               android:layout_height="fill_parent"
               android:layout_weight="1"
               android:layout_margin="3dp"
-              android:text="@string/no_records"
+              android:text="@string/no_files"
               />
 </LinearLayout>

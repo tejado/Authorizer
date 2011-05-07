@@ -42,7 +42,6 @@ public class FileList extends ListActivity
 
     private static final int DIALOG_ABOUT = 1;
 
-    private TextView itsHeader;
     private File itsDir;
 
     public static final class FileData
@@ -132,8 +131,6 @@ public class FileList extends ListActivity
             }
         });
 
-        itsHeader = new TextView(this);
-        getListView().addHeaderView(itsHeader);
         if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
             openFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE));
         }
@@ -328,18 +325,33 @@ public class FileList extends ListActivity
         String state = Environment.getExternalStorageState();
         if (!Environment.MEDIA_MOUNTED.equals(state) &&
             !Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            itsHeader.setText(R.string.ext_storage_not_mounted);
             itsDir = null;
         } else {
             itsDir = Preferences.getFileDirPref(prefs);
-            itsHeader.setText(getString(R.string.file_list_header, itsDir));
             FileData[] data = getFiles(itsDir);
             adapter = new ArrayAdapter<FileData>(
                             this, android.R.layout.simple_list_item_1, data);
         }
 
-        TextView tv = (TextView)findViewById(R.id.current_group_label);
-        tv.setText((itsDir == null) ? null : itsDir.toString());
+        View groupPanel = findViewById(R.id.current_group_panel);
+        TextView groupLabel = (TextView)findViewById(R.id.current_group_label);
+        TextView emptyLabel = (TextView)findViewById(android.R.id.empty);
+        if (itsDir == null) {
+            groupPanel.setVisibility(View.GONE);
+            groupLabel.setText("");
+            emptyLabel.setText(R.string.ext_storage_not_mounted);
+        } else {
+            groupPanel.setVisibility(View.VISIBLE);
+            groupLabel.setText(itsDir.toString());
+            emptyLabel.setText(R.string.no_files);
+        }
+
+        View selectFileLabel = findViewById(R.id.select_file_label);
+        if ((adapter != null) && !adapter.isEmpty()) {
+            selectFileLabel.setVisibility(View.VISIBLE);
+        } else {
+            selectFileLabel.setVisibility(View.GONE);
+        }
 
         setListAdapter(adapter);
         if (adapter != null) {
@@ -362,11 +374,11 @@ public class FileList extends ListActivity
     {
         PasswdSafeApp.dbginfo(TAG, "doBackPressed");
         if (itsDir != null) {
-            itsDir = itsDir.getParentFile();
-            if (itsDir == null) {
+            File newdir = itsDir.getParentFile();
+            if (newdir == null) {
                 return false;
             }
-            changeDir(itsDir);
+            changeDir(newdir);
             return true;
         }
         return false;
