@@ -108,6 +108,15 @@
             </intent-filter>
         </activity>
     
+        <activity android:name=".LauncherRecordShortcuts"
+                  android:label="@string/password_record"
+                  android:theme="@android:style/Theme.Dialog">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    
         <receiver android:name=".PasswdSafeApp$FileTimeoutReceiver">
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.FILE_TIMEOUT"/>

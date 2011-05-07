@@ -20,7 +20,6 @@ import android.widget.ListView;
 
 public class LauncherFileShortcuts extends ListActivity
 {
-
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
      */
@@ -56,7 +55,7 @@ public class LauncherFileShortcuts extends ListActivity
         if (file != null) {
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
-                            FileList.createOpenIntent(file.itsFile));
+                            FileList.createOpenIntent(file.itsFile, null));
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, file.itsFile.getName());
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(

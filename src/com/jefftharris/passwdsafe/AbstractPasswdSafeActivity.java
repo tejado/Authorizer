@@ -21,6 +21,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -40,6 +41,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public abstract class AbstractPasswdSafeActivity extends ListActivity
+    implements PasswdFileActivity
 {
     protected static final String TAG = "PasswdSafe";
 
@@ -135,6 +137,36 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
             Preferences.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
         itsFontSize = Preferences.getFontSizePref(prefs);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#getActivity()
+     */
+    public Activity getActivity()
+    {
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#saveFinished(boolean)
+     */
+    public void saveFinished(boolean success)
+    {
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#showProgressDialog()
+     */
+    public void showProgressDialog()
+    {
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#removeProgressDialog()
+     */
+    public void removeProgressDialog()
+    {
     }
 
 
@@ -317,7 +349,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     protected abstract void onRecordClick(PwsRecord rec);
 
 
-    protected final void showFileData()
+    protected void showFileData()
     {
         populateFileData();
 

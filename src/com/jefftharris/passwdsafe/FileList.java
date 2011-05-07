@@ -86,9 +86,13 @@ public class FileList extends ListActivity
         return data;
     }
 
-    public static Intent createOpenIntent(File file)
+    public static Intent createOpenIntent(File file, String recToOpen)
     {
-        return new Intent(PasswdSafeApp.VIEW_INTENT, Uri.fromFile(file));
+        Uri.Builder builder = Uri.fromFile(file).buildUpon();
+        if (recToOpen != null) {
+            builder.appendQueryParameter("recToOpen", recToOpen);
+        }
+        return new Intent(PasswdSafeApp.VIEW_INTENT, builder.build());
     }
 
     /* (non-Javadoc)
@@ -266,6 +270,6 @@ public class FileList extends ListActivity
 
     private final void openFile(File file)
     {
-        startActivity(createOpenIntent(file));
+        startActivity(createOpenIntent(file, null));
     }
 }

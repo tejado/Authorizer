@@ -14,7 +14,6 @@ import java.util.HashMap;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -37,7 +36,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class PasswdSafe extends AbstractPasswdSafeActivity
-    implements PasswdFileActivity
 {
     private static final int DIALOG_GET_PASSWD = 0;
     private static final int DIALOG_PROGRESS = 1;
@@ -61,6 +59,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private LoadTask itsLoadTask;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
+    private String itsRecToOpen;
 
     /** Called when the activity is first created. */
     @Override
@@ -85,23 +84,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdFileActivity#getActivity()
-     */
-    public Activity getActivity()
-    {
-        return this;
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdFileActivity#saveFinished(boolean)
-     */
-    public void saveFinished(boolean success)
-    {
-    }
-
-    /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.PasswdFileActivity#showProgressDialog()
      */
+    @Override
     public void showProgressDialog()
     {
         showDialog(DIALOG_SAVE_PROGRESS);
@@ -110,10 +95,27 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.PasswdFileActivity#removeProgressDialog()
      */
+    @Override
     public void removeProgressDialog()
     {
         removeDialog(DIALOG_SAVE_PROGRESS);
     }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        if (intent != null) {
+            String action = intent.getAction();
+            if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
+                action.equals(Intent.ACTION_VIEW)) {
+                onCreateView(intent);
+                return;
+            }
+        }
+
+        super.onNewIntent(intent);
+    }
+
 
     /* (non-Javadoc)
      * @see android.app.Activity#onPause()
@@ -551,14 +553,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     protected void onRecordClick(PwsRecord rec)
     {
         PasswdFileData fileData = itsPasswdFile.getFileData();
-        Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
         String uuid = fileData.getUUID(rec);
-        if (uuid != null) {
-            builder.appendQueryParameter("rec", uuid.toString());
-        }
-        Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
-                                   this, RecordView.class);
-        startActivityForResult(intent, RECORD_VIEW_REQUEST);
+        openRecord(uuid);
     }
 
 
@@ -620,6 +616,16 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
 
+    @Override
+    protected void showFileData()
+    {
+        if (itsRecToOpen != null) {
+            openRecord(itsRecToOpen);
+        }
+        super.showFileData();
+    }
+
+
     private final void onCreateView(Intent intent)
     {
         itsFile = new File(intent.getData().getPath());
@@ -630,6 +636,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             title += " - AUTOOPEN!!!!!";
         }
         setTitle(title);
+
+        itsRecToOpen = intent.getData().getQueryParameter("recToOpen");
 
         if (!itsPasswdFile.isOpen()) {
             if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
@@ -706,6 +714,18 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         removeDialog(DIALOG_PROGRESS);
         removeDialog(DIALOG_GET_PASSWD);
         finish();
+    }
+
+
+    private void openRecord(String uuid)
+    {
+        Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
+        if (uuid != null) {
+            builder.appendQueryParameter("rec", uuid.toString());
+        }
+        Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
+                                   this, RecordView.class);
+        startActivityForResult(intent, RECORD_VIEW_REQUEST);
     }
 
 

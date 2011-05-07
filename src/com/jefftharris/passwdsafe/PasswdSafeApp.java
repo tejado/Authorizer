@@ -157,8 +157,8 @@ public class PasswdSafeApp extends Application
 
     public static final boolean DEBUG = false;
     public static final String DEBUG_AUTO_FILE =
-        //null;
-        Preferences.PREF_FILE_DIR_DEF + "/test.psafe3";
+        null;
+        //Preferences.PREF_FILE_DIR_DEF + "/test.psafe3";
 
     public static final String NEW_INTENT =
         "com.jefftharris.passwdsafe.action.NEW";
@@ -268,10 +268,20 @@ public class PasswdSafeApp extends Application
     {
         if ((itsFileData == null) || (itsFileData.getFile() == null) ||
             (!itsFileData.getFile().equals(file))) {
+            itsFileDataActivities.remove(activity);
             closeFileData(false);
         }
 
         dbginfo(TAG, "access file:" + file+ ", data:" + itsFileData);
+        return new AppActivityPasswdFile(itsFileData, activity);
+    }
+
+    public synchronized ActivityPasswdFile accessOpenFile
+    (
+        PasswdFileActivity activity
+    )
+    {
+        dbginfo(TAG, "access opne file data: " + itsFileData);
         return new AppActivityPasswdFile(itsFileData, activity);
     }
 
