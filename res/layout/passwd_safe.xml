@@ -48,6 +48,7 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:layout_weight="1"
+              android:layout_margin="3dp"
               android:text="@string/no_records"/>
 
     <RelativeLayout android:id="@+id/query_panel"

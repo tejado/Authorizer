@@ -281,7 +281,10 @@ public class PasswdSafeApp extends Application
         PasswdFileActivity activity
     )
     {
-        dbginfo(TAG, "access opne file data: " + itsFileData);
+        dbginfo(TAG, "access open file data: " + itsFileData);
+        if (itsFileData == null) {
+            return null;
+        }
         return new AppActivityPasswdFile(itsFileData, activity);
     }
 

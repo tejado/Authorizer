@@ -11,6 +11,7 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
 
 public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
 {
@@ -24,7 +25,6 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
         setTitle(R.string.shortcut_choose_record);
 
         Intent intent = getIntent();
-
         if (!Intent.ACTION_CREATE_SHORTCUT.equals(intent.getAction())) {
             finish();
             return;
@@ -32,15 +32,13 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
 
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         itsPasswdFile = app.accessOpenFile(this);
-        if (itsPasswdFile.getFileData() == null) {
-            // TODO: dialog to indicate file needs to be open
-            finish();
-            return;
+        if (itsPasswdFile != null) {
+            itsFile = itsPasswdFile.getFileData().getFile();
+        } else {
+            TextView empty = (TextView)findViewById(android.R.id.empty);
+            empty.setText(R.string.no_records_open_file);
         }
-        itsFile = itsPasswdFile.getFileData().getFile();
-        if (itsPasswdFile.isOpen()) {
-            showFileData();
-        }
+        showFileData();
     }
 
 

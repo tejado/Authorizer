@@ -30,7 +30,6 @@ public class LauncherFileShortcuts extends ListActivity
         setTitle(R.string.shortcut_choose_file);
 
         Intent intent = getIntent();
-
         if (!Intent.ACTION_CREATE_SHORTCUT.equals(intent.getAction())) {
             finish();
             return;
