@@ -8,7 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 import java.util.Arrays;
 
 import android.app.Activity;
@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -34,8 +35,9 @@ public class FileList extends ListActivity
     private static final String TAG = "FileList";
 
     private static final int MENU_FILE_NEW = 1;
-    private static final int MENU_PREFERENCES = 2;
-    private static final int MENU_ABOUT = 3;
+    private static final int MENU_PARENT = 2;
+    private static final int MENU_PREFERENCES = 3;
+    private static final int MENU_ABOUT = 4;
 
     private static final int DIALOG_ABOUT = 1;
 
@@ -58,8 +60,12 @@ public class FileList extends ListActivity
 
     public static FileData[] getFiles(File dir, final boolean showBackupFiles)
     {
-        File[] files = dir.listFiles(new FilenameFilter() {
-            public final boolean accept(File dir, String filename) {
+        File[] files = dir.listFiles(new FileFilter() {
+            public final boolean accept(File pathname) {
+                if (pathname.isDirectory()) {
+                    return true;
+                }
+                String filename = pathname.getName();
                 if (filename.endsWith(".psafe3") || filename.endsWith(".dat")) {
                     return true;
                 }
@@ -102,6 +108,16 @@ public class FileList extends ListActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.file_list);
+
+        View v = findViewById(R.id.current_group_panel);
+        v.setOnClickListener(new View.OnClickListener()
+        {
+            public final void onClick(View v)
+            {
+                doBackPressed();
+            }
+        });
 
         itsHeader = new TextView(this);
         getListView().addHeaderView(itsHeader);
@@ -140,29 +156,7 @@ public class FileList extends ListActivity
             });
         file.close();
 
-        String state = Environment.getExternalStorageState();
-        if (!Environment.MEDIA_MOUNTED.equals(state) &&
-            !Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            itsHeader.setText(R.string.ext_storage_not_mounted);
-            setListAdapter(null);
-        } else {
-            SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-            String dirName = Preferences.getFileDirPref(prefs);
-            itsDir = new File(dirName);
-            itsHeader.setText(getString(R.string.file_list_header, itsDir));
-            FileData[] data = getFiles(itsDir);
-            setListAdapter(new ArrayAdapter<FileData>(
-                            this, android.R.layout.simple_list_item_1, data));
-
-            if (app.checkOpenDefault()) {
-                String defFileName = Preferences.getDefFilePref(prefs);
-                File defFile = new File(itsDir, defFileName);
-                if (defFile.isFile() && defFile.canRead()) {
-                    openFile(defFile);
-                }
-            }
-        }
+        showFiles();
     }
 
     /* (non-Javadoc)
@@ -175,8 +169,13 @@ public class FileList extends ListActivity
         if (file == null) {
             return;
         }
-        PasswdSafeApp.dbginfo(TAG, "Open file: " + file.itsFile);
-        openFile(file.itsFile);
+
+        if (file.itsFile.isDirectory()) {
+            changeDir(file.itsFile);
+        } else {
+            PasswdSafeApp.dbginfo(TAG, "Open file: " + file.itsFile);
+            openFile(file.itsFile);
+        }
     }
 
     /* (non-Javadoc)
@@ -190,6 +189,9 @@ public class FileList extends ListActivity
         item = menu.add(0, MENU_FILE_NEW, 0, R.string.new_file);
         item.setIcon(android.R.drawable.ic_menu_add);
 
+        item = menu.add(0, MENU_PARENT, 0, R.string.parent_directory);
+        item.setIcon(R.drawable.arrow_up);
+
         item = menu.add(0, MENU_PREFERENCES, 0, R.string.preferences);
         item.setIcon(android.R.drawable.ic_menu_preferences);
         item.setIntent(new Intent(this, Preferences.class));
@@ -198,6 +200,21 @@ public class FileList extends ListActivity
         item.setIcon(android.R.drawable.ic_menu_info_details);
         return true;
     }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem mi = menu.findItem(MENU_PARENT);
+        if (mi != null) {
+            mi.setEnabled((itsDir != null) && (itsDir.getParentFile() != null));
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
 
     /* (non-Javadoc)
      * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
@@ -212,6 +229,11 @@ public class FileList extends ListActivity
                 startActivity(new Intent(PasswdSafeApp.NEW_INTENT,
                                          Uri.fromFile(itsDir)));
             }
+            return true;
+        }
+        case MENU_PARENT:
+        {
+            doBackPressed();
             return true;
         }
         case MENU_ABOUT:
@@ -271,5 +293,69 @@ public class FileList extends ListActivity
     private final void openFile(File file)
     {
         startActivity(createOpenIntent(file, null));
+    }
+
+    // TODO: add back key support
+    // TODO: need to re-fetch prefs all the time?
+    // TODO: home button to goto /sdcard
+    private final void showFiles()
+    {
+        ListAdapter adapter = null;
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        String state = Environment.getExternalStorageState();
+        if (!Environment.MEDIA_MOUNTED.equals(state) &&
+            !Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            itsHeader.setText(R.string.ext_storage_not_mounted);
+            itsDir = null;
+        } else {
+            itsDir = Preferences.getFileDirPref(prefs);
+            itsHeader.setText(getString(R.string.file_list_header, itsDir));
+            FileData[] data = getFiles(itsDir);
+            adapter = new ArrayAdapter<FileData>(
+                            this, android.R.layout.simple_list_item_1, data);
+        }
+
+        TextView tv = (TextView)findViewById(R.id.current_group_label);
+        tv.setText((itsDir == null) ? null : itsDir.toString());
+
+        setListAdapter(adapter);
+        if (adapter != null) {
+            PasswdSafeApp app = (PasswdSafeApp)getApplication();
+            if (app.checkOpenDefault()) {
+                String defFileName = Preferences.getDefFilePref(prefs);
+                File defFile = new File(itsDir, defFileName);
+                if (defFile.isFile() && defFile.canRead()) {
+                    openFile(defFile);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * @return true if a directory was popped, false to use default behavior
+     */
+    private final boolean doBackPressed()
+    {
+        PasswdSafeApp.dbginfo(TAG, "doBackPressed");
+        if (itsDir != null) {
+            itsDir = itsDir.getParentFile();
+            if (itsDir == null) {
+                return false;
+            }
+            changeDir(itsDir);
+            return true;
+        }
+        return false;
+    }
+
+
+    private final void changeDir(File newDir)
+    {
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        Preferences.setFileDirPref(newDir, prefs);
+        showFiles();
     }
 }

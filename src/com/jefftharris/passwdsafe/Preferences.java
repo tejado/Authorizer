@@ -112,9 +112,16 @@ public class Preferences extends PreferenceActivity
                                 PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF);
     }
 
-    public static String getFileDirPref(SharedPreferences prefs)
+    public static File getFileDirPref(SharedPreferences prefs)
     {
-        return prefs.getString(PREF_FILE_DIR, PREF_FILE_DIR_DEF);
+        return new File(prefs.getString(PREF_FILE_DIR, PREF_FILE_DIR_DEF));
+    }
+
+    public static void setFileDirPref(File dir, SharedPreferences prefs)
+    {
+        SharedPreferences.Editor prefsEdit = prefs.edit();
+        prefsEdit.putString(Preferences.PREF_FILE_DIR, dir.toString());
+        prefsEdit.commit();
     }
 
     public static String getDefFilePref(SharedPreferences prefs)
@@ -269,10 +276,10 @@ public class Preferences extends PreferenceActivity
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
         if (key.equals(PREF_FILE_DIR)) {
-            String pref = getFileDirPref(prefs);
-            if (pref.length() == 0) {
-                pref = PREF_FILE_DIR_DEF;
-                itsFileDirPref.setText(pref);
+            File pref = getFileDirPref(prefs);
+            if (pref.toString().length() == 0) {
+                pref = new File(PREF_FILE_DIR_DEF);
+                itsFileDirPref.setText(pref.toString());
             }
             itsDefFilePref.setValue(PREF_DEF_FILE_DEF);
             updateFileDirPrefs(pref, prefs);
@@ -300,12 +307,11 @@ public class Preferences extends PreferenceActivity
         }
     }
 
-    private final void updateFileDirPrefs(String summary,
+    private final void updateFileDirPrefs(File fileDir,
                                           SharedPreferences prefs)
     {
-        itsFileDirPref.setSummary(summary);
+        itsFileDirPref.setSummary(fileDir.toString());
 
-        File fileDir = new File(getFileDirPref(prefs));
         FileList.FileData[] files = FileList.getFiles(fileDir, false);
         String[] entries = new String[files.length + 1];
         String[] entryValues = new String[files.length + 1];

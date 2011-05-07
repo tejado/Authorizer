@@ -37,7 +37,7 @@ public class LauncherFileShortcuts extends ListActivity
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
-        File dir = new File(Preferences.getFileDirPref(prefs));
+        File dir = Preferences.getFileDirPref(prefs);
         FileList.FileData[] data = FileList.getFiles(dir, false);
         setListAdapter(new ArrayAdapter<FileList.FileData>(
                         this, android.R.layout.simple_list_item_1, data));

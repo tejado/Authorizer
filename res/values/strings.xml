@@ -51,6 +51,7 @@
     <string name="notes_label">Notes:</string>
     <string name="num_records_label">Number of Records:</string>
     <string name="ok">Ok</string>
+    <string name="parent_directory">Parent Directory</string>
     <string name="parent_group">Parent Group</string>
     <string name="password">Password</string>
     <string name="password_and_confirm">Password /\nConfirm</string>

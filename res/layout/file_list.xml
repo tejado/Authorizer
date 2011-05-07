@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              >
+    <RelativeLayout android:id="@+id/current_group_panel"
+                    android:visible="false"
+                    android:clickable="true"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    >
+        <ImageView android:id="@+id/current_group_icon"
+                   android:src="@drawable/folder_up_rev"
+                   android:layout_width="36dp"
+                   android:layout_height="36dp"
+                   />
+        <TextView android:id="@+id/current_group_label"
+                      android:text="current group"
+                      android:gravity="center_vertical"
+                      android:layout_marginBottom="2dp"
+                      android:layout_toRightOf="@id/current_group_icon"
+                      android:layout_alignTop="@id/current_group_icon"
+                      android:layout_alignBottom="@id/current_group_icon"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      />
+        <View android:layout_width="fill_parent"
+              android:layout_height="2dip"
+              android:layout_below="@id/current_group_label"
+              android:background="#FF909090"
+              />
+    </RelativeLayout>
+              
+    <ListView android:id="@android:id/list"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:layout_weight="1"
+              android:fastScrollEnabled="true"
+              android:drawSelectorOnTop="false"
+              />
+    <TextView android:id="@android:id/empty"
+              android:textSize="16sp"
+              android:textStyle="bold"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:layout_weight="1"
+              android:layout_margin="3dp"
+              android:text="@string/no_records"
+              />
+</LinearLayout>
