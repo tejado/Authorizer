@@ -9,16 +9,10 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 
-import android.app.ListActivity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
-public class LauncherFileShortcuts extends ListActivity
+public class LauncherFileShortcuts extends AbstractFileListActivity
 {
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -34,28 +28,16 @@ public class LauncherFileShortcuts extends ListActivity
             finish();
             return;
         }
-
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        File dir = Preferences.getFileDirPref(prefs);
-        FileList.FileData[] data = FileList.getFiles(dir, false);
-        setListAdapter(new ArrayAdapter<FileList.FileData>(
-                        this, android.R.layout.simple_list_item_1, data));
     }
 
-    /* (non-Javadoc)
-     * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
-     */
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id)
+    protected void onFileClick(File file)
     {
-        FileList.FileData file =
-            (FileList.FileData)l.getItemAtPosition(position);
         if (file != null) {
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
-                            FileList.createOpenIntent(file.itsFile, null));
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, file.itsFile.getName());
+                            FileList.createOpenIntent(file, null));
+            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, file.getName());
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(
                                 this, R.drawable.icon));
