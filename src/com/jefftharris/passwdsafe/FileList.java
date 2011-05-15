@@ -130,6 +130,23 @@ public class FileList extends AbstractFileListActivity
     }
 
 
+    @Override
+    protected File getFileDir()
+    {
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        return Preferences.getFileDirPref(prefs);
+    }
+
+    @Override
+    protected void setFileDir(File dir)
+    {
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        Preferences.setFileDirPref(dir, prefs);
+    }
+
+
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateDialog(int)
      */
@@ -185,5 +202,4 @@ public class FileList extends AbstractFileListActivity
     {
         startActivity(createOpenIntent(file, null));
     }
-
 }

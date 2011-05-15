@@ -198,9 +198,6 @@ public abstract class AbstractFileListActivity extends ListActivity
     }
 
 
-    protected abstract void onFileClick(File file);
-
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
         if (GuiUtils.isBackKeyDown(keyCode, event)) {
@@ -226,19 +223,15 @@ public abstract class AbstractFileListActivity extends ListActivity
     }
 
 
-    // TODO: need to re-fetch prefs all the time?
-    // TODO: Update prefs in shortcut chooser??
     protected void showFiles()
     {
         ListAdapter adapter = null;
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
         String state = Environment.getExternalStorageState();
         if (!Environment.MEDIA_MOUNTED.equals(state) &&
             !Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             itsDir = null;
         } else {
-            itsDir = Preferences.getFileDirPref(prefs);
+            itsDir = getFileDir();
             FileData[] data = getFiles(itsDir);
             List<Map<String, Object>> fileData =
                 new ArrayList<Map<String, Object>>();
@@ -290,6 +283,12 @@ public abstract class AbstractFileListActivity extends ListActivity
         }
     }
 
+
+    protected abstract void onFileClick(File file);
+    protected abstract File getFileDir();
+    protected abstract void setFileDir(File dir);
+
+
     /**
      * @return true if a directory was popped, false to use default behavior
      */
@@ -325,9 +324,7 @@ public abstract class AbstractFileListActivity extends ListActivity
         if (saveHistory && (itsDir != null)) {
             itsDirHistory.addFirst(itsDir);
         }
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        Preferences.setFileDirPref(newDir, prefs);
+        setFileDir(newDir);
         showFiles();
     }
 }

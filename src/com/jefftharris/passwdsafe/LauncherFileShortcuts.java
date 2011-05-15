@@ -10,10 +10,14 @@ package com.jefftharris.passwdsafe;
 import java.io.File;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 public class LauncherFileShortcuts extends AbstractFileListActivity
 {
+    private File itsFileDir;
+
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
      */
@@ -45,5 +49,22 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
         }
 
         finish();
+    }
+
+    @Override
+    protected File getFileDir()
+    {
+        if (itsFileDir == null) {
+            SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+            itsFileDir = Preferences.getFileDirPref(prefs);
+        }
+        return itsFileDir;
+    }
+
+    @Override
+    protected void setFileDir(File dir)
+    {
+        itsFileDir = dir;
     }
 }
