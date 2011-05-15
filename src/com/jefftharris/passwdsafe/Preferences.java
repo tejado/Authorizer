@@ -312,7 +312,7 @@ public class Preferences extends PreferenceActivity
     {
         itsFileDirPref.setSummary(fileDir.toString());
 
-        FileList.FileData[] files = FileList.getFiles(fileDir, false);
+        FileList.FileData[] files = FileList.getFiles(fileDir, false, false);
         String[] entries = new String[files.length + 1];
         String[] entryValues = new String[files.length + 1];
         entries[0] = PREF_DEF_FILE_NONE;

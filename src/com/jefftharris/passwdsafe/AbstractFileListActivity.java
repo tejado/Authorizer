@@ -52,6 +52,7 @@ public abstract class AbstractFileListActivity extends ListActivity
         }
     };
 
+
     protected File itsDir;
     private LinkedList<File> itsDirHistory = new LinkedList<File>();
 
@@ -70,12 +71,18 @@ public abstract class AbstractFileListActivity extends ListActivity
         }
     }
 
-    public static FileData[] getFiles(File dir, final boolean showHiddenFiles)
+
+    public static FileData[] getFiles(File dir,
+                                      final boolean showHiddenFiles,
+                                      final boolean showDirs)
     {
         File[] files = dir.listFiles(new FileFilter() {
             public final boolean accept(File pathname) {
                 String filename = pathname.getName();
                 if (pathname.isDirectory()) {
+                    if (!showDirs) {
+                        return false;
+                    }
                     if (!showHiddenFiles &&
                         (filename.startsWith(".") ||
                          filename.equalsIgnoreCase("LOST.DIR"))) {
@@ -108,6 +115,7 @@ public abstract class AbstractFileListActivity extends ListActivity
 
         return data;
     }
+
 
     public static Intent createOpenIntent(File file, String recToOpen)
     {
@@ -330,7 +338,7 @@ public abstract class AbstractFileListActivity extends ListActivity
             PreferenceManager.getDefaultSharedPreferences(this);
         boolean showHiddenFiles =
             Preferences.getShowHiddenFilesPref(prefs);
-        return getFiles(dir, showHiddenFiles);
+        return getFiles(dir, showHiddenFiles, true);
     }
 
 
