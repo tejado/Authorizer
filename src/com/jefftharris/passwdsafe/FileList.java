@@ -9,8 +9,12 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,9 +31,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class FileList extends ListActivity
@@ -43,6 +47,9 @@ public class FileList extends ListActivity
     private static final int MENU_ABOUT = 5;
 
     private static final int DIALOG_ABOUT = 1;
+
+    protected static final String TITLE = "title";
+    protected static final String ICON = "icon";
 
     private File itsDir;
     private LinkedList<File> itsDirHistory = new LinkedList<File>();
@@ -185,7 +192,14 @@ public class FileList extends ListActivity
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id)
     {
-        FileData file = (FileData) l.getItemAtPosition(position);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> item =
+            (HashMap<String, Object>)l.getItemAtPosition(position);
+        if (item == null) {
+            return;
+        }
+
+        FileData file = (FileData) item.get(TITLE);
         if (file == null) {
             return;
         }
@@ -351,7 +365,6 @@ public class FileList extends ListActivity
 
     // TODO: need to re-fetch prefs all the time?
     // TODO: directory support in shortcut chooser
-    // TODO: show icons
     private final void showFiles()
     {
         ListAdapter adapter = null;
@@ -364,8 +377,19 @@ public class FileList extends ListActivity
         } else {
             itsDir = Preferences.getFileDirPref(prefs);
             FileData[] data = getFiles(itsDir);
-            adapter = new ArrayAdapter<FileData>(
-                            this, android.R.layout.simple_list_item_1, data);
+            List<Map<String, Object>> fileData =
+                new ArrayList<Map<String, Object>>();
+            for (FileData file: data) {
+                HashMap<String, Object> item = new HashMap<String, Object>();
+                item.put(TITLE, file);
+                item.put(ICON, file.itsFile.isDirectory() ?
+                               R.drawable.folder_rev : R.drawable.login_rev);
+                fileData.add(item);
+            }
+
+            adapter = new SimpleAdapter(this, fileData, R.layout.file_list_item,
+                                        new String[] { TITLE, ICON },
+                                        new int[] { R.id.text, R.id.icon });
         }
 
         View groupPanel = findViewById(R.id.current_group_panel);
