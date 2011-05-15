@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,11 +36,25 @@ public abstract class AbstractFileListActivity extends ListActivity
 {
     private static final String TAG = "FileList";
 
-    protected static final String TITLE = "title";
-    protected static final String ICON = "icon";
+    private static final String TITLE = "title";
+    private static final String ICON = "icon";
+
+    private static Comparator<File> FILE_COMP = new Comparator<File>()
+    {
+        public int compare(File obj1, File obj2)
+        {
+            if (obj1.isDirectory() && !obj2.isDirectory()) {
+                return 1;
+            } else if (!obj1.isDirectory() && obj2.isDirectory()) {
+                return -1;
+            }
+            return obj1.compareTo(obj2);
+        }
+    };
 
     protected File itsDir;
     private LinkedList<File> itsDirHistory = new LinkedList<File>();
+
 
     public static final class FileData
     {
@@ -82,7 +97,7 @@ public abstract class AbstractFileListActivity extends ListActivity
 
         FileData[] data;
         if (files != null) {
-            Arrays.sort(files);
+            Arrays.sort(files, FILE_COMP);
             data = new FileData[files.length];
             for (int i = 0; i < files.length; ++i) {
                 data[i] = new FileData(files[i]);
