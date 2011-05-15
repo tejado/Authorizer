@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,6 +23,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,6 +45,7 @@ public class FileList extends ListActivity
     private static final int DIALOG_ABOUT = 1;
 
     private File itsDir;
+    private LinkedList<File> itsDirHistory = new LinkedList<File>();
 
     public static final class FileData
     {
@@ -110,17 +113,17 @@ public class FileList extends ListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_list);
 
-        View.OnClickListener backListener = new View.OnClickListener()
+        View.OnClickListener parentListener = new View.OnClickListener()
         {
             public final void onClick(View v)
             {
-                doBackPressed();
+                doParentPressed();
             }
         };
         View v = findViewById(R.id.current_group_icon);
-        v.setOnClickListener(backListener);
+        v.setOnClickListener(parentListener);
         v = findViewById(R.id.current_group_label);
-        v.setOnClickListener(backListener);
+        v.setOnClickListener(parentListener);
 
         v = findViewById(R.id.home);
         v.setOnClickListener(new View.OnClickListener()
@@ -135,6 +138,7 @@ public class FileList extends ListActivity
             openFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE));
         }
     }
+
 
     /* (non-Javadoc)
      * @see android.app.Activity#onResume()
@@ -166,6 +170,7 @@ public class FileList extends ListActivity
             });
         file.close();
 
+        itsDirHistory.clear();
         showFiles();
     }
 
@@ -181,7 +186,7 @@ public class FileList extends ListActivity
         }
 
         if (file.itsFile.isDirectory()) {
-            changeDir(file.itsFile);
+            changeDir(file.itsFile, true);
         } else {
             PasswdSafeApp.dbginfo(TAG, "Open file: " + file.itsFile);
             openFile(file.itsFile);
@@ -251,7 +256,7 @@ public class FileList extends ListActivity
         }
         case MENU_PARENT:
         {
-            doBackPressed();
+            doParentPressed();
             return true;
         }
         case MENU_ABOUT:
@@ -265,6 +270,32 @@ public class FileList extends ListActivity
         }
         }
     }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (GuiUtils.isBackKeyDown(keyCode, event)) {
+            // Take care of calling this method on earlier versions of
+            // the platform where it doesn't exist.
+            if (doBackPressed()) {
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onBackPressed()
+     */
+    @Override
+    public void onBackPressed()
+    {
+        if (!doBackPressed()) {
+            finish();
+        }
+    }
+
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateDialog(int)
@@ -313,10 +344,10 @@ public class FileList extends ListActivity
         startActivity(createOpenIntent(file, null));
     }
 
-    // TODO: add back key support
     // TODO: need to re-fetch prefs all the time?
     // TODO: directory support in shortcut chooser
     // TODO: hide 'private' directories - . and LOST.DIR
+    // TODO: show icons
     private final void showFiles()
     {
         ListAdapter adapter = null;
@@ -367,32 +398,42 @@ public class FileList extends ListActivity
     }
 
 
+    private final void doParentPressed()
+    {
+        PasswdSafeApp.dbginfo(TAG, "doParentPressed");
+        if (itsDir != null) {
+            File newdir = itsDir.getParentFile();
+            if (newdir != null) {
+                changeDir(newdir, true);
+            }
+        }
+    }
+
     /**
      * @return true if a directory was popped, false to use default behavior
      */
     private final boolean doBackPressed()
     {
         PasswdSafeApp.dbginfo(TAG, "doBackPressed");
-        if (itsDir != null) {
-            File newdir = itsDir.getParentFile();
-            if (newdir == null) {
-                return false;
-            }
-            changeDir(newdir);
-            return true;
+        if (itsDirHistory.size() == 0) {
+            return false;
         }
-        return false;
+        changeDir(itsDirHistory.removeFirst(), false);
+        return true;
     }
 
 
     private final void doHomePressed()
     {
-        changeDir(Environment.getExternalStorageDirectory());
+        changeDir(Environment.getExternalStorageDirectory(), true);
     }
 
 
-    private final void changeDir(File newDir)
+    private final void changeDir(File newDir, boolean saveHistory)
     {
+        if (saveHistory && (itsDir != null)) {
+            itsDirHistory.addFirst(itsDir);
+        }
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
         Preferences.setFileDirPref(newDir, prefs);

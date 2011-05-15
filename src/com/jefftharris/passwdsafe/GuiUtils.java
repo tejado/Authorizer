@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -23,6 +24,18 @@ import android.widget.TextView;
 
 public final class GuiUtils
 {
+    public static final int SDK_VERSION;
+    static {
+        int sdk;
+        try {
+            sdk = Integer.parseInt(android.os.Build.VERSION.SDK);
+        } catch (NumberFormatException e) {
+            // Default back to android 1.5
+            sdk = 3;
+        }
+        SDK_VERSION = sdk;
+    }
+
     private static final String PASSWD = "passwd";
     private static final String DATE = "date";
 
@@ -84,5 +97,13 @@ public final class GuiUtils
                               new int[] { android.R.id.text1,
                                           android.R.id.text2 });
         return adapter;
+    }
+
+
+    public static boolean isBackKeyDown(int keyCode, KeyEvent event)
+    {
+        return (SDK_VERSION < android.os.Build.VERSION_CODES.ECLAIR)
+            && (keyCode == KeyEvent.KEYCODE_BACK)
+            && (event.getRepeatCount() == 0);
     }
 }

@@ -60,18 +60,6 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     private static final String BUNDLE_CURR_GROUPS =
         "passwdsafe.currGroups";
 
-    private static final int SDK_VERSION;
-    static {
-        int sdk;
-        try {
-            sdk = Integer.parseInt(android.os.Build.VERSION.SDK);
-        } catch (NumberFormatException e) {
-            // Default back to android 1.5
-            sdk = 3;
-        }
-        SDK_VERSION = sdk;
-    }
-
     protected File itsFile;
     protected ActivityPasswdFile itsPasswdFile;
     private boolean itsGroupRecords = true;
@@ -303,9 +291,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
-        if ((SDK_VERSION < android.os.Build.VERSION_CODES.ECLAIR)
-            && keyCode == KeyEvent.KEYCODE_BACK
-            && event.getRepeatCount() == 0) {
+        if (GuiUtils.isBackKeyDown(keyCode, event)) {
             // Take care of calling this method on earlier versions of
             // the platform where it doesn't exist.
             if (doBackPressed()) {
