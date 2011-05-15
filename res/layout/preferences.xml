@@ -18,7 +18,7 @@
                         android:key="fileCloseTimeoutPref"/>
 
         <CheckBoxPreference android:name="showBackupFiles Pref"
-                            android:title="Show backup files"
+                            android:title="Show hidden files"
                             android:key="showBackupFilesPref"
                             android:defaultValue="false"/>
 

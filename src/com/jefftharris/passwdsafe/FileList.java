@@ -61,18 +61,23 @@ public class FileList extends ListActivity
         }
     }
 
-    public static FileData[] getFiles(File dir, final boolean showBackupFiles)
+    public static FileData[] getFiles(File dir, final boolean showHiddenFiles)
     {
         File[] files = dir.listFiles(new FileFilter() {
             public final boolean accept(File pathname) {
+                String filename = pathname.getName();
                 if (pathname.isDirectory()) {
+                    if (!showHiddenFiles &&
+                        (filename.startsWith(".") ||
+                         filename.equalsIgnoreCase("LOST.DIR"))) {
+                        return false;
+                    }
                     return true;
                 }
-                String filename = pathname.getName();
                 if (filename.endsWith(".psafe3") || filename.endsWith(".dat")) {
                     return true;
                 }
-                if (showBackupFiles &&
+                if (showHiddenFiles &&
                     (filename.endsWith(".psafe3~") ||
                      filename.endsWith(".dat~"))) {
                     return true;
@@ -334,9 +339,9 @@ public class FileList extends ListActivity
     {
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
-        boolean showBackupFiles =
-            Preferences.getShowBackupFilesPref(prefs);
-        return getFiles(dir, showBackupFiles);
+        boolean showHiddenFiles =
+            Preferences.getShowHiddenFilesPref(prefs);
+        return getFiles(dir, showHiddenFiles);
     }
 
     private final void openFile(File file)
@@ -346,7 +351,6 @@ public class FileList extends ListActivity
 
     // TODO: need to re-fetch prefs all the time?
     // TODO: directory support in shortcut chooser
-    // TODO: hide 'private' directories - . and LOST.DIR
     // TODO: show icons
     private final void showFiles()
     {

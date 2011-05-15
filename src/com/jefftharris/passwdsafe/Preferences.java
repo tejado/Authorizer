@@ -59,8 +59,8 @@ public class Preferences extends PreferenceActivity
     public static final String PREF_SEARCH_REGEX = "searchRegexPref";
     public static final boolean PREF_SEARCH_REGEX_DEF = false;
 
-    public static final String PREF_SHOW_BACKUP_FILES = "showBackupFilesPref";
-    public static final boolean PREF_SHOW_BACKUP_FILES_DEF = false;
+    public static final String PREF_SHOW_HIDDEN_FILES = "showBackupFilesPref";
+    public static final boolean PREF_SHOW_HIDDEN_FILES_DEF = false;
 
     public static final String PREF_SORT_CASE_SENSITIVE =
         "sortCaseSensitivePref";
@@ -196,10 +196,10 @@ public class Preferences extends PreferenceActivity
         return prefs.getBoolean(PREF_SEARCH_REGEX, PREF_SEARCH_REGEX_DEF);
     }
 
-    public static boolean getShowBackupFilesPref(SharedPreferences prefs)
+    public static boolean getShowHiddenFilesPref(SharedPreferences prefs)
     {
-        return prefs.getBoolean(PREF_SHOW_BACKUP_FILES,
-                                PREF_SHOW_BACKUP_FILES_DEF);
+        return prefs.getBoolean(PREF_SHOW_HIDDEN_FILES,
+                                PREF_SHOW_HIDDEN_FILES_DEF);
     }
 
     public static boolean getSortCaseSensitivePref(SharedPreferences prefs)
