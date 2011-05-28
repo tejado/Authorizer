@@ -54,6 +54,7 @@
     <string name="ok">Ok</string>
     <string name="parent_directory">Parent Directory</string>
     <string name="parent_group">Parent Group</string>
+    <string name="passwdsafe_IME_label">PasswdSafe Input Method</string>
     <string name="password">Password</string>
     <string name="password_and_confirm">Password /\nConfirm</string>
     <string name="password_encoding_label">Password Encoding:</string>
