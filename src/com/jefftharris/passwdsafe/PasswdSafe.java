@@ -173,19 +173,24 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        boolean addEnabled = false;
+        boolean editEnabled = false;
         boolean deleteEnabled = false;
         if (itsPasswdFile != null) {
             PasswdFileData fileData = itsPasswdFile.getFileData();
             if (fileData != null) {
-                addEnabled = fileData.canEdit();
+                editEnabled = fileData.canEdit();
                 deleteEnabled = fileData.canDelete();
             }
         }
 
         MenuItem mi = menu.findItem(MENU_ADD_RECORD);
         if (mi != null) {
-            mi.setEnabled(addEnabled);
+            mi.setEnabled(editEnabled);
+        }
+
+        mi = menu.findItem(MENU_CHANGE_PASSWD);
+        if (mi != null) {
+            mi.setEnabled(editEnabled);
         }
 
         mi = menu.findItem(MENU_DELETE);
