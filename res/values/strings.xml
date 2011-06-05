@@ -31,6 +31,7 @@
     <string name="expiration">Expiration</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
     <string name="file_label">File:</string>
+    <string name="file_label_val">File: %1$s</string>
     <string name="file_name_label">File Name:</string>
     <string name="generate_password">Generate Password</string>
     <string name="group">Group</string>
@@ -52,6 +53,7 @@
     <string name="notes_label">Notes:</string>
     <string name="num_records_label">Number of Records:</string>
     <string name="ok">Ok</string>
+    <string name="open_file_title">Open File</string>
     <string name="parent_directory">Parent Directory</string>
     <string name="parent_group">Parent Group</string>
     <string name="password">Password</string>

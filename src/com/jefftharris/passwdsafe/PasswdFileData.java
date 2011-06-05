@@ -54,6 +54,7 @@ public class PasswdFileData
     private final HashMap<String, PwsRecord> itsRecordsByUUID =
         new HashMap<String, PwsRecord>();
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
+    private boolean itsIsOpenReadOnly = false;
 
     private static final String TAG = "PasswdFileData";
 
@@ -65,14 +66,15 @@ public class PasswdFileData
         itsFile = file;
     }
 
-    public void load(StringBuilder passwd)
+    public void load(StringBuilder passwd, boolean readonly)
         throws IOException, NoSuchAlgorithmException,
             EndOfFileException, InvalidPassphraseException,
             UnsupportedFileVersionException
     {
         PasswdSafeApp.dbginfo(TAG, "before load file");
+        itsIsOpenReadOnly = readonly;
         itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
-        if (!itsFile.canWrite()) {
+        if (!itsFile.canWrite() || itsIsOpenReadOnly) {
             itsPwsFile.setReadOnly(true);
         }
         finishOpenFile(passwd);
@@ -180,10 +182,16 @@ public class PasswdFileData
 
     public final boolean canEdit()
     {
-        return (itsPwsFile != null) &&
+        return !itsIsOpenReadOnly &&
+               (itsPwsFile != null) &&
                !itsPwsFile.isReadOnly() &&
                ((itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION) ||
                 (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION));
+    }
+
+    public final boolean canDelete()
+    {
+        return !itsIsOpenReadOnly && itsFile.canWrite();
     }
 
     public final boolean isV3()

@@ -18,11 +18,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -32,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -176,7 +179,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             PasswdFileData fileData = itsPasswdFile.getFileData();
             if (fileData != null) {
                 addEnabled = fileData.canEdit();
-                deleteEnabled = fileData.getFile().canWrite();
+                deleteEnabled = fileData.canDelete();
             }
         }
 
@@ -262,18 +265,26 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case DIALOG_GET_PASSWD:
         {
             LayoutInflater factory = LayoutInflater.from(this);
-            final View passwdView =
-                factory.inflate(R.layout.passwd_entry, null);
+            View passwdView = factory.inflate(R.layout.passwd_entry, null);
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
             {
                 @Override
                 public void onOkClicked(DialogInterface dialog)
                 {
-                    EditText passwdInput = (EditText) passwdView
-                        .findViewById(R.id.passwd_edit);
+                    Dialog d = (Dialog)dialog;
+                    CheckBox cb = (CheckBox)d.findViewById(R.id.read_only);
+                    boolean readonly = cb.isChecked();
+                    SharedPreferences prefs =
+                        PreferenceManager.getDefaultSharedPreferences(
+                            PasswdSafe.this);
+                    Preferences.setFileOpenReadOnlyPref(readonly, prefs);
+
+                    EditText passwdInput =
+                        (EditText)d.findViewById(R.id.passwd_edit);
                     openFile(
-                         new StringBuilder(passwdInput.getText().toString()));
+                         new StringBuilder(passwdInput.getText().toString()),
+                         readonly);
                 }
 
                 @Override
@@ -284,8 +295,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             };
 
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle("Open " + itsFile.getPath())
-                .setMessage("Enter password:")
+                .setTitle(R.string.open_file_title)
                 .setView(passwdView)
                 .setPositiveButton("Ok", dlgClick)
                 .setNegativeButton("Cancel", dlgClick)
@@ -306,8 +316,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case DIALOG_DETAILS:
         {
             LayoutInflater factory = LayoutInflater.from(this);
-            final View detailsView =
-                factory.inflate(R.layout.file_details, null);
+            View detailsView = factory.inflate(R.layout.file_details, null);
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(itsFile.getName())
                 .setView(detailsView)
@@ -481,6 +490,16 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         super.onPrepareDialog(id, dialog);
         switch (id)
         {
+        case DIALOG_GET_PASSWD:
+        {
+            SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+            TextView tv = (TextView)dialog.findViewById(R.id.file);
+            tv.setText(getString(R.string.file_label_val, itsFile.getPath()));
+            CheckBox cb = (CheckBox)dialog.findViewById(R.id.read_only);
+            cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
+            break;
+        }
         case DIALOG_DETAILS:
         {
             TextView tv;
@@ -642,7 +661,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         if (!itsPasswdFile.isOpen()) {
             if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
                 (itsFile.getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
-                openFile(new StringBuilder("test123"));
+                openFile(new StringBuilder("test123"), false);
             } else {
                 showDialog(DIALOG_GET_PASSWD);
             }
@@ -657,11 +676,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         showDialog(DIALOG_FILE_NEW);
     }
 
-    private final void openFile(StringBuilder passwd)
+    private final void openFile(StringBuilder passwd, boolean readonly)
     {
         removeDialog(DIALOG_GET_PASSWD);
         showDialog(DIALOG_PROGRESS);
-        itsLoadTask = new LoadTask(passwd);
+        itsLoadTask = new LoadTask(passwd, readonly);
         itsLoadTask.execute();
     }
 
@@ -732,10 +751,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private final class LoadTask extends AsyncTask<Void, Void, Object>
     {
         private final StringBuilder itsPasswd;
+        private final boolean itsIsReadOnly;
 
-        private LoadTask(StringBuilder passwd)
+        private LoadTask(StringBuilder passwd, boolean readonly)
         {
             itsPasswd = passwd;
+            itsIsReadOnly = readonly;
         }
 
         /* (non-Javadoc)
@@ -746,7 +767,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             try {
                 PasswdFileData fileData = new PasswdFileData(itsFile);
-                fileData.load(itsPasswd);
+                fileData.load(itsPasswd, itsIsReadOnly);
                 return fileData;
             } catch (Exception e) {
                 return e;

@@ -42,6 +42,10 @@ public class Preferences extends PreferenceActivity
         "fileCloseClearClipboardPref";
     public static final boolean PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF = true;
 
+    public static final String PREF_FILE_OPEN_READ_ONLY =
+        "fileOpenReadOnly";
+    public static final boolean PREF_FILE_OPEN_READ_ONLY_DEF = false;
+
     public static final String PREF_DEF_FILE = "defFilePref";
     public static final String PREF_DEF_FILE_DEF = "";
     public static final String PREF_DEF_FILE_NONE = "None";
@@ -110,6 +114,20 @@ public class Preferences extends PreferenceActivity
     {
         return prefs.getBoolean(PREF_FILE_CLOSE_CLEAR_CLIPBOARD,
                                 PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF);
+    }
+
+    public static boolean getFileOpenReadOnlyPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_OPEN_READ_ONLY,
+                                PREF_FILE_OPEN_READ_ONLY_DEF);
+    }
+
+    public static void setFileOpenReadOnlyPref(boolean readonly,
+                                               SharedPreferences prefs)
+    {
+        SharedPreferences.Editor prefsEdit = prefs.edit();
+        prefsEdit.putBoolean(PREF_FILE_OPEN_READ_ONLY, readonly);
+        prefsEdit.commit();
     }
 
     public static File getFileDirPref(SharedPreferences prefs)

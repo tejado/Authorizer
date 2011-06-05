@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<EditText xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/passwd_edit"
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:layout_marginLeft="20dip"
-        android:layout_marginRight="20dip"
-        android:scrollHorizontally="true"
-        android:autoText="false"
-        android:capitalize="none"
-        android:gravity="fill_horizontal"
-        android:password="true"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:singleLine="true"
-        />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical"
+              android:padding="10sp"
+              >
+    <TextView android:id="@+id/file"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              />
+    <TextView android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/password_label"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              />
+    <EditText android:id="@+id/passwd_edit"
+              android:layout_height="wrap_content"
+              android:layout_width="fill_parent"
+              android:scrollHorizontally="true"
+              android:autoText="false"
+              android:capitalize="none"
+              android:gravity="fill_horizontal"
+              android:password="true"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:singleLine="true"
+              />
+    <CheckBox android:id="@+id/read_only"
+              android:layout_height="wrap_content"
+              android:layout_width="fill_parent"
+              android:text="@string/read_only"
+              />
+</LinearLayout>
