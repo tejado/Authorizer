@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
@@ -575,7 +576,7 @@ public class PasswdFileData
             {
                 PwsField field = doGetField(rec, fieldId);
                 if (field != null) {
-                    return field.toString();
+                    return doHdrFieldToString(field);
                 }
 
                 return getHdrLastSaveWhoField(rec, true);
@@ -584,7 +585,7 @@ public class PasswdFileData
             {
                 PwsField field = doGetField(rec, fieldId);
                 if (field != null) {
-                    return field.toString();
+                    return doHdrFieldToString(field);
                 }
 
                 return getHdrLastSaveWhoField(rec, false);
@@ -592,7 +593,11 @@ public class PasswdFileData
             case PwsRecordV3.HEADER_LAST_SAVE_WHO:
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
             {
-                return doGetFieldStr(rec, fieldId);
+                PwsField field = doGetField(rec, fieldId);
+                if (field != null) {
+                    return doHdrFieldToString(field);
+                }
+                return null;
             }
             default:
             {
@@ -632,18 +637,16 @@ public class PasswdFileData
             }
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
             {
-                rec.setField(
-                    new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_WHAT,
-                                        value.toString().getBytes()));
+                doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHAT,
+                                    value.toString());
                 break;
             }
             case PwsRecordV3.HEADER_LAST_SAVE_USER:
             {
                 int minor = getHdrMinorVersion(rec);
                 if (minor >= 2) {
-                    rec.setField(
-                        new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_USER,
-                                            value.toString().getBytes()));
+                    doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_USER,
+                                        value.toString());
                 } else {
                     setHdrLastSaveWhoField(rec, value.toString(),
                                            getHdrLastSaveWhoField(rec, false));
@@ -654,9 +657,8 @@ public class PasswdFileData
             {
                 int minor = getHdrMinorVersion(rec);
                 if (minor >= 2) {
-                    rec.setField(
-                        new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_HOST,
-                                            value.toString().getBytes()));
+                    doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_HOST,
+                                        value.toString());
                 } else {
                     setHdrLastSaveWhoField(rec,
                                            getHdrLastSaveWhoField(rec, true),
@@ -671,6 +673,30 @@ public class PasswdFileData
             }
         }
     }
+
+
+    private static String doHdrFieldToString(PwsField field)
+    {
+        try {
+            return new String(field.getBytes(), "UTF-8");
+        }
+        catch (UnsupportedEncodingException e) {
+            return null;
+        }
+    }
+
+
+    private static void doSetHdrFieldString(PwsRecord rec,
+                                            int fieldId, String val)
+    {
+        try {
+            PwsField f = new PwsUnknownField(fieldId, val.getBytes("UTF-8"));
+            rec.setField(f);
+        }
+        catch (UnsupportedEncodingException e) {
+        }
+    }
+
 
     private final String doGetFieldStr(PwsRecord rec, int fieldId)
     {
@@ -855,22 +881,26 @@ public class PasswdFileData
             return null;
         }
 
-        byte[] whoBytes = field.getBytes();
-        if (whoBytes.length < 4) {
-            Log.e(TAG, "Invalid who length: " + whoBytes.length);
+        String str = doHdrFieldToString(field);
+        if (str == null) {
             return null;
         }
-        int len = hexBytesToInt(whoBytes, 0, 4);
 
-        if ((len + 4) > whoBytes.length) {
+        if (str.length() < 4) {
+            Log.e(TAG, "Invalid who length: " + str.length());
+            return null;
+        }
+        int len = Integer.parseInt(str.substring(0, 4), 16);
+
+        if ((len + 4) > str.length()) {
             Log.e(TAG, "Invalid user length: " + (len + 4));
             return null;
         }
 
         if (isUser) {
-            return new String(whoBytes, 4, len);
+            return str.substring(4, len);
         } else {
-            return new String(whoBytes, len + 4, whoBytes.length - len - 4);
+            return str.substring(len + 4, str.length() - len - 4);
         }
     }
 
@@ -882,7 +912,7 @@ public class PasswdFileData
         who.append(String.format("%04x", user.length()));
         who.append(user);
         who.append(host);
-        rec.setField(new PwsUnknownField(PwsRecordV3.HEADER_LAST_SAVE_WHO,
-                                         who.toString().getBytes()));
+        doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO,
+                            who.toString());
     }
 }
