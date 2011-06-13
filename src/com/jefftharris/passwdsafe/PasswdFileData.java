@@ -898,9 +898,9 @@ public class PasswdFileData
         }
 
         if (isUser) {
-            return str.substring(4, len);
+            return str.substring(4, len + 4);
         } else {
-            return str.substring(len + 4, str.length() - len - 4);
+            return str.substring(len + 4);
         }
     }
 
