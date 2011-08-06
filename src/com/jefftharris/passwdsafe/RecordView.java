@@ -15,7 +15,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,10 +52,43 @@ public class RecordView extends AbstractRecordTabActivity
     //private static final int TAB_HISTORY = 1;
     private static final int TAB_NOTES = 2;
 
+    private class NotesTabDrawable extends StateListDrawable
+    {
+        public NotesTabDrawable(Resources res)
+        {
+            addState(new int[] { android.R.attr.state_selected },
+                     res.getDrawable(R.drawable.ic_tab_attachment_selected));
+            addState(new int[] { },
+                     res.getDrawable(R.drawable.ic_tab_attachment_normal));
+        }
+
+        @Override
+        protected boolean onStateChange(int[] stateSet)
+        {
+            boolean rc = super.onStateChange(stateSet);
+
+            Drawable draw = getCurrent();
+            if (draw != null) {
+                draw.setLevel(itsHasNotes ? 1 : 0);
+                rc = true;
+            }
+
+            return rc;
+        }
+
+        @Override
+        public boolean isStateful()
+        {
+            return true;
+        }
+    }
+
     private TextView itsUserView;
     private boolean isPasswordShown = false;
     private TextView itsPasswordView;
     private boolean isWordWrap = true;
+    private boolean itsHasNotes = false;
+    private Drawable itsNotesTabDrawable;
 
     /** Called when the activity is first created. */
     @Override
@@ -80,9 +116,9 @@ public class RecordView extends AbstractRecordTabActivity
             .setContent(R.id.history_tab);
         tabHost.addTab(spec);
 
+        itsNotesTabDrawable = new NotesTabDrawable(res);
         spec = tabHost.newTabSpec("notes")
-            .setIndicator("Notes",
-                          res.getDrawable(R.drawable.ic_tab_attachment))
+            .setIndicator("Notes", itsNotesTabDrawable)
             .setContent(R.id.notes_tab);
         tabHost.addTab(spec);
 
@@ -365,7 +401,13 @@ public class RecordView extends AbstractRecordTabActivity
         }
         setText(R.id.expiration, R.id.expiration_row,
                 fileData.getPasswdExpiryTime(rec));
-        setText(R.id.notes, View.NO_ID, fileData.getNotes(rec));
+
+        String notes = fileData.getNotes(rec);
+        itsHasNotes = !TextUtils.isEmpty(notes);
+        int[] currState = itsNotesTabDrawable.getState();
+        itsNotesTabDrawable.setState(new int[currState.length + 1]);
+        itsNotesTabDrawable.setState(currState);
+        setText(R.id.notes, View.NO_ID, notes);
 
         PasswdHistory history = fileData.getPasswdHistory(rec);
         boolean historyExists = (history != null);
@@ -470,11 +512,8 @@ public class RecordView extends AbstractRecordTabActivity
             }
         }
 
-        TextView tv = null;
-        if (text != null) {
-            tv = (TextView)findViewById(id);
-            tv.setText(text);
-        }
-        return tv;
+        TextView tv = (TextView)findViewById(id);
+        tv.setText(text);
+        return (text == null) ? null : tv;
     }
 }
