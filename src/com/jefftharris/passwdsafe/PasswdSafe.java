@@ -152,11 +152,17 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        MenuItem mi = menu.add(0, MENU_ADD_RECORD, 0, R.string.add_record);
-        mi.setIcon(android.R.drawable.ic_menu_add);
+        MenuItem mi;
+
+        addSearchMenuItem(menu);
 
         mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
         mi.setIcon(android.R.drawable.ic_menu_info_details);
+
+        mi = menu.add(0, MENU_ADD_RECORD, 0, R.string.add_record);
+        mi.setIcon(android.R.drawable.ic_menu_add);
+
+        addCloseMenuItem(menu);
 
         mi = menu.add(0, MENU_CHANGE_PASSWD, 0, R.string.change_password);
         mi.setIcon(android.R.drawable.ic_menu_edit);
@@ -164,7 +170,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         mi = menu.add(0, MENU_DELETE, 0, R.string.delete_file);
         mi.setIcon(android.R.drawable.ic_menu_delete);
 
-        return super.onCreateOptionsMenu(menu);
+        addParentMenuItem(menu);
+
+        return true;
     }
 
     /* (non-Javadoc)

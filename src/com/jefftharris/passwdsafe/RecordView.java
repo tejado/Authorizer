@@ -45,6 +45,7 @@ public class RecordView extends AbstractRecordTabActivity
     private static final int MENU_COPY_PASSWORD = 5;
     private static final int MENU_COPY_NOTES = 6;
     private static final int MENU_TOGGLE_WRAP_NOTES = 7;
+    private static final int MENU_CLOSE = 8;
 
     private static final int EDIT_RECORD_REQUEST = 0;
 
@@ -206,6 +207,9 @@ public class RecordView extends AbstractRecordTabActivity
         mi = menu.add(0, MENU_DELETE, 0, R.string.delete);
         mi.setIcon(android.R.drawable.ic_menu_delete);
 
+        mi = menu.add(0, MENU_CLOSE, 0, R.string.close);
+        mi.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
         menu.add(0, MENU_COPY_USER, 0, R.string.copy_user);
         menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_password);
@@ -319,6 +323,14 @@ public class RecordView extends AbstractRecordTabActivity
             editor.commit();
 
             setWordWrap();
+            return true;
+        }
+        case MENU_CLOSE:
+        {
+            ActivityPasswdFile passwdFile = getPasswdFile();
+            if (passwdFile != null) {
+                passwdFile.close();
+            }
             return true;
         }
         default:

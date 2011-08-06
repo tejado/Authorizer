@@ -47,7 +47,8 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
 
     private static final int MENU_PARENT = 1;
     private static final int MENU_SEARCH = 2;
-    protected static final int ABS_MENU_MAX = 2;
+    private static final int MENU_CLOSE = 3;
+    protected static final int ABS_MENU_MAX = 3;
 
     protected static final String RECORD = "record";
     protected static final String TITLE = "title";
@@ -229,20 +230,36 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     }
 
 
+    protected void addSearchMenuItem(Menu menu)
+    {
+        MenuItem mi = menu.add(0, MENU_SEARCH, 0, R.string.search);
+        mi.setIcon(android.R.drawable.ic_menu_search);
+    }
+
+
+    protected void addParentMenuItem(Menu menu)
+    {
+        MenuItem mi = menu.add(0, MENU_PARENT, 0, R.string.parent_group);
+        mi.setIcon(R.drawable.arrow_up);
+    }
+
+
+    protected void addCloseMenuItem(Menu menu)
+    {
+        MenuItem mi = menu.add(0, MENU_CLOSE, 0, R.string.close);
+        mi.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+    }
+
+
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        MenuItem mi;
-
-        mi = menu.add(0, MENU_SEARCH, 0, R.string.search);
-        mi.setIcon(android.R.drawable.ic_menu_search);
-
-        mi = menu.add(0, MENU_PARENT, 0, R.string.parent_group);
-        mi.setIcon(R.drawable.arrow_up);
-
+        addSearchMenuItem(menu);
+        addCloseMenuItem(menu);
+        addParentMenuItem(menu);
         return true;
     }
 
@@ -277,6 +294,13 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
         case MENU_SEARCH:
         {
             onSearchRequested();
+            break;
+        }
+        case MENU_CLOSE:
+        {
+            if (itsPasswdFile != null) {
+                itsPasswdFile.close();
+            }
             break;
         }
         default:
