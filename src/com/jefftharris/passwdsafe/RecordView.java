@@ -52,6 +52,9 @@ public class RecordView extends AbstractRecordTabActivity
     //private static final int TAB_HISTORY = 1;
     private static final int TAB_NOTES = 2;
 
+    private static final int NOTES_ICON_LEVEL_BASE = 0;
+    private static final int NOTES_ICON_LEVEL_NOTES = 1;
+
     private class NotesTabDrawable extends StateListDrawable
     {
         public NotesTabDrawable(Resources res)
@@ -69,7 +72,8 @@ public class RecordView extends AbstractRecordTabActivity
 
             Drawable draw = getCurrent();
             if (draw != null) {
-                draw.setLevel(itsHasNotes ? 1 : 0);
+                draw.setLevel(itsHasNotes ? NOTES_ICON_LEVEL_NOTES :
+                                            NOTES_ICON_LEVEL_BASE);
                 rc = true;
             }
 
