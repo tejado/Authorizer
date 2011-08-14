@@ -17,6 +17,10 @@
                         android:title="File close timeout"
                         android:key="fileCloseTimeoutPref"/>
 
+        <ListPreference android:name="fileBackup Pref"
+                        android:title="File backups"
+                        android:key="fileBackupPref"/>
+
         <CheckBoxPreference android:name="showBackupFiles Pref"
                             android:title="Show hidden files"
                             android:key="showBackupFilesPref"

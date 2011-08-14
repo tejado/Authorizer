@@ -38,6 +38,10 @@ public class Preferences extends PreferenceActivity
     public static final FileTimeoutPref PREF_FILE_CLOSE_TIMEOUT_DEF =
         FileTimeoutPref.TO_5_MIN;
 
+    public static final String PREF_FILE_BACKUP = "fileBackupPref";
+    public static final FileBackupPref PREF_FILE_BACKUP_DEF =
+        FileBackupPref.BACKUP_1;
+
     public static final String PREF_FILE_CLOSE_CLEAR_CLIPBOARD =
         "fileCloseClearClipboardPref";
     public static final boolean PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF = true;
@@ -95,6 +99,7 @@ public class Preferences extends PreferenceActivity
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
     private ListPreference itsFileClosePref;
+    private ListPreference itsFileBackupPref;
     private ListPreference itsPasswdEncPref;
     private ListPreference itsFontSizePref;
 
@@ -107,6 +112,17 @@ public class Preferences extends PreferenceActivity
                                 PREF_FILE_CLOSE_TIMEOUT_DEF.getValue()));
         } catch (IllegalArgumentException e) {
             return PREF_FILE_CLOSE_TIMEOUT_DEF;
+        }
+    }
+
+    public static FileBackupPref getFileBackupPref(SharedPreferences prefs)
+    {
+        try {
+            return FileBackupPref.prefValueOf(
+                prefs.getString(PREF_FILE_BACKUP,
+                                PREF_FILE_BACKUP_DEF.getValue()));
+        } catch (IllegalArgumentException e) {
+            return PREF_FILE_BACKUP_DEF;
         }
     }
 
@@ -242,6 +258,8 @@ public class Preferences extends PreferenceActivity
         itsDefFilePref = (ListPreference)findPreference(PREF_DEF_FILE);
         itsFileClosePref = (ListPreference)
             findPreference(PREF_FILE_CLOSE_TIMEOUT);
+        itsFileBackupPref = (ListPreference)
+            findPreference(PREF_FILE_BACKUP);
 
         itsFileDirPref.setDefaultValue(PREF_FILE_DIR_DEF);
         updateFileDirPrefs(getFileDirPref(prefs), prefs);
@@ -251,6 +269,10 @@ public class Preferences extends PreferenceActivity
         itsFileClosePref.setEntries(FileTimeoutPref.getDisplayNames());
         itsFileClosePref.setEntryValues(FileTimeoutPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_FILE_CLOSE_TIMEOUT);
+
+        itsFileBackupPref.setEntries(FileBackupPref.getDisplayNames());
+        itsFileBackupPref.setEntryValues(FileBackupPref.getValues());
+        onSharedPreferenceChanged(prefs, PREF_FILE_BACKUP);
 
         itsPasswdEncPref = (ListPreference)findPreference(PREF_PASSWD_ENC);
         String[] charsets =
@@ -307,6 +329,9 @@ public class Preferences extends PreferenceActivity
         } else if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
             itsFileClosePref.setSummary(
                 getFileCloseTimeoutPref(prefs).getDisplayName());
+        } else if (key.equals(PREF_FILE_BACKUP)) {
+            itsFileBackupPref.setSummary(
+                getFileBackupPref(prefs).getDisplayName());
         } else if (key.equals(PREF_PASSWD_ENC)) {
             itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
         } else if (key.equals(PREF_GEN_LENGTH)) {
