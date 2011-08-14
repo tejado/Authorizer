@@ -837,7 +837,7 @@ public class PasswdFileData
         itsRecords.ensureCapacity(itsPwsFile.getRecordCount());
         itsRecordsByUUID.clear();
         Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
-        for (int idx = 0; recIter.hasNext(); ++idx) {
+        while (recIter.hasNext()) {
             PwsRecord rec = recIter.next();
             String uuid = getUUID(rec);
             if (uuid == null) {
