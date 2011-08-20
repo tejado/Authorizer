@@ -8,14 +8,18 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import org.pwsafe.lib.UUID;
 import org.pwsafe.lib.Util;
@@ -38,13 +42,16 @@ import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
+import org.pwsafe.lib.file.PwsStorage;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -92,7 +99,7 @@ public class PasswdFileData
         finishOpenFile(passwd);
     }
 
-    public void save(Context context)
+    public void save(final Context context)
         throws IOException, NoSuchAlgorithmException,
                ConcurrentModificationException
     {
@@ -107,7 +114,19 @@ public class PasswdFileData
             }
 
             setSaveHdrFields(context);
-            itsPwsFile.save();
+
+            itsPwsFile.getStorage().setSaveHelper(new PwsStorage.SaveHelper()
+            {
+                public void createBackupFile(File file) throws IOException
+                {
+                    PasswdFileData.this.createBackupFile(file, context);
+                }
+            });
+            try {
+                itsPwsFile.save();
+            } finally {
+                itsPwsFile.getStorage().setSaveHelper(null);
+            }
         }
     }
 
@@ -859,6 +878,60 @@ public class PasswdFileData
             itsRecordsByUUID.put(uuid, rec);
         }
     }
+
+
+    private void createBackupFile(File file, Context context)
+        throws IOException
+    {
+        // TODO if open ibak file, always open readonly?
+        // create backup for backup?
+
+        SharedPreferences prefs =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+        FileBackupPref backupPref = Preferences.getFileBackupPref(prefs);
+
+        File dir = file.getParentFile();
+        String fileName = file.getName();
+        int dotpos = fileName.lastIndexOf('.');
+        if (dotpos != -1) {
+            fileName = fileName.substring(0, dotpos);
+        }
+
+        final Pattern pat = Pattern.compile(
+            "^" + Pattern.quote(fileName) + "_\\d{8}_\\d{6}\\.ibak$");
+        File[] backupFiles = dir.listFiles(new FileFilter() {
+            public boolean accept(File f)
+            {
+                return f.isFile() && pat.matcher(f.getName()).matches();
+            }
+        });
+        if (backupFiles != null) {
+            Arrays.sort(backupFiles);
+
+            int numBackups = backupPref.getNumBackups();
+            if (numBackups > 0) {
+                --numBackups;
+            }
+            for (int i = 0, numFiles = backupFiles.length;
+                 numFiles > numBackups; ++i, --numFiles) {
+                backupFiles[i].delete();
+            }
+        }
+
+        if (backupPref != FileBackupPref.BACKUP_NONE) {
+            SimpleDateFormat bakTime = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            StringBuilder bakName = new StringBuilder(fileName);
+            bakName.append("_");
+            bakName.append(bakTime.format(new Date()));
+            bakName.append(".ibak");
+
+            File bakFile = new File(dir, bakName.toString());
+            if (!file.renameTo(bakFile)) {
+                throw new IOException("Can not create backup file: " + bakFile);
+            }
+        }
+    }
+
 
     private static final int getHdrMinorVersion(PwsRecord rec)
     {

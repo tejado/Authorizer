@@ -265,10 +265,7 @@ public final class PwsFileV3 extends PwsFile {
 			}
 			else
 			{
-				// FIXMElib: What is the proper error code (see PwsFile::save).
-				LOG.error( I18nHelper.getInstance().formatMessage("E00010", new Object [] { "Storage" } ) );
-				// TODOlib Throw an exception here?
-				return;
+			    throw new IOException("Unable to save file");
 			}
 		}
 		catch ( IOException e ) {

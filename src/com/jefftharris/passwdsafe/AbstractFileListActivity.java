@@ -95,7 +95,8 @@ public abstract class AbstractFileListActivity extends ListActivity
                 }
                 if (showHiddenFiles &&
                     (filename.endsWith(".psafe3~") ||
-                     filename.endsWith(".dat~"))) {
+                     filename.endsWith(".dat~") ||
+                     filename.endsWith(".ibak"))) {
                     return true;
                 }
                 return false;

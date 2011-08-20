@@ -245,11 +245,7 @@ public abstract class PwsFileV1V2 extends PwsFile {
 			}
 			else
 			{
-				// FIXMElib: I'm not sure what this message should be, but it should
-				// reflect the fact that storage failed, not anything about a temp file.
-				LOG.error( I18nHelper.getInstance().formatMessage("E00010", new Object [] { "Storage file" } ) );
-				// TODOlib Throw an exception here?
-				return;
+                            throw new IOException("Unable to save file");
 			}
 		} catch (IOException e) {
 			try {

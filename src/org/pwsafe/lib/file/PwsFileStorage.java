@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
-import org.pwsafe.lib.I18nHelper;
 import org.pwsafe.lib.Log;
 
 /**
@@ -39,6 +38,8 @@ public class PwsFileStorage implements PwsStorage {
 
 	/** The filename used for storage */
 	private final String filename;
+
+	private SaveHelper itsSaveHelper;
 
 	/*
 	 * Build an implementation given the filename for the underlying storage.
@@ -92,16 +93,12 @@ public class PwsFileStorage implements PwsStorage {
 			LOG.debug1("Number of bytes to save = "+data.length);
 			LOG.debug1("Original file: "+filename);
 
-			File file		= new File( filename );
+			File file = new File( filename );
 			if (!file.exists()) {
-				/* Original file doesn't exisit, just go ahead and write it
+				/* Original file doesn't exist, just go ahead and write it
 				 * (no backup, temp files needed).
 				 */
-				FileOutputStream OutStream	= new FileOutputStream( file );
-
-				OutStream.write(data);
-				OutStream.getFD().sync();
-				OutStream.close(); // TODOlib: needs a finally
+			        writeFile(file, data);
 				return true;
 			}
 			LOG.debug1("Original file path: "+file.getAbsolutePath());
@@ -110,51 +107,34 @@ public class PwsFileStorage implements PwsStorage {
 				LOG.error("Couldn't find the parent directory for: "+file.getAbsolutePath());
 				return false;
 			}
-			String FilePath	= dir.getAbsolutePath();
+			File FilePath = dir.getAbsoluteFile();
 			String FileName	= file.getName();
 
-			File oldFile		= new File( FilePath, FileName );
-			File bakFile		= new File( FilePath, FileName + "~" );
+			File oldFile = new File( FilePath, FileName );
 
-			if ( bakFile.exists() )
-			{
-				if ( !bakFile.delete() )
-				{
-					LOG.error( I18nHelper.getInstance().formatMessage("E00012", new Object [] { bakFile.getCanonicalPath() } ) );
-					// TODOlib Throw an exception here
-					return false;
-				}
+			File tempFile = null;
+			try {
+			    tempFile = File.createTempFile("pwsafe", null,
+			                                   FilePath);
+			    writeFile(tempFile, data);
+
+                            createBackupFile(oldFile);
+
+			    if (tempFile.renameTo(oldFile)) {
+			        LOG.debug1("Temp file renamed to " + oldFile);
+			        tempFile = null;
+			    } else {
+			        throw new IOException("Error renaming " +
+			                              tempFile + " to " +
+			                              oldFile);
+			    }
+			} finally {
+			    if (tempFile != null) {
+			        tempFile.delete();
+			    }
 			}
 
-			File tempFile	= File.createTempFile( "pwsafe", null, new File(FilePath) );
-			FileOutputStream OutStream	= new FileOutputStream( tempFile );
-
-			OutStream.write(data);
-			OutStream.getFD().sync();
-			OutStream.close(); // TODOlib: needs a finally
-
-			if (oldFile.exists()) {
-				if (!oldFile.renameTo(bakFile)) {
-					LOG.error(I18nHelper.getInstance().formatMessage("E00011",
-							new Object[] { tempFile.getCanonicalPath() }));
-					// TODOlib Throw an exception here?
-					return false;
-				}
-				LOG.debug1("Old file successfully renamed to "
-						+ bakFile.getCanonicalPath());
-			}
-
-			if (tempFile.renameTo(oldFile)) {
-
-				LOG.debug1("Temp file successfully renamed to "
-						+ oldFile.getCanonicalPath());
-				return true;
-			} else {
-				LOG.error(I18nHelper.getInstance().formatMessage("E00010",
-						new Object[] { tempFile.getCanonicalPath() }));
-				// TODOlib Throw an exception here?
-				return false;
-			}
+			return true;
 		} catch (Exception e) {
 			LOG.error(e.getMessage());
 			return false;
@@ -188,5 +168,53 @@ public class PwsFileStorage implements PwsStorage {
 		return modified;
 	}
 
+	public void setSaveHelper(SaveHelper helper)
+	{
+	    itsSaveHelper = helper;
+	}
 
+	private void createBackupFile(File file) throws IOException
+	{
+	    if (itsSaveHelper != null) {
+	        itsSaveHelper.createBackupFile(file);
+	    } else {
+	        File bakFile = new File(file.getParentFile(),
+	                                file.getName() + "~");
+
+	        if (bakFile.exists()) {
+	            if (!bakFile.delete()) {
+	                throw new IOException("Can not delete backup file: " +
+	                                      bakFile);
+	            }
+	        }
+
+	        if (file.exists()) {
+	            if (!file.renameTo(bakFile)) {
+	                throw new IOException("Can not create backup file: " +
+	                                      bakFile);
+	            }
+	        }
+	    }
+	}
+
+	private void writeFile(File file, byte[] data) throws IOException
+	{
+            FileOutputStream outStream = new FileOutputStream(file);
+            try {
+                outStream.write(data);
+                outStream.getFD().sync();
+            } catch (IOException e) {
+                try {
+                    outStream.close();
+                } catch (IOException e2) {
+                    LOG.error(e2.getMessage());
+                }
+                outStream = null;
+                throw e;
+            } finally {
+                if (outStream != null) {
+                    outStream.close();
+                }
+            }
+	}
 }

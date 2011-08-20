@@ -9,6 +9,7 @@
  */
 package org.pwsafe.lib.file;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -28,7 +29,13 @@ import java.util.Date;
  *
  */
 public interface PwsStorage {
-	/**
+
+        public interface SaveHelper
+        {
+            public void createBackupFile(File file) throws IOException;
+        }
+
+        /**
 	 * This method provides an input stream that can be used
 	 * @return
 	 * @throws IOException
@@ -65,4 +72,6 @@ public interface PwsStorage {
 	 * @return null if the method is not supported
 	 */
 	public Date getModifiedDate ();
+
+	public void setSaveHelper(SaveHelper helper);
 }
