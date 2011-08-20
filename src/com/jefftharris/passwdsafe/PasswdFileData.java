@@ -19,6 +19,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.pwsafe.lib.UUID;
@@ -117,9 +118,15 @@ public class PasswdFileData
 
             itsPwsFile.getStorage().setSaveHelper(new PwsStorage.SaveHelper()
             {
-                public void createBackupFile(File file) throws IOException
+                public String getSaveFileName(File file, boolean isV3)
                 {
-                    PasswdFileData.this.createBackupFile(file, context);
+                    return PasswdFileData.getSaveFileName(file, isV3);
+                }
+
+                public void createBackupFile(File fromFile, File toFile)
+                    throws IOException
+                {
+                    PasswdFileData.createBackupFile(fromFile, toFile, context);
                 }
             });
             try {
@@ -880,18 +887,33 @@ public class PasswdFileData
     }
 
 
-    private void createBackupFile(File file, Context context)
+    private static String getSaveFileName(File file, boolean isV3)
+    {
+        String name = file.getName();
+        Pattern pat = Pattern.compile("^(.*)_\\d{8}_\\d{6}\\.ibak$");
+        Matcher match = pat.matcher(name);
+        if ((match != null) && match.matches()) {
+            name = match.group(1);
+            if (isV3) {
+                name += ".psafe3";
+            } else {
+                name += ".dat";
+            }
+        }
+        return name;
+    }
+
+
+    private static void createBackupFile(File fromFile, File toFile,
+                                         Context context)
         throws IOException
     {
-        // TODO if open ibak file, always open readonly?
-        // create backup for backup?
-
         SharedPreferences prefs =
                         PreferenceManager.getDefaultSharedPreferences(context);
         FileBackupPref backupPref = Preferences.getFileBackupPref(prefs);
 
-        File dir = file.getParentFile();
-        String fileName = file.getName();
+        File dir = toFile.getParentFile();
+        String fileName = toFile.getName();
         int dotpos = fileName.lastIndexOf('.');
         if (dotpos != -1) {
             fileName = fileName.substring(0, dotpos);
@@ -914,7 +936,9 @@ public class PasswdFileData
             }
             for (int i = 0, numFiles = backupFiles.length;
                  numFiles > numBackups; ++i, --numFiles) {
-                backupFiles[i].delete();
+                if (!backupFiles[i].equals(fromFile)) {
+                    backupFiles[i].delete();
+                }
             }
         }
 
@@ -926,7 +950,7 @@ public class PasswdFileData
             bakName.append(".ibak");
 
             File bakFile = new File(dir, bakName.toString());
-            if (!file.renameTo(bakFile)) {
+            if (!toFile.renameTo(bakFile)) {
                 throw new IOException("Can not create backup file: " + bakFile);
             }
         }

@@ -88,7 +88,7 @@ public class PwsFileStorage implements PwsStorage {
 	 * original file is not overwritten or deleted until the
 	 * new file has been successfully saved.
 	 */
-	public boolean save(byte[] data) {
+	public boolean save(byte[] data, boolean isV3) {
 		try {
 			LOG.debug1("Number of bytes to save = "+data.length);
 			LOG.debug1("Original file: "+filename);
@@ -108,9 +108,9 @@ public class PwsFileStorage implements PwsStorage {
 				return false;
 			}
 			File FilePath = dir.getAbsoluteFile();
-			String FileName	= file.getName();
-
-			File oldFile = new File( FilePath, FileName );
+			File fromFile = new File(FilePath, file.getName());
+			File toFile = new File(FilePath,
+			                       getSaveFileName(file, isV3));
 
 			File tempFile = null;
 			try {
@@ -118,15 +118,15 @@ public class PwsFileStorage implements PwsStorage {
 			                                   FilePath);
 			    writeFile(tempFile, data);
 
-                            createBackupFile(oldFile);
+                            createBackupFile(fromFile, toFile);
 
-			    if (tempFile.renameTo(oldFile)) {
-			        LOG.debug1("Temp file renamed to " + oldFile);
+			    if (tempFile.renameTo(toFile)) {
+			        LOG.debug1("Temp file renamed to " + toFile);
 			        tempFile = null;
 			    } else {
 			        throw new IOException("Error renaming " +
 			                              tempFile + " to " +
-			                              oldFile);
+			                              toFile);
 			    }
 			} finally {
 			    if (tempFile != null) {
@@ -173,13 +173,22 @@ public class PwsFileStorage implements PwsStorage {
 	    itsSaveHelper = helper;
 	}
 
-	private void createBackupFile(File file) throws IOException
+	private String getSaveFileName(File file, boolean isV3)
 	{
 	    if (itsSaveHelper != null) {
-	        itsSaveHelper.createBackupFile(file);
+	        return itsSaveHelper.getSaveFileName(file, isV3);
+	    }
+	    return file.getName();
+	}
+
+	private void createBackupFile(File fromFile, File toFile)
+	    throws IOException
+	{
+	    if (itsSaveHelper != null) {
+	        itsSaveHelper.createBackupFile(fromFile, toFile);
 	    } else {
-	        File bakFile = new File(file.getParentFile(),
-	                                file.getName() + "~");
+	        File bakFile = new File(toFile.getParentFile(),
+	                                toFile.getName() + "~");
 
 	        if (bakFile.exists()) {
 	            if (!bakFile.delete()) {
@@ -188,8 +197,8 @@ public class PwsFileStorage implements PwsStorage {
 	            }
 	        }
 
-	        if (file.exists()) {
-	            if (!file.renameTo(bakFile)) {
+	        if (toFile.exists()) {
+	            if (!toFile.renameTo(bakFile)) {
 	                throw new IOException("Can not create backup file: " +
 	                                      bakFile);
 	            }

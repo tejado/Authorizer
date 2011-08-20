@@ -259,7 +259,7 @@ public final class PwsFileV3 extends PwsFile {
 
 			outStream.close();
 
-			if (storage.save(baos.toByteArray())) {
+			if (storage.save(baos.toByteArray(), true)) {
 				modified = false;
 				lastStorageChange = storage.getModifiedDate();
 			}

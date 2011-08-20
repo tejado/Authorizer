@@ -32,7 +32,10 @@ public interface PwsStorage {
 
         public interface SaveHelper
         {
-            public void createBackupFile(File file) throws IOException;
+            public String getSaveFileName(File file, boolean isV3);
+
+            public void createBackupFile(File fromFile, File toFile)
+                throws IOException;
         }
 
         /**
@@ -55,10 +58,11 @@ public interface PwsStorage {
 	 * TODOlib Should this throw an exception instead?
 	 *
 	 * @param data The bytes making up the PasswordSafe file
+	 * @param isV3 Is the file version 3
 	 * @return true if save was successful
 	 * @throws IOException
 	 */
-	public boolean save(byte[] data);
+	public boolean save(byte[] data, boolean isV3);
 
 	/**
 	 * Returns a human readable identifier of this storage that might be presented
