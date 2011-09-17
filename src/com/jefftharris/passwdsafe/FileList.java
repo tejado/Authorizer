@@ -41,6 +41,7 @@ public class FileList extends AbstractFileListActivity
         if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
             openFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE));
         }
+        // TODO: implement app icon
     }
 
 
@@ -60,13 +61,16 @@ public class FileList extends AbstractFileListActivity
 
         item = menu.add(0, MENU_PARENT, 0, R.string.parent_directory);
         item.setIcon(R.drawable.arrow_up);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_PREFERENCES, 0, R.string.preferences);
         item.setIcon(android.R.drawable.ic_menu_preferences);
         item.setIntent(new Intent(this, Preferences.class));
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_ABOUT, 0, R.string.about);
         item.setIcon(android.R.drawable.ic_menu_info_details);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return true;
     }
 

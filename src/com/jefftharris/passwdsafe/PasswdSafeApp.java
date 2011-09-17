@@ -25,6 +25,7 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,7 +34,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.text.ClipboardManager;
 import android.util.Log;
 
 public class PasswdSafeApp extends Application
@@ -333,6 +333,7 @@ public class PasswdSafeApp extends Application
 
     public static void copyToClipboard(String str, Context ctx)
     {
+        // TODO: use newer API?
         ClipboardManager clipMgr = (ClipboardManager)
             ctx.getSystemService(Context.CLIPBOARD_SERVICE);
         clipMgr.setText(str);
