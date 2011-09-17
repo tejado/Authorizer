@@ -84,6 +84,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             Log.e(TAG, "Unknown action for intent: " + intent);
             finish();
         }
+        // TODO: app icon
+        // TODO: app view for search
     }
 
     /* (non-Javadoc)

@@ -132,6 +132,6 @@
             </intent-filter>
         </receiver>
     </application>
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11"/>
+    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="11"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 </manifest> 
