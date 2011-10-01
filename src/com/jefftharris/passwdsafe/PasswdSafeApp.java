@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
-import java.security.Security;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -148,11 +147,6 @@ public class PasswdSafeApp extends Application
             app.closeFileData(true);
         }
 
-    }
-
-    static {
-        Security.removeProvider("BC");
-        Security.addProvider(new BCProvider());
     }
 
     public static final boolean DEBUG = false;
