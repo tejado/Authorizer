@@ -51,15 +51,19 @@ public class InMemoryKey {
 			buffer.flip();
 	}
 
-	public byte[] getKey () {
+	public byte[] getKey (int size) {
 		if (buffer == null) {
 			throw new IllegalStateException("InMemoryKey has not been intialised or been disposed");
 		}
+		if (size > access.length) {
+		    throw new IllegalArgumentException("Size " + size +
+		                                       " too small");
+		}
 
-		final byte[] content = new byte[8];
+		final byte[] content = new byte[size];
 
 		// TODOlib: use higher bits of short value for content rotate
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < content.length; i++) {
 			final short pos = access[i];
 			content[i] = buffer.get(Math.abs(pos) % BUFFER_SIZE);
 		}

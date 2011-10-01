@@ -114,6 +114,14 @@ public abstract class PwsFile
 	/** Encoding to use for the file's password */
 	private static String itsPasswordEncoding = DEFAULT_PASSWORD_CHARSET;
 
+	/** Cipher spec for storing passwords in memory */
+	private static final String CIPHER_SPEC = "AES/CBC/PKCS5Padding";
+
+	/** Cipher key spec for storing passwords in memory */
+	private static final String CIPHER_KEY_SPEC = "AES";
+
+	/** Cipher key length for storing passwords in memory */
+	private static final int CIPHER_KEY_LEN = 16;
 
 	/** The storage implementation associated with this file */
 	protected PwsStorage		storage;
@@ -318,7 +326,7 @@ public abstract class PwsFile
 
     private Cipher getCipher (boolean forWriting) {
     	if (memoryIv == null) {
-    		memoryIv = new byte[8];
+    		memoryIv = new byte[CIPHER_KEY_LEN];
     		Util.newRandBytes(memoryIv);
     	}
 
@@ -329,11 +337,11 @@ public abstract class PwsFile
     	}
 
     	//TODOlib: use BouncyCastle Provider!
-        SecretKeySpec   key = new SecretKeySpec(getKeyBytes(), "Blowfish");
+    	SecretKeySpec   key = new SecretKeySpec(getKeyBytes(), CIPHER_KEY_SPEC);
         IvParameterSpec ivSpec = new IvParameterSpec(memoryIv);
         Cipher cipher = null;
 		try {
-			cipher = Cipher.getInstance("Blowfish/CBC/PKCS5Padding");
+		    cipher = Cipher.getInstance(CIPHER_SPEC);
 		} catch (NoSuchAlgorithmException e1) {
 			throw new MemoryKeyException("memory key generation failed",e1);
 //		} catch (NoSuchProviderException e1) {
@@ -361,10 +369,10 @@ public abstract class PwsFile
 
     private byte[] getKeyBytes () {
     	if (memoryKey == null) {
-    		memoryKey = new InMemoryKey(16);
+    		memoryKey = new InMemoryKey(CIPHER_KEY_LEN);
     		memoryKey.init();
 	    }
-    	return memoryKey.getKey();
+    	return memoryKey.getKey(CIPHER_KEY_LEN);
     }
 
 	/**
@@ -761,7 +769,6 @@ public abstract class PwsFile
 	{
 	    itsPasswordEncoding = encoding;
 	}
-
 
 	/**
      * This provides a wrapper around the <code>Iterator</code> that is returned by the
