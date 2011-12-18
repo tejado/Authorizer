@@ -477,13 +477,13 @@ public class PasswdSafeApp extends Application
             if (isTimeout) {
                 itsIsOpenDefault = true;
             }
+
+            if (itsIsFileCloseClearClipboard) {
+                copyToClipboard("", this);
+            }
         }
 
         cancelFileDataTimer();
-
-        if (itsIsFileCloseClearClipboard) {
-            copyToClipboard("", this);
-        }
 
         for (Map.Entry<Activity, Object> entry :
             itsFileDataActivities.entrySet()) {
