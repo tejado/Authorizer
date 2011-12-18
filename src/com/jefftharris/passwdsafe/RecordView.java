@@ -27,6 +27,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.TextView;
 
 public class RecordView extends AbstractRecordTabActivity
@@ -406,6 +407,7 @@ public class RecordView extends AbstractRecordTabActivity
             return;
         }
 
+        TabWidget tabs = getTabHost().getTabWidget();
         setText(R.id.title, View.NO_ID, fileData.getTitle(rec));
         setText(R.id.group, R.id.group_row, fileData.getGroup(rec));
         setText(R.id.url, R.id.url_row, fileData.getURL(rec));
@@ -424,6 +426,10 @@ public class RecordView extends AbstractRecordTabActivity
         itsNotesTabDrawable.setState(new int[currState.length + 1]);
         itsNotesTabDrawable.setState(currState);
         setText(R.id.notes, View.NO_ID, notes);
+        View notesTab = tabs.getChildAt(TAB_NOTES);
+        View notesTitle = notesTab.findViewById(android.R.id.title);
+        notesTab.setEnabled(itsHasNotes);
+        notesTitle.setEnabled(itsHasNotes);
 
         PasswdHistory history = fileData.getPasswdHistory(rec);
         boolean historyExists = (history != null);
