@@ -14,6 +14,8 @@ import java.util.HashMap;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -307,6 +309,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 }
             };
 
+            TextView tv = (TextView)passwdView.findViewById(R.id.passwd_edit);
+            PasswordVisibilityMenuHandler.set(tv);
+
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(R.string.open_file_title)
                 .setView(passwdView)
@@ -346,22 +351,28 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case DIALOG_CHANGE_PASSWD:
         {
             LayoutInflater factory = LayoutInflater.from(this);
-            final View passwdView =
-                factory.inflate(R.layout.change_passwd, null);
+            View passwdView = factory.inflate(R.layout.change_passwd, null);
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
                 {
                     @Override
                     public void onOkClicked(DialogInterface dialog)
                     {
+                        Dialog d = (Dialog)dialog;
                         EditText passwdEdit = (EditText)
-                            passwdView.findViewById(R.id.password);
+                                        d.findViewById(R.id.password);
                         StringBuilder passwdText =
                             new StringBuilder(passwdEdit.getText().toString());
                         dialog.dismiss();
                         changePasswd(passwdText);
                     }
                 };
+
+            TextView tv1 = (TextView)passwdView.findViewById(R.id.password);
+            TextView tv2 =
+                (TextView)passwdView.findViewById(R.id.password_confirm);
+            PasswordVisibilityMenuHandler.set(tv1, tv2);
+
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(itsFile.getName())
                 .setView(passwdView)

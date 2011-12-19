@@ -23,9 +23,12 @@
               android:capitalize="none"
               android:gravity="fill_horizontal"
               android:password="true"
+              android:inputType="textPassword"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:singleLine="true"
-              />
+              >
+        <requestFocus />
+    </EditText>
     <CheckBox android:id="@+id/read_only"
               android:layout_height="wrap_content"
               android:layout_width="fill_parent"

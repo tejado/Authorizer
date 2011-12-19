@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,14 @@ public final class GuiUtils
 
     private static final String PASSWD = "passwd";
     private static final String DATE = "date";
+
+    public static final int INPUT_TEXT_PASSWORD =
+        InputType.TYPE_CLASS_TEXT |
+        InputType.TYPE_TEXT_VARIATION_PASSWORD;
+    public static final int INPUT_TEXT_PASSWORD_VISIBLE =
+        InputType.TYPE_CLASS_TEXT |
+        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+
 
     public static String getTextViewStr(Activity act, int viewId)
     {
@@ -105,5 +114,18 @@ public final class GuiUtils
         return (SDK_VERSION < android.os.Build.VERSION_CODES.ECLAIR)
             && (keyCode == KeyEvent.KEYCODE_BACK)
             && (event.getRepeatCount() == 0);
+    }
+
+
+    public static boolean isPasswordVisible(TextView tv)
+    {
+        return tv.getInputType() == INPUT_TEXT_PASSWORD_VISIBLE;
+    }
+
+
+    public static void setPasswordVisible(TextView tv, boolean visible)
+    {
+        tv.setInputType(visible ? INPUT_TEXT_PASSWORD_VISIBLE :
+                        INPUT_TEXT_PASSWORD);
     }
 }

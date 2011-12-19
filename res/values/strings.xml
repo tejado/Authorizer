@@ -36,6 +36,7 @@
     <string name="generate_password">Generate Password</string>
     <string name="group">Group</string>
     <string name="hide_password">Hide Password</string>
+    <string name="hide_passwords">Hide Passwords</string>
     <string name="history">History</string>
     <string name="history_label">History:</string>
     <string name="home">Home</string>
@@ -77,6 +78,7 @@
     <string name="shortcut_choose_file">Choose shortcut password file</string>
     <string name="shortcut_choose_record">Choose shortcut password record</string>
     <string name="show_password">Show Password</string>
+    <string name="show_passwords">Show Passwords</string>
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
     <string name="up">Up</string>

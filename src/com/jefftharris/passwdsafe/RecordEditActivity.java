@@ -17,6 +17,8 @@ import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -26,9 +28,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextUtils;
-import android.text.method.PasswordTransformationMethod;
-import android.text.method.SingleLineTransformationMethod;
-import android.text.method.TransformationMethod;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -67,7 +66,6 @@ public class RecordEditActivity extends AbstractRecordActivity
     private String itsPrevGroup;
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
     private DialogValidator itsValidator;
-    private boolean isPasswordShown = false;
     private PasswdHistory itsHistory;
 
     private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
@@ -139,6 +137,10 @@ public class RecordEditActivity extends AbstractRecordActivity
                 hideRow(R.id.email_row);
             }
         }
+
+        TextView passwdField = (TextView)findViewById(R.id.password);
+        TextView confirmField = (TextView)findViewById(R.id.password_confirm);
+        PasswordVisibilityMenuHandler.set(passwdField, confirmField);
 
         initGroup(fileData, record, group);
         if (fileData.isV3()) {
@@ -308,8 +310,10 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         MenuItem mi = menu.findItem(MENU_TOGGLE_PASSWORD);
         if (mi != null) {
-            mi.setTitle(isPasswordShown ? R.string.hide_password :
-                        R.string.show_password);
+            TextView tv = (TextView)findViewById(R.id.password);
+            boolean visible = GuiUtils.isPasswordVisible(tv);
+            mi.setTitle(visible ? R.string.hide_passwords :
+                        R.string.show_passwords);
         }
         return true;
     }
@@ -320,9 +324,10 @@ public class RecordEditActivity extends AbstractRecordActivity
         switch (item.getItemId()) {
         case MENU_TOGGLE_PASSWORD:
         {
+            TextView passwdField = (TextView)findViewById(R.id.password);
             setPasswordVisibility(
-                !isPasswordShown,
-                (TextView)findViewById(R.id.password),
+                !GuiUtils.isPasswordVisible(passwdField),
+                passwdField,
                 (TextView)findViewById(R.id.password_confirm));
             return true;
         }
@@ -394,15 +399,8 @@ public class RecordEditActivity extends AbstractRecordActivity
                                              TextView passwdField,
                                              TextView confirmField)
     {
-        isPasswordShown = visible;
-        TransformationMethod tm;
-        if (isPasswordShown) {
-            tm = SingleLineTransformationMethod.getInstance();
-        } else {
-            tm = PasswordTransformationMethod.getInstance();
-        }
-        passwdField.setTransformationMethod(tm);
-        confirmField.setTransformationMethod(tm);
+        GuiUtils.setPasswordVisible(passwdField, visible);
+        GuiUtils.setPasswordVisible(confirmField, visible);
     }
 
     private final void generatePassword()
