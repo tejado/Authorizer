@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="PasswdSafe" basedir=".">
-    <property name="rev.dir" value="${basedir}/gen/com/jefftharris/passwdsafe"/>
+    <property name="pkg.dir" value="com/jefftharris/passwdsafe"/>
+    <property name="rev.dir" value="${basedir}/gen/${pkg.dir}"/>
     <property name="rev.file" value="${rev.dir}/Rev.java"/>
     
     <target name="genRev" depends="checkGenRev" unless="genRevUptodate">
@@ -22,6 +23,9 @@ public class Rev
     public static final String BUILD_DATE="${buildDate}";
 }
         </echo>
+
+        <javac srcdir="${basedir}/gen" destdir="${basedir}/bin/classes"
+            includes="${pkg.dir}/Rev.java" includeAntRuntime="false"/>
     </target>
     
     <target name="checkGenRev">
@@ -36,5 +40,6 @@ public class Rev
     
     <target name="clean">
         <delete file="${rev.file}"/>
+        <delete file="${basedir}/bin/classes/${pkg.dir}/Rev.class"/>
     </target>
 </project>
