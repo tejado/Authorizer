@@ -19,7 +19,7 @@
           
     <ScrollView android:layout_weight="1"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="0dp">
         <LinearLayout android:orientation="vertical"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content">
@@ -33,6 +33,7 @@
                               android:singleLine="true"
                               android:autoText="true"
                               android:capitalize="sentences"
+                              android:inputType="textCapSentences"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
@@ -50,6 +51,7 @@
                     <TextView android:text="@string/url"/>
                     <EditText android:id="@+id/url"
                               android:singleLine="true"
+                              android:inputType="textUri"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
@@ -58,6 +60,7 @@
                     <TextView android:text="@string/email"/>
                     <EditText android:id="@+id/email"
                               android:singleLine="true"
+                              android:inputType="textEmailAddress"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
@@ -66,6 +69,7 @@
                     <TextView android:text="@string/username"/>
                     <EditText android:id="@+id/user"
                               android:singleLine="true"
+                              android:inputType="text"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
@@ -80,12 +84,14 @@
                         <EditText android:id="@+id/password"
                                   android:singleLine="true"
                                   android:password="true"
+                                  android:inputType="textPassword"
                                   android:layout_weight="1"
                                   android:layout_width="fill_parent"
                                   android:layout_height="wrap_content"/>
                         <EditText android:id="@+id/password_confirm"
                                   android:singleLine="true"
                                   android:password="true"
+                                  android:inputType="textPassword"
                                   android:layout_weight="1"
                                   android:layout_width="fill_parent"
                                   android:layout_height="wrap_content"/>
@@ -105,7 +111,7 @@
                             android:layout_height="wrap_content"
                             >
                 <Button android:id="@+id/history_addremove"
-                        android:text="Add"
+                        android:text="@string/add"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
@@ -133,6 +139,7 @@
                           android:numeric="integer"
                           android:singleLine="true"
                           android:minWidth="50dip"
+                          android:inputType="number"
                           android:layout_below="@id/history_label"
                           android:layout_alignParentRight="true"
                           />
@@ -167,6 +174,7 @@
             <EditText android:id="@+id/notes"
                       android:autoText="true"
                       android:capitalize="sentences"
+                      android:inputType="textCapSentences|textMultiLine|textLongMessage"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       />

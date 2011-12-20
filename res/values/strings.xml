@@ -67,6 +67,7 @@
     <string name="permissions_label">Permissions:</string>
     <string name="preferences">Preferences</string>
     <string name="pref_file_dir">Directory for Files</string>
+    <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Search filter: %1$s</string>
     <string name="read_only">Read-only</string>
     <string name="read_write">Read-write</string>

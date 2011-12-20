@@ -3,7 +3,7 @@
              android:layout_width="fill_parent"
              android:layout_height="fill_parent">
     <TableLayout android:layout_width="fill_parent"
-                 android:layout_height="fill_parent"
+                 android:layout_height="wrap_content"
                  android:stretchColumns="1"
                  android:shrinkColumns="1"
                  android:padding="3dip"

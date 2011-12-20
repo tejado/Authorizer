@@ -9,5 +9,6 @@
               android:singleLine="true"
               android:autoText="true"
               android:capitalize="sentences"
+              android:inputType="textCapSentences"
               />
 </LinearLayout>
