@@ -14,6 +14,7 @@
         android:scaleType="fitCenter" 
         android:adjustViewBounds="true"
         android:layout_weight="0"
+        android:contentDescription="@string/record_type"
         />
 
     <RelativeLayout 

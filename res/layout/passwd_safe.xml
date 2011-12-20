@@ -14,10 +14,11 @@
                    android:src="@drawable/folder_up_rev"
                    android:layout_width="36dp"
                    android:layout_height="36dp"
+                   android:contentDescription="@string/up"
                    />
                    
         <TextView android:id="@+id/current_group_label"
-                      android:text="current group"
+                      android:text="@string/group"
                       android:gravity="center_vertical"
                       android:layout_marginBottom="2dp"
                       android:layout_toRightOf="@id/current_group_icon"
@@ -71,7 +72,7 @@
                 android:layout_height="wrap_content"/>
 
         <TextView android:id="@+id/query"
-                  android:text="query"
+                  android:text=""
                   android:textSize="16sp"
                   android:gravity="center_vertical"
                   android:layout_alignTop="@id/query_clear_btn"

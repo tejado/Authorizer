@@ -144,7 +144,7 @@ public abstract class AbstractFileListActivity extends ListActivity
                 doParentPressed();
             }
         };
-        View v = findViewById(R.id.current_group_icon);
+        View v = findViewById(R.id.up_icon);
         v.setOnClickListener(parentListener);
         v = findViewById(R.id.current_group_label);
         v.setOnClickListener(parentListener);

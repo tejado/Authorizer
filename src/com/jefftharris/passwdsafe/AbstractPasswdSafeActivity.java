@@ -361,6 +361,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
 
     protected void showFileData()
     {
+        // TODO: need to invalidate options menu on >= 3.00 to recall prepare
         populateFileData();
 
         View panel = findViewById(R.id.current_group_panel);

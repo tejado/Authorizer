@@ -33,6 +33,7 @@
     <string name="file_label">File:</string>
     <string name="file_label_val">File: %1$s</string>
     <string name="file_name_label">File Name:</string>
+    <string name="file_type_icon">File type icon</string>
     <string name="generate_password">Generate Password</string>
     <string name="group">Group</string>
     <string name="hide_password">Hide Password</string>
@@ -69,6 +70,7 @@
     <string name="pref_file_dir">Directory for Files</string>
     <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Search filter: %1$s</string>
+    <string name="record_type">Record type</string>
     <string name="read_only">Read-only</string>
     <string name="read_write">Read-write</string>
     <string name="remove">Remove</string>
