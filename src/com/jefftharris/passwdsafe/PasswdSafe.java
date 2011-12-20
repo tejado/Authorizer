@@ -433,6 +433,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     finish();
                 }
             };
+
+            TextView tv1 = (TextView)fileNewView.findViewById(R.id.password);
+            TextView tv2 =
+                (TextView)fileNewView.findViewById(R.id.password_confirm);
+            PasswordVisibilityMenuHandler.set(tv1, tv2);
+
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(R.string.new_file)
                 .setView(fileNewView)
