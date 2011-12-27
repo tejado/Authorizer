@@ -53,6 +53,9 @@
                 <data android:pathPattern=".*\\.dat"/>
                 <data android:pathPattern=".*\\.ibak"/>
                 <data android:pathPattern=".*\\.psafe3"/>
+                <data android:pathPattern=".*Android/data/com\\.dropbox\\.android/.*\\.dat"/>
+                <data android:pathPattern=".*Android/data/com\\.dropbox\\.android/.*\\.ibak"/>
+                <data android:pathPattern=".*Android/data/com\\.dropbox\\.android/.*\\.psafe3"/>
                 <data android:mimeType="application/octet-stream"/>
                 <data android:mimeType="application/x-ibak"/>
                 <data android:mimeType="application/x-psafe"/>
