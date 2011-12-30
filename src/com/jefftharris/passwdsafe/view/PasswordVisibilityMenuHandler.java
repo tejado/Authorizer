@@ -10,6 +10,8 @@ package com.jefftharris.passwdsafe.view;
 import com.jefftharris.passwdsafe.GuiUtils;
 import com.jefftharris.passwdsafe.R;
 
+import android.content.Context;
+import android.text.ClipboardManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -19,53 +21,88 @@ import android.view.View.OnCreateContextMenuListener;
 import android.widget.TextView;
 
 public class PasswordVisibilityMenuHandler
-    implements OnCreateContextMenuListener, OnMenuItemClickListener
 {
-    private TextView[] itsViews;
-
     public static void set(TextView view)
     {
-        new PasswordVisibilityMenuHandler(view, null);
+        set(view, null);
     }
 
     public static void set(TextView view1, TextView view2)
     {
-        new PasswordVisibilityMenuHandler(view1, view2);
-    }
-
-    private PasswordVisibilityMenuHandler(TextView view1, TextView view2)
-    {
+        TextView[] views;
         if (view2 == null) {
-            itsViews = new TextView[] { view1 };
+            views = new TextView[] { view1 };
         } else {
-            itsViews = new TextView[] { view1, view2 };
+            views = new TextView[] { view1, view2 };
         }
 
-        for (TextView tv : itsViews) {
-            tv.setOnCreateContextMenuListener(this);
+        for (TextView tv : views) {
+            tv.setOnCreateContextMenuListener(new MenuListener(tv, views));
         }
     }
 
-    public boolean onMenuItemClick(MenuItem item)
+    private static class MenuListener
+        implements OnCreateContextMenuListener, OnMenuItemClickListener
     {
-        boolean visible = GuiUtils.isPasswordVisible(itsViews[0]);
-        for (TextView tv : itsViews) {
-            GuiUtils.setPasswordVisible(tv, !visible);
+        private static final int MENU_TOGGLE_PASSWORD = 0;
+
+        private TextView itsViews[];
+        private TextView itsView;
+
+        public MenuListener(TextView view, TextView[] views)
+        {
+            itsViews = views;
+            itsView = view;
         }
-        return true;
-    }
 
-    public void onCreateContextMenu(ContextMenu menu,
-                                    View v,
-                                    ContextMenuInfo menuInfo)
-    {
-        menu.setHeaderTitle(R.string.app_name);
-        boolean visible = GuiUtils.isPasswordVisible(itsViews[0]);
-        int title = (itsViews.length > 1) ?
-            (visible ? R.string.hide_passwords : R.string.show_passwords) :
-            (visible ? R.string.hide_password : R.string.show_password);
+        public void onCreateContextMenu(ContextMenu menu,
+                                        View v,
+                                        ContextMenuInfo menuInfo)
+        {
+            menu.setHeaderTitle(R.string.app_name);
 
-        MenuItem mi = menu.add(0, 0, 0, title);
-        mi.setOnMenuItemClickListener(this);
+            MenuItem mi;
+            mi = menu.findItem(android.R.id.paste);
+            if (mi == null) {
+                ClipboardManager clipMgr = (ClipboardManager)
+                    v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipMgr.hasText()) {
+                    mi = menu.add(0, android.R.id.paste, 0,
+                                  android.R.string.paste);
+                    mi.setOnMenuItemClickListener(this);
+                }
+            }
+
+            boolean visible = GuiUtils.isPasswordVisible(itsView);
+            int title = (itsViews.length > 1) ?
+                (visible ? R.string.hide_passwords : R.string.show_passwords) :
+                (visible ? R.string.hide_password : R.string.show_password);
+
+            mi = menu.add(0, MENU_TOGGLE_PASSWORD, 0, title);
+            mi.setOnMenuItemClickListener(this);
+        }
+
+        public boolean onMenuItemClick(MenuItem item)
+        {
+            boolean rc = true;
+            switch (item.getItemId()) {
+            case android.R.id.paste: {
+                itsView.onTextContextMenuItem(android.R.id.paste);
+                break;
+            }
+            case MENU_TOGGLE_PASSWORD: {
+                boolean visible = GuiUtils.isPasswordVisible(itsView);
+                for (TextView tv : itsViews) {
+                    GuiUtils.setPasswordVisible(tv, !visible);
+                }
+                break;
+            }
+            default: {
+                rc = false;
+                break;
+            }
+            }
+            return rc;
+        }
     }
 }
