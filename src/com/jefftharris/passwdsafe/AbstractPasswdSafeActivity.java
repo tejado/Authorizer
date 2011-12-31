@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -81,6 +82,17 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     private String QUERY_MATCH_NOTES;
 
     private ArrayList<String> itsCurrGroups = new ArrayList<String>();
+
+    private static Method itsInvalidateOptionsMenuMeth;
+
+    static {
+        try {
+            itsInvalidateOptionsMenuMeth =
+                Activity.class.getMethod("invalidateOptionsMenu");
+        } catch (NoSuchMethodException e) {
+            // No method
+        }
+    }
 
     /** Called when the activity is first created. */
     @Override
@@ -361,7 +373,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
 
     protected void showFileData()
     {
-        // TODO: need to invalidate options menu on >= 3.00 to recall prepare
+        doInvalidateOptionsMenu();
         populateFileData();
 
         View panel = findViewById(R.id.current_group_panel);
@@ -403,6 +415,19 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
                                                      from, to,
                                                      itsIsSortCaseSensitive);
         setListAdapter(adapter);
+    }
+
+
+    protected void doInvalidateOptionsMenu()
+    {
+        if (itsInvalidateOptionsMenuMeth != null) {
+            try {
+                itsInvalidateOptionsMenuMeth.invoke(this);
+            }
+            catch (Exception e) {
+                PasswdSafeApp.showFatalMsg(e, this);
+            }
+        }
     }
 
 
