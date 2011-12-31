@@ -50,12 +50,22 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="file" android:host="*"/>
-                <data android:pathPattern=".*\\.dat"/>
-                <data android:pathPattern=".*\\.ibak"/>
+                <!-- Handle some number of '.'s in the path -->
                 <data android:pathPattern=".*\\.psafe3"/>
-                <data android:pathPattern=".*Android/data/com\\.dropbox\\.android/.*\\.dat"/>
-                <data android:pathPattern=".*Android/data/com\\.dropbox\\.android/.*\\.ibak"/>
-                <data android:pathPattern=".*Android/data/com\\.dropbox\\.android/.*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\.psafe3" />
+                <data android:pathPattern=".*\\..*\\..*\\.psafe3" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.psafe3" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.psafe3" />
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat" />
+                <data android:pathPattern=".*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\.ibak" />
+                <data android:pathPattern=".*\\..*\\..*\\.ibak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak" />
                 <data android:mimeType="application/octet-stream"/>
                 <data android:mimeType="application/x-ibak"/>
                 <data android:mimeType="application/x-psafe"/>
@@ -71,7 +81,12 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="file" android:host="*"/>
+                <!-- Handle some number of '.'s in the path -->
                 <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat" />
                 <data android:mimeType="application/x-ns-proxy-autoconfig"/>
             </intent-filter>
 
@@ -80,9 +95,22 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="file" android:host="*"/>
-                <data android:pathPattern=".*\\.dat"/>
-                <data android:pathPattern=".*\\.ibak"/>
+                <!-- Handle some number of '.'s in the path -->
                 <data android:pathPattern=".*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\.psafe3" />
+                <data android:pathPattern=".*\\..*\\..*\\.psafe3" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.psafe3" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.psafe3" />
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat" />
+                <data android:pathPattern=".*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\.ibak" />
+                <data android:pathPattern=".*\\..*\\..*\\.ibak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak" />
             </intent-filter>
             
             <!--  Search -->
