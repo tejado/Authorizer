@@ -120,7 +120,13 @@ public abstract class AbstractFileListActivity extends ListActivity
 
     public static Intent createOpenIntent(File file, String recToOpen)
     {
-        Uri.Builder builder = Uri.fromFile(file).buildUpon();
+        return createOpenIntent(Uri.fromFile(file), recToOpen);
+    }
+
+
+    public static Intent createOpenIntent(Uri uri, String recToOpen)
+    {
+        Uri.Builder builder = uri.buildUpon();
         if (recToOpen != null) {
             builder.appendQueryParameter("recToOpen", recToOpen);
         }

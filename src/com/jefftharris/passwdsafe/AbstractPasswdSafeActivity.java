@@ -28,6 +28,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -62,7 +63,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     private static final String BUNDLE_CURR_GROUPS =
         "passwdsafe.currGroups";
 
-    protected File itsFile;
+    protected Uri itsUri;
     protected ActivityPasswdFile itsPasswdFile;
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
@@ -428,6 +429,18 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
                 PasswdSafeApp.showFatalMsg(e, this);
             }
         }
+    }
+
+
+    protected String getUriName()
+    {
+        return itsUri.getLastPathSegment();
+    }
+
+
+    protected File getUriAsFile()
+    {
+        return PasswdFileData.getUriAsFile(itsUri);
     }
 
 

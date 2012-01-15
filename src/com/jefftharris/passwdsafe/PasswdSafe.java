@@ -222,7 +222,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case MENU_ADD_RECORD:
         {
             startActivityForResult(
-                new Intent(Intent.ACTION_INSERT, Uri.fromFile(itsFile),
+                new Intent(Intent.ACTION_INSERT, itsUri,
                            this, RecordEditActivity.class),
                 RECORD_ADD_REQUEST);
             break;
@@ -325,7 +325,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             ProgressDialog dlg = new ProgressDialog(this);
             dlg.setTitle(PasswdSafeApp.getAppTitle(this));
-            dlg.setMessage("Loading " + itsFile.getName() + "...");
+            dlg.setMessage("Loading " + getUriName() + "...");
             dlg.setIndeterminate(true);
             dlg.setCancelable(true);
             dialog = dlg;
@@ -336,7 +336,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             LayoutInflater factory = LayoutInflater.from(this);
             View detailsView = factory.inflate(R.layout.file_details, null);
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle(itsFile.getName())
+                .setTitle(getUriName())
                 .setView(detailsView)
                 .setNeutralButton(R.string.close, new OnClickListener()
                 {
@@ -374,7 +374,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             PasswordVisibilityMenuHandler.set(tv1, tv2);
 
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle(itsFile.getName())
+                .setTitle(getUriName())
                 .setView(passwdView)
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)
@@ -469,7 +469,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         }
                     }
 
-                    File f = new File(itsFile, fileName + ".psafe3");
+                    File dir = getUriAsFile();
+                    if (dir == null) {
+                        return "New file not supported for URI " + itsUri;
+                    }
+                    File f = new File(dir, fileName + ".psafe3");
                     if (f.exists()) {
                         return "File exists";
                     }
@@ -498,7 +502,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(R.string.delete_file_title)
                 .setMessage(getString(R.string.delete_file_msg,
-                                      itsFile.toString()))
+                                      itsUri.getPath()))
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
@@ -525,7 +529,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
             TextView tv = (TextView)dialog.findViewById(R.id.file);
-            tv.setText(getString(R.string.file_label_val, itsFile.getPath()));
+            tv.setText(getString(R.string.file_label_val, itsUri.getPath()));
             CheckBox cb = (CheckBox)dialog.findViewById(R.id.read_only);
             cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
             break;
@@ -534,7 +538,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             TextView tv;
             tv = (TextView)dialog.findViewById(R.id.file);
-            tv.setText(itsFile.getPath());
+            tv.setText(itsUri.toString());
 
             PasswdFileData fileData = itsPasswdFile.getFileData();
             tv = (TextView)dialog.findViewById(R.id.permissions);
@@ -677,10 +681,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
     private final void onCreateView(Intent intent)
     {
-        itsFile = new File(intent.getData().getPath());
+        itsUri = PasswdSafeApp.getFileUriFromIntent(intent);
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsPasswdFile = app.accessPasswdFile(itsFile, this);
-        String title = PasswdSafeApp.getAppFileTitle(itsFile, this);
+        itsPasswdFile = app.accessPasswdFile(itsUri, this);
+        String title = PasswdSafeApp.getAppFileTitle(itsUri, this);
         if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
             title += " - AUTOOPEN!!!!!";
         }
@@ -690,7 +694,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         if (!itsPasswdFile.isOpen()) {
             if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
-                (itsFile.getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
+                (itsUri.getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
                 openFile(new StringBuilder("test123"), false);
             } else {
                 showDialog(DIALOG_GET_PASSWD);
@@ -702,7 +706,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
     private final void onCreateNew(Intent intent)
     {
-        itsFile = new File(intent.getData().getPath());
+        itsUri = PasswdSafeApp.getFileUriFromIntent(intent);
         showDialog(DIALOG_FILE_NEW);
     }
 
@@ -718,19 +722,24 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     {
         try
         {
-            File dir = itsFile;
-            itsFile = new File(dir, fileName + ".psafe3");
+            File dir = getUriAsFile();
+            if (dir == null) {
+                throw new Exception("File creation not supported for URI " +
+                                    itsUri);
+            }
+            File file = new File(dir, fileName + ".psafe3");
+            itsUri = Uri.fromFile(file);
 
-            PasswdFileData fileData = new PasswdFileData(itsFile);
+            PasswdFileData fileData = new PasswdFileData(itsUri);
             fileData.createNewFile(passwd, this);
 
             PasswdSafeApp app = (PasswdSafeApp)getApplication();
-            itsPasswdFile = app.accessPasswdFile(itsFile, this);
+            itsPasswdFile = app.accessPasswdFile(itsUri, this);
             itsPasswdFile.setFileData(fileData);
-            setTitle(PasswdSafeApp.getAppFileTitle(itsFile, this));
+            setTitle(PasswdSafeApp.getAppFileTitle(itsUri, this));
             showFileData();
         } catch (Exception e) {
-            PasswdSafeApp.showFatalMsg(e, "Can't create file: " + itsFile,
+            PasswdSafeApp.showFatalMsg(e, "Can't create file: " + itsUri,
                                        this);
             finish();
         }
@@ -738,11 +747,17 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
     private final void deleteFile()
     {
-        if (!itsFile.delete()) {
-            PasswdSafeApp.showFatalMsg("Could not delete file: " + itsFile,
-                                       this);
+        File file = getUriAsFile();
+        if (file != null) {
+            if (file.delete()) {
+                finish();
+            } else {
+                PasswdSafeApp.showFatalMsg("Could not delete file: " + itsUri,
+                                           this);
+            }
         } else {
-            finish();
+            PasswdSafeApp.showFatalMsg("Delete not supported for " + itsUri,
+                                       this);
         }
     }
 
@@ -754,7 +769,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             itsPasswdFile.save();
         } else {
             PasswdSafeApp.showFatalMsg(
-                "Could not change password on closed file: " + itsFile, this);
+                "Could not change password on closed file: " + itsUri, this);
         }
     }
 
@@ -768,7 +783,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
     private void openRecord(String uuid)
     {
-        Uri.Builder builder = Uri.fromFile(itsFile).buildUpon();
+        Uri.Builder builder = itsUri.buildUpon();
         if (uuid != null) {
             builder.appendQueryParameter("rec", uuid.toString());
         }
@@ -796,7 +811,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         protected Object doInBackground(Void... params)
         {
             try {
-                PasswdFileData fileData = new PasswdFileData(itsFile);
+                PasswdFileData fileData = new PasswdFileData(itsUri);
                 fileData.load(itsPasswd, itsIsReadOnly);
                 return fileData;
             } catch (Exception e) {

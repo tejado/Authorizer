@@ -51,6 +51,7 @@ import org.pwsafe.lib.file.PwsUnknownField;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -58,6 +59,7 @@ import android.util.Log;
 
 public class PasswdFileData
 {
+    private Uri itsUri;
     private File itsFile;
     private PwsFile itsPwsFile;
     private final HashMap<String, PwsRecord> itsRecordsByUUID =
@@ -70,9 +72,10 @@ public class PasswdFileData
     private static final int FIELD_UNSUPPORTED = -1;
     private static final int FIELD_NOT_PRESENT = -2;
 
-    public PasswdFileData(File file)
+    public PasswdFileData(Uri uri)
     {
-        itsFile = file;
+        itsUri = uri;
+        itsFile = getUriAsFile(itsUri);
     }
 
     public void load(StringBuilder passwd, boolean readonly)
@@ -81,9 +84,10 @@ public class PasswdFileData
             UnsupportedFileVersionException
     {
         PasswdSafeApp.dbginfo(TAG, "before load file");
+        // TODO: fix for non-files
         itsIsOpenReadOnly = readonly;
         itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
-        if (!itsFile.canWrite() || itsIsOpenReadOnly) {
+        if (itsIsOpenReadOnly || (itsFile == null) || !itsFile.canWrite()) {
             itsPwsFile.setReadOnly(true);
         }
         finishOpenFile(passwd);
@@ -92,8 +96,10 @@ public class PasswdFileData
     public void createNewFile(StringBuilder passwd, Context context)
         throws IOException, NoSuchAlgorithmException
     {
+        // TODO: fix for non-files
         itsPwsFile = PwsFileFactory.newFile();
         itsPwsFile.setPassphrase(passwd);
+        // TODO: fix open of new file by storage
         itsPwsFile.setStorage(new PwsFileStorage(itsFile.getAbsolutePath()));
         setSaveHdrFields(context);
         itsPwsFile.save();
@@ -139,6 +145,7 @@ public class PasswdFileData
 
     public void close()
     {
+        itsUri = null;
         itsFile = null;
         itsPwsFile.dispose();
         itsPwsFile = null;
@@ -202,9 +209,9 @@ public class PasswdFileData
         itsPwsFile.setPassphrase(passwd);
     }
 
-    public final File getFile()
+    public final Uri getUri()
     {
-        return itsFile;
+        return itsUri;
     }
 
     public final boolean canEdit()
@@ -218,7 +225,7 @@ public class PasswdFileData
 
     public final boolean canDelete()
     {
-        return !itsIsOpenReadOnly && itsFile.canWrite();
+        return (itsPwsFile != null) && !itsPwsFile.isReadOnly();
     }
 
     public final boolean isV3()
@@ -397,6 +404,14 @@ public class PasswdFileData
     public final void setHdrLastSaveTime(Date date)
     {
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
+    }
+
+    public static File getUriAsFile(Uri uri)
+    {
+        if (uri.getScheme().equals("file")) {
+            return new File(uri.getPath());
+        }
+        return null;
     }
 
     public static final int hexBytesToInt(byte[] bytes, int pos, int len)

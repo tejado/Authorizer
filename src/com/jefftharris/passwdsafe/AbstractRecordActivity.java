@@ -7,10 +7,9 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.Dialog;
+import android.net.Uri;
 import android.os.Bundle;
 
 public abstract class AbstractRecordActivity extends Activity
@@ -58,9 +57,9 @@ public abstract class AbstractRecordActivity extends Activity
     }
 
 
-    protected final File getFile()
+    protected final Uri getUri()
     {
-        return itsHelper.getFile();
+        return itsHelper.getUri();
     }
 
     protected final String getUUID()

@@ -7,11 +7,10 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 public class RecordActivityHelper implements PasswdFileActivity
@@ -21,7 +20,7 @@ public class RecordActivityHelper implements PasswdFileActivity
     private static final int DIALOG_PROGRESS = 0;
     public static final int MAX_DIALOG = DIALOG_PROGRESS;
 
-    private File itsFile;
+    private Uri itsUri;
     private String itsUUID;
     private ActivityPasswdFile itsPasswdFile;
     private final Activity itsActivity;
@@ -54,9 +53,9 @@ public class RecordActivityHelper implements PasswdFileActivity
         }
     }
 
-    public final File getFile()
+    public final Uri getUri()
     {
-        return itsFile;
+        return itsUri;
     }
 
     public final String getUUID()
@@ -74,14 +73,14 @@ public class RecordActivityHelper implements PasswdFileActivity
         Intent intent = itsActivity.getIntent();
         PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + intent);
 
-        itsFile = new File(intent.getData().getPath());
+        itsUri = PasswdSafeApp.getFileUriFromIntent(intent);
         itsUUID = intent.getData().getQueryParameter("rec");
 
         PasswdSafeApp app = (PasswdSafeApp)itsActivity.getApplication();
-        itsPasswdFile = app.accessPasswdFile(itsFile, this);
+        itsPasswdFile = app.accessPasswdFile(itsUri, this);
         PasswdFileData fileData = itsPasswdFile.getFileData();
         if (fileData == null) {
-            PasswdSafeApp.showFatalMsg("File not open: " + itsFile,
+            PasswdSafeApp.showFatalMsg("File not open: " + itsUri,
                                        itsActivity);
             return;
         }

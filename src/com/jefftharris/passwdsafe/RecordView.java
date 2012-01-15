@@ -131,7 +131,7 @@ public class RecordView extends AbstractRecordTabActivity
         tabHost.setCurrentTab(0);
 
         if (getUUID() == null) {
-            PasswdSafeApp.showFatalMsg("No record chosen for file: " + getFile(),
+            PasswdSafeApp.showFatalMsg("No record chosen for file: " + getUri(),
                                        this);
             return;
         }

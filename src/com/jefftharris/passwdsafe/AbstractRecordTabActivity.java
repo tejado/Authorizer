@@ -7,11 +7,10 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.TabActivity;
+import android.net.Uri;
 import android.os.Bundle;
 
 public class AbstractRecordTabActivity extends TabActivity implements
@@ -46,9 +45,9 @@ public class AbstractRecordTabActivity extends TabActivity implements
         itsHelper.saveFinished(success);
     }
 
-    protected final File getFile()
+    protected final Uri getUri()
     {
-        return itsHelper.getFile();
+        return itsHelper.getUri();
     }
 
     protected final String getUUID()

@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -30,6 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
@@ -254,19 +254,32 @@ public class PasswdSafeApp extends Application
         }
     }
 
+    /**
+     * Sanitize an intent URI for the open file URI. Removes fragments and query
+     * parameters
+     */
+    public static Uri getFileUriFromIntent(Intent intent)
+    {
+        Uri uri = intent.getData();
+        Uri.Builder builder = uri.buildUpon();
+        builder.fragment("");
+        builder.query("");
+        return builder.build();
+    }
+
     public synchronized ActivityPasswdFile accessPasswdFile
     (
-         File file,
+         Uri uri,
          PasswdFileActivity activity
     )
     {
-        if ((itsFileData == null) || (itsFileData.getFile() == null) ||
-            (!itsFileData.getFile().equals(file))) {
+        if ((itsFileData == null) || (itsFileData.getUri() == null) ||
+            (!itsFileData.getUri().equals(uri))) {
             itsFileDataActivities.remove(activity);
             closeFileData(false);
         }
 
-        dbginfo(TAG, "access file:" + file+ ", data:" + itsFileData);
+        dbginfo(TAG, "access uri:" + uri + ", data:" + itsFileData);
         return new AppActivityPasswdFile(itsFileData, activity);
     }
 
@@ -285,22 +298,22 @@ public class PasswdSafeApp extends Application
     public static final String getAppFileTitle(ActivityPasswdFile actFile,
                                                Context ctx)
     {
-        File file = null;
+        Uri uri = null;
         if (actFile != null) {
             PasswdFileData fileData = actFile.getFileData();
             if (fileData != null) {
-                file= fileData.getFile();
+                uri = fileData.getUri();
             }
         }
-        return getAppFileTitle(file, ctx);
+        return getAppFileTitle(uri, ctx);
     }
 
-    public static final String getAppFileTitle(File file, Context ctx)
+    public static final String getAppFileTitle(Uri uri, Context ctx)
     {
         StringBuilder builder = new StringBuilder(getAppTitle(ctx));
-        if (file != null) {
+        if (uri != null) {
             builder.append(" - ");
-            builder.append(file.getName());
+            builder.append(uri.getLastPathSegment());
         }
         return builder.toString();
 
