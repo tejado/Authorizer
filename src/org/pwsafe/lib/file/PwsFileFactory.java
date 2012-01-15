@@ -9,14 +9,12 @@
  */
 package org.pwsafe.lib.file;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 
-import org.pwsafe.lib.I18nHelper;
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.crypto.BlowfishPwsECB;
@@ -39,6 +37,9 @@ public class PwsFileFactory {
 
 	private static final Log LOG = Log.getInstance(PwsFileFactory.class.getPackage().getName());
 
+	private static final int MAX_HEADER_LEN = PwsFile.STUFF_LENGTH +
+	                                          PwsFile.HASH_LENGTH;
+
 	/**
 	 * Private for the singleton pattern.
 	 */
@@ -51,109 +52,57 @@ public class PwsFileFactory {
 	 * normally if everything is OK or {@link InvalidPassphraseException} if the passphrase is
 	 * incorrect.
 	 *
-	 * @param filename   the name of the file to be opened.
+	 * @param header the file header bytes
 	 * @param passphrase the file's passphrase.
 	 *
 	 * @return the password encoding
 	 *
 	 * @throws InvalidPassphraseException If the passphrase is not the correct one for the file.
-	 * @throws FileNotFoundException      If the given file does not exist.
-	 * @throws IOException                If an error occurs whilst reading from the file.
 	 * @throws NoSuchAlgorithmException   If no SHA-1 implementation is found.
 	 */
-	private static final String checkPassword( String filename, String passphrase )
-	throws InvalidPassphraseException, FileNotFoundException, IOException, NoSuchAlgorithmException
+	private static final String checkPassword( byte[] header,
+	                                           String passphrase )
+	    throws InvalidPassphraseException, NoSuchAlgorithmException
 	{
-		LOG.enterMethod( "PwsFileFactory.checkPassword" );
+	    LOG.enterMethod( "PwsFileFactory.checkPassword" );
 
-		FileInputStream	fis				= null;
-		byte []			stuff;
-		byte []			fudged;
-		byte []			fhash;
-		byte []			phash;
-		boolean			handlingError	= false;
-		String encoding = null;
+	    byte []			phash;
+	    String encoding = null;
 
-		try
-		{
-			fis		= new FileInputStream( filename );
-			stuff	= new byte[ PwsFile.STUFF_LENGTH ];
-			fhash	= new byte[ PwsFile.HASH_LENGTH ];
+	    byte[] stuff = Util.getBytes(header, 0, PwsFile.STUFF_LENGTH);
+	    byte[] fhash = Util.getBytes(header, PwsFile.STUFF_LENGTH,
+	                                 PwsFile.HASH_LENGTH);
+	    byte[] fudged = new byte[ PwsFile.STUFF_LENGTH + 2 ];
+	    System.arraycopy(stuff, 0, fudged, 0, PwsFile.STUFF_LENGTH);
+	    stuff = null;
 
-			fis.read( stuff );
-			fis.read( fhash );
-
-			fudged	= new byte[ PwsFile.STUFF_LENGTH + 2 ];
-
-			for ( int ii = 0; ii < PwsFile.STUFF_LENGTH; ++ii )
-			{
-				fudged[ii] = stuff[ii];
-			}
-			stuff	= null;
-			boolean validPassword = false;
-	        for (String charset : PwsFile.getPasswordEncodings()) {
-	            LOG.debug1("Trying " + charset);
-	            try {
-	                phash = genRandHash(passphrase, charset, fudged);
-	            } catch(UnsupportedEncodingException e) {
-	                // Skip this charset
-	                continue;
-	            }
-
-	            if (Util.bytesAreEqual(fhash, phash)) {
-	                validPassword = true;
-	                encoding = charset;
-	                break;
-	            }
+	    boolean validPassword = false;
+	    for (String charset : PwsFile.getPasswordEncodings()) {
+	        LOG.debug1("Trying " + charset);
+	        try {
+	            phash = genRandHash(passphrase, charset, fudged);
+	        } catch(UnsupportedEncodingException e) {
+	            // Skip this charset
+	            continue;
 	        }
 
-			if ( !validPassword )
-			{
-				LOG.debug1( "Password is incorrect - throwing InvalidPassphraseException" );
-				LOG.leaveMethod( "PwsFileFactory.checkPassword" );
-				throw new InvalidPassphraseException();
-			}
-		}
-		catch ( IOException e )
-		{
-			handlingError = true;
-			LOG.error( I18nHelper.getInstance().formatMessage("E00007", new Object [] { e.getClass().getName() } ), e );
-			LOG.info( "I00001" );
-			LOG.leaveMethod( "PwsFileFactory.checkPassword" );
-			throw e;
-		}
-		finally
-		{
-			if ( fis != null )
-			{
-				try
-				{
-					LOG.debug1( "Attempting to close the file" );
-					fis.close();
+	        if (Util.bytesAreEqual(fhash, phash)) {
+	            validPassword = true;
+	            encoding = charset;
+	            break;
+	        }
+	    }
 
-					fis = null;
-				}
-				catch ( IOException e )
-				{
-					// log the exception then decide what we're going to do with it
-					LOG.error( I18nHelper.getInstance().formatMessage("E00007", new Object [] { e.getClass().getName() } ), e );
-					if ( handlingError )
-					{
-						// ignore the error
-						LOG.info( I18nHelper.getInstance().formatMessage( "I00002" ) );
-					}
-					else
-					{
-						LOG.info( I18nHelper.getInstance().formatMessage( "I00001" ) );
-						throw e;
-					}
-				}
-			}
-		}
+	    if ( !validPassword )
+	    {
+	        LOG.debug1( "Password is incorrect - throwing InvalidPassphraseException" );
+	        LOG.leaveMethod( "PwsFileFactory.checkPassword" );
+	        throw new InvalidPassphraseException();
+	    }
 
-		LOG.debug1( "Password is OK" );
-		LOG.leaveMethod( "PwsFileFactory.checkPassword" );
-		return encoding;
+	    LOG.debug1( "Password is OK" );
+	    LOG.leaveMethod( "PwsFileFactory.checkPassword" );
+	    return encoding;
 	}
 
 	static final byte[] genRandHash(String passphrase, byte[] stuff)
@@ -263,56 +212,63 @@ public class PwsFileFactory {
 	public static final PwsFile loadFile( String filename, StringBuilder aPassphrase )
 	throws EndOfFileException, FileNotFoundException, InvalidPassphraseException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		LOG.enterMethod( "PwsFileFactory.loadFile" );
+	    LOG.enterMethod( "PwsFileFactory.loadFile" );
 
-		PwsFile		file;
+	    PwsFile file;
 
-		//TODOlib change to StringBuilder Constructors
-		String passphrase = aPassphrase.toString();
+	    //TODOlib change to StringBuilder Constructors
+	    String passphrase = aPassphrase.toString();
 
-		// First check for a v3 file...
-		FileInputStream fis = new FileInputStream(filename);
-		byte[] first4Bytes = new byte[4];
-		fis.read(first4Bytes);
-		fis.close();
-		if (Util.bytesAreEqual("PWS3".getBytes(), first4Bytes)) {
-			LOG.debug1( "This is a V3 format file." );
-			file = new PwsFileV3(new PwsFileStorage(filename), passphrase);
-			file.readAll();
-			file.close();
-			return file;
-		}
+	    PwsStorage storage = new PwsFileStorage(filename);
 
-		PwsRecordV1	rec;
+	    try
+	    {
+	        byte[] header = storage.openForLoad(MAX_HEADER_LEN);
 
-		String encoding = checkPassword( filename, passphrase );
+	        // First check for a v3 file...
+	        byte[] first4Bytes = Util.getBytes(header, 0, 4);
+	        if (Util.bytesAreEqual("PWS3".getBytes(), first4Bytes)) {
+	            LOG.debug1( "This is a V3 format file." );
+	            file = new PwsFileV3(storage, passphrase);
+	            file.readAll();
+	            file.close();
+	            return file;
+	        }
 
-		file	= new PwsFileV1( new PwsFileStorage(filename), passphrase, encoding );
-		try {
-			rec		= (PwsRecordV1) file.readRecord();
-		} catch (PasswordSafeException e) {
-			throw new IllegalStateException(e);
-		}
+	        PwsRecordV1	rec;
+	        String encoding = checkPassword( header, passphrase );
+	        file = new PwsFileV1( storage, passphrase, encoding );
+	        try {
+	            rec = (PwsRecordV1) file.readRecord();
+	        } catch (PasswordSafeException e) {
+	            throw new IllegalStateException(e);
+	        }
+	        file.close();
 
-		file.close();
+	        // TODOlib what can we do about this?
+	        // it will probably be fooled if someone is daft enough to create a V1 file with the
+	        // title of the first record set to the value of PwsFileV2.ID_STRING!
 
-		// TODOlib what can we do about this?
-		// it will probably be fooled if someone is daft enough to create a V1 file with the
-		// title of the first record set to the value of PwsFileV2.ID_STRING!
+	        if ( rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING) ) {
+	            LOG.debug1( "This is a V2 format file." );
+	            file = new PwsFileV2( storage, passphrase, encoding );
+	        } else {
+	            LOG.debug1( "This is a V1 format file." );
+	            file = new PwsFileV1( storage, passphrase, encoding );
+	        }
+	        file.readAll();
+	        file.close();
 
-		if ( rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING) ) {
-			LOG.debug1( "This is a V2 format file." );
-			file = new PwsFileV2( new PwsFileStorage(filename), passphrase, encoding );
-		} else {
-			LOG.debug1( "This is a V1 format file." );
-			file = new PwsFileV1( new PwsFileStorage(filename), passphrase, encoding );
-		}
-		file.readAll();
-		file.close();
-
-		LOG.debug1( "File contains " + file.getRecordCount() + " records." );
-		LOG.leaveMethod( "PwsFileFactory.loadFile" );
-		return file;
+	        LOG.debug1( "File contains " + file.getRecordCount() + " records." );
+	        LOG.leaveMethod( "PwsFileFactory.loadFile" );
+	        return file;
+	    } finally {
+	        try {
+	            storage.closeAfterLoad();
+	        } catch (IOException ioe) {
+	            LOG.error("Error closing file " + filename, ioe);
+	        }
+	    }
 	}
 
 	/**

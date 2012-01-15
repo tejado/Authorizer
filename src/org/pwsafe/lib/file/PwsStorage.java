@@ -39,13 +39,24 @@ public interface PwsStorage {
         }
 
         /**
-	 * This method provides an input stream that can be used
-	 * @return
+         * Open the file for loading
+         * @return The header bytes
+         * @throws IOException
+         */
+        public byte[] openForLoad(int headerLen) throws IOException;
+
+        /**
+         * Grab all the bytes in the file
+         * @return The bytes in the file
+         * @throws IOException
+         */
+	public byte[] load() throws IOException;
+
+	/**
+	 * Close the file after being loaded
 	 * @throws IOException
 	 */
-	//public InputStream getInputStream() throws IOException;
-
-	public byte[] load() throws IOException;
+	public void closeAfterLoad() throws IOException;
 
 	/**
 	 * This method takes a series of bytes as input and then attempts

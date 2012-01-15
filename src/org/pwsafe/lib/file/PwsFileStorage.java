@@ -10,11 +10,11 @@
 package org.pwsafe.lib.file;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 
 import org.pwsafe.lib.Log;
@@ -41,6 +41,10 @@ public class PwsFileStorage implements PwsStorage {
 
 	private SaveHelper itsSaveHelper;
 
+	private BufferedInputStream itsLoadStream;
+
+	private byte[] itsLoadBytes;
+
 	/*
 	 * Build an implementation given the filename for the underlying storage.
 	 */
@@ -48,37 +52,59 @@ public class PwsFileStorage implements PwsStorage {
 		this.filename = filename;
 	}
 
-	/** Grab all the bytes in the file */
-	public byte[] load() throws IOException {
-		File file = new File(filename);
-        InputStream is = new BufferedInputStream(new FileInputStream(file));
+	public byte[] openForLoad(int headerLen) throws IOException
+	{
+	    itsLoadStream =
+	        new BufferedInputStream(new FileInputStream(filename));
 
-        // Get the size of the file
-        long length = file.length();
+	    itsLoadStream.mark(headerLen);
+	    byte[] bytes = new byte[headerLen];
+	    int offset = 0;
+	    int numread = 0;
+	    while (offset < bytes.length) {
+	        numread = itsLoadStream.read(bytes, offset,
+	                                     bytes.length - offset);
+	        if (numread < 0) {
+	            throw new IOException("Error reading header from " +
+	                                  filename);
+	        }
+	        offset += numread;
+	    }
+	    itsLoadStream.reset();
+	    return bytes;
+	}
 
-        if (length > Integer.MAX_VALUE) {
-            // File is too large
-        }
+	public byte[] load() throws IOException
+	{
+	    if (itsLoadBytes == null) {
+	        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	        byte[] buf = new byte[1024];
+	        int numread = 0;
 
-        // Create the byte array to hold the data
-        byte[] bytes = new byte[(int)length];
+	        for (;;) {
+	            numread = itsLoadStream.read(buf);
+	            if (numread > 0) {
+	                bos.write(buf, 0, numread);
+	            } else if (numread < 0) {
+	                break;
+	            }
+	        }
+	        closeAfterLoad();
+	        itsLoadBytes = bos.toByteArray();
+	    }
+	    return itsLoadBytes;
+	}
 
-        // Read in the bytes
-        int offset = 0;
-        int numRead = 0;
-        while (offset < bytes.length
-               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-            offset += numRead;
-        }
-
-        // Ensure all the bytes have been read in
-        if (offset < bytes.length) {
-            throw new IOException("Could not completely read file "+file.getName());
-        }
-
-        // Close the input stream and return bytes
-        is.close();
-        return bytes;
+	public void closeAfterLoad() throws IOException
+	{
+	    itsLoadBytes = null;
+	    if (itsLoadStream != null) {
+	        try {
+	            itsLoadStream.close();
+	        } finally {
+	            itsLoadStream = null;
+	        }
+	    }
 	}
 
 	/**
