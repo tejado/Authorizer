@@ -113,6 +113,20 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak" />
             </intent-filter>
             
+            <!-- Content providers - e.g. mail app attachments -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="content"/>
+                <data android:mimeType="application/psafe3"/>
+                <data android:mimeType="application/psafe"/>
+                <data android:mimeType="application/dat"/>
+                <data android:mimeType="application/x-psafe3"/>
+                <data android:mimeType="application/x-psafe"/>
+                <data android:mimeType="application/x-dat"/>
+                <data android:mimeType="application/octet-stream"/>
+            </intent-filter>
+            
             <!--  Search -->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
