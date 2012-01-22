@@ -93,6 +93,11 @@ public class PwsRecordV2 extends PwsRecord
 	 * Constant for the last time any field in the record was changed.
 	 */
 	public static final int     LAST_MOD_TIME       = 12;
+	
+	/**
+	 * Constant for the url field
+	 */
+	public static final int     URL                 = 13;
 
 	/**
 	 * Constant for the end of record marker field.
@@ -117,6 +122,7 @@ public class PwsRecordV2 extends PwsRecord
 		new Object [] { new Integer(PASSWORD_LIFETIME),	"PASSWORD_LIFETIME",	PwsIntegerField.class },
 		new Object [] { new Integer(PASSWORD_POLICY),	"PASSWORD_POLICY",		PwsStringField.class },
 		new Object [] { new Integer(LAST_MOD_TIME),     "LAST_MOD_TIME",        PwsTimeField.class },
+		new Object [] { new Integer(URL),               "URL",                  PwsStringField.class },
 	};
 
 	/**
@@ -267,6 +273,7 @@ public class PwsRecordV2 extends PwsRecord
 				case TITLE :
 				case USERNAME :
 				case NOTES :
+				case URL :
 					itemVal	= new PwsStringField( item.getType(), item.getData() );
 					break;
 

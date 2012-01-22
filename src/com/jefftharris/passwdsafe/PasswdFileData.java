@@ -537,8 +537,12 @@ public class PasswdFileData
                 fieldId = PwsRecordV2.UUID;
                 break;
             }
-            case PwsRecordV3.EMAIL:
             case PwsRecordV3.URL:
+            {
+                fieldId = PwsRecordV2.URL;
+                break;
+            }
+            case PwsRecordV3.EMAIL:
             case PwsRecordV3.PASSWORD_HISTORY:
             {
                 fieldId = FIELD_NOT_PRESENT;
