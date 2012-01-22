@@ -37,9 +37,11 @@ public class PwsFileStorage extends PwsStreamStorage {
     /*
      * Build an implementation given the filename for the underlying storage.
      */
-    public PwsFileStorage(String filename) throws IOException
+    public PwsFileStorage(String identifier, String fileToOpen)
+        throws IOException
     {
-        super(filename, new FileInputStream(filename));
+        super(identifier,
+              (fileToOpen == null) ? null : new FileInputStream(fileToOpen));
     }
 
     /**

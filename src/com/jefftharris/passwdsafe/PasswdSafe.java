@@ -289,11 +289,15 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 {
                     Dialog d = (Dialog)dialog;
                     CheckBox cb = (CheckBox)d.findViewById(R.id.read_only);
-                    boolean readonly = cb.isChecked();
-                    SharedPreferences prefs =
-                        PreferenceManager.getDefaultSharedPreferences(
-                            PasswdSafe.this);
-                    Preferences.setFileOpenReadOnlyPref(readonly, prefs);
+                    boolean readonly;
+                    if (cb.isEnabled()) {
+                        readonly = cb.isChecked();
+                        SharedPreferences prefs =
+                            PreferenceManager.getDefaultSharedPreferences(PasswdSafe.this);
+                        Preferences.setFileOpenReadOnlyPref(readonly, prefs);
+                    } else {
+                        readonly = true;
+                    }
 
                     EditText passwdInput =
                         (EditText)d.findViewById(R.id.passwd_edit);
@@ -502,7 +506,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(R.string.delete_file_title)
                 .setMessage(getString(R.string.delete_file_msg,
-                                      itsUri.getPath()))
+                                      PasswdFileData.getUriIdentifier(itsUri,
+                                                                      this,
+                                                                      false)))
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
@@ -529,9 +535,17 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
             TextView tv = (TextView)dialog.findViewById(R.id.file);
-            tv.setText(getString(R.string.file_label_val, itsUri.getPath()));
+            tv.setText(getString(R.string.file_label_val,
+                                 PasswdFileData.getUriIdentifier(itsUri, this,
+                                                                 false)));
             CheckBox cb = (CheckBox)dialog.findViewById(R.id.read_only);
-            cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
+            if (PasswdFileData.isFileUri(itsUri)) {
+                cb.setEnabled(true);
+                cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
+            } else {
+                cb.setEnabled(false);
+                cb.setChecked(true);
+            }
             break;
         }
         case DIALOG_DETAILS:
@@ -812,7 +826,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             try {
                 PasswdFileData fileData = new PasswdFileData(itsUri);
-                fileData.load(itsPasswd, itsIsReadOnly);
+                fileData.load(itsPasswd, itsIsReadOnly, PasswdSafe.this);
                 return fileData;
             } catch (Exception e) {
                 return e;

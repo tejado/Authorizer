@@ -214,64 +214,91 @@ public class PwsFileFactory {
 	{
 	    LOG.enterMethod( "PwsFileFactory.loadFile" );
 
-	    PwsFile file;
+	    PwsStorage storage = new PwsFileStorage(filename, filename);
+	    PwsFile file = loadFromStorage(storage, aPassphrase);
 
-	    //TODOlib change to StringBuilder Constructors
-	    String passphrase = aPassphrase.toString();
-
-	    PwsStorage storage = new PwsFileStorage(filename);
-
-	    try
-	    {
-	        byte[] header = storage.openForLoad(MAX_HEADER_LEN);
-
-	        // First check for a v3 file...
-	        byte[] first4Bytes = Util.getBytes(header, 0, 4);
-	        if (Util.bytesAreEqual("PWS3".getBytes(), first4Bytes)) {
-	            LOG.debug1( "This is a V3 format file." );
-	            file = new PwsFileV3(storage, passphrase);
-	            file.readAll();
-	            file.close();
-	            return file;
-	        }
-
-	        PwsRecordV1	rec;
-	        String encoding = checkPassword( header, passphrase );
-	        file = new PwsFileV1( storage, passphrase, encoding );
-	        try {
-	            rec = (PwsRecordV1) file.readRecord();
-	        } catch (PasswordSafeException e) {
-	            throw new IllegalStateException(e);
-	        }
-	        file.close();
-
-	        // TODOlib what can we do about this?
-	        // it will probably be fooled if someone is daft enough to create a V1 file with the
-	        // title of the first record set to the value of PwsFileV2.ID_STRING!
-
-	        if ( rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING) ) {
-	            LOG.debug1( "This is a V2 format file." );
-	            file = new PwsFileV2( storage, passphrase, encoding );
-	        } else {
-	            LOG.debug1( "This is a V1 format file." );
-	            file = new PwsFileV1( storage, passphrase, encoding );
-	        }
-	        file.readAll();
-	        file.close();
-
-	        LOG.debug1( "File contains " + file.getRecordCount() + " records." );
-	        LOG.leaveMethod( "PwsFileFactory.loadFile" );
-	        return file;
-	    } finally {
-	        try {
-	            storage.closeAfterLoad();
-	        } catch (IOException ioe) {
-	            LOG.error("Error closing file " + filename, ioe);
-	        }
-	    }
+	    LOG.leaveMethod( "PwsFileFactory.loadFile" );
+	    return file;
 	}
 
-	/**
+        /**
+         * Loads a Password Safe file.  It returns the appropriate subclass of {@link PwsFile}.
+         *
+         * @param storage the password storage
+         * @param passphrase the passphrase for the file
+         *
+         * @return The correct subclass of {@link PwsFile} for the file.
+         *
+         * @throws EndOfFileException
+         * @throws InvalidPassphraseException
+         * @throws IOException
+         * @throws UnsupportedFileVersionException
+         * @throws NoSuchAlgorithmException        If no SHA-1 implementation is found.
+         */
+        public static final PwsFile loadFromStorage(PwsStorage storage,
+                                                    StringBuilder aPassphrase)
+            throws EndOfFileException, InvalidPassphraseException, IOException,
+                   UnsupportedFileVersionException, NoSuchAlgorithmException
+        {
+            LOG.enterMethod( "PwsFileFactory.loadFromStorage" );
+
+            PwsFile file;
+
+            //TODOlib change to StringBuilder Constructors
+            String passphrase = aPassphrase.toString();
+
+            try
+            {
+                byte[] header = storage.openForLoad(MAX_HEADER_LEN);
+
+                // First check for a v3 file...
+                byte[] first4Bytes = Util.getBytes(header, 0, 4);
+                if (Util.bytesAreEqual("PWS3".getBytes(), first4Bytes)) {
+                    LOG.debug1( "This is a V3 format file." );
+                    file = new PwsFileV3(storage, passphrase);
+                    file.readAll();
+                    file.close();
+                    return file;
+                }
+
+                PwsRecordV1     rec;
+                String encoding = checkPassword( header, passphrase );
+                file = new PwsFileV1( storage, passphrase, encoding );
+                try {
+                    rec = (PwsRecordV1) file.readRecord();
+                } catch (PasswordSafeException e) {
+                    throw new IllegalStateException(e);
+                }
+                file.close();
+
+                // TODOlib what can we do about this?
+                // it will probably be fooled if someone is daft enough to create a V1 file with the
+                // title of the first record set to the value of PwsFileV2.ID_STRING!
+
+                if ( rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING) ) {
+                    LOG.debug1( "This is a V2 format file." );
+                    file = new PwsFileV2( storage, passphrase, encoding );
+                } else {
+                    LOG.debug1( "This is a V1 format file." );
+                    file = new PwsFileV1( storage, passphrase, encoding );
+                }
+                file.readAll();
+                file.close();
+
+                LOG.debug1( "File contains " + file.getRecordCount() + " records." );
+                LOG.leaveMethod( "PwsFileFactory.loadFile" );
+                return file;
+            } finally {
+                try {
+                    storage.closeAfterLoad();
+                } catch (IOException ioe) {
+                    LOG.error("Error closing file " + storage.getIdentifier(),
+                              ioe);
+                }
+            }
+        }
+
+        /**
 	 * Creates a new, empty PasswordSafe database in memory.  The database will always
 	 * be the latest version supported by this library which for this release is version 2.
 	 *
@@ -290,5 +317,6 @@ public class PwsFileFactory {
 		return new PwsEntryStoreImpl(aFile, sparseFields);
 
 	}
+
 
 }

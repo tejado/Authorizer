@@ -434,7 +434,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
 
     protected String getUriName()
     {
-        return itsUri.getLastPathSegment();
+        return PasswdFileData.getUriIdentifier(itsUri, this, true);
     }
 
 

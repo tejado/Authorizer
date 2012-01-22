@@ -23,7 +23,7 @@ public class PwsStreamStorage implements PwsStorage
     private byte[] itsLoadBytes;
     private String itsIdentifier;
 
-    PwsStreamStorage(String identifier, InputStream stream)
+    public PwsStreamStorage(String identifier, InputStream stream)
     {
         itsIdentifier = identifier;
         itsLoadStream = new BufferedInputStream(stream);

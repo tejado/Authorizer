@@ -81,7 +81,8 @@ public class FileConverter
 
 		newFile.setPassphrase( new StringBuilder( oldFile.getPassphrase() ));
 		PwsFileStorage oldStorage = (PwsFileStorage) oldFile.getStorage();
-		PwsFileStorage newStorage = new PwsFileStorage(makeNewFilename(oldStorage.getFilename(), "v2-"));
+		String name = makeNewFilename(oldStorage.getFilename(), "v2-");
+		PwsFileStorage newStorage = new PwsFileStorage(name, name);
 		newFile.setStorage( newStorage );
 
 		for ( Iterator<?> iter = oldFile.getRecords(); iter.hasNext(); )
@@ -122,7 +123,8 @@ public class FileConverter
 
 		newFile.setPassphrase( new StringBuilder(oldFile.getPassphrase()) );
 		PwsFileStorage oldStorage = (PwsFileStorage) oldFile.getStorage();
-		PwsFileStorage newStorage = new PwsFileStorage(makeNewFilename(oldStorage.getFilename(), "v1-"));
+		String name = makeNewFilename(oldStorage.getFilename(), "v1-");
+		PwsFileStorage newStorage = new PwsFileStorage(name, name);
 		newFile.setStorage( newStorage );
 		for ( Iterator<?> iter = oldFile.getRecords(); iter.hasNext(); )
 		{

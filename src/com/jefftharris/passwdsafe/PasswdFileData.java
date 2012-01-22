@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -44,11 +45,13 @@ import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
 import org.pwsafe.lib.file.PwsStorage;
+import org.pwsafe.lib.file.PwsStreamStorage;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -78,15 +81,25 @@ public class PasswdFileData
         itsFile = getUriAsFile(itsUri);
     }
 
-    public void load(StringBuilder passwd, boolean readonly)
+    public void load(StringBuilder passwd, boolean readonly, Context context)
         throws IOException, NoSuchAlgorithmException,
             EndOfFileException, InvalidPassphraseException,
             UnsupportedFileVersionException
     {
         PasswdSafeApp.dbginfo(TAG, "before load file");
-        // TODO: fix for non-files
         itsIsOpenReadOnly = readonly;
-        itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
+
+        if (isFileUri(itsUri)) {
+            itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(),
+                                                 passwd);
+        } else {
+            ContentResolver cr = context.getContentResolver();
+            InputStream is = cr.openInputStream(itsUri);
+            String id = getUriIdentifier(itsUri, context, false);
+            PwsStorage storage = new PwsStreamStorage(id, is);
+            itsPwsFile = PwsFileFactory.loadFromStorage(storage, passwd);
+        }
+
         if (itsIsOpenReadOnly || (itsFile == null) || !itsFile.canWrite()) {
             itsPwsFile.setReadOnly(true);
         }
@@ -96,11 +109,10 @@ public class PasswdFileData
     public void createNewFile(StringBuilder passwd, Context context)
         throws IOException, NoSuchAlgorithmException
     {
-        // TODO: fix for non-files
         itsPwsFile = PwsFileFactory.newFile();
         itsPwsFile.setPassphrase(passwd);
-        // TODO: fix open of new file by storage
-        itsPwsFile.setStorage(new PwsFileStorage(itsFile.getAbsolutePath()));
+        itsPwsFile.setStorage(new PwsFileStorage(itsFile.getAbsolutePath(),
+                                                 null));
         setSaveHdrFields(context);
         itsPwsFile.save();
         finishOpenFile(passwd);
@@ -406,12 +418,37 @@ public class PasswdFileData
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
 
+    public static final boolean isFileUri(Uri uri)
+    {
+        return uri.getScheme().equals(ContentResolver.SCHEME_FILE);
+    }
+
     public static File getUriAsFile(Uri uri)
     {
-        if (uri.getScheme().equals("file")) {
+        if (isFileUri(uri)) {
             return new File(uri.getPath());
         }
         return null;
+    }
+
+    public static String getUriIdentifier(Uri uri, Context context,
+                                          boolean shortId)
+    {
+        String id;
+        if (isFileUri(uri)) {
+            if (shortId) {
+                id = uri.getLastPathSegment();
+            } else {
+                id = uri.getPath();
+            }
+        } else {
+            if (uri.getAuthority().indexOf("mail") != -1) {
+                id = context.getString(R.string.email_attachment);
+            } else {
+                id = context.getString(R.string.content_file);
+            }
+        }
+        return id;
     }
 
     public static final int hexBytesToInt(byte[] bytes, int pos, int len)

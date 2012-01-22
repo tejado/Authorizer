@@ -13,6 +13,7 @@
     <string name="confirm">Confirm</string>
     <string name="confirm_label">Confirm:</string>
     <string name="confirm_password_label">Confirm Password:</string>
+    <string name="content_file">Content File</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
@@ -26,6 +27,7 @@
     <string name="done">Done</string>
     <string name="edit">Edit</string>
     <string name="email">Email</string>
+    <string name="email_attachment">Email Attachment</string>
     <string name="enabled">Enabled</string>
     <string name="error_msg">&lt;b&gt;&lt;i&gt;Problem&lt;/i&gt;&lt;/b&gt; - %1$s</string>
     <string name="expiration">Expiration</string>

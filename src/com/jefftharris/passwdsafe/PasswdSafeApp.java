@@ -313,7 +313,7 @@ public class PasswdSafeApp extends Application
         StringBuilder builder = new StringBuilder(getAppTitle(ctx));
         if (uri != null) {
             builder.append(" - ");
-            builder.append(uri.getLastPathSegment());
+            builder.append(PasswdFileData.getUriIdentifier(uri, ctx, true));
         }
         return builder.toString();
 
