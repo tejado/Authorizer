@@ -258,8 +258,16 @@ public class RecordView extends AbstractRecordTabActivity
         }
 
         ActivityPasswdFile passwdFile = getPasswdFile();
-        boolean canEdit = (passwdFile != null) &&
-            passwdFile.getFileData().canEdit();
+        boolean canEdit = false;
+        if (passwdFile != null) {
+            PasswdFileData fileData = passwdFile.getFileData();
+            if (fileData != null) {
+                canEdit = fileData.canEdit();
+            } else {
+                finish();
+                return false;
+            }
+        }
 
         item = menu.findItem(MENU_EDIT);
         if (item != null) {
