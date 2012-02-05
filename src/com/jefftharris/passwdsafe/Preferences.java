@@ -215,8 +215,12 @@ public class Preferences extends PreferenceActivity
 
     public static int getPasswordGenLengthPref(SharedPreferences prefs)
     {
-        return Integer.parseInt(
-            prefs.getString(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF));
+        try {
+            return Integer.parseInt(prefs.getString(PREF_GEN_LENGTH,
+                                                    PREF_GEN_LENGTH_DEF));
+        } catch (NumberFormatException e) {
+            return Integer.parseInt(PREF_GEN_LENGTH_DEF);
+        }
     }
 
     public static boolean getSearchCaseSensitivePref(SharedPreferences prefs)
