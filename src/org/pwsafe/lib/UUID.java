@@ -206,7 +206,7 @@ public class UUID implements Comparable<Object>, Serializable
 			throw new IllegalArgumentException();
 		}
 
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder(38);
 
 		sb.append( '{' );
 		sb.append( Util.bytesToHex(uuid, 0, 4) );

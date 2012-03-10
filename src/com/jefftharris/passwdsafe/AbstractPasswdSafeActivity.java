@@ -558,6 +558,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
         recInfo.put(MATCH, rec.itsMatch);
         recInfo.put(USERNAME, user);
         recInfo.put(ICON, R.drawable.contact_rev);
+        // TODO: icons for type
         return recInfo;
     }
 

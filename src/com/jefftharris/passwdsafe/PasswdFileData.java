@@ -19,7 +19,9 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,6 +69,8 @@ public class PasswdFileData
     private PwsFile itsPwsFile;
     private final HashMap<String, PwsRecord> itsRecordsByUUID =
         new HashMap<String, PwsRecord>();
+    private final Map<PwsRecord, PasswdRecord> itsPasswdRecords =
+        new IdentityHashMap<PwsRecord, PasswdRecord>();
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
     private boolean itsIsOpenReadOnly = false;
 
@@ -173,6 +177,11 @@ public class PasswdFileData
     public PwsRecord getRecord(String uuid)
     {
         return itsRecordsByUUID.get(uuid);
+    }
+
+    public PasswdRecord getPasswdRecord(PwsRecord rec)
+    {
+        return itsPasswdRecords.get(rec);
     }
 
     public PwsRecord createRecord()
@@ -939,6 +948,9 @@ public class PasswdFileData
 
             itsRecords.add(rec);
             itsRecordsByUUID.put(uuid, rec);
+        }
+        for (PwsRecord rec: itsRecords) {
+            itsPasswdRecords.put(rec, new PasswdRecord(rec, this));
         }
     }
 
