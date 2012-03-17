@@ -267,6 +267,26 @@ public class PasswdFileData
             null;
     }
 
+    public final String getId(PwsRecord rec)
+    {
+        StringBuilder id = new StringBuilder();
+
+        String group = getGroup(rec);
+        if (!TextUtils.isEmpty(group)) {
+            id.append("[");
+            id.append(group);
+            id.append("] ");
+        }
+        id.append(getTitle(rec));
+        String user = getUsername(rec);
+        if (!TextUtils.isEmpty(user)) {
+            id.append(" [");
+            id.append(user);
+            id.append("]");
+        }
+        return id.toString();
+    }
+
     public final String getEmail(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.EMAIL);

@@ -51,7 +51,7 @@ public class RecordView extends AbstractRecordTabActivity
     private static final int EDIT_RECORD_REQUEST = 0;
 
     private static final int TAB_BASIC = 0;
-    //private static final int TAB_HISTORY = 1;
+    private static final int TAB_HISTORY = 1;
     private static final int TAB_NOTES = 2;
 
     private static final int NOTES_ICON_LEVEL_BASE = 0;
@@ -414,72 +414,22 @@ public class RecordView extends AbstractRecordTabActivity
             PasswdSafeApp.showFatalMsg("Unknown record: " + uuid, this);
             return;
         }
+        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
 
         TabWidget tabs = getTabHost().getTabWidget();
+
+        setBaseRecord(passwdRec, fileData);
         setText(R.id.title, View.NO_ID, fileData.getTitle(rec));
         setText(R.id.group, R.id.group_row, fileData.getGroup(rec));
-        setText(R.id.url, R.id.url_row, fileData.getURL(rec));
-        setText(R.id.email, R.id.email_row, fileData.getEmail(rec));
         itsUserView =
             setText(R.id.user, R.id.user_row, fileData.getUsername(rec));
         if (itsUserView != null) {
             registerForContextMenu(itsUserView);
         }
-        setText(R.id.expiration, R.id.expiration_row,
-                fileData.getPasswdExpiryTime(rec));
 
-        String notes = fileData.getNotes(rec);
-        itsHasNotes = !TextUtils.isEmpty(notes);
-        int[] currState = itsNotesTabDrawable.getState();
-        itsNotesTabDrawable.setState(new int[currState.length + 1]);
-        itsNotesTabDrawable.setState(currState);
-        setText(R.id.notes, View.NO_ID, notes);
-        View notesTab = tabs.getChildAt(TAB_NOTES);
-        View notesTitle = notesTab.findViewById(android.R.id.title);
-        notesTab.setEnabled(itsHasNotes);
-        notesTitle.setEnabled(itsHasNotes);
-
-        PasswdHistory history = fileData.getPasswdHistory(rec);
-        boolean historyExists = (history != null);
-        boolean historyEnabled = false;
-        String historyMaxSize;
-        ListView histView = (ListView)findViewById(R.id.history);
-        if (historyExists) {
-            historyEnabled = history.isEnabled();
-            historyMaxSize = Integer.toString(history.getMaxSize());
-            histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(history,
-                                                                    this));
-        } else {
-            historyMaxSize = getString(R.string.n_a);
-            histView.setAdapter(null);
-        }
-        CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
-        enabledCb.setClickable(false);
-        enabledCb.setChecked(historyEnabled);
-        enabledCb.setEnabled(historyExists);
-        TextView historyMaxSizeView =
-            (TextView)findViewById(R.id.history_max_size);
-        historyMaxSizeView.setText(historyMaxSize);
-        historyMaxSizeView.setEnabled(historyExists);
-        histView.setEnabled(historyEnabled);
-        findViewById(R.id.history_max_size_label).setEnabled(historyExists);
-        findViewById(R.id.history_sep).setEnabled(historyExists);
-
-        isPasswordShown = false;
-        itsPasswordView =
-            setText(R.id.password, R.id.password_row,
-                    (fileData.hasPassword(rec) ? HIDDEN_PASSWORD : null));
-        if (itsPasswordView != null) {
-            itsPasswordView.setOnClickListener(new View.OnClickListener()
-            {
-                public void onClick(View v)
-                {
-                    togglePasswordShown();
-                }
-            });
-            registerForContextMenu(itsPasswordView);
-        }
-        setWordWrap();
+        setBasicFields(passwdRec, fileData);
+        setNotesFields(passwdRec, fileData, tabs);
+        setHistoryFields(passwdRec, fileData, tabs);
     }
 
     private final void deleteRecord()
@@ -545,5 +495,161 @@ public class RecordView extends AbstractRecordTabActivity
         TextView tv = (TextView)findViewById(id);
         tv.setText(text);
         return (text == null) ? null : tv;
+    }
+
+    private final void setBaseRecord(PasswdRecord passwdRec,
+                                     PasswdFileData fileData)
+    {
+        View baseRow = findViewById(R.id.base_row);
+        TextView baseLabel = (TextView)findViewById(R.id.base_label);
+        TextView base = (TextView)findViewById(R.id.base);
+        PwsRecord ref = passwdRec.getRef();
+
+        switch (passwdRec.getType()) {
+        case NORMAL: {
+            baseRow.setVisibility(View.GONE);
+            break;
+        }
+        case ALIAS: {
+            baseRow.setVisibility(View.VISIBLE);
+            baseLabel.setText(R.string.alias_base_record_label);
+            base.setText(fileData.getId(ref));
+            break;
+        }
+        case SHORTCUT: {
+            baseRow.setVisibility(View.VISIBLE);
+            baseLabel.setText(R.string.shortcut_base_record_label);
+            base.setText(fileData.getId(ref));
+            break;
+        }
+        }
+
+        // TODO: click to goto base record
+    }
+
+    private final void setBasicFields(PasswdRecord passwdRec,
+                                      PasswdFileData fileData)
+    {
+        PwsRecord rec = passwdRec.getRecord();
+
+        switch (passwdRec.getType()) {
+        case NORMAL:
+        case ALIAS: {
+            setText(R.id.url, R.id.url_row, fileData.getURL(rec));
+            setText(R.id.email, R.id.email_row, fileData.getEmail(rec));
+            setText(R.id.expiration, R.id.expiration_row,
+                    fileData.getPasswdExpiryTime(rec));
+            break;
+        }
+        case SHORTCUT: {
+            setText(R.id.url, R.id.url_row, null);
+            setText(R.id.email, R.id.email_row, null);
+            setText(R.id.expiration, R.id.expiration_row, null);
+            break;
+        }
+        }
+
+        // TODO: decide what password to use for non-normal
+        isPasswordShown = false;
+        switch (passwdRec.getType()) {
+        case NORMAL: {
+            itsPasswordView =
+                setText(R.id.password, R.id.password_row,
+                        (fileData.hasPassword(rec) ? HIDDEN_PASSWORD : null));
+            if (itsPasswordView != null) {
+                itsPasswordView.setOnClickListener(new View.OnClickListener()
+                {
+                    public void onClick(View v)
+                    {
+                        togglePasswordShown();
+                    }
+                });
+                registerForContextMenu(itsPasswordView);
+            }
+            break;
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            itsPasswordView = setText(R.id.password, R.id.password_row, null);
+            break;
+        }
+        }
+    }
+
+    private final void setNotesFields(PasswdRecord passwdRec,
+                                      PasswdFileData fileData,
+                                      TabWidget tabs)
+    {
+        PwsRecord rec = passwdRec.getRecord();
+
+        switch (passwdRec.getType()) {
+        case NORMAL:
+        case ALIAS: {
+            String notes = fileData.getNotes(rec);
+            itsHasNotes = !TextUtils.isEmpty(notes);
+            setText(R.id.notes, View.NO_ID, notes);
+            break;
+        }
+        case SHORTCUT: {
+            itsHasNotes = false;
+            break;
+        }
+        }
+
+        int[] currState = itsNotesTabDrawable.getState();
+        itsNotesTabDrawable.setState(new int[currState.length + 1]);
+        itsNotesTabDrawable.setState(currState);
+        View notesTab = tabs.getChildAt(TAB_NOTES);
+        View notesTitle = notesTab.findViewById(android.R.id.title);
+        notesTab.setEnabled(itsHasNotes);
+        notesTitle.setEnabled(itsHasNotes);
+        setWordWrap();
+    }
+
+    private final void setHistoryFields(PasswdRecord passwdRec,
+                                        PasswdFileData fileData,
+                                        TabWidget tabs)
+    {
+        PwsRecord rec = passwdRec.getRecord();
+
+        View historyTab = tabs.getChildAt(TAB_HISTORY);
+        PasswdHistory history = null;
+        switch (passwdRec.getType()) {
+        case NORMAL:
+        case ALIAS: {
+            history = fileData.getPasswdHistory(rec);
+            historyTab.setEnabled(true);
+            break;
+        }
+        case SHORTCUT: {
+            historyTab.setEnabled(false);
+            break;
+        }
+        }
+
+        boolean historyExists = (history != null);
+        boolean historyEnabled = false;
+        String historyMaxSize;
+        ListView histView = (ListView)findViewById(R.id.history);
+        if (historyExists) {
+            historyEnabled = history.isEnabled();
+            historyMaxSize = Integer.toString(history.getMaxSize());
+            histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(history,
+                                                                    this));
+        } else {
+            historyMaxSize = getString(R.string.n_a);
+            histView.setAdapter(null);
+        }
+        CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
+        enabledCb.setClickable(false);
+        enabledCb.setChecked(historyEnabled);
+        enabledCb.setEnabled(historyExists);
+        TextView historyMaxSizeView =
+            (TextView)findViewById(R.id.history_max_size);
+        historyMaxSizeView.setText(historyMaxSize);
+        historyMaxSizeView.setEnabled(historyExists);
+        histView.setEnabled(historyEnabled);
+        findViewById(R.id.history_max_size_label).setEnabled(historyExists);
+        findViewById(R.id.history_sep).setEnabled(historyExists);
     }
 }

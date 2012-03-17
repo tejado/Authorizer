@@ -37,10 +37,37 @@
                              android:stretchColumns="1"
                              android:shrinkColumns="1"
                              >
+                    <TableRow android:id="@+id/base_row">
+                        <TextView android:id="@+id/base_label"
+                                  android:padding="3dip"/>
+                        <TextView android:id="@+id/base"
+                                  android:layout_width="wrap_content"
+                                  android:layout_height="wrap_content"
+                                  android:padding="3dip"/>
+                    </TableRow>
                     <TableRow android:id="@+id/group_row">
                         <TextView android:text="@string/group"
                                   android:padding="3dip"/>
                         <TextView android:id="@+id/group"
+                                  android:layout_width="wrap_content"
+                                  android:layout_height="wrap_content"
+                                  android:padding="3dip"/>
+                    </TableRow>
+            
+                    <TableRow android:id="@+id/user_row">
+                        <TextView android:text="@string/username"
+                                  android:padding="3dip"/>
+                        <TextView android:id="@+id/user"
+                                  android:layout_width="wrap_content"
+                                  android:layout_height="wrap_content"
+                                  android:padding="3dip"/>
+                    </TableRow>
+            
+                    <TableRow android:id="@+id/password_row">
+                        <TextView android:text="@string/password"
+                                  android:padding="3dip"/>
+                        <TextView android:id="@+id/password"
+                                  android:clickable="true"
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
                                   android:padding="3dip"/>
@@ -61,25 +88,6 @@
                                   android:padding="3dip"/>
                         <TextView android:id="@+id/email"
                                   android:autoLink="email"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
-                    </TableRow>
-            
-                    <TableRow android:id="@+id/user_row">
-                        <TextView android:text="@string/username"
-                                  android:padding="3dip"/>
-                        <TextView android:id="@+id/user"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
-                    </TableRow>
-            
-                    <TableRow android:id="@+id/password_row">
-                        <TextView android:text="@string/password"
-                                  android:padding="3dip"/>
-                        <TextView android:id="@+id/password"
-                                  android:clickable="true"
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
                                   android:padding="3dip"/>
