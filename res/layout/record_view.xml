@@ -40,10 +40,23 @@
                     <TableRow android:id="@+id/base_row">
                         <TextView android:id="@+id/base_label"
                                   android:padding="3dip"/>
-                        <TextView android:id="@+id/base"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
+                        <RelativeLayout >
+                            <ImageButton
+                                android:id="@+id/base_btn" 
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:src="@android:drawable/ic_media_play"
+                                android:contentDescription="@string/go_to"
+                                />
+                            <TextView 
+                                android:id="@+id/base"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_toLeftOf="@+id/base_btn"
+                                android:padding="3dip"
+                                />
+                        </RelativeLayout>
                     </TableRow>
                     <TableRow android:id="@+id/group_row">
                         <TextView android:text="@string/group"

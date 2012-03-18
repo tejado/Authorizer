@@ -38,6 +38,7 @@
     <string name="file_name_label">File Name:</string>
     <string name="file_type_icon">File type icon</string>
     <string name="generate_password">Generate Password</string>
+    <string name="go_to">Goto</string>
     <string name="group">Group</string>
     <string name="hide_password">Hide Password</string>
     <string name="hide_passwords">Hide Passwords</string>

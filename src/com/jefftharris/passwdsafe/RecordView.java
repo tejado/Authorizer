@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -17,6 +18,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -48,7 +50,8 @@ public class RecordView extends AbstractRecordTabActivity
     private static final int MENU_TOGGLE_WRAP_NOTES = 7;
     private static final int MENU_CLOSE = 8;
 
-    private static final int EDIT_RECORD_REQUEST = 0;
+    private static final int RECORD_EDIT_REQUEST = 0;
+    private static final int RECORD_VIEW_REQUEST = 1;
 
     private static final int TAB_BASIC = 0;
     private static final int TAB_HISTORY = 1;
@@ -95,6 +98,22 @@ public class RecordView extends AbstractRecordTabActivity
     private boolean isWordWrap = true;
     private boolean itsHasNotes = false;
     private Drawable itsNotesTabDrawable;
+
+
+    public static void startActivityForResult(Uri fileUri, String uuid,
+                                              int requestCode,
+                                              Activity parentAct)
+    {
+        Uri.Builder builder = fileUri.buildUpon();
+        if (uuid != null) {
+            builder.appendQueryParameter("rec", uuid);
+        }
+        PasswdSafeApp.dbginfo(TAG, "start activity: " + builder);
+        Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
+                                   parentAct, RecordView.class);
+        parentAct.startActivityForResult(intent, requestCode);
+    }
+
 
     /** Called when the activity is first created. */
     @Override
@@ -293,7 +312,7 @@ public class RecordView extends AbstractRecordTabActivity
             startActivityForResult(
                 new Intent(Intent.ACTION_EDIT, getIntent().getData(),
                            this, RecordEditActivity.class),
-                EDIT_RECORD_REQUEST);
+                RECORD_EDIT_REQUEST);
             return true;
         }
         case MENU_DELETE:
@@ -392,7 +411,8 @@ public class RecordView extends AbstractRecordTabActivity
         PasswdSafeApp.dbginfo(TAG,
                               "onActivityResult req: " + requestCode +
                               ", rc: " + resultCode);
-        if ((requestCode == EDIT_RECORD_REQUEST) &&
+        if (((requestCode == RECORD_EDIT_REQUEST) ||
+             (requestCode == RECORD_VIEW_REQUEST))&&
             (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {
             setResult(PasswdSafeApp.RESULT_MODIFIED);
             refresh();
@@ -524,7 +544,37 @@ public class RecordView extends AbstractRecordTabActivity
         }
         }
 
-        // TODO: click to goto base record
+        View baseBtn = findViewById(R.id.base_btn);
+        baseBtn.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                showBaseRef();
+            }
+        });
+    }
+
+    private final void showBaseRef()
+    {
+        PasswdFileData fileData = getPasswdFile().getFileData();
+        if (fileData == null) {
+            return;
+        }
+        PwsRecord rec = fileData.getRecord(getUUID());
+        if (rec == null) {
+            return;
+        }
+        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+        PwsRecord refRec = passwdRec.getRef();
+        if (refRec == null) {
+            return;
+        }
+        String uuid = fileData.getUUID(refRec);
+        if (uuid == null) {
+            return;
+        }
+
+        startActivityForResult(getUri(), uuid, RECORD_VIEW_REQUEST, this);
     }
 
     private final void setBasicFields(PasswdRecord passwdRec,
@@ -613,16 +663,19 @@ public class RecordView extends AbstractRecordTabActivity
         PwsRecord rec = passwdRec.getRecord();
 
         View historyTab = tabs.getChildAt(TAB_HISTORY);
+        View historyTitle = historyTab.findViewById(android.R.id.title);
         PasswdHistory history = null;
         switch (passwdRec.getType()) {
         case NORMAL:
         case ALIAS: {
             history = fileData.getPasswdHistory(rec);
             historyTab.setEnabled(true);
+            historyTitle.setEnabled(true);
             break;
         }
         case SHORTCUT: {
             historyTab.setEnabled(false);
+            historyTitle.setEnabled(false);
             break;
         }
         }

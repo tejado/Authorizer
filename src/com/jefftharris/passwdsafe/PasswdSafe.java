@@ -797,13 +797,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
     private void openRecord(String uuid)
     {
-        Uri.Builder builder = itsUri.buildUpon();
-        if (uuid != null) {
-            builder.appendQueryParameter("rec", uuid.toString());
-        }
-        Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
-                                   this, RecordView.class);
-        startActivityForResult(intent, RECORD_VIEW_REQUEST);
+        RecordView.startActivityForResult(itsUri, uuid, RECORD_VIEW_REQUEST,
+                                          this);
     }
 
 
