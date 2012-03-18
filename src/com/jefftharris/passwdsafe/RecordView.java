@@ -35,7 +35,6 @@ import android.widget.TextView;
 public class RecordView extends AbstractRecordTabActivity
 {
     private static final String TAG = "RecordView";
-    private static final String HIDDEN_PASSWORD = "***** (tap to show)";
 
     private static final String WORD_WRAP_PREF = "wordwrap";
 
@@ -95,6 +94,7 @@ public class RecordView extends AbstractRecordTabActivity
     private TextView itsUserView;
     private boolean isPasswordShown = false;
     private TextView itsPasswordView;
+    private String itsHiddenPasswordStr;
     private boolean isWordWrap = true;
     private boolean itsHasNotes = false;
     private Drawable itsNotesTabDrawable;
@@ -450,6 +450,8 @@ public class RecordView extends AbstractRecordTabActivity
         setBasicFields(passwdRec, fileData);
         setNotesFields(passwdRec, fileData, tabs);
         setHistoryFields(passwdRec, fileData, tabs);
+
+        // TODO: show records which alias/shortcut to this record
     }
 
     private final void deleteRecord()
@@ -479,7 +481,7 @@ public class RecordView extends AbstractRecordTabActivity
         TextView passwordField = (TextView)findViewById(R.id.password);
         isPasswordShown = !isPasswordShown;
         passwordField.setText(
-            isPasswordShown ? getPassword() : HIDDEN_PASSWORD);
+            isPasswordShown ? getPassword() : itsHiddenPasswordStr);
     }
 
     private final String getPassword()
@@ -490,7 +492,18 @@ public class RecordView extends AbstractRecordTabActivity
         if (fileData != null) {
             PwsRecord rec = fileData.getRecord(getUUID());
             if (rec != null) {
-                password = fileData.getPassword(rec);
+                PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+                switch (passwdRec.getType()) {
+                case NORMAL: {
+                    password = fileData.getPassword(rec);
+                    break;
+                }
+                case ALIAS:
+                case SHORTCUT: {
+                    password = fileData.getPassword(passwdRec.getRef());
+                    break;
+                }
+                }
             }
         }
 
@@ -599,30 +612,37 @@ public class RecordView extends AbstractRecordTabActivity
         }
         }
 
-        // TODO: decide what password to use for non-normal
-        isPasswordShown = false;
+        PwsRecord recForPassword = rec;
+        int hiddenId = R.string.hidden_password_normal;
         switch (passwdRec.getType()) {
         case NORMAL: {
-            itsPasswordView =
-                setText(R.id.password, R.id.password_row,
-                        (fileData.hasPassword(rec) ? HIDDEN_PASSWORD : null));
-            if (itsPasswordView != null) {
-                itsPasswordView.setOnClickListener(new View.OnClickListener()
-                {
-                    public void onClick(View v)
-                    {
-                        togglePasswordShown();
-                    }
-                });
-                registerForContextMenu(itsPasswordView);
-            }
             break;
         }
-        case ALIAS:
+        case ALIAS: {
+            recForPassword = passwdRec.getRef();
+            hiddenId = R.string.hidden_password_alias;
+            break;
+        }
         case SHORTCUT: {
-            itsPasswordView = setText(R.id.password, R.id.password_row, null);
+            recForPassword = passwdRec.getRef();
+            hiddenId = R.string.hidden_password_shortcut;
             break;
         }
+        }
+        isPasswordShown = false;
+        itsHiddenPasswordStr = getString(hiddenId);
+        itsPasswordView = setText(R.id.password, R.id.password_row,
+                                  (fileData.hasPassword(recForPassword)
+                                      ? itsHiddenPasswordStr : null));
+        if (itsPasswordView != null) {
+            itsPasswordView.setOnClickListener(new View.OnClickListener()
+            {
+                public void onClick(View v)
+                {
+                    togglePasswordShown();
+                }
+            });
+            registerForContextMenu(itsPasswordView);
         }
     }
 

@@ -40,6 +40,9 @@
     <string name="generate_password">Generate Password</string>
     <string name="go_to">Goto</string>
     <string name="group">Group</string>
+    <string name="hidden_password_alias">***** (from alias, tap to show)</string>
+    <string name="hidden_password_normal">***** (tap to show)</string>
+    <string name="hidden_password_shortcut">***** (from shortcut, tap to show)</string>
     <string name="hide_password">Hide Password</string>
     <string name="hide_passwords">Hide Passwords</string>
     <string name="history">History</string>
