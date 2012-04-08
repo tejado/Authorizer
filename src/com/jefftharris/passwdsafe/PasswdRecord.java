@@ -7,6 +7,9 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.pwsafe.lib.file.PwsRecord;
 
 public class PasswdRecord
@@ -19,6 +22,8 @@ public class PasswdRecord
     private final PwsRecord itsRecord;
     private final Type itsType;
     private final PwsRecord itsRef;
+    private final ArrayList<PwsRecord> itsRefsToRecord =
+        new ArrayList<PwsRecord>();
 
     public PasswdRecord(PwsRecord rec, PasswdFileData fileData)
     {
@@ -59,6 +64,16 @@ public class PasswdRecord
     public PwsRecord getRef()
     {
         return itsRef;
+    }
+
+    public void addRefToRecord(PwsRecord ref)
+    {
+        itsRefsToRecord.add(ref);
+    }
+
+    public List<PwsRecord> getRefsToRecord()
+    {
+        return itsRefsToRecord;
     }
 
     private PwsRecord lookupRef(String passwd, PasswdFileData fileData)

@@ -204,6 +204,7 @@ public class PasswdFileData
 
     public final boolean removeRecord(PwsRecord rec)
     {
+        // TODO: disallow delete if record still refers to deleted one
         if (itsPwsFile != null) {
             String recuuid = getUUID(rec);
             if (recuuid == null) {
@@ -947,6 +948,7 @@ public class PasswdFileData
         itsRecords.clear();
         itsRecords.ensureCapacity(itsPwsFile.getRecordCount());
         itsRecordsByUUID.clear();
+        itsPasswdRecords.clear();
         Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
         while (recIter.hasNext()) {
             PwsRecord rec = recIter.next();
@@ -969,8 +971,16 @@ public class PasswdFileData
             itsRecords.add(rec);
             itsRecordsByUUID.put(uuid, rec);
         }
+        // TODO: Check when to re-index when references may change...
         for (PwsRecord rec: itsRecords) {
             itsPasswdRecords.put(rec, new PasswdRecord(rec, this));
+        }
+        for (PasswdRecord passwdRec: itsPasswdRecords.values()) {
+            PwsRecord ref = passwdRec.getRef();
+            PasswdRecord referencedRecord = itsPasswdRecords.get(ref);
+            if (referencedRecord != null) {
+                referencedRecord.addRefToRecord(passwdRec.getRecord());
+            }
         }
     }
 

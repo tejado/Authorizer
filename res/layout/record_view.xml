@@ -32,89 +32,96 @@
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
               
-                <TableLayout android:layout_width="fill_parent"
-                             android:layout_height="wrap_content"
-                             android:stretchColumns="1"
-                             android:shrinkColumns="1"
-                             >
-                    <TableRow android:id="@+id/base_row">
-                        <TextView android:id="@+id/base_label"
-                                  android:padding="3dip"/>
-                        <RelativeLayout >
-                            <ImageButton
-                                android:id="@+id/base_btn" 
+                <LinearLayout android:orientation="vertical"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content">
+                
+                    <TableLayout android:layout_width="fill_parent"
+                                 android:layout_height="wrap_content"
+                                 android:stretchColumns="1"
+                                 android:shrinkColumns="1"
+                                 >
+                        <TableRow android:id="@+id/base_row">
+                            <TextView android:id="@+id/base_label"
+                                      android:padding="3dip"/>
+                            <Button 
+                                android:id="@+id/base"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:src="@android:drawable/ic_media_play"
-                                android:contentDescription="@string/go_to"
-                                />
-                            <TextView 
-                                android:id="@+id/base"
-                                android:layout_width="fill_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_toLeftOf="@+id/base_btn"
                                 android:padding="3dip"
+                                android:drawableRight="@android:drawable/ic_menu_directions"
                                 />
-                        </RelativeLayout>
-                    </TableRow>
-                    <TableRow android:id="@+id/group_row">
-                        <TextView android:text="@string/group"
-                                  android:padding="3dip"/>
-                        <TextView android:id="@+id/group"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
-                    </TableRow>
-            
-                    <TableRow android:id="@+id/user_row">
-                        <TextView android:text="@string/username"
-                                  android:padding="3dip"/>
-                        <TextView android:id="@+id/user"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
-                    </TableRow>
-            
-                    <TableRow android:id="@+id/password_row">
-                        <TextView android:text="@string/password"
-                                  android:padding="3dip"/>
-                        <TextView android:id="@+id/password"
-                                  android:clickable="true"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
-                    </TableRow>
-            
-                    <TableRow android:id="@+id/url_row">
-                        <TextView android:text="@string/url"
-                                  android:padding="3dip"/>
-                        <TextView android:id="@+id/url"
-                                  android:autoLink="web"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
-                    </TableRow>
-            
-                    <TableRow android:id="@+id/email_row">
-                        <TextView android:text="@string/email"
-                                  android:padding="3dip"/>
-                        <TextView android:id="@+id/email"
-                                  android:autoLink="email"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
-                    </TableRow>
-            
-                    <TableRow android:id="@+id/expiration_row">
-                        <TextView android:text="@string/expiration"
-                                  android:padding="3dip"/>
-                        <TextView android:id="@+id/expiration"
-                                  android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:padding="3dip"/>
-                    </TableRow>
-                </TableLayout>       
+                        </TableRow>
+                        <TableRow android:id="@+id/group_row">
+                            <TextView android:text="@string/group"
+                                      android:padding="3dip"/>
+                            <TextView android:id="@+id/group"
+                                      android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content"
+                                      android:padding="3dip"/>
+                        </TableRow>
+                
+                        <TableRow android:id="@+id/user_row">
+                            <TextView android:text="@string/username"
+                                      android:padding="3dip"/>
+                            <TextView android:id="@+id/user"
+                                      android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content"
+                                      android:padding="3dip"/>
+                        </TableRow>
+                
+                        <TableRow android:id="@+id/password_row">
+                            <TextView android:text="@string/password"
+                                      android:padding="3dip"/>
+                            <TextView android:id="@+id/password"
+                                      android:clickable="true"
+                                      android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content"
+                                      android:padding="3dip"/>
+                        </TableRow>
+                
+                        <TableRow android:id="@+id/url_row">
+                            <TextView android:text="@string/url"
+                                      android:padding="3dip"/>
+                            <TextView android:id="@+id/url"
+                                      android:autoLink="web"
+                                      android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content"
+                                      android:padding="3dip"/>
+                        </TableRow>
+                
+                        <TableRow android:id="@+id/email_row">
+                            <TextView android:text="@string/email"
+                                      android:padding="3dip"/>
+                            <TextView android:id="@+id/email"
+                                      android:autoLink="email"
+                                      android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content"
+                                      android:padding="3dip"/>
+                        </TableRow>
+                
+                        <TableRow android:id="@+id/expiration_row">
+                            <TextView android:text="@string/expiration"
+                                      android:padding="3dip"/>
+                            <TextView android:id="@+id/expiration"
+                                      android:layout_width="wrap_content"
+                                      android:layout_height="wrap_content"
+                                      android:padding="3dip"/>
+                        </TableRow>
+                    </TableLayout>
+                    
+                    <TextView android:id="@+id/references_label"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:text="@string/references_label"
+                              android:padding="3dip"
+                              />                              
+                    <ListView android:id="@+id/references"
+                              android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:isScrollContainer="false"
+                              />
+                </LinearLayout>
             </ScrollView>                          
 
             <RelativeLayout android:id="@+id/history_tab"

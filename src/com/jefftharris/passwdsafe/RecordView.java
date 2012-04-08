@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.util.List;
+
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.Activity;
@@ -26,6 +28,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -450,8 +455,6 @@ public class RecordView extends AbstractRecordTabActivity
         setBasicFields(passwdRec, fileData);
         setNotesFields(passwdRec, fileData, tabs);
         setHistoryFields(passwdRec, fileData, tabs);
-
-        // TODO: show records which alias/shortcut to this record
     }
 
     private final void deleteRecord()
@@ -557,17 +560,17 @@ public class RecordView extends AbstractRecordTabActivity
         }
         }
 
-        View baseBtn = findViewById(R.id.base_btn);
+        View baseBtn = findViewById(R.id.base);
         baseBtn.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
             {
-                showBaseRef();
+                showRefRec(true, 0);
             }
         });
     }
 
-    private final void showBaseRef()
+    private final void showRefRec(boolean baseRef, int referencingPos)
     {
         PasswdFileData fileData = getPasswdFile().getFileData();
         if (fileData == null) {
@@ -578,7 +581,15 @@ public class RecordView extends AbstractRecordTabActivity
             return;
         }
         PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-        PwsRecord refRec = passwdRec.getRef();
+        PwsRecord refRec = null;
+        if (baseRef) {
+            refRec = passwdRec.getRef();
+        } else {
+            List<PwsRecord> references = passwdRec.getRefsToRecord();
+            if (referencingPos < references.size()) {
+                refRec = references.get(referencingPos);
+            }
+        }
         if (refRec == null) {
             return;
         }
@@ -643,6 +654,36 @@ public class RecordView extends AbstractRecordTabActivity
                 }
             });
             registerForContextMenu(itsPasswordView);
+        }
+
+        View referencesLabel = findViewById(R.id.references_label);
+        ListView referencesView = (ListView)findViewById(R.id.references);
+        referencesView.setOnItemClickListener(new OnItemClickListener()
+        {
+            public void onItemClick(AdapterView<?> parent,
+                                    View view,
+                                    int position,
+                                    long id)
+            {
+                showRefRec(false, position);
+            }
+        });
+
+        List<PwsRecord> references = passwdRec.getRefsToRecord();
+        if ((references != null) && !references.isEmpty()) {
+            referencesLabel.setVisibility(View.VISIBLE);
+            ArrayAdapter<String> adapter =
+                new ArrayAdapter<String>(this,
+                                         android.R.layout.simple_list_item_1);
+            for (PwsRecord refRec: references) {
+                adapter.add(fileData.getId(refRec));
+            }
+            referencesView.setAdapter(adapter);
+            referencesView.setVisibility(View.VISIBLE);
+        } else {
+            referencesLabel.setVisibility(View.GONE);
+            referencesView.setAdapter(null);
+            referencesView.setVisibility(View.GONE);
         }
     }
 
