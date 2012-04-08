@@ -80,8 +80,6 @@ public class PasswdRecord
     {
         PwsRecord ref = null;
 
-        // TODO: test passords that look like aliases/shortcuts but aren't
-
         // Passwd in the form of [[<uuid>]] or [~<uuid>~]. Check for a real
         // entry. The <uuid> is a string of hex digits and needs to be converted
         // to the format used by the UUID class
