@@ -202,13 +202,28 @@ public class PasswdFileData
         }
     }
 
-    public final boolean removeRecord(PwsRecord rec)
+    public final boolean removeRecord(PwsRecord rec, Context context)
     {
-        // TODO: disallow delete if record still refers to deleted one
-        if (itsPwsFile != null) {
+        int errMsg = 0;
+        do {
+            if (itsPwsFile == null) {
+                errMsg = R.string.record_not_found;
+                break;
+            }
+            PasswdRecord passwdRec = getPasswdRecord(rec);
+            if (passwdRec == null) {
+                errMsg = R.string.record_not_found;
+                break;
+            }
+            if (!passwdRec.getRefsToRecord().isEmpty()) {
+                errMsg = R.string.record_has_references;
+                break;
+            }
+
             String recuuid = getUUID(rec);
             if (recuuid == null) {
-                return false;
+                errMsg = R.string.record_not_found;
+                break;
             }
 
             for (int i = 0; i < itsRecords.size(); ++i) {
@@ -218,12 +233,21 @@ public class PasswdFileData
                     boolean rc = itsPwsFile.removeRecord(i);
                     if (rc) {
                         indexRecords();
+                    } else {
+                        errMsg = R.string.record_not_found;
                     }
-                    return rc;
+                    break;
                 }
             }
+        } while(false);
+
+        if (errMsg != 0) {
+            String msg = context.getString(R.string.cannot_delete_record,
+                                           context.getString(errMsg));
+            PasswdSafeApp.showErrorMsg(msg, context);
+            return false;
         }
-        return false;
+        return true;
     }
 
     public final void changePasswd(StringBuilder passwd)

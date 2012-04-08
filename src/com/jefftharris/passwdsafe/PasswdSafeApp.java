@@ -25,6 +25,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -381,12 +382,30 @@ public class PasswdSafeApp extends Application
             }
         };
 
+        // TODO: i18n for - Error
         AlertDialog.Builder dlg = new AlertDialog.Builder(activity)
         .setTitle(getAppTitle(activity) + " - Error")
         .setMessage(msg)
         .setCancelable(false)
-        .setPositiveButton("Copy Trace and Close", dlgClick)
+        .setPositiveButton(R.string.copy_trace_and_close, dlgClick)
         .setOnCancelListener(dlgClick);
+        dlg.show();
+    }
+
+    public static void showErrorMsg(String msg, Context context)
+    {
+        // TODO: i18n for - Error
+        AlertDialog.Builder dlg = new AlertDialog.Builder(context)
+        .setTitle(getAppTitle(context) + " - Error")
+        .setMessage(msg)
+        .setCancelable(true)
+        .setNeutralButton(R.string.close, new OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+            }
+        });
         dlg.show();
     }
 

@@ -471,7 +471,7 @@ public class RecordView extends AbstractRecordTabActivity
                 break;
             }
 
-            removed = fileData.removeRecord(rec);
+            removed = fileData.removeRecord(rec, this);
         } while(false);
 
         if (removed) {

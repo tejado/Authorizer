@@ -14,10 +14,12 @@
     <string name="confirm">Confirm</string>
     <string name="confirm_label">Confirm:</string>
     <string name="confirm_password_label">Confirm Password:</string>
+    <string name="cannot_delete_record">Cannot delete record - %1$s"</string>
     <string name="content_file">Content File</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
+    <string name="copy_trace_and_close">Copy Trace and Close</string>
     <string name="copy_user">Copy User Name</string>
     <string name="database_version_label">Database version:</string>
     <string name="delete">Delete</string>
@@ -77,6 +79,8 @@
     <string name="pref_file_dir">Directory for Files</string>
     <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Search filter: %1$s</string>
+    <string name="record_has_references">Record has references</string>
+    <string name="record_not_found">Record not found</string>
     <string name="record_type">Record type</string>
     <string name="read_only">Read-only</string>
     <string name="read_write">Read-write</string>
