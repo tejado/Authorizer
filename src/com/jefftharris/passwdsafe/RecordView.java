@@ -560,14 +560,18 @@ public class RecordView extends AbstractRecordTabActivity
         }
         }
 
-        View baseBtn = findViewById(R.id.base);
-        baseBtn.setOnClickListener(new View.OnClickListener()
+        View.OnClickListener onclick = new View.OnClickListener()
         {
             public void onClick(View v)
             {
                 showRefRec(true, 0);
             }
-        });
+        };
+        View baseGroup = findViewById(R.id.base_group);
+        View baseBtn = findViewById(R.id.base_btn);
+        base.setOnClickListener(onclick);
+        baseGroup.setOnClickListener(onclick);
+        baseBtn.setOnClickListener(onclick);
     }
 
     private final void showRefRec(boolean baseRef, int referencingPos)
@@ -586,7 +590,7 @@ public class RecordView extends AbstractRecordTabActivity
             refRec = passwdRec.getRef();
         } else {
             List<PwsRecord> references = passwdRec.getRefsToRecord();
-            if (referencingPos < references.size()) {
+            if ((referencingPos >= 0) && (referencingPos < references.size())) {
                 refRec = references.get(referencingPos);
             }
         }
@@ -656,7 +660,6 @@ public class RecordView extends AbstractRecordTabActivity
             registerForContextMenu(itsPasswordView);
         }
 
-        View referencesLabel = findViewById(R.id.references_label);
         ListView referencesView = (ListView)findViewById(R.id.references);
         referencesView.setOnItemClickListener(new OnItemClickListener()
         {
@@ -665,26 +668,32 @@ public class RecordView extends AbstractRecordTabActivity
                                     int position,
                                     long id)
             {
-                showRefRec(false, position);
+                ListView parentList = (ListView)parent;
+                showRefRec(false, position - parentList.getHeaderViewsCount());
             }
         });
 
+        View header = getLayoutInflater().inflate(R.layout.listview_header,
+                                                  null);
+        TextView tv = (TextView)header.findViewById(R.id.text);
+        tv.setText(R.string.references);
+        referencesView.addHeaderView(header);
+
         List<PwsRecord> references = passwdRec.getRefsToRecord();
         if ((references != null) && !references.isEmpty()) {
-            referencesLabel.setVisibility(View.VISIBLE);
             ArrayAdapter<String> adapter =
                 new ArrayAdapter<String>(this,
-                                         android.R.layout.simple_list_item_1);
+                                         R.layout.normal_list_item1);
             for (PwsRecord refRec: references) {
                 adapter.add(fileData.getId(refRec));
             }
             referencesView.setAdapter(adapter);
             referencesView.setVisibility(View.VISIBLE);
         } else {
-            referencesLabel.setVisibility(View.GONE);
             referencesView.setAdapter(null);
             referencesView.setVisibility(View.GONE);
         }
+        GuiUtils.setListViewHeightBasedOnChildren(referencesView);
     }
 
     private final void setNotesFields(PasswdRecord passwdRec,

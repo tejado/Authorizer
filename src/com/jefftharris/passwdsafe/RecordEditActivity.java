@@ -196,8 +196,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         });
 
-        button = (Button)findViewById(R.id.history_enabled);
-        button.setOnClickListener(new View.OnClickListener()
+        CheckBox cb = (CheckBox)findViewById(R.id.history_enabled);
+        cb.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
             {

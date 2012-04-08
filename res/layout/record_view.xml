@@ -44,13 +44,25 @@
                         <TableRow android:id="@+id/base_row">
                             <TextView android:id="@+id/base_label"
                                       android:padding="3dip"/>
-                            <Button 
-                                android:id="@+id/base"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="3dip"
-                                android:drawableRight="@android:drawable/ic_menu_directions"
-                                />
+                            <RelativeLayout android:id="@+id/base_group"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:padding="3dip"
+                                            android:clickable="true"
+                                            >
+                                <Button android:id="@+id/base_btn"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentRight="true"
+                                        android:text="@string/go_to"
+                                        />
+                                <TextView android:id="@+id/base"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_toLeftOf="@id/base_btn"
+                                        android:clickable="true"
+                                        />                                          
+                            </RelativeLayout>
                         </TableRow>
                         <TableRow android:id="@+id/group_row">
                             <TextView android:text="@string/group"
@@ -110,16 +122,10 @@
                         </TableRow>
                     </TableLayout>
                     
-                    <TextView android:id="@+id/references_label"
-                              android:layout_width="fill_parent"
-                              android:layout_height="wrap_content"
-                              android:text="@string/references_label"
-                              android:padding="3dip"
-                              />                              
                     <ListView android:id="@+id/references"
                               android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
-                              android:isScrollContainer="false"
+                              android:padding="3dip"
                               />
                 </LinearLayout>
             </ScrollView>                          
