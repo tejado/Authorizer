@@ -541,9 +541,6 @@ public class RecordView extends AbstractRecordTabActivity
         TextView base = (TextView)findViewById(R.id.base);
         PwsRecord ref = passwdRec.getRef();
 
-        // TODO: check alias text layout in landscape mode
-        // TODO: check scrolling of references
-
         switch (passwdRec.getType()) {
         case NORMAL: {
             baseRow.setVisibility(View.GONE);
