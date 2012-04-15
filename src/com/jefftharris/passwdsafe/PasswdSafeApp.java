@@ -382,9 +382,9 @@ public class PasswdSafeApp extends Application
             }
         };
 
-        // TODO: i18n for - Error
         AlertDialog.Builder dlg = new AlertDialog.Builder(activity)
-        .setTitle(getAppTitle(activity) + " - Error")
+        .setTitle(getAppTitle(activity) + " - " +
+                  activity.getString(R.string.error))
         .setMessage(msg)
         .setCancelable(false)
         .setPositiveButton(R.string.copy_trace_and_close, dlgClick)
@@ -394,9 +394,9 @@ public class PasswdSafeApp extends Application
 
     public static void showErrorMsg(String msg, Context context)
     {
-        // TODO: i18n for - Error
         AlertDialog.Builder dlg = new AlertDialog.Builder(context)
-        .setTitle(getAppTitle(context) + " - Error")
+        .setTitle(getAppTitle(context) + " - " +
+                  context.getString(R.string.error))
         .setMessage(msg)
         .setCancelable(true)
         .setNeutralButton(R.string.close, new OnClickListener()
