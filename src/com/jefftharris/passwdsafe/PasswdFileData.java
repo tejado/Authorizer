@@ -366,6 +366,21 @@ public class PasswdFileData
             setPasswdHistory(history, rec);
         }
         setField(newPasswd, rec, PwsRecordV3.PASSWORD);
+        // Update PasswdRecord and indexes if the record exists
+        PasswdRecord passwdRec = getPasswdRecord(rec);
+        if (passwdRec != null) {
+            PwsRecord oldRef = passwdRec.getRef();
+            if (oldRef != null) {
+                PasswdRecord oldPasswdRec = getPasswdRecord(oldRef);
+                oldPasswdRec.removeRefToRecord(rec);
+            }
+            passwdRec.passwordChanged(this);
+            PwsRecord newRef = passwdRec.getRef();
+            if (newRef != null) {
+                PasswdRecord newPasswdRec = getPasswdRecord(newRef);
+                newPasswdRec.addRefToRecord(rec);
+            }
+        }
     }
 
     public final String getPasswdExpiryTime(PwsRecord rec)
@@ -995,7 +1010,6 @@ public class PasswdFileData
             itsRecords.add(rec);
             itsRecordsByUUID.put(uuid, rec);
         }
-        // TODO: Check when to re-index when references may change...
         for (PwsRecord rec: itsRecords) {
             itsPasswdRecords.put(rec, new PasswdRecord(rec, this));
         }

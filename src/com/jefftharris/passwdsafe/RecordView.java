@@ -541,6 +541,9 @@ public class RecordView extends AbstractRecordTabActivity
         TextView base = (TextView)findViewById(R.id.base);
         PwsRecord ref = passwdRec.getRef();
 
+        // TODO: check alias text layout in landscape mode
+        // TODO: check scrolling of references
+
         switch (passwdRec.getType()) {
         case NORMAL: {
             baseRow.setVisibility(View.GONE);
@@ -673,11 +676,13 @@ public class RecordView extends AbstractRecordTabActivity
             }
         });
 
-        View header = getLayoutInflater().inflate(R.layout.listview_header,
-                                                  null);
-        TextView tv = (TextView)header.findViewById(R.id.text);
-        tv.setText(R.string.references);
-        referencesView.addHeaderView(header);
+        if (referencesView.getHeaderViewsCount() == 0) {
+            View header = getLayoutInflater().inflate(R.layout.listview_header,
+                                                      null);
+            TextView tv = (TextView)header.findViewById(R.id.text);
+            tv.setText(R.string.references);
+            referencesView.addHeaderView(header);
+        }
 
         List<PwsRecord> references = passwdRec.getRefsToRecord();
         if ((references != null) && !references.isEmpty()) {

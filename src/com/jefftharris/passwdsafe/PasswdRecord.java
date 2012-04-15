@@ -20,35 +20,15 @@ public class PasswdRecord
     }
 
     private final PwsRecord itsRecord;
-    private final Type itsType;
-    private final PwsRecord itsRef;
+    private Type itsType;
+    private PwsRecord itsRef;
     private final ArrayList<PwsRecord> itsRefsToRecord =
         new ArrayList<PwsRecord>();
 
     public PasswdRecord(PwsRecord rec, PasswdFileData fileData)
     {
         itsRecord = rec;
-
-        PwsRecord ref = null;
-        Type type = Type.NORMAL;
-        if (fileData.isV3()) {
-            String passwd = fileData.getPassword(rec);
-            if (passwd != null) {
-                if (passwd.startsWith("[[") && passwd.endsWith("]]")) {
-                    ref = lookupRef(passwd, fileData);
-                    if (ref != null) {
-                        type = Type.ALIAS;
-                    }
-                } else if (passwd.startsWith("[~") && passwd.endsWith("~]")) {
-                    ref = lookupRef(passwd, fileData);
-                    if (ref != null) {
-                        type = Type.SHORTCUT;
-                    }
-                }
-            }
-        }
-        itsType = type;
-        itsRef = ref;
+        passwordChanged(fileData);
     }
 
     public PwsRecord getRecord()
@@ -71,9 +51,38 @@ public class PasswdRecord
         itsRefsToRecord.add(ref);
     }
 
+    public void removeRefToRecord(PwsRecord ref)
+    {
+        itsRefsToRecord.remove(ref);
+    }
+
     public List<PwsRecord> getRefsToRecord()
     {
         return itsRefsToRecord;
+    }
+
+    public void passwordChanged(PasswdFileData fileData)
+    {
+        PwsRecord ref = null;
+        Type type = Type.NORMAL;
+        if (fileData.isV3()) {
+            String passwd = fileData.getPassword(itsRecord);
+            if (passwd != null) {
+                if (passwd.startsWith("[[") && passwd.endsWith("]]")) {
+                    ref = lookupRef(passwd, fileData);
+                    if (ref != null) {
+                        type = Type.ALIAS;
+                    }
+                } else if (passwd.startsWith("[~") && passwd.endsWith("~]")) {
+                    ref = lookupRef(passwd, fileData);
+                    if (ref != null) {
+                        type = Type.SHORTCUT;
+                    }
+                }
+            }
+        }
+        itsType = type;
+        itsRef = ref;
     }
 
     private PwsRecord lookupRef(String passwd, PasswdFileData fileData)
