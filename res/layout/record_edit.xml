@@ -27,6 +27,14 @@
                          android:layout_height="wrap_content"
                          android:stretchColumns="1"
                          android:shrinkColumns="1">
+                <TableRow android:id="@+id/type_row">
+                    <TextView android:text="@string/type"/>
+                    <Spinner android:id="@+id/type"
+                             android:layout_width="fill_parent"
+                             android:layout_height="wrap_content"
+                             android:prompt="@string/choose_type"
+                             android:entries="@array/record_type"/>
+                </TableRow>
                 <TableRow android:id="@+id/title_row">
                     <TextView android:text="@string/title"/>
                     <EditText android:id="@+id/title"
@@ -97,6 +105,18 @@
                                   android:layout_height="wrap_content"/>
                     </LinearLayout>
                 </TableRow>
+                
+                <TableRow android:id="@+id/password_link_row"
+                          android:visibility="gone">
+                    <TextView android:id="@+id/password_link_label"
+                              android:gravity="center_vertical"
+                              android:layout_height="fill_parent"
+                              />
+                    <Spinner android:id="@+id/password_link"
+                             android:drawSelectorOnTop="true"
+                             android:layout_width="fill_parent"
+                             android:layout_height="wrap_content"/>
+                </TableRow>
             </TableLayout>
 
             <View android:id="@+id/history_group_sep"
@@ -160,13 +180,15 @@
                           />
             </RelativeLayout>
 
-            <View android:layout_width="fill_parent"
+            <View android:id="@+id/notes_sep"
+                  android:layout_width="fill_parent"
                   android:layout_height="1dip"
                   android:layout_marginTop="2dip"
                   android:layout_marginBottom="2dip"
                   android:background="#FF909090"/>
                   
-            <TextView android:text="@string/notes"
+            <TextView android:id="@+id/notes_label"
+                      android:text="@string/notes"
                       android:textSize="24sp"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"

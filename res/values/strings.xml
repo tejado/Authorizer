@@ -9,6 +9,7 @@
     <string name="cancel">Cancel</string>
     <string name="change_password">Change Password</string>
     <string name="choose_group">Choose Group</string>
+    <string name="choose_type">Choose Type</string>
     <string name="clear">Clear</string>
     <string name="close">Close</string>
     <string name="confirm">Confirm</string>
@@ -98,7 +99,15 @@
     <string name="show_passwords">Show Passwords</string>
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
+    <string name="type">Type</string>
     <string name="up">Up</string>
     <string name="url">URL</string>
     <string name="username">User Name</string>
+    
+    <!-- Order must match constants in RecordEditActivity -->
+    <string-array name="record_type">
+        <item>Normal</item>
+        <item>Alias</item>
+        <item>Shortcut</item>
+    </string-array>
 </resources>

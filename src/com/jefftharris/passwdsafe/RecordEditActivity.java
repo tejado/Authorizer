@@ -17,6 +17,7 @@ import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.PasswdRecord.Type;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import android.app.AlertDialog;
@@ -67,6 +68,8 @@ public class RecordEditActivity extends AbstractRecordActivity
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
     private DialogValidator itsValidator;
     private PasswdHistory itsHistory;
+    private PasswdRecord.Type itsPrevType = Type.NORMAL;
+    private PasswdRecord.Type itsOrigType = Type.NORMAL;
 
     private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
@@ -76,6 +79,12 @@ public class RecordEditActivity extends AbstractRecordActivity
     private static final String EASY_UPPER_CHARS = "ABCDEFGHJKLMNPQRTUVWXY";
     private static final String EASY_DIGITS = "346789";
     private static final String EASY_SYMBOLS = "+-=_@#$%^&<>/~\\?";
+
+    // Constants must match record_type strings
+    private static final int TYPE_NORMAL = 0;
+    private static final int TYPE_ALIAS = 1;
+    private static final int TYPE_SHORTCUT = 2;
+
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -92,6 +101,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsValidator = new Validator();
 
         PasswdFileData fileData = getPasswdFile().getFileData();
+        boolean isV3 = fileData.isV3();
         PwsRecord record = null;
         String group = null;
         String uuid = getUUID();
@@ -101,6 +111,9 @@ public class RecordEditActivity extends AbstractRecordActivity
                 PasswdSafeApp.showFatalMsg("Unknown record: " + uuid, this);
                 return;
             }
+
+            PasswdRecord passwdRec = fileData.getPasswdRecord(record);
+            itsOrigType = passwdRec.getType();
 
             setText(R.id.rec_title, "Edit " + fileData.getTitle(record));
             setText(R.id.title, fileData.getTitle(record));
@@ -112,7 +125,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             setText(R.id.password, password);
             setText(R.id.password_confirm, password);
 
-            if (fileData.isV3()) {
+            if (isV3) {
                 setText(R.id.url, fileData.getURL(record));
                 setText(R.id.email, fileData.getEmail(record));
             } else {
@@ -129,7 +142,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             setText(R.id.password_confirm, null);
             setText(R.id.notes, null);
 
-            if (fileData.isV3()) {
+            if (isV3) {
                 setText(R.id.url, null);
                 setText(R.id.email, null);
             } else {
@@ -138,12 +151,14 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         }
 
+        initType(fileData, isV3);
+
         TextView passwdField = (TextView)findViewById(R.id.password);
         TextView confirmField = (TextView)findViewById(R.id.password_confirm);
         PasswordVisibilityMenuHandler.set(passwdField, confirmField);
 
         initGroup(fileData, record, group);
-        if (fileData.isV3()) {
+        if (isV3) {
             TextView tv = (TextView)findViewById(R.id.history_max_size);
             tv.addTextChangedListener(new AbstractTextWatcher()
             {
@@ -393,6 +408,118 @@ public class RecordEditActivity extends AbstractRecordActivity
             return super.onContextItemSelected(item);
         }
         }
+    }
+
+    private final void initType(PasswdFileData fileData, boolean isV3)
+    {
+        if (isV3) {
+            Spinner typeSpin = (Spinner)findViewById(R.id.type);
+            typeSpin.setOnItemSelectedListener(new OnItemSelectedListener()
+            {
+                public void onItemSelected(AdapterView<?> parent, View arg1,
+                                           int position, long id)
+                {
+                    PasswdRecord.Type type = Type.NORMAL;
+                    switch (position) {
+                    case TYPE_NORMAL: {
+                        type = Type.NORMAL;
+                        break;
+                    }
+                    case TYPE_ALIAS: {
+                        type = Type.ALIAS;
+                        break;
+                    }
+                    case TYPE_SHORTCUT: {
+                        type = Type.SHORTCUT;
+                        break;
+                    }
+                    }
+                    setType(type, false);
+                }
+
+                public void onNothingSelected(AdapterView<?> arg0)
+                {
+                    setType(Type.NORMAL, false);
+                }
+            });
+            setType(itsOrigType, true);
+        } else {
+            hideRow(R.id.type_row);
+            hideRow(R.id.password_link_row);
+        }
+    }
+
+    private final void setType(PasswdRecord.Type type, boolean init)
+    {
+        if (type == itsPrevType) {
+            return;
+        }
+        // Prev type needs to be updated before setting spinner to prevent
+        // recursion
+        itsPrevType = type;
+
+        if (init) {
+            int pos = TYPE_NORMAL;
+            switch (type) {
+            case NORMAL: {
+                pos = TYPE_NORMAL;
+                break;
+            }
+            case ALIAS: {
+                pos = TYPE_ALIAS;
+                break;
+            }
+            case SHORTCUT: {
+                pos = TYPE_SHORTCUT;
+                break;
+            }
+            }
+            Spinner typeSpin = (Spinner) findViewById(R.id.type);
+            typeSpin.setSelection(pos);
+        }
+
+        boolean showNormalPassword = true;
+        int passwordLinkLabel = 0;
+        boolean showDetails = true;
+        boolean showHistory = true;
+        switch (type) {
+        case NORMAL: {
+            showNormalPassword = true;
+            showDetails = true;
+            showHistory = true;
+            break;
+        }
+        case ALIAS: {
+            showNormalPassword = false;
+            passwordLinkLabel = R.string.alias_base_record_label;
+            showDetails = true;
+            showHistory = false;
+            break;
+        }
+        case SHORTCUT: {
+            showNormalPassword = false;
+            passwordLinkLabel = R.string.shortcut_base_record_label;
+            showDetails = false;
+            showHistory = false;
+            break;
+        }
+        }
+        setVisibility(R.id.password_row, showNormalPassword);
+        setVisibility(R.id.password_link_row, !showNormalPassword);
+        if (passwordLinkLabel != 0) {
+            TextView tv = (TextView)findViewById(R.id.password_link_label);
+            tv.setText(passwordLinkLabel);
+        }
+        setVisibility(R.id.url_row, showDetails);
+        setVisibility(R.id.email_row, showDetails);
+        setVisibility(R.id.notes_sep, showDetails);
+        setVisibility(R.id.notes_label, showDetails);
+        setVisibility(R.id.notes, showDetails);
+        setVisibility(R.id.history_group_sep, showHistory);
+        setVisibility(R.id.history_group, showHistory);
+
+        // TODO: clear password on type change? Or change from alias <->
+        // shortcut
     }
 
     private final void setPasswordVisibility(boolean visible,
@@ -776,8 +903,14 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private final void hideRow(int rowId)
     {
-        View row = findViewById(rowId);
-        row.setVisibility(View.GONE);
+        // TODO remove?
+        setVisibility(rowId, false);
+    }
+
+    private final void setVisibility(int viewId, boolean visible)
+    {
+        View v = findViewById(viewId);
+        v.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private class Validator extends DialogValidator
