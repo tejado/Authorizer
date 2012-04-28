@@ -19,6 +19,11 @@ public class PasswdRecord
         NORMAL, ALIAS, SHORTCUT
     }
 
+    private static final String ALIAS_OPEN = "[[";
+    private static final String ALIAS_CLOSE = "]]";
+    private static final String SHORTCUT_OPEN = "[~";
+    private static final String SHORTCUT_CLOSE = "~]";
+
     private final PwsRecord itsRecord;
     private Type itsType;
     private PwsRecord itsRef;
@@ -68,12 +73,14 @@ public class PasswdRecord
         if (fileData.isV3()) {
             String passwd = fileData.getPassword(itsRecord);
             if (passwd != null) {
-                if (passwd.startsWith("[[") && passwd.endsWith("]]")) {
+                if (passwd.startsWith(ALIAS_OPEN) &&
+                    passwd.endsWith(ALIAS_CLOSE)) {
                     ref = lookupRef(passwd, fileData);
                     if (ref != null) {
                         type = Type.ALIAS;
                     }
-                } else if (passwd.startsWith("[~") && passwd.endsWith("~]")) {
+                } else if (passwd.startsWith(SHORTCUT_OPEN) &&
+                           passwd.endsWith(SHORTCUT_CLOSE)) {
                     ref = lookupRef(passwd, fileData);
                     if (ref != null) {
                         type = Type.SHORTCUT;
@@ -85,6 +92,59 @@ public class PasswdRecord
         itsRef = ref;
     }
 
+    public static String uuidToPasswd(String uuid, Type type)
+    {
+        StringBuilder sb = new StringBuilder(36);
+
+        switch (type) {
+        case NORMAL: {
+            break;
+        }
+        case ALIAS: {
+            sb.append(ALIAS_OPEN);
+            break;
+        }
+        case SHORTCUT: {
+            sb.append(SHORTCUT_OPEN);
+            break;
+        }
+        }
+
+        switch (type) {
+        case NORMAL: {
+            sb.append(uuid);
+            break;
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            if (uuid.length() == 38) {
+                sb.append(uuid, 1, 1 + 8);
+                sb.append(uuid, 10, 10 + 4);
+                sb.append(uuid, 15, 15 + 4);
+                sb.append(uuid, 20, 20 + 4);
+                sb.append(uuid, 25, 25 + 12);
+            }
+            break;
+        }
+        }
+
+        switch (type) {
+        case NORMAL: {
+            break;
+        }
+        case ALIAS: {
+            sb.append(ALIAS_CLOSE);
+            break;
+        }
+        case SHORTCUT: {
+            sb.append(SHORTCUT_CLOSE);
+            break;
+        }
+        }
+
+        return sb.toString();
+    }
+
     private PwsRecord lookupRef(String passwd, PasswdFileData fileData)
     {
         PwsRecord ref = null;
@@ -93,7 +153,7 @@ public class PasswdRecord
         // entry. The <uuid> is a string of hex digits and needs to be converted
         // to the format used by the UUID class
         if (passwd.length() == 36) {
-            StringBuilder sb = new StringBuilder(38);
+            StringBuilder sb = new StringBuilder(36 - 4 + 6);
             sb.append('{');
             sb.append(passwd, 2, 2 + 8);
             sb.append('-');
@@ -105,10 +165,11 @@ public class PasswdRecord
             sb.append('-');
             sb.append(passwd, 22, 22 + 12);
             sb.append('}');
-            ref = fileData.getRecord(sb.toString());
+            ref = fileData.getRecord(sb.toString().toLowerCase());
             for (int i = 0; i < sb.length(); ++i) {
                 sb.setCharAt(i, '\0');
             }
+            // TODO: test passwords with right format but no matching uuid record
         }
 
         return ref;

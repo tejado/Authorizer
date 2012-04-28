@@ -884,19 +884,59 @@ public class RecordEditActivity extends AbstractRecordActivity
                 fileData.setEmail(updateStr, record);
             }
 
-            if (isPasswdHistoryUpdated(fileData.getPasswdHistory(record))) {
-                if (itsHistory != null) {
-                    itsHistory.adjustEntriesToMaxSize();
+            // TODO: when changing type, check all fields for ones that need
+            // to be removed
+            PasswdHistory currHistory = fileData.getPasswdHistory(record);
+            switch (itsType) {
+            case NORMAL: {
+                if (isPasswdHistoryUpdated(currHistory)) {
+                    if (itsHistory != null) {
+                        itsHistory.adjustEntriesToMaxSize();
+                    }
+                    fileData.setPasswdHistory(itsHistory, record);
                 }
-                fileData.setPasswdHistory(itsHistory, record);
+                break;
+            }
+            case ALIAS:
+            case SHORTCUT: {
+                if (currHistory != null) {
+                    fileData.setPasswdHistory(null, record);
+                }
+                break;
+            }
             }
         }
 
         // Update password after history so update is shown in new history
         String currPasswd = fileData.getPassword(record);
-        updateStr = getUpdatedField(currPasswd, R.id.password);
-        if (updateStr != null) {
-            fileData.setPassword(currPasswd, updateStr, record);
+        String newPasswd = null;
+        switch (itsType) {
+        case NORMAL: {
+            newPasswd = getUpdatedField(currPasswd, R.id.password);
+            switch (itsOrigType) {
+            case NORMAL: {
+                break;
+            }
+            case ALIAS:
+            case SHORTCUT: {
+                currPasswd = null;
+                break;
+            }
+            }
+            break;
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            newPasswd = PasswdRecord.uuidToPasswd(fileData.getUUID(itsLinkRef),
+                                                  itsType);
+            if (newPasswd.equals(currPasswd)) {
+                newPasswd = null;
+            }
+            break;
+        }
+        }
+        if (newPasswd != null) {
+            fileData.setPassword(currPasswd, newPasswd, record);
         }
 
         try {

@@ -612,6 +612,8 @@ public class RecordView extends AbstractRecordTabActivity
     {
         PwsRecord rec = passwdRec.getRecord();
 
+        // TODO: appears password expiration and history for aliases are shown
+        // from base record
         switch (passwdRec.getType()) {
         case NORMAL:
         case ALIAS: {
