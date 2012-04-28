@@ -70,7 +70,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
     private DialogValidator itsValidator;
     private PasswdHistory itsHistory;
-    private PasswdRecord.Type itsPrevType = Type.NORMAL;
+    private PasswdRecord.Type itsType = Type.NORMAL;
     private PasswdRecord.Type itsOrigType = Type.NORMAL;
     private PwsRecord itsLinkRef = null;
 
@@ -417,8 +417,6 @@ public class RecordEditActivity extends AbstractRecordActivity
                 return;
             }
             setLinkRef(fileData.getRecord(uuid), fileData);
-            // TODO: validate no password link selected
-
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -509,12 +507,12 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private final void setType(PasswdRecord.Type type, boolean init)
     {
-        if (type == itsPrevType) {
+        if ((type == itsType) && !init) {
             return;
         }
         // Prev type needs to be updated before setting spinner to prevent
         // recursion
-        itsPrevType = type;
+        itsType = type;
 
         if (init) {
             int pos = TYPE_NORMAL;
@@ -575,9 +573,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         setVisibility(R.id.notes, showDetails);
         setVisibility(R.id.history_group_sep, showHistory);
         setVisibility(R.id.history_group, showHistory);
-
-        // TODO: clear password on type change? Or change from alias <->
-        // shortcut
+        itsValidator.validate();
     }
 
     private void setLinkRef(PwsRecord ref, PasswdFileData fileData)
@@ -589,6 +585,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
         TextView tv = (TextView)findViewById(R.id.password_link);
         tv.setText(id);
+        itsValidator.validate();
     }
 
     private final void setPasswordVisibility(boolean visible,
@@ -1014,6 +1011,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                                                   R.id.user));
             if (itsRecordKeys.contains(key)) {
                 return "Duplicate entry";
+                // TODO: i18n
             }
 
             if (itsHistory != null) {
@@ -1022,6 +1020,24 @@ public class RecordEditActivity extends AbstractRecordActivity
                     (histMaxSize > PasswdHistory.MAX_SIZE_MAX)) {
                     return "Invalid history maximum size";
                 }
+            }
+
+            switch (itsType) {
+            case NORMAL: {
+                break;
+            }
+            case ALIAS: {
+                if (itsLinkRef == null) {
+                    return getString(R.string.no_alias_chosen);
+                }
+                break;
+            }
+            case SHORTCUT: {
+                if (itsLinkRef == null) {
+                    return getString(R.string.no_shortcut_chosen);
+                }
+                break;
+            }
             }
 
             return super.doValidation();

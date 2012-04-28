@@ -61,6 +61,8 @@
     <string name="n_a">N/A</string>
     <string name="new_file">New File</string>
     <string name="new_password_label">New Password:</string>
+    <string name="no_alias_chosen">No alias chosen</string>
+    <string name="no_shortcut_chosen">No shortcut chosen</string>
     <string name="no_files">No Files</string>
     <string name="no_records">No Records</string>
     <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
