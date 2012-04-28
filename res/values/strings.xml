@@ -8,7 +8,9 @@
     <string name="app_name">PasswdSafe</string>
     <string name="cancel">Cancel</string>
     <string name="change_password">Change Password</string>
+    <string name="choose">Choose</string>
     <string name="choose_group">Choose Group</string>
+    <string name="choose_record">Choose Record</string>
     <string name="choose_type">Choose Type</string>
     <string name="clear">Clear</string>
     <string name="close">Close</string>

@@ -109,13 +109,24 @@
                 <TableRow android:id="@+id/password_link_row"
                           android:visibility="gone">
                     <TextView android:id="@+id/password_link_label"
-                              android:gravity="center_vertical"
                               android:layout_height="fill_parent"
                               />
-                    <Spinner android:id="@+id/password_link"
-                             android:drawSelectorOnTop="true"
-                             android:layout_width="fill_parent"
-                             android:layout_height="wrap_content"/>
+                    <RelativeLayout android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+                        <Button android:id="@+id/password_link_btn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:text="@string/choose"
+                                />
+                        <TextView android:id="@+id/password_link"
+                                  android:layout_width="fill_parent"
+                                  android:layout_height="match_parent"
+                                  android:layout_alignParentLeft="true" 
+                                  android:layout_toLeftOf="@id/password_link_btn" 
+                                  android:gravity="center_vertical"
+                                  />
+                    </RelativeLayout>
                 </TableRow>
             </TableLayout>
 

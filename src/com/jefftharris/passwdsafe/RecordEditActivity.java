@@ -62,6 +62,8 @@ public class RecordEditActivity extends AbstractRecordActivity
     private static final int CTXMENU_REMOVE = 1;
     private static final int CTXMENU_SET_PASSWORD = 2;
 
+    private static final int RECORD_SELECTION_REQUEST = 0;
+
     private TreeSet<String> itsGroups =
         new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     private String itsPrevGroup;
@@ -70,6 +72,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private PasswdHistory itsHistory;
     private PasswdRecord.Type itsPrevType = Type.NORMAL;
     private PasswdRecord.Type itsOrigType = Type.NORMAL;
+    private PwsRecord itsLinkRef = null;
 
     private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
@@ -112,18 +115,11 @@ public class RecordEditActivity extends AbstractRecordActivity
                 return;
             }
 
-            PasswdRecord passwdRec = fileData.getPasswdRecord(record);
-            itsOrigType = passwdRec.getType();
-
             setText(R.id.rec_title, "Edit " + fileData.getTitle(record));
             setText(R.id.title, fileData.getTitle(record));
             group = fileData.getGroup(record);
             setText(R.id.user, fileData.getUsername(record));
             setText(R.id.notes, fileData.getNotes(record));
-
-            String password = fileData.getPassword(record);
-            setText(R.id.password, password);
-            setText(R.id.password_confirm, password);
 
             if (isV3) {
                 setText(R.id.url, fileData.getURL(record));
@@ -138,8 +134,6 @@ public class RecordEditActivity extends AbstractRecordActivity
             setText(R.id.rec_title, "New Entry");
             setText(R.id.title, null);
             setText(R.id.user, null);
-            setText(R.id.password, null);
-            setText(R.id.password_confirm, null);
             setText(R.id.notes, null);
 
             if (isV3) {
@@ -151,13 +145,9 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         }
 
-        initType(fileData, isV3);
-
-        TextView passwdField = (TextView)findViewById(R.id.password);
-        TextView confirmField = (TextView)findViewById(R.id.password_confirm);
-        PasswordVisibilityMenuHandler.set(passwdField, confirmField);
-
+        initTypeAndPassword(fileData, record, isV3);
         initGroup(fileData, record, group);
+
         if (isV3) {
             TextView tv = (TextView)findViewById(R.id.history_max_size);
             tv.addTextChangedListener(new AbstractTextWatcher()
@@ -410,8 +400,56 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
     }
 
-    private final void initType(PasswdFileData fileData, boolean isV3)
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        PasswdSafeApp.dbginfo(TAG, "onActivityResult data: " + data);
+
+        if ((requestCode == RECORD_SELECTION_REQUEST) &&
+            (resultCode == RESULT_OK)) {
+            String uuid = data.getStringExtra(PasswdSafeApp.RESULT_DATA_UUID);
+            PasswdFileData fileData = getPasswdFile().getFileData();
+            if (fileData == null) {
+                return;
+            }
+            setLinkRef(fileData.getRecord(uuid), fileData);
+            // TODO: validate no password link selected
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+
+    private final void initTypeAndPassword(PasswdFileData fileData,
+                                           PwsRecord record,
+                                           boolean isV3)
+    {
+        itsOrigType = Type.NORMAL;
+        PwsRecord linkRef = null;
+        String password = null;
+
+        if (record != null) {
+            PasswdRecord passwdRec = fileData.getPasswdRecord(record);
+            itsOrigType = passwdRec.getType();
+
+            switch (itsOrigType) {
+            case NORMAL: {
+                password = fileData.getPassword(record);
+                break;
+            }
+            case ALIAS:
+            case SHORTCUT: {
+                linkRef = passwdRec.getRef();
+                break;
+            }
+            }
+        }
+
         if (isV3) {
             Spinner typeSpin = (Spinner)findViewById(R.id.type);
             typeSpin.setOnItemSelectedListener(new OnItemSelectedListener()
@@ -442,11 +480,31 @@ public class RecordEditActivity extends AbstractRecordActivity
                     setType(Type.NORMAL, false);
                 }
             });
-            setType(itsOrigType, true);
+
+            Button btn = (Button)findViewById(R.id.password_link_btn);
+            btn.setOnClickListener(new OnClickListener()
+            {
+                public void onClick(View v)
+                {
+                    startActivityForResult(
+                        new Intent(PasswdSafeApp.CHOOSE_RECORD_INTENT,
+                                   getIntent().getData(),
+                                   RecordEditActivity.this,
+                                   RecordSelectionActivity.class),
+                        RECORD_SELECTION_REQUEST);
+                }
+            });
         } else {
+            // TODO: test v2 files
             hideRow(R.id.type_row);
             hideRow(R.id.password_link_row);
         }
+
+        setType(itsOrigType, true);
+        TextView passwdField = setText(R.id.password, password);
+        TextView confirmField = setText(R.id.password_confirm, password);
+        PasswordVisibilityMenuHandler.set(passwdField, confirmField);
+        setLinkRef(linkRef, fileData);
     }
 
     private final void setType(PasswdRecord.Type type, boolean init)
@@ -520,6 +578,17 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         // TODO: clear password on type change? Or change from alias <->
         // shortcut
+    }
+
+    private void setLinkRef(PwsRecord ref, PasswdFileData fileData)
+    {
+        itsLinkRef = ref;
+        String id = "";
+        if (itsLinkRef != null) {
+            id = fileData.getId(itsLinkRef);
+        }
+        TextView tv = (TextView)findViewById(R.id.password_link);
+        tv.setText(id);
     }
 
     private final void setPasswordVisibility(boolean visible,
@@ -885,7 +954,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
     }
 
-    private final void setText(int id, String text)
+    private final TextView setText(int id, String text)
     {
         TextView tv = (TextView)findViewById(id);
         if (text != null) {
@@ -899,6 +968,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             itsValidator.registerTextView(tv);
             break;
         }
+
+        return tv;
     }
 
     private final void hideRow(int rowId)

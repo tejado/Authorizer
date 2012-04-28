@@ -161,8 +161,11 @@ public class PasswdSafeApp extends Application
         "com.jefftharris.passwdsafe.action.VIEW";
     public static final String FILE_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
+    public static final String CHOOSE_RECORD_INTENT =
+        "com.jefftharris.passwdsafe.action.CHOOSE_RECORD_INTENT";
 
     public static final int RESULT_MODIFIED = Activity.RESULT_FIRST_USER;
+    public static final String RESULT_DATA_UUID = "uuid";
 
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
