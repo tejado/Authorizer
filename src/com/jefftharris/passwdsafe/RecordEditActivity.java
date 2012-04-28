@@ -313,12 +313,31 @@ public class RecordEditActivity extends AbstractRecordActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        boolean userPassword = true;
+        switch (itsType) {
+        case NORMAL: {
+            userPassword = true;
+            break;
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            userPassword = false;
+            break;
+        }
+        }
+
         MenuItem mi = menu.findItem(MENU_TOGGLE_PASSWORD);
         if (mi != null) {
+            mi.setEnabled(userPassword);
             TextView tv = (TextView)findViewById(R.id.password);
             boolean visible = GuiUtils.isPasswordVisible(tv);
             mi.setTitle(visible ? R.string.hide_passwords :
                         R.string.show_passwords);
+        }
+
+        mi = menu.findItem(MENU_GENERATE_PASSWORD);
+        if (mi != null) {
+            mi.setEnabled(userPassword);
         }
         return true;
     }
