@@ -612,34 +612,32 @@ public class RecordView extends AbstractRecordTabActivity
     {
         PwsRecord rec = passwdRec.getRecord();
 
-        // TODO: appears password expiration and history for aliases are shown
-        // from base record
         switch (passwdRec.getType()) {
         case NORMAL:
         case ALIAS: {
             setText(R.id.url, R.id.url_row, fileData.getURL(rec));
             setText(R.id.email, R.id.email_row, fileData.getEmail(rec));
-            setText(R.id.expiration, R.id.expiration_row,
-                    fileData.getPasswdExpiryTime(rec));
             break;
         }
         case SHORTCUT: {
             setText(R.id.url, R.id.url_row, null);
             setText(R.id.email, R.id.email_row, null);
-            setText(R.id.expiration, R.id.expiration_row, null);
             break;
         }
         }
 
         PwsRecord recForPassword = rec;
         int hiddenId = R.string.hidden_password_normal;
+        String passwdExpiry = null;
         switch (passwdRec.getType()) {
         case NORMAL: {
+            passwdExpiry = fileData.getPasswdExpiryTime(rec);
             break;
         }
         case ALIAS: {
             recForPassword = passwdRec.getRef();
             hiddenId = R.string.hidden_password_alias;
+            passwdExpiry = fileData.getPasswdExpiryTime(recForPassword);
             break;
         }
         case SHORTCUT: {
@@ -663,6 +661,9 @@ public class RecordView extends AbstractRecordTabActivity
             });
             registerForContextMenu(itsPasswordView);
         }
+        setText(R.id.expiration, R.id.expiration_row, passwdExpiry);
+
+        // TODO: scroll record view to top if too many references
 
         ListView referencesView = (ListView)findViewById(R.id.references);
         referencesView.setOnItemClickListener(new OnItemClickListener()
@@ -736,25 +737,28 @@ public class RecordView extends AbstractRecordTabActivity
                                         PasswdFileData fileData,
                                         TabWidget tabs)
     {
-        PwsRecord rec = passwdRec.getRecord();
-
         View historyTab = tabs.getChildAt(TAB_HISTORY);
         View historyTitle = historyTab.findViewById(android.R.id.title);
         PasswdHistory history = null;
+        boolean tabEnabled = true;
         switch (passwdRec.getType()) {
-        case NORMAL:
+        case NORMAL: {
+            history = fileData.getPasswdHistory(passwdRec.getRecord());
+            tabEnabled = true;
+            break;
+        }
         case ALIAS: {
-            history = fileData.getPasswdHistory(rec);
-            historyTab.setEnabled(true);
-            historyTitle.setEnabled(true);
+            history = fileData.getPasswdHistory(passwdRec.getRef());
+            tabEnabled = true;
             break;
         }
         case SHORTCUT: {
-            historyTab.setEnabled(false);
-            historyTitle.setEnabled(false);
+            tabEnabled = false;
             break;
         }
         }
+        historyTab.setEnabled(tabEnabled);
+        historyTitle.setEnabled(tabEnabled);
 
         boolean historyExists = (history != null);
         boolean historyEnabled = false;
