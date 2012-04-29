@@ -34,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
@@ -155,6 +156,13 @@ public class RecordView extends AbstractRecordTabActivity
         tabHost.addTab(spec);
 
         tabHost.setCurrentTab(0);
+        tabHost.setOnTabChangedListener(new OnTabChangeListener()
+        {
+            public void onTabChanged(String tabId)
+            {
+                scrollTabToTop();
+            }
+        });
 
         if (getUUID() == null) {
             PasswdSafeApp.showFatalMsg("No record chosen for file: " + getUri(),
@@ -663,8 +671,6 @@ public class RecordView extends AbstractRecordTabActivity
         }
         setText(R.id.expiration, R.id.expiration_row, passwdExpiry);
 
-        // TODO: scroll record view to top if too many references
-
         ListView referencesView = (ListView)findViewById(R.id.references);
         referencesView.setOnItemClickListener(new OnItemClickListener()
         {
@@ -701,6 +707,7 @@ public class RecordView extends AbstractRecordTabActivity
             referencesView.setVisibility(View.GONE);
         }
         GuiUtils.setListViewHeightBasedOnChildren(referencesView);
+        scrollTabToTop();
     }
 
     private final void setNotesFields(PasswdRecord passwdRec,
@@ -784,5 +791,18 @@ public class RecordView extends AbstractRecordTabActivity
         histView.setEnabled(historyEnabled);
         findViewById(R.id.history_max_size_label).setEnabled(historyExists);
         findViewById(R.id.history_sep).setEnabled(historyExists);
+    }
+
+    private void scrollTabToTop()
+    {
+        TabHost host = getTabHost();
+        int id = host.getCurrentTab();
+        final View v = host.getTabContentView().getChildAt(id);
+        v.post(new Runnable() {
+            public void run()
+            {
+                v.scrollTo(0, 0);
+            }
+        });
     }
 }
