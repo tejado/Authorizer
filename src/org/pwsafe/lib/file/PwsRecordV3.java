@@ -454,7 +454,7 @@ public class PwsRecordV3 extends PwsRecord
 			if (ignoreFieldTypes) {
 				// header record has no valid types...
 				itemVal = new PwsUnknownField(item.getType(), item.getByteData());
-				attributes.put( new Integer(item.getType()), itemVal );
+				attributes.put( Integer.valueOf(item.getType()), itemVal );
 			} else {
 
 				switch ( item.getType() )

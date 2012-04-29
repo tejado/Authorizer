@@ -35,7 +35,7 @@ public class PwsIntegerField extends PwsField
 	 */
 	public PwsIntegerField( int type, byte [] value )
 	{
-		super( type, new Integer( Util.getIntFromByteArray(value, 0) ) );
+		super( type, Integer.valueOf( Util.getIntFromByteArray(value, 0) ) );
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class PwsIntegerField extends PwsField
 	 */
 	public PwsIntegerField( PwsFieldType type, byte [] value )
 	{
-		super( type, new Integer( Util.getIntFromByteArray(value, 0) ) );
+		super( type, Integer.valueOf( Util.getIntFromByteArray(value, 0) ) );
 	}
 
 	/**

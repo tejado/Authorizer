@@ -75,11 +75,11 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 	 */
 	private static final Object []	VALID_TYPES	= new Object []
 	{
-		new Object [] { new Integer(TITLE),		"TITLE",	PwsStringField.class },
-		new Object [] { new Integer(USERNAME),	"USERNAME",	PwsStringField.class },
-		new Object [] { new Integer(NOTES),		"NOTES",	PwsStringField.class },
-		new Object [] { new Integer(PASSWORD),	"PASSWORD",	PwsPasswdField.class },
-		new Object [] { new Integer(UUID),	    "UUID",	    PwsStringField.class }
+		new Object [] { Integer.valueOf(TITLE),		"TITLE",	PwsStringField.class },
+		new Object [] { Integer.valueOf(USERNAME),	"USERNAME",	PwsStringField.class },
+		new Object [] { Integer.valueOf(NOTES),		"NOTES",	PwsStringField.class },
+		new Object [] { Integer.valueOf(PASSWORD),	"PASSWORD",	PwsPasswdField.class },
+		new Object [] { Integer.valueOf(UUID),	    "UUID",	    PwsStringField.class }
 	};
 
 	static

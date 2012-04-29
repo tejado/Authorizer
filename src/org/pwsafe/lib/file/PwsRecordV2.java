@@ -93,7 +93,7 @@ public class PwsRecordV2 extends PwsRecord
 	 * Constant for the last time any field in the record was changed.
 	 */
 	public static final int     LAST_MOD_TIME       = 12;
-	
+
 	/**
 	 * Constant for the url field
 	 */
@@ -109,20 +109,20 @@ public class PwsRecordV2 extends PwsRecord
 	 */
 	private static final Object []	VALID_TYPES	= new Object []
 	{
-		new Object [] { new Integer(V2_ID_STRING),		"V2_ID_STRING",			PwsStringField.class },
-		new Object [] { new Integer(UUID),				"UUID",					PwsUUIDField.class },
-		new Object [] { new Integer(GROUP),				"GROUP",				PwsStringField.class },
-		new Object [] { new Integer(TITLE),				"TITLE",				PwsStringField.class },
-		new Object [] { new Integer(USERNAME),			"USERNAME",				PwsStringField.class },
-		new Object [] { new Integer(NOTES),				"NOTES",				PwsStringField.class },
-		new Object [] { new Integer(PASSWORD),			"PASSWORD",				PwsPasswdField.class },
-		new Object [] { new Integer(CREATION_TIME),		"CREATION_TIME",		PwsTimeField.class },
-		new Object [] { new Integer(PASSWORD_MOD_TIME),	"PASSWORD_MOD_TIME",	PwsTimeField.class },
-		new Object [] { new Integer(LAST_ACCESS_TIME),	"LAST_ACCESS_TIME",		PwsTimeField.class },
-		new Object [] { new Integer(PASSWORD_LIFETIME),	"PASSWORD_LIFETIME",	PwsIntegerField.class },
-		new Object [] { new Integer(PASSWORD_POLICY),	"PASSWORD_POLICY",		PwsStringField.class },
-		new Object [] { new Integer(LAST_MOD_TIME),     "LAST_MOD_TIME",        PwsTimeField.class },
-		new Object [] { new Integer(URL),               "URL",                  PwsStringField.class },
+		new Object [] { Integer.valueOf(V2_ID_STRING),		"V2_ID_STRING",			PwsStringField.class },
+		new Object [] { Integer.valueOf(UUID),				"UUID",					PwsUUIDField.class },
+		new Object [] { Integer.valueOf(GROUP),				"GROUP",				PwsStringField.class },
+		new Object [] { Integer.valueOf(TITLE),				"TITLE",				PwsStringField.class },
+		new Object [] { Integer.valueOf(USERNAME),			"USERNAME",				PwsStringField.class },
+		new Object [] { Integer.valueOf(NOTES),				"NOTES",				PwsStringField.class },
+		new Object [] { Integer.valueOf(PASSWORD),			"PASSWORD",				PwsPasswdField.class },
+		new Object [] { Integer.valueOf(CREATION_TIME),		"CREATION_TIME",		PwsTimeField.class },
+		new Object [] { Integer.valueOf(PASSWORD_MOD_TIME),	"PASSWORD_MOD_TIME",	PwsTimeField.class },
+		new Object [] { Integer.valueOf(LAST_ACCESS_TIME),	"LAST_ACCESS_TIME",		PwsTimeField.class },
+		new Object [] { Integer.valueOf(PASSWORD_LIFETIME),	"PASSWORD_LIFETIME",	PwsIntegerField.class },
+		new Object [] { Integer.valueOf(PASSWORD_POLICY),	"PASSWORD_POLICY",		PwsStringField.class },
+		new Object [] { Integer.valueOf(LAST_MOD_TIME),     "LAST_MOD_TIME",        PwsTimeField.class },
+		new Object [] { Integer.valueOf(URL),               "URL",                  PwsStringField.class },
 	};
 
 	/**

@@ -565,7 +565,7 @@ public abstract class PwsFile
 		}
 		else if ( count < bytes.length )
 		{
-			LOG.info( I18nHelper.getInstance().formatMessage("I00003", new Object [] { new Integer(bytes.length), new Integer(count) } ) );
+			LOG.info( I18nHelper.getInstance().formatMessage("I00003", new Object [] { Integer.valueOf(bytes.length), Integer.valueOf(count) } ) );
 			throw new IOException( I18nHelper.getInstance().formatMessage("E00006") );
 		}
 	}

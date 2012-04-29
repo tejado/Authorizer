@@ -213,7 +213,7 @@ public final class Util
 		{
 			String	msg;
 
-			msg = I18nHelper.getInstance().formatMessage( "E00009", new Object [] { new Integer(src.length) } );
+			msg = I18nHelper.getInstance().formatMessage( "E00009", new Object [] { Integer.valueOf(src.length) } );
 
 			LOG.error( msg );
 			LOG.leaveMethod( "Util.bytesToLittleEndian(byte[]) - by throwing IllegalArgumentException" );
