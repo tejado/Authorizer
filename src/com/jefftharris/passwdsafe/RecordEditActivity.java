@@ -70,6 +70,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
     private DialogValidator itsValidator;
     private PasswdHistory itsHistory;
+    private boolean itsIsV3 = false;
     private PasswdRecord.Type itsType = Type.NORMAL;
     private boolean itsTypeHasNormalPassword = true;
     private boolean itsTypeHasDetails = true;
@@ -106,7 +107,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsValidator = new Validator();
 
         PasswdFileData fileData = getPasswdFile().getFileData();
-        boolean isV3 = fileData.isV3();
+        itsIsV3 = fileData.isV3();
         PwsRecord record = null;
         String group = null;
         String uuid = getUUID();
@@ -123,12 +124,9 @@ public class RecordEditActivity extends AbstractRecordActivity
             setText(R.id.user, fileData.getUsername(record));
             setText(R.id.notes, fileData.getNotes(record));
 
-            if (isV3) {
+            if (itsIsV3) {
                 setText(R.id.url, fileData.getURL(record));
                 setText(R.id.email, fileData.getEmail(record));
-            } else {
-                hideRow(R.id.url_row);
-                hideRow(R.id.email_row);
             }
 
             itsHistory = fileData.getPasswdHistory(record);
@@ -138,19 +136,20 @@ public class RecordEditActivity extends AbstractRecordActivity
             setText(R.id.user, null);
             setText(R.id.notes, null);
 
-            if (isV3) {
+            if (itsIsV3) {
                 setText(R.id.url, null);
                 setText(R.id.email, null);
-            } else {
-                hideRow(R.id.url_row);
-                hideRow(R.id.email_row);
             }
         }
+        if (!itsIsV3) {
+            hideRow(R.id.url_row);
+            hideRow(R.id.email_row);
+        }
 
-        initTypeAndPassword(fileData, record, isV3);
+        initTypeAndPassword(fileData, record);
         initGroup(fileData, record, group);
 
-        if (isV3) {
+        if (itsIsV3) {
             TextView tv = (TextView)findViewById(R.id.history_max_size);
             tv.addTextChangedListener(new AbstractTextWatcher()
             {
@@ -445,8 +444,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
 
     private final void initTypeAndPassword(PasswdFileData fileData,
-                                           PwsRecord record,
-                                           boolean isV3)
+                                           PwsRecord record)
     {
         itsOrigType = Type.NORMAL;
         PwsRecord linkRef = null;
@@ -469,7 +467,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         }
 
-        if (isV3) {
+        if (itsIsV3) {
             Spinner typeSpin = (Spinner)findViewById(R.id.type);
             typeSpin.setOnItemSelectedListener(new OnItemSelectedListener()
             {
@@ -514,7 +512,6 @@ public class RecordEditActivity extends AbstractRecordActivity
                 }
             });
         } else {
-            // TODO: test v2 files
             hideRow(R.id.type_row);
             hideRow(R.id.password_link_row);
         }
@@ -583,8 +580,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             TextView tv = (TextView)findViewById(R.id.password_link_label);
             tv.setText(passwordLinkLabel);
         }
-        setVisibility(R.id.url_row, itsTypeHasDetails);
-        setVisibility(R.id.email_row, itsTypeHasDetails);
+        setVisibility(R.id.url_row, itsIsV3 && itsTypeHasDetails);
+        setVisibility(R.id.email_row, itsIsV3 && itsTypeHasDetails);
         setVisibility(R.id.notes_sep, itsTypeHasDetails);
         setVisibility(R.id.notes_label, itsTypeHasDetails);
         setVisibility(R.id.notes, itsTypeHasDetails);
@@ -878,7 +875,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         }
 
-        if (fileData.isV3()) {
+        if (itsIsV3) {
             String currUrl = fileData.getURL(record);
             String currEmail = fileData.getEmail(record);
             PasswdHistory currHistory = fileData.getPasswdHistory(record);
