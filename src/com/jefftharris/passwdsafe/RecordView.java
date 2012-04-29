@@ -38,7 +38,6 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
-// TODO: remove these basic and history activities from manifest?
 
 public class RecordView extends AbstractRecordTabActivity
 {
