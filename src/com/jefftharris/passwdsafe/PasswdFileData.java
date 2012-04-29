@@ -343,7 +343,9 @@ public class PasswdFileData
 
     public final void setNotes(String str, PwsRecord rec)
     {
-        str = str.replace("\n", "\r\n");
+        if (str != null) {
+            str = str.replace("\n", "\r\n");
+        }
         setField(str, rec, PwsRecordV3.NOTES);
     }
 
