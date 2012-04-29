@@ -169,7 +169,6 @@ public class PasswdRecord
             for (int i = 0; i < sb.length(); ++i) {
                 sb.setCharAt(i, '\0');
             }
-            // TODO: test passwords with right format but no matching uuid record
         }
 
         return ref;
