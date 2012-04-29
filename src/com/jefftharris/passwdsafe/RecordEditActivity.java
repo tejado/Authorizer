@@ -142,8 +142,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         }
         if (!itsIsV3) {
-            hideRow(R.id.url_row);
-            hideRow(R.id.email_row);
+            setVisibility(R.id.url_row, false);
+            setVisibility(R.id.email_row, false);
         }
 
         initTypeAndPassword(fileData, record);
@@ -512,8 +512,8 @@ public class RecordEditActivity extends AbstractRecordActivity
                 }
             });
         } else {
-            hideRow(R.id.type_row);
-            hideRow(R.id.password_link_row);
+            setVisibility(R.id.type_row, false);
+            setVisibility(R.id.password_link_row, false);
         }
 
         setType(itsOrigType, true);
@@ -1026,11 +1026,6 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         return tv;
-    }
-
-    private final void hideRow(int rowId)
-    {
-        setVisibility(rowId, false);
     }
 
     private final void setVisibility(int viewId, boolean visible)
