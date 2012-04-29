@@ -71,6 +71,8 @@ public class RecordEditActivity extends AbstractRecordActivity
     private DialogValidator itsValidator;
     private PasswdHistory itsHistory;
     private PasswdRecord.Type itsType = Type.NORMAL;
+    private boolean itsTypeHasNormalPassword = true;
+    private boolean itsTypeHasDetails = true;
     private PasswdRecord.Type itsOrigType = Type.NORMAL;
     private PwsRecord itsLinkRef = null;
 
@@ -553,45 +555,41 @@ public class RecordEditActivity extends AbstractRecordActivity
             typeSpin.setSelection(pos);
         }
 
-        boolean showNormalPassword = true;
+        itsTypeHasNormalPassword = true;
+        itsTypeHasDetails = true;
         int passwordLinkLabel = 0;
-        boolean showDetails = true;
-        boolean showHistory = true;
         switch (type) {
         case NORMAL: {
-            showNormalPassword = true;
-            showDetails = true;
-            showHistory = true;
+            itsTypeHasNormalPassword = true;
+            itsTypeHasDetails = true;
             break;
         }
         case ALIAS: {
-            showNormalPassword = false;
+            itsTypeHasNormalPassword = false;
+            itsTypeHasDetails = true;
             passwordLinkLabel = R.string.alias_base_record_label;
-            showDetails = true;
-            showHistory = false;
             break;
         }
         case SHORTCUT: {
-            showNormalPassword = false;
+            itsTypeHasNormalPassword = false;
+            itsTypeHasDetails = false;
             passwordLinkLabel = R.string.shortcut_base_record_label;
-            showDetails = false;
-            showHistory = false;
             break;
         }
         }
-        setVisibility(R.id.password_row, showNormalPassword);
-        setVisibility(R.id.password_link_row, !showNormalPassword);
+        setVisibility(R.id.password_row, itsTypeHasNormalPassword);
+        setVisibility(R.id.password_link_row, !itsTypeHasNormalPassword);
         if (passwordLinkLabel != 0) {
             TextView tv = (TextView)findViewById(R.id.password_link_label);
             tv.setText(passwordLinkLabel);
         }
-        setVisibility(R.id.url_row, showDetails);
-        setVisibility(R.id.email_row, showDetails);
-        setVisibility(R.id.notes_sep, showDetails);
-        setVisibility(R.id.notes_label, showDetails);
-        setVisibility(R.id.notes, showDetails);
-        setVisibility(R.id.history_group_sep, showHistory);
-        setVisibility(R.id.history_group, showHistory);
+        setVisibility(R.id.url_row, itsTypeHasDetails);
+        setVisibility(R.id.email_row, itsTypeHasDetails);
+        setVisibility(R.id.notes_sep, itsTypeHasDetails);
+        setVisibility(R.id.notes_label, itsTypeHasDetails);
+        setVisibility(R.id.notes, itsTypeHasDetails);
+        setVisibility(R.id.history_group_sep, itsTypeHasNormalPassword);
+        setVisibility(R.id.history_group, itsTypeHasNormalPassword);
         itsValidator.validate();
     }
 
@@ -868,50 +866,60 @@ public class RecordEditActivity extends AbstractRecordActivity
             fileData.setUsername(updateStr, record);
         }
 
-        updateStr = getUpdatedField(fileData.getNotes(record), R.id.notes);
-        if (updateStr != null) {
-            fileData.setNotes(updateStr, record);
+        String currNotes = fileData.getNotes(record);
+        if (itsTypeHasDetails) {
+            updateStr = getUpdatedField(currNotes, R.id.notes);
+            if (updateStr != null) {
+                fileData.setNotes(updateStr, record);
+            }
+        } else {
+            if (currNotes != null) {
+                fileData.setNotes(null, record);
+            }
         }
 
         if (fileData.isV3()) {
-            updateStr = getUpdatedField(fileData.getURL(record), R.id.url);
-            if (updateStr != null) {
-                fileData.setURL(updateStr, record);
-            }
-
-            updateStr = getUpdatedField(fileData.getEmail(record), R.id.email);
-            if (updateStr != null) {
-                fileData.setEmail(updateStr, record);
-            }
-
-            // TODO: when changing type, check all fields for ones that need
-            // to be removed
+            String currUrl = fileData.getURL(record);
+            String currEmail = fileData.getEmail(record);
             PasswdHistory currHistory = fileData.getPasswdHistory(record);
-            switch (itsType) {
-            case NORMAL: {
+
+            if (itsTypeHasDetails) {
+                updateStr = getUpdatedField(currUrl, R.id.url);
+                if (updateStr != null) {
+                    fileData.setURL(updateStr, record);
+                }
+
+                updateStr = getUpdatedField(currEmail, R.id.email);
+                if (updateStr != null) {
+                    fileData.setEmail(updateStr, record);
+                }
+            } else {
+                if (currUrl != null) {
+                    fileData.setURL(null, record);
+                }
+                if (currEmail != null) {
+                    fileData.setEmail(null, record);
+                }
+            }
+
+            if (itsTypeHasNormalPassword) {
                 if (isPasswdHistoryUpdated(currHistory)) {
                     if (itsHistory != null) {
                         itsHistory.adjustEntriesToMaxSize();
                     }
                     fileData.setPasswdHistory(itsHistory, record);
                 }
-                break;
-            }
-            case ALIAS:
-            case SHORTCUT: {
+            } else {
                 if (currHistory != null) {
                     fileData.setPasswdHistory(null, record);
                 }
-                break;
-            }
             }
         }
 
         // Update password after history so update is shown in new history
         String currPasswd = fileData.getPassword(record);
         String newPasswd = null;
-        switch (itsType) {
-        case NORMAL: {
+        if (itsTypeHasNormalPassword) {
             newPasswd = getUpdatedField(currPasswd, R.id.password);
             switch (itsOrigType) {
             case NORMAL: {
@@ -923,17 +931,12 @@ public class RecordEditActivity extends AbstractRecordActivity
                 break;
             }
             }
-            break;
-        }
-        case ALIAS:
-        case SHORTCUT: {
+        } else {
             newPasswd = PasswdRecord.uuidToPasswd(fileData.getUUID(itsLinkRef),
                                                   itsType);
             if (newPasswd.equals(currPasswd)) {
                 newPasswd = null;
             }
-            break;
-        }
         }
         if (newPasswd != null) {
             fileData.setPassword(currPasswd, newPasswd, record);
@@ -1030,7 +1033,6 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private final void hideRow(int rowId)
     {
-        // TODO remove?
         setVisibility(rowId, false);
     }
 
