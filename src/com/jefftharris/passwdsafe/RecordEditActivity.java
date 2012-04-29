@@ -1053,7 +1053,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             String title =
                 GuiUtils.getTextViewStr(RecordEditActivity.this, R.id.title);
             if (title.length() == 0) {
-                return "Empty title";
+                return getString(R.string.empty_title);
             }
 
             V3Key key =
@@ -1063,15 +1063,14 @@ public class RecordEditActivity extends AbstractRecordActivity
                           GuiUtils.getTextViewStr(RecordEditActivity.this,
                                                   R.id.user));
             if (itsRecordKeys.contains(key)) {
-                return "Duplicate entry";
-                // TODO: i18n
+                return getString(R.string.duplicate_entry);
             }
 
             if (itsHistory != null) {
                 int histMaxSize = getHistMaxSize();
                 if ((histMaxSize < PasswdHistory.MAX_SIZE_MIN) ||
                     (histMaxSize > PasswdHistory.MAX_SIZE_MAX)) {
-                    return "Invalid history maximum size";
+                    return getString(R.string.invalid_history_max_size);
                 }
             }
 

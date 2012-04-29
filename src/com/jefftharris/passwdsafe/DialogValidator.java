@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import android.app.Activity;
+import android.content.Context;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 public abstract class DialogValidator
 {
+    private final Context itsContext;
     private TextView itsPassword;
     private TextView itsPasswordConfirm;
     private TextView itsErrorMsgView;
@@ -30,6 +32,7 @@ public abstract class DialogValidator
 
     public DialogValidator(Activity act)
     {
+        itsContext = act;
         itsPassword = (TextView) act.findViewById(R.id.password);
         registerTextView(itsPassword);
         itsPasswordConfirm = (TextView)act.findViewById(R.id.password_confirm);
@@ -38,8 +41,9 @@ public abstract class DialogValidator
         itsErrorFmt = act.getResources().getString(R.string.error_msg);
     }
 
-    public DialogValidator(View view)
+    public DialogValidator(View view, Activity act)
     {
+        itsContext = act;
         itsPassword = (TextView) view.findViewById(R.id.password);
         registerTextView(itsPassword);
         itsPasswordConfirm = (TextView)view.findViewById(R.id.password_confirm);
@@ -63,8 +67,8 @@ public abstract class DialogValidator
     public final void validate()
     {
         String errorMsg = doValidation();
-
-        if (errorMsg == null) {
+        boolean isError = (errorMsg != null);
+        if (!isError) {
             itsErrorMsgView.setVisibility(View.GONE);
         } else {
             itsErrorMsgView.setVisibility(View.VISIBLE);
@@ -72,7 +76,7 @@ public abstract class DialogValidator
                 Html.fromHtml(String.format(itsErrorFmt, errorMsg)));
         }
 
-        getDoneButton().setEnabled(errorMsg == null);
+        getDoneButton().setEnabled(!isError);
     }
 
     protected abstract View getDoneButton();
@@ -86,8 +90,18 @@ public abstract class DialogValidator
     {
         if (!itsPassword.getText().toString().equals(
              itsPasswordConfirm.getText().toString())) {
-            return "Passwords do not match";
+            return getString(R.string.passwords_do_not_match);
         }
         return null;
+    }
+
+    protected final String getString(int id)
+    {
+        return itsContext.getString(id);
+    }
+
+    protected final String getString(int id, Object... args)
+    {
+        return itsContext.getString(id, args);
     }
 }

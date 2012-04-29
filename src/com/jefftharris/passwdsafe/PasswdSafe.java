@@ -384,7 +384,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
             final AlertDialog alertDialog = alert.create();
-            itsChangePasswdValidator = new DialogValidator(passwdView)
+            itsChangePasswdValidator = new DialogValidator(passwdView, this)
             {
                 @Override
                 protected final View getDoneButton()
@@ -396,7 +396,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 protected final String doValidation()
                 {
                     if (getPassword().getText().length() == 0) {
-                        return "Empty password";
+                        return getString(R.string.empty_password);
                     }
                     return super.doValidation();
                 }
@@ -450,7 +450,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
             final AlertDialog alertDialog = alert.create();
-            itsFileNewValidator = new DialogValidator(fileNewView)
+            itsFileNewValidator = new DialogValidator(fileNewView, this)
             {
                 @Override
                 protected final View getDoneButton()
@@ -463,27 +463,28 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 {
                     CharSequence fileName = fileNameView.getText();
                     if (fileName.length() == 0) {
-                        return "Empty file name";
+                        return getString(R.string.empty_file_name);
                     }
 
                     for (int i = 0; i < fileName.length(); ++i) {
                         char c = fileName.charAt(i);
                         if ((c == '/') || (c == '\\')) {
-                            return "Invalid file name";
+                            return getString(R.string.invalid_file_name);
                         }
                     }
 
                     File dir = getUriAsFile();
                     if (dir == null) {
-                        return "New file not supported for URI " + itsUri;
+                        return getString(R.string.new_file_not_supp_uri,
+                                         itsUri);
                     }
                     File f = new File(dir, fileName + ".psafe3");
                     if (f.exists()) {
-                        return "File exists";
+                        return getString(R.string.file_exists);
                     }
 
                     if (getPassword().getText().length() == 0) {
-                        return "Empty password";
+                        return getString(R.string.empty_password);
                     }
                     return super.doValidation();
                 }
