@@ -18,8 +18,8 @@ import android.widget.TextView;
 public abstract class DialogValidator
 {
     private final Context itsContext;
-    private TextView itsPassword;
-    private TextView itsPasswordConfirm;
+    private TextView itsPassword = null;
+    private TextView itsPasswordConfirm = null;
     private TextView itsErrorMsgView;
     private String itsErrorFmt;
     private TextWatcher itsTextWatcher = new AbstractTextWatcher()
@@ -30,6 +30,9 @@ public abstract class DialogValidator
         }
     };
 
+    /**
+     * Constructor with the activity as the view and password fields
+     */
     public DialogValidator(Activity act)
     {
         itsContext = act;
@@ -41,13 +44,27 @@ public abstract class DialogValidator
         itsErrorFmt = act.getResources().getString(R.string.error_msg);
     }
 
+    /**
+     * Constructor with a specific view and password fields
+     */
     public DialogValidator(View view, Activity act)
     {
+        this(view, act, true);
+    }
+
+    /**
+     * Constructor with a specific view and optional password fields
+     */
+    public DialogValidator(View view, Activity act, boolean hasPasswords)
+    {
         itsContext = act;
-        itsPassword = (TextView) view.findViewById(R.id.password);
-        registerTextView(itsPassword);
-        itsPasswordConfirm = (TextView)view.findViewById(R.id.password_confirm);
-        registerTextView(itsPasswordConfirm);
+        if (hasPasswords) {
+            itsPassword = (TextView) view.findViewById(R.id.password);
+            registerTextView(itsPassword);
+            itsPasswordConfirm =
+                (TextView)view.findViewById(R.id.password_confirm);
+            registerTextView(itsPasswordConfirm);
+        }
         itsErrorMsgView = (TextView)view.findViewById(R.id.error_msg);
         itsErrorFmt = view.getResources().getString(R.string.error_msg);
     }
@@ -59,8 +76,10 @@ public abstract class DialogValidator
 
     public final void reset()
     {
-        itsPassword.setText("");
-        itsPasswordConfirm.setText("");
+        if (itsPassword != null) {
+            itsPassword.setText("");
+            itsPasswordConfirm.setText("");
+        }
         validate();
     }
 
@@ -88,7 +107,8 @@ public abstract class DialogValidator
 
     protected String doValidation()
     {
-        if (!itsPassword.getText().toString().equals(
+        if ((itsPassword != null) &&
+            !itsPassword.getText().toString().equals(
              itsPasswordConfirm.getText().toString())) {
             return getString(R.string.passwords_do_not_match);
         }

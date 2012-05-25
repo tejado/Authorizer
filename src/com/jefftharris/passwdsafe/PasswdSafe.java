@@ -14,6 +14,7 @@ import java.util.HashMap;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import android.app.AlertDialog;
@@ -37,6 +38,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -64,6 +67,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private LoadTask itsLoadTask;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
+    private DialogValidator itsDeleteValidator;
     private String itsRecToOpen;
 
     /** Called when the activity is first created. */
@@ -501,23 +505,22 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
+            {
+                @Override
+                public final void onOkClicked(DialogInterface dialog)
                 {
-                    @Override
-                    public final void onOkClicked(DialogInterface dialog)
-                    {
-                        deleteFile();
-                    }
-                };
-            AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle(R.string.delete_file_title)
-                .setMessage(getString(R.string.delete_file_msg,
-                                      PasswdFileData.getUriIdentifier(itsUri,
-                                                                      this,
-                                                                      false)))
-                .setPositiveButton(R.string.ok, dlgClick)
-                .setNegativeButton(R.string.cancel, dlgClick)
-                .setOnCancelListener(dlgClick);
-            dialog = alert.create();
+                    deleteFile();
+                }
+            };
+
+            String prompt =
+                getString(R.string.delete_file_msg,
+                          PasswdFileData.getUriIdentifier(itsUri, this, false));
+            String title = getString(R.string.delete_file_title);
+            DialogUtils.DialogData data =
+                DialogUtils.createDeletePrompt(this, dlgClick, title, prompt);
+            dialog = data.itsDialog;
+            itsDeleteValidator = data.itsValidator;
             break;
         }
         default:
@@ -612,6 +615,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case DIALOG_FILE_NEW:
         {
             itsFileNewValidator.reset();
+            break;
+        }
+        case DIALOG_DELETE:
+        {
+            itsDeleteValidator.reset();
             break;
         }
         default:

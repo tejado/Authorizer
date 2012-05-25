@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.view.DialogUtils;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -105,6 +107,7 @@ public class RecordView extends AbstractRecordTabActivity
     private boolean isWordWrap = true;
     private boolean itsHasNotes = false;
     private Drawable itsNotesTabDrawable;
+    private DialogValidator itsDeleteValidator;
 
 
     public static void startActivityForResult(Uri fileUri, String uuid,
@@ -389,22 +392,21 @@ public class RecordView extends AbstractRecordTabActivity
         {
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
+            {
+                @Override
+                public void onOkClicked(DialogInterface dialog)
                 {
-                    @Override
-                    public void onOkClicked(DialogInterface dialog)
-                    {
-                        deleteRecord();
-                    }
-                };
+                    deleteRecord();
+                }
+            };
 
             TextView tv = (TextView)findViewById(R.id.title);
-            AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle("Delete Record?")
-                .setMessage("Delete record \"" + tv.getText() + "\"?")
-                .setPositiveButton("Ok", dlgClick)
-                .setNegativeButton("Cancel", dlgClick)
-                .setOnCancelListener(dlgClick);
-            dialog = alert.create();
+            String prompt = getString(R.string.delete_record_msg, tv.getText());
+            String title = getString(R.string.delete_record_title);
+            DialogUtils.DialogData data =
+                DialogUtils.createDeletePrompt(this, dlgClick, title, prompt);
+            dialog = data.itsDialog;
+            itsDeleteValidator = data.itsValidator;
             break;
         }
         default:
@@ -415,6 +417,29 @@ public class RecordView extends AbstractRecordTabActivity
         }
         return dialog;
     }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
+     */
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog)
+    {
+        super.onPrepareDialog(id, dialog);
+        switch (id)
+        {
+        case DIALOG_DELETE:
+        {
+            itsDeleteValidator.reset();
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+    }
+
 
     /* (non-Javadoc)
      * @see android.app.Activity#onActivityResult(int, int, android.content.Intent)

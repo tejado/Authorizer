@@ -8,6 +8,7 @@
     <string name="app_name">PasswdSafe</string>
     <string name="cancel">Cancel</string>
     <string name="change_password">Change Password</string>
+    <string name="check_box_to_confirm">Check box to confirm</string>
     <string name="choose">Choose</string>
     <string name="choose_group">Choose Group</string>
     <string name="choose_record">Choose Record</string>
@@ -28,7 +29,9 @@
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
     <string name="delete_file_msg">Delete file &quot;%1$s&quot;?</string>
-    <string name="delete_file_title">Delete File?</string>
+    <string name="delete_file_title">Confirm File Deletion</string>
+    <string name="delete_record_msg">Delete record &quot;%1$s&quot;?</string>
+    <string name="delete_record_title">Confirm Record Deletion</string>
     <string name="details">Details</string>
     <string name="done">Done</string>
     <string name="duplicate_entry">Duplicate entry</string>
