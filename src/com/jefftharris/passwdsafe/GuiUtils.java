@@ -11,18 +11,29 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.jefftharris.passwdsafe.view.GuiUtilsFroyo;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+/**
+ * @author jharris
+ *
+ */
 public final class GuiUtils
 {
     public static final int SDK_VERSION;
@@ -127,5 +138,66 @@ public final class GuiUtils
     {
         tv.setInputType(visible ? INPUT_TEXT_PASSWORD_VISIBLE :
                         INPUT_TEXT_PASSWORD);
+    }
+
+
+    /**
+     * Setup the keyboard on a dialog. The initial field gets focus and shows
+     * the keyboard. The final field clicks the Ok button when enter is pressed.
+     */
+    public static void setupDialogKeyboard(final AlertDialog dialog,
+                                           TextView initialField,
+                                           TextView finalField,
+                                           Context ctx)
+    {
+        setShowKeyboardListener(dialog, initialField, ctx);
+        finalField.setOnKeyListener(new OnKeyListener()
+        {
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER: {
+                        Button btn =
+                            dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        if (btn.isEnabled()) {
+                            btn.performClick();
+                        }
+                        return true;
+                    }
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+
+    /**
+     * Set the keyboard visibility on a view
+     */
+    public static void setKeyboardVisible(View v, Context ctx, boolean visible)
+    {
+        InputMethodManager imm = (InputMethodManager)
+            ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (visible) {
+            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+        } else {
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
+    }
+
+
+    /**
+     * Set a listener to show the keyboard when the dialog is shown. Only works
+     * on Froyo and higher.
+     */
+    public static void setShowKeyboardListener(Dialog dialog, View view,
+                                               Context ctx)
+    {
+        if (SDK_VERSION >= android.os.Build.VERSION_CODES.FROYO) {
+            GuiUtilsFroyo.setShowKeyboardListener(dialog, view, ctx);
+        }
     }
 }

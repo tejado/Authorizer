@@ -26,6 +26,7 @@
               android:inputType="textPassword"
               android:textAppearance="?android:attr/textAppearanceMedium"
               android:singleLine="true"
+              android:imeOptions="actionGo"
               >
         <requestFocus />
     </EditText>

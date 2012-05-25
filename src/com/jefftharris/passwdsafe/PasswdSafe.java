@@ -322,7 +322,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 .setPositiveButton("Ok", dlgClick)
                 .setNegativeButton("Cancel", dlgClick)
                 .setOnCancelListener(dlgClick);
-            dialog = alert.create();
+            AlertDialog alertDialog = alert.create();
+            GuiUtils.setupDialogKeyboard(alertDialog, tv, tv, this);
+            dialog = alertDialog;
             break;
         }
         case DIALOG_PROGRESS:
@@ -401,6 +403,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     return super.doValidation();
                 }
             };
+            GuiUtils.setupDialogKeyboard(alertDialog, tv1, tv2, this);
             dialog = alertDialog;
             break;
         }
