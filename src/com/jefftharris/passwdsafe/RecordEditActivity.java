@@ -281,7 +281,10 @@ public class RecordEditActivity extends AbstractRecordActivity
                 .setPositiveButton("Ok", dlgClick)
                 .setNegativeButton("Cancel", dlgClick)
                 .setOnCancelListener(dlgClick);
-            dialog = builder.create();
+            AlertDialog alertDialog = builder.create();
+            TextView tv = (TextView)view.findViewById(R.id.new_group);
+            GuiUtils.setupDialogKeyboard(alertDialog, tv, tv, this);
+            dialog = alertDialog;
             break;
         }
         default:

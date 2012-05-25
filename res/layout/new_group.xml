@@ -10,5 +10,6 @@
               android:autoText="true"
               android:capitalize="sentences"
               android:inputType="textCapSentences"
+              android:imeOptions="actionGo"
               />
 </LinearLayout>

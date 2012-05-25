@@ -493,6 +493,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 }
             };
             itsFileNewValidator.registerTextView(fileNameView);
+            GuiUtils.setupDialogKeyboard(alertDialog, fileNameView, tv2, this);
             dialog = alertDialog;
             break;
         }
