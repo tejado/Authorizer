@@ -60,27 +60,22 @@ public class DialogUtils
         TextView prompt = (TextView)dlgView.findViewById(R.id.prompt);
         prompt.setText(promptStr);
 
-        final CheckBox confirmCb = (CheckBox)dlgView.findViewById(R.id.confirm);
-
         AlertDialog.Builder alert = new AlertDialog.Builder(act)
             .setTitle(titleStr)
             .setView(dlgView)
             .setPositiveButton(R.string.ok, dlgClick)
             .setNegativeButton(R.string.cancel, dlgClick)
             .setOnCancelListener(dlgClick);
-        final AlertDialog alertDialog = alert.create();
-        final DialogValidator validator =
-            new DialogValidator(dlgView, act, false)
-        {
-            @Override
-            protected final View getDoneButton()
-            {
-                return alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-            }
+        AlertDialog alertDialog = alert.create();
 
+        final DialogValidator validator =
+            new DialogValidator.AlertValidator(alertDialog, dlgView, act, false)
+        {
             @Override
             protected final String doValidation()
             {
+                CheckBox confirmCb =
+                    (CheckBox)getDialog().findViewById(R.id.confirm);
                 if (!confirmCb.isChecked()) {
                     return getString(R.string.check_box_to_confirm);
                 }
@@ -88,6 +83,7 @@ public class DialogUtils
             }
         };
 
+        CheckBox confirmCb = (CheckBox)dlgView.findViewById(R.id.confirm);
         confirmCb.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             public void onCheckedChanged(CompoundButton buttonView,

@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.text.Editable;
 import android.text.Html;
@@ -17,6 +18,46 @@ import android.widget.TextView;
 
 public abstract class DialogValidator
 {
+    /**
+     * DialogValidator for alert dialogs
+     */
+    public static abstract class AlertValidator extends DialogValidator
+    {
+        private final AlertDialog itsDialog;
+
+        /**
+         * Constructor with a specific view and password fields
+         */
+        public AlertValidator(AlertDialog dlg, View view, Activity act)
+        {
+            this(dlg, view, act, true);
+        }
+
+        /**
+         * Constructor with a specific view and optional password fields
+         */
+        public AlertValidator(AlertDialog dlg, View view, Activity act,
+                              boolean hasPasswords)
+        {
+            super(view, act, hasPasswords);
+            itsDialog = dlg;
+        }
+
+        @Override
+        protected final View getDoneButton()
+        {
+            return itsDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        }
+
+        /**
+         * Get the alert dialog
+         */
+        protected final AlertDialog getDialog()
+        {
+            return itsDialog;
+        }
+    }
+
     private final Context itsContext;
     private TextView itsPassword = null;
     private TextView itsPasswordConfirm = null;
@@ -45,14 +86,6 @@ public abstract class DialogValidator
     }
 
     /**
-     * Constructor with a specific view and password fields
-     */
-    public DialogValidator(View view, Activity act)
-    {
-        this(view, act, true);
-    }
-
-    /**
      * Constructor with a specific view and optional password fields
      */
     public DialogValidator(View view, Activity act, boolean hasPasswords)
@@ -68,6 +101,7 @@ public abstract class DialogValidator
         itsErrorMsgView = (TextView)view.findViewById(R.id.error_msg);
         itsErrorFmt = view.getResources().getString(R.string.error_msg);
     }
+
 
     public final void registerTextView(TextView tv)
     {

@@ -14,7 +14,6 @@ import org.pwsafe.lib.file.PwsRecord;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;

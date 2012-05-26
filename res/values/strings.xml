@@ -43,7 +43,7 @@
     <string name="empty_title">Empty title</string>
     <string name="enabled">Enabled</string>
     <string name="error">Error</string>
-    <string name="error_msg">&lt;b&gt;&lt;i&gt;Problem&lt;/i&gt;&lt;/b&gt; - %1$s</string>
+    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
     <string name="file_exists">File exists</string>

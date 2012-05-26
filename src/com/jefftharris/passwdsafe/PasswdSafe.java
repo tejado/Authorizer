@@ -38,8 +38,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -389,15 +387,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
-            final AlertDialog alertDialog = alert.create();
-            itsChangePasswdValidator = new DialogValidator(passwdView, this)
+            AlertDialog alertDialog = alert.create();
+            itsChangePasswdValidator =
+                new DialogValidator.AlertValidator(alertDialog,
+                                                   passwdView, this)
             {
-                @Override
-                protected final View getDoneButton()
-                {
-                    return alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                }
-
                 @Override
                 protected final String doValidation()
                 {
@@ -456,15 +450,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
-            final AlertDialog alertDialog = alert.create();
-            itsFileNewValidator = new DialogValidator(fileNewView, this)
+            AlertDialog alertDialog = alert.create();
+            itsFileNewValidator =
+                new DialogValidator.AlertValidator(alertDialog,
+                                                   fileNewView, this)
             {
-                @Override
-                protected final View getDoneButton()
-                {
-                    return alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                }
-
                 @Override
                 protected final String doValidation()
                 {
