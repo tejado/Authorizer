@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.view;
 
 import com.jefftharris.passwdsafe.GuiUtils;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +19,7 @@ import android.view.View;
  * The GuiUtilsFroyo class contains helper GUI methods that are usable on Froyo
  * and higher
  */
+@TargetApi(8)
 public final class GuiUtilsFroyo
 {
     /**

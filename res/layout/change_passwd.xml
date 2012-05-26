@@ -16,7 +16,6 @@
                       
             <EditText android:id="@+id/password"
                       android:singleLine="true"
-                      android:password="true"
                       android:inputType="textPassword"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"/>
@@ -27,7 +26,6 @@
 
             <EditText android:id="@+id/password_confirm"
                       android:singleLine="true"
-                      android:password="true"
                       android:inputType="textPassword"
                       android:imeOptions="actionGo"
                       android:layout_width="fill_parent"

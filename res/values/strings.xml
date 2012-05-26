@@ -62,7 +62,6 @@
     <string name="hide_password">Hide Password</string>
     <string name="hide_passwords">Hide Passwords</string>
     <string name="history">History</string>
-    <string name="history_label">History:</string>
     <string name="home">Home</string>
     <string name="invalid_file_name">Invalid file name</string>
     <string name="invalid_history_max_size">Invalid history maximum size</string>
@@ -80,9 +79,8 @@
     <string name="no_records">No Records</string>
     <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
     <string name="notes">Notes</string>
-    <string name="notes_label">Notes:</string>
     <string name="num_records_label">Number of Records:</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="open_file_title">Open File</string>
     <string name="parent_directory">Parent Directory</string>
     <string name="parent_group">Parent Group</string>
@@ -96,7 +94,6 @@
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="permissions_label">Permissions:</string>
     <string name="preferences">Preferences</string>
-    <string name="pref_file_dir">Directory for Files</string>
     <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Search filter: %1$s</string>
     <string name="record_has_references">Record has references</string>

@@ -3,7 +3,9 @@
               android:orientation="vertical"
               android:id="@+id/record_edit"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent">
+              android:layout_height="fill_parent" 
+              xmlns:tools="http://schemas.android.com/tools" 
+              tools:ignore="NestedScrolling,NestedWeights">
               
     <TextView android:id="@+id/rec_title"
               android:gravity="center"
@@ -39,9 +41,7 @@
                     <TextView android:text="@string/title"/>
                     <EditText android:id="@+id/title"
                               android:singleLine="true"
-                              android:autoText="true"
-                              android:capitalize="sentences"
-                              android:inputType="textCapSentences"
+                              android:inputType="textCapSentences|textAutoCorrect"
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
@@ -91,14 +91,12 @@
                                   android:layout_height="wrap_content">
                         <EditText android:id="@+id/password"
                                   android:singleLine="true"
-                                  android:password="true"
                                   android:inputType="textPassword"
                                   android:layout_weight="1"
                                   android:layout_width="fill_parent"
                                   android:layout_height="wrap_content"/>
                         <EditText android:id="@+id/password_confirm"
                                   android:singleLine="true"
-                                  android:password="true"
                                   android:inputType="textPassword"
                                   android:layout_weight="1"
                                   android:layout_width="fill_parent"
@@ -167,7 +165,6 @@
                 <EditText android:id="@+id/history_max_size"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:numeric="integer"
                           android:singleLine="true"
                           android:minWidth="50dip"
                           android:inputType="number"
@@ -205,9 +202,7 @@
                       android:layout_height="wrap_content"
                       />
             <EditText android:id="@+id/notes"
-                      android:autoText="true"
-                      android:capitalize="sentences"
-                      android:inputType="textCapSentences|textMultiLine|textLongMessage"
+                      android:inputType="textCapSentences|textMultiLine|textLongMessage|textAutoCorrect"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       />
@@ -228,13 +223,13 @@
         <Button android:id="@+id/done_btn"
                 android:text="@string/done" 
                 android:layout_weight="1"
-                android:layout_width="fill_parent"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"/>
-
         <Button android:id="@+id/cancel_btn"
                 android:text="@string/cancel"
                 android:layout_weight="1"
-                android:layout_width="fill_parent"
+                android:layout_width="0dip"
                 android:layout_height="wrap_content"/>
     </LinearLayout>              
+
 </LinearLayout>

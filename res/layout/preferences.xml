@@ -42,7 +42,7 @@
             <EditTextPreference android:name="passwdGenLength Pref"
                                 android:title="Password length"
                                 android:key="passwdGenLength"
-                                android:numeric="integer"
+                                android:inputType="number"
                                 android:defaultValue="8"/>
                                 
             <CheckBoxPreference android:name="passwdGenHex Pref"
