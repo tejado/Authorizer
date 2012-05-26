@@ -276,10 +276,10 @@ public class RecordEditActivity extends AbstractRecordActivity
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(PasswdSafeApp.getAppTitle(this))
-                .setMessage("Enter new group:")
+                .setMessage(R.string.enter_net_group)
                 .setView(view)
-                .setPositiveButton("Ok", dlgClick)
-                .setNegativeButton("Cancel", dlgClick)
+                .setPositiveButton(R.string.ok, dlgClick)
+                .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
             AlertDialog alertDialog = builder.create();
             TextView tv = (TextView)view.findViewById(R.id.new_group);

@@ -161,10 +161,9 @@ public class FileList extends AbstractFileListActivity
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.app_name)
                 .setIcon(android.R.drawable.ic_menu_info_details)
-                .setMessage("Version: " + version +
-                            "\n\nBuild ID: " + Rev.BUILD_ID +
-                            "\n\nBuild Date: " + Rev.BUILD_DATE)
-                .setPositiveButton("Close",
+                .setMessage(getString(R.string.about_details,
+                                      version, Rev.BUILD_ID, Rev.BUILD_DATE))
+                .setPositiveButton(R.string.close,
                                    new DialogInterface.OnClickListener()
                 {
                     public void onClick(DialogInterface dialog, int which)

@@ -321,8 +321,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(R.string.open_file_title)
                 .setView(passwdView)
-                .setPositiveButton("Ok", dlgClick)
-                .setNegativeButton("Cancel", dlgClick)
+                .setPositiveButton(R.string.ok, dlgClick)
+                .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
             AlertDialog alertDialog = alert.create();
             GuiUtils.setupDialogKeyboard(alertDialog, tv, tv, this);
