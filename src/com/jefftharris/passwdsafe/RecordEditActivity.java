@@ -36,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -119,6 +120,8 @@ public class RecordEditActivity extends AbstractRecordActivity
                 return;
             }
 
+            getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
             setText(R.id.rec_title, "Edit " + fileData.getTitle(record));
             setText(R.id.title, fileData.getTitle(record));
             group = fileData.getGroup(record);
