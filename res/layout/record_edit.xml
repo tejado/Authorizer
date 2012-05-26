@@ -6,13 +6,35 @@
               android:layout_height="fill_parent" 
               xmlns:tools="http://schemas.android.com/tools" 
               tools:ignore="NestedScrolling,NestedWeights">
-              
-    <TextView android:id="@+id/rec_title"
-              android:gravity="center"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:textSize="24sp"/>
-              
+       
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        
+        <TextView
+            android:id="@+id/rec_title"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:textSize="24sp"/>
+        
+        <Button
+            android:id="@+id/done_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/done"/>
+        
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/error_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"/>
+
     <View android:layout_width="fill_parent"
           android:layout_height="1dip"
           android:layout_marginTop="2dip"
@@ -208,28 +230,5 @@
                       />
         </LinearLayout>
     </ScrollView>
-
-    <View android:layout_width="fill_parent"
-          android:layout_height="1dip"
-          android:background="#FF909090"/>
-          
-    <TextView android:id="@+id/error_msg"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"/> 
-
-    <LinearLayout android:orientation="horizontal"
-                  android:layout_height="wrap_content"
-                  android:layout_width="fill_parent">
-        <Button android:id="@+id/done_btn"
-                android:text="@string/done" 
-                android:layout_weight="1"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"/>
-        <Button android:id="@+id/cancel_btn"
-                android:text="@string/cancel"
-                android:layout_weight="1"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"/>
-    </LinearLayout>              
 
 </LinearLayout>

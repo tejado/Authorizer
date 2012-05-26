@@ -58,6 +58,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private static final int MENU_TOGGLE_PASSWORD = 3;
     private static final int MENU_GENERATE_PASSWORD = 4;
     private static final int MENU_PASSWORD_PREFERENCES = 5;
+    private static final int MENU_CANCEL = 6;
 
     private static final int CTXMENU_REMOVE = 1;
     private static final int CTXMENU_SET_PASSWORD = 2;
@@ -179,15 +180,6 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         });
 
-        button = (Button)findViewById(R.id.cancel_btn);
-        button.setOnClickListener(new OnClickListener()
-        {
-            public final void onClick(View v)
-            {
-                finish();
-            }
-        });
-
         button = (Button)findViewById(R.id.history_addremove);
         button.setOnClickListener(new View.OnClickListener()
         {
@@ -301,6 +293,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         MenuItem item;
 
+        menu.add(0, MENU_CANCEL, 0, R.string.cancel);
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
         menu.add(0, MENU_GENERATE_PASSWORD, 0, R.string.generate_password);
 
@@ -357,18 +350,24 @@ public class RecordEditActivity extends AbstractRecordActivity
                 !GuiUtils.isPasswordVisible(passwdField),
                 passwdField,
                 (TextView)findViewById(R.id.password_confirm));
-            return true;
+            break;
         }
         case MENU_GENERATE_PASSWORD:
         {
             generatePassword();
-            return true;
+            break;
+        }
+        case MENU_CANCEL:
+        {
+            finish();
+            break;
         }
         default:
         {
             return super.onOptionsItemSelected(item);
         }
         }
+        return true;
     }
 
     @Override
