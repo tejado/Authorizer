@@ -298,6 +298,12 @@ public class RecordView extends AbstractRecordTabActivity
             PasswdFileData fileData = passwdFile.getFileData();
             if (fileData != null) {
                 canEdit = fileData.canEdit();
+                if (canEdit) {
+                    PwsRecord rec = fileData.getRecord(getUUID());
+                    if ((rec != null) && fileData.isProtected(rec)) {
+                        canEdit = false;
+                    }
+                }
             } else {
                 finish();
                 return false;
