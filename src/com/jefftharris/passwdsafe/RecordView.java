@@ -555,15 +555,20 @@ public class RecordView extends AbstractRecordTabActivity
     private final TextView setText(int id, int rowId, String text)
     {
         if (rowId != View.NO_ID) {
-            View row = findViewById(rowId);
-            if (row != null) {
-                row.setVisibility((text != null) ? View.VISIBLE : View.GONE);
-            }
+            setVisibility(rowId, (text != null));
         }
 
         TextView tv = (TextView)findViewById(id);
         tv.setText(text);
         return (text == null) ? null : tv;
+    }
+
+    private final void setVisibility(int id, boolean visible)
+    {
+        View v = findViewById(id);
+        if (v != null) {
+            v.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
     }
 
     private final void setBaseRecord(PasswdRecord passwdRec,
@@ -730,6 +735,9 @@ public class RecordView extends AbstractRecordTabActivity
             referencesView.setVisibility(View.GONE);
         }
         GuiUtils.setListViewHeightBasedOnChildren(referencesView);
+
+        setVisibility(R.id.protected_row, fileData.isProtected(rec));
+
         scrollTabToTop();
     }
 

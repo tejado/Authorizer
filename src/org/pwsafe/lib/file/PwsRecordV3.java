@@ -19,7 +19,7 @@ import org.pwsafe.lib.exception.EndOfFileException;
 
 /**
  * Support for new v3 Record type.
- * 
+ *
  * @author Glen Smith (based on Kevin's code for V2 records)
  */
 public class PwsRecordV3 extends PwsRecord
@@ -33,6 +33,14 @@ public class PwsRecordV3 extends PwsRecord
      * Constant for the version 3 ID string field.
      */
     public static final int V3_ID_STRING = 0;
+
+    /**
+     * Minor version for version PasswordSave 3.25 with protected entry support
+     */
+    public static final byte DB_FMT_MINOR_3_25 = 8;
+
+    /** Minor version of the max supported database format */
+    public static final byte DB_FMT_MINOR_VERSION = DB_FMT_MINOR_3_25;
 
     /**
      * Constant for the Universally Unique ID (UUID) field.
@@ -135,6 +143,11 @@ public class PwsRecordV3 extends PwsRecord
     public static final int EMAIL = 20;
 
     /**
+     * Protected entry
+     */
+    public static final int PROTECTED_ENTRY = 21;
+
+    /**
      * Header database version
      */
     public static final int HEADER_VERSION = 0;
@@ -179,21 +192,21 @@ public class PwsRecordV3 extends PwsRecord
      */
     private static final Object[] VALID_TYPES =
         new Object[] {
-            new Object[] { Integer.valueOf(V3_ID_STRING), 
+            new Object[] { Integer.valueOf(V3_ID_STRING),
                             "V3_ID_STRING", PwsVersionField.class },
-            new Object[] { Integer.valueOf(UUID), 
+            new Object[] { Integer.valueOf(UUID),
                             "UUID", PwsUUIDField.class },
-            new Object[] { Integer.valueOf(GROUP), 
+            new Object[] { Integer.valueOf(GROUP),
                             "GROUP", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(TITLE), 
+            new Object[] { Integer.valueOf(TITLE),
                             "TITLE", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(USERNAME), 
+            new Object[] { Integer.valueOf(USERNAME),
                             "USERNAME", PwsStringUnicodeField.class },
             new Object[] { Integer.valueOf(NOTES),
                             "NOTES", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(PASSWORD), 
+            new Object[] { Integer.valueOf(PASSWORD),
                             "PASSWORD", PwsPasswdUnicodeField.class },
-            new Object[] { Integer.valueOf(CREATION_TIME), 
+            new Object[] { Integer.valueOf(CREATION_TIME),
                             "CREATION_TIME", PwsTimeField.class },
             new Object[] { Integer.valueOf(PASSWORD_MOD_TIME),
                             "PASSWORD_MOD_TIME", PwsTimeField.class },
@@ -203,24 +216,27 @@ public class PwsRecordV3 extends PwsRecord
                             "PASSWORD_LIFETIME", PwsTimeField.class },
             new Object[] { Integer.valueOf(PASSWORD_POLICY_DEPRECATED),
                             "PASSWORD_POLICY_OLD", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(LAST_MOD_TIME), 
+            new Object[] { Integer.valueOf(LAST_MOD_TIME),
                             "LAST_MOD_TIME", PwsTimeField.class },
-            new Object[] { Integer.valueOf(URL), 
+            new Object[] { Integer.valueOf(URL),
                             "URL", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(AUTOTYPE), 
+            new Object[] { Integer.valueOf(AUTOTYPE),
                             "AUTOTYPE", PwsStringUnicodeField.class },
             new Object[] { Integer.valueOf(PASSWORD_HISTORY),
                             "PASSWORD_HISTORY", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(PASSWORD_POLICY), 
+            new Object[] { Integer.valueOf(PASSWORD_POLICY),
                             "PASSWORD_POLICY", PwsStringUnicodeField.class },
             new Object[] { Integer.valueOf(PASSWORD_EXPIRY_INTERVAL),
                             "PASSWORD_EXPIRY_INTERVAL", PwsIntegerField.class },
-            new Object[] { Integer.valueOf(RUN_COMMAND), 
+            new Object[] { Integer.valueOf(RUN_COMMAND),
                             "RUN_COMMAND", PwsStringUnicodeField.class },
             new Object[] { Integer.valueOf(DOUBLE_CLICK_ACTION),
                             "DOUBLE_CLICK_ACTION", PwsShortField.class },
-            new Object[] { Integer.valueOf(EMAIL), 
-                            "EMAIL", PwsStringUnicodeField.class }, };
+            new Object[] { Integer.valueOf(EMAIL),
+                            "EMAIL", PwsStringUnicodeField.class },
+            new Object[] { Integer.valueOf(PROTECTED_ENTRY),
+                            "PROTECTED_ENTRY", PwsByteField.class},
+    };
 
     /**
      * Create a new record with all mandatory fields given their default value.
@@ -238,19 +254,20 @@ public class PwsRecordV3 extends PwsRecord
 
     /**
      * A special version for header records
-     * 
+     *
      * @param isHeader Marker for header record
      */
     PwsRecordV3(boolean isHeader)
     {
         super(VALID_TYPES, true);
-        setField(new PwsVersionField(HEADER_VERSION, new byte[] { 7, 3 }));
+        setField(new PwsVersionField(HEADER_VERSION,
+                                     new byte[] { DB_FMT_MINOR_VERSION, 3 }));
         setField(new PwsUUIDField(HEADER_UUID, new UUID()));
     }
 
     /**
      * Create a new record by reading it from <code>file</code>.
-     * 
+     *
      * @param file the file to read data from.
      * @throws EndOfFileException If end of file is reached
      * @throws IOException If a read error occurs.
@@ -263,7 +280,7 @@ public class PwsRecordV3 extends PwsRecord
     /**
      * A special version which reads and ignores all headers since they have
      * different ids to standard types.
-     * 
+     *
      * @param file the file to read data from.
      * @param validTypes the types allowable in the incoming data
      * @throws EndOfFileException If end of file is reached
@@ -277,7 +294,7 @@ public class PwsRecordV3 extends PwsRecord
 
     /**
      * Creates a new record that is a copy <code>base</code>.
-     * 
+     *
      * @param base the record to copy.
      */
     PwsRecordV3(PwsRecord base)
@@ -288,7 +305,7 @@ public class PwsRecordV3 extends PwsRecord
     /**
      * The V3 format allows and requires the ability to add formerly unknown
      * fields.
-     * 
+     *
      * @return true
      */
     @Override
@@ -299,7 +316,7 @@ public class PwsRecordV3 extends PwsRecord
 
     /**
      * Creates a deep clone of this record.
-     * 
+     *
      * @return the new record.
      */
     @Override
@@ -313,7 +330,7 @@ public class PwsRecordV3 extends PwsRecord
      * if this record is "less than" <code>other</code>, zero if they are
      * "equal", or greater than zero if this record is "greater than"
      * <code>other</code>.
-     * 
+     *
      * @param other the record to compare this record to.
      * @return A value &lt; zero if this record is "less than" <code>other</code>
      *         , zero if they're equal and &gt; zero if this record is
@@ -332,7 +349,7 @@ public class PwsRecordV3 extends PwsRecord
     /**
      * Compares this record to another returning <code>true</code> if they're
      * equal and <code>false</code> if they're unequal.
-     * 
+     *
      * @param that the record this one is compared to.
      * @return <code>true</code> if the records are equal, <code>false</code> if
      *         they're unequal.
@@ -362,7 +379,7 @@ public class PwsRecordV3 extends PwsRecord
      * user or not. The header record is the only one we suppress, and we
      * determine the header record by checking for the presence of the type 0
      * field which represents the file format version.
-     * 
+     *
      * @return <code>true</code> if it's valid or <code>false</code> if unequal.
      */
     @Override
@@ -452,7 +469,7 @@ public class PwsRecordV3 extends PwsRecord
 
     /**
      * Initialises this record by reading its data from <code>file</code>.
-     * 
+     *
      * @param file the file to read the data from.
      * @throws EndOfFileException
      * @throws IOException
@@ -484,12 +501,12 @@ public class PwsRecordV3 extends PwsRecord
                 case V3_ID_STRING:
                     // itemVal = new PwsIntegerField( item.getType(), new byte[]
                     // {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} );
-                    itemVal = new PwsVersionField(item.getType(), 
+                    itemVal = new PwsVersionField(item.getType(),
                                                   item.getByteData());
                     break;
 
                 case UUID:
-                    itemVal = new PwsUUIDField(item.getType(), 
+                    itemVal = new PwsUUIDField(item.getType(),
                                                item.getByteData());
                     break;
 
@@ -509,7 +526,7 @@ public class PwsRecordV3 extends PwsRecord
 
                 case PASSWORD:
                     itemVal = new PwsPasswdUnicodeField(item.getType(),
-                                                        item.getByteData(), 
+                                                        item.getByteData(),
                                                         file);
                     item.clear();
                     break;
@@ -518,27 +535,27 @@ public class PwsRecordV3 extends PwsRecord
                 case PASSWORD_MOD_TIME:
                 case LAST_ACCESS_TIME:
                 case LAST_MOD_TIME:
-                    itemVal = new PwsTimeField(item.getType(), 
+                    itemVal = new PwsTimeField(item.getType(),
                                                item.getByteData());
                     break;
 
                 case PASSWORD_LIFETIME:
-                    itemVal = new PwsTimeField(item.getType(), 
+                    itemVal = new PwsTimeField(item.getType(),
                                                item.getByteData());
                     break;
 
                 case PASSWORD_EXPIRY_INTERVAL:
-                    itemVal = new PwsIntegerField(item.getType(), 
+                    itemVal = new PwsIntegerField(item.getType(),
                                                   item.getByteData());
                     break;
 
                 case DOUBLE_CLICK_ACTION:
-                    itemVal = new PwsShortField(item.getType(), 
+                    itemVal = new PwsShortField(item.getType(),
                                                 item.getByteData());
                     break;
 
                 default:
-                    itemVal = new PwsUnknownField(item.getType(), 
+                    itemVal = new PwsUnknownField(item.getType(),
                                                   item.getByteData());
                     break;
                 // throw new UnimplementedConversionException();
@@ -554,7 +571,7 @@ public class PwsRecordV3 extends PwsRecord
 
     /**
      * Saves this record to <code>file</code>.
-     * 
+     *
      * @param file the file that the record will be written to.
      * @throws IOException if a write error occurs.
      * @see org.pwsafe.lib.file.PwsRecord#saveRecord(org.pwsafe.lib.file.PwsFile)
@@ -586,7 +603,7 @@ public class PwsRecordV3 extends PwsRecord
 
     /**
      * Writes a single field to the file.
-     * 
+     *
      * @param file the file to write the field to.
      * @param field the field to be written.
      * @param type the type to write to the file instead of
@@ -630,7 +647,7 @@ public class PwsRecordV3 extends PwsRecord
 
     /**
      * Returns a string representation of this record.
-     * 
+     *
      * @return A string representation of this object.
      */
     @Override

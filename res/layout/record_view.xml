@@ -123,6 +123,16 @@
                                       android:layout_height="wrap_content"
                                       android:padding="3dip"/>
                         </TableRow>
+                        
+                        <TableRow android:id="@+id/protected_row">
+                            <TextView
+                                android:padding="3dip"
+                                android:text="@string/protected_record"/>
+                            <TextView
+                                android:padding="3dip"
+                                android:text="@string/unprotect_to_modify"/>
+                        </TableRow>
+ 
                     </TableLayout>
                     
                     <ListView android:id="@+id/references"

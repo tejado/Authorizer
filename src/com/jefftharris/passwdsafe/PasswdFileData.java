@@ -31,6 +31,7 @@ import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
+import org.pwsafe.lib.file.PwsByteField;
 import org.pwsafe.lib.file.PwsField;
 import org.pwsafe.lib.file.PwsFieldTypeV2;
 import org.pwsafe.lib.file.PwsFieldTypeV3;
@@ -409,6 +410,27 @@ public class PasswdFileData
                  rec, PwsRecordV3.PASSWORD_HISTORY);
     }
 
+    public final boolean isProtected(PwsRecord rec)
+    {
+        boolean prot = false;
+        PwsField field =
+            doGetField(rec, getVersionFieldId(PwsRecordV3.PROTECTED_ENTRY));
+        if (field != null) {
+            byte[] value = field.getBytes();
+            if ((value != null) && (value.length > 0)) {
+                prot = (value[0] != 0);
+            }
+        }
+        return prot;
+    }
+
+    public final void setProtected(boolean prot, PwsRecord rec)
+    {
+        byte val = prot ? (byte)1 : (byte)0;
+        setField(val, rec, PwsRecordV3.PROTECTED_ENTRY);
+        updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_25);
+    }
+
     public final String getTitle(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.TITLE);
@@ -540,7 +562,17 @@ public class PasswdFileData
         setHdrLastSaveUser("User");
         setHdrLastSaveHost(Build.MODEL);
         setHdrLastSaveTime(new Date());
+    }
 
+    private final void updateFormatVersion(byte minMinor)
+    {
+        if (isV3()) {
+            PwsRecord rec = ((PwsFileV3)itsPwsFile).getHeaderRecord();
+            int minor = getHdrMinorVersion(rec);
+            if ((minor != -1) && (minor < minMinor)) {
+                setHdrMinorVersion(rec, minMinor);
+            }
+        }
     }
 
     private final String getField(PwsRecord rec, int fieldId)
@@ -615,6 +647,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.PASSWORD_HISTORY:
+            case PwsRecordV3.PROTECTED_ENTRY:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -657,6 +690,7 @@ public class PasswdFileData
             case PwsRecordV3.PASSWORD_LIFETIME:
             case PwsRecordV3.URL:
             case PwsRecordV3.PASSWORD_HISTORY:
+            case PwsRecordV3.PROTECTED_ENTRY:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -890,7 +924,7 @@ public class PasswdFileData
         }
     }
 
-    private final void setField(String str, PwsRecord rec, int fieldId)
+    private final void setField(Object val, PwsRecord rec, int fieldId)
     {
         PwsField field = null;
         switch (itsPwsFile.getFileVersionMajor())
@@ -907,6 +941,7 @@ public class PasswdFileData
             case PwsRecordV3.USERNAME:
             case PwsRecordV3.PASSWORD_HISTORY:
             {
+                String str = val.toString();
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringUnicodeField(fieldId, str);
                 }
@@ -914,8 +949,16 @@ public class PasswdFileData
             }
             case PwsRecordV3.PASSWORD:
             {
+                String str = val.toString();
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsPasswdUnicodeField(fieldId, str, itsPwsFile);
+                }
+                break;
+            }
+            case PwsRecordV3.PROTECTED_ENTRY: {
+                Byte b = (Byte)val;
+                if ((b != null) && (b.byteValue() != 0)) {
+                    field = new PwsByteField(fieldId, b.byteValue());
                 }
                 break;
             }
@@ -936,6 +979,7 @@ public class PasswdFileData
             case PwsRecordV3.TITLE:
             case PwsRecordV3.USERNAME:
             {
+                String str = val.toString();
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringField(fieldId, str);
                 }
@@ -943,6 +987,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.PASSWORD:
             {
+                String str = val.toString();
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsPasswdField(fieldId, str, itsPwsFile);
                 }
@@ -1094,7 +1139,6 @@ public class PasswdFileData
         }
     }
 
-
     private static final int getHdrMinorVersion(PwsRecord rec)
     {
         PwsField ver = doGetField(rec, PwsRecordV3.HEADER_VERSION);
@@ -1106,6 +1150,25 @@ public class PasswdFileData
             return -1;
         }
         return bytes[0];
+    }
+
+    private static final void setHdrMinorVersion(PwsRecord rec, byte minor)
+    {
+        PwsField ver = doGetField(rec, PwsRecordV3.HEADER_VERSION);
+        if (ver == null) {
+            return;
+        }
+        byte[] bytes = ver.getBytes();
+        if ((bytes == null) || (bytes.length == 0)) {
+            return;
+        }
+
+        byte[] newbytes = new byte[bytes.length];
+        System.arraycopy(bytes, 0, newbytes, 0, bytes.length);
+        newbytes[0] = minor;
+        PwsField newVer = new PwsUnknownField(PwsRecordV3.HEADER_VERSION,
+                                              newbytes);
+        rec.setField(newVer);
     }
 
     private static final String getHdrLastSaveWhoField(PwsRecord rec,

@@ -10,9 +10,9 @@ package org.pwsafe.lib.file;
 import org.pwsafe.lib.Util;
 
 /**
- * Provides a wrapper for fields that hold an integer value such as the date
- * and time fields.  Integer values are stored in the database in little-endian
- * order and are converted to and from this format on writing and reading.
+ * Provides a wrapper for fields that hold an short integer value. Short values
+ * are stored in the database in little-endian order and are converted to and
+ * from this format on writing and reading.
  *
  * @author Jeff Harris
  */
@@ -50,7 +50,7 @@ public class PwsShortField extends PwsField
     }
 
     /**
-     * Returns this integer as an array of bytes.  The returned array will have
+     * Returns this short as an array of bytes.  The returned array will have
      * a length of PwsFile.BLOCK_LENGTH and is thus suitable to be written to the
      * database.
      *
