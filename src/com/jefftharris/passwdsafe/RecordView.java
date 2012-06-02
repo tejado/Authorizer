@@ -294,14 +294,16 @@ public class RecordView extends AbstractRecordTabActivity
 
         ActivityPasswdFile passwdFile = getPasswdFile();
         boolean canEdit = false;
+        boolean canDelete = false;
         if (passwdFile != null) {
             PasswdFileData fileData = passwdFile.getFileData();
             if (fileData != null) {
                 canEdit = fileData.canEdit();
-                if (canEdit) {
+                canDelete = canEdit;
+                if (canDelete) {
                     PwsRecord rec = fileData.getRecord(getUUID());
                     if ((rec != null) && fileData.isProtected(rec)) {
-                        canEdit = false;
+                        canDelete = false;
                     }
                 }
             } else {
@@ -317,7 +319,7 @@ public class RecordView extends AbstractRecordTabActivity
 
         item = menu.findItem(MENU_DELETE);
         if (item != null) {
-            item.setEnabled(canEdit);
+            item.setEnabled(canDelete);
         }
         return true;
     }

@@ -36,7 +36,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -78,6 +80,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private boolean itsTypeHasDetails = true;
     private PasswdRecord.Type itsOrigType = Type.NORMAL;
     private PwsRecord itsLinkRef = null;
+    private ArrayList<View> itsProtectViews = new ArrayList<View>();
 
     private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
@@ -113,6 +116,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         PwsRecord record = null;
         String group = null;
         String uuid = getUUID();
+        CheckBox protCb = (CheckBox)findViewById(R.id.protected_record);
         if (uuid != null) {
             record = fileData.getRecord(uuid);
             if (record == null) {
@@ -131,6 +135,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             if (itsIsV3) {
                 setText(R.id.url, fileData.getURL(record));
                 setText(R.id.email, fileData.getEmail(record));
+                protCb.setChecked(fileData.isProtected(record));
             }
 
             itsHistory = fileData.getPasswdHistory(record);
@@ -148,6 +153,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         if (!itsIsV3) {
             setVisibility(R.id.url_row, false);
             setVisibility(R.id.email_row, false);
+            setVisibility(R.id.protected_row, false);
         }
 
         initTypeAndPassword(fileData, record);
@@ -209,6 +215,19 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         });
 
+        protCb.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                setProtected(((CheckBox)v).isChecked());
+            }
+        });
+
+        initProtViews(findViewById(R.id.base_group));
+        initProtViews(findViewById(R.id.history_group));
+        initProtViews(findViewById(R.id.notes_label));
+        initProtViews(findViewById(R.id.notes));
+        setProtected(isProtected());
         itsValidator.validate();
     }
 
@@ -337,7 +356,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         mi = menu.findItem(MENU_GENERATE_PASSWORD);
         if (mi != null) {
-            mi.setEnabled(userPassword);
+            mi.setEnabled(userPassword && !isProtected());
         }
         return true;
     }
@@ -794,7 +813,6 @@ public class RecordEditActivity extends AbstractRecordActivity
         CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
         enabledCb.setVisibility(visibility);
 
-
         TextView maxSize = (TextView)findViewById(R.id.history_max_size);
         maxSize.setVisibility(visibility);
         View maxSizeLabel = findViewById(R.id.history_max_size_label);
@@ -818,12 +836,39 @@ public class RecordEditActivity extends AbstractRecordActivity
             histView.setAdapter(histAdapter);
             GuiUtils.setListViewHeightBasedOnChildren(histView);
             histView.setEnabled(historyEnabled);
+            // TODO: this item enable doesn't work...
             for (int i = 0; i < histAdapter.getCount(); ++i) {
                 histAdapter.getView(i, null, histView).setEnabled(historyEnabled);
             }
         }
 
         itsValidator.validate();
+    }
+
+    /**
+     * Is the record protected
+     */
+    private final boolean isProtected()
+    {
+        CheckBox cb = (CheckBox)findViewById(R.id.protected_record);
+        return cb.isChecked();
+    }
+
+    /**
+     * Set whether the record is protected
+     */
+    private final void setProtected(boolean prot)
+    {
+        for (View v: itsProtectViews) {
+            v.setEnabled(!prot);
+        }
+
+        if (!prot) {
+            historyChanged(true);
+        }
+
+        // TODO: need to invalidate options menu
+        // TODO: try to disable listview items
     }
 
     private final void saveRecord()
@@ -883,6 +928,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         if (itsIsV3) {
             String currUrl = fileData.getURL(record);
             String currEmail = fileData.getEmail(record);
+            boolean currProt = fileData.isProtected(record);
             PasswdHistory currHistory = fileData.getPasswdHistory(record);
 
             if (itsTypeHasDetails) {
@@ -902,6 +948,11 @@ public class RecordEditActivity extends AbstractRecordActivity
                 if (currEmail != null) {
                     fileData.setEmail(null, record);
                 }
+            }
+
+            boolean updateProt = isProtected();
+            if (updateProt != currProt) {
+                fileData.setProtected(updateProt, record);
             }
 
             if (itsTypeHasNormalPassword) {
@@ -1031,6 +1082,31 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         return tv;
+    }
+
+    /**
+     * Initialize the list of views which are enabled based on whether the
+     * record is protected
+     */
+    private final void initProtViews(View v)
+    {
+        if (v.getId() == R.id.protected_record) {
+            // Don't include the protected checkbox itself
+            return;
+        }
+
+        if ((v instanceof TextView) ||
+            (v instanceof Spinner) ||
+            (v instanceof AbsListView)) {
+            itsProtectViews.add(v);
+        }
+
+        if (v instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup)v;
+            for (int i = 0; i < vg.getChildCount(); ++i) {
+                initProtViews(vg.getChildAt(i));
+            }
+        }
     }
 
     private final void setVisibility(int viewId, boolean visible)

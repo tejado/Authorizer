@@ -77,7 +77,6 @@ public final class GuiUtils
     {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
-            // pre-condition
             return;
         }
 

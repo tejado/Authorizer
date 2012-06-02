@@ -47,7 +47,8 @@
         <LinearLayout android:orientation="vertical"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content">
-            <TableLayout android:layout_width="fill_parent"
+            <TableLayout android:id="@+id/base_group"
+                         android:layout_width="fill_parent"
                          android:layout_height="wrap_content"
                          android:stretchColumns="1"
                          android:shrinkColumns="1">
@@ -147,6 +148,15 @@
                                   android:gravity="center_vertical"
                                   />
                     </RelativeLayout>
+                </TableRow>
+                
+                <TableRow android:id="@+id/protected_row">
+
+                    <CheckBox
+                        android:id="@+id/protected_record"
+                        android:layout_span="2"
+                        android:text="@string/protected_record"/>
+
                 </TableRow>
             </TableLayout>
 
