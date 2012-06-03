@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.jefftharris.passwdsafe.view.GuiUtilsFroyo;
+import com.jefftharris.passwdsafe.view.GuiUtilsHoneycomb;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -36,6 +37,12 @@ import android.widget.TextView;
  */
 public final class GuiUtils
 {
+    private static final int SDK_CUPCAKE =
+        android.os.Build.VERSION_CODES.CUPCAKE;
+    private static final int SDK_FROYO =
+        android.os.Build.VERSION_CODES.FROYO;
+    private static final int SDK_HONEYCOMB = 11;
+
     public static final int SDK_VERSION;
     static {
         int sdk;
@@ -43,10 +50,12 @@ public final class GuiUtils
             sdk = Integer.parseInt(android.os.Build.VERSION.SDK);
         } catch (NumberFormatException e) {
             // Default back to android 1.5
-            sdk = 3;
+            sdk = SDK_CUPCAKE;
         }
         SDK_VERSION = sdk;
     }
+
+
 
     private static final String PASSWD = "passwd";
     private static final String DATE = "date";
@@ -195,8 +204,19 @@ public final class GuiUtils
     public static void setShowKeyboardListener(Dialog dialog, View view,
                                                Context ctx)
     {
-        if (SDK_VERSION >= android.os.Build.VERSION_CODES.FROYO) {
+        if (SDK_VERSION >= SDK_FROYO) {
             GuiUtilsFroyo.setShowKeyboardListener(dialog, view, ctx);
+        }
+    }
+
+
+    /**
+     * Invalidate the options menu on an activity
+     */
+    public static void invalidateOptionsMenu(Activity act)
+    {
+        if (SDK_VERSION >= SDK_HONEYCOMB) {
+            GuiUtilsHoneycomb.invalidateOptionsMenu(act);
         }
     }
 }

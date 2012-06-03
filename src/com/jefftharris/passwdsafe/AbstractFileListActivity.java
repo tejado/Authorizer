@@ -356,5 +356,6 @@ public abstract class AbstractFileListActivity extends ListActivity
         }
         setFileDir(newDir);
         showFiles();
+        GuiUtils.invalidateOptionsMenu(this);
     }
 }

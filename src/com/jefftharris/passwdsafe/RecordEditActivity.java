@@ -555,6 +555,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         // Prev type needs to be updated before setting spinner to prevent
         // recursion
         itsType = type;
+        GuiUtils.invalidateOptionsMenu(this);
 
         if (init) {
             int pos = TYPE_NORMAL;
@@ -867,8 +868,10 @@ public class RecordEditActivity extends AbstractRecordActivity
             historyChanged(true);
         }
 
-        // TODO: need to invalidate options menu
+        GuiUtils.invalidateOptionsMenu(this);
+
         // TODO: try to disable listview items
+        // TODO: Add options to protect/unprotect all entries in db
     }
 
     private final void saveRecord()

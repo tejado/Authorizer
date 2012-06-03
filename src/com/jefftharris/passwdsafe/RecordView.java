@@ -496,6 +496,7 @@ public class RecordView extends AbstractRecordTabActivity
         setBasicFields(passwdRec, fileData);
         setNotesFields(passwdRec, fileData, tabs);
         setHistoryFields(passwdRec, fileData, tabs);
+        GuiUtils.invalidateOptionsMenu(this);
     }
 
     private final void deleteRecord()
