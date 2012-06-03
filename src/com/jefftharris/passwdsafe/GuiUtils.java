@@ -10,6 +10,8 @@ package com.jefftharris.passwdsafe;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.jefftharris.passwdsafe.view.GuiUtilsFroyo;
 import com.jefftharris.passwdsafe.view.GuiUtilsHoneycomb;
@@ -56,7 +58,6 @@ public final class GuiUtils
     }
 
 
-
     private static final String PASSWD = "passwd";
     private static final String DATE = "date";
 
@@ -66,6 +67,54 @@ public final class GuiUtils
     public static final int INPUT_TEXT_PASSWORD_VISIBLE =
         InputType.TYPE_CLASS_TEXT |
         InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+
+
+    /**
+     * The EnableAdapter class is a SimpleAdapter that can show its items in a
+     * disabled state
+     */
+    public static class EnableAdapter extends SimpleAdapter
+    {
+        private final boolean itsIsEnabled;
+
+        /**
+         * Constructor
+         */
+        public EnableAdapter(Context context,
+                             List<? extends Map<String, ?>> data, int resource,
+                             String[] from, int[] to, boolean enabled)
+        {
+            super(context, data, resource, from, to);
+            itsIsEnabled = enabled;
+        }
+
+        /* (non-Javadoc)
+         * @see android.widget.SimpleAdapter#getView(int, android.view.View, android.view.ViewGroup)
+         */
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            View v = super.getView(position, convertView, parent);
+            if (!itsIsEnabled) {
+                setEnabled(v);
+            }
+            return v;
+        }
+
+        /**
+         * Set the enabled state of the view and its children
+         */
+        private void setEnabled(View v)
+        {
+            v.setEnabled(itsIsEnabled);
+            if (v instanceof ViewGroup) {
+                ViewGroup vg = (ViewGroup)v;
+                for (int i = 0; i < vg.getChildCount(); ++i) {
+                    setEnabled(vg.getChildAt(i));
+                }
+            }
+        }
+    }
 
 
     public static String getTextViewStr(Activity act, int viewId)
@@ -104,7 +153,8 @@ public final class GuiUtils
 
 
     public static ListAdapter createPasswdHistoryAdapter(PasswdHistory history,
-                                                         Context context)
+                                                         Context context,
+                                                         boolean enabled)
     {
         ArrayList<HashMap<String, Object>> histData =
             new ArrayList<HashMap<String, Object>>();
@@ -119,11 +169,12 @@ public final class GuiUtils
         }
 
         ListAdapter adapter =
-            new SimpleAdapter(context, histData,
+            new EnableAdapter(context, histData,
                               android.R.layout.simple_list_item_2,
                               new String[] { PASSWD, DATE },
                               new int[] { android.R.id.text1,
-                                          android.R.id.text2 });
+                                          android.R.id.text2 },
+                              enabled);
         return adapter;
     }
 

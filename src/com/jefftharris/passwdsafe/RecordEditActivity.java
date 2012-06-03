@@ -803,7 +803,18 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
     }
 
+    /**
+     * Update the view when the history changes
+     */
     private final void historyChanged(boolean updateMaxSize)
+    {
+        historyChanged(updateMaxSize, isProtected());
+    }
+
+    /**
+     * Update the view when the history changes
+     */
+    private final void historyChanged(boolean updateMaxSize, boolean prot)
     {
         boolean historyExists = (itsHistory != null);
         int visibility = historyExists ? View.VISIBLE : View.GONE;
@@ -823,7 +834,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         histView.setVisibility(visibility);
 
         if (historyExists) {
-            boolean historyEnabled = itsHistory.isEnabled();
+            boolean historyEnabled = itsHistory.isEnabled() && !prot;
             enabledCb.setChecked(historyEnabled);
 
             maxSize.setEnabled(historyEnabled);
@@ -833,14 +844,11 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             ListAdapter histAdapter =
-                GuiUtils.createPasswdHistoryAdapter(itsHistory, this);
+                GuiUtils.createPasswdHistoryAdapter(itsHistory, this,
+                                                    historyEnabled);
             histView.setAdapter(histAdapter);
             GuiUtils.setListViewHeightBasedOnChildren(histView);
             histView.setEnabled(historyEnabled);
-            // TODO: this item enable doesn't work...
-            for (int i = 0; i < histAdapter.getCount(); ++i) {
-                histAdapter.getView(i, null, histView).setEnabled(historyEnabled);
-            }
         }
 
         itsValidator.validate();
@@ -863,14 +871,8 @@ public class RecordEditActivity extends AbstractRecordActivity
         for (View v: itsProtectViews) {
             v.setEnabled(!prot);
         }
-
-        if (!prot) {
-            historyChanged(true);
-        }
-
+        historyChanged(true, prot);
         GuiUtils.invalidateOptionsMenu(this);
-
-        // TODO: try to disable listview items
     }
 
     private final void saveRecord()

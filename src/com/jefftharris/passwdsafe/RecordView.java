@@ -814,8 +814,8 @@ public class RecordView extends AbstractRecordTabActivity
         if (historyExists) {
             historyEnabled = history.isEnabled();
             historyMaxSize = Integer.toString(history.getMaxSize());
-            histView.setAdapter(GuiUtils.createPasswdHistoryAdapter(history,
-                                                                    this));
+            histView.setAdapter(
+                GuiUtils.createPasswdHistoryAdapter(history, this, true));
         } else {
             historyMaxSize = getString(R.string.n_a);
             histView.setAdapter(null);
