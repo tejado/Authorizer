@@ -871,7 +871,6 @@ public class RecordEditActivity extends AbstractRecordActivity
         GuiUtils.invalidateOptionsMenu(this);
 
         // TODO: try to disable listview items
-        // TODO: Add options to protect/unprotect all entries in db
     }
 
     private final void saveRecord()

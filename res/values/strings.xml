@@ -52,6 +52,7 @@
     <string name="file_label">File:</string>
     <string name="file_label_val">File: %1$s</string>
     <string name="file_name_label">File Name:</string>
+    <string name="file_operations">File Operations…</string>
     <string name="file_type_icon">File type icon</string>
     <string name="generate_password">Generate Password</string>
     <string name="go_to">Goto</string>
@@ -94,6 +95,8 @@
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="permissions_label">Permissions:</string>
     <string name="preferences">Preferences</string>
+    <string name="protect_all">Protect All Records</string>
+    <string name="protect_group">Protect Group Records</string>
     <string name="protected_record">Protected</string>
     <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Search filter: %1$s</string>
@@ -116,6 +119,8 @@
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
     <string name="type">Type</string>
+    <string name="unprotect_all">Unprotect All Records</string>
+    <string name="unprotect_group">Unprotect Group Records</string>
     <string name="unprotect_to_modify">Unprotect to modify</string>
     <string name="up">Up</string>
     <string name="url">URL</string>

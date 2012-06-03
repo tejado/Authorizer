@@ -143,6 +143,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
      */
     public void saveFinished(boolean success)
     {
+        showFileData();
     }
 
     /* (non-Javadoc)
@@ -273,7 +274,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     {
         MenuItem mi = menu.findItem(MENU_PARENT);
         if (mi != null) {
-            mi.setEnabled(itsCurrGroups.size() > 0);
+            mi.setEnabled(!isRootGroup());
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -366,7 +367,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
         populateFileData();
 
         View panel = findViewById(R.id.current_group_panel);
-        if (itsCurrGroups.isEmpty()) {
+        if (isRootGroup()) {
             panel.setVisibility(View.GONE);
         } else {
             panel.setVisibility(View.VISIBLE);
@@ -416,6 +417,15 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     protected File getUriAsFile()
     {
         return PasswdFileData.getUriAsFile(itsUri);
+    }
+
+
+    /**
+     * Is the root group selected
+     */
+    protected boolean isRootGroup()
+    {
+        return itsCurrGroups.isEmpty();
     }
 
 

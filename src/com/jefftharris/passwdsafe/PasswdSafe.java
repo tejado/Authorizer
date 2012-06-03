@@ -35,6 +35,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
@@ -55,6 +56,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int MENU_DETAILS =         ABS_MENU_MAX + 2;
     private static final int MENU_CHANGE_PASSWD =   ABS_MENU_MAX + 3;
     private static final int MENU_DELETE =          ABS_MENU_MAX + 4;
+    private static final int MENU_PROTECT_ALL =     ABS_MENU_MAX + 5;
+    private static final int MENU_UNPROTECT_ALL =   ABS_MENU_MAX + 6;
 
     private static final int CTXMENU_COPY_USER = 1;
     private static final int CTXMENU_COPY_PASSWD = 2;
@@ -168,11 +171,16 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         addCloseMenuItem(menu);
 
-        mi = menu.add(0, MENU_CHANGE_PASSWD, 0, R.string.change_password);
+        SubMenu submenu = menu.addSubMenu(R.string.file_operations);
+
+        mi = submenu.add(0, MENU_CHANGE_PASSWD, 0, R.string.change_password);
         mi.setIcon(android.R.drawable.ic_menu_edit);
 
-        mi = menu.add(0, MENU_DELETE, 0, R.string.delete_file);
+        mi = submenu.add(0, MENU_DELETE, 0, R.string.delete_file);
         mi.setIcon(android.R.drawable.ic_menu_delete);
+
+        mi = submenu.add(0, MENU_PROTECT_ALL, 0, R.string.protect_all);
+        mi = submenu.add(0, MENU_UNPROTECT_ALL, 0, R.string.unprotect_all);
 
         addParentMenuItem(menu);
 
@@ -187,6 +195,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     {
         boolean editEnabled = false;
         boolean deleteEnabled = false;
+        boolean isRoot = isRootGroup();
         if (itsPasswdFile != null) {
             PasswdFileData fileData = itsPasswdFile.getFileData();
             if (fileData != null) {
@@ -208,6 +217,19 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         mi = menu.findItem(MENU_DELETE);
         if (mi != null) {
             mi.setEnabled(deleteEnabled);
+        }
+
+        mi = menu.findItem(MENU_PROTECT_ALL);
+        if (mi != null) {
+            mi.setTitle(isRoot ? R.string.protect_all : R.string.protect_group);
+            mi.setEnabled(editEnabled);
+        }
+
+        mi = menu.findItem(MENU_UNPROTECT_ALL);
+        if (mi != null) {
+            mi.setTitle(isRoot ?
+                        R.string.unprotect_all : R.string.unprotect_group);
+            mi.setEnabled(editEnabled);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -242,6 +264,16 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case MENU_DELETE:
         {
             showDialog(DIALOG_DELETE);
+            break;
+        }
+        case MENU_PROTECT_ALL:
+        {
+            setProtectAll(true);
+            break;
+        }
+        case MENU_UNPROTECT_ALL:
+        {
+            setProtectAll(false);
             break;
         }
         default:
@@ -788,6 +820,23 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             PasswdSafeApp.showFatalMsg(
                 "Could not change password on closed file: " + itsUri, this);
         }
+    }
+
+    /**
+     * Protect or unprotect all entries
+     */
+    private final void setProtectAll(boolean prot)
+    {
+        // TODO: protect from current group on down, not whole file
+        PasswdFileData fileData = itsPasswdFile.getFileData();
+        if (fileData == null) {
+            return;
+        }
+
+        for (PwsRecord rec: fileData.getRecords()) {
+            fileData.setProtected(prot, rec);
+        }
+        itsPasswdFile.save();
     }
 
     private final void cancelFileOpen()
