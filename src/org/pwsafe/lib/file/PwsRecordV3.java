@@ -554,6 +554,11 @@ public class PwsRecordV3 extends PwsRecord
                                                 item.getByteData());
                     break;
 
+                case PROTECTED_ENTRY:
+                    itemVal = new PwsByteField(item.getType(),
+                                               item.getByteData());
+                    break;
+
                 default:
                     itemVal = new PwsUnknownField(item.getType(),
                                                   item.getByteData());
