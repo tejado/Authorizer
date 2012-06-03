@@ -81,6 +81,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private PasswdRecord.Type itsOrigType = Type.NORMAL;
     private PwsRecord itsLinkRef = null;
     private ArrayList<View> itsProtectViews = new ArrayList<View>();
+    private boolean itsIsProtected = false;
 
     private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
@@ -113,6 +114,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         PasswdFileData fileData = getPasswdFile().getFileData();
         itsIsV3 = fileData.isV3();
+        itsIsProtected = false;
         PwsRecord record = null;
         String group = null;
         String uuid = getUUID();
@@ -135,7 +137,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             if (itsIsV3) {
                 setText(R.id.url, fileData.getURL(record));
                 setText(R.id.email, fileData.getEmail(record));
-                protCb.setChecked(fileData.isProtected(record));
+                itsIsProtected = fileData.isProtected(record);
+                protCb.setChecked(itsIsProtected);
             }
 
             itsHistory = fileData.getPasswdHistory(record);
@@ -219,7 +222,8 @@ public class RecordEditActivity extends AbstractRecordActivity
         {
             public void onClick(View v)
             {
-                setProtected(((CheckBox)v).isChecked());
+                itsIsProtected = ((CheckBox)v).isChecked();
+                updateProtected();
             }
         });
 
@@ -227,7 +231,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         initProtViews(findViewById(R.id.history_group));
         initProtViews(findViewById(R.id.notes_label));
         initProtViews(findViewById(R.id.notes));
-        setProtected(isProtected());
+        updateProtected();
         itsValidator.validate();
     }
 
@@ -356,7 +360,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         mi = menu.findItem(MENU_GENERATE_PASSWORD);
         if (mi != null) {
-            mi.setEnabled(userPassword && !isProtected());
+            mi.setEnabled(userPassword && !itsIsProtected);
         }
         return true;
     }
@@ -808,14 +812,6 @@ public class RecordEditActivity extends AbstractRecordActivity
      */
     private final void historyChanged(boolean updateMaxSize)
     {
-        historyChanged(updateMaxSize, isProtected());
-    }
-
-    /**
-     * Update the view when the history changes
-     */
-    private final void historyChanged(boolean updateMaxSize, boolean prot)
-    {
         boolean historyExists = (itsHistory != null);
         int visibility = historyExists ? View.VISIBLE : View.GONE;
         Button addRemoveBtn = (Button)findViewById(R.id.history_addremove);
@@ -834,7 +830,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         histView.setVisibility(visibility);
 
         if (historyExists) {
-            boolean historyEnabled = itsHistory.isEnabled() && !prot;
+            boolean historyEnabled = itsHistory.isEnabled() && !itsIsProtected;
             enabledCb.setChecked(historyEnabled);
 
             maxSize.setEnabled(historyEnabled);
@@ -855,23 +851,14 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /**
-     * Is the record protected
+     * Update the UI when the protected state changes
      */
-    private final boolean isProtected()
-    {
-        CheckBox cb = (CheckBox)findViewById(R.id.protected_record);
-        return cb.isChecked();
-    }
-
-    /**
-     * Set whether the record is protected
-     */
-    private final void setProtected(boolean prot)
+    private final void updateProtected()
     {
         for (View v: itsProtectViews) {
-            v.setEnabled(!prot);
+            v.setEnabled(!itsIsProtected);
         }
-        historyChanged(true, prot);
+        historyChanged(true);
         GuiUtils.invalidateOptionsMenu(this);
     }
 
@@ -954,7 +941,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 }
             }
 
-            boolean updateProt = isProtected();
+            boolean updateProt = itsIsProtected;
             if (updateProt != currProt) {
                 fileData.setProtected(updateProt, record);
             }
