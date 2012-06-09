@@ -70,6 +70,8 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     private boolean itsIsSearchRegex = false;
     private FontSizePref itsFontSize = Preferences.PREF_FONT_SIZE_DEF;
 
+    private GroupNode itsRootNode = null;
+    private GroupNode itsCurrGroupNode = null;
     protected final ArrayList<HashMap<String, Object>> itsListData =
         new ArrayList<HashMap<String, Object>>();
 
@@ -441,8 +443,8 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
             return;
         }
         ArrayList<PwsRecord> records = fileData.getRecords();
-        RecordMapComparator comp =
-            new RecordMapComparator(itsIsSortCaseSensitive);
+        // TODO: rebuild root node only when necessary
+        itsRootNode = new GroupNode();
 
         if (itsGroupRecords) {
             Comparator<String> groupComp;
@@ -452,7 +454,6 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
                 groupComp = String.CASE_INSENSITIVE_ORDER;
             }
 
-            GroupNode root = new GroupNode();
             for (PwsRecord rec : records) {
                 String match = filterRecord(rec, fileData);
                 if (match == null) {
@@ -463,7 +464,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
                     group = "";
                 }
                 String[] groups = TextUtils.split(group, "\\.");
-                GroupNode node = root;
+                GroupNode node = itsRootNode;
                 for (String g : groups) {
                     GroupNode groupNode = node.getGroup(g);
                     if (groupNode == null) {
@@ -474,54 +475,55 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
                 }
                 node.addRecord(new MatchPwsRecord(rec, match));
             }
-
-            // find right group
-            GroupNode node = root;
-            for (int i = 0; i < itsCurrGroups.size(); ++i) {
-                String group = itsCurrGroups.get(i);
-                GroupNode childNode = node.getGroup(group);
-                if (childNode == null) {
-                    // Prune groups from current item in the stack on down
-                    for (int j = itsCurrGroups.size() - 1; j >= i; --j) {
-                        itsCurrGroups.remove(j);
-                    }
-                    break;
-                }
-                node = childNode;
-            }
-
-            Map<String, GroupNode> entryGroups = node.getGroups();
-            if (entryGroups != null) {
-                for(Map.Entry<String, GroupNode> entry :
-                        entryGroups.entrySet()) {
-                    HashMap<String, Object> recInfo =
-                        new HashMap<String, Object>();
-                    recInfo.put(TITLE, entry.getKey());
-                    recInfo.put(ICON,R.drawable.folder_rev);
-
-                    int items = entry.getValue().getNumRecords();
-                    String str = (items == 1) ? "item" : "items";
-                    recInfo.put(USERNAME, "[" + items + " " + str + "]");
-                    itsListData.add(recInfo);
-                }
-            }
-
-            List<MatchPwsRecord> entryRecs = node.getRecords();
-            if (entryRecs != null) {
-                for (MatchPwsRecord rec : entryRecs) {
-                    itsListData.add(createRecInfo(rec, fileData));
-                }
-            }
         } else {
             for (PwsRecord rec : records) {
                 String match = filterRecord(rec, fileData);
                 if (match == null) {
                     continue;
                 }
-                itsListData.add(createRecInfo(new MatchPwsRecord(rec, match),
-                                              fileData));
+                itsRootNode.addRecord(new MatchPwsRecord(rec, match));
             }
         }
+
+        // find right group
+        itsCurrGroupNode = itsRootNode;
+        for (int i = 0; i < itsCurrGroups.size(); ++i) {
+            String group = itsCurrGroups.get(i);
+            GroupNode childNode = itsCurrGroupNode.getGroup(group);
+            if (childNode == null) {
+                // Prune groups from current item in the stack on down
+                for (int j = itsCurrGroups.size() - 1; j >= i; --j) {
+                    itsCurrGroups.remove(j);
+                }
+                break;
+            }
+            itsCurrGroupNode = childNode;
+        }
+
+        // Build the list data
+        Map<String, GroupNode> entryGroups = itsCurrGroupNode.getGroups();
+        if (entryGroups != null) {
+            for(Map.Entry<String, GroupNode> entry : entryGroups.entrySet()) {
+                HashMap<String, Object> recInfo = new HashMap<String, Object>();
+                recInfo.put(TITLE, entry.getKey());
+                recInfo.put(ICON,R.drawable.folder_rev);
+
+                int items = entry.getValue().getNumRecords();
+                String str = (items == 1) ? "item" : "items";
+                recInfo.put(USERNAME, "[" + items + " " + str + "]");
+                itsListData.add(recInfo);
+            }
+        }
+
+        List<MatchPwsRecord> entryRecs = itsCurrGroupNode.getRecords();
+        if (entryRecs != null) {
+            for (MatchPwsRecord rec : entryRecs) {
+                itsListData.add(createRecInfo(rec, fileData));
+            }
+        }
+
+        RecordMapComparator comp =
+            new RecordMapComparator(itsIsSortCaseSensitive);
         Collections.sort(itsListData, comp);
     }
 
