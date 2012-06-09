@@ -431,6 +431,13 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     }
 
 
+    /** Get the current group node */
+    protected GroupNode getCurrGroupNode()
+    {
+        return itsCurrGroupNode;
+    }
+
+
     private final void populateFileData()
     {
         itsListData.clear();
@@ -711,7 +718,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     }
 
 
-    private static final class MatchPwsRecord
+    protected static final class MatchPwsRecord
     {
         public final PwsRecord itsRecord;
         public final String itsMatch;
@@ -724,7 +731,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     }
 
 
-    private static final class GroupNode
+    protected static final class GroupNode
     {
         private List<MatchPwsRecord> itsRecords = null;
         private TreeMap<String, GroupNode> itsGroups = null;

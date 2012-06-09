@@ -10,6 +10,8 @@ package com.jefftharris.passwdsafe;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
@@ -56,8 +58,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int MENU_DETAILS =         ABS_MENU_MAX + 2;
     private static final int MENU_CHANGE_PASSWD =   ABS_MENU_MAX + 3;
     private static final int MENU_DELETE =          ABS_MENU_MAX + 4;
-    private static final int MENU_PROTECT_ALL =     ABS_MENU_MAX + 5;
-    private static final int MENU_UNPROTECT_ALL =   ABS_MENU_MAX + 6;
+    private static final int MENU_PROTECT=          ABS_MENU_MAX + 5;
+    private static final int MENU_UNPROTECT=        ABS_MENU_MAX + 6;
 
     private static final int CTXMENU_COPY_USER = 1;
     private static final int CTXMENU_COPY_PASSWD = 2;
@@ -179,8 +181,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         mi = submenu.add(0, MENU_DELETE, 0, R.string.delete_file);
         mi.setIcon(android.R.drawable.ic_menu_delete);
 
-        mi = submenu.add(0, MENU_PROTECT_ALL, 0, R.string.protect_all);
-        mi = submenu.add(0, MENU_UNPROTECT_ALL, 0, R.string.unprotect_all);
+        mi = submenu.add(0, MENU_PROTECT, 0, R.string.protect_all);
+        mi = submenu.add(0, MENU_UNPROTECT, 0, R.string.unprotect_all);
 
         addParentMenuItem(menu);
 
@@ -219,13 +221,13 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             mi.setEnabled(deleteEnabled);
         }
 
-        mi = menu.findItem(MENU_PROTECT_ALL);
+        mi = menu.findItem(MENU_PROTECT);
         if (mi != null) {
             mi.setTitle(isRoot ? R.string.protect_all : R.string.protect_group);
             mi.setEnabled(editEnabled);
         }
 
-        mi = menu.findItem(MENU_UNPROTECT_ALL);
+        mi = menu.findItem(MENU_UNPROTECT);
         if (mi != null) {
             mi.setTitle(isRoot ?
                         R.string.unprotect_all : R.string.unprotect_group);
@@ -266,14 +268,14 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             showDialog(DIALOG_DELETE);
             break;
         }
-        case MENU_PROTECT_ALL:
+        case MENU_PROTECT:
         {
-            setProtectAll(true);
+            setProtectRecords(true);
             break;
         }
-        case MENU_UNPROTECT_ALL:
+        case MENU_UNPROTECT:
         {
-            setProtectAll(false);
+            setProtectRecords(false);
             break;
         }
         default:
@@ -823,20 +825,37 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
     /**
-     * Protect or unprotect all entries
+     * Protect or unprotect entries
      */
-    private final void setProtectAll(boolean prot)
+    private final void setProtectRecords(boolean prot)
     {
-        // TODO: protect from current group on down, not whole file
         PasswdFileData fileData = itsPasswdFile.getFileData();
         if (fileData == null) {
             return;
         }
 
-        for (PwsRecord rec: fileData.getRecords()) {
-            fileData.setProtected(prot, rec);
-        }
+        setProtectRecords(prot, fileData, getCurrGroupNode());
         itsPasswdFile.save();
+    }
+
+    /** Protect or unprotect entries in the given group */
+    private final void setProtectRecords(boolean prot,
+                                         PasswdFileData fileData,
+                                         GroupNode node)
+    {
+	Map<String, GroupNode> childGroups = node.getGroups();
+	if (childGroups != null) {
+	    for (GroupNode child : childGroups.values()) {
+	        setProtectRecords(prot, fileData, child);
+	    }
+	}
+
+	List<MatchPwsRecord> childRecords = node.getRecords();
+	if (childRecords != null) {
+	    for (MatchPwsRecord matchRec : childRecords) {
+	        fileData.setProtected(prot, matchRec.itsRecord);
+	    }
+	}
     }
 
     private final void cancelFileOpen()
