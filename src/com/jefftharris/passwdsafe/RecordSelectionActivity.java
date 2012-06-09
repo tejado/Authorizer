@@ -27,7 +27,7 @@ public class RecordSelectionActivity extends AbstractPasswdSafeActivity
         itsPasswdFile = app.accessOpenFile(this);
         if (itsPasswdFile != null) {
             itsUri = itsPasswdFile.getFileData().getUri();
-            showFileData();
+            showFileData(MOD_DATA);
         } else {
             finish();
         }

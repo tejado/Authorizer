@@ -299,7 +299,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
          if (((requestCode == RECORD_VIEW_REQUEST) ||
               (requestCode == RECORD_ADD_REQUEST)) &&
              (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {
-             showFileData();
+             showFileData(MOD_DATA);
          } else {
              super.onActivityResult(requestCode, resultCode, data);
          }
@@ -721,12 +721,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
 
     @Override
-    protected void showFileData()
+    protected void showFileData(int mod)
     {
         if (itsRecToOpen != null) {
             openRecord(itsRecToOpen);
         }
-        super.showFileData();
+        super.showFileData(mod);
     }
 
 
@@ -751,7 +751,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 showDialog(DIALOG_GET_PASSWD);
             }
         } else {
-            showFileData();
+            showFileData(MOD_DATA);
         }
     }
 
@@ -788,7 +788,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             itsPasswdFile = app.accessPasswdFile(itsUri, this);
             itsPasswdFile.setFileData(fileData);
             setTitle(PasswdSafeApp.getAppFileTitle(itsUri, this));
-            showFileData();
+            showFileData(MOD_DATA);
         } catch (Exception e) {
             PasswdSafeApp.showFatalMsg(e, "Can't create file: " + itsUri,
                                        this);
@@ -925,7 +925,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {
                 itsPasswdFile.setFileData((PasswdFileData)result);
-                showFileData();
+                showFileData(MOD_DATA);
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
                 if (((e instanceof IOException) &&

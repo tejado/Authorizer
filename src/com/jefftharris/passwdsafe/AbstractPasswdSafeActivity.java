@@ -62,16 +62,20 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     private static final String BUNDLE_CURR_GROUPS =
         "passwdsafe.currGroups";
 
+    protected static final int MOD_DATA           = 1 << 0;
+    protected static final int MOD_GROUP          = 1 << 1;
+    protected static final int MOD_SEARCH         = 1 << 2;
+
     protected Uri itsUri;
     protected ActivityPasswdFile itsPasswdFile;
+    private GroupNode itsRootNode = null;
+    private GroupNode itsCurrGroupNode = null;
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
     private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = false;
     private FontSizePref itsFontSize = Preferences.PREF_FONT_SIZE_DEF;
 
-    private GroupNode itsRootNode = null;
-    private GroupNode itsCurrGroupNode = null;
     protected final ArrayList<HashMap<String, Object>> itsListData =
         new ArrayList<HashMap<String, Object>>();
 
@@ -145,7 +149,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
      */
     public void saveFinished(boolean success)
     {
-        showFileData();
+        showFileData(MOD_DATA);
     }
 
     /* (non-Javadoc)
@@ -355,7 +359,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
         } else {
             String childTitle = (String)item.get(TITLE);
             itsCurrGroups.add(childTitle);
-            showFileData();
+            showFileData(MOD_GROUP);
         }
     }
 
@@ -363,10 +367,10 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     protected abstract void onRecordClick(PwsRecord rec);
 
 
-    protected void showFileData()
+    protected void showFileData(int mod)
     {
         GuiUtils.invalidateOptionsMenu(this);
-        populateFileData();
+        populateFileData(mod);
 
         View panel = findViewById(R.id.current_group_panel);
         if (isRootGroup()) {
@@ -438,7 +442,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     }
 
 
-    private final void populateFileData()
+    private final void populateFileData(int mod)
     {
         itsListData.clear();
         if (itsPasswdFile == null) {
@@ -449,47 +453,9 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
         if (fileData == null) {
             return;
         }
-        ArrayList<PwsRecord> records = fileData.getRecords();
-        // TODO: rebuild root node only when necessary
-        itsRootNode = new GroupNode();
 
-        if (itsGroupRecords) {
-            Comparator<String> groupComp;
-            if (itsIsSortCaseSensitive) {
-                groupComp = new StringComparator();
-            } else {
-                groupComp = String.CASE_INSENSITIVE_ORDER;
-            }
-
-            for (PwsRecord rec : records) {
-                String match = filterRecord(rec, fileData);
-                if (match == null) {
-                    continue;
-                }
-                String group = fileData.getGroup(rec);
-                if (group == null) {
-                    group = "";
-                }
-                String[] groups = TextUtils.split(group, "\\.");
-                GroupNode node = itsRootNode;
-                for (String g : groups) {
-                    GroupNode groupNode = node.getGroup(g);
-                    if (groupNode == null) {
-                        groupNode = new GroupNode();
-                        node.putGroup(g, groupNode, groupComp);
-                    }
-                    node = groupNode;
-                }
-                node.addRecord(new MatchPwsRecord(rec, match));
-            }
-        } else {
-            for (PwsRecord rec : records) {
-                String match = filterRecord(rec, fileData);
-                if (match == null) {
-                    continue;
-                }
-                itsRootNode.addRecord(new MatchPwsRecord(rec, match));
-            }
+        if ((mod & (MOD_DATA | MOD_SEARCH)) != 0) {
+            populateRootNode(fileData);
         }
 
         // find right group
@@ -532,6 +498,54 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
         RecordMapComparator comp =
             new RecordMapComparator(itsIsSortCaseSensitive);
         Collections.sort(itsListData, comp);
+    }
+
+
+    /** Populate the contents of the root node from the file data */
+    private final void populateRootNode(PasswdFileData fileData)
+    {
+        PasswdSafeApp.dbginfo(TAG, "populateRootNode");
+        ArrayList<PwsRecord> records = fileData.getRecords();
+        itsRootNode = new GroupNode();
+
+        if (itsGroupRecords) {
+            Comparator<String> groupComp;
+            if (itsIsSortCaseSensitive) {
+                groupComp = new StringComparator();
+            } else {
+                groupComp = String.CASE_INSENSITIVE_ORDER;
+            }
+
+            for (PwsRecord rec : records) {
+                String match = filterRecord(rec, fileData);
+                if (match == null) {
+                    continue;
+                }
+                String group = fileData.getGroup(rec);
+                if (group == null) {
+                    group = "";
+                }
+                String[] groups = TextUtils.split(group, "\\.");
+                GroupNode node = itsRootNode;
+                for (String g : groups) {
+                    GroupNode groupNode = node.getGroup(g);
+                    if (groupNode == null) {
+                        groupNode = new GroupNode();
+                        node.putGroup(g, groupNode, groupComp);
+                    }
+                    node = groupNode;
+                }
+                node.addRecord(new MatchPwsRecord(rec, match));
+            }
+        } else {
+            for (PwsRecord rec : records) {
+                String match = filterRecord(rec, fileData);
+                if (match == null) {
+                    continue;
+                }
+                itsRootNode.addRecord(new MatchPwsRecord(rec, match));
+            }
+        }
     }
 
 
@@ -592,7 +606,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
             panel.setVisibility(View.GONE);
         }
 
-        showFileData();
+        showFileData(MOD_SEARCH);
     }
 
 
@@ -645,7 +659,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
         int size = itsCurrGroups.size();
         if (size != 0) {
             itsCurrGroups.remove(size - 1);
-            showFileData();
+            showFileData(MOD_GROUP);
             return true;
         } else {
             return false;

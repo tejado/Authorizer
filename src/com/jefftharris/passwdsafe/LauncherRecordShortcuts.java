@@ -38,7 +38,7 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
             TextView empty = (TextView)findViewById(android.R.id.empty);
             empty.setText(R.string.no_records_open_file);
         }
-        showFileData();
+        showFileData(MOD_DATA);
     }
 
 
