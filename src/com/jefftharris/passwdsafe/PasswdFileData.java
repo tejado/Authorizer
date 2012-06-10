@@ -648,6 +648,8 @@ public class PasswdFileData
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PROTECTED_ENTRY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -691,6 +693,8 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PROTECTED_ENTRY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -779,6 +783,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.HEADER_LAST_SAVE_WHO:
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            case PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES:
             {
                 PwsField field = doGetField(rec, fieldId);
                 if (field != null) {
@@ -823,9 +828,9 @@ public class PasswdFileData
                 break;
             }
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            case PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES:
             {
-                doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHAT,
-                                    value.toString());
+                doSetHdrFieldString(rec, fieldId, value.toString());
                 break;
             }
             case PwsRecordV3.HEADER_LAST_SAVE_USER:
@@ -940,6 +945,8 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
             case PwsRecordV3.PASSWORD_HISTORY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 String str = val.toString();
                 if (!TextUtils.isEmpty(str)) {
