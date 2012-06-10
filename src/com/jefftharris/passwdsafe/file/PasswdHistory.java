@@ -5,7 +5,7 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.file;
 
 import java.util.ArrayList;
 import java.util.Collections;

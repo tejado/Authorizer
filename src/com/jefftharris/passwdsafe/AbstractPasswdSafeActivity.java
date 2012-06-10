@@ -21,6 +21,8 @@ import java.util.regex.PatternSyntaxException;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+
 import android.app.Activity;
 import android.app.ListActivity;
 import android.app.SearchManager;

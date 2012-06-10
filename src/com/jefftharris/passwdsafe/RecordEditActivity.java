@@ -17,7 +17,10 @@ import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
 
-import com.jefftharris.passwdsafe.PasswdRecord.Type;
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdHistory;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import android.app.AlertDialog;

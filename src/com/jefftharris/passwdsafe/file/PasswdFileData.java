@@ -5,7 +5,7 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.file;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -53,6 +53,11 @@ import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
+
+import com.jefftharris.passwdsafe.FileBackupPref;
+import com.jefftharris.passwdsafe.PasswdSafeApp;
+import com.jefftharris.passwdsafe.Preferences;
+import com.jefftharris.passwdsafe.R;
 
 import android.content.ContentResolver;
 import android.content.Context;
