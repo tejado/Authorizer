@@ -953,7 +953,7 @@ public class PasswdFileData
             case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
             case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
-                String str = val.toString();
+                String str = (val == null) ? null : val.toString();
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringUnicodeField(fieldId, str);
                 }
@@ -961,7 +961,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.PASSWORD:
             {
-                String str = val.toString();
+                String str = (val == null) ? null : val.toString();
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsPasswdUnicodeField(fieldId, str, itsPwsFile);
                 }
@@ -991,7 +991,7 @@ public class PasswdFileData
             case PwsRecordV3.TITLE:
             case PwsRecordV3.USERNAME:
             {
-                String str = val.toString();
+                String str = (val == null) ? null : val.toString();
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsStringField(fieldId, str);
                 }
@@ -999,7 +999,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.PASSWORD:
             {
-                String str = val.toString();
+                String str = (val == null) ? null : val.toString();
                 if (!TextUtils.isEmpty(str)) {
                     field = new PwsPasswdField(fieldId, str, itsPwsFile);
                 }
