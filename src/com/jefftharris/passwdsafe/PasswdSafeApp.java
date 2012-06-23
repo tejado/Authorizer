@@ -144,13 +144,13 @@ public class PasswdSafeApp extends Application
     {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "File timeout: " + intent);
             boolean closeFile = true;
             PasswdSafeApp app = (PasswdSafeApp)context.getApplicationContext();
             if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
                 closeFile = app.itsIsFileCloseScreenOff;
             }
             if (closeFile) {
+                Log.i(TAG, "File timeout: " + intent);
                 app.closeFileData(true);
             }
         }
@@ -229,10 +229,6 @@ public class PasswdSafeApp extends Application
         updateFileCloseScreenOffPref(prefs);
         setPasswordEncodingPref(prefs);
         setFileCloseClearClipboardPref(prefs);
-
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-        itsScreenOffReceiver = new FileTimeoutReceiver();
-        registerReceiver(itsScreenOffReceiver, filter);
     }
 
     /* (non-Javadoc)
@@ -243,7 +239,6 @@ public class PasswdSafeApp extends Application
     {
         dbginfo(TAG, "onTerminate");
         closeFileData(false);
-        unregisterReceiver(itsScreenOffReceiver);
         super.onTerminate();
     }
 
@@ -298,10 +293,11 @@ public class PasswdSafeApp extends Application
         if ((itsFileData == null) || (itsFileData.getUri() == null) ||
             (!itsFileData.getUri().equals(uri))) {
             itsFileDataActivities.remove(activity);
+            checkScreenOffReceiver();
             closeFileData(false);
         }
 
-        dbginfo(TAG, "access uri:" + uri + ", data:" + itsFileData);
+        dbgverb(TAG, "access uri:" + uri + ", data:" + itsFileData);
         return new AppActivityPasswdFile(itsFileData, activity);
     }
 
@@ -310,7 +306,7 @@ public class PasswdSafeApp extends Application
         PasswdFileActivity activity
     )
     {
-        dbginfo(TAG, "access open file data: " + itsFileData);
+        dbgverb(TAG, "access open file data: " + itsFileData);
         if (itsFileData == null) {
             return null;
         }
@@ -430,10 +426,18 @@ public class PasswdSafeApp extends Application
         dlg.show();
     }
 
+    /** Log a debug message at info level */
     public static void dbginfo(String tag, String msg)
     {
         if (DEBUG)
             Log.i(tag, msg);
+    }
+
+    /** Log a debug message at verbose level */
+    public static void dbgverb(String tag, String msg)
+    {
+        if (DEBUG)
+            Log.v(tag, msg);
     }
 
     private synchronized final
@@ -488,7 +492,7 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void touchFileDataTimer()
     {
-        dbginfo(TAG, "touch timer timeout: " + itsFileCloseTimeout);
+        dbgverb(TAG, "touch timer timeout: " + itsFileCloseTimeout);
         if ((itsFileData != null) && (itsFileCloseTimeout != 0) &&
             !itsFileTimerPaused) {
             if (itsCloseIntent == null) {
@@ -505,17 +509,19 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void touchFileData(Activity activity)
     {
-        dbginfo(TAG, "touch activity:" + activity + ", data:" + itsFileData);
+        dbgverb(TAG, "touch activity:" + activity + ", data:" + itsFileData);
         if (itsFileData != null) {
             itsFileDataActivities.put(activity, null);
+            checkScreenOffReceiver();
             touchFileDataTimer();
         }
     }
 
     private synchronized final void releaseFileData(Activity activity)
     {
-        dbginfo(TAG, "release activity:" + activity);
+        dbgverb(TAG, "release activity:" + activity);
         itsFileDataActivities.remove(activity);
+        checkScreenOffReceiver();
     }
 
     private synchronized final void setFileData(PasswdFileData fileData,
@@ -546,9 +552,26 @@ public class PasswdSafeApp extends Application
 
         for (Map.Entry<Activity, Object> entry :
             itsFileDataActivities.entrySet()) {
-            dbginfo(TAG, "closeFileData activity:" + entry.getKey());
+            dbgverb(TAG, "closeFileData activity:" + entry.getKey());
             entry.getKey().finish();
         }
         itsFileDataActivities.clear();
+        checkScreenOffReceiver();
+    }
+
+    /** Check whether the screen off receiver should be added or removed */
+    private synchronized final void checkScreenOffReceiver()
+    {
+        boolean haveActivities = !itsFileDataActivities.isEmpty();
+        if ((itsScreenOffReceiver == null) && haveActivities) {
+            dbginfo(TAG, "add screen off receiver");
+            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+            itsScreenOffReceiver = new FileTimeoutReceiver();
+            registerReceiver(itsScreenOffReceiver, filter);
+        } else if ((itsScreenOffReceiver != null) && !haveActivities) {
+            dbginfo(TAG, "remove screen off receiver");
+            unregisterReceiver(itsScreenOffReceiver);
+            itsScreenOffReceiver = null;
+        }
     }
 }
