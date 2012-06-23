@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -143,11 +144,16 @@ public class PasswdSafeApp extends Application
     {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "File timeout");
+            Log.i(TAG, "File timeout: " + intent);
+            boolean closeFile = true;
             PasswdSafeApp app = (PasswdSafeApp)context.getApplicationContext();
-            app.closeFileData(true);
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                closeFile = app.itsIsFileCloseScreenOff;
+            }
+            if (closeFile) {
+                app.closeFileData(true);
+            }
         }
-
     }
 
     public static final boolean DEBUG = false;
@@ -174,10 +180,13 @@ public class PasswdSafeApp extends Application
     private PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout =
         Preferences.PREF_FILE_CLOSE_TIMEOUT_DEF.getTimeout();
+    private boolean itsIsFileCloseScreenOff =
+                    Preferences.PREF_FILE_CLOSE_SCREEN_OFF_DEF;
     private boolean itsIsFileCloseClearClipboard =
         Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF;
     private boolean itsIsOpenDefault = true;
     private boolean itsFileTimerPaused = false;
+    private BroadcastReceiver itsScreenOffReceiver = null;
 
     private static final Intent FILE_TIMEOUT_INTENT_OBJ =
         new Intent(FILE_TIMEOUT_INTENT);
@@ -217,8 +226,13 @@ public class PasswdSafeApp extends Application
         }
 
         updateFileCloseTimeoutPref(prefs);
+        updateFileCloseScreenOffPref(prefs);
         setPasswordEncodingPref(prefs);
         setFileCloseClearClipboardPref(prefs);
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        itsScreenOffReceiver = new FileTimeoutReceiver();
+        registerReceiver(itsScreenOffReceiver, filter);
     }
 
     /* (non-Javadoc)
@@ -227,7 +241,9 @@ public class PasswdSafeApp extends Application
     @Override
     public void onTerminate()
     {
+        dbginfo(TAG, "onTerminate");
         closeFileData(false);
+        unregisterReceiver(itsScreenOffReceiver);
         super.onTerminate();
     }
 
@@ -241,6 +257,8 @@ public class PasswdSafeApp extends Application
 
         if (key.equals(Preferences.PREF_FILE_CLOSE_TIMEOUT)) {
             updateFileCloseTimeoutPref(prefs);
+        } else if (key.equals(Preferences.PREF_FILE_CLOSE_SCREEN_OFF)) {
+            updateFileCloseScreenOffPref(prefs);
         } else if (key.equals(Preferences.PREF_PASSWD_ENC)) {
             setPasswordEncodingPref(prefs);
         } else if (key.equals(Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD)) {
@@ -429,6 +447,12 @@ public class PasswdSafeApp extends Application
         } else {
             touchFileDataTimer();
         }
+    }
+
+    private final void updateFileCloseScreenOffPref(SharedPreferences prefs)
+    {
+        itsIsFileCloseScreenOff =
+                        Preferences.getFileCloseScreenOffPref(prefs);
     }
 
     private static void setPasswordEncodingPref(SharedPreferences prefs)

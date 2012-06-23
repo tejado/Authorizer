@@ -37,6 +37,9 @@ public class Preferences extends PreferenceActivity
     public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
     public static final FileTimeoutPref PREF_FILE_CLOSE_TIMEOUT_DEF =
         FileTimeoutPref.TO_5_MIN;
+    public static final String PREF_FILE_CLOSE_SCREEN_OFF =
+                    "fileCloseScreenOffPref";
+    public static final boolean PREF_FILE_CLOSE_SCREEN_OFF_DEF = false;
 
     public static final String PREF_FILE_BACKUP = "fileBackupPref";
     public static final FileBackupPref PREF_FILE_BACKUP_DEF =
@@ -113,6 +116,12 @@ public class Preferences extends PreferenceActivity
         } catch (IllegalArgumentException e) {
             return PREF_FILE_CLOSE_TIMEOUT_DEF;
         }
+    }
+
+    public static boolean getFileCloseScreenOffPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_CLOSE_SCREEN_OFF,
+                                PREF_FILE_CLOSE_SCREEN_OFF_DEF);
     }
 
     public static FileBackupPref getFileBackupPref(SharedPreferences prefs)

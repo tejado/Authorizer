@@ -16,6 +16,11 @@
         <ListPreference android:name="fileTimeout Pref"
                         android:title="File close timeout"
                         android:key="fileCloseTimeoutPref"/>
+        
+        <CheckBoxPreference android:name="fileCloseScreenOff Pref"
+                            android:title="Close file when screen is off"
+                            android:key="fileCloseScreenOffPref"
+                            android:defaultValue="false"/>
 
         <ListPreference android:name="fileBackup Pref"
                         android:title="File backups"
