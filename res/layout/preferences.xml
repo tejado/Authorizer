@@ -18,7 +18,7 @@
                         android:key="fileCloseTimeoutPref"/>
         
         <CheckBoxPreference android:name="fileCloseScreenOff Pref"
-                            android:title="Close file when screen is off"
+                            android:title="Close file on screen off"
                             android:key="fileCloseScreenOffPref"
                             android:defaultValue="false"/>
 
