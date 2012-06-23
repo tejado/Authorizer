@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;

@@ -9,6 +9,8 @@ package com.jefftharris.passwdsafe;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;

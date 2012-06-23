@@ -5,7 +5,7 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.file;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -53,6 +53,11 @@ import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
+
+import com.jefftharris.passwdsafe.FileBackupPref;
+import com.jefftharris.passwdsafe.PasswdSafeApp;
+import com.jefftharris.passwdsafe.Preferences;
+import com.jefftharris.passwdsafe.R;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -648,6 +653,8 @@ public class PasswdFileData
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PROTECTED_ENTRY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -691,6 +698,8 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PROTECTED_ENTRY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -779,6 +788,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.HEADER_LAST_SAVE_WHO:
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            case PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES:
             {
                 PwsField field = doGetField(rec, fieldId);
                 if (field != null) {
@@ -823,9 +833,9 @@ public class PasswdFileData
                 break;
             }
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            case PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES:
             {
-                doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHAT,
-                                    value.toString());
+                doSetHdrFieldString(rec, fieldId, value.toString());
                 break;
             }
             case PwsRecordV3.HEADER_LAST_SAVE_USER:
@@ -940,6 +950,8 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
             case PwsRecordV3.PASSWORD_HISTORY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 String str = (val == null) ? null : val.toString();
                 if (!TextUtils.isEmpty(str)) {

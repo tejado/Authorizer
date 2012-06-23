@@ -17,6 +17,8 @@ import java.util.WeakHashMap;
 
 import org.pwsafe.lib.file.PwsFile;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
