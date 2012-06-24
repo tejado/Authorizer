@@ -68,10 +68,10 @@ public class PasswdPolicyTest extends AndroidTestCase
                      PasswdPolicy.FLAG_USE_EASY_VISION |
                      PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE, policy.getFlags());
         assertEquals(0xabc, policy.getLength());
-        assertEquals(0x111, policy.getMinLowercase());
-        assertEquals(0xaaa, policy.getMinUppercase());
-        assertEquals(0x000, policy.getMinDigits());
-        assertEquals(0xfff, policy.getMinSymbols());
+        assertEquals(0x111, policy.getMinDigits());
+        assertEquals(0xaaa, policy.getMinLowercase());
+        assertEquals(0x000, policy.getMinSymbols());
+        assertEquals(0xfff, policy.getMinUppercase());
         assertEquals("!@#", policy.getSpecialSymbols());
 
         assertEquals(policiesStr, PasswdPolicy.hdrPoliciesToString(policies));
@@ -79,6 +79,77 @@ public class PasswdPolicyTest extends AndroidTestCase
 
     /** Test multiple valid header policies */
     public void testHdrMultiValid()
+    {
+        String policiesStr = "050ceasy to readb40000a0010010010010008hex only08000140010010010010008policy 1f00000f0040020050030009pronounced200008001001001001000dspecial charsf00000d0030010040020a!@#$%^&*()";
+        List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies(policiesStr);
+        assertEquals(5, policies.size());
+
+        PasswdPolicy policy;
+        policy = policies.get(0);
+        assertEquals("easy to read", policy.getName());
+        assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
+                     PasswdPolicy.FLAG_USE_DIGITS |
+                     PasswdPolicy.FLAG_USE_SYMBOLS |
+                     PasswdPolicy.FLAG_USE_EASY_VISION, policy.getFlags());
+        assertEquals(10, policy.getLength());
+        assertEquals(1, policy.getMinLowercase());
+        assertEquals(1, policy.getMinUppercase());
+        assertEquals(1, policy.getMinDigits());
+        assertEquals(1, policy.getMinSymbols());
+        assertEquals("", policy.getSpecialSymbols());
+
+        policy = policies.get(1);
+        assertEquals("hex only", policy.getName());
+        assertEquals(PasswdPolicy.FLAG_USE_HEX_DIGITS, policy.getFlags());
+        assertEquals(20, policy.getLength());
+        assertEquals(1, policy.getMinLowercase());
+        assertEquals(1, policy.getMinUppercase());
+        assertEquals(1, policy.getMinDigits());
+        assertEquals(1, policy.getMinSymbols());
+        assertEquals("", policy.getSpecialSymbols());
+
+        policy = policies.get(2);
+        assertEquals("policy 1", policy.getName());
+        assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
+                     PasswdPolicy.FLAG_USE_UPPERCASE |
+                     PasswdPolicy.FLAG_USE_DIGITS |
+                     PasswdPolicy.FLAG_USE_SYMBOLS, policy.getFlags());
+        assertEquals(15, policy.getLength());
+        assertEquals(2, policy.getMinLowercase());
+        assertEquals(3, policy.getMinUppercase());
+        assertEquals(4, policy.getMinDigits());
+        assertEquals(5, policy.getMinSymbols());
+        assertEquals("", policy.getSpecialSymbols());
+
+        policy = policies.get(3);
+        assertEquals("pronounce", policy.getName());
+        assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
+                     PasswdPolicy.FLAG_USE_UPPERCASE |
+                     PasswdPolicy.FLAG_USE_SYMBOLS |
+                     PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE, policy.getFlags());
+        assertEquals(8, policy.getLength());
+        assertEquals(1, policy.getMinLowercase());
+        assertEquals(1, policy.getMinUppercase());
+        assertEquals(1, policy.getMinDigits());
+        assertEquals(1, policy.getMinSymbols());
+        assertEquals("", policy.getSpecialSymbols());
+
+        policy = policies.get(4);
+        assertEquals("special chars", policy.getName());
+        assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
+                     PasswdPolicy.FLAG_USE_UPPERCASE |
+                     PasswdPolicy.FLAG_USE_DIGITS |
+                     PasswdPolicy.FLAG_USE_SYMBOLS, policy.getFlags());
+        assertEquals(13, policy.getLength());
+        assertEquals(1, policy.getMinLowercase());
+        assertEquals(2, policy.getMinUppercase());
+        assertEquals(3, policy.getMinDigits());
+        assertEquals(4, policy.getMinSymbols());
+        assertEquals("!@#$%^&*()", policy.getSpecialSymbols());
+    }
+
+    /** Test max valid header policies */
+    public void testHdrMaxValid()
     {
         StringBuilder policiesStr = new StringBuilder("ff");
         for (int i = 0; i < 255; ++i) {
@@ -100,10 +171,10 @@ public class PasswdPolicyTest extends AndroidTestCase
                          PasswdPolicy.FLAG_USE_EASY_VISION |
                          PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE, policy.getFlags());
             assertEquals(i + 1, policy.getLength());
-            assertEquals(i + 2, policy.getMinLowercase());
-            assertEquals(i + 3, policy.getMinUppercase());
-            assertEquals(i + 4, policy.getMinDigits());
-            assertEquals(i + 5, policy.getMinSymbols());
+            assertEquals(i + 2, policy.getMinDigits());
+            assertEquals(i + 3, policy.getMinLowercase());
+            assertEquals(i + 4, policy.getMinSymbols());
+            assertEquals(i + 5, policy.getMinUppercase());
             assertEquals("!@#", policy.getSpecialSymbols());
         }
 
@@ -131,29 +202,29 @@ public class PasswdPolicyTest extends AndroidTestCase
         doTestBadHdrPolicy("0107Policy1fe00ab",
                            "Policy 0 too short for password length: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc",
-                           "Policy 0 too short for min lowercase chars: 3");
+                           "Policy 0 too short for min digit chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc1",
-                           "Policy 0 too short for min lowercase chars: 3");
+                           "Policy 0 too short for min digit chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc11",
-                           "Policy 0 too short for min lowercase chars: 3");
+                           "Policy 0 too short for min digit chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111",
-                           "Policy 0 too short for min uppercase chars: 3");
+                           "Policy 0 too short for min lowercase chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111a",
-                           "Policy 0 too short for min uppercase chars: 3");
+                           "Policy 0 too short for min lowercase chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111aa",
-                           "Policy 0 too short for min uppercase chars: 3");
+                           "Policy 0 too short for min lowercase chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111aaa",
-                           "Policy 0 too short for min digit chars: 3");
+                           "Policy 0 too short for min symbol chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111aaa0",
-                           "Policy 0 too short for min digit chars: 3");
+                           "Policy 0 too short for min symbol chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111aaa00",
-                           "Policy 0 too short for min digit chars: 3");
+                           "Policy 0 too short for min symbol chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111aaa000",
-                           "Policy 0 too short for min symbol chars: 3");
+                           "Policy 0 too short for min uppercase chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111aaa000f",
-                           "Policy 0 too short for min symbol chars: 3");
+                           "Policy 0 too short for min uppercase chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111aaa000ff",
-                           "Policy 0 too short for min symbol chars: 3");
+                           "Policy 0 too short for min uppercase chars: 3");
         doTestBadHdrPolicy("0107Policy1fe00abc111aaa000fff",
                            "Policy 0 too short for special symbols length: 2");
         doTestBadHdrPolicy("0107Policy1fe00abc111aaa000fff0",
@@ -192,29 +263,29 @@ public class PasswdPolicyTest extends AndroidTestCase
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00ab",
                            "Policy 1 too short for password length: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc",
-                           "Policy 1 too short for min lowercase chars: 3");
+                           "Policy 1 too short for min digit chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc1",
-                           "Policy 1 too short for min lowercase chars: 3");
+                           "Policy 1 too short for min digit chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc11",
-                           "Policy 1 too short for min lowercase chars: 3");
+                           "Policy 1 too short for min digit chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111",
-                           "Policy 1 too short for min uppercase chars: 3");
+                           "Policy 1 too short for min lowercase chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111a",
-                           "Policy 1 too short for min uppercase chars: 3");
+                           "Policy 1 too short for min lowercase chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aa",
-                           "Policy 1 too short for min uppercase chars: 3");
+                           "Policy 1 too short for min lowercase chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aaa",
-                           "Policy 1 too short for min digit chars: 3");
+                           "Policy 1 too short for min symbol chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aaa0",
-                           "Policy 1 too short for min digit chars: 3");
+                           "Policy 1 too short for min symbol chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aaa00",
-                           "Policy 1 too short for min digit chars: 3");
+                           "Policy 1 too short for min symbol chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aaa000",
-                           "Policy 1 too short for min symbol chars: 3");
+                           "Policy 1 too short for min uppercase chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aaa000f",
-                           "Policy 1 too short for min symbol chars: 3");
+                           "Policy 1 too short for min uppercase chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aaa000ff",
-                           "Policy 1 too short for min symbol chars: 3");
+                           "Policy 1 too short for min uppercase chars: 3");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aaa000fff",
                            "Policy 1 too short for special symbols length: 2");
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#07Policy1fe00abc111aaa000fff0",

@@ -180,25 +180,25 @@ public class PasswdPolicy
             fieldStart += 3;
             policy.setLength(pwLen);
 
-            int minLower = getPolicyStrInt(policyStr, i, fieldStart, 3,
-                                           "min lowercase chars");
-            fieldStart += 3;
-            policy.setMinLowercase(minLower);
-
-            int minUpper = getPolicyStrInt(policyStr, i, fieldStart, 3,
-                                           "min uppercase chars");
-            fieldStart += 3;
-            policy.setMinUppercase(minUpper);
-
             int minDigits = getPolicyStrInt(policyStr, i, fieldStart, 3,
                                             "min digit chars");
             fieldStart += 3;
             policy.setMinDigits(minDigits);
 
+            int minLower = getPolicyStrInt(policyStr, i, fieldStart, 3,
+                                           "min lowercase chars");
+            fieldStart += 3;
+            policy.setMinLowercase(minLower);
+
             int minSymbols = getPolicyStrInt(policyStr, i, fieldStart, 3,
                                              "min symbol chars");
             fieldStart += 3;
             policy.setMinSymbols(minSymbols);
+
+            int minUpper = getPolicyStrInt(policyStr, i, fieldStart, 3,
+                                           "min uppercase chars");
+            fieldStart += 3;
+            policy.setMinUppercase(minUpper);
 
             int numSpecials = getPolicyStrInt(policyStr, i, fieldStart, 2,
                                               "special symbols length");
@@ -232,10 +232,10 @@ public class PasswdPolicy
             str.append(String.format("%04x%03x%03x%03x%03x%03x%02x",
                                      policy.getFlags(),
                                      policy.getLength(),
-                                     policy.getMinLowercase(),
-                                     policy.getMinUppercase(),
                                      policy.getMinDigits(),
+                                     policy.getMinLowercase(),
                                      policy.getMinSymbols(),
+                                     policy.getMinUppercase(),
                                      policy.getSpecialSymbols().length()));
             str.append(policy.getSpecialSymbols());
         }
