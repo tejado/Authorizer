@@ -517,10 +517,22 @@ public class PasswdFileData
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
 
+    /** Get the named password policies from the file header */
     public final List<PasswdPolicy> getHdrPasswdPolicies()
     {
         return PasswdPolicy.parseHdrPolicies(
             getHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES));
+    }
+
+    /**
+     * Set the named password policies in the file header
+     * @param policies The policies; null to remove the field
+     */
+    public final void setHdrPasswdPolicies(List<PasswdPolicy> policies)
+    {
+        setHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES,
+                    PasswdPolicy.hdrPoliciesToString(policies));
+        updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
     }
 
     public static final boolean isFileUri(Uri uri)
@@ -842,7 +854,8 @@ public class PasswdFileData
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
             case PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES:
             {
-                doSetHdrFieldString(rec, fieldId, value.toString());
+                doSetHdrFieldString(rec, fieldId,
+                                    (value == null) ? null : value.toString());
                 break;
             }
             case PwsRecordV3.HEADER_LAST_SAVE_USER:
@@ -894,8 +907,11 @@ public class PasswdFileData
                                             int fieldId, String val)
     {
         try {
-            PwsField f = new PwsUnknownField(fieldId, val.getBytes("UTF-8"));
-            rec.setField(f);
+            PwsField field = null;
+            if (val != null) {
+                field = new PwsUnknownField(fieldId, val.getBytes("UTF-8"));
+            }
+            setOrRemoveField(field, fieldId, rec);
         }
         catch (UnsupportedEncodingException e) {
         }
@@ -1028,11 +1044,17 @@ public class PasswdFileData
         }
 
         if (fieldId != FIELD_UNSUPPORTED) {
-            if (field != null) {
-                rec.setField(field);
-            } else {
-                rec.removeField(fieldId);
-            }
+            setOrRemoveField(field, fieldId, rec);
+        }
+    }
+
+    private static final void setOrRemoveField(PwsField field, int fieldId,
+                                               PwsRecord rec)
+    {
+        if (field != null) {
+            rec.setField(field);
+        } else {
+            rec.removeField(fieldId);
         }
     }
 

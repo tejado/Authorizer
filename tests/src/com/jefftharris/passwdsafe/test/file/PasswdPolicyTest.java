@@ -25,7 +25,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         super();
     }
 
-    /** Test an empty policy */
+    /** Test an empty header policy */
     public void testHdrEmpty()
     {
         List<PasswdPolicy> policies;
@@ -33,25 +33,30 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertNull(policies);
         policies = PasswdPolicy.parseHdrPolicies("");
         assertNull(policies);
+
+        String str = PasswdPolicy.hdrPoliciesToString(null);
+        assertNull(str);
     }
 
-    /** Test a zero policies */
+    /** Test zero header policies */
     public void testHdrZero()
     {
         doTestBadHdrPolicy("0", "Policies length (1) too short: 2");
 
         List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies("00");
         MoreAsserts.assertEmpty(policies);
+        String str = PasswdPolicy.hdrPoliciesToString(policies);
+        assertEquals("00", str);
 
         doTestBadHdrPolicy("000",
                            "Policies field does not end at the last policy");
     }
 
-    /** Test one valid policy */
+    /** Test one valid header policy */
     public void testHdrOneValid()
     {
-        List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies(
-            "0107Policy1fe00abc111aaa000fff03!@#");
+        String policiesStr = "0107Policy1fe00abc111aaa000fff03!@#";
+        List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies(policiesStr);
         assertEquals(1, policies.size());
         PasswdPolicy policy = policies.get(0);
         assertEquals("Policy1", policy.getName());
@@ -68,9 +73,11 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(0x000, policy.getMinDigits());
         assertEquals(0xfff, policy.getMinSymbols());
         assertEquals("!@#", policy.getSpecialSymbols());
+
+        assertEquals(policiesStr, PasswdPolicy.hdrPoliciesToString(policies));
     }
 
-    /** Test multiple valid policies */
+    /** Test multiple valid header policies */
     public void testHdrMultiValid()
     {
         StringBuilder policiesStr = new StringBuilder("ff");
@@ -99,9 +106,12 @@ public class PasswdPolicyTest extends AndroidTestCase
             assertEquals(i + 5, policy.getMinSymbols());
             assertEquals("!@#", policy.getSpecialSymbols());
         }
+
+        assertEquals(policiesStr.toString(),
+                     PasswdPolicy.hdrPoliciesToString(policies));
     }
 
-    /** Test an invalid policy */
+    /** Test an invalid header policy */
     public void testHdrOneInvalid()
     {
         doTestBadHdrPolicy("01",
@@ -162,7 +172,7 @@ public class PasswdPolicyTest extends AndroidTestCase
                            "Policies field does not end at the last policy");
     }
 
-    /** Test multiple invalid policies */
+    /** Test multiple invalid header policies */
     public void testHdrMultiInvalid()
     {
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#",

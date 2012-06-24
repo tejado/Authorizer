@@ -41,6 +41,7 @@ public class PasswdPolicy
     // TODO: Support pronounceable passwords
     // TODO HEX_DIGITS exclusivity
     // TODO: defaults?
+    // TODO: UTF-8 chars in policy name and special chars
 
     /**
      * Constructor
@@ -215,6 +216,30 @@ public class PasswdPolicy
         }
 
         return policies;
+    }
+
+    public static String hdrPoliciesToString(List<PasswdPolicy> policies)
+    {
+        if (policies == null) {
+            return null;
+        }
+
+        StringBuilder str = new StringBuilder();
+        str.append(String.format("%02x", policies.size()));
+        for (PasswdPolicy policy: policies) {
+            str.append(String.format("%02x", policy.getName().length()));
+            str.append(policy.getName());
+            str.append(String.format("%04x%03x%03x%03x%03x%03x%02x",
+                                     policy.getFlags(),
+                                     policy.getLength(),
+                                     policy.getMinLowercase(),
+                                     policy.getMinUppercase(),
+                                     policy.getMinDigits(),
+                                     policy.getMinSymbols(),
+                                     policy.getSpecialSymbols().length()));
+            str.append(policy.getSpecialSymbols());
+        }
+        return str.toString();
     }
 
     /** Get an integer from a hexidecimal policy field */
