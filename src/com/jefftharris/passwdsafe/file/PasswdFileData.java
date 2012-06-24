@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -514,6 +515,12 @@ public class PasswdFileData
     public final void setHdrLastSaveTime(Date date)
     {
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
+    }
+
+    public final List<PasswdPolicy> getHdrPasswdPolicies()
+    {
+        return PasswdPolicy.parseHdrPolicies(
+            getHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES));
     }
 
     public static final boolean isFileUri(Uri uri)
