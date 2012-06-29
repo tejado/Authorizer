@@ -37,6 +37,23 @@ public class PasswdPolicy
         RECORD_POLICY
     }
 
+    /** Policy fields for a record */
+    public static class RecordPolicyStrs
+    {
+        public final String itsPolicyName;
+        public final String itsPolicyStr;
+        public final String itsOwnSymbols;
+
+        public RecordPolicyStrs(String policyName,
+                                String policyStr,
+                                String ownSymbols)
+        {
+            itsPolicyName = policyName;
+            itsPolicyStr = policyStr;
+            itsOwnSymbols = ownSymbols;
+        }
+    }
+
     // TODO: Support pronounceable passwords
     // TODO HEX_DIGITS exclusivity
     // TODO: defaults?
@@ -247,23 +264,6 @@ public class PasswdPolicy
             policy.setSpecialSymbols(ownSymbols);
         }
         return policy;
-    }
-
-    /** Policy fields for a record */
-    public static class RecordPolicyStrs
-    {
-        public final String itsPolicyName;
-        public final String itsPolicyStr;
-        public final String itsOwnSymbols;
-
-        public RecordPolicyStrs(String policyName,
-                                String policyStr,
-                                String ownSymbols)
-        {
-            itsPolicyName = policyName;
-            itsPolicyStr = policyStr;
-            itsOwnSymbols = ownSymbols;
-        }
     }
 
     /** Convert a record policy to its string fields */
