@@ -18,12 +18,14 @@ import android.text.TextUtils;
 public class PasswdPolicy
 {
     private final String itsName;
-    private int itsFlags;
-    private int itsLength;
-    private int itsMinLowercase;
-    private int itsMinUppercase;
-    private int itsMinDigits;
-    private int itsMinSymbols;
+    private final Type itsType;
+    private int itsFlags = FLAG_USE_LOWERCASE | FLAG_USE_UPPERCASE |
+                           FLAG_USE_DIGITS | FLAG_USE_SYMBOLS;
+    private int itsLength = 12;
+    private int itsMinLowercase = 1;
+    private int itsMinUppercase = 1;
+    private int itsMinDigits = 1;
+    private int itsMinSymbols = 1;
     private String itsSpecialSymbols = null;
 
     public static final int FLAG_USE_LOWERCASE          = 0x8000;
@@ -38,6 +40,14 @@ public class PasswdPolicy
     /** Maximum value for length fields */
     public static final int LENGTH_MAX = 4095;
 
+    /** The type of policy */
+    public enum Type
+    {
+        HEADER_POLICY,
+        RECORD_POLICY_NAME,
+        RECORD_POLICY
+    }
+
     // TODO: Support pronounceable passwords
     // TODO HEX_DIGITS exclusivity
     // TODO: defaults?
@@ -46,15 +56,22 @@ public class PasswdPolicy
     /**
      * Constructor
      */
-    public PasswdPolicy(String name)
+    public PasswdPolicy(String name, Type type)
     {
         itsName = name;
+        itsType = type;
     }
 
     /** Get the policy name */
     public String getName()
     {
         return itsName;
+    }
+
+    /** Get the type */
+    public Type getType()
+    {
+        return itsType;
     }
 
     /** Get the policy flags */
@@ -168,37 +185,11 @@ public class PasswdPolicy
             String name = getPolicyStrField(policyStr, i, fieldStart, nameLen,
                                             "name");
             fieldStart += nameLen;
-            PasswdPolicy policy = new PasswdPolicy(name);
+            PasswdPolicy policy = new PasswdPolicy(name, Type.HEADER_POLICY);
             policies.add(policy);
 
-            int flags = getPolicyStrInt(policyStr, i, fieldStart, 4, "flags");
-            fieldStart += 4;
-            policy.setFlags(flags);
-
-            int pwLen = getPolicyStrInt(policyStr, i, fieldStart, 3,
-                                        "password length");
-            fieldStart += 3;
-            policy.setLength(pwLen);
-
-            int minDigits = getPolicyStrInt(policyStr, i, fieldStart, 3,
-                                            "min digit chars");
-            fieldStart += 3;
-            policy.setMinDigits(minDigits);
-
-            int minLower = getPolicyStrInt(policyStr, i, fieldStart, 3,
-                                           "min lowercase chars");
-            fieldStart += 3;
-            policy.setMinLowercase(minLower);
-
-            int minSymbols = getPolicyStrInt(policyStr, i, fieldStart, 3,
-                                             "min symbol chars");
-            fieldStart += 3;
-            policy.setMinSymbols(minSymbols);
-
-            int minUpper = getPolicyStrInt(policyStr, i, fieldStart, 3,
-                                           "min uppercase chars");
-            fieldStart += 3;
-            policy.setMinUppercase(minUpper);
+            fieldStart = parsePolicyFlagsAndLengths(policy, policyStr,
+                                                    i, fieldStart);
 
             int numSpecials = getPolicyStrInt(policyStr, i, fieldStart, 2,
                                               "special symbols length");
@@ -218,6 +209,7 @@ public class PasswdPolicy
         return policies;
     }
 
+    /** Convert the header policies to a string */
     public static String hdrPoliciesToString(List<PasswdPolicy> policies)
     {
         if (policies == null) {
@@ -229,18 +221,125 @@ public class PasswdPolicy
         for (PasswdPolicy policy: policies) {
             str.append(String.format("%02x", policy.getName().length()));
             str.append(policy.getName());
-            str.append(String.format("%04x%03x%03x%03x%03x%03x%02x",
-                                     policy.getFlags(),
-                                     policy.getLength(),
-                                     policy.getMinDigits(),
-                                     policy.getMinLowercase(),
-                                     policy.getMinSymbols(),
-                                     policy.getMinUppercase(),
+            str.append(policyFlagsAndLengthsToString(policy));
+            str.append(String.format("%02x",
                                      policy.getSpecialSymbols().length()));
             str.append(policy.getSpecialSymbols());
         }
         return str.toString();
     }
+
+    /** Parse a record's policy from its fields */
+    public static PasswdPolicy parseRecordPolicy(String policyName,
+                                                 String policyStr,
+                                                 String ownSymbols)
+    {
+        PasswdPolicy policy = null;
+        if (policyName != null) {
+            policy = new PasswdPolicy(policyName, Type.RECORD_POLICY_NAME);
+        } else if (policyStr != null) {
+            policy = new PasswdPolicy(null, Type.RECORD_POLICY);
+            int endPos = parsePolicyFlagsAndLengths(policy, policyStr, 0, 0);
+            if (endPos != policyStr.length()) {
+                throw new IllegalArgumentException(
+                    "Password policy too long: " + policyStr);
+            }
+            policy.setSpecialSymbols(ownSymbols);
+        }
+        return policy;
+    }
+
+    /** Policy fields for a record */
+    public static class RecordPolicyStrs
+    {
+        public final String itsPolicyName;
+        public final String itsPolicyStr;
+        public final String itsOwnSymbols;
+
+        public RecordPolicyStrs(String policyName,
+                                String policyStr,
+                                String ownSymbols)
+        {
+            itsPolicyName = policyName;
+            itsPolicyStr = policyStr;
+            itsOwnSymbols = ownSymbols;
+        }
+    }
+
+    /** Convert a record policy to its string fields */
+    public static RecordPolicyStrs recordPolicyToString(PasswdPolicy policy)
+    {
+        if (policy == null) {
+            return null;
+        }
+        switch (policy.getType()) {
+        case HEADER_POLICY: {
+            return null;
+        }
+        case RECORD_POLICY_NAME: {
+            return new RecordPolicyStrs(policy.getName(), null, null);
+        }
+        case RECORD_POLICY: {
+            return new RecordPolicyStrs(null,
+                                        policyFlagsAndLengthsToString(policy),
+                                        policy.getSpecialSymbols());
+        }
+        }
+        return null;
+    }
+
+    /** Parse the flags and lengths of a policy from a string */
+    private static int parsePolicyFlagsAndLengths(PasswdPolicy policy,
+                                                  String policyStr,
+                                                  int policyNum,
+                                                  int fieldStart)
+
+    {
+        int flags = getPolicyStrInt(policyStr, policyNum, fieldStart, 4,
+                                    "flags");
+        fieldStart += 4;
+        policy.setFlags(flags);
+
+        int pwLen = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
+                                    "password length");
+        fieldStart += 3;
+        policy.setLength(pwLen);
+
+        int minDigits = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
+                                        "min digit chars");
+        fieldStart += 3;
+        policy.setMinDigits(minDigits);
+
+        int minLower = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
+                                       "min lowercase chars");
+        fieldStart += 3;
+        policy.setMinLowercase(minLower);
+
+        int minSymbols = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
+                                         "min symbol chars");
+        fieldStart += 3;
+        policy.setMinSymbols(minSymbols);
+
+        int minUpper = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
+                                       "min uppercase chars");
+        fieldStart += 3;
+        policy.setMinUppercase(minUpper);
+
+        return fieldStart;
+    }
+
+    /** Convert a policy's flags and lengths to a string */
+    private static String policyFlagsAndLengthsToString(PasswdPolicy policy)
+    {
+        return String.format("%04x%03x%03x%03x%03x%03x",
+                             policy.getFlags(),
+                             policy.getLength(),
+                             policy.getMinDigits(),
+                             policy.getMinLowercase(),
+                             policy.getMinSymbols(),
+                             policy.getMinUppercase());
+    }
+
 
     /** Get an integer from a hexidecimal policy field */
     private static int getPolicyStrInt(String policyStr,

@@ -416,6 +416,29 @@ public class PasswdFileData
                  rec, PwsRecordV3.PASSWORD_HISTORY);
     }
 
+    /** Get the password policy contained in a record */
+    public final PasswdPolicy getPasswdPolicy(PwsRecord rec)
+    {
+        return PasswdPolicy.parseRecordPolicy(
+            getField(rec, PwsRecordV3.PASSWORD_POLICY_NAME),
+            getField(rec, PwsRecordV3.PASSWORD_POLICY),
+            getField(rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS));
+    }
+
+    /** Set the password policy for a record */
+    public final void setPasswdPolicy(PasswdPolicy policy, PwsRecord rec)
+    {
+        PasswdPolicy.RecordPolicyStrs strs =
+            PasswdPolicy.recordPolicyToString(policy);
+        setField((strs == null) ? null : strs.itsPolicyName,
+                 rec, PwsRecordV3.PASSWORD_POLICY_NAME);
+        setField((strs == null) ? null : strs.itsPolicyStr,
+                 rec, PwsRecordV3.PASSWORD_POLICY);
+        setField((strs == null) ? null : strs.itsOwnSymbols,
+                 rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS);
+        updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
+    }
+
     public final boolean isProtected(PwsRecord rec)
     {
         boolean prot = false;

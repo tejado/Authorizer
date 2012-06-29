@@ -60,6 +60,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(1, policies.size());
         PasswdPolicy policy = policies.get(0);
         assertEquals("Policy1", policy.getName());
+        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
@@ -87,6 +88,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         PasswdPolicy policy;
         policy = policies.get(0);
         assertEquals("easy to read", policy.getName());
+        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
                      PasswdPolicy.FLAG_USE_SYMBOLS |
@@ -100,6 +102,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         policy = policies.get(1);
         assertEquals("hex only", policy.getName());
+        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
         assertEquals(PasswdPolicy.FLAG_USE_HEX_DIGITS, policy.getFlags());
         assertEquals(20, policy.getLength());
         assertEquals(1, policy.getMinLowercase());
@@ -110,6 +113,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         policy = policies.get(2);
         assertEquals("policy 1", policy.getName());
+        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
@@ -123,6 +127,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         policy = policies.get(3);
         assertEquals("pronounce", policy.getName());
+        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_SYMBOLS |
@@ -136,6 +141,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         policy = policies.get(4);
         assertEquals("special chars", policy.getName());
+        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
@@ -163,6 +169,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         for (int i = 0; i < 255; ++i) {
             PasswdPolicy policy = policies.get(i);
             assertEquals(String.format("Policy%03d", i), policy.getName());
+            assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
             assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                          PasswdPolicy.FLAG_USE_UPPERCASE |
                          PasswdPolicy.FLAG_USE_DIGITS |
@@ -304,6 +311,110 @@ public class PasswdPolicyTest extends AndroidTestCase
                            "Policies field does not end at the last policy");
     }
 
+    /** Test a record without a policy */
+    public void testRecNone()
+    {
+        PasswdPolicy policy = PasswdPolicy.parseRecordPolicy(null, null, null);
+        assertNull(policy);
+
+        PasswdPolicy.RecordPolicyStrs strs =
+            PasswdPolicy.recordPolicyToString(null);
+        assertNull(strs);
+    }
+
+    /** Test a record with a policy name */
+    public void testRecPolicyName()
+    {
+        doTestRecordPolicyName("policy1", null, null);
+        doTestRecordPolicyName("policy2", "foo", null);
+        doTestRecordPolicyName("policy3", null, "bar");
+        doTestRecordPolicyName("policy4", "foo", "bar");
+    }
+
+    /** Test a record with its own policy */
+    public void testRecPolicy()
+    {
+        // easy to read
+        doTestRecordPolicy(null, "b40000a001001001001", null,
+                           PasswdPolicy.FLAG_USE_LOWERCASE |
+                           PasswdPolicy.FLAG_USE_DIGITS |
+                           PasswdPolicy.FLAG_USE_SYMBOLS |
+                           PasswdPolicy.FLAG_USE_EASY_VISION,
+                           10, 1, 1, 1, 1);
+
+        // hex only
+        doTestRecordPolicy(null, "0800014001001001001", null,
+                           PasswdPolicy.FLAG_USE_HEX_DIGITS,
+                           20, 1, 1, 1, 1);
+
+        // policy 1
+        doTestRecordPolicy(null, "f00000f004002005003", null,
+                           PasswdPolicy.FLAG_USE_LOWERCASE |
+                           PasswdPolicy.FLAG_USE_UPPERCASE |
+                           PasswdPolicy.FLAG_USE_DIGITS |
+                           PasswdPolicy.FLAG_USE_SYMBOLS,
+                           15, 2, 3, 4, 5);
+
+        // pronounce
+        doTestRecordPolicy(null, "d200008001001001001", null,
+                           PasswdPolicy.FLAG_USE_LOWERCASE |
+                           PasswdPolicy.FLAG_USE_UPPERCASE |
+                           PasswdPolicy.FLAG_USE_SYMBOLS |
+                           PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE,
+                           8, 1, 1, 1, 1);
+
+        // special chars
+        doTestRecordPolicy(null, "f00000d003001004002", "!@#$%^&*()",
+                           PasswdPolicy.FLAG_USE_LOWERCASE |
+                           PasswdPolicy.FLAG_USE_UPPERCASE |
+                           PasswdPolicy.FLAG_USE_DIGITS |
+                           PasswdPolicy.FLAG_USE_SYMBOLS,
+                           13, 1, 2, 3, 4);
+    }
+
+    /** Test an invalid record policy */
+    public void testRecPolicyInvalid()
+    {
+        doTestBadRecPolicy("",
+                           "Policy 0 too short for flags: 4");
+        doTestBadRecPolicy("f",
+                           "Policy 0 too short for flags: 4");
+        doTestBadRecPolicy("fe0",
+                           "Policy 0 too short for flags: 4");
+        doTestBadRecPolicy("fe00",
+                           "Policy 0 too short for password length: 3");
+        doTestBadRecPolicy("fe00a",
+                           "Policy 0 too short for password length: 3");
+        doTestBadRecPolicy("fe00ab",
+                           "Policy 0 too short for password length: 3");
+        doTestBadRecPolicy("fe00abc",
+                           "Policy 0 too short for min digit chars: 3");
+        doTestBadRecPolicy("fe00abc1",
+                           "Policy 0 too short for min digit chars: 3");
+        doTestBadRecPolicy("fe00abc11",
+                           "Policy 0 too short for min digit chars: 3");
+        doTestBadRecPolicy("fe00abc111",
+                           "Policy 0 too short for min lowercase chars: 3");
+        doTestBadRecPolicy("fe00abc111a",
+                           "Policy 0 too short for min lowercase chars: 3");
+        doTestBadRecPolicy("fe00abc111aa",
+                           "Policy 0 too short for min lowercase chars: 3");
+        doTestBadRecPolicy("fe00abc111aaa",
+                           "Policy 0 too short for min symbol chars: 3");
+        doTestBadRecPolicy("fe00abc111aaa0",
+                           "Policy 0 too short for min symbol chars: 3");
+        doTestBadRecPolicy("fe00abc111aaa00",
+                           "Policy 0 too short for min symbol chars: 3");
+        doTestBadRecPolicy("fe00abc111aaa000",
+                           "Policy 0 too short for min uppercase chars: 3");
+        doTestBadRecPolicy("fe00abc111aaa000f",
+                           "Policy 0 too short for min uppercase chars: 3");
+        doTestBadRecPolicy("fe00abc111aaa000ff",
+                           "Policy 0 too short for min uppercase chars: 3");
+        doTestBadRecPolicy("fe00abc111aaa000fff0",
+                           "Password policy too long: fe00abc111aaa000fff0");
+    }
+
     /** Check a bad header policy */
     private static void doTestBadHdrPolicy(String policyStr, String exMsg)
     {
@@ -314,5 +425,76 @@ public class PasswdPolicyTest extends AndroidTestCase
             assertTrue(t instanceof IllegalArgumentException);
             assertEquals(exMsg, t.getMessage());
         }
+    }
+
+    /** Check a bad record policy */
+    private static void doTestBadRecPolicy(String policyStr, String exMsg)
+    {
+        try {
+            PasswdPolicy.parseRecordPolicy(null, policyStr, null);
+            fail();
+        } catch (Throwable t) {
+            assertTrue(t instanceof IllegalArgumentException);
+            assertEquals(exMsg, t.getMessage());
+        }
+    }
+
+    /** Check a record with a named password policy */
+    private static void doTestRecordPolicyName(String policyName,
+                                               String policyStr,
+                                               String ownSymbols)
+    {
+        PasswdPolicy policy = PasswdPolicy.parseRecordPolicy(policyName,
+                                                             policyStr,
+                                                             ownSymbols);
+        assertNotNull(policy);
+        assertEquals(policyName, policy.getName());
+        assertEquals(PasswdPolicy.Type.RECORD_POLICY_NAME, policy.getType());
+        assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
+                     PasswdPolicy.FLAG_USE_UPPERCASE |
+                     PasswdPolicy.FLAG_USE_DIGITS |
+                     PasswdPolicy.FLAG_USE_SYMBOLS, policy.getFlags());
+        assertEquals(12, policy.getLength());
+        assertEquals(1, policy.getMinDigits());
+        assertEquals(1, policy.getMinLowercase());
+        assertEquals(1, policy.getMinSymbols());
+        assertEquals(1, policy.getMinUppercase());
+        assertNull(policy.getSpecialSymbols());
+
+        PasswdPolicy.RecordPolicyStrs strs =
+            PasswdPolicy.recordPolicyToString(policy);
+        assertNotNull(strs);
+        assertEquals(policyName, strs.itsPolicyName);
+        assertEquals(null, strs.itsPolicyStr);
+        assertEquals(null, strs.itsOwnSymbols);
+    }
+
+    /** Check a record with its own password policy */
+    private static void doTestRecordPolicy(String policyName, String policyStr,
+                                           String ownSymbols,
+                                           int flags, int length,
+                                           int minLower, int minUpper,
+                                           int minDigits, int minSymbols)
+    {
+        PasswdPolicy policy = PasswdPolicy.parseRecordPolicy(policyName,
+                                                             policyStr,
+                                                             ownSymbols);
+        assertNotNull(policy);
+        assertNull(policy.getName());
+        assertEquals(PasswdPolicy.Type.RECORD_POLICY, policy.getType());
+        assertEquals(flags, policy.getFlags());
+        assertEquals(length, policy.getLength());
+        assertEquals(minDigits, policy.getMinDigits());
+        assertEquals(minLower, policy.getMinLowercase());
+        assertEquals(minSymbols, policy.getMinSymbols());
+        assertEquals(minUpper, policy.getMinUppercase());
+        assertEquals(ownSymbols, policy.getSpecialSymbols());
+
+        PasswdPolicy.RecordPolicyStrs strs =
+            PasswdPolicy.recordPolicyToString(policy);
+        assertNotNull(strs);
+        assertEquals(policyName, strs.itsPolicyName);
+        assertEquals(policyStr, strs.itsPolicyStr);
+        assertEquals(ownSymbols, strs.itsOwnSymbols);
     }
 }
