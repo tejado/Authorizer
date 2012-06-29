@@ -17,17 +17,6 @@ import android.text.TextUtils;
  */
 public class PasswdPolicy
 {
-    private final String itsName;
-    private final Type itsType;
-    private int itsFlags = FLAG_USE_LOWERCASE | FLAG_USE_UPPERCASE |
-                           FLAG_USE_DIGITS | FLAG_USE_SYMBOLS;
-    private int itsLength = 12;
-    private int itsMinLowercase = 1;
-    private int itsMinUppercase = 1;
-    private int itsMinDigits = 1;
-    private int itsMinSymbols = 1;
-    private String itsSpecialSymbols = null;
-
     public static final int FLAG_USE_LOWERCASE          = 0x8000;
     public static final int FLAG_USE_UPPERCASE          = 0x4000;
     public static final int FLAG_USE_DIGITS             = 0x2000;
@@ -52,6 +41,17 @@ public class PasswdPolicy
     // TODO HEX_DIGITS exclusivity
     // TODO: defaults?
     // TODO: UTF-8 chars in policy name and special chars
+
+    private final String itsName;
+    private final Type itsType;
+    private int itsFlags = FLAG_USE_LOWERCASE | FLAG_USE_UPPERCASE |
+                           FLAG_USE_DIGITS | FLAG_USE_SYMBOLS;
+    private int itsLength = 12;
+    private int itsMinLowercase = 1;
+    private int itsMinUppercase = 1;
+    private int itsMinDigits = 1;
+    private int itsMinSymbols = 1;
+    private String itsSpecialSymbols = null;
 
     /**
      * Constructor
