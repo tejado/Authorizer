@@ -121,6 +121,10 @@
                         android:resource="@xml/searchable"/>
         </activity>
         
+        <activity android:name=".PasswdPolicyActivity"
+                  android:label="@string/app_name"
+                  android:finishOnTaskLaunch="true"/>
+                  
         <activity android:name=".Preferences"
                   android:label="@string/app_name"
                   android:finishOnTaskLaunch="true"/>

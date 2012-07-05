@@ -77,6 +77,7 @@
     <string name="no_alias_chosen">No alias chosen</string>
     <string name="no_shortcut_chosen">No shortcut chosen</string>
     <string name="no_files">No Files</string>
+    <string name="no_policies">No Policies</string>
     <string name="no_records">No Records</string>
     <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
     <string name="notes">Notes</string>
@@ -90,6 +91,7 @@
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_file">Password file</string>
     <string name="password_label">Password:</string>
+    <string name="password_policies">Password Policies</string>
     <string name="password_preferences">Password Preferences</string>
     <string name="password_record">Password record</string>
     <string name="passwords_do_not_match">Passwords do not match</string>

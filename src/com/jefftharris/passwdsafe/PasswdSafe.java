@@ -60,12 +60,14 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int MENU_DELETE =          ABS_MENU_MAX + 4;
     private static final int MENU_PROTECT=          ABS_MENU_MAX + 5;
     private static final int MENU_UNPROTECT=        ABS_MENU_MAX + 6;
+    private static final int MENU_PASSWD_POLICIES = ABS_MENU_MAX + 7;
 
     private static final int CTXMENU_COPY_USER = 1;
     private static final int CTXMENU_COPY_PASSWD = 2;
 
     private static final int RECORD_VIEW_REQUEST = 0;
     private static final int RECORD_ADD_REQUEST = 1;
+    private static final int POLICY_VIEW_REQUEST = 2;
 
     private LoadTask itsLoadTask;
     private DialogValidator itsChangePasswdValidator;
@@ -154,6 +156,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         mi.setIcon(android.R.drawable.ic_menu_add);
 
         addCloseMenuItem(menu);
+
+        mi = menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
 
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);
 
@@ -258,6 +262,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             setProtectRecords(false);
             break;
         }
+        case MENU_PASSWD_POLICIES: {
+            startActivityForResult(new Intent(Intent.ACTION_VIEW, getUri(),
+                                             this, PasswdPolicyActivity.class),
+                                   POLICY_VIEW_REQUEST);
+            break;
+        }
         default:
         {
             rc = super.onOptionsItemSelected(item);
@@ -277,7 +287,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                               "onActivityResult req: " + requestCode +
                               ", rc: " + resultCode);
          if (((requestCode == RECORD_VIEW_REQUEST) ||
-              (requestCode == RECORD_ADD_REQUEST)) &&
+              (requestCode == RECORD_ADD_REQUEST) ||
+              (requestCode == POLICY_VIEW_REQUEST)) &&
              (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {
              showFileData(MOD_DATA);
          } else {

@@ -175,6 +175,13 @@ public class PasswdPolicy
         itsSpecialSymbols = symbols;
     }
 
+    /** Convert the object to a string */
+    @Override
+    public String toString()
+    {
+        return itsName;
+    }
+
     /** Parse policies from the header named policies field */
     public static List<PasswdPolicy> parseHdrPolicies(String policyStr)
         throws IllegalArgumentException, NumberFormatException
