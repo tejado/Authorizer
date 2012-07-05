@@ -134,7 +134,7 @@
                   android:finishOnTaskLaunch="true"/>
     
         <activity android:name=".RecordSelectionActivity"
-                  android:label="Record selection"
+                  android:label="@string/password_record"
                   android:theme="@android:style/Theme.Dialog"
                   android:finishOnTaskLaunch="true"/>
                   
