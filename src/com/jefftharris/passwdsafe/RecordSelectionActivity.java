@@ -25,10 +25,7 @@ public class RecordSelectionActivity extends AbstractPasswdSafeActivity
         super.onCreate(savedInstanceState);
         setTitle(R.string.choose_record);
 
-        PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsPasswdFile = app.accessOpenFile(this);
-        if (itsPasswdFile != null) {
-            itsUri = itsPasswdFile.getFileData().getUri();
+        if (accessOpenFile()) {
             showFileData(MOD_DATA);
         } else {
             finish();
@@ -39,7 +36,7 @@ public class RecordSelectionActivity extends AbstractPasswdSafeActivity
     @Override
     protected void onRecordClick(PwsRecord rec)
     {
-        PasswdFileData fileData = itsPasswdFile.getFileData();
+        PasswdFileData fileData = getPasswdFileData();
         String uuid = fileData.getUUID(rec);
 
         Intent intent = new Intent();

@@ -32,11 +32,7 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
             return;
         }
 
-        PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsPasswdFile = app.accessOpenFile(this);
-        if (itsPasswdFile != null) {
-            itsUri = itsPasswdFile.getFileData().getUri();
-        } else {
+        if (!accessOpenFile()) {
             TextView empty = (TextView)findViewById(android.R.id.empty);
             empty.setText(R.string.no_records_open_file);
         }
@@ -47,9 +43,9 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
     @Override
     protected void onRecordClick(PwsRecord rec)
     {
-        PasswdFileData fileData = itsPasswdFile.getFileData();
+        PasswdFileData fileData = getPasswdFileData();
         String uuid = fileData.getUUID(rec);
-        Intent shortcutIntent = FileList.createOpenIntent(itsUri, uuid);
+        Intent shortcutIntent = FileList.createOpenIntent(getUri(), uuid);
 
         Intent intent = new Intent();
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);

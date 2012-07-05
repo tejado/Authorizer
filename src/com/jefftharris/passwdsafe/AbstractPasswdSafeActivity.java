@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,13 +22,10 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 
-import android.app.Activity;
-import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -43,7 +39,7 @@ import android.widget.SectionIndexer;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public abstract class AbstractPasswdSafeActivity extends ListActivity
+public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListActivity
     implements PasswdFileActivity
 {
     protected static final String TAG = "PasswdSafe";
@@ -68,8 +64,6 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     protected static final int MOD_GROUP          = 1 << 1;
     protected static final int MOD_SEARCH         = 1 << 2;
 
-    protected Uri itsUri;
-    protected ActivityPasswdFile itsPasswdFile;
     private GroupNode itsRootNode = null;
     private GroupNode itsCurrGroupNode = null;
     private boolean itsGroupRecords = true;
@@ -139,35 +133,12 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdFileActivity#getActivity()
-     */
-    public Activity getActivity()
-    {
-        return this;
-    }
-
-    /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.PasswdFileActivity#saveFinished(boolean)
      */
     public void saveFinished(boolean success)
     {
         showFileData(MOD_DATA);
     }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdFileActivity#showProgressDialog()
-     */
-    public void showProgressDialog()
-    {
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdFileActivity#removeProgressDialog()
-     */
-    public void removeProgressDialog()
-    {
-    }
-
 
     @Override
     protected void onNewIntent(Intent intent)
@@ -179,48 +150,6 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
             query = intent.getStringExtra(SearchManager.QUERY);
         }
         setSearchQuery(query);
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.app.Activity#onDestroy()
-     */
-    @Override
-    protected void onDestroy()
-    {
-        PasswdSafeApp.dbginfo(TAG, "onDestroy");
-        super.onDestroy();
-        if (itsPasswdFile != null) {
-            itsPasswdFile.onActivityDestroy();
-        }
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.app.Activity#onPause()
-     */
-    @Override
-    protected void onPause()
-    {
-        PasswdSafeApp.dbginfo(TAG, "onPause");
-        super.onPause();
-
-        if (itsPasswdFile != null) {
-            itsPasswdFile.onActivityPause();
-        }
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.app.Activity#onResume()
-     */
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        if (itsPasswdFile != null) {
-            itsPasswdFile.touch();
-        }
     }
 
 
@@ -308,8 +237,9 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
         }
         case MENU_CLOSE:
         {
-            if (itsPasswdFile != null) {
-                itsPasswdFile.close();
+            ActivityPasswdFile passwdFile = getPasswdFile();
+            if (passwdFile != null) {
+                passwdFile.close();
             }
             break;
         }
@@ -416,18 +346,6 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     }
 
 
-    protected String getUriName()
-    {
-        return PasswdFileData.getUriIdentifier(itsUri, this, true);
-    }
-
-
-    protected File getUriAsFile()
-    {
-        return PasswdFileData.getUriAsFile(itsUri);
-    }
-
-
     /**
      * Is the root group selected
      */
@@ -447,11 +365,7 @@ public abstract class AbstractPasswdSafeActivity extends ListActivity
     private final void populateFileData(int mod)
     {
         itsListData.clear();
-        if (itsPasswdFile == null) {
-            return;
-        }
-
-        PasswdFileData fileData = itsPasswdFile.getFileData();
+        PasswdFileData fileData = getPasswdFileData();
         if (fileData == null) {
             return;
         }
