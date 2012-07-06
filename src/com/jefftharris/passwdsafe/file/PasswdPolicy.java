@@ -29,6 +29,10 @@ public class PasswdPolicy
     /** Maximum value for length fields */
     public static final int LENGTH_MAX = 4095;
 
+    public static final String SYMBOLS_DEFAULT = "+-=_@#$%^&;:,.<>/~\\[](){}?!|";
+    public static final String SYMBOLS_EASY = "+-=_@#$%^&<>/~\\?";
+    public static final String SYMBOLS_PRONOUNCE = "@&(#!|$+";
+
     /** The type of policy */
     public enum Type
     {

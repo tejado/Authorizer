@@ -19,6 +19,7 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
@@ -89,11 +90,9 @@ public class RecordEditActivity extends AbstractRecordActivity
     private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
     private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
     private static final String DIGITS = "0123456789";
-    private static final String SYMBOLS = "+-=_@#$%^&;:,.<>/~\\[](){}?!|";
     private static final String EASY_LOWER_CHARS = "abcdefghijkmnopqrstuvwxyz";
     private static final String EASY_UPPER_CHARS = "ABCDEFGHJKLMNPQRTUVWXY";
     private static final String EASY_DIGITS = "346789";
-    private static final String EASY_SYMBOLS = "+-=_@#$%^&<>/~\\?";
 
     // Constants must match record_type strings
     private static final int TYPE_NORMAL = 0;
@@ -661,7 +660,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                     chars.add(EASY_DIGITS);
                 }
                 if (Preferences.getPasswordGenSymbolsPref(prefs)) {
-                    chars.add(EASY_SYMBOLS);
+                    chars.add(PasswdPolicy.SYMBOLS_EASY);
                 }
             } else {
                 if (Preferences.getPasswordGenLowerPref(prefs)) {
@@ -674,7 +673,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                     chars.add(DIGITS);
                 }
                 if (Preferences.getPasswordGenSymbolsPref(prefs)) {
-                    chars.add(SYMBOLS);
+                    chars.add(PasswdPolicy.SYMBOLS_DEFAULT);
                 }
             }
         }

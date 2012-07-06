@@ -91,11 +91,19 @@
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_file">Password file</string>
     <string name="password_label">Password:</string>
+    <string name="password_length">Password Length</string>
     <string name="password_policies">Password Policies</string>
     <string name="password_preferences">Password Preferences</string>
     <string name="password_record">Password record</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="permissions_label">Permissions:</string>
+    <string name="policy_no">No</string>
+    <string name="policy_yes">Yes</string>
+    <string name="policy_yes_len">Yes - At least %1$d</string>
+    <string name="policy_yes_sym_default">Yes - At least %1$d from default symbols: %2$s</string>
+    <string name="policy_yes_sym_easy">Yes - At least %1$d from easy symbols: %2$s</string>
+    <string name="policy_yes_sym_policy">Yes - At least %1$d from policy symbols: %2$s</string>
+    <string name="policy_yes_sym_pronounce">Yes - At least %1$d from pronounceable symbols: %2$s</string>
     <string name="preferences">Preferences</string>
     <string name="protect_all">Protect All Records</string>
     <string name="protect_group">Protect Group Records</string>
@@ -127,6 +135,13 @@
     <string name="up">Up</string>
     <string name="url">URL</string>
     <string name="username">User Name</string>
+    <string name="use_lowercase">Use Lowercase</string>
+    <string name="use_uppercase">Use Uppercase</string>
+    <string name="use_digits">Use Digits</string>
+    <string name="use_symbols">Use Symbols</string>
+    <string name="use_easyvision">Use Easyvision</string>
+    <string name="use_pronounceable">Use Pronounceable</string>
+    <string name="use_hexadecimal">Use Hexadecimal</string>
     
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">
