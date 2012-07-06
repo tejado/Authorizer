@@ -72,6 +72,15 @@ public class DialogUtils
             new DialogValidator.AlertValidator(alertDialog, dlgView, act, false)
         {
             @Override
+            public final void reset()
+            {
+                CheckBox confirmCb =
+                    (CheckBox)getDialog().findViewById(R.id.confirm);
+                confirmCb.setChecked(false);
+                super.reset();
+            }
+
+            @Override
             protected final String doValidation()
             {
                 CheckBox confirmCb =

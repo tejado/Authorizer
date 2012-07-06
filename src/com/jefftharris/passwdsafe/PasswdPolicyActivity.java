@@ -12,9 +12,14 @@ import java.util.List;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.view.DialogUtils;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -25,7 +30,16 @@ import android.widget.TextView;
  */
 public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 {
+    private static final String TAG = "PasswdPolicyActivity";
+
+    private static final int MENU_ADD =         0;
+    private static final int MENU_EDIT =        1;
+    private static final int MENU_DELETE =      2;
+
+    private static final int DIALOG_DELETE =    MAX_DIALOG + 1;
+
     private List<PasswdPolicy> itsPolicies;
+    private DialogValidator itsDeleteValidator;
 
     // TODO: app default policy
 
@@ -44,7 +58,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 
         setTitle(PasswdSafeApp.getAppFileTitle(getUri(), this));
         showPolicies();
-        showPolicy(null);
     }
 
 
@@ -59,11 +72,126 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        int selectedPos = getListView().getCheckedItemPosition();
+        PasswdSafeApp.dbginfo(TAG, "onPrepareOptionsMenu pos " + selectedPos);
+        boolean editDelete = (getSelectedPolicy() != null);
+
+        MenuItem mi;
+        mi = menu.findItem(MENU_EDIT);
+        mi.setEnabled(editDelete);
+        mi = menu.findItem(MENU_DELETE);
+        mi.setEnabled(editDelete);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        menu.add(0, MENU_ADD, 0, R.string.add_policy);
+        menu.add(0, MENU_EDIT, 0, R.string.edit_policy);
+        menu.add(0, MENU_DELETE, 0, R.string.delete_policy);
+        return true;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        boolean rc = true;
+        switch (item.getItemId()) {
+        case MENU_DELETE: {
+            removeDialog(DIALOG_DELETE);
+            showDialog(DIALOG_DELETE);
+            break;
+        }
+        default: {
+            rc = super.onOptionsItemSelected(item);
+            break;
+        }
+        }
+        return rc;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateDialog(int, android.os.Bundle)
+     */
+    @Override
+    protected Dialog onCreateDialog(int id, Bundle args)
+    {
+        Dialog dialog = null;
+        switch (id) {
+        case DIALOG_DELETE: {
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+            {
+                @Override
+                public final void onOkClicked(DialogInterface dialog)
+                {
+                    deletePolicy();
+                }
+            };
+
+            PasswdPolicy policy = getSelectedPolicy();
+            String prompt = getString(R.string.delete_policy_msg,
+                                      policy.getName());
+            String title = getString(R.string.delete_policy_title);
+            DialogUtils.DialogData data =
+                DialogUtils.createDeletePrompt(this, dlgClick, title, prompt);
+            dialog = data.itsDialog;
+            itsDeleteValidator = data.itsValidator;
+            break;
+
+        }
+        default: {
+            dialog = super.onCreateDialog(id, args);
+            break;
+        }
+        }
+        return dialog;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
+     */
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog)
+    {
+        switch (id) {
+        case DIALOG_DELETE: {
+            itsDeleteValidator.reset();
+            break;
+        }
+        default: {
+            super.onPrepareDialog(id, dialog);
+            break;
+        }
+        }
+    }
+
+
+    /* (non-Javadoc)
      * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
      */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id)
     {
+        GuiUtils.invalidateOptionsMenu(this);
+
         PasswdPolicy policy = null;
         if (position < itsPolicies.size()) {
             policy = itsPolicies.get(position);
@@ -87,6 +215,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         setListAdapter(new ArrayAdapter<PasswdPolicy>(
             this, android.R.layout.simple_list_item_single_choice,
             itsPolicies));
+        showPolicy(null);
     }
 
 
@@ -128,6 +257,34 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         setTextStr(R.id.easyvision, easyvision);
         setTextStr(R.id.pronounceable, pronounceable);
         setTextStr(R.id.hexadecimal, hexadecimal);
+    }
+
+
+    /** Delete the currently selected policy */
+    private final void deletePolicy()
+    {
+        itsPolicies.remove(getSelectedPolicy());
+        PasswdFileData fileData = getPasswdFileData();
+        if (fileData != null) {
+            fileData.setHdrPasswdPolicies(
+                (itsPolicies.size() > 0) ? itsPolicies : null);
+            getPasswdFile().save();
+        }
+        showPolicies();
+    }
+
+
+    /** Get the currently selected policy */
+    private final PasswdPolicy getSelectedPolicy()
+    {
+        PasswdPolicy policy = null;
+        int selectedPos = getListView().getCheckedItemPosition();
+        if ((itsPolicies != null) &&
+            (selectedPos >= 0) &&
+            (selectedPos < itsPolicies.size())) {
+            policy = itsPolicies.get(selectedPos);
+        }
+        return policy;
     }
 
 

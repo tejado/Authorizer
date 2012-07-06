@@ -108,7 +108,7 @@ public abstract class DialogValidator
         tv.addTextChangedListener(itsTextWatcher);
     }
 
-    public final void reset()
+    public void reset()
     {
         if (itsPassword != null) {
             itsPassword.setText("");
