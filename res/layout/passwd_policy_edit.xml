@@ -64,6 +64,7 @@
                         android:text="@string/use_lowercase"/>
 
                     <TextView
+                        android:id="@+id/lowercase_label"
                         android:paddingLeft="3dp"
                         android:text="@string/at_least"/>
 
@@ -79,6 +80,7 @@
                         android:text="@string/use_uppercase"/>
 
                     <TextView
+                        android:id="@+id/uppercase_label"
                         android:paddingLeft="3dp"
                         android:text="@string/at_least"/>
 
@@ -94,6 +96,7 @@
                         android:text="@string/use_digits"/>
 
                     <TextView
+                        android:id="@+id/digits_label"
                         android:paddingLeft="3dp"
                         android:text="@string/at_least"/>
 
@@ -109,6 +112,7 @@
                         android:text="@string/use_symbols"/>
 
                     <TextView
+                        android:id="@+id/symbols_label"
                         android:paddingLeft="3dp"
                         android:text="@string/at_least"/>
 

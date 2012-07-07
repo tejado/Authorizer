@@ -27,9 +27,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 /**
@@ -413,6 +415,14 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             int titleId;
             String name;
             int len;
+            boolean useLowercase;
+            boolean useUppercase;
+            boolean useDigits;
+            boolean useSymbols;
+            int lowerLen;
+            int upperLen;
+            int digitsLen;
+            int symbolsLen;
             if (policy != null) {
                 titleId = R.string.edit_policy;
                 name = policy.getName();
@@ -427,32 +437,22 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 } else {
                     itsOrigType = TYPE_NORMAL;
                 }
+                useLowercase = ((flags & PasswdPolicy.FLAG_USE_LOWERCASE) != 0);
+                useUppercase = ((flags & PasswdPolicy.FLAG_USE_UPPERCASE) != 0);
+                useDigits = ((flags & PasswdPolicy.FLAG_USE_DIGITS) != 0);
+                useSymbols = ((flags & PasswdPolicy.FLAG_USE_SYMBOLS) != 0);
+                lowerLen = policy.getMinLowercase();
+                upperLen = policy.getMinUppercase();
+                digitsLen = policy.getMinDigits();
+                symbolsLen = policy.getMinSymbols();
             } else {
                 titleId = R.string.new_policy;
                 name = "";
                 len = 12;
                 itsOrigType = TYPE_NORMAL;
+                useLowercase = useUppercase = useDigits = useSymbols = true;
+                lowerLen = upperLen = digitsLen = symbolsLen = 1;
             }
-
-            TextView tv;
-            tv = (TextView)itsView.findViewById(R.id.name);
-            tv.setText(name);
-            tv = (TextView)itsView.findViewById(R.id.length);
-            tv.setText(Integer.toString(len));
-            Spinner typeSpin = (Spinner)itsView.findViewById(R.id.type);
-            typeSpin.setOnItemSelectedListener(new OnItemSelectedListener()
-            {
-                public void onItemSelected(AdapterView<?> parent, View arg1,
-                                           int position, long id)
-                {
-                    setType(position, false);
-                }
-
-                public void onNothingSelected(AdapterView<?> arg0)
-                {
-                    setType(TYPE_NORMAL, false);
-                }
-            });
 
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
@@ -477,7 +477,20 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 // TODO: all sorts of validations
             };
 
+            TextView tv;
+            tv = (TextView)itsView.findViewById(R.id.name);
+            tv.setText(name);
+            setTextView(R.id.length, len);
             setType(itsOrigType, true);
+            setOption(R.id.lowercase, useLowercase, true);
+            setOption(R.id.uppercase, useUppercase, true);
+            setOption(R.id.digits, useDigits, true);
+            setOption(R.id.symbols, useSymbols, true);
+            setTextView(R.id.lowercase_len, lowerLen);
+            setTextView(R.id.uppercase_len, upperLen);
+            setTextView(R.id.digits_len, digitsLen);
+            setTextView(R.id.symbols_len, symbolsLen);
+
             return dialog;
         }
 
@@ -500,25 +513,34 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             if (init) {
                 Spinner typeSpin = (Spinner)itsView.findViewById(R.id.type);
                 typeSpin.setSelection(itsType);
+                typeSpin.setOnItemSelectedListener(new OnItemSelectedListener()
+                {
+                    public void onItemSelected(AdapterView<?> parent, View arg1,
+                                               int position, long id)
+                    {
+                        setType(position, false);
+                    }
+
+                    public void onNothingSelected(AdapterView<?> arg0)
+                    {
+                        setType(TYPE_NORMAL, false);
+                    }
+                });
             }
 
             boolean optionsVisible = false;
-            boolean optionsLenVisible = false;
             switch (itsType) {
             case TYPE_NORMAL: {
                 optionsVisible = true;
-                optionsLenVisible = true;
                 break;
             }
             case TYPE_EASY_TO_READ:
             case TYPE_PRONOUNCEABLE: {
                 optionsVisible = true;
-                optionsLenVisible = false;
                 break;
             }
             case TYPE_HEXADECIMAL: {
                 optionsVisible = false;
-                optionsLenVisible = false;
                 break;
             }
             }
@@ -527,13 +549,81 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             setVisible(R.id.uppercase_row, optionsVisible);
             setVisible(R.id.digits_row, optionsVisible);
             setVisible(R.id.symbols_row, optionsVisible);
-            TableLayout table = (TableLayout)itsView.findViewById(R.id.options);
-            table.setColumnCollapsed(1, !optionsLenVisible);
-            table.setColumnCollapsed(2, !optionsLenVisible);
+            setOptionLenVisible(itsType, R.id.lowercase);
+            setOptionLenVisible(itsType, R.id.uppercase);
+            setOptionLenVisible(itsType, R.id.digits);
+            setOptionLenVisible(itsType, R.id.symbols);
             // TODO: custom symbol visibility updates
 
             if (!init) {
                 itsValidator.validate();
+            }
+        }
+
+
+        /** Set whether an option is used */
+        private final void setOption(int optionId, boolean use, boolean init)
+        {
+            if (init) {
+                CheckBox cb = (CheckBox)itsView.findViewById(optionId);
+                cb.setChecked(use);
+                cb.setOnCheckedChangeListener(new OnCheckedChangeListener()
+                {
+                    public void onCheckedChanged(CompoundButton buttonView,
+                                                 boolean isChecked)
+                    {
+                        setOption(buttonView.getId(), isChecked, false);
+                    }
+                });
+            }
+
+            setOptionLenVisible(itsType, optionId);
+
+            if (!init) {
+                itsValidator.validate();
+            }
+        }
+
+
+        /** Set the visibility on an option's length field */
+        private final void setOptionLenVisible(int type, int optionId)
+        {
+            boolean visible;
+            if (type == TYPE_NORMAL) {
+                CheckBox cb = (CheckBox)itsView.findViewById(optionId);
+                visible = cb.isChecked();
+            } else {
+                visible = false;
+            }
+
+            int labelId = 0;
+            int lengthId = 0;
+            switch (optionId) {
+            case R.id.lowercase: {
+                labelId = R.id.lowercase_label;
+                lengthId = R.id.lowercase_len;
+                break;
+            }
+            case R.id.uppercase: {
+                labelId = R.id.uppercase_label;
+                lengthId = R.id.uppercase_len;
+                break;
+            }
+            case R.id.digits: {
+                labelId = R.id.digits_label;
+                lengthId = R.id.digits_len;
+                break;
+            }
+            case R.id.symbols: {
+                labelId = R.id.symbols_label;
+                lengthId = R.id.symbols_len;
+                break;
+            }
+            }
+
+            if (labelId != 0) {
+                setVisible(labelId, visible);
+                setVisible(lengthId, visible);
             }
         }
 
@@ -543,6 +633,14 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         {
             View v = itsView.findViewById(id);
             v.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+
+
+        /** Set a text view to an integer value */
+        private final void setTextView(int id, int value)
+        {
+            TextView tv = (TextView)itsView.findViewById(id);
+            tv.setText(Integer.toString(value));
         }
     }
 }
