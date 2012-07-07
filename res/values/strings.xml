@@ -8,6 +8,7 @@
     <string name="alias_base_record_label">Alias</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">PasswdSafe</string>
+    <string name="at_least">At least</string>
     <string name="cancel">Cancel</string>
     <string name="change_password">Change Password</string>
     <string name="check_box_to_confirm">Check box to confirm</string>
@@ -27,7 +28,9 @@
     <string name="copy_password">Copy Password</string>
     <string name="copy_trace_and_close">Copy Trace and Close</string>
     <string name="copy_user">Copy User Name</string>
+    <string name="custom_symbols">Custom Symbols</string>
     <string name="database_version_label">Database version:</string>
+    <string name="default_symbols">Default Symbols</string>
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
     <string name="delete_file_msg">Delete file \"%1$s\"?</string>
@@ -74,11 +77,14 @@
     <string name="last_save_app_label">Last saved app:</string>
     <string name="last_save_by_label">Last saved by:</string>
     <string name="last_save_time_label">Last save time:</string>
+    <string name="length">Length</string>
     <string name="max_size_label">Maximum size:</string>
     <string name="n_a">N/A</string>
+    <string name="name">Name</string>
     <string name="new_file">New File</string>
     <string name="new_file_not_supp_uri">New file not supported for URI %1$s</string>
     <string name="new_password_label">New Password:</string>
+    <string name="new_policy">New Policy</string>
     <string name="no_alias_chosen">No alias chosen</string>
     <string name="no_shortcut_chosen">No shortcut chosen</string>
     <string name="no_files">No Files</string>
@@ -153,5 +159,13 @@
         <item>Normal</item>
         <item>Alias</item>
         <item>Shortcut</item>
+    </string-array>
+    
+    <!-- Order must match constants in PolicyPolicyActivity -->
+    <string-array name="policy_type">
+        <item>Normal</item>
+        <item>Easy-to-read</item>
+        <item>Pronounceable</item>
+        <item>Hexadecimal</item>
     </string-array>
 </resources>

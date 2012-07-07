@@ -14,15 +14,22 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 /**
@@ -36,10 +43,19 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private static final int MENU_EDIT =        1;
     private static final int MENU_DELETE =      2;
 
-    private static final int DIALOG_DELETE =    MAX_DIALOG + 1;
+    private static final int DIALOG_ADD =       MAX_DIALOG + 1;
+    private static final int DIALOG_EDIT =      MAX_DIALOG + 2;
+    private static final int DIALOG_DELETE =    MAX_DIALOG + 3;
+
+    // Constants must match policy_type strings
+    private static final int TYPE_NORMAL =              0;
+    private static final int TYPE_EASY_TO_READ =        1;
+    private static final int TYPE_PRONOUNCEABLE =       2;
+    private static final int TYPE_HEXADECIMAL =         3;
 
     private List<PasswdPolicy> itsPolicies;
     private DialogValidator itsDeleteValidator;
+    private EditDialog itsEditDialog;
 
     // TODO: app default policy
 
@@ -57,6 +73,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         }
 
         setTitle(PasswdSafeApp.getAppFileTitle(getUri(), this));
+        // Programmatic setting for Android 1.5
+        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         showPolicies();
     }
 
@@ -112,6 +130,16 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     {
         boolean rc = true;
         switch (item.getItemId()) {
+        case MENU_ADD: {
+            removeDialog(DIALOG_ADD);
+            showDialog(DIALOG_ADD);
+            break;
+        }
+        case MENU_EDIT: {
+            removeDialog(DIALOG_EDIT);
+            showDialog(DIALOG_EDIT);
+            break;
+        }
         case MENU_DELETE: {
             removeDialog(DIALOG_DELETE);
             showDialog(DIALOG_DELETE);
@@ -127,13 +155,23 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 
 
     /* (non-Javadoc)
-     * @see android.app.Activity#onCreateDialog(int, android.os.Bundle)
+     * @see android.app.Activity#onCreateDialog(int)
      */
     @Override
-    protected Dialog onCreateDialog(int id, Bundle args)
+    protected Dialog onCreateDialog(int id)
     {
         Dialog dialog = null;
         switch (id) {
+        case DIALOG_ADD: {
+            itsEditDialog = new EditDialog();
+            dialog = itsEditDialog.create(null);
+            break;
+        }
+        case DIALOG_EDIT: {
+            itsEditDialog = new EditDialog();
+            dialog = itsEditDialog.create(getSelectedPolicy());
+            break;
+        }
         case DIALOG_DELETE: {
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
@@ -157,7 +195,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 
         }
         default: {
-            dialog = super.onCreateDialog(id, args);
+            dialog = super.onCreateDialog(id);
             break;
         }
         }
@@ -172,6 +210,11 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     protected void onPrepareDialog(int id, Dialog dialog)
     {
         switch (id) {
+        case DIALOG_ADD:
+        case DIALOG_EDIT: {
+            itsEditDialog.reset();
+            break;
+        }
         case DIALOG_DELETE: {
             itsDeleteValidator.reset();
             break;
@@ -346,5 +389,160 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             }
         }
         return str;
+    }
+
+
+    /**
+     * The EditDialog class encapsulates the functionality for the dialog to
+     * add or edit a policy.
+     */
+    private class EditDialog
+    {
+        private View itsView;
+        private DialogValidator itsValidator;
+        private int itsOrigType = TYPE_NORMAL;
+        private int itsType = TYPE_NORMAL;
+
+        /** Create a dialog to edit the give policy (null for an add) */
+        public Dialog create(PasswdPolicy policy)
+        {
+            Activity act = PasswdPolicyActivity.this;
+            LayoutInflater factory = LayoutInflater.from(act);
+            itsView = factory.inflate(R.layout.passwd_policy_edit, null);
+
+            int titleId;
+            String name;
+            int len;
+            if (policy != null) {
+                titleId = R.string.edit_policy;
+                name = policy.getName();
+                len = policy.getLength();
+                int flags = policy.getFlags();
+                if ((flags & PasswdPolicy.FLAG_USE_EASY_VISION) != 0) {
+                    itsOrigType = TYPE_EASY_TO_READ;
+                } else if ((flags & PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE) != 0) {
+                    itsOrigType = TYPE_PRONOUNCEABLE;
+                } else if ((flags & PasswdPolicy.FLAG_USE_HEX_DIGITS) != 0) {
+                    itsOrigType = TYPE_HEXADECIMAL;
+                } else {
+                    itsOrigType = TYPE_NORMAL;
+                }
+            } else {
+                titleId = R.string.new_policy;
+                name = "";
+                len = 12;
+                itsOrigType = TYPE_NORMAL;
+            }
+
+            TextView tv;
+            tv = (TextView)itsView.findViewById(R.id.name);
+            tv.setText(name);
+            tv = (TextView)itsView.findViewById(R.id.length);
+            tv.setText(Integer.toString(len));
+            Spinner typeSpin = (Spinner)itsView.findViewById(R.id.type);
+            typeSpin.setOnItemSelectedListener(new OnItemSelectedListener()
+            {
+                public void onItemSelected(AdapterView<?> parent, View arg1,
+                                           int position, long id)
+                {
+                    setType(position, false);
+                }
+
+                public void onNothingSelected(AdapterView<?> arg0)
+                {
+                    setType(TYPE_NORMAL, false);
+                }
+            });
+
+            AbstractDialogClickListener dlgClick =
+                new AbstractDialogClickListener()
+                {
+                    @Override
+                    public void onOkClicked(DialogInterface dialog)
+                    {
+                    }
+                };
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(act)
+                .setTitle(titleId)
+                .setView(itsView)
+                .setPositiveButton(R.string.ok, dlgClick)
+                .setNegativeButton(R.string.cancel, dlgClick)
+                .setOnCancelListener(dlgClick);
+            AlertDialog dialog = alert.create();
+
+            itsValidator = new DialogValidator.AlertValidator(dialog, itsView,
+                                                              act, false)
+            {
+                // TODO: all sorts of validations
+            };
+
+            setType(itsOrigType, true);
+            return dialog;
+        }
+
+
+        /** Reset the dialog validation */
+        public void reset()
+        {
+            itsValidator.reset();
+        }
+
+
+        /** Set the type of policy and update the UI */
+        private final void setType(int type, boolean init)
+        {
+            if ((type == itsType) && !init) {
+                return;
+            }
+
+            itsType = type;
+            if (init) {
+                Spinner typeSpin = (Spinner)itsView.findViewById(R.id.type);
+                typeSpin.setSelection(itsType);
+            }
+
+            boolean optionsVisible = false;
+            boolean optionsLenVisible = false;
+            switch (itsType) {
+            case TYPE_NORMAL: {
+                optionsVisible = true;
+                optionsLenVisible = true;
+                break;
+            }
+            case TYPE_EASY_TO_READ:
+            case TYPE_PRONOUNCEABLE: {
+                optionsVisible = true;
+                optionsLenVisible = false;
+                break;
+            }
+            case TYPE_HEXADECIMAL: {
+                optionsVisible = false;
+                optionsLenVisible = false;
+                break;
+            }
+            }
+
+            setVisible(R.id.lowercase_row, optionsVisible);
+            setVisible(R.id.uppercase_row, optionsVisible);
+            setVisible(R.id.digits_row, optionsVisible);
+            setVisible(R.id.symbols_row, optionsVisible);
+            TableLayout table = (TableLayout)itsView.findViewById(R.id.options);
+            table.setColumnCollapsed(1, !optionsLenVisible);
+            table.setColumnCollapsed(2, !optionsLenVisible);
+            // TODO: custom symbol visibility updates
+
+            if (!init) {
+                itsValidator.validate();
+            }
+        }
+
+
+        /** Set the visibility of a view */
+        private final void setVisible(int id, boolean visible)
+        {
+            View v = itsView.findViewById(id);
+            v.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
     }
 }
