@@ -8,7 +8,9 @@
 package com.jefftharris.passwdsafe;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -56,6 +58,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private static final int TYPE_HEXADECIMAL =         3;
 
     private List<PasswdPolicy> itsPolicies;
+    private Set<String> itsPolicyNames;
     private DialogValidator itsDeleteValidator;
     private EditDialog itsEditDialog;
 
@@ -256,6 +259,10 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         } else {
             itsPolicies = Collections.emptyList();
         }
+        itsPolicyNames = new HashSet<String>(itsPolicies.size());
+        for (PasswdPolicy policy: itsPolicies) {
+            itsPolicyNames.add(policy.getName());
+        }
 
         setListAdapter(new ArrayAdapter<PasswdPolicy>(
             this, android.R.layout.simple_list_item_single_choice,
@@ -400,29 +407,41 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
      */
     private class EditDialog
     {
+        private PasswdPolicy itsPolicy;
         private View itsView;
         private DialogValidator itsValidator;
         private int itsOrigType = TYPE_NORMAL;
         private int itsType = TYPE_NORMAL;
+        private TextView itsNameEdit;
+        private TextView itsLengthEdit;
+        // Lower, upper, digits, symbols
+        private CheckBox[] itsOptions = new CheckBox[4];
+        private TextView[] itsOptionLens = new TextView[4];
 
         /** Create a dialog to edit the give policy (null for an add) */
         public Dialog create(PasswdPolicy policy)
         {
+            itsPolicy = policy;
             Activity act = PasswdPolicyActivity.this;
             LayoutInflater factory = LayoutInflater.from(act);
             itsView = factory.inflate(R.layout.passwd_policy_edit, null);
 
+            itsNameEdit = (TextView)itsView.findViewById(R.id.name);
+            itsLengthEdit = (TextView)itsView.findViewById(R.id.length);
+            itsOptions[0] = (CheckBox)itsView.findViewById(R.id.lowercase);
+            itsOptions[1] = (CheckBox)itsView.findViewById(R.id.uppercase);
+            itsOptions[2] = (CheckBox)itsView.findViewById(R.id.digits);
+            itsOptions[3] = (CheckBox)itsView.findViewById(R.id.symbols);
+            itsOptionLens[0] = (TextView)itsView.findViewById(R.id.lowercase_len);
+            itsOptionLens[1] = (TextView)itsView.findViewById(R.id.uppercase_len);
+            itsOptionLens[2] = (TextView)itsView.findViewById(R.id.digits_len);
+            itsOptionLens[3] = (TextView)itsView.findViewById(R.id.symbols_len);
+
             int titleId;
             String name;
             int len;
-            boolean useLowercase;
-            boolean useUppercase;
-            boolean useDigits;
-            boolean useSymbols;
-            int lowerLen;
-            int upperLen;
-            int digitsLen;
-            int symbolsLen;
+            boolean[] useOptions = new boolean[4];
+            int[] optionLens = new int[4];
             String customSymbols;
             if (policy != null) {
                 titleId = R.string.edit_policy;
@@ -438,22 +457,24 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 } else {
                     itsOrigType = TYPE_NORMAL;
                 }
-                useLowercase = ((flags & PasswdPolicy.FLAG_USE_LOWERCASE) != 0);
-                useUppercase = ((flags & PasswdPolicy.FLAG_USE_UPPERCASE) != 0);
-                useDigits = ((flags & PasswdPolicy.FLAG_USE_DIGITS) != 0);
-                useSymbols = ((flags & PasswdPolicy.FLAG_USE_SYMBOLS) != 0);
-                lowerLen = policy.getMinLowercase();
-                upperLen = policy.getMinUppercase();
-                digitsLen = policy.getMinDigits();
-                symbolsLen = policy.getMinSymbols();
+                useOptions[0] = ((flags & PasswdPolicy.FLAG_USE_LOWERCASE) != 0);
+                useOptions[1] = ((flags & PasswdPolicy.FLAG_USE_UPPERCASE) != 0);
+                useOptions[2] = ((flags & PasswdPolicy.FLAG_USE_DIGITS) != 0);
+                useOptions[3] = ((flags & PasswdPolicy.FLAG_USE_SYMBOLS) != 0);
+                optionLens[0] = policy.getMinLowercase();
+                optionLens[1] = policy.getMinUppercase();
+                optionLens[2] = policy.getMinDigits();
+                optionLens[3] = policy.getMinSymbols();
                 customSymbols = policy.getSpecialSymbols();
             } else {
                 titleId = R.string.new_policy;
                 name = "";
                 len = 12;
                 itsOrigType = TYPE_NORMAL;
-                useLowercase = useUppercase = useDigits = useSymbols = true;
-                lowerLen = upperLen = digitsLen = symbolsLen = 1;
+                for (int i = 0; i < useOptions.length; ++i) {
+                    useOptions[i] = true;
+                    optionLens[i] = 1;
+                }
                 customSymbols = null;
             }
 
@@ -477,20 +498,92 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             itsValidator = new DialogValidator.AlertValidator(dialog, itsView,
                                                               act, false)
             {
-                // TODO: all sorts of validations
+                @Override
+                protected String doValidation()
+                {
+                    String name = itsNameEdit.getText().toString();
+                    if (TextUtils.isEmpty(name)) {
+                        return getString(R.string.empty_name);
+                    }
+
+                    if (((itsPolicy == null) ||
+                         (!itsPolicy.getName().equals(name))) &&
+                        itsPolicyNames.contains(name)) {
+                        return getString(R.string.duplicate_name);
+                    }
+
+                    String lenStr = itsLengthEdit.getText().toString();
+                    int length;
+                    try {
+                        length = Integer.valueOf(lenStr, 10);
+                        if (length < 4) {
+                            return getString(R.string.length_min_val, 4);
+                        } else if (length > 1024) {
+                            return getString(R.string.length_max_val, 1024);
+                        } else if ((itsType == TYPE_HEXADECIMAL) &&
+                                   ((length % 2) != 0) ) {
+                            return getString(R.string.length_even_hex);
+                        }
+
+                    } catch (NumberFormatException e) {
+                        return getString(R.string.invalid_length);
+                    }
+
+                    if (itsType != TYPE_HEXADECIMAL) {
+                        boolean oneSelected = false;
+                        for (CheckBox option: itsOptions) {
+                            if (option.isChecked()) {
+                                oneSelected = true;
+                                break;
+                            }
+                        }
+                        if (!oneSelected) {
+                            return getString(R.string.option_not_selected);
+                        }
+                    }
+
+                    if (itsType == TYPE_NORMAL) {
+                        int minOptionsLen = 0;
+                        for (int i = 0; i < itsOptions.length; ++i) {
+                            if (itsOptions[i].isChecked()) {
+                                try {
+                                    int len = Integer.valueOf(
+                                        itsOptionLens[i].getText().toString(),
+                                        10);
+                                    minOptionsLen += len;
+                                } catch (NumberFormatException e) {
+                                    return getString(
+                                        R.string.invalid_option_length);
+                                }
+                            }
+                        }
+                        if (minOptionsLen > length) {
+                            return getString(R.string.password_len_short_opt);
+                        }
+                    }
+
+                    // TODO validate custom symbol chars
+                    return super.doValidation();
+                }
+
             };
 
-            setTextView(R.id.name, name);
-            setTextView(R.id.length, len);
+            // Must set text before registering view so validation isn't
+            // triggered right away
+
+            // TODO: show/hide symbol options based on radio buttons
+
+            itsNameEdit.setText(name);
+            itsValidator.registerTextView(itsNameEdit);
+            setTextView(itsLengthEdit, len);
+            itsValidator.registerTextView(itsLengthEdit);
+
             setType(itsOrigType, true);
-            setOption(R.id.lowercase, useLowercase, true);
-            setOption(R.id.uppercase, useUppercase, true);
-            setOption(R.id.digits, useDigits, true);
-            setOption(R.id.symbols, useSymbols, true);
-            setTextView(R.id.lowercase_len, lowerLen);
-            setTextView(R.id.uppercase_len, upperLen);
-            setTextView(R.id.digits_len, digitsLen);
-            setTextView(R.id.symbols_len, symbolsLen);
+            for (int i = 0; i < itsOptions.length; ++i) {
+                setOption(itsOptions[i], useOptions[i], true);
+                setTextView(itsOptionLens[i], optionLens[i]);
+                itsValidator.registerTextView(itsOptionLens[i]);
+            }
             setTextView(R.id.symbols_custom, customSymbols);
 
             return dialog;
@@ -558,13 +651,11 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             setVisible(R.id.uppercase_row, optionsVisible);
             setVisible(R.id.digits_row, optionsVisible);
             setVisible(R.id.symbols_row, optionsVisible);
-            setOptionLenVisible(R.id.lowercase);
-            setOptionLenVisible(R.id.uppercase);
-            setOptionLenVisible(R.id.digits);
-            setOptionLenVisible(R.id.symbols);
+            for (CheckBox option: itsOptions) {
+                setOptionLenVisible(option);
+            }
             setCustomSymbolsVisible();
             setTextView(R.id.symbols_default, defaultSymbols);
-            // TODO: custom symbol visibility updates
 
             if (!init) {
                 itsValidator.validate();
@@ -573,23 +664,22 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 
 
         /** Set whether an option is used */
-        private final void setOption(int optionId, boolean use, boolean init)
+        private final void setOption(CheckBox option, boolean use, boolean init)
         {
             if (init) {
-                CheckBox cb = (CheckBox)itsView.findViewById(optionId);
-                cb.setChecked(use);
-                cb.setOnCheckedChangeListener(new OnCheckedChangeListener()
+                option.setChecked(use);
+                option.setOnCheckedChangeListener(new OnCheckedChangeListener()
                 {
                     public void onCheckedChanged(CompoundButton buttonView,
                                                  boolean isChecked)
                     {
-                        setOption(buttonView.getId(), isChecked, false);
+                        setOption((CheckBox)buttonView, isChecked, false);
                     }
                 });
             }
 
-            setOptionLenVisible(optionId);
-            if (optionId == R.id.symbols) {
+            setOptionLenVisible(option);
+            if (option.getId() == R.id.symbols) {
                 setCustomSymbolsVisible();
             }
 
@@ -599,6 +689,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         }
 
 
+        /** Set the visibility of the custom symbols options */
         private final void setCustomSymbolsVisible()
         {
             CheckBox cb = (CheckBox)itsView.findViewById(R.id.symbols);
@@ -606,20 +697,20 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             setVisible(R.id.custom_symbols_set, visible);
         }
 
+
         /** Set the visibility on an option's length field */
-        private final void setOptionLenVisible(int optionId)
+        private final void setOptionLenVisible(CheckBox option)
         {
             boolean visible;
             if (itsType == TYPE_NORMAL) {
-                CheckBox cb = (CheckBox)itsView.findViewById(optionId);
-                visible = cb.isChecked();
+                visible = option.isChecked();
             } else {
                 visible = false;
             }
 
             int labelId = 0;
             int lengthId = 0;
-            switch (optionId) {
+            switch (option.getId()) {
             case R.id.lowercase: {
                 labelId = R.id.lowercase_label;
                 lengthId = R.id.lowercase_len;
@@ -658,9 +749,9 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 
 
         /** Set a text view to an integer value */
-        private final void setTextView(int id, int value)
+        private final void setTextView(TextView tv, int value)
         {
-            setTextView(id, Integer.toString(value));
+            tv.setText(Integer.toString(value));
         }
 
 

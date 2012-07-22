@@ -27,7 +27,7 @@
 
                     <EditText
                         android:id="@+id/name"
-                        android:inputType="textCapWords"/>
+                        android:inputType="textCapSentences"/>
                 </TableRow>
                 
                 <TableRow>
