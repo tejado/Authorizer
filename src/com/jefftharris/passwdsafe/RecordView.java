@@ -725,7 +725,7 @@ public class RecordView extends AbstractRecordTabActivity
             View header = getLayoutInflater().inflate(R.layout.listview_header,
                                                       null);
             TextView tv = (TextView)header.findViewById(R.id.text);
-            tv.setText(R.string.references);
+            tv.setText(R.string.references_label);
             referencesView.addHeaderView(header);
         }
 
