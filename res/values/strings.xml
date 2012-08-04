@@ -30,7 +30,6 @@
     <string name="copy_user">Copy User Name</string>
     <string name="custom_symbols">Custom Symbols</string>
     <string name="database_version_label">Database version:</string>
-    <string name="default_symbols">Default Symbols</string>
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
     <string name="delete_file_msg">Delete file \"%1$s\"?</string>

@@ -562,7 +562,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                         }
                     }
 
-                    // TODO validate custom symbol chars
+                    // TODO validate custom symbol chars - non-empty and
+                    // no alphanumerics
                     return super.doValidation();
                 }
 
@@ -570,8 +571,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 
             // Must set text before registering view so validation isn't
             // triggered right away
-
-            // TODO: show/hide symbol options based on radio buttons
 
             itsNameEdit.setText(name);
             itsValidator.registerTextView(itsNameEdit);
@@ -584,6 +583,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 setTextView(itsOptionLens[i], optionLens[i]);
                 itsValidator.registerTextView(itsOptionLens[i]);
             }
+
+            setCustomSymbolsOption(customSymbols != null, true);
             setTextView(R.id.symbols_custom, customSymbols);
 
             return dialog;
@@ -681,6 +682,41 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             setOptionLenVisible(option);
             if (option.getId() == R.id.symbols) {
                 setCustomSymbolsVisible();
+            }
+
+            if (!init) {
+                itsValidator.validate();
+            }
+        }
+
+
+        /** Set the custom symbols option */
+        private final void setCustomSymbolsOption(boolean useCustom,
+                                                  boolean init)
+        {
+            CheckBox cb =
+                (CheckBox)itsView.findViewById(R.id.use_custom_symbols);
+            if (init) {
+                cb.setChecked(useCustom);
+                cb.setOnCheckedChangeListener(new OnCheckedChangeListener()
+                {
+                    public void onCheckedChanged(CompoundButton buttonView,
+                                                 boolean isChecked)
+                    {
+                        setCustomSymbolsOption(isChecked, false);
+                    }
+                });
+            }
+
+            View defView = itsView.findViewById(R.id.symbols_default);
+            View customView = itsView.findViewById(R.id.symbols_custom);
+            if (useCustom) {
+                defView.setVisibility(View.GONE);
+                customView.setVisibility(View.VISIBLE);
+                customView.requestFocus();
+            } else {
+                defView.setVisibility(View.VISIBLE);
+                customView.setVisibility(View.GONE);
             }
 
             if (!init) {

@@ -129,30 +129,25 @@
                 android:layout_marginLeft="32dip"
                 android:orientation="vertical">
 
-                <RadioGroup
-                    android:id="@+id/symbol_set_group"
+                <CheckBox
+                    android:id="@+id/use_custom_symbols"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <RadioButton
-                        android:id="@+id/symbol_set_default"
-                        android:text="@string/default_symbols"/>
-
-                    <RadioButton
-                        android:id="@+id/symbol_set_custom"
-                        android:text="@string/custom_symbols"/>
-                </RadioGroup>
+                    android:layout_height="wrap_content"
+                    android:text="@string/custom_symbols"/>
 
                 <TextView
                     android:id="@+id/symbols_default"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="32dip"/>
 
                 <EditText
                     android:id="@+id/symbols_custom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="32dip"
                     android:inputType="text"/>
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
