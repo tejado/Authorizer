@@ -222,10 +222,12 @@ public class PasswdPolicy
             int numSpecials = getPolicyStrInt(policyStr, i, fieldStart, 2,
                                               "special symbols length");
             fieldStart += 2;
-            String specialSyms = getPolicyStrField(policyStr, i, fieldStart,
-                                                   numSpecials,
-                                                   "special symbols");
-            fieldStart += numSpecials;
+            String specialSyms = null;
+            if (numSpecials > 0) {
+                specialSyms = getPolicyStrField(policyStr, i, fieldStart,
+                                                numSpecials, "special symbols");
+                fieldStart += numSpecials;
+            }
             policy.setSpecialSymbols(specialSyms);
         }
 

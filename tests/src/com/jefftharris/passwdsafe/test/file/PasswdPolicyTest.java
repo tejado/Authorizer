@@ -122,7 +122,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(1, policy.getMinUppercase());
         assertEquals(1, policy.getMinDigits());
         assertEquals(1, policy.getMinSymbols());
-        assertEquals("", policy.getSpecialSymbols());
+        assertNull(policy.getSpecialSymbols());
 
         policy = policies.get(1);
         assertEquals("hex only", policy.getName());
@@ -133,7 +133,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(1, policy.getMinUppercase());
         assertEquals(1, policy.getMinDigits());
         assertEquals(1, policy.getMinSymbols());
-        assertEquals("", policy.getSpecialSymbols());
+        assertNull(policy.getSpecialSymbols());
 
         policy = policies.get(2);
         assertEquals("policy 1", policy.getName());
@@ -147,7 +147,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(3, policy.getMinUppercase());
         assertEquals(4, policy.getMinDigits());
         assertEquals(5, policy.getMinSymbols());
-        assertEquals("", policy.getSpecialSymbols());
+        assertNull(policy.getSpecialSymbols());
 
         policy = policies.get(3);
         assertEquals("pronounce", policy.getName());
@@ -161,7 +161,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(1, policy.getMinUppercase());
         assertEquals(1, policy.getMinDigits());
         assertEquals(1, policy.getMinSymbols());
-        assertEquals("", policy.getSpecialSymbols());
+        assertNull(policy.getSpecialSymbols());
 
         policy = policies.get(4);
         assertEquals("special chars", policy.getName());
