@@ -417,6 +417,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         // Lower, upper, digits, symbols
         private CheckBox[] itsOptions = new CheckBox[4];
         private TextView[] itsOptionLens = new TextView[4];
+        private CheckBox itsUseCustomSymbols;
+        private TextView itsCustomSymbolsEdit;
 
         /** Create a dialog to edit the give policy (null for an add) */
         public Dialog create(PasswdPolicy policy)
@@ -436,6 +438,10 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             itsOptionLens[1] = (TextView)itsView.findViewById(R.id.uppercase_len);
             itsOptionLens[2] = (TextView)itsView.findViewById(R.id.digits_len);
             itsOptionLens[3] = (TextView)itsView.findViewById(R.id.symbols_len);
+            itsUseCustomSymbols =
+                (CheckBox)itsView.findViewById(R.id.use_custom_symbols);
+            itsCustomSymbolsEdit =
+                (TextView)itsView.findViewById(R.id.symbols_custom);
 
             int titleId;
             String name;
@@ -562,8 +568,21 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                         }
                     }
 
-                    // TODO validate custom symbol chars - non-empty and
-                    // no alphanumerics
+                    if (itsUseCustomSymbols.isChecked()) {
+                        String syms = itsCustomSymbolsEdit.getText().toString();
+                        if (TextUtils.isEmpty(syms)) {
+                            return getString(R.string.empty_custom_symbols);
+                        }
+                        for (int i = 0; i < syms.length(); ++i) {
+                            char c = syms.charAt(i);
+                            if (Character.isLetterOrDigit(c) ||
+                                Character.isSpaceChar(c)) {
+                                return getString(
+                                    R.string.custom_symbol_not_alphanum);
+                            }
+                        }
+                    }
+
                     return super.doValidation();
                 }
 
@@ -585,7 +604,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             }
 
             setCustomSymbolsOption(customSymbols != null, true);
-            setTextView(R.id.symbols_custom, customSymbols);
+            itsCustomSymbolsEdit.setText(customSymbols);
+            itsValidator.registerTextView(itsCustomSymbolsEdit);
 
             return dialog;
         }
@@ -694,29 +714,27 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         private final void setCustomSymbolsOption(boolean useCustom,
                                                   boolean init)
         {
-            CheckBox cb =
-                (CheckBox)itsView.findViewById(R.id.use_custom_symbols);
             if (init) {
-                cb.setChecked(useCustom);
-                cb.setOnCheckedChangeListener(new OnCheckedChangeListener()
-                {
-                    public void onCheckedChanged(CompoundButton buttonView,
-                                                 boolean isChecked)
+                itsUseCustomSymbols.setChecked(useCustom);
+                itsUseCustomSymbols.setOnCheckedChangeListener(
+                    new OnCheckedChangeListener()
                     {
-                        setCustomSymbolsOption(isChecked, false);
-                    }
-                });
+                        public void onCheckedChanged(CompoundButton buttonView,
+                                                     boolean isChecked)
+                        {
+                            setCustomSymbolsOption(isChecked, false);
+                        }
+                    });
             }
 
             View defView = itsView.findViewById(R.id.symbols_default);
-            View customView = itsView.findViewById(R.id.symbols_custom);
             if (useCustom) {
                 defView.setVisibility(View.GONE);
-                customView.setVisibility(View.VISIBLE);
-                customView.requestFocus();
+                itsCustomSymbolsEdit.setVisibility(View.VISIBLE);
+                itsCustomSymbolsEdit.requestFocus();
             } else {
                 defView.setVisibility(View.VISIBLE);
-                customView.setVisibility(View.GONE);
+                itsCustomSymbolsEdit.setVisibility(View.GONE);
             }
 
             if (!init) {

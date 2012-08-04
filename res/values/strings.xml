@@ -29,6 +29,7 @@
     <string name="copy_trace_and_close">Copy Trace and Close</string>
     <string name="copy_user">Copy User Name</string>
     <string name="custom_symbols">Custom Symbols</string>
+    <string name="custom_symbol_not_alphanum">Custom symbols must not be alphanumeric or whitespace</string>
     <string name="database_version_label">Database version:</string>
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
@@ -47,6 +48,7 @@
     <string name="edit_policy">Edit Policy</string>
     <string name="email">Email</string>
     <string name="email_attachment">Email Attachment</string>
+    <string name="empty_custom_symbols">Empty custom symbols</string>
     <string name="empty_file_name">Empty file name</string>
     <string name="empty_name">Empty name</string>
     <string name="empty_password">Empty password</string>
