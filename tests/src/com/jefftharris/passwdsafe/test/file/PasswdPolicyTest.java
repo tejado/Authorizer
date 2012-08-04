@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe.test.file;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -76,6 +77,29 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals("!@#", policy.getSpecialSymbols());
 
         assertEquals(policiesStr, PasswdPolicy.hdrPoliciesToString(policies));
+    }
+
+    /** Test a default header policy */
+    public void testHdrDefault()
+    {
+        PasswdPolicy policy = new PasswdPolicy("policy1",
+                                               PasswdPolicy.Type.HEADER_POLICY);
+        assertEquals("policy1", policy.getName());
+        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
+                     PasswdPolicy.FLAG_USE_UPPERCASE |
+                     PasswdPolicy.FLAG_USE_DIGITS |
+                     PasswdPolicy.FLAG_USE_SYMBOLS, policy.getFlags());
+        assertEquals(12, policy.getLength());
+        assertEquals(1, policy.getMinDigits());
+        assertEquals(1, policy.getMinLowercase());
+        assertEquals(1, policy.getMinSymbols());
+        assertEquals(1, policy.getMinUppercase());
+        assertNull(policy.getSpecialSymbols());
+
+        assertEquals("0107policy1f00000c00100100100100",
+                     PasswdPolicy.hdrPoliciesToString(
+                         Collections.singletonList(policy)));
     }
 
     /** Test multiple valid header policies */

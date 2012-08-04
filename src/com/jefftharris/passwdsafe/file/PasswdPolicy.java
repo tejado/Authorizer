@@ -250,9 +250,13 @@ public class PasswdPolicy
             str.append(String.format("%02x", policy.getName().length()));
             str.append(policy.getName());
             str.append(policyFlagsAndLengthsToString(policy));
-            str.append(String.format("%02x",
-                                     policy.getSpecialSymbols().length()));
-            str.append(policy.getSpecialSymbols());
+            String specialSyms = policy.getSpecialSymbols();
+            if (specialSyms == null) {
+                str.append("00");
+            } else {
+                str.append(String.format("%02x", specialSyms.length()));
+                str.append(specialSyms);
+            }
         }
         return str.toString();
     }
