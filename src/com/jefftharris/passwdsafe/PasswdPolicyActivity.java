@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -122,6 +123,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        // TODO: readonly mode
         int selectedPos = getListView().getCheckedItemPosition();
         PasswdSafeApp.dbginfo(TAG, "onPrepareOptionsMenu pos " + selectedPos);
         boolean editDelete = (getSelectedPolicy() != null);
@@ -277,12 +279,15 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         GuiUtils.invalidateOptionsMenu(this);
 
         PasswdFileData fileData = getPasswdFileData();
+        itsPolicies = null;
         if (fileData != null) {
             itsPolicies = fileData.getHdrPasswdPolicies();
-            sortPolicies();
-        } else {
-            itsPolicies = Collections.emptyList();
         }
+        if (itsPolicies == null) {
+            itsPolicies = new ArrayList<PasswdPolicy>();
+        }
+        sortPolicies();
+
         itsPolicyNames = new HashSet<String>(itsPolicies.size());
         for (PasswdPolicy policy: itsPolicies) {
             itsPolicyNames.add(policy.getName());
