@@ -482,8 +482,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             itsCustomSymbolsEdit =
                 (TextView)itsView.findViewById(R.id.symbols_custom);
 
-            // TODO: easy to read always uses default symbols
-
             int titleId;
             String name;
             int len;
@@ -689,10 +687,16 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 if (itsOptions[3].isChecked()) {
                     flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
                 }
+            }
 
+            switch (itsType) {
+            case TYPE_NORMAL:
+            case TYPE_PRONOUNCEABLE: {
                 if (itsUseCustomSymbols.isChecked()) {
                     customSymbols = itsCustomSymbolsEdit.getText().toString();
                 }
+                break;
+            }
             }
 
             switch (itsType) {
@@ -864,8 +868,15 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         /** Set the visibility of the custom symbols options */
         private final void setCustomSymbolsVisible()
         {
-            CheckBox cb = (CheckBox)itsView.findViewById(R.id.symbols);
-            boolean visible = (itsType != TYPE_HEXADECIMAL) && cb.isChecked();
+            boolean visible = false;
+            switch (itsType) {
+            case TYPE_NORMAL:
+            case TYPE_PRONOUNCEABLE: {
+                CheckBox cb = (CheckBox)itsView.findViewById(R.id.symbols);
+                visible = cb.isChecked();
+                break;
+            }
+            }
             setVisible(R.id.custom_symbols_set, visible);
         }
 
