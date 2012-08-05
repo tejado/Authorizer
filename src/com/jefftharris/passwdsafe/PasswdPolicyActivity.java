@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -256,6 +257,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         PasswdFileData fileData = getPasswdFileData();
         if (fileData != null) {
             itsPolicies = fileData.getHdrPasswdPolicies();
+            sortPolicies();
         } else {
             itsPolicies = Collections.emptyList();
         }
@@ -268,6 +270,21 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             this, android.R.layout.simple_list_item_single_choice,
             itsPolicies));
         showPolicy(null);
+    }
+
+
+    /** Sort the policies */
+    private final void sortPolicies()
+    {
+        Collections.sort(itsPolicies,
+                         new Comparator<PasswdPolicy>()
+                         {
+                            public int compare(PasswdPolicy lhs,
+                                               PasswdPolicy rhs)
+                            {
+                                return lhs.getName().compareTo(rhs.getName());
+                            }
+                         });
     }
 
 
@@ -312,10 +329,33 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     }
 
 
+    /** Add or update a policy */
+    private final void addUpdatePolicy(PasswdPolicy oldPolicy,
+                                       PasswdPolicy newPolicy)
+    {
+        if (oldPolicy != null) {
+            itsPolicies.remove(oldPolicy);
+        }
+        itsPolicies.add(newPolicy);
+        sortPolicies();
+        // TODO: select new policy
+        savePolicies();
+    }
+
+
     /** Delete the currently selected policy */
     private final void deletePolicy()
     {
         itsPolicies.remove(getSelectedPolicy());
+        savePolicies();
+    }
+
+
+    /** Save the policies */
+    private final void savePolicies()
+    {
+        // TODO: return modified flag for activity
+        // TODO: show save dialog??
         PasswdFileData fileData = getPasswdFileData();
         if (fileData != null) {
             fileData.setHdrPasswdPolicies(
@@ -324,7 +364,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         }
         showPolicies();
     }
-
 
     /** Get the currently selected policy */
     private final PasswdPolicy getSelectedPolicy()
@@ -443,6 +482,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             itsCustomSymbolsEdit =
                 (TextView)itsView.findViewById(R.id.symbols_custom);
 
+            // TODO: easy to read always uses default symbols
+
             int titleId;
             String name;
             int len;
@@ -490,6 +531,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                     @Override
                     public void onOkClicked(DialogInterface dialog)
                     {
+                        addUpdatePolicy(itsPolicy, createPolicy());
                     }
                 };
 
@@ -518,10 +560,9 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                         return getString(R.string.duplicate_name);
                     }
 
-                    String lenStr = itsLengthEdit.getText().toString();
                     int length;
                     try {
-                        length = Integer.valueOf(lenStr, 10);
+                        length = getTextViewInt(itsLengthEdit);
                         if (length < 4) {
                             return getString(R.string.length_min_val, 4);
                         } else if (length > 1024) {
@@ -553,9 +594,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                         for (int i = 0; i < itsOptions.length; ++i) {
                             if (itsOptions[i].isChecked()) {
                                 try {
-                                    int len = Integer.valueOf(
-                                        itsOptionLens[i].getText().toString(),
-                                        10);
+                                    int len = getTextViewInt(itsOptionLens[i]);
                                     minOptionsLen += len;
                                 } catch (NumberFormatException e) {
                                     return getString(
@@ -615,6 +654,85 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         public void reset()
         {
             itsValidator.reset();
+        }
+
+
+        /**
+         * Create a policy from the dialog fields. It is assumed that the fields
+         * are valid
+         */
+        private PasswdPolicy createPolicy()
+        {
+            PasswdPolicy policy =
+                new PasswdPolicy(itsNameEdit.getText().toString(),
+                                 PasswdPolicy.Type.HEADER_POLICY);
+            int length = getTextViewInt(itsLengthEdit);
+            policy.setLength(length);
+
+            int flags = 0;
+            int minLower = 1;
+            int minUpper = 1;
+            int minDigits = 1;
+            int minSymbols = 1;
+            String customSymbols = null;
+
+            if (itsType != TYPE_HEXADECIMAL) {
+                if (itsOptions[0].isChecked()) {
+                    flags |= PasswdPolicy.FLAG_USE_LOWERCASE;
+                }
+                if (itsOptions[1].isChecked()) {
+                    flags |= PasswdPolicy.FLAG_USE_UPPERCASE;
+                }
+                if (itsOptions[2].isChecked()) {
+                    flags |= PasswdPolicy.FLAG_USE_DIGITS;
+                }
+                if (itsOptions[3].isChecked()) {
+                    flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
+                }
+
+                if (itsUseCustomSymbols.isChecked()) {
+                    customSymbols = itsCustomSymbolsEdit.getText().toString();
+                }
+            }
+
+            switch (itsType) {
+            case TYPE_NORMAL: {
+                if ((flags & PasswdPolicy.FLAG_USE_LOWERCASE) != 0) {
+                    minLower = getTextViewInt(itsOptionLens[0]);
+                }
+                if ((flags & PasswdPolicy.FLAG_USE_UPPERCASE) != 0) {
+                    minUpper = getTextViewInt(itsOptionLens[1]);
+                }
+                if ((flags & PasswdPolicy.FLAG_USE_DIGITS) != 0) {
+                    minDigits = getTextViewInt(itsOptionLens[2]);
+                }
+                if ((flags & PasswdPolicy.FLAG_USE_SYMBOLS) != 0) {
+                    minSymbols = getTextViewInt(itsOptionLens[3]);
+                }
+                break;
+            }
+            case TYPE_EASY_TO_READ: {
+                flags |= PasswdPolicy.FLAG_USE_EASY_VISION;
+                break;
+            }
+            case TYPE_PRONOUNCEABLE: {
+                flags |= PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE;
+                break;
+            }
+            case TYPE_HEXADECIMAL: {
+                flags |= PasswdPolicy.FLAG_USE_HEX_DIGITS;
+                break;
+            }
+            }
+
+            policy.setFlags(flags);
+            policy.setMinLowercase(minLower);
+            policy.setMinUppercase(minUpper);
+            policy.setMinDigits(minDigits);
+            policy.setMinSymbols(minSymbols);
+            policy.setSpecialSymbols(customSymbols);
+
+            return policy;
         }
 
 
@@ -799,6 +917,14 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         {
             View v = itsView.findViewById(id);
             v.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+
+
+        /** Get an integer value from a text view */
+        private final int getTextViewInt(TextView tv)
+            throws NumberFormatException
+        {
+            return Integer.valueOf(tv.getText().toString(), 10);
         }
 
 
