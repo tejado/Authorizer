@@ -43,8 +43,6 @@ import android.widget.TextView;
  */
 public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 {
-    private static final String TAG = "PasswdPolicyActivity";
-
     private static final int MENU_ADD =         0;
     private static final int MENU_EDIT =        1;
     private static final int MENU_DELETE =      2;
@@ -124,15 +122,17 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     public boolean onPrepareOptionsMenu(Menu menu)
     {
         // TODO: readonly mode
-        int selectedPos = getListView().getCheckedItemPosition();
-        PasswdSafeApp.dbginfo(TAG, "onPrepareOptionsMenu pos " + selectedPos);
-        boolean editDelete = (getSelectedPolicy() != null);
+        PasswdPolicy selPolicy = getSelectedPolicy();
+        boolean canEdit = (selPolicy != null);
+        boolean canDelete =
+            (selPolicy != null) &&
+            (selPolicy.getType() != PasswdPolicy.Type.DEFAULT_POLICY);
 
         MenuItem mi;
         mi = menu.findItem(MENU_EDIT);
-        mi.setEnabled(editDelete);
+        mi.setEnabled(canEdit);
         mi = menu.findItem(MENU_DELETE);
-        mi.setEnabled(editDelete);
+        mi.setEnabled(canDelete);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -266,7 +266,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         GuiUtils.invalidateOptionsMenu(this);
 
         PasswdPolicy policy = null;
-        if (position < itsPolicies.size()) {
+        if ((position >= 0) && (position < itsPolicies.size())) {
             policy = itsPolicies.get(position);
         }
         showPolicy(policy);
@@ -286,12 +286,14 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         if (itsPolicies == null) {
             itsPolicies = new ArrayList<PasswdPolicy>();
         }
-        sortPolicies();
 
         itsPolicyNames = new HashSet<String>(itsPolicies.size());
         for (PasswdPolicy policy: itsPolicies) {
             itsPolicyNames.add(policy.getName());
         }
+
+        itsPolicies.add(getPasswdSafeApp().getDefaultPasswdPolicy());
+        sortPolicies();
 
         setListAdapter(new ArrayAdapter<PasswdPolicy>(
             this, android.R.layout.simple_list_item_single_choice,
@@ -303,15 +305,25 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     /** Sort the policies */
     private final void sortPolicies()
     {
-        Collections.sort(itsPolicies,
-                         new Comparator<PasswdPolicy>()
-                         {
-                            public int compare(PasswdPolicy lhs,
-                                               PasswdPolicy rhs)
-                            {
-                                return lhs.getName().compareTo(rhs.getName());
-                            }
-                         });
+        Collections.sort(
+            itsPolicies,
+            new Comparator<PasswdPolicy>()
+            {
+                public int compare(PasswdPolicy lhs, PasswdPolicy rhs)
+                {
+                    PasswdPolicy.Type lhsType = lhs.getType();
+                    PasswdPolicy.Type rhsType = rhs.getType();
+                    if (lhsType != rhsType) {
+                        if (lhsType == PasswdPolicy.Type.DEFAULT_POLICY) {
+                            return -1;
+                        }
+                        if (rhsType == PasswdPolicy.Type.DEFAULT_POLICY) {
+                            return 1;
+                        }
+                    }
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
     }
 
 
@@ -360,20 +372,28 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private final void addUpdatePolicy(PasswdPolicy oldPolicy,
                                        PasswdPolicy newPolicy)
     {
-        if (oldPolicy != null) {
-            itsPolicies.remove(oldPolicy);
+        if (newPolicy.getType() == PasswdPolicy.Type.DEFAULT_POLICY) {
+            getPasswdSafeApp().setDefaultPasswdPolicy(newPolicy);
+            showPolicies();
+        } else {
+            if (oldPolicy != null) {
+                itsPolicies.remove(oldPolicy);
+            }
+            itsPolicies.add(newPolicy);
+            sortPolicies();
+            savePolicies();
         }
-        itsPolicies.add(newPolicy);
-        sortPolicies();
-        savePolicies();
     }
 
 
     /** Delete the currently selected policy */
     private final void deletePolicy()
     {
-        itsPolicies.remove(getSelectedPolicy());
-        savePolicies();
+        PasswdPolicy policy = getSelectedPolicy();
+        if (policy.getType() != PasswdPolicy.Type.DEFAULT_POLICY) {
+            itsPolicies.remove(policy);
+            savePolicies();
+        }
     }
 
 
@@ -382,8 +402,15 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     {
         PasswdFileData fileData = getPasswdFileData();
         if (fileData != null) {
+            List<PasswdPolicy> hdrPolicies =
+                new ArrayList<PasswdPolicy>(itsPolicies.size());
+            for (PasswdPolicy policy: itsPolicies) {
+                if (policy.getType() == PasswdPolicy.Type.HEADER_POLICY) {
+                    hdrPolicies.add(policy);
+                }
+            }
             fileData.setHdrPasswdPolicies(
-                (itsPolicies.size() > 0) ? itsPolicies : null);
+                hdrPolicies.isEmpty() ? null : hdrPolicies);
             getPasswdFile().save();
         }
         showPolicies();
@@ -515,6 +542,9 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             if (policy != null) {
                 titleId = R.string.edit_policy;
                 name = policy.getName();
+                if (policy.getType() == PasswdPolicy.Type.DEFAULT_POLICY) {
+                    itsNameEdit.setEnabled(false);
+                }
                 len = policy.getLength();
                 int flags = policy.getFlags();
                 if ((flags & PasswdPolicy.FLAG_USE_EASY_VISION) != 0) {
@@ -686,9 +716,10 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
          */
         private PasswdPolicy createPolicy()
         {
-            PasswdPolicy policy =
-                new PasswdPolicy(itsNameEdit.getText().toString(),
-                                 PasswdPolicy.Type.HEADER_POLICY);
+            PasswdPolicy policy = new PasswdPolicy(
+                itsNameEdit.getText().toString(),
+                (itsPolicy != null) ? itsPolicy.getType() :
+                    PasswdPolicy.Type.HEADER_POLICY);
             int length = getTextViewInt(itsLengthEdit);
             policy.setLength(length);
 

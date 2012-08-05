@@ -36,6 +36,7 @@ public class PasswdPolicy
     /** The type of policy */
     public enum Type
     {
+        DEFAULT_POLICY,
         HEADER_POLICY,
         RECORD_POLICY_NAME,
         RECORD_POLICY
@@ -290,6 +291,7 @@ public class PasswdPolicy
             return null;
         }
         switch (policy.getType()) {
+        case DEFAULT_POLICY:
         case HEADER_POLICY: {
             return null;
         }

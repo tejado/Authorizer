@@ -30,6 +30,12 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     private ActivityPasswdFile itsPasswdFile;
 
 
+    /** Get the PasswdSafeApp */
+    protected final PasswdSafeApp getPasswdSafeApp()
+    {
+        return (PasswdSafeApp)getApplication();
+    }
+
     /** Initialize the file URI */
     protected final void initUri(Uri uri)
     {
@@ -41,16 +47,14 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     protected final void openFile(Uri uri)
     {
         itsUri = uri;
-        PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsPasswdFile = app.accessPasswdFile(itsUri, this);
+        itsPasswdFile = getPasswdSafeApp().accessPasswdFile(itsUri, this);
     }
 
 
     /** Access the open file */
     protected final boolean accessOpenFile()
     {
-        PasswdSafeApp app = (PasswdSafeApp)getApplication();
-        itsPasswdFile = app.accessOpenFile(this);
+        itsPasswdFile = getPasswdSafeApp().accessOpenFile(this);
         if (itsPasswdFile != null) {
             itsUri = itsPasswdFile.getFileData().getUri();
             return true;
