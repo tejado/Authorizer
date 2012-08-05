@@ -185,6 +185,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 @Override
                 public final void onOkClicked(DialogInterface dialog)
                 {
+                    dialog.dismiss();
                     deletePolicy();
                 }
             };
@@ -338,7 +339,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         }
         itsPolicies.add(newPolicy);
         sortPolicies();
-        // TODO: select new policy
         savePolicies();
     }
 
@@ -354,8 +354,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     /** Save the policies */
     private final void savePolicies()
     {
-        // TODO: return modified flag for activity
-        // TODO: show save dialog??
         PasswdFileData fileData = getPasswdFileData();
         if (fileData != null) {
             fileData.setHdrPasswdPolicies(
@@ -529,6 +527,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                     @Override
                     public void onOkClicked(DialogInterface dialog)
                     {
+                        dialog.dismiss();
                         addUpdatePolicy(itsPolicy, createPolicy());
                     }
                 };
