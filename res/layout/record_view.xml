@@ -162,8 +162,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:clickable="true"
-                            android:textAppearance="@android:style/TextAppearance.Medium"
-                            android:typeface="monospace" />
+                            android:textAppearance="@android:style/TextAppearance.Medium"/>
 
                     </LinearLayout>
                         

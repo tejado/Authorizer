@@ -19,6 +19,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
@@ -527,6 +528,9 @@ public class RecordView extends AbstractRecordTabActivity
         isPasswordShown = !isPasswordShown;
         passwordField.setText(
             isPasswordShown ? getPassword() : itsHiddenPasswordStr);
+        passwordField.setTypeface(
+            isPasswordShown ? Typeface.MONOSPACE : Typeface.DEFAULT);
+
     }
 
     private final String getPassword()
