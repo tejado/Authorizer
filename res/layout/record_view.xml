@@ -53,7 +53,7 @@
 
                         <View
                             android:layout_width="fill_parent"
-                            android:layout_height="1px"
+                            android:layout_height="1dp"
                             android:background="#FF404040" />
                         
                         <RelativeLayout android:id="@+id/base_group"
@@ -97,7 +97,7 @@
     
                         <View
                             android:layout_width="fill_parent"
-                            android:layout_height="1px"
+                            android:layout_height="1dp"
                             android:background="#FF404040" />
 
                         <TextView
@@ -125,7 +125,7 @@
 
                         <View
                             android:layout_width="fill_parent"
-                            android:layout_height="1px"
+                            android:layout_height="1dp"
                             android:background="#FF404040" />
 
                         <TextView
@@ -153,7 +153,7 @@
 
                         <View
                             android:layout_width="fill_parent"
-                            android:layout_height="1px"
+                            android:layout_height="1dp"
                             android:background="#FF404040" />
 
                         <TextView
@@ -183,7 +183,7 @@
 
                         <View
                             android:layout_width="fill_parent"
-                            android:layout_height="1px"
+                            android:layout_height="1dp"
                             android:background="#FF404040" />
 
                         <TextView
@@ -212,7 +212,7 @@
     
                         <View
                             android:layout_width="fill_parent"
-                            android:layout_height="1px"
+                            android:layout_height="1dp"
                             android:background="#FF404040" />
 
                         <TextView
@@ -241,7 +241,7 @@
     
                         <View
                             android:layout_width="fill_parent"
-                            android:layout_height="1px"
+                            android:layout_height="1dp"
                             android:background="#FF404040" />
 
                         <TextView
@@ -267,7 +267,7 @@
     
                         <View
                             android:layout_width="fill_parent"
-                            android:layout_height="1px"
+                            android:layout_height="1dp"
                             android:background="#FF404040" />
 
                         <TextView
