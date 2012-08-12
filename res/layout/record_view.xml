@@ -93,7 +93,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
-                            android:text="GROUP" />
+                            android:text="@string/group_header" />
     
                         <View
                             android:layout_width="fill_parent"
@@ -121,7 +121,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
-                            android:text="USER NAME" />
+                            android:text="@string/username_header" />
 
                         <View
                             android:layout_width="fill_parent"
@@ -149,7 +149,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
-                            android:text="PASSWORD" />
+                            android:text="@string/password_header" />
 
                         <View
                             android:layout_width="fill_parent"
@@ -207,7 +207,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
-                            android:text="EMAIL" />
+                            android:text="@string/email_header" />
     
                         <View
                             android:layout_width="fill_parent"
@@ -236,7 +236,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
-                            android:text="EXPIRATION" />
+                            android:text="@string/expiration_header" />
     
                         <View
                             android:layout_width="fill_parent"
@@ -262,7 +262,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
-                            android:text="PROTECTED RECORD" />
+                            android:text="@string/protected_record_header" />
     
                         <View
                             android:layout_width="fill_parent"

@@ -40,13 +40,14 @@
     <string name="email">Email</string>
     <string name="email_attachment">Email Attachment</string>
     <string name="empty_file_name">Empty file name</string>
+    <string name="email_header">EMAIL</string>
     <string name="empty_password">Empty password</string>
     <string name="empty_title">Empty title</string>
     <string name="enabled">Enabled</string>
     <string name="enter_net_group">Enter new group:</string>
     <string name="error">Error</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
-    <string name="expiration">Expiration</string>
+    <string name="expiration_header">EXPIRATION</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
     <string name="file_exists">File exists</string>
     <string name="file_label">File:</string>
@@ -57,6 +58,7 @@
     <string name="generate_password">Generate Password</string>
     <string name="go_to">Goto</string>
     <string name="group">Group</string>
+    <string name="group_header">GROUP</string>
     <string name="hidden_password_alias">***** (from alias, tap to show)</string>
     <string name="hidden_password_normal">***** (tap to show)</string>
     <string name="hidden_password_shortcut">***** (from shortcut, tap to show)</string>
@@ -89,6 +91,7 @@
     <string name="password_and_confirm">Password /\nConfirm</string>
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_file">Password file</string>
+    <string name="password_header">PASSWORD</string>
     <string name="password_label">Password:</string>
     <string name="password_preferences">Password Preferences</string>
     <string name="password_record">Password record</string>
@@ -98,6 +101,7 @@
     <string name="protect_all">Protect All Records</string>
     <string name="protect_group">Protect Group Records</string>
     <string name="protected_record">Protected</string>
+    <string name="protected_record_header">PROTECTED RECORD</string>
     <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Search filter: %1$s</string>
     <string name="record_has_references">Record has references</string>
@@ -125,6 +129,7 @@
     <string name="up">Up</string>
     <string name="url">URL</string>
     <string name="username">User Name</string>
+    <string name="username_header">USER NAME</string>
     
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">
