@@ -40,21 +40,13 @@
                 
                     <LinearLayout
                         android:id="@+id/base_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="7dp" >
+                        style="@style/RecordRow">
 
                         <TextView
                             android:id="@+id/base_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp" />
+                            style="@style/RecordHeader"/>
 
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="1dp"
-                            android:background="#FF404040" />
+                        <View style="@style/Separator"/>
                         
                         <RelativeLayout android:id="@+id/base_group"
                                         android:layout_width="wrap_content"
@@ -70,12 +62,11 @@
 
                             <TextView
                                 android:id="@+id/base"
+                                style="@style/RecordField"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
                                 android:layout_alignParentLeft="true"
                                 android:layout_toLeftOf="@id/base_btn"
-                                android:clickable="true"
-                                android:textAppearance="@android:style/TextAppearance.Medium" />
+                                android:clickable="true"/>
                                           
                         </RelativeLayout>
 
@@ -83,197 +74,122 @@
                     
                     <LinearLayout
                         android:id="@+id/group_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="7dp" >
+                        style="@style/RecordRow">
 
                         <TextView
                             android:id="@+id/group_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:text="@string/group_header" />
+                            style="@style/RecordHeader"
+                            android:text="@string/group_header"/>
     
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="1dp"
-                            android:background="#FF404040" />
+                        <View style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/group"
-                            android:layout_width="match_parent"
-                            android:layout_marginLeft="5dp"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@android:style/TextAppearance.Medium" />
+                            style="@style/RecordField"/>
                     
                     </LinearLayout>
                     
                     <LinearLayout
                         android:id="@+id/user_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="7dp" >
+                        style="@style/RecordRow">
 
                         <TextView
                             android:id="@+id/username_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            style="@style/RecordHeader"
                             android:text="@string/username_header" />
 
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="1dp"
-                            android:background="#FF404040" />
+                        <View style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/user"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:textAppearance="@android:style/TextAppearance.Medium" />
+                            style="@style/RecordField"/>
 
                     </LinearLayout>
                     
                     <LinearLayout
                         android:id="@+id/password_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="7dp" >
+                        style="@style/RecordRow">
 
                         <TextView
                             android:id="@+id/password_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            style="@style/RecordHeader"
                             android:text="@string/password_header" />
 
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="1dp"
-                            android:background="#FF404040" />
+                        <View style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/password"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:clickable="true"
-                            android:textAppearance="@android:style/TextAppearance.Medium"/>
+                            style="@style/RecordField"
+                            android:clickable="true"/>
 
                     </LinearLayout>
                         
                     <LinearLayout
                         android:id="@+id/url_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="7dp" >
+                        style="@style/RecordRow">
 
                         <TextView
                             android:id="@+id/url_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            style="@style/RecordHeader"
                             android:text="@string/url" />
 
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="1dp"
-                            android:background="#FF404040" />
+                        <View style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/url"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:autoLink="web"
-                            android:textAppearance="@android:style/TextAppearance.Medium" />
+                            style="@style/RecordField"
+                            android:autoLink="web"/>
 
                     </LinearLayout>
                     
                     <LinearLayout
                         android:id="@+id/email_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="7dp" >
+                        style="@style/RecordRow">
 
                         <TextView
                             android:id="@+id/email_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            style="@style/RecordHeader"
                             android:text="@string/email_header" />
     
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="1dp"
-                            android:background="#FF404040" />
+                        <View style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/email"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:autoLink="email"
-                            android:textAppearance="@android:style/TextAppearance.Medium" />
+                            style="@style/RecordField"
+                            android:autoLink="email"/>
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/expiration_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="7dp" >
+                        style="@style/RecordRow">
 
                         <TextView
                             android:id="@+id/expiration_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            style="@style/RecordHeader"
                             android:text="@string/expiration_header" />
     
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="1dp"
-                            android:background="#FF404040" />
+                        <View style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/expiration"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp" />
+                            style="@style/RecordField"/>
 
                     </LinearLayout>
                     
                     <LinearLayout
                         android:id="@+id/protected_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingBottom="7dp" >
+                        style="@style/RecordRow">
                     
                         <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            style="@style/RecordHeader"
                             android:text="@string/protected_record_header" />
     
-                        <View
-                            android:layout_width="fill_parent"
-                            android:layout_height="1dp"
-                            android:background="#FF404040" />
+                        <View style="@style/Separator"/>
 
                         <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
-                            android:text="@string/unprotect_to_modify" />
+                            style="@style/RecordField"
+                            android:text="@string/unprotect_to_modify"/>
 
                     </LinearLayout>
                     
