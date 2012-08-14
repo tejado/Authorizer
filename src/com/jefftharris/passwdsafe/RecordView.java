@@ -223,12 +223,21 @@ public class RecordView extends AbstractRecordTabActivity
                                     ContextMenuInfo menuInfo)
     {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if (v == itsUserView) {
+        switch (v.getId()) {
+        case R.id.username_label:
+        case R.id.username_sep:
+        case R.id.user: {
             menu.setHeaderTitle(R.string.username);
             menu.add(0, MENU_COPY_USER, 0, R.string.copy_clipboard);
-        } else if (v == itsPasswordView) {
+            break;
+        }
+        case R.id.password_label:
+        case R.id.password_sep:
+        case R.id.password: {
             menu.setHeaderTitle(R.string.password);
             menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_clipboard);
+            break;
+        }
         }
     }
 
@@ -492,6 +501,10 @@ public class RecordView extends AbstractRecordTabActivity
             setText(R.id.user, R.id.user_row, fileData.getUsername(rec));
         if (itsUserView != null) {
             registerForContextMenu(itsUserView);
+            View v = findViewById(R.id.username_label);
+            registerForContextMenu(v);
+            v = findViewById(R.id.username_sep);
+            registerForContextMenu(v);
         }
 
         setBasicFields(passwdRec, fileData);
@@ -701,14 +714,22 @@ public class RecordView extends AbstractRecordTabActivity
                                   (fileData.hasPassword(recForPassword)
                                       ? itsHiddenPasswordStr : null));
         if (itsPasswordView != null) {
-            itsPasswordView.setOnClickListener(new View.OnClickListener()
+            View.OnClickListener listener = new View.OnClickListener()
             {
                 public void onClick(View v)
                 {
                     togglePasswordShown();
                 }
-            });
+            };
+            View v = findViewById(R.id.password_label);
+            v.setOnClickListener(listener);
+            registerForContextMenu(v);
+            v = findViewById(R.id.password_sep);
+            v.setOnClickListener(listener);
+            registerForContextMenu(v);
+            itsPasswordView.setOnClickListener(listener);
             registerForContextMenu(itsPasswordView);
+
         }
         setText(R.id.expiration, R.id.expiration_row, passwdExpiry);
 

@@ -98,7 +98,9 @@
                             style="@style/RecordHeader"
                             android:text="@string/username_header" />
 
-                        <View style="@style/Separator"/>
+                        <View
+                            android:id="@+id/username_sep"
+                            style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/user"
@@ -115,7 +117,9 @@
                             style="@style/RecordHeader"
                             android:text="@string/password_header" />
 
-                        <View style="@style/Separator"/>
+                        <View
+                            android:id="@+id/password_sep"
+                            style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/password"
