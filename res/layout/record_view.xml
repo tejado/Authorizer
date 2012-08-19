@@ -104,7 +104,7 @@
 
                         <TextView
                             android:id="@+id/user"
-                            style="@style/RecordField"/>
+                            style="@style/RecordField.Large"/>
 
                     </LinearLayout>
                     
@@ -123,7 +123,7 @@
 
                         <TextView
                             android:id="@+id/password"
-                            style="@style/RecordField"
+                            style="@style/RecordField.Large"
                             android:clickable="true"/>
 
                     </LinearLayout>
@@ -177,7 +177,7 @@
 
                         <TextView
                             android:id="@+id/expiration"
-                            style="@style/RecordField"/>
+                            style="@style/RecordField.Small"/>
 
                     </LinearLayout>
                     
