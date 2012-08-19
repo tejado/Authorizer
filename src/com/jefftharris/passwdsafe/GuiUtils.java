@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.view.GuiUtilsFroyo;
 import com.jefftharris.passwdsafe.view.GuiUtilsHoneycomb;
 

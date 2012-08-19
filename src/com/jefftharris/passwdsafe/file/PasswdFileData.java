@@ -5,7 +5,7 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.file;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +54,11 @@ import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
+
+import com.jefftharris.passwdsafe.FileBackupPref;
+import com.jefftharris.passwdsafe.PasswdSafeApp;
+import com.jefftharris.passwdsafe.Preferences;
+import com.jefftharris.passwdsafe.R;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -410,6 +416,29 @@ public class PasswdFileData
                  rec, PwsRecordV3.PASSWORD_HISTORY);
     }
 
+    /** Get the password policy contained in a record */
+    public final PasswdPolicy getPasswdPolicy(PwsRecord rec)
+    {
+        return PasswdPolicy.parseRecordPolicy(
+            getField(rec, PwsRecordV3.PASSWORD_POLICY_NAME),
+            getField(rec, PwsRecordV3.PASSWORD_POLICY),
+            getField(rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS));
+    }
+
+    /** Set the password policy for a record */
+    public final void setPasswdPolicy(PasswdPolicy policy, PwsRecord rec)
+    {
+        PasswdPolicy.RecordPolicyStrs strs =
+            PasswdPolicy.recordPolicyToString(policy);
+        setField((strs == null) ? null : strs.itsPolicyName,
+                 rec, PwsRecordV3.PASSWORD_POLICY_NAME);
+        setField((strs == null) ? null : strs.itsPolicyStr,
+                 rec, PwsRecordV3.PASSWORD_POLICY);
+        setField((strs == null) ? null : strs.itsOwnSymbols,
+                 rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS);
+        updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
+    }
+
     public final boolean isProtected(PwsRecord rec)
     {
         boolean prot = false;
@@ -509,6 +538,24 @@ public class PasswdFileData
     public final void setHdrLastSaveTime(Date date)
     {
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
+    }
+
+    /** Get the named password policies from the file header */
+    public final List<PasswdPolicy> getHdrPasswdPolicies()
+    {
+        return PasswdPolicy.parseHdrPolicies(
+            getHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES));
+    }
+
+    /**
+     * Set the named password policies in the file header
+     * @param policies The policies; null to remove the field
+     */
+    public final void setHdrPasswdPolicies(List<PasswdPolicy> policies)
+    {
+        setHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES,
+                    PasswdPolicy.hdrPoliciesToString(policies));
+        updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
     }
 
     public static final boolean isFileUri(Uri uri)
@@ -648,6 +695,8 @@ public class PasswdFileData
             case PwsRecordV3.EMAIL:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PROTECTED_ENTRY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -691,6 +740,8 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PROTECTED_ENTRY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -779,6 +830,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.HEADER_LAST_SAVE_WHO:
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            case PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES:
             {
                 PwsField field = doGetField(rec, fieldId);
                 if (field != null) {
@@ -823,9 +875,10 @@ public class PasswdFileData
                 break;
             }
             case PwsRecordV3.HEADER_LAST_SAVE_WHAT:
+            case PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES:
             {
-                doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHAT,
-                                    value.toString());
+                doSetHdrFieldString(rec, fieldId,
+                                    (value == null) ? null : value.toString());
                 break;
             }
             case PwsRecordV3.HEADER_LAST_SAVE_USER:
@@ -877,8 +930,11 @@ public class PasswdFileData
                                             int fieldId, String val)
     {
         try {
-            PwsField f = new PwsUnknownField(fieldId, val.getBytes("UTF-8"));
-            rec.setField(f);
+            PwsField field = null;
+            if (val != null) {
+                field = new PwsUnknownField(fieldId, val.getBytes("UTF-8"));
+            }
+            setOrRemoveField(field, fieldId, rec);
         }
         catch (UnsupportedEncodingException e) {
         }
@@ -940,6 +996,8 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
             case PwsRecordV3.PASSWORD_HISTORY:
+            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+            case PwsRecordV3.PASSWORD_POLICY_NAME:
             {
                 String str = (val == null) ? null : val.toString();
                 if (!TextUtils.isEmpty(str)) {
@@ -1009,11 +1067,17 @@ public class PasswdFileData
         }
 
         if (fieldId != FIELD_UNSUPPORTED) {
-            if (field != null) {
-                rec.setField(field);
-            } else {
-                rec.removeField(fieldId);
-            }
+            setOrRemoveField(field, fieldId, rec);
+        }
+    }
+
+    private static final void setOrRemoveField(PwsField field, int fieldId,
+                                               PwsRecord rec)
+    {
+        if (field != null) {
+            rec.setField(field);
+        } else {
+            rec.removeField(fieldId);
         }
     }
 

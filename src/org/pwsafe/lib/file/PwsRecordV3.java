@@ -34,13 +34,14 @@ public class PwsRecordV3 extends PwsRecord
      */
     public static final int V3_ID_STRING = 0;
 
-    /**
-     * Minor version for version PasswordSave 3.25 with protected entry support
-     */
+    /** Minor version for PasswordSafe 3.25 with protected entry support */
     public static final byte DB_FMT_MINOR_3_25 = 8;
 
+    /** Minor version for PasswordSafe 3.28 with password policy support */
+    public static final byte DB_FMT_MINOR_3_28 = 10;
+
     /** Minor version of the max supported database format */
-    public static final byte DB_FMT_MINOR_VERSION = DB_FMT_MINOR_3_25;
+    public static final byte DB_FMT_MINOR_VERSION = DB_FMT_MINOR_3_28;
 
     /**
      * Constant for the Universally Unique ID (UUID) field.
@@ -147,6 +148,12 @@ public class PwsRecordV3 extends PwsRecord
      */
     public static final int PROTECTED_ENTRY = 21;
 
+    /** Own symbols for password */
+    public static final int OWN_PASSWORD_SYMBOLS = 22;
+
+    /** Password policy name */
+    public static final int PASSWORD_POLICY_NAME = 24;
+
     /**
      * Header database version
      */
@@ -181,6 +188,9 @@ public class PwsRecordV3 extends PwsRecord
      * Header last saved on host
      */
     public static final int HEADER_LAST_SAVE_HOST = 8;
+
+    /** Header named password policies */
+    public static final int HEADER_NAMED_PASSWORD_POLICIES = 16;
 
     /**
      * Constant for the end of record marker field.
@@ -236,6 +246,10 @@ public class PwsRecordV3 extends PwsRecord
                             "EMAIL", PwsStringUnicodeField.class },
             new Object[] { Integer.valueOf(PROTECTED_ENTRY),
                             "PROTECTED_ENTRY", PwsByteField.class},
+            new Object[] { Integer.valueOf(OWN_PASSWORD_SYMBOLS),
+                            "OWN_PASSWORD_SYMBOLS", PwsStringUnicodeField.class },
+            new Object[] { Integer.valueOf(PASSWORD_POLICY_NAME),
+                            "PASSWORD_POLICY_NAME", PwsStringUnicodeField.class },
     };
 
     /**
@@ -520,6 +534,8 @@ public class PwsRecordV3 extends PwsRecord
                 case AUTOTYPE:
                 case RUN_COMMAND:
                 case EMAIL:
+                case OWN_PASSWORD_SYMBOLS:
+                case PASSWORD_POLICY_NAME:
                     itemVal = new PwsStringUnicodeField(item.getType(),
                                                         item.getByteData());
                     break;

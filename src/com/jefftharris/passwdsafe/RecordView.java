@@ -11,6 +11,9 @@ import java.util.List;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdHistory;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 
 import android.app.Activity;

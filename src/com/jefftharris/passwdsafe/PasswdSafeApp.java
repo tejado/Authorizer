@@ -17,6 +17,9 @@ import java.util.WeakHashMap;
 
 import org.pwsafe.lib.file.PwsFile;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -176,6 +179,7 @@ public class PasswdSafeApp extends Application
     private PasswdFileData itsFileData = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
+    private PasswdPolicy itsDefaultPasswdPolicy = null;
     private AlarmManager itsAlarmMgr;
     private PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout =
@@ -229,6 +233,11 @@ public class PasswdSafeApp extends Application
         updateFileCloseScreenOffPref(prefs);
         setPasswordEncodingPref(prefs);
         setFileCloseClearClipboardPref(prefs);
+
+        // TODO: load default policy from prefs
+        itsDefaultPasswdPolicy =
+            new PasswdPolicy(getString(R.string.default_policy),
+                             PasswdPolicy.Type.DEFAULT_POLICY);
     }
 
     /* (non-Javadoc)
@@ -312,6 +321,22 @@ public class PasswdSafeApp extends Application
         }
         return new AppActivityPasswdFile(itsFileData, activity);
     }
+
+
+    /** Get the default password policy */
+    public synchronized PasswdPolicy getDefaultPasswdPolicy()
+    {
+        return itsDefaultPasswdPolicy;
+    }
+
+
+    /** Set the default password policy */
+    public synchronized void setDefaultPasswdPolicy(PasswdPolicy policy)
+    {
+        itsDefaultPasswdPolicy = policy;
+        // TODO: save to prefs
+    }
+
 
     public static final String getAppFileTitle(ActivityPasswdFile actFile,
                                                Context ctx)
