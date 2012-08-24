@@ -451,7 +451,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private final String getPolicyOption(PasswdPolicy policy, int flag)
     {
         String str = null;
-        if ((policy.getFlags() & flag) != 0) {
+        if (policy.checkFlags(flag)) {
             switch (flag) {
             case PasswdPolicy.FLAG_USE_LOWERCASE: {
                 str = getString(R.string.policy_yes_len,
@@ -473,12 +473,12 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 int id;
                 if (!TextUtils.isEmpty(symbols)) {
                     id = R.string.policy_yes_sym_policy;
-                } else if ((policy.getFlags() &
-                            PasswdPolicy.FLAG_USE_EASY_VISION) != 0) {
+                } else if (policy.checkFlags(
+                               PasswdPolicy.FLAG_USE_EASY_VISION)) {
                     id = R.string.policy_yes_sym_easy;
                     symbols = PasswdPolicy.SYMBOLS_EASY;
-                } else if ((policy.getFlags() &
-                            PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE) != 0) {
+                } else if (policy.checkFlags(
+                               PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE)) {
                     id = R.string.policy_yes_sym_pronounce;
                     symbols = PasswdPolicy.SYMBOLS_PRONOUNCE;
                 } else {
@@ -555,20 +555,25 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                     itsNameEdit.setEnabled(false);
                 }
                 len = policy.getLength();
-                int flags = policy.getFlags();
-                if ((flags & PasswdPolicy.FLAG_USE_EASY_VISION) != 0) {
+                if (policy.checkFlags(PasswdPolicy.FLAG_USE_EASY_VISION)) {
                     itsOrigType = Type.EASY_TO_READ;
-                } else if ((flags & PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE) != 0) {
+                } else if (policy.checkFlags(
+                               PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE)) {
                     itsOrigType = Type.PRONOUNCEABLE;
-                } else if ((flags & PasswdPolicy.FLAG_USE_HEX_DIGITS) != 0) {
+                } else if (policy.checkFlags(
+                               PasswdPolicy.FLAG_USE_HEX_DIGITS)) {
                     itsOrigType = Type.HEXADECIMAL;
                 } else {
                     itsOrigType = Type.NORMAL;
                 }
-                useOptions[0] = ((flags & PasswdPolicy.FLAG_USE_LOWERCASE) != 0);
-                useOptions[1] = ((flags & PasswdPolicy.FLAG_USE_UPPERCASE) != 0);
-                useOptions[2] = ((flags & PasswdPolicy.FLAG_USE_DIGITS) != 0);
-                useOptions[3] = ((flags & PasswdPolicy.FLAG_USE_SYMBOLS) != 0);
+                useOptions[0] =
+                    policy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
+                useOptions[1] =
+                    policy.checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE);
+                useOptions[2] =
+                    policy.checkFlags(PasswdPolicy.FLAG_USE_DIGITS);
+                useOptions[3] =
+                    policy.checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS);
                 optionLens[0] = policy.getMinLowercase();
                 optionLens[1] = policy.getMinUppercase();
                 optionLens[2] = policy.getMinDigits();
