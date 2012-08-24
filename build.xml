@@ -32,7 +32,7 @@ public class Rev
         <uptodate property="genRevUptodate" targetfile="${rev.file}">
             <srcfiles dir="${basedir}/src"/>
             <srcfiles dir="${basedir}/res"/>
-            <srcfiles dir="${basedir}/lib"/>
+            <srcfiles dir="${basedir}/libs"/>
             <srcfiles dir="${basedir}"
                       includes="AndroidManifest.xml,build.xml"/>
         </uptodate>
