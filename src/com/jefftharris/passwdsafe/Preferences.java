@@ -81,20 +81,20 @@ public class Preferences extends PreferenceActivity
         "sortCaseSensitivePref";
     public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
 
-    public static final String PREF_GEN_LOWER = "passwdGenLower";
-    public static final boolean PREF_GEN_LOWER_DEF = true;
-    public static final String PREF_GEN_UPPER = "passwdGenUpper";
-    public static final boolean PREF_GEN_UPPER_DEF = true;
-    public static final String PREF_GEN_DIGITS = "passwdGenDigits";
-    public static final boolean PREF_GEN_DIGITS_DEF = true;
-    public static final String PREF_GEN_SYMBOLS = "passwdGenSymbols";
-    public static final boolean PREF_GEN_SYMBOLS_DEF = false;
-    public static final String PREF_GEN_EASY = "passwdGenEasy";
-    public static final boolean PREF_GEN_EASY_DEF = false;
-    public static final String PREF_GEN_HEX = "passwdGenHex";
-    public static final boolean PREF_GEN_HEX_DEF = false;
-    public static final String PREF_GEN_LENGTH = "passwdGenLength";
-    public static final String PREF_GEN_LENGTH_DEF = "8";
+    private static final String PREF_GEN_LOWER = "passwdGenLower";
+    private static final boolean PREF_GEN_LOWER_DEF = true;
+    private static final String PREF_GEN_UPPER = "passwdGenUpper";
+    private static final boolean PREF_GEN_UPPER_DEF = true;
+    private static final String PREF_GEN_DIGITS = "passwdGenDigits";
+    private static final boolean PREF_GEN_DIGITS_DEF = true;
+    private static final String PREF_GEN_SYMBOLS = "passwdGenSymbols";
+    private static final boolean PREF_GEN_SYMBOLS_DEF = false;
+    private static final String PREF_GEN_EASY = "passwdGenEasy";
+    private static final boolean PREF_GEN_EASY_DEF = false;
+    private static final String PREF_GEN_HEX = "passwdGenHex";
+    private static final boolean PREF_GEN_HEX_DEF = false;
+    private static final String PREF_GEN_LENGTH = "passwdGenLength";
+    private static final String PREF_GEN_LENGTH_DEF = "8";
     public static final String PREF_DEF_PASSWD_POLICY = "defaultPasswdPolicy";
     public static final String PREF_DEF_PASSWD_POLICY_DEF = "";
 
@@ -208,7 +208,6 @@ public class Preferences extends PreferenceActivity
             return;
         }
 
-        // TODO: remove old preferences and accessors
         SharedPreferences.Editor prefsEdit = prefs.edit();
         String policyStr = PREF_DEF_PASSWD_POLICY_DEF;
         if (prefs.contains(PREF_GEN_LOWER) ||
@@ -222,28 +221,35 @@ public class Preferences extends PreferenceActivity
             PasswdPolicy policy = PasswdPolicy.createDefaultPolicy(ctx);
 
             int flags = 0;
-            if (getPasswordGenHexPref(prefs)) {
+            if (prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF)) {
                 flags |= PasswdPolicy.FLAG_USE_HEX_DIGITS;
             } else {
-                if (getPasswordGenEasyPref(prefs)) {
+                if (prefs.getBoolean(PREF_GEN_EASY, PREF_GEN_EASY_DEF)) {
                     flags |= PasswdPolicy.FLAG_USE_EASY_VISION;
                 }
 
-                if (getPasswordGenLowerPref(prefs)) {
+                if (prefs.getBoolean(PREF_GEN_LOWER, PREF_GEN_LOWER_DEF)) {
                     flags |= PasswdPolicy.FLAG_USE_LOWERCASE;
                 }
-                if (getPasswordGenUpperPref(prefs)) {
+                if (prefs.getBoolean(PREF_GEN_UPPER, PREF_GEN_UPPER_DEF)) {
                     flags |= PasswdPolicy.FLAG_USE_UPPERCASE;
                 }
-                if (getPasswordGenDigitsPref(prefs)) {
+                if (prefs.getBoolean(PREF_GEN_DIGITS, PREF_GEN_DIGITS_DEF)) {
                     flags |= PasswdPolicy.FLAG_USE_DIGITS;
                 }
-                if (getPasswordGenSymbolsPref(prefs)) {
+                if (prefs.getBoolean(PREF_GEN_SYMBOLS, PREF_GEN_SYMBOLS_DEF)) {
                     flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
                 }
             }
             policy.setFlags(flags);
-            policy.setLength(getPasswordGenLengthPref(prefs));
+            int length;
+            try {
+                length = Integer.parseInt(prefs.getString(PREF_GEN_LENGTH,
+                                                          PREF_GEN_LENGTH_DEF));
+            } catch (NumberFormatException e) {
+                length = Integer.parseInt(PREF_GEN_LENGTH_DEF);
+            }
+            policy.setLength(length);
             policyStr = policy.toHdrPolicyString();
 
             prefsEdit.remove(PREF_GEN_LOWER);
@@ -288,46 +294,6 @@ public class Preferences extends PreferenceActivity
         SharedPreferences.Editor prefsEdit = prefs.edit();
         prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policy.toHdrPolicyString());
         prefsEdit.commit();
-    }
-
-    public static boolean getPasswordGenLowerPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_LOWER, PREF_GEN_LOWER_DEF);
-    }
-
-    public static boolean getPasswordGenUpperPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_UPPER, PREF_GEN_UPPER_DEF);
-    }
-
-    public static boolean getPasswordGenDigitsPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_DIGITS, PREF_GEN_DIGITS_DEF);
-    }
-
-    public static boolean getPasswordGenSymbolsPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_SYMBOLS, PREF_GEN_SYMBOLS_DEF);
-    }
-
-    public static boolean getPasswordGenEasyPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_EASY, PREF_GEN_EASY_DEF);
-    }
-
-    public static boolean getPasswordGenHexPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF);
-    }
-
-    public static int getPasswordGenLengthPref(SharedPreferences prefs)
-    {
-        try {
-            return Integer.parseInt(prefs.getString(PREF_GEN_LENGTH,
-                                                    PREF_GEN_LENGTH_DEF));
-        } catch (NumberFormatException e) {
-            return Integer.parseInt(PREF_GEN_LENGTH_DEF);
-        }
     }
 
     public static boolean getSearchCaseSensitivePref(SharedPreferences prefs)
@@ -393,9 +359,6 @@ public class Preferences extends PreferenceActivity
         itsPasswdEncPref.setDefaultValue(PREF_PASSWD_ENC_DEF);
         onSharedPreferenceChanged(prefs, PREF_PASSWD_ENC);
 
-        onSharedPreferenceChanged(prefs, PREF_GEN_LENGTH);
-        onSharedPreferenceChanged(prefs, PREF_GEN_HEX);
-
         itsFontSizePref = (ListPreference) findPreference(PREF_FONT_SIZE);
         itsFontSizePref.setEntries(FontSizePref.getDisplayNames());
         itsFontSizePref.setEntryValues(FontSizePref.getValues());
@@ -445,17 +408,6 @@ public class Preferences extends PreferenceActivity
                 getFileBackupPref(prefs).getDisplayName());
         } else if (key.equals(PREF_PASSWD_ENC)) {
             itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
-        } else if (key.equals(PREF_GEN_LENGTH)) {
-            Preference pref = findPreference(PREF_GEN_LENGTH);
-            pref.setSummary(Integer.toString(getPasswordGenLengthPref(prefs)));
-        } else if (key.equals(PREF_GEN_HEX)) {
-            boolean isHex = getPasswordGenHexPref(prefs);
-            for (String id: new String[] { PREF_GEN_LOWER, PREF_GEN_UPPER,
-                                           PREF_GEN_DIGITS, PREF_GEN_SYMBOLS,
-                                           PREF_GEN_EASY }) {
-                Preference pref = findPreference(id);
-                pref.setEnabled(!isHex);
-            }
         } else if (key.equals(PREF_FONT_SIZE)) {
             itsFontSizePref.setSummary(getFontSizePref(prefs).getDisplayName());
         }

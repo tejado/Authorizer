@@ -72,6 +72,12 @@ public abstract class AbstractRecordActivity extends Activity
         return itsHelper.getPasswdFile();
     }
 
+    /** Get the PasswdSafeApp */
+    protected final PasswdSafeApp getPasswdSafeApp()
+    {
+        return (PasswdSafeApp)getApplication();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {

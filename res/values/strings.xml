@@ -113,6 +113,7 @@
     <string name="password_and_confirm">Password /\nConfirm</string>
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_file">Password file</string>
+    <string name="password_gen_prefs_moved">Password generation options have moved.  Open a file and edit the default policy.</string>
     <string name="password_header">PASSWORD</string>
     <string name="password_label">Password:</string>
     <string name="password_length">Password Length</string>

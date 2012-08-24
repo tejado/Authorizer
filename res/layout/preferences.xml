@@ -42,44 +42,11 @@
         <ListPreference android:name="passwordEncoding Pref"
                         android:title="File password encoding"
                         android:key="passwordEncodingPref"/>
-                    
-        <PreferenceCategory android:title="Password generation">
-            <EditTextPreference android:name="passwdGenLength Pref"
-                                android:title="Password length"
-                                android:key="passwdGenLength"
-                                android:inputType="number"
-                                android:defaultValue="8"/>
-                                
-            <CheckBoxPreference android:name="passwdGenHex Pref"
-                                android:title="Hexidecimal digits only"
-                                android:summary="0-9a-f"
-                                android:key="passwdGenHex"
-                                android:defaultValue="false"/>
-                                
-            <CheckBoxPreference android:name="passwdGenLower Pref"
-                                android:title="Use Lowercase letters"
-                                android:key="passwdGenLower"
-                                android:defaultValue="true"/>
-            <CheckBoxPreference android:name="passwdGenUpper Pref"
-                                android:title="Use Uppercase letters"
-                                android:key="passwdGenUpper"
-                                android:defaultValue="true"/>
-            <CheckBoxPreference android:name="passwdGenDigits Pref"
-                                android:title="Use Digits"
-                                android:key="passwdGenDigits"
-                                android:defaultValue="true"/>
-            <CheckBoxPreference android:name="passwdGenSymbols Pref"
-                                android:title="Use Symbols"
-                                android:summary="$, %, ^, etc."
-                                android:key="passwdGenSymbols"
-                                android:defaultValue="false"/>
-    
-            <CheckBoxPreference android:name="passwdGenEasy Pref"
-                                android:title="Easy-to-read characters"
-                                android:summary="No 1, l, etc."
-                                android:key="passwdGenEasy"
-                                android:defaultValue="false"/>
-        </PreferenceCategory>
+
+        <Preference
+            android:selectable="false"
+            android:summary="@string/password_gen_prefs_moved"
+            android:title="Password generation"/>
     </PreferenceScreen>
     
     <PreferenceScreen android:title="Record Settings"

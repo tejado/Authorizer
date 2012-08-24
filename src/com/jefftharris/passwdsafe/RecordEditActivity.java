@@ -28,9 +28,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -644,37 +642,24 @@ public class RecordEditActivity extends AbstractRecordActivity
     private final void generatePassword()
     {
         ArrayList<String> chars = new ArrayList<String>();
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        if (Preferences.getPasswordGenHexPref(prefs)) {
+        PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
+        if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_HEX_DIGITS)) {
             chars.add(DIGITS + "abcdef");
         } else {
-            if (Preferences.getPasswordGenEasyPref(prefs)) {
-                if (Preferences.getPasswordGenLowerPref(prefs)) {
-                    chars.add(EASY_LOWER_CHARS);
-                }
-                if (Preferences.getPasswordGenUpperPref(prefs)) {
-                    chars.add(EASY_UPPER_CHARS);
-                }
-                if (Preferences.getPasswordGenDigitsPref(prefs)) {
-                    chars.add(EASY_DIGITS);
-                }
-                if (Preferences.getPasswordGenSymbolsPref(prefs)) {
-                    chars.add(PasswdPolicy.SYMBOLS_EASY);
-                }
-            } else {
-                if (Preferences.getPasswordGenLowerPref(prefs)) {
-                    chars.add(LOWER_CHARS);
-                }
-                if (Preferences.getPasswordGenUpperPref(prefs)) {
-                    chars.add(UPPER_CHARS);
-                }
-                if (Preferences.getPasswordGenDigitsPref(prefs)) {
-                    chars.add(DIGITS);
-                }
-                if (Preferences.getPasswordGenSymbolsPref(prefs)) {
-                    chars.add(PasswdPolicy.SYMBOLS_DEFAULT);
-                }
+            boolean isEasy =
+                defPolicy.checkFlags(PasswdPolicy.FLAG_USE_EASY_VISION);
+            if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE)) {
+                chars.add(isEasy ? EASY_LOWER_CHARS : LOWER_CHARS);
+            }
+            if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE)) {
+                chars.add(isEasy ? EASY_UPPER_CHARS : UPPER_CHARS);
+            }
+            if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_DIGITS)) {
+                chars.add(isEasy ? EASY_DIGITS: DIGITS);
+            }
+            if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS)) {
+                chars.add(isEasy ? PasswdPolicy.SYMBOLS_EASY :
+                            PasswdPolicy.SYMBOLS_DEFAULT);
             }
         }
 
@@ -686,7 +671,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             TextUtils.concat(chars.toArray(new CharSequence[0])).toString();
         int numChars = charsStr.length();
         StringBuilder passwd = new StringBuilder();
-        int passwdLen = Preferences.getPasswordGenLengthPref(prefs);
+        int passwdLen = defPolicy.getLength();
         try {
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
             random.nextBytes(new byte[passwdLen]);

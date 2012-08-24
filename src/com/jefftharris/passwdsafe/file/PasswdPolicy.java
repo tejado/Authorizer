@@ -114,6 +114,12 @@ public class PasswdPolicy
         return itsFlags;
     }
 
+    /** Check for the presence of flags */
+    public final boolean checkFlags(int flags)
+    {
+        return (itsFlags & flags) == flags;
+    }
+
     /** Set the policy flags */
     public void setFlags(int flags)
     {
