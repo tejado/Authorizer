@@ -228,16 +228,14 @@ public class PasswdSafeApp extends Application
             fileListEdit.commit();
             prefsEdit.commit();
         }
+        Preferences.upgradePasswdPolicy(prefs, this);
 
         updateFileCloseTimeoutPref(prefs);
         updateFileCloseScreenOffPref(prefs);
         setPasswordEncodingPref(prefs);
         setFileCloseClearClipboardPref(prefs);
-
-        // TODO: load default policy from prefs
-        itsDefaultPasswdPolicy =
-            new PasswdPolicy(getString(R.string.default_policy),
-                             PasswdPolicy.Type.DEFAULT_POLICY);
+        itsDefaultPasswdPolicy = Preferences.getDefPasswdPolicyPref(prefs,
+                                                                    this);
     }
 
     /* (non-Javadoc)
@@ -334,7 +332,9 @@ public class PasswdSafeApp extends Application
     public synchronized void setDefaultPasswdPolicy(PasswdPolicy policy)
     {
         itsDefaultPasswdPolicy = policy;
-        // TODO: save to prefs
+        SharedPreferences prefs =
+            PreferenceManager.getDefaultSharedPreferences(this);
+        Preferences.setDefPasswdPolicyPref(policy, prefs);
     }
 
 
@@ -525,7 +525,7 @@ public class PasswdSafeApp extends Application
                     PendingIntent.getBroadcast(this, 0,
                                                FILE_TIMEOUT_INTENT_OBJ, 0);
             }
-            dbginfo(TAG, "register adding timer");
+            dbgverb(TAG, "register adding timer");
             itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
                             SystemClock.elapsedRealtime() + itsFileCloseTimeout,
                             itsCloseIntent);

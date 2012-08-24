@@ -83,8 +83,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private DialogValidator itsDeleteValidator;
     private EditDialog itsEditDialog;
 
-    // TODO: app default policy
-
 
     /** Called when the activity is first created. */
     @Override

@@ -11,6 +11,9 @@ import java.io.File;
 
 import org.pwsafe.lib.file.PwsFile;
 
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,6 +23,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 
 /**
  * The Preferences class defines the activity for managing preferences on the
@@ -91,6 +95,8 @@ public class Preferences extends PreferenceActivity
     public static final boolean PREF_GEN_HEX_DEF = false;
     public static final String PREF_GEN_LENGTH = "passwdGenLength";
     public static final String PREF_GEN_LENGTH_DEF = "8";
+    public static final String PREF_DEF_PASSWD_POLICY = "defaultPasswdPolicy";
+    public static final String PREF_DEF_PASSWD_POLICY_DEF = "";
 
     public static final String PREF_FONT_SIZE = "fontSizePref";
     public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
@@ -98,6 +104,7 @@ public class Preferences extends PreferenceActivity
     public static final String INTENT_SCREEN = "screen";
     public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
 
+    private static final String TAG = "Preferences";
 
     private EditTextPreference itsFileDirPref;
     private ListPreference itsDefFilePref;
@@ -190,6 +197,97 @@ public class Preferences extends PreferenceActivity
     public static String getPasswordEncodingPref(SharedPreferences prefs)
     {
         return prefs.getString(PREF_PASSWD_ENC, PREF_PASSWD_ENC_DEF);
+    }
+
+    /** Upgrade the default password policy preference if needed */
+    public static void upgradePasswdPolicy(SharedPreferences prefs,
+                                           Context ctx)
+    {
+        if (prefs.contains(PREF_DEF_PASSWD_POLICY)) {
+            PasswdSafeApp.dbginfo(TAG, "Have default policy");
+            return;
+        }
+
+        // TODO: remove old preferences and accessors
+        SharedPreferences.Editor prefsEdit = prefs.edit();
+        String policyStr = PREF_DEF_PASSWD_POLICY_DEF;
+        if (prefs.contains(PREF_GEN_LOWER) ||
+            prefs.contains(PREF_GEN_UPPER) ||
+            prefs.contains(PREF_GEN_DIGITS) ||
+            prefs.contains(PREF_GEN_SYMBOLS) ||
+            prefs.contains(PREF_GEN_EASY) ||
+            prefs.contains(PREF_GEN_HEX) ||
+            prefs.contains(PREF_GEN_LENGTH)) {
+            PasswdSafeApp.dbginfo(TAG, "Upgrade old prefs");
+            PasswdPolicy policy = PasswdPolicy.createDefaultPolicy(ctx);
+
+            int flags = 0;
+            if (getPasswordGenHexPref(prefs)) {
+                flags |= PasswdPolicy.FLAG_USE_HEX_DIGITS;
+            } else {
+                if (getPasswordGenEasyPref(prefs)) {
+                    flags |= PasswdPolicy.FLAG_USE_EASY_VISION;
+                }
+
+                if (getPasswordGenLowerPref(prefs)) {
+                    flags |= PasswdPolicy.FLAG_USE_LOWERCASE;
+                }
+                if (getPasswordGenUpperPref(prefs)) {
+                    flags |= PasswdPolicy.FLAG_USE_UPPERCASE;
+                }
+                if (getPasswordGenDigitsPref(prefs)) {
+                    flags |= PasswdPolicy.FLAG_USE_DIGITS;
+                }
+                if (getPasswordGenSymbolsPref(prefs)) {
+                    flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
+                }
+            }
+            policy.setFlags(flags);
+            policy.setLength(getPasswordGenLengthPref(prefs));
+            policyStr = policy.toHdrPolicyString();
+
+            prefsEdit.remove(PREF_GEN_LOWER);
+            prefsEdit.remove(PREF_GEN_UPPER);
+            prefsEdit.remove(PREF_GEN_DIGITS);
+            prefsEdit.remove(PREF_GEN_SYMBOLS);
+            prefsEdit.remove(PREF_GEN_EASY);
+            prefsEdit.remove(PREF_GEN_HEX);
+            prefsEdit.remove(PREF_GEN_LENGTH);
+        }
+
+        PasswdSafeApp.dbginfo(TAG, "Save new default policy: " + policyStr);
+        prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policyStr);
+        prefsEdit.commit();
+    }
+
+    /** Get the default password policy preference */
+    public static PasswdPolicy getDefPasswdPolicyPref(SharedPreferences prefs,
+                                                      Context ctx)
+    {
+        String policyStr = prefs.getString(PREF_DEF_PASSWD_POLICY,
+                                           PREF_DEF_PASSWD_POLICY_DEF);
+        PasswdPolicy policy = null;
+        if (!TextUtils.isEmpty(policyStr)) {
+            try {
+                policy = PasswdPolicy.parseHdrPolicy(
+                    policyStr, 0, 0, PasswdPolicy.Type.DEFAULT_POLICY).first;
+            } catch (Exception e) {
+                // Use default
+            }
+        }
+        if (policy == null) {
+            policy = PasswdPolicy.createDefaultPolicy(ctx);
+        }
+        return policy;
+    }
+
+    /** Set the default password policy preference */
+    public static void setDefPasswdPolicyPref(PasswdPolicy policy,
+                                              SharedPreferences prefs)
+    {
+        SharedPreferences.Editor prefsEdit = prefs.edit();
+        prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policy.toHdrPolicyString());
+        prefsEdit.commit();
     }
 
     public static boolean getPasswordGenLowerPref(SharedPreferences prefs)

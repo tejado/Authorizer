@@ -10,6 +10,10 @@ package com.jefftharris.passwdsafe.file;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.util.Pair;
+
+import android.content.Context;
 import android.text.TextUtils;
 
 /**
@@ -59,6 +63,7 @@ public class PasswdPolicy
         }
     }
 
+
     // TODO: Support pronounceable passwords
     // TODO HEX_DIGITS exclusivity
     // TODO: defaults?
@@ -82,6 +87,13 @@ public class PasswdPolicy
     {
         itsName = name;
         itsType = type;
+    }
+
+    /** Create a default policy */
+    public static PasswdPolicy createDefaultPolicy(Context ctx)
+    {
+        return new PasswdPolicy(ctx.getString(R.string.default_policy),
+                                PasswdPolicy.Type.DEFAULT_POLICY);
     }
 
     /** Get the policy name */
@@ -187,6 +199,56 @@ public class PasswdPolicy
         return itsName;
     }
 
+    /** Convert the object to a string formatted as a header policy */
+    public String toHdrPolicyString()
+    {
+        StringBuilder str = new StringBuilder();
+        str.append(String.format("%02x", itsName.length()));
+        str.append(itsName);
+        str.append(flagsAndLengthsToString());
+        if (itsSpecialSymbols == null) {
+            str.append("00");
+        } else {
+            str.append(String.format("%02x", itsSpecialSymbols.length()));
+            str.append(itsSpecialSymbols);
+        }
+        return str.toString();
+    }
+
+    /** Parse a header policy from a string */
+    public static Pair<PasswdPolicy, Integer> parseHdrPolicy(String policyStr,
+                                                             int pos,
+                                                             int policyNum,
+                                                             Type type)
+        throws IllegalArgumentException, NumberFormatException
+    {
+        int fieldStart = pos;
+        int nameLen = getPolicyStrInt(policyStr, policyNum, fieldStart, 2,
+                                      "name length");
+        fieldStart += 2;
+
+        String name = getPolicyStrField(policyStr, policyNum, fieldStart,
+                                        nameLen, "name");
+        fieldStart += nameLen;
+        PasswdPolicy policy = new PasswdPolicy(name, type);
+
+        fieldStart = parsePolicyFlagsAndLengths(policy, policyStr,
+                                                policyNum, fieldStart);
+
+        int numSpecials = getPolicyStrInt(policyStr, policyNum, fieldStart, 2,
+                                          "special symbols length");
+        fieldStart += 2;
+        String specialSyms = null;
+        if (numSpecials > 0) {
+            specialSyms = getPolicyStrField(policyStr, policyNum, fieldStart,
+                                            numSpecials, "special symbols");
+            fieldStart += numSpecials;
+        }
+        policy.setSpecialSymbols(specialSyms);
+
+        return new Pair<PasswdPolicy, Integer>(policy, fieldStart);
+    }
+
     /** Parse policies from the header named policies field */
     public static List<PasswdPolicy> parseHdrPolicies(String policyStr)
         throws IllegalArgumentException, NumberFormatException
@@ -207,29 +269,11 @@ public class PasswdPolicy
         int policyStart = 2;
         int fieldStart = policyStart;
         for (int i = 0; i < numPolicies; ++i, policyStart = fieldStart) {
-            int nameLen = getPolicyStrInt(policyStr, i, fieldStart, 2,
-                                          "name length");
-            fieldStart += 2;
-
-            String name = getPolicyStrField(policyStr, i, fieldStart, nameLen,
-                                            "name");
-            fieldStart += nameLen;
-            PasswdPolicy policy = new PasswdPolicy(name, Type.HEADER_POLICY);
-            policies.add(policy);
-
-            fieldStart = parsePolicyFlagsAndLengths(policy, policyStr,
-                                                    i, fieldStart);
-
-            int numSpecials = getPolicyStrInt(policyStr, i, fieldStart, 2,
-                                              "special symbols length");
-            fieldStart += 2;
-            String specialSyms = null;
-            if (numSpecials > 0) {
-                specialSyms = getPolicyStrField(policyStr, i, fieldStart,
-                                                numSpecials, "special symbols");
-                fieldStart += numSpecials;
-            }
-            policy.setSpecialSymbols(specialSyms);
+            Pair<PasswdPolicy, Integer> rc = parseHdrPolicy(policyStr,
+                                                            fieldStart, i,
+                                                            Type.HEADER_POLICY);
+            policies.add(rc.first);
+            fieldStart = rc.second;
         }
 
         if (policyStart != policyLen) {
@@ -250,16 +294,7 @@ public class PasswdPolicy
         StringBuilder str = new StringBuilder();
         str.append(String.format("%02x", policies.size()));
         for (PasswdPolicy policy: policies) {
-            str.append(String.format("%02x", policy.getName().length()));
-            str.append(policy.getName());
-            str.append(policyFlagsAndLengthsToString(policy));
-            String specialSyms = policy.getSpecialSymbols();
-            if (specialSyms == null) {
-                str.append("00");
-            } else {
-                str.append(String.format("%02x", specialSyms.length()));
-                str.append(specialSyms);
-            }
+            str.append(policy.toHdrPolicyString());
         }
         return str.toString();
     }
@@ -300,7 +335,7 @@ public class PasswdPolicy
         }
         case RECORD_POLICY: {
             return new RecordPolicyStrs(null,
-                                        policyFlagsAndLengthsToString(policy),
+                                        policy.flagsAndLengthsToString(),
                                         policy.getSpecialSymbols());
         }
         }
@@ -347,16 +382,12 @@ public class PasswdPolicy
         return fieldStart;
     }
 
-    /** Convert a policy's flags and lengths to a string */
-    private static String policyFlagsAndLengthsToString(PasswdPolicy policy)
+    /** Convert the policy's flags and lengths to a string */
+    private String flagsAndLengthsToString()
     {
         return String.format("%04x%03x%03x%03x%03x%03x",
-                             policy.getFlags(),
-                             policy.getLength(),
-                             policy.getMinDigits(),
-                             policy.getMinLowercase(),
-                             policy.getMinSymbols(),
-                             policy.getMinUppercase());
+                             itsFlags, itsLength, itsMinDigits, itsMinLowercase,
+                             itsMinSymbols, itsMinUppercase);
     }
 
 
