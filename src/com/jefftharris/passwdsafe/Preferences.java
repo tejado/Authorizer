@@ -276,7 +276,7 @@ public class Preferences extends PreferenceActivity
         if (!TextUtils.isEmpty(policyStr)) {
             try {
                 policy = PasswdPolicy.parseHdrPolicy(
-                    policyStr, 0, 0, PasswdPolicy.Type.DEFAULT_POLICY).first;
+                    policyStr, 0, 0, PasswdPolicy.Location.DEFAULT).first;
             } catch (Exception e) {
                 // Use default
             }

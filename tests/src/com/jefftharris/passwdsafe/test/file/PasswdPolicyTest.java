@@ -61,7 +61,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(1, policies.size());
         PasswdPolicy policy = policies.get(0);
         assertEquals("Policy1", policy.getName());
-        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
@@ -83,9 +83,9 @@ public class PasswdPolicyTest extends AndroidTestCase
     public void testHdrDefault()
     {
         PasswdPolicy policy = new PasswdPolicy("policy1",
-                                               PasswdPolicy.Type.HEADER_POLICY);
+                                               PasswdPolicy.Location.HEADER);
         assertEquals("policy1", policy.getName());
-        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
@@ -112,7 +112,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         PasswdPolicy policy;
         policy = policies.get(0);
         assertEquals("easy to read", policy.getName());
-        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
                      PasswdPolicy.FLAG_USE_SYMBOLS |
@@ -126,7 +126,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         policy = policies.get(1);
         assertEquals("hex only", policy.getName());
-        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
         assertEquals(PasswdPolicy.FLAG_USE_HEX_DIGITS, policy.getFlags());
         assertEquals(20, policy.getLength());
         assertEquals(1, policy.getMinLowercase());
@@ -137,7 +137,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         policy = policies.get(2);
         assertEquals("policy 1", policy.getName());
-        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
@@ -151,7 +151,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         policy = policies.get(3);
         assertEquals("pronounce", policy.getName());
-        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_SYMBOLS |
@@ -165,7 +165,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         policy = policies.get(4);
         assertEquals("special chars", policy.getName());
-        assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
@@ -193,7 +193,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         for (int i = 0; i < 255; ++i) {
             PasswdPolicy policy = policies.get(i);
             assertEquals(String.format("Policy%03d", i), policy.getName());
-            assertEquals(PasswdPolicy.Type.HEADER_POLICY, policy.getType());
+            assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
             assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                          PasswdPolicy.FLAG_USE_UPPERCASE |
                          PasswdPolicy.FLAG_USE_DIGITS |
@@ -473,7 +473,7 @@ public class PasswdPolicyTest extends AndroidTestCase
                                                              ownSymbols);
         assertNotNull(policy);
         assertEquals(policyName, policy.getName());
-        assertEquals(PasswdPolicy.Type.RECORD_POLICY_NAME, policy.getType());
+        assertEquals(PasswdPolicy.Location.RECORD_NAME, policy.getLocation());
         assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                      PasswdPolicy.FLAG_USE_UPPERCASE |
                      PasswdPolicy.FLAG_USE_DIGITS |
@@ -505,7 +505,7 @@ public class PasswdPolicyTest extends AndroidTestCase
                                                              ownSymbols);
         assertNotNull(policy);
         assertNull(policy.getName());
-        assertEquals(PasswdPolicy.Type.RECORD_POLICY, policy.getType());
+        assertEquals(PasswdPolicy.Location.RECORD, policy.getLocation());
         assertEquals(flags, policy.getFlags());
         assertEquals(length, policy.getLength());
         assertEquals(minDigits, policy.getMinDigits());

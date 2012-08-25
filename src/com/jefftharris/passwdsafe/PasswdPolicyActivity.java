@@ -126,12 +126,12 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         boolean canEdit =
             (selPolicy != null) &&
             (!readonlyFile ||
-                (selPolicy.getType() == PasswdPolicy.Type.DEFAULT_POLICY));
+                (selPolicy.getLocation() == PasswdPolicy.Location.DEFAULT));
 
         boolean canDelete =
             !readonlyFile &&
             (selPolicy != null) &&
-            (selPolicy.getType() != PasswdPolicy.Type.DEFAULT_POLICY);
+            (selPolicy.getLocation() != PasswdPolicy.Location.DEFAULT);
 
         MenuItem mi;
         mi = menu.findItem(MENU_ADD);
@@ -318,13 +318,13 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             {
                 public int compare(PasswdPolicy lhs, PasswdPolicy rhs)
                 {
-                    PasswdPolicy.Type lhsType = lhs.getType();
-                    PasswdPolicy.Type rhsType = rhs.getType();
-                    if (lhsType != rhsType) {
-                        if (lhsType == PasswdPolicy.Type.DEFAULT_POLICY) {
+                    PasswdPolicy.Location lhsLoc = lhs.getLocation();
+                    PasswdPolicy.Location rhsLoc = rhs.getLocation();
+                    if (lhsLoc != rhsLoc) {
+                        if (lhsLoc == PasswdPolicy.Location.DEFAULT) {
                             return -1;
                         }
-                        if (rhsType == PasswdPolicy.Type.DEFAULT_POLICY) {
+                        if (rhsLoc == PasswdPolicy.Location.DEFAULT) {
                             return 1;
                         }
                     }
@@ -379,7 +379,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private final void addUpdatePolicy(PasswdPolicy oldPolicy,
                                        PasswdPolicy newPolicy)
     {
-        if (newPolicy.getType() == PasswdPolicy.Type.DEFAULT_POLICY) {
+        if (newPolicy.getLocation() == PasswdPolicy.Location.DEFAULT) {
             getPasswdSafeApp().setDefaultPasswdPolicy(newPolicy);
             showPolicies();
         } else {
@@ -397,7 +397,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private final void deletePolicy()
     {
         PasswdPolicy policy = getSelectedPolicy();
-        if (policy.getType() != PasswdPolicy.Type.DEFAULT_POLICY) {
+        if (policy.getLocation() != PasswdPolicy.Location.DEFAULT) {
             itsPolicies.remove(policy);
             savePolicies();
         }
@@ -412,7 +412,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             List<PasswdPolicy> hdrPolicies =
                 new ArrayList<PasswdPolicy>(itsPolicies.size());
             for (PasswdPolicy policy: itsPolicies) {
-                if (policy.getType() == PasswdPolicy.Type.HEADER_POLICY) {
+                if (policy.getLocation() == PasswdPolicy.Location.HEADER) {
                     hdrPolicies.add(policy);
                 }
             }
@@ -549,7 +549,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             if (policy != null) {
                 titleId = R.string.edit_policy;
                 name = policy.getName();
-                if (policy.getType() == PasswdPolicy.Type.DEFAULT_POLICY) {
+                if (policy.getLocation() == PasswdPolicy.Location.DEFAULT) {
                     itsNameEdit.setEnabled(false);
                 }
                 len = policy.getLength();
@@ -730,8 +730,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         {
             PasswdPolicy policy = new PasswdPolicy(
                 itsNameEdit.getText().toString(),
-                (itsPolicy != null) ? itsPolicy.getType() :
-                    PasswdPolicy.Type.HEADER_POLICY);
+                (itsPolicy != null) ? itsPolicy.getLocation() :
+                    PasswdPolicy.Location.HEADER);
             int length = getTextViewInt(itsLengthEdit);
             policy.setLength(length);
 

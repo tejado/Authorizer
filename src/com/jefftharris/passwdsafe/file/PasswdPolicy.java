@@ -37,13 +37,13 @@ public class PasswdPolicy
     public static final String SYMBOLS_EASY = "+-=_@#$%^&<>/~\\?";
     public static final String SYMBOLS_PRONOUNCE = "@&(#!|$+";
 
-    /** The type of policy */
-    public enum Type
+    /** The location of the policy */
+    public enum Location
     {
-        DEFAULT_POLICY,
-        HEADER_POLICY,
-        RECORD_POLICY_NAME,
-        RECORD_POLICY
+        DEFAULT,
+        HEADER,
+        RECORD_NAME,
+        RECORD
     }
 
     /** Policy fields for a record */
@@ -70,7 +70,7 @@ public class PasswdPolicy
     // TODO: UTF-8 chars in policy name and special chars
 
     private final String itsName;
-    private final Type itsType;
+    private final Location itsLocation;
     private int itsFlags = FLAG_USE_LOWERCASE | FLAG_USE_UPPERCASE |
                            FLAG_USE_DIGITS | FLAG_USE_SYMBOLS;
     private int itsLength = 12;
@@ -83,17 +83,17 @@ public class PasswdPolicy
     /**
      * Constructor
      */
-    public PasswdPolicy(String name, Type type)
+    public PasswdPolicy(String name, Location loc)
     {
         itsName = name;
-        itsType = type;
+        itsLocation = loc;
     }
 
     /** Create a default policy */
     public static PasswdPolicy createDefaultPolicy(Context ctx)
     {
         return new PasswdPolicy(ctx.getString(R.string.default_policy),
-                                PasswdPolicy.Type.DEFAULT_POLICY);
+                                PasswdPolicy.Location.DEFAULT);
     }
 
     /** Get the policy name */
@@ -102,10 +102,10 @@ public class PasswdPolicy
         return itsName;
     }
 
-    /** Get the type */
-    public Type getType()
+    /** Get the location of the policy */
+    public Location getLocation()
     {
-        return itsType;
+        return itsLocation;
     }
 
     /** Get the policy flags */
@@ -225,7 +225,7 @@ public class PasswdPolicy
     public static Pair<PasswdPolicy, Integer> parseHdrPolicy(String policyStr,
                                                              int pos,
                                                              int policyNum,
-                                                             Type type)
+                                                             Location loc)
         throws IllegalArgumentException, NumberFormatException
     {
         int fieldStart = pos;
@@ -236,7 +236,7 @@ public class PasswdPolicy
         String name = getPolicyStrField(policyStr, policyNum, fieldStart,
                                         nameLen, "name");
         fieldStart += nameLen;
-        PasswdPolicy policy = new PasswdPolicy(name, type);
+        PasswdPolicy policy = new PasswdPolicy(name, loc);
 
         fieldStart = parsePolicyFlagsAndLengths(policy, policyStr,
                                                 policyNum, fieldStart);
@@ -277,7 +277,7 @@ public class PasswdPolicy
         for (int i = 0; i < numPolicies; ++i, policyStart = fieldStart) {
             Pair<PasswdPolicy, Integer> rc = parseHdrPolicy(policyStr,
                                                             fieldStart, i,
-                                                            Type.HEADER_POLICY);
+                                                            Location.HEADER);
             policies.add(rc.first);
             fieldStart = rc.second;
         }
@@ -312,9 +312,9 @@ public class PasswdPolicy
     {
         PasswdPolicy policy = null;
         if (policyName != null) {
-            policy = new PasswdPolicy(policyName, Type.RECORD_POLICY_NAME);
+            policy = new PasswdPolicy(policyName, Location.RECORD_NAME);
         } else if (policyStr != null) {
-            policy = new PasswdPolicy(null, Type.RECORD_POLICY);
+            policy = new PasswdPolicy(null, Location.RECORD);
             int endPos = parsePolicyFlagsAndLengths(policy, policyStr, 0, 0);
             if (endPos != policyStr.length()) {
                 throw new IllegalArgumentException(
@@ -331,15 +331,15 @@ public class PasswdPolicy
         if (policy == null) {
             return null;
         }
-        switch (policy.getType()) {
-        case DEFAULT_POLICY:
-        case HEADER_POLICY: {
+        switch (policy.getLocation()) {
+        case DEFAULT:
+        case HEADER: {
             return null;
         }
-        case RECORD_POLICY_NAME: {
+        case RECORD_NAME: {
             return new RecordPolicyStrs(policy.getName(), null, null);
         }
-        case RECORD_POLICY: {
+        case RECORD: {
             return new RecordPolicyStrs(null,
                                         policy.flagsAndLengthsToString(),
                                         policy.getSpecialSymbols());
