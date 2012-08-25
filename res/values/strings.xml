@@ -155,6 +155,7 @@
     <string name="show_passwords">Show Passwords</string>
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
+    <string name="toggle_monospace">Toggle Monospace</string>
     <string name="type">Type</string>
     <string name="unprotect_all">Unprotect All Records</string>
     <string name="unprotect_group">Unprotect Group Records</string>
