@@ -51,33 +51,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private static final int DIALOG_EDIT =      MAX_DIALOG + 2;
     private static final int DIALOG_DELETE =    MAX_DIALOG + 3;
 
-    /** Type of policy.  String indexes must match policy_type strings. */
-    enum Type
-    {
-        NORMAL          (0),
-        EASY_TO_READ    (1),
-        PRONOUNCEABLE   (2),
-        HEXADECIMAL     (3);
-
-        private Type(int strIdx)
-        {
-            itsStrIdx = strIdx;
-        }
-
-        public final int itsStrIdx;
-
-        /** Get the type from the string index */
-        public static Type fromStrIdx(int idx)
-        {
-            for (Type t: values()) {
-                if (idx == t.itsStrIdx) {
-                    return t;
-                }
-            }
-            return NORMAL;
-        }
-    }
-
     private List<PasswdPolicy> itsPolicies;
     private Set<String> itsPolicyNames;
     private DialogValidator itsDeleteValidator;
@@ -507,8 +480,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         private PasswdPolicy itsPolicy;
         private View itsView;
         private DialogValidator itsValidator;
-        private Type itsOrigType = Type.NORMAL;
-        private Type itsType = Type.NORMAL;
+        private PasswdPolicy.Type itsOrigType = PasswdPolicy.Type.NORMAL;
+        private PasswdPolicy.Type itsType = PasswdPolicy.Type.NORMAL;
         private TextView itsNameEdit;
         private TextView itsLengthEdit;
         // Lower, upper, digits, symbols
@@ -553,17 +526,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                     itsNameEdit.setEnabled(false);
                 }
                 len = policy.getLength();
-                if (policy.checkFlags(PasswdPolicy.FLAG_USE_EASY_VISION)) {
-                    itsOrigType = Type.EASY_TO_READ;
-                } else if (policy.checkFlags(
-                               PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE)) {
-                    itsOrigType = Type.PRONOUNCEABLE;
-                } else if (policy.checkFlags(
-                               PasswdPolicy.FLAG_USE_HEX_DIGITS)) {
-                    itsOrigType = Type.HEXADECIMAL;
-                } else {
-                    itsOrigType = Type.NORMAL;
-                }
+                itsOrigType = policy.getType();
                 useOptions[0] =
                     policy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
                 useOptions[1] =
@@ -581,7 +544,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 titleId = R.string.new_policy;
                 name = "";
                 len = 12;
-                itsOrigType = Type.NORMAL;
+                itsOrigType = PasswdPolicy.Type.NORMAL;
                 for (int i = 0; i < useOptions.length; ++i) {
                     useOptions[i] = true;
                     optionLens[i] = 1;
@@ -632,7 +595,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                             return getString(R.string.length_min_val, 4);
                         } else if (length > 1024) {
                             return getString(R.string.length_max_val, 1024);
-                        } else if ((itsType == Type.HEXADECIMAL) &&
+                        } else if ((itsType == PasswdPolicy.Type.HEXADECIMAL) &&
                                    ((length % 2) != 0) ) {
                             return getString(R.string.length_even_hex);
                         }
@@ -641,7 +604,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                         return getString(R.string.invalid_length);
                     }
 
-                    if (itsType != Type.HEXADECIMAL) {
+                    if (itsType != PasswdPolicy.Type.HEXADECIMAL) {
                         boolean oneSelected = false;
                         for (CheckBox option: itsOptions) {
                             if (option.isChecked()) {
@@ -654,7 +617,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                         }
                     }
 
-                    if (itsType == Type.NORMAL) {
+                    if (itsType == PasswdPolicy.Type.NORMAL) {
                         int minOptionsLen = 0;
                         for (int i = 0; i < itsOptions.length; ++i) {
                             if (itsOptions[i].isChecked()) {
@@ -742,7 +705,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             int minSymbols = 1;
             String customSymbols = null;
 
-            if (itsType != Type.HEXADECIMAL) {
+            if (itsType != PasswdPolicy.Type.HEXADECIMAL) {
                 if (itsOptions[0].isChecked()) {
                     flags |= PasswdPolicy.FLAG_USE_LOWERCASE;
                 }
@@ -813,7 +776,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
 
 
         /** Set the type of policy and update the UI */
-        private final void setType(Type type, boolean init)
+        private final void setType(PasswdPolicy.Type type, boolean init)
         {
             if ((type == itsType) && !init) {
                 return;
@@ -828,12 +791,12 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                     public void onItemSelected(AdapterView<?> parent, View arg1,
                                                int position, long id)
                     {
-                        setType(Type.fromStrIdx(position), false);
+                        setType(PasswdPolicy.Type.fromStrIdx(position), false);
                     }
 
                     public void onNothingSelected(AdapterView<?> arg0)
                     {
-                        setType(Type.NORMAL, false);
+                        setType(PasswdPolicy.Type.NORMAL, false);
                     }
                 });
             }
@@ -962,7 +925,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         private final void setOptionLenVisible(CheckBox option)
         {
             boolean visible;
-            if (itsType == Type.NORMAL) {
+            if (itsType == PasswdPolicy.Type.NORMAL) {
                 visible = option.isChecked();
             } else {
                 visible = false;

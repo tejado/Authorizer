@@ -63,11 +63,35 @@ public class PasswdPolicy
         }
     }
 
-
-    // TODO: Support pronounceable passwords
-    // TODO HEX_DIGITS exclusivity
-    // TODO: defaults?
     // TODO: UTF-8 chars in policy name and special chars
+
+    /** Type of policy.  String indexes must match policy_type strings. */
+    public enum Type
+    {
+        NORMAL          (0),
+        EASY_TO_READ    (1),
+        PRONOUNCEABLE   (2),
+        HEXADECIMAL     (3);
+
+        private Type(int strIdx)
+        {
+            itsStrIdx = strIdx;
+        }
+
+        public final int itsStrIdx;
+
+        /** Get the type from the string index */
+        public static Type fromStrIdx(int idx)
+        {
+            for (Type t: values()) {
+                if (idx == t.itsStrIdx) {
+                    return t;
+                }
+            }
+            return NORMAL;
+        }
+    }
+
 
     private final String itsName;
     private final Location itsLocation;
@@ -124,6 +148,19 @@ public class PasswdPolicy
     public void setFlags(int flags)
     {
         itsFlags = flags & FLAGS_VALID;
+    }
+
+    /** Get the type of policy */
+    public Type getType()
+    {
+        if (checkFlags(FLAG_USE_EASY_VISION)) {
+            return Type.EASY_TO_READ;
+        } else if (checkFlags(FLAG_MAKE_PRONOUNCEABLE)) {
+            return Type.PRONOUNCEABLE;
+        } else if (checkFlags(FLAG_USE_HEX_DIGITS)) {
+            return Type.HEXADECIMAL;
+        }
+        return Type.NORMAL;
     }
 
     /** Get the password length */

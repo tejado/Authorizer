@@ -643,11 +643,11 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         ArrayList<String> chars = new ArrayList<String>();
         PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
-        if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_HEX_DIGITS)) {
-            chars.add(DIGITS + "abcdef");
-        } else {
-            boolean isEasy =
-                defPolicy.checkFlags(PasswdPolicy.FLAG_USE_EASY_VISION);
+        PasswdPolicy.Type type = defPolicy.getType();
+        switch (type) {
+        case NORMAL:
+        case EASY_TO_READ: {
+            boolean isEasy = (type == PasswdPolicy.Type.EASY_TO_READ);
             if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE)) {
                 chars.add(isEasy ? EASY_LOWER_CHARS : LOWER_CHARS);
             }
@@ -661,6 +661,16 @@ public class RecordEditActivity extends AbstractRecordActivity
                 chars.add(isEasy ? PasswdPolicy.SYMBOLS_EASY :
                             PasswdPolicy.SYMBOLS_DEFAULT);
             }
+            break;
+        }
+        case PRONOUNCEABLE: {
+            // TODO: support pronounceable
+            break;
+        }
+        case HEXADECIMAL: {
+            chars.add(DIGITS + "abcdef");
+            break;
+        }
         }
 
         if (chars.isEmpty()) {
