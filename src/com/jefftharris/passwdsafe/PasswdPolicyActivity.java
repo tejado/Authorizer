@@ -83,9 +83,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private DialogValidator itsDeleteValidator;
     private EditDialog itsEditDialog;
 
-    // TODO: v1 and v2 file support
-
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -122,22 +119,23 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     public boolean onPrepareOptionsMenu(Menu menu)
     {
         PasswdFileData fileData = getPasswdFileData();
-        boolean readonly = (fileData == null) || !fileData.canEdit();
+        boolean readonlyFile =
+            (fileData == null) || !fileData.isV3() || !fileData.canEdit();
         PasswdPolicy selPolicy = getSelectedPolicy();
 
         boolean canEdit =
             (selPolicy != null) &&
-            (!readonly ||
+            (!readonlyFile ||
                 (selPolicy.getType() == PasswdPolicy.Type.DEFAULT_POLICY));
 
         boolean canDelete =
-            !readonly &&
+            !readonlyFile &&
             (selPolicy != null) &&
             (selPolicy.getType() != PasswdPolicy.Type.DEFAULT_POLICY);
 
         MenuItem mi;
         mi = menu.findItem(MENU_ADD);
-        mi.setEnabled(!readonly);
+        mi.setEnabled(!readonlyFile);
         mi = menu.findItem(MENU_EDIT);
         mi.setEnabled(canEdit);
         mi = menu.findItem(MENU_DELETE);
