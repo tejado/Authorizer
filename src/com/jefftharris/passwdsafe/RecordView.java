@@ -46,6 +46,7 @@ public class RecordView extends AbstractRecordTabActivity
     private static final String TAG = "RecordView";
 
     private static final String WORD_WRAP_PREF = "wordwrap";
+    private static final String MONOSPACE_PREF = "monospace";
 
     private static final int DIALOG_DELETE = MAX_DIALOG + 1;
 
@@ -57,6 +58,7 @@ public class RecordView extends AbstractRecordTabActivity
     private static final int MENU_COPY_NOTES = 6;
     private static final int MENU_TOGGLE_WRAP_NOTES = 7;
     private static final int MENU_CLOSE = 8;
+    private static final int MENU_TOGGLE_MONOSPACE = 9;
 
     private static final int RECORD_EDIT_REQUEST = 0;
     private static final int RECORD_VIEW_REQUEST = 1;
@@ -105,6 +107,7 @@ public class RecordView extends AbstractRecordTabActivity
     private TextView itsPasswordView;
     private String itsHiddenPasswordStr;
     private boolean isWordWrap = true;
+    private boolean itsIsMonospace = false;
     private boolean itsHasNotes = false;
     private Drawable itsNotesTabDrawable;
     private DialogValidator itsDeleteValidator;
@@ -163,6 +166,7 @@ public class RecordView extends AbstractRecordTabActivity
             public void onTabChanged(String tabId)
             {
                 scrollTabToTop();
+                GuiUtils.invalidateOptionsMenu(RecordView.this);
             }
         });
 
@@ -174,7 +178,7 @@ public class RecordView extends AbstractRecordTabActivity
 
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
-
+        itsIsMonospace = prefs.getBoolean(MONOSPACE_PREF, false);
         refresh();
     }
 
@@ -260,6 +264,7 @@ public class RecordView extends AbstractRecordTabActivity
         menu.add(0, MENU_COPY_USER, 0, R.string.copy_user);
         menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_password);
         menu.add(0, MENU_COPY_NOTES, 0, R.string.copy_notes);
+        menu.add(0, MENU_TOGGLE_MONOSPACE, 0, R.string.toggle_monospace);
         menu.add(0, MENU_TOGGLE_WRAP_NOTES, 0, R.string.toggle_word_wrap);
         return true;
     }
@@ -293,6 +298,11 @@ public class RecordView extends AbstractRecordTabActivity
         }
 
         item = menu.findItem(MENU_COPY_NOTES);
+        if (item != null) {
+            item.setVisible(tab == TAB_NOTES);
+        }
+
+        item = menu.findItem(MENU_TOGGLE_MONOSPACE);
         if (item != null) {
             item.setVisible(tab == TAB_NOTES);
         }
@@ -347,45 +357,41 @@ public class RecordView extends AbstractRecordTabActivity
                 new Intent(Intent.ACTION_EDIT, getIntent().getData(),
                            this, RecordEditActivity.class),
                 RECORD_EDIT_REQUEST);
-            return true;
+            break;
         }
         case MENU_DELETE:
         {
             showDialog(DIALOG_DELETE);
-            return true;
+            break;
         }
         case MENU_TOGGLE_PASSWORD:
         {
             togglePasswordShown();
-            return true;
+            break;
         }
         case MENU_COPY_USER:
         {
             TextView tv = (TextView)findViewById(R.id.user);
             PasswdSafeApp.copyToClipboard(tv.getText().toString(), this);
-            return true;
+            break;
         }
         case MENU_COPY_PASSWORD:
         {
             PasswdSafeApp.copyToClipboard(getPassword(), this);
-            return true;
+            break;
         }
         case MENU_COPY_NOTES:
         {
             TextView tv = (TextView)findViewById(R.id.notes);
             PasswdSafeApp.copyToClipboard(tv.getText().toString(), this);
-            return true;
+            break;
         }
         case MENU_TOGGLE_WRAP_NOTES:
         {
-            SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
             isWordWrap = !isWordWrap;
-            editor.putBoolean(WORD_WRAP_PREF, isWordWrap);
-            editor.commit();
-
-            setWordWrap();
-            return true;
+            saveNotesOptionsPrefs();
+            setNotesOptions();
+            break;
         }
         case MENU_CLOSE:
         {
@@ -393,11 +399,18 @@ public class RecordView extends AbstractRecordTabActivity
             if (passwdFile != null) {
                 passwdFile.close();
             }
-            return true;
+            break;
+        }
+        case MENU_TOGGLE_MONOSPACE: {
+            itsIsMonospace = !itsIsMonospace;
+            saveNotesOptionsPrefs();
+            setNotesOptions();
+            break;
         }
         default:
             return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     @Override
@@ -572,11 +585,22 @@ public class RecordView extends AbstractRecordTabActivity
         return password;
     }
 
-    private final void setWordWrap()
+    private final void saveNotesOptionsPrefs()
+    {
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(WORD_WRAP_PREF, isWordWrap);
+        editor.putBoolean(MONOSPACE_PREF, itsIsMonospace);
+        editor.commit();
+    }
+
+    private final void setNotesOptions()
     {
         TextView tv = (TextView)findViewById(R.id.notes);
         tv.setHorizontallyScrolling(!isWordWrap);
-    }
+        tv.setTypeface(
+                       itsIsMonospace ? Typeface.MONOSPACE : Typeface.DEFAULT);
+   }
 
     private final TextView setText(int id, int rowId, String text)
     {
@@ -802,7 +826,7 @@ public class RecordView extends AbstractRecordTabActivity
         View notesTitle = notesTab.findViewById(android.R.id.title);
         notesTab.setEnabled(itsHasNotes);
         notesTitle.setEnabled(itsHasNotes);
-        setWordWrap();
+        setNotesOptions();
     }
 
     private final void setHistoryFields(PasswdRecord passwdRec,
