@@ -216,20 +216,23 @@
                     android:orientation="vertical">
                     
                     <TextView
+                        android:id="@+id/policy_label"
                         style="@style/RecordHeader"
                         android:text="@string/policy_header"/>
                     
-                    <View style="@style/Separator"/>
+                    <View
+                        android:id="@+id/policy_sep"
+                        style="@style/Separator"/>
                     
                     <com.jefftharris.passwdsafe.view.PasswdPolicyView
-                        style="@style/RecordField"
                         android:id="@+id/policy"
+                        style="@style/RecordField"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:paddingBottom="5dp"/>
                               
                     <TextView
                         style="@style/RecordHeader"
-                        android:paddingTop="5dp"
                         android:text="@string/history_header"/>
                               
                     <View style="@style/Separator"/>

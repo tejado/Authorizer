@@ -9,6 +9,17 @@
         android:shrinkColumns="1"
         android:stretchColumns="1">
         
+        <TableRow
+            android:id="@+id/location_row"
+            android:visibility="gone">
+
+            <TextView
+                android:paddingRight="3dp"
+                android:text="@string/location"/>
+
+            <TextView android:id="@+id/location"/>
+        </TableRow>        
+        
         <TableRow>
 
             <TextView

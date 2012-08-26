@@ -30,6 +30,7 @@
     <string name="copy_user">Copy User Name</string>
     <string name="custom_symbols">Custom Symbols</string>
     <string name="custom_symbol_not_alphanum">Custom symbols must not be alphanumeric or whitespace</string>
+    <string name="database_policy">Database Policy - %s</string>
     <string name="database_version_label">Database version:</string>
     <string name="default_policy">Default Policy</string>
     <string name="delete">Delete</string>
@@ -90,6 +91,7 @@
     <string name="length_even_hex">Length must be even for hexadecimal</string>
     <string name="length_min_val">Length must be at least %1$d</string>
     <string name="length_max_val">Length must be at most %1$d</string>
+    <string name="location">Location</string>
     <string name="max_size_label">Maximum size:</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
@@ -139,6 +141,7 @@
     <string name="protected_record_header">PROTECTED RECORD</string>
     <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Search filter: %1$s</string>
+    <string name="record">Record</string>
     <string name="record_has_references">Record has references</string>
     <string name="record_not_found">Record not found</string>
     <string name="record_type">Record type</string>

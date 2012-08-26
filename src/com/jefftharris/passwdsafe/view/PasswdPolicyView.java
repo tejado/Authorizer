@@ -13,6 +13,7 @@ import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -33,6 +34,18 @@ public class PasswdPolicyView extends LinearLayout
     {
         super(context, attrs);
         init(context);
+    }
+
+    /** Show the policy location */
+    public void showLocation(String location)
+    {
+        View row = findViewById(R.id.location_row);
+        row.setVisibility((location == null) ? View.GONE : View.VISIBLE);
+
+        if (location != null) {
+            TextView tv = (TextView)findViewById(R.id.location);
+            tv.setText(location);
+        }
     }
 
     /** Show a policy */
@@ -80,6 +93,7 @@ public class PasswdPolicyView extends LinearLayout
     private void init(Context context)
     {
         inflate(context, R.layout.passwd_policy_view, this);
+        showLocation(null);
         showPolicy(null);
     }
 

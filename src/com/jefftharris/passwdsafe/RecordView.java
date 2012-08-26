@@ -13,8 +13,10 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.view.DialogUtils;
+import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -836,9 +838,34 @@ public class RecordView extends AbstractRecordTabActivity
                                          PasswdFileData fileData,
                                          TabWidget tabs)
     {
+        PasswdPolicy policy = null;
+        String policyLoc = null;
         PasswdHistory history = null;
         switch (passwdRec.getType()) {
         case NORMAL: {
+            policy = fileData.getPasswdPolicy(passwdRec.getRecord());
+            if (policy == null) {
+                policy = getPasswdSafeApp().getDefaultPasswdPolicy();
+                policyLoc= getString(R.string.default_policy);
+            } else if (policy.getLocation() ==
+                       PasswdPolicy.Location.RECORD_NAME) {
+                List<PasswdPolicy> policies = fileData.getHdrPasswdPolicies();
+                if (policies != null) {
+                    for (PasswdPolicy hdrPolicy: policies) {
+                        if (policy.getName().equals(hdrPolicy.getName())) {
+                            policy = hdrPolicy;
+                            break;
+                        }
+                    }
+                }
+                if (policy != null) {
+                    policyLoc = getString(R.string.database_policy,
+                                          policy.getName());
+                }
+            } else {
+                policyLoc = getString(R.string.record);
+            }
+
             history = fileData.getPasswdHistory(passwdRec.getRecord());
             break;
         }
@@ -875,6 +902,19 @@ public class RecordView extends AbstractRecordTabActivity
         historyMaxSizeView.setEnabled(historyExists);
         histView.setEnabled(historyEnabled);
         findViewById(R.id.history_max_size_label).setEnabled(historyExists);
+
+        // TODO: prevent policy deletion if a record references it
+        // TODO: prevent record deletion if there are references to it
+        int visibility = (policy != null) ? View.VISIBLE : View.GONE;
+        PasswdPolicyView policyView =
+            (PasswdPolicyView)findViewById(R.id.policy);
+        findViewById(R.id.policy_label).setVisibility(visibility);
+        findViewById(R.id.policy_sep).setVisibility(visibility);
+        policyView.setVisibility(visibility);
+        if (policy != null) {
+            policyView.showLocation(policyLoc);
+            policyView.showPolicy(policy);
+        }
     }
 
     private void scrollTabToTop()
