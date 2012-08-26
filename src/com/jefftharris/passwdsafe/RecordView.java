@@ -641,13 +641,13 @@ public class RecordView extends AbstractRecordTabActivity
         }
         case ALIAS: {
             baseRow.setVisibility(View.VISIBLE);
-            baseLabel.setText(R.string.alias_base_record_label);
+            baseLabel.setText(R.string.alias_base_record_header);
             base.setText(fileData.getId(ref));
             break;
         }
         case SHORTCUT: {
             baseRow.setVisibility(View.VISIBLE);
-            baseLabel.setText(R.string.shortcut_base_record_label);
+            baseLabel.setText(R.string.shortcut_base_record_header);
             base.setText(fileData.getId(ref));
             break;
         }

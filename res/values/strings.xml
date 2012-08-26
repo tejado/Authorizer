@@ -5,6 +5,7 @@
     <string name="add">Add</string>
     <string name="add_policy">Add Policy</string>
     <string name="add_record">Add Record</string>
+    <string name="alias_base_record_header">ALIAS</string>
     <string name="alias_base_record_label">Alias</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">PasswdSafe</string>
@@ -153,6 +154,7 @@
     <string name="search_hint">Search PasswdSafe</string>
     <string name="select_file_label">Select password file to open:</string>
     <string name="set_password">Set Password</string>
+    <string name="shortcut_base_record_header">SHORTCUT</string>
     <string name="shortcut_base_record_label">Shortcut</string>
     <string name="shortcut_choose_file">Choose shortcut password file</string>
     <string name="shortcut_choose_record">Choose shortcut password record</string>
