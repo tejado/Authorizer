@@ -24,7 +24,13 @@
         android:layout_width="fill_parent"
         android:layout_height="1dip"
         android:background="#FF909090"/>
+
+    <com.jefftharris.passwdsafe.view.PasswdPolicyView
+        android:id="@+id/policy_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
     
+<!--    
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
@@ -34,6 +40,15 @@
             android:layout_height="wrap_content"
             android:shrinkColumns="1"
             android:stretchColumns="1">
+            
+            <TableRow>
+
+                <TextView
+                    android:paddingRight="3dp"
+                    android:text="@string/type"/>
+
+                <TextView android:id="@+id/type"/>
+            </TableRow>        
             
             <TableRow>
 
@@ -110,5 +125,5 @@
         </TableLayout>
                
     </ScrollView>
-    
+-->    
 </LinearLayout>

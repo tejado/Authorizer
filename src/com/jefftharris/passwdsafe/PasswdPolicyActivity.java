@@ -17,6 +17,7 @@ import java.util.Set;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.view.DialogUtils;
+import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -310,41 +311,9 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     /** Show the details of a policy */
     private final void showPolicy(PasswdPolicy policy)
     {
-        int length = 0;
-        String lowercase = null;
-        String uppercase = null;
-        String digits = null;
-        String symbols = null;
-        String easyvision = null;
-        String pronounceable = null;
-        String hexadecimal = null;
-
-        if (policy != null) {
-            length = policy.getLength();
-            lowercase = getPolicyOption(policy,
-                                        PasswdPolicy.FLAG_USE_LOWERCASE);
-            uppercase = getPolicyOption(policy,
-                                        PasswdPolicy.FLAG_USE_UPPERCASE);
-            digits = getPolicyOption(policy,
-                                     PasswdPolicy.FLAG_USE_DIGITS);
-            symbols = getPolicyOption(policy,
-                                        PasswdPolicy.FLAG_USE_SYMBOLS);
-            easyvision = getPolicyOption(policy,
-                                        PasswdPolicy.FLAG_USE_EASY_VISION);
-            pronounceable = getPolicyOption(policy,
-                                            PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE);
-            hexadecimal = getPolicyOption(policy,
-                                          PasswdPolicy.FLAG_USE_HEX_DIGITS);
-        }
-
-        setTextStr(R.id.length, Integer.toString(length));
-        setTextStr(R.id.lowercase, lowercase);
-        setTextStr(R.id.uppercase, uppercase);
-        setTextStr(R.id.digits, digits);
-        setTextStr(R.id.symbols, symbols);
-        setTextStr(R.id.easyvision, easyvision);
-        setTextStr(R.id.pronounceable, pronounceable);
-        setTextStr(R.id.hexadecimal, hexadecimal);
+        PasswdPolicyView view =
+            (PasswdPolicyView)findViewById(R.id.policy_view);
+        view.showPolicy(policy);
     }
 
 
@@ -407,67 +376,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             policy = itsPolicies.get(selectedPos);
         }
         return policy;
-    }
-
-
-    /** Set the text on a policy detail string */
-    private final void setTextStr(int id, String str)
-    {
-        TextView tv = (TextView)findViewById(id);
-        tv.setText((str != null) ? str : getString(R.string.policy_no));
-    }
-
-
-    /** Get a string for a particular policy option flag */
-    private final String getPolicyOption(PasswdPolicy policy, int flag)
-    {
-        String str = null;
-        if (policy.checkFlags(flag)) {
-            switch (flag) {
-            case PasswdPolicy.FLAG_USE_LOWERCASE: {
-                str = getString(R.string.policy_yes_len,
-                                policy.getMinLowercase());
-                break;
-            }
-            case PasswdPolicy.FLAG_USE_UPPERCASE: {
-                str = getString(R.string.policy_yes_len,
-                                policy.getMinUppercase());
-                break;
-            }
-            case PasswdPolicy.FLAG_USE_DIGITS: {
-                str = getString(R.string.policy_yes_len,
-                                policy.getMinDigits());
-                break;
-            }
-            case PasswdPolicy.FLAG_USE_SYMBOLS: {
-                String symbols = policy.getSpecialSymbols();
-                int id;
-                if (!TextUtils.isEmpty(symbols)) {
-                    id = R.string.policy_yes_sym_policy;
-                } else if (policy.checkFlags(
-                               PasswdPolicy.FLAG_USE_EASY_VISION)) {
-                    id = R.string.policy_yes_sym_easy;
-                    symbols = PasswdPolicy.SYMBOLS_EASY;
-                } else if (policy.checkFlags(
-                               PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE)) {
-                    id = R.string.policy_yes_sym_pronounce;
-                    symbols = PasswdPolicy.SYMBOLS_PRONOUNCE;
-                } else {
-                    id = R.string.policy_yes_sym_default;
-                    symbols = PasswdPolicy.SYMBOLS_DEFAULT;
-                }
-                str = getString(id, policy.getMinSymbols(), symbols);
-                break;
-            }
-            case PasswdPolicy.FLAG_USE_HEX_DIGITS:
-            case PasswdPolicy.FLAG_USE_EASY_VISION:
-            case PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE: {
-                str = getString(R.string.policy_yes);
-                break;
-            }
-            }
-        }
-        return str;
     }
 
 
