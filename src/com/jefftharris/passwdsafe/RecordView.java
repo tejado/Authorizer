@@ -67,7 +67,7 @@ public class RecordView extends AbstractRecordTabActivity
     private static final int RECORD_VIEW_REQUEST = 1;
 
     private static final int TAB_BASIC = 0;
-    private static final int TAB_HISTORY = 1;
+    //private static final int TAB_PASSWORD = 1;
     private static final int TAB_NOTES = 2;
 
     private static final int NOTES_ICON_LEVEL_BASE = 0;
@@ -151,10 +151,10 @@ public class RecordView extends AbstractRecordTabActivity
             .setContent(R.id.basic_tab);
         tabHost.addTab(spec);
 
-        spec = tabHost.newTabSpec("history")
-            .setIndicator("History",
+        spec = tabHost.newTabSpec("password")
+            .setIndicator("Password",
                           res.getDrawable(R.drawable.ic_tab_account_list))
-            .setContent(R.id.history_tab);
+            .setContent(R.id.password_tab);
         tabHost.addTab(spec);
 
         itsNotesTabDrawable = new NotesTabDrawable(res);
@@ -524,8 +524,8 @@ public class RecordView extends AbstractRecordTabActivity
         }
 
         setBasicFields(passwdRec, fileData);
+        setPasswordFields(passwdRec, fileData, tabs);
         setNotesFields(passwdRec, fileData, tabs);
-        setHistoryFields(passwdRec, fileData, tabs);
         GuiUtils.invalidateOptionsMenu(this);
     }
 
@@ -832,32 +832,24 @@ public class RecordView extends AbstractRecordTabActivity
         setNotesOptions();
     }
 
-    private final void setHistoryFields(PasswdRecord passwdRec,
-                                        PasswdFileData fileData,
-                                        TabWidget tabs)
+    private final void setPasswordFields(PasswdRecord passwdRec,
+                                         PasswdFileData fileData,
+                                         TabWidget tabs)
     {
-        View historyTab = tabs.getChildAt(TAB_HISTORY);
-        View historyTitle = historyTab.findViewById(android.R.id.title);
         PasswdHistory history = null;
-        boolean tabEnabled = true;
         switch (passwdRec.getType()) {
         case NORMAL: {
             history = fileData.getPasswdHistory(passwdRec.getRecord());
-            tabEnabled = true;
             break;
         }
         case ALIAS: {
             history = fileData.getPasswdHistory(passwdRec.getRef());
-            tabEnabled = true;
             break;
         }
         case SHORTCUT: {
-            tabEnabled = false;
             break;
         }
         }
-        historyTab.setEnabled(tabEnabled);
-        historyTitle.setEnabled(tabEnabled);
 
         boolean historyExists = (history != null);
         boolean historyEnabled = false;
@@ -872,6 +864,7 @@ public class RecordView extends AbstractRecordTabActivity
             historyMaxSize = getString(R.string.n_a);
             histView.setAdapter(null);
         }
+        GuiUtils.setListViewHeightBasedOnChildren(histView);
         CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
         enabledCb.setClickable(false);
         enabledCb.setChecked(historyEnabled);
@@ -882,7 +875,6 @@ public class RecordView extends AbstractRecordTabActivity
         historyMaxSizeView.setEnabled(historyExists);
         histView.setEnabled(historyEnabled);
         findViewById(R.id.history_max_size_label).setEnabled(historyExists);
-        findViewById(R.id.history_sep).setEnabled(historyExists);
     }
 
     private void scrollTabToTop()

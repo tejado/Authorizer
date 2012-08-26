@@ -23,7 +23,7 @@
             android:id="@android:id/tabs"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" />
-            
+
         <FrameLayout
             android:id="@android:id/tabcontent"
             android:layout_width="fill_parent"
@@ -205,46 +205,78 @@
                 </LinearLayout>
             </ScrollView>                          
 
-            <RelativeLayout android:id="@+id/history_tab"
+            <ScrollView
+                android:id="@+id/password_tab"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+                
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    
+                    <TextView
+                        style="@style/RecordHeader"
+                        android:text="@string/policy_header"/>
+                    
+                    <View style="@style/Separator"/>
+                    
+                    <com.jefftharris.passwdsafe.view.PasswdPolicyView
+                        style="@style/RecordField"
+                        android:id="@+id/policy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                              
+                    <TextView
+                        style="@style/RecordHeader"
+                        android:paddingTop="5dp"
+                        android:text="@string/history_header"/>
+                              
+                    <View style="@style/Separator"/>
+                    
+                    <RelativeLayout
+                        style="@style/RecordField"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+        
+                        <CheckBox
+                            android:id="@+id/history_enabled"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/enabled"
+                            android:textAppearance="?android:textAppearanceSmall"/>
+                                  
+                        <TextView
+                            android:id="@+id/history_max_size"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBottom="@id/history_enabled"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignTop="@id/history_enabled"
+                            android:layout_marginLeft="3dip"
+                            android:gravity="center_vertical"/>
+        
+                        <TextView
+                            android:id="@+id/history_max_size_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBottom="@id/history_enabled"
+                            android:layout_alignTop="@id/history_enabled"
+                            android:layout_toLeftOf="@id/history_max_size"
+                            android:gravity="center_vertical"
+                            android:text="@string/max_size_label"/>
+                                  
+                        <ListView
+                            android:id="@+id/history"
                             android:layout_width="fill_parent"
-                            android:layout_height="fill_parent">
-                          
-                <CheckBox android:id="@+id/history_enabled"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:text="@string/enabled"/>
-                          
-                <TextView android:id="@+id/history_max_size"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:layout_alignParentRight="true"
-                          android:layout_alignTop="@id/history_enabled"
-                          android:layout_alignBottom="@id/history_enabled"
-                          android:gravity="center_vertical"
-                          android:layout_marginLeft="3dip"/>
-
-                <TextView android:id="@+id/history_max_size_label"
-                          android:text="@string/max_size_label"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:layout_toLeftOf="@id/history_max_size"
-                          android:layout_alignTop="@id/history_enabled"
-                          android:layout_alignBottom="@id/history_enabled"
-                          android:gravity="center_vertical"/>
-                          
-                <View android:id="@+id/history_sep"
-                      android:layout_width="fill_parent"
-                      android:layout_height="1dip"
-                      android:layout_below="@id/history_enabled"
-                      android:background="#FF909090"/>
-
-                <ListView android:id="@+id/history"
-                          android:layout_width="fill_parent"
-                          android:layout_height="fill_parent"
-                          android:layout_below="@id/history_sep"/>
-
-            </RelativeLayout>
-                     
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/history_enabled"/>
+        
+                    </RelativeLayout>
+                
+                </LinearLayout>
+            </ScrollView>
+            
             <ScrollView android:id="@+id/notes_tab"
                         android:orientation="vertical"
                         android:layout_width="fill_parent"

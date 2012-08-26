@@ -77,6 +77,7 @@
     <string name="hide_password">Hide Password</string>
     <string name="hide_passwords">Hide Passwords</string>
     <string name="history">History</string>
+    <string name="history_header">HISTORY</string>
     <string name="home">Home</string>
     <string name="invalid_file_name">Invalid file name</string>
     <string name="invalid_history_max_size">Invalid history maximum size</string>
@@ -123,6 +124,7 @@
     <string name="password_record">Password record</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="permissions_label">Permissions:</string>
+    <string name="policy_header">POLICY</string>
     <string name="policy_no">No</string>
     <string name="policy_yes">Yes</string>
     <string name="policy_yes_len">Yes - At least %1$d</string>
