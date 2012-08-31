@@ -28,11 +28,9 @@
                       android:layout_height="wrap_content"
                       />
 
-        <View android:layout_width="fill_parent"
-              android:layout_height="2dip"
-              android:layout_below="@id/current_group_label"
-              android:background="#FF909090"
-              />
+        <View
+            style="@style/Separator.Light"
+            android:layout_below="@id/current_group_label"/>
               
     </RelativeLayout>
               
@@ -57,10 +55,9 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content">
 
-        <View android:id="@+id/query_sep"
-              android:layout_width="fill_parent"
-              android:layout_height="2dip"
-              android:background="#FF909090"/>
+        <View
+            android:id="@+id/query_sep"
+            style="@style/Separator.Light"/>
           
         <Button android:id="@+id/query_clear_btn"
                 android:text="@string/clear"

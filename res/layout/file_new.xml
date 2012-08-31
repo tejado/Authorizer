@@ -12,44 +12,48 @@
                      android:stretchColumns="1"
                      android:shrinkColumns="1">
             <TableRow>
-                <TextView android:text="@string/file_name_label"
-                          android:padding="3dip"/>
+
+                <TextView
+                    style="@style/TableLabelColumn"
+                    android:text="@string/file_name_label"/>
+
                 <EditText android:id="@+id/file_name"
                           android:singleLine="true"
                           android:inputType="textNoSuggestions"
                           android:layout_width="fill_parent"
-                          android:layout_height="wrap_content"
-                          android:padding="3dip"/>
-                <TextView android:text="@string/psafe3_ext"
-                          android:padding="3dip"/>
+                          android:layout_height="wrap_content"/>
+                <TextView android:text="@string/psafe3_ext"/>
             </TableRow>
             <TableRow>
-                <TextView android:text="@string/password_label"
-                          android:padding="3dip"/>
+
+                <TextView
+                    style="@style/TableLabelColumn"
+                    android:text="@string/password_label"/>
+
                 <EditText android:id="@+id/password"
                           android:singleLine="true"
                           android:inputType="textPassword"
                           android:layout_width="fill_parent"
-                          android:layout_height="wrap_content"
-                          android:padding="3dip"/>
+                          android:layout_height="wrap_content"/>
             </TableRow>
             <TableRow>
-                <TextView android:text="@string/confirm_label"
-                          android:padding="3dip"/>
+
+                <TextView
+                    style="@style/TableLabelColumn"
+                    android:text="@string/confirm_label"/>
+
                 <EditText android:id="@+id/password_confirm"
                           android:singleLine="true"
                           android:inputType="textPassword"
                           android:imeOptions="actionGo"
                           android:layout_width="fill_parent"
-                          android:layout_height="wrap_content"
-                          android:padding="3dip"/>
+                          android:layout_height="wrap_content"/>
             </TableRow>
         </TableLayout>
     </ScrollView>
     
-    <View android:layout_width="fill_parent"
-          android:layout_height="2dip"
-          android:background="#FF909090"/>
+    <View style="@style/Separator.Light"/>
+    
     <TextView android:id="@+id/error_msg"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"/> 

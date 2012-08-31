@@ -23,7 +23,9 @@
 
                 <TableRow>
 
-                    <TextView android:text="@string/name"/>
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/name"/>
 
                     <EditText
                         android:id="@+id/name"
@@ -32,7 +34,9 @@
                 
                 <TableRow>
 
-                    <TextView android:text="@string/length"/>
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/length"/>
 
                     <EditText
                         android:id="@+id/length"
@@ -41,7 +45,9 @@
 
                 <TableRow>
 
-                    <TextView android:text="@string/type"/>
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/type"/>
 
                     <Spinner
                         android:id="@+id/type"
@@ -61,11 +67,11 @@
 
                     <CheckBox
                         android:id="@+id/lowercase"
+                        style="@style/TableLabelColumn"
                         android:text="@string/use_lowercase"/>
 
                     <TextView
                         android:id="@+id/lowercase_label"
-                        android:paddingLeft="3dp"
                         android:text="@string/at_least"/>
 
                     <EditText
@@ -77,11 +83,11 @@
 
                     <CheckBox
                         android:id="@+id/uppercase"
+                        style="@style/TableLabelColumn"
                         android:text="@string/use_uppercase"/>
 
                     <TextView
                         android:id="@+id/uppercase_label"
-                        android:paddingLeft="3dp"
                         android:text="@string/at_least"/>
 
                     <EditText
@@ -93,11 +99,11 @@
 
                     <CheckBox
                         android:id="@+id/digits"
+                        style="@style/TableLabelColumn"
                         android:text="@string/use_digits"/>
 
                     <TextView
                         android:id="@+id/digits_label"
-                        android:paddingLeft="3dp"
                         android:text="@string/at_least"/>
 
                     <EditText
@@ -109,11 +115,11 @@
 
                     <CheckBox
                         android:id="@+id/symbols"
+                        style="@style/TableLabelColumn"
                         android:text="@string/use_symbols"/>
 
                     <TextView
                         android:id="@+id/symbols_label"
-                        android:paddingLeft="3dp"
                         android:text="@string/at_least"/>
 
                     <EditText
@@ -152,11 +158,8 @@
         </LinearLayout>
     </ScrollView>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dip"
-        android:background="#FF909090"/>
-
+    <View style="@style/Separator.Light"/>
+    
     <TextView
         android:id="@+id/error_msg"
         android:layout_width="fill_parent"

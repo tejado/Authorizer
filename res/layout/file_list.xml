@@ -34,11 +34,11 @@
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       />
-        <View android:layout_width="fill_parent"
-              android:layout_height="2dip"
-              android:layout_below="@id/current_group_label"
-              android:background="#FF909090"
-              />
+
+        <View
+            style="@style/Separator.Light"
+            android:layout_below="@id/current_group_label"/>
+
     </RelativeLayout>
 
     <TextView android:id="@+id/select_file_label"

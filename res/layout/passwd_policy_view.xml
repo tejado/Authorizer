@@ -14,7 +14,7 @@
             android:visibility="gone">
 
             <TextView
-                android:paddingRight="3dp"
+                style="@style/TableLabelColumn"
                 android:text="@string/location"/>
 
             <TextView android:id="@+id/location"/>
@@ -24,7 +24,7 @@
 
             <TextView
                 android:id="@+id/length_label"
-                android:paddingRight="3dp"
+                style="@style/TableLabelColumn"
                 android:text="@string/length"/>
 
             <TextView android:id="@+id/length"/>
@@ -34,7 +34,7 @@
 
             <TextView
                 android:id="@+id/type_label"
-                android:paddingRight="3dp"
+                style="@style/TableLabelColumn"
                 android:text="@string/type"/>
 
             <TextView android:id="@+id/type"/>
@@ -44,7 +44,7 @@
 
             <TextView
                 android:id="@+id/lowercase_label"
-                android:paddingRight="3dp"
+                style="@style/TableLabelColumn"
                 android:text="@string/use_lowercase"/>
 
             <TextView android:id="@+id/lowercase"/>
@@ -54,7 +54,7 @@
 
             <TextView
                 android:id="@+id/uppercase_label"
-                android:paddingRight="3dp"
+                style="@style/TableLabelColumn"
                 android:text="@string/use_uppercase"/>
 
             <TextView android:id="@+id/uppercase"/>
@@ -64,7 +64,7 @@
 
             <TextView
                 android:id="@+id/digits_label"
-                android:paddingRight="3dp"
+                style="@style/TableLabelColumn"
                 android:text="@string/use_digits"/>
 
             <TextView android:id="@+id/digits"/>
@@ -74,7 +74,7 @@
 
             <TextView
                 android:id="@+id/symbols_label"
-                android:paddingRight="3dp"
+                style="@style/TableLabelColumn"
                 android:text="@string/use_symbols"/>
 
             <TextView android:id="@+id/symbols"/>
