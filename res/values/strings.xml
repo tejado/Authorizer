@@ -120,7 +120,6 @@
     <string name="password_gen_prefs_moved">Password generation options have moved.  Open a file and edit the default policy.</string>
     <string name="password_header">PASSWORD</string>
     <string name="password_label">Password:</string>
-    <string name="password_length">Password Length</string>
     <string name="password_len_short_opt">Password length too short for options</string>
     <string name="password_policies">Password Policies</string>
     <string name="password_preferences">Password Preferences</string>
@@ -129,7 +128,6 @@
     <string name="permissions_label">Permissions:</string>
     <string name="policy_header">POLICY</string>
     <string name="policy_no">No</string>
-    <string name="policy_yes">Yes</string>
     <string name="policy_yes_len">Yes - At least %1$d</string>
     <string name="policy_yes_sym_default">Yes - At least %1$d from default symbols: %2$s</string>
     <string name="policy_yes_sym_easy">Yes - At least %1$d from easy symbols: %2$s</string>
@@ -174,9 +172,6 @@
     <string name="use_uppercase">Use Uppercase</string>
     <string name="use_digits">Use Digits</string>
     <string name="use_symbols">Use Symbols</string>
-    <string name="use_easyvision">Use Easyvision</string>
-    <string name="use_pronounceable">Use Pronounceable</string>
-    <string name="use_hexadecimal">Use Hexadecimal</string>
     <string name="username_header">USER NAME</string>
     
     <!-- Order must match constants in RecordEditActivity -->

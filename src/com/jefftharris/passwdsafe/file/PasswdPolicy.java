@@ -163,6 +163,13 @@ public class PasswdPolicy
         return Type.NORMAL;
     }
 
+    /** Get the type of policy as a string */
+    public static String getTypeStr(Type type, Context ctx)
+    {
+        return ctx.getResources().getStringArray(
+            R.array.policy_type)[type.itsStrIdx];
+    }
+
     /** Get the password length */
     public int getLength()
     {

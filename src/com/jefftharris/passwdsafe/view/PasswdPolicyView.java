@@ -22,6 +22,8 @@ import android.widget.TextView;
  */
 public class PasswdPolicyView extends LinearLayout
 {
+    private boolean itsIsVariableHeight = false;
+
     /** Constructor */
     public PasswdPolicyView(Context context)
     {
@@ -34,6 +36,12 @@ public class PasswdPolicyView extends LinearLayout
     {
         super(context, attrs);
         init(context);
+    }
+
+    /** Set whether the height of the view changes based on type */
+    public void setVariableHeight(boolean var)
+    {
+        itsIsVariableHeight = var;
     }
 
     /** Show the policy location */
@@ -51,42 +59,33 @@ public class PasswdPolicyView extends LinearLayout
     /** Show a policy */
     public void showPolicy(PasswdPolicy policy)
     {
-        int length = 0;
-        String lowercase = null;
-        String uppercase = null;
-        String digits = null;
-        String symbols = null;
-        String easyvision = null;
-        String pronounceable = null;
-        String hexadecimal = null;
-
-        if (policy != null) {
-            length = policy.getLength();
-            lowercase = getPolicyOption(policy,
-                                        PasswdPolicy.FLAG_USE_LOWERCASE);
-            uppercase = getPolicyOption(policy,
-                                        PasswdPolicy.FLAG_USE_UPPERCASE);
-            digits = getPolicyOption(policy,
-                                     PasswdPolicy.FLAG_USE_DIGITS);
-            symbols = getPolicyOption(policy,
-                                        PasswdPolicy.FLAG_USE_SYMBOLS);
-            easyvision = getPolicyOption(policy,
-                                        PasswdPolicy.FLAG_USE_EASY_VISION);
-            pronounceable = getPolicyOption(policy,
-                                            PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE);
-            hexadecimal = getPolicyOption(policy,
-                                          PasswdPolicy.FLAG_USE_HEX_DIGITS);
+        if (policy == null) {
+            policy = PasswdPolicy.createDefaultPolicy(getContext());
+            policy.setFlags(0);
         }
 
-        setTextStr(R.id.length, Integer.toString(length));
-        setTextStr(R.id.lowercase, lowercase);
-        setTextStr(R.id.uppercase, uppercase);
-        setTextStr(R.id.digits, digits);
-        setTextStr(R.id.symbols, symbols);
-        setTextStr(R.id.easyvision, easyvision);
-        setTextStr(R.id.pronounceable, pronounceable);
-        setTextStr(R.id.hexadecimal, hexadecimal);
+        int length = policy.getLength();
+        PasswdPolicy.Type type = policy.getType();
+        String lowercase = getPolicyOption(policy,
+                                           PasswdPolicy.FLAG_USE_LOWERCASE);
+        String uppercase = getPolicyOption(policy,
+                                           PasswdPolicy.FLAG_USE_UPPERCASE);
+        String digits = getPolicyOption(policy,
+                                        PasswdPolicy.FLAG_USE_DIGITS);
+        String symbols = getPolicyOption(policy,
+                                         PasswdPolicy.FLAG_USE_SYMBOLS);
 
+        boolean optionsVisible = (type != PasswdPolicy.Type.HEXADECIMAL);
+        setTextStr(R.id.length, R.id.length_label,
+                   Integer.toString(length), true);
+        setTextStr(R.id.type, R.id.type_label,
+                   PasswdPolicy.getTypeStr(type, getContext()), true);
+        setTextStr(R.id.lowercase, R.id.lowercase_label,
+                   lowercase, optionsVisible);
+        setTextStr(R.id.uppercase, R.id.uppercase_label,
+                   uppercase, optionsVisible);
+        setTextStr(R.id.digits, R.id.digits_label, digits, optionsVisible);
+        setTextStr(R.id.symbols, R.id.symbols_label, symbols, optionsVisible);
     }
 
     /** Initialize the view */
@@ -98,11 +97,21 @@ public class PasswdPolicyView extends LinearLayout
     }
 
     /** Set the text on a policy detail string */
-    private final void setTextStr(int id, String str)
+    private final void setTextStr(int id, int labelId,
+                                  String str, boolean visible)
     {
-        Context ctx = getContext();
+        View label = findViewById(labelId);
         TextView tv = (TextView)findViewById(id);
-        tv.setText((str != null) ? str : ctx.getString(R.string.policy_no));
+        if (visible) {
+            label.setVisibility(View.VISIBLE);
+            tv.setVisibility(View.VISIBLE);
+            Context ctx = getContext();
+            tv.setText((str != null) ? str : ctx.getString(R.string.policy_no));
+        } else {
+            int vis = itsIsVariableHeight ? View.GONE : View.INVISIBLE;
+            label.setVisibility(vis);
+            tv.setVisibility(vis);
+        }
     }
 
     /** Get a string for a particular policy option flag */
@@ -145,12 +154,6 @@ public class PasswdPolicyView extends LinearLayout
                     symbols = PasswdPolicy.SYMBOLS_DEFAULT;
                 }
                 str = ctx.getString(id, policy.getMinSymbols(), symbols);
-                break;
-            }
-            case PasswdPolicy.FLAG_USE_HEX_DIGITS:
-            case PasswdPolicy.FLAG_USE_EASY_VISION:
-            case PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE: {
-                str = ctx.getString(R.string.policy_yes);
                 break;
             }
             }

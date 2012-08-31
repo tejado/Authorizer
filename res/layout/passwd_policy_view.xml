@@ -23,8 +23,9 @@
         <TableRow>
 
             <TextView
+                android:id="@+id/length_label"
                 android:paddingRight="3dp"
-                android:text="@string/password_length"/>
+                android:text="@string/length"/>
 
             <TextView android:id="@+id/length"/>
         </TableRow>        
@@ -32,6 +33,17 @@
         <TableRow>
 
             <TextView
+                android:id="@+id/type_label"
+                android:paddingRight="3dp"
+                android:text="@string/type"/>
+
+            <TextView android:id="@+id/type"/>
+        </TableRow>        
+        
+        <TableRow>
+
+            <TextView
+                android:id="@+id/lowercase_label"
                 android:paddingRight="3dp"
                 android:text="@string/use_lowercase"/>
 
@@ -41,6 +53,7 @@
         <TableRow>
 
             <TextView
+                android:id="@+id/uppercase_label"
                 android:paddingRight="3dp"
                 android:text="@string/use_uppercase"/>
 
@@ -50,6 +63,7 @@
         <TableRow>
 
             <TextView
+                android:id="@+id/digits_label"
                 android:paddingRight="3dp"
                 android:text="@string/use_digits"/>
 
@@ -59,37 +73,11 @@
         <TableRow>
 
             <TextView
+                android:id="@+id/symbols_label"
                 android:paddingRight="3dp"
                 android:text="@string/use_symbols"/>
 
             <TextView android:id="@+id/symbols"/>
-        </TableRow>        
-        
-        <TableRow>
-
-            <TextView
-                android:paddingRight="3dp"
-                android:text="@string/use_easyvision"/>
-
-            <TextView android:id="@+id/easyvision"/>
-        </TableRow>        
-        
-        <TableRow>
-
-            <TextView
-                android:paddingRight="3dp"
-                android:text="@string/use_pronounceable"/>
-
-            <TextView android:id="@+id/pronounceable"/>
-        </TableRow>        
-        
-        <TableRow>
-
-            <TextView
-                android:paddingRight="3dp"
-                android:text="@string/use_hexadecimal"/>
-
-            <TextView android:id="@+id/hexadecimal"/>
         </TableRow>        
         
     </TableLayout>
