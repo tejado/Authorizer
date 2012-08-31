@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="3dp">
-    
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="0dp"
@@ -31,7 +31,7 @@
                         android:id="@+id/name"
                         android:inputType="textCapSentences"/>
                 </TableRow>
-                
+
                 <TableRow>
 
                     <TextView
@@ -55,7 +55,7 @@
                 </TableRow>
 
             </TableLayout>
-            
+
             <TableLayout
                 android:id="@+id/options"
                 android:layout_width="match_parent"
@@ -127,7 +127,7 @@
                         android:inputType="number"/>
                 </TableRow>
             </TableLayout>
-                
+
             <LinearLayout
                 android:id="@+id/custom_symbols_set"
                 android:layout_width="match_parent"
@@ -155,14 +155,36 @@
                     android:inputType="text"/>
 
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/generate_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/generate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/generate"/>
+
+                <TextView
+                    android:id="@+id/generated_passwd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:typeface="monospace"/>
+
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
     <View style="@style/Separator.Light"/>
-    
+
     <TextView
         android:id="@+id/error_msg"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"/>
- 
+
 </LinearLayout>

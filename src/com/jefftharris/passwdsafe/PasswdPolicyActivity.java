@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,9 +30,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -485,6 +488,9 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 @Override
                 protected String doValidation()
                 {
+                    View generateRow = itsView.findViewById(R.id.generate_row);
+                    generateRow.setVisibility(View.GONE);
+
                     String name = itsNameEdit.getText().toString();
                     if (TextUtils.isEmpty(name)) {
                         return getString(R.string.empty_name);
@@ -558,7 +564,11 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                         }
                     }
 
-                    return super.doValidation();
+                    String str = super.doValidation();
+                    if (str == null) {
+                        generateRow.setVisibility(View.VISIBLE);
+                    }
+                    return str;
                 }
 
             };
@@ -581,6 +591,16 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             setCustomSymbolsOption(customSymbols != null, true);
             itsCustomSymbolsEdit.setText(customSymbols);
             itsValidator.registerTextView(itsCustomSymbolsEdit);
+
+
+            Button btn = (Button)itsView.findViewById(R.id.generate);
+            btn.setOnClickListener(new OnClickListener()
+            {
+                public void onClick(View v)
+                {
+                    generatePasswd();
+                }
+            });
 
             return dialog;
         }
@@ -682,6 +702,22 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             return policy;
         }
 
+        /** Generate a password from the policy */
+        private void generatePasswd()
+        {
+            String passwd = null;
+            PasswdPolicy policy = createPolicy();
+            if (policy != null) {
+                try {
+                    passwd = policy.generate();
+                } catch (NoSuchAlgorithmException e) {
+                    PasswdSafeApp.showErrorMsg(e.toString(),
+                                               itsView.getContext());
+                }
+            }
+            TextView tv = (TextView)itsView.findViewById(R.id.generated_passwd);
+            tv.setText(passwd);
+        }
 
         /** Set the type of policy and update the UI */
         private final void setType(PasswdPolicy.Type type, boolean init)
