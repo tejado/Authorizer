@@ -7,7 +7,10 @@
  */
 package com.jefftharris.passwdsafe.file;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.jefftharris.passwdsafe.R;
@@ -36,6 +39,13 @@ public class PasswdPolicy
     public static final String SYMBOLS_DEFAULT = "+-=_@#$%^&;:,.<>/~\\[](){}?!|";
     public static final String SYMBOLS_EASY = "+-=_@#$%^&<>/~\\?";
     public static final String SYMBOLS_PRONOUNCE = "@&(#!|$+";
+
+    private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
+    private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
+    private static final String DIGITS = "0123456789";
+    private static final String EASY_LOWER_CHARS = "abcdefghijkmnopqrstuvwxyz";
+    private static final String EASY_UPPER_CHARS = "ABCDEFGHJKLMNPQRTUVWXY";
+    private static final String EASY_DIGITS = "346789";
 
     /** The location of the policy */
     public enum Location
@@ -240,6 +250,79 @@ public class PasswdPolicy
     public void setSpecialSymbols(String symbols)
     {
         itsSpecialSymbols = symbols;
+    }
+
+    /** Generate a password */
+    public String generate()
+        throws NoSuchAlgorithmException
+    {
+        Type type = getType();
+        ArrayList<String> chars = new ArrayList<String>();
+        switch (type) {
+        case NORMAL:
+        case EASY_TO_READ: {
+            boolean isEasy = (type == PasswdPolicy.Type.EASY_TO_READ);
+            if (checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE)) {
+                chars.add(isEasy ? EASY_LOWER_CHARS : LOWER_CHARS);
+            }
+            if (checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE)) {
+                chars.add(isEasy ? EASY_UPPER_CHARS : UPPER_CHARS);
+            }
+            if (checkFlags(PasswdPolicy.FLAG_USE_DIGITS)) {
+                chars.add(isEasy ? EASY_DIGITS: DIGITS);
+            }
+            if (checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS)) {
+                chars.add(isEasy ? PasswdPolicy.SYMBOLS_EASY :
+                            PasswdPolicy.SYMBOLS_DEFAULT);
+            }
+            break;
+        }
+        case PRONOUNCEABLE: {
+            // TODO: support pronounceable
+            break;
+        }
+        case HEXADECIMAL: {
+            chars.add(DIGITS + "abcdef");
+            break;
+        }
+        }
+
+        if (chars.isEmpty()) {
+            return null;
+        }
+
+        String charsStr =
+            TextUtils.concat(chars.toArray(new CharSequence[0])).toString();
+        int numChars = charsStr.length();
+        StringBuilder passwd = new StringBuilder();
+
+        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        random.nextBytes(new byte[itsLength]);
+
+        ArrayList<String> verifyChars = new ArrayList<String>();
+        do {
+            verifyChars.clear();
+            verifyChars.addAll(chars);
+            passwd.delete(0, passwd.length());
+            for (int i = 0; i < itsLength; ++i) {
+                int charPos = random.nextInt(numChars);
+                char c = charsStr.charAt(charPos);
+                passwd.append(c);
+
+                if (!verifyChars.isEmpty()) {
+                    Iterator<String> iter = verifyChars.iterator();
+                    while (iter.hasNext()) {
+                        String verifyStr = iter.next();
+                        if (verifyStr.indexOf(c) != -1) {
+                            iter.remove();
+                        }
+                    }
+                }
+            }
+        } while (!verifyChars.isEmpty() &&
+            (itsLength > (chars.size() - verifyChars.size())));
+
+        return passwd.toString();
     }
 
     /** Convert the object to a string */

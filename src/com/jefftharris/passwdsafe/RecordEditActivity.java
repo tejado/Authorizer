@@ -8,10 +8,8 @@
 package com.jefftharris.passwdsafe;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -30,7 +28,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -84,13 +81,6 @@ public class RecordEditActivity extends AbstractRecordActivity
     private PwsRecord itsLinkRef = null;
     private ArrayList<View> itsProtectViews = new ArrayList<View>();
     private boolean itsIsProtected = false;
-
-    private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
-    private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
-    private static final String DIGITS = "0123456789";
-    private static final String EASY_LOWER_CHARS = "abcdefghijkmnopqrstuvwxyz";
-    private static final String EASY_UPPER_CHARS = "ABCDEFGHJKLMNPQRTUVWXY";
-    private static final String EASY_DIGITS = "346789";
 
     // Constants must match record_type strings
     private static final int TYPE_NORMAL = 0;
@@ -641,75 +631,10 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private final void generatePassword()
     {
-        ArrayList<String> chars = new ArrayList<String>();
         PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
-        PasswdPolicy.Type type = defPolicy.getType();
-        switch (type) {
-        case NORMAL:
-        case EASY_TO_READ: {
-            boolean isEasy = (type == PasswdPolicy.Type.EASY_TO_READ);
-            if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE)) {
-                chars.add(isEasy ? EASY_LOWER_CHARS : LOWER_CHARS);
-            }
-            if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE)) {
-                chars.add(isEasy ? EASY_UPPER_CHARS : UPPER_CHARS);
-            }
-            if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_DIGITS)) {
-                chars.add(isEasy ? EASY_DIGITS: DIGITS);
-            }
-            if (defPolicy.checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS)) {
-                chars.add(isEasy ? PasswdPolicy.SYMBOLS_EASY :
-                            PasswdPolicy.SYMBOLS_DEFAULT);
-            }
-            break;
-        }
-        case PRONOUNCEABLE: {
-            // TODO: support pronounceable
-            break;
-        }
-        case HEXADECIMAL: {
-            chars.add(DIGITS + "abcdef");
-            break;
-        }
-        }
-
-        if (chars.isEmpty()) {
-            return;
-        }
-
-        String charsStr =
-            TextUtils.concat(chars.toArray(new CharSequence[0])).toString();
-        int numChars = charsStr.length();
-        StringBuilder passwd = new StringBuilder();
-        int passwdLen = defPolicy.getLength();
         try {
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-            random.nextBytes(new byte[passwdLen]);
-
-            ArrayList<String> verifyChars = new ArrayList<String>();
-            do {
-                verifyChars.clear();
-                verifyChars.addAll(chars);
-                passwd.delete(0, passwd.length());
-                for (int i = 0; i < passwdLen; ++i) {
-                    int charPos = random.nextInt(numChars);
-                    char c = charsStr.charAt(charPos);
-                    passwd.append(c);
-
-                    if (!verifyChars.isEmpty()) {
-                        Iterator<String> iter = verifyChars.iterator();
-                        while (iter.hasNext()) {
-                            String verifyStr = iter.next();
-                            if (verifyStr.indexOf(c) != -1) {
-                                iter.remove();
-                            }
-                        }
-                    }
-                }
-            } while (!verifyChars.isEmpty() &&
-                     (passwdLen > (chars.size() - verifyChars.size())));
-
-            setPassword(passwd.toString());
+            String passwd = defPolicy.generate();
+            setPassword(passwd);
         } catch (NoSuchAlgorithmException e) {
             PasswdSafeApp.showFatalMsg(e, this);
         }

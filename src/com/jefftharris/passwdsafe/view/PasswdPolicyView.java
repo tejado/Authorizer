@@ -7,13 +7,22 @@
  */
 package com.jefftharris.passwdsafe.view;
 
+import java.security.NoSuchAlgorithmException;
+
+import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
+import android.view.View.OnCreateContextMenuListener;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,8 +30,12 @@ import android.widget.TextView;
  *  Custom view for showing a password policy
  */
 public class PasswdPolicyView extends LinearLayout
+    implements OnCreateContextMenuListener, OnMenuItemClickListener
 {
-    private boolean itsIsVariableHeight = false;
+    private static final int MENU_COPY = 0;
+
+    private PasswdPolicy itsPolicy = null;
+    private TextView itsGeneratedPasswd = null;
 
     /** Constructor */
     public PasswdPolicyView(Context context)
@@ -36,12 +49,6 @@ public class PasswdPolicyView extends LinearLayout
     {
         super(context, attrs);
         init(context);
-    }
-
-    /** Set whether the height of the view changes based on type */
-    public void setVariableHeight(boolean var)
-    {
-        itsIsVariableHeight = var;
     }
 
     /** Show the policy location */
@@ -64,15 +71,16 @@ public class PasswdPolicyView extends LinearLayout
             policy.setFlags(0);
         }
 
-        int length = policy.getLength();
-        PasswdPolicy.Type type = policy.getType();
-        String lowercase = getPolicyOption(policy,
+        itsPolicy = policy;
+        int length = itsPolicy.getLength();
+        PasswdPolicy.Type type = itsPolicy.getType();
+        String lowercase = getPolicyOption(itsPolicy,
                                            PasswdPolicy.FLAG_USE_LOWERCASE);
-        String uppercase = getPolicyOption(policy,
+        String uppercase = getPolicyOption(itsPolicy,
                                            PasswdPolicy.FLAG_USE_UPPERCASE);
-        String digits = getPolicyOption(policy,
+        String digits = getPolicyOption(itsPolicy,
                                         PasswdPolicy.FLAG_USE_DIGITS);
-        String symbols = getPolicyOption(policy,
+        String symbols = getPolicyOption(itsPolicy,
                                          PasswdPolicy.FLAG_USE_SYMBOLS);
 
         boolean optionsVisible = (type != PasswdPolicy.Type.HEXADECIMAL);
@@ -88,12 +96,72 @@ public class PasswdPolicyView extends LinearLayout
         setTextStr(R.id.symbols, R.id.symbols_label, symbols, optionsVisible);
     }
 
+    /** Set whether generation is enabled */
+    public void setGenerateEnabled(boolean enabled)
+    {
+        View row = findViewById(R.id.generate_row);
+        row.setVisibility(enabled ? View.VISIBLE : View.GONE);
+    }
+
+    /* (non-Javadoc)
+     * @see android.view.MenuItem.OnMenuItemClickListener#onMenuItemClick(android.view.MenuItem)
+     */
+    public boolean onMenuItemClick(MenuItem item)
+    {
+        if (item.getItemId() == MENU_COPY) {
+            PasswdSafeApp.copyToClipboard(
+                itsGeneratedPasswd.getText().toString(), getContext());
+            return true;
+        }
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see android.view.View.OnCreateContextMenuListener#onCreateContextMenu(android.view.ContextMenu, android.view.View, android.view.ContextMenu.ContextMenuInfo)
+     */
+    public void onCreateContextMenu(ContextMenu menu,
+                                    View v,
+                                    ContextMenuInfo menuInfo)
+    {
+        if (v == itsGeneratedPasswd) {
+            menu.setHeaderTitle(R.string.password);
+            menu.add(0, MENU_COPY, 0, R.string.copy_clipboard).
+                setOnMenuItemClickListener(this);
+        }
+    }
+
     /** Initialize the view */
     private void init(Context context)
     {
         inflate(context, R.layout.passwd_policy_view, this);
         showLocation(null);
         showPolicy(null);
+
+        Button btn = (Button)findViewById(R.id.generate);
+        btn.setOnClickListener(new OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                generatePasswd();
+            }
+        });
+
+        itsGeneratedPasswd = (TextView)findViewById(R.id.generated_passwd);
+        itsGeneratedPasswd.setOnCreateContextMenuListener(this);
+    }
+
+    /** Generate a password from the current policy */
+    private void generatePasswd()
+    {
+        String passwd = null;
+        if (itsPolicy != null) {
+            try {
+                passwd = itsPolicy.generate();
+            } catch (NoSuchAlgorithmException e) {
+                PasswdSafeApp.showErrorMsg(e.toString(), getContext());
+            }
+        }
+        itsGeneratedPasswd.setText(passwd);
     }
 
     /** Set the text on a policy detail string */
@@ -108,9 +176,8 @@ public class PasswdPolicyView extends LinearLayout
             Context ctx = getContext();
             tv.setText((str != null) ? str : ctx.getString(R.string.policy_no));
         } else {
-            int vis = itsIsVariableHeight ? View.GONE : View.INVISIBLE;
-            label.setVisibility(vis);
-            tv.setVisibility(vis);
+            label.setVisibility(View.GONE);
+            tv.setVisibility(View.GONE);
         }
     }
 

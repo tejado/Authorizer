@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:shrinkColumns="1"
         android:stretchColumns="1">
-        
+
         <TableRow
             android:id="@+id/location_row"
             android:visibility="gone">
@@ -18,8 +18,8 @@
                 android:text="@string/location"/>
 
             <TextView android:id="@+id/location"/>
-        </TableRow>        
-        
+        </TableRow>
+
         <TableRow>
 
             <TextView
@@ -28,8 +28,8 @@
                 android:text="@string/length"/>
 
             <TextView android:id="@+id/length"/>
-        </TableRow>        
-        
+        </TableRow>
+
         <TableRow>
 
             <TextView
@@ -38,8 +38,8 @@
                 android:text="@string/type"/>
 
             <TextView android:id="@+id/type"/>
-        </TableRow>        
-        
+        </TableRow>
+
         <TableRow>
 
             <TextView
@@ -48,8 +48,8 @@
                 android:text="@string/use_lowercase"/>
 
             <TextView android:id="@+id/lowercase"/>
-        </TableRow>        
-        
+        </TableRow>
+
         <TableRow>
 
             <TextView
@@ -58,8 +58,8 @@
                 android:text="@string/use_uppercase"/>
 
             <TextView android:id="@+id/uppercase"/>
-        </TableRow>        
-        
+        </TableRow>
+
         <TableRow>
 
             <TextView
@@ -68,8 +68,8 @@
                 android:text="@string/use_digits"/>
 
             <TextView android:id="@+id/digits"/>
-        </TableRow>        
-        
+        </TableRow>
+
         <TableRow>
 
             <TextView
@@ -78,8 +78,23 @@
                 android:text="@string/use_symbols"/>
 
             <TextView android:id="@+id/symbols"/>
-        </TableRow>        
-        
+        </TableRow>
+
+        <TableRow android:id="@+id/generate_row">
+
+            <Button
+                android:id="@+id/generate"
+                android:text="@string/generate"/>
+
+            <TextView
+                android:id="@+id/generated_passwd"
+                style="@android:style/Widget.EditText"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:typeface="monospace"/>
+
+        </TableRow>
+
+
     </TableLayout>
 
 </ScrollView>

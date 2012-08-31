@@ -69,6 +69,7 @@
     <string name="file_name_label">File Name:</string>
     <string name="file_operations">File Operations…</string>
     <string name="file_type_icon">File type icon</string>
+    <string name="generate">Generate</string>
     <string name="generate_password">Generate Password</string>
     <string name="go_to">Goto</string>
     <string name="group">Group</string>
@@ -173,14 +174,14 @@
     <string name="use_digits">Use Digits</string>
     <string name="use_symbols">Use Symbols</string>
     <string name="username_header">USER NAME</string>
-    
+
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">
         <item>Normal</item>
         <item>Alias</item>
         <item>Shortcut</item>
     </string-array>
-    
+
     <!-- Order must match constants in PolicyPolicyActivity -->
     <string-array name="policy_type">
         <item>Normal</item>

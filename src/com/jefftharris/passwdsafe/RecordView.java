@@ -912,7 +912,7 @@ public class RecordView extends AbstractRecordTabActivity
         findViewById(R.id.policy_sep).setVisibility(visibility);
         policyView.setVisibility(visibility);
         if (policy != null) {
-            policyView.setVariableHeight(true);
+            policyView.setGenerateEnabled(false);
             policyView.showLocation(policyLoc);
             policyView.showPolicy(policy);
         }
