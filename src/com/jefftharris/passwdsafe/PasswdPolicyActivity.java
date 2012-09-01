@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -277,39 +276,13 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         }
 
         itsPolicies.add(getPasswdSafeApp().getDefaultPasswdPolicy());
-        sortPolicies();
+        Collections.sort(itsPolicies);
 
         setListAdapter(new ArrayAdapter<PasswdPolicy>(
             this, android.R.layout.simple_list_item_single_choice,
             itsPolicies));
         showPolicy(null);
     }
-
-
-    /** Sort the policies */
-    private final void sortPolicies()
-    {
-        Collections.sort(
-            itsPolicies,
-            new Comparator<PasswdPolicy>()
-            {
-                public int compare(PasswdPolicy lhs, PasswdPolicy rhs)
-                {
-                    PasswdPolicy.Location lhsLoc = lhs.getLocation();
-                    PasswdPolicy.Location rhsLoc = rhs.getLocation();
-                    if (lhsLoc != rhsLoc) {
-                        if (lhsLoc == PasswdPolicy.Location.DEFAULT) {
-                            return -1;
-                        }
-                        if (rhsLoc == PasswdPolicy.Location.DEFAULT) {
-                            return 1;
-                        }
-                    }
-                    return lhs.getName().compareTo(rhs.getName());
-                }
-            });
-    }
-
 
     /** Show the details of a policy */
     private final void showPolicy(PasswdPolicy policy)
@@ -332,7 +305,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 itsPolicies.remove(oldPolicy);
             }
             itsPolicies.add(newPolicy);
-            sortPolicies();
+            Collections.sort(itsPolicies);
             savePolicies();
         }
     }

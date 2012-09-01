@@ -99,6 +99,7 @@
     <string name="name">Name</string>
     <string name="new_file">New File</string>
     <string name="new_file_not_supp_uri">New file not supported for URI %1$s</string>
+    <string name="new_group_menu">New group…</string>
     <string name="new_password_label">New Password:</string>
     <string name="new_policy">New Policy</string>
     <string name="no_alias_chosen">No alias chosen</string>
@@ -122,6 +123,7 @@
     <string name="password_header">PASSWORD</string>
     <string name="password_label">Password:</string>
     <string name="password_len_short_opt">Password length too short for options</string>
+    <string name="password_policy">Password Policy</string>
     <string name="password_policies">Password Policies</string>
     <string name="password_preferences">Password Preferences</string>
     <string name="password_record">Password record</string>
@@ -144,6 +146,7 @@
     <string name="record">Record</string>
     <string name="record_has_references">Record has references</string>
     <string name="record_not_found">Record not found</string>
+    <string name="record_policy">Record Policy</string>
     <string name="record_type">Record type</string>
     <string name="read_only">Read-only</string>
     <string name="read_write">Read-write</string>

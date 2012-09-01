@@ -22,7 +22,7 @@ import android.text.TextUtils;
 /**
  * The PasswdPolicy class represents a password policy for a file or record
  */
-public class PasswdPolicy
+public class PasswdPolicy implements Comparable<PasswdPolicy>
 {
     public static final int FLAG_USE_LOWERCASE          = 0x8000;
     public static final int FLAG_USE_UPPERCASE          = 0x4000;
@@ -50,10 +50,17 @@ public class PasswdPolicy
     /** The location of the policy */
     public enum Location
     {
-        DEFAULT,
-        HEADER,
-        RECORD_NAME,
-        RECORD
+        DEFAULT         (0),
+        HEADER          (1),
+        RECORD_NAME     (2),
+        RECORD          (3);
+
+        public final int itsSortOrder;
+
+        private Location(int sortOrder)
+        {
+            itsSortOrder = sortOrder;
+        }
     }
 
     /** Policy fields for a record */
@@ -121,6 +128,20 @@ public class PasswdPolicy
     {
         itsName = name;
         itsLocation = loc;
+    }
+
+    /** Copy constructor with a different name */
+    public PasswdPolicy(String name, PasswdPolicy copy)
+    {
+        itsName = name;
+        itsLocation = copy.itsLocation;
+        itsFlags = copy.itsFlags;
+        itsLength = copy.itsLength;
+        itsMinLowercase = copy.itsMinLowercase;
+        itsMinUppercase = copy.itsMinUppercase;
+        itsMinDigits = copy.itsMinDigits;
+        itsMinSymbols = copy.itsMinSymbols;
+        itsSpecialSymbols = copy.itsSpecialSymbols;
     }
 
     /** Create a default policy */
@@ -330,6 +351,18 @@ public class PasswdPolicy
     public String toString()
     {
         return itsName;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(PasswdPolicy policy)
+    {
+        if (itsLocation != policy.itsLocation) {
+            return (itsLocation.itsSortOrder < policy.itsLocation.itsSortOrder)
+                ? -1 : 1;
+        }
+        return itsName.compareTo(policy.itsName);
     }
 
     /** Convert the object to a string formatted as a header policy */

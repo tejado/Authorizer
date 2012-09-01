@@ -3,15 +3,15 @@
               android:orientation="vertical"
               android:id="@+id/record_edit"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent" 
-              xmlns:tools="http://schemas.android.com/tools" 
+              android:layout_height="fill_parent"
+              xmlns:tools="http://schemas.android.com/tools"
               tools:ignore="NestedScrolling,NestedWeights">
-       
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        
+
         <TextView
             android:id="@+id/rec_title"
             android:layout_width="0dip"
@@ -19,14 +19,14 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:textSize="24sp"/>
-        
+
         <Button
             android:id="@+id/done_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/done"/>
-        
+
     </LinearLayout>
 
     <TextView
@@ -39,7 +39,7 @@
         style="@style/Separator.Light"
         android:layout_marginBottom="2dip"
         android:layout_marginTop="2dip"/>
-          
+
     <ScrollView android:layout_weight="1"
                 android:layout_width="fill_parent"
                 android:layout_height="0dp">
@@ -75,7 +75,7 @@
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
-        
+
                 <TableRow android:id="@+id/group_row">
 
                     <TextView
@@ -88,7 +88,7 @@
                              android:layout_width="fill_parent"
                              android:layout_height="wrap_content"/>
                 </TableRow>
-    
+
                 <TableRow android:id="@+id/url_row">
 
                     <TextView
@@ -101,7 +101,7 @@
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
-        
+
                 <TableRow android:id="@+id/email_row">
 
                     <TextView
@@ -114,7 +114,7 @@
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
-        
+
                 <TableRow android:id="@+id/user_row">
 
                     <TextView
@@ -127,7 +127,7 @@
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"/>
                 </TableRow>
-        
+
                 <TableRow android:id="@+id/password_row">
 
                     <TextView
@@ -153,7 +153,7 @@
                                   android:layout_height="wrap_content"/>
                     </LinearLayout>
                 </TableRow>
-                
+
                 <TableRow android:id="@+id/password_link_row"
                           android:visibility="gone">
 
@@ -173,13 +173,13 @@
                         <TextView android:id="@+id/password_link"
                                   android:layout_width="fill_parent"
                                   android:layout_height="match_parent"
-                                  android:layout_alignParentLeft="true" 
-                                  android:layout_toLeftOf="@id/password_link_btn" 
+                                  android:layout_alignParentLeft="true"
+                                  android:layout_toLeftOf="@id/password_link_btn"
                                   android:gravity="center_vertical"
                                   />
                     </RelativeLayout>
                 </TableRow>
-                
+
                 <TableRow android:id="@+id/protected_row">
 
                     <CheckBox
@@ -190,6 +190,42 @@
 
                 </TableRow>
             </TableLayout>
+
+            <View
+                style="@style/Separator.Light"
+                android:layout_marginBottom="2dip"
+                android:layout_marginTop="2dip"/>
+
+            <TextView
+                android:id="@+id/policy_label"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/password_policy"
+                android:textSize="24sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/policy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <Button
+                    android:id="@+id/policy_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit"/>
+
+            </LinearLayout>
+
+            <com.jefftharris.passwdsafe.view.PasswdPolicyView
+                android:id="@+id/policy_view"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
 
             <View
                 android:id="@+id/history_group_sep"
@@ -255,7 +291,7 @@
                 style="@style/Separator.Light"
                 android:layout_marginBottom="2dip"
                 android:layout_marginTop="2dip"/>
-                  
+
             <TextView android:id="@+id/notes_label"
                       android:text="@string/notes"
                       android:textSize="24sp"

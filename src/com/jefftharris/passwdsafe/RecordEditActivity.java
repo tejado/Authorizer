@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -20,6 +21,7 @@ import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
+import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import android.app.AlertDialog;
@@ -151,6 +153,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         initTypeAndPassword(fileData, record);
         initGroup(fileData, record, group);
+        initPasswdPolicy(fileData, record);
 
         if (itsIsV3) {
             TextView tv = (TextView)findViewById(R.id.history_max_size);
@@ -714,19 +717,103 @@ public class RecordEditActivity extends AbstractRecordActivity
             ++pos;
         }
 
-        groupList.add("New group...");
-        ArrayAdapter<String> groupAdapter =
-            new ArrayAdapter<String>(this,
-                                     android.R.layout.simple_spinner_item,
-                                     groupList);
-        groupAdapter.setDropDownViewResource(
-            android.R.layout.simple_spinner_dropdown_item);
-        Spinner s = (Spinner)findViewById(R.id.group);
-        s.setAdapter(groupAdapter);
-        groupAdapter.notifyDataSetChanged();
+        groupList.add(getString(R.string.new_group_menu));
+        Spinner s = setSpinnerItems(R.id.group, groupList);
         if (groupPos != 0) {
             s.setSelection(groupPos);
         }
+    }
+
+    /** Initialize the password policy */
+    private final void initPasswdPolicy(PasswdFileData fileData,
+                                        PwsRecord record)
+    {
+        // TODO: protected items
+        // TODO: edit support for record policy
+        // TODO: save policy choice with record
+        // TODO: use selected password policy when generating
+        // TODO: non-v3 support for edit, view, and policy activity
+        PasswdPolicy recPolicy = null;
+        if (record != null) {
+            recPolicy = fileData.getPasswdPolicy(record);
+        }
+
+        ArrayList<PasswdPolicy> policyList = new ArrayList<PasswdPolicy>();
+        PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
+        policyList.add(defPolicy);
+        List<PasswdPolicy> filePolicies = fileData.getHdrPasswdPolicies();
+        policyList.addAll(filePolicies);
+
+        PasswdPolicy customPolicy;
+        String customName = getString(R.string.record_policy);
+        if ((recPolicy != null) &&
+            (recPolicy.getLocation() == PasswdPolicy.Location.RECORD)) {
+            customPolicy = new PasswdPolicy(customName, recPolicy);
+        } else {
+            customPolicy = new PasswdPolicy(customName,
+                                            PasswdPolicy.Location.RECORD);
+        }
+        policyList.add(customPolicy);
+
+        Collections.sort(policyList);
+
+        PasswdPolicyView view =
+            (PasswdPolicyView)findViewById(R.id.policy_view);
+        view.setGenerateEnabled(false);
+
+        Spinner spin = setSpinnerItems(R.id.policy, policyList);
+        spin.setOnItemSelectedListener(new OnItemSelectedListener()
+        {
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id)
+            {
+                Adapter adapter = parent.getAdapter();
+                PasswdPolicy policy = (PasswdPolicy)parent.getSelectedItem();
+                showPolicy(policy);
+                if (pos == (adapter.getCount() - 1)) {
+                }
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0)
+            {
+                showPolicy(null);
+            }
+        });
+
+        PasswdPolicy selPolicy = null;
+        if (recPolicy != null) {
+            if (recPolicy.getLocation() == PasswdPolicy.Location.RECORD_NAME) {
+                for (PasswdPolicy filePolicy: filePolicies) {
+                    if (recPolicy.getName().equals(filePolicy.getName())) {
+                        selPolicy = filePolicy;
+                        break;
+                    }
+                }
+            } else {
+                selPolicy = customPolicy;
+            }
+        } else {
+            selPolicy = defPolicy;
+        }
+
+        int selItem = policyList.indexOf(selPolicy);
+        if (selItem < 0) {
+            selItem = 0;
+        }
+        spin.setSelection(selItem);
+    }
+
+    /** Show a password policy */
+    private final void showPolicy(PasswdPolicy policy)
+    {
+        PasswdPolicyView view =
+            (PasswdPolicyView)findViewById(R.id.policy_view);
+        view.showPolicy(policy);
+
+        View editBtn = findViewById(R.id.policy_edit);
+        boolean canEdit = (policy != null) &&
+            (policy.getLocation() == PasswdPolicy.Location.RECORD);
+        editBtn.setVisibility(canEdit ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -995,6 +1082,21 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
 
         return tv;
+    }
+
+    /** Set the items in a spinner */
+    private final Spinner setSpinnerItems(int id, List<?> items)
+    {
+        ArrayAdapter<Object> adapter =
+            new ArrayAdapter<Object>(this,
+                                     android.R.layout.simple_spinner_item,
+                                     Collections.unmodifiableList(items));
+        adapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item);
+        Spinner s = (Spinner)findViewById(id);
+        s.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        return s;
     }
 
     /**
