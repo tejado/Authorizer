@@ -54,11 +54,11 @@ public class PasswdPolicyView extends LinearLayout
     /** Show the policy location */
     public void showLocation(String location)
     {
-        View row = findViewById(R.id.location_row);
+        View row = findViewById(R.id.policy_view_location_row);
         row.setVisibility((location == null) ? View.GONE : View.VISIBLE);
 
         if (location != null) {
-            TextView tv = (TextView)findViewById(R.id.location);
+            TextView tv = (TextView)findViewById(R.id.policy_view_location);
             tv.setText(location);
         }
     }
@@ -84,22 +84,24 @@ public class PasswdPolicyView extends LinearLayout
                                          PasswdPolicy.FLAG_USE_SYMBOLS);
 
         boolean optionsVisible = (type != PasswdPolicy.Type.HEXADECIMAL);
-        setTextStr(R.id.length, R.id.length_label,
+        setTextStr(R.id.policy_view_length, R.id.policy_view_length_label,
                    Integer.toString(length), true);
-        setTextStr(R.id.type, R.id.type_label,
+        setTextStr(R.id.policy_view_type, R.id.policy_view_type_label,
                    PasswdPolicy.getTypeStr(type, getContext()), true);
-        setTextStr(R.id.lowercase, R.id.lowercase_label,
+        setTextStr(R.id.policy_view_lowercase, R.id.policy_view_lowercase_label,
                    lowercase, optionsVisible);
-        setTextStr(R.id.uppercase, R.id.uppercase_label,
+        setTextStr(R.id.policy_view_uppercase, R.id.policy_view_uppercase_label,
                    uppercase, optionsVisible);
-        setTextStr(R.id.digits, R.id.digits_label, digits, optionsVisible);
-        setTextStr(R.id.symbols, R.id.symbols_label, symbols, optionsVisible);
+        setTextStr(R.id.policy_view_digits, R.id.policy_view_digits_label,
+                   digits, optionsVisible);
+        setTextStr(R.id.policy_view_symbols, R.id.policy_view_symbols_label,
+                   symbols, optionsVisible);
     }
 
     /** Set whether generation is enabled */
     public void setGenerateEnabled(boolean enabled)
     {
-        View row = findViewById(R.id.generate_row);
+        View row = findViewById(R.id.policy_view_generate_row);
         row.setVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
@@ -137,7 +139,7 @@ public class PasswdPolicyView extends LinearLayout
         showLocation(null);
         showPolicy(null);
 
-        Button btn = (Button)findViewById(R.id.generate);
+        Button btn = (Button)findViewById(R.id.policy_view_generate);
         btn.setOnClickListener(new OnClickListener()
         {
             public void onClick(View v)
@@ -146,7 +148,8 @@ public class PasswdPolicyView extends LinearLayout
             }
         });
 
-        itsGeneratedPasswd = (TextView)findViewById(R.id.generated_passwd);
+        itsGeneratedPasswd =
+            (TextView)findViewById(R.id.policy_view_generated_passwd);
         itsGeneratedPasswd.setOnCreateContextMenuListener(this);
     }
 

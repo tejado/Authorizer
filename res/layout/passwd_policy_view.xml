@@ -10,84 +10,84 @@
         android:stretchColumns="1">
 
         <TableRow
-            android:id="@+id/location_row"
+            android:id="@+id/policy_view_location_row"
             android:visibility="gone">
 
             <TextView
                 style="@style/TableLabelColumn"
                 android:text="@string/location"/>
 
-            <TextView android:id="@+id/location"/>
+            <TextView android:id="@+id/policy_view_location"/>
         </TableRow>
 
         <TableRow>
 
             <TextView
-                android:id="@+id/length_label"
+                android:id="@+id/policy_view_length_label"
                 style="@style/TableLabelColumn"
                 android:text="@string/length"/>
 
-            <TextView android:id="@+id/length"/>
+            <TextView android:id="@+id/policy_view_length"/>
         </TableRow>
 
         <TableRow>
 
             <TextView
-                android:id="@+id/type_label"
+                android:id="@+id/policy_view_type_label"
                 style="@style/TableLabelColumn"
                 android:text="@string/type"/>
 
-            <TextView android:id="@+id/type"/>
+            <TextView android:id="@+id/policy_view_type"/>
         </TableRow>
 
         <TableRow>
 
             <TextView
-                android:id="@+id/lowercase_label"
+                android:id="@+id/policy_view_lowercase_label"
                 style="@style/TableLabelColumn"
                 android:text="@string/use_lowercase"/>
 
-            <TextView android:id="@+id/lowercase"/>
+            <TextView android:id="@+id/policy_view_lowercase"/>
         </TableRow>
 
         <TableRow>
 
             <TextView
-                android:id="@+id/uppercase_label"
+                android:id="@+id/policy_view_uppercase_label"
                 style="@style/TableLabelColumn"
                 android:text="@string/use_uppercase"/>
 
-            <TextView android:id="@+id/uppercase"/>
+            <TextView android:id="@+id/policy_view_uppercase"/>
         </TableRow>
 
         <TableRow>
 
             <TextView
-                android:id="@+id/digits_label"
+                android:id="@+id/policy_view_digits_label"
                 style="@style/TableLabelColumn"
                 android:text="@string/use_digits"/>
 
-            <TextView android:id="@+id/digits"/>
+            <TextView android:id="@+id/policy_view_digits"/>
         </TableRow>
 
         <TableRow>
 
             <TextView
-                android:id="@+id/symbols_label"
+                android:id="@+id/policy_view_symbols_label"
                 style="@style/TableLabelColumn"
                 android:text="@string/use_symbols"/>
 
-            <TextView android:id="@+id/symbols"/>
+            <TextView android:id="@+id/policy_view_symbols"/>
         </TableRow>
 
-        <TableRow android:id="@+id/generate_row">
+        <TableRow android:id="@+id/policy_view_generate_row">
 
             <Button
-                android:id="@+id/generate"
+                android:id="@+id/policy_view_generate"
                 android:text="@string/generate"/>
 
             <TextView
-                android:id="@+id/generated_passwd"
+                android:id="@+id/policy_view_generated_passwd"
                 style="@android:style/Widget.EditText"
                 android:textAppearance="?android:textAppearanceSmall"
                 android:typeface="monospace"/>
