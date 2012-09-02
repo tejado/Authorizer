@@ -227,6 +227,9 @@ public class RecordEditActivity extends AbstractRecordActivity
         });
 
         initProtViews(findViewById(R.id.base_group));
+        initProtViews(findViewById(R.id.policy_label));
+        initProtViews(findViewById(R.id.policy_group));
+        initProtViews(findViewById(R.id.policy_view));
         initProtViews(findViewById(R.id.history_group));
         initProtViews(findViewById(R.id.notes_label));
         initProtViews(findViewById(R.id.notes));
@@ -779,7 +782,6 @@ public class RecordEditActivity extends AbstractRecordActivity
     private final void initPasswdPolicy(PasswdFileData fileData,
                                         PwsRecord record)
     {
-        // TODO: protected items
         // TODO: save policy choice with record
         // TODO: use selected password policy when generating
         // TODO: non-v3 support for edit, view, and policy activity

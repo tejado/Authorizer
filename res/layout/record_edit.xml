@@ -204,6 +204,7 @@
                 android:textSize="24sp"/>
 
             <LinearLayout
+                android:id="@+id/policy_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
