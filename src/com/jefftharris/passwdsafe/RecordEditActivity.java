@@ -21,6 +21,7 @@ import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
+import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
@@ -54,10 +55,12 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 public class RecordEditActivity extends AbstractRecordActivity
+    implements PasswdPolicyEditDialog.Editor
 {
     private static final String TAG = "RecordEditActivity";
 
     private static final int DIALOG_NEW_GROUP = MAX_DIALOG + 1;
+    private static final int DIALOG_EDIT_POLICY = MAX_DIALOG + 2;
 
     private static final int MENU_TOGGLE_PASSWORD = 3;
     private static final int MENU_GENERATE_PASSWORD = 4;
@@ -74,6 +77,9 @@ public class RecordEditActivity extends AbstractRecordActivity
     private String itsPrevGroup;
     private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
     private DialogValidator itsValidator;
+    private PasswdPolicyEditDialog itsPolicyEditDialog;
+    private List<PasswdPolicy> itsPolicies;
+    private PasswdPolicy itsCurrPolicy;
     private PasswdHistory itsHistory;
     private boolean itsIsV3 = false;
     private PasswdRecord.Type itsType = Type.NORMAL;
@@ -229,6 +235,28 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog.Editor#onPolicyEditComplete(com.jefftharris.passwdsafe.file.PasswdPolicy, com.jefftharris.passwdsafe.file.PasswdPolicy)
+     */
+    public void onPolicyEditComplete(PasswdPolicy oldPolicy,
+                                     PasswdPolicy newPolicy)
+    {
+        if (oldPolicy != null) {
+            itsPolicies.remove(oldPolicy);
+        }
+        itsPolicies.add(newPolicy);
+        updatePasswdPolicies(newPolicy);
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog.Editor#isDuplicatePolicy(java.lang.String)
+     */
+    public boolean isDuplicatePolicy(String name)
+    {
+        // Shouldn't ever be called
+        return true;
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onPause()
      */
     @Override
@@ -298,6 +326,11 @@ public class RecordEditActivity extends AbstractRecordActivity
             dialog = alertDialog;
             break;
         }
+        case DIALOG_EDIT_POLICY: {
+            itsPolicyEditDialog = new PasswdPolicyEditDialog(this);
+            dialog = itsPolicyEditDialog.create(itsCurrPolicy, this);
+            break;
+        }
         default:
         {
             dialog = super.onCreateDialog(id);
@@ -305,6 +338,24 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
         }
         return dialog;
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
+     */
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog)
+    {
+        switch (id) {
+        case DIALOG_EDIT_POLICY: {
+            itsPolicyEditDialog.reset();
+            break;
+        }
+        default: {
+            super.onPrepareDialog(id, dialog);
+            break;
+        }
+        }
     }
 
     @Override
@@ -729,7 +780,6 @@ public class RecordEditActivity extends AbstractRecordActivity
                                         PwsRecord record)
     {
         // TODO: protected items
-        // TODO: edit support for record policy
         // TODO: save policy choice with record
         // TODO: use selected password policy when generating
         // TODO: non-v3 support for edit, view, and policy activity
@@ -738,11 +788,11 @@ public class RecordEditActivity extends AbstractRecordActivity
             recPolicy = fileData.getPasswdPolicy(record);
         }
 
-        ArrayList<PasswdPolicy> policyList = new ArrayList<PasswdPolicy>();
+        itsPolicies = new ArrayList<PasswdPolicy>();
         PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
-        policyList.add(defPolicy);
+        itsPolicies.add(defPolicy);
         List<PasswdPolicy> filePolicies = fileData.getHdrPasswdPolicies();
-        policyList.addAll(filePolicies);
+        itsPolicies.addAll(filePolicies);
 
         PasswdPolicy customPolicy;
         String customName = getString(R.string.record_policy);
@@ -753,30 +803,34 @@ public class RecordEditActivity extends AbstractRecordActivity
             customPolicy = new PasswdPolicy(customName,
                                             PasswdPolicy.Location.RECORD);
         }
-        policyList.add(customPolicy);
-
-        Collections.sort(policyList);
+        itsPolicies.add(customPolicy);
 
         PasswdPolicyView view =
             (PasswdPolicyView)findViewById(R.id.policy_view);
         view.setGenerateEnabled(false);
 
-        Spinner spin = setSpinnerItems(R.id.policy, policyList);
+        Button editBtn = (Button)findViewById(R.id.policy_edit);
+        editBtn.setOnClickListener(new OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                removeDialog(DIALOG_EDIT_POLICY);
+                showDialog(DIALOG_EDIT_POLICY);
+            }
+        });
+
+        Spinner spin = (Spinner)findViewById(R.id.policy);
         spin.setOnItemSelectedListener(new OnItemSelectedListener()
         {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int pos, long id)
             {
-                Adapter adapter = parent.getAdapter();
-                PasswdPolicy policy = (PasswdPolicy)parent.getSelectedItem();
-                showPolicy(policy);
-                if (pos == (adapter.getCount() - 1)) {
-                }
+                selectPolicy((PasswdPolicy)parent.getSelectedItem());
             }
 
             public void onNothingSelected(AdapterView<?> arg0)
             {
-                showPolicy(null);
+                selectPolicy(null);
             }
         });
 
@@ -796,23 +850,34 @@ public class RecordEditActivity extends AbstractRecordActivity
             selPolicy = defPolicy;
         }
 
-        int selItem = policyList.indexOf(selPolicy);
+        updatePasswdPolicies(selPolicy);
+    }
+
+    /** Update the password policies */
+    private final void updatePasswdPolicies(PasswdPolicy selPolicy)
+    {
+        Collections.sort(itsPolicies);
+        Spinner spin = setSpinnerItems(R.id.policy, itsPolicies);
+
+        int selItem = itsPolicies.indexOf(selPolicy);
         if (selItem < 0) {
             selItem = 0;
         }
         spin.setSelection(selItem);
+
     }
 
-    /** Show a password policy */
-    private final void showPolicy(PasswdPolicy policy)
+    /** Select a password policy */
+    private final void selectPolicy(PasswdPolicy policy)
     {
+        itsCurrPolicy = policy;
         PasswdPolicyView view =
             (PasswdPolicyView)findViewById(R.id.policy_view);
-        view.showPolicy(policy);
+        view.showPolicy(itsCurrPolicy);
 
         View editBtn = findViewById(R.id.policy_edit);
-        boolean canEdit = (policy != null) &&
-            (policy.getLocation() == PasswdPolicy.Location.RECORD);
+        boolean canEdit = (itsCurrPolicy != null) &&
+            (itsCurrPolicy.getLocation() == PasswdPolicy.Location.RECORD);
         editBtn.setVisibility(canEdit ? View.VISIBLE : View.GONE);
     }
 

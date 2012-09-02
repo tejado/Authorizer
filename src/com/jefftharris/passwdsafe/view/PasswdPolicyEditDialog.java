@@ -54,6 +54,7 @@ public class PasswdPolicyEditDialog
     private DialogValidator itsValidator;
     private PasswdPolicy.Type itsOrigType = PasswdPolicy.Type.NORMAL;
     private PasswdPolicy.Type itsType = PasswdPolicy.Type.NORMAL;
+    private boolean itsIsNameEditable;
     private TextView itsNameEdit;
     private TextView itsLengthEdit;
     // Lower, upper, digits, symbols
@@ -75,6 +76,7 @@ public class PasswdPolicyEditDialog
         LayoutInflater factory = LayoutInflater.from(act);
         itsView = factory.inflate(R.layout.passwd_policy_edit, null);
 
+        itsIsNameEditable = true;
         itsNameEdit = (TextView)itsView.findViewById(R.id.name);
         itsLengthEdit = (TextView)itsView.findViewById(R.id.length);
         itsOptions[0] = (CheckBox)itsView.findViewById(R.id.lowercase);
@@ -97,11 +99,23 @@ public class PasswdPolicyEditDialog
         int[] optionLens = new int[4];
         String customSymbols;
         if (policy != null) {
+            switch (policy.getLocation()) {
+            case DEFAULT: {
+                itsNameEdit.setEnabled(false);
+                break;
+            }
+            case HEADER:
+            case RECORD_NAME: {
+                break;
+            }
+            case RECORD: {
+                itsIsNameEditable = false;
+                break;
+            }
+            }
+
             titleId = R.string.edit_policy;
             name = policy.getName();
-            if (policy.getLocation() == PasswdPolicy.Location.DEFAULT) {
-                itsNameEdit.setEnabled(false);
-            }
             len = policy.getLength();
             itsOrigType = policy.getType();
             useOptions[0] =
@@ -157,15 +171,17 @@ public class PasswdPolicyEditDialog
                 View generateRow = itsView.findViewById(R.id.generate_row);
                 generateRow.setVisibility(View.GONE);
 
-                String name = itsNameEdit.getText().toString();
-                if (TextUtils.isEmpty(name)) {
-                    return getString(R.string.empty_name);
-                }
+                if (itsIsNameEditable) {
+                    String name = itsNameEdit.getText().toString();
+                    if (TextUtils.isEmpty(name)) {
+                        return getString(R.string.empty_name);
+                    }
 
-                if (((itsPolicy == null) ||
-                     (!itsPolicy.getName().equals(name))) &&
-                    itsEditor.isDuplicatePolicy(name)) {
-                    return getString(R.string.duplicate_name);
+                    if (((itsPolicy == null) ||
+                        (!itsPolicy.getName().equals(name))) &&
+                        itsEditor.isDuplicatePolicy(name)) {
+                        return getString(R.string.duplicate_name);
+                    }
                 }
 
                 int length;
@@ -241,7 +257,8 @@ public class PasswdPolicyEditDialog
 
         // Must set text before registering view so validation isn't
         // triggered right away
-
+        View v = itsView.findViewById(R.id.name_row);
+        v.setVisibility(itsIsNameEditable ? View.VISIBLE: View.GONE);
         itsNameEdit.setText(name);
         itsValidator.registerTextView(itsNameEdit);
         setTextView(itsLengthEdit, len);

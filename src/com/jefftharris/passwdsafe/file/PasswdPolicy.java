@@ -295,6 +295,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
             if (checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS)) {
                 chars.add(isEasy ? PasswdPolicy.SYMBOLS_EASY :
                             PasswdPolicy.SYMBOLS_DEFAULT);
+                // TODO: custom symbols
             }
             break;
         }

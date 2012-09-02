@@ -21,7 +21,7 @@
                 android:shrinkColumns="1"
                 android:stretchColumns="1">
 
-                <TableRow>
+                <TableRow android:id="@+id/name_row">
 
                     <TextView
                         style="@style/TableLabelColumn"
