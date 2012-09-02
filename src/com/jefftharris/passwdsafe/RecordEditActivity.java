@@ -661,6 +661,10 @@ public class RecordEditActivity extends AbstractRecordActivity
         setVisibility(R.id.notes_sep, itsTypeHasDetails);
         setVisibility(R.id.notes_label, itsTypeHasDetails);
         setVisibility(R.id.notes, itsTypeHasDetails);
+        setVisibility(R.id.policy_sep, itsTypeHasNormalPassword);
+        setVisibility(R.id.policy_label, itsTypeHasNormalPassword);
+        setVisibility(R.id.policy_group, itsTypeHasNormalPassword);
+        setVisibility(R.id.policy_view, itsTypeHasNormalPassword);
         setVisibility(R.id.history_group_sep, itsTypeHasNormalPassword);
         setVisibility(R.id.history_group, itsTypeHasNormalPassword);
         itsValidator.validate();
