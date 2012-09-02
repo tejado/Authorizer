@@ -688,12 +688,13 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private final void generatePassword()
     {
-        PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
-        try {
-            String passwd = defPolicy.generate();
-            setPassword(passwd);
-        } catch (NoSuchAlgorithmException e) {
-            PasswdSafeApp.showFatalMsg(e, this);
+        if (itsCurrPolicy != null) {
+            try {
+                String passwd = itsCurrPolicy.generate();
+                setPassword(passwd);
+            } catch (NoSuchAlgorithmException e) {
+                PasswdSafeApp.showFatalMsg(e, this);
+            }
         }
     }
 
@@ -783,7 +784,6 @@ public class RecordEditActivity extends AbstractRecordActivity
                                         PwsRecord record)
     {
         // TODO: save policy choice with record
-        // TODO: use selected password policy when generating
         // TODO: non-v3 support for edit, view, and policy activity
         PasswdPolicy recPolicy = null;
         if (record != null) {
