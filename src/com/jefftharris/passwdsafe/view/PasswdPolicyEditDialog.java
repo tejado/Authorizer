@@ -161,99 +161,7 @@ public class PasswdPolicyEditDialog
             .setNegativeButton(R.string.cancel, dlgClick)
             .setOnCancelListener(dlgClick);
         AlertDialog dialog = alert.create();
-
-        itsValidator = new DialogValidator.AlertValidator(dialog, itsView,
-                                                          act, false)
-        {
-            @Override
-            protected String doValidation()
-            {
-                View generateRow = itsView.findViewById(R.id.generate_row);
-                generateRow.setVisibility(View.GONE);
-
-                if (itsIsNameEditable) {
-                    String name = itsNameEdit.getText().toString();
-                    if (TextUtils.isEmpty(name)) {
-                        return getString(R.string.empty_name);
-                    }
-
-                    if (((itsPolicy == null) ||
-                        (!itsPolicy.getName().equals(name))) &&
-                        itsEditor.isDuplicatePolicy(name)) {
-                        return getString(R.string.duplicate_name);
-                    }
-                }
-
-                int length;
-                try {
-                    length = getTextViewInt(itsLengthEdit);
-                    if (length < 4) {
-                        return getString(R.string.length_min_val, 4);
-                    } else if (length > 1024) {
-                        return getString(R.string.length_max_val, 1024);
-                    } else if ((itsType == PasswdPolicy.Type.HEXADECIMAL) &&
-                               ((length % 2) != 0) ) {
-                        return getString(R.string.length_even_hex);
-                    }
-
-                } catch (NumberFormatException e) {
-                    return getString(R.string.invalid_length);
-                }
-
-                if (itsType != PasswdPolicy.Type.HEXADECIMAL) {
-                    boolean oneSelected = false;
-                    for (CheckBox option: itsOptions) {
-                        if (option.isChecked()) {
-                            oneSelected = true;
-                            break;
-                        }
-                    }
-                    if (!oneSelected) {
-                        return getString(R.string.option_not_selected);
-                    }
-                }
-
-                if (itsType == PasswdPolicy.Type.NORMAL) {
-                    int minOptionsLen = 0;
-                    for (int i = 0; i < itsOptions.length; ++i) {
-                        if (itsOptions[i].isChecked()) {
-                            try {
-                                int len = getTextViewInt(itsOptionLens[i]);
-                                minOptionsLen += len;
-                            } catch (NumberFormatException e) {
-                                return getString(
-                                    R.string.invalid_option_length);
-                            }
-                        }
-                    }
-                    if (minOptionsLen > length) {
-                        return getString(R.string.password_len_short_opt);
-                    }
-                }
-
-                if (itsUseCustomSymbols.isChecked()) {
-                    String syms = itsCustomSymbolsEdit.getText().toString();
-                    if (TextUtils.isEmpty(syms)) {
-                        return getString(R.string.empty_custom_symbols);
-                    }
-                    for (int i = 0; i < syms.length(); ++i) {
-                        char c = syms.charAt(i);
-                        if (Character.isLetterOrDigit(c) ||
-                            Character.isSpaceChar(c)) {
-                            return getString(
-                                R.string.custom_symbol_not_alphanum);
-                        }
-                    }
-                }
-
-                String str = super.doValidation();
-                if (str == null) {
-                    generateRow.setVisibility(View.VISIBLE);
-                }
-                return str;
-            }
-
-        };
+        itsValidator = new Validator(dialog, itsView, act, false);
 
         // Must set text before registering view so validation isn't
         // triggered right away
@@ -618,5 +526,105 @@ public class PasswdPolicyEditDialog
     {
         TextView tv = (TextView)itsView.findViewById(id);
         tv.setText(value);
+    }
+
+
+    /** Dialog validator */
+    private final class Validator extends DialogValidator.AlertValidator
+    {
+        /** Constructor */
+        private Validator(AlertDialog dlg, View view, Activity act,
+                          boolean hasPasswords)
+        {
+            super(dlg, view, act, hasPasswords);
+        }
+
+        @Override
+        protected String doValidation()
+        {
+            View generateRow = itsView.findViewById(R.id.generate_row);
+            generateRow.setVisibility(View.GONE);
+
+            if (itsIsNameEditable) {
+                String name = itsNameEdit.getText().toString();
+                if (TextUtils.isEmpty(name)) {
+                    return getString(R.string.empty_name);
+                }
+
+                if (((itsPolicy == null) ||
+                     (!itsPolicy.getName().equals(name))) &&
+                    itsEditor.isDuplicatePolicy(name)) {
+                    return getString(R.string.duplicate_name);
+                }
+            }
+
+            int length;
+            try {
+                length = getTextViewInt(itsLengthEdit);
+                if (length < 4) {
+                    return getString(R.string.length_min_val, 4);
+                } else if (length > 1024) {
+                    return getString(R.string.length_max_val, 1024);
+                } else if ((itsType == PasswdPolicy.Type.HEXADECIMAL) &&
+                           ((length % 2) != 0) ) {
+                    return getString(R.string.length_even_hex);
+                }
+
+            } catch (NumberFormatException e) {
+                return getString(R.string.invalid_length);
+            }
+
+            if (itsType != PasswdPolicy.Type.HEXADECIMAL) {
+                boolean oneSelected = false;
+                for (CheckBox option: itsOptions) {
+                    if (option.isChecked()) {
+                        oneSelected = true;
+                        break;
+                    }
+                }
+                if (!oneSelected) {
+                    return getString(R.string.option_not_selected);
+                }
+            }
+
+            if (itsType == PasswdPolicy.Type.NORMAL) {
+                int minOptionsLen = 0;
+                for (int i = 0; i < itsOptions.length; ++i) {
+                    if (itsOptions[i].isChecked()) {
+                        try {
+                            int len = getTextViewInt(itsOptionLens[i]);
+                            minOptionsLen += len;
+                        } catch (NumberFormatException e) {
+                            return getString(
+                                R.string.invalid_option_length);
+                        }
+                    }
+                }
+                if (minOptionsLen > length) {
+                    return getString(R.string.password_len_short_opt);
+                }
+            }
+
+            if (itsUseCustomSymbols.isChecked()) {
+                String syms = itsCustomSymbolsEdit.getText().toString();
+                if (TextUtils.isEmpty(syms)) {
+                    return getString(R.string.empty_custom_symbols);
+                }
+                for (int i = 0; i < syms.length(); ++i) {
+                    char c = syms.charAt(i);
+                    if (Character.isLetterOrDigit(c) ||
+                        Character.isSpaceChar(c)) {
+                        return getString(
+                            R.string.custom_symbol_not_alphanum);
+                    }
+                }
+            }
+
+            String str = super.doValidation();
+            if (str == null) {
+                generateRow.setVisibility(View.VISIBLE);
+            }
+            return str;
+        }
     }
 }
