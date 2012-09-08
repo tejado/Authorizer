@@ -996,6 +996,7 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.USERNAME:
             case PwsRecordV3.PASSWORD_HISTORY:
+            case PwsRecordV3.PASSWORD_POLICY:
             case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
             case PwsRecordV3.PASSWORD_POLICY_NAME:
             {

@@ -366,6 +366,20 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         return itsName.compareTo(policy.itsName);
     }
 
+    public boolean recordPolicyEquals(PasswdPolicy policy)
+    {
+        if ((itsFlags != policy.itsFlags) ||
+            (itsLength != policy.itsLength) ||
+            (itsMinLowercase != policy.itsMinLowercase) ||
+            (itsMinUppercase != policy.itsMinUppercase) ||
+            (itsMinDigits != policy.itsMinDigits) ||
+            (itsMinSymbols != policy.itsMinSymbols) ||
+            !TextUtils.equals(itsSpecialSymbols, policy.itsSpecialSymbols)) {
+            return false;
+        }
+        return true;
+    }
+
     /** Convert the object to a string formatted as a header policy */
     public String toHdrPolicyString()
     {
@@ -486,17 +500,17 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         return policy;
     }
 
-    /** Convert a record policy to its string fields */
+    /** Convert a policy to the string fields for a record */
     public static RecordPolicyStrs recordPolicyToString(PasswdPolicy policy)
     {
         if (policy == null) {
             return null;
         }
         switch (policy.getLocation()) {
-        case DEFAULT:
-        case HEADER: {
+        case DEFAULT: {
             return null;
         }
+        case HEADER:
         case RECORD_NAME: {
             return new RecordPolicyStrs(policy.getName(), null, null);
         }

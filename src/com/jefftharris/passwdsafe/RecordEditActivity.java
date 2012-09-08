@@ -21,6 +21,7 @@ import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
+import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
@@ -79,6 +80,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private DialogValidator itsValidator;
     private PasswdPolicyEditDialog itsPolicyEditDialog;
     private List<PasswdPolicy> itsPolicies;
+    private PasswdPolicy itsOrigPolicy;
     private PasswdPolicy itsCurrPolicy;
     private PasswdHistory itsHistory;
     private boolean itsIsV3 = false;
@@ -787,11 +789,10 @@ public class RecordEditActivity extends AbstractRecordActivity
     private final void initPasswdPolicy(PasswdFileData fileData,
                                         PwsRecord record)
     {
-        // TODO: save policy choice with record
         // TODO: non-v3 support for edit, view, and policy activity
-        PasswdPolicy recPolicy = null;
+        itsOrigPolicy = null;
         if (record != null) {
-            recPolicy = fileData.getPasswdPolicy(record);
+            itsOrigPolicy = fileData.getPasswdPolicy(record);
         }
 
         itsPolicies = new ArrayList<PasswdPolicy>();
@@ -802,9 +803,9 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         PasswdPolicy customPolicy;
         String customName = getString(R.string.record_policy);
-        if ((recPolicy != null) &&
-            (recPolicy.getLocation() == PasswdPolicy.Location.RECORD)) {
-            customPolicy = new PasswdPolicy(customName, recPolicy);
+        if ((itsOrigPolicy != null) &&
+            (itsOrigPolicy.getLocation() == PasswdPolicy.Location.RECORD)) {
+            customPolicy = new PasswdPolicy(customName, itsOrigPolicy);
         } else {
             customPolicy = new PasswdPolicy(customName,
                                             PasswdPolicy.Location.RECORD);
@@ -841,10 +842,11 @@ public class RecordEditActivity extends AbstractRecordActivity
         });
 
         PasswdPolicy selPolicy = null;
-        if (recPolicy != null) {
-            if (recPolicy.getLocation() == PasswdPolicy.Location.RECORD_NAME) {
+        if (itsOrigPolicy != null) {
+            if (itsOrigPolicy.getLocation() ==
+                PasswdPolicy.Location.RECORD_NAME) {
                 for (PasswdPolicy filePolicy: filePolicies) {
-                    if (recPolicy.getName().equals(filePolicy.getName())) {
+                    if (itsOrigPolicy.getName().equals(filePolicy.getName())) {
                         selPolicy = filePolicy;
                         break;
                     }
@@ -1026,6 +1028,12 @@ public class RecordEditActivity extends AbstractRecordActivity
                 fileData.setProtected(updateProt, record);
             }
 
+            Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
+            PasswdSafeApp.dbginfo(TAG, "updatePolicy: " + updatePolicy);
+            if (updatePolicy.first) {
+                fileData.setPasswdPolicy(updatePolicy.second, record);
+            }
+
             if (itsTypeHasNormalPassword) {
                 if (isPasswdHistoryUpdated(currHistory)) {
                     if (itsHistory != null) {
@@ -1081,6 +1089,68 @@ public class RecordEditActivity extends AbstractRecordActivity
         } else {
             finish();
         }
+    }
+
+    /** Get the password policy that may have been updated */
+    private final Pair<Boolean, PasswdPolicy> getUpdatedPolicy()
+    {
+        PasswdPolicy.Location origLoc = PasswdPolicy.Location.DEFAULT;
+        if (itsOrigPolicy != null) {
+            origLoc = itsOrigPolicy.getLocation();
+        }
+
+        PasswdPolicy.Location currLoc = itsCurrPolicy.getLocation();
+        boolean policyChanged = false;
+        switch (origLoc) {
+        case DEFAULT: {
+            if (currLoc != origLoc) {
+                policyChanged = true;
+            }
+            break;
+        }
+        case HEADER:
+        case RECORD_NAME: {
+            switch (currLoc) {
+            case DEFAULT:
+            case RECORD: {
+                policyChanged = true;
+                break;
+            }
+            case HEADER:
+            case RECORD_NAME: {
+                if (!itsOrigPolicy.getName().equals(itsCurrPolicy.getName())) {
+                    policyChanged = true;
+                }
+                break;
+            }
+            }
+            break;
+        }
+        case RECORD: {
+            switch (currLoc) {
+            case DEFAULT:
+            case HEADER:
+            case RECORD_NAME: {
+                policyChanged = true;
+                break;
+            }
+            case RECORD: {
+                if (!itsOrigPolicy.recordPolicyEquals(itsCurrPolicy)) {
+                    policyChanged = true;
+                }
+                break;
+            }
+            }
+            break;
+        }
+        }
+
+        PasswdPolicy updatedPolicy = null;
+        if (policyChanged && (currLoc != PasswdPolicy.Location.DEFAULT)) {
+            updatedPolicy = itsCurrPolicy;
+        }
+
+        return new Pair<Boolean, PasswdPolicy>(policyChanged, updatedPolicy);
     }
 
     private final String getUpdatedField(String currStr, int viewId)
@@ -1222,6 +1292,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             if (title.length() == 0) {
                 return getString(R.string.empty_title);
             }
+
+            // TODO: validate empty password not allowed
 
             V3Key key =
                 new V3Key(title,
