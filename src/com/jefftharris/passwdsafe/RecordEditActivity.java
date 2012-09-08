@@ -789,7 +789,6 @@ public class RecordEditActivity extends AbstractRecordActivity
     private final void initPasswdPolicy(PasswdFileData fileData,
                                         PwsRecord record)
     {
-        // TODO: non-v3 support for edit, view, and policy activity
         itsOrigPolicy = null;
         if (record != null) {
             itsOrigPolicy = fileData.getPasswdPolicy(record);
@@ -799,18 +798,22 @@ public class RecordEditActivity extends AbstractRecordActivity
         PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
         itsPolicies.add(defPolicy);
         List<PasswdPolicy> filePolicies = fileData.getHdrPasswdPolicies();
-        itsPolicies.addAll(filePolicies);
-
-        PasswdPolicy customPolicy;
-        String customName = getString(R.string.record_policy);
-        if ((itsOrigPolicy != null) &&
-            (itsOrigPolicy.getLocation() == PasswdPolicy.Location.RECORD)) {
-            customPolicy = new PasswdPolicy(customName, itsOrigPolicy);
-        } else {
-            customPolicy = new PasswdPolicy(customName,
-                                            PasswdPolicy.Location.RECORD);
+        if (filePolicies != null) {
+            itsPolicies.addAll(filePolicies);
         }
-        itsPolicies.add(customPolicy);
+
+        PasswdPolicy customPolicy = null;
+        if (itsIsV3) {
+            String customName = getString(R.string.record_policy);
+            if ((itsOrigPolicy != null) &&
+                (itsOrigPolicy.getLocation() == PasswdPolicy.Location.RECORD)) {
+                customPolicy = new PasswdPolicy(customName, itsOrigPolicy);
+            } else {
+                customPolicy = new PasswdPolicy(customName,
+                                                PasswdPolicy.Location.RECORD);
+            }
+            itsPolicies.add(customPolicy);
+        }
 
         PasswdPolicyView view =
             (PasswdPolicyView)findViewById(R.id.policy_view);
@@ -1099,7 +1102,11 @@ public class RecordEditActivity extends AbstractRecordActivity
             origLoc = itsOrigPolicy.getLocation();
         }
 
-        PasswdPolicy.Location currLoc = itsCurrPolicy.getLocation();
+        PasswdPolicy.Location currLoc = PasswdPolicy.Location.DEFAULT;
+        if (itsCurrPolicy != null) {
+            itsCurrPolicy.getLocation();
+        }
+
         boolean policyChanged = false;
         switch (origLoc) {
         case DEFAULT: {

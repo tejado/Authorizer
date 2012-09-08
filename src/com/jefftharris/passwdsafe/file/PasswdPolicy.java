@@ -366,6 +366,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         return itsName.compareTo(policy.itsName);
     }
 
+    /** Are the policies equal for the fields used by a record policy */
     public boolean recordPolicyEquals(PasswdPolicy policy)
     {
         if ((itsFlags != policy.itsFlags) ||
