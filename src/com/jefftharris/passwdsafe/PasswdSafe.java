@@ -415,17 +415,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             AlertDialog alertDialog = alert.create();
             itsChangePasswdValidator =
                 new DialogValidator.AlertValidator(alertDialog,
-                                                   passwdView, this)
-            {
-                @Override
-                protected final String doValidation()
-                {
-                    if (getPassword().getText().length() == 0) {
-                        return getString(R.string.empty_password);
-                    }
-                    return super.doValidation();
-                }
-            };
+                                                   passwdView, this);
             GuiUtils.setupDialogKeyboard(alertDialog, tv1, tv2, this);
             dialog = alertDialog;
             break;
@@ -500,9 +490,6 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         return getString(R.string.file_exists);
                     }
 
-                    if (getPassword().getText().length() == 0) {
-                        return getString(R.string.empty_password);
-                    }
                     return super.doValidation();
                 }
             };

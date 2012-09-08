@@ -21,7 +21,7 @@ public abstract class DialogValidator
     /**
      * DialogValidator for alert dialogs
      */
-    public static abstract class AlertValidator extends DialogValidator
+    public static class AlertValidator extends DialogValidator
     {
         private final AlertDialog itsDialog;
 
@@ -141,10 +141,14 @@ public abstract class DialogValidator
 
     protected String doValidation()
     {
-        if ((itsPassword != null) &&
-            !itsPassword.getText().toString().equals(
-             itsPasswordConfirm.getText().toString())) {
-            return getString(R.string.passwords_do_not_match);
+        if (itsPassword != null) {
+            String passwd = itsPassword.getText().toString();
+            if (passwd.length() == 0) {
+                return getString(R.string.empty_password);
+            }
+            if (!passwd.equals(itsPasswordConfirm.getText().toString())) {
+                return getString(R.string.passwords_do_not_match);
+            }
         }
         return null;
     }

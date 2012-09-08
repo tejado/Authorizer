@@ -1300,8 +1300,6 @@ public class RecordEditActivity extends AbstractRecordActivity
                 return getString(R.string.empty_title);
             }
 
-            // TODO: validate empty password not allowed
-
             V3Key key =
                 new V3Key(title,
                           GuiUtils.getSpinnerStr(RecordEditActivity.this,

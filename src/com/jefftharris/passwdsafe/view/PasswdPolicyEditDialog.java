@@ -161,7 +161,7 @@ public class PasswdPolicyEditDialog
             .setNegativeButton(R.string.cancel, dlgClick)
             .setOnCancelListener(dlgClick);
         AlertDialog dialog = alert.create();
-        itsValidator = new Validator(dialog, itsView, act, false);
+        itsValidator = new Validator(dialog, itsView, act);
 
         // Must set text before registering view so validation isn't
         // triggered right away
@@ -533,10 +533,9 @@ public class PasswdPolicyEditDialog
     private final class Validator extends DialogValidator.AlertValidator
     {
         /** Constructor */
-        private Validator(AlertDialog dlg, View view, Activity act,
-                          boolean hasPasswords)
+        private Validator(AlertDialog dlg, View view, Activity act)
         {
-            super(dlg, view, act, hasPasswords);
+            super(dlg, view, act, false);
         }
 
         @Override
