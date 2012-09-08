@@ -42,10 +42,13 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private static final int DIALOG_EDIT =      MAX_DIALOG + 2;
     private static final int DIALOG_DELETE =    MAX_DIALOG + 3;
 
+    private static final String SAVE_SEL_POLICY = "saveSelPolicy";
+
     private List<PasswdPolicy> itsPolicies;
     private Set<String> itsPolicyNames;
     private DialogValidator itsDeleteValidator;
     private PasswdPolicyEditDialog itsEditDialog;
+    private String itsSelPolicyName = null;
 
     /** Called when the activity is first created. */
     @Override
@@ -62,6 +65,15 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         setTitle(PasswdSafeApp.getAppFileTitle(getUri(), this));
         // Programmatic setting for Android 1.5
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+        if (savedInstanceState != null) {
+            itsSelPolicyName = savedInstanceState.getString(SAVE_SEL_POLICY);
+        } else {
+            PasswdPolicy defPolicy =
+                getPasswdSafeApp().getDefaultPasswdPolicy();
+            itsSelPolicyName = defPolicy.getName();
+        }
+
         showPolicies();
     }
 
@@ -168,6 +180,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             }
             itsPolicies.add(newPolicy);
             Collections.sort(itsPolicies);
+            itsSelPolicyName = newPolicy.getName();
             savePolicies();
         }
     }
@@ -179,6 +192,17 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     {
         return itsPolicyNames.contains(name);
     }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putString(SAVE_SEL_POLICY, itsSelPolicyName);
+    }
+
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateDialog(int)
@@ -258,15 +282,15 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
      * @see android.app.ListActivity#onListItemClick(android.widget.ListView, android.view.View, int, long)
      */
     @Override
-    protected void onListItemClick(ListView l, View v, int position, long id)
+    protected void onListItemClick(ListView l, View v, int pos, long id)
     {
         GuiUtils.invalidateOptionsMenu(this);
-
-        PasswdPolicy policy = null;
-        if ((position >= 0) && (position < itsPolicies.size())) {
-            policy = itsPolicies.get(position);
+        itsSelPolicyName = null;
+        PasswdPolicy selPolicy = getPolicy(pos);
+        if (selPolicy != null) {
+            itsSelPolicyName = selPolicy.getName();
         }
-        showPolicy(policy);
+        showPolicy(selPolicy);
     }
 
 
@@ -289,13 +313,28 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             itsPolicyNames.add(policy.getName());
         }
 
-        itsPolicies.add(getPasswdSafeApp().getDefaultPasswdPolicy());
+        PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
+        itsPolicies.add(defPolicy);
         Collections.sort(itsPolicies);
+        int selPos = 0;
+        PasswdPolicy selPolicy = defPolicy;
+        if (itsSelPolicyName != null) {
+            int i = 0;
+            for (PasswdPolicy policy: itsPolicies) {
+                if (policy.getName().equals(itsSelPolicyName)) {
+                    selPos = i;
+                    selPolicy = policy;
+                    break;
+                }
+                ++i;
+            }
+        }
 
         setListAdapter(new ArrayAdapter<PasswdPolicy>(
             this, android.R.layout.simple_list_item_single_choice,
             itsPolicies));
-        showPolicy(null);
+        getListView().setItemChecked(selPos, true);
+        showPolicy(selPolicy);
     }
 
     /** Show the details of a policy */
@@ -313,6 +352,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         PasswdPolicy policy = getSelectedPolicy();
         if (policy.getLocation() != PasswdPolicy.Location.DEFAULT) {
             itsPolicies.remove(policy);
+            itsSelPolicyName = null;
             savePolicies();
         }
     }
@@ -340,13 +380,17 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     /** Get the currently selected policy */
     private final PasswdPolicy getSelectedPolicy()
     {
-        PasswdPolicy policy = null;
-        int selectedPos = getListView().getCheckedItemPosition();
+        return getPolicy(getListView().getCheckedItemPosition());
+    }
+
+    /** Get a policy */
+    private final PasswdPolicy getPolicy(int pos)
+    {
         if ((itsPolicies != null) &&
-            (selectedPos >= 0) &&
-            (selectedPos < itsPolicies.size())) {
-            policy = itsPolicies.get(selectedPos);
+            (pos >= 0) &&
+            (pos < itsPolicies.size())) {
+            return itsPolicies.get(pos);
         }
-        return policy;
+        return null;
     }
 }
