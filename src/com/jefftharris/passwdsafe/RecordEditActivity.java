@@ -1104,7 +1104,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         PasswdPolicy.Location currLoc = PasswdPolicy.Location.DEFAULT;
         if (itsCurrPolicy != null) {
-            itsCurrPolicy.getLocation();
+            currLoc = itsCurrPolicy.getLocation();
         }
 
         boolean policyChanged = false;
