@@ -114,6 +114,8 @@ public class RecordView extends AbstractRecordTabActivity
     private boolean isWordWrap = true;
     private boolean itsIsMonospace = false;
     private boolean itsHasNotes = false;
+    private boolean itsHasReferences = false;
+    private boolean itsIsProtected = false;
     private Drawable itsNotesTabDrawable;
     private DialogValidator itsDeleteValidator;
 
@@ -324,13 +326,7 @@ public class RecordView extends AbstractRecordTabActivity
             PasswdFileData fileData = passwdFile.getFileData();
             if (fileData != null) {
                 canEdit = fileData.canEdit();
-                canDelete = canEdit;
-                if (canDelete) {
-                    PwsRecord rec = fileData.getRecord(getUUID());
-                    if ((rec != null) && fileData.isProtected(rec)) {
-                        canDelete = false;
-                    }
-                }
+                canDelete = canEdit && !itsHasReferences && !itsIsProtected;
             } else {
                 finish();
                 return false;
@@ -784,7 +780,8 @@ public class RecordView extends AbstractRecordTabActivity
         }
 
         List<PwsRecord> references = passwdRec.getRefsToRecord();
-        if ((references != null) && !references.isEmpty()) {
+        itsHasReferences = (references != null) && !references.isEmpty();
+        if (itsHasReferences) {
             ArrayAdapter<String> adapter =
                 new ArrayAdapter<String>(this,
                                          R.layout.normal_list_item1);
@@ -799,7 +796,8 @@ public class RecordView extends AbstractRecordTabActivity
         }
         GuiUtils.setListViewHeightBasedOnChildren(referencesView);
 
-        setVisibility(R.id.protected_row, fileData.isProtected(rec));
+        itsIsProtected = fileData.isProtected(rec);
+        setVisibility(R.id.protected_row, itsIsProtected);
 
         scrollTabToTop();
     }
@@ -904,7 +902,6 @@ public class RecordView extends AbstractRecordTabActivity
         findViewById(R.id.history_max_size_label).setEnabled(historyExists);
 
         // TODO: prevent policy deletion if a record references it
-        // TODO: prevent record deletion if there are references to it
         int visibility = (policy != null) ? View.VISIBLE : View.GONE;
         PasswdPolicyView policyView =
             (PasswdPolicyView)findViewById(R.id.policy);
