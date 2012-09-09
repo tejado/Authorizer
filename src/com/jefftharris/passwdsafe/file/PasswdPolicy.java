@@ -80,8 +80,6 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         }
     }
 
-    // TODO: UTF-8 chars in policy name and special chars
-
     /** Type of policy.  String indexes must match policy_type strings. */
     public enum Type
     {

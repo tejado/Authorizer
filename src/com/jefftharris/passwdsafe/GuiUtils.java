@@ -271,4 +271,20 @@ public final class GuiUtils
             GuiUtilsHoneycomb.invalidateOptionsMenu(act);
         }
     }
+
+
+    /** Ensure the selected item in a ListView is visible */
+    public static void ensureListViewSelectionVisible(final ListView lv,
+                                                      final int pos)
+    {
+        lv.post(new Runnable() {
+            public void run()
+            {
+                if ((pos <= lv.getFirstVisiblePosition()) ||
+                    (pos >= lv.getLastVisiblePosition())) {
+                    lv.setSelection(pos);
+                }
+            }
+        });
+    }
 }

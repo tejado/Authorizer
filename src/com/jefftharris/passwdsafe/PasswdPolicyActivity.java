@@ -182,6 +182,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             Collections.sort(itsPolicies);
             itsSelPolicyName = newPolicy.getName();
             savePolicies();
+
+            // TODO: if rename, need to modify all users of policy to new name
         }
     }
 
@@ -291,6 +293,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             itsSelPolicyName = selPolicy.getName();
         }
         showPolicy(selPolicy);
+        GuiUtils.ensureListViewSelectionVisible(l, pos);
     }
 
 
@@ -335,6 +338,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             itsPolicies));
         getListView().setItemChecked(selPos, true);
         showPolicy(selPolicy);
+        GuiUtils.ensureListViewSelectionVisible(getListView(), selPos);
     }
 
     /** Show the details of a policy */
