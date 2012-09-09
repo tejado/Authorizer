@@ -61,6 +61,7 @@ public abstract class DialogValidator
     private final Context itsContext;
     private TextView itsPassword = null;
     private TextView itsPasswordConfirm = null;
+    private boolean itsAllowEmptyPassword = false;
     private TextView itsErrorMsgView;
     private String itsErrorFmt;
     private TextWatcher itsTextWatcher = new AbstractTextWatcher()
@@ -143,7 +144,7 @@ public abstract class DialogValidator
     {
         if (itsPassword != null) {
             String passwd = itsPassword.getText().toString();
-            if (passwd.length() == 0) {
+            if (!itsAllowEmptyPassword && (passwd.length() == 0)) {
                 return getString(R.string.empty_password);
             }
             if (!passwd.equals(itsPasswordConfirm.getText().toString())) {
@@ -161,5 +162,10 @@ public abstract class DialogValidator
     protected final String getString(int id, Object... args)
     {
         return itsContext.getString(id, args);
+    }
+
+    protected final void setAllowEmptyPassword(boolean allow)
+    {
+        itsAllowEmptyPassword = allow;
     }
 }
