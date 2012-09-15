@@ -68,7 +68,6 @@ public class PasswdPolicyView extends LinearLayout
     {
         if (policy == null) {
             policy = PasswdPolicy.createDefaultPolicy(getContext());
-            policy.setFlags(0);
         }
 
         itsPolicy = policy;

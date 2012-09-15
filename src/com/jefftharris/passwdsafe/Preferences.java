@@ -218,7 +218,6 @@ public class Preferences extends PreferenceActivity
             prefs.contains(PREF_GEN_HEX) ||
             prefs.contains(PREF_GEN_LENGTH)) {
             PasswdSafeApp.dbginfo(TAG, "Upgrade old prefs");
-            PasswdPolicy policy = PasswdPolicy.createDefaultPolicy(ctx);
 
             int flags = 0;
             if (prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF)) {
@@ -241,7 +240,6 @@ public class Preferences extends PreferenceActivity
                     flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
                 }
             }
-            policy.setFlags(flags);
             int length;
             try {
                 length = Integer.parseInt(prefs.getString(PREF_GEN_LENGTH,
@@ -249,7 +247,8 @@ public class Preferences extends PreferenceActivity
             } catch (NumberFormatException e) {
                 length = Integer.parseInt(PREF_GEN_LENGTH_DEF);
             }
-            policy.setLength(length);
+            PasswdPolicy policy = PasswdPolicy.createDefaultPolicy(ctx, flags,
+                                                                   length);
             policyStr = policy.toHdrPolicyString();
 
             prefsEdit.remove(PREF_GEN_LOWER);

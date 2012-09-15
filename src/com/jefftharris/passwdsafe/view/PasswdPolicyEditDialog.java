@@ -210,13 +210,7 @@ public class PasswdPolicyEditDialog
      */
     private PasswdPolicy createPolicy()
     {
-        PasswdPolicy policy = new PasswdPolicy(
-            itsNameEdit.getText().toString(),
-            (itsPolicy != null) ? itsPolicy.getLocation() :
-                PasswdPolicy.Location.HEADER);
         int length = getTextViewInt(itsLengthEdit);
-        policy.setLength(length);
-
         int flags = 0;
         int minLower = 1;
         int minUpper = 1;
@@ -283,14 +277,12 @@ public class PasswdPolicyEditDialog
         }
         }
 
-        policy.setFlags(flags);
-        policy.setMinLowercase(minLower);
-        policy.setMinUppercase(minUpper);
-        policy.setMinDigits(minDigits);
-        policy.setMinSymbols(minSymbols);
-        policy.setSpecialSymbols(customSymbols);
-
-        return policy;
+        return new PasswdPolicy(
+            itsNameEdit.getText().toString(),
+            (itsPolicy != null) ? itsPolicy.getLocation() :
+                PasswdPolicy.Location.HEADER,
+            flags, length,
+            minLower, minUpper, minDigits, minSymbols, customSymbols);
     }
 
     /** Generate a password from the policy */

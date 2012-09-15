@@ -110,36 +110,47 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
 
     private final String itsName;
     private final Location itsLocation;
-    private int itsFlags = FLAG_USE_LOWERCASE | FLAG_USE_UPPERCASE |
-                           FLAG_USE_DIGITS | FLAG_USE_SYMBOLS;
-    private int itsLength = 12;
-    private int itsMinLowercase = 1;
-    private int itsMinUppercase = 1;
-    private int itsMinDigits = 1;
-    private int itsMinSymbols = 1;
-    private String itsSpecialSymbols = null;
+    private final int itsFlags;
+    private final int itsLength;
+    private final int itsMinLowercase;
+    private final int itsMinUppercase;
+    private final int itsMinDigits;
+    private final int itsMinSymbols;
+    private final String itsSpecialSymbols;
 
     /**
      * Constructor
      */
     public PasswdPolicy(String name, Location loc)
     {
+        this(name, loc,
+             FLAG_USE_LOWERCASE | FLAG_USE_UPPERCASE |
+             FLAG_USE_DIGITS | FLAG_USE_SYMBOLS,
+             12, 1, 1, 1, 1, null);
+    }
+
+    /** Constructor with fields */
+    public PasswdPolicy(String name, Location loc, int flags, int length,
+                        int minLower, int minUpper, int minDigits, int minSyms,
+                        String specialSymbols)
+    {
         itsName = name;
         itsLocation = loc;
+        itsFlags = flags & FLAGS_VALID;
+        itsLength = minmaxLength(length);
+        itsMinLowercase = minmaxLength(minLower);
+        itsMinUppercase = minmaxLength(minUpper);
+        itsMinDigits = minmaxLength(minDigits);
+        itsMinSymbols = minmaxLength(minSyms);
+        itsSpecialSymbols = specialSymbols;
     }
 
     /** Copy constructor with a different name */
     public PasswdPolicy(String name, PasswdPolicy copy)
     {
-        itsName = name;
-        itsLocation = copy.itsLocation;
-        itsFlags = copy.itsFlags;
-        itsLength = copy.itsLength;
-        itsMinLowercase = copy.itsMinLowercase;
-        itsMinUppercase = copy.itsMinUppercase;
-        itsMinDigits = copy.itsMinDigits;
-        itsMinSymbols = copy.itsMinSymbols;
-        itsSpecialSymbols = copy.itsSpecialSymbols;
+        this(name, copy.itsLocation, copy.itsFlags, copy.itsLength,
+             copy.itsMinLowercase, copy.itsMinUppercase,
+             copy.itsMinDigits, copy.itsMinSymbols, copy.itsSpecialSymbols);
     }
 
     /** Create a default policy */
@@ -147,6 +158,15 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     {
         return new PasswdPolicy(ctx.getString(R.string.default_policy),
                                 PasswdPolicy.Location.DEFAULT);
+    }
+
+    /** Create a default policy with custom flags and length */
+    public static PasswdPolicy createDefaultPolicy(Context ctx,
+                                                   int flags, int length)
+    {
+        return new PasswdPolicy(ctx.getString(R.string.default_policy),
+                                PasswdPolicy.Location.DEFAULT,
+                                flags, length, 1, 1, 1, 1, null);
     }
 
     /** Get the policy name */
@@ -171,12 +191,6 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     public final boolean checkFlags(int flags)
     {
         return (itsFlags & flags) == flags;
-    }
-
-    /** Set the policy flags */
-    public void setFlags(int flags)
-    {
-        itsFlags = flags & FLAGS_VALID;
     }
 
     /** Get the type of policy */
@@ -205,22 +219,10 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         return itsLength;
     }
 
-    /** Set the password length */
-    public void setLength(int length)
-    {
-        itsLength = minmaxLength(length);
-    }
-
     /** Get the minimum number of lowercase characters */
     public int getMinLowercase()
     {
         return itsMinLowercase;
-    }
-
-    /** Set the minimum number of lowercase characters */
-    public void setMinLowercase(int length)
-    {
-        itsMinLowercase = minmaxLength(length);
     }
 
     /** Get the minimum number of uppercase characters */
@@ -229,22 +231,10 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         return itsMinUppercase;
     }
 
-    /** Set the minimum number of uppercase characters */
-    public void setMinUppercase(int length)
-    {
-        itsMinUppercase = minmaxLength(length);
-    }
-
     /** Get the minimum number of digit characters */
     public int getMinDigits()
     {
         return itsMinDigits;
-    }
-
-    /** Set the minimum number of digit characters */
-    public void setMinDigits(int length)
-    {
-        itsMinDigits = minmaxLength(length);
     }
 
     /** Get the minimum number of symbol characters */
@@ -253,22 +243,10 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         return itsMinSymbols;
     }
 
-    /** Set the minimum number of symbol characters */
-    public void setMinSymbols(int length)
-    {
-        itsMinSymbols = minmaxLength(length);
-    }
-
     /** Get the special symbols */
     public String getSpecialSymbols()
     {
         return itsSpecialSymbols;
-    }
-
-    /** Set the special symbols */
-    public void setSpecialSymbols(String symbols)
-    {
-        itsSpecialSymbols = symbols;
     }
 
     /** Generate a password */
@@ -410,10 +388,10 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         String name = getPolicyStrField(policyStr, policyNum, fieldStart,
                                         nameLen, "name");
         fieldStart += nameLen;
-        PasswdPolicy policy = new PasswdPolicy(name, loc);
 
-        fieldStart = parsePolicyFlagsAndLengths(policy, policyStr,
-                                                policyNum, fieldStart);
+        ParsedFields fields = parsePolicyFlagsAndLengths(policyStr,
+                                                         policyNum, fieldStart);
+        fieldStart = fields.itsFieldsEnd;
 
         int numSpecials = getPolicyStrInt(policyStr, policyNum, fieldStart, 2,
                                           "special symbols length");
@@ -424,8 +402,12 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
                                             numSpecials, "special symbols");
             fieldStart += numSpecials;
         }
-        policy.setSpecialSymbols(specialSyms);
 
+        PasswdPolicy policy =
+            new PasswdPolicy(name, loc, fields.itsFlags, fields.itsLength,
+                             fields.itsMinLowercase, fields.itsMinUppercase,
+                             fields.itsMinDigits, fields.itsMinSymbols,
+                             specialSyms);
         return new Pair<PasswdPolicy, Integer>(policy, fieldStart);
     }
 
@@ -488,13 +470,18 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         if (policyName != null) {
             policy = new PasswdPolicy(policyName, Location.RECORD_NAME);
         } else if (policyStr != null) {
-            policy = new PasswdPolicy(null, Location.RECORD);
-            int endPos = parsePolicyFlagsAndLengths(policy, policyStr, 0, 0);
+            ParsedFields fields = parsePolicyFlagsAndLengths(policyStr, 0, 0);
+            int endPos = fields.itsFieldsEnd;
             if (endPos != policyStr.length()) {
                 throw new IllegalArgumentException(
                     "Password policy too long: " + policyStr);
             }
-            policy.setSpecialSymbols(ownSymbols);
+            policy =
+                new PasswdPolicy(null, Location.RECORD,
+                                 fields.itsFlags, fields.itsLength,
+                                 fields.itsMinLowercase, fields.itsMinUppercase,
+                                 fields.itsMinDigits, fields.itsMinSymbols,
+                                 ownSymbols);
         }
         return policy;
     }
@@ -522,44 +509,62 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         return null;
     }
 
+    /** Fields parsed from a policy flags and length string */
+    private static class ParsedFields
+    {
+        public final int itsFlags;
+        public final int itsLength;
+        public final int itsMinLowercase;
+        public final int itsMinUppercase;
+        public final int itsMinDigits;
+        public final int itsMinSymbols;
+        public final int itsFieldsEnd;
+
+        public ParsedFields(int flags, int pwLen, int minLower, int minUpper,
+                            int minDigits, int minSymbols, int fieldsEnd)
+        {
+            itsFlags = flags;
+            itsLength = pwLen;
+            itsMinLowercase = minLower;
+            itsMinUppercase = minUpper;
+            itsMinDigits = minDigits;
+            itsMinSymbols = minSymbols;
+            itsFieldsEnd = fieldsEnd;
+        }
+    }
+
     /** Parse the flags and lengths of a policy from a string */
-    private static int parsePolicyFlagsAndLengths(PasswdPolicy policy,
-                                                  String policyStr,
-                                                  int policyNum,
-                                                  int fieldStart)
+    private static ParsedFields parsePolicyFlagsAndLengths(String policyStr,
+                                                           int policyNum,
+                                                           int fieldStart)
 
     {
         int flags = getPolicyStrInt(policyStr, policyNum, fieldStart, 4,
                                     "flags");
         fieldStart += 4;
-        policy.setFlags(flags);
 
         int pwLen = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
                                     "password length");
         fieldStart += 3;
-        policy.setLength(pwLen);
 
         int minDigits = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
                                         "min digit chars");
         fieldStart += 3;
-        policy.setMinDigits(minDigits);
 
         int minLower = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
                                        "min lowercase chars");
         fieldStart += 3;
-        policy.setMinLowercase(minLower);
 
         int minSymbols = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
                                          "min symbol chars");
         fieldStart += 3;
-        policy.setMinSymbols(minSymbols);
 
         int minUpper = getPolicyStrInt(policyStr, policyNum, fieldStart, 3,
                                        "min uppercase chars");
         fieldStart += 3;
-        policy.setMinUppercase(minUpper);
 
-        return fieldStart;
+        return new ParsedFields(flags, pwLen, minLower, minUpper,
+                                minDigits, minSymbols, fieldStart);
     }
 
     /** Convert the policy's flags and lengths to a string */
