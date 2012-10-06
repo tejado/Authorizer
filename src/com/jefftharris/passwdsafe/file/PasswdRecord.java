@@ -36,7 +36,7 @@ public class PasswdRecord
     {
         itsRecord = rec;
         passwordChanged(fileData);
-        itsPasswdPolicy = fileData.getPasswdPolicy(rec);
+        passwdPolicyChanged(fileData);
     }
 
     public PwsRecord getRecord()

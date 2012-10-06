@@ -116,14 +116,20 @@ public class RecordEditActivity extends AbstractRecordActivity
         PasswdFileData fileData = getPasswdFile().getFileData();
         itsIsV3 = fileData.isV3();
         itsIsProtected = false;
-        PwsRecord record = null;
+        PasswdRecord passwdRecord = null;
         String group = null;
         String uuid = getUUID();
         CheckBox protCb = (CheckBox)findViewById(R.id.protected_record);
         if (uuid != null) {
-            record = fileData.getRecord(uuid);
+            PwsRecord record = fileData.getRecord(uuid);
             if (record == null) {
                 PasswdSafeApp.showFatalMsg("Unknown record: " + uuid, this);
+                return;
+            }
+            passwdRecord = fileData.getPasswdRecord(record);
+            if (passwdRecord == null) {
+                PasswdSafeApp.showFatalMsg("Unknown passwd record: " + uuid,
+                                           this);
                 return;
             }
 
@@ -160,9 +166,9 @@ public class RecordEditActivity extends AbstractRecordActivity
             setVisibility(R.id.protected_row, false);
         }
 
-        initTypeAndPassword(fileData, record);
-        initGroup(fileData, record, group);
-        initPasswdPolicy(fileData, record);
+        initTypeAndPassword(fileData, passwdRecord);
+        initGroup(fileData, passwdRecord, group);
+        initPasswdPolicy(fileData, passwdRecord);
 
         if (itsIsV3) {
             TextView tv = (TextView)findViewById(R.id.history_max_size);
@@ -522,24 +528,23 @@ public class RecordEditActivity extends AbstractRecordActivity
 
 
     private final void initTypeAndPassword(PasswdFileData fileData,
-                                           PwsRecord record)
+                                           PasswdRecord record)
     {
         itsOrigType = Type.NORMAL;
         PwsRecord linkRef = null;
         String password = null;
 
         if (record != null) {
-            PasswdRecord passwdRec = fileData.getPasswdRecord(record);
-            itsOrigType = passwdRec.getType();
+            itsOrigType = record.getType();
 
             switch (itsOrigType) {
             case NORMAL: {
-                password = fileData.getPassword(record);
+                password = fileData.getPassword(record.getRecord());
                 break;
             }
             case ALIAS:
             case SHORTCUT: {
-                linkRef = passwdRec.getRef();
+                linkRef = record.getRef();
                 break;
             }
             }
@@ -714,9 +719,12 @@ public class RecordEditActivity extends AbstractRecordActivity
         setPasswordVisibility(true, passwdField, confirmField);
     }
 
-    private final void initGroup(PasswdFileData fileData, PwsRecord editRecord,
+    private final void initGroup(PasswdFileData fileData,
+                                 PasswdRecord editRecord,
 	    			 String group)
     {
+        PwsRecord editRec =
+            (editRecord != null) ? editRecord.getRecord() : null;
         ArrayList<PwsRecord> records = fileData.getRecords();
         for (PwsRecord rec : records) {
             String grp = fileData.getGroup(rec);
@@ -724,7 +732,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 itsGroups.add(grp);
             }
 
-            if (rec != editRecord) {
+            if (rec != editRec) {
                 V3Key key = new V3Key(fileData.getTitle(rec), grp,
                                       fileData.getUsername(rec));
                 itsRecordKeys.add(key);
@@ -788,11 +796,11 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     /** Initialize the password policy */
     private final void initPasswdPolicy(PasswdFileData fileData,
-                                        PwsRecord record)
+                                        PasswdRecord record)
     {
         itsOrigPolicy = null;
         if (record != null) {
-            itsOrigPolicy = fileData.getPasswdPolicy(record);
+            itsOrigPolicy = record.getPasswdPolicy();
         }
 
         itsPolicies = new ArrayList<PasswdPolicy>();

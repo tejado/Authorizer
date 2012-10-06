@@ -842,8 +842,7 @@ public class RecordView extends AbstractRecordTabActivity
         PasswdHistory history = null;
         switch (passwdRec.getType()) {
         case NORMAL: {
-            // TODO: get policy from PasswdRecord?
-            policy = fileData.getPasswdPolicy(passwdRec.getRecord());
+            policy = passwdRec.getPasswdPolicy();
             if (policy == null) {
                 policy = getPasswdSafeApp().getDefaultPasswdPolicy();
                 policyLoc = getString(R.string.default_policy);
