@@ -30,11 +30,13 @@ public class PasswdRecord
     private PwsRecord itsRef;
     private final ArrayList<PwsRecord> itsRefsToRecord =
         new ArrayList<PwsRecord>();
+    private PasswdPolicy itsPasswdPolicy;
 
     public PasswdRecord(PwsRecord rec, PasswdFileData fileData)
     {
         itsRecord = rec;
         passwordChanged(fileData);
+        itsPasswdPolicy = fileData.getPasswdPolicy(rec);
     }
 
     public PwsRecord getRecord()
@@ -91,6 +93,12 @@ public class PasswdRecord
         }
         itsType = type;
         itsRef = ref;
+    }
+
+    /** Get the record's password policy */
+    public PasswdPolicy getPasswdPolicy()
+    {
+        return itsPasswdPolicy;
     }
 
     public static String uuidToPasswd(String uuid, Type type)
