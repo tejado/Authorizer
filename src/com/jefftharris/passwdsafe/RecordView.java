@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -841,20 +842,17 @@ public class RecordView extends AbstractRecordTabActivity
         PasswdHistory history = null;
         switch (passwdRec.getType()) {
         case NORMAL: {
+            // TODO: get policy from PasswdRecord?
             policy = fileData.getPasswdPolicy(passwdRec.getRecord());
             if (policy == null) {
                 policy = getPasswdSafeApp().getDefaultPasswdPolicy();
-                policyLoc= getString(R.string.default_policy);
+                policyLoc = getString(R.string.default_policy);
             } else if (policy.getLocation() ==
                        PasswdPolicy.Location.RECORD_NAME) {
-                List<PasswdPolicy> policies = fileData.getHdrPasswdPolicies();
-                if (policies != null) {
-                    for (PasswdPolicy hdrPolicy: policies) {
-                        if (policy.getName().equals(hdrPolicy.getName())) {
-                            policy = hdrPolicy;
-                            break;
-                        }
-                    }
+                HeaderPasswdPolicies hdrPolicies =
+                    fileData.getHdrPasswdPolicies();
+                if (hdrPolicies != null) {
+                    policy = hdrPolicies.getPasswdPolicy(policy.getName());
                 }
                 if (policy != null) {
                     policyLoc = getString(R.string.database_policy,

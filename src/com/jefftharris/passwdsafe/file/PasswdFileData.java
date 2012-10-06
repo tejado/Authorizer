@@ -79,6 +79,7 @@ public class PasswdFileData
     private final Map<PwsRecord, PasswdRecord> itsPasswdRecords =
         new IdentityHashMap<PwsRecord, PasswdRecord>();
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
+    private HeaderPasswdPolicies itsHdrPolicies = new HeaderPasswdPolicies();
     private boolean itsIsOpenReadOnly = false;
 
     private static final String TAG = "PasswdFileData";
@@ -428,6 +429,8 @@ public class PasswdFileData
     /** Set the password policy for a record */
     public final void setPasswdPolicy(PasswdPolicy policy, PwsRecord rec)
     {
+        // TODO: update header policy ref counts
+        // TODO: update PasswdRecord field
         PasswdPolicy.RecordPolicyStrs strs =
             PasswdPolicy.recordPolicyToString(policy);
         setField((strs == null) ? null : strs.itsPolicyName,
@@ -540,11 +543,11 @@ public class PasswdFileData
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
 
+
     /** Get the named password policies from the file header */
-    public final List<PasswdPolicy> getHdrPasswdPolicies()
+    public HeaderPasswdPolicies getHdrPasswdPolicies()
     {
-        return PasswdPolicy.parseHdrPolicies(
-            getHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES));
+        return itsHdrPolicies;
     }
 
     /**
@@ -556,6 +559,7 @@ public class PasswdFileData
         setHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES,
                     PasswdPolicy.hdrPoliciesToString(policies));
         updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
+        indexPasswdPolicies();
     }
 
     public static final boolean isFileUri(Uri uri)
@@ -1132,6 +1136,18 @@ public class PasswdFileData
                 referencedRecord.addRefToRecord(passwdRec.getRecord());
             }
         }
+
+        indexPasswdPolicies();
+    }
+
+    /** Index the password policies */
+    private final void indexPasswdPolicies()
+    {
+        List<PasswdPolicy> hdrPolicies =
+            PasswdPolicy.parseHdrPolicies(
+                getHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES));
+        itsHdrPolicies = new HeaderPasswdPolicies(itsPasswdRecords.values(),
+                                                  hdrPolicies);
     }
 
 

@@ -9,10 +9,9 @@ package com.jefftharris.passwdsafe;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.view.DialogUtils;
@@ -45,7 +44,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     private static final String SAVE_SEL_POLICY = "saveSelPolicy";
 
     private List<PasswdPolicy> itsPolicies;
-    private Set<String> itsPolicyNames;
+    private HeaderPasswdPolicies itsHdrPolicies;
     private DialogValidator itsDeleteValidator;
     private PasswdPolicyEditDialog itsEditDialog;
     private String itsSelPolicyName = null;
@@ -192,7 +191,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
      */
     public boolean isDuplicatePolicy(String name)
     {
-        return itsPolicyNames.contains(name);
+        return itsHdrPolicies.containsPolicy(name);
     }
 
     /* (non-Javadoc)
@@ -302,18 +301,17 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     {
         GuiUtils.invalidateOptionsMenu(this);
 
+        itsHdrPolicies = null;
         PasswdFileData fileData = getPasswdFileData();
-        itsPolicies = null;
         if (fileData != null) {
-            itsPolicies = fileData.getHdrPasswdPolicies();
+            itsHdrPolicies = fileData.getHdrPasswdPolicies();
         }
-        if (itsPolicies == null) {
-            itsPolicies = new ArrayList<PasswdPolicy>();
-        }
-
-        itsPolicyNames = new HashSet<String>(itsPolicies.size());
-        for (PasswdPolicy policy: itsPolicies) {
-            itsPolicyNames.add(policy.getName());
+        itsPolicies = new ArrayList<PasswdPolicy>();
+        if (itsHdrPolicies != null) {
+            for (HeaderPasswdPolicies.HdrPolicy hdrPolicy:
+                 itsHdrPolicies.getPolicies()) {
+                itsPolicies.add(hdrPolicy.getPolicy());
+            }
         }
 
         PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();

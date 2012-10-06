@@ -16,6 +16,7 @@ import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -797,9 +798,13 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsPolicies = new ArrayList<PasswdPolicy>();
         PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
         itsPolicies.add(defPolicy);
-        List<PasswdPolicy> filePolicies = fileData.getHdrPasswdPolicies();
-        if (filePolicies != null) {
-            itsPolicies.addAll(filePolicies);
+        HeaderPasswdPolicies hdrPolicies =
+            fileData.getHdrPasswdPolicies();
+        if (hdrPolicies != null) {
+            for (HeaderPasswdPolicies.HdrPolicy hdrPolicy:
+                 hdrPolicies.getPolicies()) {
+                itsPolicies.add(hdrPolicy.getPolicy());
+            }
         }
 
         PasswdPolicy customPolicy = null;
@@ -848,12 +853,8 @@ public class RecordEditActivity extends AbstractRecordActivity
         if (itsOrigPolicy != null) {
             if (itsOrigPolicy.getLocation() ==
                 PasswdPolicy.Location.RECORD_NAME) {
-                for (PasswdPolicy filePolicy: filePolicies) {
-                    if (itsOrigPolicy.getName().equals(filePolicy.getName())) {
-                        selPolicy = filePolicy;
-                        break;
-                    }
-                }
+                selPolicy =
+                    hdrPolicies.getPasswdPolicy(itsOrigPolicy.getName());
             } else {
                 selPolicy = customPolicy;
             }
