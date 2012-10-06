@@ -899,7 +899,6 @@ public class RecordView extends AbstractRecordTabActivity
         histView.setEnabled(historyEnabled);
         findViewById(R.id.history_max_size_label).setEnabled(historyExists);
 
-        // TODO: prevent policy deletion if a record references it
         int visibility = (policy != null) ? View.VISIBLE : View.GONE;
         PasswdPolicyView policyView =
             (PasswdPolicyView)findViewById(R.id.policy);

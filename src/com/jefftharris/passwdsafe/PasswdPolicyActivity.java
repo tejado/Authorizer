@@ -106,7 +106,10 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         boolean canDelete =
             !readonlyFile &&
             (selPolicy != null) &&
-            (selPolicy.getLocation() != PasswdPolicy.Location.DEFAULT);
+            (selPolicy.getLocation() != PasswdPolicy.Location.DEFAULT) &&
+            (getPolicyUseCount(selPolicy) == 0);
+
+        // TODO: show users of policy?
 
         MenuItem mi;
         mi = menu.findItem(MENU_ADD);
@@ -344,13 +347,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     {
         PasswdPolicyView view =
             (PasswdPolicyView)findViewById(R.id.policy_view);
-        int useCount = -1;
-        if ((policy != null) &&
-            (itsHdrPolicies != null) &&
-            (policy.getLocation() == PasswdPolicy.Location.HEADER)) {
-            useCount = itsHdrPolicies.getPolicyUseCount(policy.getName());
-        }
-        view.showPolicy(policy, useCount);
+        view.showPolicy(policy, getPolicyUseCount(policy));
     }
 
 
@@ -400,5 +397,17 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             return itsPolicies.get(pos);
         }
         return null;
+    }
+
+    /** Get the use count for a policy (-1 if not a header policy) */
+    private final int getPolicyUseCount(PasswdPolicy policy)
+    {
+        int useCount = -1;
+        if ((policy != null) &&
+            (itsHdrPolicies != null) &&
+            (policy.getLocation() == PasswdPolicy.Location.HEADER)) {
+            useCount = itsHdrPolicies.getPolicyUseCount(policy.getName());
+        }
+        return useCount;
     }
 }
