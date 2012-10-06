@@ -429,8 +429,6 @@ public class PasswdFileData
     /** Set the password policy for a record */
     public final void setPasswdPolicy(PasswdPolicy policy, PwsRecord rec)
     {
-        // TODO: update header policy ref counts
-        // TODO: update PasswdRecord field
         PasswdPolicy.RecordPolicyStrs strs =
             PasswdPolicy.recordPolicyToString(policy);
         setField((strs == null) ? null : strs.itsPolicyName,
@@ -440,6 +438,9 @@ public class PasswdFileData
         setField((strs == null) ? null : strs.itsOwnSymbols,
                  rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS);
         updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
+        PasswdRecord passwdRec = getPasswdRecord(rec);
+        passwdRec.passwdPolicyChanged(this);
+        indexPasswdPolicies();
     }
 
     public final boolean isProtected(PwsRecord rec)

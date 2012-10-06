@@ -95,6 +95,12 @@ public class PasswdRecord
         itsRef = ref;
     }
 
+    /** Notification that the password policy has changed */
+    public void passwdPolicyChanged(PasswdFileData fileData)
+    {
+        itsPasswdPolicy = fileData.getPasswdPolicy(itsRecord);
+    }
+
     /** Get the record's password policy */
     public PasswdPolicy getPasswdPolicy()
     {
