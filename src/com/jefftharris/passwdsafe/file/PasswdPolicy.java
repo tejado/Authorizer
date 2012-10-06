@@ -269,9 +269,12 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
                 chars.add(isEasy ? EASY_DIGITS: DIGITS);
             }
             if (checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS)) {
-                chars.add(isEasy ? PasswdPolicy.SYMBOLS_EASY :
-                            PasswdPolicy.SYMBOLS_DEFAULT);
-                // TODO: custom symbols
+                if (itsSpecialSymbols != null) {
+                    chars.add(itsSpecialSymbols);
+                } else {
+                    chars.add(isEasy ? PasswdPolicy.SYMBOLS_EASY :
+                                       PasswdPolicy.SYMBOLS_DEFAULT);
+                }
             }
             break;
         }
