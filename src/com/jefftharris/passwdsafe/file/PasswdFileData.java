@@ -59,6 +59,7 @@ import com.jefftharris.passwdsafe.FileBackupPref;
 import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.util.Pair;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -429,18 +430,7 @@ public class PasswdFileData
     /** Set the password policy for a record */
     public final void setPasswdPolicy(PasswdPolicy policy, PwsRecord rec)
     {
-        PasswdPolicy.RecordPolicyStrs strs =
-            PasswdPolicy.recordPolicyToString(policy);
-        setField((strs == null) ? null : strs.itsPolicyName,
-                 rec, PwsRecordV3.PASSWORD_POLICY_NAME);
-        setField((strs == null) ? null : strs.itsPolicyStr,
-                 rec, PwsRecordV3.PASSWORD_POLICY);
-        setField((strs == null) ? null : strs.itsOwnSymbols,
-                 rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS);
-        updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
-        PasswdRecord passwdRec = getPasswdRecord(rec);
-        passwdRec.passwdPolicyChanged(this);
-        indexPasswdPolicies();
+        setPasswdPolicyImpl(policy, rec, true);
     }
 
     public final boolean isProtected(PwsRecord rec)
@@ -553,14 +543,39 @@ public class PasswdFileData
 
     /**
      * Set the named password policies in the file header
+     *
      * @param policies The policies; null to remove the field
+     * @param policyRename If non-null the old and new names of a renamed
+     *                      policy
      */
-    public final void setHdrPasswdPolicies(List<PasswdPolicy> policies)
+    public final void setHdrPasswdPolicies(List<PasswdPolicy> policies,
+                                           Pair<String, String> policyRename)
     {
         setHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES,
                     PasswdPolicy.hdrPoliciesToString(policies));
         updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
-        indexPasswdPolicies();
+        if (policyRename != null) {
+            // Rename policy in records as needed
+            for (PasswdRecord rec: itsPasswdRecords.values()) {
+                PasswdPolicy recPolicy = rec.getPasswdPolicy();
+                if ((recPolicy == null) ||
+                    (recPolicy.getLocation() !=
+                        PasswdPolicy.Location.RECORD_NAME) ||
+                    (!recPolicy.getName().equals(policyRename.first))) {
+                    continue;
+                }
+                recPolicy = new PasswdPolicy(policyRename.second, recPolicy);
+                PasswdSafeApp.dbginfo(
+                    TAG,
+                    "Rename policy to " + recPolicy.getName() + " for " +
+                    getId(rec.getRecord()));
+
+                setPasswdPolicyImpl(recPolicy, rec.getRecord(), false);
+            }
+            indexRecords();
+        } else {
+            indexPasswdPolicies();
+        }
     }
 
     public static final boolean isFileUri(Uri uri)
@@ -624,6 +639,28 @@ public class PasswdFileData
             if ((minor != -1) && (minor < minMinor)) {
                 setHdrMinorVersion(rec, minMinor);
             }
+        }
+    }
+
+    /** Set the password policy for a record and optionally update indexes */
+    private final void setPasswdPolicyImpl(PasswdPolicy policy,
+                                           PwsRecord rec,
+                                           boolean index)
+    {
+        PasswdPolicy.RecordPolicyStrs strs =
+            PasswdPolicy.recordPolicyToString(policy);
+        setField((strs == null) ? null : strs.itsPolicyName,
+                 rec, PwsRecordV3.PASSWORD_POLICY_NAME);
+        setField((strs == null) ? null : strs.itsPolicyStr,
+                 rec, PwsRecordV3.PASSWORD_POLICY);
+        setField((strs == null) ? null : strs.itsOwnSymbols,
+                 rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS);
+        updateFormatVersion(PwsRecordV3.DB_FMT_MINOR_3_28);
+
+        if (index) {
+            PasswdRecord passwdRec = getPasswdRecord(rec);
+            passwdRec.passwdPolicyChanged(this);
+            indexPasswdPolicies();
         }
     }
 

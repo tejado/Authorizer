@@ -14,6 +14,7 @@ import java.util.List;
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
@@ -177,15 +178,20 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             getPasswdSafeApp().setDefaultPasswdPolicy(newPolicy);
             showPolicies();
         } else {
+            Pair<String, String> policyRename = null;
+            itsSelPolicyName = newPolicy.getName();
             if (oldPolicy != null) {
                 itsPolicies.remove(oldPolicy);
+                String oldName = oldPolicy.getName();
+                if (!itsSelPolicyName.equals(oldName)) {
+                    policyRename =
+                        new Pair<String, String>(oldName, itsSelPolicyName);
+                }
             }
             itsPolicies.add(newPolicy);
             Collections.sort(itsPolicies);
-            itsSelPolicyName = newPolicy.getName();
-            savePolicies();
 
-            // TODO: if rename, need to modify all users of policy to new name
+            savePolicies(policyRename);
         }
     }
 
@@ -358,13 +364,13 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
         if (policy.getLocation() != PasswdPolicy.Location.DEFAULT) {
             itsPolicies.remove(policy);
             itsSelPolicyName = null;
-            savePolicies();
+            savePolicies(null);
         }
     }
 
 
     /** Save the policies */
-    private final void savePolicies()
+    private final void savePolicies(Pair<String, String> policyRename)
     {
         PasswdFileData fileData = getPasswdFileData();
         if (fileData != null) {
@@ -376,7 +382,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                 }
             }
             fileData.setHdrPasswdPolicies(
-                hdrPolicies.isEmpty() ? null : hdrPolicies);
+                hdrPolicies.isEmpty() ? null : hdrPolicies, policyRename);
+
             getPasswdFile().save();
         }
         showPolicies();

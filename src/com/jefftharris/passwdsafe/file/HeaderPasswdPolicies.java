@@ -69,7 +69,8 @@ public class HeaderPasswdPolicies
             if ((recPolicy != null) &&
                 (recPolicy.getLocation() ==
                  PasswdPolicy.Location.RECORD_NAME)) {
-                HeaderPasswdPolicies.HdrPolicy hdrPolicy = itsPolicies.get(recPolicy.getName());
+                HeaderPasswdPolicies.HdrPolicy hdrPolicy =
+                    itsPolicies.get(recPolicy.getName());
                 if (hdrPolicy != null) {
                     hdrPolicy.incUseCount();
                 }
