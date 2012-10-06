@@ -87,6 +87,17 @@ public class HeaderPasswdPolicies
         return null;
     }
 
+    /** Get the named password policy's use count (-1 if not found) */
+    public int getPolicyUseCount(String name)
+    {
+        HeaderPasswdPolicies.HdrPolicy hdrPolicy = itsPolicies.get(name);
+        if (hdrPolicy != null) {
+            return hdrPolicy.getUseCount();
+        }
+        return -1;
+
+    }
+
     /** Does the header contain a policy with the given name */
     public boolean containsPolicy(String name)
     {

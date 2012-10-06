@@ -63,8 +63,12 @@ public class PasswdPolicyView extends LinearLayout
         }
     }
 
-    /** Show a policy */
-    public void showPolicy(PasswdPolicy policy)
+    /**
+     * Show a policy
+     * @param policy The policy to show
+     * @param useCount The policy's use count (<0 to not show)
+     */
+    public void showPolicy(PasswdPolicy policy, int useCount)
     {
         if (policy == null) {
             policy = PasswdPolicy.createDefaultPolicy(getContext());
@@ -95,6 +99,9 @@ public class PasswdPolicyView extends LinearLayout
                    digits, optionsVisible);
         setTextStr(R.id.policy_view_symbols, R.id.policy_view_symbols_label,
                    symbols, optionsVisible);
+
+        setTextStr(R.id.policy_view_use_count, R.id.policy_view_use_count_label,
+                   Integer.toString(useCount), (useCount >= 0));
     }
 
     /** Set whether generation is enabled */
@@ -136,7 +143,7 @@ public class PasswdPolicyView extends LinearLayout
     {
         inflate(context, R.layout.passwd_policy_view, this);
         showLocation(null);
-        showPolicy(null);
+        showPolicy(null, -1);
 
         Button btn = (Button)findViewById(R.id.policy_view_generate);
         btn.setOnClickListener(new OnClickListener()

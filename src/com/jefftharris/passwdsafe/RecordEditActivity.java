@@ -885,7 +885,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsCurrPolicy = policy;
         PasswdPolicyView view =
             (PasswdPolicyView)findViewById(R.id.policy_view);
-        view.showPolicy(itsCurrPolicy);
+        view.showPolicy(itsCurrPolicy, -1);
 
         View editBtn = findViewById(R.id.policy_edit);
         boolean canEdit = (itsCurrPolicy != null) &&

@@ -80,6 +80,16 @@
             <TextView android:id="@+id/policy_view_symbols"/>
         </TableRow>
 
+        <TableRow>
+
+            <TextView
+                android:id="@+id/policy_view_use_count_label"
+                style="@style/TableLabelColumn"
+                android:text="@string/use_count"/>
+
+            <TextView android:id="@+id/policy_view_use_count"/>
+        </TableRow>
+
         <TableRow android:id="@+id/policy_view_generate_row">
 
             <Button

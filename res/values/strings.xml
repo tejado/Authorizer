@@ -172,10 +172,11 @@
     <string name="up">Up</string>
     <string name="url">URL</string>
     <string name="username">User Name</string>
-    <string name="use_lowercase">Use Lowercase</string>
-    <string name="use_uppercase">Use Uppercase</string>
+    <string name="use_count">Use Count</string>
     <string name="use_digits">Use Digits</string>
+    <string name="use_lowercase">Use Lowercase</string>
     <string name="use_symbols">Use Symbols</string>
+    <string name="use_uppercase">Use Uppercase</string>
     <string name="username_header">USER NAME</string>
 
     <!-- Order must match constants in RecordEditActivity -->

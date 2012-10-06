@@ -344,7 +344,13 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     {
         PasswdPolicyView view =
             (PasswdPolicyView)findViewById(R.id.policy_view);
-        view.showPolicy(policy);
+        int useCount = -1;
+        if ((policy != null) &&
+            (itsHdrPolicies != null) &&
+            (policy.getLocation() == PasswdPolicy.Location.HEADER)) {
+            useCount = itsHdrPolicies.getPolicyUseCount(policy.getName());
+        }
+        view.showPolicy(policy, useCount);
     }
 
 

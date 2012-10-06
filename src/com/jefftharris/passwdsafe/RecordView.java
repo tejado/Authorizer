@@ -851,12 +851,12 @@ public class RecordView extends AbstractRecordTabActivity
                        PasswdPolicy.Location.RECORD_NAME) {
                 HeaderPasswdPolicies hdrPolicies =
                     fileData.getHdrPasswdPolicies();
+                String policyName = policy.getName();
                 if (hdrPolicies != null) {
-                    policy = hdrPolicies.getPasswdPolicy(policy.getName());
+                    policy = hdrPolicies.getPasswdPolicy(policyName);
                 }
                 if (policy != null) {
-                    policyLoc = getString(R.string.database_policy,
-                                          policy.getName());
+                    policyLoc = getString(R.string.database_policy, policyName);
                 }
             } else {
                 policyLoc = getString(R.string.record);
@@ -909,7 +909,7 @@ public class RecordView extends AbstractRecordTabActivity
         if (policy != null) {
             policyView.setGenerateEnabled(false);
             policyView.showLocation(policyLoc);
-            policyView.showPolicy(policy);
+            policyView.showPolicy(policy, -1);
         }
     }
 
