@@ -10,8 +10,8 @@ package com.jefftharris.passwdsafe.file;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.util.Pair;
@@ -253,78 +253,70 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     public String generate()
         throws NoSuchAlgorithmException
     {
+        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        random.nextBytes(new byte[itsLength]);
+
+        // Fill the password with the minimum number of required
+        // characters
+        StringBuilder passwd = new StringBuilder();
+        StringBuilder allchars = new StringBuilder();
         Type type = getType();
-        ArrayList<String> chars = new ArrayList<String>();
         switch (type) {
-        case NORMAL:
+        case NORMAL: {
+            addRandomChars(FLAG_USE_LOWERCASE, itsMinLowercase,
+                           LOWER_CHARS, passwd, allchars, random);
+            addRandomChars(FLAG_USE_UPPERCASE, itsMinUppercase,
+                           UPPER_CHARS, passwd, allchars, random);
+            addRandomChars(FLAG_USE_DIGITS, itsMinDigits,
+                           DIGITS, passwd, allchars, random);
+            addRandomChars(FLAG_USE_SYMBOLS, itsMinSymbols,
+                           (itsSpecialSymbols == null) ?
+                               SYMBOLS_DEFAULT : itsSpecialSymbols,
+                           passwd, allchars, random);
+            break;
+        }
         case EASY_TO_READ: {
-            boolean isEasy = (type == PasswdPolicy.Type.EASY_TO_READ);
-            if (checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE)) {
-                chars.add(isEasy ? EASY_LOWER_CHARS : LOWER_CHARS);
-            }
-            if (checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE)) {
-                chars.add(isEasy ? EASY_UPPER_CHARS : UPPER_CHARS);
-            }
-            if (checkFlags(PasswdPolicy.FLAG_USE_DIGITS)) {
-                chars.add(isEasy ? EASY_DIGITS: DIGITS);
-            }
-            if (checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS)) {
-                if (itsSpecialSymbols != null) {
-                    chars.add(itsSpecialSymbols);
-                } else {
-                    chars.add(isEasy ? PasswdPolicy.SYMBOLS_EASY :
-                                       PasswdPolicy.SYMBOLS_DEFAULT);
-                }
-            }
+            addRandomChars(FLAG_USE_LOWERCASE, itsMinLowercase,
+                           EASY_LOWER_CHARS, passwd, allchars, random);
+            addRandomChars(FLAG_USE_UPPERCASE, itsMinUppercase,
+                           EASY_UPPER_CHARS, passwd, allchars, random);
+            addRandomChars(FLAG_USE_DIGITS, itsMinDigits,
+                           EASY_DIGITS, passwd, allchars, random);
+            addRandomChars(FLAG_USE_SYMBOLS, itsMinSymbols,
+                           (itsSpecialSymbols == null) ?
+                               SYMBOLS_EASY: itsSpecialSymbols,
+                           passwd, allchars, random);
+            break;
+        }
+        case HEXADECIMAL: {
+            allchars.append(DIGITS);
+            allchars.append("abcdef");
             break;
         }
         case PRONOUNCEABLE: {
             // TODO: support pronounceable
             break;
         }
-        case HEXADECIMAL: {
-            chars.add(DIGITS + "abcdef");
-            break;
-        }
         }
 
-        if (chars.isEmpty()) {
-            return null;
+        // Fill the rest with all of the usable characters
+        int allLen = allchars.length();
+        for (int i = passwd.length(); i < itsLength; ++i) {
+            int rand = random.nextInt(allLen);
+            passwd.append(allchars.charAt(rand));
         }
 
-        String charsStr =
-            TextUtils.concat(chars.toArray(new CharSequence[0])).toString();
-        int numChars = charsStr.length();
-        StringBuilder passwd = new StringBuilder();
-
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-        random.nextBytes(new byte[itsLength]);
-
-        ArrayList<String> verifyChars = new ArrayList<String>();
-        do {
-            verifyChars.clear();
-            verifyChars.addAll(chars);
-            passwd.delete(0, passwd.length());
-            for (int i = 0; i < itsLength; ++i) {
-                int charPos = random.nextInt(numChars);
-                char c = charsStr.charAt(charPos);
-                passwd.append(c);
-
-                if (!verifyChars.isEmpty()) {
-                    Iterator<String> iter = verifyChars.iterator();
-                    while (iter.hasNext()) {
-                        String verifyStr = iter.next();
-                        if (verifyStr.indexOf(c) != -1) {
-                            iter.remove();
-                        }
-                    }
-                }
-            }
-        } while (!verifyChars.isEmpty() &&
-            (itsLength > (chars.size() - verifyChars.size())));
+        // Shuffle the characters
+        for (int i = passwd.length(); i > 1; --i) {
+            int rand = random.nextInt(i);
+            char c = passwd.charAt(i - 1);
+            passwd.setCharAt(i - 1, passwd.charAt(rand));
+            passwd.setCharAt(rand, c);
+        }
 
         return passwd.toString();
     }
+
 
     /** Convert the object to a string */
     @Override
@@ -612,5 +604,24 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     private static final int minmaxLength(int length)
     {
         return Math.min(Math.max(length, 0), LENGTH_MAX);
+    }
+
+    /** Randomly add a number of characters to the password and add the
+     *  character set to the returned all list if the flags match */
+    private final void addRandomChars(int flag,
+                                      int numChars,
+                                      String chars,
+                                      StringBuilder passwd,
+                                      StringBuilder allchars,
+                                      Random random)
+    {
+        if (checkFlags(flag)) {
+            int charsLen = chars.length();
+            for (int i = 0; i < numChars; ++i) {
+                int rand = random.nextInt(charsLen);
+                passwd.append(chars.charAt(rand));
+            }
+            allchars.append(chars);
+        }
     }
 }
