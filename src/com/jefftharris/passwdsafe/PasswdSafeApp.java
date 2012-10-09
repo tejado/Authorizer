@@ -458,6 +458,14 @@ public class PasswdSafeApp extends Application
             Log.i(tag, msg);
     }
 
+    /** Log a formatted debug message at info level */
+    public static void dbginfo(String tag, String fmt, Object... args)
+    {
+        if (DEBUG) {
+            Log.i(tag, String.format(fmt, args));
+        }
+    }
+
     /** Log a debug message at verbose level */
     public static void dbgverb(String tag, String msg)
     {
