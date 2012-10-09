@@ -7,8 +7,6 @@
  */
 package com.jefftharris.passwdsafe.view;
 
-import java.security.NoSuchAlgorithmException;
-
 import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -166,7 +164,7 @@ public class PasswdPolicyView extends LinearLayout
         if (itsPolicy != null) {
             try {
                 passwd = itsPolicy.generate();
-            } catch (NoSuchAlgorithmException e) {
+            } catch (Exception e) {
                 PasswdSafeApp.showErrorMsg(e.toString(), getContext());
             }
         }

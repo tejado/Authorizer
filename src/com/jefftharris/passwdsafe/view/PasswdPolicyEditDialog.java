@@ -7,8 +7,6 @@
  */
 package com.jefftharris.passwdsafe.view;
 
-import java.security.NoSuchAlgorithmException;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -293,7 +291,7 @@ public class PasswdPolicyEditDialog
         if (policy != null) {
             try {
                 passwd = policy.generate();
-            } catch (NoSuchAlgorithmException e) {
+            } catch (Exception e) {
                 PasswdSafeApp.showErrorMsg(e.toString(),
                                            itsView.getContext());
             }

@@ -26,6 +26,7 @@ public class PasswdRecord
     private static final String SHORTCUT_CLOSE = "~]";
 
     private final PwsRecord itsRecord;
+    private final String itsUUID;
     private Type itsType;
     private PwsRecord itsRef;
     private final ArrayList<PwsRecord> itsRefsToRecord =
@@ -35,6 +36,7 @@ public class PasswdRecord
     public PasswdRecord(PwsRecord rec, PasswdFileData fileData)
     {
         itsRecord = rec;
+        itsUUID = fileData.getUUID(rec);
         passwordChanged(fileData);
         passwdPolicyChanged(fileData);
     }
@@ -42,6 +44,12 @@ public class PasswdRecord
     public PwsRecord getRecord()
     {
         return itsRecord;
+    }
+
+    /** Get the unique identifier of the record */
+    public String getUUID()
+    {
+        return itsUUID;
     }
 
     public Type getType()

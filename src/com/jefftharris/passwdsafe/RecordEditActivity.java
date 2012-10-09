@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -704,7 +703,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             try {
                 String passwd = itsCurrPolicy.generate();
                 setPassword(passwd);
-            } catch (NoSuchAlgorithmException e) {
+            } catch (Exception e) {
                 PasswdSafeApp.showFatalMsg(e, this);
             }
         }

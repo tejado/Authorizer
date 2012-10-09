@@ -40,12 +40,13 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     public static final String SYMBOLS_EASY = "+-=_@#$%^&<>/~\\?";
     public static final String SYMBOLS_PRONOUNCE = "@&(#!|$+";
 
-    private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
-    private static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
-    private static final String DIGITS = "0123456789";
-    private static final String EASY_LOWER_CHARS = "abcdefghijkmnopqrstuvwxyz";
-    private static final String EASY_UPPER_CHARS = "ABCDEFGHJKLMNPQRTUVWXY";
-    private static final String EASY_DIGITS = "346789";
+    public static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
+    public static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
+    public static final String DIGITS = "0123456789";
+    public static final String HEX_DIGITS = DIGITS + "abcdef";
+    public static final String EASY_LOWER_CHARS = "abcdefghijkmnopqrstuvwxyz";
+    public static final String EASY_UPPER_CHARS = "ABCDEFGHJKLMNPQRTUVWXY";
+    public static final String EASY_DIGITS = "346789";
 
     /** The location of the policy */
     public enum Location
@@ -117,6 +118,19 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     private final int itsMinDigits;
     private final int itsMinSymbols;
     private final String itsSpecialSymbols;
+
+    private static final Random itsRandom = getRandom();
+    private static final Random getRandom()
+    {
+        Random random;
+        try {
+            random = SecureRandom.getInstance("SHA1PRNG");
+        } catch (NoSuchAlgorithmException e) {
+            random = new SecureRandom();
+        }
+        random.nextBytes(new byte[32]);
+        return random;
+    }
 
     /**
      * Constructor
@@ -251,11 +265,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
 
     /** Generate a password */
     public String generate()
-        throws NoSuchAlgorithmException
     {
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-        random.nextBytes(new byte[itsLength]);
-
         // Fill the password with the minimum number of required
         // characters
         StringBuilder passwd = new StringBuilder();
@@ -264,33 +274,32 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         switch (type) {
         case NORMAL: {
             addRandomChars(FLAG_USE_LOWERCASE, itsMinLowercase,
-                           LOWER_CHARS, passwd, allchars, random);
+                           LOWER_CHARS, passwd, allchars);
             addRandomChars(FLAG_USE_UPPERCASE, itsMinUppercase,
-                           UPPER_CHARS, passwd, allchars, random);
+                           UPPER_CHARS, passwd, allchars);
             addRandomChars(FLAG_USE_DIGITS, itsMinDigits,
-                           DIGITS, passwd, allchars, random);
+                           DIGITS, passwd, allchars);
             addRandomChars(FLAG_USE_SYMBOLS, itsMinSymbols,
                            (itsSpecialSymbols == null) ?
                                SYMBOLS_DEFAULT : itsSpecialSymbols,
-                           passwd, allchars, random);
+                           passwd, allchars);
             break;
         }
         case EASY_TO_READ: {
             addRandomChars(FLAG_USE_LOWERCASE, itsMinLowercase,
-                           EASY_LOWER_CHARS, passwd, allchars, random);
+                           EASY_LOWER_CHARS, passwd, allchars);
             addRandomChars(FLAG_USE_UPPERCASE, itsMinUppercase,
-                           EASY_UPPER_CHARS, passwd, allchars, random);
+                           EASY_UPPER_CHARS, passwd, allchars);
             addRandomChars(FLAG_USE_DIGITS, itsMinDigits,
-                           EASY_DIGITS, passwd, allchars, random);
+                           EASY_DIGITS, passwd, allchars);
             addRandomChars(FLAG_USE_SYMBOLS, itsMinSymbols,
                            (itsSpecialSymbols == null) ?
                                SYMBOLS_EASY: itsSpecialSymbols,
-                           passwd, allchars, random);
+                           passwd, allchars);
             break;
         }
         case HEXADECIMAL: {
-            allchars.append(DIGITS);
-            allchars.append("abcdef");
+            allchars.append(HEX_DIGITS);
             break;
         }
         case PRONOUNCEABLE: {
@@ -302,13 +311,13 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         // Fill the rest with all of the usable characters
         int allLen = allchars.length();
         for (int i = passwd.length(); i < itsLength; ++i) {
-            int rand = random.nextInt(allLen);
+            int rand = itsRandom.nextInt(allLen);
             passwd.append(allchars.charAt(rand));
         }
 
         // Shuffle the characters
         for (int i = passwd.length(); i > 1; --i) {
-            int rand = random.nextInt(i);
+            int rand = itsRandom.nextInt(i);
             char c = passwd.charAt(i - 1);
             passwd.setCharAt(i - 1, passwd.charAt(rand));
             passwd.setCharAt(rand, c);
@@ -612,13 +621,12 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
                                       int numChars,
                                       String chars,
                                       StringBuilder passwd,
-                                      StringBuilder allchars,
-                                      Random random)
+                                      StringBuilder allchars)
     {
         if (checkFlags(flag)) {
             int charsLen = chars.length();
             for (int i = 0; i < numChars; ++i) {
-                int rand = random.nextInt(charsLen);
+                int rand = itsRandom.nextInt(charsLen);
                 passwd.append(chars.charAt(rand));
             }
             allchars.append(chars);

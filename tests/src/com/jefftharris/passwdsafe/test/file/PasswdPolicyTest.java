@@ -14,12 +14,15 @@ import com.jefftharris.passwdsafe.file.PasswdPolicy;
 
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
+import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Tests for the PasswdPolicy class
  */
 public class PasswdPolicyTest extends AndroidTestCase
 {
+    //private static final String TAG = "PasswdPolicyTest";
+
     /** Constructor */
     public PasswdPolicyTest()
     {
@@ -445,6 +448,44 @@ public class PasswdPolicyTest extends AndroidTestCase
                            "Password policy too long: fe00abc111aaa000fff0");
     }
 
+    /** Test default password generation */
+    @SmallTest
+    public void testPasswdGenDefault()
+    {
+        PasswdPolicy policy =
+            new PasswdPolicy("", PasswdPolicy.Location.DEFAULT);
+        verifyGenPasswd(policy);
+    }
+
+
+    /** Test normal type password generation */
+    @SmallTest
+    public void testPasswdGenNormal()
+    {
+        doTestPasswdGenNormalEasy(true);
+    }
+
+    /** Test easy-to-read type password generation */
+    @SmallTest
+    public void testPasswdGenEasy()
+    {
+        doTestPasswdGenNormalEasy(false);
+    }
+
+    /** Test easy-to-read type password generation */
+    @SmallTest
+    public void testPasswdGenHex()
+    {
+        for (int len = 0; len < 100; ++len) {
+            PasswdPolicy policy =
+                new PasswdPolicy("", PasswdPolicy.Location.DEFAULT,
+                                 PasswdPolicy.FLAG_USE_HEX_DIGITS,
+                                 len, 1, 1, 1, 1, null);
+            assertEquals(PasswdPolicy.Type.HEXADECIMAL, policy.getType());
+            verifyGenPasswd(policy);
+        }
+    }
+
     /** Check a bad header policy */
     private static void doTestBadHdrPolicy(String policyStr, String exMsg)
     {
@@ -530,4 +571,162 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(policyStr, strs.itsPolicyStr);
         assertEquals(ownSymbols, strs.itsOwnSymbols);
     }
+
+    /** Test normal or easy-to-read type password generation */
+    private static void doTestPasswdGenNormalEasy(boolean isNormal)
+    {
+        PasswdPolicy policy;
+
+        for (int i = 1; i < 16; ++i) {
+            int flags = isNormal ? 0 : PasswdPolicy.FLAG_USE_EASY_VISION;
+            int minLen = 0;
+            if ((i & 0x01) != 0) {
+                flags |= PasswdPolicy.FLAG_USE_LOWERCASE;
+                ++minLen;
+            }
+            if ((i & 0x02) != 0) {
+                flags |= PasswdPolicy.FLAG_USE_UPPERCASE;
+                ++minLen;
+            }
+            if ((i & 0x04) != 0) {
+                flags |= PasswdPolicy.FLAG_USE_DIGITS;
+                ++minLen;
+            }
+            if ((i & 0x08) != 0) {
+                flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
+                ++minLen;
+            }
+
+            final int MAX_LEN = 16;
+            final int LEN_STEP = MAX_LEN / 2;
+            for (int lowerIdx = 0; lowerIdx <= MAX_LEN; lowerIdx += LEN_STEP) {
+                for (int upperIdx = 0;
+                     upperIdx <= MAX_LEN - lowerIdx; upperIdx += LEN_STEP) {
+                    for (int digitIdx = 0;
+                         digitIdx <= MAX_LEN - lowerIdx - upperIdx;
+                         digitIdx += LEN_STEP) {
+                        for (int symbolIdx = 0;
+                             symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
+                             symbolIdx += LEN_STEP) {
+                            /*
+                            PasswdSafeApp.dbginfo(TAG, "Iter %x %d %d %d %d",
+                                                  flags, lowerIdx, upperIdx,
+                                                  digitIdx, symbolIdx);
+                             */
+                            policy = new PasswdPolicy(
+                                "", PasswdPolicy.Location.DEFAULT,
+                                flags, MAX_LEN + minLen, 1 + lowerIdx,
+                                1 + upperIdx, 1 + digitIdx, 1 + symbolIdx,
+                                null);
+                            assertEquals(isNormal ? PasswdPolicy.Type.NORMAL :
+                                            PasswdPolicy.Type.EASY_TO_READ,
+                                         policy.getType());
+                            verifyGenPasswd(policy);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /** Verify a generated password */
+    private static void verifyGenPasswd(PasswdPolicy policy)
+    {
+        boolean useLower = policy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
+        boolean useUpper = policy.checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE);
+        boolean useDigits = policy.checkFlags(PasswdPolicy.FLAG_USE_DIGITS);
+        boolean useSymbols = policy.checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS);
+        String symbols = policy.getSpecialSymbols();
+        for (int testIdx = 0; testIdx < 20; ++testIdx) {
+            String passwd = policy.generate();
+            assertEquals(policy.getLength(), passwd.length());
+
+            int numLower = 0;
+            int numUpper = 0;
+            int numDigits = 0;
+            int numSymbols = 0;
+            switch (policy.getType()) {
+            case NORMAL: {
+                if (symbols == null) {
+                    symbols = PasswdPolicy.SYMBOLS_DEFAULT;
+                }
+                for (int idx = 0; idx < passwd.length(); ++idx) {
+                    char c = passwd.charAt(idx);
+                    if (PasswdPolicy.LOWER_CHARS.indexOf(c) >= 0) {
+                        ++numLower;
+                    } else if (PasswdPolicy.UPPER_CHARS.indexOf(c) >= 0) {
+                        ++numUpper;
+                    } else if (PasswdPolicy.DIGITS.indexOf(c) >= 0) {
+                        ++numDigits;
+                    } else if (symbols.indexOf(c) >= 0) {
+                        ++numSymbols;
+                    } else {
+                        assertTrue(false);
+                    }
+                }
+                verifyPolicyNumChars(useLower, numLower,
+                                     policy.getMinLowercase());
+                verifyPolicyNumChars(useUpper, numUpper,
+                                     policy.getMinUppercase());
+                verifyPolicyNumChars(useDigits, numDigits,
+                                     policy.getMinDigits());
+                verifyPolicyNumChars(useSymbols, numSymbols,
+                                     policy.getMinSymbols());
+                break;
+            }
+            case EASY_TO_READ: {
+                if (symbols == null) {
+                    symbols = PasswdPolicy.SYMBOLS_EASY;
+                }
+                for (int idx = 0; idx < passwd.length(); ++idx) {
+                    char c = passwd.charAt(idx);
+                    if (PasswdPolicy.EASY_LOWER_CHARS.indexOf(c) >= 0) {
+                        ++numLower;
+                    } else if (PasswdPolicy.EASY_UPPER_CHARS.indexOf(c) >= 0) {
+                        ++numUpper;
+                    } else if (PasswdPolicy.EASY_DIGITS.indexOf(c) >= 0) {
+                        ++numDigits;
+                    } else if (symbols.indexOf(c) >= 0) {
+                        ++numSymbols;
+                    } else {
+                        assertTrue(false);
+                    }
+                }
+                verifyPolicyNumChars(useLower, numLower,
+                                     policy.getMinLowercase());
+                verifyPolicyNumChars(useUpper, numUpper,
+                                     policy.getMinUppercase());
+                verifyPolicyNumChars(useDigits, numDigits,
+                                     policy.getMinDigits());
+                verifyPolicyNumChars(useSymbols, numSymbols,
+                                     policy.getMinSymbols());
+                break;
+            }
+            case PRONOUNCEABLE: {
+                assertTrue(false);
+                break;
+            }
+            case HEXADECIMAL: {
+                for (int idx = 0; idx < passwd.length(); ++idx) {
+                    char c = passwd.charAt(idx);
+                    assertTrue(PasswdPolicy.HEX_DIGITS.indexOf(c) >= 0);
+                }
+                break;
+            }
+            }
+        }
+    }
+
+    /** Verify the number of characters used for a policy */
+    private static void verifyPolicyNumChars(boolean charsUsed,
+                                             int numChars,
+                                             int policyMin)
+    {
+        if (charsUsed) {
+            assertTrue(numChars >= policyMin);
+        } else {
+            assertEquals(0, numChars);
+        }
+    }
+
 }
