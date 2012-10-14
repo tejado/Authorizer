@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe.file;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -131,6 +132,28 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         random.nextBytes(new byte[32]);
         return random;
     }
+
+    // 'Leet' digits that can replace a character
+    private static final char[] LEETS_DIGITS = {
+        '4', '8', 0, 0, // a, b, c, d
+        '3', 0, '6', 0, // e, f, g, h
+        '1', 0, 0, '1', // i, j, k, l
+        0, 0, '0', 0,   // m, n, o, p
+        0, 0, '5', '7', // q, r, s, t
+        0, 0, 0, 0,     // u, v, w, x
+        0, '2'          // y, z
+    };
+
+    // 'Leet' symbols that can replace a character
+    private static final char[] LEETS_SYMBOLS = {
+        '@', '&', '(', 0,       // a, b, c, d
+        0, 0, 0, '#',           // e, f, g, h
+        '!', 0, 0, '|',         // i, j, k, l
+        0, 0, 0, 0,             // m, n, o, p
+        0, 0, '$', '+',         // q, r, s, t
+        0, 0, 0, 0,             // u, v, w, x
+        0, 0                    // y, z
+    };
 
     /**
      * Constructor
@@ -303,8 +326,8 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
             break;
         }
         case PRONOUNCEABLE: {
-            // TODO: support pronounceable
-            break;
+            // Pronounceable generated differently
+            return generatePronounceable();
         }
         }
 
@@ -613,6 +636,157 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     private static final int minmaxLength(int length)
     {
         return Math.min(Math.max(length, 0), LENGTH_MAX);
+    }
+
+    /** Generate a pronounceable password */
+    private final String generatePronounceable()
+    {
+        // Pronounceable passwords generation code copied from
+        // CPasswordCharPool::MakePronounceable from Password Safe project
+
+        /**
+         * Following based on gpw.C from
+         * http://www.multicians.org/thvv/tvvtools.html
+         * Thanks to Tom Van Vleck, Morrie Gasser, and Dan Edwards.
+         */
+        int c1, c2, c3;  /* array indices */
+        int sumfreq;      /* total frequencies[c1][c2][*] */
+        int ranno;        /* random number in [0,sumfreq] */
+        int sum;          /* running total of frequencies */
+        int nchar;        /* number of chars in password so far */
+
+        char[] password = new char[itsLength];
+
+        /* Pick a random starting point. */
+        /* (This cheats a little; the statistics for three-letter
+           combinations beginning a word are different from the stats
+           for the general population.  For example, this code happily
+           generates "mmitify" even though no word in my dictionary
+           begins with mmi. So what.) */
+        sumfreq = Trigram.SIGMA;  // sigma calculated by loadtris
+        ranno = itsRandom.nextInt(sumfreq+1); // Weight by sum of frequencies
+        sum = 0;
+        nchar = 0;
+        for (c1 = 0; c1 < 26; c1++) {
+            for (c2 = 0; c2 < 26; c2++) {
+                for (c3 = 0; c3 < 26; c3++) {
+                    sum += Trigram.TRIS[c1][c2][c3];
+                    if (sum > ranno) { // Pick first value
+                        if (itsLength > 0) {
+                            password[0] = LOWER_CHARS.charAt(c1);
+                            ++nchar;
+                            if (itsLength > 1) {
+                                password[1] = LOWER_CHARS.charAt(c2);
+                                ++nchar;
+                                if (itsLength > 2) {
+                                    password[2] = LOWER_CHARS.charAt(c3);
+                                    ++nchar;
+                                }
+                            }
+                        }
+                        c1 = c2 = c3 = 26; // Break all loops.
+                    } // if sum
+                } // for c3
+            } // for c2
+        } // for c1
+
+        /* Do a random walk. */
+        while (nchar < itsLength) {
+            c1 = password[nchar-2] - 'a'; // Take the last 2 chars
+            c2 = password[nchar-1] - 'a'; // .. and find the next one.
+            sumfreq = 0;
+            for (c3 = 0; c3 < 26; c3++) {
+                sumfreq += Trigram.TRIS[c1][c2][c3];
+            }
+            /* Note that sum < duos[c1][c2] because
+             duos counts all digraphs, not just those
+             in a trigraph. We want sum. */
+            /* Choose a continuation. */
+            if (sumfreq == 0) { // If there is no possible extension..
+                ranno = 0;
+            } else {
+                 // Weight by sum of frequencies
+                ranno = itsRandom.nextInt(sumfreq+1);
+            }
+            sum = 0;
+            for (c3 = 0; c3 < 26; c3++) {
+                sum += Trigram.TRIS[c1][c2][c3];
+                if (sum > ranno) {
+                    password[nchar++] = LOWER_CHARS.charAt(c3);
+                    break;
+                }
+            } // for c3
+        } // while nchar
+
+        /*
+         * password now has an all-lowercase pronounceable password
+         * We now want to modify it per policy:
+         * If use digits and/or use symbols, replace some chars with
+         * corresponding 'leet' values
+         * Also enforce use upper case & use lower case policies
+         */
+
+        // TODO: no custom symbols for pronounceable
+
+        boolean useSymbols = checkFlags(FLAG_USE_SYMBOLS);
+        boolean useDigits = checkFlags(FLAG_USE_DIGITS);
+        if (useSymbols || useDigits) {
+            // fill a vector with indices of substitution candidates
+            ArrayList<Integer> sc = new ArrayList<Integer>(password.length);
+            for (int i = 0; i < password.length; ++i) {
+                int idx = password[i] - 'a';
+                if ((useDigits && (LEETS_DIGITS[idx] != 0)) ||
+                    (useSymbols && (LEETS_SYMBOLS[idx] != 0))) {
+                    sc.add(i);
+                }
+            }
+
+            int sclen = sc.size();
+            if (sclen > 0) {
+                // choose how many to replace (not too many, but at least one)
+                int rn = 1;
+                if (sclen > 1) {
+                    rn += itsRandom.nextInt(sclen - 1)/2;
+                }
+                // replace some of them
+                Collections.shuffle(sc, itsRandom);
+                for (int i = 0; i < rn; ++i) {
+                    int pwIdx = sc.get(i);
+                    int leetIdx = password[pwIdx] - 'a';
+                    char digsub = useDigits ? LEETS_DIGITS[leetIdx] : 0;
+                    char symsub = useSymbols ? LEETS_SYMBOLS[leetIdx] : 0;
+
+                    // if both substitutions possible, select one randomly
+                    if ((digsub != 0) && (symsub != 0) &&
+                        itsRandom.nextBoolean()) {
+                        digsub = 0;
+                    }
+                    password[pwIdx] = (digsub != 0) ? digsub : symsub;
+                }
+            }
+        }
+
+        // case
+        boolean useLower = checkFlags(FLAG_USE_LOWERCASE);
+        boolean useUpper = checkFlags(FLAG_USE_UPPERCASE);
+        if (useLower && !useUpper) {
+          // nothing to do here
+        } else if (!useLower && useUpper) {
+            for (int i = 0; i < itsLength; i++) {
+                if (Character.isLowerCase(password[i])) {
+                    password[i] = Character.toUpperCase(password[i]);
+                }
+            }
+        } else if (useLower && useUpper) { // mixed case
+            for (int i = 0; i < itsLength; ++i) {
+                if (Character.isLetter(password[i]) &&
+                    itsRandom.nextBoolean()) {
+                    password[i] = Character.toUpperCase(password[i]);
+                }
+            }
+        }
+
+        return new String(password);
     }
 
     /** Randomly add a number of characters to the password and add the

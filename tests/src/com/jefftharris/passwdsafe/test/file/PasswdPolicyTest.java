@@ -14,7 +14,6 @@ import com.jefftharris.passwdsafe.file.PasswdPolicy;
 
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
-import android.test.suitebuilder.annotation.SmallTest;
 
 /**
  * Tests for the PasswdPolicy class
@@ -449,7 +448,6 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test default password generation */
-    @SmallTest
     public void testPasswdGenDefault()
     {
         PasswdPolicy policy =
@@ -459,21 +457,18 @@ public class PasswdPolicyTest extends AndroidTestCase
 
 
     /** Test normal type password generation */
-    @SmallTest
     public void testPasswdGenNormal()
     {
-        doTestPasswdGenNormalEasy(true);
+        doTestPasswdGen(PasswdPolicy.Type.NORMAL);
     }
 
     /** Test easy-to-read type password generation */
-    @SmallTest
     public void testPasswdGenEasy()
     {
-        doTestPasswdGenNormalEasy(false);
+        doTestPasswdGen(PasswdPolicy.Type.EASY_TO_READ);
     }
 
     /** Test easy-to-read type password generation */
-    @SmallTest
     public void testPasswdGenHex()
     {
         for (int len = 0; len < 100; ++len) {
@@ -484,6 +479,12 @@ public class PasswdPolicyTest extends AndroidTestCase
             assertEquals(PasswdPolicy.Type.HEXADECIMAL, policy.getType());
             verifyGenPasswd(policy);
         }
+    }
+
+    /** Test pronounceable type password generation */
+    public void testPasswdGenPronounceable()
+    {
+        doTestPasswdGen(PasswdPolicy.Type.PRONOUNCEABLE);
     }
 
     /** Check a bad header policy */
@@ -572,13 +573,30 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(ownSymbols, strs.itsOwnSymbols);
     }
 
-    /** Test normal or easy-to-read type password generation */
-    private static void doTestPasswdGenNormalEasy(boolean isNormal)
+    /** Test normal, easy-to-read, or pronounceable type password generation */
+    private static void doTestPasswdGen(PasswdPolicy.Type type)
     {
         PasswdPolicy policy;
 
         for (int i = 1; i < 16; ++i) {
-            int flags = isNormal ? 0 : PasswdPolicy.FLAG_USE_EASY_VISION;
+            int flags = 0;
+            switch (type) {
+            case NORMAL: {
+                break;
+            }
+            case EASY_TO_READ: {
+                flags = PasswdPolicy.FLAG_USE_EASY_VISION;
+                break;
+            }
+            case PRONOUNCEABLE: {
+                flags = PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE;
+                break;
+            }
+            case HEXADECIMAL: {
+                assertTrue(false);
+                break;
+            }
+            }
             int minLen = 0;
             if ((i & 0x01) != 0) {
                 flags |= PasswdPolicy.FLAG_USE_LOWERCASE;
@@ -597,34 +615,54 @@ public class PasswdPolicyTest extends AndroidTestCase
                 ++minLen;
             }
 
-            final int MAX_LEN = 16;
-            final int LEN_STEP = MAX_LEN / 2;
-            for (int lowerIdx = 0; lowerIdx <= MAX_LEN; lowerIdx += LEN_STEP) {
-                for (int upperIdx = 0;
-                     upperIdx <= MAX_LEN - lowerIdx; upperIdx += LEN_STEP) {
-                    for (int digitIdx = 0;
-                         digitIdx <= MAX_LEN - lowerIdx - upperIdx;
-                         digitIdx += LEN_STEP) {
-                        for (int symbolIdx = 0;
-                             symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
-                             symbolIdx += LEN_STEP) {
-                            /*
+            switch (type) {
+            case NORMAL:
+            case EASY_TO_READ: {
+                final int MAX_LEN = 16;
+                final int LEN_STEP = MAX_LEN / 2;
+                for (int lowerIdx = 0; lowerIdx <= MAX_LEN;
+                     lowerIdx += LEN_STEP) {
+                    for (int upperIdx = 0;
+                        upperIdx <= MAX_LEN - lowerIdx; upperIdx += LEN_STEP) {
+                        for (int digitIdx = 0;
+                            digitIdx <= MAX_LEN - lowerIdx - upperIdx;
+                            digitIdx += LEN_STEP) {
+                            for (int symbolIdx = 0;
+                                symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
+                                symbolIdx += LEN_STEP) {
+                                /*
                             PasswdSafeApp.dbginfo(TAG, "Iter %x %d %d %d %d",
                                                   flags, lowerIdx, upperIdx,
                                                   digitIdx, symbolIdx);
-                             */
-                            policy = new PasswdPolicy(
-                                "", PasswdPolicy.Location.DEFAULT,
-                                flags, MAX_LEN + minLen, 1 + lowerIdx,
-                                1 + upperIdx, 1 + digitIdx, 1 + symbolIdx,
-                                null);
-                            assertEquals(isNormal ? PasswdPolicy.Type.NORMAL :
-                                            PasswdPolicy.Type.EASY_TO_READ,
-                                         policy.getType());
-                            verifyGenPasswd(policy);
+                                 */
+                                policy = new PasswdPolicy(
+                                    "", PasswdPolicy.Location.DEFAULT,
+                                    flags, MAX_LEN + minLen, 1 + lowerIdx,
+                                    1 + upperIdx, 1 + digitIdx, 1 + symbolIdx,
+                                    null);
+                                assertEquals(type, policy.getType());
+                                verifyGenPasswd(policy);
+                            }
                         }
                     }
                 }
+                break;
+            }
+            case PRONOUNCEABLE: {
+                for (int len: new int[] {0, 1, 2, 3, 5, 10, 20}) {
+                    //PasswdSafeApp.dbginfo("TAG", "Iter %x %d", flags, len);
+                    policy = new PasswdPolicy(
+                        "", PasswdPolicy.Location.DEFAULT,
+                        flags, len, 1, 1, 1, 1, null);
+                    assertEquals(type, policy.getType());
+                    verifyGenPasswd(policy);
+                }
+                break;
+            }
+            case HEXADECIMAL: {
+                assertTrue(false);
+                break;
+            }
             }
         }
     }
@@ -703,7 +741,34 @@ public class PasswdPolicyTest extends AndroidTestCase
                 break;
             }
             case PRONOUNCEABLE: {
-                assertTrue(false);
+                String pronDigits = "483610572";
+                for (int idx = 0; idx < passwd.length(); ++idx) {
+                    char c = passwd.charAt(idx);
+                    if (PasswdPolicy.LOWER_CHARS.indexOf(c) >= 0) {
+                        ++numLower;
+                    } else if (PasswdPolicy.UPPER_CHARS.indexOf(c) >= 0) {
+                        ++numUpper;
+                    } else if (pronDigits.indexOf(c) >= 0) {
+                        ++numDigits;
+                    } else if (PasswdPolicy.SYMBOLS_PRONOUNCE.indexOf(c) >= 0) {
+                        ++numSymbols;
+                    } else {
+                        assertTrue(false);
+                    }
+                }
+
+                /*if (!useLower) {
+                    assertEquals(0, numLower);
+                }*/
+                if (!useUpper) {
+                    assertEquals(0, numUpper);
+                }
+                if (!useDigits) {
+                    assertEquals(0, numDigits);
+                }
+                if (!useSymbols) {
+                    assertEquals(0, numSymbols);
+                }
                 break;
             }
             case HEXADECIMAL: {
