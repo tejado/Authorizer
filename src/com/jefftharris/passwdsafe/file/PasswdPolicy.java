@@ -726,8 +726,6 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
          * Also enforce use upper case & use lower case policies
          */
 
-        // TODO: no custom symbols for pronounceable
-
         boolean useSymbols = checkFlags(FLAG_USE_SYMBOLS);
         boolean useDigits = checkFlags(FLAG_USE_DIGITS);
         if (useSymbols || useDigits) {

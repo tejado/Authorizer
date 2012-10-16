@@ -194,20 +194,19 @@ public class PasswdPolicyView extends LinearLayout
         Context ctx = getContext();
         String str = null;
         if (policy.checkFlags(flag)) {
+            int strId = (policy.getType() == PasswdPolicy.Type.PRONOUNCEABLE)
+                ? R.string.yes : R.string.policy_yes_len;
             switch (flag) {
             case PasswdPolicy.FLAG_USE_LOWERCASE: {
-                str = ctx.getString(R.string.policy_yes_len,
-                                    policy.getMinLowercase());
+                str = ctx.getString(strId, policy.getMinLowercase());
                 break;
             }
             case PasswdPolicy.FLAG_USE_UPPERCASE: {
-                str = ctx.getString(R.string.policy_yes_len,
-                                    policy.getMinUppercase());
+                str = ctx.getString(strId, policy.getMinUppercase());
                 break;
             }
             case PasswdPolicy.FLAG_USE_DIGITS: {
-                str = ctx.getString(R.string.policy_yes_len,
-                                    policy.getMinDigits());
+                str = ctx.getString(strId, policy.getMinDigits());
                 break;
             }
             case PasswdPolicy.FLAG_USE_SYMBOLS: {

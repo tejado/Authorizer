@@ -232,14 +232,14 @@ public class PasswdPolicyEditDialog
         }
 
         switch (itsType) {
-        case NORMAL:
-        case PRONOUNCEABLE: {
+        case NORMAL: {
             if (itsUseCustomSymbols.isChecked()) {
                 customSymbols = itsCustomSymbolsEdit.getText().toString();
             }
             break;
         }
         case EASY_TO_READ:
+        case PRONOUNCEABLE:
         case HEXADECIMAL: {
             break;
         }
@@ -430,13 +430,13 @@ public class PasswdPolicyEditDialog
     {
         boolean visible = false;
         switch (itsType) {
-        case NORMAL:
-        case PRONOUNCEABLE: {
+        case NORMAL: {
             CheckBox cb = (CheckBox)itsView.findViewById(R.id.symbols);
             visible = cb.isChecked();
             break;
         }
         case EASY_TO_READ:
+        case PRONOUNCEABLE:
         case HEXADECIMAL: {
             visible = false;
             break;

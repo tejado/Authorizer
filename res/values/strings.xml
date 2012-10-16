@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="about">About</string>
     <string name="about_details">Version: %1$s\n\nBuild ID: %2$s \n\nBuild Date: %3$s</string>
     <string name="add">Add</string>
@@ -135,7 +135,7 @@
     <string name="policy_yes_sym_default">Yes - At least %1$d from default symbols: %2$s</string>
     <string name="policy_yes_sym_easy">Yes - At least %1$d from easy symbols: %2$s</string>
     <string name="policy_yes_sym_policy">Yes - At least %1$d from policy symbols: %2$s</string>
-    <string name="policy_yes_sym_pronounce">Yes - At least %1$d from pronounceable symbols: %2$s</string>
+    <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Yes - Symbols: %2$s</string>
     <string name="preferences">Preferences</string>
     <string name="protect_all">Protect All Records</string>
     <string name="protect_group">Protect Group Records</string>
@@ -178,6 +178,7 @@
     <string name="use_symbols">Use Symbols</string>
     <string name="use_uppercase">Use Uppercase</string>
     <string name="username_header">USER NAME</string>
+    <string name="yes">Yes</string>
 
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">
