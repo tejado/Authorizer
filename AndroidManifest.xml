@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Version code format for version x.y.z and API base a: aaxxyyzz
-    If the API base is 3, a is blank and so is the first x. 
+    If the API base is 3, a is blank and so is the first x.
     E.g. 3.6.0 for API 3 is 30600 and API 11 is 11030600.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.jefftharris.passwdsafe"
-      android:versionName="3.13.0" android:versionCode="31300"
+      android:versionName="3.14.0" android:versionCode="31400"
       android:installLocation="auto">
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -18,9 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <activity android:name=".PasswdSafe"
-                  android:label="@string/app_name" 
+                  android:label="@string/app_name"
                   android:finishOnTaskLaunch="true"
                   android:launchMode="singleTop">
             <intent-filter>
@@ -29,7 +29,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:scheme="file"/>
             </intent-filter>
-            
+
             <!-- Dropbox, Astro -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -98,7 +98,7 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak" />
             </intent-filter>
-            
+
             <!-- Content providers - e.g. mail app attachments -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -112,7 +112,7 @@
                 <data android:mimeType="application/x-dat"/>
                 <data android:mimeType="application/octet-stream"/>
             </intent-filter>
-            
+
             <!--  Search -->
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
@@ -120,28 +120,28 @@
              <meta-data android:name="android.app.searchable"
                         android:resource="@xml/searchable"/>
         </activity>
-        
+
         <activity android:name=".PasswdPolicyActivity"
                   android:label="@string/app_name"
                   android:finishOnTaskLaunch="true"/>
-                  
+
         <activity android:name=".Preferences"
                   android:label="@string/app_name"
                   android:finishOnTaskLaunch="true"/>
-                  
+
         <activity android:name=".RecordEditActivity"
-                  android:label="@string/app_name" 
+                  android:label="@string/app_name"
                   android:finishOnTaskLaunch="true"/>
-    
+
         <activity android:name=".RecordView"
-                  android:label="@string/app_name" 
+                  android:label="@string/app_name"
                   android:finishOnTaskLaunch="true"/>
-    
+
         <activity android:name=".RecordSelectionActivity"
                   android:label="@string/password_record"
                   android:theme="@android:style/Theme.Dialog"
                   android:finishOnTaskLaunch="true"/>
-                  
+
         <activity android:name=".LauncherFileShortcuts"
                   android:label="@string/password_file"
                   android:theme="@android:style/Theme.Dialog">
@@ -150,7 +150,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-    
+
         <activity android:name=".LauncherRecordShortcuts"
                   android:label="@string/password_record"
                   android:theme="@android:style/Theme.Dialog">
@@ -159,11 +159,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-    
+
         <receiver android:name=".PasswdSafeApp$FileTimeoutReceiver">
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.FILE_TIMEOUT"/>
             </intent-filter>
         </receiver>
     </application>
-</manifest> 
+</manifest>
