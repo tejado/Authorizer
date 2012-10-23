@@ -7,22 +7,29 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.res.Resources;
+
 public enum FontSizePref
 {
     // Values in their display order
-    NORMAL  ("Normal"),
-    SMALL   ("Small");
+    NORMAL  (0),
+    SMALL   (1);
 
-    private final String itsDisplayName;
+    private final int itsDisplayNameIdx;
 
-    private FontSizePref(String displayName)
+    private FontSizePref(int displayNameIdx)
     {
-        itsDisplayName = displayName;
+        itsDisplayNameIdx = displayNameIdx;
     }
 
-    public final String getDisplayName()
+    public final int getDisplayNameIdx()
     {
-        return itsDisplayName;
+        return itsDisplayNameIdx;
+    }
+
+    public final String getDisplayName(Resources res)
+    {
+        return getDisplayNamesArray(res)[itsDisplayNameIdx];
     }
 
     public static String[] getValues()
@@ -35,13 +42,19 @@ public enum FontSizePref
         return strs;
     }
 
-    public static String[] getDisplayNames()
+    public static String[] getDisplayNames(Resources res)
     {
+        String[] displayNames = getDisplayNamesArray(res);
         FontSizePref[] prefs = values();
         String[] strs = new String[prefs.length];
         for (int i = 0; i < prefs.length; ++i) {
-            strs[i] = prefs[i].getDisplayName();
+            strs[i] = displayNames[prefs[i].getDisplayNameIdx()];
         }
         return strs;
+    }
+
+    private static final String[] getDisplayNamesArray(Resources res)
+    {
+        return res.getStringArray(R.array.font_size_pref);
     }
 }

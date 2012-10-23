@@ -361,7 +361,7 @@ public class Preferences extends PreferenceActivity
         onSharedPreferenceChanged(prefs, PREF_PASSWD_ENC);
 
         itsFontSizePref = (ListPreference) findPreference(PREF_FONT_SIZE);
-        itsFontSizePref.setEntries(FontSizePref.getDisplayNames());
+        itsFontSizePref.setEntries(FontSizePref.getDisplayNames(res));
         itsFontSizePref.setEntryValues(FontSizePref.getValues());
         onSharedPreferenceChanged(prefs, PREF_FONT_SIZE);
 
@@ -410,7 +410,8 @@ public class Preferences extends PreferenceActivity
         } else if (key.equals(PREF_PASSWD_ENC)) {
             itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
         } else if (key.equals(PREF_FONT_SIZE)) {
-            itsFontSizePref.setSummary(getFontSizePref(prefs).getDisplayName());
+            itsFontSizePref.setSummary(
+                getFontSizePref(prefs).getDisplayName(getResources()));
         }
     }
 

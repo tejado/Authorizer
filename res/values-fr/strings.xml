@@ -215,6 +215,12 @@
         <item>1 heure</item>
     </string-array>
 
+    <!-- Order must match FontSizePref enum values -->
+    <string-array name="font_size_pref">
+        <item>Normal</item>
+        <item>Petite</item>
+    </string-array>
+
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">
         <item>Normal</item>
