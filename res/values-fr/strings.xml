@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about">A propos</string>
+    <string name="about_details">Version: %1$s\n\nBuild ID: %2$s \n\nBuild Date: %3$s</string>
+    <string name="add">Ajouter</string>
+    <string name="add_policy">Ajouter Stratégie</string>
+    <string name="add_record">Ajouter Entrée</string>
+    <string name="alias_base_record_header">ALIAS</string>
+    <string name="alias_base_record_label">Alias</string>
+    <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
+    <string name="app_name">PasswdSafe</string>
+    <string name="at_least">Au moins</string>
+    <string name="cancel">Annuler</string>
+    <string name="change_password">Changer mot de passe</string>
+    <string name="check_box_to_confirm">Cocher la case pour confirmer</string>
+    <string name="choose">Choisir</string>
+    <string name="choose_group">Choisir un groupe</string>
+    <string name="choose_record">Choisir une entrée</string>
+    <string name="choose_type">Choisir un type</string>
+    <string name="clear">Effacer</string>
+    <string name="close">Fermer</string>
+    <string name="confirm">Confirmer</string>
+    <string name="confirm_label">Confirmer:</string>
+    <string name="confirm_password_label">Confirmer mot de passe:</string>
+    <string name="cannot_delete_record">Impossible de supprimer l\'entrée - %1$s"</string>
+    <string name="content_file">Contenu du fichier</string>
+    <string name="copy_clipboard">Copier dans le Presse-papiers</string>
+    <string name="copy_notes">Copier les notes</string>
+    <string name="copy_password">Copier le mot de passe</string>
+    <string name="copy_trace_and_close">Copier et fermer</string>
+    <string name="copy_user">Copier le nom d\'utilisateur</string>
+    <string name="custom_symbols">Symboles personnalisés</string>
+    <string name="custom_symbol_not_alphanum">Les symboles personnalisés ne doivent pas contenir d\'espaces, ni de caractères alphanumériques</string>
+    <string name="database_policy">Base de données stratégie - %s</string>
+    <string name="database_version_label">Version base de données:</string>
+    <string name="default_policy">Stratégie par défaut</string>
+    <string name="delete">Supprimer</string>
+    <string name="delete_file">Supprimer base de données</string>
+    <string name="delete_file_msg">Supprimer le fichier \"%1$s\"?</string>
+    <string name="delete_file_title">Confirmer la suppression du fichier</string>
+    <string name="delete_policy">Supprimer la stratégie</string>
+    <string name="delete_policy_msg">Supprimer la stratégie \"%1$s\"?</string>
+    <string name="delete_policy_title">Confirmer la suppression de la stratégie</string>
+    <string name="delete_record_msg">Supprimer l\'entrée \"%1$s\"?</string>
+    <string name="delete_record_title">Confirmer la suppression de l\'entrée</string>
+    <string name="details">Détails</string>
+    <string name="done">Valider</string>
+    <string name="duplicate_entry">Dupliquer l\'entrée</string>
+    <string name="duplicate_name">Dupliquer le nom</string>
+    <string name="edit">Modifier</string>
+    <string name="edit_policy">Modifier la stratégie</string>
+    <string name="email">Email</string>
+    <string name="email_attachment">fichier joint à l\'email</string>
+    <string name="email_header">EMAIL</string>
+    <string name="empty_custom_symbols">Symboles personnalisés vides</string>
+    <string name="empty_file_name">Nom de fichier vide</string>
+    <string name="empty_name">Nom vide</string>
+    <string name="empty_password">Mot de passe vide</string>
+    <string name="empty_title">Titre vide</string>
+    <string name="enabled">Activé</string>
+    <string name="enter_net_group">Entrer un nouveau groupe:</string>
+    <string name="error">Erreur</string>
+    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
+    <string name="expiration_header">EXPIRATION</string>
+    <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
+    <string name="file_exists">Le fichier existe</string>
+    <string name="file_label">Fichier:</string>
+    <string name="file_label_val">Fichier: %1$s</string>
+    <string name="file_name_label">Nom du fichier:</string>
+    <string name="file_operations">Réglage sauvegarde</string>
+    <string name="file_type_icon">Icône des types de fichier</string>
+    <string name="generate">Générer</string>
+    <string name="generate_password">Générer un mot de passe</string>
+    <string name="go_to">Aller à</string>
+    <string name="group">Groupe</string>
+    <string name="group_header">GROUPE</string>
+    <string name="hidden_password_alias">***** (de alias, taper pour visualiser)</string>
+    <string name="hidden_password_normal">***** (taper pour visualiser)</string>
+    <string name="hidden_password_shortcut">***** (de raccourci, taper pour visualiser)</string>
+    <string name="hide_password">Masquer le mot de passe</string>
+    <string name="hide_passwords">Masquer les mots de passe</string>
+    <string name="history">Historique</string>
+    <string name="history_header">HISTORIQUE</string>
+    <string name="home">Accueil</string>
+    <string name="invalid_file_name">Nom de fichier invalide</string>
+    <string name="invalid_history_max_size">Taille de l\'historique invalide</string>
+    <string name="invalid_length">Longueur invalide</string>
+    <string name="invalid_option_length">Longueur d\'option invalide</string>
+    <string name="last_save_app_label">Application utilisée:</string>
+    <string name="last_save_by_label">Dernier enregistrement par:</string>
+    <string name="last_save_time_label">Dernier enregistrement le:</string>
+    <string name="length">Longueur</string>
+    <string name="length_even_hex">La longueur doit être en hexadécimal</string>
+    <string name="length_min_val">La longueur doit être au moins %1$d</string>
+    <string name="length_max_val">La longueur doit être au plus %1$d</string>
+    <string name="location">Emplacement</string>
+    <string name="max_size_label">Taille maximale:</string>
+    <string name="n_a">N/A</string>
+    <string name="name">Nom</string>
+    <string name="new_file">Nouveau fichier</string>
+    <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
+    <string name="new_group_menu">Nouveau groupe.</string>
+    <string name="new_password_label">Nouveau mot de passe:</string>
+    <string name="new_policy">Nouvelle stratégie</string>
+    <string name="no_alias_chosen">Aucun alias choisi</string>
+    <string name="no_shortcut_chosen">Aucun raccourci choisi</string>
+    <string name="no_files">Aucun fichier</string>
+    <string name="no_policies">Aucune stratégie</string>
+    <string name="no_records">Aucune entrée</string>
+    <string name="no_records_open_file">Aucune entrée. Ouvrez un premier fichier, puis réessayez.</string>
+    <string name="notes">Notes</string>
+    <string name="num_records_label">Nombre d\'entrées:</string>
+    <string name="ok">OK</string>
+    <string name="open_file_title">Ouvrir un fichier</string>
+    <string name="option_not_selected">Au moins une option doit être sélectionnée</string>
+    <string name="parent_directory">Répertoire parent</string>
+    <string name="parent_group">Groupe parent</string>
+    <string name="password">Mot de passe</string>
+    <string name="password_and_confirm">Mot de passe /\nConfirmation</string>
+    <string name="password_encoding_label">Encodage mot de passe:</string>
+    <string name="password_file">Fichier mot de passe</string>
+    <string name="password_gen_prefs_moved">Options de génération de mot de passe déplacées. Ouvrez le fichier et modifiez la stratégie par défaut.</string>
+    <string name="password_header">MOT DE PASSE</string>
+    <string name="password_label">Mot de passe:</string>
+    <string name="password_len_short_opt">Mot de passe trop court pour les options</string>
+    <string name="password_policy">Mot de passe Stratégie</string>
+    <string name="password_policies">Mot de passe Stratégies</string>
+    <string name="password_preferences">Mot de passe Préférences</string>
+    <string name="password_record">Mot de passe entrée</string>
+    <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>
+    <string name="permissions_label">Autorisations:</string>
+    <string name="policy_header">STRATÉGIE</string>
+    <string name="policy_no">Non</string>
+    <string name="policy_yes_len">Oui - Au moins %1$d</string>
+    <string name="policy_yes_sym_default">Oui - Au moins %1$d des symboles par défaut: %2$s</string>
+    <string name="policy_yes_sym_easy">Oui - Au moins %1$d des symboles simples: %2$s</string>
+    <string name="policy_yes_sym_policy">Oui - Au moins %1$d des symboles de stratégie: %2$s</string>
+    <string name="policy_yes_sym_pronounce">Oui - Au moins %1$d des symboles prononçables: %2$s</string>
+    <string name="preferences">Préférences</string>
+    <string name="protect_all">Protéger toutes les entrées</string>
+    <string name="protect_group">Protéger un groupe d\'entrées</string>
+    <string name="protected_record">Protégé</string>
+    <string name="protected_record_header">ENTRÉE PROTEGÉE</string>
+    <string name="psafe3_ext">.psafe3</string>
+    <string name="query_label">Filtre de recherche: %1$s</string>
+    <string name="record">Entrée</string>
+    <string name="record_has_references">L\'entrée contient des références</string>
+    <string name="record_not_found">Entrée introuvable</string>
+    <string name="record_policy">Stratégie Entrée</string>
+    <string name="record_type">Type d\'entrée</string>
+    <string name="read_only">Lecture seule</string>
+    <string name="read_write">Lecture-écriture</string>
+    <string name="references_label">RÉFÉRENCES</string>
+    <string name="remove">Supprimer</string>
+    <string name="saving_file">Enregistrement %s…</string>
+    <string name="search">Rechercher</string>
+    <string name="search_hint">Rechercher PasswdSafe</string>
+    <string name="select_file_label">Sélectionnez la sauvegarde à ouvrir:</string>
+    <string name="set_password">Définir le mot de passe</string>
+    <string name="shortcut_base_record_header">RACCOURCI</string>
+    <string name="shortcut_base_record_label">Raccourci</string>
+    <string name="shortcut_choose_file">Choisir le fichier de mot de passe</string>
+    <string name="shortcut_choose_record">Choisir l\'entrée de mot de passe</string>
+    <string name="show_password">Afficher mot de passe</string>
+    <string name="show_passwords">Afficher mots de passe</string>
+    <string name="title">Titre</string>
+    <string name="toggle_word_wrap">Toggle Word Wrap</string>
+    <string name="toggle_monospace">Toggle Monospace</string>
+    <string name="type">Type</string>
+    <string name="unprotect_all">Déprotéger les entrées</string>
+    <string name="unprotect_group">Déprotéger les groupes</string>
+    <string name="unprotect_to_modify">Déprotéger les modifications</string>
+    <string name="up">Haut</string>
+    <string name="url">URL</string>
+    <string name="username">Nom utilisateur</string>
+    <string name="use_count">Utiliser compteur</string>
+    <string name="use_digits">Utiliser chiffres</string>
+    <string name="use_lowercase">Utiliser minuscules</string>
+    <string name="use_symbols">Utiliser symboles</string>
+    <string name="use_uppercase">Utiliser majuscules</string>
+    <string name="username_header">NOM UTILISATEUR</string>
+    <string name="yes">Oui</string>
+
+    <string name="loading">Chargement</string>
+    <string name="invalid_password">"Mot de passe incorrect"</string>
+    <string name="none">"Aucun"</string>
+    <string name="basic">"General"</string>
+    <string name="new_entry">"Nouvelle entrée"</string>
+    <string name="new_group">"Nouveau groupe..."</string>
+    <string name="saving">"Enregistrement"</string>
+
+
+    <plurals name="group_items">
+        <item quantity="one">[Un entree]</item>
+        <item quantity="other">[%d entrees]</item>
+    </plurals>
+
+    <!-- Order must match constants in RecordEditActivity -->
+    <string-array name="record_type">
+        <item>Normal</item>
+        <item>Alias</item>
+        <item>Raccourci</item>
+    </string-array>
+
+    <!-- Order must match constants in PolicyPolicyActivity -->
+    <string-array name="policy_type">
+        <item>Normal</item>
+        <item>Facile-à-lire</item>
+        <item>prononçable</item>
+        <item>Hexadécimal</item>
+    </string-array>
+</resources>

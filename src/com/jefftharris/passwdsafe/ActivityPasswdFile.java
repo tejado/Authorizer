@@ -79,10 +79,10 @@ public abstract class ActivityPasswdFile
         Activity activity = getActivity();
         ProgressDialog dlg = new ProgressDialog(activity);
         dlg.setTitle(PasswdSafeApp.getAppTitle(activity));
-        dlg.setMessage("Saving " +
-                       PasswdFileData.getUriIdentifier(getFileData().getUri(),
-                                                       activity, true) +
-                       "...");
+        String uri =
+            PasswdFileData.getUriIdentifier(getFileData().getUri(),
+                                            activity, true);
+        dlg.setMessage(activity.getString(R.string.saving_file, uri));
         dlg.setIndeterminate(true);
         dlg.setCancelable(false);
         return dlg;

@@ -152,6 +152,7 @@
     <string name="read_write">Read-write</string>
     <string name="references_label">REFERENCES</string>
     <string name="remove">Remove</string>
+    <string name="saving_file">Saving %s…</string>
     <string name="search">Search</string>
     <string name="search_hint">Search PasswdSafe</string>
     <string name="select_file_label">Select password file to open:</string>
@@ -179,6 +180,11 @@
     <string name="use_uppercase">Use Uppercase</string>
     <string name="username_header">USER NAME</string>
     <string name="yes">Yes</string>
+
+    <plurals name="group_items">
+        <item quantity="one">[One item]</item>
+        <item quantity="other">[%d items]</item>
+    </plurals>
 
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">

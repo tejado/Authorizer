@@ -398,8 +398,10 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                 recInfo.put(ICON,R.drawable.folder_rev);
 
                 int items = entry.getValue().getNumRecords();
-                String str = (items == 1) ? "item" : "items";
-                recInfo.put(USERNAME, "[" + items + " " + str + "]");
+                String str =
+                    getResources().getQuantityString(R.plurals.group_items,
+                                                     items, items);
+                recInfo.put(USERNAME, str);
                 itsListData.add(recInfo);
             }
         }
