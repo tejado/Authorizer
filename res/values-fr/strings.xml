@@ -195,6 +195,16 @@
         <item quantity="other">[%d entrees]</item>
     </plurals>
 
+    <!-- Order must match FileBackupPref enum values -->
+    <string-array name="file_backup_pref">
+        <item>Aucune</item>
+        <item>1 sauvegarde</item>
+        <item>2 sauvegardes</item>
+        <item>5 sauvegardes</item>
+        <item>10 sauvegardes</item>
+        <item>Toutes</item>
+    </string-array>
+
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">
         <item>Normal</item>

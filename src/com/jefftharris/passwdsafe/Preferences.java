@@ -346,7 +346,8 @@ public class Preferences extends PreferenceActivity
         itsFileClosePref.setEntryValues(FileTimeoutPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_FILE_CLOSE_TIMEOUT);
 
-        itsFileBackupPref.setEntries(FileBackupPref.getDisplayNames());
+        itsFileBackupPref.setEntries(
+            FileBackupPref.getDisplayNames(getResources()));
         itsFileBackupPref.setEntryValues(FileBackupPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_FILE_BACKUP);
 
@@ -404,7 +405,7 @@ public class Preferences extends PreferenceActivity
                 getFileCloseTimeoutPref(prefs).getDisplayName());
         } else if (key.equals(PREF_FILE_BACKUP)) {
             itsFileBackupPref.setSummary(
-                getFileBackupPref(prefs).getDisplayName());
+                getFileBackupPref(prefs).getDisplayName(getResources()));
         } else if (key.equals(PREF_PASSWD_ENC)) {
             itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
         } else if (key.equals(PREF_FONT_SIZE)) {

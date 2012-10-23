@@ -7,25 +7,27 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.res.Resources;
+
 public enum FileBackupPref
 {
     // Values in their display order
-    BACKUP_NONE   (0,                     "",     "None"),
-    BACKUP_1      (1,                     "1",    "1 backup"),
-    BACKUP_2      (2,                     "2",    "2 backups"),
-    BACKUP_5      (5,                     "5",    "5 backups"),
-    BACKUP_10     (10,                    "10",   "10 backups"),
-    BACKUP_ALL    (Integer.MAX_VALUE,     "all",  "All");
+    BACKUP_NONE   (0,                     "",     0),
+    BACKUP_1      (1,                     "1",    1),
+    BACKUP_2      (2,                     "2",    2),
+    BACKUP_5      (5,                     "5",    3),
+    BACKUP_10     (10,                    "10",   4),
+    BACKUP_ALL    (Integer.MAX_VALUE,     "all",  5);
 
     private final int itsNumBackups;
     private final String itsValue;
-    private final String itsDisplayName;
+    private final int itsDisplayNameIdx;
 
-    private FileBackupPref(int num, String value, String displayName)
+    private FileBackupPref(int num, String value, int displayNameIdx)
     {
         itsNumBackups = num;
         itsValue = value;
-        itsDisplayName = displayName;
+        itsDisplayNameIdx = displayNameIdx;
     }
 
     public final int getNumBackups()
@@ -38,9 +40,14 @@ public enum FileBackupPref
         return itsValue;
     }
 
-    public final String getDisplayName()
+    public final int getDisplayNameIdx()
     {
-        return itsDisplayName;
+        return itsDisplayNameIdx;
+    }
+
+    public final String getDisplayName(Resources res)
+    {
+        return getDisplayNamesArray(res)[itsDisplayNameIdx];
     }
 
     public static FileBackupPref prefValueOf(String str)
@@ -63,13 +70,19 @@ public enum FileBackupPref
         return strs;
     }
 
-    public static String[] getDisplayNames()
+    public static String[] getDisplayNames(Resources res)
     {
+        String[] displayNames = getDisplayNamesArray(res);
         FileBackupPref[] prefs = values();
         String[] strs = new String[prefs.length];
         for (int i = 0; i < prefs.length; ++i) {
-            strs[i] = prefs[i].getDisplayName();
+            strs[i] = displayNames[prefs[i].getDisplayNameIdx()];
         }
         return strs;
+    }
+
+    private static final String[] getDisplayNamesArray(Resources res)
+    {
+        return res.getStringArray(R.array.file_backup_pref);
     }
 }

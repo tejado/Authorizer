@@ -186,6 +186,16 @@
         <item quantity="other">[%d items]</item>
     </plurals>
 
+    <!-- Order must match FileBackupPref enum values -->
+    <string-array name="file_backup_pref">
+        <item>None</item>
+        <item>1 backup</item>
+        <item>2 backups</item>
+        <item>5 backups</item>
+        <item>10 backups</item>
+        <item>All</item>
+    </string-array>
+
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">
         <item>Normal</item>
