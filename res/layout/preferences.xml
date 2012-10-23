@@ -1,82 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:key="top_prefs">
-    <PreferenceScreen android:title="File Settings"
+    <PreferenceScreen android:title="@string/file_settings"
                       android:key="fileOptions">
         <EditTextPreference android:name="FileDir Pref"
-                            android:title="Directory for files"
+                            android:title="@string/directory_for_files"
                             android:summary="/sdcard"
                             android:defaultValue="/sdcard"
                             android:key="fileDirPref"/>
-                            
+
         <ListPreference android:name="defaultFile Pref"
-                        android:title="Default file to open"
+                        android:title="@string/default_file_to_open"
                         android:key="defFilePref"/>
-    
+
         <ListPreference android:name="fileTimeout Pref"
-                        android:title="File close timeout"
+                        android:title="@string/file_close_timeout"
                         android:key="fileCloseTimeoutPref"/>
-        
+
         <CheckBoxPreference android:name="fileCloseScreenOff Pref"
-                            android:title="Close file on screen off"
+                            android:title="@string/close_file_screen_off"
                             android:key="fileCloseScreenOffPref"
                             android:defaultValue="false"/>
 
         <ListPreference android:name="fileBackup Pref"
-                        android:title="File backups"
+                        android:title="@string/file_backups"
                         android:key="fileBackupPref"/>
 
         <CheckBoxPreference android:name="showBackupFiles Pref"
-                            android:title="Show backup files"
+                            android:title="@string/show_backup_files"
                             android:key="showBackupFilesPref"
                             android:defaultValue="false"/>
 
         <CheckBoxPreference android:name="fileCloseClearClipboard Pref"
-                            android:title="Clear clipboard on close"
+                            android:title="@string/clear_clipboard_on_close"
                             android:key="fileCloseClearClipboardPref"
                             android:defaultValue="true"/>
     </PreferenceScreen>
 
-    <PreferenceScreen android:title="Password Settings"
+    <PreferenceScreen android:title="@string/password_settings"
                       android:key="passwordOptions">
         <ListPreference android:name="passwordEncoding Pref"
-                        android:title="File password encoding"
+                        android:title="@string/file_password_encoding"
                         android:key="passwordEncodingPref"/>
 
         <Preference
             android:selectable="false"
             android:summary="@string/password_gen_prefs_moved"
-            android:title="Password generation"/>
+            android:title="@string/password_generation"/>
     </PreferenceScreen>
-    
-    <PreferenceScreen android:title="Record Settings"
+
+    <PreferenceScreen android:title="@string/record_settings"
                         android:key="recordOptions">
         <CheckBoxPreference android:name="sortCaseSensitive Pref"
-                            android:title="Case-sensitive sorting"
+                            android:title="@string/case_sensitive_sorting"
                             android:key="sortCaseSensitivePref"
                             android:defaultValue="true"/>
 
         <CheckBoxPreference android:name="groupRecords Pref"
-                            android:title="Group records"
+                            android:title="@string/group_records"
                             android:key="groupRecordsPref"
                             android:defaultValue="true"/>
     </PreferenceScreen>
-    
-    <PreferenceScreen android:title="Search Settings"
+
+    <PreferenceScreen android:title="@string/search_settings"
                         android:key="searchOptions">
         <CheckBoxPreference android:name="searchCaseSensitive Pref"
-                            android:title="Case sensitive"
+                            android:title="@string/case_sensitive"
                             android:key="searchCaseSensitivePref"
                             android:defaultValue="false"/>
-                            
+
         <CheckBoxPreference android:name="searchRegex Pref"
-                            android:title="Regular expression"
-                            android:summary="Use a regular expression to search instead of a sub-string"
+                            android:title="@string/regular_expression"
+                            android:summary="@string/regular_expression_summary"
                             android:key="searchRegexPref"
                             android:defaultValue="false"/>
     </PreferenceScreen>
 
     <ListPreference android:name="fontSize Pref"
-                    android:title="Font size"
+                    android:title="@string/font_size"
                     android:key="fontSizePref"/>
 </PreferenceScreen>
