@@ -60,7 +60,6 @@ public class Preferences extends PreferenceActivity
 
     public static final String PREF_DEF_FILE = "defFilePref";
     public static final String PREF_DEF_FILE_DEF = "";
-    public static final String PREF_DEF_FILE_NONE = "None";
 
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     public static final boolean PREF_GROUP_RECORDS_DEF = true;
@@ -423,7 +422,7 @@ public class Preferences extends PreferenceActivity
         FileList.FileData[] files = FileList.getFiles(fileDir, false, false);
         String[] entries = new String[files.length + 1];
         String[] entryValues = new String[files.length + 1];
-        entries[0] = PREF_DEF_FILE_NONE;
+        entries[0] = getString(R.string.none);
         entryValues[0] = PREF_DEF_FILE_DEF;
         for (int i = 0; i < files.length; ++i) {
             entries[i + 1] = files[i].toString();
@@ -434,10 +433,10 @@ public class Preferences extends PreferenceActivity
         itsDefFilePref.setEntryValues(entryValues);
     }
 
-    private static String defFileValueToEntry(String value)
+    private final String defFileValueToEntry(String value)
     {
         if (value.equals(PREF_DEF_FILE_DEF)) {
-            return PREF_DEF_FILE_NONE;
+            return getString(R.string.none);
         } else {
             return value;
         }

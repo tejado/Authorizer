@@ -152,19 +152,20 @@ public class RecordView extends AbstractRecordTabActivity
         TabHost.TabSpec spec;
 
         spec = tabHost.newTabSpec("basic")
-            .setIndicator("Basic", res.getDrawable(R.drawable.ic_tab_contact))
+            .setIndicator(getString(R.string.basic),
+                          res.getDrawable(R.drawable.ic_tab_contact))
             .setContent(R.id.basic_tab);
         tabHost.addTab(spec);
 
         spec = tabHost.newTabSpec("password")
-            .setIndicator("Password",
+            .setIndicator(getString(R.string.password),
                           res.getDrawable(R.drawable.ic_tab_account_list))
             .setContent(R.id.password_tab);
         tabHost.addTab(spec);
 
         itsNotesTabDrawable = new NotesTabDrawable(res);
         spec = tabHost.newTabSpec("notes")
-            .setIndicator("Notes", itsNotesTabDrawable)
+            .setIndicator(getString(R.string.notes), itsNotesTabDrawable)
             .setContent(R.id.notes_tab);
         tabHost.addTab(spec);
 

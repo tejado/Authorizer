@@ -134,7 +134,8 @@ public class RecordEditActivity extends AbstractRecordActivity
 
             getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
-            setText(R.id.rec_title, "Edit " + fileData.getTitle(record));
+            setText(R.id.rec_title, getString(R.string.edit_item,
+                                              fileData.getTitle(record)));
             setText(R.id.title, fileData.getTitle(record));
             group = fileData.getGroup(record);
             setText(R.id.user, fileData.getUsername(record));
@@ -149,7 +150,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
             itsHistory = fileData.getPasswdHistory(record);
         } else {
-            setText(R.id.rec_title, "New Entry");
+            setText(R.id.rec_title, getString(R.string.new_entry));
             setText(R.id.title, null);
             setText(R.id.user, null);
             setText(R.id.notes, null);

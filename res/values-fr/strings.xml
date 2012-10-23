@@ -10,6 +10,7 @@
     <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Au moins</string>
+    <string name="basic">"General"</string>
     <string name="cancel">Annuler</string>
     <string name="change_password">Changer mot de passe</string>
     <string name="check_box_to_confirm">Cocher la case pour confirmer</string>
@@ -48,6 +49,7 @@
     <string name="duplicate_entry">Dupliquer l\'entrée</string>
     <string name="duplicate_name">Dupliquer le nom</string>
     <string name="edit">Modifier</string>
+    <string name="edit_item">Modifier %s</string>
     <string name="edit_policy">Modifier la stratégie</string>
     <string name="email">Email</string>
     <string name="email_attachment">fichier joint à l\'email</string>
@@ -86,6 +88,7 @@
     <string name="invalid_history_max_size">Taille de l\'historique invalide</string>
     <string name="invalid_length">Longueur invalide</string>
     <string name="invalid_option_length">Longueur d\'option invalide</string>
+    <string name="invalid_password">"Mot de passe incorrect"</string>
     <string name="last_save_app_label">Application utilisée:</string>
     <string name="last_save_by_label">Dernier enregistrement par:</string>
     <string name="last_save_time_label">Dernier enregistrement le:</string>
@@ -93,13 +96,15 @@
     <string name="length_even_hex">La longueur doit être en hexadécimal</string>
     <string name="length_min_val">La longueur doit être au moins %1$d</string>
     <string name="length_max_val">La longueur doit être au plus %1$d</string>
+    <string name="loading_file">Chargement %s…</string>
     <string name="location">Emplacement</string>
     <string name="max_size_label">Taille maximale:</string>
     <string name="n_a">N/A</string>
     <string name="name">Nom</string>
+    <string name="new_entry">Nouvelle entrée</string>
     <string name="new_file">Nouveau fichier</string>
     <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
-    <string name="new_group_menu">Nouveau groupe.</string>
+    <string name="new_group_menu">Nouveau groupe…</string>
     <string name="new_password_label">Nouveau mot de passe:</string>
     <string name="new_policy">Nouvelle stratégie</string>
     <string name="no_alias_chosen">Aucun alias choisi</string>
@@ -108,6 +113,7 @@
     <string name="no_policies">Aucune stratégie</string>
     <string name="no_records">Aucune entrée</string>
     <string name="no_records_open_file">Aucune entrée. Ouvrez un premier fichier, puis réessayez.</string>
+    <string name="none">"Aucun"</string>
     <string name="notes">Notes</string>
     <string name="num_records_label">Nombre d\'entrées:</string>
     <string name="ok">OK</string>
@@ -180,15 +186,6 @@
     <string name="use_uppercase">Utiliser majuscules</string>
     <string name="username_header">NOM UTILISATEUR</string>
     <string name="yes">Oui</string>
-
-    <string name="loading">Chargement</string>
-    <string name="invalid_password">"Mot de passe incorrect"</string>
-    <string name="none">"Aucun"</string>
-    <string name="basic">"General"</string>
-    <string name="new_entry">"Nouvelle entrée"</string>
-    <string name="new_group">"Nouveau groupe..."</string>
-    <string name="saving">"Enregistrement"</string>
-
 
     <plurals name="group_items">
         <item quantity="one">[Un entree]</item>

@@ -10,6 +10,7 @@
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">At least</string>
+    <string name="basic">Basic</string>
     <string name="cancel">Cancel</string>
     <string name="change_password">Change Password</string>
     <string name="check_box_to_confirm">Check box to confirm</string>
@@ -48,6 +49,7 @@
     <string name="duplicate_entry">Duplicate entry</string>
     <string name="duplicate_name">Duplicate name</string>
     <string name="edit">Edit</string>
+    <string name="edit_item">Edit %s</string>
     <string name="edit_policy">Edit Policy</string>
     <string name="email">Email</string>
     <string name="email_attachment">Email Attachment</string>
@@ -86,6 +88,7 @@
     <string name="invalid_history_max_size">Invalid history maximum size</string>
     <string name="invalid_length">Invalid length</string>
     <string name="invalid_option_length">Invalid option length</string>
+    <string name="invalid_password">Invalid password</string>
     <string name="last_save_app_label">Last saved app:</string>
     <string name="last_save_by_label">Last saved by:</string>
     <string name="last_save_time_label">Last save time:</string>
@@ -93,10 +96,12 @@
     <string name="length_even_hex">Length must be even for hexadecimal</string>
     <string name="length_min_val">Length must be at least %1$d</string>
     <string name="length_max_val">Length must be at most %1$d</string>
+    <string name="loading_file">Loading %s…</string>
     <string name="location">Location</string>
     <string name="max_size_label">Maximum size:</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
+    <string name="new_entry">New Entry</string>
     <string name="new_file">New File</string>
     <string name="new_file_not_supp_uri">New file not supported for URI %1$s</string>
     <string name="new_group_menu">New group…</string>
@@ -108,6 +113,7 @@
     <string name="no_policies">No Policies</string>
     <string name="no_records">No Records</string>
     <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
+    <string name="none">None</string>
     <string name="notes">Notes</string>
     <string name="num_records_label">Number of Records:</string>
     <string name="ok">OK</string>

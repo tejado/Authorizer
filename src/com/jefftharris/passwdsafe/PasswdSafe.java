@@ -358,7 +358,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             ProgressDialog dlg = new ProgressDialog(this);
             dlg.setTitle(PasswdSafeApp.getAppTitle(this));
-            dlg.setMessage("Loading " + getUriName(true) + "...");
+            dlg.setMessage(getString(R.string.loading_file, getUriName(true)));
             dlg.setIndeterminate(true);
             dlg.setCancelable(true);
             dialog = dlg;
@@ -892,8 +892,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 if (((e instanceof IOException) &&
                      e.getMessage().equals("Invalid password")) ||
                     (e instanceof InvalidPassphraseException))
-                    PasswdSafeApp.showFatalMsg("Invalid password",
-                                               PasswdSafe.this);
+                    PasswdSafeApp.showFatalMsg(
+                        getString(R.string.invalid_password), PasswdSafe.this);
                 else
                     PasswdSafeApp.showFatalMsg(e, PasswdSafe.this);
             }
