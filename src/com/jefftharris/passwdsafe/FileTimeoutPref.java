@@ -7,25 +7,27 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.res.Resources;
+
 public enum FileTimeoutPref
 {
     // Values in their display order
-    TO_NONE     (0,             "",     "None"),
-    TO_30_SEC   (30 * 1000,     "30",   "30 seconds"),
-    TO_2_MIN    (120 * 1000,    "120",  "2 minutes"),
-    TO_5_MIN    (300 * 1000,    "300",  "5 minutes"),
-    TO_15_MIN   (900 * 1000,    "900",  "15 minutes"),
-    TO_1_HR     (3600 * 1000,   "3600", "1 hour");
+    TO_NONE     (0,             "",     0),
+    TO_30_SEC   (30 * 1000,     "30",   1),
+    TO_2_MIN    (120 * 1000,    "120",  2),
+    TO_5_MIN    (300 * 1000,    "300",  3),
+    TO_15_MIN   (900 * 1000,    "900",  4),
+    TO_1_HR     (3600 * 1000,   "3600", 5);
 
     private final int itsTimeout;
     private final String itsValue;
-    private final String itsDisplayName;
+    private final int itsDisplayNameIdx;
 
-    private FileTimeoutPref(int timeout, String value, String displayName)
+    private FileTimeoutPref(int timeout, String value, int displayNameIdx)
     {
         itsTimeout = timeout;
         itsValue = value;
-        itsDisplayName = displayName;
+        itsDisplayNameIdx = displayNameIdx;
     }
 
     /// Get timeout in milliseconds
@@ -39,9 +41,14 @@ public enum FileTimeoutPref
         return itsValue;
     }
 
-    public final String getDisplayName()
+    public final int getDisplayNameIdx()
     {
-        return itsDisplayName;
+        return itsDisplayNameIdx;
+    }
+
+    public final String getDisplayName(Resources res)
+    {
+        return getDisplayNamesArray(res)[itsDisplayNameIdx];
     }
 
     public static FileTimeoutPref prefValueOf(String str)
@@ -64,13 +71,19 @@ public enum FileTimeoutPref
         return strs;
     }
 
-    public static String[] getDisplayNames()
+    public static String[] getDisplayNames(Resources res)
     {
+        String[] displayNames = getDisplayNamesArray(res);
         FileTimeoutPref[] prefs = values();
         String[] strs = new String[prefs.length];
         for (int i = 0; i < prefs.length; ++i) {
-            strs[i] = prefs[i].getDisplayName();
+            strs[i] = displayNames[prefs[i].getDisplayNameIdx()];
         }
         return strs;
+    }
+
+    private static final String[] getDisplayNamesArray(Resources res)
+    {
+        return res.getStringArray(R.array.file_timeout_pref);
     }
 }

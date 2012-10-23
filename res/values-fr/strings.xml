@@ -205,6 +205,16 @@
         <item>Toutes</item>
     </string-array>
 
+    <!-- Order must match FileTimeoutPref enum values -->
+    <string-array name="file_timeout_pref">
+        <item>Jamais</item>
+        <item>30 secondes</item>
+        <item>2 minutes</item>
+        <item>5 minutes</item>
+        <item>15 minutes</item>
+        <item>1 heure</item>
+    </string-array>
+
     <!-- Order must match constants in RecordEditActivity -->
     <string-array name="record_type">
         <item>Normal</item>

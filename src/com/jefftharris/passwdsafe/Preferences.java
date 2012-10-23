@@ -16,6 +16,7 @@ import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.EditTextPreference;
@@ -342,12 +343,12 @@ public class Preferences extends PreferenceActivity
 
         onSharedPreferenceChanged(prefs, PREF_DEF_FILE);
 
-        itsFileClosePref.setEntries(FileTimeoutPref.getDisplayNames());
+        Resources res = getResources();
+        itsFileClosePref.setEntries(FileTimeoutPref.getDisplayNames(res));
         itsFileClosePref.setEntryValues(FileTimeoutPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_FILE_CLOSE_TIMEOUT);
 
-        itsFileBackupPref.setEntries(
-            FileBackupPref.getDisplayNames(getResources()));
+        itsFileBackupPref.setEntries(FileBackupPref.getDisplayNames(res));
         itsFileBackupPref.setEntryValues(FileBackupPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_FILE_BACKUP);
 
@@ -402,7 +403,7 @@ public class Preferences extends PreferenceActivity
                 defFileValueToEntry(getDefFilePref(prefs)));
         } else if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
             itsFileClosePref.setSummary(
-                getFileCloseTimeoutPref(prefs).getDisplayName());
+                getFileCloseTimeoutPref(prefs).getDisplayName(getResources()));
         } else if (key.equals(PREF_FILE_BACKUP)) {
             itsFileBackupPref.setSummary(
                 getFileBackupPref(prefs).getDisplayName(getResources()));
