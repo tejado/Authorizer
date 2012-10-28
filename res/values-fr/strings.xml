@@ -144,7 +144,6 @@
     <string name="password_len_short_opt">Mot de passe trop court pour les options</string>
     <string name="password_policy">Mot de passe Stratégie</string>
     <string name="password_policies">Mot de passe Stratégies</string>
-    <string name="password_preferences">Mot de passe Préférences</string>
     <string name="password_record">Mot de passe entrée</string>
     <string name="password_settings">Paramètres mots de passe</string>
     <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>

@@ -65,8 +65,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private static final int MENU_TOGGLE_PASSWORD = 3;
     private static final int MENU_GENERATE_PASSWORD = 4;
-    private static final int MENU_PASSWORD_PREFERENCES = 5;
-    private static final int MENU_CANCEL = 6;
+    private static final int MENU_CANCEL = 5;
 
     private static final int CTXMENU_REMOVE = 1;
     private static final int CTXMENU_SET_PASSWORD = 2;
@@ -373,19 +372,9 @@ public class RecordEditActivity extends AbstractRecordActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        MenuItem item;
-
         menu.add(0, MENU_CANCEL, 0, R.string.cancel);
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
         menu.add(0, MENU_GENERATE_PASSWORD, 0, R.string.generate_password);
-
-        item = menu.add(0, MENU_PASSWORD_PREFERENCES, 0,
-                        R.string.password_preferences);
-        item.setIcon(android.R.drawable.ic_menu_preferences);
-        Intent intent = new Intent(this, Preferences.class);
-        intent.putExtra(Preferences.INTENT_SCREEN,
-                        Preferences.SCREEN_PASSWORD_OPTIONS);
-        item.setIntent(intent);
         return true;
     }
 

@@ -144,7 +144,6 @@
     <string name="password_len_short_opt">Password length too short for options</string>
     <string name="password_policy">Password Policy</string>
     <string name="password_policies">Password Policies</string>
-    <string name="password_preferences">Password Preferences</string>
     <string name="password_record">Password record</string>
     <string name="password_settings">Password Settings</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
