@@ -61,8 +61,10 @@ public class HeaderPasswdPolicies
     public HeaderPasswdPolicies(Collection<PasswdRecord> recs,
                                 List<PasswdPolicy> policies)
     {
-        for (PasswdPolicy policy: policies) {
-            itsPolicies.put(policy.getName(), new HdrPolicy(policy));
+        if (policies != null) {
+            for (PasswdPolicy policy: policies) {
+                itsPolicies.put(policy.getName(), new HdrPolicy(policy));
+            }
         }
         for (PasswdRecord rec: recs) {
             PasswdPolicy recPolicy = rec.getPasswdPolicy();
