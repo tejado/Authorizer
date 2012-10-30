@@ -206,8 +206,8 @@
     <string name="yes">Oui</string>
 
     <plurals name="group_items">
-        <item quantity="one">[Un entree]</item>
-        <item quantity="other">[%d entrees]</item>
+        <item quantity="one">[Une entrée]</item>
+        <item quantity="other">[%d entrées]</item>
     </plurals>
 
     <!-- Order must match FileBackupPref enum values -->
@@ -232,7 +232,7 @@
 
     <!-- Order must match FontSizePref enum values -->
     <string-array name="font_size_pref">
-        <item>Normal</item>
+        <item>Normale</item>
         <item>Petite</item>
     </string-array>
 
