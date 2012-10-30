@@ -188,8 +188,8 @@
     <string name="show_password">Afficher mot de passe</string>
     <string name="show_passwords">Afficher mots de passe</string>
     <string name="title">Titre</string>
-    <string name="toggle_word_wrap">Toggle Word Wrap</string>
-    <string name="toggle_monospace">Toggle Monospace</string>
+    <string name="toggle_word_wrap">Adapter les retours-chariot</string>
+    <string name="toggle_monospace">Adapter les espaces</string>
     <string name="type">Type</string>
     <string name="unprotect_all">Déprotéger les entrées</string>
     <string name="unprotect_group">Déprotéger les groupes</string>
