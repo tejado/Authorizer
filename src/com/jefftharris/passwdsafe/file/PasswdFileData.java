@@ -659,7 +659,9 @@ public class PasswdFileData
 
         if (index) {
             PasswdRecord passwdRec = getPasswdRecord(rec);
-            passwdRec.passwdPolicyChanged(this);
+            if (passwdRec != null) {
+                passwdRec.passwdPolicyChanged(this);
+            }
             indexPasswdPolicies();
         }
     }
