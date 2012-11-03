@@ -34,6 +34,7 @@
     <string name="copy_password">Copier le mot de passe</string>
     <string name="copy_trace_and_close">Copier et fermer</string>
     <string name="copy_user">Copier le nom d\'utilisateur</string>
+    <string name="created">Créé</string>
     <string name="custom_symbols">Symboles personnalisés</string>
     <string name="custom_symbol_not_alphanum">Les symboles personnalisés ne doivent pas contenir d\'espaces, ni de caractères alphanumériques</string>
     <string name="database_policy">Base de données stratégie - %s</string>
@@ -69,7 +70,7 @@
     <string name="enter_net_group">Entrer un nouveau groupe:</string>
     <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
-    <string name="expiration_header">EXPIRATION</string>
+    <string name="expiration">Expiration</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
     <string name="file_backups">Fichiers de sauvegarde</string>
     <string name="file_close_timeout">Fermeture automatique de fichier</string>
@@ -111,6 +112,7 @@
     <string name="loading_file">Chargement %s…</string>
     <string name="location">Emplacement</string>
     <string name="max_size_label">Taille maximale:</string>
+    <string name="modified">Modifié</string>
     <string name="n_a">N/A</string>
     <string name="name">Nom</string>
     <string name="new_entry">Nouvelle entrée</string>
@@ -146,6 +148,7 @@
     <string name="password_policies">Mot de passe Stratégies</string>
     <string name="password_record">Mot de passe entrée</string>
     <string name="password_settings">Paramètres mots de passe</string>
+    <string name="password_times_header">TEMPS MOT DE PASSE</string>
     <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>
     <string name="permissions_label">Autorisations:</string>
     <string name="policy_header">STRATÉGIE</string>
@@ -187,6 +190,7 @@
     <string name="show_backup_files">Afficher les sauvegardes</string>
     <string name="show_password">Afficher mot de passe</string>
     <string name="show_passwords">Afficher mots de passe</string>
+    <string name="times_header">TEMPS</string>
     <string name="title">Titre</string>
     <string name="toggle_word_wrap">Adapter les retours-chariot</string>
     <string name="toggle_monospace">Adapter les espaces</string>

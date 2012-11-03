@@ -2,15 +2,15 @@
 <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/tabhost"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" 
-    xmlns:tools="http://schemas.android.com/tools" 
+    android:layout_height="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="NestedScrolling">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="5dp">
-        
+
         <TextView
             android:id="@+id/title"
             android:layout_width="fill_parent"
@@ -33,11 +33,11 @@
             <ScrollView android:id="@+id/basic_tab"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
-              
+
                 <LinearLayout android:orientation="vertical"
                               android:layout_width="fill_parent"
                               android:layout_height="wrap_content">
-                
+
                     <LinearLayout
                         android:id="@+id/base_row"
                         style="@style/RecordRow">
@@ -47,7 +47,7 @@
                             style="@style/RecordHeader"/>
 
                         <View style="@style/Separator"/>
-                        
+
                         <RelativeLayout android:id="@+id/base_group"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
@@ -67,11 +67,11 @@
                                 android:layout_alignParentLeft="true"
                                 android:layout_toLeftOf="@id/base_btn"
                                 android:clickable="true"/>
-                                          
+
                         </RelativeLayout>
 
                     </LinearLayout>
-                    
+
                     <LinearLayout
                         android:id="@+id/group_row"
                         style="@style/RecordRow">
@@ -80,15 +80,15 @@
                             android:id="@+id/group_label"
                             style="@style/RecordHeader"
                             android:text="@string/group_header"/>
-    
+
                         <View style="@style/Separator"/>
 
                         <TextView
                             android:id="@+id/group"
                             style="@style/RecordField"/>
-                    
+
                     </LinearLayout>
-                    
+
                     <LinearLayout
                         android:id="@+id/user_row"
                         style="@style/RecordRow">
@@ -107,7 +107,7 @@
                             style="@style/RecordField.Large"/>
 
                     </LinearLayout>
-                    
+
                     <LinearLayout
                         android:id="@+id/password_row"
                         style="@style/RecordRow">
@@ -127,7 +127,7 @@
                             android:clickable="true"/>
 
                     </LinearLayout>
-                        
+
                     <LinearLayout
                         android:id="@+id/url_row"
                         style="@style/RecordRow">
@@ -145,7 +145,7 @@
                             android:autoLink="web"/>
 
                     </LinearLayout>
-                    
+
                     <LinearLayout
                         android:id="@+id/email_row"
                         style="@style/RecordRow">
@@ -154,7 +154,7 @@
                             android:id="@+id/email_label"
                             style="@style/RecordHeader"
                             android:text="@string/email_header" />
-    
+
                         <View style="@style/Separator"/>
 
                         <TextView
@@ -165,30 +165,55 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/expiration_row"
+                        android:id="@+id/times_row"
                         style="@style/RecordRow">
 
                         <TextView
-                            android:id="@+id/expiration_label"
+                            android:id="@+id/times_label"
                             style="@style/RecordHeader"
-                            android:text="@string/expiration_header" />
-    
+                            android:text="@string/times_header" />
+
                         <View style="@style/Separator"/>
 
-                        <TextView
-                            android:id="@+id/expiration"
-                            style="@style/RecordField.Small"/>
+                        <TableLayout
+                            android:id="@+id/times"
+                            style="@style/RecordField.Small"
+                            android:shrinkColumns="1"
+                            android:stretchColumns="1">
 
+                            <TableRow android:id="@+id/creation_time_row">
+
+                                <TextView
+                                    style="@style/TableLabelColumn"
+                                    android:text="@string/created"/>
+
+                                <TextView
+                                    android:id="@+id/creation_time"
+                                    android:layout_width="wrap_content"/>
+                            </TableRow>
+
+                            <TableRow android:id="@+id/last_mod_time_row">
+
+                                <TextView
+                                    style="@style/TableLabelColumn"
+                                    android:text="@string/modified"/>
+
+                                <TextView
+                                    android:id="@+id/last_mod_time"
+                                    android:layout_width="wrap_content"/>
+                            </TableRow>
+
+                        </TableLayout>
                     </LinearLayout>
-                    
+
                     <LinearLayout
                         android:id="@+id/protected_row"
                         style="@style/RecordRow">
-                    
+
                         <TextView
                             style="@style/RecordHeader"
                             android:text="@string/protected_record_header" />
-    
+
                         <View style="@style/Separator"/>
 
                         <TextView
@@ -196,59 +221,101 @@
                             android:text="@string/unprotect_to_modify"/>
 
                     </LinearLayout>
-                    
+
                     <ListView android:id="@+id/references"
                               android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
                               android:padding="3dip"
                               />
                 </LinearLayout>
-            </ScrollView>                          
+            </ScrollView>
 
             <ScrollView
                 android:id="@+id/password_tab"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
-                
+
                 <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-                    
+
                     <TextView
                         android:id="@+id/policy_label"
                         style="@style/RecordHeader"
                         android:text="@string/policy_header"/>
-                    
+
                     <View
                         android:id="@+id/policy_sep"
                         style="@style/Separator"/>
-                    
+
                     <com.jefftharris.passwdsafe.view.PasswdPolicyView
                         android:id="@+id/policy"
                         style="@style/RecordField"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingBottom="5dp"/>
-                              
+
+                    <LinearLayout
+                        android:id="@+id/password_times_row"
+                        style="@style/RecordRow">
+
+                        <TextView
+                            android:id="@+id/password_times_label"
+                            style="@style/RecordHeader"
+                            android:text="@string/password_times_header" />
+
+                        <View style="@style/Separator"/>
+
+                        <TableLayout
+                            android:id="@+id/password_times"
+                            style="@style/RecordField.Small"
+                            android:shrinkColumns="1"
+                            android:stretchColumns="1">
+
+                            <TableRow android:id="@+id/expiration_time_row">
+
+                                <TextView
+                                    style="@style/TableLabelColumn"
+                                    android:text="@string/expiration"/>
+
+                                <TextView
+                                    android:id="@+id/expiration_time"
+                                    android:layout_width="wrap_content"/>
+                            </TableRow>
+
+                            <TableRow android:id="@+id/password_mod_time_row">
+
+                                <TextView
+                                    style="@style/TableLabelColumn"
+                                    android:text="@string/modified"/>
+
+                                <TextView
+                                    android:id="@+id/password_mod_time"
+                                    android:layout_width="wrap_content"/>
+                            </TableRow>
+
+                        </TableLayout>
+                    </LinearLayout>
+
                     <TextView
                         style="@style/RecordHeader"
                         android:text="@string/history_header"/>
-                              
+
                     <View style="@style/Separator"/>
-                    
+
                     <RelativeLayout
                         style="@style/RecordField"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content">
-        
+
                         <CheckBox
                             android:id="@+id/history_enabled"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/enabled"
                             android:textAppearance="?android:textAppearanceSmall"/>
-                                  
+
                         <TextView
                             android:id="@+id/history_max_size"
                             android:layout_width="wrap_content"
@@ -258,7 +325,7 @@
                             android:layout_alignTop="@id/history_enabled"
                             android:layout_marginLeft="3dip"
                             android:gravity="center_vertical"/>
-        
+
                         <TextView
                             android:id="@+id/history_max_size_label"
                             android:layout_width="wrap_content"
@@ -268,23 +335,23 @@
                             android:layout_toLeftOf="@id/history_max_size"
                             android:gravity="center_vertical"
                             android:text="@string/max_size_label"/>
-                                  
+
                         <ListView
                             android:id="@+id/history"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:layout_below="@id/history_enabled"/>
-        
+
                     </RelativeLayout>
-                
+
                 </LinearLayout>
             </ScrollView>
-            
+
             <ScrollView android:id="@+id/notes_tab"
                         android:orientation="vertical"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
-                        
+
                 <TextView android:id="@+id/notes"
                           android:autoLink="all"
                           android:clickable="false"
@@ -295,5 +362,5 @@
 
         </FrameLayout>
     </LinearLayout>
-    
+
 </TabHost>

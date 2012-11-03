@@ -52,6 +52,7 @@ import org.pwsafe.lib.file.PwsStorage;
 import org.pwsafe.lib.file.PwsStreamStorage;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
+import org.pwsafe.lib.file.PwsTimeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
@@ -205,6 +206,9 @@ public class PasswdFileData
     public final void addRecord(PwsRecord rec)
         throws PasswordSafeException
     {
+        // TODO: set creation times and update mod times
+        // TODO: password changes do not affect general mod time?
+        // TODO: add creation time if non-existent?
         if (itsPwsFile != null) {
             itsPwsFile.add(rec);
             indexRecords();
@@ -321,6 +325,12 @@ public class PasswdFileData
         return id.toString();
     }
 
+    /// Get the time the record was created
+    public final Date getCreationTime(PwsRecord rec)
+    {
+        return getDateField(rec, PwsRecordV3.CREATION_TIME);
+    }
+
     public final String getEmail(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.EMAIL);
@@ -339,6 +349,12 @@ public class PasswdFileData
     public final void setGroup(String str, PwsRecord rec)
     {
         setField(str, rec, PwsRecordV3.GROUP);
+    }
+
+    /// Get the time the record was last modified
+    public final Date getLastModTime(PwsRecord rec)
+    {
+        return getDateField(rec, PwsRecordV3.LAST_MOD_TIME);
     }
 
     public final String getNotes(PwsRecord rec)
@@ -394,9 +410,16 @@ public class PasswdFileData
         }
     }
 
-    public final String getPasswdExpiryTime(PwsRecord rec)
+    /// Get the time the password will expire in the record
+    public final Date getPasswdExpiryTime(PwsRecord rec)
     {
-        return getField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+        return getDateField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+    }
+
+    /// Get the time the password was last modified
+    public final Date getPasswdLastModTime(PwsRecord rec)
+    {
+        return getDateField(rec, PwsRecordV3.PASSWORD_MOD_TIME);
     }
 
     public final PasswdHistory getPasswdHistory(PwsRecord rec)
@@ -675,6 +698,17 @@ public class PasswdFileData
         return doGetFieldStr(rec, getVersionFieldId(fieldId));
     }
 
+    /// Get a field value as a Date
+    private final Date getDateField(PwsRecord rec, int fieldId)
+    {
+        Date date = null;
+        PwsField field = doGetField(rec, getVersionFieldId(fieldId));
+        if ((field != null) && (field instanceof PwsTimeField)) {
+            date = (Date)field.getValue();
+        }
+        return date;
+    }
+
     private final boolean hasField(PwsRecord rec, int fieldId)
     {
         return doGetField(rec, getVersionFieldId(fieldId)) != null;
@@ -741,6 +775,9 @@ public class PasswdFileData
             case PwsRecordV3.PROTECTED_ENTRY:
             case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
             case PwsRecordV3.PASSWORD_POLICY_NAME:
+            case PwsRecordV3.CREATION_TIME:
+            case PwsRecordV3.PASSWORD_MOD_TIME:
+            case PwsRecordV3.LAST_MOD_TIME:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -786,6 +823,9 @@ public class PasswdFileData
             case PwsRecordV3.PROTECTED_ENTRY:
             case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
             case PwsRecordV3.PASSWORD_POLICY_NAME:
+            case PwsRecordV3.CREATION_TIME:
+            case PwsRecordV3.PASSWORD_MOD_TIME:
+            case PwsRecordV3.LAST_MOD_TIME:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;

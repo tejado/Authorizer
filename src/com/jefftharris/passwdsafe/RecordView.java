@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.util.Date;
 import java.util.List;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -31,6 +32,7 @@ import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -603,7 +605,7 @@ public class RecordView extends AbstractRecordTabActivity
         tv.setHorizontallyScrolling(!isWordWrap);
         tv.setTypeface(
                        itsIsMonospace ? Typeface.MONOSPACE : Typeface.DEFAULT);
-   }
+    }
 
     private final TextView setText(int id, int rowId, String text)
     {
@@ -614,6 +616,19 @@ public class RecordView extends AbstractRecordTabActivity
         TextView tv = (TextView)findViewById(id);
         tv.setText(text);
         return (text == null) ? null : tv;
+    }
+
+    /// Set the contents of a text field with a date
+    private final TextView setDateText(int id, int rowId, Date date)
+    {
+        String str = null;
+        if (date != null) {
+            str = DateUtils.formatDateTime(this, date.getTime(),
+                                           DateUtils.FORMAT_SHOW_TIME |
+                                           DateUtils.FORMAT_SHOW_DATE |
+                                           DateUtils.FORMAT_SHOW_YEAR);
+        }
+        return setText(id, rowId, str);
     }
 
     private final void setVisibility(int id, boolean visible)
@@ -717,21 +732,26 @@ public class RecordView extends AbstractRecordTabActivity
 
         PwsRecord recForPassword = rec;
         int hiddenId = R.string.hidden_password_normal;
-        String passwdExpiry = null;
+        Date creationTime = null;
+        Date lastModTime = null;
         switch (passwdRec.getType()) {
         case NORMAL: {
-            passwdExpiry = fileData.getPasswdExpiryTime(rec);
+            creationTime = fileData.getCreationTime(rec);
+            lastModTime = fileData.getLastModTime(rec);
             break;
         }
         case ALIAS: {
             recForPassword = passwdRec.getRef();
             hiddenId = R.string.hidden_password_alias;
-            passwdExpiry = fileData.getPasswdExpiryTime(recForPassword);
+            creationTime = fileData.getCreationTime(recForPassword);
+            lastModTime = fileData.getLastModTime(recForPassword);
             break;
         }
         case SHORTCUT: {
             recForPassword = passwdRec.getRef();
             hiddenId = R.string.hidden_password_shortcut;
+            creationTime = fileData.getCreationTime(recForPassword);
+            lastModTime = fileData.getLastModTime(recForPassword);
             break;
         }
         }
@@ -758,7 +778,11 @@ public class RecordView extends AbstractRecordTabActivity
             registerForContextMenu(itsPasswordView);
 
         }
-        setText(R.id.expiration, R.id.expiration_row, passwdExpiry);
+
+        setVisibility(R.id.times_row,
+                      (creationTime != null) || (lastModTime != null));
+        setDateText(R.id.creation_time, R.id.creation_time_row, creationTime);
+        setDateText(R.id.last_mod_time, R.id.last_mod_time_row, lastModTime);
 
         ListView referencesView = (ListView)findViewById(R.id.references);
         referencesView.setOnItemClickListener(new OnItemClickListener()
@@ -840,6 +864,8 @@ public class RecordView extends AbstractRecordTabActivity
     {
         PasswdPolicy policy = null;
         String policyLoc = null;
+        Date passwdExpiry = null;
+        Date lastModTime = null;
         PasswdHistory history = null;
         switch (passwdRec.getType()) {
         case NORMAL: {
@@ -862,17 +888,30 @@ public class RecordView extends AbstractRecordTabActivity
                 policyLoc = getString(R.string.record);
             }
 
-            history = fileData.getPasswdHistory(passwdRec.getRecord());
+            PwsRecord rec = passwdRec.getRecord();
+            passwdExpiry = fileData.getPasswdExpiryTime(rec);
+            lastModTime = fileData.getPasswdLastModTime(rec);
+            history = fileData.getPasswdHistory(rec);
             break;
         }
         case ALIAS: {
-            history = fileData.getPasswdHistory(passwdRec.getRef());
+            PwsRecord recForPassword = passwdRec.getRef();
+            passwdExpiry = fileData.getPasswdExpiryTime(recForPassword);
+            lastModTime = fileData.getPasswdLastModTime(recForPassword);
+            history = fileData.getPasswdHistory(recForPassword);
             break;
         }
         case SHORTCUT: {
             break;
         }
         }
+
+        setVisibility(R.id.password_times_row,
+                      (passwdExpiry != null) || (lastModTime != null));
+        setDateText(R.id.expiration_time, R.id.expiration_time_row,
+                    passwdExpiry);
+        setDateText(R.id.password_mod_time, R.id.password_mod_time_row,
+                    lastModTime);
 
         boolean historyExists = (history != null);
         boolean historyEnabled = false;
