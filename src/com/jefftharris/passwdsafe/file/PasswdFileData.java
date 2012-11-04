@@ -468,8 +468,7 @@ public class PasswdFileData
     public final boolean isProtected(PwsRecord rec)
     {
         boolean prot = false;
-        PwsField field =
-            doGetField(rec, getVersionFieldId(PwsRecordV3.PROTECTED_ENTRY));
+        PwsField field = doGetRecField(rec, PwsRecordV3.PROTECTED_ENTRY);
         if (field != null) {
             byte[] value = field.getBytes();
             if ((value != null) && (value.length > 0)) {
@@ -698,24 +697,29 @@ public class PasswdFileData
         }
     }
 
+    /// Get a field value as a string
     private final String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
             return "";
         }
 
-        return doGetFieldStr(rec, getVersionFieldId(fieldId));
+        fieldId = getVersionFieldId(fieldId);
+        if (fieldId == FIELD_UNSUPPORTED) {
+            return "(unsupported)";
+        }
+        PwsField field = doGetField(rec, fieldId);
+        return (field == null) ? null : field.toString();
     }
 
     /// Get a field value as an 4 byte integer
     private final Integer getIntField(PwsRecord rec, int fieldId)
     {
         Integer val = null;
-        PwsField field = doGetField(rec, getVersionFieldId(fieldId));
+        PwsField field = doGetRecField(rec, fieldId);
         if ((field != null) && (field instanceof PwsIntegerField)) {
             val = (Integer)field.getValue();
         }
-
         return val;
     }
 
@@ -723,7 +727,7 @@ public class PasswdFileData
     private final Date getDateField(PwsRecord rec, int fieldId)
     {
         Date date = null;
-        PwsField field = doGetField(rec, getVersionFieldId(fieldId));
+        PwsField field = doGetRecField(rec, fieldId);
         if ((field != null) && (field instanceof PwsTimeField)) {
             date = (Date)field.getValue();
         }
@@ -732,7 +736,7 @@ public class PasswdFileData
 
     private final boolean hasField(PwsRecord rec, int fieldId)
     {
-        return doGetField(rec, getVersionFieldId(fieldId)) != null;
+        return doGetRecField(rec, fieldId) != null;
     }
 
     private final int getVersionFieldId(int fieldId)
@@ -1047,30 +1051,13 @@ public class PasswdFileData
         }
     }
 
-
-    private final String doGetFieldStr(PwsRecord rec, int fieldId)
+    /// Get a non-header record's field after translating its field identifier
+    private final PwsField doGetRecField(PwsRecord rec, int fieldId)
     {
-        switch (fieldId)
-        {
-        case FIELD_UNSUPPORTED:
-        {
-            return "(unsupported)";
-        }
-        case FIELD_NOT_PRESENT:
-        {
-            return null;
-        }
-        default:
-        {
-            PwsField field = rec.getField(fieldId);
-            if (field == null) {
-                return null;
-            }
-            return field.toString();
-        }
-        }
+        return doGetField(rec, getVersionFieldId(fieldId));
     }
 
+    /// Get a field from a record
     private static final PwsField doGetField(PwsRecord rec, int fieldId)
     {
         switch (fieldId)
