@@ -386,7 +386,6 @@ public class PasswdFileData
     {
         PasswdHistory history = getPasswdHistory(rec);
         if ((history != null) && !TextUtils.isEmpty(oldPasswd)) {
-            // TODO: use new date format
             Date passwdDate = getPasswdLastModTime(rec);
             if (passwdDate == null) {
                 passwdDate = getCreationTime(rec);

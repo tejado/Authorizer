@@ -17,6 +17,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 
@@ -623,10 +624,7 @@ public class RecordView extends AbstractRecordTabActivity
     {
         String str = null;
         if (date != null) {
-            str = DateUtils.formatDateTime(this, date.getTime(),
-                                           DateUtils.FORMAT_SHOW_TIME |
-                                           DateUtils.FORMAT_SHOW_DATE |
-                                           DateUtils.FORMAT_SHOW_YEAR);
+            str = Utils.formatDate(date, this);
         }
         return setText(id, rowId, str);
     }
