@@ -386,9 +386,12 @@ public class PasswdFileData
     {
         PasswdHistory history = getPasswdHistory(rec);
         if ((history != null) && !TextUtils.isEmpty(oldPasswd)) {
-            // TODO: use password mod time or creation time not now
             // TODO: use new date format
-            history.addPasswd(oldPasswd);
+            Date passwdDate = getPasswdLastModTime(rec);
+            if (passwdDate == null) {
+                passwdDate = getCreationTime(rec);
+            }
+            history.addPasswd(oldPasswd, passwdDate);
             setPasswdHistory(history, rec, false);
         }
         setField(newPasswd, rec, PwsRecordV3.PASSWORD);
