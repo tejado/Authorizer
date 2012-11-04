@@ -206,9 +206,6 @@ public class PasswdFileData
     public final void addRecord(PwsRecord rec)
         throws PasswordSafeException
     {
-        // TODO: set creation times and update mod times
-        // TODO: password changes do not affect general mod time?
-        // TODO: add creation time if non-existent?
         if (itsPwsFile != null) {
             itsPwsFile.add(rec);
             indexRecords();
@@ -389,8 +386,10 @@ public class PasswdFileData
     {
         PasswdHistory history = getPasswdHistory(rec);
         if ((history != null) && !TextUtils.isEmpty(oldPasswd)) {
+            // TODO: use password mod time or creation time not now
+            // TODO: use new date format
             history.addPasswd(oldPasswd);
-            setPasswdHistory(history, rec);
+            setPasswdHistory(history, rec, false);
         }
         setField(newPasswd, rec, PwsRecordV3.PASSWORD);
         // Update PasswdRecord and indexes if the record exists
@@ -435,10 +434,11 @@ public class PasswdFileData
         return null;
     }
 
-    public final void setPasswdHistory(PasswdHistory history, PwsRecord rec)
+    public final void setPasswdHistory(PasswdHistory history, PwsRecord rec,
+                                       boolean updateModTime)
     {
         setField((history == null) ? null : history.toString(),
-                 rec, PwsRecordV3.PASSWORD_HISTORY);
+                 rec, PwsRecordV3.PASSWORD_HISTORY, updateModTime);
     }
 
     /** Get the password policy contained in a record */
@@ -1066,6 +1066,12 @@ public class PasswdFileData
 
     private final void setField(Object val, PwsRecord rec, int fieldId)
     {
+        setField(val, rec, fieldId, true);
+    }
+
+    private final void setField(Object val, PwsRecord rec, int fieldId,
+                                boolean updateModTime)
+    {
         PwsField field = null;
         switch (itsPwsFile.getFileVersionMajor())
         {
@@ -1153,6 +1159,12 @@ public class PasswdFileData
 
         if (fieldId != FIELD_UNSUPPORTED) {
             setOrRemoveField(field, fieldId, rec);
+            // TODO: Update expiration times when password is changed - see CItemData::UpdatePassword
+            if (updateModTime && isV3() && itsPasswdRecords.containsKey(rec)) {
+                int modFieldId = (fieldId == PwsRecordV3.PASSWORD) ?
+                    PwsRecordV3.PASSWORD_MOD_TIME : PwsRecordV3.LAST_MOD_TIME;
+                rec.setField(new PwsTimeField(modFieldId, new Date()));
+            }
         }
     }
 

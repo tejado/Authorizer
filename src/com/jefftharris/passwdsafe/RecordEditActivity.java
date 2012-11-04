@@ -1040,11 +1040,11 @@ public class RecordEditActivity extends AbstractRecordActivity
                     if (itsHistory != null) {
                         itsHistory.adjustEntriesToMaxSize();
                     }
-                    fileData.setPasswdHistory(itsHistory, record);
+                    fileData.setPasswdHistory(itsHistory, record, true);
                 }
             } else {
                 if (currHistory != null) {
-                    fileData.setPasswdHistory(null, record);
+                    fileData.setPasswdHistory(null, record, true);
                 }
             }
         }
