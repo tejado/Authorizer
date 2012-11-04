@@ -42,6 +42,7 @@ import org.pwsafe.lib.file.PwsFileStorage;
 import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
+import org.pwsafe.lib.file.PwsIntegerField;
 import org.pwsafe.lib.file.PwsPasswdField;
 import org.pwsafe.lib.file.PwsPasswdUnicodeField;
 import org.pwsafe.lib.file.PwsRecord;
@@ -417,6 +418,12 @@ public class PasswdFileData
         return getDateField(rec, PwsRecordV3.PASSWORD_LIFETIME);
     }
 
+    /// Get the password expiration interval in days (null or 0 for not set)
+    public final Integer getPasswdExpiryInterval(PwsRecord rec)
+    {
+        return getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
+    }
+
     /// Get the time the password was last modified
     public final Date getPasswdLastModTime(PwsRecord rec)
     {
@@ -700,6 +707,18 @@ public class PasswdFileData
         return doGetFieldStr(rec, getVersionFieldId(fieldId));
     }
 
+    /// Get a field value as an 4 byte integer
+    private final Integer getIntField(PwsRecord rec, int fieldId)
+    {
+        Integer val = null;
+        PwsField field = doGetField(rec, getVersionFieldId(fieldId));
+        if ((field != null) && (field instanceof PwsIntegerField)) {
+            val = (Integer)field.getValue();
+        }
+
+        return val;
+    }
+
     /// Get a field value as a Date
     private final Date getDateField(PwsRecord rec, int fieldId)
     {
@@ -780,6 +799,7 @@ public class PasswdFileData
             case PwsRecordV3.CREATION_TIME:
             case PwsRecordV3.PASSWORD_MOD_TIME:
             case PwsRecordV3.LAST_MOD_TIME:
+            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -828,6 +848,7 @@ public class PasswdFileData
             case PwsRecordV3.CREATION_TIME:
             case PwsRecordV3.PASSWORD_MOD_TIME:
             case PwsRecordV3.LAST_MOD_TIME:
+            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;

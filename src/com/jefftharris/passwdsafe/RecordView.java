@@ -33,7 +33,6 @@ import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -863,6 +862,7 @@ public class RecordView extends AbstractRecordTabActivity
         PasswdPolicy policy = null;
         String policyLoc = null;
         Date passwdExpiry = null;
+        Integer passwdExpiryInt = null;
         Date lastModTime = null;
         PasswdHistory history = null;
         switch (passwdRec.getType()) {
@@ -888,6 +888,7 @@ public class RecordView extends AbstractRecordTabActivity
 
             PwsRecord rec = passwdRec.getRecord();
             passwdExpiry = fileData.getPasswdExpiryTime(rec);
+            passwdExpiryInt = fileData.getPasswdExpiryInterval(rec);
             lastModTime = fileData.getPasswdLastModTime(rec);
             history = fileData.getPasswdHistory(rec);
             break;
@@ -895,6 +896,7 @@ public class RecordView extends AbstractRecordTabActivity
         case ALIAS: {
             PwsRecord recForPassword = passwdRec.getRef();
             passwdExpiry = fileData.getPasswdExpiryTime(recForPassword);
+            passwdExpiryInt = fileData.getPasswdExpiryInterval(recForPassword);
             lastModTime = fileData.getPasswdLastModTime(recForPassword);
             history = fileData.getPasswdHistory(recForPassword);
             break;
@@ -904,12 +906,24 @@ public class RecordView extends AbstractRecordTabActivity
         }
         }
 
+        String expiryIntStr = null;
+        if (passwdExpiryInt != null) {
+            int val = passwdExpiryInt.intValue();
+            if (val != 0) {
+                expiryIntStr =
+                    getResources().getQuantityString(R.plurals.interval_days,
+                                                     val, val);
+            }
+        }
         setVisibility(R.id.password_times_row,
-                      (passwdExpiry != null) || (lastModTime != null));
+                      (passwdExpiry != null) || (lastModTime != null) ||
+                      (expiryIntStr != null));
         setDateText(R.id.expiration_time, R.id.expiration_time_row,
                     passwdExpiry);
         setDateText(R.id.password_mod_time, R.id.password_mod_time_row,
                     lastModTime);
+        setText(R.id.expiration_interval, R.id.expiration_interval_row,
+                expiryIntStr);
 
         boolean historyExists = (history != null);
         boolean historyEnabled = false;

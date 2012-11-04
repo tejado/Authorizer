@@ -124,7 +124,7 @@ public class PwsRecordV3 extends PwsRecord
     public static final int PASSWORD_POLICY = 16;
 
     /**
-     * History of recently used passwords.
+     * Password expiration interval
      */
     public static final int PASSWORD_EXPIRY_INTERVAL = 17;
 

@@ -97,6 +97,7 @@
     <string name="history">History</string>
     <string name="history_header">HISTORY</string>
     <string name="home">Home</string>
+    <string name="interval">Interval</string>
     <string name="invalid_file_name">Invalid file name</string>
     <string name="invalid_history_max_size">Invalid history maximum size</string>
     <string name="invalid_length">Invalid length</string>
@@ -212,6 +213,11 @@
     <plurals name="group_items">
         <item quantity="one">[One item]</item>
         <item quantity="other">[%d items]</item>
+    </plurals>
+
+    <plurals name="interval_days">
+        <item quantity="one">Daily</item>
+        <item quantity="other">%d days</item>
     </plurals>
 
     <!-- Order must match FileBackupPref enum values -->

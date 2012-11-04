@@ -5,7 +5,7 @@ Copyright (c) 2003-2012 Rony Shapiro <ronys@users.sourceforge.net>.
 All rights reserved. Use of the code is allowed under the Artistic
 License terms, as specified in the LICENSE file distributed with this
 code, or available from
-http://www.opensource.org/licenses/artistic-license-2.0.php 
+http://www.opensource.org/licenses/artistic-license-2.0.php
 
 
 1. Introduction: This document defines a file format for the secure
@@ -201,7 +201,7 @@ eight-byte hexadecimal ASCII string. Implementations SHOULD attempt to
 parse 8-byte long timestamps as a hexadecimal ASCII string
 representation of the timestamp value.
 
-[6] Text saved in the format: nnnnu..uh..h, where: 
+[6] Text saved in the format: nnnnu..uh..h, where:
     nnnn = 4 hexadecimal digits giving length of following user name field
     u..u = user name
     h..h = host computer name
@@ -241,9 +241,9 @@ the purpose or other practical use of the database. This field was
 introduced in format version 0x0302.
 
 [12] Specfic filters for this database.  This is the text equivalent to
-the XML export of the filters as defined by the filter schema. The text 
+the XML export of the filters as defined by the filter schema. The text
 'image' has no 'print formatting' e.g. tabs and carraige return/line feeds,
-since XML processing does not require this. This field was introduced in 
+since XML processing does not require this. This field was introduced in
 format version 0x0305.
 
 [13] Values marked 'Reserved' are know to have been used by customized
@@ -263,7 +263,7 @@ introduced in format version 0x0307.
 where:
      NN = 2 hexadecimal digits giving number of password policies in
     field (max. 255).
-     
+
    Each entry is of the form:
      LL = 2 hexadecimal digits giving length of the policy name in bytes
      xxx...xxx = The policy name (maximum 255 bytes)
@@ -285,7 +285,7 @@ where:
          symbols, or zero to specify the database default special symbol
          set.
     SSS...SSS = List of allowed symbols in this policy (maximum 255 bytes)
-    
+
 This field was introduced in format version 0x030A.
 
 [16] This fields contains the name of an empty group that cannot be constructed
@@ -317,7 +317,7 @@ URL                         0x0d        Text          Y              [10]
 Autotype                    0x0e        Text          Y              [11]
 Password History            0x0f        Text          Y              [12]
 Password Policy             0x10        Text          Y              [13]
-Password Expiry Interval    0x11        2 bytes       Y              [14]
+Password Expiry Interval    0x11        4 bytes       Y              [14]
 Run Command                 0x12        Text          Y
 Double-Click Action         0x13        2 bytes       Y              [15]
 EMail address               0x14        Text          Y              [16]
@@ -336,19 +336,19 @@ groups such as "Finance.credit cards.Visa", "Finance.credit
 cards.Mastercard", Finance.bank.web access", etc. Dots entered by the user
 should be "escaped" by the application.
 
-[3] If the entry is an alias, the password will be saved in a special form 
-of "[[uuidstr]]", where "uuidstr" is a 32-character representation of the 
+[3] If the entry is an alias, the password will be saved in a special form
+of "[[uuidstr]]", where "uuidstr" is a 32-character representation of the
 alias' associated base entry's UUID (field type 0x01).  This representation
-is the same as the standard 36-character string representation as defined in 
+is the same as the standard 36-character string representation as defined in
 RFC4122 but with the four hyphens removed. If an entry with this UUID is not
 in the database, this is treated just as an 'unusual' password.  The alias
 will only use its base's password entry when copying it to the clipboard or
 during Autotype.
 
-[4] If the entry is a shortcut, the password will be saved in a special form 
-of "[~uuidstr~]", where "uuidstr" is a 32-character representation of the 
+[4] If the entry is a shortcut, the password will be saved in a special form
+of "[~uuidstr~]", where "uuidstr" is a 32-character representation of the
 shortcut's associated base entry's UUID (field type 0x01).  This representation
-is the same as the standard 36-character string representation as defined in 
+is the same as the standard 36-character string representation as defined in
 RFC4122 but with the four hyphens removed. If an entry with this UUID is not
 in the database, this is treated just as an 'unusual' password. The shortcut
 will use all its base's data when used in any action.  It has no fields of
@@ -409,10 +409,10 @@ is mutually exclusive with the policy name field [0x18]. The format is:
     "ffffnnnllluuudddsss"
 where:
      ffff = 4 hexadecimal digits representing the following flags
-        UseLowercase        0x8000 
-        UseUppercase        0x4000 
-        UseDigits           0x2000 
-        UseSymbols          0x1000 
+        UseLowercase        0x8000
+        UseUppercase        0x4000
+        UseDigits           0x2000
+        UseSymbols          0x1000
         UseHexDigits        0x0800 (if set, then no other flags can be set)
         UseEasyVision       0x0400
         MakePronounceable   0x0200
