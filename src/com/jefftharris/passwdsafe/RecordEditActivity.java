@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -22,6 +23,7 @@ import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
 import com.jefftharris.passwdsafe.util.Pair;
+import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
@@ -51,6 +53,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -81,6 +84,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private List<PasswdPolicy> itsPolicies;
     private PasswdPolicy itsOrigPolicy;
     private PasswdPolicy itsCurrPolicy;
+    private PasswdExpiration itsOrigExpiry;
     private PasswdHistory itsHistory;
     private boolean itsIsV3 = false;
     private PasswdRecord.Type itsType = Type.NORMAL;
@@ -168,6 +172,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         initTypeAndPassword(fileData, passwdRecord);
         initGroup(fileData, passwdRecord, group);
         initPasswdPolicy(fileData, passwdRecord);
+        initPasswdExpiry(fileData, passwdRecord);
 
         if (itsIsV3) {
             TextView tv = (TextView)findViewById(R.id.history_max_size);
@@ -238,6 +243,8 @@ public class RecordEditActivity extends AbstractRecordActivity
         initProtViews(findViewById(R.id.policy_label));
         initProtViews(findViewById(R.id.policy_group));
         initProtViews(findViewById(R.id.policy_view));
+        initProtViews(findViewById(R.id.expire_label));
+        initProtViews(findViewById(R.id.expire_choice));
         initProtViews(findViewById(R.id.history_group));
         initProtViews(findViewById(R.id.notes_label));
         initProtViews(findViewById(R.id.notes));
@@ -890,6 +897,76 @@ public class RecordEditActivity extends AbstractRecordActivity
         editBtn.setVisibility(canEdit ? View.VISIBLE : View.GONE);
     }
 
+    /** Initialize password expiration fields */
+    private final void initPasswdExpiry(PasswdFileData fileData,
+                                        PasswdRecord passwdRecord)
+    {
+        // TODO: v2 support
+
+        if (passwdRecord == null) {
+            itsOrigExpiry = null;
+        } else {
+            PwsRecord rec = passwdRecord.getRecord();
+            Date expTime = fileData.getPasswdExpiryTime(rec);
+            Integer expInt = fileData.getPasswdExpiryInterval(rec);
+            if (expTime != null) {
+                boolean haveInt = (expInt != null);
+                itsOrigExpiry =
+                    new PasswdExpiration(expTime,
+                                         haveInt ? expInt.intValue() : 0,
+                                         haveInt);
+            }
+        }
+
+        Date expire;
+        int interval;
+        boolean reoccur;
+        int checkedId;
+        if (itsOrigExpiry == null) {
+            checkedId = R.id.expire_never;
+            expire = new Date();
+            interval = 30;
+            reoccur = false;
+        } else {
+            if ((itsOrigExpiry.itsInterval != 0) &&
+                itsOrigExpiry.itsIsReoccurring) {
+                checkedId = R.id.expire_interval;
+            } else {
+                checkedId = R.id.expire_date;
+            }
+            expire = itsOrigExpiry.itsExpiration;
+            interval = itsOrigExpiry.itsInterval;
+            reoccur = itsOrigExpiry.itsIsReoccurring;
+        }
+
+        setText(R.id.expire_date_val, Utils.formatDate(expire, this));
+        setText(R.id.expire_interval_val, Integer.toString(interval));
+        CheckBox cb = (CheckBox)findViewById(R.id.expire_interval_reoccur);
+        cb.setChecked(reoccur);
+
+        RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
+        group.check(checkedId);
+        updatePasswdExpiryChoice(checkedId);
+
+        group.setOnCheckedChangeListener(
+            new RadioGroup.OnCheckedChangeListener()
+            {
+                public void onCheckedChanged(RadioGroup group, int checkedId)
+                {
+                    updatePasswdExpiryChoice(checkedId);
+                }
+            });
+    }
+
+    /** Update fields based on the password expiration choice changing */
+    private final void updatePasswdExpiryChoice(int checkedId)
+    {
+        setVisibility(R.id.expire_date_fields,
+                      checkedId == R.id.expire_date);
+        setVisibility(R.id.expire_interval_fields,
+                      checkedId == R.id.expire_interval);
+    }
+
     /**
      * Update the view when the history changes
      */
@@ -1336,6 +1413,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
             }
 
+            // TODO: expiration validations
+
             return super.doValidation();
         }
     }
@@ -1371,6 +1450,25 @@ public class RecordEditActivity extends AbstractRecordActivity
         {
             return itsTitle.hashCode() ^ itsGroup.hashCode() ^
             itsUser.hashCode();
+        }
+    }
+
+    /**
+     * The PasswdExpiration class contains the password expiration options for a
+     * record
+     */
+    private static class PasswdExpiration
+    {
+        public final Date itsExpiration;
+        public final int itsInterval;
+        public final boolean itsIsReoccurring;
+
+        /** Constructor */
+        public PasswdExpiration(Date date, int interval, boolean reoccur)
+        {
+            itsExpiration = date;
+            itsInterval = interval;
+            itsIsReoccurring = reoccur;
         }
     }
 }
