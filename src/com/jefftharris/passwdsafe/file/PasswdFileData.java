@@ -395,6 +395,16 @@ public class PasswdFileData
             setPasswdHistory(history, rec, false);
         }
         setField(newPasswd, rec, PwsRecordV3.PASSWORD);
+
+        Integer expInterval = getPasswdExpiryInterval(rec);
+        if ((expInterval != null) && (expInterval.intValue() > 0)) {
+            long exp = System.currentTimeMillis();
+            exp += (long)expInterval.intValue() * 86400 * 1000;
+            setField(new Date(exp), rec, PwsRecordV3.PASSWORD_LIFETIME, false);
+
+            // TODO: if pw expiration manually set, update after this field
+        }
+
         // Update PasswdRecord and indexes if the record exists
         PasswdRecord passwdRec = getPasswdRecord(rec);
         if (passwdRec != null) {
@@ -1121,6 +1131,13 @@ public class PasswdFileData
                 }
                 break;
             }
+            case PwsRecordV3.PASSWORD_LIFETIME: {
+                Date d = (Date)val;
+                if ((d != null) && (d.getTime() != 0)) {
+                    field = new PwsTimeField(fieldId, d);
+                }
+                break;
+            }
             default:
             {
                 fieldId = FIELD_UNSUPPORTED;
@@ -1169,7 +1186,6 @@ public class PasswdFileData
 
         if (fieldId != FIELD_UNSUPPORTED) {
             setOrRemoveField(field, fieldId, rec);
-            // TODO: Update expiration times when password is changed - see CItemData::UpdatePassword
             if (updateModTime && isV3() && itsPasswdRecords.containsKey(rec)) {
                 int modFieldId = (fieldId == PwsRecordV3.PASSWORD) ?
                     PwsRecordV3.PASSWORD_MOD_TIME : PwsRecordV3.LAST_MOD_TIME;
