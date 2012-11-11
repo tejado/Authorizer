@@ -890,7 +890,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
                 if (((e instanceof IOException) &&
-                     e.getMessage().equals("Invalid password")) ||
+                     TextUtils.equals(e.getMessage(), "Invalid password")) ||
                     (e instanceof InvalidPassphraseException))
                     PasswdSafeApp.showFatalMsg(
                         getString(R.string.invalid_password), PasswdSafe.this);
