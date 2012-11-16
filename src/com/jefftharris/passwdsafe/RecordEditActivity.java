@@ -575,12 +575,33 @@ public class RecordEditActivity extends AbstractRecordActivity
             {
                 public void onClick(View v)
                 {
-                    startActivityForResult(
+                    Intent intent =
                         new Intent(PasswdSafeApp.CHOOSE_RECORD_INTENT,
                                    getIntent().getData(),
                                    RecordEditActivity.this,
-                                   RecordSelectionActivity.class),
-                        RECORD_SELECTION_REQUEST);
+                                   RecordSelectionActivity.class);
+                    // Do not allow mixed alias and shortcut references to a
+                    // record to work around a bug in Password Safe that does
+                    // not allow both
+                    switch (itsType) {
+                    case NORMAL: {
+                        break;
+                    }
+                    case ALIAS: {
+                        intent.putExtra(
+                            RecordSelectionActivity.FILTER_NO_SHORTCUT, true);
+                        break;
+                    }
+                    case SHORTCUT: {
+                        intent.putExtra(
+                            RecordSelectionActivity.FILTER_NO_ALIAS, true);
+                        break;
+                    }
+                    }
+
+                    // TODO: changing type needs to clear chosen item
+                    startActivityForResult(intent,
+                                           RECORD_SELECTION_REQUEST);
                 }
             });
         } else {
@@ -665,6 +686,11 @@ public class RecordEditActivity extends AbstractRecordActivity
         setVisibility(R.id.history_group_sep, itsTypeHasNormalPassword);
         setVisibility(R.id.history_group, itsTypeHasNormalPassword);
         itsValidator.validate();
+
+        if (!init) {
+            // Clear link on type change in case it is no longer valid
+            setLinkRef(null, null);
+        }
     }
 
     private void setLinkRef(PwsRecord ref, PasswdFileData fileData)

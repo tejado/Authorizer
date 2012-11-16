@@ -21,6 +21,7 @@ import java.util.regex.PatternSyntaxException;
 import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -55,13 +56,18 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected static final String USERNAME = "username";
     protected static final String ICON = "icon";
 
-    private static final String BUNDLE_SEARCH_QUERY =
-        "passwdsafe.searchQuery";
+    private static final String BUNDLE_FILTER_QUERY =
+        "passwdsafe.filterQuery";
+    private static final String BUNDLE_FILTER_OPTS =
+        "passwdsafe.filterOptions";
     private static final String BUNDLE_CURR_GROUPS =
         "passwdsafe.currGroups";
 
+    /** File data may have been modified */
     protected static final int MOD_DATA           = 1 << 0;
+    /** Group may have been modified */
     protected static final int MOD_GROUP          = 1 << 1;
+    /** Search may have been modified */
     protected static final int MOD_SEARCH         = 1 << 2;
 
     private GroupNode itsRootNode = null;
@@ -75,7 +81,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected final ArrayList<HashMap<String, Object>> itsListData =
         new ArrayList<HashMap<String, Object>>();
 
-    private Pattern itsSearchQuery = null;
+    private RecordFilter itsFilter = null;
     private static final String QUERY_MATCH = "";
     private String QUERY_MATCH_TITLE;
     private String QUERY_MATCH_USERNAME;
@@ -97,7 +103,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         {
             public final void onClick(View v)
             {
-                setSearchQuery(null);
+                setRecordFilter(null);
             }
         });
 
@@ -110,16 +116,19 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             }
         });
 
-        String query = null;
+        String filterQuery = null;
+        int filterOpts = RecordFilter.OPTS_DEFAULT;
         if (savedInstanceState != null) {
-            query = savedInstanceState.getString(BUNDLE_SEARCH_QUERY);
+            filterQuery = savedInstanceState.getString(BUNDLE_FILTER_QUERY);
+            filterOpts = savedInstanceState.getInt(BUNDLE_FILTER_OPTS,
+                                                   RecordFilter.OPTS_DEFAULT);
             ArrayList<String> currGroups =
                 savedInstanceState.getStringArrayList(BUNDLE_CURR_GROUPS);
             if (currGroups != null) {
                 itsCurrGroups = new ArrayList<String>(currGroups);
             }
         }
-        setSearchQuery(query);
+        setRecordFilter(filterQuery, filterOpts);
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
@@ -149,7 +158,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             intent.getAction().equals(Intent.ACTION_SEARCH)) {
             query = intent.getStringExtra(SearchManager.QUERY);
         }
-        setSearchQuery(query);
+        setRecordFilter(query);
     }
 
 
@@ -160,11 +169,16 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-        String query = null;
-        if (itsSearchQuery != null) {
-            query = itsSearchQuery.pattern();
+        String filterQuery = null;
+        int filterOpts = RecordFilter.OPTS_DEFAULT;
+        if (itsFilter != null) {
+            if (itsFilter.itsSearchQuery != null) {
+                filterQuery = itsFilter.itsSearchQuery.pattern();
+            }
+            filterOpts = itsFilter.itsOptions;
         }
-        outState.putString(BUNDLE_SEARCH_QUERY, query);
+        outState.putString(BUNDLE_FILTER_QUERY, filterQuery);
+        outState.putInt(BUNDLE_FILTER_OPTS, filterOpts);
         outState.putStringArrayList(BUNDLE_CURR_GROUPS, itsCurrGroups);
     }
 
@@ -329,7 +343,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
         String[] from;
         int[] to;
-        if (itsSearchQuery == null) {
+        if (!hasFilterSearchQuery()) {
             from = new String[] { TITLE, USERNAME, ICON };
             to = new int[] { android.R.id.text1, android.R.id.text2,
                              R.id.icon };
@@ -488,9 +502,18 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     }
 
 
-    private final void setSearchQuery(String query)
+    /** Set the filter to match on various fields */
+    protected final void setRecordFilter(String query)
     {
-        itsSearchQuery = null;
+        setRecordFilter(query, RecordFilter.OPTS_DEFAULT);
+    }
+
+
+    /** Set the record filter options */
+    protected final void setRecordFilter(String query, int options)
+    {
+        itsFilter = null;
+        Pattern queryPattern = null;
         if ((query != null) && (query.length() != 0)) {
             if (QUERY_MATCH_TITLE == null) {
                 QUERY_MATCH_TITLE = getString(R.string.title);
@@ -509,17 +532,21 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                 if (!itsIsSearchRegex) {
                     flags |= Pattern.LITERAL;
                 }
-                itsSearchQuery = Pattern.compile(query, flags);
+                queryPattern = Pattern.compile(query, flags);
             } catch(PatternSyntaxException e) {
             }
         }
+        if ((queryPattern != null) ||
+            (options != RecordFilter.OPTS_DEFAULT)) {
+            itsFilter = new RecordFilter(queryPattern, options);
+        }
 
         View panel = findViewById(R.id.query_panel);
-        if (itsSearchQuery != null) {
+        if (hasFilterSearchQuery()) {
             panel.setVisibility(View.VISIBLE);
             TextView tv = (TextView)findViewById(R.id.query);
             tv.setText(getString(R.string.query_label,
-                                 itsSearchQuery.pattern()));
+                                 itsFilter.itsSearchQuery.pattern()));
         } else {
             panel.setVisibility(View.GONE);
         }
@@ -528,40 +555,83 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     }
 
 
+    /** Does the record filter have a search query */
+    private final boolean hasFilterSearchQuery()
+    {
+        return (itsFilter != null) && (itsFilter.itsSearchQuery != null);
+    }
+
+
+    /**
+     * Filter a record
+     * @return A non-null string if the record matches the filter; null if it
+     * does not
+     */
     private final String filterRecord(PwsRecord rec, PasswdFileData fileData)
     {
-        if (itsSearchQuery == null) {
+        if (itsFilter == null) {
             return QUERY_MATCH;
         }
 
-        if (filterField(fileData.getTitle(rec))) {
-            return QUERY_MATCH_TITLE;
+        String queryMatch = null;
+        if (itsFilter.itsSearchQuery != null) {
+            if (filterField(fileData.getTitle(rec))) {
+                queryMatch = QUERY_MATCH_TITLE;
+            } else if (filterField(fileData.getUsername(rec))) {
+                queryMatch = QUERY_MATCH_USERNAME;
+            } else if (filterField(fileData.getURL(rec))) {
+                queryMatch = QUERY_MATCH_URL;
+            } else if (filterField(fileData.getEmail(rec))) {
+                queryMatch = QUERY_MATCH_EMAIL;
+            } else if (filterField(fileData.getNotes(rec))) {
+                queryMatch = QUERY_MATCH_NOTES;
+            }
+        } else {
+            queryMatch = QUERY_MATCH;
         }
 
-        if (filterField(fileData.getUsername(rec))) {
-            return QUERY_MATCH_USERNAME;
+        if ((queryMatch != null) &&
+            (itsFilter.itsOptions != RecordFilter.OPTS_DEFAULT)) {
+            PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+            if (passwdRec != null) {
+                for (PwsRecord ref: passwdRec.getRefsToRecord()) {
+                    PasswdRecord passwdRef = fileData.getPasswdRecord(ref);
+                    if (passwdRef == null) {
+                        continue;
+                    }
+                    switch (passwdRef.getType()) {
+                    case NORMAL: {
+                        break;
+                    }
+                    case ALIAS: {
+                        if (itsFilter.hasOptions(RecordFilter.OPTS_NO_ALIAS)) {
+                            queryMatch = null;
+                        }
+                        break;
+                    }
+                    case SHORTCUT: {
+                        if (itsFilter.hasOptions(
+                                RecordFilter.OPTS_NO_SHORTCUT)) {
+                            queryMatch = null;
+                        }
+                        break;
+                    }
+                    }
+                    if (queryMatch == null) {
+                        break;
+                    }
+                }
+            }
         }
 
-        if (filterField(fileData.getURL(rec))) {
-            return QUERY_MATCH_URL;
-        }
-
-        if (filterField(fileData.getEmail(rec))) {
-            return QUERY_MATCH_EMAIL;
-        }
-
-        if (filterField(fileData.getNotes(rec))) {
-            return QUERY_MATCH_NOTES;
-        }
-
-        return null;
+        return queryMatch;
     }
 
 
     private final boolean filterField(String field)
     {
         if (field != null) {
-            Matcher m = itsSearchQuery.matcher(field);
+            Matcher m = itsFilter.itsSearchQuery.matcher(field);
             return m.find();
         } else {
             return false;
@@ -649,6 +719,36 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
     }
 
+
+    /** A filter for records */
+    protected static final class RecordFilter
+    {
+        /** Default options to match */
+        public static final int OPTS_DEFAULT =          0;
+        /** Record can not have an alias referencing it */
+        public static final int OPTS_NO_ALIAS =         1 << 0;
+        /** Record can not have a shortcut referencing it */
+        public static final int OPTS_NO_SHORTCUT =      1 << 1;
+
+        /** Regex to match on various fields */
+        public final Pattern itsSearchQuery;
+
+        /** Filter options */
+        public final int itsOptions;
+
+        /** Constructor */
+        public RecordFilter(Pattern query, int opts)
+        {
+            itsSearchQuery = query;
+            itsOptions = opts;
+        }
+
+        /** Does the filter have the given options */
+        public final boolean hasOptions(int opts)
+        {
+            return (itsOptions & opts) != 0;
+        }
+    }
 
     protected static final class MatchPwsRecord
     {
