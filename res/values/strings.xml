@@ -30,6 +30,7 @@
     <string name="cannot_delete_record">Cannot delete record - %1$s"</string>
     <string name="content_file">Content File</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
+    <string name="copy_clipboard_error">Error copying to the clipboard.  The error may be due to a known error in Samsung devices.</string>
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
     <string name="copy_trace_and_close">Copy Trace and Close</string>

@@ -383,9 +383,13 @@ public class PasswdSafeApp extends Application
 
     public static void copyToClipboard(String str, Context ctx)
     {
-        ClipboardManager clipMgr = (ClipboardManager)
-            ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-        clipMgr.setText(str);
+        try {
+            ClipboardManager clipMgr = (ClipboardManager)
+                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipMgr.setText(str);
+        } catch (Throwable e) {
+            showErrorMsg(ctx.getString(R.string.copy_clipboard_error), ctx);
+        }
     }
 
     public static void showFatalMsg(Throwable t, Activity activity)
