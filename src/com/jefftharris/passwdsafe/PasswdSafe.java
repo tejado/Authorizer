@@ -893,7 +893,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                      TextUtils.equals(e.getMessage(), "Invalid password")) ||
                     (e instanceof InvalidPassphraseException))
                     PasswdSafeApp.showFatalMsg(
-                        getString(R.string.invalid_password), PasswdSafe.this);
+                        getString(R.string.invalid_password), PasswdSafe.this,
+                        false);
                 else
                     PasswdSafeApp.showFatalMsg(e, PasswdSafe.this);
             }

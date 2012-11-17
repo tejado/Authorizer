@@ -390,18 +390,34 @@ public class PasswdSafeApp extends Application
 
     public static void showFatalMsg(Throwable t, Activity activity)
     {
-        showFatalMsg(t, t.toString(), activity);
+        showFatalMsg(t, t.toString(), activity, true);
     }
 
-    public static void showFatalMsg(String msg, final Activity activity)
+    public static void showFatalMsg(String msg, Activity activity)
     {
-        showFatalMsg(null, msg, activity);
+        showFatalMsg(null, msg, activity, true);
     }
 
-    public static void showFatalMsg(Throwable t, String msg,
-                                    final Activity activity)
+    public static void showFatalMsg(String msg,
+                                    Activity activity,
+                                    boolean copyTrace)
     {
-        if (t != null) {
+        showFatalMsg(null, msg, activity, copyTrace);
+    }
+
+    public static void showFatalMsg(Throwable t,
+                                    String msg,
+                                    Activity activity)
+    {
+        showFatalMsg(t, msg, activity, true);
+    }
+
+    public static void showFatalMsg(Throwable t,
+                                    String msg,
+                                    final Activity activity,
+                                    boolean copyTrace)
+    {
+        if (copyTrace && (t != null)) {
             StringWriter writer = new StringWriter();
             t.printStackTrace(new PrintWriter(writer));
             String trace = writer.toString();
@@ -429,7 +445,9 @@ public class PasswdSafeApp extends Application
                   activity.getString(R.string.error))
         .setMessage(msg)
         .setCancelable(false)
-        .setPositiveButton(R.string.copy_trace_and_close, dlgClick)
+        .setPositiveButton(
+             copyTrace ? R.string.copy_trace_and_close : R.string.close,
+             dlgClick)
         .setOnCancelListener(dlgClick);
         dlg.show();
     }
