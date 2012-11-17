@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.file;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -188,7 +189,7 @@ public class PasswdRecord
             sb.append('-');
             sb.append(passwd, 22, 22 + 12);
             sb.append('}');
-            ref = fileData.getRecord(sb.toString().toLowerCase());
+            ref = fileData.getRecord(sb.toString().toLowerCase(Locale.US));
             for (int i = 0; i < sb.length(); ++i) {
                 sb.setCharAt(i, '\0');
             }

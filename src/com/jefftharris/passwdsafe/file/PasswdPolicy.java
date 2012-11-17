@@ -42,7 +42,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     public static final String SYMBOLS_PRONOUNCE = "@&(#!|$+";
 
     public static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
-    public static final String UPPER_CHARS = LOWER_CHARS.toUpperCase();
+    public static final String UPPER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String DIGITS = "0123456789";
     public static final String HEX_DIGITS = DIGITS + "abcdef";
     public static final String EASY_LOWER_CHARS = "abcdefghijkmnopqrstuvwxyz";
