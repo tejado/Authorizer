@@ -30,7 +30,7 @@
     <string name="cannot_delete_record">Impossible de supprimer l\'entrée - %1$s"</string>
     <string name="content_file">Contenu du fichier</string>
     <string name="copy_clipboard">Copier dans le Presse-papiers</string>
-    <string name="copy_clipboard_error">Erreur de copie dans le presse papier. L\'erreur peut être due à une erreur connue dans les appareils Samsung.</string>
+    <string name="copy_clipboard_error">Erreur de copie dans le presse papier. Elle peut être due à une erreur propre aux appareils Samsung.</string>
     <string name="copy_notes">Copier les notes</string>
     <string name="copy_password">Copier le mot de passe</string>
     <string name="copy_trace_and_close">Copier et fermer</string>
