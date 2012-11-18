@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -912,7 +913,8 @@ public class PasswdFileData
             {
             case PwsRecordV3.HEADER_VERSION:
             {
-                return String.format("%d.%02d", 3, getHdrMinorVersion(rec));
+                return String.format(Locale.US, "%d.%02d",
+                                     3, getHdrMinorVersion(rec));
             }
             case PwsRecordV3.HEADER_LAST_SAVE_TIME:
             {
@@ -1325,7 +1327,8 @@ public class PasswdFileData
         }
 
         if (backupPref != FileBackupPref.BACKUP_NONE) {
-            SimpleDateFormat bakTime = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            SimpleDateFormat bakTime = new SimpleDateFormat("yyyyMMdd_HHmmss",
+                                                            Locale.US);
             StringBuilder bakName = new StringBuilder(fileName);
             bakName.append("_");
             bakName.append(bakTime.format(new Date()));

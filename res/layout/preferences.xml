@@ -1,82 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:key="top_prefs">
-    <PreferenceScreen android:title="@string/file_settings"
-                      android:key="fileOptions">
-        <EditTextPreference android:name="FileDir Pref"
-                            android:title="@string/directory_for_files"
-                            android:summary="/sdcard"
-                            android:defaultValue="/sdcard"
-                            android:key="fileDirPref"/>
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:key="top_prefs">
 
-        <ListPreference android:name="defaultFile Pref"
-                        android:title="@string/default_file_to_open"
-                        android:key="defFilePref"/>
+    <PreferenceScreen
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:key="fileOptions"
+        android:title="@string/file_settings">
 
-        <ListPreference android:name="fileTimeout Pref"
-                        android:title="@string/file_close_timeout"
-                        android:key="fileCloseTimeoutPref"/>
+        <EditTextPreference
+            android:name="FileDir Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="/sdcard"
+            android:key="fileDirPref"
+            android:summary="/sdcard"
+            android:title="@string/directory_for_files"/>
 
-        <CheckBoxPreference android:name="fileCloseScreenOff Pref"
-                            android:title="@string/close_file_screen_off"
-                            android:key="fileCloseScreenOffPref"
-                            android:defaultValue="false"/>
+        <ListPreference
+            android:name="defaultFile Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:key="defFilePref"
+            android:title="@string/default_file_to_open"/>
 
-        <ListPreference android:name="fileBackup Pref"
-                        android:title="@string/file_backups"
-                        android:key="fileBackupPref"/>
+        <ListPreference
+            android:name="fileTimeout Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:key="fileCloseTimeoutPref"
+            android:title="@string/file_close_timeout"/>
 
-        <CheckBoxPreference android:name="showBackupFiles Pref"
-                            android:title="@string/show_backup_files"
-                            android:key="showBackupFilesPref"
-                            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:name="fileCloseScreenOff Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:key="fileCloseScreenOffPref"
+            android:title="@string/close_file_screen_off"/>
 
-        <CheckBoxPreference android:name="fileCloseClearClipboard Pref"
-                            android:title="@string/clear_clipboard_on_close"
-                            android:key="fileCloseClearClipboardPref"
-                            android:defaultValue="true"/>
+        <ListPreference
+            android:name="fileBackup Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:key="fileBackupPref"
+            android:title="@string/file_backups"/>
+
+        <CheckBoxPreference
+            android:name="showBackupFiles Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:key="showBackupFilesPref"
+            android:title="@string/show_backup_files"/>
+
+        <CheckBoxPreference
+            android:name="fileCloseClearClipboard Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="true"
+            android:key="fileCloseClearClipboardPref"
+            android:title="@string/clear_clipboard_on_close"/>
+
     </PreferenceScreen>
 
-    <PreferenceScreen android:title="@string/password_settings"
-                      android:key="passwordOptions">
-        <ListPreference android:name="passwordEncoding Pref"
-                        android:title="@string/file_password_encoding"
-                        android:key="passwordEncodingPref"/>
+    <PreferenceScreen
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:key="passwordOptions"
+        android:title="@string/password_settings">
+
+        <ListPreference
+            android:name="passwordEncoding Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:key="passwordEncodingPref"
+            android:title="@string/file_password_encoding"/>
 
         <Preference
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:selectable="false"
             android:summary="@string/password_gen_prefs_moved"
             android:title="@string/password_generation"/>
+
     </PreferenceScreen>
 
-    <PreferenceScreen android:title="@string/record_settings"
-                        android:key="recordOptions">
-        <CheckBoxPreference android:name="sortCaseSensitive Pref"
-                            android:title="@string/case_sensitive_sorting"
-                            android:key="sortCaseSensitivePref"
-                            android:defaultValue="true"/>
+    <PreferenceScreen
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:key="recordOptions"
+        android:title="@string/record_settings">
 
-        <CheckBoxPreference android:name="groupRecords Pref"
-                            android:title="@string/group_records"
-                            android:key="groupRecordsPref"
-                            android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:name="sortCaseSensitive Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="true"
+            android:key="sortCaseSensitivePref"
+            android:title="@string/case_sensitive_sorting"/>
+
+        <CheckBoxPreference
+            android:name="groupRecords Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="true"
+            android:key="groupRecordsPref"
+            android:title="@string/group_records"/>
+
     </PreferenceScreen>
 
-    <PreferenceScreen android:title="@string/search_settings"
-                        android:key="searchOptions">
-        <CheckBoxPreference android:name="searchCaseSensitive Pref"
-                            android:title="@string/case_sensitive"
-                            android:key="searchCaseSensitivePref"
-                            android:defaultValue="false"/>
+    <PreferenceScreen
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:key="searchOptions"
+        android:title="@string/search_settings">
 
-        <CheckBoxPreference android:name="searchRegex Pref"
-                            android:title="@string/regular_expression"
-                            android:summary="@string/regular_expression_summary"
-                            android:key="searchRegexPref"
-                            android:defaultValue="false"/>
+        <CheckBoxPreference
+            android:name="searchCaseSensitive Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:key="searchCaseSensitivePref"
+            android:title="@string/case_sensitive"/>
+
+        <CheckBoxPreference
+            android:name="searchRegex Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:key="searchRegexPref"
+            android:summary="@string/regular_expression_summary"
+            android:title="@string/regular_expression"/>
+
     </PreferenceScreen>
 
-    <ListPreference android:name="fontSize Pref"
-                    android:title="@string/font_size"
-                    android:key="fontSizePref"/>
+    <ListPreference
+        android:name="fontSize Pref"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:key="fontSizePref"
+        android:title="@string/font_size"/>
+
 </PreferenceScreen>

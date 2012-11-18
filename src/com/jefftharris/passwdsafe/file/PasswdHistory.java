@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class PasswdHistory
 {
@@ -168,13 +169,14 @@ public class PasswdHistory
     public String toString()
     {
         StringBuilder strbld = new StringBuilder();
-        String str = String.format("%1d%02x%02x", isEnabled() ? 1 : 0,
+        String str = String.format(Locale.US, "%1d%02x%02x",
+                                   isEnabled() ? 1 : 0,
                                    itsMaxSize, itsPasswds.size());
         strbld.append(str);
 
         for (Entry entry : itsPasswds) {
             String passwd = entry.getPasswd();
-            str = String.format("%08x%04x",
+            str = String.format(Locale.US, "%08x%04x",
                                 (int)(entry.getDate().getTime() / 1000),
                                 passwd.length());
             strbld.append(str);
