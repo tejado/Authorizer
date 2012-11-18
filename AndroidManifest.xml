@@ -6,7 +6,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.jefftharris.passwdsafe"
-      android:versionName="3.14.1" android:versionCode="31401"
+      android:versionName="3.14.2" android:versionCode="31402"
       android:installLocation="auto">
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
