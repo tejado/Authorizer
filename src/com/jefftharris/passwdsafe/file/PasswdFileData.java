@@ -398,13 +398,13 @@ public class PasswdFileData
         setField(newPasswd, rec, PwsRecordV3.PASSWORD);
 
         Integer expInterval = getPasswdExpiryInterval(rec);
+        Date expTime = null;
         if ((expInterval != null) && (expInterval.intValue() > 0)) {
             long exp = System.currentTimeMillis();
             exp += (long)expInterval.intValue() * 86400 * 1000;
-            setField(new Date(exp), rec, PwsRecordV3.PASSWORD_LIFETIME, false);
-
-            // TODO: if pw expiration manually set, update after this field
+            expTime = new Date(exp);
         }
+        setField(expTime, rec, PwsRecordV3.PASSWORD_LIFETIME, false);
 
         // Update PasswdRecord and indexes if the record exists
         PasswdRecord passwdRec = getPasswdRecord(rec);
@@ -429,10 +429,23 @@ public class PasswdFileData
         return getDateField(rec, PwsRecordV3.PASSWORD_LIFETIME);
     }
 
+    /// Set the time the password will expire in the record
+    public final void setPasswdExpiryTime(Date expiry, PwsRecord rec)
+    {
+        setField(expiry, rec, PwsRecordV3.PASSWORD_LIFETIME);
+    }
+
     /// Get the password expiration interval in days (null or 0 for not set)
     public final Integer getPasswdExpiryInterval(PwsRecord rec)
     {
         return getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
+    }
+
+    /// Set the password expiration interval in days (0 to remove)
+    public final void setPasswdExpiryInterval(int interval, PwsRecord rec)
+    {
+        setField((interval != 0) ? interval : null, rec,
+                 PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
     }
 
     /// Get the time the password was last modified
@@ -1137,6 +1150,13 @@ public class PasswdFileData
                 Date d = (Date)val;
                 if ((d != null) && (d.getTime() != 0)) {
                     field = new PwsTimeField(fieldId, d);
+                }
+                break;
+            }
+            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL: {
+                Integer ival = (Integer)val;
+                if ((ival != null) && (ival.intValue() != 0)) {
+                    field = new PwsIntegerField(fieldId, ival);
                 }
                 break;
             }

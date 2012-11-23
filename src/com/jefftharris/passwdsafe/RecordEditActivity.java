@@ -85,6 +85,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private PasswdPolicy itsOrigPolicy;
     private PasswdPolicy itsCurrPolicy;
     private PasswdExpiration itsOrigExpiry;
+    private Date itsExpiryDate;
     private PasswdHistory itsHistory;
     private boolean itsIsV3 = false;
     private PasswdRecord.Type itsType = Type.NORMAL;
@@ -606,7 +607,6 @@ public class RecordEditActivity extends AbstractRecordActivity
                     }
                     }
 
-                    // TODO: changing type needs to clear chosen item
                     startActivityForResult(intent,
                                            RECORD_SELECTION_REQUEST);
                 }
@@ -944,13 +944,13 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         }
 
-        Date expire;
+        itsExpiryDate = null;
         int interval;
         boolean reoccur;
         int checkedId;
         if (itsOrigExpiry == null) {
             checkedId = R.id.expire_never;
-            expire = new Date();
+            itsExpiryDate = new Date();
             interval = 30;
             reoccur = false;
         } else {
@@ -960,12 +960,14 @@ public class RecordEditActivity extends AbstractRecordActivity
             } else {
                 checkedId = R.id.expire_date;
             }
-            expire = itsOrigExpiry.itsExpiration;
+            itsExpiryDate = itsOrigExpiry.itsExpiration;
             interval = itsOrigExpiry.itsInterval;
             reoccur = itsOrigExpiry.itsIsReoccurring;
         }
 
-        setText(R.id.expire_date_val, Utils.formatDate(expire, this));
+        // TODO: support choose button
+
+        setText(R.id.expire_date_val, Utils.formatDate(itsExpiryDate, this));
         setText(R.id.expire_interval_val, Integer.toString(interval));
         CheckBox cb = (CheckBox)findViewById(R.id.expire_interval_reoccur);
         cb.setChecked(reoccur);
@@ -1178,6 +1180,23 @@ public class RecordEditActivity extends AbstractRecordActivity
             fileData.setPassword(currPasswd, newPasswd, record);
         }
 
+        // Update expiration dates after password so changes in expiration
+        // overwrite basic expiration updates when the password changes.
+        Pair<Boolean, PasswdExpiration> updateExpiry = getUpdatedExpiry();
+        if (updateExpiry.first) {
+            PasswdExpiration expiry = updateExpiry.second;
+            Date expiryTime = null;
+            int expiryInterval = 0;
+            if (expiry != null) {
+                expiryTime = expiry.itsExpiration;
+                if (expiry.itsIsReoccurring) {
+                    expiryInterval = expiry.itsInterval;
+                }
+            }
+            fileData.setPasswdExpiryTime(expiryTime, record);
+            fileData.setPasswdExpiryInterval(expiryInterval, record);
+        }
+
         try {
             if (newRecord) {
                 fileData.addRecord(record);
@@ -1193,6 +1212,81 @@ public class RecordEditActivity extends AbstractRecordActivity
         } else {
             finish();
         }
+    }
+
+    /** Get the password expiration that may have been updated */
+    private final Pair<Boolean, PasswdExpiration> getUpdatedExpiry()
+    {
+        // Get the updated expiration
+        PasswdExpiration updatedExpiry;
+        RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
+        switch (group.getCheckedRadioButtonId()) {
+        case R.id.expire_never:
+        default: {
+            updatedExpiry = null;
+            break;
+        }
+        case R.id.expire_date: {
+            updatedExpiry = new PasswdExpiration(itsExpiryDate, 0, false);
+            break;
+        }
+        case R.id.expire_interval: {
+            int interval;
+            try {
+                interval = Integer.valueOf(
+                    GuiUtils.getTextViewStr(this, R.id.expire_interval_val));
+            } catch (NumberFormatException e) {
+                interval = 30;
+            }
+            long exp = System.currentTimeMillis();
+            exp += (long)interval * 86400 * 1000;
+            Date expiry = new Date(exp);
+
+            CheckBox cb = (CheckBox)findViewById(R.id.expire_interval_reoccur);
+            if (cb.isChecked()) {
+                updatedExpiry = new PasswdExpiration(expiry, interval, true);
+            } else {
+                updatedExpiry = new PasswdExpiration(expiry, 0, false);
+            }
+            break;
+        }
+        }
+
+        // Determine if it has changed
+        boolean changed = false;
+        do {
+            if (((itsOrigExpiry == null) && (updatedExpiry != null)) ||
+                ((itsOrigExpiry != null) && (updatedExpiry == null))) {
+                changed = true;
+                break;
+            }
+
+            if ((itsOrigExpiry == null) && (updatedExpiry == null)) {
+                break;
+            }
+
+            if ((itsOrigExpiry.itsExpiration == null) ||
+                (updatedExpiry.itsExpiration == null)) {
+                changed = true;
+                break;
+            }
+
+            if (!itsOrigExpiry.itsExpiration.equals(
+                     updatedExpiry.itsExpiration)) {
+                changed = true;
+                break;
+            }
+
+            if ((itsOrigExpiry.itsInterval != updatedExpiry.itsInterval) ||
+                (itsOrigExpiry.itsIsReoccurring !=
+                 updatedExpiry.itsIsReoccurring)) {
+                changed = true;
+                break;
+            }
+
+        } while(false);
+
+        return new Pair<Boolean, PasswdExpiration>(changed, updatedExpiry);
     }
 
     /** Get the password policy that may have been updated */

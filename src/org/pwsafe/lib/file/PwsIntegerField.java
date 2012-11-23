@@ -38,6 +38,12 @@ public class PwsIntegerField extends PwsField
 		super( type, Integer.valueOf( Util.getIntFromByteArray(value, 0) ) );
 	}
 
+	/** Constructor */
+	public PwsIntegerField(int type, Integer value)
+	{
+	    super(type, value);
+	}
+
 	/**
 	 * Constructs the object
 	 *
