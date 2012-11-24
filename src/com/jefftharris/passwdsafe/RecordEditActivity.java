@@ -1290,6 +1290,9 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
         if (newPasswd != null) {
             fileData.setPassword(currPasswd, newPasswd, record);
+            if (!itsTypeHasNormalPassword) {
+                fileData.clearPasswdLastModTime(record);
+            }
         }
 
         if (itsIsV3) {
@@ -1331,7 +1334,6 @@ public class RecordEditActivity extends AbstractRecordActivity
     /** Get the password expiration that may have been updated */
     private final Pair<Boolean, PasswdExpiration> getUpdatedExpiry()
     {
-        // TODO: password mod time shouldn't be present for an alias/shortcut
         // Get the updated expiration
         PasswdExpiration updatedExpiry = null;
         switch (itsType) {

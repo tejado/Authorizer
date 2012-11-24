@@ -454,6 +454,12 @@ public class PasswdFileData
         return getDateField(rec, PwsRecordV3.PASSWORD_MOD_TIME);
     }
 
+    /** Clear the time the password was last modified */
+    public final void clearPasswdLastModTime(PwsRecord rec)
+    {
+        setField(null, rec, PwsRecordV3.PASSWORD_MOD_TIME);
+    }
+
     public final PasswdHistory getPasswdHistory(PwsRecord rec)
     {
         String fieldStr = getField(rec, PwsRecordV3.PASSWORD_HISTORY);
