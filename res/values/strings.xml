@@ -40,7 +40,6 @@
     <string name="custom_symbol_not_alphanum">Custom symbols must not be alphanumeric or whitespace</string>
     <string name="database_policy">Database Policy - %s</string>
     <string name="database_version_label">Database version:</string>
-    <string name="date">Date</string>
     <string name="days">Days</string>
     <string name="default_file_to_open">Default file to open</string>
     <string name="default_policy">Default Policy</string>
@@ -119,7 +118,6 @@
     <string name="modified">Modified</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
-    <string name="never">Never</string>
     <string name="new_entry">New Entry</string>
     <string name="new_file">New File</string>
     <string name="new_file_not_supp_uri">New file not supported for URI %1$s</string>
@@ -261,7 +259,14 @@
         <item>Shortcut</item>
     </string-array>
 
-    <!-- Order must match constants in PolicyPolicyActivity -->
+    <!-- Order must match constants in PasswdExpiration.Type -->
+    <string-array name="expire_type">
+        <item>Never</item>
+        <item>Date</item>
+        <item>Interval</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdPolicy.Type -->
     <string-array name="policy_type">
         <item>Normal</item>
         <item>Easy-to-read</item>

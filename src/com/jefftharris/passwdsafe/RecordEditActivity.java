@@ -58,7 +58,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -93,6 +92,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private PasswdPolicy itsOrigPolicy;
     private PasswdPolicy itsCurrPolicy;
     private PasswdExpiration itsOrigExpiry;
+    private PasswdExpiration.Type itsExpiryType = PasswdExpiration.Type.NEVER;
     private Calendar itsExpiryDate;
     private PasswdHistory itsHistory;
     private boolean itsIsV3 = false;
@@ -254,6 +254,8 @@ public class RecordEditActivity extends AbstractRecordActivity
         initProtViews(findViewById(R.id.policy_view));
         initProtViews(findViewById(R.id.expire_label));
         initProtViews(findViewById(R.id.expire_choice));
+        initProtViews(findViewById(R.id.expire_date_fields));
+        initProtViews(findViewById(R.id.expire_interval_fields));
         initProtViews(findViewById(R.id.history_group));
         initProtViews(findViewById(R.id.notes_label));
         initProtViews(findViewById(R.id.notes));
@@ -749,6 +751,11 @@ public class RecordEditActivity extends AbstractRecordActivity
         setVisibility(R.id.policy_label, itsTypeHasNormalPassword);
         setVisibility(R.id.policy_group, itsTypeHasNormalPassword);
         setVisibility(R.id.policy_view, itsTypeHasNormalPassword);
+        setVisibility(R.id.expire_sep, itsTypeHasNormalPassword);
+        setVisibility(R.id.expire_label, itsTypeHasNormalPassword);
+        setVisibility(R.id.expire_choice, itsTypeHasNormalPassword);
+        setVisibility(R.id.expire_date_fields, itsTypeHasNormalPassword);
+        setVisibility(R.id.expire_interval_fields, itsTypeHasNormalPassword);
         setVisibility(R.id.history_group_sep, itsTypeHasNormalPassword);
         setVisibility(R.id.history_group, itsTypeHasNormalPassword);
         itsValidator.validate();
@@ -990,6 +997,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             setVisibility(R.id.expire_sep, false);
             setVisibility(R.id.expire_label, false);
             setVisibility(R.id.expire_choice, false);
+            setVisibility(R.id.expire_date_fields, false);
+            setVisibility(R.id.expire_interval_fields, false);
             return;
         }
 
@@ -1011,19 +1020,19 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsExpiryDate = Calendar.getInstance();
         int interval;
         boolean recurring;
-        int checkedId;
+        PasswdExpiration.Type expireType;
         if (itsOrigExpiry == null) {
-            checkedId = R.id.expire_never;
+            expireType = PasswdExpiration.Type.NEVER;
             interval = PasswdExpiration.INTERVAL_DEFAULT;
             recurring = false;
         } else {
             if ((itsOrigExpiry.itsInterval != 0) &&
                 itsOrigExpiry.itsIsRecurring) {
-                checkedId = R.id.expire_interval;
+                expireType = PasswdExpiration.Type.INTERVAL;
                 interval = itsOrigExpiry.itsInterval;
                 recurring = true;
             } else {
-                checkedId = R.id.expire_date;
+                expireType = PasswdExpiration.Type.DATE;
                 interval = PasswdExpiration.INTERVAL_DEFAULT;
                 recurring = false;
             }
@@ -1056,27 +1065,35 @@ public class RecordEditActivity extends AbstractRecordActivity
         CheckBox cb = (CheckBox)findViewById(R.id.expire_interval_recurring);
         cb.setChecked(recurring);
 
-        RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
-        group.check(checkedId);
-        updatePasswdExpiryChoice(checkedId);
-
-        group.setOnCheckedChangeListener(
-            new RadioGroup.OnCheckedChangeListener()
+        Spinner expireTypeSpin = (Spinner)findViewById(R.id.expire_choice);
+        expireTypeSpin.setSelection(expireType.itsStrIdx);
+        updatePasswdExpiryChoice(expireType);
+        expireTypeSpin.setOnItemSelectedListener(new OnItemSelectedListener()
+        {
+            public void onItemSelected(AdapterView<?> parent, View arg1,
+                                       int position, long id)
             {
-                public void onCheckedChanged(RadioGroup group, int checkedId)
-                {
-                    updatePasswdExpiryChoice(checkedId);
-                }
-            });
+                updatePasswdExpiryChoice(
+                    PasswdExpiration.Type.fromStrIdx(position));
+
+            }
+
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+                updatePasswdExpiryChoice(PasswdExpiration.Type.NEVER);
+            }
+        });
     }
 
     /** Update fields based on the password expiration choice changing */
-    private final void updatePasswdExpiryChoice(int checkedId)
+    private final void updatePasswdExpiryChoice(PasswdExpiration.Type type)
     {
+        itsExpiryType = type;
         setVisibility(R.id.expire_date_fields,
-                      checkedId == R.id.expire_date);
+                      itsExpiryType == PasswdExpiration.Type.DATE);
         setVisibility(R.id.expire_interval_fields,
-                      checkedId == R.id.expire_interval);
+                      itsExpiryType == PasswdExpiration.Type.INTERVAL);
+        itsValidator.validate();
     }
 
     /** Update fields after the password expiration date changes */
@@ -1314,35 +1331,45 @@ public class RecordEditActivity extends AbstractRecordActivity
     /** Get the password expiration that may have been updated */
     private final Pair<Boolean, PasswdExpiration> getUpdatedExpiry()
     {
+        // TODO: password mod time shouldn't be present for an alias/shortcut
         // Get the updated expiration
-        PasswdExpiration updatedExpiry;
-        RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
-        switch (group.getCheckedRadioButtonId()) {
-        case R.id.expire_never:
-        default: {
-            updatedExpiry = null;
-            break;
-        }
-        case R.id.expire_date: {
-            updatedExpiry = new PasswdExpiration(itsExpiryDate.getTime(),
-                                                 0, false);
-            break;
-        }
-        case R.id.expire_interval: {
-            int interval =
-                getIntegerTextField(R.id.expire_interval_val,
-                                    PasswdExpiration.INTERVAL_DEFAULT);
-            long exp = System.currentTimeMillis();
-            exp += (long)interval * 86400 * 1000;
-            Date expiry = new Date(exp);
-
-            CheckBox cb =
-                (CheckBox)findViewById(R.id.expire_interval_recurring);
-            if (cb.isChecked()) {
-                updatedExpiry = new PasswdExpiration(expiry, interval, true);
-            } else {
-                updatedExpiry = new PasswdExpiration(expiry, 0, false);
+        PasswdExpiration updatedExpiry = null;
+        switch (itsType) {
+        case NORMAL: {
+            switch (itsExpiryType) {
+            case NEVER: {
+                updatedExpiry = null;
+                break;
             }
+            case DATE: {
+                updatedExpiry = new PasswdExpiration(itsExpiryDate.getTime(),
+                                                     0, false);
+                break;
+            }
+            case INTERVAL: {
+                int interval =
+                    getIntegerTextField(R.id.expire_interval_val,
+                                        PasswdExpiration.INTERVAL_DEFAULT);
+                long exp = System.currentTimeMillis();
+                exp += (long)interval * 86400 * 1000;
+                Date expiry = new Date(exp);
+
+                CheckBox cb =
+                    (CheckBox)findViewById(R.id.expire_interval_recurring);
+                if (cb.isChecked()) {
+                    updatedExpiry = new PasswdExpiration(expiry, interval,
+                                                         true);
+                } else {
+                    updatedExpiry = new PasswdExpiration(expiry, 0, false);
+                }
+                break;
+            }
+            }
+            break;
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            updatedExpiry = null;
             break;
         }
         }
@@ -1635,12 +1662,11 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             if (itsIsV3) {
-                RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
-                switch (group.getCheckedRadioButtonId()) {
-                case R.id.expire_never: {
+                switch (itsExpiryType) {
+                case NEVER: {
                     break;
                 }
-                case R.id.expire_date: {
+                case DATE: {
                     long now = System.currentTimeMillis();
                     long expiry = itsExpiryDate.getTimeInMillis();
                     if (expiry < now) {
@@ -1648,7 +1674,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                     }
                     break;
                 }
-                case R.id.expire_interval: {
+                case INTERVAL: {
                     int interval = getIntegerTextField(R.id.expire_interval_val,
                                                        -1);
                     if ((interval < PasswdExpiration.VALID_INTERVAL_MIN) ||
@@ -1705,6 +1731,35 @@ public class RecordEditActivity extends AbstractRecordActivity
      */
     private static class PasswdExpiration
     {
+        /** Expiration type */
+        public enum Type
+        {
+            NEVER       (0),
+            DATE        (1),
+            INTERVAL    (2);
+
+            /** Constructor */
+            private Type(int strIdx)
+            {
+                itsStrIdx = strIdx;
+            }
+
+            /** Index of the type in the string array of choices */
+            public final int itsStrIdx;
+
+            /** Get the type from the string index */
+            public static Type fromStrIdx(int idx)
+            {
+                for (Type t: values()) {
+                    if (idx == t.itsStrIdx) {
+                        return t;
+                    }
+                }
+                return NEVER;
+            }
+        }
+
+
         public static final int VALID_INTERVAL_MIN = 1;
         public static final int VALID_INTERVAL_MAX = 3650;
         public static final int INTERVAL_DEFAULT = 30;

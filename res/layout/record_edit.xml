@@ -242,82 +242,61 @@
                 android:text="@string/password_expiration"
                 android:textSize="24sp"/>
 
-            <RadioGroup
+            <Spinner
                 android:id="@+id/expire_choice"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:entries="@array/expire_type"
+                android:prompt="@string/choose_type"/>
 
-                <RadioButton
-                    android:id="@+id/expire_never"
-                    android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/expire_date_fields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/expire_date_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <Button
+                    android:id="@+id/expire_date_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/expire_interval_fields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/expire_interval_val"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/never"/>
+                    android:inputType="number"/>
 
-                <RadioButton
-                    android:id="@+id/expire_date"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/expire_interval_days"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/date"/>
+                    android:layout_toRightOf="@id/expire_interval_val"
+                    android:layout_alignBaseline="@id/expire_interval_val"
+                    android:text="@string/days"/>
 
-                <LinearLayout
-                    android:id="@+id/expire_date_fields"
-                    android:layout_width="match_parent"
+                <CheckBox
+                    android:id="@+id/expire_interval_recurring"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="40dp">
+                    android:layout_alignBaseline="@id/expire_interval_val"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@id/expire_interval_days"
+                    android:text="@string/recurring"/>
 
-                    <Button
-                        android:id="@+id/expire_date_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <Button
-                        android:id="@+id/expire_date_date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-                <RadioButton
-                    android:id="@+id/expire_interval"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/interval"/>
-
-                <RelativeLayout
-                    android:id="@+id/expire_interval_fields"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingLeft="40dp">
-
-                    <EditText
-                        android:id="@+id/expire_interval_val"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:inputType="number"/>
-
-                    <TextView
-                        android:id="@+id/expire_interval_days"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@id/expire_interval_val"
-                        android:layout_alignBaseline="@id/expire_interval_val"
-                        android:text="@string/days"/>
-
-                    <CheckBox
-                        android:id="@+id/expire_interval_recurring"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBaseline="@id/expire_interval_val"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginLeft="16dp"
-                        android:layout_toRightOf="@id/expire_interval_days"
-                        android:text="@string/recurring"/>
-
-                </RelativeLayout>
-
-            </RadioGroup>
+            </RelativeLayout>
 
             <View
                 android:id="@+id/history_group_sep"

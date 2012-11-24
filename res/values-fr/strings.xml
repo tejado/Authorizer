@@ -40,7 +40,6 @@
     <string name="custom_symbol_not_alphanum">Les symboles personnalisés ne doivent pas contenir d\'espaces, ni de caractères alphanumériques</string>
     <string name="database_policy">Base de données stratégie - %s</string>
     <string name="database_version_label">Version base de données:</string>
-    <string name="date">Date</string>
     <string name="days">Journées</string>
     <string name="default_file_to_open">Fichier à ouvrir par défaut</string>
     <string name="default_policy">Stratégie par défaut</string>
@@ -119,7 +118,6 @@
     <string name="modified">Modifié</string>
     <string name="n_a">N/A</string>
     <string name="name">Nom</string>
-    <string name="never">Jamais</string>
     <string name="new_entry">Nouvelle entrée</string>
     <string name="new_file">Nouveau fichier</string>
     <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
@@ -261,7 +259,14 @@
         <item>Raccourci</item>
     </string-array>
 
-    <!-- Order must match constants in PolicyPolicyActivity -->
+    <!-- Order must match constants in PasswdExpiration.Type -->
+    <string-array name="expire_type">
+        <item>Jamais</item>
+        <item>Date</item>
+        <item>Intervalle</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdPolicy.Type -->
     <string-array name="policy_type">
         <item>Normal</item>
         <item>Facile-à-lire</item>
