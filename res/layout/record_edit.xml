@@ -239,7 +239,7 @@
                 android:id="@+id/expire_label"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Password Expiration"
+                android:text="@string/password_expiration"
                 android:textSize="24sp"/>
 
             <RadioGroup
@@ -250,14 +250,20 @@
 
                 <RadioButton
                     android:id="@+id/expire_never"
-                    android:text="Never"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/never"/>
 
                 <RadioButton
                     android:id="@+id/expire_date"
-                    android:text="Date"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/date"/>
 
                 <LinearLayout
                     android:id="@+id/expire_date_fields"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:paddingLeft="40dp">
 
@@ -274,7 +280,9 @@
 
                 <RadioButton
                     android:id="@+id/expire_interval"
-                    android:text="Interval"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/interval"/>
 
                 <RelativeLayout
                     android:id="@+id/expire_interval_fields"
@@ -287,8 +295,7 @@
                         android:id="@+id/expire_interval_val"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
-                        android:text="30"/>
+                        android:inputType="number"/>
 
                     <TextView
                         android:id="@+id/expire_interval_days"
@@ -296,17 +303,17 @@
                         android:layout_height="wrap_content"
                         android:layout_toRightOf="@id/expire_interval_val"
                         android:layout_alignBaseline="@id/expire_interval_val"
-                        android:text="Days"/>
+                        android:text="@string/days"/>
 
                     <CheckBox
-                        android:id="@+id/expire_interval_reoccur"
+                        android:id="@+id/expire_interval_recurring"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@id/expire_interval_val"
                         android:layout_alignParentRight="true"
                         android:layout_marginLeft="16dp"
                         android:layout_toRightOf="@id/expire_interval_days"
-                        android:text="Reoccurring"/>
+                        android:text="@string/recurring"/>
 
                 </RelativeLayout>
 

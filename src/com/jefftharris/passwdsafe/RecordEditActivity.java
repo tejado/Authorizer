@@ -1005,22 +1005,22 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         itsExpiryDate = Calendar.getInstance();
         int interval;
-        boolean reoccur;
+        boolean recurring;
         int checkedId;
         if (itsOrigExpiry == null) {
             checkedId = R.id.expire_never;
             interval = 30;
-            reoccur = false;
+            recurring = false;
         } else {
             if ((itsOrigExpiry.itsInterval != 0) &&
-                itsOrigExpiry.itsIsReoccurring) {
+                itsOrigExpiry.itsIsRecurring) {
                 checkedId = R.id.expire_interval;
                 interval = itsOrigExpiry.itsInterval;
-                reoccur = true;
+                recurring = true;
             } else {
                 checkedId = R.id.expire_date;
                 interval = 30;
-                reoccur = false;
+                recurring = false;
             }
             itsExpiryDate.setTime(itsOrigExpiry.itsExpiration);
         }
@@ -1048,8 +1048,8 @@ public class RecordEditActivity extends AbstractRecordActivity
         updatePasswdExpiryDate();
 
         setText(R.id.expire_interval_val, Integer.toString(interval));
-        CheckBox cb = (CheckBox)findViewById(R.id.expire_interval_reoccur);
-        cb.setChecked(reoccur);
+        CheckBox cb = (CheckBox)findViewById(R.id.expire_interval_recurring);
+        cb.setChecked(recurring);
 
         RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
         group.check(checkedId);
@@ -1278,7 +1278,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             int expiryInterval = 0;
             if (expiry != null) {
                 expiryTime = expiry.itsExpiration;
-                if (expiry.itsIsReoccurring) {
+                if (expiry.itsIsRecurring) {
                     expiryInterval = expiry.itsInterval;
                 }
             }
@@ -1332,7 +1332,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             exp += (long)interval * 86400 * 1000;
             Date expiry = new Date(exp);
 
-            CheckBox cb = (CheckBox)findViewById(R.id.expire_interval_reoccur);
+            CheckBox cb =
+                (CheckBox)findViewById(R.id.expire_interval_recurring);
             if (cb.isChecked()) {
                 updatedExpiry = new PasswdExpiration(expiry, interval, true);
             } else {
@@ -1368,8 +1369,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             if ((itsOrigExpiry.itsInterval != updatedExpiry.itsInterval) ||
-                (itsOrigExpiry.itsIsReoccurring !=
-                 updatedExpiry.itsIsReoccurring)) {
+                (itsOrigExpiry.itsIsRecurring !=
+                 updatedExpiry.itsIsRecurring)) {
                 changed = true;
                 break;
             }
@@ -1671,14 +1672,14 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         public final Date itsExpiration;
         public final int itsInterval;
-        public final boolean itsIsReoccurring;
+        public final boolean itsIsRecurring;
 
         /** Constructor */
-        public PasswdExpiration(Date date, int interval, boolean reoccur)
+        public PasswdExpiration(Date date, int interval, boolean recurring)
         {
             itsExpiration = date;
             itsInterval = interval;
-            itsIsReoccurring = reoccur;
+            itsIsRecurring = recurring;
         }
     }
 }

@@ -40,6 +40,8 @@
     <string name="custom_symbol_not_alphanum">Les symboles personnalisés ne doivent pas contenir d\'espaces, ni de caractères alphanumériques</string>
     <string name="database_policy">Base de données stratégie - %s</string>
     <string name="database_version_label">Version base de données:</string>
+    <string name="date">Date</string>
+    <string name="days">Journées</string>
     <string name="default_file_to_open">Fichier à ouvrir par défaut</string>
     <string name="default_policy">Stratégie par défaut</string>
     <string name="delete">Supprimer</string>
@@ -117,6 +119,7 @@
     <string name="modified">Modifié</string>
     <string name="n_a">N/A</string>
     <string name="name">Nom</string>
+    <string name="never">Jamais</string>
     <string name="new_entry">Nouvelle entrée</string>
     <string name="new_file">Nouveau fichier</string>
     <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
@@ -140,6 +143,7 @@
     <string name="password">Mot de passe</string>
     <string name="password_and_confirm">Mot de passe /\nConfirmation</string>
     <string name="password_encoding_label">Encodage mot de passe:</string>
+    <string name="password_expiration">Expiration mot de passe</string>
     <string name="password_file">Fichier mot de passe</string>
     <string name="password_generation">Composition des mots de passe</string>
     <string name="password_gen_prefs_moved">Options de génération de mot de passe déplacées. Ouvrez le fichier et modifiez la stratégie par défaut.</string>
@@ -179,6 +183,7 @@
     <string name="regular_expression">Expression régulière</string>
     <string name="regular_expression_summary">Utiliser une expression régulière pour la recherche au lieu d\'une sous-chaîne</string>
     <string name="remove">Supprimer</string>
+    <string name="recurring">Périodique</string>
     <string name="saving_file">Enregistrement %s…</string>
     <string name="search">Rechercher</string>
     <string name="search_hint">Rechercher PasswdSafe</string>
