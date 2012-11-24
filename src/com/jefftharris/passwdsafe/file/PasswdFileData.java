@@ -324,7 +324,7 @@ public class PasswdFileData
         return id.toString();
     }
 
-    /// Get the time the record was created
+    /** Get the time the record was created */
     public final Date getCreationTime(PwsRecord rec)
     {
         return getDateField(rec, PwsRecordV3.CREATION_TIME);
@@ -350,7 +350,7 @@ public class PasswdFileData
         setField(str, rec, PwsRecordV3.GROUP);
     }
 
-    /// Get the time the record was last modified
+    /** Get the time the record was last modified */
     public final Date getLastModTime(PwsRecord rec)
     {
         return getDateField(rec, PwsRecordV3.LAST_MOD_TIME);
@@ -423,32 +423,32 @@ public class PasswdFileData
         }
     }
 
-    /// Get the time the password will expire in the record
+    /** Get the time the password will expire in the record */
     public final Date getPasswdExpiryTime(PwsRecord rec)
     {
         return getDateField(rec, PwsRecordV3.PASSWORD_LIFETIME);
     }
 
-    /// Set the time the password will expire in the record
+    /** Set the time the password will expire in the record */
     public final void setPasswdExpiryTime(Date expiry, PwsRecord rec)
     {
         setField(expiry, rec, PwsRecordV3.PASSWORD_LIFETIME);
     }
 
-    /// Get the password expiration interval in days (null or 0 for not set)
+    /** Get the password expiration interval in days (null or 0 for not set) */
     public final Integer getPasswdExpiryInterval(PwsRecord rec)
     {
         return getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
     }
 
-    /// Set the password expiration interval in days (0 to remove)
+    /** Set the password expiration interval in days (0 to remove) */
     public final void setPasswdExpiryInterval(int interval, PwsRecord rec)
     {
         setField((interval != 0) ? interval : null, rec,
                  PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
     }
 
-    /// Get the time the password was last modified
+    /** Get the time the password was last modified */
     public final Date getPasswdLastModTime(PwsRecord rec)
     {
         return getDateField(rec, PwsRecordV3.PASSWORD_MOD_TIME);
@@ -727,7 +727,7 @@ public class PasswdFileData
         }
     }
 
-    /// Get a field value as a string
+    /** Get a field value as a string */
     private final String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
@@ -742,7 +742,7 @@ public class PasswdFileData
         return (field == null) ? null : field.toString();
     }
 
-    /// Get a field value as an 4 byte integer
+    /** Get a field value as an 4 byte integer */
     private final Integer getIntField(PwsRecord rec, int fieldId)
     {
         Integer val = null;
@@ -753,7 +753,7 @@ public class PasswdFileData
         return val;
     }
 
-    /// Get a field value as a Date
+    /** Get a field value as a Date */
     private final Date getDateField(PwsRecord rec, int fieldId)
     {
         Date date = null;
@@ -1082,13 +1082,14 @@ public class PasswdFileData
         }
     }
 
-    /// Get a non-header record's field after translating its field identifier
+    /** Get a non-header record's field after translating its field
+     * identifier */
     private final PwsField doGetRecField(PwsRecord rec, int fieldId)
     {
         return doGetField(rec, getVersionFieldId(fieldId));
     }
 
-    /// Get a field from a record
+    /** Get a field from a record */
     private static final PwsField doGetField(PwsRecord rec, int fieldId)
     {
         switch (fieldId)
