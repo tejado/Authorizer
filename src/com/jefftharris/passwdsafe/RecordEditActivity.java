@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -29,11 +30,14 @@ import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.format.DateFormat;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -50,12 +54,14 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 public class RecordEditActivity extends AbstractRecordActivity
@@ -65,6 +71,8 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private static final int DIALOG_NEW_GROUP = MAX_DIALOG + 1;
     private static final int DIALOG_EDIT_POLICY = MAX_DIALOG + 2;
+    private static final int DIALOG_PASSWD_EXPIRY_TIME = MAX_DIALOG + 3;
+    private static final int DIALOG_PASSWD_EXPIRY_DATE = MAX_DIALOG + 4;
 
     private static final int MENU_TOGGLE_PASSWORD = 3;
     private static final int MENU_GENERATE_PASSWORD = 4;
@@ -85,7 +93,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private PasswdPolicy itsOrigPolicy;
     private PasswdPolicy itsCurrPolicy;
     private PasswdExpiration itsOrigExpiry;
-    private Date itsExpiryDate;
+    private Calendar itsExpiryDate;
     private PasswdHistory itsHistory;
     private boolean itsIsV3 = false;
     private PasswdRecord.Type itsType = Type.NORMAL;
@@ -350,6 +358,44 @@ public class RecordEditActivity extends AbstractRecordActivity
             dialog = itsPolicyEditDialog.create(itsCurrPolicy, this);
             break;
         }
+        case DIALOG_PASSWD_EXPIRY_TIME: {
+            dialog = new TimePickerDialog(
+                this,
+                new TimePickerDialog.OnTimeSetListener()
+                {
+                    public void onTimeSet(TimePicker view,
+                                          int hourOfDay, int minute)
+                    {
+                        itsExpiryDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        itsExpiryDate.set(Calendar.MINUTE, minute);
+                        updatePasswdExpiryDate();
+                    }
+                },
+                itsExpiryDate.get(Calendar.HOUR_OF_DAY),
+                itsExpiryDate.get(Calendar.MINUTE),
+                DateFormat.is24HourFormat(this));
+            break;
+        }
+        case DIALOG_PASSWD_EXPIRY_DATE: {
+            dialog = new DatePickerDialog(
+                this,
+                new DatePickerDialog.OnDateSetListener()
+                {
+                    public void onDateSet(DatePicker view,
+                                          int year, int monthOfYear,
+                                          int dayOfMonth)
+                    {
+                        itsExpiryDate.set(Calendar.YEAR, year);
+                        itsExpiryDate.set(Calendar.MONTH, monthOfYear);
+                        itsExpiryDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        updatePasswdExpiryDate();
+                    }
+                },
+                itsExpiryDate.get(Calendar.YEAR),
+                itsExpiryDate.get(Calendar.MONTH),
+                itsExpiryDate.get(Calendar.DAY_OF_MONTH));
+            break;
+        }
         default:
         {
             dialog = super.onCreateDialog(id);
@@ -368,6 +414,19 @@ public class RecordEditActivity extends AbstractRecordActivity
         switch (id) {
         case DIALOG_EDIT_POLICY: {
             itsPolicyEditDialog.reset();
+            break;
+        }
+        case DIALOG_PASSWD_EXPIRY_TIME: {
+            TimePickerDialog dlg = (TimePickerDialog)dialog;
+            dlg.updateTime(itsExpiryDate.get(Calendar.HOUR_OF_DAY),
+                           itsExpiryDate.get(Calendar.MINUTE));
+            break;
+        }
+        case DIALOG_PASSWD_EXPIRY_DATE: {
+            DatePickerDialog dlg = (DatePickerDialog)dialog;
+            dlg.updateDate(itsExpiryDate.get(Calendar.YEAR),
+                           itsExpiryDate.get(Calendar.MONTH),
+                           itsExpiryDate.get(Calendar.DAY_OF_MONTH));
             break;
         }
         default: {
@@ -944,30 +1003,50 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         }
 
-        itsExpiryDate = null;
+        itsExpiryDate = Calendar.getInstance();
         int interval;
         boolean reoccur;
         int checkedId;
         if (itsOrigExpiry == null) {
             checkedId = R.id.expire_never;
-            itsExpiryDate = new Date();
             interval = 30;
             reoccur = false;
         } else {
             if ((itsOrigExpiry.itsInterval != 0) &&
                 itsOrigExpiry.itsIsReoccurring) {
                 checkedId = R.id.expire_interval;
+                interval = itsOrigExpiry.itsInterval;
+                reoccur = true;
             } else {
                 checkedId = R.id.expire_date;
+                interval = 30;
+                reoccur = false;
             }
-            itsExpiryDate = itsOrigExpiry.itsExpiration;
-            interval = itsOrigExpiry.itsInterval;
-            reoccur = itsOrigExpiry.itsIsReoccurring;
+            itsExpiryDate.setTime(itsOrigExpiry.itsExpiration);
         }
 
-        // TODO: support choose button
+        OnClickListener dateListener = new OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                switch (v.getId()) {
+                case R.id.expire_date_time: {
+                    showDialog(DIALOG_PASSWD_EXPIRY_TIME);
+                    break;
+                }
+                case R.id.expire_date_date: {
+                    showDialog(DIALOG_PASSWD_EXPIRY_DATE);
+                    break;
+                }
+                }
+            }
+        };
+        TextView tv = (TextView)findViewById(R.id.expire_date_time);
+        tv.setOnClickListener(dateListener);
+        tv = (TextView)findViewById(R.id.expire_date_date);
+        tv.setOnClickListener(dateListener);
+        updatePasswdExpiryDate();
 
-        setText(R.id.expire_date_val, Utils.formatDate(itsExpiryDate, this));
         setText(R.id.expire_interval_val, Integer.toString(interval));
         CheckBox cb = (CheckBox)findViewById(R.id.expire_interval_reoccur);
         cb.setChecked(reoccur);
@@ -993,6 +1072,16 @@ public class RecordEditActivity extends AbstractRecordActivity
                       checkedId == R.id.expire_date);
         setVisibility(R.id.expire_interval_fields,
                       checkedId == R.id.expire_interval);
+    }
+
+    /** Update fields after the password expiration date changes */
+    private final void updatePasswdExpiryDate()
+    {
+        Date expiryDate = itsExpiryDate.getTime();
+        setText(R.id.expire_date_time,
+                Utils.formatDate(expiryDate, this, true, false));
+        setText(R.id.expire_date_date,
+                Utils.formatDate(expiryDate, this, false, true));
     }
 
     /**
@@ -1227,7 +1316,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             break;
         }
         case R.id.expire_date: {
-            updatedExpiry = new PasswdExpiration(itsExpiryDate, 0, false);
+            updatedExpiry = new PasswdExpiration(itsExpiryDate.getTime(),
+                                                 0, false);
             break;
         }
         case R.id.expire_interval: {

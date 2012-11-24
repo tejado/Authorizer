@@ -20,9 +20,20 @@ public final class Utils
     /// Format a date according to the current locale settings
     public static String formatDate(Date date, Context ctx)
     {
-        return DateUtils.formatDateTime(ctx, date.getTime(),
-                                        DateUtils.FORMAT_SHOW_TIME |
-                                        DateUtils.FORMAT_SHOW_DATE |
-                                        DateUtils.FORMAT_SHOW_YEAR);
+        return formatDate(date, ctx, true, true);
+    }
+
+    /// Format a time and/or date according to the current locale settings
+    public static String formatDate(Date date, Context ctx,
+                                    boolean showTime, boolean showDate)
+    {
+        int flags = 0;
+        if (showTime) {
+            flags |= DateUtils.FORMAT_SHOW_TIME;
+        }
+        if (showDate) {
+            flags |= DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR;
+        }
+        return DateUtils.formatDateTime(ctx, date.getTime(), flags);
     }
 }

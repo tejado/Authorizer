@@ -261,18 +261,15 @@
                     android:orientation="horizontal"
                     android:paddingLeft="40dp">
 
-                    <TextView
-                        android:id="@+id/expire_date_val"
+                    <Button
+                        android:id="@+id/expire_date_time"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12:55pm, November 29, 2012"/>
+                        android:layout_height="wrap_content"/>
 
                     <Button
-                        android:id="@+id/expire_date_choose"
+                        android:id="@+id/expire_date_date"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/choose"/>
-
+                        android:layout_height="wrap_content"/>
                 </LinearLayout>
 
                 <RadioButton
