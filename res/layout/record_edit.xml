@@ -255,15 +255,18 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <Button
+                <TextView
                     android:id="@+id/expire_date_time"
+                    style="@style/TextViewSpinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
-                <Button
+                <TextView
                     android:id="@+id/expire_date_date"
+                    style="@style/TextViewSpinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
             </LinearLayout>
 
             <RelativeLayout

@@ -5,13 +5,13 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">vertical</item>
     </style>
-    
+
     <style name="RecordHeader">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginLeft">5dp</item>
     </style>
-    
+
     <style name="RecordField">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -19,26 +19,32 @@
         <item name="android:minHeight">44dp</item>
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
     </style>
-    
+
     <style name="RecordField.Small">
         <item name="android:textAppearance">?android:textAppearanceSmall</item>
     </style>
-    
+
     <style name="RecordField.Large">
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
     </style>
-    
+
     <style name="Separator">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:background">#FF404040</item>
     </style>
-    
+
     <style name="Separator.Light">
         <item name="android:background">#FF909090</item>
     </style>
-    
+
     <style name="TableLabelColumn">
         <item name="android:paddingRight">3dp</item>
+    </style>
+
+    <style name="TextViewSpinner">
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:background">@drawable/spinner_background_holo_dark</item>
+        <item name="android:gravity">center_vertical|left</item>
     </style>
 </resources>
