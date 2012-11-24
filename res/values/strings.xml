@@ -144,6 +144,8 @@
     <string name="password_and_confirm">Password /\nConfirm</string>
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_expiration">Password Expiration</string>
+    <string name="password_expiration_in_past">Password expiration is in the past</string>
+    <string name="password_expiration_invalid_interval">Password expiration interval must be in the range 1&#8211;3650</string>
     <string name="password_file">Password file</string>
     <string name="password_generation">Password generation</string>
     <string name="password_gen_prefs_moved">Password generation options have moved.  Open a file and edit the default policy.</string>

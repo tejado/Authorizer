@@ -1009,7 +1009,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         int checkedId;
         if (itsOrigExpiry == null) {
             checkedId = R.id.expire_never;
-            interval = 30;
+            interval = PasswdExpiration.INTERVAL_DEFAULT;
             recurring = false;
         } else {
             if ((itsOrigExpiry.itsInterval != 0) &&
@@ -1019,7 +1019,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 recurring = true;
             } else {
                 checkedId = R.id.expire_date;
-                interval = 30;
+                interval = PasswdExpiration.INTERVAL_DEFAULT;
                 recurring = false;
             }
             itsExpiryDate.setTime(itsOrigExpiry.itsExpiration);
@@ -1082,6 +1082,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 Utils.formatDate(expiryDate, this, true, false));
         setText(R.id.expire_date_date,
                 Utils.formatDate(expiryDate, this, false, true));
+        itsValidator.validate();
     }
 
     /**
@@ -1321,13 +1322,9 @@ public class RecordEditActivity extends AbstractRecordActivity
             break;
         }
         case R.id.expire_interval: {
-            int interval;
-            try {
-                interval = Integer.valueOf(
-                    GuiUtils.getTextViewStr(this, R.id.expire_interval_val));
-            } catch (NumberFormatException e) {
-                interval = 30;
-            }
+            int interval =
+                getIntegerTextField(R.id.expire_interval_val,
+                                    PasswdExpiration.INTERVAL_DEFAULT);
             long exp = System.currentTimeMillis();
             exp += (long)interval * 86400 * 1000;
             Date expiry = new Date(exp);
@@ -1473,12 +1470,17 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private final int getHistMaxSize()
     {
-        String str = GuiUtils.getTextViewStr(this, R.id.history_max_size);
+        return getIntegerTextField(R.id.history_max_size, -1);
+    }
+
+    /** Get the value of a text field as an integer */
+    private final int getIntegerTextField(int fieldId, int defaultValue)
+    {
+        String str = GuiUtils.getTextViewStr(this, fieldId);
         try {
-            int size = Integer.parseInt(str);
-            return size;
+            return Integer.parseInt(str);
         } catch (NumberFormatException e) {
-            return -1;
+            return defaultValue;
         }
     }
 
@@ -1511,6 +1513,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         {
         case R.id.title:
         case R.id.user:
+        case R.id.expire_interval_val:
             itsValidator.registerTextView(tv);
             break;
         }
@@ -1624,7 +1627,30 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
             }
 
-            // TODO: expiration validations
+            RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
+            switch (group.getCheckedRadioButtonId()) {
+            case R.id.expire_never: {
+                break;
+            }
+            case R.id.expire_date: {
+                long now = System.currentTimeMillis();
+                long expiry = itsExpiryDate.getTimeInMillis();
+                if (expiry < now) {
+                    return getString(R.string.password_expiration_in_past);
+                }
+                break;
+            }
+            case R.id.expire_interval: {
+                int interval = getIntegerTextField(R.id.expire_interval_val,
+                                                   -1);
+                if ((interval < PasswdExpiration.VALID_INTERVAL_MIN) ||
+                    (interval > PasswdExpiration.VALID_INTERVAL_MAX)) {
+                    return getString(
+                        R.string.password_expiration_invalid_interval);
+                }
+                break;
+            }
+            }
 
             return super.doValidation();
         }
@@ -1670,6 +1696,10 @@ public class RecordEditActivity extends AbstractRecordActivity
      */
     private static class PasswdExpiration
     {
+        public static final int VALID_INTERVAL_MIN = 1;
+        public static final int VALID_INTERVAL_MAX = 3650;
+        public static final int INTERVAL_DEFAULT = 30;
+
         public final Date itsExpiration;
         public final int itsInterval;
         public final boolean itsIsRecurring;

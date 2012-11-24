@@ -146,6 +146,8 @@
     <string name="password_expiration">Expiration mot de passe</string>
     <string name="password_file">Fichier mot de passe</string>
     <string name="password_generation">Composition des mots de passe</string>
+    <string name="password_expiration_in_past">L\'expiration du mot est dans le passé</string>
+    <string name="password_expiration_invalid_interval">Délai d\'expiration du mot de passe doit être dans la gamme 1&#8211;3650</string>
     <string name="password_gen_prefs_moved">Options de génération de mot de passe déplacées. Ouvrez le fichier et modifiez la stratégie par défaut.</string>
     <string name="password_header">MOT DE PASSE</string>
     <string name="password_label">Mot de passe:</string>
