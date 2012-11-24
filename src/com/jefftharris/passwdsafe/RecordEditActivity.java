@@ -986,7 +986,12 @@ public class RecordEditActivity extends AbstractRecordActivity
     private final void initPasswdExpiry(PasswdFileData fileData,
                                         PasswdRecord passwdRecord)
     {
-        // TODO: v2 support
+        if (!itsIsV3) {
+            setVisibility(R.id.expire_sep, false);
+            setVisibility(R.id.expire_label, false);
+            setVisibility(R.id.expire_choice, false);
+            return;
+        }
 
         if (passwdRecord == null) {
             itsOrigExpiry = null;
@@ -1270,21 +1275,23 @@ public class RecordEditActivity extends AbstractRecordActivity
             fileData.setPassword(currPasswd, newPasswd, record);
         }
 
-        // Update expiration dates after password so changes in expiration
-        // overwrite basic expiration updates when the password changes.
-        Pair<Boolean, PasswdExpiration> updateExpiry = getUpdatedExpiry();
-        if (updateExpiry.first) {
-            PasswdExpiration expiry = updateExpiry.second;
-            Date expiryTime = null;
-            int expiryInterval = 0;
-            if (expiry != null) {
-                expiryTime = expiry.itsExpiration;
-                if (expiry.itsIsRecurring) {
-                    expiryInterval = expiry.itsInterval;
+        if (itsIsV3) {
+            // Update expiration dates after password so changes in expiration
+            // overwrite basic expiration updates when the password changes.
+            Pair<Boolean, PasswdExpiration> updateExpiry = getUpdatedExpiry();
+            if (updateExpiry.first) {
+                PasswdExpiration expiry = updateExpiry.second;
+                Date expiryTime = null;
+                int expiryInterval = 0;
+                if (expiry != null) {
+                    expiryTime = expiry.itsExpiration;
+                    if (expiry.itsIsRecurring) {
+                        expiryInterval = expiry.itsInterval;
+                    }
                 }
+                fileData.setPasswdExpiryTime(expiryTime, record);
+                fileData.setPasswdExpiryInterval(expiryInterval, record);
             }
-            fileData.setPasswdExpiryTime(expiryTime, record);
-            fileData.setPasswdExpiryInterval(expiryInterval, record);
         }
 
         try {
@@ -1627,29 +1634,31 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
             }
 
-            RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
-            switch (group.getCheckedRadioButtonId()) {
-            case R.id.expire_never: {
-                break;
-            }
-            case R.id.expire_date: {
-                long now = System.currentTimeMillis();
-                long expiry = itsExpiryDate.getTimeInMillis();
-                if (expiry < now) {
-                    return getString(R.string.password_expiration_in_past);
+            if (itsIsV3) {
+                RadioGroup group = (RadioGroup)findViewById(R.id.expire_choice);
+                switch (group.getCheckedRadioButtonId()) {
+                case R.id.expire_never: {
+                    break;
                 }
-                break;
-            }
-            case R.id.expire_interval: {
-                int interval = getIntegerTextField(R.id.expire_interval_val,
-                                                   -1);
-                if ((interval < PasswdExpiration.VALID_INTERVAL_MIN) ||
-                    (interval > PasswdExpiration.VALID_INTERVAL_MAX)) {
-                    return getString(
-                        R.string.password_expiration_invalid_interval);
+                case R.id.expire_date: {
+                    long now = System.currentTimeMillis();
+                    long expiry = itsExpiryDate.getTimeInMillis();
+                    if (expiry < now) {
+                        return getString(R.string.password_expiration_in_past);
+                    }
+                    break;
                 }
-                break;
-            }
+                case R.id.expire_interval: {
+                    int interval = getIntegerTextField(R.id.expire_interval_val,
+                                                       -1);
+                    if ((interval < PasswdExpiration.VALID_INTERVAL_MIN) ||
+                        (interval > PasswdExpiration.VALID_INTERVAL_MAX)) {
+                        return getString(
+                            R.string.password_expiration_invalid_interval);
+                    }
+                    break;
+                }
+                }
             }
 
             return super.doValidation();
