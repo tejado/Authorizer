@@ -33,7 +33,7 @@ public class PasswdExpiration
         public final int itsStrIdx;
 
         /** Get the type from the string index */
-        public static PasswdExpiration.Type fromStrIdx(int idx)
+        public static Type fromStrIdx(int idx)
         {
             for (PasswdExpiration.Type t: values()) {
                 if (idx == t.itsStrIdx) {
