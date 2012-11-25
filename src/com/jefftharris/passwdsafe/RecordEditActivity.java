@@ -18,6 +18,7 @@ import java.util.TreeSet;
 import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
+import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -1724,58 +1725,6 @@ public class RecordEditActivity extends AbstractRecordActivity
         {
             return itsTitle.hashCode() ^ itsGroup.hashCode() ^
             itsUser.hashCode();
-        }
-    }
-
-    /**
-     * The PasswdExpiration class contains the password expiration options for a
-     * record
-     */
-    private static class PasswdExpiration
-    {
-        /** Expiration type */
-        public enum Type
-        {
-            NEVER       (0),
-            DATE        (1),
-            INTERVAL    (2);
-
-            /** Constructor */
-            private Type(int strIdx)
-            {
-                itsStrIdx = strIdx;
-            }
-
-            /** Index of the type in the string array of choices */
-            public final int itsStrIdx;
-
-            /** Get the type from the string index */
-            public static Type fromStrIdx(int idx)
-            {
-                for (Type t: values()) {
-                    if (idx == t.itsStrIdx) {
-                        return t;
-                    }
-                }
-                return NEVER;
-            }
-        }
-
-
-        public static final int VALID_INTERVAL_MIN = 1;
-        public static final int VALID_INTERVAL_MAX = 3650;
-        public static final int INTERVAL_DEFAULT = 30;
-
-        public final Date itsExpiration;
-        public final int itsInterval;
-        public final boolean itsIsRecurring;
-
-        /** Constructor */
-        public PasswdExpiration(Date date, int interval, boolean recurring)
-        {
-            itsExpiration = date;
-            itsInterval = interval;
-            itsIsRecurring = recurring;
         }
     }
 }
