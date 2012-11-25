@@ -73,6 +73,7 @@
     <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
+    <string name="expires_in_days">Expire dans %1$d jours</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
     <string name="file_backups">Fichiers de sauvegarde</string>
     <string name="file_close_timeout">Fermeture automatique de fichier</string>
@@ -170,7 +171,7 @@
     <string name="protected_record">Protégé</string>
     <string name="protected_record_header">ENTRÉE PROTEGÉE</string>
     <string name="psafe3_ext">.psafe3</string>
-    <string name="query_label">Filtre de recherche: %1$s</string>
+    <string name="query_label">Recherche: %1$s</string>
     <string name="record">Entrée</string>
     <string name="record_has_references">L\'entrée contient des références</string>
     <string name="record_not_found">Entrée introuvable</string>

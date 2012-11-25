@@ -73,6 +73,7 @@
     <string name="error">Error</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
+    <string name="expires_in_days">Expires in %1$d days</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
     <string name="file_backups">File backups</string>
     <string name="file_close_timeout">File close timeout</string>
@@ -170,7 +171,7 @@
     <string name="protected_record">Protected</string>
     <string name="protected_record_header">PROTECTED RECORD</string>
     <string name="psafe3_ext">.psafe3</string>
-    <string name="query_label">Search filter: %1$s</string>
+    <string name="query_label">Search: %1$s</string>
     <string name="record">Record</string>
     <string name="record_has_references">Record has references</string>
     <string name="record_not_found">Record not found</string>

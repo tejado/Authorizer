@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -1354,7 +1355,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                     getIntegerTextField(R.id.expire_interval_val,
                                         PasswdExpiration.INTERVAL_DEFAULT);
                 long exp = System.currentTimeMillis();
-                exp += (long)interval * 86400 * 1000;
+                exp += (long)interval * DateUtils.DAY_IN_MILLIS;
                 Date expiry = new Date(exp);
 
                 CheckBox cb =

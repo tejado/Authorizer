@@ -61,6 +61,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int MENU_PROTECT=          ABS_MENU_MAX + 5;
     private static final int MENU_UNPROTECT=        ABS_MENU_MAX + 6;
     private static final int MENU_PASSWD_POLICIES = ABS_MENU_MAX + 7;
+    private static final int MENU_PASSWD_EXPIRYS =  ABS_MENU_MAX + 8;
 
     private static final int CTXMENU_COPY_USER = 1;
     private static final int CTXMENU_COPY_PASSWD = 2;
@@ -158,6 +159,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         addCloseMenuItem(menu);
 
         mi = menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
+
+        mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.password_expiration);
 
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);
 
@@ -266,6 +269,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             startActivityForResult(new Intent(Intent.ACTION_VIEW, getUri(),
                                              this, PasswdPolicyActivity.class),
                                    POLICY_VIEW_REQUEST);
+            break;
+        }
+        case MENU_PASSWD_EXPIRYS: {
+            setRecordExpiryFilter(3650);
             break;
         }
         default:

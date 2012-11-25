@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -171,6 +173,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         super.onSaveInstanceState(outState);
         String filterQuery = null;
         int filterOpts = RecordFilter.OPTS_DEFAULT;
+        // TODO: save/restore filter
         if (itsFilter != null) {
             if (itsFilter.itsSearchQuery != null) {
                 filterQuery = itsFilter.itsSearchQuery.pattern();
@@ -541,12 +544,29 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             itsFilter = new RecordFilter(queryPattern, options);
         }
 
+        updateQueryPanel();
+    }
+
+    /** Set the record filter for an expiration in the given number of days */
+    protected final void setRecordExpiryFilter(int days)
+    {
+        if (days >= 0) {
+            itsFilter = new RecordFilter(days, RecordFilter.OPTS_DEFAULT);
+        } else {
+            itsFilter = null;
+        }
+        updateQueryPanel();
+    }
+
+    /** Update the query panel after a filter change */
+    private final void updateQueryPanel()
+    {
         View panel = findViewById(R.id.query_panel);
         if (hasFilterSearchQuery()) {
             panel.setVisibility(View.VISIBLE);
             TextView tv = (TextView)findViewById(R.id.query);
             tv.setText(getString(R.string.query_label,
-                                 itsFilter.itsSearchQuery.pattern()));
+                                 itsFilter.toString(this)));
         } else {
             panel.setVisibility(View.GONE);
         }
@@ -558,7 +578,18 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     /** Does the record filter have a search query */
     private final boolean hasFilterSearchQuery()
     {
-        return (itsFilter != null) && (itsFilter.itsSearchQuery != null);
+        if (itsFilter == null) {
+            return false;
+        }
+        switch (itsFilter.itsType) {
+        case QUERY: {
+            return itsFilter.itsSearchQuery != null;
+        }
+        case EXPIRATION: {
+            return true;
+        }
+        }
+        return true;
     }
 
 
@@ -574,20 +605,38 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
 
         String queryMatch = null;
-        if (itsFilter.itsSearchQuery != null) {
-            if (filterField(fileData.getTitle(rec))) {
-                queryMatch = QUERY_MATCH_TITLE;
-            } else if (filterField(fileData.getUsername(rec))) {
-                queryMatch = QUERY_MATCH_USERNAME;
-            } else if (filterField(fileData.getURL(rec))) {
-                queryMatch = QUERY_MATCH_URL;
-            } else if (filterField(fileData.getEmail(rec))) {
-                queryMatch = QUERY_MATCH_EMAIL;
-            } else if (filterField(fileData.getNotes(rec))) {
-                queryMatch = QUERY_MATCH_NOTES;
+        switch (itsFilter.itsType) {
+        case QUERY: {
+            if (itsFilter.itsSearchQuery != null) {
+                if (filterField(fileData.getTitle(rec))) {
+                    queryMatch = QUERY_MATCH_TITLE;
+                } else if (filterField(fileData.getUsername(rec))) {
+                    queryMatch = QUERY_MATCH_USERNAME;
+                } else if (filterField(fileData.getURL(rec))) {
+                    queryMatch = QUERY_MATCH_URL;
+                } else if (filterField(fileData.getEmail(rec))) {
+                    queryMatch = QUERY_MATCH_EMAIL;
+                } else if (filterField(fileData.getNotes(rec))) {
+                    queryMatch = QUERY_MATCH_NOTES;
+                }
+            } else {
+                queryMatch = QUERY_MATCH;
             }
-        } else {
-            queryMatch = QUERY_MATCH;
+            break;
+        }
+        case EXPIRATION: {
+            Date expiry = fileData.getPasswdExpiryTime(rec);
+            if (expiry == null) {
+                break;
+            }
+            long expire = expiry.getTime();
+            if (expire < itsFilter.itsExpiryAtMillis) {
+                queryMatch = DateUtils.getRelativeDateTimeString(
+                    this, expire, DateUtils.HOUR_IN_MILLIS,
+                    DateUtils.WEEK_IN_MILLIS, 0).toString();
+            }
+            break;
+        }
         }
 
         if ((queryMatch != null) &&
@@ -723,6 +772,13 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     /** A filter for records */
     protected static final class RecordFilter
     {
+        /** Type of filter */
+        enum Type
+        {
+            QUERY,
+            EXPIRATION
+        }
+
         /** Default options to match */
         public static final int OPTS_DEFAULT =          0;
         /** Record can not have an alias referencing it */
@@ -730,16 +786,39 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         /** Record can not have a shortcut referencing it */
         public static final int OPTS_NO_SHORTCUT =      1 << 1;
 
+        /** Filter type */
+        public final Type itsType;
+
         /** Regex to match on various fields */
         public final Pattern itsSearchQuery;
+
+        /** Number of days in the future to match on a record's expiration */
+        public final int itsExpiryDays;
+
+        /** The expiration time to match on a record's expiration */
+        public final long itsExpiryAtMillis;
 
         /** Filter options */
         public final int itsOptions;
 
-        /** Constructor */
+        /** Constructor for a query */
         public RecordFilter(Pattern query, int opts)
         {
+            itsType = Type.QUERY;
             itsSearchQuery = query;
+            itsExpiryDays = -1;
+            itsExpiryAtMillis = 0;
+            itsOptions = opts;
+        }
+
+        /** Constructor for expiration */
+        public RecordFilter(int expiryDays, int opts)
+        {
+            itsType = Type.EXPIRATION;
+            itsSearchQuery = null;
+            itsExpiryDays = expiryDays;
+            itsExpiryAtMillis = System.currentTimeMillis() +
+                itsExpiryDays * DateUtils.DAY_IN_MILLIS;
             itsOptions = opts;
         }
 
@@ -747,6 +826,20 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         public final boolean hasOptions(int opts)
         {
             return (itsOptions & opts) != 0;
+        }
+
+        /** Convert the filter to a string */
+        public final String toString(Context ctx)
+        {
+            switch (itsType) {
+            case QUERY: {
+                return (itsSearchQuery != null) ? itsSearchQuery.pattern() : "";
+            }
+            case EXPIRATION: {
+                return ctx.getString(R.string.expires_in_days, itsExpiryDays);
+            }
+            }
+            return "";
         }
     }
 

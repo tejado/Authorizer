@@ -71,6 +71,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 public class PasswdFileData
@@ -401,7 +402,7 @@ public class PasswdFileData
         Date expTime = null;
         if ((expInterval != null) && (expInterval.intValue() > 0)) {
             long exp = System.currentTimeMillis();
-            exp += (long)expInterval.intValue() * 86400 * 1000;
+            exp += (long)expInterval.intValue() * DateUtils.DAY_IN_MILLIS;
             expTime = new Date(exp);
         }
         setField(expTime, rec, PwsRecordV3.PASSWORD_LIFETIME, false);
