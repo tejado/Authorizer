@@ -639,8 +639,8 @@ public class RecordEditActivity extends AbstractRecordActivity
                 }
             });
 
-            Button btn = (Button)findViewById(R.id.password_link_btn);
-            btn.setOnClickListener(new OnClickListener()
+            View passwdLink = findViewById(R.id.password_link);
+            passwdLink.setOnClickListener(new OnClickListener()
             {
                 public void onClick(View v)
                 {

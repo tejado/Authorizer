@@ -154,30 +154,20 @@
                     </LinearLayout>
                 </TableRow>
 
-                <TableRow android:id="@+id/password_link_row"
-                          android:visibility="gone">
+                <TableRow
+                    android:id="@+id/password_link_row"
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/password_link_label"
-                        style="@style/TableLabelColumn"
-                        android:layout_height="fill_parent"/>
+                        style="@style/TableLabelColumn"/>
 
-                    <RelativeLayout android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
-                        <Button android:id="@+id/password_link_btn"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentRight="true"
-                                android:text="@string/choose"
-                                />
-                        <TextView android:id="@+id/password_link"
-                                  android:layout_width="fill_parent"
-                                  android:layout_height="match_parent"
-                                  android:layout_alignParentLeft="true"
-                                  android:layout_toLeftOf="@id/password_link_btn"
-                                  android:gravity="center_vertical"
-                                  />
-                    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/password_link"
+                        style="@style/TextViewSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/choose"/>
                 </TableRow>
 
                 <TableRow android:id="@+id/protected_row">
