@@ -73,7 +73,6 @@
     <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
-    <string name="expires_in_days">Expire dans %1$d jours</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
     <string name="file_backups">Fichiers de sauvegarde</string>
     <string name="file_close_timeout">Fermeture automatique de fichier</string>
@@ -260,6 +259,17 @@
         <item>Raccourci</item>
     </string-array>
 
+    <!-- Order must match values of RecordFilter.ExpiryFilter -->
+    <string-array name="expire_filters">
+        <item>Expiré</item>
+        <item>Aujourd\'hui</item>
+        <item>Dans une Semaine</item>
+        <item>Dans une Mois</item>
+        <item>Dans une Année</item>
+        <item>Tout</item>
+        <item>Personnalisée</item>
+    </string-array>
+
     <!-- Order must match constants in PasswdExpiration.Type -->
     <string-array name="expire_type">
         <item>Jamais</item>
@@ -271,7 +281,7 @@
     <string-array name="policy_type">
         <item>Normal</item>
         <item>Facile-à-lire</item>
-        <item>prononçable</item>
+        <item>Prononçable</item>
         <item>Hexadécimal</item>
     </string-array>
 </resources>

@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -42,6 +44,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -53,6 +56,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int DIALOG_CHANGE_PASSWD =     MAX_DIALOG + 4;
     private static final int DIALOG_FILE_NEW =          MAX_DIALOG + 5;
     private static final int DIALOG_DELETE =            MAX_DIALOG + 6;
+    private static final int DIALOG_PASSWD_EXPIRYS =    MAX_DIALOG + 7;
+    private static final int DIALOG_PASSWD_EXPIRYS_CUSTOM = MAX_DIALOG + 8;
 
     private static final int MENU_ADD_RECORD =      ABS_MENU_MAX + 1;
     private static final int MENU_DETAILS =         ABS_MENU_MAX + 2;
@@ -160,6 +165,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         mi = menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
 
+        // TODO: better name to indicate a filter choice
         mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.password_expiration);
 
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);
@@ -272,7 +278,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             break;
         }
         case MENU_PASSWD_EXPIRYS: {
-            setRecordExpiryFilter(3650);
+            showDialog(DIALOG_PASSWD_EXPIRYS);
             break;
         }
         default:
@@ -524,6 +530,59 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 DialogUtils.createDeletePrompt(this, dlgClick, title, prompt);
             dialog = data.itsDialog;
             itsDeleteValidator = data.itsValidator;
+            break;
+        }
+        case DIALOG_PASSWD_EXPIRYS: {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this)
+                .setTitle(R.string.password_expiration)
+                .setItems(R.array.expire_filters,
+                          new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        RecordFilter.ExpiryFilter filter =
+                            RecordFilter.ExpiryFilter.fromIdx(which);
+                        switch (filter) {
+                        case EXPIRED:
+                        case TODAY:
+                        case IN_A_WEEK:
+                        case IN_A_MONTH:
+                        case IN_A_YEAR:
+                        case ANY: {
+                            setRecordExpiryFilter(filter, null);
+                            break;
+                        }
+                        case CUSTOM: {
+                            showDialog(DIALOG_PASSWD_EXPIRYS_CUSTOM);
+                            break;
+                        }
+                        }
+
+                    }
+                });
+            dialog = alert.create();
+            break;
+        }
+        case DIALOG_PASSWD_EXPIRYS_CUSTOM: {
+            Calendar now = Calendar.getInstance();
+            dialog = new DatePickerDialog(
+                this,
+                new DatePickerDialog.OnDateSetListener()
+                {
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth)
+                    {
+                        Calendar date = Calendar.getInstance();
+                        date.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
+                        date.set(Calendar.MILLISECOND, 0);
+                        date.add(Calendar.DAY_OF_MONTH, 1);
+                        setRecordExpiryFilter(RecordFilter.ExpiryFilter.CUSTOM,
+                                              date.getTime());
+                    }
+                },
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH));
             break;
         }
         default:
