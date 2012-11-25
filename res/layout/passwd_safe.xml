@@ -59,23 +59,25 @@
             android:id="@+id/query_sep"
             style="@style/Separator.Light"/>
           
-        <Button android:id="@+id/query_clear_btn"
-                android:text="@string/clear"
-                android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
-                android:layout_marginTop="2dp"
-                android:layout_below="@id/query_sep"
-                android:layout_alignParentRight="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/query_clear_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/query_sep"
+            android:layout_marginTop="2dp"
+            android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
+            android:text="@string/clear"/>
 
-        <TextView android:id="@+id/query"
-                  android:text=""
-                  android:textSize="16sp"
-                  android:gravity="center_vertical"
-                  android:layout_alignTop="@id/query_clear_btn"
-                  android:layout_alignBottom="@id/query_clear_btn"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/query"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/query_clear_btn"
+            android:gravity="center_vertical"
+            android:textSize="16sp"/>
 
     </RelativeLayout>
 </LinearLayout>
