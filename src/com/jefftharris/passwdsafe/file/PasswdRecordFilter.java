@@ -39,7 +39,7 @@ public final class PasswdRecordFilter
         CUSTOM;
 
         /** Get the filter value from its value index */
-        public static PasswdRecordFilter.ExpiryFilter fromIdx(int idx)
+        public static ExpiryFilter fromIdx(int idx)
         {
             if ((idx >= 0) && (idx < values().length)) {
                 return values()[idx];
@@ -56,13 +56,13 @@ public final class PasswdRecordFilter
     public static final int OPTS_NO_SHORTCUT =      1 << 1;
 
     /** Filter type */
-    public final PasswdRecordFilter.Type itsType;
+    public final Type itsType;
 
     /** Regex to match on various fields */
     public final Pattern itsSearchQuery;
 
     /** Expiration filter type */
-    public final PasswdRecordFilter.ExpiryFilter itsExpiryFilter;
+    public final ExpiryFilter itsExpiryFilter;
 
     /** The expiration time to match on a record's expiration */
     public final long itsExpiryAtMillis;
@@ -81,8 +81,7 @@ public final class PasswdRecordFilter
     }
 
     /** Constructor for expiration */
-    public PasswdRecordFilter(PasswdRecordFilter.ExpiryFilter filter, Date customDate,
-                              int opts)
+    public PasswdRecordFilter(ExpiryFilter filter, Date customDate, int opts)
     {
         itsType = Type.EXPIRATION;
         itsSearchQuery = null;
