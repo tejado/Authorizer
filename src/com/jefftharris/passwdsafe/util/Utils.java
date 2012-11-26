@@ -17,14 +17,17 @@ import android.text.format.DateUtils;
  */
 public final class Utils
 {
-    /// Format a date according to the current locale settings
+    /** Format a date according to the current locale settings */
     public static String formatDate(Date date, Context ctx)
     {
-        return formatDate(date, ctx, true, true);
+        return formatDate(date.getTime(), ctx, true, true);
     }
 
-    /// Format a time and/or date according to the current locale settings
-    public static String formatDate(Date date, Context ctx,
+    /**
+     * Format a time and/or date in milliseconds according to the current locale
+     * settings
+     */
+    public static String formatDate(long date, Context ctx,
                                     boolean showTime, boolean showDate)
     {
         int flags = 0;
@@ -34,6 +37,6 @@ public final class Utils
         if (showDate) {
             flags |= DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR;
         }
-        return DateUtils.formatDateTime(ctx, date.getTime(), flags);
+        return DateUtils.formatDateTime(ctx, date, flags);
     }
 }

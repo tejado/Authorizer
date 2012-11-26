@@ -24,6 +24,7 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.util.Utils;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -889,11 +890,31 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         {
             switch (itsType) {
             case QUERY: {
-                return (itsSearchQuery != null) ? itsSearchQuery.pattern() : "";
+                if (itsSearchQuery != null) {
+                    return itsSearchQuery.pattern();
+                }
+                break;
             }
             case EXPIRATION: {
-                // TODO: better format
-                return String.format("Before %s", new Date(itsExpiryAtMillis).toString());
+                switch (itsExpiryFilter) {
+                case EXPIRED: {
+                    return ctx.getString(R.string.password_expired);
+                }
+                case TODAY: {
+                    return ctx.getString(R.string.password_expires_today);
+                }
+                case IN_A_WEEK:
+                case IN_A_MONTH:
+                case IN_A_YEAR:
+                case CUSTOM: {
+                    return ctx.getString(
+                        R.string.password_expires_before,
+                        Utils.formatDate(itsExpiryAtMillis, ctx, true, true));
+                }
+                case ANY: {
+                    return ctx.getString(R.string.password_with_expiration);
+                }
+                }
             }
             }
             return "";

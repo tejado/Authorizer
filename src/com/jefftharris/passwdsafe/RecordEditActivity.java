@@ -1101,7 +1101,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     /** Update fields after the password expiration date changes */
     private final void updatePasswdExpiryDate()
     {
-        Date expiryDate = itsExpiryDate.getTime();
+        long expiryDate = itsExpiryDate.getTimeInMillis();
         setText(R.id.expire_date_time,
                 Utils.formatDate(expiryDate, this, true, false));
         setText(R.id.expire_date_date,

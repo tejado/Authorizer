@@ -144,6 +144,9 @@
     <string name="password_expiration">Password Expiration</string>
     <string name="password_expiration_in_past">Password expiration is in the past</string>
     <string name="password_expiration_invalid_interval">Password expiration interval must be in the range 1&#8211;3650</string>
+    <string name="password_expired">Password expired</string>
+    <string name="password_expires_before">Password expires before %1$s</string>
+    <string name="password_expires_today">Password expires today</string>
     <string name="password_file">Password file</string>
     <string name="password_generation">Password generation</string>
     <string name="password_gen_prefs_moved">Password generation options have moved.  Open a file and edit the default policy.</string>
@@ -155,6 +158,7 @@
     <string name="password_record">Password record</string>
     <string name="password_settings">Password Settings</string>
     <string name="password_times_header">PASSWORD TIMES</string>
+    <string name="password_with_expiration">Password with expiration date</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="permissions_label">Permissions:</string>
     <string name="policy_header">POLICY</string>
