@@ -15,14 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 
 import android.app.SearchManager;
@@ -32,7 +30,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -85,12 +82,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         new ArrayList<HashMap<String, Object>>();
 
     private PasswdRecordFilter itsFilter = null;
-    private static final String QUERY_MATCH = "";
-    private String QUERY_MATCH_TITLE;
-    private String QUERY_MATCH_USERNAME;
-    private String QUERY_MATCH_URL;
-    private String QUERY_MATCH_EMAIL;
-    private String QUERY_MATCH_NOTES;
 
     private ArrayList<String> itsCurrGroups = new ArrayList<String>();
 
@@ -519,17 +510,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         itsFilter = null;
         Pattern queryPattern = null;
         if ((query != null) && (query.length() != 0)) {
-            if (QUERY_MATCH_TITLE == null) {
-                QUERY_MATCH_TITLE = getString(R.string.title);
-                QUERY_MATCH_USERNAME = getString(R.string.username);
-                QUERY_MATCH_URL = getString(R.string.url);
-                QUERY_MATCH_EMAIL = getString(R.string.email);
-                QUERY_MATCH_NOTES = getString(R.string.notes);
-            }
-
             try {
                 int flags = 0;
-
                 if (!itsIsSearchCaseSensitive) {
                     flags |= Pattern.CASE_INSENSITIVE;
                 }
@@ -583,15 +565,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         if (itsFilter == null) {
             return false;
         }
-        switch (itsFilter.itsType) {
-        case QUERY: {
-            return itsFilter.itsSearchQuery != null;
-        }
-        case EXPIRATION: {
-            return true;
-        }
-        }
-        return true;
+        return itsFilter.hasSearchQuery();
     }
 
 
@@ -603,92 +577,11 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private final String filterRecord(PwsRecord rec, PasswdFileData fileData)
     {
         if (itsFilter == null) {
-            return QUERY_MATCH;
+            return PasswdRecordFilter.QUERY_MATCH;
         }
-
-        String queryMatch = null;
-        switch (itsFilter.itsType) {
-        case QUERY: {
-            if (itsFilter.itsSearchQuery != null) {
-                if (filterField(fileData.getTitle(rec))) {
-                    queryMatch = QUERY_MATCH_TITLE;
-                } else if (filterField(fileData.getUsername(rec))) {
-                    queryMatch = QUERY_MATCH_USERNAME;
-                } else if (filterField(fileData.getURL(rec))) {
-                    queryMatch = QUERY_MATCH_URL;
-                } else if (filterField(fileData.getEmail(rec))) {
-                    queryMatch = QUERY_MATCH_EMAIL;
-                } else if (filterField(fileData.getNotes(rec))) {
-                    queryMatch = QUERY_MATCH_NOTES;
-                }
-            } else {
-                queryMatch = QUERY_MATCH;
-            }
-            break;
-        }
-        case EXPIRATION: {
-            Date expiry = fileData.getPasswdExpiryTime(rec);
-            if (expiry == null) {
-                break;
-            }
-            long expire = expiry.getTime();
-            if (expire < itsFilter.itsExpiryAtMillis) {
-                queryMatch = DateUtils.getRelativeDateTimeString(
-                    this, expire, DateUtils.HOUR_IN_MILLIS,
-                    DateUtils.WEEK_IN_MILLIS, 0).toString();
-            }
-            break;
-        }
-        }
-
-        if ((queryMatch != null) &&
-            (itsFilter.itsOptions != PasswdRecordFilter.OPTS_DEFAULT)) {
-            PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-            if (passwdRec != null) {
-                for (PwsRecord ref: passwdRec.getRefsToRecord()) {
-                    PasswdRecord passwdRef = fileData.getPasswdRecord(ref);
-                    if (passwdRef == null) {
-                        continue;
-                    }
-                    switch (passwdRef.getType()) {
-                    case NORMAL: {
-                        break;
-                    }
-                    case ALIAS: {
-                        if (itsFilter.hasOptions(
-                                PasswdRecordFilter.OPTS_NO_ALIAS)) {
-                            queryMatch = null;
-                        }
-                        break;
-                    }
-                    case SHORTCUT: {
-                        if (itsFilter.hasOptions(
-                                PasswdRecordFilter.OPTS_NO_SHORTCUT)) {
-                            queryMatch = null;
-                        }
-                        break;
-                    }
-                    }
-                    if (queryMatch == null) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        return queryMatch;
+        return itsFilter.filterRecord(rec, fileData, this);
     }
 
-
-    private final boolean filterField(String field)
-    {
-        if (field != null) {
-            Matcher m = itsFilter.itsSearchQuery.matcher(field);
-            return m.find();
-        } else {
-            return false;
-        }
-    }
 
     /**
      * @return true if a group was popped, false to use default behavior

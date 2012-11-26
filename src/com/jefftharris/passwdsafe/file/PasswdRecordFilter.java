@@ -9,9 +9,13 @@ package com.jefftharris.passwdsafe.file;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.pwsafe.lib.file.PwsRecord;
+
 import android.content.Context;
+import android.text.format.DateUtils;
 
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.util.Utils;
@@ -56,19 +60,28 @@ public final class PasswdRecordFilter
     public static final int OPTS_NO_SHORTCUT =      1 << 1;
 
     /** Filter type */
-    public final Type itsType;
+    private final Type itsType;
 
     /** Regex to match on various fields */
     public final Pattern itsSearchQuery;
 
     /** Expiration filter type */
-    public final ExpiryFilter itsExpiryFilter;
+    private final ExpiryFilter itsExpiryFilter;
 
     /** The expiration time to match on a record's expiration */
-    public final long itsExpiryAtMillis;
+    private final long itsExpiryAtMillis;
 
     /** Filter options */
     public final int itsOptions;
+
+    // TODO: make all fields private
+
+    public static final String QUERY_MATCH = "";
+    private String QUERY_MATCH_TITLE;
+    private String QUERY_MATCH_USERNAME;
+    private String QUERY_MATCH_URL;
+    private String QUERY_MATCH_EMAIL;
+    private String QUERY_MATCH_NOTES;
 
     /** Constructor for a query */
     public PasswdRecordFilter(Pattern query, int opts)
@@ -125,11 +138,110 @@ public final class PasswdRecordFilter
         itsOptions = opts;
     }
 
-    /** Does the filter have the given options */
-    public final boolean hasOptions(int opts)
+
+    /**
+     * Filter a record
+     * @return A non-null string if the record matches the filter; null if it
+     * does not
+     */
+    public final String filterRecord(PwsRecord rec,
+                                     PasswdFileData fileData,
+                                     Context ctx)
     {
-        return (itsOptions & opts) != 0;
+        String queryMatch = null;
+        switch (itsType) {
+        case QUERY: {
+            if (itsSearchQuery != null) {
+                if (QUERY_MATCH_TITLE == null) {
+                    QUERY_MATCH_TITLE = ctx.getString(R.string.title);
+                    QUERY_MATCH_USERNAME = ctx.getString(R.string.username);
+                    QUERY_MATCH_URL = ctx.getString(R.string.url);
+                    QUERY_MATCH_EMAIL = ctx.getString(R.string.email);
+                    QUERY_MATCH_NOTES = ctx.getString(R.string.notes);
+                }
+
+                if (filterField(fileData.getTitle(rec))) {
+                    queryMatch = QUERY_MATCH_TITLE;
+                } else if (filterField(fileData.getUsername(rec))) {
+                    queryMatch = QUERY_MATCH_USERNAME;
+                } else if (filterField(fileData.getURL(rec))) {
+                    queryMatch = QUERY_MATCH_URL;
+                } else if (filterField(fileData.getEmail(rec))) {
+                    queryMatch = QUERY_MATCH_EMAIL;
+                } else if (filterField(fileData.getNotes(rec))) {
+                    queryMatch = QUERY_MATCH_NOTES;
+                }
+            } else {
+                queryMatch = QUERY_MATCH;
+            }
+            break;
+        }
+        case EXPIRATION: {
+            Date expiry = fileData.getPasswdExpiryTime(rec);
+            if (expiry == null) {
+                break;
+            }
+            long expire = expiry.getTime();
+            if (expire < itsExpiryAtMillis) {
+                queryMatch = DateUtils.getRelativeDateTimeString(
+                    ctx, expire, DateUtils.HOUR_IN_MILLIS,
+                    DateUtils.WEEK_IN_MILLIS, 0).toString();
+            }
+            break;
+        }
+        }
+
+        if ((queryMatch != null) &&
+            (itsOptions != PasswdRecordFilter.OPTS_DEFAULT)) {
+            PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+            if (passwdRec != null) {
+                for (PwsRecord ref: passwdRec.getRefsToRecord()) {
+                    PasswdRecord passwdRef = fileData.getPasswdRecord(ref);
+                    if (passwdRef == null) {
+                        continue;
+                    }
+                    switch (passwdRef.getType()) {
+                    case NORMAL: {
+                        break;
+                    }
+                    case ALIAS: {
+                        if (hasOptions(PasswdRecordFilter.OPTS_NO_ALIAS)) {
+                            queryMatch = null;
+                        }
+                        break;
+                    }
+                    case SHORTCUT: {
+                        if (hasOptions(PasswdRecordFilter.OPTS_NO_SHORTCUT)) {
+                            queryMatch = null;
+                        }
+                        break;
+                    }
+                    }
+                    if (queryMatch == null) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return queryMatch;
     }
+
+
+    /** Does the record filter have a search query */
+    public final boolean hasSearchQuery()
+    {
+        switch (itsType) {
+        case QUERY: {
+            return itsSearchQuery != null;
+        }
+        case EXPIRATION: {
+            return true;
+        }
+        }
+        return true;
+    }
+
 
     /** Convert the filter to a string */
     public final String toString(Context ctx)
@@ -164,5 +276,24 @@ public final class PasswdRecordFilter
         }
         }
         return "";
+    }
+
+
+    /** Does the filter have the given options */
+    private final boolean hasOptions(int opts)
+    {
+        return (itsOptions & opts) != 0;
+    }
+
+
+    /** Match a field against the search query */
+    private final boolean filterField(String field)
+    {
+        if (field != null) {
+            Matcher m = itsSearchQuery.matcher(field);
+            return m.find();
+        } else {
+            return false;
+        }
     }
 }
