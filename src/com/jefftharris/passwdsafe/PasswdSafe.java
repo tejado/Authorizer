@@ -18,6 +18,7 @@ import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
@@ -540,8 +541,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 {
                     public void onClick(DialogInterface dialog, int which)
                     {
-                        RecordFilter.ExpiryFilter filter =
-                            RecordFilter.ExpiryFilter.fromIdx(which);
+                        PasswdRecordFilter.ExpiryFilter filter =
+                            PasswdRecordFilter.ExpiryFilter.fromIdx(which);
                         switch (filter) {
                         case EXPIRED:
                         case TODAY:
@@ -576,8 +577,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         date.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
                         date.set(Calendar.MILLISECOND, 0);
                         date.add(Calendar.DAY_OF_MONTH, 1);
-                        setRecordExpiryFilter(RecordFilter.ExpiryFilter.CUSTOM,
-                                              date.getTime());
+                        setRecordExpiryFilter(
+                            PasswdRecordFilter.ExpiryFilter.CUSTOM,
+                            date.getTime());
                     }
                 },
                 now.get(Calendar.YEAR),

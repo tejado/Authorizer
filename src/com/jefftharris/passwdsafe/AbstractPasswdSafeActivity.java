@@ -8,7 +8,6 @@
 package com.jefftharris.passwdsafe;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -24,7 +23,7 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
-import com.jefftharris.passwdsafe.util.Utils;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -85,7 +84,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected final ArrayList<HashMap<String, Object>> itsListData =
         new ArrayList<HashMap<String, Object>>();
 
-    private RecordFilter itsFilter = null;
+    private PasswdRecordFilter itsFilter = null;
     private static final String QUERY_MATCH = "";
     private String QUERY_MATCH_TITLE;
     private String QUERY_MATCH_USERNAME;
@@ -121,11 +120,11 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         });
 
         String filterQuery = null;
-        int filterOpts = RecordFilter.OPTS_DEFAULT;
+        int filterOpts = PasswdRecordFilter.OPTS_DEFAULT;
         if (savedInstanceState != null) {
             filterQuery = savedInstanceState.getString(BUNDLE_FILTER_QUERY);
-            filterOpts = savedInstanceState.getInt(BUNDLE_FILTER_OPTS,
-                                                   RecordFilter.OPTS_DEFAULT);
+            filterOpts = savedInstanceState.getInt(
+                BUNDLE_FILTER_OPTS, PasswdRecordFilter.OPTS_DEFAULT);
             ArrayList<String> currGroups =
                 savedInstanceState.getStringArrayList(BUNDLE_CURR_GROUPS);
             if (currGroups != null) {
@@ -174,7 +173,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     {
         super.onSaveInstanceState(outState);
         String filterQuery = null;
-        int filterOpts = RecordFilter.OPTS_DEFAULT;
+        int filterOpts = PasswdRecordFilter.OPTS_DEFAULT;
         // TODO: save/restore filter
         if (itsFilter != null) {
             if (itsFilter.itsSearchQuery != null) {
@@ -510,7 +509,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     /** Set the filter to match on various fields */
     protected final void setRecordFilter(String query)
     {
-        setRecordFilter(query, RecordFilter.OPTS_DEFAULT);
+        setRecordFilter(query, PasswdRecordFilter.OPTS_DEFAULT);
     }
 
 
@@ -542,20 +541,22 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             }
         }
         if ((queryPattern != null) ||
-            (options != RecordFilter.OPTS_DEFAULT)) {
-            itsFilter = new RecordFilter(queryPattern, options);
+            (options != PasswdRecordFilter.OPTS_DEFAULT)) {
+            itsFilter = new PasswdRecordFilter(queryPattern, options);
         }
 
         updateQueryPanel();
     }
 
     /** Set the record filter for an expiration */
-    protected final void setRecordExpiryFilter(RecordFilter.ExpiryFilter filter,
-                                               Date customDate)
-
+    protected final void setRecordExpiryFilter
+    (
+        PasswdRecordFilter.ExpiryFilter filter,
+        Date customDate
+    )
     {
-        itsFilter = new RecordFilter(filter, customDate,
-                                     RecordFilter.OPTS_DEFAULT);
+        itsFilter = new PasswdRecordFilter(filter, customDate,
+                                           PasswdRecordFilter.OPTS_DEFAULT);
         updateQueryPanel();
     }
 
@@ -641,7 +642,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
 
         if ((queryMatch != null) &&
-            (itsFilter.itsOptions != RecordFilter.OPTS_DEFAULT)) {
+            (itsFilter.itsOptions != PasswdRecordFilter.OPTS_DEFAULT)) {
             PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
             if (passwdRec != null) {
                 for (PwsRecord ref: passwdRec.getRefsToRecord()) {
@@ -654,14 +655,15 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                         break;
                     }
                     case ALIAS: {
-                        if (itsFilter.hasOptions(RecordFilter.OPTS_NO_ALIAS)) {
+                        if (itsFilter.hasOptions(
+                                PasswdRecordFilter.OPTS_NO_ALIAS)) {
                             queryMatch = null;
                         }
                         break;
                     }
                     case SHORTCUT: {
                         if (itsFilter.hasOptions(
-                                RecordFilter.OPTS_NO_SHORTCUT)) {
+                                PasswdRecordFilter.OPTS_NO_SHORTCUT)) {
                             queryMatch = null;
                         }
                         break;
@@ -769,157 +771,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
     }
 
-
-    /** A filter for records */
-    protected static final class RecordFilter
-    {
-        /** Type of filter */
-        enum Type
-        {
-            QUERY,
-            EXPIRATION
-        }
-
-        /** Expiration filter type */
-        enum ExpiryFilter
-        {
-            // Order must match expire_filters string array
-            EXPIRED,
-            TODAY,
-            IN_A_WEEK,
-            IN_A_MONTH,
-            IN_A_YEAR,
-            ANY,
-            CUSTOM;
-
-            /** Get the filter value from its value index */
-            public static ExpiryFilter fromIdx(int idx)
-            {
-                if ((idx >= 0) && (idx < values().length)) {
-                    return values()[idx];
-                }
-                return ANY;
-            }
-        }
-
-        /** Default options to match */
-        public static final int OPTS_DEFAULT =          0;
-        /** Record can not have an alias referencing it */
-        public static final int OPTS_NO_ALIAS =         1 << 0;
-        /** Record can not have a shortcut referencing it */
-        public static final int OPTS_NO_SHORTCUT =      1 << 1;
-
-        /** Filter type */
-        public final Type itsType;
-
-        /** Regex to match on various fields */
-        public final Pattern itsSearchQuery;
-
-        /** Expiration filter type */
-        public final ExpiryFilter itsExpiryFilter;
-
-        /** The expiration time to match on a record's expiration */
-        public final long itsExpiryAtMillis;
-
-        /** Filter options */
-        public final int itsOptions;
-
-        /** Constructor for a query */
-        public RecordFilter(Pattern query, int opts)
-        {
-            itsType = Type.QUERY;
-            itsSearchQuery = query;
-            itsExpiryFilter = ExpiryFilter.ANY;
-            itsExpiryAtMillis = 0;
-            itsOptions = opts;
-        }
-
-        /** Constructor for expiration */
-        public RecordFilter(ExpiryFilter filter, Date customDate, int opts)
-        {
-            itsType = Type.EXPIRATION;
-            itsSearchQuery = null;
-            itsExpiryFilter = filter;
-            Calendar expiry = Calendar.getInstance();
-            switch (itsExpiryFilter) {
-            case EXPIRED: {
-                break;
-            }
-            case TODAY: {
-                expiry.add(Calendar.DAY_OF_MONTH, 1);
-                expiry.set(Calendar.HOUR_OF_DAY, 0);
-                expiry.set(Calendar.MINUTE, 0);
-                expiry.set(Calendar.SECOND, 0);
-                expiry.set(Calendar.MILLISECOND, 0);
-                break;
-            }
-            case IN_A_WEEK: {
-                expiry.add(Calendar.WEEK_OF_YEAR, 1);
-                break;
-            }
-            case IN_A_MONTH: {
-                expiry.add(Calendar.MONTH, 1);
-                break;
-            }
-            case IN_A_YEAR: {
-                expiry.add(Calendar.YEAR, 1);
-                break;
-            }
-            case ANY: {
-                expiry.setTimeInMillis(Long.MAX_VALUE);
-                break;
-            }
-            case CUSTOM: {
-                expiry.setTime(customDate);
-                break;
-            }
-            }
-
-            itsExpiryAtMillis = expiry.getTimeInMillis();
-            itsOptions = opts;
-        }
-
-        /** Does the filter have the given options */
-        public final boolean hasOptions(int opts)
-        {
-            return (itsOptions & opts) != 0;
-        }
-
-        /** Convert the filter to a string */
-        public final String toString(Context ctx)
-        {
-            switch (itsType) {
-            case QUERY: {
-                if (itsSearchQuery != null) {
-                    return itsSearchQuery.pattern();
-                }
-                break;
-            }
-            case EXPIRATION: {
-                switch (itsExpiryFilter) {
-                case EXPIRED: {
-                    return ctx.getString(R.string.password_expired);
-                }
-                case TODAY: {
-                    return ctx.getString(R.string.password_expires_today);
-                }
-                case IN_A_WEEK:
-                case IN_A_MONTH:
-                case IN_A_YEAR:
-                case CUSTOM: {
-                    return ctx.getString(
-                        R.string.password_expires_before,
-                        Utils.formatDate(itsExpiryAtMillis, ctx, true, true));
-                }
-                case ANY: {
-                    return ctx.getString(R.string.password_with_expiration);
-                }
-                }
-            }
-            }
-            return "";
-        }
-    }
 
     protected static final class MatchPwsRecord
     {

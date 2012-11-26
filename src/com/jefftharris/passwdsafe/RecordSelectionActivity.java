@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -40,12 +41,12 @@ public class RecordSelectionActivity extends AbstractPasswdSafeActivity
 
         Intent intent = getIntent();
 
-        int options = RecordFilter.OPTS_DEFAULT;
+        int options = PasswdRecordFilter.OPTS_DEFAULT;
         if (intent.getBooleanExtra(FILTER_NO_ALIAS, false)) {
-            options |= RecordFilter.OPTS_NO_ALIAS;
+            options |= PasswdRecordFilter.OPTS_NO_ALIAS;
         }
         if (intent.getBooleanExtra(FILTER_NO_SHORTCUT, false)) {
-            options |= RecordFilter.OPTS_NO_SHORTCUT;
+            options |= PasswdRecordFilter.OPTS_NO_SHORTCUT;
         }
 
         if (accessOpenFile()) {
