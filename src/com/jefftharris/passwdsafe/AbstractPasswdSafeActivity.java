@@ -95,9 +95,11 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         {
             public final void onClick(View v)
             {
-                setRecordFilter(null);
+                setPasswdRecordFilter(null);
             }
         });
+
+        GuiUtils.removeUnsupportedCenterVertical(findViewById(R.id.query));
 
         v = findViewById(R.id.current_group_panel);
         v.setOnClickListener(new View.OnClickListener()

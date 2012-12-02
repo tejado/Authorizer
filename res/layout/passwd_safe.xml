@@ -3,20 +3,20 @@
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:orientation="vertical">
-              
+
     <RelativeLayout android:id="@+id/current_group_panel"
                     android:visible="false"
                     android:clickable="true"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content">
-                    
+
         <ImageView android:id="@+id/current_group_icon"
                    android:src="@drawable/folder_up_rev"
                    android:layout_width="36dp"
                    android:layout_height="36dp"
                    android:contentDescription="@string/up"
                    />
-                   
+
         <TextView android:id="@+id/current_group_label"
                       android:text="@string/group"
                       android:gravity="center_vertical"
@@ -31,16 +31,16 @@
         <View
             style="@style/Separator.Light"
             android:layout_below="@id/current_group_label"/>
-              
+
     </RelativeLayout>
-              
+
     <ListView android:id="@android:id/list"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               android:layout_weight="1"
               android:fastScrollEnabled="true"
               android:drawSelectorOnTop="false"/>
-                        
+
     <TextView android:id="@android:id/empty"
               android:textSize="16sp"
               android:textStyle="bold"
@@ -58,16 +58,17 @@
         <View
             android:id="@+id/query_sep"
             style="@style/Separator.Light"/>
-          
-        <Button
+
+        <ImageButton
             android:id="@+id/query_clear_btn"
+            style="@android:style/Widget.ImageWell"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@id/query_sep"
             android:layout_marginTop="2dp"
-            android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
-            android:text="@string/clear"/>
+            android:contentDescription="@string/clear"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
 
         <TextView
             android:id="@+id/query"

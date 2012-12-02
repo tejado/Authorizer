@@ -30,6 +30,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -284,5 +285,17 @@ public final class GuiUtils
                 }
             }
         });
+    }
+
+
+    /** Remove the layout_centerVertical flag if it is not supported */
+    public static void removeUnsupportedCenterVertical(View v)
+    {
+        if (SDK_VERSION <= SDK_CUPCAKE) {
+            RelativeLayout.LayoutParams params =
+                (RelativeLayout.LayoutParams)v.getLayoutParams();
+            params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+            v.setLayoutParams(params);
+        }
     }
 }
