@@ -73,6 +73,7 @@
     <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
+    <string name="expired_passwords">Mots de passe Expirés</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
     <string name="file_backups">Fichiers de sauvegarde</string>
     <string name="file_close_timeout">Fermeture automatique de fichier</string>

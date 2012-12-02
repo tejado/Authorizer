@@ -73,6 +73,7 @@
     <string name="error">Error</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
+    <string name="expired_passwords">Expired Passwords</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
     <string name="file_backups">File backups</string>
     <string name="file_close_timeout">File close timeout</string>

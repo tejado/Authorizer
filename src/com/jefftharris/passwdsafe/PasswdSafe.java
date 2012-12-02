@@ -156,9 +156,6 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         addSearchMenuItem(menu);
 
-        mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
-        mi.setIcon(android.R.drawable.ic_menu_info_details);
-
         mi = menu.add(0, MENU_ADD_RECORD, 0, R.string.add_record);
         mi.setIcon(android.R.drawable.ic_menu_add);
 
@@ -166,9 +163,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         mi = menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
 
-        // TODO: better name to indicate a filter choice
-        mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.password_expiration);
+        mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.expired_passwords);
 
+        // File operations submenu
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);
 
         mi = submenu.add(0, MENU_CHANGE_PASSWD, 0, R.string.change_password);
@@ -179,6 +176,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         mi = submenu.add(0, MENU_PROTECT, 0, R.string.protect_all);
         mi = submenu.add(0, MENU_UNPROTECT, 0, R.string.unprotect_all);
+        // End file operations submenu
+
+        mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
+        mi.setIcon(android.R.drawable.ic_menu_info_details);
 
         addParentMenuItem(menu);
 
@@ -535,7 +536,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
         case DIALOG_PASSWD_EXPIRYS: {
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle(R.string.password_expiration)
+                .setTitle(R.string.expired_passwords)
                 .setItems(R.array.expire_filters,
                           new DialogInterface.OnClickListener()
                 {
