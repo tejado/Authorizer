@@ -58,8 +58,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
     private static final String BUNDLE_FILTER_QUERY =
         "passwdsafe.filterQuery";
-    private static final String BUNDLE_FILTER_OPTS =
-        "passwdsafe.filterOptions";
     private static final String BUNDLE_CURR_GROUPS =
         "passwdsafe.currGroups";
 
@@ -110,19 +108,16 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             }
         });
 
-        String filterQuery = null;
-        int filterOpts = PasswdRecordFilter.OPTS_DEFAULT;
+        PasswdRecordFilter filter = null;
         if (savedInstanceState != null) {
-            filterQuery = savedInstanceState.getString(BUNDLE_FILTER_QUERY);
-            filterOpts = savedInstanceState.getInt(
-                BUNDLE_FILTER_OPTS, PasswdRecordFilter.OPTS_DEFAULT);
+            filter = savedInstanceState.getParcelable(BUNDLE_FILTER_QUERY);
             ArrayList<String> currGroups =
                 savedInstanceState.getStringArrayList(BUNDLE_CURR_GROUPS);
             if (currGroups != null) {
                 itsCurrGroups = new ArrayList<String>(currGroups);
             }
         }
-        setRecordFilter(filterQuery, filterOpts);
+        setPasswdRecordFilter(filter);
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
@@ -163,17 +158,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-        String filterQuery = null;
-        int filterOpts = PasswdRecordFilter.OPTS_DEFAULT;
-        // TODO: save/restore filter
-        if (itsFilter != null) {
-            if (itsFilter.itsSearchQuery != null) {
-                filterQuery = itsFilter.itsSearchQuery.pattern();
-            }
-            filterOpts = itsFilter.itsOptions;
-        }
-        outState.putString(BUNDLE_FILTER_QUERY, filterQuery);
-        outState.putInt(BUNDLE_FILTER_OPTS, filterOpts);
+        outState.putParcelable(BUNDLE_FILTER_QUERY,
+                               (itsFilter != null) ? itsFilter : null);
         outState.putStringArrayList(BUNDLE_CURR_GROUPS, itsCurrGroups);
     }
 
@@ -507,7 +493,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     /** Set the record filter options */
     protected final void setRecordFilter(String query, int options)
     {
-        itsFilter = null;
+        PasswdRecordFilter filter = null;
         Pattern queryPattern = null;
         if ((query != null) && (query.length() != 0)) {
             try {
@@ -524,10 +510,10 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
         if ((queryPattern != null) ||
             (options != PasswdRecordFilter.OPTS_DEFAULT)) {
-            itsFilter = new PasswdRecordFilter(queryPattern, options);
+            filter = new PasswdRecordFilter(queryPattern, options);
         }
 
-        updateQueryPanel();
+        setPasswdRecordFilter(filter);
     }
 
     /** Set the record filter for an expiration */
@@ -537,14 +523,15 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         Date customDate
     )
     {
-        itsFilter = new PasswdRecordFilter(filter, customDate,
-                                           PasswdRecordFilter.OPTS_DEFAULT);
-        updateQueryPanel();
+        setPasswdRecordFilter(
+            new PasswdRecordFilter(filter, customDate,
+                                   PasswdRecordFilter.OPTS_DEFAULT));
     }
 
-    /** Update the query panel after a filter change */
-    private final void updateQueryPanel()
+    /** Set the record filter */
+    private final void setPasswdRecordFilter(PasswdRecordFilter filter)
     {
+        itsFilter = filter;
         View panel = findViewById(R.id.query_panel);
         if (hasFilterSearchQuery()) {
             panel.setVisibility(View.VISIBLE);
