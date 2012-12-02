@@ -13,6 +13,7 @@ import java.util.List;
 import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
+import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -861,8 +862,7 @@ public class RecordView extends AbstractRecordTabActivity
     {
         PasswdPolicy policy = null;
         String policyLoc = null;
-        Date passwdExpiry = null;
-        Integer passwdExpiryInt = null;
+        PasswdExpiration passwdExpiry = null;
         Date lastModTime = null;
         PasswdHistory history = null;
         switch (passwdRec.getType()) {
@@ -887,16 +887,14 @@ public class RecordView extends AbstractRecordTabActivity
             }
 
             PwsRecord rec = passwdRec.getRecord();
-            passwdExpiry = fileData.getPasswdExpiryTime(rec);
-            passwdExpiryInt = fileData.getPasswdExpiryInterval(rec);
+            passwdExpiry = fileData.getPasswdExpiry(rec);
             lastModTime = fileData.getPasswdLastModTime(rec);
             history = fileData.getPasswdHistory(rec);
             break;
         }
         case ALIAS: {
             PwsRecord recForPassword = passwdRec.getRef();
-            passwdExpiry = fileData.getPasswdExpiryTime(recForPassword);
-            passwdExpiryInt = fileData.getPasswdExpiryInterval(recForPassword);
+            passwdExpiry = fileData.getPasswdExpiry(recForPassword);
             lastModTime = fileData.getPasswdLastModTime(recForPassword);
             history = fileData.getPasswdHistory(recForPassword);
             break;
@@ -907,8 +905,8 @@ public class RecordView extends AbstractRecordTabActivity
         }
 
         String expiryIntStr = null;
-        if (passwdExpiryInt != null) {
-            int val = passwdExpiryInt.intValue();
+        if ((passwdExpiry != null) && passwdExpiry.itsIsRecurring) {
+            int val = passwdExpiry.itsInterval;
             if (val != 0) {
                 expiryIntStr =
                     getResources().getQuantityString(R.plurals.interval_days,
@@ -919,7 +917,7 @@ public class RecordView extends AbstractRecordTabActivity
                       (passwdExpiry != null) || (lastModTime != null) ||
                       (expiryIntStr != null));
         setDateText(R.id.expiration_time, R.id.expiration_time_row,
-                    passwdExpiry);
+                    (passwdExpiry != null) ? passwdExpiry.itsExpiration : null);
         setDateText(R.id.password_mod_time, R.id.password_mod_time_row,
                     lastModTime);
         setText(R.id.expiration_interval, R.id.expiration_interval_row,

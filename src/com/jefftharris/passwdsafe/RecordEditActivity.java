@@ -1007,16 +1007,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         if (passwdRecord == null) {
             itsOrigExpiry = null;
         } else {
-            PwsRecord rec = passwdRecord.getRecord();
-            Date expTime = fileData.getPasswdExpiryTime(rec);
-            Integer expInt = fileData.getPasswdExpiryInterval(rec);
-            if (expTime != null) {
-                boolean haveInt = (expInt != null);
-                itsOrigExpiry =
-                    new PasswdExpiration(expTime,
-                                         haveInt ? expInt.intValue() : 0,
-                                         haveInt);
-            }
+            itsOrigExpiry = passwdRecord.getPasswdExpiry();
         }
 
         itsExpiryDate = Calendar.getInstance();
@@ -1302,17 +1293,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             // overwrite basic expiration updates when the password changes.
             Pair<Boolean, PasswdExpiration> updateExpiry = getUpdatedExpiry();
             if (updateExpiry.first) {
-                PasswdExpiration expiry = updateExpiry.second;
-                Date expiryTime = null;
-                int expiryInterval = 0;
-                if (expiry != null) {
-                    expiryTime = expiry.itsExpiration;
-                    if (expiry.itsIsRecurring) {
-                        expiryInterval = expiry.itsInterval;
-                    }
-                }
-                fileData.setPasswdExpiryTime(expiryTime, record);
-                fileData.setPasswdExpiryInterval(expiryInterval, record);
+                fileData.setPasswdExpiry(updateExpiry.second, record);
             }
         }
 

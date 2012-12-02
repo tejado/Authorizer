@@ -398,11 +398,12 @@ public class PasswdFileData
         }
         setField(newPasswd, rec, PwsRecordV3.PASSWORD);
 
-        Integer expInterval = getPasswdExpiryInterval(rec);
+        PasswdExpiration expiry = getPasswdExpiry(rec);
         Date expTime = null;
-        if ((expInterval != null) && (expInterval.intValue() > 0)) {
+        if ((expiry != null) && expiry.itsIsRecurring &&
+            (expiry.itsInterval > 0)) {
             long exp = System.currentTimeMillis();
-            exp += (long)expInterval.intValue() * DateUtils.DAY_IN_MILLIS;
+            exp += (long)expiry.itsInterval * DateUtils.DAY_IN_MILLIS;
             expTime = new Date(exp);
         }
         setField(expTime, rec, PwsRecordV3.PASSWORD_LIFETIME, false);
@@ -424,29 +425,41 @@ public class PasswdFileData
         }
     }
 
-    /** Get the time the password will expire in the record */
-    public final Date getPasswdExpiryTime(PwsRecord rec)
+    /** Get the password expiration */
+    public final PasswdExpiration getPasswdExpiry(PwsRecord rec)
     {
-        return getDateField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+        PasswdExpiration expiry = null;
+        Date expTime = getDateField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+        if (expTime != null) {
+            Integer expInt =
+                getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
+            boolean haveInt = (expInt != null);
+            expiry = new PasswdExpiration(expTime,
+                                          haveInt ? expInt.intValue() : 0,
+                                          haveInt);
+        }
+        return expiry;
     }
 
-    /** Set the time the password will expire in the record */
-    public final void setPasswdExpiryTime(Date expiry, PwsRecord rec)
+    /** Set the password expiration */
+    public final void setPasswdExpiry(PasswdExpiration expiry, PwsRecord rec)
     {
-        setField(expiry, rec, PwsRecordV3.PASSWORD_LIFETIME);
-    }
-
-    /** Get the password expiration interval in days (null or 0 for not set) */
-    public final Integer getPasswdExpiryInterval(PwsRecord rec)
-    {
-        return getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
-    }
-
-    /** Set the password expiration interval in days (0 to remove) */
-    public final void setPasswdExpiryInterval(int interval, PwsRecord rec)
-    {
-        setField((interval != 0) ? interval : null, rec,
+        Date expDate = null;
+        int expInterval = 0;
+        if (expiry != null) {
+            expDate = expiry.itsExpiration;
+            if (expiry.itsIsRecurring) {
+                expInterval = expiry.itsInterval;
+            }
+        }
+        setField(expDate, rec, PwsRecordV3.PASSWORD_LIFETIME);
+        setField((expInterval != 0) ? expInterval : null, rec,
                  PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
+
+        PasswdRecord passwdRec = getPasswdRecord(rec);
+        if (passwdRec != null) {
+            passwdRec.passwdExpiryChanged(this);
+        }
     }
 
     /** Get the time the password was last modified */

@@ -244,11 +244,11 @@ public final class PasswdRecordFilter implements Parcelable
             break;
         }
         case EXPIRATION: {
-            Date expiry = fileData.getPasswdExpiryTime(rec);
+            PasswdExpiration expiry = fileData.getPasswdExpiry(rec);
             if (expiry == null) {
                 break;
             }
-            long expire = expiry.getTime();
+            long expire = expiry.itsExpiration.getTime();
             if (expire < itsExpiryAtMillis) {
                 queryMatch = DateUtils.getRelativeDateTimeString(
                     ctx, expire, DateUtils.HOUR_IN_MILLIS,
