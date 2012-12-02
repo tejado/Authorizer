@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.util.Utils;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;
@@ -26,10 +27,7 @@ public class PasswdRecordFilterTest extends AndroidTestCase
         Pattern pattern = Pattern.compile("foobar", Pattern.CASE_INSENSITIVE);
         PasswdRecordFilter filter =
             new PasswdRecordFilter(pattern, PasswdRecordFilter.OPTS_DEFAULT);
-
-        PasswdRecordFilter filter2 = recreateFilter(filter);
-        assertNotSame(filter, filter2);
-        assertEquals(filter, filter2);
+        doParcelTest(filter, "foobar");
     }
 
 
@@ -39,24 +37,34 @@ public class PasswdRecordFilterTest extends AndroidTestCase
         PasswdRecordFilter filter =
             new PasswdRecordFilter(PasswdRecordFilter.ExpiryFilter.TODAY, null,
                                    PasswdRecordFilter.OPTS_NO_ALIAS);
-
-        PasswdRecordFilter filter2 = recreateFilter(filter);
-        assertNotSame(filter, filter2);
-        assertEquals(filter, filter2);
+        doParcelTest(filter, "Password expires today");
     }
 
 
     /** Test parcelling a custom expiration filter */
     public void testExpiryCustomParcel()
     {
+        Date now = new Date();
         PasswdRecordFilter filter =
             new PasswdRecordFilter(PasswdRecordFilter.ExpiryFilter.CUSTOM,
-                                   new Date(),
+                                   now,
                                    PasswdRecordFilter.OPTS_NO_SHORTCUT);
+        doParcelTest(filter, "Password expires before " +
+                                 Utils.formatDate(now.getTime(), getContext(),
+                                                  true, true));
+    }
 
+
+    /** Test a parceled filter */
+    private final void doParcelTest(PasswdRecordFilter filter,
+                                    String expectedToString)
+    {
         PasswdRecordFilter filter2 = recreateFilter(filter);
         assertNotSame(filter, filter2);
         assertEquals(filter, filter2);
+
+        assertEquals(expectedToString, filter.toString(getContext()));
+        assertEquals(expectedToString, filter2.toString(getContext()));
     }
 
 
