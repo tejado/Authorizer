@@ -24,6 +24,7 @@ import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -77,7 +78,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = false;
     private FontSizePref itsFontSize = Preferences.PREF_FONT_SIZE_DEF;
-    protected PasswdRecordFilter.ExpiryFilter itsExpiryNotifFilter =
+    protected PasswdExpiryNotifPref itsExpiryNotifPref =
         Preferences.PREF_PASSWD_EXPIRY_NOTIF_DEF;
     protected int itsNumExpired = 0;
 
@@ -134,7 +135,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             Preferences.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
         itsFontSize = Preferences.getFontSizePref(prefs);
-        itsExpiryNotifFilter = Preferences.getPasswdExpiryNotifPref(prefs);
+        itsExpiryNotifPref = Preferences.getPasswdExpiryNotifPref(prefs);
     }
 
 
@@ -469,15 +470,18 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
 
         itsNumExpired = 0;
-        long expiration = itsExpiryNotifFilter.getExpiryFromNow(null);
-        for (PasswdRecord rec : fileData.getPasswdRecords()) {
-            PasswdExpiration expiry = rec.getPasswdExpiry();
-            if (expiry == null) {
-                continue;
-            }
+        PasswdRecordFilter.ExpiryFilter filter = itsExpiryNotifPref.getFilter();
+        if (filter != null) {
+            long expiration = filter.getExpiryFromNow(null);
+            for (PasswdRecord rec : fileData.getPasswdRecords()) {
+                PasswdExpiration expiry = rec.getPasswdExpiry();
+                if (expiry == null) {
+                    continue;
+                }
 
-            if (expiry.itsExpiration.getTime() <= expiration) {
-                ++itsNumExpired;
+                if (expiry.itsExpiration.getTime() <= expiration) {
+                    ++itsNumExpired;
+                }
             }
         }
     }

@@ -12,7 +12,7 @@ import java.io.File;
 import org.pwsafe.lib.file.PwsFile;
 
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
-import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 
 import android.content.Context;
 import android.content.Intent;
@@ -70,9 +70,8 @@ public class Preferences extends PreferenceActivity
         PwsFile.DEFAULT_PASSWORD_CHARSET;
     public static final String PREF_PASSWD_EXPIRY_NOTIF =
         "passwordExpiryNotifyPref";
-    public static final PasswdRecordFilter.ExpiryFilter
-        PREF_PASSWD_EXPIRY_NOTIF_DEF =
-        PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS;
+    public static final PasswdExpiryNotifPref PREF_PASSWD_EXPIRY_NOTIF_DEF =
+        PasswdExpiryNotifPref.IN_TWO_WEEKS;
 
     public static final String PREF_SEARCH_CASE_SENSITIVE =
         "searchCaseSensitivePref";
@@ -207,13 +206,15 @@ public class Preferences extends PreferenceActivity
     }
 
     /** Get the password expiration notification preference */
-    public static PasswdRecordFilter.ExpiryFilter
-    getPasswdExpiryNotifPref(SharedPreferences prefs)
+    public static PasswdExpiryNotifPref getPasswdExpiryNotifPref
+    (
+         SharedPreferences prefs
+    )
     {
         try {
-            return PasswdRecordFilter.ExpiryFilter.prefValueOf(
+            return PasswdExpiryNotifPref.prefValueOf(
                 prefs.getString(PREF_PASSWD_EXPIRY_NOTIF,
-                                PREF_PASSWD_EXPIRY_NOTIF_DEF.getPrefValue()));
+                                PREF_PASSWD_EXPIRY_NOTIF_DEF.getValue()));
         } catch (IllegalArgumentException e) {
             return PREF_PASSWD_EXPIRY_NOTIF_DEF;
         }
@@ -382,9 +383,9 @@ public class Preferences extends PreferenceActivity
         itsPasswdExpiryNotifPref =
             (ListPreference)findPreference(PREF_PASSWD_EXPIRY_NOTIF);
         itsPasswdExpiryNotifPref.setEntries(
-            PasswdRecordFilter.ExpiryFilter.getPrefDisplayNames(res));
+            PasswdExpiryNotifPref.getDisplayNames(res));
         itsPasswdExpiryNotifPref.setEntryValues(
-            PasswdRecordFilter.ExpiryFilter.getPrefValues());
+            PasswdExpiryNotifPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_PASSWD_EXPIRY_NOTIF);
 
         itsFontSizePref = (ListPreference) findPreference(PREF_FONT_SIZE);
@@ -438,8 +439,7 @@ public class Preferences extends PreferenceActivity
             itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
         } else if (key.equals(PREF_PASSWD_EXPIRY_NOTIF)) {
             itsPasswdExpiryNotifPref.setSummary(
-               getPasswdExpiryNotifPref(prefs).getPrefDisplayName(
-                   getResources()));
+               getPasswdExpiryNotifPref(prefs).getDisplayName(getResources()));
         } else if (key.equals(PREF_FONT_SIZE)) {
             itsFontSizePref.setSummary(
                 getFontSizePref(prefs).getDisplayName(getResources()));

@@ -285,6 +285,17 @@
         <item>%1$s passwords expire within a month</item>
         <item>%1$s passwords expire within a year</item>
     </string-array>
+    
+    <!-- Order must match PasswdExpiryNotifPref enum values -->
+    <string-array name="passwd_expiry_notif_pref">
+        <item>None</item>
+        <item>Expired</item>
+        <item>Today</item>
+        <item>In a Week</item>
+        <item>In Two Weeks</item>
+        <item>In a Month</item>
+        <item>In a Year</item>
+     </string-array>
 
     <!-- Order must match constants in PasswdExpiration.Type -->
     <string-array name="expire_type">

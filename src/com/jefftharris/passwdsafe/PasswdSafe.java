@@ -110,7 +110,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             {
                 View panel = findViewById(R.id.expiry_panel);
                 panel.setVisibility(View.GONE);
-                setRecordExpiryFilter(itsExpiryNotifFilter, null);
+                PasswdRecordFilter.ExpiryFilter filter =
+                    itsExpiryNotifPref.getFilter();
+                if (filter != null) {
+                    setRecordExpiryFilter(filter, null);
+                }
             }
         });
 
@@ -794,9 +798,13 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         if (itsIsNotifyExpirations && ((mod & MOD_DATA) != 0)) {
             itsIsNotifyExpirations = false;
-            TextView tv = (TextView)findViewById(R.id.expiry);
-            tv.setText(itsExpiryNotifFilter.getRecordsExpireStr(
-                           itsNumExpired, getResources()));
+            PasswdRecordFilter.ExpiryFilter filter =
+                itsExpiryNotifPref.getFilter();
+            if (filter != null) {
+                TextView tv = (TextView)findViewById(R.id.expiry);
+                tv.setText(filter.getRecordsExpireStr(itsNumExpired,
+                                                      getResources()));
+            }
             View group = findViewById(R.id.expiry_panel);
             group.setVisibility(itsNumExpired > 0 ? View.VISIBLE : View.GONE);
         }
