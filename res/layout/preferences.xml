@@ -79,6 +79,13 @@
             android:key="passwordEncodingPref"
             android:title="@string/file_password_encoding"/>
 
+        <ListPreference
+            android:name="passwordExpiryNotify Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:key="passwordExpiryNotifyPref"
+            android:title="Expired password notification"/>
+
         <Preference
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

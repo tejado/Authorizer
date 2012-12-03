@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe.file;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -38,21 +39,23 @@ public final class PasswdRecordFilter implements Parcelable
     {
         // Order must match expire_filters string array
         // Records indexes must match expire_filter_records string array
-        EXPIRED         (0),
-        TODAY           (1),
-        IN_A_WEEK       (2),
-        IN_TWO_WEEKS    (3),
-        IN_A_MONTH      (4),
-        IN_A_YEAR       (5),
-        ANY             (-1),
-        CUSTOM          (-1);
+        EXPIRED         (0,     "EXPIRED"),
+        TODAY           (1,     "TODAY"),
+        IN_A_WEEK       (2,     "IN_A_WEEK"),
+        IN_TWO_WEEKS    (3,     "IN_TWO_WEEKS"),
+        IN_A_MONTH      (4,     "IN_A_MONTH"),
+        IN_A_YEAR       (5,     "IN_A_YEAR"),
+        ANY             (-1,    "ANY"),
+        CUSTOM          (-1,    "CUSTOM");
 
         private final int itsExpireRecordsIdx;
+        private final String itsPrefValue;
 
         /** Constructor */
-        private ExpiryFilter(int expireRecordsIdx)
+        private ExpiryFilter(int expireRecordsIdx, String prefValue)
         {
             itsExpireRecordsIdx = expireRecordsIdx;
+            itsPrefValue = prefValue;
         }
 
         /** Get the filter value from its value index */
@@ -62,6 +65,54 @@ public final class PasswdRecordFilter implements Parcelable
                 return values()[idx];
             }
             return ANY;
+        }
+
+        /** Get the value for use as a preference */
+        public final String getPrefValue()
+        {
+            return itsPrefValue;
+        }
+
+        /** Get the display name of the type for a preference */
+        public final String getPrefDisplayName(Resources res)
+        {
+            return getPrefDisplayNamesArray(res)[ordinal()];
+        }
+
+        /** Get the type from its preference value */
+        public static ExpiryFilter prefValueOf(String str)
+        {
+            for (ExpiryFilter pref : ExpiryFilter.values()) {
+                if (pref.getPrefValue().equals(str)) {
+                    return pref;
+                }
+            }
+            throw new IllegalArgumentException(str);
+        }
+
+        /** Get all of the values for preferences */
+        public static String[] getPrefValues()
+        {
+            ArrayList<String> strs = new ArrayList<String>();
+            for (ExpiryFilter pref: values()) {
+                if (pref.itsExpireRecordsIdx >= 0) {
+                    strs.add(pref.getPrefValue());
+                }
+            }
+            return strs.toArray(new String[strs.size()]);
+        }
+
+        /** Get the display names of all of the types for preferences */
+        public static String[] getPrefDisplayNames(Resources res)
+        {
+            ArrayList<String> strs = new ArrayList<String>();
+            String[] displayNames = getPrefDisplayNamesArray(res);
+            for (ExpiryFilter pref: values()) {
+                if (pref.itsExpireRecordsIdx >= 0) {
+                    strs.add(displayNames[pref.ordinal()]);
+                }
+            }
+            return strs.toArray(new String[strs.size()]);
         }
 
         /**
@@ -121,6 +172,15 @@ public final class PasswdRecordFilter implements Parcelable
             }
             }
             return expiry.getTimeInMillis();
+        }
+
+        /**
+         * Get the strings used for the display names of the types for
+         * preferences
+         */
+        private static final String[] getPrefDisplayNamesArray(Resources res)
+        {
+            return res.getStringArray(R.array.expire_filters);
         }
     }
 

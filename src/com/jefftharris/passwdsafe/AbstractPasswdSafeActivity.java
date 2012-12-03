@@ -78,7 +78,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private boolean itsIsSearchRegex = false;
     private FontSizePref itsFontSize = Preferences.PREF_FONT_SIZE_DEF;
     protected PasswdRecordFilter.ExpiryFilter itsExpiryNotifFilter =
-        PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS;
+        Preferences.PREF_PASSWD_EXPIRY_NOTIF_DEF;
     protected int itsNumExpired = 0;
 
     protected final ArrayList<HashMap<String, Object>> itsListData =
@@ -134,6 +134,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             Preferences.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
         itsFontSize = Preferences.getFontSizePref(prefs);
+        itsExpiryNotifFilter = Preferences.getPasswdExpiryNotifPref(prefs);
     }
 
 

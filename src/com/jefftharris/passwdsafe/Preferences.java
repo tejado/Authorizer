@@ -12,6 +12,7 @@ import java.io.File;
 import org.pwsafe.lib.file.PwsFile;
 
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -67,6 +68,11 @@ public class Preferences extends PreferenceActivity
     public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
     public static final String PREF_PASSWD_ENC_DEF =
         PwsFile.DEFAULT_PASSWORD_CHARSET;
+    public static final String PREF_PASSWD_EXPIRY_NOTIF =
+        "passwordExpiryNotifyPref";
+    public static final PasswdRecordFilter.ExpiryFilter
+        PREF_PASSWD_EXPIRY_NOTIF_DEF =
+        PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS;
 
     public static final String PREF_SEARCH_CASE_SENSITIVE =
         "searchCaseSensitivePref";
@@ -111,6 +117,7 @@ public class Preferences extends PreferenceActivity
     private ListPreference itsFileClosePref;
     private ListPreference itsFileBackupPref;
     private ListPreference itsPasswdEncPref;
+    private ListPreference itsPasswdExpiryNotifPref;
     private ListPreference itsFontSizePref;
 
 
@@ -197,6 +204,19 @@ public class Preferences extends PreferenceActivity
     public static String getPasswordEncodingPref(SharedPreferences prefs)
     {
         return prefs.getString(PREF_PASSWD_ENC, PREF_PASSWD_ENC_DEF);
+    }
+
+    /** Get the password expiration notification preference */
+    public static PasswdRecordFilter.ExpiryFilter
+    getPasswdExpiryNotifPref(SharedPreferences prefs)
+    {
+        try {
+            return PasswdRecordFilter.ExpiryFilter.prefValueOf(
+                prefs.getString(PREF_PASSWD_EXPIRY_NOTIF,
+                                PREF_PASSWD_EXPIRY_NOTIF_DEF.getPrefValue()));
+        } catch (IllegalArgumentException e) {
+            return PREF_PASSWD_EXPIRY_NOTIF_DEF;
+        }
     }
 
     /** Upgrade the default password policy preference if needed */
@@ -359,6 +379,14 @@ public class Preferences extends PreferenceActivity
         itsPasswdEncPref.setDefaultValue(PREF_PASSWD_ENC_DEF);
         onSharedPreferenceChanged(prefs, PREF_PASSWD_ENC);
 
+        itsPasswdExpiryNotifPref =
+            (ListPreference)findPreference(PREF_PASSWD_EXPIRY_NOTIF);
+        itsPasswdExpiryNotifPref.setEntries(
+            PasswdRecordFilter.ExpiryFilter.getPrefDisplayNames(res));
+        itsPasswdExpiryNotifPref.setEntryValues(
+            PasswdRecordFilter.ExpiryFilter.getPrefValues());
+        onSharedPreferenceChanged(prefs, PREF_PASSWD_EXPIRY_NOTIF);
+
         itsFontSizePref = (ListPreference) findPreference(PREF_FONT_SIZE);
         itsFontSizePref.setEntries(FontSizePref.getDisplayNames(res));
         itsFontSizePref.setEntryValues(FontSizePref.getValues());
@@ -408,6 +436,10 @@ public class Preferences extends PreferenceActivity
                 getFileBackupPref(prefs).getDisplayName(getResources()));
         } else if (key.equals(PREF_PASSWD_ENC)) {
             itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
+        } else if (key.equals(PREF_PASSWD_EXPIRY_NOTIF)) {
+            itsPasswdExpiryNotifPref.setSummary(
+               getPasswdExpiryNotifPref(prefs).getPrefDisplayName(
+                   getResources()));
         } else if (key.equals(PREF_FONT_SIZE)) {
             itsFontSizePref.setSummary(
                 getFontSizePref(prefs).getDisplayName(getResources()));
