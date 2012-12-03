@@ -96,7 +96,9 @@
         android:clickable="true"
         android:visibility="gone">
 
-        <View style="@style/Separator.Light"/>
+        <View
+            android:id="@+id/expiry_sep"
+            style="@style/Separator.Light"/>
 
         <ImageButton
             android:id="@+id/expiry_clear_btn"
@@ -104,7 +106,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/query_sep"
+            android:layout_below="@id/expiry_sep"
             android:layout_marginTop="2dp"
             android:contentDescription="@string/clear"
             android:src="@android:drawable/ic_menu_close_clear_cancel"/>
@@ -115,12 +117,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:layout_marginTop="4dp"
             android:layout_toLeftOf="@id/expiry_clear_btn"
             android:drawableLeft="@android:drawable/ic_dialog_alert"
             android:drawablePadding="4dp"
             android:gravity="center_vertical"
             android:textSize="16sp"/>
-
     </RelativeLayout>
 
 </LinearLayout>
