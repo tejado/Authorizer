@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
@@ -195,6 +196,12 @@ public class PasswdFileData
     public PasswdRecord getPasswdRecord(PwsRecord rec)
     {
         return itsPasswdRecords.get(rec);
+    }
+
+    /** Get the collection of PasswdRecords in the file */
+    public Collection<PasswdRecord> getPasswdRecords()
+    {
+        return itsPasswdRecords.values();
     }
 
     public PwsRecord createRecord()

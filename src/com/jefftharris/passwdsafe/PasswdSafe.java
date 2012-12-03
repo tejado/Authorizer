@@ -81,6 +81,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private DialogValidator itsFileNewValidator;
     private DialogValidator itsDeleteValidator;
     private String itsRecToOpen;
+    private boolean itsIsNotifyExpirations = true;
 
     /** Called when the activity is first created. */
     @Override
@@ -91,6 +92,30 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         Intent intent = getIntent();
         PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + intent);
+
+        View v = findViewById(R.id.expiry_clear_btn);
+        v.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                View panel = findViewById(R.id.expiry_panel);
+                panel.setVisibility(View.GONE);
+            }
+        });
+
+        v = findViewById(R.id.expiry_panel);
+        v.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                View panel = findViewById(R.id.expiry_panel);
+                panel.setVisibility(View.GONE);
+                setRecordExpiryFilter(
+                    PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS, null);
+            }
+        });
+
+        GuiUtils.removeUnsupportedCenterVertical(findViewById(R.id.expiry));
 
         String action = intent.getAction();
         if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
@@ -548,6 +573,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         case EXPIRED:
                         case TODAY:
                         case IN_A_WEEK:
+                        case IN_TWO_WEEKS:
                         case IN_A_MONTH:
                         case IN_A_YEAR:
                         case ANY: {
@@ -766,6 +792,15 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             openRecord(itsRecToOpen);
         }
         super.showFileData(mod);
+
+        if (itsIsNotifyExpirations && ((mod & MOD_DATA) != 0)) {
+            itsIsNotifyExpirations = false;
+            TextView tv = (TextView)findViewById(R.id.expiry);
+            tv.setText(String.format("%d records expire within the next two weeks",
+                                     itsNumExpired));
+            View group = findViewById(R.id.expiry_panel);
+            group.setVisibility(itsNumExpired > 0 ? View.VISIBLE : View.GONE);
+        }
     }
 
 

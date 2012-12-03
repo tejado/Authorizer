@@ -20,7 +20,9 @@ import java.util.regex.PatternSyntaxException;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 
 import android.app.SearchManager;
@@ -30,6 +32,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -75,6 +78,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = false;
     private FontSizePref itsFontSize = Preferences.PREF_FONT_SIZE_DEF;
+    protected int itsNumExpired = 0;
 
     protected final ArrayList<HashMap<String, Object>> itsListData =
         new ArrayList<HashMap<String, Object>>();
@@ -459,6 +463,20 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                     continue;
                 }
                 itsRootNode.addRecord(new MatchPwsRecord(rec, match));
+            }
+        }
+
+        itsNumExpired = 0;
+        long expiration =
+            System.currentTimeMillis() + 2 * DateUtils.WEEK_IN_MILLIS;
+        for (PasswdRecord rec : fileData.getPasswdRecords()) {
+            PasswdExpiration expiry = rec.getPasswdExpiry();
+            if (expiry == null) {
+                continue;
+            }
+
+            if (expiry.itsExpiration.getTime() <= expiration) {
+                ++itsNumExpired;
             }
         }
     }

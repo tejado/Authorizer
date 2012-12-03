@@ -47,4 +47,8 @@
         <item name="android:background">@drawable/spinner_background_holo_dark</item>
         <item name="android:gravity">center_vertical|left</item>
     </style>
+    
+    <style name="BorderlessButton">
+        <item name="android:background">@android:drawable/list_selector_background</item>
+    </style>
 </resources>

@@ -39,6 +39,7 @@ public final class PasswdRecordFilter implements Parcelable
         EXPIRED,
         TODAY,
         IN_A_WEEK,
+        IN_TWO_WEEKS,
         IN_A_MONTH,
         IN_A_YEAR,
         ANY,
@@ -114,6 +115,10 @@ public final class PasswdRecordFilter implements Parcelable
         }
         case IN_A_WEEK: {
             expiry.add(Calendar.WEEK_OF_YEAR, 1);
+            break;
+        }
+        case IN_TWO_WEEKS: {
+            expiry.add(Calendar.WEEK_OF_YEAR, 2);
             break;
         }
         case IN_A_MONTH: {
@@ -329,6 +334,7 @@ public final class PasswdRecordFilter implements Parcelable
                 return ctx.getString(R.string.password_expires_today);
             }
             case IN_A_WEEK:
+            case IN_TWO_WEEKS:
             case IN_A_MONTH:
             case IN_A_YEAR:
             case CUSTOM: {
