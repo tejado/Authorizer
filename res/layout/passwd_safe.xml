@@ -59,7 +59,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:visible="false">
+        android:visibility="gone">
 
         <View
             android:id="@+id/query_sep"
@@ -94,7 +94,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:visible="false">
+        android:visibility="gone">
 
         <View style="@style/Separator.Light"/>
 
@@ -116,6 +116,8 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/expiry_clear_btn"
+            android:drawableLeft="@android:drawable/ic_dialog_alert"
+            android:drawablePadding="4dp"
             android:gravity="center_vertical"
             android:textSize="16sp"/>
 
