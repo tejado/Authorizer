@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateUtils;
@@ -36,14 +37,23 @@ public final class PasswdRecordFilter implements Parcelable
     public enum ExpiryFilter
     {
         // Order must match expire_filters string array
-        EXPIRED,
-        TODAY,
-        IN_A_WEEK,
-        IN_TWO_WEEKS,
-        IN_A_MONTH,
-        IN_A_YEAR,
-        ANY,
-        CUSTOM;
+        // Records indexes must match expire_filter_records string array
+        EXPIRED         (0),
+        TODAY           (1),
+        IN_A_WEEK       (2),
+        IN_TWO_WEEKS    (3),
+        IN_A_MONTH      (4),
+        IN_A_YEAR       (5),
+        ANY             (-1),
+        CUSTOM          (-1);
+
+        private final int itsExpireRecordsIdx;
+
+        /** Constructor */
+        private ExpiryFilter(int expireRecordsIdx)
+        {
+            itsExpireRecordsIdx = expireRecordsIdx;
+        }
 
         /** Get the filter value from its value index */
         public static ExpiryFilter fromIdx(int idx)
@@ -52,6 +62,65 @@ public final class PasswdRecordFilter implements Parcelable
                 return values()[idx];
             }
             return ANY;
+        }
+
+        /**
+         * Get a string indicating how many records expire based on the filter
+         * type
+         */
+        public String getRecordsExpireStr(int numRecords, Resources res)
+        {
+            if (itsExpireRecordsIdx == -1) {
+                throw new IllegalArgumentException("No str");
+            }
+            String[] strs = res.getStringArray(R.array.expire_filter_records);
+            return String.format(strs[itsExpireRecordsIdx], numRecords);
+        }
+
+        /** Get the expiration date from now based on the filter type */
+        public long getExpiryFromNow(Date customDate)
+        {
+            Calendar expiry = Calendar.getInstance();
+            switch (this) {
+            case EXPIRED: {
+                break;
+            }
+            case TODAY: {
+                expiry.add(Calendar.DAY_OF_MONTH, 1);
+                expiry.set(Calendar.HOUR_OF_DAY, 0);
+                expiry.set(Calendar.MINUTE, 0);
+                expiry.set(Calendar.SECOND, 0);
+                expiry.set(Calendar.MILLISECOND, 0);
+                break;
+            }
+            case IN_A_WEEK: {
+                expiry.add(Calendar.WEEK_OF_YEAR, 1);
+                break;
+            }
+            case IN_TWO_WEEKS: {
+                expiry.add(Calendar.WEEK_OF_YEAR, 2);
+                break;
+            }
+            case IN_A_MONTH: {
+                expiry.add(Calendar.MONTH, 1);
+                break;
+            }
+            case IN_A_YEAR: {
+                expiry.add(Calendar.YEAR, 1);
+                break;
+            }
+            case ANY: {
+                expiry.setTimeInMillis(Long.MAX_VALUE);
+                break;
+            }
+            case CUSTOM: {
+                if (customDate != null) {
+                    expiry.setTime(customDate);
+                }
+                break;
+            }
+            }
+            return expiry.getTimeInMillis();
         }
     }
 
@@ -100,46 +169,7 @@ public final class PasswdRecordFilter implements Parcelable
         itsType = Type.EXPIRATION;
         itsSearchQuery = null;
         itsExpiryFilter = filter;
-        Calendar expiry = Calendar.getInstance();
-        switch (itsExpiryFilter) {
-        case EXPIRED: {
-            break;
-        }
-        case TODAY: {
-            expiry.add(Calendar.DAY_OF_MONTH, 1);
-            expiry.set(Calendar.HOUR_OF_DAY, 0);
-            expiry.set(Calendar.MINUTE, 0);
-            expiry.set(Calendar.SECOND, 0);
-            expiry.set(Calendar.MILLISECOND, 0);
-            break;
-        }
-        case IN_A_WEEK: {
-            expiry.add(Calendar.WEEK_OF_YEAR, 1);
-            break;
-        }
-        case IN_TWO_WEEKS: {
-            expiry.add(Calendar.WEEK_OF_YEAR, 2);
-            break;
-        }
-        case IN_A_MONTH: {
-            expiry.add(Calendar.MONTH, 1);
-            break;
-        }
-        case IN_A_YEAR: {
-            expiry.add(Calendar.YEAR, 1);
-            break;
-        }
-        case ANY: {
-            expiry.setTimeInMillis(Long.MAX_VALUE);
-            break;
-        }
-        case CUSTOM: {
-            expiry.setTime(customDate);
-            break;
-        }
-        }
-
-        itsExpiryAtMillis = expiry.getTimeInMillis();
+        itsExpiryAtMillis = itsExpiryFilter.getExpiryFromNow(customDate);
         itsOptions = opts;
     }
 

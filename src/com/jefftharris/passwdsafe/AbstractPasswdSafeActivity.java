@@ -32,7 +32,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -78,6 +77,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = false;
     private FontSizePref itsFontSize = Preferences.PREF_FONT_SIZE_DEF;
+    protected PasswdRecordFilter.ExpiryFilter itsExpiryNotifFilter =
+        PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS;
     protected int itsNumExpired = 0;
 
     protected final ArrayList<HashMap<String, Object>> itsListData =
@@ -467,8 +468,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
 
         itsNumExpired = 0;
-        long expiration =
-            System.currentTimeMillis() + 2 * DateUtils.WEEK_IN_MILLIS;
+        long expiration = itsExpiryNotifFilter.getExpiryFromNow(null);
         for (PasswdRecord rec : fileData.getPasswdRecords()) {
             PasswdExpiration expiry = rec.getPasswdExpiry();
             if (expiry == null) {

@@ -264,7 +264,7 @@
         <item>Shortcut</item>
     </string-array>
 
-    <!-- Order must match values of RecordFilter.ExpiryFilter -->
+    <!-- Order must match values of PasswdRecordFilter.ExpiryFilter -->
     <string-array name="expire_filters">
         <item>Expired</item>
         <item>Today</item>
@@ -274,6 +274,16 @@
         <item>In a Year</item>
         <item>Any</item>
         <item>Custom</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_records">
+        <item>%1$s passwords have expired</item>
+        <item>%1$s passwords expire today</item>
+        <item>%1$s passwords expire within a week</item>
+        <item>%1$s passwords expire within two weeks</item>
+        <item>%1$s passwords expire within a month</item>
+        <item>%1$s passwords expire within a year</item>
     </string-array>
 
     <!-- Order must match constants in PasswdExpiration.Type -->

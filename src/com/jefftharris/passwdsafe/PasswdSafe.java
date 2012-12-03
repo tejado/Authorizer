@@ -110,8 +110,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             {
                 View panel = findViewById(R.id.expiry_panel);
                 panel.setVisibility(View.GONE);
-                setRecordExpiryFilter(
-                    PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS, null);
+                setRecordExpiryFilter(itsExpiryNotifFilter, null);
             }
         });
 
@@ -796,8 +795,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         if (itsIsNotifyExpirations && ((mod & MOD_DATA) != 0)) {
             itsIsNotifyExpirations = false;
             TextView tv = (TextView)findViewById(R.id.expiry);
-            tv.setText(String.format("%d records expire within the next two weeks",
-                                     itsNumExpired));
+            tv.setText(itsExpiryNotifFilter.getRecordsExpireStr(
+                           itsNumExpired, getResources()));
             View group = findViewById(R.id.expiry_panel);
             group.setVisibility(itsNumExpired > 0 ? View.VISIBLE : View.GONE);
         }
