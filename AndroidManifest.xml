@@ -59,6 +59,7 @@
                 <data android:pathPattern=".*\\..*\\..*\\.ibak" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak" />
+                <data android:mimeType="*/*"/>
                 <data android:mimeType="application/octet-stream"/>
                 <data android:mimeType="application/x-ibak"/>
                 <data android:mimeType="application/x-psafe"/>
