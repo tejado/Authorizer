@@ -26,6 +26,7 @@ import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.util.Utils;
+import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
