@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.jefftharris.passwdsafe.view.GuiUtils;
+
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;

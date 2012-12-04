@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe.view;
 
-import com.jefftharris.passwdsafe.GuiUtils;
 
 import android.annotation.TargetApi;
 import android.app.Dialog;

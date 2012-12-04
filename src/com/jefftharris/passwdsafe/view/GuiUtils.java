@@ -5,7 +5,7 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.view;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,8 +14,6 @@ import java.util.Map;
 
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.util.Utils;
-import com.jefftharris.passwdsafe.view.GuiUtilsFroyo;
-import com.jefftharris.passwdsafe.view.GuiUtilsHoneycomb;
 
 import android.app.Activity;
 import android.app.AlertDialog;
