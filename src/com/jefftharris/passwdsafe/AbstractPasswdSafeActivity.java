@@ -24,6 +24,7 @@ import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.pref.FontSizePref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 
 import android.app.SearchManager;

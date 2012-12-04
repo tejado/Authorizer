@@ -13,6 +13,8 @@ import org.pwsafe.lib.file.PwsFile;
 
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
+import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
+import com.jefftharris.passwdsafe.pref.FontSizePref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 
 import android.content.Context;

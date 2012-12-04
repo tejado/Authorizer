@@ -5,21 +5,42 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.pref;
+
+import com.jefftharris.passwdsafe.R;
 
 import android.content.res.Resources;
 
-public enum FontSizePref
+public enum FileTimeoutPref
 {
     // Values in their display order
-    NORMAL  (0),
-    SMALL   (1);
+    TO_NONE     (0,             "",     0),
+    TO_30_SEC   (30 * 1000,     "30",   1),
+    TO_2_MIN    (120 * 1000,    "120",  2),
+    TO_5_MIN    (300 * 1000,    "300",  3),
+    TO_15_MIN   (900 * 1000,    "900",  4),
+    TO_1_HR     (3600 * 1000,   "3600", 5);
 
+    private final int itsTimeout;
+    private final String itsValue;
     private final int itsDisplayNameIdx;
 
-    private FontSizePref(int displayNameIdx)
+    private FileTimeoutPref(int timeout, String value, int displayNameIdx)
     {
+        itsTimeout = timeout;
+        itsValue = value;
         itsDisplayNameIdx = displayNameIdx;
+    }
+
+    /// Get timeout in milliseconds
+    public final int getTimeout()
+    {
+        return itsTimeout;
+    }
+
+    public final String getValue()
+    {
+        return itsValue;
     }
 
     public final int getDisplayNameIdx()
@@ -32,12 +53,22 @@ public enum FontSizePref
         return getDisplayNamesArray(res)[itsDisplayNameIdx];
     }
 
+    public static FileTimeoutPref prefValueOf(String str)
+    {
+        for (FileTimeoutPref pref : FileTimeoutPref.values()) {
+            if (pref.getValue().equals(str)) {
+                return pref;
+            }
+        }
+        throw new IllegalArgumentException(str);
+    }
+
     public static String[] getValues()
     {
-        FontSizePref[] prefs = values();
+        FileTimeoutPref[] prefs = values();
         String[] strs = new String[prefs.length];
         for (int i = 0; i < prefs.length; ++i) {
-            strs[i] = prefs[i].toString();
+            strs[i] = prefs[i].getValue();
         }
         return strs;
     }
@@ -45,7 +76,7 @@ public enum FontSizePref
     public static String[] getDisplayNames(Resources res)
     {
         String[] displayNames = getDisplayNamesArray(res);
-        FontSizePref[] prefs = values();
+        FileTimeoutPref[] prefs = values();
         String[] strs = new String[prefs.length];
         for (int i = 0; i < prefs.length; ++i) {
             strs[i] = displayNames[prefs[i].getDisplayNameIdx()];
@@ -55,6 +86,6 @@ public enum FontSizePref
 
     private static final String[] getDisplayNamesArray(Resources res)
     {
-        return res.getStringArray(R.array.font_size_pref);
+        return res.getStringArray(R.array.file_timeout_pref);
     }
 }
