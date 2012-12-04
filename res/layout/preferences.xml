@@ -84,7 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="passwordExpiryNotifyPref"
-            android:title="Expired password notification"/>
+            android:title="@string/expired_password_notification"/>
 
         <Preference
             android:layout_width="match_parent"
