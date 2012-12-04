@@ -51,7 +51,7 @@ public class PasswdRecordFilterTest extends AndroidTestCase
                                    PasswdRecordFilter.OPTS_NO_SHORTCUT);
         doParcelTest(filter, "Password expires before " +
                                  Utils.formatDate(now.getTime(), getContext(),
-                                                  true, true));
+                                                  true, true, false));
     }
 
 
