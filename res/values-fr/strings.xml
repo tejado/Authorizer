@@ -35,10 +35,12 @@
     <string name="copy_password">Copier le mot de passe</string>
     <string name="copy_trace_and_close">Copier et fermer</string>
     <string name="copy_user">Copier le nom d\'utilisateur</string>
+    <string name="created">Créé</string>
     <string name="custom_symbols">Symboles personnalisés</string>
     <string name="custom_symbol_not_alphanum">Les symboles personnalisés ne doivent pas contenir d\'espaces, ni de caractères alphanumériques</string>
     <string name="database_policy">Base de données stratégie - %s</string>
     <string name="database_version_label">Version base de données:</string>
+    <string name="days">Journées</string>
     <string name="default_file_to_open">Fichier à ouvrir par défaut</string>
     <string name="default_policy">Stratégie par défaut</string>
     <string name="delete">Supprimer</string>
@@ -70,7 +72,8 @@
     <string name="enter_net_group">Entrer un nouveau groupe:</string>
     <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
-    <string name="expiration_header">EXPIRATION</string>
+    <string name="expiration">Expiration</string>
+    <string name="expired_passwords">Mots de passe Expirés</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
     <string name="file_backups">Fichiers de sauvegarde</string>
     <string name="file_close_timeout">Fermeture automatique de fichier</string>
@@ -97,6 +100,7 @@
     <string name="history">Historique</string>
     <string name="history_header">HISTORIQUE</string>
     <string name="home">Accueil</string>
+    <string name="interval">Intervalle</string>
     <string name="invalid_file_name">Nom de fichier invalide</string>
     <string name="invalid_history_max_size">Taille de l\'historique invalide</string>
     <string name="invalid_length">Longueur invalide</string>
@@ -112,6 +116,7 @@
     <string name="loading_file">Chargement %s…</string>
     <string name="location">Emplacement</string>
     <string name="max_size_label">Taille maximale:</string>
+    <string name="modified">Modifié</string>
     <string name="n_a">N/A</string>
     <string name="name">Nom</string>
     <string name="new_entry">Nouvelle entrée</string>
@@ -137,8 +142,14 @@
     <string name="password">Mot de passe</string>
     <string name="password_and_confirm">Mot de passe /\nConfirmation</string>
     <string name="password_encoding_label">Encodage mot de passe:</string>
+    <string name="password_expiration">Expiration mot de passe</string>
     <string name="password_file">Fichier mot de passe</string>
     <string name="password_generation">Composition des mots de passe</string>
+    <string name="password_expiration_in_past">L\'expiration du mot est dans le passé</string>
+    <string name="password_expiration_invalid_interval">Délai d\'expiration du mot de passe doit être dans la gamme 1&#8211;3650</string>
+    <string name="password_expired">Mot de passe expiré</string>
+    <string name="password_expires_before">Mot de passe expire avant %1$s</string>
+    <string name="password_expires_today">Mot de passe expire aujourd\'hui</string>
     <string name="password_gen_prefs_moved">Options de génération de mot de passe déplacées. Ouvrez le fichier et modifiez la stratégie par défaut.</string>
     <string name="password_header">MOT DE PASSE</string>
     <string name="password_label">Mot de passe:</string>
@@ -147,6 +158,8 @@
     <string name="password_policies">Mot de passe Stratégies</string>
     <string name="password_record">Mot de passe entrée</string>
     <string name="password_settings">Paramètres mots de passe</string>
+    <string name="password_times_header">TEMPS MOT DE PASSE</string>
+    <string name="password_with_expiration">Mot de passe avec date d\'expiration</string>
     <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>
     <string name="permissions_label">Autorisations:</string>
     <string name="policy_header">STRATÉGIE</string>
@@ -162,7 +175,7 @@
     <string name="protected_record">Protégé</string>
     <string name="protected_record_header">ENTRÉE PROTEGÉE</string>
     <string name="psafe3_ext">.psafe3</string>
-    <string name="query_label">Filtre de recherche: %1$s</string>
+    <string name="query_label">Recherche: %1$s</string>
     <string name="record">Entrée</string>
     <string name="record_has_references">L\'entrée contient des références</string>
     <string name="record_not_found">Entrée introuvable</string>
@@ -175,6 +188,7 @@
     <string name="regular_expression">Expression régulière</string>
     <string name="regular_expression_summary">Utiliser une expression régulière pour la recherche au lieu d\'une sous-chaîne</string>
     <string name="remove">Supprimer</string>
+    <string name="recurring">Périodique</string>
     <string name="saving_file">Enregistrement %s…</string>
     <string name="search">Rechercher</string>
     <string name="search_hint">Rechercher PasswdSafe</string>
@@ -188,6 +202,7 @@
     <string name="show_backup_files">Afficher les sauvegardes</string>
     <string name="show_password">Afficher mot de passe</string>
     <string name="show_passwords">Afficher mots de passe</string>
+    <string name="times_header">TEMPS</string>
     <string name="title">Titre</string>
     <string name="toggle_word_wrap">Adapter les retours-chariot</string>
     <string name="toggle_monospace">Adapter les espaces</string>
@@ -209,6 +224,11 @@
     <plurals name="group_items">
         <item quantity="one">[Une entrée]</item>
         <item quantity="other">[%d entrées]</item>
+    </plurals>
+
+    <plurals name="interval_days">
+        <item quantity="one">Quotidien</item>
+        <item quantity="other">%d jours</item>
     </plurals>
 
     <!-- Order must match FileBackupPref enum values -->
@@ -244,11 +264,51 @@
         <item>Raccourci</item>
     </string-array>
 
-    <!-- Order must match constants in PolicyPolicyActivity -->
+    <!-- Order must match values of PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filters">
+        <item>Expiré</item>
+        <item>Aujourd\'hui</item>
+        <item>Dans une Semaine</item>
+        <item>Dans deux Semaines</item>
+        <item>Dans une Mois</item>
+        <item>Dans une Année</item>
+        <item>Tout</item>
+        <item>Personnalisée</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_records">
+        <item>%1$s mots de passe ont expiré</item>
+        <item>%1$s mots de passe expirent aujourd\'hui</item>
+        <item>%1$s mots de passe expirent dans une semaine</item>
+        <item>%1$s mots de passe expirent dans les deux semaines</item>
+        <item>%1$s mots de passe expirent dans un mois</item>
+        <item>%1$s mots de passe expirera dans un an</item>
+    </string-array>
+
+    <!-- Order must match PasswdExpiryNotifPref enum values -->
+    <string-array name="passwd_expiry_notif_pref">
+        <item>Aucune</item>
+        <item>Expiré</item>
+        <item>Aujourd\'hui</item>
+        <item>Dans une Semaine</item>
+        <item>Dans deux Semaines</item>
+        <item>Dans une Mois</item>
+        <item>Dans une Année</item>
+     </string-array>
+
+    <!-- Order must match constants in PasswdExpiration.Type -->
+    <string-array name="expire_type">
+        <item>Jamais</item>
+        <item>Date</item>
+        <item>Intervalle</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdPolicy.Type -->
     <string-array name="policy_type">
         <item>Normal</item>
         <item>Facile-à-lire</item>
-        <item>prononçable</item>
+        <item>Prononçable</item>
         <item>Hexadécimal</item>
     </string-array>
 </resources>

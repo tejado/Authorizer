@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+    <issue id="IconDuplicatesConfig">
+        <ignore path="res/drawable/spinner_default_holo_dark.9.png" />
+        <ignore path="res/drawable/spinner_disabled_holo_dark.9.png" />
+        <ignore path="res/drawable/spinner_focused_holo_dark.9.png" />
+        <ignore path="res/drawable/spinner_pressed_holo_dark.9.png" />
+    </issue>
 </lint>

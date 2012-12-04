@@ -33,6 +33,7 @@ public class PasswdRecord
     private final ArrayList<PwsRecord> itsRefsToRecord =
         new ArrayList<PwsRecord>();
     private PasswdPolicy itsPasswdPolicy;
+    private PasswdExpiration itsPasswdExpiry;
 
     public PasswdRecord(PwsRecord rec, PasswdFileData fileData)
     {
@@ -40,6 +41,7 @@ public class PasswdRecord
         itsUUID = fileData.getUUID(rec);
         passwordChanged(fileData);
         passwdPolicyChanged(fileData);
+        passwdExpiryChanged(fileData);
     }
 
     public PwsRecord getRecord()
@@ -114,6 +116,18 @@ public class PasswdRecord
     public PasswdPolicy getPasswdPolicy()
     {
         return itsPasswdPolicy;
+    }
+
+    /** Notification that the password expiration has changed */
+    public void passwdExpiryChanged(PasswdFileData fileData)
+    {
+        itsPasswdExpiry = fileData.getPasswdExpiry(itsRecord);
+    }
+
+    /** Get the record's password expiration */
+    public PasswdExpiration getPasswdExpiry()
+    {
+        return itsPasswdExpiry;
     }
 
     public static String uuidToPasswd(String uuid, Type type)

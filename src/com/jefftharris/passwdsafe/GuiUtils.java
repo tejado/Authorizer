@@ -7,13 +7,13 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.jefftharris.passwdsafe.file.PasswdHistory;
+import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.GuiUtilsFroyo;
 import com.jefftharris.passwdsafe.view.GuiUtilsHoneycomb;
 
@@ -30,6 +30,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -159,13 +160,11 @@ public final class GuiUtils
     {
         ArrayList<HashMap<String, Object>> histData =
             new ArrayList<HashMap<String, Object>>();
-        DateFormat dateFormatter = DateFormat.getDateTimeInstance(
-            DateFormat.MEDIUM, DateFormat.MEDIUM);
         for (PasswdHistory.Entry entry : history.getPasswds()) {
             HashMap<String, Object> entryData =
                 new HashMap<String, Object>();
             entryData.put(PASSWD, entry.getPasswd());
-            entryData.put(DATE, dateFormatter.format(entry.getDate()));
+            entryData.put(DATE, Utils.formatDate(entry.getDate(), context));
             histData.add(entryData);
         }
 
@@ -286,5 +285,17 @@ public final class GuiUtils
                 }
             }
         });
+    }
+
+
+    /** Remove the layout_centerVertical flag if it is not supported */
+    public static void removeUnsupportedCenterVertical(View v)
+    {
+        if (SDK_VERSION <= SDK_CUPCAKE) {
+            RelativeLayout.LayoutParams params =
+                (RelativeLayout.LayoutParams)v.getLayoutParams();
+            params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+            v.setLayoutParams(params);
+        }
     }
 }

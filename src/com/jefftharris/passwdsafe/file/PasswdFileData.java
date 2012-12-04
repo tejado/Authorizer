@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import org.pwsafe.lib.file.PwsFileStorage;
 import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
+import org.pwsafe.lib.file.PwsIntegerField;
 import org.pwsafe.lib.file.PwsPasswdField;
 import org.pwsafe.lib.file.PwsPasswdUnicodeField;
 import org.pwsafe.lib.file.PwsRecord;
@@ -53,6 +55,7 @@ import org.pwsafe.lib.file.PwsStorage;
 import org.pwsafe.lib.file.PwsStreamStorage;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
+import org.pwsafe.lib.file.PwsTimeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
@@ -69,6 +72,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 public class PasswdFileData
@@ -192,6 +196,12 @@ public class PasswdFileData
     public PasswdRecord getPasswdRecord(PwsRecord rec)
     {
         return itsPasswdRecords.get(rec);
+    }
+
+    /** Get the collection of PasswdRecords in the file */
+    public Collection<PasswdRecord> getPasswdRecords()
+    {
+        return itsPasswdRecords.values();
     }
 
     public PwsRecord createRecord()
@@ -322,6 +332,12 @@ public class PasswdFileData
         return id.toString();
     }
 
+    /** Get the time the record was created */
+    public final Date getCreationTime(PwsRecord rec)
+    {
+        return getDateField(rec, PwsRecordV3.CREATION_TIME);
+    }
+
     public final String getEmail(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.EMAIL);
@@ -340,6 +356,12 @@ public class PasswdFileData
     public final void setGroup(String str, PwsRecord rec)
     {
         setField(str, rec, PwsRecordV3.GROUP);
+    }
+
+    /** Get the time the record was last modified */
+    public final Date getLastModTime(PwsRecord rec)
+    {
+        return getDateField(rec, PwsRecordV3.LAST_MOD_TIME);
     }
 
     public final String getNotes(PwsRecord rec)
@@ -374,10 +396,25 @@ public class PasswdFileData
     {
         PasswdHistory history = getPasswdHistory(rec);
         if ((history != null) && !TextUtils.isEmpty(oldPasswd)) {
-            history.addPasswd(oldPasswd);
-            setPasswdHistory(history, rec);
+            Date passwdDate = getPasswdLastModTime(rec);
+            if (passwdDate == null) {
+                passwdDate = getCreationTime(rec);
+            }
+            history.addPasswd(oldPasswd, passwdDate);
+            setPasswdHistory(history, rec, false);
         }
         setField(newPasswd, rec, PwsRecordV3.PASSWORD);
+
+        PasswdExpiration expiry = getPasswdExpiry(rec);
+        Date expTime = null;
+        if ((expiry != null) && expiry.itsIsRecurring &&
+            (expiry.itsInterval > 0)) {
+            long exp = System.currentTimeMillis();
+            exp += (long)expiry.itsInterval * DateUtils.DAY_IN_MILLIS;
+            expTime = new Date(exp);
+        }
+        setField(expTime, rec, PwsRecordV3.PASSWORD_LIFETIME, false);
+
         // Update PasswdRecord and indexes if the record exists
         PasswdRecord passwdRec = getPasswdRecord(rec);
         if (passwdRec != null) {
@@ -395,9 +432,53 @@ public class PasswdFileData
         }
     }
 
-    public final String getPasswdExpiryTime(PwsRecord rec)
+    /** Get the password expiration */
+    public final PasswdExpiration getPasswdExpiry(PwsRecord rec)
     {
-        return getField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+        PasswdExpiration expiry = null;
+        Date expTime = getDateField(rec, PwsRecordV3.PASSWORD_LIFETIME);
+        if (expTime != null) {
+            Integer expInt =
+                getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
+            boolean haveInt = (expInt != null);
+            expiry = new PasswdExpiration(expTime,
+                                          haveInt ? expInt.intValue() : 0,
+                                          haveInt);
+        }
+        return expiry;
+    }
+
+    /** Set the password expiration */
+    public final void setPasswdExpiry(PasswdExpiration expiry, PwsRecord rec)
+    {
+        Date expDate = null;
+        int expInterval = 0;
+        if (expiry != null) {
+            expDate = expiry.itsExpiration;
+            if (expiry.itsIsRecurring) {
+                expInterval = expiry.itsInterval;
+            }
+        }
+        setField(expDate, rec, PwsRecordV3.PASSWORD_LIFETIME);
+        setField((expInterval != 0) ? expInterval : null, rec,
+                 PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
+
+        PasswdRecord passwdRec = getPasswdRecord(rec);
+        if (passwdRec != null) {
+            passwdRec.passwdExpiryChanged(this);
+        }
+    }
+
+    /** Get the time the password was last modified */
+    public final Date getPasswdLastModTime(PwsRecord rec)
+    {
+        return getDateField(rec, PwsRecordV3.PASSWORD_MOD_TIME);
+    }
+
+    /** Clear the time the password was last modified */
+    public final void clearPasswdLastModTime(PwsRecord rec)
+    {
+        setField(null, rec, PwsRecordV3.PASSWORD_MOD_TIME);
     }
 
     public final PasswdHistory getPasswdHistory(PwsRecord rec)
@@ -413,10 +494,11 @@ public class PasswdFileData
         return null;
     }
 
-    public final void setPasswdHistory(PasswdHistory history, PwsRecord rec)
+    public final void setPasswdHistory(PasswdHistory history, PwsRecord rec,
+                                       boolean updateModTime)
     {
         setField((history == null) ? null : history.toString(),
-                 rec, PwsRecordV3.PASSWORD_HISTORY);
+                 rec, PwsRecordV3.PASSWORD_HISTORY, updateModTime);
     }
 
     /** Get the password policy contained in a record */
@@ -437,8 +519,7 @@ public class PasswdFileData
     public final boolean isProtected(PwsRecord rec)
     {
         boolean prot = false;
-        PwsField field =
-            doGetField(rec, getVersionFieldId(PwsRecordV3.PROTECTED_ENTRY));
+        PwsField field = doGetRecField(rec, PwsRecordV3.PROTECTED_ENTRY);
         if (field != null) {
             byte[] value = field.getBytes();
             if ((value != null) && (value.length > 0)) {
@@ -667,18 +748,46 @@ public class PasswdFileData
         }
     }
 
+    /** Get a field value as a string */
     private final String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
             return "";
         }
 
-        return doGetFieldStr(rec, getVersionFieldId(fieldId));
+        fieldId = getVersionFieldId(fieldId);
+        if (fieldId == FIELD_UNSUPPORTED) {
+            return "(unsupported)";
+        }
+        PwsField field = doGetField(rec, fieldId);
+        return (field == null) ? null : field.toString();
+    }
+
+    /** Get a field value as an 4 byte integer */
+    private final Integer getIntField(PwsRecord rec, int fieldId)
+    {
+        Integer val = null;
+        PwsField field = doGetRecField(rec, fieldId);
+        if ((field != null) && (field instanceof PwsIntegerField)) {
+            val = (Integer)field.getValue();
+        }
+        return val;
+    }
+
+    /** Get a field value as a Date */
+    private final Date getDateField(PwsRecord rec, int fieldId)
+    {
+        Date date = null;
+        PwsField field = doGetRecField(rec, fieldId);
+        if ((field != null) && (field instanceof PwsTimeField)) {
+            date = (Date)field.getValue();
+        }
+        return date;
     }
 
     private final boolean hasField(PwsRecord rec, int fieldId)
     {
-        return doGetField(rec, getVersionFieldId(fieldId)) != null;
+        return doGetRecField(rec, fieldId) != null;
     }
 
     private final int getVersionFieldId(int fieldId)
@@ -742,6 +851,10 @@ public class PasswdFileData
             case PwsRecordV3.PROTECTED_ENTRY:
             case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
             case PwsRecordV3.PASSWORD_POLICY_NAME:
+            case PwsRecordV3.CREATION_TIME:
+            case PwsRecordV3.PASSWORD_MOD_TIME:
+            case PwsRecordV3.LAST_MOD_TIME:
+            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -787,6 +900,10 @@ public class PasswdFileData
             case PwsRecordV3.PROTECTED_ENTRY:
             case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
             case PwsRecordV3.PASSWORD_POLICY_NAME:
+            case PwsRecordV3.CREATION_TIME:
+            case PwsRecordV3.PASSWORD_MOD_TIME:
+            case PwsRecordV3.LAST_MOD_TIME:
+            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL:
             {
                 fieldId = FIELD_NOT_PRESENT;
                 break;
@@ -986,30 +1103,14 @@ public class PasswdFileData
         }
     }
 
-
-    private final String doGetFieldStr(PwsRecord rec, int fieldId)
+    /** Get a non-header record's field after translating its field
+     * identifier */
+    private final PwsField doGetRecField(PwsRecord rec, int fieldId)
     {
-        switch (fieldId)
-        {
-        case FIELD_UNSUPPORTED:
-        {
-            return "(unsupported)";
-        }
-        case FIELD_NOT_PRESENT:
-        {
-            return null;
-        }
-        default:
-        {
-            PwsField field = rec.getField(fieldId);
-            if (field == null) {
-                return null;
-            }
-            return field.toString();
-        }
-        }
+        return doGetField(rec, getVersionFieldId(fieldId));
     }
 
+    /** Get a field from a record */
     private static final PwsField doGetField(PwsRecord rec, int fieldId)
     {
         switch (fieldId)
@@ -1027,6 +1128,12 @@ public class PasswdFileData
     }
 
     private final void setField(Object val, PwsRecord rec, int fieldId)
+    {
+        setField(val, rec, fieldId, true);
+    }
+
+    private final void setField(Object val, PwsRecord rec, int fieldId,
+                                boolean updateModTime)
     {
         PwsField field = null;
         switch (itsPwsFile.getFileVersionMajor())
@@ -1064,6 +1171,20 @@ public class PasswdFileData
                 Byte b = (Byte)val;
                 if ((b != null) && (b.byteValue() != 0)) {
                     field = new PwsByteField(fieldId, b.byteValue());
+                }
+                break;
+            }
+            case PwsRecordV3.PASSWORD_LIFETIME: {
+                Date d = (Date)val;
+                if ((d != null) && (d.getTime() != 0)) {
+                    field = new PwsTimeField(fieldId, d);
+                }
+                break;
+            }
+            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL: {
+                Integer ival = (Integer)val;
+                if ((ival != null) && (ival.intValue() != 0)) {
+                    field = new PwsIntegerField(fieldId, ival);
                 }
                 break;
             }
@@ -1115,6 +1236,11 @@ public class PasswdFileData
 
         if (fieldId != FIELD_UNSUPPORTED) {
             setOrRemoveField(field, fieldId, rec);
+            if (updateModTime && isV3() && itsPasswdRecords.containsKey(rec)) {
+                int modFieldId = (fieldId == PwsRecordV3.PASSWORD) ?
+                    PwsRecordV3.PASSWORD_MOD_TIME : PwsRecordV3.LAST_MOD_TIME;
+                rec.setField(new PwsTimeField(modFieldId, new Date()));
+            }
         }
     }
 

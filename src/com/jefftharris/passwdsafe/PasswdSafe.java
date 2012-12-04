@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,10 +18,12 @@ import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -42,6 +45,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -53,6 +57,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int DIALOG_CHANGE_PASSWD =     MAX_DIALOG + 4;
     private static final int DIALOG_FILE_NEW =          MAX_DIALOG + 5;
     private static final int DIALOG_DELETE =            MAX_DIALOG + 6;
+    private static final int DIALOG_PASSWD_EXPIRYS =    MAX_DIALOG + 7;
+    private static final int DIALOG_PASSWD_EXPIRYS_CUSTOM = MAX_DIALOG + 8;
 
     private static final int MENU_ADD_RECORD =      ABS_MENU_MAX + 1;
     private static final int MENU_DETAILS =         ABS_MENU_MAX + 2;
@@ -61,6 +67,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int MENU_PROTECT=          ABS_MENU_MAX + 5;
     private static final int MENU_UNPROTECT=        ABS_MENU_MAX + 6;
     private static final int MENU_PASSWD_POLICIES = ABS_MENU_MAX + 7;
+    private static final int MENU_PASSWD_EXPIRYS =  ABS_MENU_MAX + 8;
 
     private static final int CTXMENU_COPY_USER = 1;
     private static final int CTXMENU_COPY_PASSWD = 2;
@@ -74,6 +81,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private DialogValidator itsFileNewValidator;
     private DialogValidator itsDeleteValidator;
     private String itsRecToOpen;
+    private boolean itsIsNotifyExpirations = true;
 
     /** Called when the activity is first created. */
     @Override
@@ -84,6 +92,33 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         Intent intent = getIntent();
         PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + intent);
+
+        View v = findViewById(R.id.expiry_clear_btn);
+        v.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                View panel = findViewById(R.id.expiry_panel);
+                panel.setVisibility(View.GONE);
+            }
+        });
+
+        v = findViewById(R.id.expiry_panel);
+        v.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                View panel = findViewById(R.id.expiry_panel);
+                panel.setVisibility(View.GONE);
+                PasswdRecordFilter.ExpiryFilter filter =
+                    itsExpiryNotifPref.getFilter();
+                if (filter != null) {
+                    setRecordExpiryFilter(filter, null);
+                }
+            }
+        });
+
+        GuiUtils.removeUnsupportedCenterVertical(findViewById(R.id.expiry));
 
         String action = intent.getAction();
         if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
@@ -149,9 +184,6 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         addSearchMenuItem(menu);
 
-        mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
-        mi.setIcon(android.R.drawable.ic_menu_info_details);
-
         mi = menu.add(0, MENU_ADD_RECORD, 0, R.string.add_record);
         mi.setIcon(android.R.drawable.ic_menu_add);
 
@@ -159,6 +191,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         mi = menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
 
+        mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.expired_passwords);
+
+        // File operations submenu
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);
 
         mi = submenu.add(0, MENU_CHANGE_PASSWD, 0, R.string.change_password);
@@ -169,6 +204,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         mi = submenu.add(0, MENU_PROTECT, 0, R.string.protect_all);
         mi = submenu.add(0, MENU_UNPROTECT, 0, R.string.unprotect_all);
+        // End file operations submenu
+
+        mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
+        mi.setIcon(android.R.drawable.ic_menu_info_details);
 
         addParentMenuItem(menu);
 
@@ -266,6 +305,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             startActivityForResult(new Intent(Intent.ACTION_VIEW, getUri(),
                                              this, PasswdPolicyActivity.class),
                                    POLICY_VIEW_REQUEST);
+            break;
+        }
+        case MENU_PASSWD_EXPIRYS: {
+            showDialog(DIALOG_PASSWD_EXPIRYS);
             break;
         }
         default:
@@ -519,6 +562,61 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             itsDeleteValidator = data.itsValidator;
             break;
         }
+        case DIALOG_PASSWD_EXPIRYS: {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this)
+                .setTitle(R.string.expired_passwords)
+                .setItems(R.array.expire_filters,
+                          new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        PasswdRecordFilter.ExpiryFilter filter =
+                            PasswdRecordFilter.ExpiryFilter.fromIdx(which);
+                        switch (filter) {
+                        case EXPIRED:
+                        case TODAY:
+                        case IN_A_WEEK:
+                        case IN_TWO_WEEKS:
+                        case IN_A_MONTH:
+                        case IN_A_YEAR:
+                        case ANY: {
+                            setRecordExpiryFilter(filter, null);
+                            break;
+                        }
+                        case CUSTOM: {
+                            showDialog(DIALOG_PASSWD_EXPIRYS_CUSTOM);
+                            break;
+                        }
+                        }
+
+                    }
+                });
+            dialog = alert.create();
+            break;
+        }
+        case DIALOG_PASSWD_EXPIRYS_CUSTOM: {
+            Calendar now = Calendar.getInstance();
+            dialog = new DatePickerDialog(
+                this,
+                new DatePickerDialog.OnDateSetListener()
+                {
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth)
+                    {
+                        Calendar date = Calendar.getInstance();
+                        date.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
+                        date.set(Calendar.MILLISECOND, 0);
+                        date.add(Calendar.DAY_OF_MONTH, 1);
+                        setRecordExpiryFilter(
+                            PasswdRecordFilter.ExpiryFilter.CUSTOM,
+                            date.getTime());
+                    }
+                },
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH));
+            break;
+        }
         default:
         {
             dialog = super.onCreateDialog(id);
@@ -697,6 +795,19 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             openRecord(itsRecToOpen);
         }
         super.showFileData(mod);
+
+        if (itsIsNotifyExpirations && ((mod & MOD_DATA) != 0)) {
+            itsIsNotifyExpirations = false;
+            PasswdRecordFilter.ExpiryFilter filter =
+                itsExpiryNotifPref.getFilter();
+            if (filter != null) {
+                TextView tv = (TextView)findViewById(R.id.expiry);
+                tv.setText(filter.getRecordsExpireStr(itsNumExpired,
+                                                      getResources()));
+            }
+            View group = findViewById(R.id.expiry_panel);
+            group.setVisibility(itsNumExpired > 0 ? View.VISIBLE : View.GONE);
+        }
     }
 
 

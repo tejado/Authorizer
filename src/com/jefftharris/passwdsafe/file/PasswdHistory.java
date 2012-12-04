@@ -149,14 +149,18 @@ public class PasswdHistory
         return itsPasswds;
     }
 
-    public void addPasswd(String passwd)
+    /// Add the password and the date it was last modified to the history
+    public void addPasswd(String passwd, Date passwdDate)
     {
         if (itsIsEnabled && (itsMaxSize > 0)) {
             if (itsPasswds.size() == itsMaxSize) {
                 // Remove oldest
                 itsPasswds.remove(itsPasswds.size() - 1);
             }
-            itsPasswds.add(new Entry(new Date(), passwd));
+            if (passwdDate == null) {
+                passwdDate = new Date();
+            }
+            itsPasswds.add(new Entry(passwdDate, passwd));
             Collections.sort(itsPasswds);
         }
     }
