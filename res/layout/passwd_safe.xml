@@ -58,7 +58,6 @@
         android:id="@+id/query_panel"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
         android:visibility="gone">
 
         <View
@@ -83,7 +82,6 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/query_clear_btn"
-            android:clickable="true"
             android:gravity="center_vertical"
             android:textSize="16sp"/>
     </RelativeLayout>
