@@ -18,7 +18,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.format.DateUtils;
 
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.util.Utils;
@@ -284,9 +283,7 @@ public final class PasswdRecordFilter implements Parcelable
             }
             long expire = expiry.itsExpiration.getTime();
             if (expire < itsExpiryAtMillis) {
-                queryMatch = DateUtils.getRelativeDateTimeString(
-                    ctx, expire, DateUtils.HOUR_IN_MILLIS,
-                    DateUtils.WEEK_IN_MILLIS, 0).toString();
+                queryMatch = Utils.formatDate(expire, ctx, true, true, true);
             }
             break;
         }
@@ -369,7 +366,8 @@ public final class PasswdRecordFilter implements Parcelable
             case CUSTOM: {
                 return ctx.getString(
                     R.string.password_expires_before,
-                    Utils.formatDate(itsExpiryAtMillis, ctx, true, true));
+                    Utils.formatDate(itsExpiryAtMillis, ctx,
+                                     true, true, false));
             }
             case ANY: {
                 return ctx.getString(R.string.password_with_expiration);

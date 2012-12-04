@@ -1094,9 +1094,9 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         long expiryDate = itsExpiryDate.getTimeInMillis();
         setText(R.id.expire_date_time,
-                Utils.formatDate(expiryDate, this, true, false));
+                Utils.formatDate(expiryDate, this, true, false, false));
         setText(R.id.expire_date_date,
-                Utils.formatDate(expiryDate, this, false, true));
+                Utils.formatDate(expiryDate, this, false, true, false));
         itsValidator.validate();
     }
 

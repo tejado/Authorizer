@@ -20,7 +20,7 @@ public final class Utils
     /** Format a date according to the current locale settings */
     public static String formatDate(Date date, Context ctx)
     {
-        return formatDate(date.getTime(), ctx, true, true);
+        return formatDate(date.getTime(), ctx, true, true, false);
     }
 
     /**
@@ -28,14 +28,21 @@ public final class Utils
      * settings
      */
     public static String formatDate(long date, Context ctx,
-                                    boolean showTime, boolean showDate)
+                                    boolean showTime, boolean showDate,
+                                    boolean abbrev)
     {
         int flags = 0;
         if (showTime) {
             flags |= DateUtils.FORMAT_SHOW_TIME;
+            if (abbrev) {
+                flags |= DateUtils.FORMAT_ABBREV_TIME;
+            }
         }
         if (showDate) {
             flags |= DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR;
+            if (abbrev) {
+                flags |= DateUtils.FORMAT_ABBREV_ALL;
+            }
         }
         return DateUtils.formatDateTime(ctx, date, flags);
     }
