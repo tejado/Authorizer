@@ -596,7 +596,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
 
     /**
-     * @return true if a group was popped, false to use default behavior
+     * @return true if a group was popped or filter removed, false to use
+     *         default behavior
      */
     private final boolean doBackPressed()
     {
@@ -605,6 +606,9 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         if (size != 0) {
             itsCurrGroups.remove(size - 1);
             showFileData(MOD_GROUP);
+            return true;
+        } else if (itsFilter != null) {
+            setPasswdRecordFilter(null);
             return true;
         } else {
             return false;
