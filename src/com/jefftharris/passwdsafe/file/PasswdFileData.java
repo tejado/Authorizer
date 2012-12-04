@@ -59,10 +59,10 @@ import org.pwsafe.lib.file.PwsTimeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
-import com.jefftharris.passwdsafe.FileBackupPref;
 import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.pref.FileBackupPref;
 import com.jefftharris.passwdsafe.util.Pair;
 
 import android.content.ContentResolver;
