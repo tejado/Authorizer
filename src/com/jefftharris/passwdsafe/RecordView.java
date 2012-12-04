@@ -20,6 +20,7 @@ import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.DialogUtils;
+import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 
 import android.app.Activity;

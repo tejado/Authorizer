@@ -20,6 +20,7 @@ import org.pwsafe.lib.file.PwsRecord;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.view.DialogUtils;
+import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import android.app.AlertDialog;

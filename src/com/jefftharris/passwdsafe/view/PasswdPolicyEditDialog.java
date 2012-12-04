@@ -25,7 +25,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.jefftharris.passwdsafe.AbstractDialogClickListener;
-import com.jefftharris.passwdsafe.DialogValidator;
 import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
