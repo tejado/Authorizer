@@ -7,7 +7,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.jefftharris.passwdsafe"
       android:versionName="3.14.2" android:versionCode="31402"
-      android:installLocation="auto">
+      android:installLocation="auto" xmlns:tools="http://schemas.android.com/tools">
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
@@ -29,7 +29,7 @@
         <activity android:name=".PasswdSafe"
                   android:label="@string/app_name"
                   android:finishOnTaskLaunch="true"
-                  android:launchMode="singleTop">
+                  android:launchMode="singleTop" tools:ignore="ExportedActivity">
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.NEW"/>
                 <action android:name="com.jefftharris.passwdsafe.action.VIEW"/>
@@ -152,7 +152,7 @@
 
         <activity android:name=".LauncherFileShortcuts"
                   android:label="@string/password_file"
-                  android:theme="@android:style/Theme.Dialog">
+                  android:theme="@android:style/Theme.Dialog" tools:ignore="ExportedActivity">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -161,14 +161,14 @@
 
         <activity android:name=".LauncherRecordShortcuts"
                   android:label="@string/password_record"
-                  android:theme="@android:style/Theme.Dialog">
+                  android:theme="@android:style/Theme.Dialog" tools:ignore="ExportedActivity">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".PasswdSafeApp$FileTimeoutReceiver">
+        <receiver android:name=".PasswdSafeApp$FileTimeoutReceiver" tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.FILE_TIMEOUT"/>
             </intent-filter>
