@@ -73,6 +73,8 @@
     <string name="error">Error</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
+    <string name="expiration_notifications">Expiration Notifications</string>
+    <string name="expiration_notifications_warning">Enabling expiration notifications requires PasswdSafe to store expiration information for the file (record name, user name, group, and expiration date).  This information is stored unencrypted on the device.  No passwords are stored.</string>
     <string name="expired_passwords">Expired Passwords</string>
     <string name="expired_password_notification">Expired password notification</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>

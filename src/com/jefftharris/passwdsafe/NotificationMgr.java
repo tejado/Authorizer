@@ -7,9 +7,13 @@
  */
 package com.jefftharris.passwdsafe;
 
+import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.view.DialogUtils;
+
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -66,15 +70,35 @@ public class NotificationMgr
     public void togglePasswdExpiryNotif(Uri uri, Activity act)
     {
         try {
-            String uristr = uri.toString();
+            final String uristr = uri.toString();
             SQLiteDatabase db = itsDbHelper.getWritableDatabase();
             if (doHasPasswdExpiryNotif(uristr, db)) {
                 db.delete(DB_TABLE_URIS, DB_MATCH_URIS_URI,
                           new String[] { uristr });
             } else {
-                ContentValues values = new ContentValues(1);
-                values.put(DB_COL_URIS_URI, uristr);
-                db.insert(DB_TABLE_URIS, null, values);
+                DialogUtils.DialogData dlgData =
+                    DialogUtils.createConfirmPrompt(
+                        act,
+                        new AbstractDialogClickListener()
+                        {
+                            @Override
+                            public void onOkClicked(DialogInterface dialog)
+                            {
+                                try {
+                                    SQLiteDatabase db =
+                                        itsDbHelper.getWritableDatabase();
+                                    ContentValues values = new ContentValues(1);
+                                    values.put(DB_COL_URIS_URI, uristr);
+                                    db.insert(DB_TABLE_URIS, null, values);
+                                } catch (SQLiteException e) {
+                                    Log.e(TAG, "Database error", e);
+                                }
+                            }
+                        },
+                        act.getString(R.string.expiration_notifications),
+                        act.getString(R.string.expiration_notifications_warning));
+                dlgData.itsDialog.show();
+                dlgData.itsValidator.validate();
             }
         } catch (SQLiteException e) {
             Log.e(TAG, "Database error", e);

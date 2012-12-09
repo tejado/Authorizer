@@ -198,8 +198,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.expired_passwords);
 
         mi = menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
-                      "Expiration Notifications");
-        // TODO: resource string
+                      R.string.expiration_notifications);
         mi.setCheckable(true);
 
         // File operations submenu
