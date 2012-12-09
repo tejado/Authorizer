@@ -183,6 +183,7 @@ public class PasswdSafeApp extends Application
         new WeakHashMap<Activity, Object>();
     private PasswdPolicy itsDefaultPasswdPolicy = null;
     private AlarmManager itsAlarmMgr;
+    private NotificationMgr itsNotifyMgr;
     private PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout =
         Preferences.PREF_FILE_CLOSE_TIMEOUT_DEF.getTimeout();
@@ -210,6 +211,7 @@ public class PasswdSafeApp extends Application
     {
         super.onCreate();
         itsAlarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        itsNotifyMgr = new NotificationMgr();
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
@@ -337,6 +339,13 @@ public class PasswdSafeApp extends Application
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
         Preferences.setDefPasswdPolicyPref(policy, prefs);
+    }
+
+
+    /** Get the notification manager */
+    public NotificationMgr getNotifyMgr()
+    {
+        return itsNotifyMgr;
     }
 
 

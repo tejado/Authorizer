@@ -71,6 +71,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int MENU_UNPROTECT=        ABS_MENU_MAX + 6;
     private static final int MENU_PASSWD_POLICIES = ABS_MENU_MAX + 7;
     private static final int MENU_PASSWD_EXPIRYS =  ABS_MENU_MAX + 8;
+    private static final int MENU_PASSWD_EXPIRY_NOTIF = ABS_MENU_MAX + 9;
 
     private static final int CTXMENU_COPY_USER = 1;
     private static final int CTXMENU_COPY_PASSWD = 2;
@@ -196,6 +197,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.expired_passwords);
 
+        mi = menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
+                      "Expiration Notifications");
+        // TODO: resource string
+        mi.setCheckable(true);
+
         // File operations submenu
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);
 
@@ -260,6 +266,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             mi.setEnabled(editEnabled);
         }
 
+        mi = menu.findItem(MENU_PASSWD_EXPIRY_NOTIF);
+        if (mi != null) {
+            NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
+            mi.setChecked(notifyMgr.hasPasswdExpiryNotif(getUri()));
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -312,6 +324,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
         case MENU_PASSWD_EXPIRYS: {
             showDialog(DIALOG_PASSWD_EXPIRYS);
+            break;
+        }
+        case MENU_PASSWD_EXPIRY_NOTIF: {
+            NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
+            notifyMgr.togglePasswdExpiryNotif(getUri(), this);
             break;
         }
         default:
