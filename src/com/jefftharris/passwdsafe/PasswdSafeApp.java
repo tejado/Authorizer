@@ -211,7 +211,7 @@ public class PasswdSafeApp extends Application
     {
         super.onCreate();
         itsAlarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        itsNotifyMgr = new NotificationMgr();
+        itsNotifyMgr = new NotificationMgr(this);
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
