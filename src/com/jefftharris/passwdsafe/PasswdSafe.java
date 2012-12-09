@@ -577,7 +577,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                                       getUriName(false));
             String title = getString(R.string.delete_file_title);
             DialogUtils.DialogData data =
-                DialogUtils.createDeletePrompt(this, dlgClick, title, prompt);
+                DialogUtils.createConfirmPrompt(this, dlgClick, title, prompt);
             dialog = data.itsDialog;
             itsDeleteValidator = data.itsValidator;
             break;

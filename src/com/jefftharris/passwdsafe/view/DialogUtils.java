@@ -42,9 +42,9 @@ public class DialogUtils
     }
 
     /**
-     * Create a dialog used as a prompt to delete an item
+     * Create a dialog used as a prompt to confirm an operation
      */
-    public static DialogData createDeletePrompt
+    public static DialogData createConfirmPrompt
     (
         Activity act,
         AbstractDialogClickListener dlgClick,
@@ -53,7 +53,7 @@ public class DialogUtils
     )
     {
         LayoutInflater factory = LayoutInflater.from(act);
-        View dlgView = factory.inflate(R.layout.delete_prompt, null);
+        View dlgView = factory.inflate(R.layout.confirm_prompt, null);
 
         TextView prompt = (TextView)dlgView.findViewById(R.id.prompt);
         prompt.setText(promptStr);

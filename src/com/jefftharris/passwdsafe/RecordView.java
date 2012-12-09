@@ -443,7 +443,7 @@ public class RecordView extends AbstractRecordTabActivity
             String prompt = getString(R.string.delete_record_msg, tv.getText());
             String title = getString(R.string.delete_record_title);
             DialogUtils.DialogData data =
-                DialogUtils.createDeletePrompt(this, dlgClick, title, prompt);
+                DialogUtils.createConfirmPrompt(this, dlgClick, title, prompt);
             dialog = data.itsDialog;
             itsDeleteValidator = data.itsValidator;
             break;
