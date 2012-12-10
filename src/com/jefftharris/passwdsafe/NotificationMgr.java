@@ -7,6 +7,14 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import org.pwsafe.lib.file.PwsRecord;
+
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
@@ -43,11 +51,21 @@ public class NotificationMgr implements PasswdFileDataObserver
     private static final String DB_TABLE_EXPIRYS = "expirations";
     private static final String DB_COL_EXPIRYS_ID = BaseColumns._ID;
     private static final String DB_COL_EXPIRYS_URI = "uri";
-    private static final String DB_COL_EXPIRYS_UUID = "uuid";
+    private static final String DB_COL_EXPIRYS_UUID = "rec_uuid";
+    private static final String DB_COL_EXPIRYS_TITLE = "rec_title";
+    private static final String DB_COL_EXPIRYS_GROUP = "rec_group";
+    private static final String DB_COL_EXPIRYS_USER = "rec_username";
+    private static final String DB_COL_EXPIRYS_EXPIRE = "rec_expire";
     private static final String DB_MATCH_EXPIRYS_URI =
         DB_COL_EXPIRYS_URI + " = ?";
 
-    DbHelper itsDbHelper;
+    private static final DateFormat SQL_DATE_FMT =
+        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    static {
+        SQL_DATE_FMT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    private DbHelper itsDbHelper;
 
     /** Constructor */
     public NotificationMgr(Context ctx)
@@ -123,6 +141,7 @@ public class NotificationMgr implements PasswdFileDataObserver
      */
     public void passwdFileDataChanged(PasswdFileData fileData)
     {
+        // TODO: only update if necessary
         try {
             SQLiteDatabase db = itsDbHelper.getWritableDatabase();
             try {
@@ -178,7 +197,13 @@ public class NotificationMgr implements PasswdFileDataObserver
         for (PasswdRecord rec: fileData.getPasswdRecords()) {
             PasswdExpiration expiry = rec.getPasswdExpiry();
             if (expiry != null) {
+                PwsRecord pwsrec = rec.getRecord();
                 values.put(DB_COL_EXPIRYS_UUID, rec.getUUID());
+                values.put(DB_COL_EXPIRYS_TITLE, fileData.getTitle(pwsrec));
+                values.put(DB_COL_EXPIRYS_GROUP, fileData.getGroup(pwsrec));
+                values.put(DB_COL_EXPIRYS_USER, fileData.getUsername(pwsrec));
+                values.put(DB_COL_EXPIRYS_EXPIRE,
+                           dateToSqlDate(expiry.itsExpiration));
                 db.insertOrThrow(DB_TABLE_EXPIRYS, null, values);
             }
         }
@@ -200,6 +225,13 @@ public class NotificationMgr implements PasswdFileDataObserver
         } finally {
             cursor.close();
         }
+    }
+
+
+    /** Convert a Date to a string for the database */
+    private static synchronized String dateToSqlDate(Date date)
+    {
+        return SQL_DATE_FMT.format(date);
     }
 
     // TODO: not all URIs should support notifications
@@ -229,10 +261,14 @@ public class NotificationMgr implements PasswdFileDataObserver
                        DB_COL_URIS_URI + " TEXT NOT NULL" +
                        ");");
             db.execSQL("CREATE TABLE " + DB_TABLE_EXPIRYS + " (" +
-                       DB_COL_EXPIRYS_ID + " INTEGER PRIMARY KEY," +
+                       DB_COL_EXPIRYS_ID + " INTEGER PRIMARY KEY, " +
                        DB_COL_EXPIRYS_URI + " INTEGER REFERENCES " +
-                           DB_TABLE_URIS + "(" + DB_COL_URIS_ID +") NOT NULL," +
-                       DB_COL_EXPIRYS_UUID + " TEXT NOT NULL" +
+                           DB_TABLE_URIS + "(" + DB_COL_URIS_ID +") NOT NULL, " +
+                       DB_COL_EXPIRYS_UUID + " TEXT NOT NULL, " +
+                       DB_COL_EXPIRYS_TITLE + " TEXT NOT NULL, " +
+                       DB_COL_EXPIRYS_GROUP + " TEXT, " +
+                       DB_COL_EXPIRYS_USER + " TEXT, " +
+                       DB_COL_EXPIRYS_EXPIRE + " TEXT NOT NULL" +
                        ");");
         }
 
