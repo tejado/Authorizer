@@ -88,6 +88,9 @@ public class PasswdFileData
     private HeaderPasswdPolicies itsHdrPolicies = new HeaderPasswdPolicies();
     private boolean itsIsOpenReadOnly = false;
 
+    private static List<PasswdFileDataObserver> itsObservers =
+        new ArrayList<PasswdFileDataObserver>();
+
     private static final String TAG = "PasswdFileData";
 
     private static final int FIELD_UNSUPPORTED = -1;
@@ -167,6 +170,7 @@ public class PasswdFileData
             });
             try {
                 itsPwsFile.save();
+                notifyObservers(this);
             } finally {
                 itsPwsFile.getStorage().setSaveHelper(null);
             }
@@ -701,6 +705,12 @@ public class PasswdFileData
             i |= Character.digit(bytes[idx], 16);
         }
         return i;
+    }
+
+    /** Add an observer for file changes */
+    public static void addObserver(PasswdFileDataObserver observer)
+    {
+        itsObservers.add(observer);
     }
 
     private final void setSaveHdrFields(Context context)
@@ -1263,6 +1273,7 @@ public class PasswdFileData
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");
         indexRecords();
+        notifyObservers(this);
         PasswdSafeApp.dbginfo(TAG, "file loaded");
     }
 
@@ -1462,5 +1473,14 @@ public class PasswdFileData
         who.append(host);
         doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO,
                             who.toString());
+    }
+
+
+    /** Notify observer of file changes */
+    private static void notifyObservers(PasswdFileData fileData)
+    {
+        for (PasswdFileDataObserver obs: itsObservers) {
+            obs.passwdFileDataChanged(fileData);
+        }
     }
 }

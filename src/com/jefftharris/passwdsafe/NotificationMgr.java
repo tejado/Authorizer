@@ -7,6 +7,10 @@
  */
 package com.jefftharris.passwdsafe;
 
+import com.jefftharris.passwdsafe.file.PasswdExpiration;
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 
@@ -14,11 +18,11 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
@@ -26,15 +30,22 @@ import android.util.Log;
 /**
  * The NotificationMgr class encapsulates the notifications provided by the app
  */
-public class NotificationMgr
+public class NotificationMgr implements PasswdFileDataObserver
 {
     private static final String TAG = "NotificationMgr";
 
     private static final String DB_TABLE_URIS = "uris";
     private static final String DB_COL_URIS_ID = BaseColumns._ID;
     private static final String DB_COL_URIS_URI = "uri";
-
+    private static final String DB_MATCH_URIS_ID = DB_COL_URIS_ID + " = ?";
     private static final String DB_MATCH_URIS_URI = DB_COL_URIS_URI + " = ?";
+
+    private static final String DB_TABLE_EXPIRYS = "expirations";
+    private static final String DB_COL_EXPIRYS_ID = BaseColumns._ID;
+    private static final String DB_COL_EXPIRYS_URI = "uri";
+    private static final String DB_COL_EXPIRYS_UUID = "uuid";
+    private static final String DB_MATCH_EXPIRYS_URI =
+        DB_COL_EXPIRYS_URI + " = ?";
 
     DbHelper itsDbHelper;
 
@@ -42,6 +53,7 @@ public class NotificationMgr
     public NotificationMgr(Context ctx)
     {
         itsDbHelper = new DbHelper(ctx);
+        PasswdFileData.addObserver(this);
 
         // Simple query to create the database on startup
         SQLiteDatabase db = itsDbHelper.getReadableDatabase();
@@ -57,24 +69,32 @@ public class NotificationMgr
                 return false;
             }
             SQLiteDatabase db = itsDbHelper.getReadableDatabase();
-            return doHasPasswdExpiryNotif(uri.toString(), db);
+            Long uriId = getDbUriId(uri.toString(), db);
+            return uriId != null;
             // TODO: cache flag in memory?
-        } catch (SQLiteException e) {
+        } catch (SQLException e) {
             Log.e(TAG, "Database error", e);
             return false;
         }
     }
 
 
-    /** Toggle whether notifications are enabled for a URI */
-    public void togglePasswdExpiryNotif(Uri uri, Activity act)
+    /** Toggle whether notifications are enabled for a password file */
+    public void togglePasswdExpiryNotif(final PasswdFileData fileData,
+                                        Activity act)
     {
         try {
-            final String uristr = uri.toString();
+            if (fileData == null) {
+                return;
+            }
+
+            String uristr = fileData.getUri().toString();
             SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-            if (doHasPasswdExpiryNotif(uristr, db)) {
-                db.delete(DB_TABLE_URIS, DB_MATCH_URIS_URI,
-                          new String[] { uristr });
+            Long uriId = getDbUriId(uristr, db);
+            if (uriId != null) {
+                String[] idarg = new String[] { uriId.toString() };
+                db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI, idarg);
+                db.delete(DB_TABLE_URIS, DB_MATCH_URIS_ID, idarg);
             } else {
                 DialogUtils.DialogData dlgData =
                     DialogUtils.createConfirmPrompt(
@@ -84,15 +104,7 @@ public class NotificationMgr
                             @Override
                             public void onOkClicked(DialogInterface dialog)
                             {
-                                try {
-                                    SQLiteDatabase db =
-                                        itsDbHelper.getWritableDatabase();
-                                    ContentValues values = new ContentValues(1);
-                                    values.put(DB_COL_URIS_URI, uristr);
-                                    db.insert(DB_TABLE_URIS, null, values);
-                                } catch (SQLiteException e) {
-                                    Log.e(TAG, "Database error", e);
-                                }
+                                enablePasswdExpiryNotif(fileData);
                             }
                         },
                         act.getString(R.string.expiration_notifications),
@@ -100,21 +112,94 @@ public class NotificationMgr
                 dlgData.itsDialog.show();
                 dlgData.itsValidator.validate();
             }
-        } catch (SQLiteException e) {
+        } catch (SQLException e) {
             Log.e(TAG, "Database error", e);
         }
     }
 
 
-    /** Implementation to check whether notifications are enabled for a URI */
-    private boolean doHasPasswdExpiryNotif(String uristr, SQLiteDatabase db)
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.file.PasswdFileDataObserver#passwdFileDataChanged(com.jefftharris.passwdsafe.file.PasswdFileData)
+     */
+    public void passwdFileDataChanged(PasswdFileData fileData)
     {
-        String query = SQLiteQueryBuilder.buildQueryString(
-            true, DB_TABLE_URIS, new String[] { "count(*)" },
-            DB_MATCH_URIS_URI, null, null, null, null);
-        long count = DatabaseUtils.longForQuery(
-            db, query, new String[] { uristr });
-        return count != 0;
+        try {
+            SQLiteDatabase db = itsDbHelper.getWritableDatabase();
+            try {
+                db.beginTransaction();
+                Long id = getDbUriId(fileData.getUri().toString(), db);
+                if (id != null) {
+                    doUpdatePasswdFileData(id, fileData, db);
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        } catch (SQLException e) {
+            Log.e(TAG, "Database error", e);
+        }
+    }
+
+
+    /** Enable notifications for the password file */
+    private void enablePasswdExpiryNotif(PasswdFileData fileData)
+    {
+        try {
+            SQLiteDatabase db = itsDbHelper.getWritableDatabase();
+            try {
+                db.beginTransaction();
+                ContentValues values = new ContentValues(1);
+                values.put(DB_COL_URIS_URI, fileData.getUri().toString());
+                long id = db.insertOrThrow(DB_TABLE_URIS, null, values);
+                doUpdatePasswdFileData(id, fileData, db);
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        } catch (SQLException e) {
+            Log.e(TAG, "Database error", e);
+        }
+    }
+
+
+    /** Update the notification expirations for a password file */
+    private void doUpdatePasswdFileData(long uriId,
+                                        PasswdFileData fileData,
+                                        SQLiteDatabase db)
+        throws SQLException
+    {
+        PasswdSafeApp.dbginfo(TAG, "Update " + fileData.getUri() + ", id: " +
+                              uriId);
+
+        db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI,
+                  new String[] { Long.toString(uriId) });
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_EXPIRYS_URI, uriId);
+        for (PasswdRecord rec: fileData.getPasswdRecords()) {
+            PasswdExpiration expiry = rec.getPasswdExpiry();
+            if (expiry != null) {
+                values.put(DB_COL_EXPIRYS_UUID, rec.getUUID());
+                db.insertOrThrow(DB_TABLE_EXPIRYS, null, values);
+            }
+        }
+    }
+
+
+    /** Get the id for a URI or null if not found */
+    private Long getDbUriId(String uristr, SQLiteDatabase db)
+        throws SQLException
+    {
+        Cursor cursor = db.query(DB_TABLE_URIS, new String[] { DB_COL_URIS_ID },
+                                 DB_MATCH_URIS_URI, new String[] { uristr },
+                                 null, null, null);
+        try {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+            return cursor.getLong(0);
+        } finally {
+            cursor.close();
+        }
     }
 
     // TODO: not all URIs should support notifications
@@ -131,17 +216,26 @@ public class NotificationMgr
             super(context, DB_NAME, null, DB_VERSION);
         }
 
+
         /* (non-Javadoc)
          * @see android.database.sqlite.SQLiteOpenHelper#onCreate(android.database.sqlite.SQLiteDatabase)
          */
         @Override
         public void onCreate(SQLiteDatabase db)
         {
+            enableForeignKey(db);
             db.execSQL("CREATE TABLE " + DB_TABLE_URIS + " (" +
                        DB_COL_URIS_ID + " INTEGER PRIMARY KEY," +
                        DB_COL_URIS_URI + " TEXT NOT NULL" +
                        ");");
+            db.execSQL("CREATE TABLE " + DB_TABLE_EXPIRYS + " (" +
+                       DB_COL_EXPIRYS_ID + " INTEGER PRIMARY KEY," +
+                       DB_COL_EXPIRYS_URI + " INTEGER REFERENCES " +
+                           DB_TABLE_URIS + "(" + DB_COL_URIS_ID +") NOT NULL," +
+                       DB_COL_EXPIRYS_UUID + " TEXT NOT NULL" +
+                       ");");
         }
+
 
         /* (non-Javadoc)
          * @see android.database.sqlite.SQLiteOpenHelper#onUpgrade(android.database.sqlite.SQLiteDatabase, int, int)
@@ -149,6 +243,28 @@ public class NotificationMgr
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
         {
+            enableForeignKey(db);
+        }
+
+
+        /* (non-Javadoc)
+         * @see android.database.sqlite.SQLiteOpenHelper#onOpen(android.database.sqlite.SQLiteDatabase)
+         */
+        @Override
+        public void onOpen(SQLiteDatabase db)
+        {
+            enableForeignKey(db);
+            super.onOpen(db);
+        }
+
+
+        /** Enable support for foreign keys on the open database connection */
+        private void enableForeignKey(SQLiteDatabase db)
+            throws SQLException
+        {
+            if (!db.isReadOnly()) {
+                db.execSQL("PRAGMA foreign_keys = ON;");
+            }
         }
     }
 }

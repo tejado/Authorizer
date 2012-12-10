@@ -327,7 +327,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
         case MENU_PASSWD_EXPIRY_NOTIF: {
             NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
-            notifyMgr.togglePasswdExpiryNotif(getUri(), this);
+            notifyMgr.togglePasswdExpiryNotif(getPasswdFileData(), this);
             break;
         }
         default:
