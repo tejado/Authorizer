@@ -8,10 +8,12 @@
 package com.jefftharris.passwdsafe;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -27,7 +29,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -66,6 +67,7 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
     private DbHelper itsDbHelper;
+    private TreeSet<ExpiryEntry> itsEntries = new TreeSet<ExpiryEntry>();
 
     /** Constructor */
     public NotificationMgr(Context ctx)
@@ -74,8 +76,12 @@ public class NotificationMgr implements PasswdFileDataObserver
         PasswdFileData.addObserver(this);
 
         // Simple query to create the database on startup
-        SQLiteDatabase db = itsDbHelper.getReadableDatabase();
-        DatabaseUtils.queryNumEntries(db, DB_TABLE_URIS);
+        try {
+            SQLiteDatabase db = itsDbHelper.getReadableDatabase();
+            loadEntries(db);
+        } catch (SQLException e) {
+            Log.e(TAG, "Database error", e);
+        }
     }
 
 
@@ -210,6 +216,36 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
 
+    /** Load the expiration entries from the database */
+    private void loadEntries(SQLiteDatabase db)
+    {
+        String uriCol = DB_TABLE_URIS + "." + DB_COL_URIS_URI;
+        String uuidCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_UUID;
+        String titleCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_TITLE;
+        String groupCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_GROUP;
+        String userCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_USER;
+        String expireCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_EXPIRE;
+        Cursor cursor =
+            db.query(DB_TABLE_URIS + "," + DB_TABLE_EXPIRYS +
+                     " ON (" + DB_TABLE_URIS + "." + DB_COL_URIS_ID + "=" +
+                     DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_URI + ")",
+                     new String[] { uriCol, uuidCol, titleCol, groupCol,
+                                    userCol, expireCol },
+                     null, null, null, null, null);
+        //Log.e(TAG, "entries: " + DatabaseUtils.dumpCursorToString(cursor));
+        while (!cursor.moveToNext()) {
+            ExpiryEntry entry =
+                new ExpiryEntry(cursor.getString(2) + "/" +
+                                cursor.getString(3) + "/" +
+                                cursor.getString(4),
+                                cursor.getString(0),
+                                cursor.getString(1),
+                                sqlDateToDate(cursor.getString(5)));
+            itsEntries.add(entry);
+        }
+    }
+
+
     /** Get the id for a URI or null if not found */
     private Long getDbUriId(String uristr, SQLiteDatabase db)
         throws SQLException
@@ -234,10 +270,20 @@ public class NotificationMgr implements PasswdFileDataObserver
         return SQL_DATE_FMT.format(date);
     }
 
+
+    /** Convert a date string in the database to a Date */
+    private static synchronized Date sqlDateToDate(String str)
+    {
+        try {
+            return SQL_DATE_FMT.parse(str);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
     // TODO: not all URIs should support notifications
 
     /** Database helper class to manage the database tables */
-    private static class DbHelper extends SQLiteOpenHelper
+    private static final class DbHelper extends SQLiteOpenHelper
     {
         private static final String DB_NAME = "notifications.db";
         private static final int DB_VERSION = 1;
@@ -301,6 +347,44 @@ public class NotificationMgr implements PasswdFileDataObserver
             if (!db.isReadOnly()) {
                 db.execSQL("PRAGMA foreign_keys = ON;");
             }
+        }
+    }
+
+
+    /** The ExpiryEntry class represents an expiration entry for notifications */
+    private static final class ExpiryEntry implements Comparable<ExpiryEntry>
+    {
+        public final String itsName;
+        public final String itsUri;
+        public final String itsUuid;
+        public final Date itsExpiry;
+
+        /** Constructor */
+        public ExpiryEntry(String name, String uri, String uuid, Date expiry)
+        {
+            itsName = name;
+            itsUri = uri;
+            itsUuid = uuid;
+            itsExpiry = expiry;
+        }
+
+
+        /* (non-Javadoc)
+         * @see java.lang.Comparable#compareTo(java.lang.Object)
+         */
+        public int compareTo(ExpiryEntry another)
+        {
+            int rc = itsExpiry.compareTo(another.itsExpiry);
+            if (rc == 0) {
+                rc = itsName.compareTo(another.itsName);
+                if (rc == 0) {
+                    rc = itsUuid.compareTo(another.itsUuid);
+                    if (rc == 0) {
+                        rc = itsUri.compareTo(another.itsUri);
+                    }
+                }
+            }
+            return rc;
         }
     }
 }
