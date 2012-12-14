@@ -41,6 +41,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.ClipboardManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
@@ -390,7 +391,10 @@ public class PasswdSafeApp extends Application
                 ctx.getSystemService(Context.CLIPBOARD_SERVICE);
             clipMgr.setText(str);
         } catch (Throwable e) {
-            showErrorMsg(ctx.getString(R.string.copy_clipboard_error), ctx);
+            String err = ctx.getString(R.string.copy_clipboard_error,
+                                       getAppTitle(ctx));
+            Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
+            Log.e(TAG, err + ": " + e.toString());
         }
     }
 
