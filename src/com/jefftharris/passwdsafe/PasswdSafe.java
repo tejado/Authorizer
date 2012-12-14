@@ -658,6 +658,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             tv.setText(getUri().toString());
 
             PasswdFileData fileData = getPasswdFileData();
+            if (fileData == null) {
+                // TODO: Need better fix for fileData becoming null when the
+                // file is closed
+                break;
+            }
             tv = (TextView)dialog.findViewById(R.id.permissions);
             tv.setText(fileData.canEdit() ?
                        R.string.read_write : R.string.read_only);
