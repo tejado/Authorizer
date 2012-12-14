@@ -11,6 +11,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -21,10 +24,14 @@ import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -66,16 +73,24 @@ public class NotificationMgr implements PasswdFileDataObserver
         SQL_DATE_FMT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    private DbHelper itsDbHelper;
-    private TreeSet<ExpiryEntry> itsEntries = new TreeSet<ExpiryEntry>();
+    private final Context itsCtx;
+    private final NotificationManager itsNotifyMgr;
+    private final DbHelper itsDbHelper;
+    private final HashMap<Long, Integer> itsUriNotifs =
+        new HashMap<Long, Integer>();
+    private int itsNextNotifId = 1;
 
     /** Constructor */
     public NotificationMgr(Context ctx)
     {
+        itsCtx = ctx;
+        itsNotifyMgr = (NotificationManager)
+            ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+
         itsDbHelper = new DbHelper(ctx);
         PasswdFileData.addObserver(this);
 
-        // Simple query to create the database on startup
+        // TODO: start app on android startup
         try {
             SQLiteDatabase db = itsDbHelper.getReadableDatabase();
             loadEntries(db);
@@ -119,6 +134,7 @@ public class NotificationMgr implements PasswdFileDataObserver
                 String[] idarg = new String[] { uriId.toString() };
                 db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI, idarg);
                 db.delete(DB_TABLE_URIS, DB_MATCH_URIS_ID, idarg);
+                loadEntries(db);
             } else {
                 DialogUtils.DialogData dlgData =
                     DialogUtils.createConfirmPrompt(
@@ -213,36 +229,110 @@ public class NotificationMgr implements PasswdFileDataObserver
                 db.insertOrThrow(DB_TABLE_EXPIRYS, null, values);
             }
         }
+
+        loadEntries(db);
     }
 
 
     /** Load the expiration entries from the database */
     private void loadEntries(SQLiteDatabase db)
     {
-        String uriCol = DB_TABLE_URIS + "." + DB_COL_URIS_URI;
-        String uuidCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_UUID;
-        String titleCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_TITLE;
-        String groupCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_GROUP;
-        String userCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_USER;
-        String expireCol = DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_EXPIRE;
-        Cursor cursor =
-            db.query(DB_TABLE_URIS + "," + DB_TABLE_EXPIRYS +
-                     " ON (" + DB_TABLE_URIS + "." + DB_COL_URIS_ID + "=" +
-                     DB_TABLE_EXPIRYS + "." + DB_COL_EXPIRYS_URI + ")",
-                     new String[] { uriCol, uuidCol, titleCol, groupCol,
-                                    userCol, expireCol },
+        PasswdRecordFilter.ExpiryFilter filter =
+            PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS;
+        long expiration = filter.getExpiryFromNow(null);
+        long nextExpiration = Long.MAX_VALUE;
+
+        HashSet<Long> uris = new HashSet<Long>();
+        Cursor uriCursor =
+            db.query(DB_TABLE_URIS,
+                     new String[] { DB_COL_URIS_ID, DB_COL_URIS_URI },
                      null, null, null, null, null);
-        //Log.e(TAG, "entries: " + DatabaseUtils.dumpCursorToString(cursor));
-        while (!cursor.moveToNext()) {
-            ExpiryEntry entry =
-                new ExpiryEntry(cursor.getString(2) + "/" +
-                                cursor.getString(3) + "/" +
-                                cursor.getString(4),
-                                cursor.getString(0),
-                                cursor.getString(1),
-                                sqlDateToDate(cursor.getString(5)));
-            itsEntries.add(entry);
+        while (uriCursor.moveToNext()) {
+            long id = uriCursor.getLong(0);
+            String uri = uriCursor.getString(1);
+
+            TreeSet<ExpiryEntry> expired = new TreeSet<ExpiryEntry>();
+            Cursor expirysCursor =
+                db.query(DB_TABLE_EXPIRYS,
+                         new String[] { DB_COL_EXPIRYS_UUID,
+                                        DB_COL_EXPIRYS_TITLE,
+                                        DB_COL_EXPIRYS_GROUP,
+                                        DB_COL_EXPIRYS_USER,
+                                        DB_COL_EXPIRYS_EXPIRE },
+                         DB_MATCH_EXPIRYS_URI,
+                         new String[] { Long.toString(id) },
+                         null, null, null);
+            while (expirysCursor.moveToNext()) {
+                Date expiry = sqlDateToDate(expirysCursor.getString(4));
+                // TODO: invalid date format?
+
+                long entryExpiry = expiry.getTime();
+                if (entryExpiry <= expiration) {
+                    String uuid = expirysCursor.getString(0);
+                    String name = expirysCursor.getString(1) + "/" +
+                        expirysCursor.getString(2) + "/" +
+                        expirysCursor.getString(3);
+                    ExpiryEntry entry = new ExpiryEntry(name, uri,
+                                                        uuid, expiry);
+                    PasswdSafeApp.dbginfo(TAG,
+                                          "expired entry: " + entry.itsName);
+                    expired.add(entry);
+                }
+                else if (entryExpiry < nextExpiration) {
+                    nextExpiration = entryExpiry;
+                }
+            }
+
+            int numExpired = expired.size();
+            if (numExpired == 0) {
+                continue;
+            }
+
+            uris.add(id);
+            Integer notifyId = itsUriNotifs.get(id);
+            if (notifyId == null) {
+                notifyId = itsNextNotifId++;
+                itsUriNotifs.put(id, notifyId);
+            }
+
+            String record = null;
+            if (numExpired == 1) {
+                ExpiryEntry entry = expired.first();
+                record = entry.itsUuid;
+            }
+
+            // TODO: only update notification if something has changed
+            // TODO: when opening a file different from current file, clear the records from screen while loading
+            PendingIntent intent = PendingIntent.getActivity(
+                itsCtx, 0,
+                AbstractFileListActivity.createOpenIntent(
+                    Uri.parse(uri), record),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+
+            // TODO: should just indicate how many new entries expired
+            Notification notif =
+                new Notification(R.drawable.icon,
+                                 String.format("%d passwords have expired",
+                                               numExpired),
+                                               System.currentTimeMillis());
+            notif.setLatestEventInfo(itsCtx, uri,
+                                     String.format("%d expired passwords",
+                                                   numExpired),
+                                     intent);
+            itsNotifyMgr.notify(notifyId, notif);
         }
+
+        Iterator<HashMap.Entry<Long, Integer>> iter =
+            itsUriNotifs.entrySet().iterator();
+        while (iter.hasNext()) {
+            HashMap.Entry<Long, Integer> entry = iter.next();
+            if (!uris.contains(entry.getKey())) {
+                itsNotifyMgr.cancel(entry.getValue());
+                iter.remove();
+            }
+        }
+        PasswdSafeApp.dbginfo(TAG,
+                              "nextExpiration: " + new Date(nextExpiration));
     }
 
 
