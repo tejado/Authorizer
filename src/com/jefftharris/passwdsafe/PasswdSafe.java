@@ -1012,7 +1012,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 return;
             }
             PasswdSafeApp.dbginfo(TAG, "LoadTask post execute");
-            dismissDialog(DIALOG_PROGRESS);
+            removeDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {
                 getPasswdFile().setFileData((PasswdFileData)result);
