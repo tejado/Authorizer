@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -76,8 +78,8 @@ public class NotificationMgr implements PasswdFileDataObserver
     private final Context itsCtx;
     private final NotificationManager itsNotifyMgr;
     private final DbHelper itsDbHelper;
-    private final HashMap<Long, Integer> itsUriNotifs =
-        new HashMap<Long, Integer>();
+    private final HashMap<Long, UriNotifInfo> itsUriNotifs =
+        new HashMap<Long, UriNotifInfo>();
     private int itsNextNotifId = 1;
 
     /** Constructor */
@@ -237,6 +239,7 @@ public class NotificationMgr implements PasswdFileDataObserver
     /** Load the expiration entries from the database */
     private void loadEntries(SQLiteDatabase db)
     {
+        // TODO: use pref
         PasswdRecordFilter.ExpiryFilter filter =
             PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS;
         long expiration = filter.getExpiryFromNow(null);
@@ -250,6 +253,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         while (uriCursor.moveToNext()) {
             long id = uriCursor.getLong(0);
             String uri = uriCursor.getString(1);
+            PasswdSafeApp.dbginfo(TAG, "Load " + uri);
 
             TreeSet<ExpiryEntry> expired = new TreeSet<ExpiryEntry>();
             Cursor expirysCursor =
@@ -283,25 +287,34 @@ public class NotificationMgr implements PasswdFileDataObserver
                 }
             }
 
-            int numExpired = expired.size();
-            if (numExpired == 0) {
+            if (expired.isEmpty()) {
                 continue;
             }
 
             uris.add(id);
-            Integer notifyId = itsUriNotifs.get(id);
-            if (notifyId == null) {
-                notifyId = itsNextNotifId++;
-                itsUriNotifs.put(id, notifyId);
+            UriNotifInfo info = itsUriNotifs.get(id);
+            if (info == null) {
+                info = new UriNotifInfo(itsNextNotifId++);
+                itsUriNotifs.put(id, info);
             }
+
+            // Skip the notification if the entries are the same
+            if (info.getEntries().equals(expired))
+            {
+                PasswdSafeApp.dbginfo(TAG, "No expiry changes");
+                continue;
+            }
+
+            info.setEntries(expired);
+            int numExpired = info.getEntries().size();
 
             String record = null;
             if (numExpired == 1) {
-                ExpiryEntry entry = expired.first();
+                ExpiryEntry entry = info.getEntries().first();
                 record = entry.itsUuid;
             }
 
-            // TODO: only update notification if something has changed
+            // TODO: need notification icon
             // TODO: when opening a file different from current file, clear the records from screen while loading
             PendingIntent intent = PendingIntent.getActivity(
                 itsCtx, 0,
@@ -309,25 +322,23 @@ public class NotificationMgr implements PasswdFileDataObserver
                     Uri.parse(uri), record),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            // TODO: should just indicate how many new entries expired
-            Notification notif =
-                new Notification(R.drawable.icon,
-                                 String.format("%d passwords have expired",
-                                               numExpired),
-                                               System.currentTimeMillis());
+            // TODO: need a preference option to clear the notification db
+            Notification notif = new Notification(R.drawable.icon,
+                                                  "Password expirations",
+                                                  System.currentTimeMillis());
             notif.setLatestEventInfo(itsCtx, uri,
                                      String.format("%d expired passwords",
                                                    numExpired),
                                      intent);
-            itsNotifyMgr.notify(notifyId, notif);
+            itsNotifyMgr.notify(info.getNotifId(), notif);
         }
 
-        Iterator<HashMap.Entry<Long, Integer>> iter =
+        Iterator<HashMap.Entry<Long, UriNotifInfo>> iter =
             itsUriNotifs.entrySet().iterator();
         while (iter.hasNext()) {
-            HashMap.Entry<Long, Integer> entry = iter.next();
+            HashMap.Entry<Long, UriNotifInfo> entry = iter.next();
             if (!uris.contains(entry.getKey())) {
-                itsNotifyMgr.cancel(entry.getValue());
+                itsNotifyMgr.cancel(entry.getValue().getNotifId());
                 iter.remove();
             }
         }
@@ -475,6 +486,40 @@ public class NotificationMgr implements PasswdFileDataObserver
                 }
             }
             return rc;
+        }
+    }
+
+
+    /** The UriNotifInfo contains the parsed notification data for a URI */
+    private static final class UriNotifInfo
+    {
+        private final int itsNotifId;
+        private final TreeSet<ExpiryEntry> itsEntries =
+            new TreeSet<ExpiryEntry>();
+
+        /** Constructor */
+        public UriNotifInfo(int notifId)
+        {
+            itsNotifId = notifId;
+        }
+
+        /** Get the notification id */
+        public int getNotifId()
+        {
+            return itsNotifId;
+        }
+
+        /** Get the expired entries */
+        public SortedSet<ExpiryEntry> getEntries()
+        {
+            return itsEntries;
+        }
+
+        /** Set the expired entries */
+        public void setEntries(Set<ExpiryEntry> entries)
+        {
+            itsEntries.clear();
+            itsEntries.addAll(entries);
         }
     }
 }
