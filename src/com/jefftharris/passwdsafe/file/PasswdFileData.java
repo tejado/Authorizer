@@ -183,8 +183,7 @@ public class PasswdFileData
         itsFile = null;
         itsPwsFile.dispose();
         itsPwsFile = null;
-        itsRecordsByUUID.clear();
-        itsRecords.clear();
+        indexRecords();
     }
 
     public ArrayList<PwsRecord> getRecords()
@@ -1280,30 +1279,32 @@ public class PasswdFileData
     private final void indexRecords()
     {
         itsRecords.clear();
-        itsRecords.ensureCapacity(itsPwsFile.getRecordCount());
         itsRecordsByUUID.clear();
         itsPasswdRecords.clear();
-        Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
-        while (recIter.hasNext()) {
-            PwsRecord rec = recIter.next();
-            String uuid = getUUID(rec);
-            if (uuid == null) {
-                // Add a UUID field for records without one.  The record will
-                // not be marked as modified unless the user manually edits it.
-                PwsUUIDField uuidField =
-                    new PwsUUIDField(isV2() ?
-                                     PwsFieldTypeV2.UUID : PwsFieldTypeV3.UUID,
-                                     new UUID());
-                boolean modified = rec.isModified();
-                rec.setField(uuidField);
-                if (!modified) {
-                    rec.resetModified();
+        if (itsPwsFile != null) {
+            itsRecords.ensureCapacity(itsPwsFile.getRecordCount());
+            Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
+            while (recIter.hasNext()) {
+                PwsRecord rec = recIter.next();
+                String uuid = getUUID(rec);
+                if (uuid == null) {
+                    // Add a UUID field for records without one.  The record
+                    // will not be marked as modified unless the user manually
+                    // edits it.
+                    PwsUUIDField uuidField = new PwsUUIDField(
+                        isV2() ? PwsFieldTypeV2.UUID : PwsFieldTypeV3.UUID,
+                        new UUID());
+                    boolean modified = rec.isModified();
+                    rec.setField(uuidField);
+                    if (!modified) {
+                        rec.resetModified();
+                    }
+                    uuid = uuidField.toString();
                 }
-                uuid = uuidField.toString();
-            }
 
-            itsRecords.add(rec);
-            itsRecordsByUUID.put(uuid, rec);
+                itsRecords.add(rec);
+                itsRecordsByUUID.put(uuid, rec);
+            }
         }
         for (PwsRecord rec: itsRecords) {
             itsPasswdRecords.put(rec, new PasswdRecord(rec, this));

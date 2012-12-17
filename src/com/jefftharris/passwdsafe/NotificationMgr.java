@@ -315,7 +315,6 @@ public class NotificationMgr implements PasswdFileDataObserver
             }
 
             // TODO: need notification icon
-            // TODO: when opening a file different from current file, clear the records from screen while loading
             PendingIntent intent = PendingIntent.getActivity(
                 itsCtx, 0,
                 AbstractFileListActivity.createOpenIntent(

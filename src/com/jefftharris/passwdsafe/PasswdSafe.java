@@ -139,16 +139,29 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void onNewIntent(Intent intent)
     {
+        super.onNewIntent(intent);
+
         if (intent != null) {
             String action = intent.getAction();
             if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
                 action.equals(Intent.ACTION_VIEW)) {
+                initNewViewIntent();
+                showFileData(MOD_INIT);
                 onCreateView(intent);
                 return;
             }
         }
+    }
 
-        super.onNewIntent(intent);
+
+    /** Initialize the activity for a new view intent */
+    @Override
+    protected void initNewViewIntent()
+    {
+        super.initNewViewIntent();
+        itsIsNotifyExpirations = true;
+        findViewById(R.id.expiry_panel).setVisibility(View.GONE);
+        itsRecToOpen = null;
     }
 
 
@@ -810,8 +823,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void showFileData(int mod)
     {
-        if (itsRecToOpen != null) {
-            openRecord(itsRecToOpen);
+        if ((mod & MOD_INIT) == 0) {
+            if (itsRecToOpen != null) {
+                openRecord(itsRecToOpen);
+            }
         }
         super.showFileData(mod);
 

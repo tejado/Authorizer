@@ -72,6 +72,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected static final int MOD_GROUP          = 1 << 1;
     /** Search may have been modified */
     protected static final int MOD_SEARCH         = 1 << 2;
+    /** Initialize file data */
+    protected static final int MOD_INIT           = 1 << 3;
 
     private GroupNode itsRootNode = null;
     private GroupNode itsCurrGroupNode = null;
@@ -89,7 +91,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
     private PasswdRecordFilter itsFilter = null;
 
-    private ArrayList<String> itsCurrGroups = new ArrayList<String>();
+    private final ArrayList<String> itsCurrGroups = new ArrayList<String>();
 
     /** Called when the activity is first created. */
     @Override
@@ -103,7 +105,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         {
             public final void onClick(View v)
             {
-                setPasswdRecordFilter(null);
+                setPasswdRecordFilter(null, false);
             }
         });
 
@@ -124,10 +126,11 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             ArrayList<String> currGroups =
                 savedInstanceState.getStringArrayList(BUNDLE_CURR_GROUPS);
             if (currGroups != null) {
-                itsCurrGroups = new ArrayList<String>(currGroups);
+                itsCurrGroups.clear();
+                itsCurrGroups.addAll(currGroups);
             }
         }
-        setPasswdRecordFilter(filter);
+        setPasswdRecordFilter(filter, false);
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
@@ -153,12 +156,21 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        String query = null;
         if ((intent != null) &&
             intent.getAction().equals(Intent.ACTION_SEARCH)) {
-            query = intent.getStringExtra(SearchManager.QUERY);
+            setRecordFilter(intent.getStringExtra(SearchManager.QUERY));
         }
-        setRecordFilter(query);
+    }
+
+
+    /** Initialize the activity for a new view intent */
+    protected void initNewViewIntent()
+    {
+        itsRootNode = null;
+        itsCurrGroupNode = null;
+        itsNumExpired = 0;
+        itsCurrGroups.clear();
+        setPasswdRecordFilter(null, true);
     }
 
 
@@ -371,12 +383,17 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private final void populateFileData(int mod)
     {
         itsListData.clear();
-        PasswdFileData fileData = getPasswdFileData();
-        if (fileData == null) {
-            return;
+        PasswdFileData fileData;
+        if ((mod & MOD_INIT) == 0) {
+            fileData = getPasswdFileData();
+            if (fileData == null) {
+                return;
+            }
+        } else {
+            fileData = null;
         }
 
-        if ((mod & (MOD_DATA | MOD_SEARCH)) != 0) {
+        if ((mod & (MOD_DATA | MOD_SEARCH | MOD_INIT)) != 0) {
             populateRootNode(fileData);
         }
 
@@ -429,8 +446,13 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private final void populateRootNode(PasswdFileData fileData)
     {
         PasswdSafeApp.dbginfo(TAG, "populateRootNode");
-        ArrayList<PwsRecord> records = fileData.getRecords();
         itsRootNode = new GroupNode();
+        itsNumExpired = 0;
+        if (fileData == null) {
+            return;
+        }
+
+        ArrayList<PwsRecord> records = fileData.getRecords();
 
         if (itsGroupRecords) {
             Comparator<String> groupComp;
@@ -471,7 +493,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             }
         }
 
-        itsNumExpired = 0;
         PasswdRecordFilter.ExpiryFilter filter = itsExpiryNotifPref.getFilter();
         if (filter != null) {
             long expiration = filter.getExpiryFromNow(null);
@@ -540,7 +561,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             filter = new PasswdRecordFilter(queryPattern, options);
         }
 
-        setPasswdRecordFilter(filter);
+        setPasswdRecordFilter(filter, false);
     }
 
     /** Set the record filter for an expiration */
@@ -552,11 +573,13 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     {
         setPasswdRecordFilter(
             new PasswdRecordFilter(filter, customDate,
-                                   PasswdRecordFilter.OPTS_DEFAULT));
+                                   PasswdRecordFilter.OPTS_DEFAULT),
+            false);
     }
 
     /** Set the record filter */
-    private final void setPasswdRecordFilter(PasswdRecordFilter filter)
+    private final void setPasswdRecordFilter(PasswdRecordFilter filter,
+                                             boolean init)
     {
         itsFilter = filter;
         View panel = findViewById(R.id.query_panel);
@@ -569,7 +592,9 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             panel.setVisibility(View.GONE);
         }
 
-        showFileData(MOD_SEARCH);
+        if (!init) {
+            showFileData(MOD_SEARCH);
+        }
     }
 
 
@@ -610,7 +635,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             showFileData(MOD_GROUP);
             return true;
         } else if (itsFilter != null) {
-            setPasswdRecordFilter(null);
+            setPasswdRecordFilter(null, false);
             return true;
         } else {
             return false;
