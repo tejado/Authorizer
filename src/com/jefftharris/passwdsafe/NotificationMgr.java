@@ -356,14 +356,14 @@ public class NotificationMgr implements PasswdFileDataObserver
                 record = entry.itsUuid;
             }
 
-            // TODO: need notification icon
+            // TODO: use newer notification apis if available
             PendingIntent intent = PendingIntent.getActivity(
                 itsCtx, 0,
                 AbstractFileListActivity.createOpenIntent(
                     Uri.parse(uri), record),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Notification notif = new Notification(R.drawable.icon,
+            Notification notif = new Notification(R.drawable.ic_stat_app,
                                                   "Password expirations",
                                                   System.currentTimeMillis());
             notif.setLatestEventInfo(itsCtx, uri,
