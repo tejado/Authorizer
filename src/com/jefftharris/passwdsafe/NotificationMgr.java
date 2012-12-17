@@ -267,12 +267,20 @@ public class NotificationMgr implements PasswdFileDataObserver
                          new String[] { Long.toString(id) },
                          null, null, null);
             while (expirysCursor.moveToNext()) {
-                Date expiry = sqlDateToDate(expirysCursor.getString(4));
-                // TODO: invalid date format?
+                String uuid = expirysCursor.getString(0);
+                String expiryStr = expirysCursor.getString(4);
+                Date expiry;
+                try {
+                    expiry = sqlDateToDate(expiryStr);
+                } catch (Exception e) {
+                    Log.e(TAG,
+                          String.format("Invalid expiry date for %1$s: %2$s",
+                                        uuid, expiryStr), e);
+                    continue;
+                }
 
                 long entryExpiry = expiry.getTime();
                 if (entryExpiry <= expiration) {
-                    String uuid = expirysCursor.getString(0);
                     String name = expirysCursor.getString(1) + "/" +
                         expirysCursor.getString(2) + "/" +
                         expirysCursor.getString(3);
@@ -367,18 +375,19 @@ public class NotificationMgr implements PasswdFileDataObserver
     /** Convert a Date to a string for the database */
     private static synchronized String dateToSqlDate(Date date)
     {
+        if (date == null) {
+            return "";
+        }
         return SQL_DATE_FMT.format(date);
     }
 
 
-    /** Convert a date string in the database to a Date */
+    /** Convert a date string in the database to a Date
+     * @throws ParseException */
     private static synchronized Date sqlDateToDate(String str)
+        throws ParseException
     {
-        try {
-            return SQL_DATE_FMT.parse(str);
-        } catch (ParseException e) {
-            return null;
-        }
+        return SQL_DATE_FMT.parse(str);
     }
     // TODO: not all URIs should support notifications
 
