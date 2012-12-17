@@ -22,6 +22,7 @@
     <string name="choose_type">Choisir un type</string>
     <string name="clear">Effacer</string>
     <string name="clear_clipboard_on_close">Vider le presse-papiers en quittant</string>
+    <string name="clear_password_notifications">Effacer les notifications de mot de passe</string>
     <string name="close">Fermer</string>
     <string name="close_file_screen_off">Fermer le fichier à l\'extinction de l\'écran</string>
     <string name="confirm">Confirmer</string>
@@ -70,6 +71,7 @@
     <string name="empty_title">Titre vide</string>
     <string name="enabled">Activé</string>
     <string name="enter_net_group">Entrer un nouveau groupe:</string>
+    <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers chenilles</string>
     <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>

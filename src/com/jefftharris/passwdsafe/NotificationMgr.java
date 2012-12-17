@@ -184,6 +184,40 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
 
+    /** Clear all notifications in the database */
+    public void clearAllNotifications(Activity act)
+    {
+        AbstractDialogClickListener listener =
+            new AbstractDialogClickListener()
+            {
+                @Override
+                public void onOkClicked(DialogInterface dialog)
+                {
+                    try {
+                        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
+                        try {
+                            db.beginTransaction();
+                            db.delete(DB_TABLE_EXPIRYS, null, null);
+                            db.delete(DB_TABLE_URIS, null, null);
+                            loadEntries(db);
+                            db.setTransactionSuccessful();
+                        } finally {
+                            db.endTransaction();
+                        }
+                    } catch (SQLException e) {
+                        Log.e(TAG, "Database error", e);
+                    }
+                }
+            };
+
+        DialogUtils.DialogData dlgData = DialogUtils.createConfirmPrompt(
+            act, listener,
+            act.getString(R.string.clear_password_notifications),
+            act.getString(R.string.erase_all_expiration_notifications));
+        dlgData.itsDialog.show();
+        dlgData.itsValidator.validate();
+    }
+
     /** Enable notifications for the password file */
     private void enablePasswdExpiryNotif(PasswdFileData fileData)
     {
@@ -329,7 +363,6 @@ public class NotificationMgr implements PasswdFileDataObserver
                     Uri.parse(uri), record),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            // TODO: need a preference option to clear the notification db
             Notification notif = new Notification(R.drawable.icon,
                                                   "Password expirations",
                                                   System.currentTimeMillis());

@@ -22,6 +22,7 @@
     <string name="choose_type">Choose Type</string>
     <string name="clear">Clear</string>
     <string name="clear_clipboard_on_close">Clear clipboard on close</string>
+    <string name="clear_password_notifications">Clear password notifications</string>
     <string name="close">Close</string>
     <string name="close_file_screen_off">Close file on screen off</string>
     <string name="confirm">Confirm</string>
@@ -70,6 +71,7 @@
     <string name="empty_title">Empty title</string>
     <string name="enabled">Enabled</string>
     <string name="enter_net_group">Enter new group:</string>
+    <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
     <string name="error">Error</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
