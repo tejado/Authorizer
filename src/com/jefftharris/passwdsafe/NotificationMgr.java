@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,9 +30,9 @@ import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogUtils;
+import com.jefftharris.passwdsafe.view.GuiUtils;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
@@ -349,6 +350,10 @@ public class NotificationMgr implements PasswdFileDataObserver
 
             info.setEntries(expired);
             int numExpired = info.getEntries().size();
+            ArrayList<String> strs = new ArrayList<String>(numExpired);
+            for (ExpiryEntry entry: info.getEntries()) {
+                strs.add(entry.itsName);
+            }
 
             String record = null;
             if (numExpired == 1) {
@@ -356,21 +361,21 @@ public class NotificationMgr implements PasswdFileDataObserver
                 record = entry.itsUuid;
             }
 
-            // TODO: use newer notification apis if available
             PendingIntent intent = PendingIntent.getActivity(
                 itsCtx, 0,
                 AbstractFileListActivity.createOpenIntent(
                     Uri.parse(uri), record),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Notification notif = new Notification(R.drawable.ic_stat_app,
-                                                  "Password expirations",
-                                                  System.currentTimeMillis());
-            notif.setLatestEventInfo(itsCtx, uri,
-                                     String.format("%d expired passwords",
-                                                   numExpired),
-                                     intent);
-            itsNotifyMgr.notify(info.getNotifId(), notif);
+            // TODO: resource strings
+            // TODO: sort expiry entries by date so last to expire is shown first
+            // TODO: better text for expiry name
+            String content = String.format("%d expired passwords", numExpired);
+            GuiUtils.showNotification(itsNotifyMgr, itsCtx,
+                                      R.drawable.ic_stat_app,
+                                      "Password expiration", uri, content,
+                                      content, uri, strs,
+                                      intent, info.getNotifId());
         }
 
         Iterator<HashMap.Entry<Long, UriNotifInfo>> iter =

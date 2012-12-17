@@ -12,13 +12,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.util.Utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
+import android.support.v4.app.NotificationCompat;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
@@ -295,5 +301,54 @@ public final class GuiUtils
             params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
             v.setLayoutParams(params);
         }
+    }
+
+
+    /** Show a notification */
+    public static void showNotification(NotificationManager notifyMgr,
+                                        Context ctx,
+                                        int iconId,
+                                        String tickerText,
+                                        String title,
+                                        String content,
+                                        String bigTitle,
+                                        String bigSummary,
+                                        List<String> bigLines,
+                                        PendingIntent intent,
+                                        int notifyId)
+    {
+        Notification notif;
+        if (SDK_VERSION == SDK_CUPCAKE) {
+            notif = new Notification(iconId, tickerText,
+                                     System.currentTimeMillis());
+            notif.setLatestEventInfo(ctx, title, content, intent);
+        } else {
+            BitmapDrawable b = (BitmapDrawable)
+                ctx.getResources().getDrawable(R.drawable.icon);
+            NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(ctx)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setContentIntent(intent)
+                .setSmallIcon(iconId)
+                .setLargeIcon(b.getBitmap())
+                .setTicker(tickerText);
+            NotificationCompat.InboxStyle style =
+                new NotificationCompat.InboxStyle(builder)
+                .setBigContentTitle(bigTitle)
+                .setSummaryText(bigSummary);
+
+            int numLines = Math.min(bigLines.size(), 5);
+            for (int i = 0; i < numLines; ++i) {
+                style.addLine(bigLines.get(i));
+            }
+            if (numLines < bigLines.size()) {
+                style.addLine("...");
+            }
+
+            builder.setStyle(style);
+            notif = builder.build();
+        }
+        notifyMgr.notify(notifyId, notif);
     }
 }
