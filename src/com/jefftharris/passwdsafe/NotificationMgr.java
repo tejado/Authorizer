@@ -219,6 +219,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         dlgData.itsValidator.validate();
     }
 
+
     /** Enable notifications for the password file */
     private void enablePasswdExpiryNotif(PasswdFileData fileData)
     {
@@ -367,15 +368,14 @@ public class NotificationMgr implements PasswdFileDataObserver
                     Uri.parse(uri), record),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            // TODO: resource strings
             // TODO: sort expiry entries by date so last to expire is shown first
             // TODO: better text for expiry name
-            String content = String.format("%d expired passwords", numExpired);
-            GuiUtils.showNotification(itsNotifyMgr, itsCtx,
-                                      R.drawable.ic_stat_app,
-                                      "Password expiration", uri, content,
-                                      content, uri, strs,
-                                      intent, info.getNotifId());
+            String title = itsCtx.getResources().getQuantityString(
+                R.plurals.expired_passwords, numExpired, numExpired);
+            GuiUtils.showNotification(
+                itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
+                itsCtx.getString(R.string.password_expired),
+                title, uri, strs, intent, info.getNotifId());
         }
 
         Iterator<HashMap.Entry<Long, UriNotifInfo>> iter =

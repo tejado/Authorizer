@@ -224,6 +224,11 @@
     <string name="username_header">NOM UTILISATEUR</string>
     <string name="yes">Oui</string>
 
+    <plurals name="expired_passwords">
+        <item quantity="one">Un mot de passe a expiré</item>
+        <item quantity="other">%1$d mots de passe expirés</item>
+    </plurals>
+    
     <plurals name="group_items">
         <item quantity="one">[Une entrée]</item>
         <item quantity="other">[%d entrées]</item>

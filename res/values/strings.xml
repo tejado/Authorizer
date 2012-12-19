@@ -226,6 +226,11 @@
     <string name="username_header">USER NAME</string>
     <string name="yes">Yes</string>
 
+    <plurals name="expired_passwords">
+        <item quantity="one">One expired password</item>
+        <item quantity="other">%1$d expired passwords</item>
+    </plurals>
+    
     <plurals name="group_items">
         <item quantity="one">[One item]</item>
         <item quantity="other">[%d items]</item>
@@ -235,7 +240,7 @@
         <item quantity="one">Daily</item>
         <item quantity="other">%d days</item>
     </plurals>
-
+    
     <!-- Order must match FileBackupPref enum values -->
     <string-array name="file_backup_pref">
         <item>None</item>

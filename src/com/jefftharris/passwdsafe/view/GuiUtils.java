@@ -311,8 +311,6 @@ public final class GuiUtils
                                         String tickerText,
                                         String title,
                                         String content,
-                                        String bigTitle,
-                                        String bigSummary,
                                         List<String> bigLines,
                                         PendingIntent intent,
                                         int notifyId)
@@ -335,8 +333,8 @@ public final class GuiUtils
                 .setTicker(tickerText);
             NotificationCompat.InboxStyle style =
                 new NotificationCompat.InboxStyle(builder)
-                .setBigContentTitle(bigTitle)
-                .setSummaryText(bigSummary);
+                .setBigContentTitle(title)
+                .setSummaryText(content);
 
             int numLines = Math.min(bigLines.size(), 5);
             for (int i = 0; i < numLines; ++i) {
