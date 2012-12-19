@@ -343,7 +343,7 @@ public final class GuiUtils
                 style.addLine(bigLines.get(i));
             }
             if (numLines < bigLines.size()) {
-                style.addLine("...");
+                style.addLine("…");
             }
 
             builder.setStyle(style);
