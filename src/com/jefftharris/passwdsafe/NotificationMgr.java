@@ -28,6 +28,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.GuiUtils;
@@ -330,11 +331,16 @@ public class NotificationMgr implements PasswdFileDataObserver
 
                 long entryExpiry = expiry.getTime();
                 if (entryExpiry <= expiration) {
-                    String name = PasswdRecord.getRecordId(
-                        expirysCursor.getString(2),
-                        expirysCursor.getString(1),
-                        expirysCursor.getString(3));
-                    ExpiryEntry entry = new ExpiryEntry(name, uri,
+                    StringBuilder name = new StringBuilder();
+                    name.append(PasswdRecord.getRecordId(
+                                    expirysCursor.getString(2),
+                                    expirysCursor.getString(1),
+                                    expirysCursor.getString(3)));
+                    name.append(" (");
+                    name.append(Utils.formatDate(expiry.getTime(), itsCtx,
+                                                 false, true, true));
+                    name.append(")");
+                    ExpiryEntry entry = new ExpiryEntry(name.toString(),
                                                         uuid, expiry);
                     PasswdSafeApp.dbginfo(TAG,
                                           "expired entry: " + entry.itsName);
@@ -515,15 +521,13 @@ public class NotificationMgr implements PasswdFileDataObserver
     private static final class ExpiryEntry implements Comparable<ExpiryEntry>
     {
         public final String itsName;
-        public final Uri itsUri;
         public final String itsUuid;
         public final Date itsExpiry;
 
         /** Constructor */
-        public ExpiryEntry(String name, Uri uri, String uuid, Date expiry)
+        public ExpiryEntry(String name, String uuid, Date expiry)
         {
             itsName = name;
-            itsUri = uri;
             itsUuid = uuid;
             itsExpiry = expiry;
         }
@@ -534,14 +538,11 @@ public class NotificationMgr implements PasswdFileDataObserver
          */
         public int compareTo(ExpiryEntry another)
         {
-            int rc = itsExpiry.compareTo(another.itsExpiry);
+            int rc = -itsExpiry.compareTo(another.itsExpiry);
             if (rc == 0) {
                 rc = itsName.compareTo(another.itsName);
                 if (rc == 0) {
                     rc = itsUuid.compareTo(another.itsUuid);
-                    if (rc == 0) {
-                        rc = itsUri.compareTo(another.itsUri);
-                    }
                 }
             }
             return rc;
