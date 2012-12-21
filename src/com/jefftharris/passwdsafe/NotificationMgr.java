@@ -81,7 +81,7 @@ public class NotificationMgr implements PasswdFileDataObserver
     private final DbHelper itsDbHelper;
     private final HashMap<Long, UriNotifInfo> itsUriNotifs =
         new HashMap<Long, UriNotifInfo>();
-    private final HashSet<String> itsNotifUris = new HashSet<String>();
+    private final HashSet<Uri> itsNotifUris = new HashSet<Uri>();
     private int itsNextNotifId = 1;
     private PasswdRecordFilter.ExpiryFilter itsExpiryFilter = null;
 
@@ -105,10 +105,7 @@ public class NotificationMgr implements PasswdFileDataObserver
     /** Are notifications enabled for a URI */
     public boolean hasPasswdExpiryNotif(Uri uri)
     {
-        if (uri == null) {
-            return false;
-        }
-        return itsNotifUris.contains(uri.toString());
+        return itsNotifUris.contains(uri);
     }
 
 
@@ -303,7 +300,7 @@ public class NotificationMgr implements PasswdFileDataObserver
                      null, null, null, null, null);
         while (uriCursor.moveToNext()) {
             long id = uriCursor.getLong(0);
-            String uri = uriCursor.getString(1);
+            Uri uri = Uri.parse(uriCursor.getString(1));
             itsNotifUris.add(uri);
             PasswdSafeApp.dbginfo(TAG, "Load " + uri);
 
@@ -381,9 +378,8 @@ public class NotificationMgr implements PasswdFileDataObserver
 
             PendingIntent intent = PendingIntent.getActivity(
                 itsCtx, 0,
-                AbstractFileListActivity.createOpenIntent(
-                    Uri.parse(uri), record),
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                AbstractFileListActivity.createOpenIntent(uri, record),
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
             // TODO: sort expiry entries by date so last to expire is shown first
             String title = itsCtx.getResources().getQuantityString(
@@ -391,7 +387,8 @@ public class NotificationMgr implements PasswdFileDataObserver
             GuiUtils.showNotification(
                 itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
                 itsCtx.getString(R.string.password_expired),
-                title, uri, strs, intent, info.getNotifId());
+                title, PasswdFileData.getUriIdentifier(uri, itsCtx, false),
+                strs, intent, info.getNotifId());
         }
 
         Iterator<HashMap.Entry<Long, UriNotifInfo>> iter =
@@ -518,12 +515,12 @@ public class NotificationMgr implements PasswdFileDataObserver
     private static final class ExpiryEntry implements Comparable<ExpiryEntry>
     {
         public final String itsName;
-        public final String itsUri;
+        public final Uri itsUri;
         public final String itsUuid;
         public final Date itsExpiry;
 
         /** Constructor */
-        public ExpiryEntry(String name, String uri, String uuid, Date expiry)
+        public ExpiryEntry(String name, Uri uri, String uuid, Date expiry)
         {
             itsName = name;
             itsUri = uri;
