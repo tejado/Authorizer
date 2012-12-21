@@ -19,6 +19,7 @@ import org.pwsafe.lib.file.PwsFile;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 
@@ -210,11 +211,13 @@ public class PasswdSafeApp extends Application
     public void onCreate()
     {
         super.onCreate();
-        itsAlarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-        itsNotifyMgr = new NotificationMgr(this);
-
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
+
+        itsAlarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        itsNotifyMgr = new NotificationMgr(this,
+                                           getPasswdExpiryNotifPref(prefs));
+
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         // Move the fileDirPref from the FileList class to the preferences
@@ -269,6 +272,8 @@ public class PasswdSafeApp extends Application
             setPasswordEncodingPref(prefs);
         } else if (key.equals(Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD)) {
             setFileCloseClearClipboardPref(prefs);
+        } else if (key.equals(Preferences.PREF_PASSWD_EXPIRY_NOTIF)) {
+            itsNotifyMgr.setPasswdExpiryFilter(getPasswdExpiryNotifPref(prefs));
         }
     }
 
@@ -534,6 +539,14 @@ public class PasswdSafeApp extends Application
     {
         itsIsFileCloseClearClipboard =
             Preferences.getFileCloseClearClipboardPref(prefs);
+    }
+
+    /** Get the password expiration filter for notifications from a
+     * preference */
+    private static PasswdRecordFilter.ExpiryFilter
+        getPasswdExpiryNotifPref(SharedPreferences prefs)
+    {
+        return Preferences.getPasswdExpiryNotifPref(prefs).getFilter();
     }
 
     private synchronized final void pauseFileTimer()

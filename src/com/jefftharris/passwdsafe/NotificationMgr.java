@@ -82,24 +82,22 @@ public class NotificationMgr implements PasswdFileDataObserver
     private final HashMap<Long, UriNotifInfo> itsUriNotifs =
         new HashMap<Long, UriNotifInfo>();
     private int itsNextNotifId = 1;
+    private PasswdRecordFilter.ExpiryFilter itsExpiryFilter = null;
 
     /** Constructor */
-    public NotificationMgr(Context ctx)
+    public NotificationMgr(Context ctx,
+                           PasswdRecordFilter.ExpiryFilter expiryFilter)
     {
         itsCtx = ctx;
         itsNotifyMgr = (NotificationManager)
             ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+        itsExpiryFilter = expiryFilter;
 
         itsDbHelper = new DbHelper(ctx);
         PasswdFileData.addObserver(this);
 
         // TODO: start app on android startup
-        try {
-            SQLiteDatabase db = itsDbHelper.getReadableDatabase();
-            loadEntries(db);
-        } catch (SQLException e) {
-            Log.e(TAG, "Database error", e);
-        }
+        loadEntries();
     }
 
 
@@ -220,6 +218,14 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
 
+    /** Set the password expiration filter */
+    public void setPasswdExpiryFilter(PasswdRecordFilter.ExpiryFilter filter)
+    {
+        itsExpiryFilter = filter;
+        loadEntries();
+    }
+
+
     /** Enable notifications for the password file */
     private void enablePasswdExpiryNotif(PasswdFileData fileData)
     {
@@ -272,13 +278,28 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
 
+    /** Load the expiration entries */
+    private void loadEntries()
+    {
+        try {
+            SQLiteDatabase db = itsDbHelper.getReadableDatabase();
+            loadEntries(db);
+        } catch (SQLException e) {
+            Log.e(TAG, "Database error", e);
+        }
+    }
+
+
     /** Load the expiration entries from the database */
     private void loadEntries(SQLiteDatabase db)
+        throws SQLException
     {
-        // TODO: use pref
-        PasswdRecordFilter.ExpiryFilter filter =
-            PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS;
-        long expiration = filter.getExpiryFromNow(null);
+        long expiration;
+        if (itsExpiryFilter != null) {
+            expiration = itsExpiryFilter.getExpiryFromNow(null);
+        } else {
+            expiration = Long.MIN_VALUE;
+        }
         long nextExpiration = Long.MAX_VALUE;
 
         HashSet<Long> uris = new HashSet<Long>();
