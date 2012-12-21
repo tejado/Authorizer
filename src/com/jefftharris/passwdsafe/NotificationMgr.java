@@ -81,6 +81,7 @@ public class NotificationMgr implements PasswdFileDataObserver
     private final DbHelper itsDbHelper;
     private final HashMap<Long, UriNotifInfo> itsUriNotifs =
         new HashMap<Long, UriNotifInfo>();
+    private final HashSet<String> itsNotifUris = new HashSet<String>();
     private int itsNextNotifId = 1;
     private PasswdRecordFilter.ExpiryFilter itsExpiryFilter = null;
 
@@ -104,18 +105,10 @@ public class NotificationMgr implements PasswdFileDataObserver
     /** Are notifications enabled for a URI */
     public boolean hasPasswdExpiryNotif(Uri uri)
     {
-        try {
-            if (uri == null) {
-                return false;
-            }
-            SQLiteDatabase db = itsDbHelper.getReadableDatabase();
-            Long uriId = getDbUriId(uri.toString(), db);
-            return uriId != null;
-            // TODO: cache flag in memory?
-        } catch (SQLException e) {
-            Log.e(TAG, "Database error", e);
+        if (uri == null) {
             return false;
         }
+        return itsNotifUris.contains(uri.toString());
     }
 
 
@@ -302,6 +295,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         }
         long nextExpiration = Long.MAX_VALUE;
 
+        itsNotifUris.clear();
         HashSet<Long> uris = new HashSet<Long>();
         Cursor uriCursor =
             db.query(DB_TABLE_URIS,
@@ -310,6 +304,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         while (uriCursor.moveToNext()) {
             long id = uriCursor.getLong(0);
             String uri = uriCursor.getString(1);
+            itsNotifUris.add(uri);
             PasswdSafeApp.dbginfo(TAG, "Load " + uri);
 
             TreeSet<ExpiryEntry> expired = new TreeSet<ExpiryEntry>();
