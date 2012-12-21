@@ -317,9 +317,10 @@ public class NotificationMgr implements PasswdFileDataObserver
 
                 long entryExpiry = expiry.getTime();
                 if (entryExpiry <= expiration) {
-                    String name = expirysCursor.getString(1) + "/" +
-                        expirysCursor.getString(2) + "/" +
-                        expirysCursor.getString(3);
+                    String name = PasswdRecord.getRecordId(
+                        expirysCursor.getString(2),
+                        expirysCursor.getString(1),
+                        expirysCursor.getString(3));
                     ExpiryEntry entry = new ExpiryEntry(name, uri,
                                                         uuid, expiry);
                     PasswdSafeApp.dbginfo(TAG,
@@ -369,7 +370,6 @@ public class NotificationMgr implements PasswdFileDataObserver
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
             // TODO: sort expiry entries by date so last to expire is shown first
-            // TODO: better text for expiry name
             String title = itsCtx.getResources().getQuantityString(
                 R.plurals.expired_passwords, numExpired, numExpired);
             GuiUtils.showNotification(

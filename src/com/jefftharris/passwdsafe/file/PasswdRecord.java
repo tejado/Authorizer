@@ -13,6 +13,8 @@ import java.util.Locale;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import android.text.TextUtils;
+
 
 public class PasswdRecord
 {
@@ -128,6 +130,26 @@ public class PasswdRecord
     public PasswdExpiration getPasswdExpiry()
     {
         return itsPasswdExpiry;
+    }
+
+    /** Get an identifier for a record from its naming fields */
+    public static final String getRecordId(String group,
+                                           String title,
+                                           String username)
+    {
+        StringBuilder id = new StringBuilder();
+
+        if (!TextUtils.isEmpty(group)) {
+            id.append(group.replace(".", " / "));
+            id.append(" / ");
+        }
+        id.append(title);
+        if (!TextUtils.isEmpty(username)) {
+            id.append(" [");
+            id.append(username);
+            id.append("]");
+        }
+        return id.toString();
     }
 
     public static String uuidToPasswd(String uuid, Type type)

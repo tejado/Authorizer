@@ -317,22 +317,8 @@ public class PasswdFileData
 
     public final String getId(PwsRecord rec)
     {
-        StringBuilder id = new StringBuilder();
-
-        String group = getGroup(rec);
-        if (!TextUtils.isEmpty(group)) {
-            id.append("[");
-            id.append(group);
-            id.append("] ");
-        }
-        id.append(getTitle(rec));
-        String user = getUsername(rec);
-        if (!TextUtils.isEmpty(user)) {
-            id.append(" [");
-            id.append(user);
-            id.append("]");
-        }
-        return id.toString();
+        return PasswdRecord.getRecordId(getGroup(rec), getTitle(rec),
+                                        getUsername(rec));
     }
 
     /** Get the time the record was created */
@@ -695,6 +681,7 @@ public class PasswdFileData
         }
         return id;
     }
+
 
     public static final int hexBytesToInt(byte[] bytes, int pos, int len)
     {
