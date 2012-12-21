@@ -14,9 +14,7 @@
             android:name="FileDir Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:defaultValue="/sdcard"
             android:key="fileDirPref"
-            android:summary="/sdcard"
             android:title="@string/directory_for_files"/>
 
         <ListPreference
