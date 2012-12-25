@@ -66,7 +66,6 @@ public class NotificationMgr implements PasswdFileDataObserver
     private static final String DB_COL_EXPIRYS_UUID = "rec_uuid";
     private static final String DB_COL_EXPIRYS_TITLE = "rec_title";
     private static final String DB_COL_EXPIRYS_GROUP = "rec_group";
-    private static final String DB_COL_EXPIRYS_USER = "rec_username";
     private static final String DB_COL_EXPIRYS_EXPIRE = "rec_expire";
     private static final String DB_MATCH_EXPIRYS_URI =
         DB_COL_EXPIRYS_URI + " = ?";
@@ -258,7 +257,6 @@ public class NotificationMgr implements PasswdFileDataObserver
                 values.put(DB_COL_EXPIRYS_UUID, rec.getUUID());
                 values.put(DB_COL_EXPIRYS_TITLE, fileData.getTitle(pwsrec));
                 values.put(DB_COL_EXPIRYS_GROUP, fileData.getGroup(pwsrec));
-                values.put(DB_COL_EXPIRYS_USER, fileData.getUsername(pwsrec));
                 values.put(DB_COL_EXPIRYS_EXPIRE,
                            dateToSqlDate(expiry.itsExpiration));
                 db.insertOrThrow(DB_TABLE_EXPIRYS, null, values);
@@ -311,14 +309,13 @@ public class NotificationMgr implements PasswdFileDataObserver
                          new String[] { DB_COL_EXPIRYS_UUID,
                                         DB_COL_EXPIRYS_TITLE,
                                         DB_COL_EXPIRYS_GROUP,
-                                        DB_COL_EXPIRYS_USER,
                                         DB_COL_EXPIRYS_EXPIRE },
                          DB_MATCH_EXPIRYS_URI,
                          new String[] { Long.toString(id) },
                          null, null, null);
             while (expirysCursor.moveToNext()) {
                 String uuid = expirysCursor.getString(0);
-                String expiryStr = expirysCursor.getString(4);
+                String expiryStr = expirysCursor.getString(3);
                 Date expiry;
                 try {
                     expiry = sqlDateToDate(expiryStr);
@@ -335,7 +332,7 @@ public class NotificationMgr implements PasswdFileDataObserver
                     name.append(PasswdRecord.getRecordId(
                                     expirysCursor.getString(2),
                                     expirysCursor.getString(1),
-                                    expirysCursor.getString(3)));
+                                    null));
                     name.append(" (");
                     name.append(Utils.formatDate(expiry.getTime(), itsCtx,
                                                  false, true, true));
@@ -387,7 +384,6 @@ public class NotificationMgr implements PasswdFileDataObserver
                 AbstractFileListActivity.createOpenIntent(uri, record),
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-            // TODO: sort expiry entries by date so last to expire is shown first
             String title = itsCtx.getResources().getQuantityString(
                 R.plurals.expired_passwords, numExpired, numExpired);
             GuiUtils.showNotification(
@@ -479,7 +475,6 @@ public class NotificationMgr implements PasswdFileDataObserver
                        DB_COL_EXPIRYS_UUID + " TEXT NOT NULL, " +
                        DB_COL_EXPIRYS_TITLE + " TEXT NOT NULL, " +
                        DB_COL_EXPIRYS_GROUP + " TEXT, " +
-                       DB_COL_EXPIRYS_USER + " TEXT, " +
                        DB_COL_EXPIRYS_EXPIRE + " TEXT NOT NULL" +
                        ");");
         }
