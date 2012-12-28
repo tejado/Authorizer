@@ -445,7 +445,11 @@ public class PwsRecordV3 extends PwsRecord
 
             length = Util.getIntFromByteArray(rawData, 0);
             type = rawData[4] & 0x000000ff; // rest of header is now random data
-            data = new byte[length];
+            try {
+                data = new byte[length];
+            } catch (OutOfMemoryError e) {
+                throw new IOException("Item length too long: " + length);
+            }
             byte[] remainingDataInRecord = Util.getBytes(rawData, 5, 11);
             if (length <= 11) {
                 Util.copyBytes(Util.getBytes(remainingDataInRecord, 0, length),
