@@ -42,4 +42,21 @@ public class Rev
         <delete file="${rev.file}"/>
         <delete file="${basedir}/bin/classes/${pkg.dir}/Rev.class"/>
     </target>
+    
+    <target name="hg-push">
+        <do-hg-push dest=""/>
+        <do-hg-push dest="win"/>
+        <do-hg-push dest="sf"/>
+        <do-hg-push dest="bb"/>
+    </target>
+        
+    <macrodef name="do-hg-push">
+        <attribute name="dest"/>
+        <sequential>
+            <exec dir="${basedir}" executable="hg">
+                <arg value="push"/>
+                <arg value="@{dest}"/>
+            </exec>
+        </sequential>       
+    </macrodef>
 </project>
