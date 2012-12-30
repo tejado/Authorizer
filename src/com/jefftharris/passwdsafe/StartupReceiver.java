@@ -22,7 +22,7 @@ public class StartupReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        PasswdSafeApp.dbginfo(TAG, "StartupReceiver");
+        PasswdSafeApp.dbginfo(TAG, "onReceive");
         // The app is created in order to launch the receiver which in turn
         // starts the notification manager
     }
