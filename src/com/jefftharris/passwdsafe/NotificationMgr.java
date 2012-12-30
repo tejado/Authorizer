@@ -436,8 +436,8 @@ public class NotificationMgr implements PasswdFileDataObserver
         PasswdSafeApp.dbginfo(TAG,
                               "nextExpiration: " + new Date(nextExpiration));
 
-        if ((nextExpiration != Long.MAX_VALUE) && !itsUriNotifs.isEmpty())
-        {
+        if ((nextExpiration != Long.MAX_VALUE) &&
+            (itsExpiryFilter != null)) {
             if (itsTimerIntent == null) {
                 Intent intent =
                     new Intent(PasswdSafeApp.EXPIRATION_TIMEOUT_INTENT);
@@ -449,7 +449,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             PasswdSafeApp.dbginfo(TAG, "nextTimer: " + new Date(nextTimer));
             itsAlarmMgr.set(AlarmManager.RTC, nextTimer, itsTimerIntent);
         }
-        else if(itsTimerIntent != null) {
+        else if (itsTimerIntent != null) {
             PasswdSafeApp.dbginfo(TAG, "cancel expiration timer");
             itsAlarmMgr.cancel(itsTimerIntent);
         }
@@ -512,6 +512,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         @Override
         public void onCreate(SQLiteDatabase db)
         {
+            PasswdSafeApp.dbginfo(TAG, "Create DB");
             enableForeignKey(db);
             db.execSQL("CREATE TABLE " + DB_TABLE_URIS + " (" +
                        DB_COL_URIS_ID + " INTEGER PRIMARY KEY," +
