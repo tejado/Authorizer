@@ -35,11 +35,13 @@ import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.GuiUtils;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -78,6 +80,7 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
     private final Context itsCtx;
+    private final AlarmManager itsAlarmMgr;
     private final NotificationManager itsNotifyMgr;
     private final DbHelper itsDbHelper;
     private final HashMap<Long, UriNotifInfo> itsUriNotifs =
@@ -85,12 +88,15 @@ public class NotificationMgr implements PasswdFileDataObserver
     private final HashSet<Uri> itsNotifUris = new HashSet<Uri>();
     private int itsNextNotifId = 1;
     private PasswdRecordFilter.ExpiryFilter itsExpiryFilter = null;
+    private PendingIntent itsTimerIntent;
 
     /** Constructor */
     public NotificationMgr(Context ctx,
+                           AlarmManager alarmMgr,
                            PasswdRecordFilter.ExpiryFilter expiryFilter)
     {
         itsCtx = ctx;
+        itsAlarmMgr = alarmMgr;
         itsNotifyMgr = (NotificationManager)
             ctx.getSystemService(Context.NOTIFICATION_SERVICE);
         itsExpiryFilter = expiryFilter;
@@ -212,6 +218,13 @@ public class NotificationMgr implements PasswdFileDataObserver
     public void setPasswdExpiryFilter(PasswdRecordFilter.ExpiryFilter filter)
     {
         itsExpiryFilter = filter;
+        loadEntries();
+    }
+
+
+    /** Handle an expiration timeout */
+    public void handleExpirationTimeout()
+    {
         loadEntries();
     }
 
@@ -423,7 +436,23 @@ public class NotificationMgr implements PasswdFileDataObserver
         PasswdSafeApp.dbginfo(TAG,
                               "nextExpiration: " + new Date(nextExpiration));
 
-        // TODO: add timer for next expiration
+        if ((nextExpiration != Long.MAX_VALUE) && !itsUriNotifs.isEmpty())
+        {
+            if (itsTimerIntent == null) {
+                Intent intent =
+                    new Intent(PasswdSafeApp.EXPIRATION_TIMEOUT_INTENT);
+                itsTimerIntent = PendingIntent.getBroadcast(
+                    itsCtx, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            }
+            long nextTimer = System.currentTimeMillis() +
+                (nextExpiration - expiration);
+            PasswdSafeApp.dbginfo(TAG, "nextTimer: " + new Date(nextTimer));
+            itsAlarmMgr.set(AlarmManager.RTC, nextTimer, itsTimerIntent);
+        }
+        else if(itsTimerIntent != null) {
+            PasswdSafeApp.dbginfo(TAG, "cancel expiration timer");
+            itsAlarmMgr.cancel(itsTimerIntent);
+        }
     }
 
 

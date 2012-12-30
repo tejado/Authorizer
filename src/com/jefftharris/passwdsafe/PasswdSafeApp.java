@@ -171,6 +171,8 @@ public class PasswdSafeApp extends Application
         "com.jefftharris.passwdsafe.action.NEW";
     public static final String VIEW_INTENT =
         "com.jefftharris.passwdsafe.action.VIEW";
+    public static final String EXPIRATION_TIMEOUT_INTENT =
+        "com.jefftharris.passwdsafe.action.EXPIRATION_TIMEOUT";
     public static final String FILE_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
     public static final String CHOOSE_RECORD_INTENT =
@@ -216,6 +218,7 @@ public class PasswdSafeApp extends Application
 
         itsAlarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         itsNotifyMgr = new NotificationMgr(this,
+                                           itsAlarmMgr,
                                            getPasswdExpiryNotifPref(prefs));
 
         prefs.registerOnSharedPreferenceChangeListener(this);
