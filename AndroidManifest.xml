@@ -10,6 +10,7 @@
       android:installLocation="auto" xmlns:tools="http://schemas.android.com/tools">
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name="PasswdSafeApp"
@@ -171,6 +172,12 @@
         <receiver android:name=".PasswdSafeApp$FileTimeoutReceiver" tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.FILE_TIMEOUT"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".StartupReceiver" tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
     </application>

@@ -98,7 +98,6 @@ public class NotificationMgr implements PasswdFileDataObserver
         itsDbHelper = new DbHelper(ctx);
         PasswdFileData.addObserver(this);
 
-        // TODO: start app on android startup
         loadEntries();
     }
 
@@ -423,6 +422,8 @@ public class NotificationMgr implements PasswdFileDataObserver
         }
         PasswdSafeApp.dbginfo(TAG,
                               "nextExpiration: " + new Date(nextExpiration));
+
+        // TODO: add timer for next expiration
     }
 
 
