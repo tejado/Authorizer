@@ -75,6 +75,8 @@
     <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
+    <string name="expiration_notifications">Notifications d\'Expiration</string>
+    <string name="expiration_notifications_warning">Activation des notifications d\'expiration nécessite PasswdSafe pour stocker les informations d\'expiration du fichier (titre du disque, le groupe et date d\'expiration). Ces informations sont stockées en clair sur l\'appareil. Aucun mot de passe sont stockés.</string>
     <string name="expired_passwords">Mots de passe Expirés</string>
     <string name="expired_password_notification">Notification mot de passe expiré</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
