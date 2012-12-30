@@ -376,6 +376,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                     {
                         itsExpiryDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         itsExpiryDate.set(Calendar.MINUTE, minute);
+                        itsExpiryDate.set(Calendar.SECOND, 0);
                         updatePasswdExpiryDate();
                     }
                 },
