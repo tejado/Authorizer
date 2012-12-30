@@ -285,13 +285,23 @@
     </string-array>
 
     <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_record">
+        <item>Un mot de passe a expiré</item>
+        <item>Un mot de passe expirent aujourd\'hui</item>
+        <item>Un mot de passe expirent dans une semaine</item>
+        <item>Un mot de passe expirent dans les deux semaines</item>
+        <item>Un mot de passe expirent dans un mois</item>
+        <item>Un mot de passe expirera dans un an</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
     <string-array name="expire_filter_records">
         <item>%1$s mots de passe ont expiré</item>
-        <item>%1$s mots de passe expirent aujourd\'hui</item>
-        <item>%1$s mots de passe expirent dans une semaine</item>
-        <item>%1$s mots de passe expirent dans les deux semaines</item>
-        <item>%1$s mots de passe expirent dans un mois</item>
-        <item>%1$s mots de passe expirera dans un an</item>
+        <item>%1$s mots de passe expire aujourd\'hui</item>
+        <item>%1$s mots de passe expire dans une semaine</item>
+        <item>%1$s mots de passe expire dans les deux semaines</item>
+        <item>%1$s mots de passe expire dans un mois</item>
+        <item>%1$s mots de passe expire dans un an</item>
     </string-array>
 
     <!-- Order must match PasswdExpiryNotifPref enum values -->

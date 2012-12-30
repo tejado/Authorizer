@@ -287,6 +287,16 @@
     </string-array>
 
     <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_record">
+        <item>One password has expired</item>
+        <item>One password expires today</item>
+        <item>One password expires within a week</item>
+        <item>One password expires within two weeks</item>
+        <item>One password expires within a month</item>
+        <item>One password expires within a year</item>
+    </string-array>
+    
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
     <string-array name="expire_filter_records">
         <item>%1$s passwords have expired</item>
         <item>%1$s passwords expire today</item>
