@@ -280,8 +280,15 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         mi = menu.findItem(MENU_PASSWD_EXPIRY_NOTIF);
         if (mi != null) {
-            NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
-            mi.setChecked(notifyMgr.hasPasswdExpiryNotif(getUri()));
+            Uri uri = getUri();
+            boolean enabled = NotificationMgr.notifSupported(uri);
+            boolean checked = false;
+            if (enabled) {
+                NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
+                checked = notifyMgr.hasPasswdExpiryNotif(uri);
+            }
+            mi.setChecked(checked);
+            mi.setEnabled(enabled);
         }
 
         return super.onPrepareOptionsMenu(menu);

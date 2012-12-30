@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -213,6 +214,24 @@ public class NotificationMgr implements PasswdFileDataObserver
     {
         itsExpiryFilter = filter;
         loadEntries();
+    }
+
+
+    /** Return whether notifications are supported for the URI */
+    public static boolean notifSupported(Uri uri)
+    {
+        if (uri == null) {
+            return false;
+        }
+
+        File file = PasswdFileData.getUriAsFile(uri);
+        if (file == null) {
+            return false;
+        }
+
+        String path = file.getPath();
+        return (!path.contains("/data/com.google.android.apps.") &&
+                !path.contains("/data/com.dropbox.android"));
     }
 
 
@@ -442,7 +461,7 @@ public class NotificationMgr implements PasswdFileDataObserver
     {
         return SQL_DATE_FMT.parse(str);
     }
-    // TODO: not all URIs should support notifications
+
 
     /** Database helper class to manage the database tables */
     private static final class DbHelper extends SQLiteOpenHelper
