@@ -69,6 +69,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -1467,8 +1468,23 @@ public class PasswdFileData
     /** Notify observer of file changes */
     private static void notifyObservers(PasswdFileData fileData)
     {
-        for (PasswdFileDataObserver obs: itsObservers) {
-            obs.passwdFileDataChanged(fileData);
-        }
+        AsyncTask<PasswdFileData, Void, PasswdFileData> notifyTask =
+            new AsyncTask<PasswdFileData, Void, PasswdFileData>()
+            {
+                @Override
+                protected PasswdFileData doInBackground(PasswdFileData... params)
+                {
+                    return params[0];
+                }
+
+                @Override
+                protected void onPostExecute(PasswdFileData fileData)
+                {
+                    for (PasswdFileDataObserver obs: itsObservers) {
+                        obs.passwdFileDataChanged(fileData);
+                    }
+                }
+            };
+        notifyTask.execute(fileData);
     }
 }
