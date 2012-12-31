@@ -79,6 +79,7 @@
     <string name="expiration_notifications_warning">Enabling expiration notifications requires PasswdSafe to store expiration information for the file (record title, group, and expiration date).  This information is stored unencrypted on the device.  No passwords are stored.</string>
     <string name="expired_passwords">Expired Passwords</string>
     <string name="expired_password_notification">Expired password notification</string>
+    <string name="expiring_password">Expiring password</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
     <string name="file_backups">File backups</string>
     <string name="file_close_timeout">File close timeout</string>
@@ -226,9 +227,9 @@
     <string name="username_header">USER NAME</string>
     <string name="yes">Yes</string>
 
-    <plurals name="expired_passwords">
-        <item quantity="one">One expired password</item>
-        <item quantity="other">%1$d expired passwords</item>
+    <plurals name="expiring_passwords">
+        <item quantity="one">One expiring password</item>
+        <item quantity="other">%1$d expiring passwords</item>
     </plurals>
     
     <plurals name="group_items">

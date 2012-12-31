@@ -79,6 +79,7 @@
     <string name="expiration_notifications_warning">Activation des notifications d\'expiration nécessite PasswdSafe pour stocker les informations d\'expiration du fichier (titre du disque, le groupe et date d\'expiration). Ces informations sont stockées en clair sur l\'appareil. Aucun mot de passe sont stockés.</string>
     <string name="expired_passwords">Mots de passe Expirés</string>
     <string name="expired_password_notification">Notification mot de passe expiré</string>
+    <string name="expiring_password">Expirant mot de passe</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
     <string name="file_backups">Fichiers de sauvegarde</string>
     <string name="file_close_timeout">Fermeture automatique de fichier</string>
@@ -226,9 +227,9 @@
     <string name="username_header">NOM UTILISATEUR</string>
     <string name="yes">Oui</string>
 
-    <plurals name="expired_passwords">
-        <item quantity="one">Un mot de passe a expiré</item>
-        <item quantity="other">%1$d mots de passe expirés</item>
+    <plurals name="expiring_passwords">
+        <item quantity="one">Un mot de passe expirant</item>
+        <item quantity="other">%1$d mots de passe expirant</item>
     </plurals>
     
     <plurals name="group_items">

@@ -416,10 +416,10 @@ public class NotificationMgr implements PasswdFileDataObserver
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
             String title = itsCtx.getResources().getQuantityString(
-                R.plurals.expired_passwords, numExpired, numExpired);
+                R.plurals.expiring_passwords, numExpired, numExpired);
             GuiUtils.showNotification(
                 itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
-                itsCtx.getString(R.string.password_expired),
+                itsCtx.getString(R.string.expiring_password),
                 title, PasswdFileData.getUriIdentifier(uri, itsCtx, false),
                 strs, intent, info.getNotifId());
         }
