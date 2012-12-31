@@ -124,9 +124,8 @@ public class NotificationMgr implements PasswdFileDataObserver
                 return;
             }
 
-            String uristr = fileData.getUri().toString();
             SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-            Long uriId = getDbUriId(uristr, db);
+            Long uriId = getDbUriId(fileData.getUri(), db);
             if (uriId != null) {
                 String[] idarg = new String[] { uriId.toString() };
                 db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI, idarg);
@@ -165,7 +164,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             SQLiteDatabase db = itsDbHelper.getWritableDatabase();
             try {
                 db.beginTransaction();
-                Long id = getDbUriId(fileData.getUri().toString(), db);
+                Long id = getDbUriId(fileData.getUri(), db);
                 if (id != null) {
                     doUpdatePasswdFileData(id, fileData, db);
                 }
@@ -211,6 +210,24 @@ public class NotificationMgr implements PasswdFileDataObserver
             act.getString(R.string.erase_all_expiration_notifications));
         dlgData.itsDialog.show();
         dlgData.itsValidator.validate();
+    }
+
+
+    /** Cancel the notification for a URI */
+    public void cancelNotification(Uri uri)
+    {
+        if (uri != null) {
+            try {
+                SQLiteDatabase db = itsDbHelper.getReadableDatabase();
+                Long id = getDbUriId(uri, db);
+                UriNotifInfo info = itsUriNotifs.get(id);
+                if (info != null) {
+                    itsNotifyMgr.cancel(info.getNotifId());
+                }
+            } catch (SQLException e) {
+                Log.e(TAG, "Database error for uri: " + uri, e);
+            }
+        }
     }
 
 
@@ -457,11 +474,12 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
     /** Get the id for a URI or null if not found */
-    private Long getDbUriId(String uristr, SQLiteDatabase db)
+    private static Long getDbUriId(Uri uri, SQLiteDatabase db)
         throws SQLException
     {
         Cursor cursor = db.query(DB_TABLE_URIS, new String[] { DB_COL_URIS_ID },
-                                 DB_MATCH_URIS_URI, new String[] { uristr },
+                                 DB_MATCH_URIS_URI,
+                                 new String[] { uri.toString() },
                                  null, null, null);
         try {
             if (!cursor.moveToFirst()) {

@@ -850,6 +850,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             View group = findViewById(R.id.expiry_panel);
             group.setVisibility(itsNumExpired > 0 ? View.VISIBLE : View.GONE);
         }
+
+        if ((mod & MOD_OPEN_NEW) != 0) {
+            NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
+            notifyMgr.cancelNotification(getUri());
+        }
     }
 
 
@@ -872,7 +877,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 showDialog(DIALOG_GET_PASSWD);
             }
         } else {
-            showFileData(MOD_DATA);
+            showFileData(MOD_DATA | MOD_OPEN_NEW);
         }
     }
 
@@ -1039,7 +1044,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {
                 getPasswdFile().setFileData((PasswdFileData)result);
-                showFileData(MOD_DATA);
+                showFileData(MOD_DATA | MOD_OPEN_NEW);
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
                 if (((e instanceof IOException) &&

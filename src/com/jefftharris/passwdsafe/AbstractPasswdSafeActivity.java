@@ -74,6 +74,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected static final int MOD_SEARCH         = 1 << 2;
     /** Initialize file data */
     protected static final int MOD_INIT           = 1 << 3;
+    /** First change after a file has been opened from a new intent */
+    protected static final int MOD_OPEN_NEW       = 1 << 4;
 
     private GroupNode itsRootNode = null;
     private GroupNode itsCurrGroupNode = null;
