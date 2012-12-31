@@ -135,7 +135,7 @@ public class RecordView extends AbstractRecordTabActivity
         if (uuid != null) {
             builder.appendQueryParameter("rec", uuid);
         }
-        PasswdSafeApp.dbginfo(TAG, "start activity: " + builder);
+        PasswdSafeApp.dbginfo(TAG, "start activity: %s", builder);
         Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
                                    parentAct, RecordView.class);
         parentAct.startActivityForResult(intent, requestCode);
@@ -486,9 +486,8 @@ public class RecordView extends AbstractRecordTabActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        PasswdSafeApp.dbginfo(TAG,
-                              "onActivityResult req: " + requestCode +
-                              ", rc: " + resultCode);
+        PasswdSafeApp.dbginfo(TAG, "onActivityResult req: %d, rc: %d",
+                              requestCode, resultCode);
         if (((requestCode == RECORD_EDIT_REQUEST) ||
              (requestCode == RECORD_VIEW_REQUEST))&&
             (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {

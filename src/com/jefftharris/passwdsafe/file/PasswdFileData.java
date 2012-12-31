@@ -148,7 +148,7 @@ public class PasswdFileData
             for (int idx = 0; idx < itsRecords.size(); ++idx) {
                 PwsRecord rec = itsRecords.get(idx);
                 if (rec.isModified()) {
-                    PasswdSafeApp.dbginfo(TAG, "Updating idx: " + idx);
+                    PasswdSafeApp.dbginfo(TAG, "Updating idx: %d", idx);
                     itsPwsFile.set(idx, rec);
                     rec.resetModified();
                 }
@@ -637,10 +637,9 @@ public class PasswdFileData
                     continue;
                 }
                 recPolicy = new PasswdPolicy(policyRename.second, recPolicy);
-                PasswdSafeApp.dbginfo(
-                    TAG,
-                    "Rename policy to " + recPolicy.getName() + " for " +
-                    getId(rec.getRecord()));
+                PasswdSafeApp.dbginfo(TAG, "Rename policy to %s for %s",
+                                      recPolicy.getName(),
+                                      getId(rec.getRecord()));
 
                 setPasswdPolicyImpl(recPolicy, rec.getRecord(), false);
             }

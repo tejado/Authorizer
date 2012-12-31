@@ -229,7 +229,7 @@ public class PasswdSafeApp extends Application
                                                                MODE_PRIVATE);
         if ((fileListPrefs != null) && fileListPrefs.contains(dirPrefName)) {
             String dirPref = fileListPrefs.getString(dirPrefName, "");
-            dbginfo(TAG, "Moving dir pref \"" + dirPref + "\" to main");
+            dbginfo(TAG, "Moving dir pref \"%s\" to main", dirPref);
 
             SharedPreferences.Editor fileListEdit = fileListPrefs.edit();
             SharedPreferences.Editor prefsEdit = prefs.edit();
@@ -264,8 +264,8 @@ public class PasswdSafeApp extends Application
      */
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
-        dbginfo(TAG, "Preference change: " + key + ", value: " +
-                prefs.getAll().get(key));
+        dbginfo(TAG, "Preference change: %s, value: %s",
+                key, prefs.getAll().get(key));
 
         if (key.equals(Preferences.PREF_FILE_CLOSE_TIMEOUT)) {
             updateFileCloseTimeoutPref(prefs);
@@ -316,7 +316,7 @@ public class PasswdSafeApp extends Application
             closeFileData(false);
         }
 
-        dbgverb(TAG, "access uri:" + uri + ", data:" + itsFileData);
+        dbgverb(TAG, "access uri: %s, data: %s", uri, itsFileData);
         return new AppActivityPasswdFile(itsFileData, activity);
     }
 
@@ -325,7 +325,7 @@ public class PasswdSafeApp extends Application
         PasswdFileActivity activity
     )
     {
-        dbgverb(TAG, "access open file data: " + itsFileData);
+        dbgverb(TAG, "access open file data: %s", itsFileData);
         if (itsFileData == null) {
             return null;
         }
@@ -508,17 +508,17 @@ public class PasswdSafeApp extends Application
     }
 
     /** Log a debug message at verbose level */
-    public static void dbgverb(String tag, String msg)
+    public static void dbgverb(String tag, String fmt, Object... args)
     {
         if (DEBUG)
-            Log.v(tag, msg);
+            Log.v(tag, String.format(fmt, args));
     }
 
     private synchronized final
     void updateFileCloseTimeoutPref(SharedPreferences prefs)
     {
         FileTimeoutPref pref = Preferences.getFileCloseTimeoutPref(prefs);
-        dbginfo(TAG, "new file close timeout: " + pref);
+        dbginfo(TAG, "new file close timeout: %s", pref);
         itsFileCloseTimeout = pref.getTimeout();
         if (itsFileCloseTimeout == 0) {
             cancelFileDataTimer();
@@ -574,7 +574,7 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void touchFileDataTimer()
     {
-        dbgverb(TAG, "touch timer timeout: " + itsFileCloseTimeout);
+        dbgverb(TAG, "touch timer timeout: %d", itsFileCloseTimeout);
         if ((itsFileData != null) && (itsFileCloseTimeout != 0) &&
             !itsFileTimerPaused) {
             if (itsCloseIntent == null) {
@@ -591,7 +591,7 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void touchFileData(Activity activity)
     {
-        dbgverb(TAG, "touch activity:" + activity + ", data:" + itsFileData);
+        dbgverb(TAG, "touch activity: %s, data: %s", activity, itsFileData);
         if (itsFileData != null) {
             itsFileDataActivities.put(activity, null);
             checkScreenOffReceiver();
@@ -601,7 +601,7 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void releaseFileData(Activity activity)
     {
-        dbgverb(TAG, "release activity:" + activity);
+        dbgverb(TAG, "release activity: %s", activity);
         itsFileDataActivities.remove(activity);
         checkScreenOffReceiver();
     }
@@ -616,7 +616,7 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void closeFileData(boolean isTimeout)
     {
-        dbginfo(TAG, "closeFileData data:" + itsFileData);
+        dbginfo(TAG, "closeFileData data: %s", itsFileData);
         if (itsFileData != null) {
             itsFileData.close();
             itsFileData = null;
@@ -634,7 +634,7 @@ public class PasswdSafeApp extends Application
 
         for (Map.Entry<Activity, Object> entry :
             itsFileDataActivities.entrySet()) {
-            dbgverb(TAG, "closeFileData activity:" + entry.getKey());
+            dbgverb(TAG, "closeFileData activity: %s", entry.getKey());
             entry.getKey().finish();
         }
         itsFileDataActivities.clear();

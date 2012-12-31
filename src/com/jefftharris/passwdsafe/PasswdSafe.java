@@ -95,7 +95,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         registerForContextMenu(getListView());
 
         Intent intent = getIntent();
-        PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + intent);
+        PasswdSafeApp.dbginfo(TAG, "onCreate intent: %s", intent);
 
         View v = findViewById(R.id.expiry_clear_btn);
         v.setOnClickListener(new View.OnClickListener()
@@ -366,9 +366,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        PasswdSafeApp.dbginfo(TAG,
-                              "onActivityResult req: " + requestCode +
-                              ", rc: " + resultCode);
+        PasswdSafeApp.dbginfo(TAG, "onActivityResult req: %d, rc: %d",
+                              requestCode, resultCode);
          if (((requestCode == RECORD_VIEW_REQUEST) ||
               (requestCode == RECORD_ADD_REQUEST) ||
               (requestCode == POLICY_VIEW_REQUEST)) &&

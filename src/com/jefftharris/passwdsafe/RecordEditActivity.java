@@ -576,7 +576,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        PasswdSafeApp.dbginfo(TAG, "onActivityResult data: " + data);
+        PasswdSafeApp.dbginfo(TAG, "onActivityResult data: %s", data);
 
         if ((requestCode == RECORD_SELECTION_REQUEST) &&
             (resultCode == RESULT_OK)) {
@@ -1245,7 +1245,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
-            PasswdSafeApp.dbginfo(TAG, "updatePolicy: " + updatePolicy);
+            PasswdSafeApp.dbginfo(TAG, "updatePolicy: %s", updatePolicy);
             if (updatePolicy.first) {
                 fileData.setPasswdPolicy(updatePolicy.second, record);
             }

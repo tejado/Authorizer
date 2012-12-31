@@ -286,7 +286,7 @@ public class Preferences extends PreferenceActivity
             prefsEdit.remove(PREF_GEN_LENGTH);
         }
 
-        PasswdSafeApp.dbginfo(TAG, "Save new default policy: " + policyStr);
+        PasswdSafeApp.dbginfo(TAG, "Save new default policy: %s", policyStr);
         prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policyStr);
         prefsEdit.commit();
     }
