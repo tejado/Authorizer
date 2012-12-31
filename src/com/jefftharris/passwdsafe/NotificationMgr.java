@@ -291,8 +291,8 @@ public class NotificationMgr implements PasswdFileDataObserver
                                         SQLiteDatabase db)
         throws SQLException
     {
-        PasswdSafeApp.dbginfo(TAG, "Update " + fileData.getUri() + ", id: " +
-                              uriId);
+        PasswdSafeApp.dbginfo(TAG, "Update %s, id: %d",
+                              fileData.getUri(), uriId);
 
         db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI,
                   new String[] { Long.toString(uriId) });
@@ -349,7 +349,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             long id = uriCursor.getLong(0);
             Uri uri = Uri.parse(uriCursor.getString(1));
             itsNotifUris.add(uri);
-            PasswdSafeApp.dbginfo(TAG, "Load " + uri);
+            PasswdSafeApp.dbginfo(TAG, "Load %s", uri);
 
             TreeSet<ExpiryEntry> expired = new TreeSet<ExpiryEntry>();
             Cursor expirysCursor =
@@ -376,19 +376,12 @@ public class NotificationMgr implements PasswdFileDataObserver
 
                 long entryExpiry = expiry.getTime();
                 if (entryExpiry <= expiration) {
-                    StringBuilder name = new StringBuilder();
-                    name.append(PasswdRecord.getRecordId(
-                                    expirysCursor.getString(2),
-                                    expirysCursor.getString(1),
-                                    null));
-                    name.append(" (");
-                    name.append(Utils.formatDate(expiry.getTime(), itsCtx,
-                                                 false, true, true));
-                    name.append(")");
-                    ExpiryEntry entry = new ExpiryEntry(name.toString(),
-                                                        uuid, expiry);
-                    PasswdSafeApp.dbginfo(TAG,
-                                          "expired entry: " + entry.itsName);
+                    String name = PasswdRecord.getRecordId(
+                        expirysCursor.getString(2), expirysCursor.getString(1),
+                        null);
+                    ExpiryEntry entry = new ExpiryEntry(name, uuid, expiry);
+                    PasswdSafeApp.dbginfo(TAG, "expired entry: %s, at: %s",
+                                          entry.itsName, entry.itsExpiry);
                     expired.add(entry);
                 }
                 else if (entryExpiry < nextExpiration) {
@@ -418,7 +411,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             int numExpired = info.getEntries().size();
             ArrayList<String> strs = new ArrayList<String>(numExpired);
             for (ExpiryEntry entry: info.getEntries()) {
-                strs.add(entry.itsName);
+                strs.add(entry.toString(itsCtx));
             }
 
             String record = null;
@@ -450,8 +443,7 @@ public class NotificationMgr implements PasswdFileDataObserver
                 iter.remove();
             }
         }
-        PasswdSafeApp.dbginfo(TAG,
-                              "nextExpiration: " + new Date(nextExpiration));
+        PasswdSafeApp.dbginfo(TAG, "nextExpiration: %tc", nextExpiration);
 
         if ((nextExpiration != Long.MAX_VALUE) &&
             (itsExpiryFilter != null)) {
@@ -463,7 +455,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             }
             long nextTimer = System.currentTimeMillis() +
                 (nextExpiration - expiration);
-            PasswdSafeApp.dbginfo(TAG, "nextTimer: " + new Date(nextTimer));
+            PasswdSafeApp.dbginfo(TAG, "nextTimer: %tc", nextTimer);
             itsAlarmMgr.set(AlarmManager.RTC, nextTimer, itsTimerIntent);
         }
         else if (itsTimerIntent != null) {
@@ -609,6 +601,14 @@ public class NotificationMgr implements PasswdFileDataObserver
                 }
             }
             return rc;
+        }
+
+
+        /** Convert the entry to a string for users */
+        public final String toString(Context ctx)
+        {
+            return itsName + " (" + Utils.formatDate(itsExpiry.getTime(), ctx,
+                                                     false, true, true) + ")";
         }
     }
 
