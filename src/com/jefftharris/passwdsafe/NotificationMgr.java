@@ -8,18 +8,12 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -72,12 +66,6 @@ public class NotificationMgr implements PasswdFileDataObserver
     private static final String DB_COL_EXPIRYS_EXPIRE = "rec_expire";
     private static final String DB_MATCH_EXPIRYS_URI =
         DB_COL_EXPIRYS_URI + " = ?";
-
-    private static final DateFormat SQL_DATE_FMT =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-    static {
-        SQL_DATE_FMT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     private final Context itsCtx;
     private final AlarmManager itsAlarmMgr;
@@ -306,7 +294,7 @@ public class NotificationMgr implements PasswdFileDataObserver
                 values.put(DB_COL_EXPIRYS_TITLE, fileData.getTitle(pwsrec));
                 values.put(DB_COL_EXPIRYS_GROUP, fileData.getGroup(pwsrec));
                 values.put(DB_COL_EXPIRYS_EXPIRE,
-                           dateToSqlDate(expiry.itsExpiration));
+                           expiry.itsExpiration.getTime());
                 db.insertOrThrow(DB_TABLE_EXPIRYS, null, values);
             }
         }
@@ -362,30 +350,19 @@ public class NotificationMgr implements PasswdFileDataObserver
                          new String[] { Long.toString(id) },
                          null, null, null);
             while (expirysCursor.moveToNext()) {
-                String uuid = expirysCursor.getString(0);
-                String expiryStr = expirysCursor.getString(3);
-                Date expiry;
-                try {
-                    expiry = sqlDateToDate(expiryStr);
-                } catch (Exception e) {
-                    Log.e(TAG,
-                          String.format("Invalid expiry date for %1$s: %2$s",
-                                        uuid, expiryStr), e);
-                    continue;
-                }
-
-                long entryExpiry = expiry.getTime();
-                if (entryExpiry <= expiration) {
+                long expiry = expirysCursor.getLong(3);
+                if (expiry <= expiration) {
                     String name = PasswdRecord.getRecordId(
                         expirysCursor.getString(2), expirysCursor.getString(1),
                         null);
+                    String uuid = expirysCursor.getString(0);
                     ExpiryEntry entry = new ExpiryEntry(name, uuid, expiry);
-                    PasswdSafeApp.dbginfo(TAG, "expired entry: %s, at: %s",
+                    PasswdSafeApp.dbginfo(TAG, "expired entry: %s, at: %tc",
                                           entry.itsName, entry.itsExpiry);
                     expired.add(entry);
                 }
-                else if (entryExpiry < nextExpiration) {
-                    nextExpiration = entryExpiry;
+                else if (expiry < nextExpiration) {
+                    nextExpiration = expiry;
                 }
             }
 
@@ -484,25 +461,6 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
 
-    /** Convert a Date to a string for the database */
-    private static synchronized String dateToSqlDate(Date date)
-    {
-        if (date == null) {
-            return "";
-        }
-        return SQL_DATE_FMT.format(date);
-    }
-
-
-    /** Convert a date string in the database to a Date
-     * @throws ParseException */
-    private static synchronized Date sqlDateToDate(String str)
-        throws ParseException
-    {
-        return SQL_DATE_FMT.parse(str);
-    }
-
-
     /** Database helper class to manage the database tables */
     private static final class DbHelper extends SQLiteOpenHelper
     {
@@ -535,7 +493,7 @@ public class NotificationMgr implements PasswdFileDataObserver
                        DB_COL_EXPIRYS_UUID + " TEXT NOT NULL, " +
                        DB_COL_EXPIRYS_TITLE + " TEXT NOT NULL, " +
                        DB_COL_EXPIRYS_GROUP + " TEXT, " +
-                       DB_COL_EXPIRYS_EXPIRE + " TEXT NOT NULL" +
+                       DB_COL_EXPIRYS_EXPIRE + " INTEGER NOT NULL" +
                        ");");
         }
 
@@ -577,10 +535,10 @@ public class NotificationMgr implements PasswdFileDataObserver
     {
         public final String itsName;
         public final String itsUuid;
-        public final Date itsExpiry;
+        public final long itsExpiry;
 
         /** Constructor */
-        public ExpiryEntry(String name, String uuid, Date expiry)
+        public ExpiryEntry(String name, String uuid, long expiry)
         {
             itsName = name;
             itsUuid = uuid;
@@ -593,8 +551,13 @@ public class NotificationMgr implements PasswdFileDataObserver
          */
         public int compareTo(ExpiryEntry another)
         {
-            int rc = -itsExpiry.compareTo(another.itsExpiry);
-            if (rc == 0) {
+            int rc;
+            // Reverse sort on expiration time
+            if (itsExpiry < another.itsExpiry) {
+                rc = 1;
+            } else if (itsExpiry > another.itsExpiry) {
+                rc = -1;
+            } else {
                 rc = itsName.compareTo(another.itsName);
                 if (rc == 0) {
                     rc = itsUuid.compareTo(another.itsUuid);
@@ -607,7 +570,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         /** Convert the entry to a string for users */
         public final String toString(Context ctx)
         {
-            return itsName + " (" + Utils.formatDate(itsExpiry.getTime(), ctx,
+            return itsName + " (" + Utils.formatDate(itsExpiry, ctx,
                                                      false, true, true) + ")";
         }
     }
