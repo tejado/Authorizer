@@ -301,9 +301,8 @@ public class NotificationMgr implements PasswdFileDataObserver
             entries.put(entry, cursor.getLong(0));
         }
 
-        TreeSet<ExpiryEntry> fileEntries = new TreeSet<ExpiryEntry>();
-        ContentValues values = new ContentValues();
-        values.put(DB_COL_EXPIRYS_URI, uriId);
+        boolean dbchanged = false;
+        ContentValues values = null;
         for (PasswdRecord rec: fileData.getPasswdRecords()) {
             PasswdExpiration expiry = rec.getPasswdExpiry();
             if (expiry == null) {
@@ -316,21 +315,28 @@ public class NotificationMgr implements PasswdFileDataObserver
                                                 fileData.getGroup(pwsrec),
                                                 expiry.itsExpiration.getTime());
             if (entries.remove(entry) == null) {
+                if (values == null) {
+                    values = new ContentValues();
+                    values.put(DB_COL_EXPIRYS_URI, uriId);
+                }
                 values.put(DB_COL_EXPIRYS_UUID, entry.itsUuid);
                 values.put(DB_COL_EXPIRYS_TITLE, entry.itsTitle);
                 values.put(DB_COL_EXPIRYS_GROUP, entry.itsGroup);
                 values.put(DB_COL_EXPIRYS_EXPIRE, entry.itsExpiry);
                 db.insertOrThrow(DB_TABLE_EXPIRYS, null, values);
+                dbchanged = true;
             }
-            fileEntries.add(entry);
         }
 
         for (Long rmId: entries.values()) {
             db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_ID,
                       new String[] { rmId.toString() });
+            dbchanged = true;
         }
 
-        loadEntries(db);
+        if (dbchanged) {
+            loadEntries(db);
+        }
     }
 
 
