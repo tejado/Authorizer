@@ -197,6 +197,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        PasswdFileData fileData = getPasswdFileData();
+        boolean isV3 = (fileData != null) && fileData.isV3();
+
         MenuItem mi;
 
         addSearchMenuItem(menu);
@@ -206,13 +209,17 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         addCloseMenuItem(menu);
 
-        mi = menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
+        if (isV3) {
+            mi = menu.add(0, MENU_PASSWD_POLICIES, 0,
+                          R.string.password_policies);
 
-        mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.expired_passwords);
+            mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R
+                          .string.expired_passwords);
 
-        mi = menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
-                      R.string.expiration_notifications);
-        mi.setCheckable(true);
+            mi = menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
+                          R.string.expiration_notifications);
+            mi.setCheckable(true);
+        }
 
         // File operations submenu
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);

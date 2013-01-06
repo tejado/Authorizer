@@ -281,8 +281,6 @@ public class NotificationMgr implements PasswdFileDataObserver
                                         SQLiteDatabase db)
         throws SQLException
     {
-        // TODO: v1/v2 databases
-
         PasswdSafeApp.dbginfo(TAG, "Update %s, id: %d",
                               fileData.getUri(), uriId);
 
