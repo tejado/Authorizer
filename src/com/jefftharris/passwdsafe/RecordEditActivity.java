@@ -1342,6 +1342,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                                         PasswdExpiration.INTERVAL_DEFAULT);
                 long exp = System.currentTimeMillis();
                 exp += (long)interval * DateUtils.DAY_IN_MILLIS;
+                exp -= (exp % DateUtils.MINUTE_IN_MILLIS);
                 Date expiry = new Date(exp);
 
                 CheckBox cb =
