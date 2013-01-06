@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -66,6 +67,8 @@ public class NotificationMgr implements PasswdFileDataObserver
     private static final String DB_COL_EXPIRYS_EXPIRE = "rec_expire";
     private static final String DB_MATCH_EXPIRYS_URI =
         DB_COL_EXPIRYS_URI + " = ?";
+    private static final String DB_MATCH_EXPIRYS_ID =
+        DB_COL_EXPIRYS_ID + " = ?";
 
     private final Context itsCtx;
     private final AlarmManager itsAlarmMgr;
@@ -147,7 +150,6 @@ public class NotificationMgr implements PasswdFileDataObserver
      */
     public void passwdFileDataChanged(PasswdFileData fileData)
     {
-        // TODO: only update if necessary
         try {
             SQLiteDatabase db = itsDbHelper.getWritableDatabase();
             try {
@@ -279,24 +281,53 @@ public class NotificationMgr implements PasswdFileDataObserver
                                         SQLiteDatabase db)
         throws SQLException
     {
+        // TODO: v1/v2 databases
+
         PasswdSafeApp.dbginfo(TAG, "Update %s, id: %d",
                               fileData.getUri(), uriId);
 
-        db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI,
-                  new String[] { Long.toString(uriId) });
+        TreeMap<ExpiryEntry, Long> entries = new TreeMap<ExpiryEntry, Long>();
+        Cursor cursor =
+            db.query(DB_TABLE_EXPIRYS,
+                     new String[] { DB_COL_EXPIRYS_ID, DB_COL_EXPIRYS_UUID,
+                                    DB_COL_EXPIRYS_TITLE, DB_COL_EXPIRYS_GROUP,
+                                    DB_COL_EXPIRYS_EXPIRE },
+                     DB_MATCH_EXPIRYS_URI,
+                     new String[] { Long.toString(uriId) }, null, null, null);
+        while (cursor.moveToNext()) {
+            ExpiryEntry entry =
+                new ExpiryEntry(cursor.getString(1), cursor.getString(2),
+                                cursor.getString(3), cursor.getLong(4));
+            entries.put(entry, cursor.getLong(0));
+        }
+
+        TreeSet<ExpiryEntry> fileEntries = new TreeSet<ExpiryEntry>();
         ContentValues values = new ContentValues();
         values.put(DB_COL_EXPIRYS_URI, uriId);
         for (PasswdRecord rec: fileData.getPasswdRecords()) {
             PasswdExpiration expiry = rec.getPasswdExpiry();
-            if (expiry != null) {
-                PwsRecord pwsrec = rec.getRecord();
-                values.put(DB_COL_EXPIRYS_UUID, rec.getUUID());
-                values.put(DB_COL_EXPIRYS_TITLE, fileData.getTitle(pwsrec));
-                values.put(DB_COL_EXPIRYS_GROUP, fileData.getGroup(pwsrec));
-                values.put(DB_COL_EXPIRYS_EXPIRE,
-                           expiry.itsExpiration.getTime());
+            if (expiry == null) {
+                continue;
+            }
+
+            PwsRecord pwsrec = rec.getRecord();
+            ExpiryEntry entry = new ExpiryEntry(rec.getUUID(),
+                                                fileData.getTitle(pwsrec),
+                                                fileData.getGroup(pwsrec),
+                                                expiry.itsExpiration.getTime());
+            if (entries.remove(entry) == null) {
+                values.put(DB_COL_EXPIRYS_UUID, entry.itsUuid);
+                values.put(DB_COL_EXPIRYS_TITLE, entry.itsTitle);
+                values.put(DB_COL_EXPIRYS_GROUP, entry.itsGroup);
+                values.put(DB_COL_EXPIRYS_EXPIRE, entry.itsExpiry);
                 db.insertOrThrow(DB_TABLE_EXPIRYS, null, values);
             }
+            fileEntries.add(entry);
+        }
+
+        for (Long rmId: entries.values()) {
+            db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_ID,
+                      new String[] { rmId.toString() });
         }
 
         loadEntries(db);
@@ -352,13 +383,14 @@ public class NotificationMgr implements PasswdFileDataObserver
             while (expirysCursor.moveToNext()) {
                 long expiry = expirysCursor.getLong(3);
                 if (expiry <= expiration) {
-                    String name = PasswdRecord.getRecordId(
-                        expirysCursor.getString(2), expirysCursor.getString(1),
-                        null);
-                    String uuid = expirysCursor.getString(0);
-                    ExpiryEntry entry = new ExpiryEntry(name, uuid, expiry);
-                    PasswdSafeApp.dbginfo(TAG, "expired entry: %s, at: %tc",
-                                          entry.itsName, entry.itsExpiry);
+                    ExpiryEntry entry =
+                        new ExpiryEntry(expirysCursor.getString(0),
+                                        expirysCursor.getString(1),
+                                        expirysCursor.getString(2),
+                                        expiry);
+                    PasswdSafeApp.dbginfo(TAG, "expired entry: %s/%s, at: %tc",
+                                          entry.itsGroup, entry.itsTitle,
+                                          entry.itsExpiry);
                     expired.add(entry);
                 }
                 else if (expiry < nextExpiration) {
@@ -533,15 +565,17 @@ public class NotificationMgr implements PasswdFileDataObserver
     /** The ExpiryEntry class represents an expiration entry for notifications */
     private static final class ExpiryEntry implements Comparable<ExpiryEntry>
     {
-        public final String itsName;
         public final String itsUuid;
+        public final String itsTitle;
+        public final String itsGroup;
         public final long itsExpiry;
 
         /** Constructor */
-        public ExpiryEntry(String name, String uuid, long expiry)
+        public ExpiryEntry(String uuid, String title, String group, long expiry)
         {
-            itsName = name;
             itsUuid = uuid;
+            itsTitle = title;
+            itsGroup = group;
             itsExpiry = expiry;
         }
 
@@ -558,9 +592,12 @@ public class NotificationMgr implements PasswdFileDataObserver
             } else if (itsExpiry > another.itsExpiry) {
                 rc = -1;
             } else {
-                rc = itsName.compareTo(another.itsName);
+                rc = compareStrs(itsGroup, another.itsGroup);
                 if (rc == 0) {
-                    rc = itsUuid.compareTo(another.itsUuid);
+                    rc = compareStrs(itsTitle, another.itsTitle);
+                    if (rc == 0) {
+                        rc = itsUuid.compareTo(another.itsUuid);
+                    }
                 }
             }
             return rc;
@@ -570,8 +607,24 @@ public class NotificationMgr implements PasswdFileDataObserver
         /** Convert the entry to a string for users */
         public final String toString(Context ctx)
         {
-            return itsName + " (" + Utils.formatDate(itsExpiry, ctx,
-                                                     false, true, true) + ")";
+            return PasswdRecord.getRecordId(itsGroup, itsTitle, null) +
+                " (" + Utils.formatDate(itsExpiry, ctx, false, true, true) +
+                ")";
+        }
+
+
+        /** Compare two strings, accounting for null */
+        private static int compareStrs(String str1, String str2)
+        {
+            if (str1 != null) {
+                if (str2 != null) {
+                    return str1.compareTo(str2);
+                }
+                return 1;
+            } else if (str2 != null) {
+                return -1;
+            }
+            return 0;
         }
     }
 
