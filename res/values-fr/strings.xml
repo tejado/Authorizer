@@ -71,15 +71,15 @@
     <string name="empty_title">Titre vide</string>
     <string name="enabled">Activé</string>
     <string name="enter_net_group">Entrer un nouveau groupe:</string>
-    <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers chenilles</string>
+    <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers logs</string>
     <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Notifications d\'Expiration</string>
-    <string name="expiration_notifications_warning">Activation des notifications d\'expiration nécessite PasswdSafe pour stocker les informations d\'expiration du fichier (titre du disque, le groupe et date d\'expiration). Ces informations sont stockées en clair sur l\'appareil. Aucun mot de passe sont stockés.</string>
+    <string name="expiration_notifications_warning">L\'activation des notifications d\'expiration implique que PasswdSafe stocke les informations d\'expiration dans un fichier (titre de l\'entrée, le groupe et la date d\'expiration). Ces informations sont stockées en clair sur l\'appareil, mais aucun mot de passe n\'y est stockés.</string>
     <string name="expired_passwords">Mots de passe Expirés</string>
     <string name="expired_password_notification">Notification mot de passe expiré</string>
-    <string name="expiring_password">Expirant mot de passe</string>
+    <string name="expiring_password">Expiration mot de passe</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
     <string name="file_backups">Fichiers de sauvegarde</string>
     <string name="file_close_timeout">Fermeture automatique de fichier</string>
@@ -151,8 +151,8 @@
     <string name="password_expiration">Expiration mot de passe</string>
     <string name="password_file">Fichier mot de passe</string>
     <string name="password_generation">Composition des mots de passe</string>
-    <string name="password_expiration_in_past">L\'expiration du mot est dans le passé</string>
-    <string name="password_expiration_invalid_interval">Délai d\'expiration du mot de passe doit être dans la gamme 1&#8211;3650</string>
+    <string name="password_expiration_in_past">L\'expiration du mot est atteint</string>
+    <string name="password_expiration_invalid_interval">Délai d\'expiration du mot de passe doit être dans la plage 1&#8211;3650</string>
     <string name="password_expired">Mot de passe expiré</string>
     <string name="password_expires_before">Mot de passe expire avant %1$s</string>
     <string name="password_expires_today">Mot de passe expire aujourd\'hui</string>
@@ -228,10 +228,10 @@
     <string name="yes">Oui</string>
 
     <plurals name="expiring_passwords">
-        <item quantity="one">Un mot de passe expirant</item>
-        <item quantity="other">%1$d mots de passe expirant</item>
+        <item quantity="one">Un mot de passe expire</item>
+        <item quantity="other">%1$d mots de passe expirent</item>
     </plurals>
-    
+
     <plurals name="group_items">
         <item quantity="one">[Une entrée]</item>
         <item quantity="other">[%d entrées]</item>
@@ -281,8 +281,8 @@
         <item>Aujourd\'hui</item>
         <item>Dans une Semaine</item>
         <item>Dans deux Semaines</item>
-        <item>Dans une Mois</item>
-        <item>Dans une Année</item>
+        <item>Dans un Mois</item>
+        <item>Dans un An</item>
         <item>Tout</item>
         <item>Personnalisée</item>
     </string-array>
@@ -290,21 +290,21 @@
     <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
     <string-array name="expire_filter_record">
         <item>Un mot de passe a expiré</item>
-        <item>Un mot de passe expirent aujourd\'hui</item>
-        <item>Un mot de passe expirent dans une semaine</item>
-        <item>Un mot de passe expirent dans les deux semaines</item>
-        <item>Un mot de passe expirent dans un mois</item>
-        <item>Un mot de passe expirera dans un an</item>
+        <item>Un mot de passe expire aujourd\'hui</item>
+        <item>Un mot de passe expire dans une semaine</item>
+        <item>Un mot de passe expire dans les deux semaines</item>
+        <item>Un mot de passe expire dans un mois</item>
+        <item>Un mot de passe expire dans un an</item>
     </string-array>
 
     <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
     <string-array name="expire_filter_records">
         <item>%1$s mots de passe ont expiré</item>
-        <item>%1$s mots de passe expire aujourd\'hui</item>
-        <item>%1$s mots de passe expire dans une semaine</item>
-        <item>%1$s mots de passe expire dans les deux semaines</item>
-        <item>%1$s mots de passe expire dans un mois</item>
-        <item>%1$s mots de passe expire dans un an</item>
+        <item>%1$s mots de passe expirent aujourd\'hui</item>
+        <item>%1$s mots de passe expirent dans une semaine</item>
+        <item>%1$s mots de passe expirent dans les deux semaines</item>
+        <item>%1$s mots de passe expirent dans un mois</item>
+        <item>%1$s mots de passe expirent dans un an</item>
     </string-array>
 
     <!-- Order must match PasswdExpiryNotifPref enum values -->
@@ -314,8 +314,8 @@
         <item>Aujourd\'hui</item>
         <item>Dans une Semaine</item>
         <item>Dans deux Semaines</item>
-        <item>Dans une Mois</item>
-        <item>Dans une Année</item>
+        <item>Dans un Mois</item>
+        <item>Dans un An</item>
      </string-array>
 
     <!-- Order must match constants in PasswdExpiration.Type -->
