@@ -702,8 +702,6 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
             PasswdFileData fileData = getPasswdFileData();
             if (fileData == null) {
-                // TODO: Need better fix for fileData becoming null when the
-                // file is closed
                 break;
             }
             tv = (TextView)dialog.findViewById(R.id.permissions);
