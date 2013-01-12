@@ -69,6 +69,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -87,6 +88,9 @@ public class PasswdFileData
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
     private HeaderPasswdPolicies itsHdrPolicies = new HeaderPasswdPolicies();
     private boolean itsIsOpenReadOnly = false;
+
+    private static List<PasswdFileDataObserver> itsObservers =
+        new ArrayList<PasswdFileDataObserver>();
 
     private static final String TAG = "PasswdFileData";
 
@@ -144,7 +148,7 @@ public class PasswdFileData
             for (int idx = 0; idx < itsRecords.size(); ++idx) {
                 PwsRecord rec = itsRecords.get(idx);
                 if (rec.isModified()) {
-                    PasswdSafeApp.dbginfo(TAG, "Updating idx: " + idx);
+                    PasswdSafeApp.dbginfo(TAG, "Updating idx: %d", idx);
                     itsPwsFile.set(idx, rec);
                     rec.resetModified();
                 }
@@ -167,6 +171,7 @@ public class PasswdFileData
             });
             try {
                 itsPwsFile.save();
+                notifyObservers(this);
             } finally {
                 itsPwsFile.getStorage().setSaveHelper(null);
             }
@@ -179,8 +184,7 @@ public class PasswdFileData
         itsFile = null;
         itsPwsFile.dispose();
         itsPwsFile = null;
-        itsRecordsByUUID.clear();
-        itsRecords.clear();
+        indexRecords();
     }
 
     public ArrayList<PwsRecord> getRecords()
@@ -314,22 +318,8 @@ public class PasswdFileData
 
     public final String getId(PwsRecord rec)
     {
-        StringBuilder id = new StringBuilder();
-
-        String group = getGroup(rec);
-        if (!TextUtils.isEmpty(group)) {
-            id.append("[");
-            id.append(group);
-            id.append("] ");
-        }
-        id.append(getTitle(rec));
-        String user = getUsername(rec);
-        if (!TextUtils.isEmpty(user)) {
-            id.append(" [");
-            id.append(user);
-            id.append("]");
-        }
-        return id.toString();
+        return PasswdRecord.getRecordId(getGroup(rec), getTitle(rec),
+                                        getUsername(rec));
     }
 
     /** Get the time the record was created */
@@ -647,10 +637,9 @@ public class PasswdFileData
                     continue;
                 }
                 recPolicy = new PasswdPolicy(policyRename.second, recPolicy);
-                PasswdSafeApp.dbginfo(
-                    TAG,
-                    "Rename policy to " + recPolicy.getName() + " for " +
-                    getId(rec.getRecord()));
+                PasswdSafeApp.dbginfo(TAG, "Rename policy to %s for %s",
+                                      recPolicy.getName(),
+                                      getId(rec.getRecord()));
 
                 setPasswdPolicyImpl(recPolicy, rec.getRecord(), false);
             }
@@ -693,6 +682,7 @@ public class PasswdFileData
         return id;
     }
 
+
     public static final int hexBytesToInt(byte[] bytes, int pos, int len)
     {
         int i = 0;
@@ -701,6 +691,12 @@ public class PasswdFileData
             i |= Character.digit(bytes[idx], 16);
         }
         return i;
+    }
+
+    /** Add an observer for file changes */
+    public static void addObserver(PasswdFileDataObserver observer)
+    {
+        itsObservers.add(observer);
     }
 
     private final void setSaveHdrFields(Context context)
@@ -1263,36 +1259,39 @@ public class PasswdFileData
         passwd = null;
         PasswdSafeApp.dbginfo(TAG, "after load file");
         indexRecords();
+        notifyObservers(this);
         PasswdSafeApp.dbginfo(TAG, "file loaded");
     }
 
     private final void indexRecords()
     {
         itsRecords.clear();
-        itsRecords.ensureCapacity(itsPwsFile.getRecordCount());
         itsRecordsByUUID.clear();
         itsPasswdRecords.clear();
-        Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
-        while (recIter.hasNext()) {
-            PwsRecord rec = recIter.next();
-            String uuid = getUUID(rec);
-            if (uuid == null) {
-                // Add a UUID field for records without one.  The record will
-                // not be marked as modified unless the user manually edits it.
-                PwsUUIDField uuidField =
-                    new PwsUUIDField(isV2() ?
-                                     PwsFieldTypeV2.UUID : PwsFieldTypeV3.UUID,
-                                     new UUID());
-                boolean modified = rec.isModified();
-                rec.setField(uuidField);
-                if (!modified) {
-                    rec.resetModified();
+        if (itsPwsFile != null) {
+            itsRecords.ensureCapacity(itsPwsFile.getRecordCount());
+            Iterator<PwsRecord> recIter = itsPwsFile.getRecords();
+            while (recIter.hasNext()) {
+                PwsRecord rec = recIter.next();
+                String uuid = getUUID(rec);
+                if (uuid == null) {
+                    // Add a UUID field for records without one.  The record
+                    // will not be marked as modified unless the user manually
+                    // edits it.
+                    PwsUUIDField uuidField = new PwsUUIDField(
+                        isV2() ? PwsFieldTypeV2.UUID : PwsFieldTypeV3.UUID,
+                        new UUID());
+                    boolean modified = rec.isModified();
+                    rec.setField(uuidField);
+                    if (!modified) {
+                        rec.resetModified();
+                    }
+                    uuid = uuidField.toString();
                 }
-                uuid = uuidField.toString();
-            }
 
-            itsRecords.add(rec);
-            itsRecordsByUUID.put(uuid, rec);
+                itsRecords.add(rec);
+                itsRecordsByUUID.put(uuid, rec);
+            }
         }
         for (PwsRecord rec: itsRecords) {
             itsPasswdRecords.put(rec, new PasswdRecord(rec, this));
@@ -1462,5 +1461,29 @@ public class PasswdFileData
         who.append(host);
         doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO,
                             who.toString());
+    }
+
+
+    /** Notify observer of file changes */
+    private static void notifyObservers(PasswdFileData fileData)
+    {
+        AsyncTask<PasswdFileData, Void, PasswdFileData> notifyTask =
+            new AsyncTask<PasswdFileData, Void, PasswdFileData>()
+            {
+                @Override
+                protected PasswdFileData doInBackground(PasswdFileData... params)
+                {
+                    return params[0];
+                }
+
+                @Override
+                protected void onPostExecute(PasswdFileData fileData)
+                {
+                    for (PasswdFileDataObserver obs: itsObservers) {
+                        obs.passwdFileDataChanged(fileData);
+                    }
+                }
+            };
+        notifyTask.execute(fileData);
     }
 }

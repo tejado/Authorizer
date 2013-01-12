@@ -252,7 +252,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
                                       policy.getName());
             String title = getString(R.string.delete_policy_title);
             DialogUtils.DialogData data =
-                DialogUtils.createDeletePrompt(this, dlgClick, title, prompt);
+                DialogUtils.createConfirmPrompt(this, dlgClick, title, prompt);
             dialog = data.itsDialog;
             itsDeleteValidator = data.itsValidator;
             break;

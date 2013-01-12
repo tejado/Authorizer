@@ -71,7 +71,9 @@ public final class PasswdRecordFilter implements Parcelable
             if (itsExpireRecordsIdx == -1) {
                 throw new IllegalArgumentException("No str");
             }
-            String[] strs = res.getStringArray(R.array.expire_filter_records);
+            String[] strs = res.getStringArray((numRecords == 1) ?
+                                               R.array.expire_filter_record :
+                                               R.array.expire_filter_records);
             return String.format(strs[itsExpireRecordsIdx], numRecords);
         }
 

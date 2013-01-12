@@ -376,6 +376,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                     {
                         itsExpiryDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         itsExpiryDate.set(Calendar.MINUTE, minute);
+                        itsExpiryDate.set(Calendar.SECOND, 0);
                         updatePasswdExpiryDate();
                     }
                 },
@@ -575,7 +576,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        PasswdSafeApp.dbginfo(TAG, "onActivityResult data: " + data);
+        PasswdSafeApp.dbginfo(TAG, "onActivityResult data: %s", data);
 
         if ((requestCode == RECORD_SELECTION_REQUEST) &&
             (resultCode == RESULT_OK)) {
@@ -1244,7 +1245,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
-            PasswdSafeApp.dbginfo(TAG, "updatePolicy: " + updatePolicy);
+            PasswdSafeApp.dbginfo(TAG, "updatePolicy: %s", updatePolicy);
             if (updatePolicy.first) {
                 fileData.setPasswdPolicy(updatePolicy.second, record);
             }
@@ -1341,6 +1342,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                                         PasswdExpiration.INTERVAL_DEFAULT);
                 long exp = System.currentTimeMillis();
                 exp += (long)interval * DateUtils.DAY_IN_MILLIS;
+                exp -= (exp % DateUtils.MINUTE_IN_MILLIS);
                 Date expiry = new Date(exp);
 
                 CheckBox cb =

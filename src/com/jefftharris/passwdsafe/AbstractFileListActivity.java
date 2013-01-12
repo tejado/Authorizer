@@ -224,7 +224,7 @@ public abstract class AbstractFileListActivity extends ListActivity
         if (file.itsFile.isDirectory()) {
             changeDir(file.itsFile, true);
         } else {
-            PasswdSafeApp.dbginfo(TAG, "Open file: " + file.itsFile);
+            PasswdSafeApp.dbginfo(TAG, "Open file: %s", file.itsFile);
             onFileClick(file.itsFile);
         }
     }

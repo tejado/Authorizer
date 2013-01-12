@@ -75,6 +75,8 @@ public class Preferences extends PreferenceActivity
         "passwordExpiryNotifyPref";
     public static final PasswdExpiryNotifPref PREF_PASSWD_EXPIRY_NOTIF_DEF =
         PasswdExpiryNotifPref.IN_TWO_WEEKS;
+    public static final String PREF_PASSWD_CLEAR_ALL_NOTIFS =
+        "passwordClearAllNotifsPref";
 
     public static final String PREF_SEARCH_CASE_SENSITIVE =
         "searchCaseSensitivePref";
@@ -284,7 +286,7 @@ public class Preferences extends PreferenceActivity
             prefsEdit.remove(PREF_GEN_LENGTH);
         }
 
-        PasswdSafeApp.dbginfo(TAG, "Save new default policy: " + policyStr);
+        PasswdSafeApp.dbginfo(TAG, "Save new default policy: %s", policyStr);
         prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policyStr);
         prefsEdit.commit();
     }
@@ -390,6 +392,18 @@ public class Preferences extends PreferenceActivity
         itsPasswdExpiryNotifPref.setEntryValues(
             PasswdExpiryNotifPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_PASSWD_EXPIRY_NOTIF);
+
+        Preference pref = findPreference(PREF_PASSWD_CLEAR_ALL_NOTIFS);
+        pref.setOnPreferenceClickListener(
+            new Preference.OnPreferenceClickListener()
+        {
+            public boolean onPreferenceClick(Preference preference)
+            {
+                PasswdSafeApp app = (PasswdSafeApp)getApplication();
+                app.getNotifyMgr().clearAllNotifications(Preferences.this);
+                return true;
+            }
+        });
 
         itsFontSizePref = (ListPreference) findPreference(PREF_FONT_SIZE);
         itsFontSizePref.setEntries(FontSizePref.getDisplayNames(res));

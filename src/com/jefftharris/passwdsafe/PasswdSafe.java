@@ -71,6 +71,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int MENU_UNPROTECT=        ABS_MENU_MAX + 6;
     private static final int MENU_PASSWD_POLICIES = ABS_MENU_MAX + 7;
     private static final int MENU_PASSWD_EXPIRYS =  ABS_MENU_MAX + 8;
+    private static final int MENU_PASSWD_EXPIRY_NOTIF = ABS_MENU_MAX + 9;
 
     private static final int CTXMENU_COPY_USER = 1;
     private static final int CTXMENU_COPY_PASSWD = 2;
@@ -94,7 +95,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         registerForContextMenu(getListView());
 
         Intent intent = getIntent();
-        PasswdSafeApp.dbginfo(TAG, "onCreate intent:" + intent);
+        PasswdSafeApp.dbginfo(TAG, "onCreate intent: %s", intent);
 
         View v = findViewById(R.id.expiry_clear_btn);
         v.setOnClickListener(new View.OnClickListener()
@@ -138,16 +139,29 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void onNewIntent(Intent intent)
     {
+        super.onNewIntent(intent);
+
         if (intent != null) {
             String action = intent.getAction();
             if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
                 action.equals(Intent.ACTION_VIEW)) {
+                initNewViewIntent();
+                showFileData(MOD_INIT);
                 onCreateView(intent);
                 return;
             }
         }
+    }
 
-        super.onNewIntent(intent);
+
+    /** Initialize the activity for a new view intent */
+    @Override
+    protected void initNewViewIntent()
+    {
+        super.initNewViewIntent();
+        itsIsNotifyExpirations = true;
+        findViewById(R.id.expiry_panel).setVisibility(View.GONE);
+        itsRecToOpen = null;
     }
 
 
@@ -183,6 +197,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        PasswdFileData fileData = getPasswdFileData();
+        boolean isV3 = (fileData != null) && fileData.isV3();
+
         MenuItem mi;
 
         addSearchMenuItem(menu);
@@ -192,9 +209,17 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         addCloseMenuItem(menu);
 
-        mi = menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
+        if (isV3) {
+            mi = menu.add(0, MENU_PASSWD_POLICIES, 0,
+                          R.string.password_policies);
 
-        mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.expired_passwords);
+            mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R
+                          .string.expired_passwords);
+
+            mi = menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
+                          R.string.expiration_notifications);
+            mi.setCheckable(true);
+        }
 
         // File operations submenu
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);
@@ -260,6 +285,19 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             mi.setEnabled(editEnabled);
         }
 
+        mi = menu.findItem(MENU_PASSWD_EXPIRY_NOTIF);
+        if (mi != null) {
+            Uri uri = getUri();
+            boolean enabled = NotificationMgr.notifSupported(uri);
+            boolean checked = false;
+            if (enabled) {
+                NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
+                checked = notifyMgr.hasPasswdExpiryNotif(uri);
+            }
+            mi.setChecked(checked);
+            mi.setEnabled(enabled);
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -314,6 +352,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             showDialog(DIALOG_PASSWD_EXPIRYS);
             break;
         }
+        case MENU_PASSWD_EXPIRY_NOTIF: {
+            NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
+            notifyMgr.togglePasswdExpiryNotif(getPasswdFileData(), this);
+            GuiUtils.invalidateOptionsMenu(this);
+            break;
+        }
         default:
         {
             rc = super.onOptionsItemSelected(item);
@@ -329,9 +373,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        PasswdSafeApp.dbginfo(TAG,
-                              "onActivityResult req: " + requestCode +
-                              ", rc: " + resultCode);
+        PasswdSafeApp.dbginfo(TAG, "onActivityResult req: %d, rc: %d",
+                              requestCode, resultCode);
          if (((requestCode == RECORD_VIEW_REQUEST) ||
               (requestCode == RECORD_ADD_REQUEST) ||
               (requestCode == POLICY_VIEW_REQUEST)) &&
@@ -560,7 +603,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                                       getUriName(false));
             String title = getString(R.string.delete_file_title);
             DialogUtils.DialogData data =
-                DialogUtils.createDeletePrompt(this, dlgClick, title, prompt);
+                DialogUtils.createConfirmPrompt(this, dlgClick, title, prompt);
             dialog = data.itsDialog;
             itsDeleteValidator = data.itsValidator;
             break;
@@ -799,8 +842,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void showFileData(int mod)
     {
-        if (itsRecToOpen != null) {
-            openRecord(itsRecToOpen);
+        if ((mod & MOD_INIT) == 0) {
+            if (itsRecToOpen != null) {
+                openRecord(itsRecToOpen);
+            }
         }
         super.showFileData(mod);
 
@@ -815,6 +860,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             }
             View group = findViewById(R.id.expiry_panel);
             group.setVisibility(itsNumExpired > 0 ? View.VISIBLE : View.GONE);
+        }
+
+        if ((mod & MOD_OPEN_NEW) != 0) {
+            NotificationMgr notifyMgr = getPasswdSafeApp().getNotifyMgr();
+            notifyMgr.cancelNotification(getUri());
         }
     }
 
@@ -838,7 +888,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 showDialog(DIALOG_GET_PASSWD);
             }
         } else {
-            showFileData(MOD_DATA);
+            showFileData(MOD_DATA | MOD_OPEN_NEW);
         }
     }
 
@@ -1001,11 +1051,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 return;
             }
             PasswdSafeApp.dbginfo(TAG, "LoadTask post execute");
-            dismissDialog(DIALOG_PROGRESS);
+            removeDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {
                 getPasswdFile().setFileData((PasswdFileData)result);
-                showFileData(MOD_DATA);
+                showFileData(MOD_DATA | MOD_OPEN_NEW);
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
                 if (((e instanceof IOException) &&

@@ -14,9 +14,7 @@
             android:name="FileDir Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:defaultValue="/sdcard"
             android:key="fileDirPref"
-            android:summary="/sdcard"
             android:title="@string/directory_for_files"/>
 
         <ListPreference
@@ -85,6 +83,13 @@
             android:layout_height="wrap_content"
             android:key="passwordExpiryNotifyPref"
             android:title="@string/expired_password_notification"/>
+        
+        <Preference
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:key="passwordClearAllNotifsPref"
+            android:summary="@string/erase_all_expiration_notifications"
+            android:title="@string/clear_password_notifications"/>
 
         <Preference
             android:layout_width="match_parent"
