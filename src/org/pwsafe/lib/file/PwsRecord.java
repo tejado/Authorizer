@@ -99,7 +99,13 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 			length	= Util.getIntFromByteArray( rawData, 0 );
 			//type	= Util.getIntFromByteArray( RawData, 4 );
 			type = rawData[4] & 0x000000ff; // rest of header is now random data
-			data	= PwsFile.allocateBuffer( length );
+			try {
+			    data	= PwsFile.allocateBuffer( length );
+			} catch (OutOfMemoryError e) {
+			    throw new IOException(
+			        "Out of memory.  Record length too long: " +
+			        length);
+			}
 
 			file.readDecryptedBytes( data );
 		}

@@ -448,7 +448,8 @@ public class PwsRecordV3 extends PwsRecord
             try {
                 data = new byte[length];
             } catch (OutOfMemoryError e) {
-                throw new IOException("Item length too long: " + length);
+                throw new IOException(
+                    "Out of memory.  Record length too long: " + length);
             }
             byte[] remainingDataInRecord = Util.getBytes(rawData, 5, 11);
             if (length <= 11) {
