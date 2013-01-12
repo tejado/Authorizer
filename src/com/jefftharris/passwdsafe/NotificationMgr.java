@@ -24,6 +24,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.util.LongReference;
 import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogUtils;
@@ -292,11 +293,15 @@ public class NotificationMgr implements PasswdFileDataObserver
                                     DB_COL_EXPIRYS_EXPIRE },
                      DB_MATCH_EXPIRYS_URI,
                      new String[] { Long.toString(uriId) }, null, null, null);
-        while (cursor.moveToNext()) {
-            ExpiryEntry entry =
-                new ExpiryEntry(cursor.getString(1), cursor.getString(2),
-                                cursor.getString(3), cursor.getLong(4));
-            entries.put(entry, cursor.getLong(0));
+        try {
+            while (cursor.moveToNext()) {
+                ExpiryEntry entry =
+                    new ExpiryEntry(cursor.getString(1), cursor.getString(2),
+                                    cursor.getString(3), cursor.getLong(4));
+                entries.put(entry, cursor.getLong(0));
+            }
+        } finally {
+            cursor.close();
         }
 
         boolean dbchanged = false;
@@ -360,7 +365,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         } else {
             expiration = Long.MIN_VALUE;
         }
-        long nextExpiration = Long.MAX_VALUE;
+        LongReference nextExpiration = new LongReference(Long.MAX_VALUE);
 
         itsNotifUris.clear();
         HashSet<Long> uris = new HashSet<Long>();
@@ -368,83 +373,14 @@ public class NotificationMgr implements PasswdFileDataObserver
             db.query(DB_TABLE_URIS,
                      new String[] { DB_COL_URIS_ID, DB_COL_URIS_URI },
                      null, null, null, null, null);
-        while (uriCursor.moveToNext()) {
-            long id = uriCursor.getLong(0);
-            Uri uri = Uri.parse(uriCursor.getString(1));
-            itsNotifUris.add(uri);
-            PasswdSafeApp.dbginfo(TAG, "Load %s", uri);
-
-            TreeSet<ExpiryEntry> expired = new TreeSet<ExpiryEntry>();
-            Cursor expirysCursor =
-                db.query(DB_TABLE_EXPIRYS,
-                         new String[] { DB_COL_EXPIRYS_UUID,
-                                        DB_COL_EXPIRYS_TITLE,
-                                        DB_COL_EXPIRYS_GROUP,
-                                        DB_COL_EXPIRYS_EXPIRE },
-                         DB_MATCH_EXPIRYS_URI,
-                         new String[] { Long.toString(id) },
-                         null, null, null);
-            while (expirysCursor.moveToNext()) {
-                long expiry = expirysCursor.getLong(3);
-                if (expiry <= expiration) {
-                    ExpiryEntry entry =
-                        new ExpiryEntry(expirysCursor.getString(0),
-                                        expirysCursor.getString(1),
-                                        expirysCursor.getString(2),
-                                        expiry);
-                    PasswdSafeApp.dbginfo(TAG, "expired entry: %s/%s, at: %tc",
-                                          entry.itsGroup, entry.itsTitle,
-                                          entry.itsExpiry);
-                    expired.add(entry);
-                }
-                else if (expiry < nextExpiration) {
-                    nextExpiration = expiry;
-                }
+        try {
+            while (uriCursor.moveToNext()) {
+                long id = uriCursor.getLong(0);
+                Uri uri = Uri.parse(uriCursor.getString(1));
+                loadUri(id, uri, uris, expiration, nextExpiration, db);
             }
-
-            if (expired.isEmpty()) {
-                continue;
-            }
-
-            uris.add(id);
-            UriNotifInfo info = itsUriNotifs.get(id);
-            if (info == null) {
-                info = new UriNotifInfo(itsNextNotifId++);
-                itsUriNotifs.put(id, info);
-            }
-
-            // Skip the notification if the entries are the same
-            if (info.getEntries().equals(expired))
-            {
-                PasswdSafeApp.dbginfo(TAG, "No expiry changes");
-                continue;
-            }
-
-            info.setEntries(expired);
-            int numExpired = info.getEntries().size();
-            ArrayList<String> strs = new ArrayList<String>(numExpired);
-            for (ExpiryEntry entry: info.getEntries()) {
-                strs.add(entry.toString(itsCtx));
-            }
-
-            String record = null;
-            if (numExpired == 1) {
-                ExpiryEntry entry = info.getEntries().first();
-                record = entry.itsUuid;
-            }
-
-            PendingIntent intent = PendingIntent.getActivity(
-                itsCtx, 0,
-                AbstractFileListActivity.createOpenIntent(uri, record),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-            String title = itsCtx.getResources().getQuantityString(
-                R.plurals.expiring_passwords, numExpired, numExpired);
-            GuiUtils.showNotification(
-                itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
-                itsCtx.getString(R.string.expiring_password),
-                title, PasswdFileData.getUriIdentifier(uri, itsCtx, false),
-                strs, intent, info.getNotifId());
+        } finally {
+            uriCursor.close();
         }
 
         Iterator<HashMap.Entry<Long, UriNotifInfo>> iter =
@@ -456,9 +392,10 @@ public class NotificationMgr implements PasswdFileDataObserver
                 iter.remove();
             }
         }
-        PasswdSafeApp.dbginfo(TAG, "nextExpiration: %tc", nextExpiration);
+        PasswdSafeApp.dbginfo(TAG, "nextExpiration: %tc",
+                              nextExpiration.itsValue);
 
-        if ((nextExpiration != Long.MAX_VALUE) &&
+        if ((nextExpiration.itsValue != Long.MAX_VALUE) &&
             (itsExpiryFilter != null)) {
             if (itsTimerIntent == null) {
                 Intent intent =
@@ -467,14 +404,116 @@ public class NotificationMgr implements PasswdFileDataObserver
                     itsCtx, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
             }
             long nextTimer = System.currentTimeMillis() +
-                (nextExpiration - expiration);
+                (nextExpiration.itsValue - expiration);
             PasswdSafeApp.dbginfo(TAG, "nextTimer: %tc", nextTimer);
             itsAlarmMgr.set(AlarmManager.RTC, nextTimer, itsTimerIntent);
-        }
-        else if (itsTimerIntent != null) {
+        } else if (itsTimerIntent != null) {
             PasswdSafeApp.dbginfo(TAG, "cancel expiration timer");
             itsAlarmMgr.cancel(itsTimerIntent);
         }
+    }
+
+
+    /** Handle the expiration entries for a URI in the database */
+    private void loadUri(final long uriId,
+                         final Uri uri,
+                         final HashSet<Long> expiredUris,
+                         final long expiration,
+                         final LongReference nextExpiration,
+                         final SQLiteDatabase db)
+        throws SQLException
+    {
+        itsNotifUris.add(uri);
+        PasswdSafeApp.dbginfo(TAG, "Load %s", uri);
+
+        TreeSet<ExpiryEntry> expired =
+            loadUriEntries(uriId, expiration, nextExpiration, db);
+
+        if (expired.isEmpty()) {
+            return;
+        }
+
+        expiredUris.add(uriId);
+        UriNotifInfo info = itsUriNotifs.get(uriId);
+        if (info == null) {
+            info = new UriNotifInfo(itsNextNotifId++);
+            itsUriNotifs.put(uriId, info);
+        }
+
+        // Skip the notification if the entries are the same
+        if (info.getEntries().equals(expired))
+        {
+            PasswdSafeApp.dbginfo(TAG, "No expiry changes");
+            return;
+        }
+
+        info.setEntries(expired);
+        int numExpired = info.getEntries().size();
+        ArrayList<String> strs = new ArrayList<String>(numExpired);
+        for (ExpiryEntry entry: info.getEntries()) {
+            strs.add(entry.toString(itsCtx));
+        }
+
+        String record = null;
+        if (numExpired == 1) {
+            ExpiryEntry entry = info.getEntries().first();
+            record = entry.itsUuid;
+        }
+
+        PendingIntent intent = PendingIntent.getActivity(
+            itsCtx, 0,
+            AbstractFileListActivity.createOpenIntent(uri, record),
+            PendingIntent.FLAG_UPDATE_CURRENT);
+
+        String title = itsCtx.getResources().getQuantityString(
+            R.plurals.expiring_passwords, numExpired, numExpired);
+        GuiUtils.showNotification(
+            itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
+            itsCtx.getString(R.string.expiring_password),
+            title, PasswdFileData.getUriIdentifier(uri, itsCtx, false),
+            strs, intent, info.getNotifId());
+    }
+
+
+    /** Load the expiration entries for a URI from the database */
+    private TreeSet<ExpiryEntry>
+    loadUriEntries(final long uriId,
+                   final long expiration,
+                   final LongReference nextExpiration,
+                   final SQLiteDatabase db)
+        throws SQLException
+    {
+        TreeSet<ExpiryEntry> expired = new TreeSet<ExpiryEntry>();
+        Cursor cursor = db.query(DB_TABLE_EXPIRYS,
+                                 new String[] { DB_COL_EXPIRYS_UUID,
+                                                DB_COL_EXPIRYS_TITLE,
+                                                DB_COL_EXPIRYS_GROUP,
+                                                DB_COL_EXPIRYS_EXPIRE },
+                                 DB_MATCH_EXPIRYS_URI,
+                                 new String[] { Long.toString(uriId) },
+                                 null, null, null);
+        try {
+            while (cursor.moveToNext()) {
+                long expiry = cursor.getLong(3);
+                if (expiry <= expiration) {
+                    ExpiryEntry entry = new ExpiryEntry(cursor.getString(0),
+                                                        cursor.getString(1),
+                                                        cursor.getString(2),
+                                                        expiry);
+                    PasswdSafeApp.dbginfo(TAG, "expired entry: %s/%s, at: %tc",
+                                          entry.itsGroup, entry.itsTitle,
+                                          entry.itsExpiry);
+                    expired.add(entry);
+                }
+                else if (expiry < nextExpiration.itsValue) {
+                    nextExpiration.itsValue = expiry;
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return expired;
     }
 
 
