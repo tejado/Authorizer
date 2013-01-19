@@ -46,6 +46,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>top/.hgignore</name>
+			<type>1</type>
+			<locationURI>HG_PROJECT/.hgignore</locationURI>
+		</link>
+		<link>
 			<name>top/LICENSE</name>
 			<type>1</type>
 			<locationURI>HG_PROJECT/LICENSE</locationURI>

@@ -1,6 +1,4 @@
-bin
-changes.txt
-gen
-lib/.old
-PasswdSafe.apk
-test/*.ibak
+^passwdsafe/bin
+^passwdsafe/gen
+^tests/bin
+^tests/gen
