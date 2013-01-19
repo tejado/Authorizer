@@ -4,7 +4,7 @@
     <property name="pkg.dir" value="com/jefftharris/passwdsafe"/>
     <property name="rev.dir" value="${basedir}/gen/${pkg.dir}"/>
     <property name="rev.file" value="${rev.dir}/Rev.java"/>
-    
+
     <target name="genRev" depends="checkGenRev" unless="genRevUptodate">
         <exec dir="${basedir}" executable="hg" outputproperty="buildId">
             <arg value="id"/>
@@ -12,7 +12,7 @@
         <tstamp>
             <format property="buildDate" pattern="MM/dd/yyyy HH:mm:ss Z"/>
         </tstamp>
-    
+
         <mkdir dir="${rev.dir}"/>
         <echo message="Update ${rev.file}"/>
         <echo file="${rev.file}">
@@ -27,7 +27,7 @@ public class Rev
         <javac srcdir="${basedir}/gen" destdir="${basedir}/bin/classes"
             includes="${pkg.dir}/Rev.java" includeAntRuntime="false"/>
     </target>
-    
+
     <target name="checkGenRev">
         <uptodate property="genRevUptodate" targetfile="${rev.file}">
             <srcfiles dir="${basedir}/src"/>
@@ -37,26 +37,9 @@ public class Rev
                       includes="AndroidManifest.xml,build.xml"/>
         </uptodate>
     </target>
-    
+
     <target name="clean">
         <delete file="${rev.file}"/>
         <delete file="${basedir}/bin/classes/${pkg.dir}/Rev.class"/>
     </target>
-    
-    <target name="hg-push">
-        <do-hg-push dest=""/>
-        <do-hg-push dest="win"/>
-        <do-hg-push dest="sf"/>
-        <do-hg-push dest="bb"/>
-    </target>
-        
-    <macrodef name="do-hg-push">
-        <attribute name="dest"/>
-        <sequential>
-            <exec dir="${basedir}" executable="hg">
-                <arg value="push"/>
-                <arg value="@{dest}"/>
-            </exec>
-        </sequential>       
-    </macrodef>
 </project>

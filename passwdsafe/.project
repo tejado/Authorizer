@@ -61,6 +61,11 @@
 			<locationURI>HG_PROJECT/android-NOTICE.txt</locationURI>
 		</link>
 		<link>
+			<name>top/build.xml</name>
+			<type>1</type>
+			<locationURI>HG_PROJECT/build.xml</locationURI>
+		</link>
+		<link>
 			<name>top/doc</name>
 			<type>2</type>
 			<locationURI>HG_PROJECT/doc</locationURI>
