@@ -1,4 +1,6 @@
 ^passwdsafe/bin
 ^passwdsafe/gen
+^sync/bin
+^sync/gen
 ^tests/bin
 ^tests/gen
