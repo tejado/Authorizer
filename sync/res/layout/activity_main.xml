@@ -5,10 +5,27 @@
     tools:context=".MainActivity" >
 
     <TextView
+        android:id="@+id/hello"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="@string/hello_world" />
+        android:text="@string/hello_world"/>
+
+    <Button
+        android:id="@+id/account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hello"
+        android:onClick="onChooseAccount"
+        android:text="Account"/>
+    
+    <Button
+        android:id="@+id/clear_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/account"
+        android:onClick="onClearAccount"
+        android:text="Clear Account"/>
 
 </RelativeLayout>
