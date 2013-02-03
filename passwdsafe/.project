@@ -3,6 +3,7 @@
 	<name>PasswdSafe</name>
 	<comment></comment>
 	<projects>
+		<project>PasswdSafeLib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

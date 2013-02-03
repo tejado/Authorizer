@@ -23,12 +23,11 @@ import android.widget.Button;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 
 public class MainActivity extends Activity
 {
     private static final String TAG = "MainActivity";
-    private static final String PROVIDER =
-        "com.jefftharris.passwdsafe.sync.provider";
 
     private static final int CHOOSE_ACCOUNT = 0;
 
@@ -145,7 +144,8 @@ public class MainActivity extends Activity
         Account oldAccount = getPreferenceAccount();
         // Stop syncing for the previously selected account.
         if (oldAccount != null) {
-            ContentResolver.setSyncAutomatically(oldAccount, PROVIDER, false);
+            ContentResolver.setSyncAutomatically(
+                oldAccount, PasswdSafeContract.AUTHORITY, false);
         }
 
         if (account != null) {
@@ -173,9 +173,11 @@ public class MainActivity extends Activity
             String syncValue = itsPrefs.getString("sync_frequency_preference",
                                                   "300");
 
-            ContentResolver.setSyncAutomatically(account, PROVIDER, true);
-            ContentResolver.addPeriodicSync(account, PROVIDER, new Bundle(),
-                                            Long.parseLong(syncValue));
+            ContentResolver.setSyncAutomatically(
+                account, PasswdSafeContract.AUTHORITY, true);
+            ContentResolver.addPeriodicSync(
+                account, PasswdSafeContract.AUTHORITY, new Bundle(),
+                Long.parseLong(syncValue));
       }
     }
 

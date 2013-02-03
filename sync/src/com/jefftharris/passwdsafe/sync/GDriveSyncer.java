@@ -90,6 +90,7 @@ public class GDriveSyncer
                 PendingIntent pendingIntent =
                     PendingIntent.getActivity(itsContext, 0,
                                               authorizationIntent, 0);
+                // TODO: resource strs
                 Notification notification = new NotificationCompat.Builder(itsContext)
                     .setSmallIcon(android.R.drawable.ic_dialog_alert)
                     .setTicker("Permission requested")
