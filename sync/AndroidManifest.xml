@@ -37,8 +37,8 @@
 
         <provider
             android:name=".PasswdSafeProvider"
-            android:authorities="com.jefftharris.passwdsafe.sync.PasswdSafeProvider"
-            android:exported="false">
+            android:authorities="com.jefftharris.passwdsafe.sync.provider"
+            android:exported="true">
 
             <grant-uri-permission android:pathPattern=".*" />
         </provider>

@@ -63,7 +63,8 @@ public class GDriveSyncer
      *
      * @return An authorized service object.
      */
-    private Drive getDriveService() {
+    private Drive getDriveService()
+    {
         Drive drive = null;
         try {
             GoogleAccountCredential credential =

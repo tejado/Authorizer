@@ -27,7 +27,8 @@ import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccoun
 public class MainActivity extends Activity
 {
     private static final String TAG = "MainActivity";
-    private static final String PROVIDER = PasswdSafeProvider.class.getName();
+    private static final String PROVIDER =
+        "com.jefftharris.passwdsafe.sync.provider";
 
     private static final int CHOOSE_ACCOUNT = 0;
 
