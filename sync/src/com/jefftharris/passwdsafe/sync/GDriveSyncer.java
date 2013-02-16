@@ -6,12 +6,7 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
+import java.io.IOException;
 
 import android.accounts.Account;
 import android.app.Notification;
@@ -23,12 +18,25 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.About;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
+
 /**
  *  The GDriveSyncer class syncs password files from Google Drive
  */
 public class GDriveSyncer
 {
     private static final String TAG = "GDriveSyncer";
+
+    private static final String ABOUT_CHANGE_ID = "largestChangeId";
 
     private final Context itsContext;
     private final ContentProviderClient itsProvider;
@@ -50,8 +58,54 @@ public class GDriveSyncer
     /** Perform synchronization */
     public void performSync()
     {
+        if (itsDrive == null) {
+            return;
+        }
+
         Log.i(TAG, "Performing sync for " + itsAccount.name);
         // TODO: do sync
+
+        performFullSync();
+    }
+
+
+    /** Perform a full sync of the files */
+    private void performFullSync()
+    {
+        long largestChangeId = -1;
+        try {
+            About about = itsDrive.about().get()
+                .setFields(ABOUT_CHANGE_ID).execute();
+            largestChangeId = about.getLargestChangeId();
+        }
+        catch (IOException e) {
+            Log.e(TAG, "Failed to get change ID", e);
+        }
+        Log.i(TAG, "largest change " + largestChangeId);
+
+        try {
+            // TODO: filter on mime types
+            Files.List request =
+                itsDrive.files().list().setQ("not trashed");
+            do {
+                FileList files = request.execute();
+                Log.i(TAG, "num files: " + files.getItems().size());
+                for (File file: files.getItems()) {
+                    String ext = file.getFileExtension();
+                    if ((ext == null) || (!ext.equals("psafe3"))) {
+                        continue;
+                    }
+                    Log.i(TAG, "File id: " + file.getId() + ", title: " +
+                          file.getTitle() + ", mime: " + file.getMimeType());
+                    //Log.i(TAG, "File: " + file);
+                }
+                request.setPageToken(files.getNextPageToken());
+            } while((request.getPageToken() != null) &&
+                    (request.getPageToken().length() > 0));
+        }
+        catch (IOException e) {
+            Log.e(TAG, "Error getting files", e);
+        }
     }
 
 
