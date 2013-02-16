@@ -85,6 +85,7 @@ public class GDriveSyncer
 
         try {
             // TODO: filter on mime types
+            // TODO: .dat files?
             Files.List request =
                 itsDrive.files().list().setQ("not trashed");
             do {
