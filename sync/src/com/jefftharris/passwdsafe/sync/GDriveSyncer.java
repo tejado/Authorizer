@@ -57,9 +57,9 @@ public class GDriveSyncer
 
     /**
      * Retrieve a authorized service object to send requests to the Google Drive
-     * API. On failure to retrieve an access token, a notification is sent to the
-     * user requesting that authorization be granted for the
-     * {@code https://www.googleapis.com/auth/drive.file} scope.
+     * API. On failure to retrieve an access token, a notification is sent to
+     * the user requesting that authorization be granted for the
+     * {@code https://www.googleapis.com/auth/drive} scope.
      *
      * @return An authorized service object.
      */
@@ -69,7 +69,7 @@ public class GDriveSyncer
         try {
             GoogleAccountCredential credential =
                 GoogleAccountCredential.usingOAuth2(itsContext,
-                                                    DriveScopes.DRIVE_FILE);
+                                                    DriveScopes.DRIVE);
           credential.setSelectedAccountName(itsAccount.name);
           // Trying to get a token right away to see if we are authorized
           credential.getToken();
@@ -77,8 +77,8 @@ public class GDriveSyncer
                                     new GsonFactory(), credential).build();
         } catch (Exception e) {
             Log.e(TAG, "Failed to get token");
-            // If the Exception is User Recoverable, we display a notification that will trigger the
-            // intent to fix the issue.
+            // If the Exception is User Recoverable, we display a notification
+            // that will trigger the intent to fix the issue.
             if (e instanceof UserRecoverableAuthException) {
                 UserRecoverableAuthException exception =
                     (UserRecoverableAuthException) e;
