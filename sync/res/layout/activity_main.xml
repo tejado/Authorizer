@@ -19,7 +19,7 @@
         android:layout_below="@id/hello"
         android:onClick="onChooseAccount"
         android:text="Account"/>
-    
+
     <Button
         android:id="@+id/clear_account"
         android:layout_width="wrap_content"
@@ -27,5 +27,13 @@
         android:layout_below="@id/account"
         android:onClick="onClearAccount"
         android:text="Clear Account"/>
+
+    <Button
+        android:id="@+id/sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/clear_account"
+        android:onClick="onSync"
+        android:text="Sync"/>
 
 </RelativeLayout>

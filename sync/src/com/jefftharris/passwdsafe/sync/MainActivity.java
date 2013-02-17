@@ -128,6 +128,16 @@ public class MainActivity extends Activity
         setAccount(null);
     }
 
+    public void onSync(View view)
+    {
+        Account acct = getPreferenceAccount();
+        if (acct != null) {
+            ContentResolver.requestSync(acct, PasswdSafeContract.AUTHORITY,
+                                        new Bundle());
+        }
+    }
+
+
     private void chooseAccount()
     {
         itsAccountState = AccountState.CHOOSING_ACCOUNT;
