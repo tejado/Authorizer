@@ -11,9 +11,8 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.database.SQLException;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,10 +40,10 @@ public class MainActivity extends Activity
         DONE
     }
 
-    private SharedPreferences itsPrefs;
     private Button itsAccountBtn;
     private AccountState itsAccountState = AccountState.INITIAL;
     private GoogleAccountManager itsAccountMgr;
+    private SyncDb itsSyncDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,10 +52,11 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
         Log.i(TAG, "onCreate");
 
-        itsPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // TODO: create a special google acct for the sync service
         itsAccountBtn = (Button)findViewById(R.id.account);
         itsAccountState = AccountState.INITIAL;
         itsAccountMgr = new GoogleAccountManager(this);
+        itsSyncDb = new SyncDb(this);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class MainActivity extends Activity
         itsAccountState = AccountState.CHOOSING_ACCOUNT;
         Intent intent =
             AccountPicker.newChooseAccountIntent(getPreferenceAccount(),
-                                                 null, ACCOUNT_TYPE, false,
+                                                 null, ACCOUNT_TYPE, true,
                                                  null, null, null, null);
         startActivityForResult(intent, CHOOSE_ACCOUNT);
     }
@@ -141,28 +141,25 @@ public class MainActivity extends Activity
     /** Set the new account to use with the app */
     private void setAccount(Account account)
     {
-        Account oldAccount = getPreferenceAccount();
-        // Stop syncing for the previously selected account.
-        if (oldAccount != null) {
-            ContentResolver.setSyncAutomatically(
-                oldAccount, PasswdSafeContract.AUTHORITY, false);
-        }
+        try {
+            Account oldAccount = getPreferenceAccount();
+            // Stop syncing for the previously selected account.
+            if (oldAccount != null) {
+                ContentResolver.setSyncAutomatically(
+                    oldAccount, PasswdSafeContract.AUTHORITY, false);
+                itsSyncDb.deleteProvider(oldAccount.name);
+                itsAccountBtn.setText("Choose Account");
+                itsAccountState = AccountState.DONE;
+            }
 
-        if (account != null) {
-            SharedPreferences.Editor editor = itsPrefs.edit();
-            editor.putString("selected_account_preference", account.name);
-            editor.commit();
-
-            itsAccountBtn.setText("Account - " + account.name);
-            setSyncFrequency(account);
-            itsAccountState = AccountState.DONE;
-        } else {
-            SharedPreferences.Editor editor = itsPrefs.edit();
-            editor.remove("selected_account_preference");
-            editor.remove("sync_frequency_preference");
-            editor.commit();
-            itsAccountBtn.setText("Choose Account");
-            itsAccountState = AccountState.DONE;
+            if (account != null) {
+                itsSyncDb.addProvider(account.name);
+                itsAccountBtn.setText("Account - " + account.name);
+                setSyncFrequency(account);
+                itsAccountState = AccountState.DONE;
+            }
+        } catch (SQLException e) {
+            Log.e(TAG, "DB error", e);
         }
     }
 
@@ -170,22 +167,22 @@ public class MainActivity extends Activity
     private void setSyncFrequency(Account account)
     {
         if (account != null) {
-            String syncValue = itsPrefs.getString("sync_frequency_preference",
-                                                  "300");
-
-            ContentResolver.setSyncAutomatically(
-                account, PasswdSafeContract.AUTHORITY, true);
-            ContentResolver.addPeriodicSync(
-                account, PasswdSafeContract.AUTHORITY, new Bundle(),
-                Long.parseLong(syncValue));
-      }
+            try {
+                int freq = itsSyncDb.getProviderSyncFreq(account.name);
+                ContentResolver.setSyncAutomatically(
+                    account, PasswdSafeContract.AUTHORITY, true);
+                ContentResolver.addPeriodicSync(
+                    account, PasswdSafeContract.AUTHORITY, new Bundle(), freq);
+            } catch (SQLException e) {
+                Log.e(TAG, "DB error", e);
+            }
+        }
     }
 
     /** Get the currently preferred account to use with the app */
     private Account getPreferenceAccount()
     {
-        return itsAccountMgr.getAccountByName(
-            itsPrefs.getString("selected_account_preference", ""));
+        return itsAccountMgr.getAccountByName(itsSyncDb.getProviderAccount());
     }
 /*
 
