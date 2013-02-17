@@ -7,6 +7,7 @@
 package com.jefftharris.passwdsafe.sync;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import android.accounts.Account;
 import android.app.Notification;
@@ -24,11 +25,15 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Changes;
 import com.google.api.services.drive.Drive.Files;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.About;
+import com.google.api.services.drive.model.Change;
+import com.google.api.services.drive.model.ChangeList;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  *  The GDriveSyncer class syncs password files from Google Drive
@@ -71,18 +76,29 @@ public class GDriveSyncer
         try {
             long changeId = itsSyncDb.getProviderSyncChange(itsAccount.name);
             Log.i(TAG, "largest change " + changeId);
+            long newChangeId = -1;
             if (changeId == -1) {
-                performFullSync();
+                newChangeId = performFullSync();
+            } else {
+                // TODO: use same db txn for whole sync
+                newChangeId = performSyncSince(changeId);
+            }
+            if (changeId != newChangeId) {
+                itsSyncDb.setProviderSyncChange(itsAccount.name, newChangeId);
             }
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
         }
-
     }
 
+    /** Close the syncer */
+    public void close()
+    {
+        itsSyncDb.close();
+    }
 
     /** Perform a full sync of the files */
-    private void performFullSync()
+    private long performFullSync()
         throws SQLException, IOException
     {
         Log.i(TAG, "Perform full sync");
@@ -99,8 +115,7 @@ public class GDriveSyncer
                 FileList files = request.execute();
                 Log.i(TAG, "num files: " + files.getItems().size());
                 for (File file: files.getItems()) {
-                    String ext = file.getFileExtension();
-                    if ((ext == null) || (!ext.equals("psafe3"))) {
+                    if (!isSyncFile(file)) {
                         continue;
                     }
                     Log.i(TAG, "File id: " + file.getId() + ", title: " +
@@ -115,9 +130,51 @@ public class GDriveSyncer
             Log.e(TAG, "Error getting files", e);
         }
 
-        itsSyncDb.setProviderSyncChange(itsAccount.name, largestChangeId);
+        return largestChangeId;
     }
 
+    /** Perform a sync of files since the given change id */
+    private long performSyncSince(long changeId)
+        throws SQLException, IOException
+    {
+        // TODO: dbginfo in file
+        PasswdSafeUtil.dbginfo(TAG, "performSyncSince %d", changeId);
+        HashMap<String, File> changedFiles = new HashMap<String, File>();
+        Changes.List request =
+            itsDrive.changes().list().setStartChangeId(changeId + 1);
+        do {
+            ChangeList changes = request.execute();
+            long changesLargestId = changes.getLargestChangeId().longValue();
+
+            for (Change change: changes.getItems()) {
+                File file = change.getFile();
+                if (change.getDeleted() || !isSyncFile(file)) {
+                    file = null;
+                }
+                changedFiles.put(change.getFileId(), file);
+                PasswdSafeUtil.dbginfo(TAG, "performSyncSince changed %s: %s",
+                                       change.getFileId(), file);
+            }
+
+            if (changesLargestId > changeId) {
+                changeId = changesLargestId;
+            }
+            request.setPageToken(changes.getNextPageToken());
+        } while((request.getPageToken() != null) &&
+                (request.getPageToken().length() > 0));
+
+        return changeId;
+    }
+
+    /** Should the file be synced */
+    private static boolean isSyncFile(File file)
+    {
+        if (file.getLabels().getTrashed()) {
+            return false;
+        }
+        String ext = file.getFileExtension();
+        return (ext != null) && ext.equals("psafe3");
+    }
 
     /**
      * Retrieve a authorized service object to send requests to the Google Drive

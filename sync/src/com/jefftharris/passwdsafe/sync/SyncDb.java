@@ -48,6 +48,12 @@ public class SyncDb
         itsDbHelper = new DbHelper(ctx);
     }
 
+    /** Close the DB */
+    public void close()
+    {
+        itsDbHelper.close();
+    }
+
     /** Get the sync provider account */
     public String getProviderAccount()
     {
