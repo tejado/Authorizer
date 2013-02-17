@@ -15,6 +15,7 @@ import android.app.PendingIntent;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
+import android.database.SQLException;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -42,6 +43,7 @@ public class GDriveSyncer
     private final ContentProviderClient itsProvider;
     private final Account itsAccount;
     private final Drive itsDrive;
+    private final SyncDb itsSyncDb;
 
     /** Constructor */
     public GDriveSyncer(Context context,
@@ -52,6 +54,7 @@ public class GDriveSyncer
         itsProvider = provider;
         itsAccount = account;
         itsDrive = getDriveService();
+        itsSyncDb = new SyncDb(itsContext);
         Log.i(TAG, "GDriveSyncer");
     }
 
@@ -65,23 +68,27 @@ public class GDriveSyncer
         Log.i(TAG, "Performing sync for " + itsAccount.name);
         // TODO: do sync
 
-        performFullSync();
+        try {
+            long changeId = itsSyncDb.getProviderSyncChange(itsAccount.name);
+            Log.i(TAG, "largest change " + changeId);
+            if (changeId == -1) {
+                performFullSync();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Sync error", e);
+        }
+
     }
 
 
     /** Perform a full sync of the files */
     private void performFullSync()
+        throws SQLException, IOException
     {
-        long largestChangeId = -1;
-        try {
-            About about = itsDrive.about().get()
-                .setFields(ABOUT_CHANGE_ID).execute();
-            largestChangeId = about.getLargestChangeId();
-        }
-        catch (IOException e) {
-            Log.e(TAG, "Failed to get change ID", e);
-        }
-        Log.i(TAG, "largest change " + largestChangeId);
+        Log.i(TAG, "Perform full sync");
+        About about = itsDrive.about().get()
+            .setFields(ABOUT_CHANGE_ID).execute();
+        long largestChangeId = about.getLargestChangeId();
 
         try {
             // TODO: filter on mime types
@@ -107,6 +114,8 @@ public class GDriveSyncer
         catch (IOException e) {
             Log.e(TAG, "Error getting files", e);
         }
+
+        itsSyncDb.setProviderSyncChange(itsAccount.name, largestChangeId);
     }
 
 

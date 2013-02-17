@@ -33,7 +33,7 @@ public class SyncDb
     private static final String DB_COL_PROVIDERS_ID = BaseColumns._ID;
     private static final String DB_COL_PROVIDERS_TYPE = "type";
     private static final String DB_COL_PROVIDERS_ACCT = "acct";
-    private static final String DB_COL_PROVIDERS_LAST_SYNC_ID = "last_sync_id";
+    private static final String DB_COL_PROVIDERS_SYNC_CHANGE = "sync_change";
     private static final String DB_COL_PROVIDERS_SYNC_FREQ = "sync_freq";
     private static final String DB_MATCH_PROVIDERS_TYPE=
         DB_COL_PROVIDERS_TYPE + " = ?";
@@ -75,14 +75,15 @@ public class SyncDb
     public void addProvider(String name)
         throws SQLException
     {
+        PasswdSafeUtil.dbginfo(TAG, "Add provider %s", name);
         SQLiteDatabase db = itsDbHelper.getWritableDatabase();
         try {
             db.beginTransaction();
             ContentValues values = new ContentValues();
             values.put(DB_COL_PROVIDERS_TYPE, ProviderType.GDRIVE.toString());
             values.put(DB_COL_PROVIDERS_ACCT, name);
-            values.put(DB_COL_PROVIDERS_LAST_SYNC_ID, -1);
-            values.put(DB_COL_PROVIDERS_SYNC_FREQ, 300);
+            values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
+            values.put(DB_COL_PROVIDERS_SYNC_FREQ, 15 * 60);
             db.insertOrThrow(DB_TABLE_PROVIDERS, null, values);
             db.setTransactionSuccessful();
         } finally {
@@ -94,6 +95,7 @@ public class SyncDb
     public void deleteProvider(String name)
         throws SQLException
     {
+        PasswdSafeUtil.dbginfo(TAG, "Delete provider %s", name);
         SQLiteDatabase db = itsDbHelper.getWritableDatabase();
         try {
             db.beginTransaction();
@@ -111,20 +113,75 @@ public class SyncDb
         throws SQLException
     {
         int freq = -1;
+        Cursor cursor = getProviderField(name, DB_COL_PROVIDERS_SYNC_FREQ);
+        if (cursor != null) {
+            try {
+                freq = cursor.getInt(0);
+            } finally {
+                cursor.close();
+            }
+        }
+        return freq;
+    }
+
+    /** Get the sync change id for a provider */
+    public long getProviderSyncChange(String name)
+        throws SQLException
+    {
+        long changeId = -1;
+        Cursor cursor = getProviderField(name, DB_COL_PROVIDERS_SYNC_CHANGE);
+        if (cursor != null) {
+            try {
+                changeId = cursor.getLong(0);
+            } finally {
+                cursor.close();
+            }
+        }
+        return changeId;
+    }
+
+
+    public void setProviderSyncChange(String name, long changeId)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "Set provider sync change %s: %d",
+                               name, changeId);
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_PROVIDERS_SYNC_CHANGE, changeId);
+        setProviderField(name, values);
+    }
+
+
+    private Cursor getProviderField(String name, String column)
+        throws SQLException
+    {
         SQLiteDatabase db = itsDbHelper.getReadableDatabase();
         String[] args = new String[] { ProviderType.GDRIVE.toString(), name };
         Cursor cursor = db.query(DB_TABLE_PROVIDERS,
-                                 new String[] { DB_COL_PROVIDERS_SYNC_FREQ },
+                                 new String[] { column },
                                  DB_MATCH_PROVIDERS_TYPE_ACCT, args,
                                  null, null, null);
-        try {
-            if (cursor.moveToFirst()) {
-                freq = cursor.getInt(0);
-            }
-        } finally {
+        if (cursor.moveToFirst()) {
+            return cursor;
+        } else {
             cursor.close();
         }
-        return freq;
+        return null;
+    }
+
+    private void setProviderField(String name, ContentValues values)
+        throws SQLException
+    {
+        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
+        try {
+            db.beginTransaction();
+            String[] args = new String[] { ProviderType.GDRIVE.toString(),
+                                           name };
+            db.update(DB_TABLE_PROVIDERS, values,
+                      DB_MATCH_PROVIDERS_TYPE_ACCT, args);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     /*
@@ -172,7 +229,7 @@ public class SyncDb
                        DB_COL_PROVIDERS_ID + " INTEGER PRIMARY KEY," +
                        DB_COL_PROVIDERS_TYPE + " TEXT NOT NULL," +
                        DB_COL_PROVIDERS_ACCT + " TEXT NOT NULL," +
-                       DB_COL_PROVIDERS_LAST_SYNC_ID + " INTEGER NOT NULL," +
+                       DB_COL_PROVIDERS_SYNC_CHANGE + " INTEGER NOT NULL," +
                        DB_COL_PROVIDERS_SYNC_FREQ + " INTEGER NOT NULL" +
                        ");");
         }
