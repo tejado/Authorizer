@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +26,7 @@ public class ExpirationTimeoutReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        PasswdSafeApp.dbginfo(TAG, "onReceive");
+        PasswdSafeUtil.dbginfo(TAG, "onReceive");
         PasswdSafeApp app = (PasswdSafeApp)context.getApplicationContext();
         app.getNotifyMgr().handleExpirationTimeout();
     }

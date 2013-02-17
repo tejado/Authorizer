@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +24,7 @@ public class StartupReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        PasswdSafeApp.dbginfo(TAG, "onReceive");
+        PasswdSafeUtil.dbginfo(TAG, "onReceive");
         // The app is created in order to launch the receiver which in turn
         // starts the notification manager
     }

@@ -62,6 +62,7 @@ import org.pwsafe.lib.file.PwsUnknownField;
 import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 import com.jefftharris.passwdsafe.util.Pair;
 
@@ -108,7 +109,7 @@ public class PasswdFileData
             EndOfFileException, InvalidPassphraseException,
             UnsupportedFileVersionException
     {
-        PasswdSafeApp.dbginfo(TAG, "before load file");
+        PasswdSafeUtil.dbginfo(TAG, "before load file");
         itsIsOpenReadOnly = readonly;
 
         if (isFileUri(itsUri)) {
@@ -148,7 +149,7 @@ public class PasswdFileData
             for (int idx = 0; idx < itsRecords.size(); ++idx) {
                 PwsRecord rec = itsRecords.get(idx);
                 if (rec.isModified()) {
-                    PasswdSafeApp.dbginfo(TAG, "Updating idx: %d", idx);
+                    PasswdSafeUtil.dbginfo(TAG, "Updating idx: %d", idx);
                     itsPwsFile.set(idx, rec);
                     rec.resetModified();
                 }
@@ -637,9 +638,9 @@ public class PasswdFileData
                     continue;
                 }
                 recPolicy = new PasswdPolicy(policyRename.second, recPolicy);
-                PasswdSafeApp.dbginfo(TAG, "Rename policy to %s for %s",
-                                      recPolicy.getName(),
-                                      getId(rec.getRecord()));
+                PasswdSafeUtil.dbginfo(TAG, "Rename policy to %s for %s",
+                                       recPolicy.getName(),
+                                       getId(rec.getRecord()));
 
                 setPasswdPolicyImpl(recPolicy, rec.getRecord(), false);
             }
@@ -1257,10 +1258,10 @@ public class PasswdFileData
         }
         passwd.delete(0, passwd.length());
         passwd = null;
-        PasswdSafeApp.dbginfo(TAG, "after load file");
+        PasswdSafeUtil.dbginfo(TAG, "after load file");
         indexRecords();
         notifyObservers(this);
-        PasswdSafeApp.dbginfo(TAG, "file loaded");
+        PasswdSafeUtil.dbginfo(TAG, "file loaded");
     }
 
     private final void indexRecords()

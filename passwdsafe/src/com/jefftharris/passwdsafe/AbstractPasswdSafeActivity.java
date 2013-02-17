@@ -24,6 +24,7 @@ import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FontSizePref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 import com.jefftharris.passwdsafe.view.GuiUtils;
@@ -447,7 +448,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     /** Populate the contents of the root node from the file data */
     private final void populateRootNode(PasswdFileData fileData)
     {
-        PasswdSafeApp.dbginfo(TAG, "populateRootNode");
+        PasswdSafeUtil.dbginfo(TAG, "populateRootNode");
         itsRootNode = new GroupNode();
         itsNumExpired = 0;
         if (fileData == null) {
@@ -630,7 +631,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
      */
     private final boolean doBackPressed()
     {
-        PasswdSafeApp.dbginfo(TAG, "doBackPressed");
+        PasswdSafeUtil.dbginfo(TAG, "doBackPressed");
         int size = itsCurrGroups.size();
         if (size != 0) {
             itsCurrGroups.remove(size - 1);

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -106,7 +107,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     @Override
     protected void onDestroy()
     {
-        PasswdSafeApp.dbginfo(TAG, "onDestroy");
+        PasswdSafeUtil.dbginfo(TAG, "onDestroy");
         super.onDestroy();
         if (itsPasswdFile != null) {
             itsPasswdFile.onActivityDestroy();
@@ -120,7 +121,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     @Override
     protected void onPause()
     {
-        PasswdSafeApp.dbginfo(TAG, "onPause");
+        PasswdSafeUtil.dbginfo(TAG, "onPause");
         super.onPause();
 
         if (itsPasswdFile != null) {

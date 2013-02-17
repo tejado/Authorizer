@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -73,7 +74,7 @@ public class RecordActivityHelper implements PasswdFileActivity
     public void onCreate(Bundle savedInstanceState)
     {
         Intent intent = itsActivity.getIntent();
-        PasswdSafeApp.dbginfo(TAG, "onCreate intent: %s", intent);
+        PasswdSafeUtil.dbginfo(TAG, "onCreate intent: %s", intent);
 
         itsUri = PasswdSafeApp.getFileUriFromIntent(intent);
         itsUUID = intent.getData().getQueryParameter("rec");
@@ -93,7 +94,7 @@ public class RecordActivityHelper implements PasswdFileActivity
 
     public void onDestroy()
     {
-        PasswdSafeApp.dbginfo(TAG, "onDestroy");
+        PasswdSafeUtil.dbginfo(TAG, "onDestroy");
         if (itsPasswdFile != null) {
             itsPasswdFile.onActivityDestroy();
         }
@@ -101,7 +102,7 @@ public class RecordActivityHelper implements PasswdFileActivity
 
     public void onPause()
     {
-        PasswdSafeApp.dbginfo(TAG, "onPause");
+        PasswdSafeUtil.dbginfo(TAG, "onPause");
         if (itsPasswdFile != null) {
             itsPasswdFile.onActivityPause();
         }

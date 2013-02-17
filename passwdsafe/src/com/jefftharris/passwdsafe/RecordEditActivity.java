@@ -24,6 +24,7 @@ import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
@@ -311,7 +312,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     protected void onResume()
     {
         super.onResume();
-        PasswdSafeApp.dbginfo(TAG, "onResume");
+        PasswdSafeUtil.dbginfo(TAG, "onResume");
         ActivityPasswdFile passwdFile = getPasswdFile();
         if (passwdFile != null) {
             passwdFile.pauseFileTimer();
@@ -576,7 +577,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        PasswdSafeApp.dbginfo(TAG, "onActivityResult data: %s", data);
+        PasswdSafeUtil.dbginfo(TAG, "onActivityResult data: %s", data);
 
         if ((requestCode == RECORD_SELECTION_REQUEST) &&
             (resultCode == RESULT_OK)) {
@@ -1245,7 +1246,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
-            PasswdSafeApp.dbginfo(TAG, "updatePolicy: %s", updatePolicy);
+            PasswdSafeUtil.dbginfo(TAG, "updatePolicy: %s", updatePolicy);
             if (updatePolicy.first) {
                 fileData.setPasswdPolicy(updatePolicy.second, record);
             }

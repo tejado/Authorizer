@@ -24,6 +24,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.LongReference;
 import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
@@ -282,8 +283,8 @@ public class NotificationMgr implements PasswdFileDataObserver
                                         SQLiteDatabase db)
         throws SQLException
     {
-        PasswdSafeApp.dbginfo(TAG, "Update %s, id: %d",
-                              fileData.getUri(), uriId);
+        PasswdSafeUtil.dbginfo(TAG, "Update %s, id: %d",
+                               fileData.getUri(), uriId);
 
         TreeMap<ExpiryEntry, Long> entries = new TreeMap<ExpiryEntry, Long>();
         Cursor cursor =
@@ -392,8 +393,8 @@ public class NotificationMgr implements PasswdFileDataObserver
                 iter.remove();
             }
         }
-        PasswdSafeApp.dbginfo(TAG, "nextExpiration: %tc",
-                              nextExpiration.itsValue);
+        PasswdSafeUtil.dbginfo(TAG, "nextExpiration: %tc",
+                               nextExpiration.itsValue);
 
         if ((nextExpiration.itsValue != Long.MAX_VALUE) &&
             (itsExpiryFilter != null)) {
@@ -405,10 +406,10 @@ public class NotificationMgr implements PasswdFileDataObserver
             }
             long nextTimer = System.currentTimeMillis() +
                 (nextExpiration.itsValue - expiration);
-            PasswdSafeApp.dbginfo(TAG, "nextTimer: %tc", nextTimer);
+            PasswdSafeUtil.dbginfo(TAG, "nextTimer: %tc", nextTimer);
             itsAlarmMgr.set(AlarmManager.RTC, nextTimer, itsTimerIntent);
         } else if (itsTimerIntent != null) {
-            PasswdSafeApp.dbginfo(TAG, "cancel expiration timer");
+            PasswdSafeUtil.dbginfo(TAG, "cancel expiration timer");
             itsAlarmMgr.cancel(itsTimerIntent);
         }
     }
@@ -424,7 +425,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         throws SQLException
     {
         itsNotifUris.add(uri);
-        PasswdSafeApp.dbginfo(TAG, "Load %s", uri);
+        PasswdSafeUtil.dbginfo(TAG, "Load %s", uri);
 
         TreeSet<ExpiryEntry> expired =
             loadUriEntries(uriId, expiration, nextExpiration, db);
@@ -443,7 +444,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         // Skip the notification if the entries are the same
         if (info.getEntries().equals(expired))
         {
-            PasswdSafeApp.dbginfo(TAG, "No expiry changes");
+            PasswdSafeUtil.dbginfo(TAG, "No expiry changes");
             return;
         }
 
@@ -500,9 +501,9 @@ public class NotificationMgr implements PasswdFileDataObserver
                                                         cursor.getString(1),
                                                         cursor.getString(2),
                                                         expiry);
-                    PasswdSafeApp.dbginfo(TAG, "expired entry: %s/%s, at: %tc",
-                                          entry.itsGroup, entry.itsTitle,
-                                          entry.itsExpiry);
+                    PasswdSafeUtil.dbginfo(TAG, "expired entry: %s/%s, at: %tc",
+                                           entry.itsGroup, entry.itsTitle,
+                                           entry.itsExpiry);
                     expired.add(entry);
                 }
                 else if (expiry < nextExpiration.itsValue) {
@@ -555,7 +556,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         @Override
         public void onCreate(SQLiteDatabase db)
         {
-            PasswdSafeApp.dbginfo(TAG, "Create DB");
+            PasswdSafeUtil.dbginfo(TAG, "Create DB");
             enableForeignKey(db);
             db.execSQL("CREATE TABLE " + DB_TABLE_URIS + " (" +
                        DB_COL_URIS_ID + " INTEGER PRIMARY KEY," +

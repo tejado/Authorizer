@@ -18,6 +18,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogUtils;
@@ -135,7 +136,7 @@ public class RecordView extends AbstractRecordTabActivity
         if (uuid != null) {
             builder.appendQueryParameter("rec", uuid);
         }
-        PasswdSafeApp.dbginfo(TAG, "start activity: %s", builder);
+        PasswdSafeUtil.dbginfo(TAG, "start activity: %s", builder);
         Intent intent = new Intent(Intent.ACTION_VIEW, builder.build(),
                                    parentAct, RecordView.class);
         parentAct.startActivityForResult(intent, requestCode);
@@ -486,8 +487,8 @@ public class RecordView extends AbstractRecordTabActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        PasswdSafeApp.dbginfo(TAG, "onActivityResult req: %d, rc: %d",
-                              requestCode, resultCode);
+        PasswdSafeUtil.dbginfo(TAG, "onActivityResult req: %d, rc: %d",
+                               requestCode, resultCode);
         if (((requestCode == RECORD_EDIT_REQUEST) ||
              (requestCode == RECORD_VIEW_REQUEST))&&
             (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {

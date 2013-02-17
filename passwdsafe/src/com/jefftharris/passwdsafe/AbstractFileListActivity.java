@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.view.GuiUtils;
 
 import android.app.Activity;
@@ -224,7 +225,7 @@ public abstract class AbstractFileListActivity extends ListActivity
         if (file.itsFile.isDirectory()) {
             changeDir(file.itsFile, true);
         } else {
-            PasswdSafeApp.dbginfo(TAG, "Open file: %s", file.itsFile);
+            PasswdSafeUtil.dbginfo(TAG, "Open file: %s", file.itsFile);
             onFileClick(file.itsFile);
         }
     }
@@ -306,7 +307,7 @@ public abstract class AbstractFileListActivity extends ListActivity
 
     protected final void doParentPressed()
     {
-        PasswdSafeApp.dbginfo(TAG, "doParentPressed");
+        PasswdSafeUtil.dbginfo(TAG, "doParentPressed");
         if (itsDir != null) {
             File newdir = itsDir.getParentFile();
             if (newdir != null) {
@@ -326,7 +327,7 @@ public abstract class AbstractFileListActivity extends ListActivity
      */
     private final boolean doBackPressed()
     {
-        PasswdSafeApp.dbginfo(TAG, "doBackPressed");
+        PasswdSafeUtil.dbginfo(TAG, "doBackPressed");
         if (itsDirHistory.size() == 0) {
             return false;
         }

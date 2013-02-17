@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -68,7 +69,7 @@ public abstract class ActivityPasswdFile
 
     public final void save()
     {
-        PasswdSafeApp.dbginfo(TAG, "saving");
+        PasswdSafeUtil.dbginfo(TAG, "saving");
         itsActivity.showProgressDialog();
         itsSaveTask = new SaveTask();
         itsSaveTask.execute();

@@ -12,6 +12,7 @@ import java.io.File;
 import org.pwsafe.lib.file.PwsFile;
 
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 import com.jefftharris.passwdsafe.pref.FontSizePref;
@@ -230,7 +231,7 @@ public class Preferences extends PreferenceActivity
                                            Context ctx)
     {
         if (prefs.contains(PREF_DEF_PASSWD_POLICY)) {
-            PasswdSafeApp.dbginfo(TAG, "Have default policy");
+            PasswdSafeUtil.dbginfo(TAG, "Have default policy");
             return;
         }
 
@@ -243,7 +244,7 @@ public class Preferences extends PreferenceActivity
             prefs.contains(PREF_GEN_EASY) ||
             prefs.contains(PREF_GEN_HEX) ||
             prefs.contains(PREF_GEN_LENGTH)) {
-            PasswdSafeApp.dbginfo(TAG, "Upgrade old prefs");
+            PasswdSafeUtil.dbginfo(TAG, "Upgrade old prefs");
 
             int flags = 0;
             if (prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF)) {
@@ -286,7 +287,7 @@ public class Preferences extends PreferenceActivity
             prefsEdit.remove(PREF_GEN_LENGTH);
         }
 
-        PasswdSafeApp.dbginfo(TAG, "Save new default policy: %s", policyStr);
+        PasswdSafeUtil.dbginfo(TAG, "Save new default policy: %s", policyStr);
         prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policyStr);
         prefsEdit.commit();
     }

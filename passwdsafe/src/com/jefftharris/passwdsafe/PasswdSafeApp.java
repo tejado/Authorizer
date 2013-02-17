@@ -20,6 +20,7 @@ import org.pwsafe.lib.file.PwsFile;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 
@@ -163,7 +164,6 @@ public class PasswdSafeApp extends Application
         }
     }
 
-    public static final boolean DEBUG = false;
     public static final String DEBUG_AUTO_FILE =
         null;
         //Preferences.PREF_FILE_DIR_DEF + "/test.psafe3";
@@ -230,7 +230,8 @@ public class PasswdSafeApp extends Application
                                                                MODE_PRIVATE);
         if ((fileListPrefs != null) && fileListPrefs.contains(dirPrefName)) {
             String dirPref = fileListPrefs.getString(dirPrefName, "");
-            dbginfo(TAG, "Moving dir pref \"%s\" to main", dirPref);
+            PasswdSafeUtil.dbginfo(TAG, "Moving dir pref \"%s\" to main",
+                                   dirPref);
 
             SharedPreferences.Editor fileListEdit = fileListPrefs.edit();
             SharedPreferences.Editor prefsEdit = prefs.edit();
@@ -255,7 +256,7 @@ public class PasswdSafeApp extends Application
     @Override
     public void onTerminate()
     {
-        dbginfo(TAG, "onTerminate");
+        PasswdSafeUtil.dbginfo(TAG, "onTerminate");
         closeFileData(false);
         super.onTerminate();
     }
@@ -265,8 +266,8 @@ public class PasswdSafeApp extends Application
      */
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
-        dbginfo(TAG, "Preference change: %s, value: %s",
-                key, prefs.getAll().get(key));
+        PasswdSafeUtil.dbginfo(TAG, "Preference change: %s, value: %s",
+                               key, prefs.getAll().get(key));
 
         if (key.equals(Preferences.PREF_FILE_CLOSE_TIMEOUT)) {
             updateFileCloseTimeoutPref(prefs);
@@ -317,7 +318,8 @@ public class PasswdSafeApp extends Application
             closeFileData(false);
         }
 
-        dbgverb(TAG, "access uri: %s, data: %s", uri, itsFileData);
+        PasswdSafeUtil.dbgverb(TAG, "access uri: %s, data: %s",
+                               uri, itsFileData);
         return new AppActivityPasswdFile(itsFileData, activity);
     }
 
@@ -326,7 +328,7 @@ public class PasswdSafeApp extends Application
         PasswdFileActivity activity
     )
     {
-        dbgverb(TAG, "access open file data: %s", itsFileData);
+        PasswdSafeUtil.dbgverb(TAG, "access open file data: %s", itsFileData);
         if (itsFileData == null) {
             return null;
         }
@@ -496,33 +498,11 @@ public class PasswdSafeApp extends Application
         dlg.show();
     }
 
-    /** Log a debug message at info level */
-    public static void dbginfo(String tag, String msg)
-    {
-        if (DEBUG)
-            Log.i(tag, msg);
-    }
-
-    /** Log a formatted debug message at info level */
-    public static void dbginfo(String tag, String fmt, Object... args)
-    {
-        if (DEBUG) {
-            Log.i(tag, String.format(fmt, args));
-        }
-    }
-
-    /** Log a debug message at verbose level */
-    public static void dbgverb(String tag, String fmt, Object... args)
-    {
-        if (DEBUG)
-            Log.v(tag, String.format(fmt, args));
-    }
-
     private synchronized final
     void updateFileCloseTimeoutPref(SharedPreferences prefs)
     {
         FileTimeoutPref pref = Preferences.getFileCloseTimeoutPref(prefs);
-        dbginfo(TAG, "new file close timeout: %s", pref);
+        PasswdSafeUtil.dbginfo(TAG, "new file close timeout: %s", pref);
         itsFileCloseTimeout = pref.getTimeout();
         if (itsFileCloseTimeout == 0) {
             cancelFileDataTimer();
@@ -578,7 +558,8 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void touchFileDataTimer()
     {
-        dbgverb(TAG, "touch timer timeout: %d", itsFileCloseTimeout);
+        PasswdSafeUtil.dbgverb(TAG, "touch timer timeout: %d",
+                               itsFileCloseTimeout);
         if ((itsFileData != null) && (itsFileCloseTimeout != 0) &&
             !itsFileTimerPaused) {
             if (itsCloseIntent == null) {
@@ -586,7 +567,7 @@ public class PasswdSafeApp extends Application
                     PendingIntent.getBroadcast(this, 0,
                                                FILE_TIMEOUT_INTENT_OBJ, 0);
             }
-            dbgverb(TAG, "register adding timer");
+            PasswdSafeUtil.dbgverb(TAG, "register adding timer");
             itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
                             SystemClock.elapsedRealtime() + itsFileCloseTimeout,
                             itsCloseIntent);
@@ -595,7 +576,8 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void touchFileData(Activity activity)
     {
-        dbgverb(TAG, "touch activity: %s, data: %s", activity, itsFileData);
+        PasswdSafeUtil.dbgverb(TAG, "touch activity: %s, data: %s",
+                               activity, itsFileData);
         if (itsFileData != null) {
             itsFileDataActivities.put(activity, null);
             checkScreenOffReceiver();
@@ -605,7 +587,7 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void releaseFileData(Activity activity)
     {
-        dbgverb(TAG, "release activity: %s", activity);
+        PasswdSafeUtil.dbgverb(TAG, "release activity: %s", activity);
         itsFileDataActivities.remove(activity);
         checkScreenOffReceiver();
     }
@@ -620,7 +602,7 @@ public class PasswdSafeApp extends Application
 
     private synchronized final void closeFileData(boolean isTimeout)
     {
-        dbginfo(TAG, "closeFileData data: %s", itsFileData);
+        PasswdSafeUtil.dbginfo(TAG, "closeFileData data: %s", itsFileData);
         if (itsFileData != null) {
             itsFileData.close();
             itsFileData = null;
@@ -638,7 +620,8 @@ public class PasswdSafeApp extends Application
 
         for (Map.Entry<Activity, Object> entry :
             itsFileDataActivities.entrySet()) {
-            dbgverb(TAG, "closeFileData activity: %s", entry.getKey());
+            PasswdSafeUtil.dbgverb(TAG, "closeFileData activity: %s",
+                                   entry.getKey());
             entry.getKey().finish();
         }
         itsFileDataActivities.clear();
@@ -650,12 +633,12 @@ public class PasswdSafeApp extends Application
     {
         boolean haveActivities = !itsFileDataActivities.isEmpty();
         if ((itsScreenOffReceiver == null) && haveActivities) {
-            dbginfo(TAG, "add screen off receiver");
+            PasswdSafeUtil.dbginfo(TAG, "add screen off receiver");
             IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
             itsScreenOffReceiver = new FileTimeoutReceiver();
             registerReceiver(itsScreenOffReceiver, filter);
         } else if ((itsScreenOffReceiver != null) && !haveActivities) {
-            dbginfo(TAG, "remove screen off receiver");
+            PasswdSafeUtil.dbginfo(TAG, "remove screen off receiver");
             unregisterReceiver(itsScreenOffReceiver);
             itsScreenOffReceiver = null;
         }

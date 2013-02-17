@@ -19,6 +19,7 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.DialogValidator;
@@ -95,7 +96,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         registerForContextMenu(getListView());
 
         Intent intent = getIntent();
-        PasswdSafeApp.dbginfo(TAG, "onCreate intent: %s", intent);
+        PasswdSafeUtil.dbginfo(TAG, "onCreate intent: %s", intent);
 
         View v = findViewById(R.id.expiry_clear_btn);
         v.setOnClickListener(new View.OnClickListener()
@@ -373,8 +374,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        PasswdSafeApp.dbginfo(TAG, "onActivityResult req: %d, rc: %d",
-                              requestCode, resultCode);
+        PasswdSafeUtil.dbginfo(TAG, "onActivityResult req: %d, rc: %d",
+                               requestCode, resultCode);
          if (((requestCode == RECORD_VIEW_REQUEST) ||
               (requestCode == RECORD_ADD_REQUEST) ||
               (requestCode == POLICY_VIEW_REQUEST)) &&
@@ -1033,7 +1034,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         @Override
         protected void onCancelled()
         {
-            PasswdSafeApp.dbginfo(TAG, "LoadTask cancelled");
+            PasswdSafeUtil.dbginfo(TAG, "LoadTask cancelled");
             itsLoadTask = null;
             cancelFileOpen();
         }
@@ -1048,7 +1049,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 onCancelled();
                 return;
             }
-            PasswdSafeApp.dbginfo(TAG, "LoadTask post execute");
+            PasswdSafeUtil.dbginfo(TAG, "LoadTask post execute");
             removeDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {
