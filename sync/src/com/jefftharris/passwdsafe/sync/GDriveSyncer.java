@@ -71,6 +71,7 @@ public class GDriveSyncer
         Log.i(TAG, "GDriveSyncer");
     }
 
+
     /** Perform synchronization */
     public void performSync()
     {
@@ -134,7 +135,7 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        List<Long> localFilesToRemove = new ArrayList<Long>();
+        HashMap<Long, String> localFilesToRemove = new HashMap<Long, String>();
         Cursor cursor = itsSyncDb.getFiles(itsAccount.name);
         try {
             for (boolean more = cursor.moveToFirst(); more;
@@ -151,14 +152,17 @@ public class GDriveSyncer
                     PasswdSafeUtil.dbginfo(TAG,
                                            "performFullSync remove local %s",
                                            fileId);
-                    localFilesToRemove.add(id);
+                    localFilesToRemove.put(id, fileId);
                 }
             }
         } finally {
             cursor.close();
         }
 
-        itsSyncDb.removeFiles(localFilesToRemove);
+        for (String fileId: localFilesToRemove.values()) {
+            itsContext.deleteFile(fileId);
+        }
+        itsSyncDb.removeFiles(localFilesToRemove.keySet());
         insertNewDriveFiles(allFiles.values());
 
         return largestChangeId;
