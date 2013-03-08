@@ -157,14 +157,13 @@ public class MainActivity extends Activity
             if (oldAccount != null) {
                 ContentResolver.setSyncAutomatically(
                     oldAccount, PasswdSafeContract.AUTHORITY, false);
-                // TODO: delete local files for provider
-                itsSyncDb.deleteProvider(oldAccount.name);
+                GDriveSyncer.deleteProvider(oldAccount, itsSyncDb, this);
                 itsAccountBtn.setText("Choose Account");
                 itsAccountState = AccountState.DONE;
             }
 
             if (account != null) {
-                itsSyncDb.addProvider(account.name);
+                GDriveSyncer.addProvider(account, itsSyncDb);
                 itsAccountBtn.setText("Account - " + account.name);
                 setSyncFrequency(account);
                 itsAccountState = AccountState.DONE;

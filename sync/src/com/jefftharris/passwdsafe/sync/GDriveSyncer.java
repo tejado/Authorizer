@@ -72,6 +72,39 @@ public class GDriveSyncer
     }
 
 
+    /** Add a provider for an account */
+    public static void addProvider(Account account, SyncDb db)
+        throws SQLException
+    {
+        Log.i(TAG, "Add provider: " + account);
+        db.addProvider(account.name);
+    }
+
+
+    /** Delete the provider for the account */
+    public static void deleteProvider(Account account, SyncDb db, Context ctx)
+        throws SQLException
+    {
+        Log.i(TAG, "Delete provider: " + account);
+        List<String> localFilesToRemove = new ArrayList<String>();
+        Cursor cursor = db.getFiles(account.name);
+        try {
+            for (boolean more = cursor.moveToFirst(); more;
+                more = cursor.moveToNext()) {
+                String fileId = cursor.getString(1);
+                localFilesToRemove.add(fileId);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        for (String fileId: localFilesToRemove) {
+            ctx.deleteFile(fileId);
+        }
+        db.deleteProvider(account.name);
+    }
+
+
     /** Perform synchronization */
     public void performSync()
     {
