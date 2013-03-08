@@ -59,6 +59,16 @@ public class MainActivity extends Activity
         itsSyncDb = new SyncDb(this);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Activity#onDestroy()
+     */
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        itsSyncDb.close();
+    }
+
     @Override
     public void onResume()
     {
