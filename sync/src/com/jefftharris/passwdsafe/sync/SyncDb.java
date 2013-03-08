@@ -6,7 +6,7 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import java.util.Collection;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -16,6 +16,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  * The SyncDb encapsulates the synchronization database
@@ -35,10 +37,24 @@ public class SyncDb
     private static final String DB_COL_PROVIDERS_ACCT = "acct";
     private static final String DB_COL_PROVIDERS_SYNC_CHANGE = "sync_change";
     private static final String DB_COL_PROVIDERS_SYNC_FREQ = "sync_freq";
-    private static final String DB_MATCH_PROVIDERS_TYPE=
+    private static final String DB_MATCH_PROVIDERS_ID =
+        DB_COL_PROVIDERS_ID + " = ?";
+    private static final String DB_MATCH_PROVIDERS_TYPE =
         DB_COL_PROVIDERS_TYPE + " = ?";
     private static final String DB_MATCH_PROVIDERS_TYPE_ACCT =
         DB_COL_PROVIDERS_TYPE + " = ? AND " + DB_COL_PROVIDERS_ACCT + " = ?";
+
+    private static final String DB_TABLE_FILES = "files";
+    private static final String DB_COL_FILES_ID = BaseColumns._ID;
+    private static final String DB_COL_FILES_PROVIDER = "provider";
+    private static final String DB_COL_FILES_LOCAL_FILE = "local_file";
+    private static final String DB_COL_FILES_FILE_ID = "file_id";
+    private static final String DB_COL_FILES_FILE_TITLE = "file_title";
+    private static final String DB_COL_FILES_FILE_MOD_DATE = "file_mod_date";
+    private static final String DB_MATCH_FILES_ID =
+        DB_COL_FILES_ID + " = ?";
+    private static final String DB_MATCH_FILES_PROVIDER_ID =
+        DB_COL_FILES_PROVIDER + " = ?";
 
     private DbHelper itsDbHelper;
 
@@ -102,16 +118,36 @@ public class SyncDb
         throws SQLException
     {
         PasswdSafeUtil.dbginfo(TAG, "Delete provider %s", name);
+        long id = getProviderId(name);
+        if (id == -1) {
+            return;
+        }
         SQLiteDatabase db = itsDbHelper.getWritableDatabase();
         try {
             db.beginTransaction();
-            String[] args = new String[] { ProviderType.GDRIVE.toString(),
-                                           name };
-            db.delete(DB_TABLE_PROVIDERS, DB_MATCH_PROVIDERS_TYPE_ACCT, args);
+            String[] idargs = new String[] { Long.toString(id) };
+            db.delete(DB_TABLE_FILES, DB_MATCH_FILES_PROVIDER_ID, idargs);
+            db.delete(DB_TABLE_PROVIDERS, DB_MATCH_PROVIDERS_ID, idargs);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
+    }
+
+    /** Get the id for a provider */
+    public long getProviderId(String name)
+        throws SQLException
+    {
+        long id = -1;
+        Cursor cursor = getProviderField(name, DB_COL_PROVIDERS_ID);
+        if (cursor != null) {
+            try {
+                id = cursor.getLong(0);
+            } finally {
+                cursor.close();
+            }
+        }
+        return id;
     }
 
     /** Get the sync frequency for a provider */
@@ -147,6 +183,7 @@ public class SyncDb
     }
 
 
+    /** Set the sync change identifier for a provider */
     public void setProviderSyncChange(String name, long changeId)
     {
         PasswdSafeUtil.dbginfo(TAG, "Set provider sync change %s: %d",
@@ -157,6 +194,94 @@ public class SyncDb
     }
 
 
+    /** Get a cursor for all of the files for a provider */
+    public Cursor getFiles(String providerName)
+        throws SQLException
+    {
+        long providerId = getProviderId(providerName);
+        SQLiteDatabase db = itsDbHelper.getReadableDatabase();
+        return db.query(DB_TABLE_FILES,
+                        new String[] { DB_COL_FILES_ID,
+                                       DB_COL_FILES_FILE_ID,
+                                       DB_COL_FILES_FILE_TITLE,
+                                       DB_COL_FILES_FILE_MOD_DATE,
+                                       DB_COL_FILES_LOCAL_FILE },
+                        DB_MATCH_FILES_PROVIDER_ID,
+                        new String[] { Long.toString(providerId) },
+                        null, null, null);
+    }
+
+
+    /** Add a file for a provider */
+    public void addFile(String providerName,
+                        String localFile,
+                        String fileId,
+                        String fileTitle,
+                        long fileModDate)
+        throws SQLException
+    {
+        long providerId = getProviderId(providerName);
+        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
+        try {
+            db.beginTransaction();
+            ContentValues values = new ContentValues();
+            values.put(DB_COL_FILES_PROVIDER, providerId);
+            values.put(DB_COL_FILES_LOCAL_FILE, localFile);
+            values.put(DB_COL_FILES_FILE_ID, fileId);
+            values.put(DB_COL_FILES_FILE_TITLE, fileTitle);
+            values.put(DB_COL_FILES_FILE_MOD_DATE, fileModDate);
+            db.insertOrThrow(DB_TABLE_FILES, null, values);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+
+    /** Update a file */
+    public void updateFile(long fileId, String localFile,
+                           String fileTitle, long fileModDate)
+        throws SQLException
+    {
+        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
+        try {
+            db.beginTransaction();
+            ContentValues values = new ContentValues();
+            if (localFile != null) {
+                values.put(DB_COL_FILES_LOCAL_FILE, localFile);
+            }
+            values.put(DB_COL_FILES_FILE_TITLE, fileTitle);
+            values.put(DB_COL_FILES_FILE_MOD_DATE, fileModDate);
+            db.update(DB_TABLE_FILES, values,
+                      DB_MATCH_FILES_ID,
+                      new String[] { Long.toString(fileId) });
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+
+    /** Remove the files */
+    public void removeFiles(Collection<Long> fileIds)
+        throws SQLException
+    {
+        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
+        try {
+            db.beginTransaction();
+            String[] args = new String[1];
+            for (Long id: fileIds) {
+                args[0] = id.toString();
+                db.delete(DB_TABLE_FILES, DB_MATCH_FILES_ID, args);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+
+    /** Get a field for a provider */
     private Cursor getProviderField(String name, String column)
         throws SQLException
     {
@@ -174,6 +299,8 @@ public class SyncDb
         return null;
     }
 
+
+    /** Set a field for a provider */
     private void setProviderField(String name, ContentValues values)
         throws SQLException
     {
@@ -237,6 +364,16 @@ public class SyncDb
                        DB_COL_PROVIDERS_ACCT + " TEXT NOT NULL," +
                        DB_COL_PROVIDERS_SYNC_CHANGE + " INTEGER NOT NULL," +
                        DB_COL_PROVIDERS_SYNC_FREQ + " INTEGER NOT NULL" +
+                       ");");
+            db.execSQL("CREATE TABLE " + DB_TABLE_FILES + " (" +
+                       DB_COL_FILES_ID + " INTEGER PRIMARY KEY," +
+                       DB_COL_FILES_PROVIDER + " INTEGER REFERENCES " +
+                           DB_TABLE_PROVIDERS + "(" + DB_COL_PROVIDERS_ID +
+                           ") NOT NULL," +
+                       DB_COL_FILES_LOCAL_FILE + " TEXT," +
+                       DB_COL_FILES_FILE_ID + " TEXT NOT NULL," +
+                       DB_COL_FILES_FILE_TITLE + " TEXT NOT NULL," +
+                       DB_COL_FILES_FILE_MOD_DATE + " INTEGER NOT NULL" +
                        ");");
         }
 
