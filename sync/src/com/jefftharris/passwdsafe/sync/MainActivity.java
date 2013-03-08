@@ -157,6 +157,7 @@ public class MainActivity extends Activity
             if (oldAccount != null) {
                 ContentResolver.setSyncAutomatically(
                     oldAccount, PasswdSafeContract.AUTHORITY, false);
+                // TODO: delete local files for provider
                 itsSyncDb.deleteProvider(oldAccount.name);
                 itsAccountBtn.setText("Choose Account");
                 itsAccountState = AccountState.DONE;

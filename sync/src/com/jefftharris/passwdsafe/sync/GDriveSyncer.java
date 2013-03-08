@@ -6,8 +6,13 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import android.accounts.Account;
 import android.app.Notification;
@@ -16,6 +21,7 @@ import android.app.PendingIntent;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -23,6 +29,8 @@ import android.util.Log;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.http.GenericUrl;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Changes;
@@ -71,8 +79,6 @@ public class GDriveSyncer
         }
 
         Log.i(TAG, "Performing sync for " + itsAccount.name);
-        // TODO: do sync
-
         try {
             long changeId = itsSyncDb.getProviderSyncChange(itsAccount.name);
             Log.i(TAG, "largest change " + changeId);
@@ -89,6 +95,7 @@ public class GDriveSyncer
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
         }
+        Log.i(TAG, "Sync finished for " + itsAccount.name);
     }
 
     /** Close the syncer */
@@ -106,29 +113,53 @@ public class GDriveSyncer
             .setFields(ABOUT_CHANGE_ID).execute();
         long largestChangeId = about.getLargestChangeId();
 
-        try {
-            // TODO: filter on mime types
-            // TODO: .dat files?
-            Files.List request =
-                itsDrive.files().list().setQ("not trashed");
-            do {
-                FileList files = request.execute();
-                Log.i(TAG, "num files: " + files.getItems().size());
-                for (File file: files.getItems()) {
-                    if (!isSyncFile(file)) {
-                        continue;
-                    }
-                    Log.i(TAG, "File id: " + file.getId() + ", title: " +
-                          file.getTitle() + ", mime: " + file.getMimeType());
-                    //Log.i(TAG, "File: " + file);
+        // TODO: filter on mime types
+        // TODO: .dat files?
+        // TODO: only get needed fields
+        HashMap<String, File> allFiles = new HashMap<String, File>();
+        Files.List request = itsDrive.files().list().setQ("not trashed");
+        do {
+            FileList files = request.execute();
+            Log.i(TAG, "num files: " + files.getItems().size());
+            for (File file: files.getItems()) {
+                if (!isSyncFile(file)) {
+                    continue;
                 }
-                request.setPageToken(files.getNextPageToken());
-            } while((request.getPageToken() != null) &&
-                    (request.getPageToken().length() > 0));
+                Log.i(TAG, "File id: " + file.getId() + ", title: " +
+                    file.getTitle() + ", mime: " + file.getMimeType());
+                //Log.i(TAG, "File: " + file);
+                allFiles.put(file.getId(), file);
+            }
+            request.setPageToken(files.getNextPageToken());
+        } while((request.getPageToken() != null) &&
+                (request.getPageToken().length() > 0));
+
+        List<Long> localFilesToRemove = new ArrayList<Long>();
+        Cursor cursor = itsSyncDb.getFiles(itsAccount.name);
+        try {
+            for (boolean more = cursor.moveToFirst(); more;
+                 more = cursor.moveToNext()) {
+                long id = cursor.getLong(0);
+                String fileId = cursor.getString(1);
+                File file = allFiles.get(fileId);
+                if (file != null) {
+                    String title = cursor.getString(2);
+                    long modDate = cursor.getLong(3);
+                    mergeFile(file, id, title, modDate);
+                    allFiles.remove(fileId);
+                } else {
+                    PasswdSafeUtil.dbginfo(TAG,
+                                           "performFullSync remove local %s",
+                                           fileId);
+                    localFilesToRemove.add(id);
+                }
+            }
+        } finally {
+            cursor.close();
         }
-        catch (IOException e) {
-            Log.e(TAG, "Error getting files", e);
-        }
+
+        itsSyncDb.removeFiles(localFilesToRemove);
+        insertNewDriveFiles(allFiles.values());
 
         return largestChangeId;
     }
@@ -163,7 +194,169 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
+        HashMap<Long, String> localFilesToRemove = new HashMap<Long, String>();
+        Cursor cursor = itsSyncDb.getFiles(itsAccount.name);
+        try {
+            for (boolean more = cursor.moveToFirst(); more;
+                 more = cursor.moveToNext()) {
+                long id = cursor.getLong(0);
+                String fileId = cursor.getString(1);
+                String title = cursor.getString(2);
+                long modDate = cursor.getLong(3);
+
+                if (changedFiles.containsKey(fileId)) {
+                    File file = changedFiles.get(fileId);
+                    if (file != null) {
+                        mergeFile(file, id, title, modDate);
+                    } else {
+                        PasswdSafeUtil.dbginfo(TAG,
+                                               "performSyncSince remove local %s",
+                                               fileId);
+                        localFilesToRemove.put(id, fileId);
+                    }
+                    changedFiles.remove(fileId);
+                } else {
+                    String localFileName = cursor.getString(4);
+                    java.io.File localFile =
+                        itsContext.getFileStreamPath(fileId);
+                    if ((localFileName == null) || (!localFile.isFile())) {
+                        File file = itsDrive.files().get(fileId).execute();
+                        modDate = -1;
+                        mergeFile(file, id, title, modDate);
+                    }
+                    // TODO: Update remote from local changes??
+                    // TODO: delete remote files if local deleted
+                }
+
+            }
+        } finally {
+            cursor.close();
+        }
+
+        for (String fileId: localFilesToRemove.values()) {
+            itsContext.deleteFile(fileId);
+        }
+        itsSyncDb.removeFiles(localFilesToRemove.keySet());
+        insertNewDriveFiles(changedFiles.values());
+
         return changeId;
+    }
+
+
+    /** Merge a local and remote file */
+    void mergeFile(File file,
+                   long localId,
+                   String localTitle,
+                   long localModDate)
+        throws SQLException, IOException
+    {
+        String fileId = file.getId();
+        long fileModDate = file.getModifiedDate().getValue();
+        // TODO: moving file to different folder doesn't update modDate
+
+        PasswdSafeUtil.dbginfo(
+            TAG, "mergeFile %s, title %s, file date %d, local date %d",
+            fileId, file.getTitle(), fileModDate, localModDate);
+        if (fileModDate > localModDate) {
+            PasswdSafeUtil.dbginfo(TAG, "mergeFile update local %s", fileId);
+            String localFileName = downloadFile(file);
+            itsSyncDb.updateFile(localId, localFileName,
+                                 file.getTitle(), fileModDate);
+        } else if (localModDate > fileModDate) {
+            // TODO: update remote file
+            PasswdSafeUtil.dbginfo(TAG, "mergeFile update remote %s", fileId);
+            File updateFile = (File)file.clone();
+            updateFile.setTitle(localTitle);
+            File updatedFile = itsDrive.files().update(fileId, file).execute();
+            itsSyncDb.updateFile(localId, null, updatedFile.getTitle(),
+                                 updatedFile.getModifiedDate().getValue());
+        }
+    }
+
+
+    /** Insert new files from the drive */
+    void insertNewDriveFiles(Collection<File> files)
+        throws SQLException, IOException
+    {
+        for (File file: files) {
+            if (file == null) {
+                continue;
+            }
+            String fileId = file.getId();
+            PasswdSafeUtil.dbginfo(TAG, "insertNewDriveFiles %s", fileId);
+            String localFileName = downloadFile(file);
+            itsSyncDb.addFile(itsAccount.name, localFileName,
+                              fileId, file.getTitle(),
+                              file.getModifiedDate().getValue());
+        }
+    }
+
+
+    /** Download a file */
+    String downloadFile(File file)
+    {
+        String url = file.getDownloadUrl();
+        if ((url == null) || (url.length() <= 0)) {
+            return null;
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "downloadFile %s from %s",
+                               file.getId(), url);
+        String localFileName = null;
+        try {
+            GenericUrl downloadUrl = new GenericUrl(url);
+            OutputStream os = null;
+            try {
+                os = new BufferedOutputStream(
+                    itsContext.openFileOutput(file.getId(),
+                                              Context.MODE_PRIVATE));
+                Drive.Files.Get get = itsDrive.files().get(file.getId());
+                MediaHttpDownloader dl = get.getMediaHttpDownloader();
+                // TODO: get listener to work?
+                /*
+                dl.setProgressListener(new MediaHttpDownloaderProgressListener()
+                    {
+                        @Override
+                        public void progressChanged(MediaHttpDownloader dl)
+                            throws IOException
+                        {
+                            switch (dl.getDownloadState()) {
+                            case NOT_STARTED: {
+                                PasswdSafeUtil.dbginfo(TAG,
+                                                       "downloadFile not start");
+                                break;
+                            }
+                            case MEDIA_IN_PROGRESS: {
+                                PasswdSafeUtil.dbginfo(TAG,
+                                                       "downloadFile %s",
+                                                       dl.getProgress());
+                                break;
+                            }
+                            case MEDIA_COMPLETE: {
+                                PasswdSafeUtil.dbginfo(TAG,
+                                                       "downloadFile complete");
+                                break;
+                            }
+                            }
+                        }
+                    });
+                    */
+                dl.setDirectDownloadEnabled(true);
+                dl.download(downloadUrl, os);
+            } finally {
+                if (os != null) {
+                    os.close();
+                }
+            }
+
+            java.io.File localFile = itsContext.getFileStreamPath(file.getId());
+            localFile.setLastModified(file.getModifiedDate().getValue());
+            localFileName = localFile.getAbsolutePath();
+        } catch (IOException e) {
+            itsContext.deleteFile(file.getId());
+            Log.e(TAG, "Sync failed to download " + file.getTitle(), e);
+        }
+        return localFileName;
     }
 
     /** Should the file be synced */
