@@ -48,6 +48,8 @@ public class SyncDb
     private static final String DB_COL_FILES_ID = BaseColumns._ID;
     private static final String DB_COL_FILES_PROVIDER = "provider";
     private static final String DB_COL_FILES_LOCAL_FILE = "local_file";
+    private static final String DB_COL_FILES_LOCAL_MOD_DATE = "local_mod_date";
+    private static final String DB_COL_FILES_LOCAL_DELETED = "local_deleted";
     private static final String DB_COL_FILES_FILE_ID = "file_id";
     private static final String DB_COL_FILES_FILE_TITLE = "file_title";
     private static final String DB_COL_FILES_FILE_MOD_DATE = "file_mod_date";
@@ -227,6 +229,7 @@ public class SyncDb
             ContentValues values = new ContentValues();
             values.put(DB_COL_FILES_PROVIDER, providerId);
             values.put(DB_COL_FILES_LOCAL_FILE, localFile);
+            values.put(DB_COL_FILES_LOCAL_DELETED, false);
             values.put(DB_COL_FILES_FILE_ID, fileId);
             values.put(DB_COL_FILES_FILE_TITLE, fileTitle);
             values.put(DB_COL_FILES_FILE_MOD_DATE, fileModDate);
@@ -371,6 +374,8 @@ public class SyncDb
                            DB_TABLE_PROVIDERS + "(" + DB_COL_PROVIDERS_ID +
                            ") NOT NULL," +
                        DB_COL_FILES_LOCAL_FILE + " TEXT," +
+                       DB_COL_FILES_LOCAL_MOD_DATE + " INTEGER," +
+                       DB_COL_FILES_LOCAL_DELETED + " INTEGER NOT NULL," +
                        DB_COL_FILES_FILE_ID + " TEXT NOT NULL," +
                        DB_COL_FILES_FILE_TITLE + " TEXT NOT NULL," +
                        DB_COL_FILES_FILE_MOD_DATE + " INTEGER NOT NULL" +

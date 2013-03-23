@@ -257,11 +257,16 @@ public class GDriveSyncer
                     java.io.File localFile =
                         itsContext.getFileStreamPath(fileId);
                     if ((localFileName == null) || (!localFile.isFile())) {
+                        // Check for files that haven't been downloaded
                         File file = itsDrive.files().get(fileId).execute();
                         modDate = -1;
                         mergeFile(file, id, title, modDate);
+                    } else if (localFile.lastModified() > modDate) {
+                        // Update remote file if local changes
+                        File file = itsDrive.files().get(fileId).execute();
+                        modDate = Long.MAX_VALUE;
+                        mergeFile(file, id, title, modDate);
                     }
-                    // TODO: Update remote from local changes??
                     // TODO: delete remote files if local deleted
                 }
 
