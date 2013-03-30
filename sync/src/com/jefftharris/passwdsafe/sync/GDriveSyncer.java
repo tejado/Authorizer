@@ -178,36 +178,7 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        List<SyncDb.DbFile> dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
-        for (SyncDb.DbFile dbfile: dbfiles) {
-            File remfile = allRemFiles.get(dbfile.itsRemoteId);
-            if (remfile != null) {
-                PasswdSafeUtil.dbginfo(TAG,
-                                       "performFullSync update remote %s",
-                                       dbfile.itsRemoteId);
-                itsSyncDb.updateRemoteFile(
-                        dbfile.itsId, remfile.getTitle(),
-                        remfile.getModifiedDate().getValue(), db);
-                allRemFiles.remove(dbfile.itsRemoteId);
-            } else {
-                PasswdSafeUtil.dbginfo(TAG,
-                                       "performFullSync remove remote %s",
-                                       dbfile.itsRemoteId);
-                itsSyncDb.updateRemoteFileDeleted(dbfile.itsId, db);
-            }
-        }
-
-        for (File remfile: allRemFiles.values()) {
-            if (remfile == null) {
-                continue;
-            }
-            String fileId = remfile.getId();
-            PasswdSafeUtil.dbginfo(TAG, "performFullSync add remote %s",
-                                   fileId);
-            itsSyncDb.addRemoteFile(itsAccount.name, fileId, remfile.getTitle(),
-                                    remfile.getModifiedDate().getValue(), db);
-        }
-
+        performSync(allRemFiles, db);
         return largestChangeId;
     }
 
@@ -241,39 +212,43 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
+        performSync(changedFiles, db);
+        return changeId;
+    }
+
+
+    /** Perform a sync of the files */
+    private void performSync(HashMap<String, File> remfiles, SQLiteDatabase db)
+            throws SQLException
+    {
         List<SyncDb.DbFile> dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
         for (SyncDb.DbFile dbfile: dbfiles) {
-            if (changedFiles.containsKey(dbfile.itsRemoteId)) {
-                File remfile = changedFiles.get(dbfile.itsRemoteId);
+            if (remfiles.containsKey(dbfile.itsRemoteId)) {
+                File remfile = remfiles.get(dbfile.itsRemoteId);
                 if (remfile != null) {
-                    PasswdSafeUtil.dbginfo(TAG,
-                                           "performSyncSince update remote %s",
+                    PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s",
                                            dbfile.itsRemoteId);
                     itsSyncDb.updateRemoteFile(
                             dbfile.itsId, remfile.getTitle(),
                             remfile.getModifiedDate().getValue(), db);
                 } else {
-                    PasswdSafeUtil.dbginfo(TAG,
-                                           "performSyncSince remove remote %s",
+                    PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
                                            dbfile.itsRemoteId);
                     itsSyncDb.updateRemoteFileDeleted(dbfile.itsId, db);
                 }
-                changedFiles.remove(dbfile.itsRemoteId);
+                remfiles.remove(dbfile.itsRemoteId);
             }
         }
 
-        for (File remfile: changedFiles.values()) {
+        for (File remfile: remfiles.values()) {
             if (remfile == null) {
                 continue;
             }
             String fileId = remfile.getId();
-            PasswdSafeUtil.dbginfo(TAG, "performSyncSince add remote %s",
-                                   fileId);
+            PasswdSafeUtil.dbginfo(TAG, "performSync add remote %s", fileId);
             itsSyncDb.addRemoteFile(itsAccount.name, fileId, remfile.getTitle(),
                                     remfile.getModifiedDate().getValue(), db);
         }
-
-        return changeId;
     }
 
 
