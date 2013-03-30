@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -249,7 +250,7 @@ public class GDriveSyncer
         dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
         for (SyncDb.DbFile dbfile: dbfiles) {
             try {
-                if (dbfile.itsRemoteModDate > dbfile.itsLocalModDate) {
+                if (isRemoteNewer(dbfile)) {
                     if (dbfile.itsIsRemoteDeleted) {
                         removeFile(dbfile, db);
                     } else if (dbfile.itsIsLocalDeleted) {
@@ -276,6 +277,24 @@ public class GDriveSyncer
     }
 
 
+    /** Is the remote file considered newer than the local */
+    private boolean isRemoteNewer(SyncDb.DbFile dbfile)
+    {
+        if (dbfile.itsRemoteModDate > dbfile.itsLocalModDate) {
+            return true;
+        }
+        if (TextUtils.isEmpty(dbfile.itsLocalFile)) {
+            return true;
+        }
+        java.io.File localFile =
+                itsContext.getFileStreamPath(dbfile.itsLocalFile);
+        if (!localFile.exists()) {
+            return true;
+        }
+        return false;
+    }
+
+
     /** Sync a remote file to local */
     private void syncRemoteToLocal(SyncDb.DbFile dbfile,
                                    HashMap<String, File> fileCache,
@@ -287,7 +306,7 @@ public class GDriveSyncer
         if (file == null) {
             file = itsDrive.files().get(dbfile.itsRemoteId).execute();
         }
-        String localFile = Long.toString(dbfile.itsId);
+        String localFile = "syncfile-" + Long.toString(dbfile.itsId);
         try {
             if (downloadFile(file, localFile)) {
                 itsSyncDb.updateLocalFile(dbfile.itsId, localFile,
