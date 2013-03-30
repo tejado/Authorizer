@@ -9,8 +9,6 @@ package com.jefftharris.passwdsafe.sync;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,8 +19,8 @@ import android.app.PendingIntent;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -86,11 +84,12 @@ public class GDriveSyncer
         throws SQLException
     {
         Log.i(TAG, "Delete provider: " + account);
+        /*
         List<String> localFilesToRemove = new ArrayList<String>();
         Cursor cursor = db.getFiles(account.name);
         try {
             for (boolean more = cursor.moveToFirst(); more;
-                more = cursor.moveToNext()) {
+                    more = cursor.moveToNext()) {
                 String fileId = cursor.getString(1);
                 localFilesToRemove.add(fileId);
             }
@@ -101,7 +100,15 @@ public class GDriveSyncer
         for (String fileId: localFilesToRemove) {
             ctx.deleteFile(fileId);
         }
+        */
+        // TODO: implement provider delete
         db.deleteProvider(account.name);
+    }
+
+    /** Close the syncer */
+    public void close()
+    {
+        itsSyncDb.close();
     }
 
 
@@ -113,44 +120,48 @@ public class GDriveSyncer
         }
 
         Log.i(TAG, "Performing sync for " + itsAccount.name);
+
+        SQLiteDatabase db = itsSyncDb.getDb();
         try {
-            long changeId = itsSyncDb.getProviderSyncChange(itsAccount.name);
+            db.beginTransaction();
+            long changeId = itsSyncDb.getProviderSyncChange(itsAccount.name,
+                                                            db);
             Log.i(TAG, "largest change " + changeId);
             long newChangeId = -1;
             if (changeId == -1) {
-                newChangeId = performFullSync();
+                newChangeId = performFullSync(db);
             } else {
-                // TODO: use same db txn for whole sync
-                newChangeId = performSyncSince(changeId);
+                newChangeId = performSyncSince(changeId, db);
             }
             if (changeId != newChangeId) {
-                itsSyncDb.setProviderSyncChange(itsAccount.name, newChangeId);
+                itsSyncDb.setProviderSyncChange(itsAccount.name, newChangeId,
+                                                db);
             }
+
+            db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
+        } finally {
+            db.endTransaction();
         }
         Log.i(TAG, "Sync finished for " + itsAccount.name);
     }
 
-    /** Close the syncer */
-    public void close()
-    {
-        itsSyncDb.close();
-    }
+    // TODO: filter on mime types
+    // TODO: .dat files?
+    // TODO: only get needed fields
+
 
     /** Perform a full sync of the files */
-    private long performFullSync()
-        throws SQLException, IOException
+    private long performFullSync(SQLiteDatabase db)
+            throws SQLException, IOException
     {
         Log.i(TAG, "Perform full sync");
         About about = itsDrive.about().get()
-            .setFields(ABOUT_CHANGE_ID).execute();
+                .setFields(ABOUT_CHANGE_ID).execute();
         long largestChangeId = about.getLargestChangeId();
 
-        // TODO: filter on mime types
-        // TODO: .dat files?
-        // TODO: only get needed fields
-        HashMap<String, File> allFiles = new HashMap<String, File>();
+        HashMap<String, File> allRemFiles = new HashMap<String, File>();
         Files.List request = itsDrive.files().list().setQ("not trashed");
         do {
             FileList files = request.execute();
@@ -161,51 +172,50 @@ public class GDriveSyncer
                 }
                 Log.i(TAG, "File id: " + file.getId() + ", title: " +
                     file.getTitle() + ", mime: " + file.getMimeType());
-                //Log.i(TAG, "File: " + file);
-                allFiles.put(file.getId(), file);
+                allRemFiles.put(file.getId(), file);
             }
             request.setPageToken(files.getNextPageToken());
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        HashMap<Long, String> localFilesToRemove = new HashMap<Long, String>();
-        Cursor cursor = itsSyncDb.getFiles(itsAccount.name);
-        try {
-            for (boolean more = cursor.moveToFirst(); more;
-                 more = cursor.moveToNext()) {
-                long id = cursor.getLong(0);
-                String fileId = cursor.getString(1);
-                File file = allFiles.get(fileId);
-                if (file != null) {
-                    String title = cursor.getString(2);
-                    long modDate = cursor.getLong(3);
-                    mergeFile(file, id, title, modDate);
-                    allFiles.remove(fileId);
-                } else {
-                    PasswdSafeUtil.dbginfo(TAG,
-                                           "performFullSync remove local %s",
-                                           fileId);
-                    localFilesToRemove.put(id, fileId);
-                }
+        List<SyncDb.DbFile> dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
+        for (SyncDb.DbFile dbfile: dbfiles) {
+            File remfile = allRemFiles.get(dbfile.itsRemoteId);
+            if (remfile != null) {
+                PasswdSafeUtil.dbginfo(TAG,
+                                       "performFullSync update remote %s",
+                                       dbfile.itsRemoteId);
+                itsSyncDb.updateRemoteFile(
+                        dbfile.itsId, remfile.getTitle(),
+                        remfile.getModifiedDate().getValue(), db);
+                allRemFiles.remove(dbfile.itsRemoteId);
+            } else {
+                PasswdSafeUtil.dbginfo(TAG,
+                                       "performFullSync remove remote %s",
+                                       dbfile.itsRemoteId);
+                itsSyncDb.updateRemoteFileDeleted(dbfile.itsId, db);
             }
-        } finally {
-            cursor.close();
         }
 
-        for (String fileId: localFilesToRemove.values()) {
-            itsContext.deleteFile(fileId);
+        for (File remfile: allRemFiles.values()) {
+            if (remfile == null) {
+                continue;
+            }
+            String fileId = remfile.getId();
+            PasswdSafeUtil.dbginfo(TAG, "performFullSync add remote %s",
+                                   fileId);
+            itsSyncDb.addRemoteFile(itsAccount.name, fileId, remfile.getTitle(),
+                                    remfile.getModifiedDate().getValue(), db);
         }
-        itsSyncDb.removeFiles(localFilesToRemove.keySet());
-        insertNewDriveFiles(allFiles.values());
 
         return largestChangeId;
     }
 
+
     /** Perform a sync of files since the given change id */
-    private long performSyncSince(long changeId)
+    private long performSyncSince(long changeId, SQLiteDatabase db)
         throws SQLException, IOException
     {
-        // TODO: dbginfo in file
         PasswdSafeUtil.dbginfo(TAG, "performSyncSince %d", changeId);
         HashMap<String, File> changedFiles = new HashMap<String, File>();
         Changes.List request =
@@ -231,61 +241,44 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        HashMap<Long, String> localFilesToRemove = new HashMap<Long, String>();
-        Cursor cursor = itsSyncDb.getFiles(itsAccount.name);
-        try {
-            for (boolean more = cursor.moveToFirst(); more;
-                 more = cursor.moveToNext()) {
-                long id = cursor.getLong(0);
-                String fileId = cursor.getString(1);
-                String title = cursor.getString(2);
-                long modDate = cursor.getLong(3);
-
-                if (changedFiles.containsKey(fileId)) {
-                    File file = changedFiles.get(fileId);
-                    if (file != null) {
-                        mergeFile(file, id, title, modDate);
-                    } else {
-                        PasswdSafeUtil.dbginfo(TAG,
-                                               "performSyncSince remove local %s",
-                                               fileId);
-                        localFilesToRemove.put(id, fileId);
-                    }
-                    changedFiles.remove(fileId);
+        List<SyncDb.DbFile> dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
+        for (SyncDb.DbFile dbfile: dbfiles) {
+            if (changedFiles.containsKey(dbfile.itsRemoteId)) {
+                File remfile = changedFiles.get(dbfile.itsRemoteId);
+                if (remfile != null) {
+                    PasswdSafeUtil.dbginfo(TAG,
+                                           "performSyncSince update remote %s",
+                                           dbfile.itsRemoteId);
+                    itsSyncDb.updateRemoteFile(
+                            dbfile.itsId, remfile.getTitle(),
+                            remfile.getModifiedDate().getValue(), db);
                 } else {
-                    String localFileName = cursor.getString(4);
-                    java.io.File localFile =
-                        itsContext.getFileStreamPath(fileId);
-                    if ((localFileName == null) || (!localFile.isFile())) {
-                        // Check for files that haven't been downloaded
-                        File file = itsDrive.files().get(fileId).execute();
-                        modDate = -1;
-                        mergeFile(file, id, title, modDate);
-                    } else if (localFile.lastModified() > modDate) {
-                        // Update remote file if local changes
-                        File file = itsDrive.files().get(fileId).execute();
-                        modDate = Long.MAX_VALUE;
-                        mergeFile(file, id, title, modDate);
-                    }
-                    // TODO: delete remote files if local deleted
+                    PasswdSafeUtil.dbginfo(TAG,
+                                           "performSyncSince remove remote %s",
+                                           dbfile.itsRemoteId);
+                    itsSyncDb.updateRemoteFileDeleted(dbfile.itsId, db);
                 }
-
+                changedFiles.remove(dbfile.itsRemoteId);
             }
-        } finally {
-            cursor.close();
         }
 
-        for (String fileId: localFilesToRemove.values()) {
-            itsContext.deleteFile(fileId);
+        for (File remfile: changedFiles.values()) {
+            if (remfile == null) {
+                continue;
+            }
+            String fileId = remfile.getId();
+            PasswdSafeUtil.dbginfo(TAG, "performSyncSince add remote %s",
+                                   fileId);
+            itsSyncDb.addRemoteFile(itsAccount.name, fileId, remfile.getTitle(),
+                                    remfile.getModifiedDate().getValue(), db);
         }
-        itsSyncDb.removeFiles(localFilesToRemove.keySet());
-        insertNewDriveFiles(changedFiles.values());
 
         return changeId;
     }
 
 
     /** Merge a local and remote file */
+    /*
     void mergeFile(File file,
                    long localId,
                    String localTitle,
@@ -314,9 +307,11 @@ public class GDriveSyncer
                                  updatedFile.getModifiedDate().getValue());
         }
     }
+    */
 
 
     /** Insert new files from the drive */
+    /*
     void insertNewDriveFiles(Collection<File> files)
         throws SQLException, IOException
     {
@@ -332,9 +327,11 @@ public class GDriveSyncer
                               file.getModifiedDate().getValue());
         }
     }
+    */
 
 
     /** Download a file */
+    // TODO: remove??
     String downloadFile(File file)
     {
         String url = file.getDownloadUrl();
