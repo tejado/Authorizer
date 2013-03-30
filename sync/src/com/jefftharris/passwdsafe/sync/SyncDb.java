@@ -64,21 +64,37 @@ public class SyncDb
 
 
     /** Entry in the files table */
-    public class DbFile
+    public static class DbFile
     {
-        public long itsId;
-        public String itsRemoteId;
-        public String itsRemoteTitle;
-        public long itsRemoteModDate;
-        public boolean itsIsRemoteDeleted;
+        public final long itsId;
+        public final String itsLocalFile;
+        public final long itsLocalModDate;
+        public final boolean itsIsLocalDeleted;
+        public final String itsRemoteId;
+        public final String itsRemoteTitle;
+        public final long itsRemoteModDate;
+        public final boolean itsIsRemoteDeleted;
+
+        public static final String[] QUERY_FIELDS = {
+            DB_COL_FILES_ID,
+            DB_COL_FILES_LOCAL_FILE,
+            DB_COL_FILES_LOCAL_MOD_DATE,
+            DB_COL_FILES_LOCAL_DELETED,
+            DB_COL_FILES_REMOTE_ID,
+            DB_COL_FILES_REMOTE_TITLE,
+            DB_COL_FILES_REMOTE_MOD_DATE,
+            DB_COL_FILES_REMOTE_DELETED };
 
         public DbFile(Cursor cursor)
         {
             itsId = cursor.getLong(0);
-            itsRemoteId = cursor.getString(1);
-            itsRemoteTitle = cursor.getString(2);
-            itsRemoteModDate = cursor.getLong(3);
-            itsIsRemoteDeleted = cursor.getInt(4) != 0;
+            itsLocalFile = cursor.getString(1);
+            itsLocalModDate = cursor.getLong(2);
+            itsIsLocalDeleted = cursor.getInt(3) != 0;
+            itsRemoteId = cursor.getString(4);
+            itsRemoteTitle = cursor.getString(5);
+            itsRemoteModDate = cursor.getLong(6);
+            itsIsRemoteDeleted = cursor.getInt(7) != 0;
         }
     }
 
@@ -250,12 +266,7 @@ public class SyncDb
         long providerId = getProviderId(providerName, db);
 
         List<DbFile> files = new ArrayList<DbFile>();
-        Cursor cursor = db.query(DB_TABLE_FILES,
-                                 new String[] { DB_COL_FILES_ID,
-                                                DB_COL_FILES_REMOTE_ID,
-                                                DB_COL_FILES_REMOTE_TITLE,
-                                                DB_COL_FILES_REMOTE_MOD_DATE,
-                                                DB_COL_FILES_REMOTE_DELETED },
+        Cursor cursor = db.query(DB_TABLE_FILES, DbFile.QUERY_FIELDS,
                                  DB_MATCH_FILES_PROVIDER_ID,
                                  new String[] { Long.toString(providerId) },
                                  null, null, null);
