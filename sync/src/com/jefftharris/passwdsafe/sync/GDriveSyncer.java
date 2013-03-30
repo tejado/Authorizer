@@ -80,29 +80,24 @@ public class GDriveSyncer
 
 
     /** Delete the provider for the account */
-    public static void deleteProvider(Account account, SyncDb db, Context ctx)
+    public static void deleteProvider(Account account, SyncDb syncDb,
+                                      Context ctx)
         throws SQLException
     {
         Log.i(TAG, "Delete provider: " + account);
-        /*
-        List<String> localFilesToRemove = new ArrayList<String>();
-        Cursor cursor = db.getFiles(account.name);
-        try {
-            for (boolean more = cursor.moveToFirst(); more;
-                    more = cursor.moveToNext()) {
-                String fileId = cursor.getString(1);
-                localFilesToRemove.add(fileId);
-            }
-        } finally {
-            cursor.close();
-        }
 
-        for (String fileId: localFilesToRemove) {
-            ctx.deleteFile(fileId);
+        SQLiteDatabase db = syncDb.getDb();
+        try {
+            db.beginTransaction();
+            List<SyncDb.DbFile> dbfiles = syncDb.getFiles(account.name, db);
+            for (SyncDb.DbFile dbfile: dbfiles) {
+                ctx.deleteFile(dbfile.itsLocalFile);
+            }
+            syncDb.deleteProvider(account.name, db);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
-        */
-        // TODO: implement provider delete
-        db.deleteProvider(account.name);
     }
 
     /** Close the syncer */
@@ -221,6 +216,7 @@ public class GDriveSyncer
     private void performSync(HashMap<String, File> remfiles, SQLiteDatabase db)
             throws SQLException
     {
+        HashMap<String, File> fileCache = new HashMap<String, File>(remfiles);
         List<SyncDb.DbFile> dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
         for (SyncDb.DbFile dbfile: dbfiles) {
             if (remfiles.containsKey(dbfile.itsRemoteId)) {
@@ -249,6 +245,75 @@ public class GDriveSyncer
             itsSyncDb.addRemoteFile(itsAccount.name, fileId, remfile.getTitle(),
                                     remfile.getModifiedDate().getValue(), db);
         }
+
+        dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
+        for (SyncDb.DbFile dbfile: dbfiles) {
+            try {
+                if (dbfile.itsRemoteModDate > dbfile.itsLocalModDate) {
+                    if (dbfile.itsIsRemoteDeleted) {
+                        removeFile(dbfile, db);
+                    } else if (dbfile.itsIsLocalDeleted) {
+                        // TODO: conflict?
+                    } else {
+                        syncRemoteToLocal(dbfile, fileCache, db);
+                    }
+                } else if (dbfile.itsLocalModDate > dbfile.itsRemoteModDate) {
+                    if (dbfile.itsIsLocalDeleted) {
+                        removeFile(dbfile, db);
+                    } else if (dbfile.itsIsRemoteDeleted) {
+                        // TODO: conflict?
+                    } else {
+                        // TODO: sync file
+                    }
+                } else if (dbfile.itsIsRemoteDeleted ||
+                        dbfile.itsIsLocalDeleted) {
+                    removeFile(dbfile, db);
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Sync error for file " + dbfile);
+            }
+        }
+    }
+
+
+    /** Sync a remote file to local */
+    private void syncRemoteToLocal(SyncDb.DbFile dbfile,
+                                   HashMap<String, File> fileCache,
+                                   SQLiteDatabase db)
+            throws SQLException, IOException
+    {
+        PasswdSafeUtil.dbginfo(TAG, "syncRemoteToLocal %s", dbfile);
+        File file = fileCache.get(dbfile.itsRemoteId);
+        if (file == null) {
+            file = itsDrive.files().get(dbfile.itsRemoteId).execute();
+        }
+        String localFile = Long.toString(dbfile.itsId);
+        try {
+            if (downloadFile(file, localFile)) {
+                itsSyncDb.updateLocalFile(dbfile.itsId, localFile,
+                                          dbfile.itsRemoteModDate, db);
+            }
+        } catch (SQLException e) {
+            itsContext.deleteFile(localFile);
+            throw e;
+        }
+    }
+
+
+    /** Remove a local and/or remote file */
+    private void removeFile(SyncDb.DbFile dbfile, SQLiteDatabase db)
+            throws SQLException, IOException
+    {
+        PasswdSafeUtil.dbginfo(TAG, "removeFile %s", dbfile);
+        if (dbfile.itsLocalFile != null) {
+            itsContext.deleteFile(dbfile.itsLocalFile);
+        }
+
+        if (!dbfile.itsIsRemoteDeleted) {
+            itsDrive.files().trash(dbfile.itsRemoteId).execute();
+        }
+
+        itsSyncDb.removeFile(dbfile.itsId, db);
     }
 
 
@@ -285,76 +350,25 @@ public class GDriveSyncer
     */
 
 
-    /** Insert new files from the drive */
-    /*
-    void insertNewDriveFiles(Collection<File> files)
-        throws SQLException, IOException
-    {
-        for (File file: files) {
-            if (file == null) {
-                continue;
-            }
-            String fileId = file.getId();
-            PasswdSafeUtil.dbginfo(TAG, "insertNewDriveFiles %s", fileId);
-            String localFileName = downloadFile(file);
-            itsSyncDb.addFile(itsAccount.name, localFileName,
-                              fileId, file.getTitle(),
-                              file.getModifiedDate().getValue());
-        }
-    }
-    */
-
-
     /** Download a file */
-    // TODO: remove??
-    String downloadFile(File file)
+    private boolean downloadFile(File file, String localFileName)
     {
         String url = file.getDownloadUrl();
         if ((url == null) || (url.length() <= 0)) {
-            return null;
+            return false;
         }
 
         PasswdSafeUtil.dbginfo(TAG, "downloadFile %s from %s",
                                file.getId(), url);
-        String localFileName = null;
         try {
             GenericUrl downloadUrl = new GenericUrl(url);
             OutputStream os = null;
             try {
                 os = new BufferedOutputStream(
-                    itsContext.openFileOutput(file.getId(),
+                    itsContext.openFileOutput(localFileName,
                                               Context.MODE_PRIVATE));
                 Drive.Files.Get get = itsDrive.files().get(file.getId());
                 MediaHttpDownloader dl = get.getMediaHttpDownloader();
-                // TODO: get listener to work?
-                /*
-                dl.setProgressListener(new MediaHttpDownloaderProgressListener()
-                    {
-                        @Override
-                        public void progressChanged(MediaHttpDownloader dl)
-                            throws IOException
-                        {
-                            switch (dl.getDownloadState()) {
-                            case NOT_STARTED: {
-                                PasswdSafeUtil.dbginfo(TAG,
-                                                       "downloadFile not start");
-                                break;
-                            }
-                            case MEDIA_IN_PROGRESS: {
-                                PasswdSafeUtil.dbginfo(TAG,
-                                                       "downloadFile %s",
-                                                       dl.getProgress());
-                                break;
-                            }
-                            case MEDIA_COMPLETE: {
-                                PasswdSafeUtil.dbginfo(TAG,
-                                                       "downloadFile complete");
-                                break;
-                            }
-                            }
-                        }
-                    });
-                    */
                 dl.setDirectDownloadEnabled(true);
                 dl.download(downloadUrl, os);
             } finally {
@@ -363,14 +377,15 @@ public class GDriveSyncer
                 }
             }
 
-            java.io.File localFile = itsContext.getFileStreamPath(file.getId());
+            java.io.File localFile =
+                    itsContext.getFileStreamPath(localFileName);
             localFile.setLastModified(file.getModifiedDate().getValue());
-            localFileName = localFile.getAbsolutePath();
         } catch (IOException e) {
-            itsContext.deleteFile(file.getId());
+            itsContext.deleteFile(localFileName);
             Log.e(TAG, "Sync failed to download " + file.getTitle(), e);
+            return false;
         }
-        return localFileName;
+        return true;
     }
 
     /** Should the file be synced */

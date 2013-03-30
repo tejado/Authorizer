@@ -8,6 +8,7 @@ package com.jefftharris.passwdsafe.sync;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -96,6 +97,17 @@ public class SyncDb
             itsRemoteModDate = cursor.getLong(6);
             itsIsRemoteDeleted = cursor.getInt(7) != 0;
         }
+
+        @Override
+        public String toString()
+        {
+            return String.format(Locale.US,
+                    "{id:%d, local:{file:%s, mod:%d, del:%b}, " +
+                    "remote:{id:%s, title:'%s', mod:%d, del:%b}}",
+                    itsId, itsLocalFile, itsLocalModDate, itsIsLocalDeleted,
+                    itsRemoteId, itsRemoteTitle,
+                    itsRemoteModDate, itsIsRemoteDeleted);
+        }
     }
 
 
@@ -161,24 +173,17 @@ public class SyncDb
     }
 
     /** Delete a provider */
-    public void deleteProvider(String name)
+    public void deleteProvider(String name, SQLiteDatabase db)
         throws SQLException
     {
         PasswdSafeUtil.dbginfo(TAG, "Delete provider %s", name);
-        long id = getProviderId(name);
+        long id = getProviderId(name, db);
         if (id == -1) {
             return;
         }
-        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-        try {
-            db.beginTransaction();
-            String[] idargs = new String[] { Long.toString(id) };
-            db.delete(DB_TABLE_FILES, DB_MATCH_FILES_PROVIDER_ID, idargs);
-            db.delete(DB_TABLE_PROVIDERS, DB_MATCH_PROVIDERS_ID, idargs);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        String[] idargs = new String[] { Long.toString(id) };
+        db.delete(DB_TABLE_FILES, DB_MATCH_FILES_PROVIDER_ID, idargs);
+        db.delete(DB_TABLE_PROVIDERS, DB_MATCH_PROVIDERS_ID, idargs);
     }
 
     /** Get the id for a provider */
@@ -301,6 +306,19 @@ public class SyncDb
         db.insertOrThrow(DB_TABLE_FILES, null, values);
     }
 
+
+    /** Update a local file */
+    public void updateLocalFile(long fileId, String locFile,
+                                long locModDate, SQLiteDatabase db)
+            throws SQLException
+    {
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_FILES_LOCAL_FILE, locFile);
+        values.put(DB_COL_FILES_LOCAL_MOD_DATE, locModDate);
+        values.put(DB_COL_FILES_LOCAL_DELETED, false);
+        db.update(DB_TABLE_FILES, values,
+                  DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
+    }
 
     /** Update a remote file */
     public void updateRemoteFile(long fileId, String remTitle,
