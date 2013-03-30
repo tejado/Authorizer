@@ -29,6 +29,7 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
@@ -226,7 +227,8 @@ public class GDriveSyncer
                     PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s",
                                            dbfile.itsRemoteId);
                     itsSyncDb.updateRemoteFile(
-                            dbfile.itsId, remfile.getTitle(),
+                            dbfile.itsId, dbfile.itsRemoteId,
+                            remfile.getTitle(),
                             remfile.getModifiedDate().getValue(), db);
                 } else {
                     PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
@@ -264,7 +266,7 @@ public class GDriveSyncer
                     } else if (dbfile.itsIsRemoteDeleted) {
                         // TODO: conflict?
                     } else {
-                        // TODO: sync file
+                        syncLocalToRemote(dbfile, fileCache, db);
                     }
                 } else if (dbfile.itsIsRemoteDeleted ||
                         dbfile.itsIsLocalDeleted) {
@@ -317,6 +319,50 @@ public class GDriveSyncer
             itsContext.deleteFile(localFile);
             throw e;
         }
+    }
+
+
+    /** Sync a local file to remote */
+    private void syncLocalToRemote(SyncDb.DbFile dbfile,
+                                   HashMap<String, File> fileCache,
+                                   SQLiteDatabase db)
+            throws SQLException, IOException
+    {
+        PasswdSafeUtil.dbginfo(TAG, "syncLocalToRemote %s", dbfile);
+
+        File file;
+        boolean isInsert;
+        if (TextUtils.isEmpty(dbfile.itsRemoteId)) {
+            file = new File();
+            file.setDescription("Password Safe file");
+            file.setMimeType("application/x-psafe3");
+            isInsert = true;
+        } else {
+            file = fileCache.get(dbfile.itsRemoteId);
+            if (file == null) {
+                file = itsDrive.files().get(dbfile.itsRemoteId).execute();
+            }
+            isInsert = false;
+        }
+
+        file.setTitle(dbfile.itsLocalTitle);
+        java.io.File localFile =
+                itsContext.getFileStreamPath(dbfile.itsLocalFile);
+        FileContent fileMedia = new FileContent(file.getMimeType(), localFile);
+        if (isInsert) {
+            file = itsDrive.files().insert(file, fileMedia).execute();
+        } else {
+            file = itsDrive.files().update(dbfile.itsRemoteId, file,
+                                           fileMedia).execute();
+        }
+
+        String title = file.getTitle();
+        long modDate = file.getModifiedDate().getValue();
+        itsSyncDb.updateRemoteFile(dbfile.itsId, file.getId(),
+                                   title, modDate, db);
+        itsSyncDb.updateLocalFile(dbfile.itsId, dbfile.itsLocalFile,
+                                  title, modDate, db);
+        localFile.setLastModified(modDate);
     }
 
 

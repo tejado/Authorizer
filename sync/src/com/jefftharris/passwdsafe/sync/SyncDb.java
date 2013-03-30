@@ -327,11 +327,13 @@ public class SyncDb
     }
 
     /** Update a remote file */
-    public void updateRemoteFile(long fileId, String remTitle,
-                                 long remModDate, SQLiteDatabase db)
+    public void updateRemoteFile(long fileId, String remId,
+                                 String remTitle, long remModDate,
+                                 SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
+        values.put(DB_COL_FILES_REMOTE_ID, remId);
         values.put(DB_COL_FILES_REMOTE_TITLE, remTitle);
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, remModDate);
         values.put(DB_COL_FILES_REMOTE_DELETED, false);
