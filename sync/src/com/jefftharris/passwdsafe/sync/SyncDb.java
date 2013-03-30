@@ -299,6 +299,7 @@ public class SyncDb
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_REMOTE_TITLE, remTitle);
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, remModDate);
+        values.put(DB_COL_FILES_REMOTE_DELETED, false);
         db.update(DB_TABLE_FILES, values,
                   DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
     }
