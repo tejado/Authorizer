@@ -310,6 +310,7 @@ public class GDriveSyncer
         try {
             if (downloadFile(file, localFile)) {
                 itsSyncDb.updateLocalFile(dbfile.itsId, localFile,
+                                          dbfile.itsRemoteTitle,
                                           dbfile.itsRemoteModDate, db);
             }
         } catch (SQLException e) {

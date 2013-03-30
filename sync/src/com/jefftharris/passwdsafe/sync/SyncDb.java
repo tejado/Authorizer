@@ -50,6 +50,7 @@ public class SyncDb
     private static final String DB_COL_FILES_ID = BaseColumns._ID;
     private static final String DB_COL_FILES_PROVIDER = "provider";
     private static final String DB_COL_FILES_LOCAL_FILE = "local_file";
+    private static final String DB_COL_FILES_LOCAL_TITLE = "local_title";
     private static final String DB_COL_FILES_LOCAL_MOD_DATE = "local_mod_date";
     private static final String DB_COL_FILES_LOCAL_DELETED = "local_deleted";
     private static final String DB_COL_FILES_REMOTE_ID = "remote_id";
@@ -69,6 +70,7 @@ public class SyncDb
     {
         public final long itsId;
         public final String itsLocalFile;
+        public final String itsLocalTitle;
         public final long itsLocalModDate;
         public final boolean itsIsLocalDeleted;
         public final String itsRemoteId;
@@ -79,6 +81,7 @@ public class SyncDb
         public static final String[] QUERY_FIELDS = {
             DB_COL_FILES_ID,
             DB_COL_FILES_LOCAL_FILE,
+            DB_COL_FILES_LOCAL_TITLE,
             DB_COL_FILES_LOCAL_MOD_DATE,
             DB_COL_FILES_LOCAL_DELETED,
             DB_COL_FILES_REMOTE_ID,
@@ -90,12 +93,13 @@ public class SyncDb
         {
             itsId = cursor.getLong(0);
             itsLocalFile = cursor.getString(1);
-            itsLocalModDate = cursor.getLong(2);
-            itsIsLocalDeleted = cursor.getInt(3) != 0;
-            itsRemoteId = cursor.getString(4);
-            itsRemoteTitle = cursor.getString(5);
-            itsRemoteModDate = cursor.getLong(6);
-            itsIsRemoteDeleted = cursor.getInt(7) != 0;
+            itsLocalTitle = cursor.getString(2);
+            itsLocalModDate = cursor.getLong(3);
+            itsIsLocalDeleted = cursor.getInt(4) != 0;
+            itsRemoteId = cursor.getString(5);
+            itsRemoteTitle = cursor.getString(6);
+            itsRemoteModDate = cursor.getLong(7);
+            itsIsRemoteDeleted = cursor.getInt(8) != 0;
         }
 
         @Override
@@ -309,11 +313,13 @@ public class SyncDb
 
     /** Update a local file */
     public void updateLocalFile(long fileId, String locFile,
-                                long locModDate, SQLiteDatabase db)
+                                String locTitle, long locModDate,
+                                SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_LOCAL_FILE, locFile);
+        values.put(DB_COL_FILES_LOCAL_TITLE, locTitle);
         values.put(DB_COL_FILES_LOCAL_MOD_DATE, locModDate);
         values.put(DB_COL_FILES_LOCAL_DELETED, false);
         db.update(DB_TABLE_FILES, values,
@@ -426,6 +432,7 @@ public class SyncDb
                            DB_TABLE_PROVIDERS + "(" + DB_COL_PROVIDERS_ID +
                            ") NOT NULL," +
                        DB_COL_FILES_LOCAL_FILE + " TEXT," +
+                       DB_COL_FILES_LOCAL_TITLE + " TEXT," +
                        DB_COL_FILES_LOCAL_MOD_DATE + " INTEGER NOT NULL," +
                        DB_COL_FILES_LOCAL_DELETED + " INTEGER NOT NULL," +
                        DB_COL_FILES_REMOTE_ID + " TEXT," +

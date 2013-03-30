@@ -176,6 +176,9 @@ public class MainActivity extends Activity
                 GDriveSyncer.addProvider(account, itsSyncDb);
                 itsAccountBtn.setText("Account - " + account.name);
                 setSyncFrequency(account);
+                ContentResolver.requestSync(account,
+                                            PasswdSafeContract.AUTHORITY,
+                                            new Bundle());
                 itsAccountState = AccountState.DONE;
             }
         } catch (SQLException e) {
