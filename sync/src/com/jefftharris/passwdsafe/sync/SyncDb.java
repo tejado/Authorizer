@@ -33,12 +33,12 @@ public class SyncDb
 
     private static final String TAG = "SyncDb";
 
-    private static final String DB_TABLE_PROVIDERS = "providers";
-    private static final String DB_COL_PROVIDERS_ID = BaseColumns._ID;
-    private static final String DB_COL_PROVIDERS_TYPE = "type";
-    private static final String DB_COL_PROVIDERS_ACCT = "acct";
-    private static final String DB_COL_PROVIDERS_SYNC_CHANGE = "sync_change";
-    private static final String DB_COL_PROVIDERS_SYNC_FREQ = "sync_freq";
+    public static final String DB_TABLE_PROVIDERS = "providers";
+    public static final String DB_COL_PROVIDERS_ID = BaseColumns._ID;
+    public static final String DB_COL_PROVIDERS_TYPE = "type";
+    public static final String DB_COL_PROVIDERS_ACCT = "acct";
+    public static final String DB_COL_PROVIDERS_SYNC_CHANGE = "sync_change";
+    public static final String DB_COL_PROVIDERS_SYNC_FREQ = "sync_freq";
     private static final String DB_MATCH_PROVIDERS_ID =
         DB_COL_PROVIDERS_ID + " = ?";
     private static final String DB_MATCH_PROVIDERS_TYPE =

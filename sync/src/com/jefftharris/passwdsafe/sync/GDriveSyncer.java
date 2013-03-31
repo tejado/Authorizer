@@ -41,6 +41,7 @@ import com.google.api.services.drive.model.Change;
 import com.google.api.services.drive.model.ChangeList;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
@@ -73,11 +74,13 @@ public class GDriveSyncer
 
 
     /** Add a provider for an account */
-    public static void addProvider(Account account, SyncDb db)
+    public static void addProvider(Account account, SyncDb db, Context ctx)
         throws SQLException
     {
         Log.i(TAG, "Add provider: " + account);
         db.addProvider(account.name);
+        ctx.getContentResolver().notifyChange(
+                PasswdSafeContract.Providers.CONTENT_URI, null);
     }
 
 
@@ -96,6 +99,8 @@ public class GDriveSyncer
                 ctx.deleteFile(dbfile.itsLocalFile);
             }
             syncDb.deleteProvider(account.name, db);
+            ctx.getContentResolver().notifyChange(
+                    PasswdSafeContract.Providers.CONTENT_URI, null);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

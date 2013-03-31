@@ -6,9 +6,16 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.util.HashMap;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
@@ -19,6 +26,28 @@ import android.util.Log;
 public class PasswdSafeProvider extends ContentProvider
 {
     private static final String TAG = "PasswdSafeProvider";
+
+    private static final UriMatcher MATCHER;
+    private static final int MATCH_PROVIDERS = 1;
+
+    private static final HashMap<String, String> PROVIDERS_MAP;
+
+    private SyncDb itsDb;
+
+    static {
+        MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE,
+                       MATCH_PROVIDERS);
+
+        PROVIDERS_MAP = new HashMap<String, String>();
+        PROVIDERS_MAP.put(PasswdSafeContract.Providers._ID,
+                          SyncDb.DB_COL_PROVIDERS_ID);
+        PROVIDERS_MAP.put(PasswdSafeContract.Providers.COL_TYPE,
+                          SyncDb.DB_COL_PROVIDERS_TYPE);
+        PROVIDERS_MAP.put(PasswdSafeContract.Providers.COL_ACCT,
+                          SyncDb.DB_COL_PROVIDERS_ACCT);
+    }
 
 
     /* (non-Javadoc)
@@ -58,7 +87,7 @@ public class PasswdSafeProvider extends ContentProvider
     public boolean onCreate()
     {
         Log.i(TAG, "onCreate");
-        // TODO Auto-generated method stub
+        itsDb = new SyncDb(getContext());
         return true;
     }
 
@@ -72,8 +101,36 @@ public class PasswdSafeProvider extends ContentProvider
                         String[] selectionArgs,
                         String sortOrder)
     {
-        // TODO Auto-generated method stub
-        return null;
+        Log.i(TAG, "query uri: " + uri);
+
+        if (selection != null) {
+            throw new IllegalArgumentException("selection not supported");
+        }
+        if (selectionArgs != null) {
+            throw new IllegalArgumentException("selectionArgs not supported");
+        }
+        if (sortOrder != null) {
+            throw new IllegalArgumentException("sortOrder not supported");
+        }
+
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        switch (MATCHER.match(uri)) {
+        case MATCH_PROVIDERS: {
+            qb.setTables(SyncDb.DB_TABLE_PROVIDERS);
+            qb.setProjectionMap(PROVIDERS_MAP);
+            break;
+        }
+        default: {
+            throw new IllegalArgumentException(
+                    "query unknown match for uri: " + uri);
+        }
+        }
+
+        SQLiteDatabase db = itsDb.getDb();
+        Cursor c = qb.query(db, projection, selection, selectionArgs,
+                            null, null, null);
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return c;
     }
 
     /* (non-Javadoc)

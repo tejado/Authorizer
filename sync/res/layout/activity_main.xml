@@ -1,22 +1,14 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity" >
-
-    <TextView
-        android:id="@+id/hello"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/hello_world"/>
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
     <Button
         android:id="@+id/account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/hello"
         android:onClick="onChooseAccount"
         android:text="Account"/>
 
@@ -24,7 +16,6 @@
         android:id="@+id/clear_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/account"
         android:onClick="onClearAccount"
         android:text="Clear Account"/>
 
@@ -32,8 +23,13 @@
         android:id="@+id/sync"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/clear_account"
         android:onClick="onSync"
         android:text="Sync"/>
 
-</RelativeLayout>
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+</LinearLayout>

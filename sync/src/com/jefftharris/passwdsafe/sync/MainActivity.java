@@ -8,23 +8,31 @@ package com.jefftharris.passwdsafe.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.SQLException;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 
-public class MainActivity extends Activity
+public class MainActivity extends FragmentActivity
+        implements LoaderCallbacks<Cursor>
 {
     private static final String TAG = "MainActivity";
 
@@ -44,6 +52,7 @@ public class MainActivity extends Activity
     private AccountState itsAccountState = AccountState.INITIAL;
     private GoogleAccountManager itsAccountMgr;
     private SyncDb itsSyncDb;
+    private SimpleCursorAdapter itsProviderAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -57,6 +66,17 @@ public class MainActivity extends Activity
         itsAccountState = AccountState.INITIAL;
         itsAccountMgr = new GoogleAccountManager(this);
         itsSyncDb = new SyncDb(this);
+
+        itsProviderAdapter = new SimpleCursorAdapter(
+                this, android.R.layout.simple_list_item_2, null,
+                new String[] { PasswdSafeContract.Providers.COL_ACCT,
+                               PasswdSafeContract.Providers.COL_TYPE },
+                new int[] { android.R.id.text1, android.R.id.text2 }, 0);
+
+        ListView lv = (ListView)findViewById(R.id.list);
+        lv.setAdapter(itsProviderAdapter);
+
+        getSupportLoaderManager().initLoader(0, null, this);
     }
 
     /* (non-Javadoc)
@@ -128,6 +148,36 @@ public class MainActivity extends Activity
         }
     }
 
+    /* (non-Javadoc)
+     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
+     */
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args)
+    {
+        Uri uri = PasswdSafeContract.Providers.CONTENT_URI;
+        return new CursorLoader(this, uri,
+                                PasswdSafeContract.Providers.PROJECTION,
+                                null, null, null);
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoadFinished(android.support.v4.content.Loader, java.lang.Object)
+     */
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
+    {
+        itsProviderAdapter.swapCursor(cursor);
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoaderReset(android.support.v4.content.Loader)
+     */
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader)
+    {
+        itsProviderAdapter.swapCursor(null);
+    }
+
     public void onChooseAccount(View view)
     {
         chooseAccount();
@@ -173,7 +223,7 @@ public class MainActivity extends Activity
             }
 
             if (account != null) {
-                GDriveSyncer.addProvider(account, itsSyncDb);
+                GDriveSyncer.addProvider(account, itsSyncDb, this);
                 itsAccountBtn.setText("Account - " + account.name);
                 setSyncFrequency(account);
                 ContentResolver.requestSync(account,
