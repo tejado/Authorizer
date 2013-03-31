@@ -273,7 +273,7 @@ public class GDriveSyncer
                     removeFile(dbfile, db);
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Sync error for file " + dbfile);
+                Log.e(TAG, "Sync error for file " + dbfile, e);
             }
         }
     }
