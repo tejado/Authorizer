@@ -135,8 +135,6 @@ public class FileListFragment extends ListFragment
     }
 
 
-    // TODO: deal with back press in activity
-
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
      */
@@ -219,6 +217,20 @@ public class FileListFragment extends ListFragment
             PasswdSafeUtil.dbginfo(TAG, "Open file: %s", file.itsFile);
             openFile(file.itsFile);
         }
+    }
+
+
+    /**
+     * @return true if a directory was popped, false to use default behavior
+     */
+    public final boolean doBackPressed()
+    {
+        PasswdSafeUtil.dbginfo(TAG, "doBackPressed");
+        if (itsDirHistory.size() == 0) {
+            return false;
+        }
+        changeDir(itsDirHistory.removeFirst(), false);
+        return true;
     }
 
 
@@ -314,7 +326,6 @@ public class FileListFragment extends ListFragment
     /** Handle the action to navigate to the home directory */
     private final void doHomePressed()
     {
-        // TODO: does this work??
         changeDir(Environment.getExternalStorageDirectory(), true);
     }
 

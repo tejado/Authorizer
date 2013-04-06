@@ -7,10 +7,14 @@
  */
 package com.jefftharris.passwdsafe;
 
+import com.jefftharris.passwdsafe.view.GuiUtils;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -66,5 +70,45 @@ public class FileListActivity extends FragmentActivity
             return super.onOptionsItemSelected(item);
         }
         }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (GuiUtils.isBackKeyDown(keyCode, event)) {
+            // Take care of calling this method on earlier versions of
+            // the platform where it doesn't exist.
+            if (doBackPressed()) {
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onBackPressed()
+     */
+    @Override
+    public void onBackPressed()
+    {
+        if (!doBackPressed()) {
+            finish();
+        }
+    }
+
+
+    /**
+     * @return true if a directory was popped, false to use default behavior
+     */
+    private final boolean doBackPressed()
+    {
+        FragmentManager mgr = getSupportFragmentManager();
+        FileListFragment frag =
+                (FileListFragment)mgr.findFragmentById(R.id.files);
+        return frag.doBackPressed();
     }
 }
