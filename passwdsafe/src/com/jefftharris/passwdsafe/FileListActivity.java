@@ -62,8 +62,8 @@ public class FileListActivity extends FragmentActivity
     {
         switch (item.getItemId()) {
         case R.id.about: {
-            // TODO: about dialog fragment
-            //showDialog(DIALOG_ABOUT);
+            AboutDialog dlg = new AboutDialog();
+            dlg.show(getSupportFragmentManager(), "AboutDialog");
             return true;
         }
         default: {
