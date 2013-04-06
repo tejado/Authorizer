@@ -29,6 +29,8 @@ public final class PasswdSafeContract
         public static final String TABLE = "providers";
         public static final Uri CONTENT_URI =
                 Uri.withAppendedPath(PasswdSafeContract.CONTENT_URI, TABLE);
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE;
 
         public static final String COL_TYPE = "type";
         public static final String COL_ACCT = "acct";

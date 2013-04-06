@@ -66,8 +66,15 @@ public class PasswdSafeProvider extends ContentProvider
     @Override
     public String getType(Uri uri)
     {
-        // TODO Auto-generated method stub
-        return null;
+        switch (MATCHER.match(uri)) {
+        case MATCH_PROVIDERS: {
+            return PasswdSafeContract.Providers.CONTENT_TYPE;
+        }
+        default: {
+            throw new IllegalArgumentException(
+                    "type unknown match for uri: " + uri);
+        }
+        }
     }
 
     /* (non-Javadoc)
