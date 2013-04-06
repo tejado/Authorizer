@@ -105,11 +105,9 @@ public class PasswdSafeProvider extends ContentProvider
 
         if (selection != null) {
             throw new IllegalArgumentException("selection not supported");
-        }
-        if (selectionArgs != null) {
+        } else if (selectionArgs != null) {
             throw new IllegalArgumentException("selectionArgs not supported");
-        }
-        if (sortOrder != null) {
+        } else if (sortOrder != null) {
             throw new IllegalArgumentException("sortOrder not supported");
         }
 
