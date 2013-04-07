@@ -34,6 +34,7 @@ public class SyncProviderFragment extends ListFragment
     /** Listener interface for the owning activity */
     public interface Listener
     {
+        /** Show the files for a provider's URI */
         public void showSyncProviderFiles(Uri uri);
     }
 

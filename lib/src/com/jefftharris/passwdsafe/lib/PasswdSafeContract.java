@@ -42,6 +42,7 @@ public final class PasswdSafeContract
         };
     }
 
+    /** The table of files */
     public static final class Files implements BaseColumns
     {
         public static final String TABLE = "files";
