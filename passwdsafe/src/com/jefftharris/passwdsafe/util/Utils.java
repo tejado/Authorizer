@@ -20,7 +20,13 @@ public final class Utils
     /** Format a date according to the current locale settings */
     public static String formatDate(Date date, Context ctx)
     {
-        return formatDate(date.getTime(), ctx, true, true, false);
+        return formatDate(date.getTime(), ctx);
+    }
+
+    /** Format a date according to the current locale settings */
+    public static String formatDate(long date, Context ctx)
+    {
+        return formatDate(date, ctx, true, true, false);
     }
 
     /**

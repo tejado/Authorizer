@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
+import com.jefftharris.passwdsafe.util.Utils;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 /**
  * @author jharris
@@ -52,7 +54,6 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         // TODO: header
-        // TODO: format mod time
         return view;
     }
 
@@ -71,6 +72,23 @@ public class SyncProviderFilesFragment extends ListFragment
                new String[] { PasswdSafeContract.Files.COL_TITLE,
                               PasswdSafeContract.Files.COL_MOD_DATE },
                new int[] { android.R.id.text1, android.R.id.text2 }, 0);
+
+        itsProviderAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder()
+        {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int colIdx)
+            {
+                if (colIdx ==
+                        PasswdSafeContract.Files.PROJECTION_IDX_MOD_DATE) {
+                    long modDate = cursor.getLong(colIdx);
+                    TextView tv = (TextView)view;
+                    tv.setText(Utils.formatDate(modDate, getActivity()));
+                    return true;
+                }
+                return false;
+            }
+        });
+
         setListAdapter(itsProviderAdapter);
         getLoaderManager().initLoader(0, null, this);
     }

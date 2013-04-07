@@ -57,5 +57,9 @@ public final class PasswdSafeContract
             Files.COL_TITLE,
             Files.COL_MOD_DATE
         };
+
+        public static final int PROJECTION_IDX_ID = 0;
+        public static final int PROJECTION_IDX_TITLE = 1;
+        public static final int PROJECTION_IDX_MOD_DATE = 2;
     }
 }
