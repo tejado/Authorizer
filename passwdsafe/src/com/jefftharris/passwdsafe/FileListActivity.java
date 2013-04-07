@@ -127,10 +127,7 @@ public class FileListActivity extends FragmentActivity
     @Override
     public void onBackPressed()
     {
-        // TODO: make work when the sync files frag is shown and a subdir is
-        // chosen
         if (!doBackPressed()) {
-            //finish();
             super.onBackPressed();
         }
     }
@@ -143,7 +140,7 @@ public class FileListActivity extends FragmentActivity
     {
         FragmentManager mgr = getSupportFragmentManager();
         Fragment frag = mgr.findFragmentById(R.id.files);
-        if (frag instanceof FileListFragment) {
+        if ((frag instanceof FileListFragment) && frag.isVisible()) {
             return ((FileListFragment)frag).doBackPressed();
         }
         return false;
