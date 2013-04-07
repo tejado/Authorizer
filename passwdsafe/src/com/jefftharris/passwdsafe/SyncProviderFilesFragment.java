@@ -104,7 +104,8 @@ public class SyncProviderFilesFragment extends ListFragment
             PasswdSafeContract.Files.TABLE).build();
         return new CursorLoader(getActivity(), uri,
                                 PasswdSafeContract.Files.PROJECTION,
-                                null, null, null);
+                                null, null,
+                                PasswdSafeContract.Files.TITLE_SORT_ORDER);
     }
 
 

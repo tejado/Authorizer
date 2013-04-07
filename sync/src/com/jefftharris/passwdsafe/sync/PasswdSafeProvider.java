@@ -133,9 +133,8 @@ public class PasswdSafeProvider extends ContentProvider
             throw new IllegalArgumentException("selection not supported");
         } else if (selectionArgs != null) {
             throw new IllegalArgumentException("selectionArgs not supported");
-        } else if (sortOrder != null) {
-            throw new IllegalArgumentException("sortOrder not supported");
         }
+        boolean sortOrderValid = (sortOrder == null);
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         switch (MATCHER.match(uri)) {
@@ -150,6 +149,10 @@ public class PasswdSafeProvider extends ContentProvider
 
             selection = SyncDb.DB_MATCH_FILES_PROVIDER_ID;
             selectionArgs = new String[] { uri.getPathSegments().get(1) };
+
+            if (PasswdSafeContract.Files.TITLE_SORT_ORDER.equals(sortOrder)) {
+                sortOrderValid = true;
+            }
             break;
         }
         default: {
@@ -158,9 +161,13 @@ public class PasswdSafeProvider extends ContentProvider
         }
         }
 
+        if (!sortOrderValid) {
+            throw new IllegalArgumentException("sortOrder not supported");
+        }
+
         SQLiteDatabase db = itsDb.getDb();
         Cursor c = qb.query(db, projection, selection, selectionArgs,
-                            null, null, null);
+                            null, null, sortOrder);
         c.setNotificationUri(getContext().getContentResolver(),
                              PasswdSafeContract.CONTENT_URI);
         return c;

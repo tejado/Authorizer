@@ -52,6 +52,8 @@ public final class PasswdSafeContract
         public static final String COL_TITLE = "title";
         public static final String COL_MOD_DATE = "mod_date";
 
+        public static final String TITLE_SORT_ORDER = "title ASC";
+
         public static final String[] PROJECTION = {
             Files._ID,
             Files.COL_TITLE,
