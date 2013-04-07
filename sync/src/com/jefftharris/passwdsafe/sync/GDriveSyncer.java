@@ -100,7 +100,7 @@ public class GDriveSyncer
             }
             syncDb.deleteProvider(account.name, db);
             ctx.getContentResolver().notifyChange(
-                    PasswdSafeContract.Providers.CONTENT_URI, null);
+                    PasswdSafeContract.CONTENT_URI, null);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

@@ -134,7 +134,8 @@ public class PasswdSafeProvider extends ContentProvider
         SQLiteDatabase db = itsDb.getDb();
         Cursor c = qb.query(db, projection, selection, selectionArgs,
                             null, null, null);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
+        c.setNotificationUri(getContext().getContentResolver(),
+                             PasswdSafeContract.CONTENT_URI);
         return c;
     }
 
