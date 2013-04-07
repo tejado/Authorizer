@@ -42,4 +42,19 @@ public final class PasswdSafeContract
         };
     }
 
+    public static final class Files implements BaseColumns
+    {
+        public static final String TABLE = "files";
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE;
+
+        public static final String COL_TITLE = "title";
+        public static final String COL_MOD_DATE = "mod_date";
+
+        public static final String[] PROJECTION = {
+            Files._ID,
+            Files.COL_TITLE,
+            Files.COL_MOD_DATE
+        };
+    }
 }

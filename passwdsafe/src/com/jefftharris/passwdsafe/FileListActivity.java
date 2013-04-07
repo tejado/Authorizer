@@ -9,10 +9,15 @@ package com.jefftharris.passwdsafe;
 
 import com.jefftharris.passwdsafe.view.GuiUtils;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -23,6 +28,7 @@ import android.view.MenuItem;
  * top-level options
  */
 public class FileListActivity extends FragmentActivity
+        implements SyncProviderFragment.Listener
 {
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
@@ -32,6 +38,11 @@ public class FileListActivity extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_list);
+
+        FragmentManager fragMgr = getSupportFragmentManager();
+        FragmentTransaction txn = fragMgr.beginTransaction();
+        txn.replace(R.id.sync, new SyncProviderFragment());
+        txn.commit();
     }
 
     /* (non-Javadoc)
@@ -74,6 +85,26 @@ public class FileListActivity extends FragmentActivity
 
 
     /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.SyncProviderFragment.Listener#showSyncProviderFiles(android.net.Uri)
+     */
+    @Override
+    public void showSyncProviderFiles(Uri uri)
+    {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        Fragment filesFrag = fragMgr.findFragmentById(R.id.files);
+
+        SyncProviderFilesFragment syncFrag =
+                SyncProviderFilesFragment.newInstance(uri);
+
+        FragmentTransaction txn = fragMgr.beginTransaction();
+        txn.hide(filesFrag);
+        txn.replace(R.id.sync, syncFrag);
+        txn.addToBackStack(null);
+        txn.commit();
+    }
+
+
+    /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
      */
     @Override
@@ -92,11 +123,15 @@ public class FileListActivity extends FragmentActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onBackPressed()
      */
+    @TargetApi(Build.VERSION_CODES.ECLAIR)
     @Override
     public void onBackPressed()
     {
+        // TODO: make work when the sync files frag is shown and a subdir is
+        // chosen
         if (!doBackPressed()) {
-            finish();
+            //finish();
+            super.onBackPressed();
         }
     }
 
@@ -107,8 +142,10 @@ public class FileListActivity extends FragmentActivity
     private final boolean doBackPressed()
     {
         FragmentManager mgr = getSupportFragmentManager();
-        FileListFragment frag =
-                (FileListFragment)mgr.findFragmentById(R.id.files);
-        return frag.doBackPressed();
+        Fragment frag = mgr.findFragmentById(R.id.files);
+        if (frag instanceof FileListFragment) {
+            return ((FileListFragment)frag).doBackPressed();
+        }
+        return false;
     }
 }

@@ -9,9 +9,6 @@ package com.jefftharris.passwdsafe;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,32 +20,25 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 /**
- * The SyncProviderFragment allows the user to choose a sync provider
+ * @author jharris
+ *
  */
-public class SyncProviderFragment extends ListFragment
+public class SyncProviderFilesFragment extends ListFragment
         implements LoaderCallbacks<Cursor>
 {
-    /** Listener interface for the owning activity */
-    public interface Listener
-    {
-        public void showSyncProviderFiles(Uri uri);
-    }
-
     private SimpleCursorAdapter itsProviderAdapter;
-    private boolean itsHasProvider = true;
-    private Listener itsListener;
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
-     */
-    @Override
-    public void onAttach(Activity activity)
+
+    /** Create a new instance of the fragment */
+    public static SyncProviderFilesFragment newInstance(Uri providerUri)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        SyncProviderFilesFragment frag = new SyncProviderFilesFragment();
+        Bundle args = new Bundle();
+        args.putString("providerUri", providerUri.toString());
+        frag.setArguments(args);
+        return frag;
     }
 
 
@@ -60,8 +50,10 @@ public class SyncProviderFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
-        return inflater.inflate(R.layout.fragment_sync_provider,
-                                container, false);
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        // TODO: header
+        // TODO: format mod time
+        return view;
     }
 
 
@@ -72,44 +64,15 @@ public class SyncProviderFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+        setEmptyText(getString(R.string.no_files));
 
         itsProviderAdapter = new SimpleCursorAdapter(
                getActivity(), android.R.layout.simple_list_item_2, null,
-               new String[] { PasswdSafeContract.Providers.COL_ACCT,
-                              PasswdSafeContract.Providers.COL_TYPE },
+               new String[] { PasswdSafeContract.Files.COL_TITLE,
+                              PasswdSafeContract.Files.COL_MOD_DATE },
                new int[] { android.R.id.text1, android.R.id.text2 }, 0);
         setListAdapter(itsProviderAdapter);
-
-        itsHasProvider = checkProvider();
         getLoaderManager().initLoader(0, null, this);
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onDetach()
-     */
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        itsListener = null;
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
-     */
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id)
-    {
-        Cursor cursor = (Cursor)getListAdapter().getItem(position);
-        if ((cursor == null) || (itsListener == null)) {
-            return;
-        }
-
-        Uri uri = ContentUris.withAppendedId(
-                PasswdSafeContract.Providers.CONTENT_URI, id);
-        itsListener.showSyncProviderFiles(uri);
     }
 
 
@@ -119,12 +82,10 @@ public class SyncProviderFragment extends ListFragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args)
     {
-        if (!itsHasProvider) {
-            return null;
-        }
-        Uri uri = PasswdSafeContract.Providers.CONTENT_URI;
+        Uri uri = getProviderUri().buildUpon().appendPath(
+            PasswdSafeContract.Files.TABLE).build();
         return new CursorLoader(getActivity(), uri,
-                                PasswdSafeContract.Providers.PROJECTION,
+                                PasswdSafeContract.Files.PROJECTION,
                                 null, null, null);
     }
 
@@ -149,11 +110,9 @@ public class SyncProviderFragment extends ListFragment
     }
 
 
-    /** Check whether the sync provider is present */
-    private final boolean checkProvider()
+    /** Get the URI of the provider whose files are shown */
+    private Uri getProviderUri()
     {
-        ContentResolver res = getActivity().getContentResolver();
-        String type = res.getType(PasswdSafeContract.Providers.CONTENT_URI);
-        return (type != null);
+        return Uri.parse(getArguments().getString("providerUri"));
     }
 }

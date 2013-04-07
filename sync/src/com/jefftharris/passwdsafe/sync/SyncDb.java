@@ -46,20 +46,20 @@ public class SyncDb
     private static final String DB_MATCH_PROVIDERS_TYPE_ACCT =
         DB_COL_PROVIDERS_TYPE + " = ? AND " + DB_COL_PROVIDERS_ACCT + " = ?";
 
-    private static final String DB_TABLE_FILES = "files";
-    private static final String DB_COL_FILES_ID = BaseColumns._ID;
-    private static final String DB_COL_FILES_PROVIDER = "provider";
-    private static final String DB_COL_FILES_LOCAL_FILE = "local_file";
-    private static final String DB_COL_FILES_LOCAL_TITLE = "local_title";
-    private static final String DB_COL_FILES_LOCAL_MOD_DATE = "local_mod_date";
-    private static final String DB_COL_FILES_LOCAL_DELETED = "local_deleted";
-    private static final String DB_COL_FILES_REMOTE_ID = "remote_id";
-    private static final String DB_COL_FILES_REMOTE_TITLE = "remote_title";
-    private static final String DB_COL_FILES_REMOTE_MOD_DATE = "remote_mod_date";
-    private static final String DB_COL_FILES_REMOTE_DELETED = "remote_deleted";
+    public static final String DB_TABLE_FILES = "files";
+    public static final String DB_COL_FILES_ID = BaseColumns._ID;
+    public static final String DB_COL_FILES_PROVIDER = "provider";
+    public static final String DB_COL_FILES_LOCAL_FILE = "local_file";
+    public static final String DB_COL_FILES_LOCAL_TITLE = "local_title";
+    public static final String DB_COL_FILES_LOCAL_MOD_DATE = "local_mod_date";
+    public static final String DB_COL_FILES_LOCAL_DELETED = "local_deleted";
+    public static final String DB_COL_FILES_REMOTE_ID = "remote_id";
+    public static final String DB_COL_FILES_REMOTE_TITLE = "remote_title";
+    public static final String DB_COL_FILES_REMOTE_MOD_DATE = "remote_mod_date";
+    public static final String DB_COL_FILES_REMOTE_DELETED = "remote_deleted";
     private static final String DB_MATCH_FILES_ID =
         DB_COL_FILES_ID + " = ?";
-    private static final String DB_MATCH_FILES_PROVIDER_ID =
+    public static final String DB_MATCH_FILES_PROVIDER_ID =
         DB_COL_FILES_PROVIDER + " = ?";
 
     private DbHelper itsDbHelper;

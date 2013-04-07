@@ -29,8 +29,10 @@ public class PasswdSafeProvider extends ContentProvider
 
     private static final UriMatcher MATCHER;
     private static final int MATCH_PROVIDERS = 1;
+    private static final int MATCH_PROVIDER_FILES = 2;
 
     private static final HashMap<String, String> PROVIDERS_MAP;
+    private static final HashMap<String, String> FILES_MAP;
 
     private SyncDb itsDb;
 
@@ -39,6 +41,10 @@ public class PasswdSafeProvider extends ContentProvider
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.Providers.TABLE,
                        MATCH_PROVIDERS);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE + "/#/" +
+                               PasswdSafeContract.Files.TABLE,
+                       MATCH_PROVIDER_FILES);
 
         PROVIDERS_MAP = new HashMap<String, String>();
         PROVIDERS_MAP.put(PasswdSafeContract.Providers._ID,
@@ -47,6 +53,16 @@ public class PasswdSafeProvider extends ContentProvider
                           SyncDb.DB_COL_PROVIDERS_TYPE);
         PROVIDERS_MAP.put(PasswdSafeContract.Providers.COL_ACCT,
                           SyncDb.DB_COL_PROVIDERS_ACCT);
+
+        FILES_MAP = new HashMap<String, String>();
+        FILES_MAP.put(PasswdSafeContract.Files._ID,
+                      SyncDb.DB_COL_FILES_ID);
+        FILES_MAP.put(PasswdSafeContract.Files.COL_TITLE,
+                      SyncDb.DB_COL_FILES_LOCAL_TITLE + " AS " +
+                              PasswdSafeContract.Files.COL_TITLE);
+        FILES_MAP.put(PasswdSafeContract.Files.COL_MOD_DATE,
+                      SyncDb.DB_COL_FILES_LOCAL_MOD_DATE + " AS " +
+                              PasswdSafeContract.Files.COL_MOD_DATE);
     }
 
 
@@ -69,6 +85,9 @@ public class PasswdSafeProvider extends ContentProvider
         switch (MATCHER.match(uri)) {
         case MATCH_PROVIDERS: {
             return PasswdSafeContract.Providers.CONTENT_TYPE;
+        }
+        case MATCH_PROVIDER_FILES: {
+            return PasswdSafeContract.Files.CONTENT_TYPE;
         }
         default: {
             throw new IllegalArgumentException(
@@ -123,6 +142,14 @@ public class PasswdSafeProvider extends ContentProvider
         case MATCH_PROVIDERS: {
             qb.setTables(SyncDb.DB_TABLE_PROVIDERS);
             qb.setProjectionMap(PROVIDERS_MAP);
+            break;
+        }
+        case MATCH_PROVIDER_FILES: {
+            qb.setTables(SyncDb.DB_TABLE_FILES);
+            qb.setProjectionMap(FILES_MAP);
+
+            selection = SyncDb.DB_MATCH_FILES_PROVIDER_ID;
+            selectionArgs = new String[] { uri.getPathSegments().get(1) };
             break;
         }
         default: {
