@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -28,8 +29,10 @@ import android.widget.TextView;
  *
  */
 public class SyncProviderFilesFragment extends ListFragment
-        implements LoaderCallbacks<Cursor>
 {
+    public static final int LOADER_TITLE = 0;
+    public static final int LOADER_FILES = 1;
+
     private SimpleCursorAdapter itsProviderAdapter;
 
 
@@ -52,9 +55,12 @@ public class SyncProviderFilesFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
+        return inflater.inflate(R.layout.fragment_sync_provider_files,
+                                container, false);
         // TODO: header
-        return view;
+        // TODO: sync menu item
+        // TODO: add/delete file
+        // TODO: open/save file
     }
 
 
@@ -65,7 +71,6 @@ public class SyncProviderFilesFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        setEmptyText(getString(R.string.no_files));
 
         itsProviderAdapter = new SimpleCursorAdapter(
                getActivity(), android.R.layout.simple_list_item_2, null,
@@ -90,42 +95,65 @@ public class SyncProviderFilesFragment extends ListFragment
         });
 
         setListAdapter(itsProviderAdapter);
-        getLoaderManager().initLoader(0, null, this);
-    }
 
+        LoaderManager lm = getLoaderManager();
+        lm.initLoader(LOADER_TITLE, null, new LoaderCallbacks<Cursor>()
+            {
+                @Override
+                public Loader<Cursor> onCreateLoader(int id, Bundle args)
+                {
+                    return new CursorLoader(
+                            getActivity(), getProviderUri(),
+                            PasswdSafeContract.Providers.PROJECTION,
+                            null, null, null);
+                }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
-     */
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args)
-    {
-        Uri uri = getProviderUri().buildUpon().appendPath(
-            PasswdSafeContract.Files.TABLE).build();
-        return new CursorLoader(getActivity(), uri,
-                                PasswdSafeContract.Files.PROJECTION,
-                                null, null,
-                                PasswdSafeContract.Files.TITLE_SORT_ORDER);
-    }
+                @Override
+                public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
+                {
+                    String str;
+                    if (cursor.moveToFirst()) {
+                        str = cursor.getString(
+                            PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+                    } else {
+                        str = getString(R.string.none);
+                    }
+                    TextView tv = (TextView)getView().findViewById(R.id.title);
+                    tv.setText(str);
+                }
 
+                @Override
+                public void onLoaderReset(Loader<Cursor> loader)
+                {
+                }
+            });
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoadFinished(android.support.v4.content.Loader, java.lang.Object)
-     */
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
-    {
-        itsProviderAdapter.swapCursor(cursor);
-    }
+        lm.initLoader(LOADER_FILES, null, new LoaderCallbacks<Cursor>()
+            {
+                 @Override
+                 public Loader<Cursor> onCreateLoader(int id, Bundle args)
+                 {
+                     Uri uri = getProviderUri().buildUpon().appendPath(
+                             PasswdSafeContract.Files.TABLE).build();
+                     return new CursorLoader(
+                             getActivity(), uri,
+                             PasswdSafeContract.Files.PROJECTION,
+                             null, null,
+                             PasswdSafeContract.Files.TITLE_SORT_ORDER);
+                 }
 
+                 @Override
+                 public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
+                 {
+                     itsProviderAdapter.swapCursor(cursor);
+                 }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoaderReset(android.support.v4.content.Loader)
-     */
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader)
-    {
-        itsProviderAdapter.swapCursor(null);
+                 @Override
+                 public void onLoaderReset(Loader<Cursor> loader)
+                 {
+                     itsProviderAdapter.swapCursor(null);
+                 }
+            });
     }
 
 

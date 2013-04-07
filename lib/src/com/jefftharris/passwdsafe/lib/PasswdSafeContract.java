@@ -31,6 +31,8 @@ public final class PasswdSafeContract
                 Uri.withAppendedPath(PasswdSafeContract.CONTENT_URI, TABLE);
         public static final String CONTENT_TYPE =
                 "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE;
 
         public static final String COL_TYPE = "type";
         public static final String COL_ACCT = "acct";
@@ -40,6 +42,10 @@ public final class PasswdSafeContract
             Providers.COL_TYPE,
             Providers.COL_ACCT
         };
+
+        public static final int PROJECTION_IDX_ID = 0;
+        public static final int PROJECTION_IDX_TYPE = 1;
+        public static final int PROJECTION_IDX_ACCT = 2;
     }
 
     /** The table of files */

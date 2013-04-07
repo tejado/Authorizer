@@ -39,7 +39,7 @@ public class SyncDb
     public static final String DB_COL_PROVIDERS_ACCT = "acct";
     public static final String DB_COL_PROVIDERS_SYNC_CHANGE = "sync_change";
     public static final String DB_COL_PROVIDERS_SYNC_FREQ = "sync_freq";
-    private static final String DB_MATCH_PROVIDERS_ID =
+    public static final String DB_MATCH_PROVIDERS_ID =
         DB_COL_PROVIDERS_ID + " = ?";
     private static final String DB_MATCH_PROVIDERS_TYPE =
         DB_COL_PROVIDERS_TYPE + " = ?";

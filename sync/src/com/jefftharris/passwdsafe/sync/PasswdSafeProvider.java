@@ -29,7 +29,8 @@ public class PasswdSafeProvider extends ContentProvider
 
     private static final UriMatcher MATCHER;
     private static final int MATCH_PROVIDERS = 1;
-    private static final int MATCH_PROVIDER_FILES = 2;
+    private static final int MATCH_PROVIDER = 2;
+    private static final int MATCH_PROVIDER_FILES = 3;
 
     private static final HashMap<String, String> PROVIDERS_MAP;
     private static final HashMap<String, String> FILES_MAP;
@@ -41,6 +42,9 @@ public class PasswdSafeProvider extends ContentProvider
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.Providers.TABLE,
                        MATCH_PROVIDERS);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE + "/#",
+                       MATCH_PROVIDER);
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.Providers.TABLE + "/#/" +
                                PasswdSafeContract.Files.TABLE,
@@ -85,6 +89,9 @@ public class PasswdSafeProvider extends ContentProvider
         switch (MATCHER.match(uri)) {
         case MATCH_PROVIDERS: {
             return PasswdSafeContract.Providers.CONTENT_TYPE;
+        }
+        case MATCH_PROVIDER: {
+            return PasswdSafeContract.Providers.CONTENT_ITEM_TYPE;
         }
         case MATCH_PROVIDER_FILES: {
             return PasswdSafeContract.Files.CONTENT_TYPE;
@@ -141,6 +148,13 @@ public class PasswdSafeProvider extends ContentProvider
         case MATCH_PROVIDERS: {
             qb.setTables(SyncDb.DB_TABLE_PROVIDERS);
             qb.setProjectionMap(PROVIDERS_MAP);
+            break;
+        }
+        case MATCH_PROVIDER: {
+            qb.setTables(SyncDb.DB_TABLE_PROVIDERS);
+            qb.setProjectionMap(PROVIDERS_MAP);
+            selection = SyncDb.DB_MATCH_PROVIDERS_ID;
+            selectionArgs = new String[] { uri.getPathSegments().get(1) };
             break;
         }
         case MATCH_PROVIDER_FILES: {
