@@ -14,6 +14,7 @@ import java.util.Map;
 
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.util.Utils;
 
 import android.app.Activity;
@@ -45,25 +46,6 @@ import android.widget.TextView;
  */
 public final class GuiUtils
 {
-    private static final int SDK_CUPCAKE =
-        android.os.Build.VERSION_CODES.CUPCAKE;
-    private static final int SDK_FROYO =
-        android.os.Build.VERSION_CODES.FROYO;
-    private static final int SDK_HONEYCOMB = 11;
-
-    public static final int SDK_VERSION;
-    static {
-        int sdk;
-        try {
-            sdk = Integer.parseInt(android.os.Build.VERSION.SDK);
-        } catch (NumberFormatException e) {
-            // Default back to android 1.5
-            sdk = SDK_CUPCAKE;
-        }
-        SDK_VERSION = sdk;
-    }
-
-
     private static final String PASSWD = "passwd";
     private static final String DATE = "date";
 
@@ -185,7 +167,7 @@ public final class GuiUtils
 
     public static boolean isBackKeyDown(int keyCode, KeyEvent event)
     {
-        return (SDK_VERSION < android.os.Build.VERSION_CODES.ECLAIR)
+        return (ApiCompat.SDK_VERSION < android.os.Build.VERSION_CODES.ECLAIR)
             && (keyCode == KeyEvent.KEYCODE_BACK)
             && (event.getRepeatCount() == 0);
     }
@@ -259,7 +241,7 @@ public final class GuiUtils
     public static void setShowKeyboardListener(Dialog dialog, View view,
                                                Context ctx)
     {
-        if (SDK_VERSION >= SDK_FROYO) {
+        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_FROYO) {
             GuiUtilsFroyo.setShowKeyboardListener(dialog, view, ctx);
         }
     }
@@ -270,7 +252,7 @@ public final class GuiUtils
      */
     public static void invalidateOptionsMenu(Activity act)
     {
-        if (SDK_VERSION >= SDK_HONEYCOMB) {
+        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
             GuiUtilsHoneycomb.invalidateOptionsMenu(act);
         }
     }
@@ -295,7 +277,7 @@ public final class GuiUtils
     /** Remove the layout_centerVertical flag if it is not supported */
     public static void removeUnsupportedCenterVertical(View v)
     {
-        if (SDK_VERSION <= SDK_CUPCAKE) {
+        if (ApiCompat.SDK_VERSION <= ApiCompat.SDK_CUPCAKE) {
             RelativeLayout.LayoutParams params =
                 (RelativeLayout.LayoutParams)v.getLayoutParams();
             params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
@@ -316,7 +298,7 @@ public final class GuiUtils
                                         int notifyId)
     {
         Notification notif;
-        if (SDK_VERSION == SDK_CUPCAKE) {
+        if (ApiCompat.SDK_VERSION == ApiCompat.SDK_CUPCAKE) {
             notif = new Notification(iconId, tickerText,
                                      System.currentTimeMillis());
             notif.setLatestEventInfo(ctx, title, content, intent);
