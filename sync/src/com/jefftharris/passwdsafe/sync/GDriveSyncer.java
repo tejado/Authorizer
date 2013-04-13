@@ -141,7 +141,7 @@ public class GDriveSyncer
             }
 
             itsContext.getContentResolver().notifyChange(
-                    PasswdSafeContract.CONTENT_URI, null);
+                    PasswdSafeContract.CONTENT_URI, null, false);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
