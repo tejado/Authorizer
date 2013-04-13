@@ -240,15 +240,8 @@ public class MainActivity extends FragmentActivity
     private void setSyncFrequency(Account account)
     {
         if (account != null) {
-            try {
-                int freq = itsSyncDb.getProviderSyncFreq(account.name);
-                ContentResolver.setSyncAutomatically(
+            ContentResolver.setSyncAutomatically(
                     account, PasswdSafeContract.AUTHORITY, true);
-                ContentResolver.addPeriodicSync(
-                    account, PasswdSafeContract.AUTHORITY, new Bundle(), freq);
-            } catch (SQLException e) {
-                Log.e(TAG, "DB error", e);
-            }
         }
     }
 

@@ -224,6 +224,7 @@ public class SyncDb
     public int getProviderSyncFreq(String name)
         throws SQLException
     {
+        // TODO: need sync frequency pref?
         int freq = -1;
         Cursor cursor = getProviderField(name, DB_COL_PROVIDERS_SYNC_FREQ);
         if (cursor != null) {
