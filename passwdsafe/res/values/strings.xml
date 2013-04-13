@@ -208,6 +208,7 @@
     <string name="show_backup_files">Show backup files</string>
     <string name="show_password">Show Password</string>
     <string name="show_passwords">Show Passwords</string>
+    <string name="sync">Sync</string>
     <string name="times_header">TIMES</string>
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
@@ -231,7 +232,7 @@
         <item quantity="one">One expiring password</item>
         <item quantity="other">%1$d expiring passwords</item>
     </plurals>
-    
+
     <plurals name="group_items">
         <item quantity="one">[One item]</item>
         <item quantity="other">[%d items]</item>
@@ -241,7 +242,7 @@
         <item quantity="one">Daily</item>
         <item quantity="other">%d days</item>
     </plurals>
-    
+
     <!-- Order must match FileBackupPref enum values -->
     <string-array name="file_backup_pref">
         <item>None</item>
@@ -296,7 +297,7 @@
         <item>One password expires within a month</item>
         <item>One password expires within a year</item>
     </string-array>
-    
+
     <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
     <string-array name="expire_filter_records">
         <item>%1$s passwords have expired</item>
@@ -306,7 +307,7 @@
         <item>%1$s passwords expire within a month</item>
         <item>%1$s passwords expire within a year</item>
     </string-array>
-    
+
     <!-- Order must match PasswdExpiryNotifPref enum values -->
     <string-array name="passwd_expiry_notif_pref">
         <item>None</item>

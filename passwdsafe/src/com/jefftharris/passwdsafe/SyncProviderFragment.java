@@ -19,8 +19,12 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -62,6 +66,7 @@ public class SyncProviderFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_sync_provider,
                                 container, false);
     }
@@ -111,6 +116,47 @@ public class SyncProviderFragment extends ListFragment
     {
         super.onDetach();
         itsListener = null;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_sync_provider, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem mi = menu.findItem(R.id.sync);
+        MenuItemCompat.setShowAsAction(mi,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.sync: {
+            /*
+            Bundle options = new Bundle();
+            options.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+            //ContentResolver.requestSync(null, PasswdSafeContract.AUTHORITY,
+              //                          options);
+            ContentResolver res = getActivity().getContentResolver();
+            res.startSync(PasswdSafeContract.CONTENT_URI,
+                                        options);
+             */
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
     }
 
 

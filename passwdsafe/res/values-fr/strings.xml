@@ -208,6 +208,7 @@
     <string name="show_backup_files">Afficher les sauvegardes</string>
     <string name="show_password">Afficher mot de passe</string>
     <string name="show_passwords">Afficher mots de passe</string>
+    <string name="sync">Synchroniser</string>
     <string name="times_header">TEMPS</string>
     <string name="title">Titre</string>
     <string name="toggle_word_wrap">Adapter les retours-chariot</string>
