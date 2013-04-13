@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 
 import android.app.Activity;
@@ -128,7 +129,7 @@ public class SyncProviderFragment extends ListFragment
         inflater.inflate(R.menu.fragment_sync_provider, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        MenuItem mi = menu.findItem(R.id.sync);
+        MenuItem mi = menu.findItem(R.id.menu_sync);
         MenuItemCompat.setShowAsAction(mi,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
@@ -141,16 +142,9 @@ public class SyncProviderFragment extends ListFragment
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
-        case R.id.sync: {
-            /*
-            Bundle options = new Bundle();
-            options.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-            //ContentResolver.requestSync(null, PasswdSafeContract.AUTHORITY,
-              //                          options);
-            ContentResolver res = getActivity().getContentResolver();
-            res.startSync(PasswdSafeContract.CONTENT_URI,
-                                        options);
-             */
+        case R.id.menu_sync: {
+            ApiCompat.requestProviderSync(PasswdSafeContract.CONTENT_URI,
+                                          getActivity());
             return true;
         }
         default: {

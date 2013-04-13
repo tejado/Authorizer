@@ -7,9 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
-import com.jefftharris.passwdsafe.util.Utils;
-
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,12 +15,20 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
+import com.jefftharris.passwdsafe.util.Utils;
 
 /**
  * @author jharris
@@ -56,10 +61,9 @@ public class SyncProviderFilesFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_sync_provider_files,
                                 container, false);
-        // TODO: header
-        // TODO: sync menu item
         // TODO: add/delete file
         // TODO: open/save file
     }
@@ -162,6 +166,40 @@ public class SyncProviderFilesFragment extends ListFragment
                      itsProviderAdapter.swapCursor(null);
                  }
             });
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_sync_provider_files, menu);
+
+        MenuItem mi = menu.findItem(R.id.menu_sync_files);
+        MenuItemCompat.setShowAsAction(mi,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_sync_files: {
+            ApiCompat.requestProviderSync(PasswdSafeContract.CONTENT_URI,
+                                          getActivity());
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
     }
 
 

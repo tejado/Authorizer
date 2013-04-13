@@ -144,7 +144,7 @@ public class FileListFragment extends ListFragment
         inflater.inflate(R.menu.fragment_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        MenuItem mi = menu.findItem(R.id.file_new);
+        MenuItem mi = menu.findItem(R.id.menu_file_new);
         MenuItemCompat.setShowAsAction(mi,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
@@ -156,7 +156,7 @@ public class FileListFragment extends ListFragment
     @Override
     public void onPrepareOptionsMenu(Menu menu)
     {
-        MenuItem mi = menu.findItem(R.id.parent);
+        MenuItem mi = menu.findItem(R.id.menu_parent);
         if (mi != null) {
             mi.setEnabled((itsDir != null) && (itsDir.getParentFile() != null));
         }
@@ -170,18 +170,18 @@ public class FileListFragment extends ListFragment
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
-        case R.id.file_new: {
+        case R.id.menu_file_new: {
             if (itsDir != null) {
                 startActivity(new Intent(PasswdSafeApp.NEW_INTENT,
                                          Uri.fromFile(itsDir)));
             }
             return true;
         }
-        case R.id.home: {
+        case R.id.menu_home: {
             doHomePressed();
             return true;
         }
-        case R.id.parent: {
+        case R.id.menu_parent: {
             doParentPressed();
             return true;
         }

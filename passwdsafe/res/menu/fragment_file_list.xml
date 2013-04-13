@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/file_new"
+        android:id="@+id/menu_file_new"
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/new_file"/>
 
     <item
-        android:id="@+id/home"
+        android:id="@+id/menu_home"
         android:icon="@drawable/ic_menu_home"
         android:title="@string/home"/>
 
     <item
-        android:id="@+id/parent"
+        android:id="@+id/menu_parent"
         android:icon="@drawable/arrow_up"
         android:title="@string/parent_directory"/>
 

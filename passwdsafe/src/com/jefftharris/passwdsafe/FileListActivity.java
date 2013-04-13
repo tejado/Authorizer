@@ -23,6 +23,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
+// TODO: update min version to 1.6
+
 /**
  * The FileListActivity is the main PasswdSafe activity for file choosing and
  * top-level options
@@ -53,12 +55,12 @@ public class FileListActivity extends FragmentActivity
     {
         getMenuInflater().inflate(R.menu.activity_file_list, menu);
 
-        MenuItem item = menu.findItem(R.id.preferences);
+        MenuItem item = menu.findItem(R.id.menu_preferences);
         item.setIntent(new Intent(this, Preferences.class));
         MenuItemCompat.setShowAsAction(item,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        item = menu.findItem(R.id.about);
+        item = menu.findItem(R.id.menu_about);
         MenuItemCompat.setShowAsAction(item,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
@@ -72,7 +74,7 @@ public class FileListActivity extends FragmentActivity
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
-        case R.id.about: {
+        case R.id.menu_about: {
             AboutDialog dlg = new AboutDialog();
             dlg.show(getSupportFragmentManager(), "AboutDialog");
             return true;
