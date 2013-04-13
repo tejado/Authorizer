@@ -22,6 +22,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -112,14 +113,21 @@ public class SyncProviderFilesFragment extends ListFragment
                 public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
                 {
                     String str;
+                    String type;
                     if (cursor.moveToFirst()) {
                         str = cursor.getString(
                             PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+                        type = cursor.getString(
+                            PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
                     } else {
                         str = getString(R.string.none);
+                        type = null;
                     }
-                    TextView tv = (TextView)getView().findViewById(R.id.title);
+                    View view = getView();
+                    TextView tv = (TextView)view.findViewById(R.id.title);
                     tv.setText(str);
+                    ImageView icon = (ImageView)view.findViewById(R.id.icon);
+                    PasswdSafeContract.Providers.setTypeIcon(icon, type);
                 }
 
                 @Override

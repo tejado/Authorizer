@@ -19,6 +19,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
@@ -26,11 +27,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
  */
 public class SyncDb
 {
-    public enum ProviderType
-    {
-        GDRIVE
-    }
-
     private static final String TAG = "SyncDb";
 
     public static final String DB_TABLE_PROVIDERS = "providers";
@@ -138,7 +134,8 @@ public class SyncDb
     {
         try {
             SQLiteDatabase db = itsDbHelper.getReadableDatabase();
-            String[] args = new String[] { ProviderType.GDRIVE.toString() };
+            String[] args = new String[]
+                    { PasswdSafeContract.Providers.Type.GDRIVE.toString() };
             Cursor cursor = db.query(DB_TABLE_PROVIDERS,
                                      new String[] { DB_COL_PROVIDERS_ACCT },
                                      DB_MATCH_PROVIDERS_TYPE, args,
@@ -165,7 +162,8 @@ public class SyncDb
         try {
             db.beginTransaction();
             ContentValues values = new ContentValues();
-            values.put(DB_COL_PROVIDERS_TYPE, ProviderType.GDRIVE.toString());
+            values.put(DB_COL_PROVIDERS_TYPE,
+                       PasswdSafeContract.Providers.Type.GDRIVE.toString());
             values.put(DB_COL_PROVIDERS_ACCT, name);
             values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
             values.put(DB_COL_PROVIDERS_SYNC_FREQ, 15 * 60);
@@ -376,7 +374,8 @@ public class SyncDb
                                     SQLiteDatabase db)
         throws SQLException
     {
-        String[] args = new String[] { ProviderType.GDRIVE.toString(), name };
+        String[] args = new String[]
+                { PasswdSafeContract.Providers.Type.GDRIVE.toString(), name };
         Cursor cursor = db.query(DB_TABLE_PROVIDERS,
                                  new String[] { column },
                                  DB_MATCH_PROVIDERS_TYPE_ACCT, args,
@@ -395,7 +394,8 @@ public class SyncDb
                                   SQLiteDatabase db)
         throws SQLException
     {
-        String[] args = new String[] { ProviderType.GDRIVE.toString(), name };
+        String[] args = new String[]
+                { PasswdSafeContract.Providers.Type.GDRIVE.toString(), name };
         db.update(DB_TABLE_PROVIDERS, values,
                   DB_MATCH_PROVIDERS_TYPE_ACCT, args);
     }

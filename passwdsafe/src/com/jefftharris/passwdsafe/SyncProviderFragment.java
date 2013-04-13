@@ -23,6 +23,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 /**
@@ -75,10 +76,26 @@ public class SyncProviderFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
 
         itsProviderAdapter = new SimpleCursorAdapter(
-               getActivity(), android.R.layout.simple_list_item_2, null,
+               getActivity(), R.layout.passwdsafe_list_item, null,
                new String[] { PasswdSafeContract.Providers.COL_ACCT,
-                              PasswdSafeContract.Providers.COL_TYPE },
-               new int[] { android.R.id.text1, android.R.id.text2 }, 0);
+                              PasswdSafeContract.Providers.COL_TYPE,
+                              PasswdSafeContract.Providers.COL_TYPE},
+               new int[] { android.R.id.text1, android.R.id.text2, R.id.icon },
+               0);
+        itsProviderAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder()
+        {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int colIdx)
+            {
+                if (view.getId() != R.id.icon) {
+                    return false;
+                }
+
+                String type = cursor.getString(colIdx);
+                return PasswdSafeContract.Providers.setTypeIcon((ImageView)view,
+                                                                type);
+            }
+        });
         setListAdapter(itsProviderAdapter);
 
         itsHasProvider = checkProvider();

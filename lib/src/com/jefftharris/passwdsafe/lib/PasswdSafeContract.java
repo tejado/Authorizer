@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.lib;
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.widget.ImageView;
 
 /**
  * The PasswdSafeContract class is the contract for the PasswdSafe sync provider
@@ -46,6 +47,30 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_ID = 0;
         public static final int PROJECTION_IDX_TYPE = 1;
         public static final int PROJECTION_IDX_ACCT = 2;
+
+        /** The type of provider */
+        public enum Type
+        {
+            GDRIVE
+        }
+
+        /** Set the ImageView to the icon of the provider type */
+        public static boolean setTypeIcon(ImageView iv, String type)
+        {
+            if (type != null) {
+                try {
+                    switch (PasswdSafeContract.Providers.Type.valueOf(type)) {
+                    case GDRIVE: {
+                        iv.setImageResource(R.drawable.google_drive);
+                        return true;
+                    }
+                    }
+                } catch (IllegalArgumentException e) {
+                }
+            }
+            iv.setImageDrawable(null);
+            return false;
+        }
     }
 
     /** The table of files */
@@ -71,3 +96,4 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_MOD_DATE = 2;
     }
 }
+

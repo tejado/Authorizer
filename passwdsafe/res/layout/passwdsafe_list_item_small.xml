@@ -11,18 +11,18 @@
     <ImageView android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:scaleType="fitCenter" 
+        android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         android:layout_weight="0"
         android:contentDescription="@string/record_type"
         />
 
-    <RelativeLayout 
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"        
-        >
-                
+        android:layout_weight="1"
+        android:paddingLeft="6dp">
+
         <TextView android:id="@android:id/text1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
             android:paddingRight="6dip"
             android:textSize="14sp"
             />
-            
+
         <TextView android:id="@android:id/text2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp"
             />
-    
+
         <TextView android:id="@+id/match"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="10sp"
             />
-            
+
     </RelativeLayout>
-    
+
 </LinearLayout>
