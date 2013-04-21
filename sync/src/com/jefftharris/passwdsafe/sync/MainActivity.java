@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -44,18 +45,11 @@ public class MainActivity extends FragmentActivity
     private static final String[] ACCOUNT_TYPE =
         new String[] {GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
 
-    enum AccountState
-    {
-        INITIAL,
-        CHOOSING_ACCOUNT,
-        DONE
-    }
-
     private Button itsAccountBtn;
-    private AccountState itsAccountState = AccountState.INITIAL;
     private GoogleAccountManager itsAccountMgr;
     private SyncDb itsSyncDb;
     private SimpleCursorAdapter itsProviderAdapter;
+    private Account itsNewAccount = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -66,7 +60,6 @@ public class MainActivity extends FragmentActivity
 
         // TODO: create a special google acct for the sync service
         itsAccountBtn = (Button)findViewById(R.id.account);
-        itsAccountState = AccountState.INITIAL;
         itsAccountMgr = new GoogleAccountManager(this);
         itsSyncDb = new SyncDb(this);
 
@@ -99,9 +92,6 @@ public class MainActivity extends FragmentActivity
         Account prefAccount = getPreferenceAccount();
         if (prefAccount != null) {
             itsAccountBtn.setText("Account - " + prefAccount.name);
-            itsAccountState = AccountState.DONE;
-        } else if (itsAccountState == AccountState.INITIAL) {
-            chooseAccount();
         }
 
         // Check the state of Google Play services
@@ -112,26 +102,34 @@ public class MainActivity extends FragmentActivity
         }
     }
 
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onResumeFragments()
+     */
+    @Override
+    protected void onResumeFragments()
+    {
+        super.onResumeFragments();
+        if (itsNewAccount != null) {
+            setAccount(itsNewAccount);
+            itsNewAccount = null;
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         switch (requestCode) {
         case CHOOSE_ACCOUNT:
             if (data != null) {
-                Log.i(TAG,
-                      "SELECTED ACCOUNT WITH EXTRA: "
-                          + data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME));
                 Bundle b = data.getExtras();
-
                 String accountName = b.getString(AccountManager.KEY_ACCOUNT_NAME);
                 Log.i(TAG, "Selected account: " + accountName);
                 if (accountName != null && accountName.length() > 0) {
                     Account account =
                         itsAccountMgr.getAccountByName(accountName);
-                    setAccount(account);
+                    itsNewAccount = account;
                 }
-            } else {
-                itsAccountState = AccountState.INITIAL;
             }
             break;
         }
@@ -210,7 +208,6 @@ public class MainActivity extends FragmentActivity
 
     private void chooseAccount()
     {
-        itsAccountState = AccountState.CHOOSING_ACCOUNT;
         Intent intent =
             AccountPicker.newChooseAccountIntent(getPreferenceAccount(),
                                                  null, ACCOUNT_TYPE, true,
@@ -218,32 +215,11 @@ public class MainActivity extends FragmentActivity
         startActivityForResult(intent, CHOOSE_ACCOUNT);
     }
 
+
     /** Set the new account to use with the app */
     private void setAccount(Account account)
     {
-        try {
-            Account oldAccount = getPreferenceAccount();
-            // Stop syncing for the previously selected account.
-            if (oldAccount != null) {
-                ContentResolver.setSyncAutomatically(
-                    oldAccount, PasswdSafeContract.AUTHORITY, false);
-                GDriveSyncer.deleteProvider(oldAccount, itsSyncDb, this);
-                itsAccountBtn.setText("Choose Account");
-                itsAccountState = AccountState.DONE;
-            }
-
-            if (account != null) {
-                GDriveSyncer.addProvider(account, itsSyncDb, this);
-                itsAccountBtn.setText("Account - " + account.name);
-                setSyncFrequency(account);
-                ContentResolver.requestSync(account,
-                                            PasswdSafeContract.AUTHORITY,
-                                            new Bundle());
-                itsAccountState = AccountState.DONE;
-            }
-        } catch (SQLException e) {
-            Log.e(TAG, "DB error", e);
-        }
+        new AccountTask(account);
     }
 
     /** Set the sync frequency for the selected account */
@@ -259,6 +235,71 @@ public class MainActivity extends FragmentActivity
     private Account getPreferenceAccount()
     {
         return itsAccountMgr.getAccountByName(itsSyncDb.getProviderAccount());
+    }
+
+
+    /** Async task to set the account */
+    private final class AccountTask extends AsyncTask<Account, Void, Account>
+    {
+        ProgressFragment itsProgressFrag;
+        Account itsOldAccount;
+
+        /** Constructor */
+        public AccountTask(Account acct)
+        {
+            String msg = (acct == null) ? "Removing account" : "Adding account";
+            itsProgressFrag = ProgressFragment.newInstance(msg);
+            itsProgressFrag.show(getSupportFragmentManager(), null);
+            itsOldAccount = getPreferenceAccount();
+            execute(acct);
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Account doInBackground(Account... params)
+        {
+            Account account = params[0];
+            try {
+                // Stop syncing for the previously selected account.
+                if (itsOldAccount != null) {
+                    ContentResolver.setSyncAutomatically(
+                        itsOldAccount, PasswdSafeContract.AUTHORITY, false);
+                    GDriveSyncer.deleteProvider(itsOldAccount, itsSyncDb,
+                                                MainActivity.this);
+                }
+
+                if (account != null) {
+                    GDriveSyncer.addProvider(account, itsSyncDb,
+                                             MainActivity.this);
+                    setSyncFrequency(account);
+                    ContentResolver.requestSync(account,
+                                                PasswdSafeContract.AUTHORITY,
+                                                new Bundle());
+                }
+            } catch (SQLException e) {
+                Log.e(TAG, "DB error", e);
+            }
+            return account;
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Account account)
+        {
+            super.onPostExecute(account);
+
+            if (account != null) {
+                itsAccountBtn.setText("Account - " + account.name);
+            } else {
+                itsAccountBtn.setText("Choose Account");
+            }
+
+            itsProgressFrag.dismiss();
+        }
     }
 /*
 
