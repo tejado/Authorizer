@@ -8,6 +8,7 @@ package com.jefftharris.passwdsafe.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,6 +29,8 @@ import android.widget.ListView;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 
@@ -99,6 +102,13 @@ public class MainActivity extends FragmentActivity
             itsAccountState = AccountState.DONE;
         } else if (itsAccountState == AccountState.INITIAL) {
             chooseAccount();
+        }
+
+        // Check the state of Google Play services
+        int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (rc != ConnectionResult.SUCCESS) {
+            Dialog dlg = GooglePlayServicesUtil.getErrorDialog(rc, this, 0);
+            dlg.show();
         }
     }
 

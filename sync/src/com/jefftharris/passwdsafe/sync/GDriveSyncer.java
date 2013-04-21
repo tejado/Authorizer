@@ -13,21 +13,21 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.accounts.Account;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ContentProviderClient;
 import android.content.Context;
-import android.content.Intent;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 
-import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableNotifiedException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
@@ -57,6 +57,7 @@ public class GDriveSyncer
     private final ContentProviderClient itsProvider;
     private final Account itsAccount;
     private final Drive itsDrive;
+    private final String itsDriveToken;
     private final SyncDb itsSyncDb;
 
     /** Constructor */
@@ -67,7 +68,9 @@ public class GDriveSyncer
         itsContext = context;
         itsProvider = provider;
         itsAccount = account;
-        itsDrive = getDriveService();
+        Pair<Drive, String> driveInfo = getDriveService();
+        itsDrive = driveInfo.first;
+        itsDriveToken = driveInfo.second;
         itsSyncDb = new SyncDb(itsContext);
         Log.i(TAG, "GDriveSyncer");
     }
@@ -136,13 +139,19 @@ public class GDriveSyncer
                 newChangeId = performSyncSince(changeId, db);
             }
             if (changeId != newChangeId) {
-                itsSyncDb.setProviderSyncChange(itsAccount.name, newChangeId,
-                                                db);
+                itsSyncDb.setProviderSyncChange(itsAccount.name,
+                                                newChangeId, db);
             }
 
             itsContext.getContentResolver().notifyChange(
-                    PasswdSafeContract.CONTENT_URI, null, false);
+                     PasswdSafeContract.CONTENT_URI, null, false);
             db.setTransactionSuccessful();
+        } catch (UserRecoverableAuthIOException e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "Recoverable google auth error");
+            GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
+        } catch (GoogleAuthIOException e) {
+            Log.e(TAG, "Google auth error", e);
+            GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
         } finally {
@@ -479,45 +488,35 @@ public class GDriveSyncer
      *
      * @return An authorized service object.
      */
-    private Drive getDriveService()
+    private Pair<Drive, String> getDriveService()
     {
         Drive drive = null;
+        String token = null;
         try {
             GoogleAccountCredential credential =
                 GoogleAccountCredential.usingOAuth2(itsContext,
                                                     DriveScopes.DRIVE);
-          credential.setSelectedAccountName(itsAccount.name);
-          // Trying to get a token right away to see if we are authorized
-          credential.getToken();
-          drive = new Drive.Builder(AndroidHttp.newCompatibleTransport(),
-                                    new GsonFactory(), credential).build();
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to get token");
-            // If the Exception is User Recoverable, we display a notification
-            // that will trigger the intent to fix the issue.
-            if (e instanceof UserRecoverableAuthException) {
-                UserRecoverableAuthException exception =
-                    (UserRecoverableAuthException) e;
-                NotificationManager notificationManager = (NotificationManager)
-                    itsContext.getSystemService(Context.NOTIFICATION_SERVICE);
-                Intent authorizationIntent = exception.getIntent();
-                authorizationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .addFlags(Intent.FLAG_FROM_BACKGROUND);
-                PendingIntent pendingIntent =
-                    PendingIntent.getActivity(itsContext, 0,
-                                              authorizationIntent, 0);
-                // TODO: resource strs
-                Notification notification = new NotificationCompat.Builder(itsContext)
-                    .setSmallIcon(android.R.drawable.ic_dialog_alert)
-                    .setTicker("Permission requested")
-                    .setContentTitle("Permission requested")
-                    .setContentText("for account " + itsAccount.name)
-                    .setContentIntent(pendingIntent).setAutoCancel(true).build();
-                notificationManager.notify(0, notification);
-            } else {
-                e.printStackTrace();
-            }
+            credential.setSelectedAccountName(itsAccount.name);
+
+            token = GoogleAuthUtil.getTokenWithNotification(
+                itsContext, itsAccount.name, credential.getScope(),
+                null, PasswdSafeContract.AUTHORITY, null);
+
+            drive = new Drive.Builder(AndroidHttp.newCompatibleTransport(),
+                                      new GsonFactory(), credential).build();
+        } catch (UserRecoverableNotifiedException e) {
+            // User notified
+            PasswdSafeUtil.dbginfo(TAG, e, "User notified auth exception");
+        } catch (GoogleAuthException e) {
+            // Unrecoverable
+            Log.e(TAG, "Unrecoverable auth exception", e);
         }
-        return drive;
+        catch (IOException e) {
+            // Transient
+            PasswdSafeUtil.dbginfo(TAG, e, "Transient error");
+        } catch (Exception e) {
+            Log.e(TAG, "Token exception", e);
+        }
+        return new Pair<Drive, String>(drive, token);
     }
 }

@@ -22,11 +22,27 @@ public class PasswdSafeUtil
             Log.i(tag, msg);
     }
 
+    /** Log a debug message and exception at info level */
+    public static void dbginfo(String tag, Throwable t, String msg)
+    {
+        if (DEBUG)
+            Log.i(tag, msg, t);
+    }
+
     /** Log a formatted debug message at info level */
     public static void dbginfo(String tag, String fmt, Object... args)
     {
         if (DEBUG) {
             Log.i(tag, String.format(fmt, args));
+        }
+    }
+
+    /** Log a formatted debug message and exception at info level */
+    public static void dbginfo(String tag, Throwable t,
+                               String fmt, Object... args)
+    {
+        if (DEBUG) {
+            Log.i(tag, String.format(fmt, args), t);
         }
     }
 
