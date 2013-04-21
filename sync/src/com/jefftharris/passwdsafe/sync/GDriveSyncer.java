@@ -102,6 +102,23 @@ public class GDriveSyncer
                 ctx.deleteFile(dbfile.itsLocalFile);
             }
             syncDb.deleteProvider(account.name, db);
+
+            try {
+                GoogleAccountCredential credential =
+                        GoogleAccountCredential.usingOAuth2(ctx,
+                                                            DriveScopes.DRIVE);
+                String token = GoogleAuthUtil.getToken(ctx, account.name,
+                                                       credential.getScope());
+                PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
+                                       account.name, token);
+                if (token != null) {
+                    GoogleAuthUtil.invalidateToken(ctx, token);
+                }
+            } catch (Exception e) {
+                PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s",
+                                       account.name);
+            }
+
             ctx.getContentResolver().notifyChange(
                     PasswdSafeContract.CONTENT_URI, null);
             db.setTransactionSuccessful();
