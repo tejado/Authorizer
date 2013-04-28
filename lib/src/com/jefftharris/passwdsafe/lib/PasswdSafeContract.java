@@ -10,6 +10,7 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * The PasswdSafeContract class is the contract for the PasswdSafe sync provider
@@ -51,25 +52,29 @@ public final class PasswdSafeContract
         /** The type of provider */
         public enum Type
         {
-            GDRIVE
-        }
+            GDRIVE;
 
-        /** Set the ImageView to the icon of the provider type */
-        public static boolean setTypeIcon(ImageView iv, String type)
-        {
-            if (type != null) {
-                try {
-                    switch (PasswdSafeContract.Providers.Type.valueOf(type)) {
-                    case GDRIVE: {
-                        iv.setImageResource(R.drawable.google_drive);
-                        return true;
-                    }
-                    }
-                } catch (IllegalArgumentException e) {
+            /** Set the ImageView to the icon of the provider type */
+            public void setIcon(ImageView iv)
+            {
+                switch (this) {
+                case GDRIVE: {
+                    iv.setImageResource(R.drawable.google_drive);
+                    break;
+                }
                 }
             }
-            iv.setImageDrawable(null);
-            return false;
+
+            /** Set the TextView to the name of the provider type */
+            public void setText(TextView tv)
+            {
+                switch (this) {
+                case GDRIVE: {
+                    tv.setText(R.string.google_drive);
+                    break;
+                }
+                }
+            }
         }
     }
 

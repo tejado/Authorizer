@@ -116,22 +116,26 @@ public class SyncProviderFilesFragment extends ListFragment
                 @Override
                 public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
                 {
+                    View view = getView();
                     String str;
-                    String type;
+                    ImageView icon = (ImageView)view.findViewById(R.id.icon);
                     if (cursor.moveToFirst()) {
                         str = cursor.getString(
                             PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
-                        type = cursor.getString(
+                        String typeStr = cursor.getString(
                             PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
+                        try {
+                            PasswdSafeContract.Providers.Type type =
+                                PasswdSafeContract.Providers.Type.valueOf(typeStr);
+                            type.setIcon(icon);
+                        } catch (IllegalArgumentException e) {
+                        }
                     } else {
                         str = getString(R.string.none);
-                        type = null;
+                        icon.setImageDrawable(null);
                     }
-                    View view = getView();
                     TextView tv = (TextView)view.findViewById(R.id.title);
                     tv.setText(str);
-                    ImageView icon = (ImageView)view.findViewById(R.id.icon);
-                    PasswdSafeContract.Providers.setTypeIcon(icon, type);
                 }
 
                 @Override

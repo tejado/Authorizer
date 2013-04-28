@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * The SyncProviderFragment allows the user to choose a sync provider
@@ -93,13 +94,29 @@ public class SyncProviderFragment extends ListFragment
             @Override
             public boolean setViewValue(View view, Cursor cursor, int colIdx)
             {
-                if (view.getId() != R.id.icon) {
+                int id = view.getId();
+                if ((id != android.R.id.text2) && (id != R.id.icon)) {
                     return false;
                 }
 
-                String type = cursor.getString(colIdx);
-                return PasswdSafeContract.Providers.setTypeIcon((ImageView)view,
-                                                                type);
+                try {
+                    String typeStr = cursor.getString(colIdx);
+                    PasswdSafeContract.Providers.Type type =
+                            PasswdSafeContract.Providers.Type.valueOf(typeStr);
+                    switch (id) {
+                    case android.R.id.text2: {
+                        type.setText((TextView)view);
+                        break;
+                    }
+                    case R.id.icon: {
+                        type.setIcon((ImageView)view);
+                        break;
+                    }
+                    }
+                    return true;
+                } catch (IllegalArgumentException e) {
+                    return false;
+                }
             }
         });
         setListAdapter(itsProviderAdapter);
