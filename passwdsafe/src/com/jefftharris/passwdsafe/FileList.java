@@ -22,6 +22,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+// TODO: delete this class
 public class FileList extends AbstractFileListActivity
 {
     private static final int MENU_FILE_NEW = 1;
