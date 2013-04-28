@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="adding_account">Adding account...</string>
+    <string name="adding_account">Adding account&#8230;</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="choose_account">Choose Account</string>
     <string name="clear">Clear</string>
     <string name="menu_settings">Settings</string>
-    <string name="removing_account">Removing account...</string>
+    <string name="removing_account">Removing account&#8230;</string>
     <string name="sync">Sync</string>
 
 </resources>
