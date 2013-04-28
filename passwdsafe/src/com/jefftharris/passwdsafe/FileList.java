@@ -9,22 +9,16 @@ package com.jefftharris.passwdsafe;
 
 import java.io.File;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
-
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -188,7 +182,6 @@ public class FileList extends AbstractFileListActivity
         return dialog;
     }
 
-    @TargetApi(Build.VERSION_CODES.ECLAIR)
     @Override
     protected void showFiles()
     {
@@ -204,23 +197,6 @@ public class FileList extends AbstractFileListActivity
                     openFile(defFile);
                 }
             }
-        }
-
-        // TODO: remove tmp client...
-        ContentResolver res = getContentResolver();
-        //Uri uri = Uri.parse("content://com.jefftharris.passwdsafe.sync.provider");
-        Uri uri = PasswdSafeContract.CONTENT_URI;
-        ContentProviderClient client = res.acquireContentProviderClient(uri);
-        Log.i("FileList", "client: " + client);
-        if (client != null) {
-            try {
-                Log.i("FileList", "type: " +
-                      client.getType(uri));
-            }
-            catch (RemoteException e) {
-                Log.i("FileList", "type failure", e);
-            }
-            client.release();
         }
     }
 
