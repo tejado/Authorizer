@@ -41,6 +41,7 @@ public class SyncDb
         DB_COL_PROVIDERS_TYPE + " = ?";
     private static final String DB_MATCH_PROVIDERS_TYPE_ACCT =
         DB_COL_PROVIDERS_TYPE + " = ? AND " + DB_COL_PROVIDERS_ACCT + " = ?";
+    public static final int DEFAULT_PROVIDER_SYNC_FREQ = 15 * 60;
 
     public static final String DB_TABLE_FILES = "files";
     public static final String DB_COL_FILES_ID = BaseColumns._ID;
@@ -166,7 +167,7 @@ public class SyncDb
                        PasswdSafeContract.Providers.Type.GDRIVE.toString());
             values.put(DB_COL_PROVIDERS_ACCT, name);
             values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
-            values.put(DB_COL_PROVIDERS_SYNC_FREQ, 15 * 60);
+            values.put(DB_COL_PROVIDERS_SYNC_FREQ, DEFAULT_PROVIDER_SYNC_FREQ);
             db.insertOrThrow(DB_TABLE_PROVIDERS, null, values);
             db.setTransactionSuccessful();
         } finally {

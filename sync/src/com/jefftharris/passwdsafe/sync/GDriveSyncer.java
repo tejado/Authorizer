@@ -14,9 +14,11 @@ import java.util.List;
 
 import android.accounts.Account;
 import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -82,6 +84,12 @@ public class GDriveSyncer
     {
         Log.i(TAG, "Add provider: " + account);
         db.addProvider(account.name);
+        ContentResolver.setSyncAutomatically(
+                account, PasswdSafeContract.AUTHORITY, true);
+        ContentResolver.addPeriodicSync(
+                account, PasswdSafeContract.AUTHORITY, new Bundle(),
+                SyncDb.DEFAULT_PROVIDER_SYNC_FREQ);
+
         ctx.getContentResolver().notifyChange(
                 PasswdSafeContract.Providers.CONTENT_URI, null);
     }
@@ -119,6 +127,10 @@ public class GDriveSyncer
                                        account.name);
             }
 
+            ContentResolver.removePeriodicSync(
+                    account, PasswdSafeContract.AUTHORITY, new Bundle());
+            ContentResolver.setSyncAutomatically(
+                    account, PasswdSafeContract.AUTHORITY, false);
             ctx.getContentResolver().notifyChange(
                     PasswdSafeContract.CONTENT_URI, null);
             db.setTransactionSuccessful();

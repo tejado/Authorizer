@@ -188,15 +188,6 @@ public class MainActivity extends FragmentActivity
         new AccountTask(account);
     }
 
-    /** Set the sync frequency for the selected account */
-    private void setSyncFrequency(Account account)
-    {
-        if (account != null) {
-            ContentResolver.setSyncAutomatically(
-                    account, PasswdSafeContract.AUTHORITY, true);
-        }
-    }
-
     /** Get the currently preferred account to use with the app */
     private Account getPreferenceAccount()
     {
@@ -231,8 +222,6 @@ public class MainActivity extends FragmentActivity
             try {
                 // Stop syncing for the previously selected account.
                 if (itsOldAccount != null) {
-                    ContentResolver.setSyncAutomatically(
-                        itsOldAccount, PasswdSafeContract.AUTHORITY, false);
                     GDriveSyncer.deleteProvider(itsOldAccount, itsSyncDb,
                                                 MainActivity.this);
                 }
@@ -240,7 +229,6 @@ public class MainActivity extends FragmentActivity
                 if (account != null) {
                     GDriveSyncer.addProvider(account, itsSyncDb,
                                              MainActivity.this);
-                    setSyncFrequency(account);
                     ContentResolver.requestSync(account,
                                                 PasswdSafeContract.AUTHORITY,
                                                 new Bundle());
