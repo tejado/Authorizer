@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,15 +7,10 @@
  */
 package com.jefftharris.passwdsafe.file;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
@@ -25,8 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.pwsafe.lib.UUID;
 import org.pwsafe.lib.Util;
@@ -39,8 +32,6 @@ import org.pwsafe.lib.file.PwsField;
 import org.pwsafe.lib.file.PwsFieldTypeV2;
 import org.pwsafe.lib.file.PwsFieldTypeV3;
 import org.pwsafe.lib.file.PwsFile;
-import org.pwsafe.lib.file.PwsFileFactory;
-import org.pwsafe.lib.file.PwsFileStorage;
 import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
@@ -51,36 +42,28 @@ import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
-import org.pwsafe.lib.file.PwsStorage;
-import org.pwsafe.lib.file.PwsStreamStorage;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsTimeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
-import com.jefftharris.passwdsafe.PasswdSafeApp;
-import com.jefftharris.passwdsafe.Preferences;
-import com.jefftharris.passwdsafe.R;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.pref.FileBackupPref;
-import com.jefftharris.passwdsafe.util.Pair;
-
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.jefftharris.passwdsafe.PasswdSafeApp;
+import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.util.Pair;
+
 public class PasswdFileData
 {
-    private Uri itsUri;
-    private File itsFile;
+    private PasswdFileUri itsUri;
     private PwsFile itsPwsFile;
     private final HashMap<String, PwsRecord> itsRecordsByUUID =
         new HashMap<String, PwsRecord>();
@@ -100,8 +83,7 @@ public class PasswdFileData
 
     public PasswdFileData(Uri uri)
     {
-        itsUri = uri;
-        itsFile = getUriAsFile(itsUri);
+        itsUri = new PasswdFileUri(uri);
     }
 
     public void load(StringBuilder passwd, boolean readonly, Context context)
@@ -111,19 +93,9 @@ public class PasswdFileData
     {
         PasswdSafeUtil.dbginfo(TAG, "before load file");
         itsIsOpenReadOnly = readonly;
+        itsPwsFile = itsUri.load(passwd, context);
 
-        if (isFileUri(itsUri)) {
-            itsPwsFile = PwsFileFactory.loadFile(itsFile.getAbsolutePath(),
-                                                 passwd);
-        } else {
-            ContentResolver cr = context.getContentResolver();
-            InputStream is = cr.openInputStream(itsUri);
-            String id = getUriIdentifier(itsUri, context, false);
-            PwsStorage storage = new PwsStreamStorage(id, is);
-            itsPwsFile = PwsFileFactory.loadFromStorage(storage, passwd);
-        }
-
-        if (itsIsOpenReadOnly || (itsFile == null) || !itsFile.canWrite()) {
+        if (itsIsOpenReadOnly || !itsUri.isWritable()) {
             itsPwsFile.setReadOnly(true);
         }
         finishOpenFile(passwd);
@@ -132,16 +104,13 @@ public class PasswdFileData
     public void createNewFile(StringBuilder passwd, Context context)
         throws IOException, NoSuchAlgorithmException
     {
-        itsPwsFile = PwsFileFactory.newFile();
-        itsPwsFile.setPassphrase(passwd);
-        itsPwsFile.setStorage(new PwsFileStorage(itsFile.getAbsolutePath(),
-                                                 null));
+        itsPwsFile = itsUri.createNew(passwd, context);
         setSaveHdrFields(context);
         itsPwsFile.save();
         finishOpenFile(passwd);
     }
 
-    public void save(final Context context)
+    public void save(Context context)
         throws IOException, NoSuchAlgorithmException,
                ConcurrentModificationException
     {
@@ -157,19 +126,8 @@ public class PasswdFileData
 
             setSaveHdrFields(context);
 
-            itsPwsFile.getStorage().setSaveHelper(new PwsStorage.SaveHelper()
-            {
-                public String getSaveFileName(File file, boolean isV3)
-                {
-                    return PasswdFileData.getSaveFileName(file, isV3);
-                }
-
-                public void createBackupFile(File fromFile, File toFile)
-                    throws IOException
-                {
-                    PasswdFileData.createBackupFile(fromFile, toFile, context);
-                }
-            });
+            itsPwsFile.getStorage().setSaveHelper(
+                    new PasswdFileUri.SaveHelper(context));
             try {
                 itsPwsFile.save();
                 notifyObservers(this);
@@ -182,7 +140,6 @@ public class PasswdFileData
     public void close()
     {
         itsUri = null;
-        itsFile = null;
         itsPwsFile.dispose();
         itsPwsFile = null;
         indexRecords();
@@ -282,7 +239,7 @@ public class PasswdFileData
 
     public final Uri getUri()
     {
-        return itsUri;
+        return itsUri.getUri();
     }
 
     public final boolean canEdit()
@@ -649,40 +606,6 @@ public class PasswdFileData
             indexPasswdPolicies();
         }
     }
-
-    public static final boolean isFileUri(Uri uri)
-    {
-        return uri.getScheme().equals(ContentResolver.SCHEME_FILE);
-    }
-
-    public static File getUriAsFile(Uri uri)
-    {
-        if (isFileUri(uri)) {
-            return new File(uri.getPath());
-        }
-        return null;
-    }
-
-    public static String getUriIdentifier(Uri uri, Context context,
-                                          boolean shortId)
-    {
-        String id;
-        if (isFileUri(uri)) {
-            if (shortId) {
-                id = uri.getLastPathSegment();
-            } else {
-                id = uri.getPath();
-            }
-        } else {
-            if (uri.getAuthority().indexOf("mail") != -1) {
-                id = context.getString(R.string.email_attachment);
-            } else {
-                id = context.getString(R.string.content_file);
-            }
-        }
-        return id;
-    }
-
 
     public static final int hexBytesToInt(byte[] bytes, int pos, int len)
     {
@@ -1318,76 +1241,6 @@ public class PasswdFileData
                                                   hdrPolicies);
     }
 
-
-    private static String getSaveFileName(File file, boolean isV3)
-    {
-        String name = file.getName();
-        Pattern pat = Pattern.compile("^(.*)_\\d{8}_\\d{6}\\.ibak$");
-        Matcher match = pat.matcher(name);
-        if ((match != null) && match.matches()) {
-            name = match.group(1);
-            if (isV3) {
-                name += ".psafe3";
-            } else {
-                name += ".dat";
-            }
-        }
-        return name;
-    }
-
-
-    private static void createBackupFile(File fromFile, File toFile,
-                                         Context context)
-        throws IOException
-    {
-        SharedPreferences prefs =
-                        PreferenceManager.getDefaultSharedPreferences(context);
-        FileBackupPref backupPref = Preferences.getFileBackupPref(prefs);
-
-        File dir = toFile.getParentFile();
-        String fileName = toFile.getName();
-        int dotpos = fileName.lastIndexOf('.');
-        if (dotpos != -1) {
-            fileName = fileName.substring(0, dotpos);
-        }
-
-        final Pattern pat = Pattern.compile(
-            "^" + Pattern.quote(fileName) + "_\\d{8}_\\d{6}\\.ibak$");
-        File[] backupFiles = dir.listFiles(new FileFilter() {
-            public boolean accept(File f)
-            {
-                return f.isFile() && pat.matcher(f.getName()).matches();
-            }
-        });
-        if (backupFiles != null) {
-            Arrays.sort(backupFiles);
-
-            int numBackups = backupPref.getNumBackups();
-            if (numBackups > 0) {
-                --numBackups;
-            }
-            for (int i = 0, numFiles = backupFiles.length;
-                 numFiles > numBackups; ++i, --numFiles) {
-                if (!backupFiles[i].equals(fromFile)) {
-                    backupFiles[i].delete();
-                }
-            }
-        }
-
-        if (backupPref != FileBackupPref.BACKUP_NONE) {
-            SimpleDateFormat bakTime = new SimpleDateFormat("yyyyMMdd_HHmmss",
-                                                            Locale.US);
-            StringBuilder bakName = new StringBuilder(fileName);
-            bakName.append("_");
-            bakName.append(bakTime.format(new Date()));
-            bakName.append(".ibak");
-
-            File bakFile = new File(dir, bakName.toString());
-            if (!toFile.renameTo(bakFile)) {
-                throw new IOException("Can not create backup file: " + bakFile);
-            }
-        }
-    }
 
     private static final int getHdrMinorVersion(PwsRecord rec)
     {

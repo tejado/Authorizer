@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -18,6 +18,7 @@ import java.util.WeakHashMap;
 import org.pwsafe.lib.file.PwsFile;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -378,7 +379,7 @@ public class PasswdSafeApp extends Application
         StringBuilder builder = new StringBuilder(getAppTitle(ctx));
         if (uri != null) {
             builder.append(" - ");
-            builder.append(PasswdFileData.getUriIdentifier(uri, ctx, true));
+            builder.append(PasswdFileUri.getUriIdentifier(uri, ctx, true));
         }
         return builder.toString();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -18,6 +18,7 @@ import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
@@ -686,7 +687,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             TextView tv = (TextView)dialog.findViewById(R.id.file);
             tv.setText(getString(R.string.file_label_val, getUriName(false)));
             CheckBox cb = (CheckBox)dialog.findViewById(R.id.read_only);
-            if (PasswdFileData.isFileUri(getUri())) {
+            if (PasswdFileUri.isFileUri(getUri())) {
                 cb.setEnabled(true);
                 cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
             } else {

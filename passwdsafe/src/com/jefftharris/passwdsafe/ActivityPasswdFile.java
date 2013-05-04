@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 import android.app.Activity;
@@ -80,9 +81,8 @@ public abstract class ActivityPasswdFile
         Activity activity = getActivity();
         ProgressDialog dlg = new ProgressDialog(activity);
         dlg.setTitle(PasswdSafeApp.getAppTitle(activity));
-        String uri =
-            PasswdFileData.getUriIdentifier(getFileData().getUri(),
-                                            activity, true);
+        String uri = PasswdFileUri.getUriIdentifier(getFileData().getUri(),
+                                                    activity, true);
         dlg.setMessage(activity.getString(R.string.saving_file, uri));
         dlg.setIndeterminate(true);
         dlg.setCancelable(false);

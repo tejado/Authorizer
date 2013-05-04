@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2012-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 import android.app.Activity;
@@ -190,13 +191,13 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     /** Get a name for the URI */
     protected final String getUriName(boolean shortId)
     {
-        return PasswdFileData.getUriIdentifier(itsUri, this, shortId);
+        return PasswdFileUri.getUriIdentifier(itsUri, this, shortId);
     }
 
 
     /** Get the URI as a file if possible */
     protected final File getUriAsFile()
     {
-        return PasswdFileData.getUriAsFile(itsUri);
+        return PasswdFileUri.getUriAsFile(itsUri);
     }
 }
