@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.app.Activity;
+import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,10 +26,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Utils;
 
 /**
@@ -36,10 +40,21 @@ import com.jefftharris.passwdsafe.util.Utils;
  */
 public class SyncProviderFilesFragment extends ListFragment
 {
-    public static final int LOADER_TITLE = 0;
-    public static final int LOADER_FILES = 1;
+    /** Listener interface for the owning activity */
+    public interface Listener
+    {
+        /** Open a file */
+        public void openFile(Uri uri);
+    }
 
+    private static final String TAG = "SyncProviderFilesFragment";
+    private static final int LOADER_TITLE = 0;
+    private static final int LOADER_FILES = 1;
+
+    private Uri itsProviderUri;
+    private Uri itsFilesUri;
     private SimpleCursorAdapter itsProviderAdapter;
+    private Listener itsListener;
 
 
     /** Create a new instance of the fragment */
@@ -50,6 +65,30 @@ public class SyncProviderFilesFragment extends ListFragment
         args.putString("providerUri", providerUri.toString());
         frag.setArguments(args);
         return frag;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
+     */
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        itsListener = (Listener)activity;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onCreate(android.os.Bundle)
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        itsProviderUri = Uri.parse(getArguments().getString("providerUri"));
+        itsFilesUri = itsProviderUri.buildUpon().appendPath(
+                PasswdSafeContract.Files.TABLE).build();
     }
 
 
@@ -108,7 +147,7 @@ public class SyncProviderFilesFragment extends ListFragment
                 public Loader<Cursor> onCreateLoader(int id, Bundle args)
                 {
                     return new CursorLoader(
-                            getActivity(), getProviderUri(),
+                            getActivity(), itsProviderUri,
                             PasswdSafeContract.Providers.PROJECTION,
                             null, null, null);
                 }
@@ -149,10 +188,8 @@ public class SyncProviderFilesFragment extends ListFragment
                  @Override
                  public Loader<Cursor> onCreateLoader(int id, Bundle args)
                  {
-                     Uri uri = getProviderUri().buildUpon().appendPath(
-                             PasswdSafeContract.Files.TABLE).build();
                      return new CursorLoader(
-                             getActivity(), uri,
+                             getActivity(), itsFilesUri,
                              PasswdSafeContract.Files.PROJECTION,
                              null, null,
                              PasswdSafeContract.Files.TITLE_SORT_ORDER);
@@ -207,9 +244,19 @@ public class SyncProviderFilesFragment extends ListFragment
     }
 
 
-    /** Get the URI of the provider whose files are shown */
-    private Uri getProviderUri()
+    /* (non-Javadoc)
+     * @see android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     */
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id)
     {
-        return Uri.parse(getArguments().getString("providerUri"));
+        Cursor cursor = (Cursor)getListAdapter().getItem(position);
+        if ((cursor == null) || (itsListener == null)) {
+            return;
+        }
+
+        Uri uri = ContentUris.withAppendedId(itsFilesUri, id);
+        PasswdSafeUtil.dbginfo(TAG, "Open provider uri %s", uri);
+        itsListener.openFile(uri);
     }
 }

@@ -84,6 +84,8 @@ public final class PasswdSafeContract
         public static final String TABLE = "files";
         public static final String CONTENT_TYPE =
                 "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE;
 
         public static final String COL_TITLE = "title";
         public static final String COL_MOD_DATE = "mod_date";

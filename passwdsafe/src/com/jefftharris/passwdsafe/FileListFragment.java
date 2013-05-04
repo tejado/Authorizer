@@ -42,6 +42,13 @@ import android.widget.TextView;
  */
 public class FileListFragment extends ListFragment
 {
+    /** Listener interface for the owning activity */
+    public interface Listener
+    {
+        /** Open a file */
+        public void openFile(Uri uri);
+    }
+
     private static final String TAG = "FileListFragment";
 
     private static final String TITLE = "title";
@@ -49,6 +56,18 @@ public class FileListFragment extends ListFragment
 
     private File itsDir;
     private LinkedList<File> itsDirHistory = new LinkedList<File>();
+    private Listener itsListener;
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
+     */
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        itsListener = (Listener)activity;
+    }
+
 
     /* (non-Javadoc)
      * @see android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
@@ -306,7 +325,7 @@ public class FileListFragment extends ListFragment
     /** Open the given file */
     private final void openFile(File file)
     {
-        startActivity(AbstractFileListActivity.createOpenIntent(file, null));
+        itsListener.openFile(Uri.fromFile(file));
     }
 
 

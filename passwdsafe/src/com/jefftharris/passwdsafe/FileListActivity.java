@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import com.jefftharris.passwdsafe.view.GuiUtils;
 
 import android.annotation.TargetApi;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -19,6 +20,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,8 +32,13 @@ import android.view.MenuItem;
  * top-level options
  */
 public class FileListActivity extends FragmentActivity
-        implements SyncProviderFragment.Listener
+        implements FileListFragment.Listener,
+                   SyncProviderFragment.Listener,
+                   SyncProviderFilesFragment.Listener
 {
+    private static final String TAG = "FileListActivity";
+
+
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
      */
@@ -105,6 +112,20 @@ public class FileListActivity extends FragmentActivity
         txn.commit();
     }
 
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#openFile(android.net.Uri)
+     * @see com.jefftharris.passwdsafe.SyncProviderFilesFragment.Listener#openFile(android.net.Uri)
+     */
+    @Override
+    public void openFile(Uri uri)
+    {
+        try {
+            startActivity(AbstractFileListActivity.createOpenIntent(uri, null));
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, "Can't open uri: " + uri, e);
+        }
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)

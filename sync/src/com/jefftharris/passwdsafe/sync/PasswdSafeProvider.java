@@ -31,6 +31,7 @@ public class PasswdSafeProvider extends ContentProvider
     private static final int MATCH_PROVIDERS = 1;
     private static final int MATCH_PROVIDER = 2;
     private static final int MATCH_PROVIDER_FILES = 3;
+    private static final int MATCH_PROVIDER_FILE = 4;
 
     private static final HashMap<String, String> PROVIDERS_MAP;
     private static final HashMap<String, String> FILES_MAP;
@@ -49,6 +50,10 @@ public class PasswdSafeProvider extends ContentProvider
                        PasswdSafeContract.Providers.TABLE + "/#/" +
                                PasswdSafeContract.Files.TABLE,
                        MATCH_PROVIDER_FILES);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE + "/#/" +
+                               PasswdSafeContract.Files.TABLE + "/#",
+                       MATCH_PROVIDER_FILE);
 
         PROVIDERS_MAP = new HashMap<String, String>();
         PROVIDERS_MAP.put(PasswdSafeContract.Providers._ID,
@@ -95,6 +100,9 @@ public class PasswdSafeProvider extends ContentProvider
         }
         case MATCH_PROVIDER_FILES: {
             return PasswdSafeContract.Files.CONTENT_TYPE;
+        }
+        case MATCH_PROVIDER_FILE: {
+            return PasswdSafeContract.Files.CONTENT_ITEM_TYPE;
         }
         default: {
             throw new IllegalArgumentException(
