@@ -18,7 +18,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.net.Uri;
 
 public abstract class AbstractPasswdFileListActivity extends ListActivity
     implements PasswdFileActivity
@@ -28,7 +27,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     private static final int DIALOG_SAVE_PROGRESS = 0;
     protected static final int MAX_DIALOG = DIALOG_SAVE_PROGRESS;
 
-    private Uri itsUri;
+    private PasswdFileUri itsUri;
     private ActivityPasswdFile itsPasswdFile;
 
 
@@ -39,14 +38,14 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     }
 
     /** Initialize the file URI */
-    protected final void initUri(Uri uri)
+    protected final void initUri(PasswdFileUri uri)
     {
         itsUri = uri;
     }
 
 
     /** Open a file from a URI */
-    protected final void openFile(Uri uri)
+    protected final void openFile(PasswdFileUri uri)
     {
         itsUri = uri;
         itsPasswdFile = getPasswdSafeApp().accessPasswdFile(itsUri, this);
@@ -66,7 +65,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
 
 
     /** Open a new file */
-    protected final void openNewFile(Uri uri, StringBuilder passwd)
+    protected final void openNewFile(PasswdFileUri uri, StringBuilder passwd)
         throws IOException, NoSuchAlgorithmException
     {
         PasswdFileData fileData = new PasswdFileData(uri);
@@ -182,7 +181,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
 
 
     /** Get the file's URI */
-    protected final Uri getUri()
+    protected final PasswdFileUri getUri()
     {
         return itsUri;
     }
@@ -191,13 +190,13 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     /** Get a name for the URI */
     protected final String getUriName(boolean shortId)
     {
-        return PasswdFileUri.getUriIdentifier(itsUri, this, shortId);
+        return itsUri.getIdentifier(this, shortId);
     }
 
 
     /** Get the URI as a file if possible */
     protected final File getUriAsFile()
     {
-        return PasswdFileUri.getUriAsFile(itsUri);
+        return itsUri.getFile();
     }
 }

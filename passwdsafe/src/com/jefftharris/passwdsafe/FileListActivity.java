@@ -7,8 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import com.jefftharris.passwdsafe.view.GuiUtils;
-
 import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -24,6 +22,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.jefftharris.passwdsafe.view.GuiUtils;
 
 // TODO: update min version to 1.6
 

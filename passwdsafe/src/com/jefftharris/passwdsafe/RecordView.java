@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -15,6 +15,7 @@ import org.pwsafe.lib.file.PwsRecord;
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
@@ -128,11 +129,11 @@ public class RecordView extends AbstractRecordTabActivity
     private DialogValidator itsDeleteValidator;
 
 
-    public static void startActivityForResult(Uri fileUri, String uuid,
+    public static void startActivityForResult(PasswdFileUri uri, String uuid,
                                               int requestCode,
                                               Activity parentAct)
     {
-        Uri.Builder builder = fileUri.buildUpon();
+        Uri.Builder builder = uri.getUri().buildUpon();
         if (uuid != null) {
             builder.appendQueryParameter("rec", uuid);
         }

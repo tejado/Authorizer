@@ -45,6 +45,7 @@ import com.jefftharris.passwdsafe.pref.FileBackupPref;
 public class PasswdFileUri
 {
     private final Uri itsUri;
+    private final Type itsType;
     private final File itsFile;
 
     /** The type of URI */
@@ -60,7 +61,29 @@ public class PasswdFileUri
     public PasswdFileUri(Uri uri)
     {
         itsUri = uri;
-        itsFile = getUriAsFile(itsUri);
+        itsType = getUriType(uri);
+        switch (itsType) {
+        case FILE: {
+            itsFile = new File(uri.getPath());
+            break;
+        }
+        case SYNC_PROVIDER:
+        case EMAIL:
+        case GENERIC_PROVIDER:
+        default: {
+            itsFile = null;
+            break;
+        }
+        }
+    }
+
+
+    /** Constructor from a File */
+    public PasswdFileUri(File file)
+    {
+        itsUri = Uri.fromFile(file);
+        itsType = Type.FILE;
+        itsFile = file;
     }
 
 
@@ -75,7 +98,7 @@ public class PasswdFileUri
         } else {
             ContentResolver cr = context.getContentResolver();
             InputStream is = cr.openInputStream(itsUri);
-            String id = getUriIdentifier(itsUri, context, false);
+            String id = getIdentifier(context, false);
             PwsStorage storage = new PwsStreamStorage(id, is);
             return PwsFileFactory.loadFromStorage(storage, passwd);
         }
@@ -110,57 +133,22 @@ public class PasswdFileUri
     }
 
 
-    /** Convert the URI to a string */
-    @Override
-    public String toString()
+    /** Get the file associated with the URI if it exists */
+    public File getFile()
     {
-        return itsUri.toString();
+        return itsFile;
     }
 
 
-    /** Get the URI type */
-    public static final Type getUriType(Uri uri)
+    /** Get an identifier for the URI */
+    public String getIdentifier(Context context, boolean shortId)
     {
-        if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
-            return Type.FILE;
-        }
-        String auth = uri.getAuthority();
-        if (PasswdSafeContract.AUTHORITY.equals(auth)) {
-            return Type.SYNC_PROVIDER;
-        } else if (auth.indexOf("mail") != -1) {
-            return Type.EMAIL;
-        }
-        return Type.GENERIC_PROVIDER;
-    }
-
-
-    /** Get the file for the URI */
-    public static File getUriAsFile(Uri uri)
-    {
-        switch (getUriType(uri)) {
-        case FILE: {
-            return new File(uri.getPath());
-        }
-        case SYNC_PROVIDER:
-        case EMAIL:
-        case GENERIC_PROVIDER: {
-            break;
-        }
-        }
-        return null;
-    }
-
-
-    /** Get an identifier for the given URI */
-    public static String getUriIdentifier(Uri uri, Context context,
-                                          boolean shortId)
-    {
-        switch (getUriType(uri)) {
+        switch (itsType) {
         case FILE: {
             if (shortId) {
-                return uri.getLastPathSegment();
+                return itsUri.getLastPathSegment();
             } else {
-                return uri.getPath();
+                return itsUri.getPath();
             }
         }
         case SYNC_PROVIDER: {
@@ -174,6 +162,44 @@ public class PasswdFileUri
         }
         }
         return "";
+    }
+
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof PasswdFileUri)) {
+            return false;
+        }
+        PasswdFileUri uri = (PasswdFileUri)o;
+        return itsUri.equals(uri.itsUri);
+    }
+
+
+    /** Convert the URI to a string */
+    @Override
+    public String toString()
+    {
+        return itsUri.toString();
+    }
+
+
+    /** Get the URI type */
+    private static final Type getUriType(Uri uri)
+    {
+        if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
+            return Type.FILE;
+        }
+        String auth = uri.getAuthority();
+        if (PasswdSafeContract.AUTHORITY.equals(auth)) {
+            return Type.SYNC_PROVIDER;
+        } else if (auth.indexOf("mail") != -1) {
+            return Type.EMAIL;
+        }
+        return Type.GENERIC_PROVIDER;
     }
 
 

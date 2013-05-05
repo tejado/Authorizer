@@ -49,7 +49,6 @@ import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
@@ -81,9 +80,9 @@ public class PasswdFileData
     private static final int FIELD_UNSUPPORTED = -1;
     private static final int FIELD_NOT_PRESENT = -2;
 
-    public PasswdFileData(Uri uri)
+    public PasswdFileData(PasswdFileUri uri)
     {
-        itsUri = new PasswdFileUri(uri);
+        itsUri = uri;
     }
 
     public void load(StringBuilder passwd, boolean readonly, Context context)
@@ -237,9 +236,9 @@ public class PasswdFileData
         itsPwsFile.setPassphrase(passwd);
     }
 
-    public final Uri getUri()
+    public final PasswdFileUri getUri()
     {
-        return itsUri.getUri();
+        return itsUri;
     }
 
     public final boolean canEdit()

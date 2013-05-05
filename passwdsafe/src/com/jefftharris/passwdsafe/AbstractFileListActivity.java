@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2011-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2011-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -17,9 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.view.GuiUtils;
-
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -34,6 +31,9 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.view.GuiUtils;
 
 public abstract class AbstractFileListActivity extends ListActivity
 {

@@ -103,9 +103,9 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
     /** Are notifications enabled for a URI */
-    public boolean hasPasswdExpiryNotif(Uri uri)
+    public boolean hasPasswdExpiryNotif(PasswdFileUri uri)
     {
-        return itsNotifUris.contains(uri);
+        return itsNotifUris.contains(uri.getUri());
     }
 
 
@@ -207,7 +207,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
     /** Cancel the notification for a URI */
-    public void cancelNotification(Uri uri)
+    public void cancelNotification(PasswdFileUri uri)
     {
         if (uri != null) {
             try {
@@ -240,13 +240,14 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
     /** Return whether notifications are supported for the URI */
-    public static boolean notifSupported(Uri uri)
+    public static boolean notifSupported(PasswdFileUri uri)
     {
+        // TODO: notifications for sync files?
         if (uri == null) {
             return false;
         }
 
-        File file = PasswdFileUri.getUriAsFile(uri);
+        File file = uri.getFile();
         if (file == null) {
             return false;
         }
@@ -462,6 +463,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             record = entry.itsUuid;
         }
 
+        PasswdFileUri passwdUri = new PasswdFileUri(uri);
         PendingIntent intent = PendingIntent.getActivity(
             itsCtx, 0,
             AbstractFileListActivity.createOpenIntent(uri, record),
@@ -472,7 +474,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         GuiUtils.showNotification(
             itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
             itsCtx.getString(R.string.expiring_password),
-            title, PasswdFileUri.getUriIdentifier(uri, itsCtx, false),
+            title, passwdUri.getIdentifier(itsCtx, false),
             strs, intent, info.getNotifId());
     }
 
@@ -520,12 +522,12 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
     /** Get the id for a URI or null if not found */
-    private static Long getDbUriId(Uri uri, SQLiteDatabase db)
+    private static Long getDbUriId(PasswdFileUri uri, SQLiteDatabase db)
         throws SQLException
     {
         Cursor cursor = db.query(DB_TABLE_URIS, new String[] { DB_COL_URIS_ID },
                                  DB_MATCH_URIS_URI,
-                                 new String[] { uri.toString() },
+                                 new String[] { uri.getUri().toString() },
                                  null, null, null);
         try {
             if (!cursor.moveToFirst()) {

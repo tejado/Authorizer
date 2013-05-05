@@ -35,7 +35,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -289,7 +288,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         mi = menu.findItem(MENU_PASSWD_EXPIRY_NOTIF);
         if (mi != null) {
-            Uri uri = getUri();
+            PasswdFileUri uri = getUri();
             boolean enabled = NotificationMgr.notifSupported(uri);
             boolean checked = false;
             if (enabled) {
@@ -314,7 +313,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case MENU_ADD_RECORD:
         {
             startActivityForResult(
-                new Intent(Intent.ACTION_INSERT, getUri(),
+                new Intent(Intent.ACTION_INSERT, getUri().getUri(),
                            this, RecordEditActivity.class),
                 RECORD_ADD_REQUEST);
             break;
@@ -345,8 +344,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             break;
         }
         case MENU_PASSWD_POLICIES: {
-            startActivityForResult(new Intent(Intent.ACTION_VIEW, getUri(),
-                                             this, PasswdPolicyActivity.class),
+            startActivityForResult(new Intent(Intent.ACTION_VIEW,
+                                              getUri().getUri(),
+                                              this, PasswdPolicyActivity.class),
                                    POLICY_VIEW_REQUEST);
             break;
         }
@@ -687,8 +687,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             TextView tv = (TextView)dialog.findViewById(R.id.file);
             tv.setText(getString(R.string.file_label_val, getUriName(false)));
             CheckBox cb = (CheckBox)dialog.findViewById(R.id.read_only);
-            PasswdFileUri fileUri = new PasswdFileUri(getUri());
-            if (fileUri.isWritable()) {
+            if (getUri().isWritable()) {
                 cb.setEnabled(true);
                 cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
             } else {
@@ -883,7 +882,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         if (!getPasswdFile().isOpen()) {
             if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
-                (getUri().getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
+                (getUri().getUri().getPath().equals(
+                     PasswdSafeApp.DEBUG_AUTO_FILE))) {
                 openFile(new StringBuilder("test123"), false);
             } else {
                 showDialog(DIALOG_GET_PASSWD);
@@ -917,7 +917,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                                     getUri());
             }
             File file = new File(dir, fileName + ".psafe3");
-            openNewFile(Uri.fromFile(file), passwd);
+            openNewFile(new PasswdFileUri(file), passwd);
             setTitle(PasswdSafeApp.getAppFileTitle(getUri(), this));
             showFileData(MOD_DATA);
         } catch (Exception e) {

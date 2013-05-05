@@ -297,18 +297,18 @@ public class PasswdSafeApp extends Application
      * Sanitize an intent URI for the open file URI. Removes fragments and query
      * parameters
      */
-    public static Uri getFileUriFromIntent(Intent intent)
+    public static PasswdFileUri getFileUriFromIntent(Intent intent)
     {
         Uri uri = intent.getData();
         Uri.Builder builder = uri.buildUpon();
         builder.fragment("");
         builder.query("");
-        return builder.build();
+        return new PasswdFileUri(builder.build());
     }
 
     public synchronized ActivityPasswdFile accessPasswdFile
     (
-         Uri uri,
+         PasswdFileUri uri,
          PasswdFileActivity activity
     )
     {
@@ -364,7 +364,7 @@ public class PasswdSafeApp extends Application
     public static final String getAppFileTitle(ActivityPasswdFile actFile,
                                                Context ctx)
     {
-        Uri uri = null;
+        PasswdFileUri uri = null;
         if (actFile != null) {
             PasswdFileData fileData = actFile.getFileData();
             if (fileData != null) {
@@ -374,12 +374,12 @@ public class PasswdSafeApp extends Application
         return getAppFileTitle(uri, ctx);
     }
 
-    public static final String getAppFileTitle(Uri uri, Context ctx)
+    public static final String getAppFileTitle(PasswdFileUri uri, Context ctx)
     {
         StringBuilder builder = new StringBuilder(getAppTitle(ctx));
         if (uri != null) {
             builder.append(" - ");
-            builder.append(PasswdFileUri.getUriIdentifier(uri, ctx, true));
+            builder.append(uri.getIdentifier(ctx, true));
         }
         return builder.toString();
 

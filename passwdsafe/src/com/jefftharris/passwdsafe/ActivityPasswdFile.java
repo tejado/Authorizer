@@ -13,7 +13,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 import android.app.Activity;
@@ -81,8 +80,7 @@ public abstract class ActivityPasswdFile
         Activity activity = getActivity();
         ProgressDialog dlg = new ProgressDialog(activity);
         dlg.setTitle(PasswdSafeApp.getAppTitle(activity));
-        String uri = PasswdFileUri.getUriIdentifier(getFileData().getUri(),
-                                                    activity, true);
+        String uri = getFileData().getUri().getIdentifier(activity, true);
         dlg.setMessage(activity.getString(R.string.saving_file, uri));
         dlg.setIndeterminate(true);
         dlg.setCancelable(false);

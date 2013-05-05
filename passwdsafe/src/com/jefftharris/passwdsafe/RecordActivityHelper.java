@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2011-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2011-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -8,12 +8,12 @@
 package com.jefftharris.passwdsafe;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 public class RecordActivityHelper implements PasswdFileActivity
@@ -23,7 +23,7 @@ public class RecordActivityHelper implements PasswdFileActivity
     private static final int DIALOG_PROGRESS = 0;
     public static final int MAX_DIALOG = DIALOG_PROGRESS;
 
-    private Uri itsUri;
+    private PasswdFileUri itsUri;
     private String itsUUID;
     private ActivityPasswdFile itsPasswdFile;
     private final Activity itsActivity;
@@ -56,7 +56,7 @@ public class RecordActivityHelper implements PasswdFileActivity
         }
     }
 
-    public final Uri getUri()
+    public final PasswdFileUri getUri()
     {
         return itsUri;
     }

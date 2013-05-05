@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,10 +7,11 @@
  */
 package com.jefftharris.passwdsafe;
 
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.TabActivity;
-import android.net.Uri;
 import android.os.Bundle;
 
 public class AbstractRecordTabActivity extends TabActivity implements
@@ -45,7 +46,7 @@ public class AbstractRecordTabActivity extends TabActivity implements
         itsHelper.saveFinished(success);
     }
 
-    protected final Uri getUri()
+    protected final PasswdFileUri getUri()
     {
         return itsHelper.getUri();
     }

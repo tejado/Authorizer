@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -9,8 +9,9 @@ package com.jefftharris.passwdsafe;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.net.Uri;
 import android.os.Bundle;
+
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 
 public abstract class AbstractRecordActivity extends Activity
     implements PasswdFileActivity
@@ -57,7 +58,7 @@ public abstract class AbstractRecordActivity extends Activity
     }
 
 
-    protected final Uri getUri()
+    protected final PasswdFileUri getUri()
     {
         return itsHelper.getUri();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2011-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2011-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -45,7 +45,8 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
     {
         PasswdFileData fileData = getPasswdFileData();
         String uuid = fileData.getUUID(rec);
-        Intent shortcutIntent = FileList.createOpenIntent(getUri(), uuid);
+        Intent shortcutIntent = FileList.createOpenIntent(getUri().getUri(),
+                                                          uuid);
 
         Intent intent = new Intent();
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
