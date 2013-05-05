@@ -54,7 +54,7 @@ public class SyncDb
     public static final String DB_COL_FILES_REMOTE_TITLE = "remote_title";
     public static final String DB_COL_FILES_REMOTE_MOD_DATE = "remote_mod_date";
     public static final String DB_COL_FILES_REMOTE_DELETED = "remote_deleted";
-    private static final String DB_MATCH_FILES_ID =
+    public static final String DB_MATCH_FILES_ID =
         DB_COL_FILES_ID + " = ?";
     public static final String DB_MATCH_FILES_PROVIDER_ID =
         DB_COL_FILES_PROVIDER + " = ?";
@@ -265,6 +265,27 @@ public class SyncDb
         ContentValues values = new ContentValues();
         values.put(DB_COL_PROVIDERS_SYNC_CHANGE, changeId);
         setProviderField(name, values, db);
+    }
+
+
+    /** Get a file */
+    public DbFile getFile(long id)
+            throws SQLException
+    {
+        SQLiteDatabase db = itsDbHelper.getReadableDatabase();
+        Cursor cursor = db.query(DB_TABLE_FILES, DbFile.QUERY_FIELDS,
+                                 DB_MATCH_FILES_ID,
+                                 new String[] { Long.toString(id) },
+                                 null, null, null);
+        try {
+            if (cursor.moveToFirst()) {
+                return new DbFile(cursor);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return null;
     }
 
 

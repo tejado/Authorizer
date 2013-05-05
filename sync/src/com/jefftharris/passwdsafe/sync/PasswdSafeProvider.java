@@ -6,6 +6,8 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
@@ -17,6 +19,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 /**
@@ -168,13 +171,18 @@ public class PasswdSafeProvider extends ContentProvider
         case MATCH_PROVIDER_FILES: {
             qb.setTables(SyncDb.DB_TABLE_FILES);
             qb.setProjectionMap(FILES_MAP);
-
             selection = SyncDb.DB_MATCH_FILES_PROVIDER_ID;
             selectionArgs = new String[] { uri.getPathSegments().get(1) };
-
             if (PasswdSafeContract.Files.TITLE_SORT_ORDER.equals(sortOrder)) {
                 sortOrderValid = true;
             }
+            break;
+        }
+        case MATCH_PROVIDER_FILE: {
+            qb.setTables(SyncDb.DB_TABLE_FILES);
+            qb.setProjectionMap(FILES_MAP);
+            selection = SyncDb.DB_MATCH_FILES_ID;
+            selectionArgs = new String[] { uri.getPathSegments().get(3) };
             break;
         }
         default: {
@@ -208,4 +216,33 @@ public class PasswdSafeProvider extends ContentProvider
         return 0;
     }
 
+    /* (non-Javadoc)
+     * @see android.content.ContentProvider#openFile(android.net.Uri, java.lang.String)
+     */
+    @Override
+    public ParcelFileDescriptor openFile(Uri uri, String mode)
+            throws FileNotFoundException
+    {
+        if (!mode.equals("r")) {
+            throw new IllegalArgumentException("Invalid mode: " + mode);
+        }
+
+        switch (MATCHER.match(uri)) {
+        case MATCH_PROVIDER_FILE: {
+            long id = Long.valueOf(uri.getPathSegments().get(3));
+            SyncDb.DbFile file = itsDb.getFile(id);
+            if ((file == null) || (file.itsLocalFile == null)) {
+                throw new FileNotFoundException(uri.toString());
+            }
+            File localFile = getContext().getFileStreamPath(file.itsLocalFile);
+            Log.i(TAG, "openFile uri " + uri + ", file " + localFile);
+            ParcelFileDescriptor fd = ParcelFileDescriptor.open(
+                    localFile, ParcelFileDescriptor.MODE_READ_ONLY);
+            return fd;
+        }
+        default: {
+            return super.openFile(uri, mode);
+        }
+        }
+    }
 }

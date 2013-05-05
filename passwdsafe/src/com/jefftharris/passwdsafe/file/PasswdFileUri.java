@@ -31,6 +31,7 @@ import org.pwsafe.lib.file.PwsStreamStorage;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
@@ -47,6 +48,7 @@ public class PasswdFileUri
     private final Uri itsUri;
     private final Type itsType;
     private final File itsFile;
+    private String itsTitle = null;
 
     /** The type of URI */
     public enum Type
@@ -152,7 +154,8 @@ public class PasswdFileUri
             }
         }
         case SYNC_PROVIDER: {
-            return "SYNC";
+            resolveSyncUri(context);
+            return itsTitle;
         }
         case EMAIL: {
             return context.getString(R.string.email_attachment);
@@ -184,6 +187,22 @@ public class PasswdFileUri
     public String toString()
     {
         return itsUri.toString();
+    }
+
+
+    /** Resolve fields for a sync URI */
+    private void resolveSyncUri(Context context)
+    {
+        if ((itsType != Type.FILE) && (itsTitle != null)) {
+            return;
+        }
+        ContentResolver cr = context.getContentResolver();
+        Cursor cursor = cr.query(itsUri, PasswdSafeContract.Files.PROJECTION,
+                                 null, null, null);
+        if (cursor.moveToFirst()) {
+            itsTitle = cursor.getString(
+                    PasswdSafeContract.Files.PROJECTION_IDX_TITLE);
+        }
     }
 
 
