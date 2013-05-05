@@ -36,6 +36,7 @@ import android.preference.PreferenceManager;
 
 import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 
 /**
@@ -45,6 +46,15 @@ public class PasswdFileUri
 {
     private final Uri itsUri;
     private final File itsFile;
+
+    /** The type of URI */
+    public enum Type
+    {
+        FILE,
+        SYNC_PROVIDER,
+        EMAIL,
+        GENERIC_PROVIDER
+    }
 
     /** Constructor */
     public PasswdFileUri(Uri uri)
@@ -100,18 +110,42 @@ public class PasswdFileUri
     }
 
 
-    /** Is the URI a file URI */
-    public static final boolean isFileUri(Uri uri)
+    /** Convert the URI to a string */
+    @Override
+    public String toString()
     {
-        return uri.getScheme().equals(ContentResolver.SCHEME_FILE);
+        return itsUri.toString();
+    }
+
+
+    /** Get the URI type */
+    public static final Type getUriType(Uri uri)
+    {
+        if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
+            return Type.FILE;
+        }
+        String auth = uri.getAuthority();
+        if (PasswdSafeContract.AUTHORITY.equals(auth)) {
+            return Type.SYNC_PROVIDER;
+        } else if (auth.indexOf("mail") != -1) {
+            return Type.EMAIL;
+        }
+        return Type.GENERIC_PROVIDER;
     }
 
 
     /** Get the file for the URI */
     public static File getUriAsFile(Uri uri)
     {
-        if (isFileUri(uri)) {
+        switch (getUriType(uri)) {
+        case FILE: {
             return new File(uri.getPath());
+        }
+        case SYNC_PROVIDER:
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            break;
+        }
         }
         return null;
     }
@@ -121,21 +155,25 @@ public class PasswdFileUri
     public static String getUriIdentifier(Uri uri, Context context,
                                           boolean shortId)
     {
-        String id;
-        if (isFileUri(uri)) {
+        switch (getUriType(uri)) {
+        case FILE: {
             if (shortId) {
-                id = uri.getLastPathSegment();
+                return uri.getLastPathSegment();
             } else {
-                id = uri.getPath();
-            }
-        } else {
-            if (uri.getAuthority().indexOf("mail") != -1) {
-                id = context.getString(R.string.email_attachment);
-            } else {
-                id = context.getString(R.string.content_file);
+                return uri.getPath();
             }
         }
-        return id;
+        case SYNC_PROVIDER: {
+            return "SYNC";
+        }
+        case EMAIL: {
+            return context.getString(R.string.email_attachment);
+        }
+        case GENERIC_PROVIDER: {
+            return context.getString(R.string.content_file);
+        }
+        }
+        return "";
     }
 
 

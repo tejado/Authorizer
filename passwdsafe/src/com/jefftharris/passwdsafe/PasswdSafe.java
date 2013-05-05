@@ -687,7 +687,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             TextView tv = (TextView)dialog.findViewById(R.id.file);
             tv.setText(getString(R.string.file_label_val, getUriName(false)));
             CheckBox cb = (CheckBox)dialog.findViewById(R.id.read_only);
-            if (PasswdFileUri.isFileUri(getUri())) {
+            PasswdFileUri fileUri = new PasswdFileUri(getUri());
+            if (fileUri.isWritable()) {
                 cb.setEnabled(true);
                 cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
             } else {
