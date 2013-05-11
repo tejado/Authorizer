@@ -95,15 +95,21 @@ public class PasswdFileUri
                 InvalidPassphraseException, IOException,
                 UnsupportedFileVersionException
     {
-        if (itsFile != null) {
+        switch (itsType) {
+        case FILE: {
             return PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
-        } else {
+        }
+        case SYNC_PROVIDER:
+        case EMAIL:
+        case GENERIC_PROVIDER: {
             ContentResolver cr = context.getContentResolver();
             InputStream is = cr.openInputStream(itsUri);
             String id = getIdentifier(context, false);
             PwsStorage storage = new PwsStreamStorage(id, is);
             return PwsFileFactory.loadFromStorage(storage, passwd);
         }
+        }
+        return null;
     }
 
 
@@ -124,7 +130,19 @@ public class PasswdFileUri
     /** Is the file writable */
     public boolean isWritable()
     {
-        return (itsFile != null) && itsFile.canWrite();
+        switch (itsType) {
+        case FILE: {
+            return (itsFile != null) && itsFile.canWrite();
+        }
+        case SYNC_PROVIDER: {
+            return true;
+        }
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            return false;
+        }
+        }
+        return false;
     }
 
 
