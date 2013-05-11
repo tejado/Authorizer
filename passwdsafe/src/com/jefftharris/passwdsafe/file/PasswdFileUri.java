@@ -117,13 +117,21 @@ public class PasswdFileUri
     public PwsFile createNew(StringBuilder passwd, Context context)
             throws IOException
     {
-        if (itsFile == null) {
+        switch (itsType) {
+        case FILE: {
+            PwsFile file = PwsFileFactory.newFile();
+            file.setPassphrase(passwd);
+            file.setStorage(new PwsFileStorage(itsFile.getAbsolutePath(),
+                                               null));
+            return file;
+        }
+        case SYNC_PROVIDER:
+        case EMAIL:
+        case GENERIC_PROVIDER: {
             throw new IOException("no file");
         }
-        PwsFile file = PwsFileFactory.newFile();
-        file.setPassphrase(passwd);
-        file.setStorage(new PwsFileStorage(itsFile.getAbsolutePath(), null));
-        return file;
+        }
+        return null;
     }
 
 
@@ -211,15 +219,25 @@ public class PasswdFileUri
     /** Resolve fields for a sync URI */
     private void resolveSyncUri(Context context)
     {
-        if ((itsType != Type.FILE) && (itsTitle != null)) {
-            return;
+        switch (itsType) {
+        case FILE:
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            break;
         }
-        ContentResolver cr = context.getContentResolver();
-        Cursor cursor = cr.query(itsUri, PasswdSafeContract.Files.PROJECTION,
-                                 null, null, null);
-        if (cursor.moveToFirst()) {
-            itsTitle = cursor.getString(
-                    PasswdSafeContract.Files.PROJECTION_IDX_TITLE);
+        case SYNC_PROVIDER: {
+            if (itsTitle == null) {
+                ContentResolver cr = context.getContentResolver();
+                Cursor cursor = cr.query(itsUri,
+                                         PasswdSafeContract.Files.PROJECTION,
+                                         null, null, null);
+                if (cursor.moveToFirst()) {
+                    itsTitle = cursor.getString(
+                            PasswdSafeContract.Files.PROJECTION_IDX_TITLE);
+                }
+            }
+            break;
+        }
         }
     }
 
