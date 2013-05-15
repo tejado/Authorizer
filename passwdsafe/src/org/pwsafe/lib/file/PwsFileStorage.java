@@ -161,7 +161,7 @@ public class PwsFileStorage extends PwsStreamStorage {
         }
     }
 
-    private void writeFile(File file, byte[] data) throws IOException
+    public static void writeFile(File file, byte[] data) throws IOException
     {
         FileOutputStream outStream = new FileOutputStream(file);
         try {

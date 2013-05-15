@@ -13,11 +13,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * The PasswdSafeContract class is the contract for the PasswdSafe sync provider
+ * The PasswdSafeContract class is the contract for the PasswdSafe client and
+ * sync providers
  */
 public final class PasswdSafeContract
 {
-    /** The provider's authority */
+    /** The sync provider's authority */
     public static final String AUTHORITY =
         "com.jefftharris.passwdsafe.sync.provider";
 
@@ -89,18 +90,35 @@ public final class PasswdSafeContract
 
         public static final String COL_TITLE = "title";
         public static final String COL_MOD_DATE = "mod_date";
+        public static final String COL_FILE = "file";
 
         public static final String TITLE_SORT_ORDER = "title ASC";
 
         public static final String[] PROJECTION = {
             Files._ID,
             Files.COL_TITLE,
-            Files.COL_MOD_DATE
+            Files.COL_MOD_DATE,
+            Files.COL_FILE
         };
 
         public static final int PROJECTION_IDX_ID = 0;
         public static final int PROJECTION_IDX_TITLE = 1;
         public static final int PROJECTION_IDX_MOD_DATE = 2;
+        public static final int PROJECTION_IDX_FILE = 3;
+    }
+
+    /** The client provider's authority */
+    public static final String CLIENT_AUTHORITY =
+            "com.jefftharris.passwdsafe.client.provider";
+
+    /** The base URI for the client provider */
+    public static final Uri CLIENT_CONTENT_URI =
+        Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + CLIENT_AUTHORITY);
+
+    /** The client files */
+    public static final class ClientFiles
+    {
+        public static final String TABLE = "files";
     }
 }
 

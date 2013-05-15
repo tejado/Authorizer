@@ -74,7 +74,6 @@ public class GDriveSyncer
         itsDrive = driveInfo.first;
         itsDriveToken = driveInfo.second;
         itsSyncDb = new SyncDb(itsContext);
-        Log.i(TAG, "GDriveSyncer");
     }
 
 
@@ -137,6 +136,12 @@ public class GDriveSyncer
         } finally {
             db.endTransaction();
         }
+    }
+
+    /** Get the filename for a local file */
+    public static String getLocalFileName(long fileId)
+    {
+        return "syncfile-" + Long.toString(fileId);
     }
 
     /** Close the syncer */
@@ -353,7 +358,7 @@ public class GDriveSyncer
         if (file == null) {
             file = itsDrive.files().get(dbfile.itsRemoteId).execute();
         }
-        String localFile = "syncfile-" + Long.toString(dbfile.itsId);
+        String localFile = getLocalFileName(dbfile.itsId);
         try {
             if (downloadFile(file, localFile)) {
                 itsSyncDb.updateLocalFile(dbfile.itsId, localFile,

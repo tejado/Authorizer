@@ -126,7 +126,7 @@ public class PasswdFileData
             setSaveHdrFields(context);
 
             itsPwsFile.getStorage().setSaveHelper(
-                    new PasswdFileUri.SaveHelper(context));
+                    new PasswdFileUri.SaveHelper(itsUri, context));
             try {
                 itsPwsFile.save();
                 notifyObservers(this);

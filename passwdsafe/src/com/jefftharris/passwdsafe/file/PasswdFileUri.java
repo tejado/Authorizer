@@ -29,15 +29,18 @@ import org.pwsafe.lib.file.PwsStorage;
 import org.pwsafe.lib.file.PwsStreamStorage;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 
 /**
@@ -45,6 +48,8 @@ import com.jefftharris.passwdsafe.pref.FileBackupPref;
  */
 public class PasswdFileUri
 {
+    private static final String TAG = "PasswdFileUri";
+
     private final Uri itsUri;
     private final Type itsType;
     private final File itsFile;
@@ -99,7 +104,13 @@ public class PasswdFileUri
         case FILE: {
             return PwsFileFactory.loadFile(itsFile.getAbsolutePath(), passwd);
         }
-        case SYNC_PROVIDER:
+        case SYNC_PROVIDER: {
+            ContentResolver cr = context.getContentResolver();
+            InputStream is = cr.openInputStream(itsUri);
+            String id = getIdentifier(context, false);
+            PwsStorage storage = new SyncStorage(itsUri, id, is);
+            return PwsFileFactory.loadFromStorage(storage, passwd);
+        }
         case EMAIL:
         case GENERIC_PROVIDER: {
             ContentResolver cr = context.getContentResolver();
@@ -261,11 +272,19 @@ public class PasswdFileUri
     /** A PwsStorage save helper for files */
     public static class SaveHelper implements PwsStorage.SaveHelper
     {
+        private final PasswdFileUri itsUri;
         private final Context itsContext;
 
-        public SaveHelper(Context context)
+        public SaveHelper(PasswdFileUri uri, Context context)
         {
+            itsUri = uri;
             itsContext = context;
+        }
+
+        /** Get the save context */
+        public Context getContext()
+        {
+            return itsContext;
         }
 
         /* (non-Javadoc)
@@ -341,6 +360,55 @@ public class PasswdFileUri
                 if (!toFile.renameTo(bakFile)) {
                     throw new IOException("Can not create backup file: " +
                                           bakFile);
+                }
+            }
+        }
+    }
+
+
+    /** A PwsStreamStorage implementation for sync providers */
+    private static class SyncStorage extends PwsStreamStorage
+    {
+        private final Uri itsUri;
+
+        public SyncStorage(Uri uri, String id, InputStream stream)
+        {
+            super(id, stream);
+            itsUri = uri;
+        }
+
+        @Override
+        public boolean save(byte[] data, boolean isV3)
+        {
+            File file = null;
+            try {
+                PasswdFileUri.SaveHelper helper =
+                        (PasswdFileUri.SaveHelper)getSaveHelper();
+                Context ctx = helper.getContext();
+                file = File.createTempFile("passwd", ".tmp", ctx.getCacheDir());
+                PwsFileStorage.writeFile(file, data);
+
+                try {
+                    Uri fileUri = PasswdClientProvider.addFile(file);
+                    ContentResolver cr = ctx.getContentResolver();
+                    ContentValues values = new ContentValues();
+                    values.put(PasswdSafeContract.Files.COL_FILE,
+                               fileUri.toString());
+                    cr.update(itsUri, values, null, null);
+                    // TODO handle errors?
+                } finally {
+                    PasswdClientProvider.removeFile(file);
+                }
+
+                PasswdSafeUtil.dbginfo(TAG, "SyncStorage update %s with %s",
+                                       itsUri, file);
+                return true;
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving " + itsUri, e);
+                return false;
+            } finally {
+                if (file != null) {
+                    file.delete();
                 }
             }
         }

@@ -6,13 +6,18 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
-
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -21,6 +26,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 
 /**
  *  The PasswdSafeProvider class is a content provider for synced
@@ -75,6 +82,9 @@ public class PasswdSafeProvider extends ContentProvider
         FILES_MAP.put(PasswdSafeContract.Files.COL_MOD_DATE,
                       SyncDb.DB_COL_FILES_LOCAL_MOD_DATE + " AS " +
                               PasswdSafeContract.Files.COL_MOD_DATE);
+        FILES_MAP.put(PasswdSafeContract.Files.COL_FILE,
+                      SyncDb.DB_COL_FILES_LOCAL_FILE + " AS " +
+                              PasswdSafeContract.Files.COL_FILE);
     }
 
 
@@ -212,8 +222,78 @@ public class PasswdSafeProvider extends ContentProvider
                       String selection,
                       String[] selectionArgs)
     {
-        // TODO Auto-generated method stub
-        return 0;
+        switch (MATCHER.match(uri)) {
+        case MATCH_PROVIDER_FILE: {
+            long id = Long.valueOf(uri.getPathSegments().get(3));
+            String updateUri =
+                    values.getAsString(PasswdSafeContract.Files.COL_FILE);
+            if (updateUri == null) {
+                throw new IllegalArgumentException("File missing");
+            }
+
+            SyncDb.DbFile file = itsDb.getFile(id);
+            if (file == null) {
+                throw new IllegalArgumentException(
+                        "File not found: " + uri);
+            }
+
+            String localFileName = (file.itsLocalFile != null) ?
+                file.itsLocalFile : GDriveSyncer.getLocalFileName(id);
+            File localFile = getContext().getFileStreamPath(localFileName);
+            InputStream is = null;
+            OutputStream os = null;
+            try {
+                ContentResolver cr = getContext().getContentResolver();
+                is = new BufferedInputStream(
+                        cr.openInputStream(Uri.parse(updateUri)));
+                FileOutputStream fos = new FileOutputStream(localFile);
+                os = new BufferedOutputStream(fos);
+                byte[] buf = new byte[4096];
+                int len;
+                while ((len = is.read(buf)) > 0) {
+                    os.write(buf, 0, len);
+                }
+                fos.getFD().sync();
+                // TODO: write to temp file first
+
+                SQLiteDatabase db = itsDb.getDb();
+                try {
+                    db.beginTransaction();
+                    itsDb.updateLocalFile(file.itsId, localFileName,
+                                          file.itsLocalTitle,
+                                          localFile.lastModified(), db);
+                    db.setTransactionSuccessful();
+
+                    // TODO: schedule sync
+                } finally {
+                    db.endTransaction();
+                }
+                return 1;
+            } catch (IOException e) {
+                Log.e(TAG, "Error updating " + uri, e);
+                return 0;
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error closing " + updateUri, e);
+                    }
+                }
+                if (os != null) {
+                    try {
+                        os.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error closing " + localFile, e);
+                    }
+                }
+            }
+        }
+        default: {
+            throw new IllegalArgumentException(
+                    "Update not supported for uri: " + uri);
+        }
+        }
     }
 
     /* (non-Javadoc)

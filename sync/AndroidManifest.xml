@@ -8,12 +8,18 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="17"/>
 
+    <permission
+        android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"
+        android:protectionLevel="signature"/>
+
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"/>
+    <uses-permission android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"/>
 
     <application
         android:allowBackup="true"
@@ -43,6 +49,7 @@
         <provider
             android:name=".PasswdSafeProvider"
             android:authorities="com.jefftharris.passwdsafe.sync.provider"
+            android:permission="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"
             android:exported="true"
             android:syncable="true">
 

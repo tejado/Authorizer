@@ -16,7 +16,7 @@ package org.pwsafe.lib;
  */
 public class Log
 {
-    private String itsTag;
+    private String itsTag = "Log";
 	private int	DebugLevel;
 
 	private Log( String name )

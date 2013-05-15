@@ -15,8 +15,14 @@
         android:minSdkVersion="3"
         android:targetSdkVersion="11"/>
 
+    <permission
+        android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"
+        android:protectionLevel="signature"/>
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"/>
+    <uses-permission android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"/>
 
     <application
         android:name="PasswdSafeApp"
@@ -205,6 +211,13 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <provider android:name=".file.PasswdClientProvider"
+            android:authorities="com.jefftharris.passwdsafe.client.provider"
+            android:permission="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"
+            android:exported="true"
+            android:syncable="false">
+        </provider>
 
         <receiver
             android:name=".ExpirationTimeoutReceiver"

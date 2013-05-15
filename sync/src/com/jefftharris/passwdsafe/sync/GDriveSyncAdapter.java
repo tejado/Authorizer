@@ -40,7 +40,6 @@ public class GDriveSyncAdapter extends AbstractThreadedSyncAdapter
                               ContentProviderClient provider,
                               SyncResult syncResult)
     {
-        Log.i(TAG, "onPerformSync");
         GDriveSyncer syncer = new GDriveSyncer(itsContext, provider, account);
         try {
             syncer.performSync();
