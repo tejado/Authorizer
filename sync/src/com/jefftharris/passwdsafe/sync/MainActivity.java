@@ -52,6 +52,13 @@ public class MainActivity extends FragmentActivity
         itsAccountMgr = new GoogleAccountManager(this);
         itsSyncDb = new SyncDb(this);
 
+        // Check the state of Google Play services
+        int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (rc != ConnectionResult.SUCCESS) {
+            Dialog dlg = GooglePlayServicesUtil.getErrorDialog(rc, this, 0);
+            dlg.show();
+        }
+
         updateGdriveAccount(getPreferenceAccount());
     }
 
@@ -64,21 +71,6 @@ public class MainActivity extends FragmentActivity
         super.onDestroy();
         itsSyncDb.close();
     }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-
-        // TODO: do this always on resume vs. perhaps create?
-        // Check the state of Google Play services
-        int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (rc != ConnectionResult.SUCCESS) {
-            Dialog dlg = GooglePlayServicesUtil.getErrorDialog(rc, this, 0);
-            dlg.show();
-        }
-    }
-
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onResumeFragments()
