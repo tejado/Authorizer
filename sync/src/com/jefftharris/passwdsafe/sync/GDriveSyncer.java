@@ -53,7 +53,9 @@ public class GDriveSyncer
 {
     private static final String TAG = "GDriveSyncer";
 
-    private static final String ABOUT_CHANGE_ID = "largestChangeId";
+    private static final String ABOUT_FIELDS = "largestChangeId";
+    private static final String FILE_FIELDS =
+            "id,title,mimeType,labels,fileExtension,modifiedDate,downloadUrl";
 
     private final Context itsContext;
     private final ContentProviderClient itsProvider;
@@ -196,7 +198,6 @@ public class GDriveSyncer
 
     // TODO: filter on mime types
     // TODO: .dat files?
-    // TODO: only get needed fields
 
 
     /** Perform a full sync of the files */
@@ -205,11 +206,13 @@ public class GDriveSyncer
     {
         Log.i(TAG, "Perform full sync");
         About about = itsDrive.about().get()
-                .setFields(ABOUT_CHANGE_ID).execute();
+                .setFields(ABOUT_FIELDS).execute();
         long largestChangeId = about.getLargestChangeId();
 
         HashMap<String, File> allRemFiles = new HashMap<String, File>();
-        Files.List request = itsDrive.files().list().setQ("not trashed");
+        Files.List request = itsDrive.files().list()
+                .setQ("not trashed")
+                .setFields("nextPageToken,items("+FILE_FIELDS+")");
         do {
             FileList files = request.execute();
             Log.i(TAG, "num files: " + files.getItems().size());
@@ -237,7 +240,9 @@ public class GDriveSyncer
         PasswdSafeUtil.dbginfo(TAG, "performSyncSince %d", changeId);
         HashMap<String, File> changedFiles = new HashMap<String, File>();
         Changes.List request =
-            itsDrive.changes().list().setStartChangeId(changeId + 1);
+            itsDrive.changes().list().setStartChangeId(changeId + 1)
+            .setFields("largestChangeId,nextPageToken," +
+                    "items(deleted,fileId,file("+FILE_FIELDS+"))");
         do {
             ChangeList changes = request.execute();
             long changesLargestId = changes.getLargestChangeId().longValue();
@@ -356,7 +361,7 @@ public class GDriveSyncer
         PasswdSafeUtil.dbginfo(TAG, "syncRemoteToLocal %s", dbfile);
         File file = fileCache.get(dbfile.itsRemoteId);
         if (file == null) {
-            file = itsDrive.files().get(dbfile.itsRemoteId).execute();
+            file = getFile(dbfile.itsRemoteId);
         }
         String localFile = getLocalFileName(dbfile.itsId);
         try {
@@ -390,7 +395,7 @@ public class GDriveSyncer
         } else {
             file = fileCache.get(dbfile.itsRemoteId);
             if (file == null) {
-                file = itsDrive.files().get(dbfile.itsRemoteId).execute();
+                file = getFile(dbfile.itsRemoteId);
             }
             isInsert = false;
         }
@@ -465,6 +470,13 @@ public class GDriveSyncer
     }
     */
 
+
+    /** Get a file's metadata */
+    private File getFile(String id)
+            throws IOException
+    {
+        return itsDrive.files().get(id).setFields(FILE_FIELDS).execute();
+    }
 
     /** Download a file */
     private boolean downloadFile(File file, String localFileName)
