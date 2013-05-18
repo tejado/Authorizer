@@ -8,12 +8,15 @@ package com.jefftharris.passwdsafe.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.SQLException;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -152,7 +155,32 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to clear a GDrive account */
     public void onGdriveClear(View view)
     {
-        setAccount(null);
+        DialogFragment prompt = new DialogFragment()
+        {
+            /* (non-Javadoc)
+             * @see android.support.v4.app.DialogFragment#onCreateDialog(android.os.Bundle)
+             */
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState)
+            {
+                AlertDialog.Builder builder =
+                        new AlertDialog.Builder(getActivity());
+                builder
+                .setMessage(R.string.remove_account)
+                .setPositiveButton(android.R.string.yes,
+                                   new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        setAccount(null);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null);
+                return builder.create();
+            }
+        };
+        prompt.show(getSupportFragmentManager(), null);
     }
 
 
