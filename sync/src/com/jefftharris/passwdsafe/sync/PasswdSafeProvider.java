@@ -264,7 +264,7 @@ public class PasswdSafeProvider extends ContentProvider
                                           localFile.lastModified(), db);
                     db.setTransactionSuccessful();
 
-                    // TODO: schedule sync
+                    cr.notifyChange(uri, null);
                 } finally {
                     db.endTransaction();
                 }
