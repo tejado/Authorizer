@@ -371,12 +371,14 @@ public class PasswdFileUri
     {
         private final Uri itsUri;
 
+        /** Constructor */
         public SyncStorage(Uri uri, String id, InputStream stream)
         {
             super(id, stream);
             itsUri = uri;
         }
 
+        /** Save the file contents */
         @Override
         public boolean save(byte[] data, boolean isV3)
         {
@@ -388,17 +390,12 @@ public class PasswdFileUri
                 file = File.createTempFile("passwd", ".tmp", ctx.getCacheDir());
                 PwsFileStorage.writeFile(file, data);
 
-                try {
-                    Uri fileUri = PasswdClientProvider.addFile(file);
-                    ContentResolver cr = ctx.getContentResolver();
-                    ContentValues values = new ContentValues();
-                    values.put(PasswdSafeContract.Files.COL_FILE,
-                               fileUri.toString());
-                    cr.update(itsUri, values, null, null);
-                    // TODO handle errors?
-                } finally {
-                    PasswdClientProvider.removeFile(file);
-                }
+                Uri fileUri = PasswdClientProvider.addFile(file);
+                ContentResolver cr = ctx.getContentResolver();
+                ContentValues values = new ContentValues();
+                values.put(PasswdSafeContract.Files.COL_FILE,
+                           fileUri.toString());
+                cr.update(itsUri, values, null, null);
 
                 PasswdSafeUtil.dbginfo(TAG, "SyncStorage update %s with %s",
                                        itsUri, file);
@@ -408,6 +405,7 @@ public class PasswdFileUri
                 return false;
             } finally {
                 if (file != null) {
+                    PasswdClientProvider.removeFile(file);
                     file.delete();
                 }
             }
