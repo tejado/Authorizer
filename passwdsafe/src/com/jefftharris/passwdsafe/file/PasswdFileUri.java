@@ -29,6 +29,7 @@ import org.pwsafe.lib.file.PwsStorage;
 import org.pwsafe.lib.file.PwsStreamStorage;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -54,6 +55,7 @@ public class PasswdFileUri
     private final Type itsType;
     private final File itsFile;
     private String itsTitle = null;
+    private PasswdSafeContract.Providers.Type itsSyncType = null;
 
     /** The type of URI */
     public enum Type
@@ -192,7 +194,8 @@ public class PasswdFileUri
         }
         case SYNC_PROVIDER: {
             resolveSyncUri(context);
-            return itsTitle;
+            return String.format("%s - %s",
+                                 itsSyncType.getName(context), itsTitle);
         }
         case EMAIL: {
             return context.getString(R.string.email_attachment);
@@ -237,14 +240,45 @@ public class PasswdFileUri
             break;
         }
         case SYNC_PROVIDER: {
-            if (itsTitle == null) {
-                ContentResolver cr = context.getContentResolver();
-                Cursor cursor = cr.query(itsUri,
+            if (itsTitle != null) {
+                break;
+            }
+            ContentResolver cr = context.getContentResolver();
+            Cursor fileCursor = cr.query(itsUri,
                                          PasswdSafeContract.Files.PROJECTION,
                                          null, null, null);
-                if (cursor.moveToFirst()) {
-                    itsTitle = cursor.getString(
-                            PasswdSafeContract.Files.PROJECTION_IDX_TITLE);
+            Cursor providerCursor = null;
+            try {
+                if (!fileCursor.moveToFirst()) {
+                    break;
+                }
+                String title = fileCursor.getString(
+                        PasswdSafeContract.Files.PROJECTION_IDX_TITLE);
+                long provider = fileCursor.getLong(
+                        PasswdSafeContract.Files.PROJECTION_IDX_PROVIDER);
+
+                Uri providerUri = ContentUris.withAppendedId(
+                        PasswdSafeContract.Providers.CONTENT_URI, provider);
+                providerCursor = cr.query(
+                        providerUri,
+                        PasswdSafeContract.Providers.PROJECTION,
+                        null, null, null);
+                if (!providerCursor.moveToFirst()) {
+                    break;
+                }
+                String typeStr = providerCursor.getString(
+                        PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
+                try {
+                    itsSyncType =
+                            PasswdSafeContract.Providers.Type.valueOf(typeStr);
+                    itsTitle = title;
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, "Unknown provider type: " + typeStr);
+                }
+            } finally {
+                fileCursor.close();
+                if (providerCursor != null) {
+                    providerCursor.close();
                 }
             }
             break;

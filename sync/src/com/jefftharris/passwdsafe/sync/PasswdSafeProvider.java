@@ -77,6 +77,9 @@ public class PasswdSafeProvider extends ContentProvider
         FILES_MAP = new HashMap<String, String>();
         FILES_MAP.put(PasswdSafeContract.Files._ID,
                       SyncDb.DB_COL_FILES_ID);
+        FILES_MAP.put(PasswdSafeContract.Files.COL_PROVIDER,
+                      SyncDb.DB_COL_FILES_PROVIDER + " AS " +
+                              PasswdSafeContract.Files.COL_PROVIDER);
         FILES_MAP.put(PasswdSafeContract.Files.COL_TITLE,
                       SyncDb.DB_COL_FILES_LOCAL_TITLE + " AS " +
                               PasswdSafeContract.Files.COL_TITLE);

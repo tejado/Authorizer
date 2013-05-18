@@ -104,7 +104,7 @@ public class SyncProviderFilesFragment extends ListFragment
         return inflater.inflate(R.layout.fragment_sync_provider_files,
                                 container, false);
         // TODO: add/delete file
-        // TODO: open/save file
+        // TODO: sync provider shortcuts
     }
 
 

@@ -7,6 +7,7 @@
 package com.jefftharris.passwdsafe.lib;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.widget.ImageView;
@@ -71,10 +72,21 @@ public final class PasswdSafeContract
             {
                 switch (this) {
                 case GDRIVE: {
-                    tv.setText(R.string.google_drive);
+                    tv.setText(getName(tv.getContext()));
                     break;
                 }
                 }
+            }
+
+            /** Get the name of the provider */
+            public String getName(Context context)
+            {
+                switch (this) {
+                case GDRIVE: {
+                    return context.getString(R.string.google_drive);
+                }
+                }
+                return null;
             }
         }
     }
@@ -88,6 +100,7 @@ public final class PasswdSafeContract
         public static final String CONTENT_ITEM_TYPE =
                 "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE;
 
+        public static final String COL_PROVIDER = "provider";
         public static final String COL_TITLE = "title";
         public static final String COL_MOD_DATE = "mod_date";
         public static final String COL_FILE = "file";
@@ -96,15 +109,17 @@ public final class PasswdSafeContract
 
         public static final String[] PROJECTION = {
             Files._ID,
+            Files.COL_PROVIDER,
             Files.COL_TITLE,
             Files.COL_MOD_DATE,
             Files.COL_FILE
         };
 
         public static final int PROJECTION_IDX_ID = 0;
-        public static final int PROJECTION_IDX_TITLE = 1;
-        public static final int PROJECTION_IDX_MOD_DATE = 2;
-        public static final int PROJECTION_IDX_FILE = 3;
+        public static final int PROJECTION_IDX_PROVIDER = 1;
+        public static final int PROJECTION_IDX_TITLE = 2;
+        public static final int PROJECTION_IDX_MOD_DATE = 3;
+        public static final int PROJECTION_IDX_FILE = 4;
     }
 
     /** The client provider's authority */
