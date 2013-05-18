@@ -19,6 +19,7 @@ import java.util.HashMap;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -239,26 +240,27 @@ public class PasswdSafeProvider extends ContentProvider
 
             String localFileName = (file.itsLocalFile != null) ?
                 file.itsLocalFile : GDriveSyncer.getLocalFileName(id);
-            File localFile = getContext().getFileStreamPath(localFileName);
-            InputStream is = null;
-            OutputStream os = null;
+            File tmpFile = null;
             try {
+                Context ctx = getContext();
+                tmpFile = File.createTempFile("passwd", ".tmp",
+                                              ctx.getFilesDir());
+
                 ContentResolver cr = getContext().getContentResolver();
-                is = new BufferedInputStream(
-                        cr.openInputStream(Uri.parse(updateUri)));
-                FileOutputStream fos = new FileOutputStream(localFile);
-                os = new BufferedOutputStream(fos);
-                byte[] buf = new byte[4096];
-                int len;
-                while ((len = is.read(buf)) > 0) {
-                    os.write(buf, 0, len);
-                }
-                fos.getFD().sync();
-                // TODO: write to temp file first
+                writeToFile(cr.openInputStream(Uri.parse(updateUri)),
+                            updateUri, tmpFile);
 
                 SQLiteDatabase db = itsDb.getDb();
                 try {
                     db.beginTransaction();
+
+                    File localFile = ctx.getFileStreamPath(localFileName);
+                    if (!tmpFile.renameTo(localFile)) {
+                        throw new IOException(
+                                 "Error renaming " + tmpFile.getAbsolutePath() +
+                                 " to " + localFile.getAbsolutePath());
+                    }
+                    tmpFile = null;
                     itsDb.updateLocalFile(file.itsId, localFileName,
                                           file.itsLocalTitle,
                                           localFile.lastModified(), db);
@@ -273,18 +275,10 @@ public class PasswdSafeProvider extends ContentProvider
                 Log.e(TAG, "Error updating " + uri, e);
                 return 0;
             } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error closing " + updateUri, e);
-                    }
-                }
-                if (os != null) {
-                    try {
-                        os.close();
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error closing " + localFile, e);
+                if (tmpFile != null) {
+                    if (!tmpFile.delete()) {
+                        Log.e(TAG, "Error deleting tmp file " +
+                                tmpFile.getAbsolutePath());
                     }
                 }
             }
@@ -323,6 +317,41 @@ public class PasswdSafeProvider extends ContentProvider
         default: {
             return super.openFile(uri, mode);
         }
+        }
+    }
+
+
+    /** Write a source stream to a file.  The source is closed. */
+    private static void writeToFile(InputStream src, String srcName, File file)
+        throws IOException
+    {
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new BufferedInputStream(src);
+            FileOutputStream fos = new FileOutputStream(file);
+            os = new BufferedOutputStream(fos);
+            byte[] buf = new byte[4096];
+            int len;
+            while ((len = is.read(buf)) > 0) {
+                os.write(buf, 0, len);
+            }
+            fos.getFD().sync();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error closing " + srcName, e);
+                }
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error closing " + file.getAbsolutePath(), e);
+                }
+            }
         }
     }
 }
