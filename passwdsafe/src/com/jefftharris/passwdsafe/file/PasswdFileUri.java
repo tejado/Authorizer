@@ -272,12 +272,10 @@ public class PasswdFileUri
     /** A PwsStorage save helper for files */
     public static class SaveHelper implements PwsStorage.SaveHelper
     {
-        private final PasswdFileUri itsUri;
         private final Context itsContext;
 
-        public SaveHelper(PasswdFileUri uri, Context context)
+        public SaveHelper(Context context)
         {
-            itsUri = uri;
             itsContext = context;
         }
 

@@ -42,6 +42,7 @@ import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
 import org.pwsafe.lib.file.PwsRecordV3;
+import org.pwsafe.lib.file.PwsStorage;
 import org.pwsafe.lib.file.PwsStringField;
 import org.pwsafe.lib.file.PwsStringUnicodeField;
 import org.pwsafe.lib.file.PwsTimeField;
@@ -125,13 +126,13 @@ public class PasswdFileData
 
             setSaveHdrFields(context);
 
-            itsPwsFile.getStorage().setSaveHelper(
-                    new PasswdFileUri.SaveHelper(itsUri, context));
+            PwsStorage storage = itsPwsFile.getStorage();
             try {
+                storage.setSaveHelper(new PasswdFileUri.SaveHelper(context));
                 itsPwsFile.save();
                 notifyObservers(this);
             } finally {
-                itsPwsFile.getStorage().setSaveHelper(null);
+                storage.setSaveHelper(null);
             }
         }
     }
