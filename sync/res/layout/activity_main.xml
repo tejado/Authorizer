@@ -29,20 +29,41 @@
         android:id="@+id/gdrive_acct"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
+        android:padding="6dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textIsSelectable="false"/>
 
-    <LinearLayout
-        android:id="@+id/gdrive_btns"
+    <RelativeLayout
+        android:id="@+id/gdrive_controls"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/gdrive_interval_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/sync_interval_label"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+            <Spinner
+                android:id="@+id/gdrive_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/interval_array"/>
+        </LinearLayout>
 
         <Button
             android:id="@+id/gdrive_sync"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/gdrive_interval_box"
             android:drawableLeft="@android:drawable/ic_popup_sync"
             android:onClick="onGdriveSync"
             android:padding="12dp"
@@ -52,11 +73,13 @@
             android:id="@+id/gdrive_clear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/gdrive_interval_box"
+            android:layout_toRightOf="@id/gdrive_sync"
             android:drawableLeft="@android:drawable/ic_delete"
             android:onClick="onGdriveClear"
             android:padding="12dp"
             android:text="@string/clear"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

@@ -27,6 +27,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -63,6 +66,22 @@ public class MainActivity extends FragmentActivity
         // TODO: create a special google acct for the sync service
         itsAccountMgr = new GoogleAccountManager(this);
         itsSyncDb = new SyncDb(this);
+
+        Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
+        freqSpin.setOnItemSelectedListener(new OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id)
+            {
+                onGdriveFreqChanged(pos);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+            }
+        });
 
         // Check the state of Google Play services
         int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -195,6 +214,12 @@ public class MainActivity extends FragmentActivity
     }
 
 
+    /** GDrive sync frequency spinner changed */
+    private void onGdriveFreqChanged(int pos)
+    {
+        //ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
+    }
+
     /* (non-Javadoc)
      * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
      */
@@ -250,11 +275,18 @@ public class MainActivity extends FragmentActivity
     {
         View chooseBtn = findViewById(R.id.gdrive_choose);
         TextView acctView = (TextView)findViewById(R.id.gdrive_acct);
-        View btns = findViewById(R.id.gdrive_btns);
+        View btns = findViewById(R.id.gdrive_controls);
         if (cursor != null) {
             String acct = cursor.getString(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+            int freqVal = cursor.getInt(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
+            ProviderSyncFreqPref freq =
+                    ProviderSyncFreqPref.freqValueOf(freqVal);
             itsGdriveAccount = itsAccountMgr.getAccountByName(acct);
+
+            Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
+            freqSpin.setSelection(freq.getDisplayIdx());
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             acctView.setText("Account - " + itsGdriveAccount.name);

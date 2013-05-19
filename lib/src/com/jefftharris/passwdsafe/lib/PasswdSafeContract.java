@@ -40,16 +40,19 @@ public final class PasswdSafeContract
 
         public static final String COL_TYPE = "type";
         public static final String COL_ACCT = "acct";
+        public static final String COL_SYNC_FREQ = "sync_freq";
 
         public static final String[] PROJECTION = {
             Providers._ID,
             Providers.COL_TYPE,
-            Providers.COL_ACCT
+            Providers.COL_ACCT,
+            Providers.COL_SYNC_FREQ
         };
 
         public static final int PROJECTION_IDX_ID = 0;
         public static final int PROJECTION_IDX_TYPE = 1;
         public static final int PROJECTION_IDX_ACCT = 2;
+        public static final int PROJECTION_IDX_SYNC_FREQ = 3;
 
         /** The type of provider */
         public enum Type

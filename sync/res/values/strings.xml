@@ -9,5 +9,14 @@
     <string name="remove_account">Remove account?</string>
     <string name="removing_account">Removing account&#8230;</string>
     <string name="sync">Sync</string>
+    <string name="sync_interval_label">Sync interval:</string>
+
+    <string-array name="interval_array">
+        <item>None</item>
+        <item>15 Minutes</item>
+        <item>30 Minutes</item>
+        <item>1 Hour</item>
+        <item>1 Day</item>
+    </string-array>
 
 </resources>
