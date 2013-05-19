@@ -17,7 +17,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -37,8 +36,6 @@ public class SyncDb
     public static final String DB_COL_PROVIDERS_SYNC_FREQ = "sync_freq";
     public static final String DB_MATCH_PROVIDERS_ID =
         DB_COL_PROVIDERS_ID + " = ?";
-    private static final String DB_MATCH_PROVIDERS_TYPE =
-        DB_COL_PROVIDERS_TYPE + " = ?";
     private static final String DB_MATCH_PROVIDERS_TYPE_ACCT =
         DB_COL_PROVIDERS_TYPE + " = ? AND " + DB_COL_PROVIDERS_ACCT + " = ?";
     public static final int DEFAULT_PROVIDER_SYNC_FREQ = 15 * 60;
@@ -128,30 +125,6 @@ public class SyncDb
     public SQLiteDatabase getDb()
     {
         return itsDbHelper.getWritableDatabase();
-    }
-
-    /** Get the sync provider account */
-    public String getProviderAccount()
-    {
-        try {
-            SQLiteDatabase db = itsDbHelper.getReadableDatabase();
-            String[] args = new String[]
-                    { PasswdSafeContract.Providers.Type.GDRIVE.toString() };
-            Cursor cursor = db.query(DB_TABLE_PROVIDERS,
-                                     new String[] { DB_COL_PROVIDERS_ACCT },
-                                     DB_MATCH_PROVIDERS_TYPE, args,
-                                     null, null, null);
-            try {
-                if (cursor.moveToFirst()) {
-                    return cursor.getString(0);
-                }
-            } finally {
-                cursor.close();
-            }
-        } catch (SQLException e) {
-            Log.e(TAG, "DB error", e);
-        }
-        return "";
     }
 
     /** Add a provider */

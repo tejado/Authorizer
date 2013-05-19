@@ -13,11 +13,16 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,16 +37,20 @@ import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccoun
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 
 public class MainActivity extends FragmentActivity
+        implements LoaderCallbacks<Cursor>
 {
     private static final String TAG = "MainActivity";
 
     private static final int CHOOSE_ACCOUNT = 0;
+
+    private static final int LOADER_PROVIDERS = 0;
 
     private static final String[] ACCOUNT_TYPE =
         new String[] {GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
 
     private GoogleAccountManager itsAccountMgr;
     private SyncDb itsSyncDb;
+    private Account itsGdriveAccount = null;
     private Account itsNewAccount = null;
 
     @Override
@@ -62,7 +71,9 @@ public class MainActivity extends FragmentActivity
             dlg.show();
         }
 
-        updateGdriveAccount(getPreferenceAccount());
+        updateGdriveAccount(null);
+        LoaderManager lm = getSupportLoaderManager();
+        lm.initLoader(LOADER_PROVIDERS, null, this);
     }
 
     /* (non-Javadoc)
@@ -134,7 +145,7 @@ public class MainActivity extends FragmentActivity
     public void onGdriveChoose(View view)
     {
         Intent intent =
-            AccountPicker.newChooseAccountIntent(getPreferenceAccount(),
+            AccountPicker.newChooseAccountIntent(itsGdriveAccount,
                                                  null, ACCOUNT_TYPE, true,
                                                  null, null, null, null);
         startActivityForResult(intent, CHOOSE_ACCOUNT);
@@ -144,9 +155,9 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to sync a GDrive account */
     public void onGdriveSync(View view)
     {
-        Account acct = getPreferenceAccount();
-        if (acct != null) {
-            ContentResolver.requestSync(acct, PasswdSafeContract.AUTHORITY,
+        if (itsGdriveAccount != null) {
+            ContentResolver.requestSync(itsGdriveAccount,
+                                        PasswdSafeContract.AUTHORITY,
                                         new Bundle());
         }
     }
@@ -184,18 +195,72 @@ public class MainActivity extends FragmentActivity
     }
 
 
+    /* (non-Javadoc)
+     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
+     */
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args)
+    {
+        return new CursorLoader(this, PasswdSafeContract.Providers.CONTENT_URI,
+                                PasswdSafeContract.Providers.PROJECTION,
+                                null, null, null);
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoadFinished(android.support.v4.content.Loader, java.lang.Object)
+     */
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
+    {
+        boolean hasGdrive = false;
+        for (boolean more = cursor.moveToFirst(); more;
+                more = cursor.moveToNext()) {
+            String typeStr = cursor.getString(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
+            try {
+                PasswdSafeContract.Providers.Type type =
+                        PasswdSafeContract.Providers.Type.valueOf(typeStr);
+                switch (type) {
+                case GDRIVE: {
+                    hasGdrive = true;
+                    updateGdriveAccount(cursor);
+                    break;
+                }
+                }
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Unknown type: " + typeStr);
+            }
+        }
+        if (!hasGdrive) {
+            updateGdriveAccount(null);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoaderReset(android.support.v4.content.Loader)
+     */
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader)
+    {
+        updateGdriveAccount(null);
+    }
+
     /** Update the UI when the GDrive account is changed */
-    private final void updateGdriveAccount(Account acct)
+    private final void updateGdriveAccount(Cursor cursor)
     {
         View chooseBtn = findViewById(R.id.gdrive_choose);
         TextView acctView = (TextView)findViewById(R.id.gdrive_acct);
         View btns = findViewById(R.id.gdrive_btns);
-        if (acct != null) {
+        if (cursor != null) {
+            String acct = cursor.getString(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+            itsGdriveAccount = itsAccountMgr.getAccountByName(acct);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
-            acctView.setText("Account - " + acct.name);
+            acctView.setText("Account - " + itsGdriveAccount.name);
             btns.setVisibility(View.VISIBLE);
         } else {
+            itsGdriveAccount = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
             btns.setVisibility(View.GONE);
@@ -207,13 +272,6 @@ public class MainActivity extends FragmentActivity
     {
         new AccountTask(account);
     }
-
-    /** Get the currently preferred account to use with the app */
-    private Account getPreferenceAccount()
-    {
-        return itsAccountMgr.getAccountByName(itsSyncDb.getProviderAccount());
-    }
-
 
     /** Async task to set the account */
     private final class AccountTask extends AsyncTask<Account, Void, Account>
@@ -228,7 +286,7 @@ public class MainActivity extends FragmentActivity
                     R.string.removing_account : R.string.adding_account);
             itsProgressFrag = ProgressFragment.newInstance(msg);
             itsProgressFrag.show(getSupportFragmentManager(), null);
-            itsOldAccount = getPreferenceAccount();
+            itsOldAccount = itsGdriveAccount;
             execute(acct);
         }
 
@@ -266,7 +324,6 @@ public class MainActivity extends FragmentActivity
         protected void onPostExecute(Account account)
         {
             super.onPostExecute(account);
-            updateGdriveAccount(account);
             itsProgressFrag.dismiss();
         }
     }
