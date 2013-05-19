@@ -194,18 +194,18 @@ public class GDriveSyncer
         SQLiteDatabase db = itsSyncDb.getDb();
         try {
             db.beginTransaction();
-            long changeId = itsSyncDb.getProviderSyncChange(itsAccount.name,
+            SyncDb.DbProvider provider = SyncDb.getProvider(itsAccount.name,
                                                             db);
+            long changeId = provider.itsSyncChange;
             Log.i(TAG, "largest change " + changeId);
             long newChangeId = -1;
             if (changeId == -1) {
-                newChangeId = performFullSync(db);
+                newChangeId = performFullSync(provider, db);
             } else {
-                newChangeId = performSyncSince(changeId, db);
+                newChangeId = performSyncSince(provider, changeId, db);
             }
             if (changeId != newChangeId) {
-                itsSyncDb.setProviderSyncChange(itsAccount.name,
-                                                newChangeId, db);
+                SyncDb.updateProviderSyncChange(provider, newChangeId, db);
             }
 
             itsContext.getContentResolver().notifyChange(
@@ -230,7 +230,7 @@ public class GDriveSyncer
 
 
     /** Perform a full sync of the files */
-    private long performFullSync(SQLiteDatabase db)
+    private long performFullSync(SyncDb.DbProvider provider, SQLiteDatabase db)
             throws SQLException, IOException
     {
         Log.i(TAG, "Perform full sync");
@@ -257,13 +257,14 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        performSync(allRemFiles, db);
+        performSync(allRemFiles, provider, db);
         return largestChangeId;
     }
 
 
     /** Perform a sync of files since the given change id */
-    private long performSyncSince(long changeId, SQLiteDatabase db)
+    private long performSyncSince(SyncDb.DbProvider provider,
+                                  long changeId, SQLiteDatabase db)
         throws SQLException, IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "performSyncSince %d", changeId);
@@ -293,17 +294,19 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        performSync(changedFiles, db);
+        performSync(changedFiles, provider, db);
         return changeId;
     }
 
 
     /** Perform a sync of the files */
-    private void performSync(HashMap<String, File> remfiles, SQLiteDatabase db)
+    private void performSync(HashMap<String, File> remfiles,
+                             SyncDb.DbProvider provider,
+                             SQLiteDatabase db)
             throws SQLException
     {
         HashMap<String, File> fileCache = new HashMap<String, File>(remfiles);
-        List<SyncDb.DbFile> dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
+        List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
         for (SyncDb.DbFile dbfile: dbfiles) {
             if (remfiles.containsKey(dbfile.itsRemoteId)) {
                 File remfile = remfiles.get(dbfile.itsRemoteId);
@@ -329,11 +332,11 @@ public class GDriveSyncer
             }
             String fileId = remfile.getId();
             PasswdSafeUtil.dbginfo(TAG, "performSync add remote %s", fileId);
-            itsSyncDb.addRemoteFile(itsAccount.name, fileId, remfile.getTitle(),
+            itsSyncDb.addRemoteFile(provider.itsId, fileId, remfile.getTitle(),
                                     remfile.getModifiedDate().getValue(), db);
         }
 
-        dbfiles = itsSyncDb.getFiles(itsAccount.name, db);
+        dbfiles = SyncDb.getFiles(provider.itsId, db);
         for (SyncDb.DbFile dbfile: dbfiles) {
             try {
                 if (isRemoteNewer(dbfile)) {

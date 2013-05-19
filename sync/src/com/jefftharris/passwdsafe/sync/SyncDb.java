@@ -184,110 +184,43 @@ public class SyncDb
                                               SQLiteDatabase db)
            throws SQLException
     {
-        String[] idargs = new String[] { Long.toString(id) };
         ContentValues values = new ContentValues();
         values.put(DB_COL_PROVIDERS_SYNC_FREQ, freq);
-        db.update(DB_TABLE_PROVIDERS, values,
-                  DB_MATCH_PROVIDERS_ID, idargs);
+        updateProviderFields(id, values, db);
     }
 
-    /** Get a provider */
+    /** Update a provider sync change */
+    public static void updateProviderSyncChange(DbProvider provider,
+                                                long change,
+                                                SQLiteDatabase db)
+           throws SQLException
+    {
+        PasswdSafeUtil.dbginfo(TAG, "Set provider sync change %s: %d",
+                               provider.itsAcct, change);
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_PROVIDERS_SYNC_CHANGE, change);
+        updateProviderFields(provider.itsId, values, db);
+    }
+
+    /** Get a provider by id */
     public static DbProvider getProvider(long id, SQLiteDatabase db)
             throws SQLException
     {
-        Cursor cursor = db.query(DB_TABLE_PROVIDERS, DbProvider.QUERY_FIELDS,
-                                 DB_MATCH_PROVIDERS_ID,
-                                 new String[] { Long.toString(id) },
-                                 null, null, null);
-        try {
-            if (cursor.moveToFirst()) {
-                return new DbProvider(cursor);
-            }
-        } finally {
-            cursor.close();
-        }
-
-        return null;
+        return getProvider(DB_MATCH_PROVIDERS_ID,
+                           new String[] { Long.toString(id) }, db);
     }
 
-    /** Get the id for a provider */
-    public long getProviderId(String name)
-        throws SQLException
+    /** Get a provider by name */
+    public static DbProvider getProvider(String acctName, SQLiteDatabase db)
+            throws SQLException
     {
-        long id = -1;
-        Cursor cursor = getProviderField(name, DB_COL_PROVIDERS_ID);
-        if (cursor != null) {
-            try {
-                id = cursor.getLong(0);
-            } finally {
-                cursor.close();
-            }
-        }
-        return id;
+        return getProvider(
+                DB_MATCH_PROVIDERS_TYPE_ACCT,
+                new String[] {
+                        PasswdSafeContract.Providers.Type.GDRIVE.toString(),
+                        acctName },
+                db);
     }
-
-    /** Get the id for a provider */
-    public long getProviderId(String name, SQLiteDatabase db)
-        throws SQLException
-    {
-        long id = -1;
-        Cursor cursor = getProviderField(name, DB_COL_PROVIDERS_ID, db);
-        if (cursor != null) {
-            try {
-                id = cursor.getLong(0);
-            } finally {
-                cursor.close();
-            }
-        }
-        return id;
-    }
-
-    /** Get the sync frequency for a provider */
-    public int getProviderSyncFreq(String name)
-        throws SQLException
-    {
-        // TODO: need sync frequency pref?
-        int freq = -1;
-        Cursor cursor = getProviderField(name, DB_COL_PROVIDERS_SYNC_FREQ);
-        if (cursor != null) {
-            try {
-                freq = cursor.getInt(0);
-            } finally {
-                cursor.close();
-            }
-        }
-        return freq;
-    }
-
-    /** Get the sync change id for a provider */
-    public long getProviderSyncChange(String name, SQLiteDatabase db)
-        throws SQLException
-    {
-        long changeId = -1;
-        Cursor cursor = getProviderField(name, DB_COL_PROVIDERS_SYNC_CHANGE,
-                                         db);
-        if (cursor != null) {
-            try {
-                changeId = cursor.getLong(0);
-            } finally {
-                cursor.close();
-            }
-        }
-        return changeId;
-    }
-
-
-    /** Set the sync change identifier for a provider */
-    public void setProviderSyncChange(String name, long changeId,
-                                      SQLiteDatabase db)
-    {
-        PasswdSafeUtil.dbginfo(TAG, "Set provider sync change %s: %d",
-                               name, changeId);
-        ContentValues values = new ContentValues();
-        values.put(DB_COL_PROVIDERS_SYNC_CHANGE, changeId);
-        setProviderField(name, values, db);
-    }
-
 
     /** Get a file */
     public DbFile getFile(long id)
@@ -309,14 +242,6 @@ public class SyncDb
         return null;
     }
 
-
-    /** Get all of the files for a provider by name */
-    public List<DbFile> getFiles(String providerName, SQLiteDatabase db)
-            throws SQLException
-    {
-        long providerId = getProviderId(providerName, db);
-        return getFiles(providerId, db);
-    }
 
     /** Get all of the files for a provider by id */
     public static List<DbFile> getFiles(long providerId, SQLiteDatabase db)
@@ -341,12 +266,11 @@ public class SyncDb
 
 
     /** Add a remote file for a provider */
-    public void addRemoteFile(String providerName,
+    public void addRemoteFile(long providerId,
                               String remId, String remTitle, long remModDate,
                               SQLiteDatabase db)
         throws SQLException
     {
-        long providerId = getProviderId(providerName, db);
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_PROVIDER, providerId);
         values.put(DB_COL_FILES_LOCAL_MOD_DATE, -1);
@@ -410,44 +334,32 @@ public class SyncDb
     }
 
 
-    /** Get a field for a provider */
-    private Cursor getProviderField(String name, String column)
-        throws SQLException
+    /** Get a provider */
+    private static DbProvider getProvider(String match, String[] matchArgs,
+                                          SQLiteDatabase db)
+            throws SQLException
     {
-        SQLiteDatabase db = itsDbHelper.getReadableDatabase();
-        return getProviderField(name, column, db);
-    }
-
-
-    /** Get a field for a provider */
-    private Cursor getProviderField(String name, String column,
-                                    SQLiteDatabase db)
-        throws SQLException
-    {
-        String[] args = new String[]
-                { PasswdSafeContract.Providers.Type.GDRIVE.toString(), name };
-        Cursor cursor = db.query(DB_TABLE_PROVIDERS,
-                                 new String[] { column },
-                                 DB_MATCH_PROVIDERS_TYPE_ACCT, args,
-                                 null, null, null);
-        if (cursor.moveToFirst()) {
-            return cursor;
-        } else {
+        Cursor cursor = db.query(DB_TABLE_PROVIDERS, DbProvider.QUERY_FIELDS,
+                                 match, matchArgs, null, null, null);
+        try {
+            if (cursor.moveToFirst()) {
+                return new DbProvider(cursor);
+            }
+        } finally {
             cursor.close();
         }
         return null;
     }
 
-
-    /** Set a field for a provider */
-    private void setProviderField(String name, ContentValues values,
-                                  SQLiteDatabase db)
+    /** Update fields for a provider */
+    private static void updateProviderFields(long providerId,
+                                             ContentValues values,
+                                             SQLiteDatabase db)
         throws SQLException
     {
-        String[] args = new String[]
-                { PasswdSafeContract.Providers.Type.GDRIVE.toString(), name };
+        String[] idargs = new String[] { Long.toString(providerId) };
         db.update(DB_TABLE_PROVIDERS, values,
-                  DB_MATCH_PROVIDERS_TYPE_ACCT, args);
+                  DB_MATCH_PROVIDERS_ID, idargs);
     }
 
 
