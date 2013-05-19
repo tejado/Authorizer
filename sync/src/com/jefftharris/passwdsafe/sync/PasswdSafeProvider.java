@@ -309,7 +309,6 @@ public class PasswdSafeProvider extends ContentProvider
                                                 db, getContext());
                 }
                 db.setTransactionSuccessful();
-                return 1;
             } catch (Exception e) {
                 String msg = "Error deleting provier: " + uri;
                 Log.e(TAG, msg, e);
@@ -317,6 +316,7 @@ public class PasswdSafeProvider extends ContentProvider
             } finally {
                 db.endTransaction();
             }
+            return 1;
         }
         case MATCH_PROVIDER_FILE: {
             long id = Long.valueOf(uri.getPathSegments().get(3));
@@ -364,7 +364,6 @@ public class PasswdSafeProvider extends ContentProvider
                 } finally {
                     db.endTransaction();
                 }
-                return 1;
             } catch (IOException e) {
                 Log.e(TAG, "Error updating " + uri, e);
                 return 0;
@@ -376,6 +375,7 @@ public class PasswdSafeProvider extends ContentProvider
                     }
                 }
             }
+            return 1;
         }
         default: {
             throw new IllegalArgumentException(
