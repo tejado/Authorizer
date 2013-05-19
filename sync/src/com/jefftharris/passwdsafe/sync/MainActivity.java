@@ -12,10 +12,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -53,11 +53,10 @@ public class MainActivity extends FragmentActivity
     private static final String[] ACCOUNT_TYPE =
         new String[] {GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
 
-    private GoogleAccountManager itsAccountMgr;
     private SyncDb itsSyncDb;
     private Account itsGdriveAccount = null;
     private Uri itsGdriveUri = null;
-    private Account itsNewAccount = null;
+    private String itsNewAccount = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,7 +66,6 @@ public class MainActivity extends FragmentActivity
         Log.i(TAG, "onCreate");
 
         // TODO: create a special google acct for the sync service
-        itsAccountMgr = new GoogleAccountManager(this);
         itsSyncDb = new SyncDb(this);
 
         Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
@@ -132,9 +130,7 @@ public class MainActivity extends FragmentActivity
                         b.getString(AccountManager.KEY_ACCOUNT_NAME);
                 Log.i(TAG, "Selected account: " + accountName);
                 if (accountName != null && accountName.length() > 0) {
-                    Account account =
-                        itsAccountMgr.getAccountByName(accountName);
-                    itsNewAccount = account;
+                    itsNewAccount = accountName;
                 }
             }
             break;
@@ -288,7 +284,9 @@ public class MainActivity extends FragmentActivity
                     PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
             ProviderSyncFreqPref freq =
                     ProviderSyncFreqPref.freqValueOf(freqVal);
-            itsGdriveAccount = itsAccountMgr.getAccountByName(acct);
+            GoogleAccountManager acctMgr = new GoogleAccountManager(this);
+            // TODO: how to handle account that no longer exists
+            itsGdriveAccount = acctMgr.getAccountByName(acct);
             itsGdriveUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
 
@@ -308,19 +306,19 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Set the new account to use with the app */
-    private void setAccount(Account account)
+    private void setAccount(String account)
     {
         new AccountTask(account);
     }
 
     /** Async task to set the account */
-    private final class AccountTask extends AsyncTask<Account, Void, Account>
+    private final class AccountTask extends AsyncTask<String, Void, Uri>
     {
         ProgressFragment itsProgressFrag;
         Uri itsOldAccount;
 
         /** Constructor */
-        public AccountTask(Account acct)
+        public AccountTask(String acct)
         {
             String msg = getString((acct == null) ?
                     R.string.removing_account : R.string.adding_account);
@@ -334,36 +332,35 @@ public class MainActivity extends FragmentActivity
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected Account doInBackground(Account... params)
+        protected Uri doInBackground(String... params)
         {
-            Account account = params[0];
+            String account = params[0];
             try {
+                ContentResolver cr = MainActivity.this.getContentResolver();
                 // Stop syncing for the previously selected account.
                 if (itsOldAccount != null) {
-                    ContentResolver cr = MainActivity.this.getContentResolver();
                     cr.delete(itsOldAccount, null, null);
                 }
 
                 if (account != null) {
-                    GDriveSyncer.addProvider(account, itsSyncDb,
-                                             MainActivity.this);
-                    ContentResolver.requestSync(account,
-                                                PasswdSafeContract.AUTHORITY,
-                                                new Bundle());
+                    ContentValues values = new ContentValues();
+                    values.put(PasswdSafeContract.Providers.COL_ACCT, account);
+                    return cr.insert(PasswdSafeContract.Providers.CONTENT_URI,
+                                     values);
                 }
-            } catch (SQLException e) {
-                Log.e(TAG, "DB error", e);
+            } catch (Exception e) {
+                Log.e(TAG, "Account update error", e);
             }
-            return account;
+            return null;
         }
 
         /* (non-Javadoc)
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(Account account)
+        protected void onPostExecute(Uri uri)
         {
-            super.onPostExecute(account);
+            super.onPostExecute(uri);
             itsProgressFrag.dismiss();
         }
     }

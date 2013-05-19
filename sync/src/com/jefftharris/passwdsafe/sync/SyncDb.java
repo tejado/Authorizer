@@ -159,24 +159,16 @@ public class SyncDb
     }
 
     /** Add a provider */
-    public void addProvider(String name)
+    public static long addProvider(String name, SQLiteDatabase db)
         throws SQLException
     {
-        PasswdSafeUtil.dbginfo(TAG, "Add provider %s", name);
-        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-        try {
-            db.beginTransaction();
-            ContentValues values = new ContentValues();
-            values.put(DB_COL_PROVIDERS_TYPE,
-                       PasswdSafeContract.Providers.Type.GDRIVE.toString());
-            values.put(DB_COL_PROVIDERS_ACCT, name);
-            values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
-            values.put(DB_COL_PROVIDERS_SYNC_FREQ, DEFAULT_PROVIDER_SYNC_FREQ);
-            db.insertOrThrow(DB_TABLE_PROVIDERS, null, values);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_PROVIDERS_TYPE,
+                   PasswdSafeContract.Providers.Type.GDRIVE.toString());
+        values.put(DB_COL_PROVIDERS_ACCT, name);
+        values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
+        values.put(DB_COL_PROVIDERS_SYNC_FREQ, DEFAULT_PROVIDER_SYNC_FREQ);
+        return db.insertOrThrow(DB_TABLE_PROVIDERS, null, values);
     }
 
     /** Delete a provider */

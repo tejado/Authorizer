@@ -18,6 +18,7 @@ import java.util.HashMap;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -123,12 +124,13 @@ public class PasswdSafeProvider extends ContentProvider
                 GDriveSyncer.deleteProvider(provider, db, getContext());
                 db.setTransactionSuccessful();
                 return 1;
-            } catch (SQLException e) {
-                Log.e(TAG, "Error deleting provider: " + uri, e);
+            } catch (Exception e) {
+                String msg = "Error deleting provier: " + uri;
+                Log.e(TAG, msg, e);
+                throw new RuntimeException(msg, e);
             } finally {
                 db.endTransaction();
             }
-            return 0;
         }
         default: {
             throw new IllegalArgumentException(
@@ -169,8 +171,34 @@ public class PasswdSafeProvider extends ContentProvider
     @Override
     public Uri insert(Uri uri, ContentValues values)
     {
-        // TODO Auto-generated method stub
-        return null;
+        switch (MATCHER.match(uri)) {
+        case MATCH_PROVIDERS: {
+            String acct = values.getAsString(
+                    PasswdSafeContract.Providers.COL_ACCT);
+            if (acct == null) {
+                throw new IllegalArgumentException("No acct for provider");
+            }
+            SQLiteDatabase db = itsDb.getDb();
+            try {
+                db.beginTransaction();
+                long id = GDriveSyncer.addProvider(acct, db, getContext());
+                db.setTransactionSuccessful();
+
+                return ContentUris.withAppendedId(
+                        PasswdSafeContract.Providers.CONTENT_URI, id);
+            } catch (Exception e) {
+                String msg = "Error adding provier: " + acct;
+                Log.e(TAG, msg, e);
+                throw new RuntimeException(msg, e);
+            } finally {
+                db.endTransaction();
+            }
+        }
+        default: {
+            throw new IllegalArgumentException(
+                    "insert unknown match for uri: " + uri);
+        }
+        }
     }
 
     /* (non-Javadoc)

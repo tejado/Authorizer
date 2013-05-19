@@ -81,19 +81,27 @@ public class GDriveSyncer
 
 
     /** Add a provider for an account */
-    public static void addProvider(Account account, SyncDb db, Context ctx)
+    public static long addProvider(String acctName, SQLiteDatabase db,
+                                   Context ctx)
         throws SQLException
     {
-        Log.i(TAG, "Add provider: " + account);
-        db.addProvider(account.name);
-        ContentResolver.setSyncAutomatically(
-                account, PasswdSafeContract.AUTHORITY, true);
-        ContentResolver.addPeriodicSync(
-                account, PasswdSafeContract.AUTHORITY, new Bundle(),
-                SyncDb.DEFAULT_PROVIDER_SYNC_FREQ);
+        Log.i(TAG, "Add provider: " + acctName);
+        long id = SyncDb.addProvider(acctName, db);
 
+        GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
+        Account acct = acctMgr.getAccountByName(acctName);
+        if (acct != null) {
+            ContentResolver.setSyncAutomatically(
+                    acct, PasswdSafeContract.AUTHORITY, true);
+            ContentResolver.addPeriodicSync(
+                    acct, PasswdSafeContract.AUTHORITY, new Bundle(),
+                    SyncDb.DEFAULT_PROVIDER_SYNC_FREQ);
+            ContentResolver.requestSync(acct, PasswdSafeContract.AUTHORITY,
+                                        new Bundle());
+        }
         ctx.getContentResolver().notifyChange(
                 PasswdSafeContract.Providers.CONTENT_URI, null);
+        return id;
     }
 
 
