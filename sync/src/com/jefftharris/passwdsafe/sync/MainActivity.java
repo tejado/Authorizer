@@ -216,7 +216,8 @@ public class MainActivity extends FragmentActivity
     /** GDrive sync frequency spinner changed */
     private void onGdriveFreqChanged(int pos)
     {
-        //ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
+        ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
+        new AccountTask(freq);
     }
 
     /* (non-Javadoc)
@@ -311,42 +312,84 @@ public class MainActivity extends FragmentActivity
         new AccountTask(account);
     }
 
-    /** Async task to set the account */
-    private final class AccountTask extends AsyncTask<String, Void, Uri>
+    /** The type of async account task */
+    private enum AccountTaskType
     {
-        ProgressFragment itsProgressFrag;
-        Uri itsOldAccount;
+        ADD_REMOVE,
+        UPDATE_SYNC_FREQ
+    }
 
-        /** Constructor */
+    /** Async task to set the account */
+    private class AccountTask extends AsyncTask<Void, Void, Void>
+    {
+        private final AccountTaskType itsType;
+        private final Uri itsCurrAccount;
+        private ProgressFragment itsProgressFrag;
+        private final String itsNewAccount;
+        private final ProviderSyncFreqPref itsUpdateFreq;
+
+        /** Constructor for add/remove */
         public AccountTask(String acct)
         {
+            itsType = AccountTaskType.ADD_REMOVE;
+            itsCurrAccount = itsGdriveUri;
+            itsNewAccount = acct;
+            itsUpdateFreq = null;
             String msg = getString((acct == null) ?
                     R.string.removing_account : R.string.adding_account);
+            init(msg);
+        }
+
+        /** Constructor for updating the sync frequency */
+        public AccountTask(ProviderSyncFreqPref freq)
+        {
+            itsType = AccountTaskType.UPDATE_SYNC_FREQ;
+            itsCurrAccount = itsGdriveUri;
+            itsNewAccount = null;
+            itsUpdateFreq = freq;
+            init(getString(R.string.updating_account));
+        }
+
+        /** Initialize the task */
+        private void init(String msg)
+        {
             itsProgressFrag = ProgressFragment.newInstance(msg);
             itsProgressFrag.show(getSupportFragmentManager(), null);
-            itsOldAccount = itsGdriveUri;
-            execute(acct);
+            execute();
         }
 
         /* (non-Javadoc)
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected Uri doInBackground(String... params)
+        protected Void doInBackground(Void... params)
         {
-            String account = params[0];
             try {
                 ContentResolver cr = MainActivity.this.getContentResolver();
-                // Stop syncing for the previously selected account.
-                if (itsOldAccount != null) {
-                    cr.delete(itsOldAccount, null, null);
-                }
 
-                if (account != null) {
+                switch (itsType) {
+                case ADD_REMOVE: {
+                    // Stop syncing for the previously selected account.
+                    if (itsCurrAccount != null) {
+                        cr.delete(itsCurrAccount, null, null);
+                    }
+
+                    if (itsNewAccount != null) {
+                        ContentValues values = new ContentValues();
+                        values.put(PasswdSafeContract.Providers.COL_ACCT,
+                                   itsNewAccount);
+                        cr.insert(PasswdSafeContract.Providers.CONTENT_URI,
+                                  values);
+                    }
+                    break;
+                }
+                case UPDATE_SYNC_FREQ: {
                     ContentValues values = new ContentValues();
-                    values.put(PasswdSafeContract.Providers.COL_ACCT, account);
-                    return cr.insert(PasswdSafeContract.Providers.CONTENT_URI,
-                                     values);
+                    values.put(PasswdSafeContract.Providers.COL_SYNC_FREQ,
+                               itsUpdateFreq.getFreq());
+                    cr.update(itsCurrAccount, values, null, null);
+                    break;
+                }
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Account update error", e);
@@ -358,9 +401,9 @@ public class MainActivity extends FragmentActivity
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(Uri uri)
+        protected void onPostExecute(Void arg)
         {
-            super.onPostExecute(uri);
+            super.onPostExecute(arg);
             itsProgressFrag.dismiss();
         }
     }

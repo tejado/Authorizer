@@ -10,6 +10,7 @@
     <string name="removing_account">Removing account&#8230;</string>
     <string name="sync">Sync</string>
     <string name="sync_interval_label">Sync interval:</string>
+    <string name="updating_account">Updating account&#8230;</string>
 
     <string-array name="interval_array">
         <item>None</item>

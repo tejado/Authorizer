@@ -38,7 +38,6 @@ public class SyncDb
         DB_COL_PROVIDERS_ID + " = ?";
     private static final String DB_MATCH_PROVIDERS_TYPE_ACCT =
         DB_COL_PROVIDERS_TYPE + " = ? AND " + DB_COL_PROVIDERS_ACCT + " = ?";
-    public static final int DEFAULT_PROVIDER_SYNC_FREQ = 15 * 60;
 
     public static final String DB_TABLE_FILES = "files";
     public static final String DB_COL_FILES_ID = BaseColumns._ID;
@@ -159,7 +158,7 @@ public class SyncDb
     }
 
     /** Add a provider */
-    public static long addProvider(String name, SQLiteDatabase db)
+    public static long addProvider(String name, int freq, SQLiteDatabase db)
         throws SQLException
     {
         ContentValues values = new ContentValues();
@@ -167,7 +166,7 @@ public class SyncDb
                    PasswdSafeContract.Providers.Type.GDRIVE.toString());
         values.put(DB_COL_PROVIDERS_ACCT, name);
         values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
-        values.put(DB_COL_PROVIDERS_SYNC_FREQ, DEFAULT_PROVIDER_SYNC_FREQ);
+        values.put(DB_COL_PROVIDERS_SYNC_FREQ, freq);
         return db.insertOrThrow(DB_TABLE_PROVIDERS, null, values);
     }
 
@@ -178,6 +177,18 @@ public class SyncDb
         String[] idargs = new String[] { Long.toString(id) };
         db.delete(DB_TABLE_FILES, DB_MATCH_FILES_PROVIDER_ID, idargs);
         db.delete(DB_TABLE_PROVIDERS, DB_MATCH_PROVIDERS_ID, idargs);
+    }
+
+    /** Update a provider sync frequency */
+    public static void updateProviderSyncFreq(long id, int freq,
+                                              SQLiteDatabase db)
+           throws SQLException
+    {
+        String[] idargs = new String[] { Long.toString(id) };
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_PROVIDERS_SYNC_FREQ, freq);
+        db.update(DB_TABLE_PROVIDERS, values,
+                  DB_MATCH_PROVIDERS_ID, idargs);
     }
 
     /** Get a provider */

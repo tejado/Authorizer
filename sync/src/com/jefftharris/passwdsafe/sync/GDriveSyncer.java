@@ -59,7 +59,6 @@ public class GDriveSyncer
             "id,title,mimeType,labels,fileExtension,modifiedDate,downloadUrl";
 
     private final Context itsContext;
-    private final ContentProviderClient itsProvider;
     private final Account itsAccount;
     private final Drive itsDrive;
     private final String itsDriveToken;
@@ -71,7 +70,6 @@ public class GDriveSyncer
                         Account account)
     {
         itsContext = context;
-        itsProvider = provider;
         itsAccount = account;
         Pair<Drive, String> driveInfo = getDriveService();
         itsDrive = driveInfo.first;
@@ -86,7 +84,8 @@ public class GDriveSyncer
         throws SQLException
     {
         Log.i(TAG, "Add provider: " + acctName);
-        long id = SyncDb.addProvider(acctName, db);
+        int freq = ProviderSyncFreqPref.DEFAULT.getFreq();
+        long id = SyncDb.addProvider(acctName, freq, db);
 
         GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
         Account acct = acctMgr.getAccountByName(acctName);
@@ -94,8 +93,7 @@ public class GDriveSyncer
             ContentResolver.setSyncAutomatically(
                     acct, PasswdSafeContract.AUTHORITY, true);
             ContentResolver.addPeriodicSync(
-                    acct, PasswdSafeContract.AUTHORITY, new Bundle(),
-                    SyncDb.DEFAULT_PROVIDER_SYNC_FREQ);
+                    acct, PasswdSafeContract.AUTHORITY, new Bundle(), freq);
             ContentResolver.requestSync(acct, PasswdSafeContract.AUTHORITY,
                                         new Bundle());
         }
@@ -145,6 +143,30 @@ public class GDriveSyncer
         }
         ctx.getContentResolver().notifyChange(PasswdSafeContract.CONTENT_URI,
                                               null);
+    }
+
+
+    /** Update the sync frequency for a provider */
+    public static void updateSyncFreq(SyncDb.DbProvider provider,
+                                      int freq,
+                                      SQLiteDatabase db,
+                                      Context ctx)
+            throws SQLException
+    {
+        SyncDb.updateProviderSyncFreq(provider.itsId, freq, db);
+
+        GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
+        Account acct = acctMgr.getAccountByName(provider.itsAcct);
+        if (acct != null) {
+            ContentResolver.removePeriodicSync(acct,
+                                               PasswdSafeContract.AUTHORITY,
+                                               new Bundle());
+            if (freq > 0) {
+                ContentResolver.addPeriodicSync(acct,
+                                                PasswdSafeContract.AUTHORITY,
+                                                new Bundle(), freq);
+            }
+        }
     }
 
     /** Get the filename for a local file */

@@ -23,7 +23,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
@@ -290,6 +289,34 @@ public class PasswdSafeProvider extends ContentProvider
                       String[] selectionArgs)
     {
         switch (MATCHER.match(uri)) {
+        case MATCH_PROVIDER: {
+            Log.i(TAG, "Update provider: " + uri);
+            Long id = Long.valueOf(uri.getPathSegments().get(1));
+            SQLiteDatabase db = itsDb.getDb();
+            try {
+                db.beginTransaction();
+                SyncDb.DbProvider provider = SyncDb.getProvider(id, db);
+                if (provider == null) {
+                    return 0;
+                }
+
+                Integer syncFreq = values.getAsInteger(
+                        PasswdSafeContract.Providers.COL_SYNC_FREQ);
+                if (syncFreq != null) {
+                    Log.i(TAG, "Update sync freq " + syncFreq);
+                    GDriveSyncer.updateSyncFreq(provider, syncFreq,
+                                                db, getContext());
+                }
+                db.setTransactionSuccessful();
+                return 1;
+            } catch (Exception e) {
+                String msg = "Error deleting provier: " + uri;
+                Log.e(TAG, msg, e);
+                throw new RuntimeException(msg, e);
+            } finally {
+                db.endTransaction();
+            }
+        }
         case MATCH_PROVIDER_FILE: {
             long id = Long.valueOf(uri.getPathSegments().get(3));
             String updateUri =
