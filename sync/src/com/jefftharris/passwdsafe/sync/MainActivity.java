@@ -11,10 +11,12 @@ import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -54,6 +56,7 @@ public class MainActivity extends FragmentActivity
     private GoogleAccountManager itsAccountMgr;
     private SyncDb itsSyncDb;
     private Account itsGdriveAccount = null;
+    private Uri itsGdriveUri = null;
     private Account itsNewAccount = null;
 
     @Override
@@ -277,6 +280,8 @@ public class MainActivity extends FragmentActivity
         TextView acctView = (TextView)findViewById(R.id.gdrive_acct);
         View btns = findViewById(R.id.gdrive_controls);
         if (cursor != null) {
+            long id = cursor.getLong(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = cursor.getString(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
             int freqVal = cursor.getInt(
@@ -284,6 +289,8 @@ public class MainActivity extends FragmentActivity
             ProviderSyncFreqPref freq =
                     ProviderSyncFreqPref.freqValueOf(freqVal);
             itsGdriveAccount = itsAccountMgr.getAccountByName(acct);
+            itsGdriveUri = ContentUris.withAppendedId(
+                    PasswdSafeContract.Providers.CONTENT_URI, id);
 
             Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
             freqSpin.setSelection(freq.getDisplayIdx());
@@ -293,6 +300,7 @@ public class MainActivity extends FragmentActivity
             btns.setVisibility(View.VISIBLE);
         } else {
             itsGdriveAccount = null;
+            itsGdriveUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
             btns.setVisibility(View.GONE);
@@ -309,7 +317,7 @@ public class MainActivity extends FragmentActivity
     private final class AccountTask extends AsyncTask<Account, Void, Account>
     {
         ProgressFragment itsProgressFrag;
-        Account itsOldAccount;
+        Uri itsOldAccount;
 
         /** Constructor */
         public AccountTask(Account acct)
@@ -318,7 +326,7 @@ public class MainActivity extends FragmentActivity
                     R.string.removing_account : R.string.adding_account);
             itsProgressFrag = ProgressFragment.newInstance(msg);
             itsProgressFrag.show(getSupportFragmentManager(), null);
-            itsOldAccount = itsGdriveAccount;
+            itsOldAccount = itsGdriveUri;
             execute(acct);
         }
 
@@ -332,8 +340,8 @@ public class MainActivity extends FragmentActivity
             try {
                 // Stop syncing for the previously selected account.
                 if (itsOldAccount != null) {
-                    GDriveSyncer.deleteProvider(itsOldAccount, itsSyncDb,
-                                                MainActivity.this);
+                    ContentResolver cr = MainActivity.this.getContentResolver();
+                    cr.delete(itsOldAccount, null, null);
                 }
 
                 if (account != null) {

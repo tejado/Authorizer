@@ -58,6 +58,37 @@ public class SyncDb
 
     private DbHelper itsDbHelper;
 
+    /** Entry in the providers table */
+    public static class DbProvider
+    {
+        public final long itsId;
+        public final String itsAcct;
+        public final long itsSyncChange;
+        public final int itsSyncFreq;
+
+        public static final String[] QUERY_FIELDS = {
+            DB_COL_PROVIDERS_ID,
+            DB_COL_PROVIDERS_ACCT,
+            DB_COL_PROVIDERS_SYNC_CHANGE,
+            DB_COL_PROVIDERS_SYNC_FREQ };
+
+        public DbProvider(Cursor cursor)
+        {
+            itsId = cursor.getLong(0);
+            itsAcct = cursor.getString(1);
+            itsSyncChange = cursor.getLong(2);
+            itsSyncFreq = cursor.getInt(3);
+        }
+
+        @Override
+        public String toString()
+        {
+            return String.format(
+                    Locale.US,
+                    "{id:%d, acct:%s, syncChange:%d, syncFreq:%d}",
+                    itsId, itsAcct, itsSyncChange, itsSyncFreq);
+        }
+    }
 
     /** Entry in the files table */
     public static class DbFile
@@ -149,17 +180,31 @@ public class SyncDb
     }
 
     /** Delete a provider */
-    public void deleteProvider(String name, SQLiteDatabase db)
+    public static void deleteProvider(long id, SQLiteDatabase db)
         throws SQLException
     {
-        PasswdSafeUtil.dbginfo(TAG, "Delete provider %s", name);
-        long id = getProviderId(name, db);
-        if (id == -1) {
-            return;
-        }
         String[] idargs = new String[] { Long.toString(id) };
         db.delete(DB_TABLE_FILES, DB_MATCH_FILES_PROVIDER_ID, idargs);
         db.delete(DB_TABLE_PROVIDERS, DB_MATCH_PROVIDERS_ID, idargs);
+    }
+
+    /** Get a provider */
+    public static DbProvider getProvider(long id, SQLiteDatabase db)
+            throws SQLException
+    {
+        Cursor cursor = db.query(DB_TABLE_PROVIDERS, DbProvider.QUERY_FIELDS,
+                                 DB_MATCH_PROVIDERS_ID,
+                                 new String[] { Long.toString(id) },
+                                 null, null, null);
+        try {
+            if (cursor.moveToFirst()) {
+                return new DbProvider(cursor);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return null;
     }
 
     /** Get the id for a provider */
@@ -262,12 +307,18 @@ public class SyncDb
     }
 
 
-    /** Get all of the files for a provider */
+    /** Get all of the files for a provider by name */
     public List<DbFile> getFiles(String providerName, SQLiteDatabase db)
             throws SQLException
     {
         long providerId = getProviderId(providerName, db);
+        return getFiles(providerId, db);
+    }
 
+    /** Get all of the files for a provider by id */
+    public static List<DbFile> getFiles(long providerId, SQLiteDatabase db)
+            throws SQLException
+    {
         List<DbFile> files = new ArrayList<DbFile>();
         Cursor cursor = db.query(DB_TABLE_FILES, DbFile.QUERY_FIELDS,
                                  DB_MATCH_FILES_PROVIDER_ID,

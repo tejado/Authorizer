@@ -27,6 +27,7 @@ import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableNotifiedException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -97,47 +98,45 @@ public class GDriveSyncer
 
 
     /** Delete the provider for the account */
-    public static void deleteProvider(Account account, SyncDb syncDb,
+    public static void deleteProvider(SyncDb.DbProvider provider,
+                                      SQLiteDatabase db,
                                       Context ctx)
         throws SQLException
     {
-        Log.i(TAG, "Delete provider: " + account);
-
-        SQLiteDatabase db = syncDb.getDb();
-        try {
-            db.beginTransaction();
-            List<SyncDb.DbFile> dbfiles = syncDb.getFiles(account.name, db);
-            for (SyncDb.DbFile dbfile: dbfiles) {
-                ctx.deleteFile(dbfile.itsLocalFile);
-            }
-            syncDb.deleteProvider(account.name, db);
-
-            try {
-                GoogleAccountCredential credential =
-                        GoogleAccountCredential.usingOAuth2(ctx,
-                                                            DriveScopes.DRIVE);
-                String token = GoogleAuthUtil.getToken(ctx, account.name,
-                                                       credential.getScope());
-                PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
-                                       account.name, token);
-                if (token != null) {
-                    GoogleAuthUtil.invalidateToken(ctx, token);
-                }
-            } catch (Exception e) {
-                PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s",
-                                       account.name);
-            }
-
-            ContentResolver.removePeriodicSync(
-                    account, PasswdSafeContract.AUTHORITY, new Bundle());
-            ContentResolver.setSyncAutomatically(
-                    account, PasswdSafeContract.AUTHORITY, false);
-            ctx.getContentResolver().notifyChange(
-                    PasswdSafeContract.CONTENT_URI, null);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
+        List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
+        for (SyncDb.DbFile dbfile: dbfiles) {
+            ctx.deleteFile(dbfile.itsLocalFile);
         }
+
+        SyncDb.deleteProvider(provider.itsId, db);
+
+        try {
+            GoogleAccountCredential credential =
+                    GoogleAccountCredential.usingOAuth2(ctx, DriveScopes.DRIVE);
+            String token = GoogleAuthUtil.getToken(ctx, provider.itsAcct,
+                                                   credential.getScope());
+            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
+                                   provider.itsAcct, token);
+            if (token != null) {
+                GoogleAuthUtil.invalidateToken(ctx, token);
+            }
+        } catch (Exception e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s",
+                                   provider.itsAcct);
+        }
+
+        GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
+        Account acct = acctMgr.getAccountByName(provider.itsAcct);
+        if (acct != null) {
+            ContentResolver.removePeriodicSync(acct,
+                                               PasswdSafeContract.AUTHORITY,
+                                               new Bundle());
+            ContentResolver.setSyncAutomatically(acct,
+                                                 PasswdSafeContract.AUTHORITY,
+                                                 false);
+        }
+        ctx.getContentResolver().notifyChange(PasswdSafeContract.CONTENT_URI,
+                                              null);
     }
 
     /** Get the filename for a local file */

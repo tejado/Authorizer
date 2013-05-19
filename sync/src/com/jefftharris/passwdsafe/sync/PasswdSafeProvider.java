@@ -22,6 +22,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
@@ -100,8 +101,40 @@ public class PasswdSafeProvider extends ContentProvider
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs)
     {
-        // TODO Auto-generated method stub
-        return 0;
+        if (selection != null) {
+            throw new IllegalArgumentException("selection not supported");
+        }
+        if (selectionArgs != null) {
+            throw new IllegalArgumentException("selectionArgs not supported");
+        }
+
+        switch (MATCHER.match(uri)) {
+        case MATCH_PROVIDER: {
+            Log.i(TAG, "Delete provider: " + uri);
+            Long id = Long.valueOf(uri.getPathSegments().get(1));
+            SQLiteDatabase db = itsDb.getDb();
+            try {
+                db.beginTransaction();
+                SyncDb.DbProvider provider = SyncDb.getProvider(id, db);
+                if (provider == null) {
+                    return 0;
+                }
+
+                GDriveSyncer.deleteProvider(provider, db, getContext());
+                db.setTransactionSuccessful();
+                return 1;
+            } catch (SQLException e) {
+                Log.e(TAG, "Error deleting provider: " + uri, e);
+            } finally {
+                db.endTransaction();
+            }
+            return 0;
+        }
+        default: {
+            throw new IllegalArgumentException(
+                    "delete unknown match for uri: " + uri);
+        }
+        }
     }
 
     /* (non-Javadoc)
