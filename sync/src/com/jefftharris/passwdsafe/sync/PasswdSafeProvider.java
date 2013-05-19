@@ -302,8 +302,9 @@ public class PasswdSafeProvider extends ContentProvider
 
                 Integer syncFreq = values.getAsInteger(
                         PasswdSafeContract.Providers.COL_SYNC_FREQ);
-                if (syncFreq != null) {
+                if ((syncFreq != null) && (provider.itsSyncFreq != syncFreq)) {
                     Log.i(TAG, "Update sync freq " + syncFreq);
+
                     GDriveSyncer.updateSyncFreq(provider, syncFreq,
                                                 db, getContext());
                 }
