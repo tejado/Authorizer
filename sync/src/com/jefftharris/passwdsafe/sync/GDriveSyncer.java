@@ -6,9 +6,8 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,9 +30,6 @@ import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccoun
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.googleapis.media.MediaHttpDownloader;
-import com.google.api.client.http.FileContent;
-import com.google.api.client.http.GenericUrl;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Changes;
@@ -55,7 +51,7 @@ public class GDriveSyncer
     private static final String TAG = "GDriveSyncer";
 
     private static final String ABOUT_FIELDS = "largestChangeId";
-    private static final String FILE_FIELDS =
+    public static final String FILE_FIELDS =
             "id,title,mimeType,labels,fileExtension,modifiedDate,downloadUrl";
 
     private final Context itsContext;
@@ -191,26 +187,48 @@ public class GDriveSyncer
 
         Log.i(TAG, "Performing sync for " + itsAccount.name);
 
-        SQLiteDatabase db = itsSyncDb.getDb();
         try {
-            db.beginTransaction();
-            SyncDb.DbProvider provider = SyncDb.getProvider(itsAccount.name,
-                                                            db);
-            long changeId = provider.itsSyncChange;
-            Log.i(TAG, "largest change " + changeId);
-            long newChangeId = -1;
-            if (changeId == -1) {
-                newChangeId = performFullSync(provider, db);
-            } else {
-                newChangeId = performSyncSince(provider, changeId, db);
+            SQLiteDatabase db = itsSyncDb.getDb();
+            List<GDriveSyncOper> opers = null;
+            try {
+                db.beginTransaction();
+                SyncDb.DbProvider provider = SyncDb.getProvider(itsAccount.name,
+                                                                db);
+                long changeId = provider.itsSyncChange;
+                Log.i(TAG, "largest change " + changeId);
+                Pair<Long, List<GDriveSyncOper>> syncrc;
+                if (changeId == -1) {
+                    syncrc = performFullSync(provider, db);
+                } else {
+                    syncrc = performSyncSince(provider, changeId, db);
+                }
+                long newChangeId = syncrc.first;
+                opers = syncrc.second;
+                if (changeId != newChangeId) {
+                    SyncDb.updateProviderSyncChange(provider, newChangeId, db);
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
             }
-            if (changeId != newChangeId) {
-                SyncDb.updateProviderSyncChange(provider, newChangeId, db);
+
+            for (GDriveSyncOper oper: opers) {
+                try {
+                    oper.doOper(itsDrive, itsContext);
+                    try {
+                        db.beginTransaction();
+                        oper.doPostOperUpdate(db, itsContext);
+                        db.setTransactionSuccessful();
+                    } finally {
+                        db.endTransaction();
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Sync error for file " + oper.getFile(), e);
+                }
             }
 
             itsContext.getContentResolver().notifyChange(
                      PasswdSafeContract.CONTENT_URI, null, false);
-            db.setTransactionSuccessful();
         } catch (UserRecoverableAuthIOException e) {
             PasswdSafeUtil.dbginfo(TAG, e, "Recoverable google auth error");
             GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
@@ -219,8 +237,6 @@ public class GDriveSyncer
             GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
-        } finally {
-            db.endTransaction();
         }
         Log.i(TAG, "Sync finished for " + itsAccount.name);
     }
@@ -230,7 +246,8 @@ public class GDriveSyncer
 
 
     /** Perform a full sync of the files */
-    private long performFullSync(SyncDb.DbProvider provider, SQLiteDatabase db)
+    private Pair<Long, List<GDriveSyncOper>>
+    performFullSync(SyncDb.DbProvider provider, SQLiteDatabase db)
             throws SQLException, IOException
     {
         Log.i(TAG, "Perform full sync");
@@ -257,14 +274,16 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        performSync(allRemFiles, provider, db);
-        return largestChangeId;
+        List<GDriveSyncOper> opers = performSync(allRemFiles, provider, db);
+        return new Pair<Long, List<GDriveSyncOper>>(largestChangeId, opers);
     }
 
 
     /** Perform a sync of files since the given change id */
-    private long performSyncSince(SyncDb.DbProvider provider,
-                                  long changeId, SQLiteDatabase db)
+    private Pair<Long, List<GDriveSyncOper>>
+    performSyncSince(SyncDb.DbProvider provider,
+                     long changeId,
+                     SQLiteDatabase db)
         throws SQLException, IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "performSyncSince %d", changeId);
@@ -294,15 +313,15 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        performSync(changedFiles, provider, db);
-        return changeId;
+        List<GDriveSyncOper> opers = performSync(changedFiles, provider, db);
+        return new Pair<Long, List<GDriveSyncOper>>(changeId, opers);
     }
 
 
     /** Perform a sync of the files */
-    private void performSync(HashMap<String, File> remfiles,
-                             SyncDb.DbProvider provider,
-                             SQLiteDatabase db)
+    private List<GDriveSyncOper> performSync(HashMap<String, File> remfiles,
+                                            SyncDb.DbProvider provider,
+                                            SQLiteDatabase db)
             throws SQLException
     {
         HashMap<String, File> fileCache = new HashMap<String, File>(remfiles);
@@ -313,7 +332,7 @@ public class GDriveSyncer
                 if (remfile != null) {
                     PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s",
                                            dbfile.itsRemoteId);
-                    itsSyncDb.updateRemoteFile(
+                    SyncDb.updateRemoteFile(
                             dbfile.itsId, dbfile.itsRemoteId,
                             remfile.getTitle(),
                             remfile.getModifiedDate().getValue(), db);
@@ -336,36 +355,35 @@ public class GDriveSyncer
                                     remfile.getModifiedDate().getValue(), db);
         }
 
-        // TODO: do not hold db txn while syncing files
+        List<GDriveSyncOper> opers = new ArrayList<GDriveSyncOper>();
         dbfiles = SyncDb.getFiles(provider.itsId, db);
         for (SyncDb.DbFile dbfile: dbfiles) {
-            try {
-                if (isRemoteNewer(dbfile)) {
-                    if (dbfile.itsIsRemoteDeleted) {
-                        removeFile(dbfile, db);
-                    } else if (dbfile.itsIsLocalDeleted) {
-                        // TODO: conflict?
-                    } else {
-                        syncRemoteToLocal(dbfile, fileCache, db);
-                    }
-                } else if (dbfile.itsLocalModDate > dbfile.itsRemoteModDate) {
-                    if (dbfile.itsIsLocalDeleted) {
-                        removeFile(dbfile, db);
-                    } else if (dbfile.itsIsRemoteDeleted) {
-                        PasswdSafeUtil.dbginfo(
-                                TAG, "performSync recreate removed %s", dbfile);
-                        syncLocalToRemote(dbfile, fileCache, true, db);
-                    } else {
-                        syncLocalToRemote(dbfile, fileCache, false, db);
-                    }
-                } else if (dbfile.itsIsRemoteDeleted ||
-                        dbfile.itsIsLocalDeleted) {
-                    removeFile(dbfile, db);
+            if (isRemoteNewer(dbfile)) {
+                if (dbfile.itsIsRemoteDeleted) {
+                    opers.add(new GDriveRmFileOper(dbfile));
+                } else if (dbfile.itsIsLocalDeleted) {
+                    // TODO: conflict?
+                } else {
+                    opers.add(new GDriveRemoteToLocalOper(dbfile, fileCache));
                 }
-            } catch (IOException e) {
-                Log.e(TAG, "Sync error for file " + dbfile, e);
+            } else if (dbfile.itsLocalModDate > dbfile.itsRemoteModDate) {
+                if (dbfile.itsIsLocalDeleted) {
+                    opers.add(new GDriveRmFileOper(dbfile));
+                } else if (dbfile.itsIsRemoteDeleted) {
+                    PasswdSafeUtil.dbginfo(
+                            TAG, "performSync recreate removed %s", dbfile);
+                    opers.add(new GDriveLocalToRemoteOper(dbfile, fileCache,
+                                                          true));
+                } else {
+                    opers.add(new GDriveLocalToRemoteOper(dbfile, fileCache,
+                                                          false));
+                }
+            } else if (dbfile.itsIsRemoteDeleted ||
+                    dbfile.itsIsLocalDeleted) {
+                opers.add(new GDriveRmFileOper(dbfile));
             }
         }
+        return opers;
     }
 
 
@@ -384,93 +402,6 @@ public class GDriveSyncer
             return true;
         }
         return false;
-    }
-
-
-    /** Sync a remote file to local */
-    private void syncRemoteToLocal(SyncDb.DbFile dbfile,
-                                   HashMap<String, File> fileCache,
-                                   SQLiteDatabase db)
-            throws SQLException, IOException
-    {
-        PasswdSafeUtil.dbginfo(TAG, "syncRemoteToLocal %s", dbfile);
-        File file = fileCache.get(dbfile.itsRemoteId);
-        if (file == null) {
-            file = getFile(dbfile.itsRemoteId);
-        }
-        String localFile = getLocalFileName(dbfile.itsId);
-        try {
-            if (downloadFile(file, localFile)) {
-                itsSyncDb.updateLocalFile(dbfile.itsId, localFile,
-                                          dbfile.itsRemoteTitle,
-                                          dbfile.itsRemoteModDate, db);
-            }
-        } catch (SQLException e) {
-            itsContext.deleteFile(localFile);
-            throw e;
-        }
-    }
-
-
-    /** Sync a local file to remote */
-    private void syncLocalToRemote(SyncDb.DbFile dbfile,
-                                   HashMap<String, File> fileCache,
-                                   boolean forceInsert,
-                                   SQLiteDatabase db)
-            throws SQLException, IOException
-    {
-        PasswdSafeUtil.dbginfo(TAG, "syncLocalToRemote %s", dbfile);
-
-        File file;
-        boolean isInsert;
-        if (forceInsert || TextUtils.isEmpty(dbfile.itsRemoteId)) {
-            file = new File();
-            file.setDescription("Password Safe file");
-            file.setMimeType("application/x-psafe3");
-            isInsert = true;
-        } else {
-            file = fileCache.get(dbfile.itsRemoteId);
-            if (file == null) {
-                file = getFile(dbfile.itsRemoteId);
-            }
-            isInsert = false;
-        }
-
-        file.setTitle(dbfile.itsLocalTitle);
-        java.io.File localFile =
-                itsContext.getFileStreamPath(dbfile.itsLocalFile);
-        FileContent fileMedia = new FileContent(file.getMimeType(), localFile);
-        if (isInsert) {
-            file = itsDrive.files().insert(file, fileMedia).execute();
-        } else {
-            file = itsDrive.files().update(dbfile.itsRemoteId, file,
-                                           fileMedia).execute();
-        }
-
-        String title = file.getTitle();
-        long modDate = file.getModifiedDate().getValue();
-        itsSyncDb.updateRemoteFile(dbfile.itsId, file.getId(),
-                                   title, modDate, db);
-        itsSyncDb.updateLocalFile(dbfile.itsId, dbfile.itsLocalFile,
-                                  title, modDate, db);
-        localFile.setLastModified(modDate);
-    }
-
-
-    /** Remove a local and/or remote file */
-    private void removeFile(SyncDb.DbFile dbfile, SQLiteDatabase db)
-            throws SQLException, IOException
-    {
-        PasswdSafeUtil.dbginfo(TAG, "removeFile %s", dbfile);
-        if (dbfile.itsLocalFile != null) {
-            itsContext.deleteFile(dbfile.itsLocalFile);
-        }
-
-        if (!dbfile.itsIsRemoteDeleted) {
-            itsDrive.files().trash(dbfile.itsRemoteId).execute();
-        }
-
-        itsSyncDb.removeFile(dbfile.itsId, db);
     }
 
 
@@ -506,51 +437,6 @@ public class GDriveSyncer
     }
     */
 
-
-    /** Get a file's metadata */
-    private File getFile(String id)
-            throws IOException
-    {
-        return itsDrive.files().get(id).setFields(FILE_FIELDS).execute();
-    }
-
-    /** Download a file */
-    private boolean downloadFile(File file, String localFileName)
-    {
-        String url = file.getDownloadUrl();
-        if ((url == null) || (url.length() <= 0)) {
-            return false;
-        }
-
-        PasswdSafeUtil.dbginfo(TAG, "downloadFile %s from %s",
-                               file.getId(), url);
-        try {
-            GenericUrl downloadUrl = new GenericUrl(url);
-            OutputStream os = null;
-            try {
-                os = new BufferedOutputStream(
-                    itsContext.openFileOutput(localFileName,
-                                              Context.MODE_PRIVATE));
-                Drive.Files.Get get = itsDrive.files().get(file.getId());
-                MediaHttpDownloader dl = get.getMediaHttpDownloader();
-                dl.setDirectDownloadEnabled(true);
-                dl.download(downloadUrl, os);
-            } finally {
-                if (os != null) {
-                    os.close();
-                }
-            }
-
-            java.io.File localFile =
-                    itsContext.getFileStreamPath(localFileName);
-            localFile.setLastModified(file.getModifiedDate().getValue());
-        } catch (IOException e) {
-            itsContext.deleteFile(localFileName);
-            Log.e(TAG, "Sync failed to download " + file.getTitle(), e);
-            return false;
-        }
-        return true;
-    }
 
     /** Should the file be synced */
     private static boolean isSyncFile(File file)

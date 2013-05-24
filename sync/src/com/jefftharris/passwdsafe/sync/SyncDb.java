@@ -284,9 +284,9 @@ public class SyncDb
 
 
     /** Update a local file */
-    public void updateLocalFile(long fileId, String locFile,
-                                String locTitle, long locModDate,
-                                SQLiteDatabase db)
+    public static void updateLocalFile(long fileId, String locFile,
+                                       String locTitle, long locModDate,
+                                       SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
@@ -299,9 +299,9 @@ public class SyncDb
     }
 
     /** Update a remote file */
-    public void updateRemoteFile(long fileId, String remId,
-                                 String remTitle, long remModDate,
-                                 SQLiteDatabase db)
+    public static void updateRemoteFile(long fileId, String remId,
+                                        String remTitle, long remModDate,
+                                        SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
@@ -326,7 +326,7 @@ public class SyncDb
 
 
     /** Remove the file */
-    public void removeFile(long fileId, SQLiteDatabase db)
+    public static void removeFile(long fileId, SQLiteDatabase db)
         throws SQLException
     {
         db.delete(DB_TABLE_FILES, DB_MATCH_FILES_ID,
