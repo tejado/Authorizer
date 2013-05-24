@@ -339,7 +339,7 @@ public class GDriveSyncer
                 } else {
                     PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
                                            dbfile.itsRemoteId);
-                    itsSyncDb.updateRemoteFileDeleted(dbfile.itsId, db);
+                    SyncDb.updateRemoteFileDeleted(dbfile.itsId, db);
                 }
                 remfiles.remove(dbfile.itsRemoteId);
             }
@@ -351,8 +351,8 @@ public class GDriveSyncer
             }
             String fileId = remfile.getId();
             PasswdSafeUtil.dbginfo(TAG, "performSync add remote %s", fileId);
-            itsSyncDb.addRemoteFile(provider.itsId, fileId, remfile.getTitle(),
-                                    remfile.getModifiedDate().getValue(), db);
+            SyncDb.addRemoteFile(provider.itsId, fileId, remfile.getTitle(),
+                                 remfile.getModifiedDate().getValue(), db);
         }
 
         List<GDriveSyncOper> opers = new ArrayList<GDriveSyncOper>();

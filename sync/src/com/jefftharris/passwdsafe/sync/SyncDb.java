@@ -266,9 +266,9 @@ public class SyncDb
 
 
     /** Add a remote file for a provider */
-    public void addRemoteFile(long providerId,
-                              String remId, String remTitle, long remModDate,
-                              SQLiteDatabase db)
+    public static void addRemoteFile(long providerId,
+                                     String remId, String remTitle,
+                                     long remModDate, SQLiteDatabase db)
         throws SQLException
     {
         ContentValues values = new ContentValues();
@@ -315,7 +315,7 @@ public class SyncDb
 
 
     /** Update a remote file as deleted */
-    public void updateRemoteFileDeleted(long fileId, SQLiteDatabase db)
+    public static void updateRemoteFileDeleted(long fileId, SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
