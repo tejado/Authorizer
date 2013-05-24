@@ -249,7 +249,7 @@ public class PasswdFileUri
                                          null, null, null);
             Cursor providerCursor = null;
             try {
-                if (!fileCursor.moveToFirst()) {
+                if ((fileCursor == null) || !fileCursor.moveToFirst()) {
                     break;
                 }
                 String title = fileCursor.getString(
@@ -263,7 +263,7 @@ public class PasswdFileUri
                         providerUri,
                         PasswdSafeContract.Providers.PROJECTION,
                         null, null, null);
-                if (!providerCursor.moveToFirst()) {
+                if ((providerCursor == null) || !providerCursor.moveToFirst()) {
                     break;
                 }
                 String typeStr = providerCursor.getString(
@@ -276,9 +276,11 @@ public class PasswdFileUri
                     Log.e(TAG, "Unknown provider type: " + typeStr);
                 }
             } finally {
-                fileCursor.close();
                 if (providerCursor != null) {
                     providerCursor.close();
+                }
+                if (fileCursor != null) {
+                    fileCursor.close();
                 }
             }
             break;
