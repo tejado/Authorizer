@@ -45,7 +45,8 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
     {
         PasswdFileData fileData = getPasswdFileData();
         String uuid = fileData.getUUID(rec);
-        Intent shortcutIntent = FileList.createOpenIntent(getUri().getUri(),
+        Intent shortcutIntent =
+                AbstractFileListActivity.createOpenIntent(getUri().getUri(),
                                                           uuid);
 
         Intent intent = new Intent();

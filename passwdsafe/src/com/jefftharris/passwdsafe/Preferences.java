@@ -469,7 +469,8 @@ public class Preferences extends PreferenceActivity
     {
         itsFileDirPref.setSummary(fileDir.toString());
 
-        FileList.FileData[] files = FileList.getFiles(fileDir, false, false);
+        AbstractFileListActivity.FileData[] files =
+                AbstractFileListActivity.getFiles(fileDir, false, false);
         String[] entries = new String[files.length + 1];
         String[] entryValues = new String[files.length + 1];
         entries[0] = getString(R.string.none);

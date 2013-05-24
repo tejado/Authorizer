@@ -40,7 +40,8 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
         if (file != null) {
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
-                            FileList.createOpenIntent(file, null));
+                            AbstractFileListActivity.createOpenIntent(file,
+                                                                      null));
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, file.getName());
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(
