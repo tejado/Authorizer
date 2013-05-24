@@ -355,9 +355,9 @@ public class PasswdSafeProvider extends ContentProvider
                                  " to " + localFile.getAbsolutePath());
                     }
                     tmpFile = null;
-                    itsDb.updateLocalFile(file.itsId, localFileName,
-                                          file.itsLocalTitle,
-                                          localFile.lastModified(), db);
+                    SyncDb.updateLocalFile(file.itsId, localFileName,
+                                           file.itsLocalTitle,
+                                           localFile.lastModified(), db);
                     db.setTransactionSuccessful();
 
                     cr.notifyChange(uri, null);
