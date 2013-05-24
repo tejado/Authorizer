@@ -243,6 +243,7 @@ public class GDriveSyncer
 
     // TODO: filter on mime types
     // TODO: .dat files?
+    // TODO: moving file to different folder doesn't update modDate
 
 
     /** Perform a full sync of the files */
@@ -403,39 +404,6 @@ public class GDriveSyncer
         }
         return false;
     }
-
-
-    /** Merge a local and remote file */
-    /*
-    void mergeFile(File file,
-                   long localId,
-                   String localTitle,
-                   long localModDate)
-        throws SQLException, IOException
-    {
-        String fileId = file.getId();
-        long fileModDate = file.getModifiedDate().getValue();
-        // TODO: moving file to different folder doesn't update modDate
-
-        PasswdSafeUtil.dbginfo(
-            TAG, "mergeFile %s, title %s, file date %d, local date %d",
-            fileId, file.getTitle(), fileModDate, localModDate);
-        if (fileModDate > localModDate) {
-            PasswdSafeUtil.dbginfo(TAG, "mergeFile update local %s", fileId);
-            String localFileName = downloadFile(file);
-            itsSyncDb.updateFile(localId, localFileName,
-                                 file.getTitle(), fileModDate);
-        } else if (localModDate > fileModDate) {
-            // TODO: update remote file
-            PasswdSafeUtil.dbginfo(TAG, "mergeFile update remote %s", fileId);
-            File updateFile = (File)file.clone();
-            updateFile.setTitle(localTitle);
-            File updatedFile = itsDrive.files().update(fileId, file).execute();
-            itsSyncDb.updateFile(localId, null, updatedFile.getTitle(),
-                                 updatedFile.getModifiedDate().getValue());
-        }
-    }
-    */
 
 
     /** Should the file be synced */
