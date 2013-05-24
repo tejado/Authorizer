@@ -336,6 +336,7 @@ public class GDriveSyncer
                                     remfile.getModifiedDate().getValue(), db);
         }
 
+        // TODO: do not hold db txn while syncing files
         dbfiles = SyncDb.getFiles(provider.itsId, db);
         for (SyncDb.DbFile dbfile: dbfiles) {
             try {
@@ -351,9 +352,11 @@ public class GDriveSyncer
                     if (dbfile.itsIsLocalDeleted) {
                         removeFile(dbfile, db);
                     } else if (dbfile.itsIsRemoteDeleted) {
-                        // TODO: conflict?
+                        PasswdSafeUtil.dbginfo(
+                                TAG, "performSync recreate removed %s", dbfile);
+                        syncLocalToRemote(dbfile, fileCache, true, db);
                     } else {
-                        syncLocalToRemote(dbfile, fileCache, db);
+                        syncLocalToRemote(dbfile, fileCache, false, db);
                     }
                 } else if (dbfile.itsIsRemoteDeleted ||
                         dbfile.itsIsLocalDeleted) {
@@ -412,6 +415,7 @@ public class GDriveSyncer
     /** Sync a local file to remote */
     private void syncLocalToRemote(SyncDb.DbFile dbfile,
                                    HashMap<String, File> fileCache,
+                                   boolean forceInsert,
                                    SQLiteDatabase db)
             throws SQLException, IOException
     {
@@ -419,7 +423,7 @@ public class GDriveSyncer
 
         File file;
         boolean isInsert;
-        if (TextUtils.isEmpty(dbfile.itsRemoteId)) {
+        if (forceInsert || TextUtils.isEmpty(dbfile.itsRemoteId)) {
             file = new File();
             file.setDescription("Password Safe file");
             file.setMimeType("application/x-psafe3");
