@@ -286,17 +286,27 @@ public class MainActivity extends FragmentActivity
             ProviderSyncFreqPref freq =
                     ProviderSyncFreqPref.freqValueOf(freqVal);
             GoogleAccountManager acctMgr = new GoogleAccountManager(this);
-            // TODO: how to handle account that no longer exists
             itsGdriveAccount = acctMgr.getAccountByName(acct);
             itsGdriveUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
 
+            View freqSpinLabel = findViewById(R.id.gdrive_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
             freqSpin.setSelection(freq.getDisplayIdx());
+            View syncBtn = findViewById(R.id.gdrive_sync);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
-            acctView.setText("Account - " + itsGdriveAccount.name);
             btns.setVisibility(View.VISIBLE);
+
+            boolean haveAccount = (itsGdriveAccount != null);
+            if (haveAccount) {
+                acctView.setText("Account - " + itsGdriveAccount.name);
+            } else {
+                acctView.setText("Account does not exist - " + acct);
+            }
+            freqSpin.setEnabled(haveAccount);
+            freqSpinLabel.setEnabled(haveAccount);
+            syncBtn.setEnabled(haveAccount);
         } else {
             itsGdriveAccount = null;
             itsGdriveUri = null;

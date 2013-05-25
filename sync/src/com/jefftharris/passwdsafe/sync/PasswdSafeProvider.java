@@ -16,6 +16,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.OnAccountsUpdateListener;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -26,6 +29,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
@@ -49,6 +53,7 @@ public class PasswdSafeProvider extends ContentProvider
     private static final HashMap<String, String> FILES_MAP;
 
     private SyncDb itsDb;
+    private OnAccountsUpdateListener itsListener;
 
     static {
         MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
@@ -120,7 +125,7 @@ public class PasswdSafeProvider extends ContentProvider
                     return 0;
                 }
 
-                GDriveSyncer.deleteProvider(provider, db, getContext());
+                GDriveSyncer.deleteProvider(provider, db, getContext(), null);
                 db.setTransactionSuccessful();
                 return 1;
             } catch (Exception e) {
@@ -208,6 +213,33 @@ public class PasswdSafeProvider extends ContentProvider
     {
         Log.i(TAG, "onCreate");
         itsDb = new SyncDb(getContext());
+        itsListener = new OnAccountsUpdateListener()
+        {
+            @Override
+            public void onAccountsUpdated(Account[] accounts)
+            {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params)
+                    {
+                        SQLiteDatabase db = itsDb.getDb();
+                        try {
+                            db.beginTransaction();
+                            GDriveSyncer.validateAccounts(db, getContext());
+                            db.setTransactionSuccessful();
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error validating accounts", e);
+                        } finally {
+                            db.endTransaction();
+                        }
+                        return null;
+                    }
+                }.execute();
+            }
+        };
+        AccountManager mgr = AccountManager.get(getContext());
+        mgr.addOnAccountsUpdatedListener(itsListener, null, false);
+
         return true;
     }
 

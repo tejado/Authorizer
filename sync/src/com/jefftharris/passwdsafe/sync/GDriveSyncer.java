@@ -102,7 +102,8 @@ public class GDriveSyncer
     /** Delete the provider for the account */
     public static void deleteProvider(SyncDb.DbProvider provider,
                                       SQLiteDatabase db,
-                                      Context ctx)
+                                      Context ctx,
+                                      GoogleAccountManager acctMgr)
         throws SQLException
     {
         List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
@@ -127,7 +128,9 @@ public class GDriveSyncer
                                    provider.itsAcct);
         }
 
-        GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
+        if (acctMgr == null) {
+            acctMgr = new GoogleAccountManager(ctx);
+        }
         Account acct = acctMgr.getAccountByName(provider.itsAcct);
         if (acct != null) {
             ContentResolver.removePeriodicSync(acct,
@@ -165,6 +168,25 @@ public class GDriveSyncer
         }
     }
 
+
+    /** Validate the provider accounts */
+    public static void validateAccounts(SQLiteDatabase db, Context ctx)
+            throws SQLException
+    {
+        PasswdSafeUtil.dbginfo(TAG, "Validating accounts");
+        GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
+
+        List<SyncDb.DbProvider> providers = SyncDb.getProviders(db);
+        for (SyncDb.DbProvider provider: providers) {
+            Account acct = acctMgr.getAccountByName(provider.itsAcct);
+            if (acct == null) {
+                deleteProvider(provider, db, ctx, acctMgr);
+            }
+        }
+        ctx.getContentResolver().notifyChange(PasswdSafeContract.CONTENT_URI,
+                                              null);
+    }
+
     /** Get the filename for a local file */
     public static String getLocalFileName(long fileId)
     {
@@ -194,36 +216,44 @@ public class GDriveSyncer
                 db.beginTransaction();
                 SyncDb.DbProvider provider = SyncDb.getProvider(itsAccount.name,
                                                                 db);
-                long changeId = provider.itsSyncChange;
-                Log.i(TAG, "largest change " + changeId);
-                Pair<Long, List<GDriveSyncOper>> syncrc;
-                if (changeId == -1) {
-                    syncrc = performFullSync(provider, db);
+                if (provider != null) {
+                    long changeId = provider.itsSyncChange;
+                    Log.i(TAG, "largest change " + changeId);
+                    Pair<Long, List<GDriveSyncOper>> syncrc;
+                    if (changeId == -1) {
+                        syncrc = performFullSync(provider, db);
+                    } else {
+                        syncrc = performSyncSince(provider, changeId, db);
+                    }
+                    long newChangeId = syncrc.first;
+                    opers = syncrc.second;
+                    if (changeId != newChangeId) {
+                        SyncDb.updateProviderSyncChange(provider, newChangeId,
+                                                        db);
+                    }
                 } else {
-                    syncrc = performSyncSince(provider, changeId, db);
+                    validateAccounts(db, itsContext);
                 }
-                long newChangeId = syncrc.first;
-                opers = syncrc.second;
-                if (changeId != newChangeId) {
-                    SyncDb.updateProviderSyncChange(provider, newChangeId, db);
-                }
+
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
             }
 
-            for (GDriveSyncOper oper: opers) {
-                try {
-                    oper.doOper(itsDrive, itsContext);
+            if (opers != null) {
+                for (GDriveSyncOper oper: opers) {
                     try {
-                        db.beginTransaction();
-                        oper.doPostOperUpdate(db, itsContext);
-                        db.setTransactionSuccessful();
-                    } finally {
-                        db.endTransaction();
+                        oper.doOper(itsDrive, itsContext);
+                        try {
+                            db.beginTransaction();
+                            oper.doPostOperUpdate(db, itsContext);
+                            db.setTransactionSuccessful();
+                        } finally {
+                            db.endTransaction();
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Sync error for file " + oper.getFile(), e);
                     }
-                } catch (Exception e) {
-                    Log.e(TAG, "Sync error for file " + oper.getFile(), e);
                 }
             }
 

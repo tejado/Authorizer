@@ -222,6 +222,24 @@ public class SyncDb
                 db);
     }
 
+    /** Get the providers */
+    public static List<DbProvider> getProviders(SQLiteDatabase db)
+            throws SQLException
+    {
+        List<DbProvider> providers = new ArrayList<DbProvider>();
+        Cursor cursor = db.query(DB_TABLE_PROVIDERS, DbProvider.QUERY_FIELDS,
+                                 null, null, null, null, null);
+        try {
+            for (boolean more = cursor.moveToFirst(); more;
+                    more = cursor.moveToNext()) {
+                providers.add(new DbProvider(cursor));
+            }
+        } finally {
+            cursor.close();
+        }
+        return providers;
+    }
+
     /** Get a file */
     public DbFile getFile(long id)
             throws SQLException
