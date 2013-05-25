@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="account_label">Account: %1$s</string>
+    <string name="account_not_exists_label">Account: %1$s (does not exist)</string>
     <string name="adding_account">Adding account&#8230;</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="choose_account">Choose Account</string>

@@ -300,9 +300,11 @@ public class MainActivity extends FragmentActivity
 
             boolean haveAccount = (itsGdriveAccount != null);
             if (haveAccount) {
-                acctView.setText("Account - " + itsGdriveAccount.name);
+                acctView.setText(getString(R.string.account_label,
+                                           itsGdriveAccount.name));
             } else {
-                acctView.setText("Account does not exist - " + acct);
+                acctView.setText(getString(R.string.account_not_exists_label,
+                                           acct));
             }
             freqSpin.setEnabled(haveAccount);
             freqSpinLabel.setEnabled(haveAccount);
