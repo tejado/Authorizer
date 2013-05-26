@@ -39,12 +39,12 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
         if (forceInsert || TextUtils.isEmpty(itsFile.itsRemoteId)) {
             itsDriveFile = new File();
             itsDriveFile.setDescription("Password Safe file");
-            itsDriveFile.setMimeType("application/x-psafe3");
             itsIsInsert = true;
         } else {
             itsDriveFile = cache.get(itsFile.itsRemoteId);
             itsIsInsert = false;
         }
+        itsDriveFile.setMimeType("application/x-psafe3");
     }
 
     /* (non-Javadoc)
