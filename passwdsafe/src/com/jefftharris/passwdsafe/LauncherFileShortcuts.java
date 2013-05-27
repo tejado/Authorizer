@@ -29,7 +29,6 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
         }
 
         // TODO: handle shortcut to provider file that no longer exists
-        // TODO: handle shortcut file ids that mismatch with changed provider
     }
 
 

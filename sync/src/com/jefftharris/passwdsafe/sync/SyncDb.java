@@ -409,7 +409,7 @@ public class SyncDb
                        DB_COL_PROVIDERS_SYNC_FREQ + " INTEGER NOT NULL" +
                        ");");
             db.execSQL("CREATE TABLE " + DB_TABLE_FILES + " (" +
-                       DB_COL_FILES_ID + " INTEGER PRIMARY KEY," +
+                       DB_COL_FILES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                        DB_COL_FILES_PROVIDER + " INTEGER REFERENCES " +
                            DB_TABLE_PROVIDERS + "(" + DB_COL_PROVIDERS_ID +
                            ") NOT NULL," +
