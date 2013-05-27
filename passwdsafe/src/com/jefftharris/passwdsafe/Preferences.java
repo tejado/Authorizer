@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -469,8 +469,8 @@ public class Preferences extends PreferenceActivity
     {
         itsFileDirPref.setSummary(fileDir.toString());
 
-        AbstractFileListActivity.FileData[] files =
-                AbstractFileListActivity.getFiles(fileDir, false, false);
+        FileListFragment.FileData[] files =
+                FileListFragment.getFiles(fileDir, false, false);
         String[] entries = new String[files.length + 1];
         String[] entryValues = new String[files.length + 1];
         entries[0] = getString(R.string.none);

@@ -8,10 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,9 +16,7 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.ListActivity;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -42,99 +37,8 @@ public abstract class AbstractFileListActivity extends ListActivity
     private static final String TITLE = "title";
     private static final String ICON = "icon";
 
-    private static Comparator<File> FILE_COMP = new Comparator<File>()
-    {
-        public int compare(File obj1, File obj2)
-        {
-            if (obj1.isDirectory() && !obj2.isDirectory()) {
-                return 1;
-            } else if (!obj1.isDirectory() && obj2.isDirectory()) {
-                return -1;
-            }
-            return obj1.compareTo(obj2);
-        }
-    };
-
-
     protected File itsDir;
     private LinkedList<File> itsDirHistory = new LinkedList<File>();
-
-
-    public static final class FileData
-    {
-        public final File itsFile;
-        public FileData(File f)
-        {
-            itsFile = f;
-        }
-        @Override
-        public final String toString()
-        {
-            return itsFile.getName();
-        }
-    }
-
-
-    public static FileData[] getFiles(File dir,
-                                      final boolean showHiddenFiles,
-                                      final boolean showDirs)
-    {
-        File[] files = dir.listFiles(new FileFilter() {
-            public final boolean accept(File pathname) {
-                String filename = pathname.getName();
-                if (pathname.isDirectory()) {
-                    if (!showDirs) {
-                        return false;
-                    }
-                    if (!showHiddenFiles &&
-                        (filename.startsWith(".") ||
-                         filename.equalsIgnoreCase("LOST.DIR"))) {
-                        return false;
-                    }
-                    return true;
-                }
-                if (filename.endsWith(".psafe3") || filename.endsWith(".dat")) {
-                    return true;
-                }
-                if (showHiddenFiles &&
-                    (filename.endsWith(".psafe3~") ||
-                     filename.endsWith(".dat~") ||
-                     filename.endsWith(".ibak"))) {
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        FileData[] data;
-        if (files != null) {
-            Arrays.sort(files, FILE_COMP);
-            data = new FileData[files.length];
-            for (int i = 0; i < files.length; ++i) {
-                data[i] = new FileData(files[i]);
-            }
-        } else {
-            data = new FileData[0];
-        }
-
-        return data;
-    }
-
-
-    public static Intent createOpenIntent(File file, String recToOpen)
-    {
-        return createOpenIntent(Uri.fromFile(file), recToOpen);
-    }
-
-
-    public static Intent createOpenIntent(Uri uri, String recToOpen)
-    {
-        Uri.Builder builder = uri.buildUpon();
-        if (recToOpen != null) {
-            builder.appendQueryParameter("recToOpen", recToOpen);
-        }
-        return new Intent(PasswdSafeApp.VIEW_INTENT, builder.build());
-    }
 
 
     /* (non-Javadoc)
@@ -217,7 +121,8 @@ public abstract class AbstractFileListActivity extends ListActivity
             return;
         }
 
-        FileData file = (FileData) item.get(TITLE);
+        FileListFragment.FileData file =
+                (FileListFragment.FileData) item.get(TITLE);
         if (file == null) {
             return;
         }
@@ -265,10 +170,10 @@ public abstract class AbstractFileListActivity extends ListActivity
             itsDir = null;
         } else {
             itsDir = getFileDir();
-            FileData[] data = getFiles(itsDir);
+            FileListFragment.FileData[] data = getFiles(itsDir);
             List<Map<String, Object>> fileData =
                 new ArrayList<Map<String, Object>>();
-            for (FileData file: data) {
+            for (FileListFragment.FileData file: data) {
                 HashMap<String, Object> item = new HashMap<String, Object>();
                 item.put(TITLE, file);
                 item.put(ICON, file.itsFile.isDirectory() ?
@@ -342,13 +247,13 @@ public abstract class AbstractFileListActivity extends ListActivity
     }
 
 
-    private final FileData[] getFiles(File dir)
+    private final FileListFragment.FileData[] getFiles(File dir)
     {
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
         boolean showHiddenFiles =
             Preferences.getShowHiddenFilesPref(prefs);
-        return getFiles(dir, showHiddenFiles, true);
+        return FileListFragment.getFiles(dir, showHiddenFiles, true);
     }
 
 

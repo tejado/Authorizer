@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2011-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2011-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -11,6 +11,7 @@ import java.io.File;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
@@ -40,8 +41,8 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
         if (file != null) {
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
-                            AbstractFileListActivity.createOpenIntent(file,
-                                                                      null));
+                            PasswdSafeApp.createOpenIntent(Uri.fromFile(file),
+                                                           null));
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, file.getName());
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(

@@ -306,6 +306,16 @@ public class PasswdSafeApp extends Application
         return new PasswdFileUri(builder.build());
     }
 
+    /** Create an intent to open a URI */
+    public static Intent createOpenIntent(Uri uri, String recToOpen)
+    {
+        Uri.Builder builder = uri.buildUpon();
+        if (recToOpen != null) {
+            builder.appendQueryParameter("recToOpen", recToOpen);
+        }
+        return new Intent(VIEW_INTENT, builder.build());
+    }
+
     public synchronized ActivityPasswdFile accessPasswdFile
     (
          PasswdFileUri uri,

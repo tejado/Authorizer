@@ -120,7 +120,7 @@ public class FileListActivity extends FragmentActivity
     public void openFile(Uri uri)
     {
         try {
-            startActivity(AbstractFileListActivity.createOpenIntent(uri, null));
+            startActivity(PasswdSafeApp.createOpenIntent(uri, null));
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Can't open uri: " + uri, e);
         }

@@ -8,13 +8,16 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.util.FileComparator;
 import com.jefftharris.passwdsafe.view.GuiUtils;
 
 import android.app.Activity;
@@ -47,6 +50,21 @@ public class FileListFragment extends ListFragment
     {
         /** Open a file */
         public void openFile(Uri uri);
+    }
+
+    /** File data information for the list */
+    public static final class FileData
+    {
+        public final File itsFile;
+        public FileData(File f)
+        {
+            itsFile = f;
+        }
+        @Override
+        public final String toString()
+        {
+            return itsFile.getName();
+        }
     }
 
     private static final String TAG = "FileListFragment";
@@ -224,8 +242,7 @@ public class FileListFragment extends ListFragment
             return;
         }
 
-        AbstractFileListActivity.FileData file =
-                (AbstractFileListActivity.FileData) item.get(TITLE);
+        FileData file = (FileData) item.get(TITLE);
         if (file == null) {
             return;
         }
@@ -253,6 +270,53 @@ public class FileListFragment extends ListFragment
     }
 
 
+    /** Get the files in a directory */
+    public static FileData[] getFiles(File dir,
+                                      final boolean showHiddenFiles,
+                                      final boolean showDirs)
+    {
+        File[] files = dir.listFiles(new FileFilter() {
+            public final boolean accept(File pathname) {
+                String filename = pathname.getName();
+                if (pathname.isDirectory()) {
+                    if (!showDirs) {
+                        return false;
+                    }
+                    if (!showHiddenFiles &&
+                        (filename.startsWith(".") ||
+                         filename.equalsIgnoreCase("LOST.DIR"))) {
+                        return false;
+                    }
+                    return true;
+                }
+                if (filename.endsWith(".psafe3") || filename.endsWith(".dat")) {
+                    return true;
+                }
+                if (showHiddenFiles &&
+                    (filename.endsWith(".psafe3~") ||
+                     filename.endsWith(".dat~") ||
+                     filename.endsWith(".ibak"))) {
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        FileData[] data;
+        if (files != null) {
+            Arrays.sort(files, new FileComparator());
+            data = new FileData[files.length];
+            for (int i = 0; i < files.length; ++i) {
+                data[i] = new FileData(files[i]);
+            }
+        } else {
+            data = new FileData[0];
+        }
+
+        return data;
+    }
+
+
     /** Show the files in the current directory */
     private final void showFiles()
     {
@@ -263,10 +327,10 @@ public class FileListFragment extends ListFragment
             itsDir = null;
         } else {
             itsDir = getFileDir();
-            AbstractFileListActivity.FileData[] data = getFiles(itsDir);
+            FileData[] data = getFiles(itsDir);
             List<Map<String, Object>> fileData =
                 new ArrayList<Map<String, Object>>();
-            for (AbstractFileListActivity.FileData file: data) {
+            for (FileData file: data) {
                 HashMap<String, Object> item = new HashMap<String, Object>();
                 item.put(TITLE, file);
                 item.put(ICON, file.itsFile.isDirectory() ?
@@ -350,13 +414,13 @@ public class FileListFragment extends ListFragment
 
 
     /** Get the files in the given directory */
-    private final AbstractFileListActivity.FileData[] getFiles(File dir)
+    private final FileData[] getFiles(File dir)
     {
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(getActivity());
         boolean showHiddenFiles =
             Preferences.getShowHiddenFilesPref(prefs);
-        return AbstractFileListActivity.getFiles(dir, showHiddenFiles, true);
+        return getFiles(dir, showHiddenFiles, true);
     }
 
 
