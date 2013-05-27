@@ -271,9 +271,9 @@ public class GDriveSyncer
         Log.i(TAG, "Sync finished for " + itsAccount.name);
     }
 
-    // TODO: filter on mime types
-    // TODO: .dat files?
     // TODO: moving file to different folder doesn't update modDate
+    // TODO: show folders
+    // TODO: launch apps from each other as needed
 
 
     /** Perform a full sync of the files */
