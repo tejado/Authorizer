@@ -65,7 +65,6 @@ public class MainActivity extends FragmentActivity
         setContentView(R.layout.activity_main);
         Log.i(TAG, "onCreate");
 
-        // TODO: create a special google acct for the sync service
         itsSyncDb = new SyncDb(this);
 
         Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
