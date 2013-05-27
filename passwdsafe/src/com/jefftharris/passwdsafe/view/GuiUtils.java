@@ -303,8 +303,8 @@ public final class GuiUtils
                                      System.currentTimeMillis());
             notif.setLatestEventInfo(ctx, title, content, intent);
         } else {
-            BitmapDrawable b = (BitmapDrawable)
-                ctx.getResources().getDrawable(R.drawable.icon);
+            BitmapDrawable b = (BitmapDrawable)ctx.getResources().getDrawable(
+                    R.drawable.ic_launcher_passwdsafe);
             NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)

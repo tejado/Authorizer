@@ -80,7 +80,29 @@
             android:onClick="onGdriveClear"
             android:padding="12dp"
             android:text="@string/clear"/>
-
     </RelativeLayout>
+
+    <View
+        style="@style/Separator"
+        android:layout_margin="6dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_launcher_passwdsafe"
+        android:drawablePadding="6dp"
+        android:gravity="fill_vertical"
+        android:paddingBottom="6dp"
+        android:paddingTop="12dp"
+        android:text="@string/passwdsafe"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onLaunchPasswdSafeClick"
+        android:drawableLeft="@android:drawable/ic_media_play"
+        android:drawablePadding="6dp"
+        android:text="@string/open"/>
 
 </LinearLayout>

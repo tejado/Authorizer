@@ -45,7 +45,7 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, file.getName());
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(
-                                this, R.drawable.icon));
+                                this, R.drawable.ic_launcher_passwdsafe));
             setResult(RESULT_OK, intent);
         }
 

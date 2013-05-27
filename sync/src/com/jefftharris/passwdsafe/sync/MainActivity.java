@@ -6,15 +6,21 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.util.List;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -156,6 +162,27 @@ public class MainActivity extends FragmentActivity
         default: {
             return super.onOptionsItemSelected(item);
         }
+        }
+    }
+
+
+    /** Button onClick handler to launch PasswdSafe */
+    public void onLaunchPasswdSafeClick(View view)
+    {
+        String pkg = "com.jefftharris.passwdsafe";
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setPackage(pkg);
+        PackageManager pm = getPackageManager();
+        List<ResolveInfo> infos = pm.queryIntentActivities(intent, 0);
+        for (ResolveInfo info: infos) {
+            ActivityInfo actInfo = info.activityInfo;
+            if ((actInfo != null) && (pkg.equals(actInfo.packageName))) {
+                intent.setComponent(new ComponentName(actInfo.packageName,
+                                                      actInfo.name));
+                startActivity(intent);
+                break;
+            }
         }
     }
 
