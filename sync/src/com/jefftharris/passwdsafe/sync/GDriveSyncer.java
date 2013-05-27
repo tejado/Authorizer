@@ -273,7 +273,6 @@ public class GDriveSyncer
 
     // TODO: moving file to different folder doesn't update modDate
     // TODO: show folders
-    // TODO: launch apps from each other as needed
 
 
     /** Perform a full sync of the files */
