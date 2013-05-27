@@ -137,7 +137,7 @@ public class SyncProviderFragment extends ListFragment
         setListAdapter(itsProviderAdapter);
 
         itsHasProvider = checkProvider();
-        //getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, this);
     }
 
 
