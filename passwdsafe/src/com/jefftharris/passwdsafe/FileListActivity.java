@@ -25,7 +25,6 @@ import android.view.MenuItem;
 
 import com.jefftharris.passwdsafe.view.GuiUtils;
 
-// TODO: update min version to 1.6
 
 /**
  * The FileListActivity is the main PasswdSafe activity for file choosing and
