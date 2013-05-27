@@ -6,6 +6,14 @@
  */
 package com.jefftharris.passwdsafe.lib;
 
+import java.util.List;
+
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.util.Log;
 
 /**
@@ -14,6 +22,25 @@ import android.util.Log;
 public class PasswdSafeUtil
 {
     public static final boolean DEBUG = false;
+
+    /** Start the main activity for a package */
+    public static void startMainActivity(String pkgName, Activity act)
+    {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setPackage(pkgName);
+        PackageManager pm = act.getPackageManager();
+        List<ResolveInfo> infos = pm.queryIntentActivities(intent, 0);
+        for (ResolveInfo info: infos) {
+            ActivityInfo actInfo = info.activityInfo;
+            if ((actInfo != null) && (pkgName.equals(actInfo.packageName))) {
+                intent.setComponent(new ComponentName(actInfo.packageName,
+                                                      actInfo.name));
+                act.startActivity(intent);
+                return;
+            }
+        }
+    }
 
     /** Log a debug message at info level */
     public static void dbginfo(String tag, String msg)

@@ -6,21 +6,15 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
-import java.util.List;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -46,6 +40,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 public class MainActivity extends FragmentActivity
         implements LoaderCallbacks<Cursor>
@@ -169,21 +164,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to launch PasswdSafe */
     public void onLaunchPasswdSafeClick(View view)
     {
-        String pkg = "com.jefftharris.passwdsafe";
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.setPackage(pkg);
-        PackageManager pm = getPackageManager();
-        List<ResolveInfo> infos = pm.queryIntentActivities(intent, 0);
-        for (ResolveInfo info: infos) {
-            ActivityInfo actInfo = info.activityInfo;
-            if ((actInfo != null) && (pkg.equals(actInfo.packageName))) {
-                intent.setComponent(new ComponentName(actInfo.packageName,
-                                                      actInfo.name));
-                startActivity(intent);
-                break;
-            }
-        }
+        PasswdSafeUtil.startMainActivity("com.jefftharris.passwdsafe", this);
     }
 
 

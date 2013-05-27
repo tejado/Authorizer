@@ -12,12 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <TextView
+    <Button
         android:id="@android:id/empty"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/no_files"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        android:drawableLeft="@drawable/ic_launcher_sync"
+        android:drawablePadding="6dp"
+        android:gravity="center_vertical"
+        android:text="@string/select_accounts"/>
 
 </LinearLayout>

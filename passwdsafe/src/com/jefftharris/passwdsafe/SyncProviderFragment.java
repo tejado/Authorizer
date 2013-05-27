@@ -7,9 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import com.jefftharris.passwdsafe.lib.ApiCompat;
-import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -27,10 +24,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  * The SyncProviderFragment allows the user to choose a sync provider
@@ -69,8 +71,21 @@ public class SyncProviderFragment extends ListFragment
                              Bundle savedInstanceState)
     {
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.fragment_sync_provider,
-                                container, false);
+        View rootView = inflater.inflate(R.layout.fragment_sync_provider,
+                                         container, false);
+
+        View launchBtn = rootView.findViewById(android.R.id.empty);
+        launchBtn.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                PasswdSafeUtil.startMainActivity(
+                        "com.jefftharris.passwdsafe.sync", getActivity());
+            }
+        });
+
+        return rootView;
     }
 
 
@@ -122,7 +137,7 @@ public class SyncProviderFragment extends ListFragment
         setListAdapter(itsProviderAdapter);
 
         itsHasProvider = checkProvider();
-        getLoaderManager().initLoader(0, null, this);
+        //getLoaderManager().initLoader(0, null, this);
     }
 
 

@@ -199,6 +199,7 @@
     <string name="search">Rechercher</string>
     <string name="search_hint">Rechercher PasswdSafe</string>
     <string name="search_settings">Paramètres de recherche</string>
+    <string name="select_accounts">Sélectionnez comptes</string>
     <string name="select_file_label">Sélectionnez la sauvegarde à ouvrir:</string>
     <string name="set_password">Définir le mot de passe</string>
     <string name="shortcut_base_record_header">RACCOURCI</string>
