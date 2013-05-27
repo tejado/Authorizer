@@ -49,7 +49,7 @@ public class FileListFragment extends ListFragment
     public interface Listener
     {
         /** Open a file */
-        public void openFile(Uri uri);
+        public void openFile(Uri uri, String fileName);
     }
 
     /** File data information for the list */
@@ -389,7 +389,7 @@ public class FileListFragment extends ListFragment
     /** Open the given file */
     private final void openFile(File file)
     {
-        itsListener.openFile(Uri.fromFile(file));
+        itsListener.openFile(Uri.fromFile(file), file.getName());
     }
 
 

@@ -44,7 +44,7 @@ public class SyncProviderFilesFragment extends ListFragment
     public interface Listener
     {
         /** Open a file */
-        public void openFile(Uri uri);
+        public void openFile(Uri uri, String fileName);
     }
 
     private static final String TAG = "SyncProviderFilesFragment";
@@ -104,7 +104,6 @@ public class SyncProviderFilesFragment extends ListFragment
         return inflater.inflate(R.layout.fragment_sync_provider_files,
                                 container, false);
         // TODO: add/delete file
-        // TODO: sync provider shortcuts
     }
 
 
@@ -257,6 +256,8 @@ public class SyncProviderFilesFragment extends ListFragment
 
         Uri uri = ContentUris.withAppendedId(itsFilesUri, id);
         PasswdSafeUtil.dbginfo(TAG, "Open provider uri %s", uri);
-        itsListener.openFile(uri);
+        itsListener.openFile(
+                uri,
+                cursor.getString(PasswdSafeContract.Files.PROJECTION_IDX_TITLE));
     }
 }

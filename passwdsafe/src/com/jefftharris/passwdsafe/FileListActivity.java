@@ -7,51 +7,23 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import com.jefftharris.passwdsafe.view.GuiUtils;
 
 
 /**
  * The FileListActivity is the main PasswdSafe activity for file choosing and
  * top-level options
  */
-public class FileListActivity extends FragmentActivity
-        implements FileListFragment.Listener,
-                   SyncProviderFragment.Listener,
-                   SyncProviderFilesFragment.Listener
+public class FileListActivity extends AbstractFileListActivity
 {
     private static final String TAG = "FileListActivity";
 
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
-     */
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_file_list);
-
-        FragmentManager fragMgr = getSupportFragmentManager();
-        FragmentTransaction txn = fragMgr.beginTransaction();
-        txn.replace(R.id.sync, new SyncProviderFragment());
-        txn.commit();
-    }
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -93,78 +65,16 @@ public class FileListActivity extends FragmentActivity
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.SyncProviderFragment.Listener#showSyncProviderFiles(android.net.Uri)
-     */
-    @Override
-    public void showSyncProviderFiles(Uri uri)
-    {
-        FragmentManager fragMgr = getSupportFragmentManager();
-        Fragment filesFrag = fragMgr.findFragmentById(R.id.files);
-
-        SyncProviderFilesFragment syncFrag =
-                SyncProviderFilesFragment.newInstance(uri);
-
-        FragmentTransaction txn = fragMgr.beginTransaction();
-        txn.hide(filesFrag);
-        txn.replace(R.id.sync, syncFrag);
-        txn.addToBackStack(null);
-        txn.commit();
-    }
-
-
-    /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.FileListFragment.Listener#openFile(android.net.Uri)
      * @see com.jefftharris.passwdsafe.SyncProviderFilesFragment.Listener#openFile(android.net.Uri)
      */
     @Override
-    public void openFile(Uri uri)
+    public void openFile(Uri uri, String fileName)
     {
         try {
             startActivity(PasswdSafeApp.createOpenIntent(uri, null));
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Can't open uri: " + uri, e);
         }
-    }
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
-     */
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
-        if (GuiUtils.isBackKeyDown(keyCode, event)) {
-            // Take care of calling this method on earlier versions of
-            // the platform where it doesn't exist.
-            if (doBackPressed()) {
-                return true;
-            }
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.app.Activity#onBackPressed()
-     */
-    @TargetApi(Build.VERSION_CODES.ECLAIR)
-    @Override
-    public void onBackPressed()
-    {
-        if (!doBackPressed()) {
-            super.onBackPressed();
-        }
-    }
-
-
-    /**
-     * @return true if a directory was popped, false to use default behavior
-     */
-    private final boolean doBackPressed()
-    {
-        FragmentManager mgr = getSupportFragmentManager();
-        Fragment frag = mgr.findFragmentById(R.id.files);
-        if ((frag instanceof FileListFragment) && frag.isVisible()) {
-            return ((FileListFragment)frag).doBackPressed();
-        }
-        return false;
     }
 }

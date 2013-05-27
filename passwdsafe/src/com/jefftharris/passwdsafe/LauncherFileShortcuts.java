@@ -7,18 +7,12 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
-
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 
 public class LauncherFileShortcuts extends AbstractFileListActivity
 {
-    private File itsFileDir;
-
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
      */
@@ -33,17 +27,24 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
             finish();
             return;
         }
+
+        // TODO: handle shortcut to provider file that no longer exists
+        // TODO: handle shortcut file ids that mismatch with changed provider
     }
 
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#openFile(android.net.Uri)
+     * @see com.jefftharris.passwdsafe.SyncProviderFilesFragment.Listener#openFile(android.net.Uri)
+     */
     @Override
-    protected void onFileClick(File file)
+    public void openFile(Uri uri, String fileName)
     {
-        if (file != null) {
+        if (uri != null) {
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
-                            PasswdSafeApp.createOpenIntent(Uri.fromFile(file),
-                                                           null));
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, file.getName());
+                            PasswdSafeApp.createOpenIntent(uri, null));
+            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, fileName);
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(
                                 this, R.drawable.ic_launcher_passwdsafe));
@@ -51,22 +52,5 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
         }
 
         finish();
-    }
-
-    @Override
-    protected File getFileDir()
-    {
-        if (itsFileDir == null) {
-            SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-            itsFileDir = Preferences.getFileDirPref(prefs);
-        }
-        return itsFileDir;
-    }
-
-    @Override
-    protected void setFileDir(File dir)
-    {
-        itsFileDir = dir;
     }
 }
