@@ -1119,14 +1119,15 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             removeDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (!(result instanceof Exception)) {
-                PasswdFileData fileData = (PasswdFileData)result;
                 switch (itsType) {
                 case OPEN: {
+                    PasswdFileData fileData = (PasswdFileData)result;
                     getPasswdFile().setFileData(fileData);
                     showFileData(MOD_DATA | MOD_OPEN_NEW);
                     break;
                 }
                 case NEW: {
+                    PasswdFileData fileData = (PasswdFileData)result;
                     openFile(fileData.getUri());
                     getPasswdFile().setFileData(fileData);
                     setTitle(PasswdSafeApp.getAppFileTitle(getUri(),
@@ -1139,7 +1140,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     break;
                 }
                 }
-            } else if (result instanceof Exception) {
+            } else {
                 Exception e = (Exception)result;
                 if (((e instanceof IOException) &&
                      TextUtils.equals(e.getMessage(), "Invalid password")) ||
