@@ -108,6 +108,8 @@ public final class PasswdSafeContract
         public static final String COL_MOD_DATE = "mod_date";
         public static final String COL_FILE = "file";
 
+        public static final String NOT_DELETED_SELECTION =
+                "not local_deleted and not remote_deleted";
         public static final String TITLE_SORT_ORDER = "title ASC";
 
         public static final String[] PROJECTION = {

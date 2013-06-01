@@ -103,7 +103,7 @@ public class SyncProviderFilesFragment extends ListFragment
         setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_sync_provider_files,
                                 container, false);
-        // TODO: add/delete file
+        // TODO: add file
     }
 
 
@@ -187,11 +187,12 @@ public class SyncProviderFilesFragment extends ListFragment
                  @Override
                  public Loader<Cursor> onCreateLoader(int id, Bundle args)
                  {
+                     // TODO: need custom CursorLoader to catch failures
                      return new CursorLoader(
                              getActivity(), itsFilesUri,
                              PasswdSafeContract.Files.PROJECTION,
-                             null, null,
-                             PasswdSafeContract.Files.TITLE_SORT_ORDER);
+                             PasswdSafeContract.Files.NOT_DELETED_SELECTION,
+                             null, PasswdSafeContract.Files.TITLE_SORT_ORDER);
                  }
 
                  @Override

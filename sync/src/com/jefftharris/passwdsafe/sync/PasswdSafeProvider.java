@@ -278,9 +278,8 @@ public class PasswdSafeProvider extends ContentProvider
     {
         Log.i(TAG, "query uri: " + uri);
 
-        if (selection != null) {
-            throw new IllegalArgumentException("selection not supported");
-        } else if (selectionArgs != null) {
+        boolean selectionValid = (selection == null);
+        if (selectionArgs != null) {
             throw new IllegalArgumentException("selectionArgs not supported");
         }
         boolean sortOrderValid = (sortOrder == null);
@@ -302,7 +301,17 @@ public class PasswdSafeProvider extends ContentProvider
         case MATCH_PROVIDER_FILES: {
             qb.setTables(SyncDb.DB_TABLE_FILES);
             qb.setProjectionMap(FILES_MAP);
-            selection = SyncDb.DB_MATCH_FILES_PROVIDER_ID;
+
+            StringBuffer fullSelection =
+                    new StringBuffer(SyncDb.DB_MATCH_FILES_PROVIDER_ID);
+            if (PasswdSafeContract.Files.NOT_DELETED_SELECTION.equals(
+                        selection)) {
+                selectionValid = true;
+                fullSelection.append(" and ");
+                fullSelection.append(selection);
+            }
+            selection = fullSelection.toString();
+
             selectionArgs = new String[] { uri.getPathSegments().get(1) };
             if (PasswdSafeContract.Files.TITLE_SORT_ORDER.equals(sortOrder)) {
                 sortOrderValid = true;
@@ -322,6 +331,9 @@ public class PasswdSafeProvider extends ContentProvider
         }
         }
 
+        if (!selectionValid) {
+            throw new IllegalArgumentException("selection not supported");
+        }
         if (!sortOrderValid) {
             throw new IllegalArgumentException("sortOrder not supported");
         }
