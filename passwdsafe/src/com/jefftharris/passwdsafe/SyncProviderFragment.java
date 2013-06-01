@@ -45,6 +45,9 @@ public class SyncProviderFragment extends ListFragment
     {
         /** Show the files for a provider's URI */
         public void showSyncProviderFiles(Uri uri);
+
+        /** Does the activity have a menu */
+        public boolean activityHasMenu();
     }
 
     private SimpleCursorAdapter itsProviderAdapter;
@@ -70,7 +73,9 @@ public class SyncProviderFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
-        setHasOptionsMenu(true);
+        if (itsListener.activityHasMenu()) {
+            setHasOptionsMenu(true);
+        }
         View rootView = inflater.inflate(R.layout.fragment_sync_provider,
                                          container, false);
 

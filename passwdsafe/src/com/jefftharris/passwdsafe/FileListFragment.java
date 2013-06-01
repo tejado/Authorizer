@@ -50,6 +50,9 @@ public class FileListFragment extends ListFragment
     {
         /** Open a file */
         public void openFile(Uri uri, String fileName);
+
+        /** Does the activity have a menu */
+        public boolean activityHasMenu();
     }
 
     /** File data information for the list */
@@ -95,7 +98,9 @@ public class FileListFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
-        setHasOptionsMenu(true);
+        if (itsListener.activityHasMenu()) {
+            setHasOptionsMenu(true);
+        }
         View view = inflater.inflate(R.layout.fragment_file_list,
                                      container, false);
 

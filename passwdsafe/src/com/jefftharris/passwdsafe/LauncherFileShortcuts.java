@@ -52,4 +52,14 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
 
         finish();
     }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#activityHasMenu()
+     */
+    @Override
+    public boolean activityHasMenu()
+    {
+        return false;
+    }
 }

@@ -77,4 +77,13 @@ public class FileListActivity extends AbstractFileListActivity
             Log.e(TAG, "Can't open uri: " + uri, e);
         }
     }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#activityHasMenu()
+     */
+    @Override
+    public boolean activityHasMenu()
+    {
+        return true;
+    }
 }
