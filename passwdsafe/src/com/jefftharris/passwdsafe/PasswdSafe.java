@@ -1078,13 +1078,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     break;
                 }
                 case DELETE: {
-                    File file = uri.getFile();
-                    if (file == null) {
-                        throw new Exception("Delete not supported for " + uri);
-                    }
-                    if (!file.delete()) {
-                        throw new Exception("Could not delete file: " + uri);
-                    }
+                    uri.delete();
                     break;
                 }
                 }

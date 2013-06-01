@@ -148,6 +148,26 @@ public class PasswdFileUri
     }
 
 
+    /** Delete a file */
+    public void delete()
+            throws IOException
+    {
+        switch (itsType) {
+        case FILE: {
+            if (!itsFile.delete()) {
+                throw new IOException("Could not delete file: " + toString());
+            }
+            break;
+        }
+        case SYNC_PROVIDER:
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            throw new IOException("Delete not supported for " + toString());
+        }
+        }
+    }
+
+
     /** Is the file writable */
     public boolean isWritable()
     {
