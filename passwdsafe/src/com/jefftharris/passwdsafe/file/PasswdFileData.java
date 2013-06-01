@@ -91,7 +91,6 @@ public class PasswdFileData
             EndOfFileException, InvalidPassphraseException,
             UnsupportedFileVersionException
     {
-        PasswdSafeUtil.dbginfo(TAG, "before load file");
         itsIsOpenReadOnly = readonly;
         itsPwsFile = itsUri.load(passwd, context);
 
@@ -1181,7 +1180,6 @@ public class PasswdFileData
         }
         passwd.delete(0, passwd.length());
         passwd = null;
-        PasswdSafeUtil.dbginfo(TAG, "after load file");
         indexRecords();
         notifyObservers(this);
         PasswdSafeUtil.dbginfo(TAG, "file loaded");
