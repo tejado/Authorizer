@@ -1078,7 +1078,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     break;
                 }
                 case DELETE: {
-                    uri.delete();
+                    uri.delete(PasswdSafe.this);
                     break;
                 }
                 }

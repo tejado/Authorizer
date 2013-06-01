@@ -136,6 +136,29 @@ public class PasswdSafeProvider extends ContentProvider
                 db.endTransaction();
             }
         }
+        case MATCH_PROVIDER_FILE: {
+            Log.i(TAG, "Delete file: " + uri);
+            SQLiteDatabase db = itsDb.getDb();
+            try {
+                db.beginTransaction();
+                Long id = Long.valueOf(uri.getPathSegments().get(3));
+                SyncDb.DbFile file = SyncDb.getFile(id, db);
+                if (file == null) {
+                    return 0;
+                }
+                SyncDb.updateLocalFileDeleted(id, db);
+                db.setTransactionSuccessful();
+
+                getContext().getContentResolver().notifyChange(uri, null);
+                return 1;
+            } catch (Exception e) {
+                String msg = "Error deleting file: " + uri;
+                Log.e(TAG, msg, e);
+                throw new RuntimeException(msg, e);
+            } finally {
+                db.endTransaction();
+            }
+        }
         default: {
             throw new IllegalArgumentException(
                     "delete unknown match for uri: " + uri);

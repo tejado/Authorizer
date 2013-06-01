@@ -149,7 +149,7 @@ public class PasswdFileUri
 
 
     /** Delete a file */
-    public void delete()
+    public void delete(Context context)
             throws IOException
     {
         switch (itsType) {
@@ -159,7 +159,14 @@ public class PasswdFileUri
             }
             break;
         }
-        case SYNC_PROVIDER:
+        case SYNC_PROVIDER: {
+            ContentResolver cr = context.getContentResolver();
+            int rc = cr.delete(itsUri, null, null);
+            if (rc != 1) {
+                throw new IOException("Could not delete file: " + toString());
+            }
+            break;
+        }
         case EMAIL:
         case GENERIC_PROVIDER: {
             throw new IOException("Delete not supported for " + toString());

@@ -245,6 +245,14 @@ public class SyncDb
             throws SQLException
     {
         SQLiteDatabase db = itsDbHelper.getReadableDatabase();
+        return getFile(id, db);
+    }
+
+
+    /** Get a file */
+    public static DbFile getFile(long id, SQLiteDatabase db)
+            throws SQLException
+    {
         Cursor cursor = db.query(DB_TABLE_FILES, DbFile.QUERY_FIELDS,
                                  DB_MATCH_FILES_ID,
                                  new String[] { Long.toString(id) },
@@ -338,6 +346,17 @@ public class SyncDb
     {
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_REMOTE_DELETED, true);
+        db.update(DB_TABLE_FILES, values,
+                  DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
+    }
+
+
+    /** Update a local file as deleted */
+    public static void updateLocalFileDeleted(long fileId, SQLiteDatabase db)
+            throws SQLException
+    {
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_FILES_LOCAL_DELETED, true);
         db.update(DB_TABLE_FILES, values,
                   DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
     }
