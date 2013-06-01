@@ -7,10 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -61,17 +57,6 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
             return true;
         }
         return false;
-    }
-
-
-    /** Open a new file */
-    protected final void openNewFile(PasswdFileUri uri, StringBuilder passwd)
-        throws IOException, NoSuchAlgorithmException
-    {
-        PasswdFileData fileData = new PasswdFileData(uri);
-        fileData.createNewFile(passwd, this);
-        openFile(uri);
-        itsPasswdFile.setFileData(fileData);
     }
 
 
@@ -191,12 +176,5 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     protected final String getUriName(boolean shortId)
     {
         return itsUri.getIdentifier(this, shortId);
-    }
-
-
-    /** Get the URI as a file if possible */
-    protected final File getUriAsFile()
-    {
-        return itsUri.getFile();
     }
 }

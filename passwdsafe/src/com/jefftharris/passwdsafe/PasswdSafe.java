@@ -427,7 +427,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 @Override
                 public void onCancelClicked(DialogInterface dialog)
                 {
-                    cancelFileOpen();
+                    cancelFileTask();
                 }
             };
 
@@ -449,7 +449,24 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             ProgressDialog dlg = new ProgressDialog(this);
             dlg.setTitle(PasswdSafeApp.getAppTitle(this));
-            dlg.setMessage(getString(R.string.loading_file, getUriName(true)));
+
+            String msg = null;
+            if (itsLoadTask != null) {
+                switch (itsLoadTask.itsType) {
+                case OPEN: {
+                    break;
+                }
+                case NEW: {
+                    msg = getString(R.string.new_file);
+                    break;
+                }
+                }
+            }
+            if (msg == null) {
+                msg = getString(R.string.loading_file, getUriName(true));
+            }
+            dlg.setMessage(msg);
+
             dlg.setIndeterminate(true);
             dlg.setCancelable(true);
             dialog = dlg;
@@ -571,10 +588,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         }
                     }
 
-                    File dir = getUriAsFile();
+                    PasswdFileUri uri = getUri();
+                    File dir = uri.getFile();
                     if (dir == null) {
-                        return getString(R.string.new_file_not_supp_uri,
-                                         getUri());
+                        return getString(R.string.new_file_not_supp_uri, uri);
                     }
                     File f = new File(dir, fileName + ".psafe3");
                     if (f.exists()) {
@@ -902,43 +919,31 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private final void openFile(StringBuilder passwd, boolean readonly)
     {
         removeDialog(DIALOG_GET_PASSWD);
-        showDialog(DIALOG_PROGRESS);
         itsLoadTask = new LoadTask(passwd, readonly);
         itsLoadTask.execute();
+        showDialog(DIALOG_PROGRESS);
     }
 
     private final void createNewFile(String fileName, StringBuilder passwd)
     {
-        try
-        {
-            File dir = getUriAsFile();
-            if (dir == null) {
-                throw new Exception("File creation not supported for URI " +
-                                    getUri());
-            }
-            File file = new File(dir, fileName + ".psafe3");
-            openNewFile(new PasswdFileUri(file), passwd);
-            setTitle(PasswdSafeApp.getAppFileTitle(getUri(), this));
-            showFileData(MOD_DATA);
-        } catch (Exception e) {
-            PasswdSafeApp.showFatalMsg(e, "Can't create file: " + getUri(),
-                                       this);
-            finish();
-        }
+        itsLoadTask = new LoadTask(fileName, passwd);
+        itsLoadTask.execute();
+        showDialog(DIALOG_PROGRESS);
     }
 
     private final void deleteFile()
     {
-        File file = getUriAsFile();
+        PasswdFileUri uri = getUri();
+        File file = uri.getFile();
         if (file != null) {
             if (file.delete()) {
                 finish();
             } else {
-                PasswdSafeApp.showFatalMsg("Could not delete file: " + getUri(),
+                PasswdSafeApp.showFatalMsg("Could not delete file: " + uri,
                                            this);
             }
         } else {
-            PasswdSafeApp.showFatalMsg("Delete not supported for " + getUri(),
+            PasswdSafeApp.showFatalMsg("Delete not supported for " + uri,
                                        this);
         }
     }
@@ -989,7 +994,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 	}
     }
 
-    private final void cancelFileOpen()
+    private final void cancelFileTask()
     {
         removeDialog(DIALOG_PROGRESS);
         removeDialog(DIALOG_GET_PASSWD);
@@ -1003,17 +1008,39 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                                           this);
     }
 
+    /** The type of load task */
+    private enum LoadType
+    {
+        OPEN,
+        NEW
+    };
 
+    /** Background task for some file operations */
     private final class LoadTask extends AsyncTask<Void, Void, Object>
     {
+        private final LoadType itsType;
+        private final String itsFileName;
         private final StringBuilder itsPasswd;
         private final boolean itsIsReadOnly;
 
+        /** Constructor for opening a file */
         private LoadTask(StringBuilder passwd, boolean readonly)
         {
+            itsType = LoadType.OPEN;
+            itsFileName = null;
             itsPasswd = passwd;
             itsIsReadOnly = readonly;
         }
+
+        /** Constructor for creating a new file */
+        private LoadTask(String fileName, StringBuilder passwd)
+        {
+            itsType = LoadType.NEW;
+            itsFileName = fileName;
+            itsPasswd = passwd;
+            itsIsReadOnly = false;
+        }
+
 
         /* (non-Javadoc)
          * @see android.os.AsyncTask#doInBackground(Params[])
@@ -1021,9 +1048,28 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         @Override
         protected Object doInBackground(Void... params)
         {
+            PasswdFileUri uri = getUri();
             try {
-                PasswdFileData fileData = new PasswdFileData(getUri());
-                fileData.load(itsPasswd, itsIsReadOnly, PasswdSafe.this);
+                PasswdFileData fileData = null;
+                switch (itsType) {
+                case OPEN: {
+                    fileData = new PasswdFileData(uri);
+                    fileData.load(itsPasswd, itsIsReadOnly, PasswdSafe.this);
+                    break;
+                }
+                case NEW: {
+                    File dir = uri.getFile();
+                    if (dir == null) {
+                        throw new Exception(
+                                "File creation not supported for URI " + uri);
+                    }
+                    File file = new File(dir, itsFileName + ".psafe3");
+                    uri = new PasswdFileUri(file);
+                    fileData = new PasswdFileData(uri);
+                    fileData.createNewFile(itsPasswd, PasswdSafe.this);
+                    break;
+                }
+                }
                 return fileData;
             } catch (Exception e) {
                 return e;
@@ -1038,7 +1084,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             PasswdSafeUtil.dbginfo(TAG, "LoadTask cancelled");
             itsLoadTask = null;
-            cancelFileOpen();
+            cancelFileTask();
         }
 
         /* (non-Javadoc)
@@ -1055,20 +1101,47 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             removeDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (result instanceof PasswdFileData) {
-                getPasswdFile().setFileData((PasswdFileData)result);
-                showFileData(MOD_DATA | MOD_OPEN_NEW);
+                PasswdFileData fileData = (PasswdFileData)result;
+                switch (itsType) {
+                case OPEN: {
+                    getPasswdFile().setFileData(fileData);
+                    showFileData(MOD_DATA | MOD_OPEN_NEW);
+                    break;
+                }
+                case NEW: {
+                    openFile(fileData.getUri());
+                    getPasswdFile().setFileData(fileData);
+                    setTitle(PasswdSafeApp.getAppFileTitle(getUri(),
+                                                           PasswdSafe.this));
+                    showFileData(MOD_DATA);
+                    break;
+                }
+                }
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
                 if (((e instanceof IOException) &&
                      TextUtils.equals(e.getMessage(), "Invalid password")) ||
-                    (e instanceof InvalidPassphraseException))
+                    (e instanceof InvalidPassphraseException)) {
                     PasswdSafeApp.showFatalMsg(
                         getString(R.string.invalid_password), PasswdSafe.this,
                         false);
-                else
-                    PasswdSafeApp.showFatalMsg(e, PasswdSafe.this);
+                } else {
+                    String msg = null;
+                    switch (itsType) {
+                    case OPEN: {
+                        break;
+                    }
+                    case NEW: {
+                        msg = "Can't create file: " + getUri();
+                        break;
+                    }
+                    }
+                    if (msg == null) {
+                        msg = e.toString();
+                    }
+                    PasswdSafeApp.showFatalMsg(e, msg, PasswdSafe.this);
+                }
             }
         }
     }
-
 }
