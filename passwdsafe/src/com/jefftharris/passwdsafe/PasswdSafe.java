@@ -449,6 +449,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             ProgressDialog dlg = new ProgressDialog(this);
             dlg.setTitle(PasswdSafeApp.getAppTitle(this));
+            dlg.setIndeterminate(true);
+            dlg.setCancelable(true);
 
             String msg = null;
             if (itsLoadTask != null) {
@@ -460,6 +462,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     msg = getString(R.string.new_file);
                     break;
                 }
+                case DELETE: {
+                    msg = getString(R.string.delete_file);
+                    break;
+                }
                 }
             }
             if (msg == null) {
@@ -467,8 +473,6 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             }
             dlg.setMessage(msg);
 
-            dlg.setIndeterminate(true);
-            dlg.setCancelable(true);
             dialog = dlg;
             break;
         }
@@ -919,33 +923,25 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private final void openFile(StringBuilder passwd, boolean readonly)
     {
         removeDialog(DIALOG_GET_PASSWD);
-        itsLoadTask = createOpenTask(passwd, readonly);
-        itsLoadTask.execute();
-        showDialog(DIALOG_PROGRESS);
+        runTask(createOpenTask(passwd, readonly));
     }
 
     private final void createNewFile(String fileName, StringBuilder passwd)
     {
-        itsLoadTask = createNewTask(fileName, passwd);
-        itsLoadTask.execute();
-        showDialog(DIALOG_PROGRESS);
+        runTask(createNewTask(fileName, passwd));
     }
 
     private final void deleteFile()
     {
-        PasswdFileUri uri = getUri();
-        File file = uri.getFile();
-        if (file != null) {
-            if (file.delete()) {
-                finish();
-            } else {
-                PasswdSafeApp.showFatalMsg("Could not delete file: " + uri,
-                                           this);
-            }
-        } else {
-            PasswdSafeApp.showFatalMsg("Delete not supported for " + uri,
-                                       this);
-        }
+        runTask(createDeleteTask());
+    }
+
+    /** Run a background task */
+    private final void runTask(LoadTask task)
+    {
+        itsLoadTask = task;
+        itsLoadTask.execute();
+        showDialog(DIALOG_PROGRESS);
     }
 
     private final void changePasswd(StringBuilder passwd)
@@ -1020,11 +1016,18 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         return new LoadTask(LoadType.NEW, fileName, passwd, false);
     }
 
+    /** Create a task for deleting a file */
+    private LoadTask createDeleteTask()
+    {
+        return new LoadTask(LoadType.DELETE, null, null, false);
+    }
+
     /** The type of load task */
     private enum LoadType
     {
         OPEN,
-        NEW
+        NEW,
+        DELETE
     };
 
     /** Background task for some file operations */
@@ -1074,6 +1077,16 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     fileData.createNewFile(itsPasswd, PasswdSafe.this);
                     break;
                 }
+                case DELETE: {
+                    File file = uri.getFile();
+                    if (file == null) {
+                        throw new Exception("Delete not supported for " + uri);
+                    }
+                    if (!file.delete()) {
+                        throw new Exception("Could not delete file: " + uri);
+                    }
+                    break;
+                }
                 }
                 return fileData;
             } catch (Exception e) {
@@ -1105,7 +1118,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             PasswdSafeUtil.dbginfo(TAG, "LoadTask post execute");
             removeDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
-            if (result instanceof PasswdFileData) {
+            if (!(result instanceof Exception)) {
                 PasswdFileData fileData = (PasswdFileData)result;
                 switch (itsType) {
                 case OPEN: {
@@ -1121,6 +1134,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     showFileData(MOD_DATA);
                     break;
                 }
+                case DELETE: {
+                    PasswdSafe.this.finish();
+                    break;
+                }
                 }
             } else if (result instanceof Exception) {
                 Exception e = (Exception)result;
@@ -1133,7 +1150,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 } else {
                     String msg = null;
                     switch (itsType) {
-                    case OPEN: {
+                    case OPEN:
+                    case DELETE: {
                         break;
                     }
                     case NEW: {
