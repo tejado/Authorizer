@@ -919,14 +919,14 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private final void openFile(StringBuilder passwd, boolean readonly)
     {
         removeDialog(DIALOG_GET_PASSWD);
-        itsLoadTask = new LoadTask(passwd, readonly);
+        itsLoadTask = createOpenTask(passwd, readonly);
         itsLoadTask.execute();
         showDialog(DIALOG_PROGRESS);
     }
 
     private final void createNewFile(String fileName, StringBuilder passwd)
     {
-        itsLoadTask = new LoadTask(fileName, passwd);
+        itsLoadTask = createNewTask(fileName, passwd);
         itsLoadTask.execute();
         showDialog(DIALOG_PROGRESS);
     }
@@ -1008,6 +1008,18 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                                           this);
     }
 
+    /** Create a task for opening a file */
+    private LoadTask createOpenTask(StringBuilder passwd, boolean readonly)
+    {
+        return new LoadTask(LoadType.OPEN, null, passwd, readonly);
+    }
+
+    /** Create a task for creating a new file */
+    private LoadTask createNewTask(String fileName, StringBuilder passwd)
+    {
+        return new LoadTask(LoadType.NEW, fileName, passwd, false);
+    }
+
     /** The type of load task */
     private enum LoadType
     {
@@ -1023,24 +1035,17 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         private final StringBuilder itsPasswd;
         private final boolean itsIsReadOnly;
 
-        /** Constructor for opening a file */
-        private LoadTask(StringBuilder passwd, boolean readonly)
+        /** Constructor */
+        private LoadTask(LoadType type,
+                         String fileName,
+                         StringBuilder passwd,
+                         boolean readonly)
         {
-            itsType = LoadType.OPEN;
-            itsFileName = null;
+            itsType = type;
+            itsFileName = fileName;
             itsPasswd = passwd;
             itsIsReadOnly = readonly;
         }
-
-        /** Constructor for creating a new file */
-        private LoadTask(String fileName, StringBuilder passwd)
-        {
-            itsType = LoadType.NEW;
-            itsFileName = fileName;
-            itsPasswd = passwd;
-            itsIsReadOnly = false;
-        }
-
 
         /* (non-Javadoc)
          * @see android.os.AsyncTask#doInBackground(Params[])
