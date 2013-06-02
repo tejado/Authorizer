@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -34,6 +33,7 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Utils;
+import com.jefftharris.passwdsafe.view.PasswdCursorLoader;
 
 /**
  * @author jharris
@@ -145,7 +145,7 @@ public class SyncProviderFilesFragment extends ListFragment
                 @Override
                 public Loader<Cursor> onCreateLoader(int id, Bundle args)
                 {
-                    return new CursorLoader(
+                    return new PasswdCursorLoader(
                             getActivity(), itsProviderUri,
                             PasswdSafeContract.Providers.PROJECTION,
                             null, null, null);
@@ -154,6 +154,9 @@ public class SyncProviderFilesFragment extends ListFragment
                 @Override
                 public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
                 {
+                    if (!PasswdCursorLoader.checkResult(loader)) {
+                        return;
+                    }
                     View view = getView();
                     String str;
                     ImageView icon = (ImageView)view.findViewById(R.id.icon);
@@ -187,8 +190,7 @@ public class SyncProviderFilesFragment extends ListFragment
                  @Override
                  public Loader<Cursor> onCreateLoader(int id, Bundle args)
                  {
-                     // TODO: need custom CursorLoader to catch failures
-                     return new CursorLoader(
+                     return new PasswdCursorLoader(
                              getActivity(), itsFilesUri,
                              PasswdSafeContract.Files.PROJECTION,
                              PasswdSafeContract.Files.NOT_DELETED_SELECTION,
@@ -198,13 +200,17 @@ public class SyncProviderFilesFragment extends ListFragment
                  @Override
                  public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
                  {
-                     itsProviderAdapter.swapCursor(cursor);
+                     if (PasswdCursorLoader.checkResult(loader)) {
+                         itsProviderAdapter.swapCursor(cursor);
+                     }
                  }
 
                  @Override
                  public void onLoaderReset(Loader<Cursor> loader)
                  {
-                     itsProviderAdapter.swapCursor(null);
+                     if (PasswdCursorLoader.checkResult(loader)) {
+                         itsProviderAdapter.swapCursor(null);
+                     }
                  }
             });
     }

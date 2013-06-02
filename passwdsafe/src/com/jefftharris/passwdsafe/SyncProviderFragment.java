@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -33,6 +32,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.view.PasswdCursorLoader;
 
 /**
  * The SyncProviderFragment allows the user to choose a sync provider
@@ -218,9 +218,9 @@ public class SyncProviderFragment extends ListFragment
             return null;
         }
         Uri uri = PasswdSafeContract.Providers.CONTENT_URI;
-        return new CursorLoader(getActivity(), uri,
-                                PasswdSafeContract.Providers.PROJECTION,
-                                null, null, null);
+        return new PasswdCursorLoader(getActivity(), uri,
+                                      PasswdSafeContract.Providers.PROJECTION,
+                                      null, null, null);
     }
 
 
@@ -230,7 +230,9 @@ public class SyncProviderFragment extends ListFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
     {
-        itsProviderAdapter.swapCursor(cursor);
+        if (PasswdCursorLoader.checkResult(loader)) {
+            itsProviderAdapter.swapCursor(cursor);
+        }
     }
 
 
@@ -240,7 +242,9 @@ public class SyncProviderFragment extends ListFragment
     @Override
     public void onLoaderReset(Loader<Cursor> loader)
     {
-        itsProviderAdapter.swapCursor(null);
+        if (PasswdCursorLoader.checkResult(loader)) {
+            itsProviderAdapter.swapCursor(null);
+        }
     }
 
 
