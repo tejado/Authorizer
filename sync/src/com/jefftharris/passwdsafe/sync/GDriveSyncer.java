@@ -420,6 +420,9 @@ public class GDriveSyncer
     /** Is the remote file considered newer than the local */
     private boolean isRemoteNewer(SyncDb.DbFile dbfile)
     {
+        if (dbfile.itsRemoteId == null) {
+            return false;
+        }
         if (dbfile.itsRemoteModDate > dbfile.itsLocalModDate) {
             return true;
         }

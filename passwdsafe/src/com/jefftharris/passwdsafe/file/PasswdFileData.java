@@ -104,8 +104,7 @@ public class PasswdFileData
         throws IOException, NoSuchAlgorithmException
     {
         itsPwsFile = itsUri.createNew(passwd, context);
-        setSaveHdrFields(context);
-        itsPwsFile.save();
+        save(context);
         finishOpenFile(passwd);
     }
 

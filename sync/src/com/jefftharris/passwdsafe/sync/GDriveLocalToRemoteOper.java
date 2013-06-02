@@ -60,16 +60,22 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
         }
 
         itsDriveFile.setTitle(itsFile.itsLocalTitle);
-        itsLocalFile = ctx.getFileStreamPath(itsFile.itsLocalFile);
-        FileContent fileMedia = new FileContent(itsDriveFile.getMimeType(),
-                                                itsLocalFile);
-        if (itsIsInsert) {
-            itsDriveFile =
-                    drive.files().insert(itsDriveFile, fileMedia).execute();
+
+        Drive.Files files = drive.files();
+        if (itsFile.itsLocalFile != null) {
+            itsLocalFile = ctx.getFileStreamPath(itsFile.itsLocalFile);
+            FileContent fileMedia = new FileContent(itsDriveFile.getMimeType(),
+                                                    itsLocalFile);
+            if (itsIsInsert) {
+                itsDriveFile =
+                        files.insert(itsDriveFile, fileMedia).execute();
+            } else {
+                itsDriveFile =
+                        files.update(itsFile.itsRemoteId, itsDriveFile,
+                                     fileMedia).execute();
+            }
         } else {
-            itsDriveFile =
-                    drive.files().update(itsFile.itsRemoteId, itsDriveFile,
-                                         fileMedia).execute();
+            itsDriveFile = files.insert(itsDriveFile).execute();
         }
     }
 
@@ -86,6 +92,8 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
                                    title, modDate, db);
         SyncDb.updateLocalFile(itsFile.itsId, itsFile.itsLocalFile,
                                   title, modDate, db);
-        itsLocalFile.setLastModified(modDate);
+        if (itsLocalFile != null) {
+            itsLocalFile.setLastModified(modDate);
+        }
     }
 }

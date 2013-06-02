@@ -6,4 +6,9 @@
         android:icon="@drawable/ic_menu_refresh"
         android:title="@string/sync"/>
 
+    <item
+        android:id="@+id/menu_file_new"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="@string/new_file"/>
+
 </menu>

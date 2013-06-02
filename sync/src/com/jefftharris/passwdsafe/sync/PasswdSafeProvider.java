@@ -205,6 +205,7 @@ public class PasswdSafeProvider extends ContentProvider
             if (acct == null) {
                 throw new IllegalArgumentException("No acct for provider");
             }
+            Log.i(TAG, "Insert provider: " + acct);
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
@@ -214,7 +215,37 @@ public class PasswdSafeProvider extends ContentProvider
                 return ContentUris.withAppendedId(
                         PasswdSafeContract.Providers.CONTENT_URI, id);
             } catch (Exception e) {
-                String msg = "Error adding provier: " + acct;
+                String msg = "Error adding provider: " + acct;
+                Log.e(TAG, msg, e);
+                throw new RuntimeException(msg, e);
+            } finally {
+                db.endTransaction();
+            }
+        }
+        case MATCH_PROVIDER_FILES: {
+            String title = values.getAsString(
+                    PasswdSafeContract.Files.COL_TITLE);
+            if (title == null) {
+                throw new IllegalArgumentException("No title for file");
+            }
+            Log.i(TAG, "Insert file \"" + title + "\" for " + uri);
+            SQLiteDatabase db = itsDb.getDb();
+            try {
+                db.beginTransaction();
+                Long providerId = Long.valueOf(uri.getPathSegments().get(1));
+                SyncDb.DbProvider provider = SyncDb.getProvider(providerId, db);
+                if (provider == null) {
+                    throw new Exception("No provider for " + providerId);
+                }
+                long id = SyncDb.addLocalFile(providerId, title,
+                                              System.currentTimeMillis(), db);
+                db.setTransactionSuccessful();
+
+                ContentResolver cr = getContext().getContentResolver();
+                cr.notifyChange(uri, null);
+                return ContentUris.withAppendedId(uri, id);
+            } catch (Exception e) {
+                String msg = "Error adding file: " + title;
                 Log.e(TAG, msg, e);
                 throw new RuntimeException(msg, e);
             } finally {

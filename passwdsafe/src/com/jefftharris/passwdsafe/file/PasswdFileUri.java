@@ -138,13 +138,71 @@ public class PasswdFileUri
                                                null));
             return file;
         }
-        case SYNC_PROVIDER:
+        case SYNC_PROVIDER: {
+            PwsFile file = PwsFileFactory.newFile();
+            file.setPassphrase(passwd);
+            String id = getIdentifier(context, false);
+            file.setStorage(new SyncStorage(itsUri, id, null));
+            return file;
+        }
         case EMAIL:
         case GENERIC_PROVIDER: {
             throw new IOException("no file");
         }
         }
         return null;
+    }
+
+
+    /**
+     * Validate a new file that is a child of the current URI. Return null if
+     * successful; error string otherwise
+     */
+    public String validateNewChild(String fileName, Context ctx)
+    {
+        switch (itsType) {
+        case FILE: {
+            File f = new File(itsFile, fileName + ".psafe3");
+            if (f.exists()) {
+                return ctx.getString(R.string.file_exists);
+            }
+            return null;
+        }
+        case SYNC_PROVIDER: {
+            return null;
+        }
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            break;
+        }
+        }
+        return ctx.getString(R.string.new_file_not_supp_uri, toString());
+    }
+
+
+    /** Create a new children file URI */
+    public PasswdFileUri createNewChild(String fileName, Context ctx)
+            throws IOException
+    {
+        switch (itsType) {
+        case FILE: {
+            File file = new File(itsFile, fileName);
+            return new PasswdFileUri(file);
+        }
+        case SYNC_PROVIDER: {
+            ContentResolver cr = ctx.getContentResolver();
+            ContentValues values = new ContentValues();
+            values.put(PasswdSafeContract.Files.COL_TITLE, fileName);
+            Uri childUri = cr.insert(itsUri, values);
+            return new PasswdFileUri(childUri);
+        }
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            break;
+        }
+        }
+        throw new IOException("Can't create child \"" + fileName +
+                              "\" for URI " + toString());
     }
 
 

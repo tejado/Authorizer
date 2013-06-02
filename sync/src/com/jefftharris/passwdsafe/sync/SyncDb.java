@@ -130,10 +130,10 @@ public class SyncDb
         public String toString()
         {
             return String.format(Locale.US,
-                    "{id:%d, local:{file:%s, mod:%d, del:%b}, " +
+                    "{id:%d, local:{title:%s, file:%s, mod:%d, del:%b}, " +
                     "remote:{id:%s, title:'%s', mod:%d, del:%b}}",
-                    itsId, itsLocalFile, itsLocalModDate, itsIsLocalDeleted,
-                    itsRemoteId, itsRemoteTitle,
+                    itsId, itsLocalTitle, itsLocalFile, itsLocalModDate,
+                    itsIsLocalDeleted, itsRemoteId, itsRemoteTitle,
                     itsRemoteModDate, itsIsRemoteDeleted);
         }
     }
@@ -291,6 +291,22 @@ public class SyncDb
     }
 
 
+    /** Add a local file for a provider */
+    public static long addLocalFile(long providerId, String title,
+                                    long modDate, SQLiteDatabase db)
+            throws SQLException
+    {
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_FILES_PROVIDER, providerId);
+        values.put(DB_COL_FILES_LOCAL_TITLE, title);
+        values.put(DB_COL_FILES_LOCAL_MOD_DATE, modDate);
+        values.put(DB_COL_FILES_LOCAL_DELETED, false);
+        values.put(DB_COL_FILES_REMOTE_MOD_DATE, -1);
+        values.put(DB_COL_FILES_REMOTE_DELETED, false);
+        return db.insertOrThrow(DB_TABLE_FILES, null, values);
+    }
+
+
     /** Add a remote file for a provider */
     public static void addRemoteFile(long providerId,
                                      String remId, String remTitle,
@@ -419,6 +435,7 @@ public class SyncDb
         public void onCreate(SQLiteDatabase db)
         {
             PasswdSafeUtil.dbginfo(TAG, "Create DB");
+            // TODO: autoincrement provider id
             enableForeignKey(db);
             db.execSQL("CREATE TABLE " + DB_TABLE_PROVIDERS + " (" +
                        DB_COL_PROVIDERS_ID + " INTEGER PRIMARY KEY," +

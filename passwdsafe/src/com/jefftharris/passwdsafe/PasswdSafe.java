@@ -31,6 +31,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
@@ -592,14 +593,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         }
                     }
 
-                    PasswdFileUri uri = getUri();
-                    File dir = uri.getFile();
-                    if (dir == null) {
-                        return getString(R.string.new_file_not_supp_uri, uri);
-                    }
-                    File f = new File(dir, fileName + ".psafe3");
-                    if (f.exists()) {
-                        return getString(R.string.file_exists);
+                    String error = getUri().validateNewChild(fileName.toString(),
+                                                        PasswdSafe.this);
+                    if (error != null) {
+                        return error;
                     }
 
                     return super.doValidation();
@@ -1057,28 +1054,24 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         protected Object doInBackground(Void... params)
         {
             PasswdFileUri uri = getUri();
+            Context ctx = PasswdSafe.this;
             try {
                 PasswdFileData fileData = null;
                 switch (itsType) {
                 case OPEN: {
                     fileData = new PasswdFileData(uri);
-                    fileData.load(itsPasswd, itsIsReadOnly, PasswdSafe.this);
+                    fileData.load(itsPasswd, itsIsReadOnly, ctx);
                     break;
                 }
                 case NEW: {
-                    File dir = uri.getFile();
-                    if (dir == null) {
-                        throw new Exception(
-                                "File creation not supported for URI " + uri);
-                    }
-                    File file = new File(dir, itsFileName + ".psafe3");
-                    uri = new PasswdFileUri(file);
-                    fileData = new PasswdFileData(uri);
-                    fileData.createNewFile(itsPasswd, PasswdSafe.this);
+                    PasswdFileUri childUri =
+                            uri.createNewChild(itsFileName + ".psafe3", ctx);
+                    fileData = new PasswdFileData(childUri);
+                    fileData.createNewFile(itsPasswd, ctx);
                     break;
                 }
                 case DELETE: {
-                    uri.delete(PasswdSafe.this);
+                    uri.delete(ctx);
                     break;
                 }
                 }

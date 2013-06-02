@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import android.app.Activity;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -103,7 +104,6 @@ public class SyncProviderFilesFragment extends ListFragment
         setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_sync_provider_files,
                                 container, false);
-        // TODO: add file
     }
 
 
@@ -221,6 +221,11 @@ public class SyncProviderFilesFragment extends ListFragment
         MenuItem mi = menu.findItem(R.id.menu_sync_files);
         MenuItemCompat.setShowAsAction(mi,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+        mi = menu.findItem(R.id.menu_file_new);
+        MenuItemCompat.setShowAsAction(mi,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -235,6 +240,10 @@ public class SyncProviderFilesFragment extends ListFragment
         case R.id.menu_sync_files: {
             ApiCompat.requestProviderSync(PasswdSafeContract.CONTENT_URI,
                                           getActivity());
+            return true;
+        }
+        case R.id.menu_file_new: {
+            startActivity(new Intent(PasswdSafeApp.NEW_INTENT, itsFilesUri));
             return true;
         }
         default: {
