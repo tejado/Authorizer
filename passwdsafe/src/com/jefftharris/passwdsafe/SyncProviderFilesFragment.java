@@ -36,8 +36,7 @@ import com.jefftharris.passwdsafe.util.Utils;
 import com.jefftharris.passwdsafe.view.PasswdCursorLoader;
 
 /**
- * @author jharris
- *
+ * The SyncProviderFilesFragment shows the list of files for a provider
  */
 public class SyncProviderFilesFragment extends ListFragment
 {
