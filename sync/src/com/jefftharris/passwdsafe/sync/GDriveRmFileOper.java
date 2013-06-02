@@ -39,7 +39,8 @@ public class GDriveRmFileOper extends GDriveSyncOper
             ctx.deleteFile(itsFile.itsLocalFile);
         }
 
-        if (!itsFile.itsIsRemoteDeleted) {
+        if (!itsFile.itsIsRemoteDeleted &&
+                (itsFile.itsRemoteId != null)) {
             drive.files().trash(itsFile.itsRemoteId).execute();
         }
     }
