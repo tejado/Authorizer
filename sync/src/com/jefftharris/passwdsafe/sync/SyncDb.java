@@ -435,10 +435,9 @@ public class SyncDb
         public void onCreate(SQLiteDatabase db)
         {
             PasswdSafeUtil.dbginfo(TAG, "Create DB");
-            // TODO: autoincrement provider id
             enableForeignKey(db);
             db.execSQL("CREATE TABLE " + DB_TABLE_PROVIDERS + " (" +
-                       DB_COL_PROVIDERS_ID + " INTEGER PRIMARY KEY," +
+                       DB_COL_PROVIDERS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                        DB_COL_PROVIDERS_TYPE + " TEXT NOT NULL," +
                        DB_COL_PROVIDERS_ACCT + " TEXT NOT NULL," +
                        DB_COL_PROVIDERS_SYNC_CHANGE + " INTEGER NOT NULL," +
