@@ -392,7 +392,10 @@ public class GDriveSyncer
                 if (dbfile.itsIsRemoteDeleted) {
                     opers.add(new GDriveRmFileOper(dbfile));
                 } else if (dbfile.itsIsLocalDeleted) {
-                    // TODO: conflict?
+                    PasswdSafeUtil.dbginfo(
+                            TAG, "performSync recreate local removed %s",
+                            dbfile);
+                    opers.add(new GDriveRemoteToLocalOper(dbfile, fileCache));
                 } else {
                     opers.add(new GDriveRemoteToLocalOper(dbfile, fileCache));
                 }
@@ -401,7 +404,8 @@ public class GDriveSyncer
                     opers.add(new GDriveRmFileOper(dbfile));
                 } else if (dbfile.itsIsRemoteDeleted) {
                     PasswdSafeUtil.dbginfo(
-                            TAG, "performSync recreate removed %s", dbfile);
+                            TAG, "performSync recreate remote removed %s",
+                            dbfile);
                     opers.add(new GDriveLocalToRemoteOper(dbfile, fileCache,
                                                           true));
                 } else {
