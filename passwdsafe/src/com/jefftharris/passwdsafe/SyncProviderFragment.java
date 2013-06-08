@@ -29,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.view.PasswdCursorLoader;
@@ -180,8 +179,8 @@ public class SyncProviderFragment extends ListFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_sync: {
-            ApiCompat.requestProviderSync(PasswdSafeContract.CONTENT_URI,
-                                          getActivity());
+            PasswdSafeUtil.requestManualSync(null,
+                                             PasswdSafeContract.AUTHORITY);
             return true;
         }
         default: {

@@ -183,9 +183,8 @@ public class MainActivity extends FragmentActivity
     public void onGdriveSync(View view)
     {
         if (itsGdriveAccount != null) {
-            ContentResolver.requestSync(itsGdriveAccount,
-                                        PasswdSafeContract.AUTHORITY,
-                                        new Bundle());
+            PasswdSafeUtil.requestManualSync(itsGdriveAccount,
+                                             PasswdSafeContract.AUTHORITY);
         }
     }
 
