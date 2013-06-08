@@ -23,6 +23,7 @@
 
     <application
         android:allowBackup="true"
+        android:description="@string/app_desc"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher_sync"
         android:label="@string/app_name"
