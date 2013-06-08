@@ -81,7 +81,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int RECORD_ADD_REQUEST = 1;
     private static final int POLICY_VIEW_REQUEST = 2;
 
-    private LoadTask itsLoadTask;
+    private AbstractTask itsLoadTask;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
     private DialogValidator itsDeleteValidator;
@@ -459,26 +459,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             dlg.setIndeterminate(true);
             dlg.setCancelable(true);
 
-            String msg = null;
             if (itsLoadTask != null) {
-                switch (itsLoadTask.itsType) {
-                case OPEN: {
-                    break;
-                }
-                case NEW: {
-                    msg = getString(R.string.new_file);
-                    break;
-                }
-                case DELETE: {
-                    msg = getString(R.string.delete_file);
-                    break;
-                }
-                }
+                dlg.setMessage(itsLoadTask.getTitle(this));
             }
-            if (msg == null) {
-                msg = getString(R.string.loading_file, getUriName(true));
-            }
-            dlg.setMessage(msg);
 
             dialog = dlg;
             break;
@@ -926,21 +909,21 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private final void openFile(StringBuilder passwd, boolean readonly)
     {
         removeDialog(DIALOG_GET_PASSWD);
-        runTask(createOpenTask(passwd, readonly));
+        runTask(new OpenTask(passwd, readonly));
     }
 
     private final void createNewFile(String fileName, StringBuilder passwd)
     {
-        runTask(createNewTask(fileName, passwd));
+        runTask(new NewTask(fileName, passwd));
     }
 
     private final void deleteFile()
     {
-        runTask(createDeleteTask());
+        runTask(new DeleteTask());
     }
 
     /** Run a background task */
-    private final void runTask(LoadTask task)
+    private final void runTask(AbstractTask task)
     {
         itsLoadTask = task;
         itsLoadTask.execute();
@@ -1007,81 +990,180 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                                           this);
     }
 
-    /** Create a task for opening a file */
-    private LoadTask createOpenTask(StringBuilder passwd, boolean readonly)
+    /** Background task for opening a file */
+    private final class OpenTask extends AbstractTask
     {
-        return new LoadTask(LoadType.OPEN, null, passwd, readonly);
-    }
-
-    /** Create a task for creating a new file */
-    private LoadTask createNewTask(String fileName, StringBuilder passwd)
-    {
-        return new LoadTask(LoadType.NEW, fileName, passwd, false);
-    }
-
-    /** Create a task for deleting a file */
-    private LoadTask createDeleteTask()
-    {
-        return new LoadTask(LoadType.DELETE, null, null, false);
-    }
-
-    /** The type of load task */
-    private enum LoadType
-    {
-        OPEN,
-        NEW,
-        DELETE
-    };
-
-    /** Background task for some file operations */
-    private final class LoadTask extends AsyncTask<Void, Void, Object>
-    {
-        private final LoadType itsType;
-        private final String itsFileName;
         private final StringBuilder itsPasswd;
         private final boolean itsIsReadOnly;
 
         /** Constructor */
-        private LoadTask(LoadType type,
-                         String fileName,
-                         StringBuilder passwd,
-                         boolean readonly)
+        public OpenTask(StringBuilder passwd, boolean readonly)
         {
-            itsType = type;
-            itsFileName = fileName;
             itsPasswd = passwd;
             itsIsReadOnly = readonly;
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#getTitle(android.content.Context)
+         */
+        @Override
+        public String getTitle(Context ctx)
+        {
+            return ctx.getString(R.string.loading_file, getUriName(true));
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
+         */
+        @Override
+        protected Object handleDoInBackground(PasswdFileUri uri, Context ctx)
+            throws Exception
+        {
+            PasswdFileData fileData = new PasswdFileData(uri);
+            fileData.load(itsPasswd, itsIsReadOnly, ctx);
+            return fileData;
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleOnPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void handleOnPostExecute(Object result)
+        {
+            PasswdFileData fileData = (PasswdFileData)result;
+            getPasswdFile().setFileData(fileData);
+            showFileData(MOD_DATA | MOD_OPEN_NEW);
+        }
+    }
+
+    /** Background task for creating a new file */
+    private final class NewTask extends AbstractTask
+    {
+        private final String itsFileName;
+        private final StringBuilder itsPasswd;
+
+        /** Constructor */
+        public NewTask(String fileName, StringBuilder passwd)
+        {
+            itsFileName = fileName;
+            itsPasswd = passwd;
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#getTitle(android.content.Context)
+         */
+        @Override
+        public String getTitle(Context ctx)
+        {
+            return ctx.getString(R.string.new_file);
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
+         */
+        @Override
+        protected Object handleDoInBackground(PasswdFileUri uri, Context ctx)
+                throws Exception
+        {
+            PasswdFileUri childUri =
+                    uri.createNewChild(itsFileName + ".psafe3", ctx);
+            PasswdFileData fileData = new PasswdFileData(childUri);
+            fileData.createNewFile(itsPasswd, ctx);
+            return fileData;
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleOnPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void handleOnPostExecute(Object result)
+        {
+            PasswdFileData fileData = (PasswdFileData)result;
+            openFile(fileData.getUri());
+            getPasswdFile().setFileData(fileData);
+            setTitle(PasswdSafeApp.getAppFileTitle(getUri(), PasswdSafe.this));
+            showFileData(MOD_DATA);
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleGetExceptionMsg(java.lang.Exception)
+         */
+        @Override
+        protected String handleGetExceptionMsg(Exception e)
+        {
+            // TODO: i18n
+            return "Can't create file: " + getUri();
+        }
+    }
+
+    /** Background task for deleting the file */
+    private final class DeleteTask extends AbstractTask
+    {
+        /** Constructor */
+        public DeleteTask()
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#getTitle(android.content.Context)
+         */
+        @Override
+        public String getTitle(Context ctx)
+        {
+            return ctx.getString(R.string.delete_file);
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
+         */
+        @Override
+        protected Object handleDoInBackground(PasswdFileUri uri, Context ctx)
+                throws Exception
+        {
+            uri.delete(ctx);
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleOnPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void handleOnPostExecute(Object result)
+        {
+            PasswdSafe.this.finish();
+        }
+    }
+
+    /** Background task for some file operations */
+    private abstract class AbstractTask extends AsyncTask<Void, Void, Object>
+    {
+        /** Get a title for the task for the progress dialog */
+        public abstract String getTitle(Context ctx);
+
+        /** Implement the doInBackground operation */
+        protected abstract Object handleDoInBackground(PasswdFileUri uri,
+                                                       Context ctx)
+            throws Exception;
+
+        /** Implement the onPostExecute operation */
+        protected abstract void handleOnPostExecute(Object result);
+
+        /** Get a message for an exception during the task */
+        protected String handleGetExceptionMsg(Exception e)
+        {
+            return null;
         }
 
         /* (non-Javadoc)
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected Object doInBackground(Void... params)
+        protected final Object doInBackground(Void... params)
         {
             PasswdFileUri uri = getUri();
             Context ctx = PasswdSafe.this;
             try {
-                PasswdFileData fileData = null;
-                switch (itsType) {
-                case OPEN: {
-                    fileData = new PasswdFileData(uri);
-                    fileData.load(itsPasswd, itsIsReadOnly, ctx);
-                    break;
-                }
-                case NEW: {
-                    PasswdFileUri childUri =
-                            uri.createNewChild(itsFileName + ".psafe3", ctx);
-                    fileData = new PasswdFileData(childUri);
-                    fileData.createNewFile(itsPasswd, ctx);
-                    break;
-                }
-                case DELETE: {
-                    uri.delete(ctx);
-                    break;
-                }
-                }
-                return fileData;
+                return handleDoInBackground(uri, ctx);
             } catch (Exception e) {
                 return e;
             }
@@ -1112,27 +1194,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             removeDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (!(result instanceof Exception)) {
-                switch (itsType) {
-                case OPEN: {
-                    PasswdFileData fileData = (PasswdFileData)result;
-                    getPasswdFile().setFileData(fileData);
-                    showFileData(MOD_DATA | MOD_OPEN_NEW);
-                    break;
-                }
-                case NEW: {
-                    PasswdFileData fileData = (PasswdFileData)result;
-                    openFile(fileData.getUri());
-                    getPasswdFile().setFileData(fileData);
-                    setTitle(PasswdSafeApp.getAppFileTitle(getUri(),
-                                                           PasswdSafe.this));
-                    showFileData(MOD_DATA);
-                    break;
-                }
-                case DELETE: {
-                    PasswdSafe.this.finish();
-                    break;
-                }
-                }
+                handleOnPostExecute(result);
             } else {
                 Exception e = (Exception)result;
                 if (((e instanceof IOException) &&
@@ -1142,17 +1204,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         getString(R.string.invalid_password), PasswdSafe.this,
                         false);
                 } else {
-                    String msg = null;
-                    switch (itsType) {
-                    case OPEN:
-                    case DELETE: {
-                        break;
-                    }
-                    case NEW: {
-                        msg = "Can't create file: " + getUri();
-                        break;
-                    }
-                    }
+                    String msg = handleGetExceptionMsg(e);
                     if (msg == null) {
                         msg = e.toString();
                     }
