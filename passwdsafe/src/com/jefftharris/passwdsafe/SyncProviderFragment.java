@@ -214,9 +214,12 @@ public class SyncProviderFragment extends ListFragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args)
     {
+        View v = getView();
         if (!itsHasProvider) {
+            v.setVisibility(View.GONE);
             return null;
         }
+        v.setVisibility(View.VISIBLE);
         Uri uri = PasswdSafeContract.Providers.CONTENT_URI;
         return new PasswdCursorLoader(getActivity(), uri,
                                       PasswdSafeContract.Providers.PROJECTION,
