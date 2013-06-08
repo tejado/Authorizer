@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -113,20 +112,31 @@ public class NotificationMgr implements PasswdFileDataObserver
     public void togglePasswdExpiryNotif(final PasswdFileData fileData,
                                         Activity act)
     {
+        if (fileData == null) {
+            return;
+        }
+        boolean checkAddNotif = true;
         try {
-            if (fileData == null) {
-                return;
-            }
-
             SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-            Long uriId = getDbUriId(fileData.getUri(), db);
-            if (uriId != null) {
-                String[] idarg = new String[] { uriId.toString() };
-                db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI, idarg);
-                db.delete(DB_TABLE_URIS, DB_MATCH_URIS_ID, idarg);
-                loadEntries(db);
-            } else {
-                DialogUtils.DialogData dlgData =
+            try {
+                db.beginTransaction();
+                Long uriId = getDbUriId(fileData.getUri(), db);
+                if (uriId != null) {
+                    checkAddNotif = false;
+                    removeUri(uriId, db);
+                    loadEntries(db);
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        } catch (SQLException e) {
+            Log.e(TAG, "Database error", e);
+            return;
+        }
+
+        if (checkAddNotif) {
+            DialogUtils.DialogData dlgData =
                     DialogUtils.createConfirmPrompt(
                         act,
                         new AbstractDialogClickListener()
@@ -139,11 +149,8 @@ public class NotificationMgr implements PasswdFileDataObserver
                         },
                         act.getString(R.string.expiration_notifications),
                         act.getString(R.string.expiration_notifications_warning));
-                dlgData.itsDialog.show();
-                dlgData.itsValidator.validate();
-            }
-        } catch (SQLException e) {
-            Log.e(TAG, "Database error", e);
+            dlgData.itsDialog.show();
+            dlgData.itsValidator.validate();
         }
     }
 
@@ -242,19 +249,26 @@ public class NotificationMgr implements PasswdFileDataObserver
     /** Return whether notifications are supported for the URI */
     public static boolean notifSupported(PasswdFileUri uri)
     {
-        // TODO: notifications for sync files?
         if (uri == null) {
             return false;
         }
 
-        File file = uri.getFile();
-        if (file == null) {
+        switch (uri.getType()) {
+        case FILE: {
+            Uri fileUri = uri.getUri();
+            String path = fileUri.getPath();
+            return (!path.contains("/data/com.google.android.apps.") &&
+                    !path.contains("/data/com.dropbox.android"));
+        }
+        case SYNC_PROVIDER: {
+            return true;
+        }
+        case EMAIL:
+        case GENERIC_PROVIDER: {
             return false;
         }
-
-        String path = file.getPath();
-        return (!path.contains("/data/com.google.android.apps.") &&
-                !path.contains("/data/com.dropbox.android"));
+        }
+        return false;
     }
 
 
@@ -349,11 +363,15 @@ public class NotificationMgr implements PasswdFileDataObserver
     /** Load the expiration entries */
     private void loadEntries()
     {
+        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
         try {
-            SQLiteDatabase db = itsDbHelper.getReadableDatabase();
+            db.beginTransaction();
             loadEntries(db);
+            db.setTransactionSuccessful();
         } catch (SQLException e) {
             Log.e(TAG, "Database error", e);
+        } finally {
+            db.endTransaction();
         }
     }
 
@@ -372,6 +390,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
         itsNotifUris.clear();
         HashSet<Long> uris = new HashSet<Long>();
+        ArrayList<Long> removeUriIds = new ArrayList<Long>();
         Cursor uriCursor =
             db.query(DB_TABLE_URIS,
                      new String[] { DB_COL_URIS_ID, DB_COL_URIS_URI },
@@ -380,7 +399,11 @@ public class NotificationMgr implements PasswdFileDataObserver
             while (uriCursor.moveToNext()) {
                 long id = uriCursor.getLong(0);
                 Uri uri = Uri.parse(uriCursor.getString(1));
-                loadUri(id, uri, uris, expiration, nextExpiration, db);
+                boolean exists =
+                        loadUri(id, uri, uris, expiration, nextExpiration, db);
+                if (!exists) {
+                    removeUriIds.add(id);
+                }
             }
         } finally {
             uriCursor.close();
@@ -395,6 +418,11 @@ public class NotificationMgr implements PasswdFileDataObserver
                 iter.remove();
             }
         }
+
+        for (Long removeId: removeUriIds) {
+            removeUri(removeId, db);
+        }
+
         PasswdSafeUtil.dbginfo(TAG, "nextExpiration: %tc",
                                nextExpiration.itsValue);
 
@@ -417,15 +445,24 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
 
-    /** Handle the expiration entries for a URI in the database */
-    private void loadUri(final long uriId,
-                         final Uri uri,
-                         final HashSet<Long> expiredUris,
-                         final long expiration,
-                         final LongReference nextExpiration,
-                         final SQLiteDatabase db)
+    /**
+     * Handle the expiration entries for a URI in the database. Return whether
+     * the URI exists.
+     */
+    private boolean loadUri(final long uriId,
+                            final Uri uri,
+                            final HashSet<Long> expiredUris,
+                            final long expiration,
+                            final LongReference nextExpiration,
+                            final SQLiteDatabase db)
         throws SQLException
     {
+        PasswdFileUri passwdUri = new PasswdFileUri(uri, itsCtx);
+        if (!passwdUri.exists()) {
+            PasswdSafeUtil.dbginfo(TAG, "Notif file doesn't exist: %s", uri);
+            return false;
+        }
+
         itsNotifUris.add(uri);
         PasswdSafeUtil.dbginfo(TAG, "Load %s", uri);
 
@@ -433,7 +470,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             loadUriEntries(uriId, expiration, nextExpiration, db);
 
         if (expired.isEmpty()) {
-            return;
+            return true;
         }
 
         expiredUris.add(uriId);
@@ -447,7 +484,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         if (info.getEntries().equals(expired))
         {
             PasswdSafeUtil.dbginfo(TAG, "No expiry changes");
-            return;
+            return true;
         }
 
         info.setEntries(expired);
@@ -463,7 +500,6 @@ public class NotificationMgr implements PasswdFileDataObserver
             record = entry.itsUuid;
         }
 
-        PasswdFileUri passwdUri = new PasswdFileUri(uri, itsCtx);
         PendingIntent intent = PendingIntent.getActivity(
             itsCtx, 0, PasswdSafeApp.createOpenIntent(uri, record),
             PendingIntent.FLAG_UPDATE_CURRENT);
@@ -475,6 +511,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             itsCtx.getString(R.string.expiring_password),
             title, passwdUri.getIdentifier(itsCtx, false),
             strs, intent, info.getNotifId());
+        return true;
     }
 
 
@@ -517,6 +554,16 @@ public class NotificationMgr implements PasswdFileDataObserver
         }
 
         return expired;
+    }
+
+
+    /** Remove the URI from the database */
+    private static void removeUri(Long id, SQLiteDatabase db)
+        throws SQLException
+    {
+        String[] idarg = new String[] { id.toString() };
+        db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI, idarg);
+        db.delete(DB_TABLE_URIS, DB_MATCH_URIS_ID, idarg);
     }
 
 

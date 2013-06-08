@@ -282,10 +282,10 @@ public class PasswdFileUri
     }
 
 
-    /** Get the file associated with the URI if it exists */
-    public File getFile()
+    /** Get the type of the URI */
+    public Type getType()
     {
-        return itsFile;
+        return itsType;
     }
 
 
