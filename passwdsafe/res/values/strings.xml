@@ -12,6 +12,7 @@
     <string name="at_least">At least</string>
     <string name="basic">Basic</string>
     <string name="cancel">Cancel</string>
+    <string name="cannot_create_file">Cannot create file: %1$s</string>
     <string name="case_sensitive">Case sensitive</string>
     <string name="case_sensitive_sorting">Case-sensitive sorting</string>
     <string name="change_password">Change Password</string>
@@ -28,7 +29,7 @@
     <string name="confirm">Confirm</string>
     <string name="confirm_label">Confirm:</string>
     <string name="confirm_password_label">Confirm Password:</string>
-    <string name="cannot_delete_record">Cannot delete record - %1$s"</string>
+    <string name="cannot_delete_record">Cannot delete record - %1$s</string>
     <string name="content_file">Content File</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
     <string name="copy_clipboard_error">%1$s - Error copying to the clipboard.  The error may be due to a known error in Samsung devices.</string>

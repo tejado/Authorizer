@@ -1089,10 +1089,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
          * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleGetExceptionMsg(java.lang.Exception)
          */
         @Override
-        protected String handleGetExceptionMsg(Exception e)
+        protected String handleGetExceptionMsg(Exception e, Context ctx)
         {
-            // TODO: i18n
-            return "Can't create file: " + getUri();
+            return ctx.getString(R.string.cannot_create_file, getUri());
         }
     }
 
@@ -1149,7 +1148,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         protected abstract void handleOnPostExecute(Object result);
 
         /** Get a message for an exception during the task */
-        protected String handleGetExceptionMsg(Exception e)
+        protected String handleGetExceptionMsg(Exception e, Context ctx)
         {
             return null;
         }
@@ -1204,7 +1203,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         getString(R.string.invalid_password), PasswdSafe.this,
                         false);
                 } else {
-                    String msg = handleGetExceptionMsg(e);
+                    String msg = handleGetExceptionMsg(e, PasswdSafe.this);
                     if (msg == null) {
                         msg = e.toString();
                     }
