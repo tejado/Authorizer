@@ -150,14 +150,7 @@ public class MainActivity extends FragmentActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId()) {
-        case R.id.menu_settings: {
-            return true;
-        }
-        default: {
-            return super.onOptionsItemSelected(item);
-        }
-        }
+        return super.onOptionsItemSelected(item);
     }
 
 
