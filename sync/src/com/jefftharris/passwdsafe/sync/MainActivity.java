@@ -193,31 +193,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to clear a GDrive account */
     public void onGdriveClear(View view)
     {
-        DialogFragment prompt = new DialogFragment()
-        {
-            /* (non-Javadoc)
-             * @see android.support.v4.app.DialogFragment#onCreateDialog(android.os.Bundle)
-             */
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState)
-            {
-                AlertDialog.Builder builder =
-                        new AlertDialog.Builder(getActivity());
-                builder
-                .setMessage(R.string.remove_account)
-                .setPositiveButton(android.R.string.yes,
-                                   new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        setAccount(null);
-                    }
-                })
-                .setNegativeButton(android.R.string.no, null);
-                return builder.create();
-            }
-        };
+        DialogFragment prompt = new ClearPromptDlg();
         prompt.show(getSupportFragmentManager(), null);
     }
 
@@ -331,6 +307,39 @@ public class MainActivity extends FragmentActivity
     private void setAccount(String account)
     {
         new AccountTask(account);
+    }
+
+    /** Dialog to prompt when an account is cleared */
+    public static class ClearPromptDlg extends DialogFragment
+    {
+        /** Constructor */
+        public ClearPromptDlg()
+        {
+        }
+
+        /* (non-Javadoc)
+         * @see android.support.v4.app.DialogFragment#onCreateDialog(android.os.Bundle)
+         */
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState)
+        {
+            AlertDialog.Builder builder =
+                    new AlertDialog.Builder(getActivity());
+            builder
+            .setMessage(R.string.remove_account)
+            .setPositiveButton(android.R.string.yes,
+                               new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    MainActivity act = (MainActivity)getActivity();
+                    act.setAccount(null);
+                }
+            })
+            .setNegativeButton(android.R.string.no, null);
+            return builder.create();
+        }
     }
 
     /** The type of async account task */
