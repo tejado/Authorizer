@@ -876,33 +876,61 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
 
-    private final void onCreateView(Intent intent)
+    private final void onCreateView(final Intent intent)
     {
-        openFile(PasswdSafeApp.getFileUriFromIntent(intent));
-        String title = PasswdSafeApp.getAppFileTitle(getUri(), this);
-        if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
-            title += " - AUTOOPEN!!!!!";
-        }
-        setTitle(title);
-
-        itsRecToOpen = intent.getData().getQueryParameter("recToOpen");
-
-        if (!getPasswdFile().isOpen()) {
-            if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
-                (getUri().getUri().getPath().equals(
-                     PasswdSafeApp.DEBUG_AUTO_FILE))) {
-                openFile(new StringBuilder("test123"), false);
-            } else {
-                showDialog(DIALOG_GET_PASSWD);
+        runTask(new AbstractTask()
+        {
+            @Override
+            public String getTitle(Context ctx)
+            {
+                return "";
             }
-        } else {
-            showFileData(MOD_DATA | MOD_OPEN_NEW);
-        }
+
+            @Override
+            protected Object handleDoInBackground(PasswdFileUri uri,
+                                                  Context ctx)
+                                                                                 throws Exception
+            {
+                return PasswdSafeApp.getFileUriFromIntent(intent, ctx);
+            }
+
+            @Override
+            protected void handleOnPostExecute(Object result)
+            {
+                PasswdFileUri uri = (PasswdFileUri)(result);
+                if (!uri.exists()) {
+                    PasswdSafeApp.showFatalMsg("File does't exist: " + uri,
+                                               PasswdSafe.this);
+                    return;
+                }
+                openFile(uri);
+                String title = PasswdSafeApp.getAppFileTitle(getUri(),
+                                                             PasswdSafe.this);
+                if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
+                    title += " - AUTOOPEN!!!!!";
+                }
+                setTitle(title);
+
+                itsRecToOpen = intent.getData().getQueryParameter("recToOpen");
+
+                if (!getPasswdFile().isOpen()) {
+                    if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
+                        (getUri().getUri().getPath().equals(
+                             PasswdSafeApp.DEBUG_AUTO_FILE))) {
+                        openFile(new StringBuilder("test123"), false);
+                    } else {
+                        showDialog(DIALOG_GET_PASSWD);
+                    }
+                } else {
+                    showFileData(MOD_DATA | MOD_OPEN_NEW);
+                }
+            }
+        });
     }
 
     private final void onCreateNew(Intent intent)
     {
-        initUri(PasswdSafeApp.getFileUriFromIntent(intent));
+        initUri(PasswdSafeApp.getFileUriFromIntent(intent, this));
         showDialog(DIALOG_FILE_NEW);
     }
 

@@ -67,7 +67,7 @@ public class PasswdFileUri
     }
 
     /** Constructor */
-    public PasswdFileUri(Uri uri)
+    public PasswdFileUri(Uri uri, Context ctx)
     {
         itsUri = uri;
         itsType = getUriType(uri);
@@ -76,7 +76,11 @@ public class PasswdFileUri
             itsFile = new File(uri.getPath());
             break;
         }
-        case SYNC_PROVIDER:
+        case SYNC_PROVIDER: {
+            itsFile = null;
+            resolveSyncUri(ctx);
+            break;
+        }
         case EMAIL:
         case GENERIC_PROVIDER:
         default: {
@@ -194,7 +198,7 @@ public class PasswdFileUri
             ContentValues values = new ContentValues();
             values.put(PasswdSafeContract.Files.COL_TITLE, fileName);
             Uri childUri = cr.insert(itsUri, values);
-            return new PasswdFileUri(childUri);
+            return new PasswdFileUri(childUri, ctx);
         }
         case EMAIL:
         case GENERIC_PROVIDER: {
@@ -230,6 +234,25 @@ public class PasswdFileUri
             throw new IOException("Delete not supported for " + toString());
         }
         }
+    }
+
+
+    /** Does the file exist at the URI */
+    public boolean exists()
+    {
+        switch (itsType) {
+        case FILE: {
+            return (itsFile != null) && itsFile.exists();
+        }
+        case SYNC_PROVIDER: {
+            return (itsSyncType != null);
+        }
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            return true;
+        }
+        }
+        return false;
     }
 
 
@@ -278,9 +301,10 @@ public class PasswdFileUri
             }
         }
         case SYNC_PROVIDER: {
-            resolveSyncUri(context);
-            return String.format("%s - %s",
-                                 itsSyncType.getName(context), itsTitle);
+            if (itsSyncType != null) {
+                return String.format("%s - %s",
+                                     itsSyncType.getName(context), itsTitle);
+            }
         }
         case EMAIL: {
             return context.getString(R.string.email_attachment);
@@ -325,7 +349,7 @@ public class PasswdFileUri
             break;
         }
         case SYNC_PROVIDER: {
-            if (itsTitle != null) {
+            if (itsSyncType != null) {
                 break;
             }
             ContentResolver cr = context.getContentResolver();

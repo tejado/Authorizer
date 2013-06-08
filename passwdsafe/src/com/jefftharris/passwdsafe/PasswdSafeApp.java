@@ -297,13 +297,14 @@ public class PasswdSafeApp extends Application
      * Sanitize an intent URI for the open file URI. Removes fragments and query
      * parameters
      */
-    public static PasswdFileUri getFileUriFromIntent(Intent intent)
+    public static PasswdFileUri getFileUriFromIntent(Intent intent,
+                                                     Context ctx)
     {
         Uri uri = intent.getData();
         Uri.Builder builder = uri.buildUpon();
         builder.fragment("");
         builder.query("");
-        return new PasswdFileUri(builder.build());
+        return new PasswdFileUri(builder.build(), ctx);
     }
 
     /** Create an intent to open a URI */

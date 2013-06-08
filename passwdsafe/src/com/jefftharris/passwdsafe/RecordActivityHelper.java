@@ -76,7 +76,7 @@ public class RecordActivityHelper implements PasswdFileActivity
         Intent intent = itsActivity.getIntent();
         PasswdSafeUtil.dbginfo(TAG, "onCreate intent: %s", intent);
 
-        itsUri = PasswdSafeApp.getFileUriFromIntent(intent);
+        itsUri = PasswdSafeApp.getFileUriFromIntent(intent, itsActivity);
         itsUUID = intent.getData().getQueryParameter("rec");
 
         PasswdSafeApp app = (PasswdSafeApp)itsActivity.getApplication();

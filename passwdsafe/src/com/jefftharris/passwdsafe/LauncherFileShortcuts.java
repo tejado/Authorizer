@@ -27,8 +27,6 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
             finish();
             return;
         }
-
-        // TODO: handle shortcut to provider file that no longer exists
     }
 
 

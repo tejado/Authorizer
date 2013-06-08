@@ -463,7 +463,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             record = entry.itsUuid;
         }
 
-        PasswdFileUri passwdUri = new PasswdFileUri(uri);
+        PasswdFileUri passwdUri = new PasswdFileUri(uri, itsCtx);
         PendingIntent intent = PendingIntent.getActivity(
             itsCtx, 0, PasswdSafeApp.createOpenIntent(uri, record),
             PendingIntent.FLAG_UPDATE_CURRENT);
