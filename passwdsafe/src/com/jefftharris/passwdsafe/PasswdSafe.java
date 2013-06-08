@@ -252,10 +252,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         boolean editEnabled = false;
         boolean deleteEnabled = false;
         boolean isRoot = isRootGroup();
+        boolean detailsEnabled = false;
         PasswdFileData fileData = getPasswdFileData();
         if (fileData != null) {
             editEnabled = fileData.canEdit();
             deleteEnabled = fileData.canDelete();
+            detailsEnabled = true;
         }
 
         MenuItem mi = menu.findItem(MENU_ADD_RECORD);
@@ -297,6 +299,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             }
             mi.setChecked(checked);
             mi.setEnabled(enabled);
+        }
+
+        mi = menu.findItem(MENU_DETAILS);
+        if (mi != null) {
+            mi.setEnabled(detailsEnabled);
         }
 
         return super.onPrepareOptionsMenu(menu);
