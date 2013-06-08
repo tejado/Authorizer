@@ -261,6 +261,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             ActivityPasswdFile passwdFile = getPasswdFile();
             if (passwdFile != null) {
                 passwdFile.close();
+            } else {
+                finish();
             }
             break;
         }
