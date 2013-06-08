@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="account_label">Compte: %1$s</string>
+    <string name="account_not_exists_label">Compte: %1$s (n\'existe pas)</string>
+    <string name="adding_account">Ajout de compte&#8230;</string>
+    <string name="app_name">PasswdSafe Sync</string>
+    <string name="choose_account">Choisir compte</string>
+    <string name="clear">Effacer</string>
+    <string name="menu_settings">Settings</string>
+    <string name="open">Ouvrir</string>
+    <string name="passwdsafe">PasswdSafe</string>
+    <string name="remove_account">Supprimer un compte?</string>
+    <string name="removing_account">Retrait de compte&#8230;</string>
+    <string name="sync">Synchroniser</string>
+    <string name="sync_interval_label">Synchroniser intervalle:</string>
+    <string name="updating_account">Mise à jour compte&#8230;</string>
+
+    <string-array name="interval_array">
+        <item>Jamais</item>
+        <item>15 Minutes</item>
+        <item>30 Minutes</item>
+        <item>1 Heure</item>
+        <item>1 Jour</item>
+    </string-array>
+
+</resources>
