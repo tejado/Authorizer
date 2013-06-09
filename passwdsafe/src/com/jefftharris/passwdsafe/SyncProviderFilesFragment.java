@@ -29,6 +29,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Utils;
@@ -242,8 +243,8 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_sync_files: {
-            PasswdSafeUtil.requestManualSync(null,
-                                             PasswdSafeContract.AUTHORITY);
+            ApiCompat.requestManualSync(null, itsProviderUri, getActivity());
+
             return true;
         }
         case R.id.menu_file_new: {

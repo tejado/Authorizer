@@ -39,6 +39,7 @@ import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
@@ -176,8 +177,8 @@ public class MainActivity extends FragmentActivity
     public void onGdriveSync(View view)
     {
         if (itsGdriveAccount != null) {
-            PasswdSafeUtil.requestManualSync(itsGdriveAccount,
-                                             PasswdSafeContract.AUTHORITY);
+            ApiCompat.requestManualSync(itsGdriveAccount,
+                                        PasswdSafeContract.CONTENT_URI, this);
         }
     }
 

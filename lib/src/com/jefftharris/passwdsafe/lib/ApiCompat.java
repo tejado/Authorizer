@@ -7,6 +7,10 @@
  */
 package com.jefftharris.passwdsafe.lib;
 
+import android.accounts.Account;
+import android.content.Context;
+import android.net.Uri;
+
 /**
  * The ApiCompat class provides a compatibility interface for different Android
  * versions
@@ -31,5 +35,15 @@ public final class ApiCompat
             sdk = SDK_CUPCAKE;
         }
         SDK_VERSION = sdk;
+    }
+
+    /** Request a manual sync of a content provider */
+    public static void requestManualSync(Account acct, Uri uri, Context ctx)
+    {
+        if (SDK_VERSION >= SDK_ECLAIR) {
+            ApiCompatEclair.requestManualSync(acct, uri.getAuthority());
+        } else {
+            ApiCompatCupcake.requestManualSync(uri, ctx);
+        }
     }
 }

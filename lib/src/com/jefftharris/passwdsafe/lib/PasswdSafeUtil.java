@@ -8,15 +8,12 @@ package com.jefftharris.passwdsafe.lib;
 
 import java.util.List;
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Bundle;
 import android.util.Log;
 
 /**
@@ -43,14 +40,6 @@ public class PasswdSafeUtil
                 return;
             }
         }
-    }
-
-    /** Request a manual sync of a content provider */
-    public static void requestManualSync(Account acct, String authority)
-    {
-        Bundle options = new Bundle();
-        options.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(acct, authority, options);
     }
 
     /** Log a debug message at info level */
