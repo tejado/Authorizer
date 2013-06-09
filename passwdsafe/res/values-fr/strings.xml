@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">A propos</string>
-    <string name="about_details">Version: %1$s\n\nBuild ID: %2$s \n\nBuild Date: %3$s</string>
     <string name="add">Ajouter</string>
     <string name="add_policy">Ajouter Stratégie</string>
     <string name="add_record">Ajouter Entrée</string>
