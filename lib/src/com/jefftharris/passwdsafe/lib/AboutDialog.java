@@ -5,12 +5,14 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.lib;
+
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
@@ -26,9 +28,19 @@ public class AboutDialog extends DialogFragment
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
         Activity act = getActivity();
-        String version = PasswdSafeApp.getAppVersion(act);
+        String name;
+        String version;
+        PackageInfo pkgInfo = PasswdSafeUtil.getAppPackageInfo(act);
+        if (pkgInfo != null) {
+            name = getString(pkgInfo.applicationInfo.labelRes);
+            version = pkgInfo.versionName;
+        } else {
+            name = null;
+            version = null;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
-            .setTitle(R.string.app_name)
+            .setTitle(name)
             .setIcon(android.R.drawable.ic_menu_info_details)
             .setMessage(getString(R.string.about_details,
                                   version, Rev.BUILD_ID, Rev.BUILD_DATE))

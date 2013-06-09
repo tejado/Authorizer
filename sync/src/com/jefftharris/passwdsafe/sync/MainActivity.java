@@ -25,6 +25,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
+import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -143,15 +145,28 @@ public class MainActivity extends FragmentActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.activity_main, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_about);
+        MenuItemCompat.setShowAsAction(item,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+        case R.id.menu_about: {
+            AboutDialog dlg = new AboutDialog();
+            dlg.show(getSupportFragmentManager(), "AboutDialog");
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
     }
 
 

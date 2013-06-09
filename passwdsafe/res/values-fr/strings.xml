@@ -24,7 +24,6 @@
     <string name="clear">Effacer</string>
     <string name="clear_clipboard_on_close">Vider le presse-papiers en quittant</string>
     <string name="clear_password_notifications">Effacer les notifications de mot de passe</string>
-    <string name="close">Fermer</string>
     <string name="close_file_screen_off">Fermer le fichier à l\'extinction de l\'écran</string>
     <string name="confirm">Confirmer</string>
     <string name="confirm_label">Confirmer:</string>

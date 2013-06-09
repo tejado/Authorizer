@@ -625,7 +625,7 @@ public class PasswdFileData
     {
         setHdrLastSaveApp(PasswdSafeApp.getAppTitle(context) +
                           " " +
-                          PasswdSafeApp.getAppVersion(context));
+                          PasswdSafeUtil.getAppVersion(context));
         setHdrLastSaveUser("User");
         setHdrLastSaveHost(Build.MODEL);
         setHdrLastSaveTime(new Date());

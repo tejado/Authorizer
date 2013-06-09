@@ -10,8 +10,10 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.util.Log;
@@ -39,6 +41,27 @@ public class PasswdSafeUtil
                 act.startActivity(intent);
                 return;
             }
+        }
+    }
+
+    /** Get the app's version */
+    public static final String getAppVersion(Context ctx)
+    {
+        PackageInfo info = getAppPackageInfo(ctx);
+        if (info != null) {
+            return info.versionName;
+        }
+        return "Unknown";
+    }
+
+    /** Get the package info for the app */
+    public static final PackageInfo getAppPackageInfo(Context ctx)
+    {
+        try {
+            PackageManager pkgMgr = ctx.getPackageManager();
+            return pkgMgr.getPackageInfo(ctx.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
         }
     }
 
@@ -79,6 +102,4 @@ public class PasswdSafeUtil
         if (DEBUG)
             Log.v(tag, String.format(fmt, args));
     }
-
-
 }

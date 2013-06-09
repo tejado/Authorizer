@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
+import com.jefftharris.passwdsafe.lib.AboutDialog;
+
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;

@@ -207,6 +207,8 @@ public class GDriveSyncer
             return;
         }
 
+        // TODO: sync log
+
         Log.i(TAG, "Performing sync for " + itsAccount.name);
 
         try {

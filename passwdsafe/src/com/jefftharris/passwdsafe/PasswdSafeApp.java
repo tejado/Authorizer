@@ -37,8 +37,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -399,20 +397,6 @@ public class PasswdSafeApp extends Application
     public static final String getAppTitle(Context ctx)
     {
         return ctx.getString(R.string.app_name);
-    }
-
-    public static final String getAppVersion(Context ctx)
-    {
-        String version;
-        try {
-            PackageManager pkgMgr = ctx.getPackageManager();
-            PackageInfo pkgInfo = pkgMgr.getPackageInfo(ctx.getPackageName(),
-                                                        0);
-            version = pkgInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            version = "Unknown";
-        }
-        return version;
     }
 
     public static void copyToClipboard(String str, Context ctx)

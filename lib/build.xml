@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="PasswdSafe" basedir=".">
-    <property name="pkg.dir" value="com/jefftharris/passwdsafe"/>
+<project name="PasswdSafeLib" basedir=".">
+    <property name="pkg.dir" value="com/jefftharris/passwdsafe/lib"/>
     <property name="rev.dir" value="${basedir}/gen/${pkg.dir}"/>
     <property name="rev.file" value="${rev.dir}/Rev.java"/>
 
@@ -16,7 +16,7 @@
         <mkdir dir="${rev.dir}"/>
         <echo message="Update ${rev.file}"/>
         <echo file="${rev.file}">
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.lib;
 public class Rev
 {
     public static final String BUILD_ID="${buildId}";
