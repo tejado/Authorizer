@@ -22,7 +22,7 @@ public enum ProviderSyncFreqPref
     private final int itsFreq;
     private final int itsDisplayIdx;
 
-    public static final ProviderSyncFreqPref DEFAULT = FREQ_15_MIN;
+    public static final ProviderSyncFreqPref DEFAULT = FREQ_1_HOUR;
 
     /** Constructor */
     private ProviderSyncFreqPref(int freq, int displayIdx)
