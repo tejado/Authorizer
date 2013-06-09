@@ -8,7 +8,9 @@
 package com.jefftharris.passwdsafe.lib;
 
 import android.accounts.Account;
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
+import android.os.Build;
 import android.os.Bundle;
 
 /**
@@ -17,6 +19,7 @@ import android.os.Bundle;
 public final class ApiCompatEclair
 {
     /** Request a manual sync of a content provider */
+    @TargetApi(Build.VERSION_CODES.ECLAIR)
     public static void requestManualSync(Account acct, String authority)
     {
         Bundle options = new Bundle();
