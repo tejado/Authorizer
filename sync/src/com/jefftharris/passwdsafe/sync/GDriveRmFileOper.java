@@ -54,4 +54,17 @@ public class GDriveRmFileOper extends GDriveSyncOper
     {
         SyncDb.removeFile(itsFile.itsId, db);
     }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.GDriveSyncOper#getDescription()
+     */
+    @Override
+    public String getDescription(Context ctx)
+    {
+        String name = itsFile.itsLocalTitle;
+        if (name == null) {
+            name = itsFile.itsRemoteTitle;
+        }
+        return ctx.getString(R.string.sync_oper_rmfile, name);
+    }
 }

@@ -34,6 +34,7 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  *  The PasswdSafeProvider class is a content provider for synced
@@ -115,7 +116,7 @@ public class PasswdSafeProvider extends ContentProvider
 
         switch (MATCHER.match(uri)) {
         case MATCH_PROVIDER: {
-            Log.i(TAG, "Delete provider: " + uri);
+            PasswdSafeUtil.dbginfo(TAG, "Delete provider: %s", uri);
             Long id = Long.valueOf(uri.getPathSegments().get(1));
             SQLiteDatabase db = itsDb.getDb();
             try {
@@ -137,7 +138,7 @@ public class PasswdSafeProvider extends ContentProvider
             }
         }
         case MATCH_PROVIDER_FILE: {
-            Log.i(TAG, "Delete file: " + uri);
+            PasswdSafeUtil.dbginfo(TAG, "Delete file: %s", uri);
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
@@ -205,7 +206,7 @@ public class PasswdSafeProvider extends ContentProvider
             if (acct == null) {
                 throw new IllegalArgumentException("No acct for provider");
             }
-            Log.i(TAG, "Insert provider: " + acct);
+            PasswdSafeUtil.dbginfo(TAG, "Insert provider: %s", acct);
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
@@ -228,7 +229,8 @@ public class PasswdSafeProvider extends ContentProvider
             if (title == null) {
                 throw new IllegalArgumentException("No title for file");
             }
-            Log.i(TAG, "Insert file \"" + title + "\" for " + uri);
+            PasswdSafeUtil.dbginfo(TAG, "Insert file \"%s\" for %s",
+                                   title, uri);
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
@@ -265,7 +267,7 @@ public class PasswdSafeProvider extends ContentProvider
     @Override
     public boolean onCreate()
     {
-        Log.i(TAG, "onCreate");
+        PasswdSafeUtil.dbginfo(TAG, "onCreate");
         itsDb = new SyncDb(getContext());
         itsListener = new OnAccountsUpdateListener()
         {
@@ -307,7 +309,7 @@ public class PasswdSafeProvider extends ContentProvider
                         String[] selectionArgs,
                         String sortOrder)
     {
-        Log.i(TAG, "query uri: " + uri);
+        PasswdSafeUtil.dbginfo(TAG, "query uri: %s", uri);
 
         boolean selectionValid = (selection == null);
         if (selectionArgs != null) {
@@ -388,7 +390,7 @@ public class PasswdSafeProvider extends ContentProvider
     {
         switch (MATCHER.match(uri)) {
         case MATCH_PROVIDER: {
-            Log.i(TAG, "Update provider: " + uri);
+            PasswdSafeUtil.dbginfo(TAG, "Update provider: %s", uri);
             Long id = Long.valueOf(uri.getPathSegments().get(1));
             SQLiteDatabase db = itsDb.getDb();
             try {
@@ -401,8 +403,8 @@ public class PasswdSafeProvider extends ContentProvider
                 Integer syncFreq = values.getAsInteger(
                         PasswdSafeContract.Providers.COL_SYNC_FREQ);
                 if ((syncFreq != null) && (provider.itsSyncFreq != syncFreq)) {
-                    Log.i(TAG, "Update sync freq " + syncFreq);
-
+                    PasswdSafeUtil.dbginfo(TAG, "Update sync freq %d",
+                                           syncFreq);
                     GDriveSyncer.updateSyncFreq(provider, syncFreq,
                                                 db, getContext());
                 }
@@ -501,7 +503,8 @@ public class PasswdSafeProvider extends ContentProvider
                 throw new FileNotFoundException(uri.toString());
             }
             File localFile = getContext().getFileStreamPath(file.itsLocalFile);
-            Log.i(TAG, "openFile uri " + uri + ", file " + localFile);
+            PasswdSafeUtil.dbginfo(TAG, "openFile uri %s, file %s",
+                                   uri, localFile);
             ParcelFileDescriptor fd = ParcelFileDescriptor.open(
                     localFile, ParcelFileDescriptor.MODE_READ_ONLY);
             return fd;

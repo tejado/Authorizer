@@ -9,10 +9,12 @@ package com.jefftharris.passwdsafe.sync;
 import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
-import android.util.Log;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  * The GDriveSyncAdapter class syncs files in a background thread
@@ -27,7 +29,7 @@ public class GDriveSyncAdapter extends AbstractThreadedSyncAdapter
     {
         super(context, autoInitialize);
         itsContext = context;
-        Log.i(TAG, "GDriveSyncAdapter ctor");
+        PasswdSafeUtil.dbginfo(TAG, "GDriveSyncAdapter ctor");
     }
 
     /* (non-Javadoc)
@@ -40,9 +42,11 @@ public class GDriveSyncAdapter extends AbstractThreadedSyncAdapter
                               ContentProviderClient provider,
                               SyncResult syncResult)
     {
+        boolean manual = (extras != null) &&
+                extras.getBoolean(ContentResolver.SYNC_EXTRAS_MANUAL);
         GDriveSyncer syncer = new GDriveSyncer(itsContext, provider, account);
         try {
-            syncer.performSync();
+            syncer.performSync(manual);
         } finally {
             syncer.close();
         }

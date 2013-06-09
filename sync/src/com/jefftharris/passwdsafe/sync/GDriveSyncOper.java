@@ -42,6 +42,9 @@ public abstract class GDriveSyncOper
     public abstract void doPostOperUpdate(SQLiteDatabase db, Context ctx)
             throws IOException, SQLException;
 
+    /** Get a description of the operation */
+    public abstract String getDescription(Context ctx);
+
     /** Get a file's metadata */
     protected static File getFile(String id, Drive drive)
             throws IOException

@@ -8,12 +8,18 @@
     <string name="app_name">PasswdSafe Sync</string>
     <string name="choose_account">Choose Account</string>
     <string name="clear">Clear</string>
+    <string name="full">full</string>
+    <string name="incremental">incremental</string>
     <string name="open">Open</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="remove_account">Remove account?</string>
     <string name="removing_account">Removing account&#8230;</string>
     <string name="sync">Sync</string>
     <string name="sync_interval_label">Sync interval:</string>
+    <string name="sync_log_record">Sync %1$s, %2$s, start: %3$tc, end: %4$tc</string>
+    <string name="sync_oper_local_to_remote">Upload file: %1$s</string>
+    <string name="sync_oper_remote_to_local">Download file: %1$s</string>
+    <string name="sync_oper_rmfile">Remove file: %1$s</string>
     <string name="updating_account">Updating account&#8230;</string>
 
     <string-array name="interval_array">

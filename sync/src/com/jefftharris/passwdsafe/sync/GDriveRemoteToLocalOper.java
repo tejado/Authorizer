@@ -75,6 +75,17 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
         }
     }
 
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.GDriveSyncOper#getDescription(android.content.Context)
+     */
+    @Override
+    public String getDescription(Context ctx)
+    {
+        return ctx.getString(R.string.sync_oper_remote_to_local,
+                             itsFile.itsRemoteTitle);
+    }
+
+
     /** Download a file */
     private boolean downloadFile(Drive drive, Context ctx)
     {

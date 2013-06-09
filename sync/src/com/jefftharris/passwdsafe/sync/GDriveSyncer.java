@@ -201,7 +201,7 @@ public class GDriveSyncer
 
 
     /** Perform synchronization */
-    public void performSync()
+    public void performSync(boolean manual)
     {
         if (itsDrive == null) {
             return;
@@ -209,7 +209,9 @@ public class GDriveSyncer
 
         // TODO: sync log
 
-        Log.i(TAG, "Performing sync for " + itsAccount.name);
+        PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s, manual: %b",
+                               itsAccount.name, manual);
+        SyncLogRecord logrec = new SyncLogRecord(itsAccount.name);
 
         try {
             SQLiteDatabase db = itsSyncDb.getDb();
@@ -220,11 +222,13 @@ public class GDriveSyncer
                                                                 db);
                 if (provider != null) {
                     long changeId = provider.itsSyncChange;
-                    Log.i(TAG, "largest change " + changeId);
+                    PasswdSafeUtil.dbginfo(TAG, "largest change %d", changeId);
                     Pair<Long, List<GDriveSyncOper>> syncrc;
                     if (changeId == -1) {
+                        logrec.setFullSync(true);
                         syncrc = performFullSync(provider, db);
                     } else {
+                        logrec.setFullSync(false);
                         syncrc = performSyncSince(provider, changeId, db);
                     }
                     long newChangeId = syncrc.first;
@@ -245,6 +249,7 @@ public class GDriveSyncer
             if (opers != null) {
                 for (GDriveSyncOper oper: opers) {
                     try {
+                        logrec.addEntry(oper.getDescription(itsContext));
                         oper.doOper(itsDrive, itsContext);
                         try {
                             db.beginTransaction();
@@ -255,6 +260,7 @@ public class GDriveSyncer
                         }
                     } catch (Exception e) {
                         Log.e(TAG, "Sync error for file " + oper.getFile(), e);
+                        logrec.addFailure(e);
                     }
                 }
             }
@@ -266,11 +272,16 @@ public class GDriveSyncer
             GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
         } catch (GoogleAuthIOException e) {
             Log.e(TAG, "Google auth error", e);
+            logrec.addFailure(e);
             GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
+            logrec.addFailure(e);
         }
-        Log.i(TAG, "Sync finished for " + itsAccount.name);
+        PasswdSafeUtil.dbginfo(TAG, "Sync finished for %s", itsAccount.name);
+        logrec.setEndTime();
+
+        Log.i(TAG, logrec.toString(itsContext));
     }
 
     // TODO: moving file to different folder doesn't update modDate
@@ -282,7 +293,7 @@ public class GDriveSyncer
     performFullSync(SyncDb.DbProvider provider, SQLiteDatabase db)
             throws SQLException, IOException
     {
-        Log.i(TAG, "Perform full sync");
+        PasswdSafeUtil.dbginfo(TAG, "Perform full sync");
         About about = itsDrive.about().get()
                 .setFields(ABOUT_FIELDS).execute();
         long largestChangeId = about.getLargestChangeId();
@@ -293,13 +304,15 @@ public class GDriveSyncer
                 .setFields("nextPageToken,items("+FILE_FIELDS+")");
         do {
             FileList files = request.execute();
-            Log.i(TAG, "num files: " + files.getItems().size());
+            PasswdSafeUtil.dbginfo(TAG, "num files: %d",
+                                   files.getItems().size());
             for (File file: files.getItems()) {
                 if (!isSyncFile(file)) {
                     continue;
                 }
-                Log.i(TAG, "File id: " + file.getId() + ", title: " +
-                    file.getTitle() + ", mime: " + file.getMimeType());
+                PasswdSafeUtil.dbginfo(TAG, "File id: %s, title: %s, mime: %s",
+                                       file.getId(), file.getTitle(),
+                                       file.getMimeType());
                 allRemFiles.put(file.getId(), file);
             }
             request.setPageToken(files.getNextPageToken());
