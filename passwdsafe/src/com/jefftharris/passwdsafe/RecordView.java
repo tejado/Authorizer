@@ -20,7 +20,7 @@ import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.util.Utils;
+import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.DialogValidator;

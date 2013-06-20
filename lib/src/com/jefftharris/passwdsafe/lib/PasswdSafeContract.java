@@ -127,6 +127,33 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_FILE = 4;
     }
 
+    /** The table of sync logs */
+    public static final class SyncLogs implements BaseColumns
+    {
+        public static final String TABLE = "sync_logs";
+        public static final Uri CONTENT_URI =
+                Uri.withAppendedPath(PasswdSafeContract.CONTENT_URI, TABLE);
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE;
+
+        public static final String COL_DATE = "date";
+        public static final String COL_LOG = "log";
+
+        public static final String DATE_SORT_ORDER = "date DESC";
+
+        public static final String[] PROJECTION = {
+            SyncLogs._ID,
+            SyncLogs.COL_DATE,
+            SyncLogs.COL_LOG
+        };
+
+        public static final int PROJECTION_IDX_ID = 0;
+        public static final int PROJECTION_IDX_DATE = 1;
+        public static final int PROJECTION_IDX_LOG = 2;
+    }
+
     /** The client provider's authority */
     public static final String CLIENT_AUTHORITY =
             "com.jefftharris.passwdsafe.client.provider";

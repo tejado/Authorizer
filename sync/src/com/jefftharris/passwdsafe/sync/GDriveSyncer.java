@@ -281,7 +281,18 @@ public class GDriveSyncer
         PasswdSafeUtil.dbginfo(TAG, "Sync finished for %s", itsAccount.name);
         logrec.setEndTime();
 
-        Log.i(TAG, logrec.toString(itsContext));
+        SQLiteDatabase db = itsSyncDb.getDb();
+        try {
+            db.beginTransaction();
+            String log = logrec.toString(itsContext);
+            Log.i(TAG, log);
+            SyncDb.addSyncLog(log, db);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.e(TAG, "Sync write log error", e);
+        } finally {
+            db.endTransaction();
+        }
     }
 
     // TODO: moving file to different folder doesn't update modDate

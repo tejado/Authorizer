@@ -177,6 +177,15 @@ public class MainActivity extends FragmentActivity
     }
 
 
+    /** Button onClick handler to show the logs */
+    public void onLaunchSyncLogs(View view)
+    {
+        Intent intent = new Intent();
+        intent.setClass(this, SyncLogsActivity.class);
+        startActivity(intent);
+    }
+
+
     /** Button onClick handler to choose a GDrive account */
     public void onGdriveChoose(View view)
     {

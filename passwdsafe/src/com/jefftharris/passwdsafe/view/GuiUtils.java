@@ -15,7 +15,7 @@ import java.util.Map;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
-import com.jefftharris.passwdsafe.util.Utils;
+import com.jefftharris.passwdsafe.lib.Utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;

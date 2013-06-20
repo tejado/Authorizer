@@ -55,6 +55,11 @@ public class SyncDb
     public static final String DB_MATCH_FILES_PROVIDER_ID =
         DB_COL_FILES_PROVIDER + " = ?";
 
+    public static final String DB_TABLE_SYNC_LOGS = "sync_logs";
+    public static final String DB_COL_SYNC_LOGS_ID = BaseColumns._ID;
+    public static final String DB_COL_SYNC_LOGS_DATE = "date";
+    public static final String DB_COL_SYNC_LOGS_LOG = "log";
+
     private DbHelper itsDbHelper;
 
     /** Entry in the providers table */
@@ -387,6 +392,18 @@ public class SyncDb
     }
 
 
+    /** Add a sync log */
+    public static void addSyncLog(String log, SQLiteDatabase db)
+        throws SQLException
+    {
+        // TODO: Delete logs older than a week
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_SYNC_LOGS_DATE, System.currentTimeMillis());
+        values.put(DB_COL_SYNC_LOGS_LOG, log);
+        db.insertOrThrow(DB_TABLE_SYNC_LOGS, null, values);
+    }
+
+
     /** Get a provider */
     private static DbProvider getProvider(String match, String[] matchArgs,
                                           SQLiteDatabase db)
@@ -456,6 +473,11 @@ public class SyncDb
                        DB_COL_FILES_REMOTE_TITLE + " TEXT," +
                        DB_COL_FILES_REMOTE_MOD_DATE + " INTEGER NOT NULL," +
                        DB_COL_FILES_REMOTE_DELETED + " INTEGER NOT NULL" +
+                       ");");
+            db.execSQL("CREATE TABLE " + DB_TABLE_SYNC_LOGS + " (" +
+                       DB_COL_SYNC_LOGS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                       DB_COL_SYNC_LOGS_DATE + " INTEGER NOT NULL," +
+                       DB_COL_SYNC_LOGS_LOG + " TEXT" +
                        ");");
         }
 

@@ -32,7 +32,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.util.Utils;
+import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.view.PasswdCursorLoader;
 
 /**

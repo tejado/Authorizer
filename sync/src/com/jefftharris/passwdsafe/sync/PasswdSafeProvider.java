@@ -49,9 +49,11 @@ public class PasswdSafeProvider extends ContentProvider
     private static final int MATCH_PROVIDER = 2;
     private static final int MATCH_PROVIDER_FILES = 3;
     private static final int MATCH_PROVIDER_FILE = 4;
+    private static final int MATCH_PROVIDER_SYNC_LOGS = 5;
 
     private static final HashMap<String, String> PROVIDERS_MAP;
     private static final HashMap<String, String> FILES_MAP;
+    private static final HashMap<String, String> SYNC_LOGS_MAP;
 
     private SyncDb itsDb;
     private OnAccountsUpdateListener itsListener;
@@ -72,6 +74,9 @@ public class PasswdSafeProvider extends ContentProvider
                        PasswdSafeContract.Providers.TABLE + "/#/" +
                                PasswdSafeContract.Files.TABLE + "/#",
                        MATCH_PROVIDER_FILE);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.SyncLogs.TABLE,
+                       MATCH_PROVIDER_SYNC_LOGS);
 
         PROVIDERS_MAP = new HashMap<String, String>();
         PROVIDERS_MAP.put(PasswdSafeContract.Providers._ID,
@@ -98,6 +103,14 @@ public class PasswdSafeProvider extends ContentProvider
         FILES_MAP.put(PasswdSafeContract.Files.COL_FILE,
                       SyncDb.DB_COL_FILES_LOCAL_FILE + " AS " +
                               PasswdSafeContract.Files.COL_FILE);
+
+        SYNC_LOGS_MAP = new HashMap<String, String>();
+        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs._ID,
+                          SyncDb.DB_COL_SYNC_LOGS_ID);
+        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_DATE,
+                          SyncDb.DB_COL_SYNC_LOGS_DATE);
+        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_LOG,
+                          SyncDb.DB_COL_SYNC_LOGS_LOG);
     }
 
 
@@ -356,6 +369,14 @@ public class PasswdSafeProvider extends ContentProvider
             qb.setProjectionMap(FILES_MAP);
             selection = SyncDb.DB_MATCH_FILES_ID;
             selectionArgs = new String[] { uri.getPathSegments().get(3) };
+            break;
+        }
+        case MATCH_PROVIDER_SYNC_LOGS: {
+            qb.setTables(SyncDb.DB_TABLE_SYNC_LOGS);
+            qb.setProjectionMap(SYNC_LOGS_MAP);
+            if (PasswdSafeContract.SyncLogs.DATE_SORT_ORDER.equals(sortOrder)) {
+                sortOrderValid = true;
+            }
             break;
         }
         default: {

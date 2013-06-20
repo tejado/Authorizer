@@ -20,7 +20,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.jefftharris.passwdsafe.R;
-import com.jefftharris.passwdsafe.util.Utils;
+import com.jefftharris.passwdsafe.lib.Utils;
 
 /** A filter for records */
 public final class PasswdRecordFilter implements Parcelable

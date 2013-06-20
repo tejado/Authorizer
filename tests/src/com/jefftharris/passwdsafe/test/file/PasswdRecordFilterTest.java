@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
-import com.jefftharris.passwdsafe.util.Utils;
+import com.jefftharris.passwdsafe.lib.Utils;
 
 import android.os.Parcel;
 import android.test.AndroidTestCase;

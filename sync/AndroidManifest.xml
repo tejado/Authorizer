@@ -42,6 +42,8 @@
                 android:value="id=704216087822" />
         </activity>
 
+        <activity android:name=".SyncLogsActivity"/>
+
         <provider
             android:name=".PasswdSafeProvider"
             android:authorities="com.jefftharris.passwdsafe.sync.provider"
