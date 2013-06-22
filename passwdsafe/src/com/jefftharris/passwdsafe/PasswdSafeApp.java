@@ -385,18 +385,14 @@ public class PasswdSafeApp extends Application
 
     public static final String getAppFileTitle(PasswdFileUri uri, Context ctx)
     {
-        StringBuilder builder = new StringBuilder(getAppTitle(ctx));
+        StringBuilder builder =
+                new StringBuilder(PasswdSafeUtil.getAppTitle(ctx));
         if (uri != null) {
             builder.append(" - ");
             builder.append(uri.getIdentifier(ctx, true));
         }
         return builder.toString();
 
-    }
-
-    public static final String getAppTitle(Context ctx)
-    {
-        return ctx.getString(R.string.app_name);
     }
 
     public static void copyToClipboard(String str, Context ctx)
@@ -407,7 +403,7 @@ public class PasswdSafeApp extends Application
             clipMgr.setText(str);
         } catch (Throwable e) {
             String err = ctx.getString(R.string.copy_clipboard_error,
-                                       getAppTitle(ctx));
+                                       PasswdSafeUtil.getAppTitle(ctx));
             Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
             Log.e(TAG, err + ": " + e.toString());
         }
@@ -466,7 +462,7 @@ public class PasswdSafeApp extends Application
         };
 
         AlertDialog.Builder dlg = new AlertDialog.Builder(activity)
-        .setTitle(getAppTitle(activity) + " - " +
+        .setTitle(PasswdSafeUtil.getAppTitle(activity) + " - " +
                   activity.getString(R.string.error))
         .setMessage(msg)
         .setCancelable(false)
@@ -480,7 +476,7 @@ public class PasswdSafeApp extends Application
     public static void showErrorMsg(String msg, Context context)
     {
         AlertDialog.Builder dlg = new AlertDialog.Builder(context)
-        .setTitle(getAppTitle(context) + " - " +
+        .setTitle(PasswdSafeUtil.getAppTitle(context) + " - " +
                   context.getString(R.string.error))
         .setMessage(msg)
         .setCancelable(true)

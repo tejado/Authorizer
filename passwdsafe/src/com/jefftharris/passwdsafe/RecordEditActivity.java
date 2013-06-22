@@ -350,7 +350,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             };
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(PasswdSafeApp.getAppTitle(this))
+                .setTitle(PasswdSafeUtil.getAppTitle(this))
                 .setMessage(R.string.enter_net_group)
                 .setView(view)
                 .setPositiveButton(R.string.ok, dlgClick)

@@ -44,6 +44,12 @@ public class PasswdSafeUtil
         }
     }
 
+    /** Get the app title */
+    public static final String getAppTitle(Context ctx)
+    {
+        return ctx.getString(R.string.app_name);
+    }
+
     /** Get the app's version */
     public static final String getAppVersion(Context ctx)
     {

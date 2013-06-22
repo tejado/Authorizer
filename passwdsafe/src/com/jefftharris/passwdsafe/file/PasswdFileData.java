@@ -623,7 +623,7 @@ public class PasswdFileData
 
     private final void setSaveHdrFields(Context context)
     {
-        setHdrLastSaveApp(PasswdSafeApp.getAppTitle(context) +
+        setHdrLastSaveApp(PasswdSafeUtil.getAppTitle(context) +
                           " " +
                           PasswdSafeUtil.getAppVersion(context));
         setHdrLastSaveUser("User");

@@ -455,7 +455,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case DIALOG_PROGRESS:
         {
             ProgressDialog dlg = new ProgressDialog(this);
-            dlg.setTitle(PasswdSafeApp.getAppTitle(this));
+            dlg.setTitle(PasswdSafeUtil.getAppTitle(this));
             dlg.setIndeterminate(true);
             dlg.setCancelable(true);
 
