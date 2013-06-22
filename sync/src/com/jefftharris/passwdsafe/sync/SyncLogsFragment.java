@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 
 /**
  * Fragment to show the sync logs
@@ -71,8 +71,7 @@ public class SyncLogsFragment extends ListFragment
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args)
             {
-                // TODO: Use PasswdCursorLoader
-                return new CursorLoader(
+                return new PasswdCursorLoader(
                         getActivity(),
                         PasswdSafeContract.SyncLogs.CONTENT_URI,
                         PasswdSafeContract.SyncLogs.PROJECTION,
@@ -84,13 +83,17 @@ public class SyncLogsFragment extends ListFragment
             @Override
             public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
             {
-                itsLogsAdapter.swapCursor(cursor);
+                if (PasswdCursorLoader.checkResult(loader)) {
+                    itsLogsAdapter.swapCursor(cursor);
+                }
             }
 
             @Override
             public void onLoaderReset(Loader<Cursor> loader)
             {
-                itsLogsAdapter.swapCursor(null);
+                if (PasswdCursorLoader.checkResult(loader)) {
+                    itsLogsAdapter.swapCursor(null);
+                }
             }
         });
     }
