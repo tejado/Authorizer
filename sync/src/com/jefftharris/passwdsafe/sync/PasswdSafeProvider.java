@@ -386,6 +386,10 @@ public class PasswdSafeProvider extends ContentProvider
             if (PasswdSafeContract.SyncLogs.START_SORT_ORDER.equals(sortOrder)) {
                 sortOrderValid = true;
             }
+            if (PasswdSafeContract.SyncLogs.DEFAULT_SELECTION.equals(
+                        selection)) {
+                selectionValid = true;
+            }
             break;
         }
         default: {

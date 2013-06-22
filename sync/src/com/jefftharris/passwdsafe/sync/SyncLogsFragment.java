@@ -16,7 +16,12 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
@@ -29,8 +34,31 @@ import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 public class SyncLogsFragment extends ListFragment
 {
     private static final int LOADER_LOGS = 0;
+    private static final String STATE_SHOW_ALL = "showAll";
 
+    private boolean itsIsShowAll = false;
     private SimpleCursorAdapter itsLogsAdapter;
+    private LoaderCallbacks<Cursor> itsLogsCbs;
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState)
+    {
+        setHasOptionsMenu(true);
+
+        if (savedInstanceState != null) {
+            itsIsShowAll = savedInstanceState.getBoolean(STATE_SHOW_ALL, false);
+        } else {
+            itsIsShowAll = false;
+        }
+
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
 
     /* (non-Javadoc)
@@ -41,7 +69,6 @@ public class SyncLogsFragment extends ListFragment
     {
         super.onActivityCreated(savedInstanceState);
 
-        // TODO: Option to hide successful logs
         itsLogsAdapter = new SimpleCursorAdapter(
                getActivity(), android.R.layout.simple_list_item_2, null,
                new String[] { PasswdSafeContract.SyncLogs.COL_START,
@@ -108,17 +135,18 @@ public class SyncLogsFragment extends ListFragment
 
         setListAdapter(itsLogsAdapter);
 
-        LoaderManager lm = getLoaderManager();
-        lm.initLoader(LOADER_LOGS, null, new LoaderCallbacks<Cursor>()
+        itsLogsCbs = new LoaderCallbacks<Cursor>()
         {
             @Override
             public Loader<Cursor> onCreateLoader(int id, Bundle args)
             {
+                String selection = itsIsShowAll ? null :
+                    PasswdSafeContract.SyncLogs.DEFAULT_SELECTION;
                 return new PasswdCursorLoader(
                         getActivity(),
                         PasswdSafeContract.SyncLogs.CONTENT_URI,
                         PasswdSafeContract.SyncLogs.PROJECTION,
-                        null, null,
+                        selection, null,
                         PasswdSafeContract.SyncLogs.START_SORT_ORDER);
 
             }
@@ -138,6 +166,55 @@ public class SyncLogsFragment extends ListFragment
                     itsLogsAdapter.swapCursor(null);
                 }
             }
-        });
+        };
+        LoaderManager lm = getLoaderManager();
+        lm.initLoader(LOADER_LOGS, null, itsLogsCbs);
+    }
+
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_SHOW_ALL, itsIsShowAll);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_sync_logs, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem item = menu.findItem(R.id.menu_show_all);
+        item.setChecked(itsIsShowAll);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_show_all: {
+            itsIsShowAll = !item.isChecked();
+            item.setChecked(itsIsShowAll);
+            LoaderManager lm = getLoaderManager();
+            lm.restartLoader(LOADER_LOGS, null, itsLogsCbs);
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
     }
 }

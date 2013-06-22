@@ -145,6 +145,7 @@ public final class PasswdSafeContract
         public static final String COL_LOG = "log";
 
         public static final String START_SORT_ORDER = COL_START + " DESC";
+        public static final String DEFAULT_SELECTION = COL_LOG + " != ''";
 
         public static final String[] PROJECTION = {
             SyncLogs._ID,

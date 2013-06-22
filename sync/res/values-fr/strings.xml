@@ -17,6 +17,7 @@
     <string name="passwdsafe">PasswdSafe</string>
     <string name="remove_account">Supprimer un compte?</string>
     <string name="removing_account">Retrait de compte&#8230;</string>
+    <string name="show_all">Afficher Tout</string>
     <string name="sync">Synchroniser</string>
     <string name="sync_interval_label">Synchroniser intervalle:</string>
     <string name="sync_log_record">Synchroniser %1$s, %2$s, %3$s, début: %4$tc, fin: %5$tc</string>
