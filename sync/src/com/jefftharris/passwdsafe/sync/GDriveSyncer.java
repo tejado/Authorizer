@@ -19,6 +19,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -286,6 +287,9 @@ public class GDriveSyncer
             db.beginTransaction();
             String log = logrec.toString(itsContext);
             Log.i(TAG, log);
+            SyncDb.deleteSyncLogs(
+                    System.currentTimeMillis() - 2 * DateUtils.WEEK_IN_MILLIS,
+                    db);
             SyncDb.addSyncLog(log, db);
             db.setTransactionSuccessful();
         } catch (Exception e) {

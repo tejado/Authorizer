@@ -396,11 +396,19 @@ public class SyncDb
     public static void addSyncLog(String log, SQLiteDatabase db)
         throws SQLException
     {
-        // TODO: Delete logs older than a week
         ContentValues values = new ContentValues();
         values.put(DB_COL_SYNC_LOGS_DATE, System.currentTimeMillis());
         values.put(DB_COL_SYNC_LOGS_LOG, log);
         db.insertOrThrow(DB_TABLE_SYNC_LOGS, null, values);
+    }
+
+
+    /** Delete old logs */
+    public static void deleteSyncLogs(long removeBefore, SQLiteDatabase db)
+        throws SQLException
+    {
+        db.delete(DB_TABLE_SYNC_LOGS, "date < ?",
+                  new String[] { Long.toString(removeBefore) });
     }
 
 
