@@ -33,7 +33,7 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
-import com.jefftharris.passwdsafe.view.PasswdCursorLoader;
+import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 
 /**
  * The SyncProviderFilesFragment shows the list of files for a provider

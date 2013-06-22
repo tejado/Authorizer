@@ -32,7 +32,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.view.PasswdCursorLoader;
+import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 
 /**
  * The SyncProviderFragment allows the user to choose a sync provider
