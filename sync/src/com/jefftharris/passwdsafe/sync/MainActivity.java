@@ -151,6 +151,10 @@ public class MainActivity extends FragmentActivity
         MenuItemCompat.setShowAsAction(item,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
+        item = menu.findItem(R.id.menu_logs);
+        MenuItemCompat.setShowAsAction(item,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
         return true;
     }
 
@@ -161,6 +165,12 @@ public class MainActivity extends FragmentActivity
         case R.id.menu_about: {
             AboutDialog dlg = new AboutDialog();
             dlg.show(getSupportFragmentManager(), "AboutDialog");
+            return true;
+        }
+        case R.id.menu_logs: {
+            Intent intent = new Intent();
+            intent.setClass(this, SyncLogsActivity.class);
+            startActivity(intent);
             return true;
         }
         default: {
@@ -174,15 +184,6 @@ public class MainActivity extends FragmentActivity
     public void onLaunchPasswdSafeClick(View view)
     {
         PasswdSafeUtil.startMainActivity("com.jefftharris.passwdsafe", this);
-    }
-
-
-    /** Button onClick handler to show the logs */
-    public void onLaunchSyncLogs(View view)
-    {
-        Intent intent = new Intent();
-        intent.setClass(this, SyncLogsActivity.class);
-        startActivity(intent);
     }
 
 

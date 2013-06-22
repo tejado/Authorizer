@@ -105,14 +105,4 @@
         android:drawablePadding="6dp"
         android:text="@string/open"/>
 
-    <View
-        style="@style/Separator"
-        android:layout_margin="6dp"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onLaunchSyncLogs"
-        android:text="@string/logs"/>
-
 </LinearLayout>
