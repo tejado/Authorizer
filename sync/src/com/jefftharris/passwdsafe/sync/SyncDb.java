@@ -411,6 +411,9 @@ public class SyncDb
         if (logrec.isFullSync()) {
             flags |= PasswdSafeContract.SyncLogs.FLAGS_IS_FULL;
         }
+        if (logrec.isManualSync()) {
+            flags |= PasswdSafeContract.SyncLogs.FLAGS_IS_MANUAL;
+        }
         values.put(DB_COL_SYNC_LOGS_FLAGS, flags);
 
         db.insertOrThrow(DB_TABLE_SYNC_LOGS, null, values);

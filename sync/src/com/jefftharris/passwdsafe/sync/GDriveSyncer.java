@@ -208,11 +208,9 @@ public class GDriveSyncer
             return;
         }
 
-        // TODO: sync log
-
         PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s, manual: %b",
                                itsAccount.name, manual);
-        SyncLogRecord logrec = new SyncLogRecord(itsAccount.name);
+        SyncLogRecord logrec = new SyncLogRecord(itsAccount.name, manual);
 
         try {
             SQLiteDatabase db = itsSyncDb.getDb();

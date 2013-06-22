@@ -84,6 +84,15 @@ public class SyncLogsFragment extends ListFragment
                     } else {
                         str.append(getString(R.string.incremental_sync));
                     }
+
+                    str.append(", ");
+                    if ((flags &
+                            PasswdSafeContract.SyncLogs.FLAGS_IS_MANUAL) != 0) {
+                        str.append(getString(R.string.manual));
+                    } else {
+                        str.append(getString(R.string.automatic));
+                    }
+
                     if (log.length() != 0) {
                         str.append("\n");
                     }

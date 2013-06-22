@@ -163,6 +163,7 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_LOG = 5;
 
         public static final int FLAGS_IS_FULL = 1 << 0;
+        public static final int FLAGS_IS_MANUAL = 1 << 1;
     }
 
     /** The client provider's authority */

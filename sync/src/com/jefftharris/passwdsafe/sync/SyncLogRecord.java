@@ -23,13 +23,15 @@ public class SyncLogRecord
     private List<Exception> itsFailures = new ArrayList<Exception>();
     private long itsEndTime = -1;
     private boolean itsIsFullSync = false;
+    private boolean itsIsManualSync;
     private List<String> itsEntries = new ArrayList<String>();
 
     /** Constructor */
-    public SyncLogRecord(String account)
+    public SyncLogRecord(String account, boolean manual)
     {
         itsAccount = account;
         itsStartTime = System.currentTimeMillis();
+        itsIsManualSync = manual;
     }
 
     /** Get the account name */
@@ -66,6 +68,12 @@ public class SyncLogRecord
     public boolean isFullSync()
     {
         return itsIsFullSync;
+    }
+
+    /** Get whether the sync was started manually */
+    public boolean isManualSync()
+    {
+        return itsIsManualSync;
     }
 
     /** Set whether the sync is full or incremental */
@@ -109,6 +117,9 @@ public class SyncLogRecord
                                  ctx.getString(itsIsFullSync ?
                                          R.string.full_sync :
                                          R.string.incremental_sync),
+                                 ctx.getString(itsIsManualSync ?
+                                         R.string.manual :
+                                         R.string.automatic),
                                  itsStartTime, itsEndTime));
         str.append("\n");
         str.append(getActions());
