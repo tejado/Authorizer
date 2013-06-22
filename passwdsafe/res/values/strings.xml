@@ -29,10 +29,8 @@
     <string name="cannot_delete_record">Cannot delete record - %1$s</string>
     <string name="content_file">Content File</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
-    <string name="copy_clipboard_error">%1$s - Error copying to the clipboard.  The error may be due to a known error in Samsung devices.</string>
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
-    <string name="copy_trace_and_close">Copy Trace and Close</string>
     <string name="copy_user">Copy User Name</string>
     <string name="created">Created</string>
     <string name="custom_symbols">Custom Symbols</string>
@@ -70,7 +68,6 @@
     <string name="enabled">Enabled</string>
     <string name="enter_net_group">Enter new group:</string>
     <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
-    <string name="error">Error</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Expiration Notifications</string>

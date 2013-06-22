@@ -7,13 +7,13 @@
  */
 package com.jefftharris.passwdsafe.view;
 
-import com.jefftharris.passwdsafe.PasswdSafeApp;
-
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  * A CursorLoader that handles background errors
@@ -52,7 +52,7 @@ public class PasswdCursorLoader extends CursorLoader
             if (pwloader.itsLoadException != null) {
                 Exception e = pwloader.itsLoadException;
                 pwloader.itsLoadException = null;
-                PasswdSafeApp.showFatalMsg(e, pwloader.itsActivity);
+                PasswdSafeUtil.showFatalMsg(e, pwloader.itsActivity);
                 return false;
             }
         }

@@ -83,8 +83,8 @@ public class RecordActivityHelper implements PasswdFileActivity
         itsPasswdFile = app.accessPasswdFile(itsUri, this);
         PasswdFileData fileData = itsPasswdFile.getFileData();
         if (fileData == null) {
-            PasswdSafeApp.showFatalMsg("File not open: " + itsUri,
-                                       itsActivity);
+            PasswdSafeUtil.showFatalMsg("File not open: " + itsUri,
+                                        itsActivity);
             return;
         }
 

@@ -6,17 +6,25 @@
  */
 package com.jefftharris.passwdsafe.lib;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.text.ClipboardManager;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 
 /**
  * The PasswdSafeUtil class contains common helper methods
@@ -24,6 +32,7 @@ import android.util.Log;
 public class PasswdSafeUtil
 {
     public static final boolean DEBUG = false;
+    private static final String TAG = "PasswdSafeUtil";
 
     /** Start the main activity for a package */
     public static void startMainActivity(String pkgName, Activity act)
@@ -69,6 +78,84 @@ public class PasswdSafeUtil
         } catch (PackageManager.NameNotFoundException e) {
             return null;
         }
+    }
+
+    public static void copyToClipboard(String str, Context ctx)
+    {
+        try {
+            ClipboardManager clipMgr = (ClipboardManager)
+                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipMgr.setText(str);
+        } catch (Throwable e) {
+            String err = ctx.getString(R.string.copy_clipboard_error,
+                                       getAppTitle(ctx));
+            Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
+            Log.e(TAG, err + ": " + e.toString());
+        }
+    }
+
+    public static void showFatalMsg(Throwable t, Activity activity)
+    {
+        showFatalMsg(t, t.toString(), activity, true);
+    }
+
+    public static void showFatalMsg(String msg, Activity activity)
+    {
+        showFatalMsg(null, msg, activity, true);
+    }
+
+    public static void showFatalMsg(String msg,
+                                    Activity activity,
+                                    boolean copyTrace)
+    {
+        showFatalMsg(null, msg, activity, copyTrace);
+    }
+
+    public static void showFatalMsg(Throwable t,
+                                    String msg,
+                                    Activity activity)
+    {
+        showFatalMsg(t, msg, activity, true);
+    }
+
+    public static void showFatalMsg(Throwable t,
+                                    String msg,
+                                    final Activity activity,
+                                    boolean copyTrace)
+    {
+        if (copyTrace && (t != null)) {
+            StringWriter writer = new StringWriter();
+            t.printStackTrace(new PrintWriter(writer));
+            String trace = writer.toString();
+            Log.e(TAG, trace);
+            copyToClipboard(trace, activity);
+        }
+
+        AbstractDialogClickListener dlgClick = new AbstractDialogClickListener()
+        {
+            @Override
+            public final void onOkClicked(DialogInterface dialog)
+            {
+                activity.finish();
+            }
+
+            @Override
+            public final void onCancelClicked(DialogInterface dialog)
+            {
+                activity.finish();
+            }
+        };
+
+        AlertDialog.Builder dlg = new AlertDialog.Builder(activity)
+        .setTitle(getAppTitle(activity) + " - " +
+                  activity.getString(R.string.error))
+        .setMessage(msg)
+        .setCancelable(false)
+        .setPositiveButton(
+             copyTrace ? R.string.copy_trace_and_close : R.string.close,
+             dlgClick)
+        .setOnCancelListener(dlgClick);
+        dlg.show();
     }
 
     /** Log a debug message at info level */

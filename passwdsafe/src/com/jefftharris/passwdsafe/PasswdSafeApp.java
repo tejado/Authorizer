@@ -8,22 +8,12 @@
 package com.jefftharris.passwdsafe;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.pwsafe.lib.file.PwsFile;
-
-import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdFileUri;
-import com.jefftharris.passwdsafe.file.PasswdPolicy;
-import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
-import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -40,9 +30,14 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.text.ClipboardManager;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 
 public class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
@@ -395,84 +390,6 @@ public class PasswdSafeApp extends Application
 
     }
 
-    public static void copyToClipboard(String str, Context ctx)
-    {
-        try {
-            ClipboardManager clipMgr = (ClipboardManager)
-                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-            clipMgr.setText(str);
-        } catch (Throwable e) {
-            String err = ctx.getString(R.string.copy_clipboard_error,
-                                       PasswdSafeUtil.getAppTitle(ctx));
-            Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
-            Log.e(TAG, err + ": " + e.toString());
-        }
-    }
-
-    public static void showFatalMsg(Throwable t, Activity activity)
-    {
-        showFatalMsg(t, t.toString(), activity, true);
-    }
-
-    public static void showFatalMsg(String msg, Activity activity)
-    {
-        showFatalMsg(null, msg, activity, true);
-    }
-
-    public static void showFatalMsg(String msg,
-                                    Activity activity,
-                                    boolean copyTrace)
-    {
-        showFatalMsg(null, msg, activity, copyTrace);
-    }
-
-    public static void showFatalMsg(Throwable t,
-                                    String msg,
-                                    Activity activity)
-    {
-        showFatalMsg(t, msg, activity, true);
-    }
-
-    public static void showFatalMsg(Throwable t,
-                                    String msg,
-                                    final Activity activity,
-                                    boolean copyTrace)
-    {
-        if (copyTrace && (t != null)) {
-            StringWriter writer = new StringWriter();
-            t.printStackTrace(new PrintWriter(writer));
-            String trace = writer.toString();
-            Log.e(TAG, trace);
-            copyToClipboard(trace, activity);
-        }
-
-        AbstractDialogClickListener dlgClick = new AbstractDialogClickListener()
-        {
-            @Override
-            public final void onOkClicked(DialogInterface dialog)
-            {
-                activity.finish();
-            }
-
-            @Override
-            public final void onCancelClicked(DialogInterface dialog)
-            {
-                activity.finish();
-            }
-        };
-
-        AlertDialog.Builder dlg = new AlertDialog.Builder(activity)
-        .setTitle(PasswdSafeUtil.getAppTitle(activity) + " - " +
-                  activity.getString(R.string.error))
-        .setMessage(msg)
-        .setCancelable(false)
-        .setPositiveButton(
-             copyTrace ? R.string.copy_trace_and_close : R.string.close,
-             dlgClick)
-        .setOnCancelListener(dlgClick);
-        dlg.show();
-    }
-
     public static void showErrorMsg(String msg, Context context)
     {
         AlertDialog.Builder dlg = new AlertDialog.Builder(context)
@@ -604,7 +521,7 @@ public class PasswdSafeApp extends Application
             }
 
             if (itsIsFileCloseClearClipboard) {
-                copyToClipboard("", this);
+                PasswdSafeUtil.copyToClipboard("", this);
             }
         }
 

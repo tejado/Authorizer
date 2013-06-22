@@ -30,10 +30,8 @@
     <string name="cannot_delete_record">Impossible de supprimer l\'entrée - %1$s"</string>
     <string name="content_file">Contenu du fichier</string>
     <string name="copy_clipboard">Copier dans le Presse-papiers</string>
-    <string name="copy_clipboard_error">%1$s - Erreur de copie dans le presse papier. Elle peut être due à une erreur propre aux appareils Samsung.</string>
     <string name="copy_notes">Copier les notes</string>
     <string name="copy_password">Copier le mot de passe</string>
-    <string name="copy_trace_and_close">Copier et fermer</string>
     <string name="copy_user">Copier le nom d\'utilisateur</string>
     <string name="created">Créé</string>
     <string name="custom_symbols">Symboles personnalisés</string>
@@ -71,7 +69,6 @@
     <string name="enabled">Activé</string>
     <string name="enter_net_group">Entrer un nouveau groupe:</string>
     <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers logs</string>
-    <string name="error">Erreur</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Notifications d\'Expiration</string>

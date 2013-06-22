@@ -9,10 +9,10 @@ package com.jefftharris.passwdsafe.view;
 
 import java.lang.reflect.Method;
 
-import com.jefftharris.passwdsafe.PasswdSafeApp;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 
 /**
@@ -42,7 +42,7 @@ public final class GuiUtilsHoneycomb
             itsInvalidateOptionsMenuMeth.invoke(act);
         }
         catch (Exception e) {
-            PasswdSafeApp.showFatalMsg(e, act);
+            PasswdSafeUtil.showFatalMsg(e, act);
         }
     }
 }

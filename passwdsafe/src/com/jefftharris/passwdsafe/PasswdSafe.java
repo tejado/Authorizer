@@ -826,7 +826,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             if ((rec != null) && (fileData != null)) {
                 String str = fileData.getUsername(rec);
-                PasswdSafeApp.copyToClipboard(str, this);
+                PasswdSafeUtil.copyToClipboard(str, this);
             }
             return true;
         }
@@ -834,7 +834,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
             if ((rec != null) && (fileData != null)) {
                 String str = fileData.getPassword(rec);
-                PasswdSafeApp.copyToClipboard(str, this);
+                PasswdSafeUtil.copyToClipboard(str, this);
             }
             return true;
         }
@@ -899,8 +899,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             {
                 PasswdFileUri uri = (PasswdFileUri)(result);
                 if (!uri.exists()) {
-                    PasswdSafeApp.showFatalMsg("File does't exist: " + uri,
-                                               PasswdSafe.this);
+                    PasswdSafeUtil.showFatalMsg("File does't exist: " + uri,
+                                                PasswdSafe.this);
                     return;
                 }
                 openFile(uri);
@@ -965,7 +965,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             fileData.changePasswd(passwd);
             getPasswdFile().save();
         } else {
-            PasswdSafeApp.showFatalMsg(
+            PasswdSafeUtil.showFatalMsg(
                 "Could not change password on closed file: " + getUri(), this);
         }
     }
@@ -1227,7 +1227,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 if (((e instanceof IOException) &&
                      TextUtils.equals(e.getMessage(), "Invalid password")) ||
                     (e instanceof InvalidPassphraseException)) {
-                    PasswdSafeApp.showFatalMsg(
+                    PasswdSafeUtil.showFatalMsg(
                         getString(R.string.invalid_password), PasswdSafe.this,
                         false);
                 } else {
@@ -1235,7 +1235,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     if (msg == null) {
                         msg = e.toString();
                     }
-                    PasswdSafeApp.showFatalMsg(e, msg, PasswdSafe.this);
+                    PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafe.this);
                 }
             }
         }

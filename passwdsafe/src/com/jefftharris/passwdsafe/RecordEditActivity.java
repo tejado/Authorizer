@@ -141,12 +141,12 @@ public class RecordEditActivity extends AbstractRecordActivity
         if (uuid != null) {
             PwsRecord record = fileData.getRecord(uuid);
             if (record == null) {
-                PasswdSafeApp.showFatalMsg("Unknown record: " + uuid, this);
+                PasswdSafeUtil.showFatalMsg("Unknown record: " + uuid, this);
                 return;
             }
             passwdRecord = fileData.getPasswdRecord(record);
             if (passwdRecord == null) {
-                PasswdSafeApp.showFatalMsg("Unknown passwd record: " + uuid,
+                PasswdSafeUtil.showFatalMsg("Unknown passwd record: " + uuid,
                                            this);
                 return;
             }
@@ -801,7 +801,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 String passwd = itsCurrPolicy.generate();
                 setPassword(passwd);
             } catch (Exception e) {
-                PasswdSafeApp.showFatalMsg(e, this);
+                PasswdSafeUtil.showFatalMsg(e, this);
             }
         }
     }
@@ -1165,7 +1165,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         PasswdFileData fileData = getPasswdFile().getFileData();
         if (fileData == null) {
-            PasswdSafeApp.showFatalMsg("File closed", this);
+            PasswdSafeUtil.showFatalMsg("File closed", this);
             finish();
             return;
         }
@@ -1181,7 +1181,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             record.setLoaded();
         }
         if (record == null) {
-            PasswdSafeApp.showFatalMsg("Unknown record: " + uuid, this);
+            PasswdSafeUtil.showFatalMsg("Unknown record: " + uuid, this);
             finish();
             return;
         }
@@ -1308,7 +1308,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 fileData.addRecord(record);
             }
         } catch (Exception e) {
-            PasswdSafeApp.showFatalMsg(e, "Error saving record: " + e, this);
+            PasswdSafeUtil.showFatalMsg(e, "Error saving record: " + e, this);
             finish();
             return;
         }

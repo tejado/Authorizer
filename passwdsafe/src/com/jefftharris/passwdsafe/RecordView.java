@@ -188,8 +188,8 @@ public class RecordView extends AbstractRecordTabActivity
         });
 
         if (getUUID() == null) {
-            PasswdSafeApp.showFatalMsg("No record chosen for file: " + getUri(),
-                                       this);
+            PasswdSafeUtil.showFatalMsg("No record chosen for file: " + getUri(),
+                                        this);
             return;
         }
 
@@ -221,13 +221,13 @@ public class RecordView extends AbstractRecordTabActivity
         switch (item.getItemId()) {
         case MENU_COPY_PASSWORD:
         {
-            PasswdSafeApp.copyToClipboard(getPassword(), this);
+            PasswdSafeUtil.copyToClipboard(getPassword(), this);
             return true;
         }
         case MENU_COPY_USER:
         {
             TextView tv = (TextView)findViewById(R.id.user);
-            PasswdSafeApp.copyToClipboard(tv.getText().toString(), this);
+            PasswdSafeUtil.copyToClipboard(tv.getText().toString(), this);
             return true;
         }
         default:
@@ -383,18 +383,18 @@ public class RecordView extends AbstractRecordTabActivity
         case MENU_COPY_USER:
         {
             TextView tv = (TextView)findViewById(R.id.user);
-            PasswdSafeApp.copyToClipboard(tv.getText().toString(), this);
+            PasswdSafeUtil.copyToClipboard(tv.getText().toString(), this);
             break;
         }
         case MENU_COPY_PASSWORD:
         {
-            PasswdSafeApp.copyToClipboard(getPassword(), this);
+            PasswdSafeUtil.copyToClipboard(getPassword(), this);
             break;
         }
         case MENU_COPY_NOTES:
         {
             TextView tv = (TextView)findViewById(R.id.notes);
-            PasswdSafeApp.copyToClipboard(tv.getText().toString(), this);
+            PasswdSafeUtil.copyToClipboard(tv.getText().toString(), this);
             break;
         }
         case MENU_TOGGLE_WRAP_NOTES:
@@ -510,7 +510,7 @@ public class RecordView extends AbstractRecordTabActivity
         String uuid = getUUID();
         PwsRecord rec = fileData.getRecord(uuid);
         if (rec == null) {
-            PasswdSafeApp.showFatalMsg("Unknown record: " + uuid, this);
+            PasswdSafeUtil.showFatalMsg("Unknown record: " + uuid, this);
             return;
         }
         PasswdRecord passwdRec = fileData.getPasswdRecord(rec);

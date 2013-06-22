@@ -52,7 +52,7 @@ public abstract class ActivityPasswdFile
             itsActivity.removeProgressDialog();
             boolean success = !(result instanceof Exception);
             if (!success) {
-                PasswdSafeApp.showFatalMsg(((Exception)result), getActivity());
+                PasswdSafeUtil.showFatalMsg(((Exception)result), getActivity());
             }
             itsSaveTask = null;
             itsActivity.saveFinished(success);
@@ -94,7 +94,7 @@ public abstract class ActivityPasswdFile
             try {
                 itsSaveTask.get();
             } catch (Exception e) {
-                PasswdSafeApp.showFatalMsg(e, getActivity());
+                PasswdSafeUtil.showFatalMsg(e, getActivity());
             }
             itsSaveTask = null;
         }

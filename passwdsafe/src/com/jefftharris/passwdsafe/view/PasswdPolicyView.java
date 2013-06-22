@@ -7,22 +7,23 @@
  */
 package com.jefftharris.passwdsafe.view;
 
-import com.jefftharris.passwdsafe.PasswdSafeApp;
-import com.jefftharris.passwdsafe.R;
-import com.jefftharris.passwdsafe.file.PasswdPolicy;
-
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.PasswdSafeApp;
+import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  *  Custom view for showing a password policy
@@ -115,7 +116,7 @@ public class PasswdPolicyView extends LinearLayout
     public boolean onMenuItemClick(MenuItem item)
     {
         if (item.getItemId() == MENU_COPY) {
-            PasswdSafeApp.copyToClipboard(
+            PasswdSafeUtil.copyToClipboard(
                 itsGeneratedPasswd.getText().toString(), getContext());
             return true;
         }
