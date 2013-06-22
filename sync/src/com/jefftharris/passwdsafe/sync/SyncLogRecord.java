@@ -32,16 +32,40 @@ public class SyncLogRecord
         itsStartTime = System.currentTimeMillis();
     }
 
+    /** Get the account name */
+    public String getAccount()
+    {
+        return itsAccount;
+    }
+
+    /** Get the start time */
+    public long getStartTime()
+    {
+        return itsStartTime;
+    }
+
     /** Add an exception failure */
     public void addFailure(Exception e)
     {
         itsFailures.add(e);
     }
 
+    /** Get the end time for a sync */
+    public long getEndTime()
+    {
+        return itsEndTime;
+    }
+
     /** Set the end time for a sync */
     public void setEndTime()
     {
         itsEndTime = System.currentTimeMillis();
+    }
+
+    /** Get whether the sync is full or incremental */
+    public boolean isFullSync()
+    {
+        return itsIsFullSync;
     }
 
     /** Set whether the sync is full or incremental */
@@ -56,22 +80,38 @@ public class SyncLogRecord
         itsEntries.add(entry);
     }
 
+    /** Get a string representation of the actions in the record */
+    public String getActions()
+    {
+        StringBuilder actions = new StringBuilder();
+        for (String entry: itsEntries) {
+            if (actions.length() != 0) {
+                actions.append("\n");
+            }
+            actions.append(entry);
+        }
+        for (Exception e: itsFailures) {
+            if (actions.length() != 0) {
+                actions.append("\n");
+            }
+            StringWriter writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
+            actions.append("FAILURE: ").append(writer.toString());
+        }
+        return actions.toString();
+    }
+
     /** Get a string representation of the record */
     public String toString(Context ctx)
     {
         StringBuilder str = new StringBuilder();
         str.append(ctx.getString(R.string.sync_log_record, itsAccount,
                                  ctx.getString(itsIsFullSync ?
-                                         R.string.full : R.string.incremental),
+                                         R.string.full_sync :
+                                         R.string.incremental_sync),
                                  itsStartTime, itsEndTime));
-        for (String entry: itsEntries) {
-            str.append("\n").append(entry);
-        }
-        for (Exception e: itsFailures) {
-            StringWriter writer = new StringWriter();
-            e.printStackTrace(new PrintWriter(writer));
-            str.append("\nFAILURE: ").append(writer.toString());
-        }
+        str.append("\n");
+        str.append(getActions());
         return str.toString();
     }
 }

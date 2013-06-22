@@ -285,12 +285,11 @@ public class GDriveSyncer
         SQLiteDatabase db = itsSyncDb.getDb();
         try {
             db.beginTransaction();
-            String log = logrec.toString(itsContext);
-            Log.i(TAG, log);
+            Log.i(TAG, logrec.toString(itsContext));
             SyncDb.deleteSyncLogs(
                     System.currentTimeMillis() - 2 * DateUtils.WEEK_IN_MILLIS,
                     db);
-            SyncDb.addSyncLog(log, db);
+            SyncDb.addSyncLog(logrec, db);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.e(TAG, "Sync write log error", e);

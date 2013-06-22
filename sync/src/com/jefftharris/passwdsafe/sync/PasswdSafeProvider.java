@@ -49,7 +49,7 @@ public class PasswdSafeProvider extends ContentProvider
     private static final int MATCH_PROVIDER = 2;
     private static final int MATCH_PROVIDER_FILES = 3;
     private static final int MATCH_PROVIDER_FILE = 4;
-    private static final int MATCH_PROVIDER_SYNC_LOGS = 5;
+    private static final int MATCH_SYNC_LOGS = 5;
 
     private static final HashMap<String, String> PROVIDERS_MAP;
     private static final HashMap<String, String> FILES_MAP;
@@ -76,7 +76,7 @@ public class PasswdSafeProvider extends ContentProvider
                        MATCH_PROVIDER_FILE);
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.SyncLogs.TABLE,
-                       MATCH_PROVIDER_SYNC_LOGS);
+                       MATCH_SYNC_LOGS);
 
         PROVIDERS_MAP = new HashMap<String, String>();
         PROVIDERS_MAP.put(PasswdSafeContract.Providers._ID,
@@ -107,8 +107,14 @@ public class PasswdSafeProvider extends ContentProvider
         SYNC_LOGS_MAP = new HashMap<String, String>();
         SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs._ID,
                           SyncDb.DB_COL_SYNC_LOGS_ID);
-        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_DATE,
-                          SyncDb.DB_COL_SYNC_LOGS_DATE);
+        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_ACCT,
+                          SyncDb.DB_COL_SYNC_LOGS_ACCT);
+        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_START,
+                          SyncDb.DB_COL_SYNC_LOGS_START);
+        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_END,
+                          SyncDb.DB_COL_SYNC_LOGS_END);
+        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_FLAGS,
+                          SyncDb.DB_COL_SYNC_LOGS_FLAGS);
         SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_LOG,
                           SyncDb.DB_COL_SYNC_LOGS_LOG);
     }
@@ -198,6 +204,9 @@ public class PasswdSafeProvider extends ContentProvider
         }
         case MATCH_PROVIDER_FILE: {
             return PasswdSafeContract.Files.CONTENT_ITEM_TYPE;
+        }
+        case MATCH_SYNC_LOGS: {
+            return PasswdSafeContract.SyncLogs.CONTENT_TYPE;
         }
         default: {
             throw new IllegalArgumentException(
@@ -371,10 +380,10 @@ public class PasswdSafeProvider extends ContentProvider
             selectionArgs = new String[] { uri.getPathSegments().get(3) };
             break;
         }
-        case MATCH_PROVIDER_SYNC_LOGS: {
+        case MATCH_SYNC_LOGS: {
             qb.setTables(SyncDb.DB_TABLE_SYNC_LOGS);
             qb.setProjectionMap(SYNC_LOGS_MAP);
-            if (PasswdSafeContract.SyncLogs.DATE_SORT_ORDER.equals(sortOrder)) {
+            if (PasswdSafeContract.SyncLogs.START_SORT_ORDER.equals(sortOrder)) {
                 sortOrderValid = true;
             }
             break;

@@ -57,8 +57,13 @@ public class SyncDb
 
     public static final String DB_TABLE_SYNC_LOGS = "sync_logs";
     public static final String DB_COL_SYNC_LOGS_ID = BaseColumns._ID;
-    public static final String DB_COL_SYNC_LOGS_DATE = "date";
+    public static final String DB_COL_SYNC_LOGS_ACCT = "acct";
+    public static final String DB_COL_SYNC_LOGS_START = "start";
+    public static final String DB_COL_SYNC_LOGS_END = "end";
+    public static final String DB_COL_SYNC_LOGS_FLAGS = "flags";
     public static final String DB_COL_SYNC_LOGS_LOG = "log";
+    public static final String DB_MATCH_SYNC_LOGS_START_BEFORE =
+            DB_COL_SYNC_LOGS_START + " < ?";
 
     private DbHelper itsDbHelper;
 
@@ -393,12 +398,21 @@ public class SyncDb
 
 
     /** Add a sync log */
-    public static void addSyncLog(String log, SQLiteDatabase db)
+    public static void addSyncLog(SyncLogRecord logrec, SQLiteDatabase db)
         throws SQLException
     {
         ContentValues values = new ContentValues();
-        values.put(DB_COL_SYNC_LOGS_DATE, System.currentTimeMillis());
-        values.put(DB_COL_SYNC_LOGS_LOG, log);
+        values.put(DB_COL_SYNC_LOGS_ACCT, logrec.getAccount());
+        values.put(DB_COL_SYNC_LOGS_START, logrec.getStartTime());
+        values.put(DB_COL_SYNC_LOGS_END, logrec.getEndTime());
+        values.put(DB_COL_SYNC_LOGS_LOG, logrec.getActions());
+
+        int flags = 0;
+        if (logrec.isFullSync()) {
+            flags |= PasswdSafeContract.SyncLogs.FLAGS_IS_FULL;
+        }
+        values.put(DB_COL_SYNC_LOGS_FLAGS, flags);
+
         db.insertOrThrow(DB_TABLE_SYNC_LOGS, null, values);
     }
 
@@ -407,7 +421,7 @@ public class SyncDb
     public static void deleteSyncLogs(long removeBefore, SQLiteDatabase db)
         throws SQLException
     {
-        db.delete(DB_TABLE_SYNC_LOGS, "date < ?",
+        db.delete(DB_TABLE_SYNC_LOGS, DB_MATCH_SYNC_LOGS_START_BEFORE,
                   new String[] { Long.toString(removeBefore) });
     }
 
@@ -483,8 +497,11 @@ public class SyncDb
                        DB_COL_FILES_REMOTE_DELETED + " INTEGER NOT NULL" +
                        ");");
             db.execSQL("CREATE TABLE " + DB_TABLE_SYNC_LOGS + " (" +
-                       DB_COL_SYNC_LOGS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                       DB_COL_SYNC_LOGS_DATE + " INTEGER NOT NULL," +
+                       DB_COL_SYNC_LOGS_ID + " INTEGER PRIMARY KEY," +
+                       DB_COL_SYNC_LOGS_ACCT + " TEXT NOT NULL," +
+                       DB_COL_SYNC_LOGS_START + " INTEGER NOT NULL," +
+                       DB_COL_SYNC_LOGS_END + " INTEGER NOT NULL," +
+                       DB_COL_SYNC_LOGS_FLAGS + " INTEGER NOT NULL," +
                        DB_COL_SYNC_LOGS_LOG + " TEXT" +
                        ");");
         }

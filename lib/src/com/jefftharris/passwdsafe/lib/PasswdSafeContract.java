@@ -138,20 +138,31 @@ public final class PasswdSafeContract
         public static final String CONTENT_ITEM_TYPE =
                 "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE;
 
-        public static final String COL_DATE = "date";
+        public static final String COL_ACCT = "acct";
+        public static final String COL_START = "start";
+        public static final String COL_END = "end";
+        public static final String COL_FLAGS = "flags";
         public static final String COL_LOG = "log";
 
-        public static final String DATE_SORT_ORDER = "date DESC";
+        public static final String START_SORT_ORDER = COL_START + " DESC";
 
         public static final String[] PROJECTION = {
             SyncLogs._ID,
-            SyncLogs.COL_DATE,
+            SyncLogs.COL_ACCT,
+            SyncLogs.COL_START,
+            SyncLogs.COL_END,
+            SyncLogs.COL_FLAGS,
             SyncLogs.COL_LOG
         };
 
         public static final int PROJECTION_IDX_ID = 0;
-        public static final int PROJECTION_IDX_DATE = 1;
-        public static final int PROJECTION_IDX_LOG = 2;
+        public static final int PROJECTION_IDX_ACCT = 1;
+        public static final int PROJECTION_IDX_START = 2;
+        public static final int PROJECTION_IDX_END = 3;
+        public static final int PROJECTION_IDX_FLAGS = 4;
+        public static final int PROJECTION_IDX_LOG = 5;
+
+        public static final int FLAGS_IS_FULL = 1 << 0;
     }
 
     /** The client provider's authority */

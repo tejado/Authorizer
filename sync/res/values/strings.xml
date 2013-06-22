@@ -8,8 +8,8 @@
     <string name="app_name">PasswdSafe Sync</string>
     <string name="choose_account">Choose Account</string>
     <string name="clear">Clear</string>
-    <string name="full">full</string>
-    <string name="incremental">incremental</string>
+    <string name="full_sync">Full sync</string>
+    <string name="incremental_sync">Incremental sync</string>
     <string name="open">Open</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="remove_account">Remove account?</string>
