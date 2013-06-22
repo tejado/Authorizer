@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe.view;
 
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;

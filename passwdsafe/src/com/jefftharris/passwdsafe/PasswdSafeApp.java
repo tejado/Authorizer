@@ -22,8 +22,8 @@ import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
-import com.jefftharris.passwdsafe.view.AbstractDialogClickListener;
 
 import android.app.Activity;
 import android.app.AlarmManager;
