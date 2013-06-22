@@ -11,6 +11,7 @@
     <string name="clear">Effacer</string>
     <string name="full_sync">Synchronisation complète</string>
     <string name="incremental_sync">Synchronisation incrémental</string>
+    <string name="logs">Archives</string>
     <string name="manual">manuel</string>
     <string name="open">Ouvrir</string>
     <string name="passwdsafe">PasswdSafe</string>
