@@ -148,7 +148,6 @@ public class SyncLogsFragment extends ListFragment
                         PasswdSafeContract.SyncLogs.PROJECTION,
                         selection, null,
                         PasswdSafeContract.SyncLogs.START_SORT_ORDER);
-
             }
 
             @Override
@@ -170,7 +169,6 @@ public class SyncLogsFragment extends ListFragment
         LoaderManager lm = getLoaderManager();
         lm.initLoader(LOADER_LOGS, null, itsLogsCbs);
     }
-
 
 
     /* (non-Javadoc)

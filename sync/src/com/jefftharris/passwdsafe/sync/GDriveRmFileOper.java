@@ -22,10 +22,17 @@ public class GDriveRmFileOper extends GDriveSyncOper
 {
     private static final String TAG = "GDriveRmFileOper";
 
+    private final boolean itsIsRmLocal;
+    private final boolean itsIsRmRemote;
+
     /** Constructor */
     public GDriveRmFileOper(SyncDb.DbFile file)
     {
         super(file);
+
+        itsIsRmLocal = (itsFile.itsLocalFile != null);
+        itsIsRmRemote = (!itsFile.itsIsRemoteDeleted &&
+                (itsFile.itsRemoteId != null));
     }
 
     /* (non-Javadoc)
@@ -35,12 +42,11 @@ public class GDriveRmFileOper extends GDriveSyncOper
     public void doOper(Drive drive, Context ctx) throws IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "removeFile %s", itsFile);
-        if (itsFile.itsLocalFile != null) {
+        if (itsIsRmLocal) {
             ctx.deleteFile(itsFile.itsLocalFile);
         }
 
-        if (!itsFile.itsIsRemoteDeleted &&
-                (itsFile.itsRemoteId != null)) {
+        if (itsIsRmRemote) {
             drive.files().trash(itsFile.itsRemoteId).execute();
         }
     }
@@ -65,6 +71,13 @@ public class GDriveRmFileOper extends GDriveSyncOper
         if (name == null) {
             name = itsFile.itsRemoteTitle;
         }
-        return ctx.getString(R.string.sync_oper_rmfile, name);
+
+        if (itsIsRmLocal && !itsIsRmRemote) {
+            return ctx.getString(R.string.sync_oper_rmfile_local, name);
+        } else if (!itsIsRmLocal && itsIsRmRemote) {
+            return ctx.getString(R.string.sync_oper_rmfile_remote, name);
+        } else {
+            return ctx.getString(R.string.sync_oper_rmfile, name);
+        }
     }
 }
