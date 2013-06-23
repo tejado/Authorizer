@@ -13,6 +13,7 @@
     <string name="incremental_sync">Incremental sync</string>
     <string name="logs">Logs</string>
     <string name="manual">manual</string>
+    <string name="no_logs">No logs</string>
     <string name="open">Open</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="remove_account">Remove account?</string>

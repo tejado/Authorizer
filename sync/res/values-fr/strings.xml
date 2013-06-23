@@ -13,6 +13,7 @@
     <string name="incremental_sync">Synchronisation incrémental</string>
     <string name="logs">Archives</string>
     <string name="manual">manuel</string>
+    <string name="no_logs">Pas de archives</string>
     <string name="open">Ouvrir</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="remove_account">Supprimer un compte?</string>

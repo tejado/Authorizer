@@ -134,6 +134,7 @@ public class SyncLogsFragment extends ListFragment
         });
 
         setListAdapter(itsLogsAdapter);
+        setEmptyText(getString(R.string.no_logs));
 
         itsLogsCbs = new LoaderCallbacks<Cursor>()
         {
