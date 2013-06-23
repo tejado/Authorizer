@@ -16,25 +16,15 @@ import java.util.Map;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
-import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdFileUri;
-import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
-import com.jefftharris.passwdsafe.view.DialogUtils;
-import com.jefftharris.passwdsafe.view.DialogValidator;
-import com.jefftharris.passwdsafe.view.GuiUtils;
-import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -52,6 +42,16 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.view.DialogUtils;
+import com.jefftharris.passwdsafe.view.DialogValidator;
+import com.jefftharris.passwdsafe.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 public class PasswdSafe extends AbstractPasswdSafeActivity
 {
@@ -556,8 +556,29 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 (TextView)fileNewView.findViewById(R.id.password_confirm);
             PasswordVisibilityMenuHandler.set(tv1, tv2);
 
+            int titleId = R.string.new_file;
+            PasswdFileUri uri = getUri();
+            switch (uri.getType()) {
+            case FILE: {
+                titleId = R.string.new_local_file;
+                break;
+            }
+            case SYNC_PROVIDER: {
+                switch (uri.getSyncType()) {
+                case GDRIVE: {
+                    titleId = R.string.new_drive_file;
+                    break;
+                }
+                }
+            }
+            case EMAIL:
+            case GENERIC_PROVIDER: {
+                break;
+            }
+            }
+
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
-                .setTitle(R.string.new_file)
+                .setTitle(titleId)
                 .setView(fileNewView)
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)

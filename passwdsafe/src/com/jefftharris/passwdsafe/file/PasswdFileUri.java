@@ -289,6 +289,13 @@ public class PasswdFileUri
     }
 
 
+    /** Get the sync type of the URI */
+    public PasswdSafeContract.Providers.Type getSyncType()
+    {
+        return itsSyncType;
+    }
+
+
     /** Get an identifier for the URI */
     public String getIdentifier(Context context, boolean shortId)
     {
