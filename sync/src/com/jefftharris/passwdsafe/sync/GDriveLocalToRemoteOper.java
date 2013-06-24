@@ -44,7 +44,6 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
             itsDriveFile = cache.get(itsFile.itsRemoteId);
             itsIsInsert = false;
         }
-        itsDriveFile.setMimeType("application/psafe3");
     }
 
     /* (non-Javadoc)
@@ -60,6 +59,7 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
         }
 
         itsDriveFile.setTitle(itsFile.itsLocalTitle);
+        itsDriveFile.setMimeType("application/psafe3");
 
         Drive.Files files = drive.files();
         if (itsFile.itsLocalFile != null) {
