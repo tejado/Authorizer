@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.test.file;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 
@@ -200,7 +201,8 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(255, policies.size());
         for (int i = 0; i < 255; ++i) {
             PasswdPolicy policy = policies.get(i);
-            assertEquals(String.format("Policy%03d", i), policy.getName());
+            assertEquals(String.format(Locale.US, "Policy%03d", i),
+                         policy.getName());
             assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
             assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
                          PasswdPolicy.FLAG_USE_UPPERCASE |
