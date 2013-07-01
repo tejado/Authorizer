@@ -499,7 +499,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         } else if (policyStr != null) {
             ParsedFields fields = parsePolicyFlagsAndLengths(policyStr, 0, 0);
             int endPos = fields.itsFieldsEnd;
-            if (endPos != policyStr.length()) {
+            if (endPos > policyStr.length()) {
                 throw new IllegalArgumentException(
                     "Password policy too long: " + policyStr);
             }

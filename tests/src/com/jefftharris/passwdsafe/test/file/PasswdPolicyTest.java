@@ -443,8 +443,6 @@ public class PasswdPolicyTest extends AndroidTestCase
                            "Policy 0 too short for min uppercase chars: 3");
         doTestBadRecPolicy("fe00abc111aaa000ff",
                            "Policy 0 too short for min uppercase chars: 3");
-        doTestBadRecPolicy("fe00abc111aaa000fff0",
-                           "Password policy too long: fe00abc111aaa000fff0");
     }
 
     /** Test default password generation */
@@ -550,6 +548,19 @@ public class PasswdPolicyTest extends AndroidTestCase
                                            int minLower, int minUpper,
                                            int minDigits, int minSymbols)
     {
+        doTestRecordPolicy(policyName, policyStr, ownSymbols, flags, length,
+                           type, minLower, minUpper, minDigits, minSymbols, 0);
+    }
+
+
+    private static void doTestRecordPolicy(String policyName, String policyStr,
+                                           String ownSymbols,
+                                           int flags, int length,
+                                           PasswdPolicy.Type type,
+                                           int minLower, int minUpper,
+                                           int minDigits, int minSymbols,
+                                           int extras)
+    {
         PasswdPolicy policy = PasswdPolicy.parseRecordPolicy(policyName,
                                                              policyStr,
                                                              ownSymbols);
@@ -569,8 +580,15 @@ public class PasswdPolicyTest extends AndroidTestCase
             PasswdPolicy.recordPolicyToString(policy);
         assertNotNull(strs);
         assertEquals(policyName, strs.itsPolicyName);
-        assertEquals(policyStr, strs.itsPolicyStr);
+        assertTrue(policyStr.startsWith(strs.itsPolicyStr));
         assertEquals(ownSymbols, strs.itsOwnSymbols);
+
+        if (extras < 5) {
+            policyStr += '\0';
+            doTestRecordPolicy(policyName, policyStr, ownSymbols, flags, length,
+                               type, minLower, minUpper, minDigits, minSymbols,
+                               extras + 1);
+        }
     }
 
     /** Test normal, easy-to-read, or pronounceable type password generation */
