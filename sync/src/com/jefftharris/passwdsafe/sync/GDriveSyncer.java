@@ -8,6 +8,7 @@ package com.jefftharris.passwdsafe.sync;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -115,8 +116,7 @@ public class GDriveSyncer
         SyncDb.deleteProvider(provider.itsId, db);
 
         try {
-            GoogleAccountCredential credential =
-                    GoogleAccountCredential.usingOAuth2(ctx, DriveScopes.DRIVE);
+            GoogleAccountCredential credential = getAcctCredential(ctx);
             String token = GoogleAuthUtil.getToken(ctx, provider.itsAcct,
                                                    credential.getScope());
             PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
@@ -492,17 +492,18 @@ public class GDriveSyncer
         Drive drive = null;
         String token = null;
         try {
-            GoogleAccountCredential credential =
-                GoogleAccountCredential.usingOAuth2(itsContext,
-                                                    DriveScopes.DRIVE);
+            GoogleAccountCredential credential = getAcctCredential(itsContext);
             credential.setSelectedAccountName(itsAccount.name);
 
             token = GoogleAuthUtil.getTokenWithNotification(
                 itsContext, itsAccount.name, credential.getScope(),
                 null, PasswdSafeContract.AUTHORITY, null);
 
-            drive = new Drive.Builder(AndroidHttp.newCompatibleTransport(),
-                                      new GsonFactory(), credential).build();
+            Drive.Builder builder =
+                    new Drive.Builder(AndroidHttp.newCompatibleTransport(),
+                                      new GsonFactory(), credential);
+            builder.setApplicationName(itsContext.getString(R.string.app_name));
+            drive = builder.build();
         } catch (UserRecoverableNotifiedException e) {
             // User notified
             PasswdSafeUtil.dbginfo(TAG, e, "User notified auth exception");
@@ -517,5 +518,13 @@ public class GDriveSyncer
             Log.e(TAG, "Token exception", e);
         }
         return new Pair<Drive, String>(drive, token);
+    }
+
+
+    /** Get the Google account credential */
+    private static GoogleAccountCredential getAcctCredential(Context ctx)
+    {
+        return GoogleAccountCredential.usingOAuth2(
+                ctx, Collections.singletonList(DriveScopes.DRIVE));
     }
 }

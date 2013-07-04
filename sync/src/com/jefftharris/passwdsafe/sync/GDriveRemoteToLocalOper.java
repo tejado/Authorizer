@@ -18,6 +18,7 @@ import android.util.Log;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -102,8 +103,9 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
             try {
                 os = new BufferedOutputStream(
                     ctx.openFileOutput(itsLocalFileName, Context.MODE_PRIVATE));
-                Drive.Files.Get get = drive.files().get(itsDriveFile.getId());
-                MediaHttpDownloader dl = get.getMediaHttpDownloader();
+                HttpRequestFactory reqFactory = drive.getRequestFactory();
+                MediaHttpDownloader dl = new MediaHttpDownloader(
+                    reqFactory.getTransport(), reqFactory.getInitializer());
                 dl.setDirectDownloadEnabled(true);
                 dl.download(downloadUrl, os);
             } finally {
