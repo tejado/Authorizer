@@ -10,6 +10,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -194,7 +195,13 @@ public class MainActivity extends FragmentActivity
             AccountPicker.newChooseAccountIntent(itsGdriveAccount,
                                                  null, ACCOUNT_TYPE, true,
                                                  null, null, null, null);
-        startActivityForResult(intent, CHOOSE_ACCOUNT);
+        try {
+            startActivityForResult(intent, CHOOSE_ACCOUNT);
+        } catch (ActivityNotFoundException e) {
+            String msg = getString(R.string.google_acct_not_available);
+            Log.e(TAG, msg, e);
+            PasswdSafeUtil.showErrorMsg(msg, this);
+        }
     }
 
 
