@@ -56,7 +56,6 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Pair;
@@ -224,7 +223,7 @@ public class PasswdFileData
         if (errMsg != 0) {
             String msg = context.getString(R.string.cannot_delete_record,
                                            context.getString(errMsg));
-            PasswdSafeApp.showErrorMsg(msg, context);
+            PasswdSafeUtil.showErrorMsg(msg, context);
             return false;
         }
         return true;

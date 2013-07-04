@@ -17,13 +17,10 @@ import org.pwsafe.lib.file.PwsFile;
 
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -388,23 +385,6 @@ public class PasswdSafeApp extends Application
         }
         return builder.toString();
 
-    }
-
-    public static void showErrorMsg(String msg, Context context)
-    {
-        AlertDialog.Builder dlg = new AlertDialog.Builder(context)
-        .setTitle(PasswdSafeUtil.getAppTitle(context) + " - " +
-                  context.getString(R.string.error))
-        .setMessage(msg)
-        .setCancelable(true)
-        .setNeutralButton(R.string.close, new OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-            }
-        });
-        dlg.show();
     }
 
     private synchronized final

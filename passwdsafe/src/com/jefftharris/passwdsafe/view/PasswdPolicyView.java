@@ -20,7 +20,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -170,7 +169,7 @@ public class PasswdPolicyView extends LinearLayout
             try {
                 passwd = itsPolicy.generate();
             } catch (Exception e) {
-                PasswdSafeApp.showErrorMsg(e.toString(), getContext());
+                PasswdSafeUtil.showErrorMsg(e.toString(), getContext());
             }
         }
         itsGeneratedPasswd.setText(passwd);

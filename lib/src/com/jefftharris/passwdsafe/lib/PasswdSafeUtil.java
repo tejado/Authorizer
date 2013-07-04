@@ -15,6 +15,7 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
@@ -155,6 +156,23 @@ public class PasswdSafeUtil
              copyTrace ? R.string.copy_trace_and_close : R.string.close,
              dlgClick)
         .setOnCancelListener(dlgClick);
+        dlg.show();
+    }
+
+    public static void showErrorMsg(String msg, Context context)
+    {
+        AlertDialog.Builder dlg = new AlertDialog.Builder(context)
+        .setTitle(PasswdSafeUtil.getAppTitle(context) + " - " +
+                  context.getString(R.string.error))
+        .setMessage(msg)
+        .setCancelable(true)
+        .setNeutralButton(R.string.close, new OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dialog.dismiss();
+            }
+        });
         dlg.show();
     }
 

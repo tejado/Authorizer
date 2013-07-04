@@ -24,9 +24,9 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-import com.jefftharris.passwdsafe.PasswdSafeApp;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 
 /**
@@ -291,8 +291,8 @@ public class PasswdPolicyEditDialog
             try {
                 passwd = policy.generate();
             } catch (Exception e) {
-                PasswdSafeApp.showErrorMsg(e.toString(),
-                                           itsView.getContext());
+                PasswdSafeUtil.showErrorMsg(e.toString(),
+                                            itsView.getContext());
             }
         }
         TextView tv = (TextView)itsView.findViewById(R.id.generated_passwd);
