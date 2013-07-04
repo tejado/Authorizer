@@ -359,48 +359,81 @@ public class PasswdFileUri
             if (itsSyncType != null) {
                 break;
             }
-            ContentResolver cr = context.getContentResolver();
-            Cursor fileCursor = cr.query(itsUri,
-                                         PasswdSafeContract.Files.PROJECTION,
-                                         null, null, null);
-            Cursor providerCursor = null;
-            try {
-                if ((fileCursor == null) || !fileCursor.moveToFirst()) {
-                    break;
-                }
-                String title = fileCursor.getString(
-                        PasswdSafeContract.Files.PROJECTION_IDX_TITLE);
-                long provider = fileCursor.getLong(
-                        PasswdSafeContract.Files.PROJECTION_IDX_PROVIDER);
 
-                Uri providerUri = ContentUris.withAppendedId(
-                        PasswdSafeContract.Providers.CONTENT_URI, provider);
-                providerCursor = cr.query(
-                        providerUri,
-                        PasswdSafeContract.Providers.PROJECTION,
-                        null, null, null);
-                if ((providerCursor == null) || !providerCursor.moveToFirst()) {
-                    break;
+            long providerId = -1;
+            boolean isFile = false;
+            switch (PasswdSafeContract.MATCHER.match(itsUri)) {
+            case PasswdSafeContract.MATCH_PROVIDER:
+            case PasswdSafeContract.MATCH_PROVIDER_FILES: {
+                providerId = Long.valueOf(itsUri.getPathSegments().get(1));
+                break;
+            }
+            case PasswdSafeContract.MATCH_PROVIDER_FILE: {
+                providerId = Long.valueOf(itsUri.getPathSegments().get(1));
+                isFile = true;
+                break;
+            }
+            }
+
+            if (providerId != -1) {
+                ContentResolver cr = context.getContentResolver();
+                resolveSyncProvider(providerId, cr);
+                if (isFile) {
+                    resolveSyncFile(cr);
                 }
+            }
+            break;
+        }
+        }
+    }
+
+
+    /** Resolve sync provider information */
+    private void resolveSyncProvider(long providerId,
+                                     ContentResolver cr)
+    {
+        Uri providerUri = ContentUris.withAppendedId(
+                PasswdSafeContract.Providers.CONTENT_URI, providerId);
+        Cursor providerCursor = cr.query(
+                providerUri,
+                PasswdSafeContract.Providers.PROJECTION,
+                null, null, null);
+        try {
+            if ((providerCursor != null) && providerCursor.moveToFirst()) {
                 String typeStr = providerCursor.getString(
                         PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
                 try {
                     itsSyncType =
                             PasswdSafeContract.Providers.Type.valueOf(typeStr);
-                    itsTitle = title;
+                    itsTitle = providerCursor.getString(
+                            PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
                 } catch (IllegalArgumentException e) {
                     Log.e(TAG, "Unknown provider type: " + typeStr);
                 }
-            } finally {
-                if (providerCursor != null) {
-                    providerCursor.close();
-                }
-                if (fileCursor != null) {
-                    fileCursor.close();
-                }
             }
-            break;
+        } finally {
+            if (providerCursor != null) {
+                providerCursor.close();
+            }
         }
+    }
+
+
+    /** Resolve sync file information */
+    private void resolveSyncFile(ContentResolver cr)
+    {
+        Cursor fileCursor = cr.query(itsUri,
+                                     PasswdSafeContract.Files.PROJECTION,
+                                     null, null, null);
+        try {
+            if ((fileCursor != null) && fileCursor.moveToFirst()) {
+                itsTitle = fileCursor.getString(
+                        PasswdSafeContract.Files.PROJECTION_IDX_TITLE);
+            }
+        } finally {
+            if (fileCursor != null) {
+                fileCursor.close();
+            }
         }
     }
 
