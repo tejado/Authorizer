@@ -24,7 +24,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
@@ -44,13 +43,6 @@ public class PasswdSafeProvider extends ContentProvider
 {
     private static final String TAG = "PasswdSafeProvider";
 
-    private static final UriMatcher MATCHER;
-    private static final int MATCH_PROVIDERS = 1;
-    private static final int MATCH_PROVIDER = 2;
-    private static final int MATCH_PROVIDER_FILES = 3;
-    private static final int MATCH_PROVIDER_FILE = 4;
-    private static final int MATCH_SYNC_LOGS = 5;
-
     private static final HashMap<String, String> PROVIDERS_MAP;
     private static final HashMap<String, String> FILES_MAP;
     private static final HashMap<String, String> SYNC_LOGS_MAP;
@@ -59,25 +51,6 @@ public class PasswdSafeProvider extends ContentProvider
     private OnAccountsUpdateListener itsListener;
 
     static {
-        MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
-                       PasswdSafeContract.Providers.TABLE,
-                       MATCH_PROVIDERS);
-        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
-                       PasswdSafeContract.Providers.TABLE + "/#",
-                       MATCH_PROVIDER);
-        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
-                       PasswdSafeContract.Providers.TABLE + "/#/" +
-                               PasswdSafeContract.Files.TABLE,
-                       MATCH_PROVIDER_FILES);
-        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
-                       PasswdSafeContract.Providers.TABLE + "/#/" +
-                               PasswdSafeContract.Files.TABLE + "/#",
-                       MATCH_PROVIDER_FILE);
-        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
-                       PasswdSafeContract.SyncLogs.TABLE,
-                       MATCH_SYNC_LOGS);
-
         PROVIDERS_MAP = new HashMap<String, String>();
         PROVIDERS_MAP.put(PasswdSafeContract.Providers._ID,
                           SyncDb.DB_COL_PROVIDERS_ID);
@@ -133,8 +106,8 @@ public class PasswdSafeProvider extends ContentProvider
             throw new IllegalArgumentException("selectionArgs not supported");
         }
 
-        switch (MATCHER.match(uri)) {
-        case MATCH_PROVIDER: {
+        switch (PasswdSafeContract.MATCHER.match(uri)) {
+        case PasswdSafeContract.MATCH_PROVIDER: {
             PasswdSafeUtil.dbginfo(TAG, "Delete provider: %s", uri);
             Long id = Long.valueOf(uri.getPathSegments().get(1));
             SQLiteDatabase db = itsDb.getDb();
@@ -156,7 +129,7 @@ public class PasswdSafeProvider extends ContentProvider
                 db.endTransaction();
             }
         }
-        case MATCH_PROVIDER_FILE: {
+        case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             PasswdSafeUtil.dbginfo(TAG, "Delete file: %s", uri);
             SQLiteDatabase db = itsDb.getDb();
             try {
@@ -192,20 +165,20 @@ public class PasswdSafeProvider extends ContentProvider
     @Override
     public String getType(Uri uri)
     {
-        switch (MATCHER.match(uri)) {
-        case MATCH_PROVIDERS: {
+        switch (PasswdSafeContract.MATCHER.match(uri)) {
+        case PasswdSafeContract.MATCH_PROVIDERS: {
             return PasswdSafeContract.Providers.CONTENT_TYPE;
         }
-        case MATCH_PROVIDER: {
+        case PasswdSafeContract.MATCH_PROVIDER: {
             return PasswdSafeContract.Providers.CONTENT_ITEM_TYPE;
         }
-        case MATCH_PROVIDER_FILES: {
+        case PasswdSafeContract.MATCH_PROVIDER_FILES: {
             return PasswdSafeContract.Files.CONTENT_TYPE;
         }
-        case MATCH_PROVIDER_FILE: {
+        case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             return PasswdSafeContract.Files.CONTENT_ITEM_TYPE;
         }
-        case MATCH_SYNC_LOGS: {
+        case PasswdSafeContract.MATCH_SYNC_LOGS: {
             return PasswdSafeContract.SyncLogs.CONTENT_TYPE;
         }
         default: {
@@ -221,8 +194,8 @@ public class PasswdSafeProvider extends ContentProvider
     @Override
     public Uri insert(Uri uri, ContentValues values)
     {
-        switch (MATCHER.match(uri)) {
-        case MATCH_PROVIDERS: {
+        switch (PasswdSafeContract.MATCHER.match(uri)) {
+        case PasswdSafeContract.MATCH_PROVIDERS: {
             String acct = values.getAsString(
                     PasswdSafeContract.Providers.COL_ACCT);
             if (acct == null) {
@@ -245,7 +218,7 @@ public class PasswdSafeProvider extends ContentProvider
                 db.endTransaction();
             }
         }
-        case MATCH_PROVIDER_FILES: {
+        case PasswdSafeContract.MATCH_PROVIDER_FILES: {
             String title = values.getAsString(
                     PasswdSafeContract.Files.COL_TITLE);
             if (title == null) {
@@ -340,20 +313,20 @@ public class PasswdSafeProvider extends ContentProvider
         boolean sortOrderValid = (sortOrder == null);
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        switch (MATCHER.match(uri)) {
-        case MATCH_PROVIDERS: {
+        switch (PasswdSafeContract.MATCHER.match(uri)) {
+        case PasswdSafeContract.MATCH_PROVIDERS: {
             qb.setTables(SyncDb.DB_TABLE_PROVIDERS);
             qb.setProjectionMap(PROVIDERS_MAP);
             break;
         }
-        case MATCH_PROVIDER: {
+        case PasswdSafeContract.MATCH_PROVIDER: {
             qb.setTables(SyncDb.DB_TABLE_PROVIDERS);
             qb.setProjectionMap(PROVIDERS_MAP);
             selection = SyncDb.DB_MATCH_PROVIDERS_ID;
             selectionArgs = new String[] { uri.getPathSegments().get(1) };
             break;
         }
-        case MATCH_PROVIDER_FILES: {
+        case PasswdSafeContract.MATCH_PROVIDER_FILES: {
             qb.setTables(SyncDb.DB_TABLE_FILES);
             qb.setProjectionMap(FILES_MAP);
 
@@ -373,14 +346,14 @@ public class PasswdSafeProvider extends ContentProvider
             }
             break;
         }
-        case MATCH_PROVIDER_FILE: {
+        case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             qb.setTables(SyncDb.DB_TABLE_FILES);
             qb.setProjectionMap(FILES_MAP);
             selection = SyncDb.DB_MATCH_FILES_ID;
             selectionArgs = new String[] { uri.getPathSegments().get(3) };
             break;
         }
-        case MATCH_SYNC_LOGS: {
+        case PasswdSafeContract.MATCH_SYNC_LOGS: {
             qb.setTables(SyncDb.DB_TABLE_SYNC_LOGS);
             qb.setProjectionMap(SYNC_LOGS_MAP);
             if (PasswdSafeContract.SyncLogs.START_SORT_ORDER.equals(sortOrder)) {
@@ -422,8 +395,8 @@ public class PasswdSafeProvider extends ContentProvider
                       String selection,
                       String[] selectionArgs)
     {
-        switch (MATCHER.match(uri)) {
-        case MATCH_PROVIDER: {
+        switch (PasswdSafeContract.MATCHER.match(uri)) {
+        case PasswdSafeContract.MATCH_PROVIDER: {
             PasswdSafeUtil.dbginfo(TAG, "Update provider: %s", uri);
             Long id = Long.valueOf(uri.getPathSegments().get(1));
             SQLiteDatabase db = itsDb.getDb();
@@ -452,7 +425,7 @@ public class PasswdSafeProvider extends ContentProvider
             }
             return 1;
         }
-        case MATCH_PROVIDER_FILE: {
+        case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             long id = Long.valueOf(uri.getPathSegments().get(3));
             String updateUri =
                     values.getAsString(PasswdSafeContract.Files.COL_FILE);
@@ -529,8 +502,8 @@ public class PasswdSafeProvider extends ContentProvider
             throw new IllegalArgumentException("Invalid mode: " + mode);
         }
 
-        switch (MATCHER.match(uri)) {
-        case MATCH_PROVIDER_FILE: {
+        switch (PasswdSafeContract.MATCHER.match(uri)) {
+        case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             long id = Long.valueOf(uri.getPathSegments().get(3));
             SyncDb.DbFile file = itsDb.getFile(id);
             if ((file == null) || (file.itsLocalFile == null)) {

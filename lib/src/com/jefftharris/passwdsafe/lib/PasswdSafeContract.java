@@ -8,6 +8,7 @@ package com.jefftharris.passwdsafe.lib;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.UriMatcher;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.widget.ImageView;
@@ -26,6 +27,34 @@ public final class PasswdSafeContract
     /** The base URI for the provider */
     public static final Uri CONTENT_URI =
         Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + AUTHORITY);
+
+    public static final UriMatcher MATCHER;
+    public  static final int MATCH_PROVIDERS = 1;
+    public static final int MATCH_PROVIDER = 2;
+    public static final int MATCH_PROVIDER_FILES = 3;
+    public static final int MATCH_PROVIDER_FILE = 4;
+    public static final int MATCH_SYNC_LOGS = 5;
+
+    static {
+        MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE,
+                       MATCH_PROVIDERS);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE + "/#",
+                       MATCH_PROVIDER);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE + "/#/" +
+                               PasswdSafeContract.Files.TABLE,
+                       MATCH_PROVIDER_FILES);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE + "/#/" +
+                               PasswdSafeContract.Files.TABLE + "/#",
+                       MATCH_PROVIDER_FILE);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.SyncLogs.TABLE,
+                       MATCH_SYNC_LOGS);
+    }
 
     /** The table of providers */
     public static final class Providers implements BaseColumns
