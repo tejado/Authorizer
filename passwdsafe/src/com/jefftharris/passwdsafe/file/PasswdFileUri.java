@@ -35,6 +35,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -47,7 +49,7 @@ import com.jefftharris.passwdsafe.pref.FileBackupPref;
 /**
  * The PasswdFileUri class encapsulates a URI to a password file
  */
-public class PasswdFileUri
+public class PasswdFileUri implements Parcelable
 {
     private static final String TAG = "PasswdFileUri";
 
@@ -65,6 +67,31 @@ public class PasswdFileUri
         EMAIL,
         GENERIC_PROVIDER
     }
+
+
+    /** Parcelable CREATOR instance */
+    public static final Parcelable.Creator<PasswdFileUri> CREATOR =
+            new Parcelable.Creator<PasswdFileUri>()
+            {
+                /* (non-Javadoc)
+                 * @see android.os.Parcelable.Creator#createFromParcel(android.os.Parcel)
+                 */
+                @Override
+                public PasswdFileUri createFromParcel(Parcel source)
+                {
+                    return new PasswdFileUri(source);
+                }
+
+                /* (non-Javadoc)
+                 * @see android.os.Parcelable.Creator#newArray(int)
+                 */
+                @Override
+                public PasswdFileUri[] newArray(int size)
+                {
+                    return new PasswdFileUri[size];
+                }
+            };
+
 
     /** Constructor */
     public PasswdFileUri(Uri uri, Context ctx)
@@ -97,6 +124,22 @@ public class PasswdFileUri
         itsUri = Uri.fromFile(file);
         itsType = Type.FILE;
         itsFile = file;
+    }
+
+
+    /** Constructor from parcelable data */
+    private PasswdFileUri(Parcel source)
+    {
+        itsUri = source.readParcelable(null);
+        itsType = Type.valueOf(source.readString());
+        itsFile = new File(source.readString());
+        itsTitle = source.readString();
+        String str = source.readString();
+        if (str != null) {
+            itsSyncType = PasswdSafeContract.Providers.Type.valueOf(str);
+        } else {
+            itsSyncType = null;
+        }
     }
 
 
@@ -343,6 +386,30 @@ public class PasswdFileUri
     public String toString()
     {
         return itsUri.toString();
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.os.Parcelable#describeContents()
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.os.Parcelable#writeToParcel(android.os.Parcel, int)
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeParcelable(itsUri, flags);
+        dest.writeString(itsType.name());
+        dest.writeString(itsFile.getAbsolutePath());
+        dest.writeString(itsTitle);
+        dest.writeString((itsSyncType != null) ? itsSyncType.name() : null);
     }
 
 

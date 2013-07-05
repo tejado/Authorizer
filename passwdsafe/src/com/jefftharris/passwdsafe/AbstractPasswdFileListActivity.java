@@ -14,6 +14,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.os.Bundle;
 
 public abstract class AbstractPasswdFileListActivity extends ListActivity
     implements PasswdFileActivity
@@ -21,11 +22,36 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     private static final String TAG = "AbstractPasswdFileListActivity";
 
     private static final int DIALOG_SAVE_PROGRESS = 0;
+
+    private static final String SAVED_URI = "saved_uri";
+
     protected static final int MAX_DIALOG = DIALOG_SAVE_PROGRESS;
 
     private PasswdFileUri itsUri;
     private ActivityPasswdFile itsPasswdFile;
 
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            itsUri = savedInstanceState.getParcelable(SAVED_URI);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(SAVED_URI, itsUri);
+    }
 
     /** Get the PasswdSafeApp */
     protected final PasswdSafeApp getPasswdSafeApp()

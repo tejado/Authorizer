@@ -173,6 +173,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     protected void onPause()
     {
         removeDialog(DIALOG_GET_PASSWD);
+        removeDialog(DIALOG_DETAILS);
         if (itsLoadTask != null) {
             itsLoadTask.cancel(true);
         }
