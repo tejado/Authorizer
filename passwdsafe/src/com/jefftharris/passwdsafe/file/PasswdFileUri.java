@@ -407,7 +407,7 @@ public class PasswdFileUri implements Parcelable
     {
         dest.writeParcelable(itsUri, flags);
         dest.writeString(itsType.name());
-        dest.writeString(itsFile.getAbsolutePath());
+        dest.writeString((itsFile != null) ? itsFile.getAbsolutePath() : null);
         dest.writeString(itsTitle);
         dest.writeString((itsSyncType != null) ? itsSyncType.name() : null);
     }
