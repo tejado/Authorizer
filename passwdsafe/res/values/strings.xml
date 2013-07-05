@@ -143,7 +143,6 @@
     <string name="parent_directory">Parent Directory</string>
     <string name="parent_group">Parent Group</string>
     <string name="password">Password</string>
-    <string name="password_and_confirm">Password /\nConfirm</string>
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_expiration">Password Expiration</string>
     <string name="password_expiration_in_past">Password expiration is in the past</string>

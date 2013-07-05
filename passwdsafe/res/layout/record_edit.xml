@@ -132,26 +132,26 @@
 
                     <TextView
                         style="@style/TableLabelColumn"
-                        android:layout_height="fill_parent"
-                        android:gravity="center_vertical"
-                        android:text="@string/password_and_confirm"/>
+                        android:text="@string/password"/>
 
-                    <LinearLayout android:orientation="horizontal"
-                                  android:layout_width="fill_parent"
-                                  android:layout_height="wrap_content">
-                        <EditText android:id="@+id/password"
-                                  android:singleLine="true"
-                                  android:inputType="textPassword"
-                                  android:layout_weight="1"
-                                  android:layout_width="fill_parent"
-                                  android:layout_height="wrap_content"/>
-                        <EditText android:id="@+id/password_confirm"
-                                  android:singleLine="true"
-                                  android:inputType="textPassword"
-                                  android:layout_weight="1"
-                                  android:layout_width="fill_parent"
-                                  android:layout_height="wrap_content"/>
-                    </LinearLayout>
+                    <EditText android:id="@+id/password"
+                              android:singleLine="true"
+                              android:inputType="textPassword"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/password_confirm_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/confirm"/>
+
+                    <EditText android:id="@+id/password_confirm"
+                              android:singleLine="true"
+                              android:inputType="textPassword"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
                 </TableRow>
 
                 <TableRow

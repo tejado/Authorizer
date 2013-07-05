@@ -144,7 +144,6 @@
     <string name="parent_directory">Répertoire parent</string>
     <string name="parent_group">Groupe parent</string>
     <string name="password">Mot de passe</string>
-    <string name="password_and_confirm">Mot de passe /\nConfirmation</string>
     <string name="password_encoding_label">Encodage mot de passe:</string>
     <string name="password_expiration">Expiration mot de passe</string>
     <string name="password_file">Fichier mot de passe</string>

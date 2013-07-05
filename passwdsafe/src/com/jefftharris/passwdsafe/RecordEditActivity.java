@@ -745,6 +745,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
         }
         setVisibility(R.id.password_row, itsTypeHasNormalPassword);
+        setVisibility(R.id.password_confirm_row, itsTypeHasNormalPassword);
         setVisibility(R.id.password_link_row, !itsTypeHasNormalPassword);
         if (passwordLinkLabel != 0) {
             TextView tv = (TextView)findViewById(R.id.password_link_label);
