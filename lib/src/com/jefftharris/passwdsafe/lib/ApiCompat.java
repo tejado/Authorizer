@@ -10,6 +10,8 @@ package com.jefftharris.passwdsafe.lib;
 import android.accounts.Account;
 import android.content.Context;
 import android.net.Uri;
+import android.view.Window;
+import android.view.WindowManager;
 
 /**
  * The ApiCompat class provides a compatibility interface for different Android
@@ -44,6 +46,21 @@ public final class ApiCompat
             ApiCompatEclair.requestManualSync(acct, uri.getAuthority());
         } else {
             ApiCompatCupcake.requestManualSync(uri, ctx);
+        }
+    }
+
+
+    /** Set whether the window is visible in the recent apps list */
+    public static void setRecentAppsVisible(Window w, boolean visible)
+    {
+        /* The screen appears garbled before honeycomb, and the screenshot
+         * feature started with honeycomb */
+        if (SDK_VERSION >= SDK_HONEYCOMB) {
+            if (visible) {
+                w.clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            } else {
+                w.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+            }
         }
     }
 }

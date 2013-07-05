@@ -12,6 +12,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 
 public abstract class AbstractRecordActivity extends Activity
     implements PasswdFileActivity
@@ -84,6 +85,7 @@ public abstract class AbstractRecordActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         itsHelper.onCreate(savedInstanceState);
+        ApiCompat.setRecentAppsVisible(getWindow(), false);
     }
 
     /* (non-Javadoc)

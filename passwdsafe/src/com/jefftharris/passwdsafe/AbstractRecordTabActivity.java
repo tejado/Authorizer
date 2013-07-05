@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -72,6 +73,7 @@ public class AbstractRecordTabActivity extends TabActivity implements
     {
         super.onCreate(savedInstanceState);
         itsHelper.onCreate(savedInstanceState);
+        ApiCompat.setRecentAppsVisible(getWindow(), false);
     }
 
     /* (non-Javadoc)
