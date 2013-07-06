@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Version code format for version x.y.z and API base a: aaxxyyzz
+    If the API base is 3, a is blank and so is the first x.
+    E.g. 3.6.0 for API 3 is 30600 and API 11 is 11030600.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.jefftharris.passwdsafe"
+    android:installLocation="auto"
+    android:versionCode="40004"
+    android:versionName="4.0.4">
+
+    <uses-sdk
+        android:minSdkVersion="4"
+        android:targetSdkVersion="11"/>
+
+    <permission
+        android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"/>
+    <uses-permission android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"/>
+
+    <application
+        android:name="PasswdSafeApp"
+        android:allowBackup="true"
+        android:description="@string/app_desc"
+        android:icon="@drawable/ic_launcher_passwdsafe"
+        android:label="@string/app_name">
+        <activity
+            android:name=".FileListActivity"
+            android:clearTaskOnLaunch="true"
+            android:finishOnTaskLaunch="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".PasswdSafe"
+            android:finishOnTaskLaunch="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            tools:ignore="ExportedActivity">
+            <intent-filter>
+                <action android:name="com.jefftharris.passwdsafe.action.NEW"/>
+                <action android:name="com.jefftharris.passwdsafe.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="file"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.jefftharris.passwdsafe.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="content"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.com.jefftharris.passwdsafe.sync.provider.files"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.jefftharris.passwdsafe.action.NEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="content"/>
+                <data android:mimeType="vnd.android.cursor.dir/vnd.com.jefftharris.passwdsafe.sync.provider.files"/>
+            </intent-filter>
+
+            <!-- Dropbox, Astro -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="*"
+                    android:scheme="file"/>
+
+                <!-- Handle some number of '.'s in the path -->
+                <data android:pathPattern=".*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak"/>
+                <data android:mimeType="*/*"/>
+                <data android:mimeType="application/octet-stream"/>
+                <data android:mimeType="application/x-ibak"/>
+                <data android:mimeType="application/x-psafe"/>
+                <data android:mimeType="application/x-psafe3"/>
+                <data android:mimeType="application/application/octet-string"/>
+                <data android:mimeType="application/application/x-ibak"/>
+                <data android:mimeType="application/application/x-psafe"/>
+                <data android:mimeType="application/application/x-psafe3"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="*"
+                    android:scheme="file"/>
+                <!-- Handle some number of '.'s in the path -->
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
+                <data android:mimeType="application/x-ns-proxy-autoconfig"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="*"
+                    android:scheme="file"/>
+                <!-- Handle some number of '.'s in the path -->
+                <data android:pathPattern=".*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak"/>
+            </intent-filter>
+
+            <!-- Content providers - e.g. mail app attachments -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:scheme="content"/>
+                <data android:mimeType="application/psafe3"/>
+                <data android:mimeType="application/psafe"/>
+                <data android:mimeType="application/dat"/>
+                <data android:mimeType="application/x-psafe3"/>
+                <data android:mimeType="application/x-psafe"/>
+                <data android:mimeType="application/x-dat"/>
+                <data android:mimeType="application/octet-stream"/>
+            </intent-filter>
+
+            <!-- Search -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
+        <activity
+            android:name=".PasswdPolicyActivity"
+            android:finishOnTaskLaunch="true"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".Preferences"
+            android:finishOnTaskLaunch="true"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".RecordEditActivity"
+            android:finishOnTaskLaunch="true"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".RecordView"
+            android:finishOnTaskLaunch="true"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".RecordSelectionActivity"
+            android:finishOnTaskLaunch="true"
+            android:label="@string/password_record"
+            android:theme="@android:style/Theme.Dialog"/>
+        <activity
+            android:name=".LauncherFileShortcuts"
+            android:label="@string/password_file"
+            android:theme="@android:style/Theme.Dialog"
+            tools:ignore="ExportedActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LauncherRecordShortcuts"
+            android:label="@string/password_record"
+            android:theme="@android:style/Theme.Dialog"
+            tools:ignore="ExportedActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <provider android:name=".file.PasswdClientProvider"
+            android:authorities="com.jefftharris.passwdsafe.client.provider"
+            android:permission="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"
+            android:exported="true"
+            android:syncable="false">
+        </provider>
+
+        <receiver
+            android:name=".ExpirationTimeoutReceiver"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.jefftharris.passwdsafe.action.EXPIRATION_TIMEOUT"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".PasswdSafeApp$FileTimeoutReceiver"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.jefftharris.passwdsafe.action.FILE_TIMEOUT"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".StartupReceiver"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:orientation="vertical"
+              android:padding="10sp"
+              >
+    <TextView android:id="@+id/file"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              />
+    <TextView android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/password_label"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              />
+    <EditText android:id="@+id/passwd_edit"
+              android:layout_height="wrap_content"
+              android:layout_width="fill_parent"
+              android:scrollHorizontally="true"
+              android:gravity="fill_horizontal"
+              android:inputType="textPassword"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:singleLine="true"
+              android:imeOptions="actionGo"
+              >
+        <requestFocus />
+    </EditText>
+    <CheckBox android:id="@+id/read_only"
+              android:layout_height="wrap_content"
+              android:layout_width="fill_parent"
+              android:text="@string/read_only"
+              />
+</LinearLayout>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="account_label">Account: %1$s</string>
+    <string name="account_not_exists_label">Account: %1$s (does not exist)</string>
+    <string name="adding_account">Adding account&#8230;</string>
+    <string name="app_desc">Sync PasswordSafe databases from cloud services</string>
+    <string name="app_name">PasswdSafe Sync</string>
+    <string name="automatic">automatic</string>
+    <string name="choose_account">Choose Account</string>
+    <string name="clear">Clear</string>
+    <string name="full_sync">Full sync</string>
+    <string name="google_acct_not_available">Google account not available</string>
+    <string name="incremental_sync">Incremental sync</string>
+    <string name="logs">Logs</string>
+    <string name="manual">manual</string>
+    <string name="no_logs">No logs</string>
+    <string name="open">Open</string>
+    <string name="passwdsafe">PasswdSafe</string>
+    <string name="remove_account">Remove account?</string>
+    <string name="removing_account">Removing account&#8230;</string>
+    <string name="show_all">Show All</string>
+    <string name="sync">Sync</string>
+    <string name="sync_interval_label">Sync interval:</string>
+    <string name="sync_log_record">Sync %1$s, %2$s, %3$s, start: %4$tc, end: %5$tc</string>
+    <string name="sync_oper_local_to_remote">Upload file: %1$s</string>
+    <string name="sync_oper_remote_to_local">Download file: %1$s</string>
+    <string name="sync_oper_rmfile">Remove file: %1$s</string>
+    <string name="sync_oper_rmfile_local">Remove local file: %1$s</string>
+    <string name="sync_oper_rmfile_remote">Remove remote file: %1$s</string>
+    <string name="updating_account">Updating account&#8230;</string>
+
+    <string-array name="interval_array">
+        <item>None</item>
+        <item>15 Minutes</item>
+        <item>30 Minutes</item>
+        <item>1 Hour</item>
+        <item>1 Day</item>
+    </string-array>
+
+</resources>
