@@ -58,9 +58,9 @@ public class GDriveSyncer
 
     private final Context itsContext;
     private final Account itsAccount;
-    private final Drive itsDrive;
-    private final String itsDriveToken;
     private final SyncDb itsSyncDb;
+    private Drive itsDrive;
+    private String itsDriveToken;
 
     /** Constructor */
     public GDriveSyncer(Context context,
@@ -69,9 +69,6 @@ public class GDriveSyncer
     {
         itsContext = context;
         itsAccount = account;
-        Pair<Drive, String> driveInfo = getDriveService();
-        itsDrive = driveInfo.first;
-        itsDriveToken = driveInfo.second;
         itsSyncDb = new SyncDb(itsContext);
     }
 
@@ -204,42 +201,54 @@ public class GDriveSyncer
     /** Perform synchronization */
     public void performSync(boolean manual)
     {
+        PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s, manual: %b",
+                               itsAccount.name, manual);
+
+        /** Check if the syncing account is a valid provider */
+        SQLiteDatabase db = itsSyncDb.getDb();
+        SyncDb.DbProvider provider = null;
+        try {
+            db.beginTransaction();
+            provider = SyncDb.getProvider(itsAccount.name, db);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        if (provider == null) {
+            PasswdSafeUtil.dbginfo(TAG, "No provider for %s", itsAccount.name);
+            return;
+        }
+
+        Pair<Drive, String> driveInfo = getDriveService();
+        itsDrive = driveInfo.first;
+        itsDriveToken = driveInfo.second;
         if (itsDrive == null) {
             return;
         }
 
-        PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s, manual: %b",
-                               itsAccount.name, manual);
         SyncLogRecord logrec = new SyncLogRecord(itsAccount.name, manual);
 
         try {
-            SQLiteDatabase db = itsSyncDb.getDb();
             List<GDriveSyncOper> opers = null;
             try {
                 db.beginTransaction();
-                SyncDb.DbProvider provider = SyncDb.getProvider(itsAccount.name,
-                                                                db);
-                if (provider != null) {
-                    long changeId = provider.itsSyncChange;
-                    PasswdSafeUtil.dbginfo(TAG, "largest change %d", changeId);
-                    Pair<Long, List<GDriveSyncOper>> syncrc;
-                    if (changeId == -1) {
-                        logrec.setFullSync(true);
-                        syncrc = performFullSync(provider, db);
-                    } else {
-                        logrec.setFullSync(false);
-                        syncrc = performSyncSince(provider, changeId, db);
-                    }
-                    long newChangeId = syncrc.first;
-                    opers = syncrc.second;
-                    if (changeId != newChangeId) {
-                        SyncDb.updateProviderSyncChange(provider, newChangeId,
-                                                        db);
-                    }
+                long changeId = provider.itsSyncChange;
+                PasswdSafeUtil.dbginfo(TAG, "largest change %d", changeId);
+                Pair<Long, List<GDriveSyncOper>> syncrc;
+                if (changeId == -1) {
+                    logrec.setFullSync(true);
+                    syncrc = performFullSync(provider, db);
                 } else {
-                    validateAccounts(db, itsContext);
+                    logrec.setFullSync(false);
+                    syncrc = performSyncSince(provider, changeId, db);
                 }
-
+                long newChangeId = syncrc.first;
+                opers = syncrc.second;
+                if (changeId != newChangeId) {
+                    SyncDb.updateProviderSyncChange(provider, newChangeId,
+                                                    db);
+                }
                 db.setTransactionSuccessful();
             } finally {
                 db.endTransaction();
@@ -280,7 +289,6 @@ public class GDriveSyncer
         PasswdSafeUtil.dbginfo(TAG, "Sync finished for %s", itsAccount.name);
         logrec.setEndTime();
 
-        SQLiteDatabase db = itsSyncDb.getDb();
         try {
             db.beginTransaction();
             Log.i(TAG, logrec.toString(itsContext));
