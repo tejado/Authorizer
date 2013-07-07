@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 
 /**
@@ -121,8 +122,7 @@ public class SyncProviderFragment extends ListFragment
 
                 try {
                     String typeStr = cursor.getString(colIdx);
-                    PasswdSafeContract.Providers.Type type =
-                            PasswdSafeContract.Providers.Type.valueOf(typeStr);
+                    ProviderType type = ProviderType.valueOf(typeStr);
                     switch (id) {
                     case android.R.id.text2: {
                         type.setText((TextView)view);

@@ -45,6 +45,7 @@ import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 
 public class MainActivity extends FragmentActivity
         implements LoaderCallbacks<Cursor>
@@ -253,8 +254,7 @@ public class MainActivity extends FragmentActivity
             String typeStr = cursor.getString(
                     PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
             try {
-                PasswdSafeContract.Providers.Type type =
-                        PasswdSafeContract.Providers.Type.valueOf(typeStr);
+                ProviderType type = ProviderType.valueOf(typeStr);
                 switch (type) {
                 case GDRIVE: {
                     hasGdrive = true;

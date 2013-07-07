@@ -20,6 +20,7 @@ import android.provider.BaseColumns;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 
 /**
  * The SyncDb encapsulates the synchronization database
@@ -172,8 +173,7 @@ public class SyncDb
         throws SQLException
     {
         ContentValues values = new ContentValues();
-        values.put(DB_COL_PROVIDERS_TYPE,
-                   PasswdSafeContract.Providers.Type.GDRIVE.toString());
+        values.put(DB_COL_PROVIDERS_TYPE, ProviderType.GDRIVE.toString());
         values.put(DB_COL_PROVIDERS_ACCT, name);
         values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
         values.put(DB_COL_PROVIDERS_SYNC_FREQ, freq);
@@ -226,9 +226,7 @@ public class SyncDb
     {
         return getProvider(
                 DB_MATCH_PROVIDERS_TYPE_ACCT,
-                new String[] {
-                        PasswdSafeContract.Providers.Type.GDRIVE.toString(),
-                        acctName },
+                new String[] { ProviderType.GDRIVE.toString(), acctName },
                 db);
     }
 

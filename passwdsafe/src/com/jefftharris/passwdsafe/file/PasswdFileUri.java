@@ -44,6 +44,7 @@ import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 
 /**
@@ -57,7 +58,7 @@ public class PasswdFileUri implements Parcelable
     private final Type itsType;
     private final File itsFile;
     private String itsTitle = null;
-    private PasswdSafeContract.Providers.Type itsSyncType = null;
+    private ProviderType itsSyncType = null;
 
     /** The type of URI */
     public enum Type
@@ -136,7 +137,7 @@ public class PasswdFileUri implements Parcelable
         itsTitle = source.readString();
         String str = source.readString();
         if (str != null) {
-            itsSyncType = PasswdSafeContract.Providers.Type.valueOf(str);
+            itsSyncType = ProviderType.valueOf(str);
         } else {
             itsSyncType = null;
         }
@@ -333,7 +334,7 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Get the sync type of the URI */
-    public PasswdSafeContract.Providers.Type getSyncType()
+    public ProviderType getSyncType()
     {
         return itsSyncType;
     }
@@ -470,8 +471,7 @@ public class PasswdFileUri implements Parcelable
                 String typeStr = providerCursor.getString(
                         PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
                 try {
-                    itsSyncType =
-                            PasswdSafeContract.Providers.Type.valueOf(typeStr);
+                    itsSyncType = ProviderType.valueOf(typeStr);
                     itsTitle = providerCursor.getString(
                             PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
                 } catch (IllegalArgumentException e) {

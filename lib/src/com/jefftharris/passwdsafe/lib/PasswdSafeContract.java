@@ -7,12 +7,9 @@
 package com.jefftharris.passwdsafe.lib;
 
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.UriMatcher;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 /**
  * The PasswdSafeContract class is the contract for the PasswdSafe client and
@@ -82,45 +79,6 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_TYPE = 1;
         public static final int PROJECTION_IDX_ACCT = 2;
         public static final int PROJECTION_IDX_SYNC_FREQ = 3;
-
-        /** The type of provider */
-        public enum Type
-        {
-            GDRIVE;
-
-            /** Set the ImageView to the icon of the provider type */
-            public void setIcon(ImageView iv)
-            {
-                switch (this) {
-                case GDRIVE: {
-                    iv.setImageResource(R.drawable.google_drive);
-                    break;
-                }
-                }
-            }
-
-            /** Set the TextView to the name of the provider type */
-            public void setText(TextView tv)
-            {
-                switch (this) {
-                case GDRIVE: {
-                    tv.setText(getName(tv.getContext()));
-                    break;
-                }
-                }
-            }
-
-            /** Get the name of the provider */
-            public String getName(Context context)
-            {
-                switch (this) {
-                case GDRIVE: {
-                    return context.getString(R.string.google_drive);
-                }
-                }
-                return null;
-            }
-        }
     }
 
     /** The table of files */
