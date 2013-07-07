@@ -118,7 +118,7 @@ public class PasswdSafeProvider extends ContentProvider
                     return 0;
                 }
 
-                GDriveSyncer.deleteProvider(provider, db, getContext(), null);
+                ProviderSyncer.deleteProvider(provider, db, getContext(), null);
                 db.setTransactionSuccessful();
                 return 1;
             } catch (Exception e) {
@@ -205,7 +205,7 @@ public class PasswdSafeProvider extends ContentProvider
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
-                long id = GDriveSyncer.addProvider(acct, db, getContext());
+                long id = ProviderSyncer.addProvider(acct, db, getContext());
                 db.setTransactionSuccessful();
 
                 return ContentUris.withAppendedId(
@@ -276,7 +276,7 @@ public class PasswdSafeProvider extends ContentProvider
                         SQLiteDatabase db = itsDb.getDb();
                         try {
                             db.beginTransaction();
-                            GDriveSyncer.validateAccounts(db, getContext());
+                            ProviderSyncer.validateAccounts(db, getContext());
                             db.setTransactionSuccessful();
                         } catch (Exception e) {
                             Log.e(TAG, "Error validating accounts", e);
@@ -412,7 +412,7 @@ public class PasswdSafeProvider extends ContentProvider
                 if ((syncFreq != null) && (provider.itsSyncFreq != syncFreq)) {
                     PasswdSafeUtil.dbginfo(TAG, "Update sync freq %d",
                                            syncFreq);
-                    GDriveSyncer.updateSyncFreq(provider, syncFreq,
+                    ProviderSyncer.updateSyncFreq(provider, syncFreq,
                                                 db, getContext());
                 }
                 db.setTransactionSuccessful();
@@ -440,7 +440,7 @@ public class PasswdSafeProvider extends ContentProvider
             }
 
             String localFileName = (file.itsLocalFile != null) ?
-                file.itsLocalFile : GDriveSyncer.getLocalFileName(id);
+                file.itsLocalFile : ProviderSyncer.getLocalFileName(id);
             File tmpFile = null;
             try {
                 Context ctx = getContext();

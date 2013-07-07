@@ -53,7 +53,7 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
         if (itsDriveFile == null) {
             itsDriveFile = getFile(itsFile.itsRemoteId, drive);
         }
-        itsLocalFileName = GDriveSyncer.getLocalFileName(itsFile.itsId);
+        itsLocalFileName = ProviderSyncer.getLocalFileName(itsFile.itsId);
         itsIsDownloaded = downloadFile(drive, ctx);
     }
 

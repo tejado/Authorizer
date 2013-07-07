@@ -46,11 +46,11 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
- *  The GDriveSyncer class syncs password files from Google Drive
+ *  The ProviderSyncer class syncs password files from Google Drive
  */
-public class GDriveSyncer
+public class ProviderSyncer
 {
-    private static final String TAG = "GDriveSyncer";
+    private static final String TAG = "ProviderSyncer";
 
     private static final String ABOUT_FIELDS = "largestChangeId";
     public static final String FILE_FIELDS =
@@ -63,7 +63,7 @@ public class GDriveSyncer
     private String itsDriveToken;
 
     /** Constructor */
-    public GDriveSyncer(Context context,
+    public ProviderSyncer(Context context,
                         ContentProviderClient provider,
                         Account account)
     {

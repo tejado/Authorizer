@@ -50,6 +50,6 @@ public abstract class GDriveSyncOper
             throws IOException
     {
         return drive.files().get(id)
-                .setFields(GDriveSyncer.FILE_FIELDS).execute();
+                .setFields(ProviderSyncer.FILE_FIELDS).execute();
     }
 }

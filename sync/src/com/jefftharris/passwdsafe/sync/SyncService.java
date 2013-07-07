@@ -11,16 +11,16 @@ import android.content.Intent;
 import android.os.IBinder;
 
 /**
- * The GDriveSyncService is a service that syncs password files from Google
- * Drive
+ * The SyncService is a service that syncs password files from various
+ * providers
  */
-public class GDriveSyncService extends Service
+public class SyncService extends Service
 {
     private static final Object itsLock = new Object();
-    private static GDriveSyncAdapter itsSyncAdapter = null;
+    private static SyncAdapter itsSyncAdapter = null;
 
     /** Constructor */
-    public GDriveSyncService()
+    public SyncService()
     {
     }
 
@@ -32,7 +32,7 @@ public class GDriveSyncService extends Service
     {
         synchronized (itsLock) {
             if (itsSyncAdapter == null) {
-                itsSyncAdapter = new GDriveSyncAdapter(getApplicationContext(),
+                itsSyncAdapter = new SyncAdapter(getApplicationContext(),
                                                        true);
             }
         }

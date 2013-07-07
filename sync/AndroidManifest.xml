@@ -55,7 +55,7 @@
         </provider>
 
         <service
-            android:name="com.jefftharris.passwdsafe.sync.GDriveSyncService"
+            android:name="com.jefftharris.passwdsafe.sync.SyncService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

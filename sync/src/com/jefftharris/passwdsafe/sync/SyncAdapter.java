@@ -17,19 +17,19 @@ import android.os.Bundle;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
- * The GDriveSyncAdapter class syncs files in a background thread
+ * The SyncAdapter class syncs files in a background thread
  */
-public class GDriveSyncAdapter extends AbstractThreadedSyncAdapter
+public class SyncAdapter extends AbstractThreadedSyncAdapter
 {
     private Context itsContext = null;
-    private static final String TAG = "GDriveSyncAdapter";
+    private static final String TAG = "SyncAdapter";
 
     /** Constructor */
-    public GDriveSyncAdapter(Context context, boolean autoInitialize)
+    public SyncAdapter(Context context, boolean autoInitialize)
     {
         super(context, autoInitialize);
         itsContext = context;
-        PasswdSafeUtil.dbginfo(TAG, "GDriveSyncAdapter ctor");
+        PasswdSafeUtil.dbginfo(TAG, "ctor");
     }
 
     /* (non-Javadoc)
@@ -44,7 +44,7 @@ public class GDriveSyncAdapter extends AbstractThreadedSyncAdapter
     {
         boolean manual = (extras != null) &&
                 extras.getBoolean(ContentResolver.SYNC_EXTRAS_MANUAL);
-        GDriveSyncer syncer = new GDriveSyncer(itsContext, provider, account);
+        ProviderSyncer syncer = new ProviderSyncer(itsContext, provider, account);
         try {
             syncer.performSync(manual);
         } finally {
