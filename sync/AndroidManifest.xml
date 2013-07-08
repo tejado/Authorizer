@@ -47,7 +47,7 @@
         <!-- Handle Google Drive file open events from the Drive app -->
         <activity
             android:name=".GDriveLaunchActivity"
-            android:label="PasswdSafe Synced File"
+            android:label="@string/passwdsafe_synced_file"
             android:exported="true">
 
             <meta-data

@@ -17,6 +17,7 @@
     <string name="no_logs">Pas de archives</string>
     <string name="open">Ouvrir</string>
     <string name="passwdsafe">PasswdSafe</string>
+    <string name="passwdsafe_synced_file">PasswdSafe fichier synchronisé</string>
     <string name="remove_account">Supprimer un compte?</string>
     <string name="removing_account">Retrait de compte&#8230;</string>
     <string name="show_all">Afficher Tout</string>
