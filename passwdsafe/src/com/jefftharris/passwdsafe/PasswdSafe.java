@@ -126,10 +126,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         GuiUtils.removeUnsupportedCenterVertical(findViewById(R.id.expiry));
 
         String action = intent.getAction();
-        if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
+        if (action.equals(PasswdSafeUtil.VIEW_INTENT) ||
             action.equals(Intent.ACTION_VIEW)) {
             onCreateView(intent);
-        } else if (action.equals(PasswdSafeApp.NEW_INTENT)) {
+        } else if (action.equals(PasswdSafeUtil.NEW_INTENT)) {
             onCreateNew(intent);
         } else {
             Log.e(TAG, "Unknown action for intent: " + intent);
@@ -144,7 +144,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
         if (intent != null) {
             String action = intent.getAction();
-            if (action.equals(PasswdSafeApp.VIEW_INTENT) ||
+            if (action.equals(PasswdSafeUtil.VIEW_INTENT) ||
                 action.equals(Intent.ACTION_VIEW)) {
                 initNewViewIntent();
                 showFileData(MOD_INIT);

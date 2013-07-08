@@ -159,10 +159,6 @@ public class PasswdSafeApp extends Application
         null;
         //Preferences.PREF_FILE_DIR_DEF + "/test.psafe3";
 
-    public static final String NEW_INTENT =
-        "com.jefftharris.passwdsafe.action.NEW";
-    public static final String VIEW_INTENT =
-        "com.jefftharris.passwdsafe.action.VIEW";
     public static final String EXPIRATION_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.EXPIRATION_TIMEOUT";
     public static final String FILE_TIMEOUT_INTENT =
@@ -295,16 +291,6 @@ public class PasswdSafeApp extends Application
         builder.fragment("");
         builder.query("");
         return new PasswdFileUri(builder.build(), ctx);
-    }
-
-    /** Create an intent to open a URI */
-    public static Intent createOpenIntent(Uri uri, String recToOpen)
-    {
-        Uri.Builder builder = uri.buildUpon();
-        if (recToOpen != null) {
-            builder.appendQueryParameter("recToOpen", recToOpen);
-        }
-        return new Intent(VIEW_INTENT, builder.build());
     }
 
     public synchronized ActivityPasswdFile accessPasswdFile

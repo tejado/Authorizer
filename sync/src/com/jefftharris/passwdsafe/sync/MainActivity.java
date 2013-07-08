@@ -73,8 +73,6 @@ public class MainActivity extends FragmentActivity
 
         itsSyncDb = new SyncDb(this);
 
-        // TODO: google drive intents to open from drive app
-
         Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
         freqSpin.setOnItemSelectedListener(new OnItemSelectedListener()
         {

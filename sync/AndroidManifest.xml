@@ -44,6 +44,23 @@
 
         <activity android:name=".SyncLogsActivity"/>
 
+        <!-- Handle Google Drive file open events from the Drive app -->
+        <activity
+            android:name=".GDriveLaunchActivity"
+            android:label="PasswdSafe Synced File"
+            android:exported="true">
+
+            <meta-data
+                android:name="com.google.android.apps.drive.APP_ID"
+                android:value="id=704216087822"/>
+
+            <intent-filter>
+                <action android:name="com.google.android.apps.drive.DRIVE_OPEN"/>
+                <data android:mimeType="application/vnd.google-apps.drive-sdk.704216087822"/>
+                <data android:mimeType="*/*"/>
+            </intent-filter>
+        </activity>
+
         <provider
             android:name=".PasswdSafeProvider"
             android:authorities="com.jefftharris.passwdsafe.sync.provider"

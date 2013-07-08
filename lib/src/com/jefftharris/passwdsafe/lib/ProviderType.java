@@ -49,4 +49,14 @@ public enum ProviderType
         }
         return null;
     }
+
+    /** Convert the string name to the ProviderType */
+    public static ProviderType fromString(String name)
+    {
+        try {
+            return ProviderType.valueOf(name);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

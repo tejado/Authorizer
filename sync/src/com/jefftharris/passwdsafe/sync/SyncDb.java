@@ -55,6 +55,9 @@ public class SyncDb
         DB_COL_FILES_ID + " = ?";
     public static final String DB_MATCH_FILES_PROVIDER_ID =
         DB_COL_FILES_PROVIDER + " = ?";
+    public static final String DB_MATCH_FILES_PROVIDER_REMOTE_ID =
+        DB_COL_FILES_PROVIDER + " = ? AND " +
+        DB_COL_FILES_REMOTE_ID + " = ?";
 
     public static final String DB_TABLE_SYNC_LOGS = "sync_logs";
     public static final String DB_COL_SYNC_LOGS_ID = BaseColumns._ID;
@@ -72,12 +75,14 @@ public class SyncDb
     public static class DbProvider
     {
         public final long itsId;
+        public final ProviderType itsType;
         public final String itsAcct;
         public final long itsSyncChange;
         public final int itsSyncFreq;
 
         public static final String[] QUERY_FIELDS = {
             DB_COL_PROVIDERS_ID,
+            DB_COL_PROVIDERS_TYPE,
             DB_COL_PROVIDERS_ACCT,
             DB_COL_PROVIDERS_SYNC_CHANGE,
             DB_COL_PROVIDERS_SYNC_FREQ };
@@ -85,9 +90,10 @@ public class SyncDb
         public DbProvider(Cursor cursor)
         {
             itsId = cursor.getLong(0);
-            itsAcct = cursor.getString(1);
-            itsSyncChange = cursor.getLong(2);
-            itsSyncFreq = cursor.getInt(3);
+            itsType = ProviderType.fromString(cursor.getString(1));
+            itsAcct = cursor.getString(2);
+            itsSyncChange = cursor.getLong(3);
+            itsSyncFreq = cursor.getInt(4);
         }
 
         @Override
@@ -95,8 +101,8 @@ public class SyncDb
         {
             return String.format(
                     Locale.US,
-                    "{id:%d, acct:%s, syncChange:%d, syncFreq:%d}",
-                    itsId, itsAcct, itsSyncChange, itsSyncFreq);
+                    "{id:%d, type: %s, acct:%s, syncChange:%d, syncFreq:%d}",
+                    itsId, itsType, itsAcct, itsSyncChange, itsSyncFreq);
         }
     }
 
@@ -257,23 +263,25 @@ public class SyncDb
     }
 
 
-    /** Get a file */
+    /** Get a file by id */
     public static DbFile getFile(long id, SQLiteDatabase db)
             throws SQLException
     {
-        Cursor cursor = db.query(DB_TABLE_FILES, DbFile.QUERY_FIELDS,
-                                 DB_MATCH_FILES_ID,
-                                 new String[] { Long.toString(id) },
-                                 null, null, null);
-        try {
-            if (cursor.moveToFirst()) {
-                return new DbFile(cursor);
-            }
-        } finally {
-            cursor.close();
-        }
+        return getFile(DB_MATCH_FILES_ID, new String[] { Long.toString(id) },
+                       db);
+    }
 
-        return null;
+
+    /** Get a file by provider and remote file id */
+    public static DbFile getFileByRemoteId(long provider,
+                                           String remoteId,
+                                           SQLiteDatabase db)
+            throws SQLException
+    {
+        return getFile(DB_MATCH_FILES_PROVIDER_REMOTE_ID,
+                       new String[] { Long.toString(provider),
+                                      remoteId },
+                       db);
     }
 
 
@@ -453,6 +461,25 @@ public class SyncDb
         String[] idargs = new String[] { Long.toString(providerId) };
         db.update(DB_TABLE_PROVIDERS, values,
                   DB_MATCH_PROVIDERS_ID, idargs);
+    }
+
+
+    /** Get a file */
+    private static DbFile getFile(String match, String[] matchArgs,
+                                  SQLiteDatabase db)
+            throws SQLException
+    {
+        Cursor cursor = db.query(DB_TABLE_FILES, DbFile.QUERY_FIELDS,
+                                 match, matchArgs, null, null, null);
+        try {
+            if (cursor.moveToFirst()) {
+                return new DbFile(cursor);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return null;
     }
 
 

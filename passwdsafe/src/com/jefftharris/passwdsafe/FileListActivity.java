@@ -7,8 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import com.jefftharris.passwdsafe.lib.AboutDialog;
-
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,6 +14,9 @@ import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.jefftharris.passwdsafe.lib.AboutDialog;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 
 /**
@@ -74,7 +75,7 @@ public class FileListActivity extends AbstractFileListActivity
     public void openFile(Uri uri, String fileName)
     {
         try {
-            startActivity(PasswdSafeApp.createOpenIntent(uri, null));
+            startActivity(PasswdSafeUtil.createOpenIntent(uri, null));
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Can't open uri: " + uri, e);
         }

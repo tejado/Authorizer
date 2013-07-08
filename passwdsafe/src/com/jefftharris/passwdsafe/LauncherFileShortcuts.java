@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+
 public class LauncherFileShortcuts extends AbstractFileListActivity
 {
     /* (non-Javadoc)
@@ -40,7 +42,7 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
         if (uri != null) {
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
-                            PasswdSafeApp.createOpenIntent(uri, null));
+                            PasswdSafeUtil.createOpenIntent(uri, null));
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, fileName);
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(

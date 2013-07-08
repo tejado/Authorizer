@@ -501,7 +501,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         }
 
         PendingIntent intent = PendingIntent.getActivity(
-            itsCtx, 0, PasswdSafeApp.createOpenIntent(uri, record),
+            itsCtx, 0, PasswdSafeUtil.createOpenIntent(uri, record),
             PendingIntent.FLAG_UPDATE_CURRENT);
 
         String title = itsCtx.getResources().getQuantityString(

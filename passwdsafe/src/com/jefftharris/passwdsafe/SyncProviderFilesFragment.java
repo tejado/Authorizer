@@ -248,7 +248,7 @@ public class SyncProviderFilesFragment extends ListFragment
             return true;
         }
         case R.id.menu_file_new: {
-            startActivity(new Intent(PasswdSafeApp.NEW_INTENT, itsFilesUri));
+            startActivity(new Intent(PasswdSafeUtil.NEW_INTENT, itsFilesUri));
             return true;
         }
         default: {

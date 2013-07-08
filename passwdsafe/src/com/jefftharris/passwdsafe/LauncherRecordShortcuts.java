@@ -9,11 +9,12 @@ package com.jefftharris.passwdsafe;
 
 import org.pwsafe.lib.file.PwsRecord;
 
-import com.jefftharris.passwdsafe.file.PasswdFileData;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
 {
@@ -46,7 +47,7 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
         PasswdFileData fileData = getPasswdFileData();
         String uuid = fileData.getUUID(rec);
         Intent shortcutIntent =
-                PasswdSafeApp.createOpenIntent(getUri().getUri(), uuid);
+                PasswdSafeUtil.createOpenIntent(getUri().getUri(), uuid);
 
         Intent intent = new Intent();
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);

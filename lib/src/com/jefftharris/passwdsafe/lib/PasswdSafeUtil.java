@@ -21,6 +21,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -32,8 +33,24 @@ import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
  */
 public class PasswdSafeUtil
 {
-    public static final boolean DEBUG = false;
+    public static final String NEW_INTENT =
+        "com.jefftharris.passwdsafe.action.NEW";
+    public static final String VIEW_INTENT =
+        "com.jefftharris.passwdsafe.action.VIEW";
+
+    public static final boolean DEBUG = BuildConfig.DEBUG;
+
     private static final String TAG = "PasswdSafeUtil";
+
+    /** Create an intent to open a URI */
+    public static Intent createOpenIntent(Uri uri, String recToOpen)
+    {
+        Uri.Builder builder = uri.buildUpon();
+        if (recToOpen != null) {
+            builder.appendQueryParameter("recToOpen", recToOpen);
+        }
+        return new Intent(VIEW_INTENT, builder.build());
+    }
 
     /** Start the main activity for a package */
     public static void startMainActivity(String pkgName, Activity act)

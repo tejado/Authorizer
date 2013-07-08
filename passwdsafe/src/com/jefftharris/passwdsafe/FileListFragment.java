@@ -214,7 +214,7 @@ public class FileListFragment extends ListFragment
         switch (item.getItemId()) {
         case R.id.menu_file_new: {
             if (itsDir != null) {
-                startActivity(new Intent(PasswdSafeApp.NEW_INTENT,
+                startActivity(new Intent(PasswdSafeUtil.NEW_INTENT,
                                          Uri.fromFile(itsDir)));
             }
             return true;
