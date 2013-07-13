@@ -431,6 +431,8 @@ public class MainActivity extends FragmentActivity
                         ContentValues values = new ContentValues();
                         values.put(PasswdSafeContract.Providers.COL_ACCT,
                                    itsNewAccount);
+                        values.put(PasswdSafeContract.Providers.COL_TYPE,
+                                   ProviderType.GDRIVE.name());
                         cr.insert(PasswdSafeContract.Providers.CONTENT_URI,
                                   values);
                     }

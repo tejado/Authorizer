@@ -44,6 +44,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 
 /**
  *  The ProviderSyncer class syncs password files from Google Drive
@@ -74,16 +75,15 @@ public class ProviderSyncer
 
 
     /** Add a provider for an account */
-    public static long addProvider(String acctName, SQLiteDatabase db,
-                                   Context ctx)
+    public static long addProvider(String acctName, ProviderType type,
+                                   SQLiteDatabase db, Context ctx)
         throws SQLException
     {
         Log.i(TAG, "Add provider: " + acctName);
         int freq = ProviderSyncFreqPref.DEFAULT.getFreq();
-        long id = SyncDb.addProvider(acctName, freq, db);
+        long id = SyncDb.addProvider(acctName, type, freq, db);
 
-        GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
-        Account acct = acctMgr.getAccountByName(acctName);
+        Account acct = getProviderAcct(acctName, type, ctx);
         if (acct != null) {
             ContentResolver.setSyncAutomatically(
                     acct, PasswdSafeContract.AUTHORITY, true);
@@ -101,8 +101,7 @@ public class ProviderSyncer
     /** Delete the provider for the account */
     public static void deleteProvider(SyncDb.DbProvider provider,
                                       SQLiteDatabase db,
-                                      Context ctx,
-                                      GoogleAccountManager acctMgr)
+                                      Context ctx)
         throws SQLException
     {
         List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
@@ -112,24 +111,25 @@ public class ProviderSyncer
 
         SyncDb.deleteProvider(provider.itsId, db);
 
-        try {
-            GoogleAccountCredential credential = getAcctCredential(ctx);
-            String token = GoogleAuthUtil.getToken(ctx, provider.itsAcct,
-                                                   credential.getScope());
-            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
-                                   provider.itsAcct, token);
-            if (token != null) {
-                GoogleAuthUtil.invalidateToken(ctx, token);
+        switch (provider.itsType) {
+        case GDRIVE: {
+            try {
+                GoogleAccountCredential credential = getAcctCredential(ctx);
+                String token = GoogleAuthUtil.getToken(ctx, provider.itsAcct,
+                                                       credential.getScope());
+                PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
+                                       provider.itsAcct, token);
+                if (token != null) {
+                    GoogleAuthUtil.invalidateToken(ctx, token);
+                }
+            } catch (Exception e) {
+                PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s",
+                                       provider.itsAcct);
             }
-        } catch (Exception e) {
-            PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s",
-                                   provider.itsAcct);
+            break;
         }
-
-        if (acctMgr == null) {
-            acctMgr = new GoogleAccountManager(ctx);
         }
-        Account acct = acctMgr.getAccountByName(provider.itsAcct);
+        Account acct = getProviderAcct(provider.itsAcct, provider.itsType, ctx);
         if (acct != null) {
             ContentResolver.removePeriodicSync(acct,
                                                PasswdSafeContract.AUTHORITY,
@@ -152,8 +152,7 @@ public class ProviderSyncer
     {
         SyncDb.updateProviderSyncFreq(provider.itsId, freq, db);
 
-        GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
-        Account acct = acctMgr.getAccountByName(provider.itsAcct);
+        Account acct = getProviderAcct(provider.itsAcct, provider.itsType, ctx);
         if (acct != null) {
             ContentResolver.removePeriodicSync(acct,
                                                PasswdSafeContract.AUTHORITY,
@@ -172,13 +171,13 @@ public class ProviderSyncer
             throws SQLException
     {
         PasswdSafeUtil.dbginfo(TAG, "Validating accounts");
-        GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
 
         List<SyncDb.DbProvider> providers = SyncDb.getProviders(db);
         for (SyncDb.DbProvider provider: providers) {
-            Account acct = acctMgr.getAccountByName(provider.itsAcct);
+            Account acct = getProviderAcct(provider.itsAcct, provider.itsType,
+                                           ctx);
             if (acct == null) {
-                deleteProvider(provider, db, ctx, acctMgr);
+                deleteProvider(provider, db, ctx);
             }
         }
         ctx.getContentResolver().notifyChange(PasswdSafeContract.CONTENT_URI,
@@ -486,6 +485,21 @@ public class ProviderSyncer
         String ext = file.getFileExtension();
         return (ext != null) && ext.equals("psafe3");
     }
+
+
+    /** Get the account for a provider's name and type */
+    private static Account getProviderAcct(String acctName, ProviderType type,
+                                           Context ctx)
+    {
+        switch (type) {
+        case GDRIVE: {
+            GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
+            return acctMgr.getAccountByName(acctName);
+        }
+        }
+        return null;
+    }
+
 
     /**
      * Retrieve a authorized service object to send requests to the Google Drive

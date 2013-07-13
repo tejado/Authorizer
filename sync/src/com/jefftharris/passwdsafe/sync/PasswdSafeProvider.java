@@ -34,6 +34,7 @@ import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 
 /**
  *  The PasswdSafeProvider class is a content provider for synced
@@ -118,7 +119,7 @@ public class PasswdSafeProvider extends ContentProvider
                     return 0;
                 }
 
-                ProviderSyncer.deleteProvider(provider, db, getContext(), null);
+                ProviderSyncer.deleteProvider(provider, db, getContext());
                 db.setTransactionSuccessful();
                 return 1;
             } catch (Exception e) {
@@ -201,11 +202,17 @@ public class PasswdSafeProvider extends ContentProvider
             if (acct == null) {
                 throw new IllegalArgumentException("No acct for provider");
             }
+            ProviderType type = ProviderType.fromString(
+                    values.getAsString(PasswdSafeContract.Providers.COL_TYPE));
+            if (type == null) {
+                throw new IllegalArgumentException("Invalid type for provider");
+            }
             PasswdSafeUtil.dbginfo(TAG, "Insert provider: %s", acct);
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
-                long id = ProviderSyncer.addProvider(acct, db, getContext());
+                long id = ProviderSyncer.addProvider(acct, type, db,
+                                                     getContext());
                 db.setTransactionSuccessful();
 
                 return ContentUris.withAppendedId(

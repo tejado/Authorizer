@@ -175,11 +175,12 @@ public class SyncDb
     }
 
     /** Add a provider */
-    public static long addProvider(String name, int freq, SQLiteDatabase db)
+    public static long addProvider(String name, ProviderType type,
+                                   int freq, SQLiteDatabase db)
         throws SQLException
     {
         ContentValues values = new ContentValues();
-        values.put(DB_COL_PROVIDERS_TYPE, ProviderType.GDRIVE.toString());
+        values.put(DB_COL_PROVIDERS_TYPE, type.toString());
         values.put(DB_COL_PROVIDERS_ACCT, name);
         values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
         values.put(DB_COL_PROVIDERS_SYNC_FREQ, freq);
