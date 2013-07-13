@@ -6,6 +6,7 @@
     <string name="close">Close</string>
     <string name="copy_clipboard_error">%1$s - Error copying to the clipboard.  The error may be due to a known error in Samsung devices.</string>
     <string name="copy_trace_and_close">Copy Trace and Close</string>
+    <string name="dropbox">Dropbox</string>
     <string name="error">Error</string>
     <string name="google_drive">Google Drive</string>
 
