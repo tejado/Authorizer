@@ -18,9 +18,6 @@ import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -56,7 +53,8 @@ public class ProviderSyncer
         int freq = ProviderSyncFreqPref.DEFAULT.getFreq();
         long id = SyncDb.addProvider(acctName, type, freq, db);
 
-        Account acct = getProviderAcct(acctName, type, ctx);
+        Provider providerImpl = getProvider(type, ctx);
+        Account acct = providerImpl.getAccount(acctName);
         if (acct != null) {
             ContentResolver.setSyncAutomatically(
                     acct, PasswdSafeContract.AUTHORITY, true);
@@ -83,27 +81,9 @@ public class ProviderSyncer
         }
 
         SyncDb.deleteProvider(provider.itsId, db);
-
-        switch (provider.itsType) {
-        case GDRIVE: {
-            try {
-                GoogleAccountCredential credential =
-                        GDriveProvider.getAcctCredential(ctx);
-                String token = GoogleAuthUtil.getToken(ctx, provider.itsAcct,
-                                                       credential.getScope());
-                PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
-                                       provider.itsAcct, token);
-                if (token != null) {
-                    GoogleAuthUtil.invalidateToken(ctx, token);
-                }
-            } catch (Exception e) {
-                PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s",
-                                       provider.itsAcct);
-            }
-            break;
-        }
-        }
-        Account acct = getProviderAcct(provider.itsAcct, provider.itsType, ctx);
+        Provider providerImpl = getProvider(provider.itsType, ctx);
+        providerImpl.cleanupOnDelete(provider.itsAcct);
+        Account acct = providerImpl.getAccount(provider.itsAcct);
         if (acct != null) {
             ContentResolver.removePeriodicSync(acct,
                                                PasswdSafeContract.AUTHORITY,
@@ -126,7 +106,8 @@ public class ProviderSyncer
     {
         SyncDb.updateProviderSyncFreq(provider.itsId, freq, db);
 
-        Account acct = getProviderAcct(provider.itsAcct, provider.itsType, ctx);
+        Provider providerImpl = getProvider(provider.itsType, ctx);
+        Account acct = providerImpl.getAccount(provider.itsAcct);
         if (acct != null) {
             ContentResolver.removePeriodicSync(acct,
                                                PasswdSafeContract.AUTHORITY,
@@ -148,8 +129,8 @@ public class ProviderSyncer
 
         List<SyncDb.DbProvider> providers = SyncDb.getProviders(db);
         for (SyncDb.DbProvider provider: providers) {
-            Account acct = getProviderAcct(provider.itsAcct, provider.itsType,
-                                           ctx);
+            Provider providerImpl = getProvider(provider.itsType, ctx);
+            Account acct = providerImpl.getAccount(provider.itsAcct);
             if (acct == null) {
                 deleteProvider(provider, db, ctx);
             }
@@ -192,14 +173,7 @@ public class ProviderSyncer
             return;
         }
 
-        Provider providerImpl = null;
-        switch (provider.itsType) {
-        case GDRIVE: {
-            providerImpl = new GDriveProvider(itsContext);
-            break;
-        }
-        }
-
+        Provider providerImpl = getProvider(provider.itsType, itsContext);
         SyncLogRecord logrec = new SyncLogRecord(itsAccount.name, manual);
         try {
             providerImpl.sync(itsAccount, provider, db, logrec);
@@ -227,15 +201,12 @@ public class ProviderSyncer
 
     // TODO: show folders
 
-
-    /** Get the account for a provider's name and type */
-    private static Account getProviderAcct(String acctName, ProviderType type,
-                                           Context ctx)
+    /** Get the provider implementation for the type */
+    private static Provider getProvider(ProviderType type, Context ctx)
     {
         switch (type) {
         case GDRIVE: {
-            GoogleAccountManager acctMgr = new GoogleAccountManager(ctx);
-            return acctMgr.getAccountByName(acctName);
+            return new GDriveProvider(ctx);
         }
         }
         return null;

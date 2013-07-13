@@ -24,6 +24,7 @@ import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableNotifiedException;
 import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -63,6 +64,32 @@ public class GDriveProvider implements Provider
     }
 
 
+    /** Get the account for the named provider */
+    public Account getAccount(String acctName)
+    {
+        GoogleAccountManager acctMgr = new GoogleAccountManager(itsContext);
+        return acctMgr.getAccountByName(acctName);
+    }
+
+
+    /** Cleanup a provider when deleted */
+    public void cleanupOnDelete(String acctName)
+    {
+        try {
+            GoogleAccountCredential credential = getAcctCredential(itsContext);
+            String token = GoogleAuthUtil.getToken(itsContext, acctName,
+                                                   credential.getScope());
+            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
+                                   acctName, token);
+            if (token != null) {
+                GoogleAuthUtil.invalidateToken(itsContext, token);
+            }
+        } catch (Exception e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s", acctName);
+        }
+    }
+
+
     /** Sync a provider */
     public void sync(Account acct, SyncDb.DbProvider provider,
                      SQLiteDatabase db, SyncLogRecord logrec) throws Exception
@@ -72,7 +99,7 @@ public class GDriveProvider implements Provider
 
 
     /** Get the Google account credential */
-    public static GoogleAccountCredential getAcctCredential(Context ctx)
+    private static GoogleAccountCredential getAcctCredential(Context ctx)
     {
         return GoogleAccountCredential.usingOAuth2(
                 ctx, Collections.singletonList(DriveScopes.DRIVE));

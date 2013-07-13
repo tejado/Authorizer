@@ -15,6 +15,12 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public interface Provider
 {
+    /** Get the account for the named provider */
+    Account getAccount(String acctName);
+
+    /** Cleanup a provider when deleted */
+    void cleanupOnDelete(String acctName);
+
     /** Sync a provider */
     void sync(Account acct, SyncDb.DbProvider provider,
               SQLiteDatabase db, SyncLogRecord logrec) throws Exception;
