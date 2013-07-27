@@ -208,6 +208,9 @@ public class ProviderSyncer
         case GDRIVE: {
             return new GDriveProvider(ctx);
         }
+        case DROPBOX: {
+            return null;
+        }
         }
         return null;
     }

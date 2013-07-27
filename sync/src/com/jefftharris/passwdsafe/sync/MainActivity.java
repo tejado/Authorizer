@@ -335,6 +335,7 @@ public class MainActivity extends FragmentActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
     {
         boolean hasGdrive = false;
+        boolean hasDropbox = false;
         for (boolean more = cursor.moveToFirst(); more;
                 more = cursor.moveToNext()) {
             String typeStr = cursor.getString(
@@ -347,6 +348,11 @@ public class MainActivity extends FragmentActivity
                     updateGdriveAccount(cursor);
                     break;
                 }
+                case DROPBOX: {
+                    hasDropbox = true;
+                    updateDropboxAccount(cursor);
+                    break;
+                }
                 }
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Unknown type: " + typeStr);
@@ -354,6 +360,9 @@ public class MainActivity extends FragmentActivity
         }
         if (!hasGdrive) {
             updateGdriveAccount(null);
+        }
+        if (!hasDropbox) {
+            updateDropboxAccount(null);
         }
     }
 

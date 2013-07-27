@@ -124,6 +124,7 @@
     <string name="new_entry">Nouvelle entrée</string>
     <string name="new_file">Nouveau fichier</string>
     <string name="new_drive_file">Nouveau fichier de Drive</string>
+    <string name="new_dropbox_file">Nouveau fichier de Dropbox</string>
     <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
     <string name="new_group_menu">Nouveau groupe…</string>
     <string name="new_local_file">Nouveau fichier local</string>

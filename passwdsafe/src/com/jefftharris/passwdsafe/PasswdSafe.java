@@ -570,6 +570,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     titleId = R.string.new_drive_file;
                     break;
                 }
+                case DROPBOX: {
+                    titleId = R.string.new_dropbox_file;
+                    break;
+                }
                 }
             }
             case EMAIL:

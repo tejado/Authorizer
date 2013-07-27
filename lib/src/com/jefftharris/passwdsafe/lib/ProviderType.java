@@ -15,7 +15,8 @@ import android.widget.TextView;
  */
 public enum ProviderType
 {
-    GDRIVE;
+    GDRIVE,
+    DROPBOX;
 
     /** Set the ImageView to the icon of the provider type */
     public void setIcon(ImageView iv)
@@ -25,18 +26,17 @@ public enum ProviderType
             iv.setImageResource(R.drawable.google_drive);
             break;
         }
+        case DROPBOX: {
+            iv.setImageResource(R.drawable.dropbox);
+            break;
+        }
         }
     }
 
     /** Set the TextView to the name of the provider type */
     public void setText(TextView tv)
     {
-        switch (this) {
-        case GDRIVE: {
-            tv.setText(getName(tv.getContext()));
-            break;
-        }
-        }
+        tv.setText(getName(tv.getContext()));
     }
 
     /** Get the name of the provider */
@@ -45,6 +45,9 @@ public enum ProviderType
         switch (this) {
         case GDRIVE: {
             return context.getString(R.string.google_drive);
+        }
+        case DROPBOX: {
+            return context.getString(R.string.dropbox);
         }
         }
         return null;
