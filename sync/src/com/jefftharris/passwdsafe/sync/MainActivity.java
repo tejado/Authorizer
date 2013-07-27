@@ -77,7 +77,7 @@ public class MainActivity extends FragmentActivity
     private SyncDb itsSyncDb;
     private Account itsGdriveAccount = null;
     private Uri itsGdriveUri = null;
-    private String itsNewAccount = null;
+    private String itsNewGdriveAccount = null;
     //private DropboxAPI<AndroidAuthSession> itsDropboxApi = null;
 
     @Override
@@ -135,9 +135,9 @@ public class MainActivity extends FragmentActivity
     protected void onResumeFragments()
     {
         super.onResumeFragments();
-        if (itsNewAccount != null) {
-            setAccount(itsNewAccount);
-            itsNewAccount = null;
+        if (itsNewGdriveAccount != null) {
+            setAccount(itsGdriveUri, itsNewGdriveAccount, ProviderType.GDRIVE);
+            itsNewGdriveAccount = null;
         }
 /*
         if (itsDropboxApi != null) {
@@ -167,7 +167,7 @@ public class MainActivity extends FragmentActivity
                         b.getString(AccountManager.KEY_ACCOUNT_NAME);
                 Log.i(TAG, "Selected account: " + accountName);
                 if (accountName != null && accountName.length() > 0) {
-                    itsNewAccount = accountName;
+                    itsNewGdriveAccount = accountName;
                 }
             }
             break;
@@ -258,7 +258,8 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to clear a GDrive account */
     public void onGdriveClear(View view)
     {
-        DialogFragment prompt = new ClearPromptDlg();
+        DialogFragment prompt = ClearPromptDlg.newInstance(itsGdriveUri,
+                                                           ProviderType.GDRIVE);
         prompt.show(getSupportFragmentManager(), null);
     }
 
@@ -463,9 +464,9 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Set the new account to use with the app */
-    private void setAccount(String account)
+    private void setAccount(Uri currAcct, String newAcct, ProviderType acctType)
     {
-        new AccountTask(account);
+        new AccountTask(currAcct, newAcct, acctType);
     }
 
     /** Get the SyncApp */
@@ -477,9 +478,16 @@ public class MainActivity extends FragmentActivity
     /** Dialog to prompt when an account is cleared */
     public static class ClearPromptDlg extends DialogFragment
     {
-        /** Constructor */
-        public ClearPromptDlg()
+        /** Create an instance of the dialog */
+        public static ClearPromptDlg newInstance(Uri currAcct,
+                                                 ProviderType providerType)
         {
+            ClearPromptDlg dlg = new ClearPromptDlg();
+            Bundle args = new Bundle();
+            args.putParcelable("currAcct", currAcct);
+            args.putString("providerType", providerType.name());
+            dlg.setArguments(args);
+            return dlg;
         }
 
         /* (non-Javadoc)
@@ -488,6 +496,11 @@ public class MainActivity extends FragmentActivity
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState)
         {
+            Bundle args = getArguments();
+            final Uri currAcct = args.getParcelable("currAcct");
+            final ProviderType providerType =
+                    ProviderType.fromString(args.getString("providerType"));
+
             AlertDialog.Builder builder =
                     new AlertDialog.Builder(getActivity());
             builder
@@ -499,7 +512,7 @@ public class MainActivity extends FragmentActivity
                 public void onClick(DialogInterface dialog, int which)
                 {
                     MainActivity act = (MainActivity)getActivity();
-                    act.setAccount(null);
+                    act.setAccount(currAcct, null, providerType);
                 }
             })
             .setNegativeButton(android.R.string.no, null);
@@ -521,16 +534,18 @@ public class MainActivity extends FragmentActivity
         private final Uri itsCurrAccount;
         private ProgressFragment itsProgressFrag;
         private final String itsNewAccount;
+        private final ProviderType itsProviderType;
         private final ProviderSyncFreqPref itsUpdateFreq;
 
         /** Constructor for add/remove */
-        public AccountTask(String acct)
+        public AccountTask(Uri currAcct, String newAcct, ProviderType type)
         {
             itsType = AccountTaskType.ADD_REMOVE;
-            itsCurrAccount = itsGdriveUri;
-            itsNewAccount = acct;
+            itsCurrAccount = currAcct;
+            itsNewAccount = newAcct;
+            itsProviderType = type;
             itsUpdateFreq = null;
-            String msg = getString((acct == null) ?
+            String msg = getString((newAcct == null) ?
                     R.string.removing_account : R.string.adding_account);
             init(msg);
         }
@@ -541,6 +556,7 @@ public class MainActivity extends FragmentActivity
             itsType = AccountTaskType.UPDATE_SYNC_FREQ;
             itsCurrAccount = itsGdriveUri;
             itsNewAccount = null;
+            itsProviderType = ProviderType.GDRIVE;
             itsUpdateFreq = freq;
             init(getString(R.string.updating_account));
         }
@@ -574,7 +590,7 @@ public class MainActivity extends FragmentActivity
                         values.put(PasswdSafeContract.Providers.COL_ACCT,
                                    itsNewAccount);
                         values.put(PasswdSafeContract.Providers.COL_TYPE,
-                                   ProviderType.GDRIVE.name());
+                                   itsProviderType.name());
                         cr.insert(PasswdSafeContract.Providers.CONTENT_URI,
                                   values);
                     }
