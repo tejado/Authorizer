@@ -79,8 +79,7 @@ public class GDriveProvider implements Provider
             GoogleAccountCredential credential = getAcctCredential(itsContext);
             String token = GoogleAuthUtil.getToken(itsContext, acctName,
                                                    credential.getScope());
-            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s: %s",
-                                   acctName, token);
+            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s", acctName);
             if (token != null) {
                 GoogleAuthUtil.invalidateToken(itsContext, token);
             }
