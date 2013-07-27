@@ -36,6 +36,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.dropbox.sync.android.DbxAccount;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
@@ -46,23 +47,38 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
+/*
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.session.AccessTokenPair;
+import com.dropbox.client2.session.AppKeyPair;
+import com.dropbox.client2.session.Session.AccessType;
+*/
 
 public class MainActivity extends FragmentActivity
         implements LoaderCallbacks<Cursor>
 {
     private static final String TAG = "MainActivity";
 
-    private static final int CHOOSE_ACCOUNT = 0;
+    private static final int CHOOSE_ACCOUNT_RC = 0;
+    private static final int DROPBOX_LINK_RC = 1;
 
     private static final int LOADER_PROVIDERS = 0;
 
     private static final String[] ACCOUNT_TYPE =
         new String[] {GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
 
+    // TODO: remove remnants of core API
+    // TODO: remove core API project and update sync API project fields
+    //private static final String DROPBOX_APP_KEY = "jaafb7iju45c60f";
+    //private static final String DROPBOX_APP_SECRET = "gabkj5758t39urh";
+    //private static final AccessType DROPBOX_ACCESS = AccessType.DROPBOX;
+
     private SyncDb itsSyncDb;
     private Account itsGdriveAccount = null;
     private Uri itsGdriveUri = null;
     private String itsNewAccount = null;
+    //private DropboxAPI<AndroidAuthSession> itsDropboxApi = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -123,13 +139,28 @@ public class MainActivity extends FragmentActivity
             setAccount(itsNewAccount);
             itsNewAccount = null;
         }
+/*
+        if (itsDropboxApi != null) {
+            if (itsDropboxApi.getSession().authenticationSuccessful()) {
+                try {
+                    itsDropboxApi.getSession().finishAuthentication();
+                    AccessTokenPair tokens =
+                            itsDropboxApi.getSession().getAccessTokenPair();
+                    PasswdSafeUtil.dbginfo(TAG, "db tokens %s", tokens);
+                } catch (IllegalStateException e) {
+                    Log.e(TAG, "Error authenticating", e);
+                }
+                itsDropboxApi = null;
+            }
+        }
+        */
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         switch (requestCode) {
-        case CHOOSE_ACCOUNT:
+        case CHOOSE_ACCOUNT_RC:
             if (data != null) {
                 Bundle b = data.getExtras();
                 String accountName =
@@ -140,6 +171,15 @@ public class MainActivity extends FragmentActivity
                 }
             }
             break;
+        case DROPBOX_LINK_RC: {
+            getSyncApp().finishDropboxLink();
+            updateDropboxAccount(null);
+            break;
+        }
+        default: {
+            super.onActivityResult(requestCode, resultCode, data);
+            break;
+        }
         }
     }
 
@@ -196,7 +236,7 @@ public class MainActivity extends FragmentActivity
                                                  null, ACCOUNT_TYPE, true,
                                                  null, null, null, null);
         try {
-            startActivityForResult(intent, CHOOSE_ACCOUNT);
+            startActivityForResult(intent, CHOOSE_ACCOUNT_RC);
         } catch (ActivityNotFoundException e) {
             String msg = getString(R.string.google_acct_not_available);
             Log.e(TAG, msg, e);
@@ -233,18 +273,39 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to choose a Dropbox account */
     public void onDropboxChoose(View view)
     {
+        /*
+        AppKeyPair appKeys = new AppKeyPair(DROPBOX_APP_KEY,
+                                            DROPBOX_APP_SECRET);
+        AndroidAuthSession session = new AndroidAuthSession(appKeys,
+                                                            DROPBOX_ACCESS);
+        itsDropboxApi = new DropboxAPI<AndroidAuthSession>(session);
+        session.startAuthentication(this);
+        */
+        getSyncApp().startDropboxLink(this, DROPBOX_LINK_RC);
     }
 
 
     /** Button onClick handler to sync a Dropbox account */
     public void onDropboxSync(View view)
     {
+        /*
+        DbxFileSystem fs = getSyncApp().getDropboxFs();
+        if (fs != null) {
+            try {
+                fs.syncNowAndWait();
+            } catch (Exception e) {
+                Log.e(TAG, "sync failed", e);
+            }
+        }
+        */
     }
 
 
     /** Button onClick handler to clear a Dropbox account */
     public void onDropboxClear(View view)
     {
+        getSyncApp().unlinkDropbox();
+        updateDropboxAccount(null);
     }
 
 
@@ -358,7 +419,9 @@ public class MainActivity extends FragmentActivity
         View chooseBtn = findViewById(R.id.dropbox_choose);
         TextView acctView = (TextView)findViewById(R.id.dropbox_acct);
         View btns = findViewById(R.id.dropbox_controls);
-        if (cursor != null) {
+        //if (cursor != null) {
+        DbxAccount dbxacct = getSyncApp().getDropboxAcct();
+        if (dbxacct != null) {
 /*
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
@@ -372,6 +435,9 @@ public class MainActivity extends FragmentActivity
             itsGdriveAccount = acctMgr.getAccountByName(acct);
             itsGdriveUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
+*/
+            // TODO: fix
+            ProviderSyncFreqPref freq = ProviderSyncFreqPref.FREQ_15_MIN;
 
             View freqSpinLabel = findViewById(R.id.gdrive_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
@@ -381,18 +447,12 @@ public class MainActivity extends FragmentActivity
             acctView.setVisibility(View.VISIBLE);
             btns.setVisibility(View.VISIBLE);
 
-            boolean haveAccount = (itsGdriveAccount != null);
-            if (haveAccount) {
-                acctView.setText(getString(R.string.account_label,
-                                           itsGdriveAccount.name));
-            } else {
-                acctView.setText(getString(R.string.account_not_exists_label,
-                                           acct));
-            }
-            freqSpin.setEnabled(haveAccount);
-            freqSpinLabel.setEnabled(haveAccount);
-            syncBtn.setEnabled(haveAccount);
-*/
+            acctView.setText(getString(R.string.account_label,
+                                       dbxacct.getUserId()));
+                                       //dbxacct.getAccountInfo().displayName));
+            freqSpin.setEnabled(true);
+            freqSpinLabel.setEnabled(true);
+            syncBtn.setEnabled(true);
         } else {
             //itsGdriveAccount = null;
             //itsGdriveUri = null;
@@ -406,6 +466,12 @@ public class MainActivity extends FragmentActivity
     private void setAccount(String account)
     {
         new AccountTask(account);
+    }
+
+    /** Get the SyncApp */
+    private SyncApp getSyncApp()
+    {
+        return (SyncApp)getApplication();
     }
 
     /** Dialog to prompt when an account is cleared */
