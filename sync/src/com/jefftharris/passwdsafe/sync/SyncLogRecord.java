@@ -11,8 +11,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jefftharris.passwdsafe.lib.ProviderType;
-
 import android.content.Context;
 
 /**
