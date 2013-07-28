@@ -23,7 +23,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 
 /**
- *  The ProviderSyncer class syncs password files from Google Drive
+ *  The ProviderSyncer class syncs password files from cloud services
  */
 public class ProviderSyncer
 {
@@ -155,8 +155,8 @@ public class ProviderSyncer
     /** Perform synchronization */
     public void performSync(boolean manual)
     {
-        PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s, manual: %b",
-                               itsAccount.name, manual);
+        PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s (%s), manual: %b",
+                               itsAccount.name, itsAccount.type, manual);
 
         /** Check if the syncing account is a valid provider */
         SQLiteDatabase db = itsSyncDb.getDb();

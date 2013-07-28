@@ -18,6 +18,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -28,6 +29,10 @@ import com.jefftharris.passwdsafe.lib.ProviderType;
 public class SyncDb
 {
     private static final String TAG = "SyncDb";
+
+    public static final String GDRIVE_ACCOUNT_TYPE =
+            GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE;
+    public static final String DROPBOX_ACCOUNT_TYPE = "com.jefftharris.dropbox";
 
     public static final String DB_TABLE_PROVIDERS = "providers";
     public static final String DB_COL_PROVIDERS_ID = BaseColumns._ID;

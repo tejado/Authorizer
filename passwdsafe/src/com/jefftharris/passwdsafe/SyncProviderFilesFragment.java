@@ -243,6 +243,7 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_sync_files: {
+            // TODO: can't use account sync
             ApiCompat.requestManualSync(null, itsProviderUri, getActivity());
 
             return true;

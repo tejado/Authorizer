@@ -37,7 +37,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.dropbox.sync.android.DbxAccount;
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -64,9 +63,6 @@ public class MainActivity extends FragmentActivity
     private static final int DROPBOX_LINK_RC = 1;
 
     private static final int LOADER_PROVIDERS = 0;
-
-    private static final String[] ACCOUNT_TYPE =
-        new String[] {GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE};
 
     // TODO: remove remnants of core API
     // TODO: remove core API project and update sync API project fields
@@ -241,10 +237,10 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to choose a GDrive account */
     public void onGdriveChoose(View view)
     {
-        Intent intent =
-            AccountPicker.newChooseAccountIntent(itsGdriveAccount,
-                                                 null, ACCOUNT_TYPE, true,
-                                                 null, null, null, null);
+        Intent intent = AccountPicker.newChooseAccountIntent(
+                itsGdriveAccount, null,
+                new String[] { SyncDb.GDRIVE_ACCOUNT_TYPE },
+                true, null, null, null, null);
         try {
             startActivityForResult(intent, CHOOSE_ACCOUNT_RC);
         } catch (ActivityNotFoundException e) {

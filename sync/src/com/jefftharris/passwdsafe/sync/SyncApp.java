@@ -111,6 +111,7 @@ public class SyncApp extends Application
                                              DbxPath path,
                                              Mode mode)
                     {
+                        // Create stub sync account for Dropbox?
                         PasswdSafeUtil.dbginfo(TAG, "Dropbox path change");
                     }
                 },
