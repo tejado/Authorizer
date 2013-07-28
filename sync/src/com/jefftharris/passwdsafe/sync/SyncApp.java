@@ -78,6 +78,7 @@ public class SyncApp extends Application
     public void unlinkDropbox()
     {
         itsDropboxAcctMgr.unlink();
+        updateDropboxFs();
     }
 
 

@@ -209,7 +209,7 @@ public class ProviderSyncer
             return new GDriveProvider(ctx);
         }
         case DROPBOX: {
-            return null;
+            return new DropboxProvider(ctx);
         }
         }
         return null;

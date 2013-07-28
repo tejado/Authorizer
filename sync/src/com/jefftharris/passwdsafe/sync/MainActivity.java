@@ -77,7 +77,9 @@ public class MainActivity extends FragmentActivity
     private SyncDb itsSyncDb;
     private Account itsGdriveAccount = null;
     private Uri itsGdriveUri = null;
-    private String itsNewGdriveAccount = null;
+    private Uri itsDropboxUri = null;
+
+    private NewAccountInfo itsNewAccount = null;
     //private DropboxAPI<AndroidAuthSession> itsDropboxApi = null;
 
     @Override
@@ -135,9 +137,11 @@ public class MainActivity extends FragmentActivity
     protected void onResumeFragments()
     {
         super.onResumeFragments();
-        if (itsNewGdriveAccount != null) {
-            setAccount(itsGdriveUri, itsNewGdriveAccount, ProviderType.GDRIVE);
-            itsNewGdriveAccount = null;
+        if (itsNewAccount != null) {
+            setAccount(itsNewAccount.itsCurrAccountUri,
+                       itsNewAccount.itsAccount,
+                       itsNewAccount.itsProviderType);
+            itsNewAccount = null;
         }
 /*
         if (itsDropboxApi != null) {
@@ -167,13 +171,19 @@ public class MainActivity extends FragmentActivity
                         b.getString(AccountManager.KEY_ACCOUNT_NAME);
                 Log.i(TAG, "Selected account: " + accountName);
                 if (accountName != null && accountName.length() > 0) {
-                    itsNewGdriveAccount = accountName;
+                    itsNewAccount = new NewAccountInfo(ProviderType.GDRIVE,
+                                                       accountName,
+                                                       itsGdriveUri);
                 }
             }
             break;
         case DROPBOX_LINK_RC: {
             getSyncApp().finishDropboxLink();
-            updateDropboxAccount(null);
+            DbxAccount dbxacct = getSyncApp().getDropboxAcct();
+            itsNewAccount = new NewAccountInfo(ProviderType.DROPBOX,
+                                               (dbxacct == null) ? null :
+                                                   dbxacct.getUserId(),
+                                               itsDropboxUri);
             break;
         }
         default: {
@@ -282,7 +292,16 @@ public class MainActivity extends FragmentActivity
         itsDropboxApi = new DropboxAPI<AndroidAuthSession>(session);
         session.startAuthentication(this);
         */
-        getSyncApp().startDropboxLink(this, DROPBOX_LINK_RC);
+        SyncApp app = getSyncApp();
+        try {
+            if (app.getDropboxAcct() != null) {
+                app.unlinkDropbox();
+            }
+            app.startDropboxLink(this, DROPBOX_LINK_RC);
+        } catch (Exception e) {
+            Log.e(TAG, "startDropboxLink failed", e);
+            app.unlinkDropbox();
+        }
     }
 
 
@@ -305,8 +324,9 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to clear a Dropbox account */
     public void onDropboxClear(View view)
     {
-        getSyncApp().unlinkDropbox();
-        updateDropboxAccount(null);
+        DialogFragment prompt =
+                ClearPromptDlg.newInstance(itsDropboxUri, ProviderType.DROPBOX);
+        prompt.show(getSupportFragmentManager(), null);
     }
 
 
@@ -429,10 +449,7 @@ public class MainActivity extends FragmentActivity
         View chooseBtn = findViewById(R.id.dropbox_choose);
         TextView acctView = (TextView)findViewById(R.id.dropbox_acct);
         View btns = findViewById(R.id.dropbox_controls);
-        //if (cursor != null) {
-        DbxAccount dbxacct = getSyncApp().getDropboxAcct();
-        if (dbxacct != null) {
-/*
+        if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = cursor.getString(
@@ -441,13 +458,10 @@ public class MainActivity extends FragmentActivity
                     PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
             ProviderSyncFreqPref freq =
                     ProviderSyncFreqPref.freqValueOf(freqVal);
-            GoogleAccountManager acctMgr = new GoogleAccountManager(this);
-            itsGdriveAccount = acctMgr.getAccountByName(acct);
-            itsGdriveUri = ContentUris.withAppendedId(
+            itsDropboxUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
-*/
-            // TODO: fix
-            ProviderSyncFreqPref freq = ProviderSyncFreqPref.FREQ_15_MIN;
+            // TODO: account display name
+            // TODO: no sync frequency for dropbox
 
             View freqSpinLabel = findViewById(R.id.gdrive_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
@@ -457,15 +471,12 @@ public class MainActivity extends FragmentActivity
             acctView.setVisibility(View.VISIBLE);
             btns.setVisibility(View.VISIBLE);
 
-            acctView.setText(getString(R.string.account_label,
-                                       dbxacct.getUserId()));
-                                       //dbxacct.getAccountInfo().displayName));
+            acctView.setText(getString(R.string.account_label, acct));
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
             syncBtn.setEnabled(true);
         } else {
-            //itsGdriveAccount = null;
-            //itsGdriveUri = null;
+            itsDropboxUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
             btns.setVisibility(View.GONE);
@@ -479,7 +490,7 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Get the SyncApp */
-    private SyncApp getSyncApp()
+    private final SyncApp getSyncApp()
     {
         return (SyncApp)getApplication();
     }
@@ -627,6 +638,22 @@ public class MainActivity extends FragmentActivity
         {
             super.onPostExecute(arg);
             itsProgressFrag.dismiss();
+        }
+    }
+
+    /** Information for a new account */
+    private static class NewAccountInfo
+    {
+        public final ProviderType itsProviderType;
+        public final String itsAccount;
+        public final Uri itsCurrAccountUri;
+
+        /** Constructor */
+        public NewAccountInfo(ProviderType type, String acct, Uri currAcctUri)
+        {
+            itsProviderType = type;
+            itsAccount = acct;
+            itsCurrAccountUri = currAcctUri;
         }
     }
 /*
