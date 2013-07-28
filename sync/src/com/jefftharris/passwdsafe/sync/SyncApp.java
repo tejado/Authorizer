@@ -84,6 +84,13 @@ public class SyncApp extends Application
     }
 
 
+    /** Manually sync dropbox */
+    public void syncDropbox()
+    {
+        new DropboxSyncer(true).execute();
+    }
+
+
     /** Get the Dropbox account; null if no account is linked */
     public DbxAccount getDropboxAcct()
     {
@@ -113,7 +120,7 @@ public class SyncApp extends Application
                                              Mode mode)
                     {
                         PasswdSafeUtil.dbginfo(TAG, "Dropbox path change");
-                        new DropboxSyncer().execute();
+                        new DropboxSyncer(false).execute();
                     }
                 }, DbxPath.ROOT, PathListener.Mode.PATH_OR_DESCENDANT);
             } catch (DbxException e) {
@@ -129,6 +136,14 @@ public class SyncApp extends Application
     /** Background syncer for Dropbox */
     private class DropboxSyncer extends AsyncTask<Void, Void, Void>
     {
+        private final boolean itsIsManual;
+
+        /** Constructor */
+        public DropboxSyncer(boolean manual)
+        {
+            itsIsManual = manual;
+        }
+
         /* (non-Javadoc)
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
@@ -136,10 +151,13 @@ public class SyncApp extends Application
         protected Void doInBackground(Void... params)
         {
             DbxAccount acct = getDropboxAcct();
-            ProviderSyncer syncer = new ProviderSyncer(
-                    SyncApp.this, null,
-                    new Account(acct.getUserId(), SyncDb.DROPBOX_ACCOUNT_TYPE));
-            syncer.performSync(false);
+            if (acct != null) {
+                ProviderSyncer syncer = new ProviderSyncer(
+                        SyncApp.this, null,
+                        new Account(acct.getUserId(),
+                                    SyncDb.DROPBOX_ACCOUNT_TYPE));
+                syncer.performSync(itsIsManual);
+            }
             return null;
         }
     }

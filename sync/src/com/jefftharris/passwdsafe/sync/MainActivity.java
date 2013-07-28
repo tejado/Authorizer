@@ -304,16 +304,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to sync a Dropbox account */
     public void onDropboxSync(View view)
     {
-        /*
-        DbxFileSystem fs = getSyncApp().getDropboxFs();
-        if (fs != null) {
-            try {
-                fs.syncNowAndWait();
-            } catch (Exception e) {
-                Log.e(TAG, "sync failed", e);
-            }
-        }
-        */
+        getSyncApp().syncDropbox();
     }
 
 
