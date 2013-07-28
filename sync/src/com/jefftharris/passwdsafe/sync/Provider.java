@@ -23,5 +23,6 @@ public interface Provider
 
     /** Sync a provider */
     void sync(Account acct, SyncDb.DbProvider provider,
-              SQLiteDatabase db, SyncLogRecord logrec) throws Exception;
+              SQLiteDatabase db,
+              boolean manual, SyncLogRecord logrec) throws Exception;
 }

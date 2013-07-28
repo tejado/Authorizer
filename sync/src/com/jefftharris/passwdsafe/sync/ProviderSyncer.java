@@ -189,7 +189,7 @@ public class ProviderSyncer
                 new SyncLogRecord(itsAccount.name,
                                   provider.itsType.getName(itsContext), manual);
         try {
-            providerImpl.sync(itsAccount, provider, db, logrec);
+            providerImpl.sync(itsAccount, provider, db, manual, logrec);
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
             logrec.addFailure(e);

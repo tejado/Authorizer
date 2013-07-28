@@ -6,10 +6,21 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
+
 import android.accounts.Account;
 import android.content.Context;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.dropbox.sync.android.DbxException;
+import com.dropbox.sync.android.DbxFileInfo;
+import com.dropbox.sync.android.DbxFileSystem;
+import com.dropbox.sync.android.DbxPath;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.SyncDb.DbProvider;
 
 /**
@@ -18,6 +29,8 @@ import com.jefftharris.passwdsafe.sync.SyncDb.DbProvider;
 public class DropboxProvider implements Provider
 {
     private final Context itsContext;
+
+    private static final String TAG = "DropboxProvider";
 
     /** Constructor */
     public DropboxProvider(Context ctx)
@@ -52,15 +65,126 @@ public class DropboxProvider implements Provider
     public void sync(Account acct,
                      DbProvider provider,
                      SQLiteDatabase db,
+                     boolean manual,
                      SyncLogRecord logrec) throws Exception
     {
-        // TODO Auto-generated method stub
+        DbxFileSystem fs = getSyncApp().getDropboxFs();
+        if (fs == null) {
+            PasswdSafeUtil.dbginfo(TAG, "sync: no fs");
+            return;
+        }
 
+        if (manual) {
+            fs.syncNowAndWait();
+        }
+
+        new Syncer(fs, provider, db, logrec).sync();
     }
+
 
     /** Get the SyncApp */
     private final SyncApp getSyncApp()
     {
         return (SyncApp)itsContext.getApplicationContext();
+    }
+
+
+    /** The Syncer class encapsulates a sync operation */
+    private static class Syncer
+    {
+        private final DbxFileSystem itsFs;
+        private final SyncDb.DbProvider itsProvider;
+        private final SQLiteDatabase itsDb;
+        private final SyncLogRecord itsLogrec;
+
+        /** Constructor */
+        public Syncer(DbxFileSystem fs,
+                      SyncDb.DbProvider provider,
+                      SQLiteDatabase db, SyncLogRecord logrec)
+        {
+            itsFs = fs;
+            itsProvider = provider;
+            itsDb = db;
+            itsLogrec = logrec;
+        }
+
+
+        /** Sync the provider */
+        public final void sync()
+                throws DbxException, SQLException
+        {
+            itsLogrec.setFullSync(true);
+
+            try {
+                itsDb.beginTransaction();
+                performSync();
+                itsDb.setTransactionSuccessful();
+            } finally {
+                itsDb.endTransaction();
+            }
+        }
+
+
+        /** Perform a sync of the files */
+        private final void performSync()
+                throws DbxException, SQLException
+        {
+            TreeMap<DbxPath, DbxFileInfo> dbxfiles =
+                    new TreeMap<DbxPath, DbxFileInfo>();
+            getDirFiles(DbxPath.ROOT, dbxfiles);
+
+            List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
+                                                          itsDb);
+            for (SyncDb.DbFile dbfile: dbfiles) {
+                DbxPath dbpath = new DbxPath(dbfile.itsRemoteId);
+                DbxFileInfo dbpathinfo = dbxfiles.get(dbpath);
+                if (dbpathinfo != null) {
+                    PasswdSafeUtil.dbginfo(TAG,
+                                           "performSync update remote %s",
+                                           dbfile.itsRemoteId);
+                    SyncDb.updateRemoteFile(
+                            dbfile.itsId, dbfile.itsRemoteId,
+                            dbpath.getName(),
+                            dbpathinfo.modifiedTime.getTime(), itsDb);
+
+                    dbxfiles.remove(dbpath);
+                } else {
+                    PasswdSafeUtil.dbginfo(TAG,
+                                           "performSync remove remote %s",
+                                           dbfile.itsRemoteId);
+                    SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
+                }
+            }
+
+            for (Map.Entry<DbxPath, DbxFileInfo> entry: dbxfiles.entrySet()) {
+                String fileId = entry.getKey().toString();
+                PasswdSafeUtil.dbginfo(TAG, "performSync add remote %s",
+                                       fileId);
+                SyncDb.addRemoteFile(itsProvider.itsId, fileId,
+                                     entry.getKey().getName(),
+                                     entry.getValue().modifiedTime.getTime(),
+                                     itsDb);
+            }
+        }
+
+
+        /** Get all of the files under the path */
+        private final void getDirFiles(DbxPath path,
+                                       Map<DbxPath, DbxFileInfo> files)
+                throws DbxException
+        {
+            List<DbxFileInfo> children = itsFs.listFolder(path);
+            for (DbxFileInfo info: children) {
+                if (info.isFolder) {
+                    getDirFiles(info.path, files);
+                } else {
+                    String filename =
+                        info.path.getName().toLowerCase(Locale.getDefault());
+                    if (filename.endsWith(".psafe3")) {
+                        files.put(info.path, info);
+                    }
+                }
+            }
+        }
     }
 }

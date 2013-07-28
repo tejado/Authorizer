@@ -91,7 +91,8 @@ public class GDriveProvider implements Provider
 
     /** Sync a provider */
     public void sync(Account acct, SyncDb.DbProvider provider,
-                     SQLiteDatabase db, SyncLogRecord logrec) throws Exception
+                     SQLiteDatabase db,
+                     boolean manual, SyncLogRecord logrec) throws Exception
     {
         new Syncer(acct, provider, db, logrec, itsContext).sync();
     }
