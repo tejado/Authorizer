@@ -163,7 +163,17 @@ public class ProviderSyncer
         SyncDb.DbProvider provider = null;
         try {
             db.beginTransaction();
-            provider = SyncDb.getProvider(itsAccount.name, db);
+            ProviderType providerType = null;
+            if (itsAccount.type.equals(SyncDb.GDRIVE_ACCOUNT_TYPE)) {
+                providerType = ProviderType.GDRIVE;
+            } else if (itsAccount.type.equals(SyncDb.DROPBOX_ACCOUNT_TYPE)) {
+                providerType = ProviderType.DROPBOX;
+            } else {
+                PasswdSafeUtil.dbginfo(TAG, "Unknown account type: ",
+                                       itsAccount.type);
+                return;
+            }
+            provider = SyncDb.getProvider(itsAccount.name, providerType, db);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

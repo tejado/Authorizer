@@ -232,13 +232,15 @@ public class SyncDb
                            new String[] { Long.toString(id) }, db);
     }
 
-    /** Get a provider by name */
-    public static DbProvider getProvider(String acctName, SQLiteDatabase db)
+    /** Get a provider by name and type */
+    public static DbProvider getProvider(String acctName,
+                                         ProviderType type,
+                                         SQLiteDatabase db)
             throws SQLException
     {
         return getProvider(
                 DB_MATCH_PROVIDERS_TYPE_ACCT,
-                new String[] { ProviderType.GDRIVE.toString(), acctName },
+                new String[] { type.name(), acctName },
                 db);
     }
 
