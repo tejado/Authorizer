@@ -6,8 +6,10 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.app.Application;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.dropbox.sync.android.DbxAccount;
@@ -103,7 +105,6 @@ public class SyncApp extends Application
         if ((acct != null) && (itsDropboxFs == null)) {
             try {
                 itsDropboxFs = DbxFileSystem.forAccount(acct);
-
                 itsDropboxFs.addPathListener(new PathListener()
                 {
                     @Override
@@ -111,18 +112,35 @@ public class SyncApp extends Application
                                              DbxPath path,
                                              Mode mode)
                     {
-                        // Create stub sync account for Dropbox?
                         PasswdSafeUtil.dbginfo(TAG, "Dropbox path change");
+                        new DropboxSyncer().execute();
                     }
-                },
-                new DbxPath("/"),
-                PathListener.Mode.PATH_OR_DESCENDANT);
+                }, DbxPath.ROOT, PathListener.Mode.PATH_OR_DESCENDANT);
             } catch (DbxException e) {
                 Log.e(TAG, "updateDropboxFs failure", e);
             }
         } else if ((acct == null) && (itsDropboxFs != null)) {
             itsDropboxFs.shutDown();
             itsDropboxFs = null;
+        }
+    }
+
+
+    /** Background syncer for Dropbox */
+    private class DropboxSyncer extends AsyncTask<Void, Void, Void>
+    {
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            DbxAccount acct = getDropboxAcct();
+            ProviderSyncer syncer = new ProviderSyncer(
+                    SyncApp.this, null,
+                    new Account(acct.getUserId(), SyncDb.DROPBOX_ACCOUNT_TYPE));
+            syncer.performSync(false);
+            return null;
         }
     }
 }

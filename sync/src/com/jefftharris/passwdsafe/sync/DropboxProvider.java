@@ -32,8 +32,7 @@ public class DropboxProvider implements Provider
     @Override
     public Account getAccount(String acctName)
     {
-        // TODO: impl
-        return null;
+        return new Account(acctName, SyncDb.DROPBOX_ACCOUNT_TYPE);
     }
 
     /* (non-Javadoc)
