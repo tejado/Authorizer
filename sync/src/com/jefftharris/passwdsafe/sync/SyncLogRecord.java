@@ -11,6 +11,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jefftharris.passwdsafe.lib.ProviderType;
+
 import android.content.Context;
 
 /**
@@ -27,9 +29,9 @@ public class SyncLogRecord
     private List<String> itsEntries = new ArrayList<String>();
 
     /** Constructor */
-    public SyncLogRecord(String account, boolean manual)
+    public SyncLogRecord(String account, String typeName, boolean manual)
     {
-        itsAccount = account;
+        itsAccount = account + " (" + typeName + ")";
         itsStartTime = System.currentTimeMillis();
         itsIsManualSync = manual;
     }

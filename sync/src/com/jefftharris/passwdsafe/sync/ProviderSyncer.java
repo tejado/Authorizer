@@ -184,7 +184,10 @@ public class ProviderSyncer
         }
 
         Provider providerImpl = getProvider(provider.itsType, itsContext);
-        SyncLogRecord logrec = new SyncLogRecord(itsAccount.name, manual);
+        // TODO: provider display name not account name
+        SyncLogRecord logrec =
+                new SyncLogRecord(itsAccount.name,
+                                  provider.itsType.getName(itsContext), manual);
         try {
             providerImpl.sync(itsAccount, provider, db, logrec);
         } catch (Exception e) {
