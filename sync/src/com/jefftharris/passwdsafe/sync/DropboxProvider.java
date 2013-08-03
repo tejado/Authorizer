@@ -6,6 +6,7 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -15,11 +16,13 @@ import android.accounts.Account;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.dropbox.sync.android.DbxException;
 import com.dropbox.sync.android.DbxFileInfo;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.SyncDb.DbProvider;
 
@@ -78,7 +81,7 @@ public class DropboxProvider implements Provider
             fs.syncNowAndWait();
         }
 
-        new Syncer(fs, provider, db, logrec).sync();
+        new Syncer(fs, provider, db, logrec, itsContext).sync();
     }
 
 
@@ -96,16 +99,18 @@ public class DropboxProvider implements Provider
         private final SyncDb.DbProvider itsProvider;
         private final SQLiteDatabase itsDb;
         private final SyncLogRecord itsLogrec;
+        private final Context itsContext;
 
         /** Constructor */
         public Syncer(DbxFileSystem fs,
                       SyncDb.DbProvider provider,
-                      SQLiteDatabase db, SyncLogRecord logrec)
+                      SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
         {
             itsFs = fs;
             itsProvider = provider;
             itsDb = db;
             itsLogrec = logrec;
+            itsContext = ctx;
         }
 
 
@@ -114,19 +119,42 @@ public class DropboxProvider implements Provider
                 throws DbxException, SQLException
         {
             itsLogrec.setFullSync(true);
+            List<DropboxSyncOper> opers = null;
 
             try {
                 itsDb.beginTransaction();
-                performSync();
+                opers = performSync();
                 itsDb.setTransactionSuccessful();
             } finally {
                 itsDb.endTransaction();
             }
+
+            if (opers != null) {
+                for (DropboxSyncOper oper: opers) {
+                    try {
+                        itsLogrec.addEntry(oper.getDescription(itsContext));
+                        oper.doOper(itsFs, itsContext);
+                        try {
+                            itsDb.beginTransaction();
+                            oper.doPostOperUpdate(itsDb, itsContext);
+                            itsDb.setTransactionSuccessful();
+                        } finally {
+                            itsDb.endTransaction();
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Sync error for file " + oper.getFile(), e);
+                        itsLogrec.addFailure(e);
+                    }
+                }
+            }
+
+            itsContext.getContentResolver().notifyChange(
+                    PasswdSafeContract.CONTENT_URI, null, false);
         }
 
 
         /** Perform a sync of the files */
-        private final void performSync()
+        private final List<DropboxSyncOper> performSync()
                 throws DbxException, SQLException
         {
             TreeMap<DbxPath, DbxFileInfo> dbxfiles =
@@ -165,6 +193,17 @@ public class DropboxProvider implements Provider
                                      entry.getValue().modifiedTime.getTime(),
                                      itsDb);
             }
+
+            List<DropboxSyncOper> opers = new ArrayList<DropboxSyncOper>();
+            dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
+            for (SyncDb.DbFile dbfile: dbfiles) {
+                if (dbfile.itsIsRemoteDeleted || dbfile.itsIsLocalDeleted) {
+                    opers.add(new DropboxRmFileOper(dbfile));
+                } else {
+                    opers.add(new DropboxRemoteToLocalOper(dbfile));
+                }
+            }
+            return opers;
         }
 
 

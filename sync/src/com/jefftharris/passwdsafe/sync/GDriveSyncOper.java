@@ -8,42 +8,25 @@ package com.jefftharris.passwdsafe.sync;
 
 import java.io.IOException;
 
+import android.content.Context;
+
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 
-import android.content.Context;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 
 /**
  *  A Google Drive sync operation
  */
-public abstract class GDriveSyncOper
+public abstract class GDriveSyncOper extends SyncOper
 {
-    protected final SyncDb.DbFile itsFile;
-
     /** Constructor */
     protected GDriveSyncOper(SyncDb.DbFile file)
     {
-        itsFile = file;
-    }
-
-    /** Get the sync database file */
-    public SyncDb.DbFile getFile()
-    {
-        return itsFile;
+        super(file);
     }
 
     /** Perform the sync operation */
-    public abstract void doOper(Drive drive, Context ctx)
-            throws IOException;
-
-    /** Perform the database update after the sync operation */
-    public abstract void doPostOperUpdate(SQLiteDatabase db, Context ctx)
-            throws IOException, SQLException;
-
-    /** Get a description of the operation */
-    public abstract String getDescription(Context ctx);
+    public abstract void doOper(Drive drive, Context ctx) throws IOException;
 
     /** Get a file's metadata */
     protected static File getFile(String id, Drive drive)
