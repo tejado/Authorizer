@@ -7,22 +7,39 @@
 package com.jefftharris.passwdsafe.sync;
 
 import android.accounts.Account;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.jefftharris.passwdsafe.lib.ProviderType;
 
 /**
  * The Provider interface encapsulates a service that provides files which are
  * synchronized
  */
-public interface Provider
+public abstract class Provider
 {
     /** Get the account for the named provider */
-    Account getAccount(String acctName);
+    public abstract Account getAccount(String acctName);
 
     /** Cleanup a provider when deleted */
-    void cleanupOnDelete(String acctName);
+    public abstract void cleanupOnDelete(String acctName);
 
     /** Sync a provider */
-    void sync(Account acct, SyncDb.DbProvider provider,
-              SQLiteDatabase db,
+    public abstract void sync(Account acct, SyncDb.DbProvider provider,
+                              SQLiteDatabase db,
               boolean manual, SyncLogRecord logrec) throws Exception;
+
+    /** Get the provider implementation for the type */
+    public static Provider getProvider(ProviderType type, Context ctx)
+    {
+        switch (type) {
+        case GDRIVE: {
+            return new GDriveProvider(ctx);
+        }
+        case DROPBOX: {
+            return new DropboxProvider(ctx);
+        }
+        }
+        return null;
+    }
 }

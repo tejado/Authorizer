@@ -29,7 +29,7 @@ import com.jefftharris.passwdsafe.sync.SyncDb.DbProvider;
 /**
  *  The DropboxProvider class encapsulates Dropbox
  */
-public class DropboxProvider implements Provider
+public class DropboxProvider extends Provider
 {
     private final Context itsContext;
 

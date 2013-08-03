@@ -44,7 +44,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 /**
  * The GDriveProvider class encapsulates Google Drive
  */
-public class GDriveProvider implements Provider
+public class GDriveProvider extends Provider
 {
     // TODO: moving file to different folder doesn't update modDate
 
@@ -65,6 +65,7 @@ public class GDriveProvider implements Provider
 
 
     /** Get the account for the named provider */
+    @Override
     public Account getAccount(String acctName)
     {
         GoogleAccountManager acctMgr = new GoogleAccountManager(itsContext);
@@ -73,6 +74,7 @@ public class GDriveProvider implements Provider
 
 
     /** Cleanup a provider when deleted */
+    @Override
     public void cleanupOnDelete(String acctName)
     {
         try {
@@ -90,6 +92,7 @@ public class GDriveProvider implements Provider
 
 
     /** Sync a provider */
+    @Override
     public void sync(Account acct, SyncDb.DbProvider provider,
                      SQLiteDatabase db,
                      boolean manual, SyncLogRecord logrec) throws Exception

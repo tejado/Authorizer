@@ -53,7 +53,7 @@ public class ProviderSyncer
         int freq = ProviderSyncFreqPref.DEFAULT.getFreq();
         long id = SyncDb.addProvider(acctName, type, freq, db);
 
-        Provider providerImpl = getProvider(type, ctx);
+        Provider providerImpl = Provider.getProvider(type, ctx);
         Account acct = providerImpl.getAccount(acctName);
         if (acct != null) {
             ContentResolver.setSyncAutomatically(
@@ -81,7 +81,7 @@ public class ProviderSyncer
         }
 
         SyncDb.deleteProvider(provider.itsId, db);
-        Provider providerImpl = getProvider(provider.itsType, ctx);
+        Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
         providerImpl.cleanupOnDelete(provider.itsAcct);
         Account acct = providerImpl.getAccount(provider.itsAcct);
         if (acct != null) {
@@ -106,7 +106,7 @@ public class ProviderSyncer
     {
         SyncDb.updateProviderSyncFreq(provider.itsId, freq, db);
 
-        Provider providerImpl = getProvider(provider.itsType, ctx);
+        Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
         Account acct = providerImpl.getAccount(provider.itsAcct);
         if (acct != null) {
             ContentResolver.removePeriodicSync(acct,
@@ -129,7 +129,7 @@ public class ProviderSyncer
 
         List<SyncDb.DbProvider> providers = SyncDb.getProviders(db);
         for (SyncDb.DbProvider provider: providers) {
-            Provider providerImpl = getProvider(provider.itsType, ctx);
+            Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
             Account acct = providerImpl.getAccount(provider.itsAcct);
             if (acct == null) {
                 deleteProvider(provider, db, ctx);
@@ -183,7 +183,8 @@ public class ProviderSyncer
             return;
         }
 
-        Provider providerImpl = getProvider(provider.itsType, itsContext);
+        Provider providerImpl =
+                Provider.getProvider(provider.itsType, itsContext);
         // TODO: provider display name not account name
         SyncLogRecord logrec =
                 new SyncLogRecord(itsAccount.name,
@@ -213,18 +214,4 @@ public class ProviderSyncer
     }
 
     // TODO: show folders
-
-    /** Get the provider implementation for the type */
-    private static Provider getProvider(ProviderType type, Context ctx)
-    {
-        switch (type) {
-        case GDRIVE: {
-            return new GDriveProvider(ctx);
-        }
-        case DROPBOX: {
-            return new DropboxProvider(ctx);
-        }
-        }
-        return null;
-    }
 }
