@@ -25,6 +25,7 @@ import com.dropbox.sync.android.DbxFileStatus;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.Utils;
 
 /**
  *  A Dropbox sync operation to sync a remote file to a local file
@@ -64,21 +65,9 @@ public class DropboxRemoteToLocalOper extends DropboxSyncOper
                 os = new BufferedOutputStream(
                         ctx.openFileOutput(itsLocalFileName,
                                            Context.MODE_PRIVATE));
-                byte[] buf = new byte[4096];
-                int len;
-                while ((len = is.read(buf)) > 0) {
-                    os.write(buf, 0, len);
-                }
+                Utils.copyStream(is, os);
             } finally {
-                try {
-                    if (is != null) {
-                        is.close();
-                    }
-                } finally {
-                    if (os != null) {
-                        os.close();
-                    }
-                }
+                Utils.closeStreams(is, os);
             }
 
             java.io.File localFile = ctx.getFileStreamPath(itsLocalFileName);
