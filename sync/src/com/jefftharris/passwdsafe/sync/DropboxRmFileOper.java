@@ -50,7 +50,9 @@ public class DropboxRmFileOper extends DropboxSyncOper
 
         if (itsIsRmRemote) {
             DbxPath path = new DbxPath(itsFile.itsRemoteId);
-            fs.delete(path);
+            if (fs.exists(path)) {
+                fs.delete(path);
+            }
         }
     }
 
