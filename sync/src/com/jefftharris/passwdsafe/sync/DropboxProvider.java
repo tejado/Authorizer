@@ -16,6 +16,7 @@ import android.accounts.Account;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.dropbox.sync.android.DbxException;
@@ -78,6 +79,7 @@ public class DropboxProvider extends Provider
         }
 
         if (manual) {
+            // TODO: sync hangs if network down
             fs.syncNowAndWait();
         }
 
@@ -184,6 +186,9 @@ public class DropboxProvider extends Provider
             TreeMap<DbxPath, DbxFileInfo> dbxfiles =
                     new TreeMap<DbxPath, DbxFileInfo>();
             getDirFiles(DbxPath.ROOT, dbxfiles);
+            TreeMap<DbxPath, DbxFileInfo> allDbxfiles =
+                    new TreeMap<DbxPath, DbxFileInfo>(dbxfiles);
+
 
             List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
                                                           itsDb);
@@ -223,11 +228,53 @@ public class DropboxProvider extends Provider
             for (SyncDb.DbFile dbfile: dbfiles) {
                 if (dbfile.itsIsRemoteDeleted || dbfile.itsIsLocalDeleted) {
                     opers.add(new DropboxRmFileOper(dbfile));
-                } else {
+                } else if (isRemoteNewer(dbfile, allDbxfiles)) {
                     opers.add(new DropboxRemoteToLocalOper(dbfile));
                 }
             }
             return opers;
+        }
+
+
+        /** Is the remote file newer than the local */
+        private final boolean isRemoteNewer(SyncDb.DbFile dbfile,
+                                            Map<DbxPath, DbxFileInfo> dbxfiles)
+        {
+            if (dbfile.itsRemoteId == null) {
+                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer null remote id");
+                return false;
+            }
+            if (dbfile.itsRemoteModDate != dbfile.itsLocalModDate) {
+                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer mod date");
+                return true;
+            }
+
+            if (TextUtils.isEmpty(dbfile.itsLocalFile)) {
+                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer no local");
+                return true;
+            }
+            java.io.File localFile =
+                    itsContext.getFileStreamPath(dbfile.itsLocalFile);
+            if (!localFile.exists()) {
+                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer local not exist");
+                return true;
+            }
+
+            DbxPath path = new DbxPath(dbfile.itsRemoteId);
+            DbxFileInfo pathinfo = dbxfiles.get(path);
+            if (pathinfo == null) {
+                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer no pathinfo");
+                return true;
+            }
+
+            if (pathinfo.size != localFile.length()) {
+                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer length");
+                return true;
+            }
+
+            // TODO: checksum files for changes?
+
+            return false;
         }
 
 
