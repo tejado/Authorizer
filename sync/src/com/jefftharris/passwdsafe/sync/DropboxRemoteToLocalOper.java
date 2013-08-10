@@ -149,8 +149,8 @@ public class DropboxRemoteToLocalOper extends DropboxSyncOper
                     PasswdSafeUtil.dbginfo(TAG, "no newer: %s", path);
                     break;
                 }
-                if (stat.isCached && stat.isLatest) {
-                    PasswdSafeUtil.dbginfo(TAG, "is latest: %s", path);
+                if (stat.isCached) {
+                    PasswdSafeUtil.dbginfo(TAG, "is cached: %s", path);
                     break;
                 }
                 PasswdSafeUtil.dbginfo(TAG, "waiting file change: %s", path);
