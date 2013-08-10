@@ -135,14 +135,20 @@ public class PasswdSafeProvider extends ContentProvider
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
+                Long providerId = Long.valueOf(uri.getPathSegments().get(1));
                 Long id = Long.valueOf(uri.getPathSegments().get(3));
                 SyncDb.DbFile file = SyncDb.getFile(id, db);
                 if (file == null) {
                     return 0;
                 }
-                SyncDb.updateLocalFileDeleted(id, db);
-                db.setTransactionSuccessful();
 
+                SyncDb.DbProvider dbProvider = SyncDb.getProvider(providerId,
+                                                                  db);
+                Provider provider = Provider.getProvider(dbProvider.itsType,
+                                                         getContext());
+                provider.deleteLocalFile(file, db);
+
+                db.setTransactionSuccessful();
                 getContext().getContentResolver().notifyChange(uri, null);
                 return 1;
             } catch (Exception e) {

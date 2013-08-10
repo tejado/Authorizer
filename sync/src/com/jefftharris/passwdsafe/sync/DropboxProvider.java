@@ -85,6 +85,30 @@ public class DropboxProvider extends Provider
     }
 
 
+    /** Delete a local file */
+    @Override
+    public void deleteLocalFile(SyncDb.DbFile file, SQLiteDatabase db)
+            throws Exception
+    {
+        SyncDb.updateLocalFileDeleted(file.itsId, db);
+
+        DbxFileSystem fs = getSyncApp().getDropboxFs();
+        if (fs == null) {
+            PasswdSafeUtil.dbginfo(TAG, "deleteLocalFile: no fs");
+            return;
+        }
+
+        if (file.itsIsRemoteDeleted || (file.itsRemoteId == null)) {
+            return;
+        }
+
+        DbxPath path = new DbxPath(file.itsRemoteId);
+        if (fs.exists(path)) {
+            fs.delete(path);
+        }
+    }
+
+
     /** Get the SyncApp */
     private final SyncApp getSyncApp()
     {

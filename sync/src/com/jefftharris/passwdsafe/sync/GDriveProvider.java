@@ -101,6 +101,14 @@ public class GDriveProvider extends Provider
     }
 
 
+    /** Delete a local file */
+    @Override
+    public void deleteLocalFile(SyncDb.DbFile file, SQLiteDatabase db)
+    {
+        SyncDb.updateLocalFileDeleted(file.itsId, db);
+    }
+
+
     /** Get the Google account credential */
     private static GoogleAccountCredential getAcctCredential(Context ctx)
     {

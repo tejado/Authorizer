@@ -27,7 +27,12 @@ public abstract class Provider
     /** Sync a provider */
     public abstract void sync(Account acct, SyncDb.DbProvider provider,
                               SQLiteDatabase db,
-              boolean manual, SyncLogRecord logrec) throws Exception;
+                              boolean manual, SyncLogRecord logrec)
+            throws Exception;
+
+    /** Delete a local file */
+    public abstract void deleteLocalFile(SyncDb.DbFile file, SQLiteDatabase db)
+            throws Exception;
 
     /** Get the provider implementation for the type */
     public static Provider getProvider(ProviderType type, Context ctx)
