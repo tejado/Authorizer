@@ -262,15 +262,6 @@ public class SyncDb
         return providers;
     }
 
-    /** Get a file */
-    public DbFile getFile(long id)
-            throws SQLException
-    {
-        SQLiteDatabase db = itsDbHelper.getReadableDatabase();
-        return getFile(id, db);
-    }
-
-
     /** Get a file by id */
     public static DbFile getFile(long id, SQLiteDatabase db)
             throws SQLException

@@ -6,6 +6,8 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.io.File;
+
 import android.accounts.Account;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,6 +30,18 @@ public abstract class Provider
     public abstract void sync(Account acct, SyncDb.DbProvider provider,
                               SQLiteDatabase db,
                               boolean manual, SyncLogRecord logrec)
+            throws Exception;
+
+    /** Insert a local file */
+    public abstract long insertLocalFile(long providerId, String title,
+                                         SQLiteDatabase db)
+            throws Exception;
+
+    /** Update a local file */
+    public abstract void updateLocalFile(SyncDb.DbFile file,
+                                         String localFileName,
+                                         File localFile,
+                                         SQLiteDatabase db)
             throws Exception;
 
     /** Delete a local file */

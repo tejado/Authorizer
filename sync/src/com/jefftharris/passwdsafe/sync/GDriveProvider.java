@@ -101,6 +101,31 @@ public class GDriveProvider extends Provider
     }
 
 
+    /** Insert a local file */
+    @Override
+    public long insertLocalFile(long providerId, String title,
+                                SQLiteDatabase db)
+            throws Exception
+    {
+        return SyncDb.addLocalFile(providerId, title,
+                                   System.currentTimeMillis(), db);
+    }
+
+
+    /** Update a local file */
+    @Override
+    public void updateLocalFile(SyncDb.DbFile file,
+                                String localFileName,
+                                java.io.File localFile,
+                                SQLiteDatabase db)
+            throws Exception
+    {
+        SyncDb.updateLocalFile(file.itsId, localFileName,
+                               file.itsLocalTitle,
+                               localFile.lastModified(), db);
+    }
+
+
     /** Delete a local file */
     @Override
     public void deleteLocalFile(SyncDb.DbFile file, SQLiteDatabase db)

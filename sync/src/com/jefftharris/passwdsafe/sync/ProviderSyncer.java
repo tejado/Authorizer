@@ -155,6 +155,8 @@ public class ProviderSyncer
     /** Perform synchronization */
     public void performSync(boolean manual)
     {
+        // TODO: sync only one provider at a time
+
         PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s (%s), manual: %b",
                                itsAccount.name, itsAccount.type, manual);
 

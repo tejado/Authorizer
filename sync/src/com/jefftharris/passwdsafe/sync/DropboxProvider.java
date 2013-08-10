@@ -6,6 +6,11 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -20,11 +25,13 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.dropbox.sync.android.DbxException;
+import com.dropbox.sync.android.DbxFile;
 import com.dropbox.sync.android.DbxFileInfo;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.SyncDb.DbProvider;
 
 /**
@@ -84,6 +91,61 @@ public class DropboxProvider extends Provider
         }
 
         new Syncer(fs, provider, db, logrec, itsContext).sync();
+    }
+
+
+    /** Insert a local file */
+    @Override
+    public long insertLocalFile(long providerId, String title,
+                                SQLiteDatabase db)
+            throws Exception
+    {
+        long fileId = SyncDb.addLocalFile(providerId, title,
+                                          System.currentTimeMillis(), db);
+
+        DbxPath path = new DbxPath(DbxPath.ROOT, title);
+        SyncDb.updateRemoteFile(fileId, path.toString(), path.getName(),
+                                -1, db);
+        return fileId;
+    }
+
+
+    /** Update a local file */
+    @Override
+    public synchronized void updateLocalFile(SyncDb.DbFile file,
+                                             String localFileName,
+                                             java.io.File localFile,
+                                             SQLiteDatabase db)
+            throws Exception
+    {
+        SyncDb.updateLocalFile(file.itsId, localFileName,
+                               file.itsLocalTitle,
+                               localFile.lastModified(), db);
+
+        DbxPath path = new DbxPath(file.itsRemoteId);
+        DbxFile dbxfile = null;
+        try {
+            DbxFileSystem fs = getSyncApp().getDropboxFs();
+            if (fs.exists(path)) {
+                dbxfile = fs.open(path);
+            } else {
+                dbxfile = fs.create(path);
+            }
+
+            InputStream is = null;
+            OutputStream os = null;
+            try {
+                is = new BufferedInputStream(new FileInputStream(localFile));
+                os = new BufferedOutputStream(dbxfile.getWriteStream());
+                Utils.copyStream(is, os);
+            } finally {
+                Utils.closeStreams(is, os);
+            }
+        } finally {
+            if (dbxfile != null) {
+                dbxfile.close();
+            }
+        }
     }
 
 

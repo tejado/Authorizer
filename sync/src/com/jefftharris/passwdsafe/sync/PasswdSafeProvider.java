@@ -35,6 +35,7 @@ import android.util.Log;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.lib.Utils;
 
 /**
  *  The PasswdSafeProvider class is a content provider for synced
@@ -243,12 +244,15 @@ public class PasswdSafeProvider extends ContentProvider
             try {
                 db.beginTransaction();
                 Long providerId = Long.valueOf(uri.getPathSegments().get(1));
-                SyncDb.DbProvider provider = SyncDb.getProvider(providerId, db);
-                if (provider == null) {
+                SyncDb.DbProvider dbProvider = SyncDb.getProvider(providerId,
+                                                                  db);
+                if (dbProvider == null) {
                     throw new Exception("No provider for " + providerId);
                 }
-                long id = SyncDb.addLocalFile(providerId, title,
-                                              System.currentTimeMillis(), db);
+
+                Provider provider = Provider.getProvider(dbProvider.itsType,
+                                                         getContext());
+                long id = provider.insertLocalFile(providerId, title, db);
                 db.setTransactionSuccessful();
 
                 ContentResolver cr = getContext().getContentResolver();
@@ -439,6 +443,7 @@ public class PasswdSafeProvider extends ContentProvider
             return 1;
         }
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
+            Long providerId = Long.valueOf(uri.getPathSegments().get(1));
             long id = Long.valueOf(uri.getPathSegments().get(3));
             String updateUri =
                     values.getAsString(PasswdSafeContract.Files.COL_FILE);
@@ -446,53 +451,51 @@ public class PasswdSafeProvider extends ContentProvider
                 throw new IllegalArgumentException("File missing");
             }
 
-            SyncDb.DbFile file = itsDb.getFile(id);
-            if (file == null) {
-                throw new IllegalArgumentException(
-                        "File not found: " + uri);
-            }
-
-            String localFileName = (file.itsLocalFile != null) ?
-                file.itsLocalFile : ProviderSyncer.getLocalFileName(id);
             File tmpFile = null;
+            SQLiteDatabase db = itsDb.getDb();
             try {
+                db.beginTransaction();
                 Context ctx = getContext();
+
+                SyncDb.DbFile file = SyncDb.getFile(id, db);
+                if (file == null) {
+                    throw new IllegalArgumentException(
+                            "File not found: " + uri);
+                }
+
+                String localFileName = (file.itsLocalFile != null) ?
+                    file.itsLocalFile : ProviderSyncer.getLocalFileName(id);
                 tmpFile = File.createTempFile("passwd", ".tmp",
                                               ctx.getFilesDir());
 
-                ContentResolver cr = getContext().getContentResolver();
+                ContentResolver cr = ctx.getContentResolver();
                 writeToFile(cr.openInputStream(Uri.parse(updateUri)),
                             updateUri, tmpFile);
 
-                SQLiteDatabase db = itsDb.getDb();
-                try {
-                    db.beginTransaction();
-
-                    File localFile = ctx.getFileStreamPath(localFileName);
-                    if (!tmpFile.renameTo(localFile)) {
-                        throw new IOException(
-                                 "Error renaming " + tmpFile.getAbsolutePath() +
-                                 " to " + localFile.getAbsolutePath());
-                    }
-                    tmpFile = null;
-                    SyncDb.updateLocalFile(file.itsId, localFileName,
-                                           file.itsLocalTitle,
-                                           localFile.lastModified(), db);
-                    db.setTransactionSuccessful();
-
-                    cr.notifyChange(uri, null);
-                } finally {
-                    db.endTransaction();
+                File localFile = ctx.getFileStreamPath(localFileName);
+                if (!tmpFile.renameTo(localFile)) {
+                    throw new IOException(
+                             "Error renaming " + tmpFile.getAbsolutePath() +
+                             " to " + localFile.getAbsolutePath());
                 }
-            } catch (IOException e) {
+                tmpFile = null;
+
+                SyncDb.DbProvider dbProvider = SyncDb.getProvider(providerId,
+                                                                  db);
+                Provider provider = Provider.getProvider(dbProvider.itsType,
+                                                         getContext());
+                provider.updateLocalFile(file, localFileName, localFile, db);
+                db.setTransactionSuccessful();
+
+                cr.notifyChange(uri, null);
+            } catch (Exception e) {
                 Log.e(TAG, "Error updating " + uri, e);
                 return 0;
             } finally {
-                if (tmpFile != null) {
-                    if (!tmpFile.delete()) {
-                        Log.e(TAG, "Error deleting tmp file " +
-                                tmpFile.getAbsolutePath());
-                    }
+                db.endTransaction();
+                if ((tmpFile != null) && !tmpFile.delete()) {
+                    Log.e(TAG, "Error deleting tmp file " +
+                            tmpFile.getAbsolutePath());
                 }
             }
             return 1;
@@ -518,7 +521,15 @@ public class PasswdSafeProvider extends ContentProvider
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             long id = Long.valueOf(uri.getPathSegments().get(3));
-            SyncDb.DbFile file = itsDb.getFile(id);
+            SyncDb.DbFile file;
+            SQLiteDatabase db = itsDb.getDb();
+            try {
+                db.beginTransaction();
+                file = SyncDb.getFile(id, db);
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
             if ((file == null) || (file.itsLocalFile == null)) {
                 throw new FileNotFoundException(uri.toString());
             }
@@ -546,27 +557,10 @@ public class PasswdSafeProvider extends ContentProvider
             is = new BufferedInputStream(src);
             FileOutputStream fos = new FileOutputStream(file);
             os = new BufferedOutputStream(fos);
-            byte[] buf = new byte[4096];
-            int len;
-            while ((len = is.read(buf)) > 0) {
-                os.write(buf, 0, len);
-            }
+            Utils.copyStream(is, os);
             fos.getFD().sync();
         } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "Error closing " + srcName, e);
-                }
-            }
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "Error closing " + file.getAbsolutePath(), e);
-                }
-            }
+            Utils.closeStreams(is, os);
         }
     }
 }
