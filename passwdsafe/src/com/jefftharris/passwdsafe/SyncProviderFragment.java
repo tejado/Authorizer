@@ -116,27 +116,36 @@ public class SyncProviderFragment extends ListFragment
             public boolean setViewValue(View view, Cursor cursor, int colIdx)
             {
                 int id = view.getId();
-                if ((id != android.R.id.text2) && (id != R.id.icon)) {
-                    return false;
-                }
-
-                try {
-                    String typeStr = cursor.getString(colIdx);
-                    ProviderType type = ProviderType.valueOf(typeStr);
-                    switch (id) {
-                    case android.R.id.text2: {
-                        type.setText((TextView)view);
-                        break;
-                    }
-                    case R.id.icon: {
-                        type.setIcon((ImageView)view);
-                        break;
-                    }
-                    }
+                switch (id) {
+                case android.R.id.text1: {
+                    String displayName =
+                            PasswdSafeContract.Providers.getDisplayName(cursor);
+                    TextView tv = (TextView)view;
+                    tv.setText(displayName);
                     return true;
-                } catch (IllegalArgumentException e) {
-                    return false;
                 }
+                case android.R.id.text2:
+                case R.id.icon: {
+                    try {
+                        String typeStr = cursor.getString(colIdx);
+                        ProviderType type = ProviderType.valueOf(typeStr);
+                        switch (id) {
+                        case android.R.id.text2: {
+                            type.setText((TextView)view);
+                            break;
+                        }
+                        case R.id.icon: {
+                            type.setIcon((ImageView)view);
+                            break;
+                        }
+                        }
+                        return true;
+                    } catch (IllegalArgumentException e) {
+                        return false;
+                    }
+                }
+                }
+                return false;
             }
         });
         setListAdapter(itsProviderAdapter);

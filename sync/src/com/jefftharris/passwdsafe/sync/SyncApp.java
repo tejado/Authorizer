@@ -111,6 +111,16 @@ public class SyncApp extends Application
         DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();
         if ((acct != null) && (itsDropboxFs == null)) {
             try {
+                acct.addListener(new DbxAccount.Listener()
+                {
+                    @Override
+                    public void onAccountChange(DbxAccount acct)
+                    {
+                        PasswdSafeUtil.dbginfo(TAG, "Dropbox acct change");
+                        new DropboxSyncer(false).execute();
+                    }
+                });
+
                 itsDropboxFs = DbxFileSystem.forAccount(acct);
                 itsDropboxFs.addPathListener(new PathListener()
                 {
@@ -156,7 +166,11 @@ public class SyncApp extends Application
                         SyncApp.this, null,
                         new Account(acct.getUserId(),
                                     SyncDb.DROPBOX_ACCOUNT_TYPE));
-                syncer.performSync(itsIsManual);
+                try {
+                    syncer.performSync(itsIsManual);
+                } finally {
+                    syncer.close();
+                }
             }
             return null;
         }

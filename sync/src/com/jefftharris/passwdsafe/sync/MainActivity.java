@@ -439,15 +439,13 @@ public class MainActivity extends FragmentActivity
         if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
-            String acct = cursor.getString(
-                    PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+            String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
             int freqVal = cursor.getInt(
                     PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
             ProviderSyncFreqPref freq =
                     ProviderSyncFreqPref.freqValueOf(freqVal);
             itsDropboxUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
-            // TODO: account display name
             // TODO: no sync frequency for dropbox
 
             View freqSpinLabel = findViewById(R.id.gdrive_interval_label);

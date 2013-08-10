@@ -24,6 +24,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.dropbox.sync.android.DbxAccount;
+import com.dropbox.sync.android.DbxAccountInfo;
 import com.dropbox.sync.android.DbxException;
 import com.dropbox.sync.android.DbxFile;
 import com.dropbox.sync.android.DbxFileInfo;
@@ -245,12 +247,27 @@ public class DropboxProvider extends Provider
         private final List<DropboxSyncOper> performSync()
                 throws DbxException, SQLException
         {
+            DbxAccount acct = itsFs.getAccount();
+            if (acct != null) {
+                DbxAccountInfo info = acct.getAccountInfo();
+                if (info != null) {
+                    if (!TextUtils.equals(itsProvider.itsDisplayName,
+                                          info.displayName)) {
+                        SyncDb.updateProviderDisplayName(itsProvider.itsId,
+                                                         info.displayName,
+                                                         itsDb);
+                    }
+                } else {
+                    SyncDb.updateProviderDisplayName(itsProvider.itsId,
+                                                     null, itsDb);
+                }
+            }
+
             TreeMap<DbxPath, DbxFileInfo> dbxfiles =
                     new TreeMap<DbxPath, DbxFileInfo>();
             getDirFiles(DbxPath.ROOT, dbxfiles);
             TreeMap<DbxPath, DbxFileInfo> allDbxfiles =
                     new TreeMap<DbxPath, DbxFileInfo>(dbxfiles);
-
 
             List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
                                                           itsDb);

@@ -15,6 +15,7 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -187,9 +188,10 @@ public class ProviderSyncer
 
         Provider providerImpl =
                 Provider.getProvider(provider.itsType, itsContext);
-        // TODO: provider display name not account name
+        String displayName = TextUtils.isEmpty(provider.itsDisplayName) ?
+                provider.itsAcct : provider.itsDisplayName;
         SyncLogRecord logrec =
-                new SyncLogRecord(itsAccount.name,
+                new SyncLogRecord(displayName,
                                   provider.itsType.getName(itsContext), manual);
         try {
             providerImpl.sync(itsAccount, provider, db, manual, logrec);

@@ -40,6 +40,7 @@ public class SyncDb
     public static final String DB_COL_PROVIDERS_ACCT = "acct";
     public static final String DB_COL_PROVIDERS_SYNC_CHANGE = "sync_change";
     public static final String DB_COL_PROVIDERS_SYNC_FREQ = "sync_freq";
+    public static final String DB_COL_PROVIDERS_DISPLAY_NAME = "display_name";
     public static final String DB_MATCH_PROVIDERS_ID =
         DB_COL_PROVIDERS_ID + " = ?";
     private static final String DB_MATCH_PROVIDERS_TYPE_ACCT =
@@ -84,13 +85,15 @@ public class SyncDb
         public final String itsAcct;
         public final long itsSyncChange;
         public final int itsSyncFreq;
+        public final String itsDisplayName;
 
         public static final String[] QUERY_FIELDS = {
             DB_COL_PROVIDERS_ID,
             DB_COL_PROVIDERS_TYPE,
             DB_COL_PROVIDERS_ACCT,
             DB_COL_PROVIDERS_SYNC_CHANGE,
-            DB_COL_PROVIDERS_SYNC_FREQ };
+            DB_COL_PROVIDERS_SYNC_FREQ,
+            DB_COL_PROVIDERS_DISPLAY_NAME };
 
         public DbProvider(Cursor cursor)
         {
@@ -99,6 +102,7 @@ public class SyncDb
             itsAcct = cursor.getString(2);
             itsSyncChange = cursor.getLong(3);
             itsSyncFreq = cursor.getInt(4);
+            itsDisplayName = cursor.getString(5);
         }
 
         @Override
@@ -106,8 +110,10 @@ public class SyncDb
         {
             return String.format(
                     Locale.US,
-                    "{id:%d, type: %s, acct:%s, syncChange:%d, syncFreq:%d}",
-                    itsId, itsType, itsAcct, itsSyncChange, itsSyncFreq);
+                    "{id:%d, type: %s, acct:%s, syncChange:%d, " +
+                    "syncFreq:%d, dispName:%s}",
+                    itsId, itsType, itsAcct, itsSyncChange, itsSyncFreq,
+                    itsDisplayName);
         }
     }
 
@@ -199,6 +205,16 @@ public class SyncDb
         String[] idargs = new String[] { Long.toString(id) };
         db.delete(DB_TABLE_FILES, DB_MATCH_FILES_PROVIDER_ID, idargs);
         db.delete(DB_TABLE_PROVIDERS, DB_MATCH_PROVIDERS_ID, idargs);
+    }
+
+    /** Update a provider display name */
+    public static void updateProviderDisplayName(long id, String displayName,
+                                                 SQLiteDatabase db)
+           throws SQLException
+    {
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_PROVIDERS_DISPLAY_NAME, displayName);
+        updateProviderFields(id, values, db);
     }
 
     /** Update a provider sync frequency */
@@ -486,7 +502,7 @@ public class SyncDb
     private static final class DbHelper extends SQLiteOpenHelper
     {
         private static final String DB_NAME = "sync.db";
-        private static final int DB_VERSION = 1;
+        private static final int DB_VERSION = 2;
 
         /** Constructor */
         public DbHelper(Context context)
@@ -531,6 +547,8 @@ public class SyncDb
                        DB_COL_SYNC_LOGS_FLAGS + " INTEGER NOT NULL," +
                        DB_COL_SYNC_LOGS_LOG + " TEXT" +
                        ");");
+
+            onUpgrade(db, 1, DB_VERSION);
         }
 
         /* (non-Javadoc)
@@ -540,6 +558,13 @@ public class SyncDb
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
         {
             enableForeignKey(db);
+
+            if (oldVersion < 2) {
+                PasswdSafeUtil.dbginfo(TAG, "Upgrade to v2");
+                db.execSQL("ALTER TABLE " + DB_TABLE_PROVIDERS +
+                           " ADD COLUMN " + DB_COL_PROVIDERS_DISPLAY_NAME +
+                           " TEXT");
+            }
         }
 
         /* (non-Javadoc)

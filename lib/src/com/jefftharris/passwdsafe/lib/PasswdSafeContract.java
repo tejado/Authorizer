@@ -8,8 +8,10 @@ package com.jefftharris.passwdsafe.lib;
 
 import android.content.ContentResolver;
 import android.content.UriMatcher;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 
 /**
  * The PasswdSafeContract class is the contract for the PasswdSafe client and
@@ -67,18 +69,34 @@ public final class PasswdSafeContract
         public static final String COL_TYPE = "type";
         public static final String COL_ACCT = "acct";
         public static final String COL_SYNC_FREQ = "sync_freq";
+        public static final String COL_DISPLAY_NAME = "display_name";
 
         public static final String[] PROJECTION = {
             Providers._ID,
             Providers.COL_TYPE,
             Providers.COL_ACCT,
-            Providers.COL_SYNC_FREQ
+            Providers.COL_SYNC_FREQ,
+            Providers.COL_DISPLAY_NAME
         };
 
         public static final int PROJECTION_IDX_ID = 0;
         public static final int PROJECTION_IDX_TYPE = 1;
         public static final int PROJECTION_IDX_ACCT = 2;
         public static final int PROJECTION_IDX_SYNC_FREQ = 3;
+        public static final int PROJECTION_IDX_DISPLAY_NAME = 4;
+
+        /** Get the provider's display name */
+        public static final String getDisplayName(Cursor cursor)
+        {
+            String displayName = null;
+            if (cursor.getColumnCount() > PROJECTION_IDX_DISPLAY_NAME) {
+                displayName = cursor.getString(PROJECTION_IDX_DISPLAY_NAME);
+            }
+            if (TextUtils.isEmpty(displayName)) {
+                displayName = cursor.getString(PROJECTION_IDX_ACCT);
+            }
+            return displayName;
+        }
     }
 
     /** The table of files */
