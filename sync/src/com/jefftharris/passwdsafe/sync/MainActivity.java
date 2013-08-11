@@ -46,13 +46,6 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
-/*
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.session.AccessTokenPair;
-import com.dropbox.client2.session.AppKeyPair;
-import com.dropbox.client2.session.Session.AccessType;
-*/
 
 public class MainActivity extends FragmentActivity
         implements LoaderCallbacks<Cursor>
@@ -64,19 +57,12 @@ public class MainActivity extends FragmentActivity
 
     private static final int LOADER_PROVIDERS = 0;
 
-    // TODO: remove remnants of core API
-    // TODO: remove core API project and update sync API project fields
-    //private static final String DROPBOX_APP_KEY = "jaafb7iju45c60f";
-    //private static final String DROPBOX_APP_SECRET = "gabkj5758t39urh";
-    //private static final AccessType DROPBOX_ACCESS = AccessType.DROPBOX;
-
     private SyncDb itsSyncDb;
     private Account itsGdriveAccount = null;
     private Uri itsGdriveUri = null;
     private Uri itsDropboxUri = null;
 
     private NewAccountInfo itsNewAccount = null;
-    //private DropboxAPI<AndroidAuthSession> itsDropboxApi = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -139,21 +125,6 @@ public class MainActivity extends FragmentActivity
                        itsNewAccount.itsProviderType);
             itsNewAccount = null;
         }
-/*
-        if (itsDropboxApi != null) {
-            if (itsDropboxApi.getSession().authenticationSuccessful()) {
-                try {
-                    itsDropboxApi.getSession().finishAuthentication();
-                    AccessTokenPair tokens =
-                            itsDropboxApi.getSession().getAccessTokenPair();
-                    PasswdSafeUtil.dbginfo(TAG, "db tokens %s", tokens);
-                } catch (IllegalStateException e) {
-                    Log.e(TAG, "Error authenticating", e);
-                }
-                itsDropboxApi = null;
-            }
-        }
-        */
     }
 
     @Override
@@ -280,14 +251,6 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to choose a Dropbox account */
     public void onDropboxChoose(View view)
     {
-        /*
-        AppKeyPair appKeys = new AppKeyPair(DROPBOX_APP_KEY,
-                                            DROPBOX_APP_SECRET);
-        AndroidAuthSession session = new AndroidAuthSession(appKeys,
-                                                            DROPBOX_ACCESS);
-        itsDropboxApi = new DropboxAPI<AndroidAuthSession>(session);
-        session.startAuthentication(this);
-        */
         SyncApp app = getSyncApp();
         try {
             if (app.getDropboxAcct() != null) {
@@ -624,104 +587,4 @@ public class MainActivity extends FragmentActivity
             itsCurrAccountUri = currAcctUri;
         }
     }
-/*
-
-    static final int REQUEST_ACCOUNT_PICKER = 1;
-    static final int REQUEST_AUTHORIZATION = 2;
-    static final int CAPTURE_IMAGE = 3;
-
-    private static Uri fileUri;
-    private static Drive service;
-    private GoogleAccountCredential credential;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-
-      credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
-      startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-    }
-
-    @Override
-    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-      switch (requestCode) {
-      case REQUEST_ACCOUNT_PICKER:
-        if (resultCode == RESULT_OK && data != null && data.getExtras() != null) {
-          String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-          if (accountName != null) {
-            credential.setSelectedAccountName(accountName);
-            service = getDriveService(credential);
-            startCameraIntent();
-          }
-        }
-        break;
-      case REQUEST_AUTHORIZATION:
-        if (resultCode == Activity.RESULT_OK) {
-          saveFileToDrive();
-        } else {
-          startActivityForResult(credential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-        }
-        break;
-      case CAPTURE_IMAGE:
-        if (resultCode == Activity.RESULT_OK) {
-          saveFileToDrive();
-        }
-      }
-    }
-
-    private void startCameraIntent() {
-      String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
-          Environment.DIRECTORY_PICTURES).getPath();
-      String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-      fileUri = Uri.fromFile(new java.io.File(mediaStorageDir + java.io.File.separator + "IMG_"
-          + timeStamp + ".jpg"));
-
-      Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-      cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-      startActivityForResult(cameraIntent, CAPTURE_IMAGE);
-    }
-
-    private void saveFileToDrive() {
-      Thread t = new Thread(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            // File's binary content
-            java.io.File fileContent = new java.io.File(fileUri.getPath());
-            FileContent mediaContent = new FileContent("image/jpeg", fileContent);
-
-            // File's metadata.
-            File body = new File();
-            body.setTitle(fileContent.getName());
-            body.setMimeType("image/jpeg");
-
-            File file = service.files().insert(body, mediaContent).execute();
-            if (file != null) {
-              showToast("Photo uploaded: " + file.getTitle());
-              startCameraIntent();
-            }
-          } catch (UserRecoverableAuthIOException e) {
-            startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-      });
-      t.start();
-    }
-
-    private Drive getDriveService(GoogleAccountCredential credential) {
-      return new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential)
-          .build();
-    }
-
-    public void showToast(final String toast) {
-      runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          Toast.makeText(getApplicationContext(), toast, Toast.LENGTH_SHORT).show();
-        }
-      });
-    }
-*/
 }
