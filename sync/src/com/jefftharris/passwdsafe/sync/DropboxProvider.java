@@ -100,10 +100,9 @@ public class DropboxProvider extends Provider
             PasswdSafeUtil.dbginfo(TAG, "sync: no fs");
             return;
         }
-
-        if (manual) {
-            // TODO: sync hangs if network down
-            fs.syncNowAndWait();
+        if (!fs.hasSynced()) {
+            PasswdSafeUtil.dbginfo(TAG, "sync: not synced");
+            return;
         }
 
         new Syncer(fs, provider, db, logrec, itsContext).sync();
@@ -334,34 +333,28 @@ public class DropboxProvider extends Provider
                                             Map<DbxPath, DbxFileInfo> dbxfiles)
         {
             if (dbfile.itsRemoteId == null) {
-                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer null remote id");
                 return false;
             }
             if (dbfile.itsRemoteModDate != dbfile.itsLocalModDate) {
-                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer mod date");
                 return true;
             }
 
             if (TextUtils.isEmpty(dbfile.itsLocalFile)) {
-                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer no local");
                 return true;
             }
             java.io.File localFile =
                     itsContext.getFileStreamPath(dbfile.itsLocalFile);
             if (!localFile.exists()) {
-                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer local not exist");
                 return true;
             }
 
             DbxPath path = new DbxPath(dbfile.itsRemoteId);
             DbxFileInfo pathinfo = dbxfiles.get(path);
             if (pathinfo == null) {
-                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer no pathinfo");
                 return true;
             }
 
             if (pathinfo.size != localFile.length()) {
-                PasswdSafeUtil.dbginfo(TAG, "isRemoteNewer length");
                 return true;
             }
 
