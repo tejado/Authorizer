@@ -10,6 +10,8 @@ import android.accounts.Account;
 import android.app.Activity;
 import android.app.Application;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.dropbox.sync.android.DbxAccount;
@@ -32,6 +34,9 @@ public class SyncApp extends Application
 
     private DbxAccountManager itsDropboxAcctMgr = null;
     private DbxFileSystem itsDropboxFs = null;
+    private boolean itsDropboxSyncInProgress = false;
+    private Handler itsTimerHandler = null;
+    private Runnable itsDropboxTimerHandler = null;
 
     /* (non-Javadoc)
      * @see android.app.Application#onCreate()
@@ -43,6 +48,7 @@ public class SyncApp extends Application
         super.onCreate();
 
         //  TODO: run when phone starts
+        itsTimerHandler = new Handler(Looper.getMainLooper());
         itsDropboxAcctMgr =
                 DbxAccountManager.getInstance(getApplicationContext(),
                                               DROPBOX_SYNC_APP_KEY,
@@ -87,7 +93,7 @@ public class SyncApp extends Application
     /** Manually sync dropbox */
     public void syncDropbox()
     {
-        new DropboxSyncer(true).execute();
+        doDropboxSync(true);
     }
 
 
@@ -117,7 +123,7 @@ public class SyncApp extends Application
                     public void onAccountChange(DbxAccount acct)
                     {
                         PasswdSafeUtil.dbginfo(TAG, "Dropbox acct change");
-                        new DropboxSyncer(false).execute();
+                        doDropboxSync(false);
                     }
                 });
 
@@ -130,7 +136,7 @@ public class SyncApp extends Application
                                              Mode mode)
                     {
                         PasswdSafeUtil.dbginfo(TAG, "Dropbox path change");
-                        new DropboxSyncer(false).execute();
+                        doDropboxSync(false);
                     }
                 }, DbxPath.ROOT, PathListener.Mode.PATH_OR_DESCENDANT);
             } catch (DbxException e) {
@@ -139,6 +145,31 @@ public class SyncApp extends Application
         } else if ((acct == null) && (itsDropboxFs != null)) {
             itsDropboxFs.shutDown();
             itsDropboxFs = null;
+        }
+    }
+
+
+    /** Check whether to start a dropbox sync */
+    private void doDropboxSync(boolean manual)
+    {
+        if (itsDropboxTimerHandler != null) {
+            return;
+        }
+        if (itsDropboxSyncInProgress) {
+            itsDropboxTimerHandler = new Runnable()
+            {
+                public void run()
+                {
+                    PasswdSafeUtil.dbginfo(TAG, "doDropboxSync timer expired");
+                    itsDropboxTimerHandler = null;
+                    doDropboxSync(false);
+                }
+            };
+            PasswdSafeUtil.dbginfo(TAG, "doDropboxSync start timer");
+            itsTimerHandler.postDelayed(itsDropboxTimerHandler, 15000);
+        } else {
+            PasswdSafeUtil.dbginfo(TAG, "doDropboxSync start");
+            new DropboxSyncer(manual).execute();
         }
     }
 
@@ -152,6 +183,7 @@ public class SyncApp extends Application
         public DropboxSyncer(boolean manual)
         {
             itsIsManual = manual;
+            itsDropboxSyncInProgress = true;
         }
 
         /* (non-Javadoc)
@@ -173,6 +205,16 @@ public class SyncApp extends Application
                 }
             }
             return null;
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            super.onPostExecute(result);
+            itsDropboxSyncInProgress = false;
         }
     }
 }
