@@ -33,6 +33,7 @@ import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.SyncDb.DbProvider;
 
@@ -61,13 +62,26 @@ public class DropboxProvider extends Provider
         return new Account(acctName, SyncDb.DROPBOX_ACCOUNT_TYPE);
     }
 
+
+    /** Check whether a provider can be added */
+    @Override
+    public void checkProviderAdd(SQLiteDatabase db)
+            throws Exception
+    {
+        List<SyncDb.DbProvider> providers = SyncDb.getProviders(db);
+        for (SyncDb.DbProvider provider: providers) {
+            if (provider.itsType == ProviderType.DROPBOX) {
+                throw new Exception("Only one Dropbox account allowed");
+            }
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.Provider#cleanupOnDelete(java.lang.String)
      */
     @Override
     public void cleanupOnDelete(String acctName)
     {
-        // TODO: only one Dropbox provider allowed
         getSyncApp().unlinkDropbox();
     }
 

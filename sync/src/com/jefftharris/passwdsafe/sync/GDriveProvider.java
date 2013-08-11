@@ -40,6 +40,7 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 
 /**
  * The GDriveProvider class encapsulates Google Drive
@@ -70,6 +71,14 @@ public class GDriveProvider extends Provider
     {
         GoogleAccountManager acctMgr = new GoogleAccountManager(itsContext);
         return acctMgr.getAccountByName(acctName);
+    }
+
+
+    /** Check whether a provider can be added */
+    @Override
+    public void checkProviderAdd(SQLiteDatabase db)
+            throws Exception
+    {
     }
 
 

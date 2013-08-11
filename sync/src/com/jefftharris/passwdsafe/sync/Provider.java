@@ -23,6 +23,10 @@ public abstract class Provider
     /** Get the account for the named provider */
     public abstract Account getAccount(String acctName);
 
+    /** Check whether a provider can be added */
+    public abstract void checkProviderAdd(SQLiteDatabase db)
+            throws Exception;
+
     /** Cleanup a provider when deleted */
     public abstract void cleanupOnDelete(String acctName);
 

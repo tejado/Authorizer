@@ -48,13 +48,15 @@ public class ProviderSyncer
     /** Add a provider for an account */
     public static long addProvider(String acctName, ProviderType type,
                                    SQLiteDatabase db, Context ctx)
-        throws SQLException
+        throws Exception
     {
         Log.i(TAG, "Add provider: " + acctName);
+        Provider providerImpl = Provider.getProvider(type, ctx);
+        providerImpl.checkProviderAdd(db);
+
         int freq = ProviderSyncFreqPref.DEFAULT.getFreq();
         long id = SyncDb.addProvider(acctName, type, freq, db);
 
-        Provider providerImpl = Provider.getProvider(type, ctx);
         Account acct = providerImpl.getAccount(acctName);
         if (acct != null) {
             ContentResolver.setSyncAutomatically(
