@@ -317,13 +317,6 @@ public class MainActivity extends FragmentActivity
     }
 
 
-    /** Dropbox sync frequency spinner changed */
-    /*
-    private void onDropboxFreqChanged(int pos)
-    {
-    }
-    */
-
     /* (non-Javadoc)
      * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
      */
@@ -440,25 +433,15 @@ public class MainActivity extends FragmentActivity
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
-            int freqVal = cursor.getInt(
-                    PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
-            ProviderSyncFreqPref freq =
-                    ProviderSyncFreqPref.freqValueOf(freqVal);
             itsDropboxUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
-            // TODO: no sync frequency for dropbox
 
-            View freqSpinLabel = findViewById(R.id.gdrive_interval_label);
-            Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
-            freqSpin.setSelection(freq.getDisplayIdx());
-            View syncBtn = findViewById(R.id.gdrive_sync);
+            View syncBtn = findViewById(R.id.dropbox_sync);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             btns.setVisibility(View.VISIBLE);
 
             acctView.setText(getString(R.string.account_label, acct));
-            freqSpin.setEnabled(true);
-            freqSpinLabel.setEnabled(true);
             syncBtn.setEnabled(true);
         } else {
             itsDropboxUri = null;
