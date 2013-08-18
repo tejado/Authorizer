@@ -57,7 +57,6 @@ public class MainActivity extends FragmentActivity
 
     private static final int LOADER_PROVIDERS = 0;
 
-    private SyncDb itsSyncDb;
     private Account itsGdriveAccount = null;
     private Uri itsGdriveUri = null;
     private Uri itsDropboxUri = null;
@@ -70,8 +69,6 @@ public class MainActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.i(TAG, "onCreate");
-
-        itsSyncDb = new SyncDb(this);
 
         Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
         freqSpin.setOnItemSelectedListener(new OnItemSelectedListener()
@@ -109,7 +106,6 @@ public class MainActivity extends FragmentActivity
     protected void onDestroy()
     {
         super.onDestroy();
-        itsSyncDb.close();
     }
 
     /* (non-Javadoc)
