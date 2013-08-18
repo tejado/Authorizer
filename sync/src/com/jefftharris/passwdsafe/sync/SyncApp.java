@@ -47,7 +47,6 @@ public class SyncApp extends Application
         PasswdSafeUtil.dbginfo(TAG, "onCreate");
         super.onCreate();
 
-        //  TODO: run when phone starts
         itsTimerHandler = new Handler(Looper.getMainLooper());
         itsDropboxAcctMgr =
                 DbxAccountManager.getInstance(getApplicationContext(),

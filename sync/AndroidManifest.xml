@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.jefftharris.passwdsafe.sync"
     android:versionCode="10100"
     android:versionName="1.1.0">
@@ -18,6 +19,7 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.READ_SYNC_STATS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"/>
     <uses-permission android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"/>
@@ -87,6 +89,14 @@
 
             <grant-uri-permission android:pathPattern=".*" />
         </provider>
+
+        <receiver
+            android:name=".StartupReceiver"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
         <service
             android:name="com.dropbox.sync.android.DbxSyncService"
