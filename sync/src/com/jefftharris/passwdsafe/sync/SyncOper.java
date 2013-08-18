@@ -17,16 +17,16 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public abstract class SyncOper
 {
-    protected final SyncDb.DbFile itsFile;
+    protected final DbFile itsFile;
 
     /** Constructor */
-    public SyncOper(SyncDb.DbFile file)
+    public SyncOper(DbFile file)
     {
         itsFile = file;
     }
 
     /** Get the sync database file */
-    public SyncDb.DbFile getFile()
+    public DbFile getFile()
     {
         return itsFile;
     }

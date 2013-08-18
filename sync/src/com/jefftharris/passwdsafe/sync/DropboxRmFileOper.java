@@ -27,7 +27,7 @@ public class DropboxRmFileOper extends DropboxSyncOper
     private final boolean itsIsRmRemote;
 
     /** Constructor */
-    protected DropboxRmFileOper(SyncDb.DbFile file)
+    protected DropboxRmFileOper(DbFile file)
     {
         super(file);
 

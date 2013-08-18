@@ -26,7 +26,7 @@ public class GDriveRmFileOper extends GDriveSyncOper
     private final boolean itsIsRmRemote;
 
     /** Constructor */
-    public GDriveRmFileOper(SyncDb.DbFile file)
+    public GDriveRmFileOper(DbFile file)
     {
         super(file);
 

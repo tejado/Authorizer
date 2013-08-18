@@ -44,7 +44,7 @@ public class GDriveLaunchActivity extends FragmentActivity
             String fileId = intent.getStringExtra("resourceId");
             PasswdSafeUtil.dbginfo(TAG, "Open GDrive file %s", fileId);
 
-            Pair<SyncDb.DbProvider, SyncDb.DbFile> rc = getFile(fileId);
+            Pair<DbProvider, DbFile> rc = getFile(fileId);
             if (rc != null) {
                 Uri uri = PasswdSafeContract.Providers.CONTENT_URI;
                 Uri.Builder builder = uri.buildUpon();
@@ -66,7 +66,7 @@ public class GDriveLaunchActivity extends FragmentActivity
 
 
     /** Get the database info for the drive file */
-    private final Pair<SyncDb.DbProvider, SyncDb.DbFile> getFile(String fileId)
+    private final Pair<DbProvider, DbFile> getFile(String fileId)
     {
         SyncDb syncDb = new SyncDb(this);
         try {
@@ -74,10 +74,10 @@ public class GDriveLaunchActivity extends FragmentActivity
             try {
                 db.beginTransaction();
 
-                List<SyncDb.DbProvider> providers = SyncDb.getProviders(db);
-                for (SyncDb.DbProvider provider: providers) {
+                List<DbProvider> providers = SyncDb.getProviders(db);
+                for (DbProvider provider: providers) {
                     if (provider.itsType == ProviderType.GDRIVE) {
-                        return new Pair<SyncDb.DbProvider, SyncDb.DbFile>(
+                        return new Pair<DbProvider, DbFile>(
                                 provider,
                                 SyncDb.getFileByRemoteId(provider.itsId, fileId,
                                                          db));

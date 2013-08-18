@@ -101,7 +101,7 @@ public class GDriveProvider extends Provider
 
     /** Sync a provider */
     @Override
-    public void sync(Account acct, SyncDb.DbProvider provider,
+    public void sync(Account acct, DbProvider provider,
                      SQLiteDatabase db,
                      boolean manual, SyncLogRecord logrec) throws Exception
     {
@@ -122,7 +122,7 @@ public class GDriveProvider extends Provider
 
     /** Update a local file */
     @Override
-    public void updateLocalFile(SyncDb.DbFile file,
+    public void updateLocalFile(DbFile file,
                                 String localFileName,
                                 java.io.File localFile,
                                 SQLiteDatabase db)
@@ -136,7 +136,7 @@ public class GDriveProvider extends Provider
 
     /** Delete a local file */
     @Override
-    public void deleteLocalFile(SyncDb.DbFile file, SQLiteDatabase db)
+    public void deleteLocalFile(DbFile file, SQLiteDatabase db)
     {
         SyncDb.updateLocalFileDeleted(file.itsId, db);
     }
@@ -155,14 +155,14 @@ public class GDriveProvider extends Provider
     {
         private final Drive itsDrive;
         private final String itsDriveToken;
-        private final SyncDb.DbProvider itsProvider;
+        private final DbProvider itsProvider;
         private final SQLiteDatabase itsDb;
         private final SyncLogRecord itsLogrec;
         private final Context itsContext;
 
 
         /** Constructor */
-        public Syncer(Account acct, SyncDb.DbProvider provider,
+        public Syncer(Account acct, DbProvider provider,
                       SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
         {
             Pair<Drive, String> drive = getDriveService(acct, ctx);
@@ -322,9 +322,9 @@ public class GDriveProvider extends Provider
         {
             HashMap<String, File> fileCache =
                     new HashMap<String, File>(remfiles);
-            List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
+            List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
                                                           itsDb);
-            for (SyncDb.DbFile dbfile: dbfiles) {
+            for (DbFile dbfile: dbfiles) {
                 if (remfiles.containsKey(dbfile.itsRemoteId)) {
                     File remfile = remfiles.get(dbfile.itsRemoteId);
                     if (remfile != null) {
@@ -360,7 +360,7 @@ public class GDriveProvider extends Provider
 
             List<GDriveSyncOper> opers = new ArrayList<GDriveSyncOper>();
             dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
-            for (SyncDb.DbFile dbfile: dbfiles) {
+            for (DbFile dbfile: dbfiles) {
                 if (isRemoteNewer(dbfile)) {
                     if (dbfile.itsIsRemoteDeleted) {
                         opers.add(new GDriveRmFileOper(dbfile));
@@ -397,7 +397,7 @@ public class GDriveProvider extends Provider
 
 
         /** Is the remote file considered newer than the local */
-        private final boolean isRemoteNewer(SyncDb.DbFile dbfile)
+        private final boolean isRemoteNewer(DbFile dbfile)
         {
             if (dbfile.itsRemoteId == null) {
                 return false;

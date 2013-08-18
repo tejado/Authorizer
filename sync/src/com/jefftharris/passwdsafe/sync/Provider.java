@@ -31,7 +31,7 @@ public abstract class Provider
     public abstract void cleanupOnDelete(String acctName);
 
     /** Sync a provider */
-    public abstract void sync(Account acct, SyncDb.DbProvider provider,
+    public abstract void sync(Account acct, DbProvider provider,
                               SQLiteDatabase db,
                               boolean manual, SyncLogRecord logrec)
             throws Exception;
@@ -42,14 +42,14 @@ public abstract class Provider
             throws Exception;
 
     /** Update a local file */
-    public abstract void updateLocalFile(SyncDb.DbFile file,
+    public abstract void updateLocalFile(DbFile file,
                                          String localFileName,
                                          File localFile,
                                          SQLiteDatabase db)
             throws Exception;
 
     /** Delete a local file */
-    public abstract void deleteLocalFile(SyncDb.DbFile file, SQLiteDatabase db)
+    public abstract void deleteLocalFile(DbFile file, SQLiteDatabase db)
             throws Exception;
 
     /** Get the provider implementation for the type */

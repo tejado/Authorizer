@@ -35,7 +35,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.Utils;
-import com.jefftharris.passwdsafe.sync.SyncDb.DbProvider;
 
 /**
  *  The DropboxProvider class encapsulates Dropbox
@@ -68,8 +67,8 @@ public class DropboxProvider extends Provider
     public void checkProviderAdd(SQLiteDatabase db)
             throws Exception
     {
-        List<SyncDb.DbProvider> providers = SyncDb.getProviders(db);
-        for (SyncDb.DbProvider provider: providers) {
+        List<DbProvider> providers = SyncDb.getProviders(db);
+        for (DbProvider provider: providers) {
             if (provider.itsType == ProviderType.DROPBOX) {
                 throw new Exception("Only one Dropbox account allowed");
             }
@@ -127,7 +126,7 @@ public class DropboxProvider extends Provider
 
     /** Update a local file */
     @Override
-    public synchronized void updateLocalFile(SyncDb.DbFile file,
+    public synchronized void updateLocalFile(DbFile file,
                                              String localFileName,
                                              java.io.File localFile,
                                              SQLiteDatabase db)
@@ -166,7 +165,7 @@ public class DropboxProvider extends Provider
 
     /** Delete a local file */
     @Override
-    public void deleteLocalFile(SyncDb.DbFile file, SQLiteDatabase db)
+    public void deleteLocalFile(DbFile file, SQLiteDatabase db)
             throws Exception
     {
         SyncDb.updateLocalFileDeleted(file.itsId, db);
@@ -199,14 +198,14 @@ public class DropboxProvider extends Provider
     private static class Syncer
     {
         private final DbxFileSystem itsFs;
-        private final SyncDb.DbProvider itsProvider;
+        private final DbProvider itsProvider;
         private final SQLiteDatabase itsDb;
         private final SyncLogRecord itsLogrec;
         private final Context itsContext;
 
         /** Constructor */
         public Syncer(DbxFileSystem fs,
-                      SyncDb.DbProvider provider,
+                      DbProvider provider,
                       SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
         {
             itsFs = fs;
@@ -282,9 +281,9 @@ public class DropboxProvider extends Provider
             TreeMap<DbxPath, DbxFileInfo> allDbxfiles =
                     new TreeMap<DbxPath, DbxFileInfo>(dbxfiles);
 
-            List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
+            List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
                                                           itsDb);
-            for (SyncDb.DbFile dbfile: dbfiles) {
+            for (DbFile dbfile: dbfiles) {
                 DbxPath dbpath = new DbxPath(dbfile.itsRemoteId);
                 DbxFileInfo dbpathinfo = dbxfiles.get(dbpath);
                 if (dbpathinfo != null) {
@@ -317,7 +316,7 @@ public class DropboxProvider extends Provider
 
             List<DropboxSyncOper> opers = new ArrayList<DropboxSyncOper>();
             dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
-            for (SyncDb.DbFile dbfile: dbfiles) {
+            for (DbFile dbfile: dbfiles) {
                 if (dbfile.itsIsRemoteDeleted || dbfile.itsIsLocalDeleted) {
                     opers.add(new DropboxRmFileOper(dbfile));
                 } else if (isRemoteNewer(dbfile, allDbxfiles)) {
@@ -329,7 +328,7 @@ public class DropboxProvider extends Provider
 
 
         /** Is the remote file newer than the local */
-        private final boolean isRemoteNewer(SyncDb.DbFile dbfile,
+        private final boolean isRemoteNewer(DbFile dbfile,
                                             Map<DbxPath, DbxFileInfo> dbxfiles)
         {
             if (dbfile.itsRemoteId == null) {

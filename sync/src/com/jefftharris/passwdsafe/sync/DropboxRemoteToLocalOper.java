@@ -38,7 +38,7 @@ public class DropboxRemoteToLocalOper extends DropboxSyncOper
     private boolean itsIsDownloaded = false;
 
     /** Constructor */
-    protected DropboxRemoteToLocalOper(SyncDb.DbFile file)
+    protected DropboxRemoteToLocalOper(DbFile file)
     {
         super(file);
     }

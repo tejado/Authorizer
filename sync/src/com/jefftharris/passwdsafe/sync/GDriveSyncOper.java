@@ -20,7 +20,7 @@ import com.google.api.services.drive.model.File;
 public abstract class GDriveSyncOper extends SyncOper
 {
     /** Constructor */
-    protected GDriveSyncOper(SyncDb.DbFile file)
+    protected GDriveSyncOper(DbFile file)
     {
         super(file);
     }

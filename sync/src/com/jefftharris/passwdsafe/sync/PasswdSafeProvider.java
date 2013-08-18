@@ -117,7 +117,7 @@ public class PasswdSafeProvider extends ContentProvider
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
-                SyncDb.DbProvider provider = SyncDb.getProvider(id, db);
+                DbProvider provider = SyncDb.getProvider(id, db);
                 if (provider == null) {
                     return 0;
                 }
@@ -140,12 +140,12 @@ public class PasswdSafeProvider extends ContentProvider
                 db.beginTransaction();
                 Long providerId = Long.valueOf(uri.getPathSegments().get(1));
                 Long id = Long.valueOf(uri.getPathSegments().get(3));
-                SyncDb.DbFile file = SyncDb.getFile(id, db);
+                DbFile file = SyncDb.getFile(id, db);
                 if (file == null) {
                     return 0;
                 }
 
-                SyncDb.DbProvider dbProvider = SyncDb.getProvider(providerId,
+                DbProvider dbProvider = SyncDb.getProvider(providerId,
                                                                   db);
                 Provider provider = Provider.getProvider(dbProvider.itsType,
                                                          getContext());
@@ -246,7 +246,7 @@ public class PasswdSafeProvider extends ContentProvider
             try {
                 db.beginTransaction();
                 Long providerId = Long.valueOf(uri.getPathSegments().get(1));
-                SyncDb.DbProvider dbProvider = SyncDb.getProvider(providerId,
+                DbProvider dbProvider = SyncDb.getProvider(providerId,
                                                                   db);
                 if (dbProvider == null) {
                     throw new Exception("No provider for " + providerId);
@@ -421,7 +421,7 @@ public class PasswdSafeProvider extends ContentProvider
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();
-                SyncDb.DbProvider provider = SyncDb.getProvider(id, db);
+                DbProvider provider = SyncDb.getProvider(id, db);
                 if (provider == null) {
                     return 0;
                 }
@@ -459,7 +459,7 @@ public class PasswdSafeProvider extends ContentProvider
                 db.beginTransaction();
                 Context ctx = getContext();
 
-                SyncDb.DbFile file = SyncDb.getFile(id, db);
+                DbFile file = SyncDb.getFile(id, db);
                 if (file == null) {
                     throw new IllegalArgumentException(
                             "File not found: " + uri);
@@ -482,7 +482,7 @@ public class PasswdSafeProvider extends ContentProvider
                 }
                 tmpFile = null;
 
-                SyncDb.DbProvider dbProvider = SyncDb.getProvider(providerId,
+                DbProvider dbProvider = SyncDb.getProvider(providerId,
                                                                   db);
                 Provider provider = Provider.getProvider(dbProvider.itsType,
                                                          getContext());
@@ -523,7 +523,7 @@ public class PasswdSafeProvider extends ContentProvider
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             long id = Long.valueOf(uri.getPathSegments().get(3));
-            SyncDb.DbFile file;
+            DbFile file;
             SQLiteDatabase db = itsDb.getDb();
             try {
                 db.beginTransaction();

@@ -8,7 +8,6 @@ package com.jefftharris.passwdsafe.sync;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -76,96 +75,6 @@ public class SyncDb
             DB_COL_SYNC_LOGS_START + " < ?";
 
     private DbHelper itsDbHelper;
-
-    /** Entry in the providers table */
-    public static class DbProvider
-    {
-        public final long itsId;
-        public final ProviderType itsType;
-        public final String itsAcct;
-        public final long itsSyncChange;
-        public final int itsSyncFreq;
-        public final String itsDisplayName;
-
-        public static final String[] QUERY_FIELDS = {
-            DB_COL_PROVIDERS_ID,
-            DB_COL_PROVIDERS_TYPE,
-            DB_COL_PROVIDERS_ACCT,
-            DB_COL_PROVIDERS_SYNC_CHANGE,
-            DB_COL_PROVIDERS_SYNC_FREQ,
-            DB_COL_PROVIDERS_DISPLAY_NAME };
-
-        public DbProvider(Cursor cursor)
-        {
-            itsId = cursor.getLong(0);
-            itsType = ProviderType.fromString(cursor.getString(1));
-            itsAcct = cursor.getString(2);
-            itsSyncChange = cursor.getLong(3);
-            itsSyncFreq = cursor.getInt(4);
-            itsDisplayName = cursor.getString(5);
-        }
-
-        @Override
-        public String toString()
-        {
-            return String.format(
-                    Locale.US,
-                    "{id:%d, type: %s, acct:%s, syncChange:%d, " +
-                    "syncFreq:%d, dispName:%s}",
-                    itsId, itsType, itsAcct, itsSyncChange, itsSyncFreq,
-                    itsDisplayName);
-        }
-    }
-
-    /** Entry in the files table */
-    public static class DbFile
-    {
-        public final long itsId;
-        public final String itsLocalFile;
-        public final String itsLocalTitle;
-        public final long itsLocalModDate;
-        public final boolean itsIsLocalDeleted;
-        public final String itsRemoteId;
-        public final String itsRemoteTitle;
-        public final long itsRemoteModDate;
-        public final boolean itsIsRemoteDeleted;
-
-        public static final String[] QUERY_FIELDS = {
-            DB_COL_FILES_ID,
-            DB_COL_FILES_LOCAL_FILE,
-            DB_COL_FILES_LOCAL_TITLE,
-            DB_COL_FILES_LOCAL_MOD_DATE,
-            DB_COL_FILES_LOCAL_DELETED,
-            DB_COL_FILES_REMOTE_ID,
-            DB_COL_FILES_REMOTE_TITLE,
-            DB_COL_FILES_REMOTE_MOD_DATE,
-            DB_COL_FILES_REMOTE_DELETED };
-
-        public DbFile(Cursor cursor)
-        {
-            itsId = cursor.getLong(0);
-            itsLocalFile = cursor.getString(1);
-            itsLocalTitle = cursor.getString(2);
-            itsLocalModDate = cursor.getLong(3);
-            itsIsLocalDeleted = cursor.getInt(4) != 0;
-            itsRemoteId = cursor.getString(5);
-            itsRemoteTitle = cursor.getString(6);
-            itsRemoteModDate = cursor.getLong(7);
-            itsIsRemoteDeleted = cursor.getInt(8) != 0;
-        }
-
-        @Override
-        public String toString()
-        {
-            return String.format(Locale.US,
-                    "{id:%d, local:{title:%s, file:%s, mod:%d, del:%b}, " +
-                    "remote:{id:%s, title:'%s', mod:%d, del:%b}}",
-                    itsId, itsLocalTitle, itsLocalFile, itsLocalModDate,
-                    itsIsLocalDeleted, itsRemoteId, itsRemoteTitle,
-                    itsRemoteModDate, itsIsRemoteDeleted);
-        }
-    }
-
 
     /** Constructor */
     public SyncDb(Context ctx)

@@ -35,7 +35,7 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
     private boolean itsIsDownloaded = false;
 
     /** Constructor */
-    public GDriveRemoteToLocalOper(SyncDb.DbFile file,
+    public GDriveRemoteToLocalOper(DbFile file,
                                    HashMap<String, File> cache)
     {
         super(file);

@@ -18,7 +18,7 @@ import com.dropbox.sync.android.DbxFileSystem;
 public abstract class DropboxSyncOper extends SyncOper
 {
     /** Constructor */
-    protected DropboxSyncOper(SyncDb.DbFile file)
+    protected DropboxSyncOper(DbFile file)
     {
         super(file);
     }

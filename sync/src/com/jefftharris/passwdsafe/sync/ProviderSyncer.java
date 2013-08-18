@@ -73,13 +73,13 @@ public class ProviderSyncer
 
 
     /** Delete the provider for the account */
-    public static void deleteProvider(SyncDb.DbProvider provider,
+    public static void deleteProvider(DbProvider provider,
                                       SQLiteDatabase db,
                                       Context ctx)
         throws SQLException
     {
-        List<SyncDb.DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
-        for (SyncDb.DbFile dbfile: dbfiles) {
+        List<DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
+        for (DbFile dbfile: dbfiles) {
             ctx.deleteFile(dbfile.itsLocalFile);
         }
 
@@ -101,7 +101,7 @@ public class ProviderSyncer
 
 
     /** Update the sync frequency for a provider */
-    public static void updateSyncFreq(SyncDb.DbProvider provider,
+    public static void updateSyncFreq(DbProvider provider,
                                       int freq,
                                       SQLiteDatabase db,
                                       Context ctx)
@@ -130,8 +130,8 @@ public class ProviderSyncer
     {
         PasswdSafeUtil.dbginfo(TAG, "Validating accounts");
 
-        List<SyncDb.DbProvider> providers = SyncDb.getProviders(db);
-        for (SyncDb.DbProvider provider: providers) {
+        List<DbProvider> providers = SyncDb.getProviders(db);
+        for (DbProvider provider: providers) {
             Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
             Account acct = providerImpl.getAccount(provider.itsAcct);
             if (acct == null) {
@@ -165,7 +165,7 @@ public class ProviderSyncer
 
         /** Check if the syncing account is a valid provider */
         SQLiteDatabase db = itsSyncDb.getDb();
-        SyncDb.DbProvider provider = null;
+        DbProvider provider = null;
         try {
             db.beginTransaction();
             ProviderType providerType = null;

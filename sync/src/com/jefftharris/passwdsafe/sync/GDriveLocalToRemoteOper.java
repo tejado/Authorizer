@@ -31,7 +31,7 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
     private java.io.File itsLocalFile;
 
     /** Constructor */
-    public GDriveLocalToRemoteOper(SyncDb.DbFile file,
+    public GDriveLocalToRemoteOper(DbFile file,
                                    HashMap<String, File> cache,
                                    boolean forceInsert)
     {
