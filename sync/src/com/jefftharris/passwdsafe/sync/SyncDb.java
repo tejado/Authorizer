@@ -472,7 +472,7 @@ public class SyncDb
                 PasswdSafeUtil.dbginfo(TAG, "Upgrade to v2");
                 db.execSQL("ALTER TABLE " + DB_TABLE_PROVIDERS +
                            " ADD COLUMN " + DB_COL_PROVIDERS_DISPLAY_NAME +
-                           " TEXT");
+                           " TEXT;");
             }
         }
 
