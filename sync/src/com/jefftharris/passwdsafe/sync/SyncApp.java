@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.sync;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +33,7 @@ public class SyncApp extends Application
 
     private static final String TAG = "SyncApp";
 
+    private SyncDb itsSyncDb = null;
     private DbxAccountManager itsDropboxAcctMgr = null;
     private DbxFileSystem itsDropboxFs = null;
     private boolean itsDropboxSyncInProgress = false;
@@ -46,6 +48,8 @@ public class SyncApp extends Application
     {
         PasswdSafeUtil.dbginfo(TAG, "onCreate");
         super.onCreate();
+
+        itsSyncDb = new SyncDb(this);
 
         itsTimerHandler = new Handler(Looper.getMainLooper());
         itsDropboxAcctMgr =
@@ -63,7 +67,17 @@ public class SyncApp extends Application
     public void onTerminate()
     {
         PasswdSafeUtil.dbginfo(TAG, "onTerminate");
+        itsSyncDb.close();
         super.onTerminate();
+    }
+
+
+    /** Acquire the SyncDb */
+    public static SyncDb acquireSyncDb(Context ctx)
+    {
+        SyncApp app = (SyncApp)ctx.getApplicationContext();
+        app.itsSyncDb.acquire();
+        return app.itsSyncDb;
     }
 
 
@@ -197,11 +211,7 @@ public class SyncApp extends Application
                         SyncApp.this, null,
                         new Account(acct.getUserId(),
                                     SyncDb.DROPBOX_ACCOUNT_TYPE));
-                try {
-                    syncer.performSync(itsIsManual);
-                } finally {
-                    syncer.close();
-                }
+                syncer.performSync(itsIsManual);
             }
             return null;
         }

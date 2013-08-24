@@ -68,30 +68,26 @@ public class GDriveLaunchActivity extends FragmentActivity
     /** Get the database info for the drive file */
     private final Pair<DbProvider, DbFile> getFile(String fileId)
     {
-        SyncDb syncDb = new SyncDb(this);
+        Pair<DbProvider, DbFile> rc = null;
+        SyncDb syncDb = SyncApp.acquireSyncDb(this);
         try {
-            SQLiteDatabase db = syncDb.getDb();
-            try {
-                db.beginTransaction();
-
-                List<DbProvider> providers = SyncDb.getProviders(db);
-                for (DbProvider provider: providers) {
-                    if (provider.itsType == ProviderType.GDRIVE) {
-                        return new Pair<DbProvider, DbFile>(
-                                provider,
-                                SyncDb.getFileByRemoteId(provider.itsId, fileId,
-                                                         db));
-                    }
+            SQLiteDatabase db = syncDb.beginTransaction();
+            List<DbProvider> providers = SyncDb.getProviders(db);
+            for (DbProvider provider: providers) {
+                if (provider.itsType == ProviderType.GDRIVE) {
+                    rc = new Pair<DbProvider, DbFile>(
+                            provider,
+                            SyncDb.getFileByRemoteId(provider.itsId, fileId,
+                                                     db));
+                    break;
                 }
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
             }
+            db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.e(TAG, "Error opening Google Drive file: " + fileId, e);
         } finally {
-            syncDb.close();
+            syncDb.endTransactionAndRelease();
         }
-        return null;
+        return rc;
     }
 }

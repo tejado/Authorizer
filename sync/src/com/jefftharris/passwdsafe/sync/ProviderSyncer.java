@@ -32,7 +32,6 @@ public class ProviderSyncer
 
     private final Context itsContext;
     private final Account itsAccount;
-    private final SyncDb itsSyncDb;
 
     /** Constructor */
     public ProviderSyncer(Context context,
@@ -41,7 +40,6 @@ public class ProviderSyncer
     {
         itsContext = context;
         itsAccount = account;
-        itsSyncDb = new SyncDb(itsContext);
     }
 
 
@@ -148,23 +146,24 @@ public class ProviderSyncer
         return "syncfile-" + Long.toString(fileId);
     }
 
-    /** Close the syncer */
-    public void close()
-    {
-        itsSyncDb.close();
-    }
-
-
     /** Perform synchronization */
     public void performSync(boolean manual)
     {
-        // TODO: sync only one provider at a time
+        SyncDb syncDb = SyncApp.acquireSyncDb(itsContext);
+        try {
+            performSync(syncDb.getDb(), manual);
+        } finally {
+            syncDb.release();
+        }
+    }
 
+    /** Perform synchronization with the database */
+    private void performSync(SQLiteDatabase db, boolean manual)
+    {
         PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s (%s), manual: %b",
                                itsAccount.name, itsAccount.type, manual);
 
         /** Check if the syncing account is a valid provider */
-        SQLiteDatabase db = itsSyncDb.getDb();
         DbProvider provider = null;
         try {
             db.beginTransaction();

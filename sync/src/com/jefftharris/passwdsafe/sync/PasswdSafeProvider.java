@@ -49,7 +49,6 @@ public class PasswdSafeProvider extends ContentProvider
     private static final HashMap<String, String> FILES_MAP;
     private static final HashMap<String, String> SYNC_LOGS_MAP;
 
-    private SyncDb itsDb;
     private OnAccountsUpdateListener itsListener;
 
     static {
@@ -114,9 +113,9 @@ public class PasswdSafeProvider extends ContentProvider
         case PasswdSafeContract.MATCH_PROVIDER: {
             PasswdSafeUtil.dbginfo(TAG, "Delete provider: %s", uri);
             Long id = Long.valueOf(uri.getPathSegments().get(1));
-            SQLiteDatabase db = itsDb.getDb();
+            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
             try {
-                db.beginTransaction();
+                SQLiteDatabase db = syncDb.beginTransaction();
                 DbProvider provider = SyncDb.getProvider(id, db);
                 if (provider == null) {
                     return 0;
@@ -130,14 +129,14 @@ public class PasswdSafeProvider extends ContentProvider
                 Log.e(TAG, msg, e);
                 throw new RuntimeException(msg, e);
             } finally {
-                db.endTransaction();
+                syncDb.endTransactionAndRelease();
             }
         }
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             PasswdSafeUtil.dbginfo(TAG, "Delete file: %s", uri);
-            SQLiteDatabase db = itsDb.getDb();
+            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
             try {
-                db.beginTransaction();
+                SQLiteDatabase db = syncDb.beginTransaction();
                 Long providerId = Long.valueOf(uri.getPathSegments().get(1));
                 Long id = Long.valueOf(uri.getPathSegments().get(3));
                 DbFile file = SyncDb.getFile(id, db);
@@ -159,7 +158,7 @@ public class PasswdSafeProvider extends ContentProvider
                 Log.e(TAG, msg, e);
                 throw new RuntimeException(msg, e);
             } finally {
-                db.endTransaction();
+                syncDb.endTransactionAndRelease();
             }
         }
         default: {
@@ -217,9 +216,9 @@ public class PasswdSafeProvider extends ContentProvider
                 throw new IllegalArgumentException("Invalid type for provider");
             }
             PasswdSafeUtil.dbginfo(TAG, "Insert provider: %s", acct);
-            SQLiteDatabase db = itsDb.getDb();
+            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
             try {
-                db.beginTransaction();
+                SQLiteDatabase db = syncDb.beginTransaction();
                 long id = ProviderSyncer.addProvider(acct, type, db,
                                                      getContext());
                 db.setTransactionSuccessful();
@@ -231,7 +230,7 @@ public class PasswdSafeProvider extends ContentProvider
                 Log.e(TAG, msg, e);
                 throw new RuntimeException(msg, e);
             } finally {
-                db.endTransaction();
+                syncDb.endTransactionAndRelease();
             }
         }
         case PasswdSafeContract.MATCH_PROVIDER_FILES: {
@@ -242,9 +241,9 @@ public class PasswdSafeProvider extends ContentProvider
             }
             PasswdSafeUtil.dbginfo(TAG, "Insert file \"%s\" for %s",
                                    title, uri);
-            SQLiteDatabase db = itsDb.getDb();
+            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
             try {
-                db.beginTransaction();
+                SQLiteDatabase db = syncDb.beginTransaction();
                 Long providerId = Long.valueOf(uri.getPathSegments().get(1));
                 DbProvider dbProvider = SyncDb.getProvider(providerId,
                                                                   db);
@@ -265,7 +264,7 @@ public class PasswdSafeProvider extends ContentProvider
                 Log.e(TAG, msg, e);
                 throw new RuntimeException(msg, e);
             } finally {
-                db.endTransaction();
+                syncDb.endTransactionAndRelease();
             }
         }
         default: {
@@ -282,7 +281,6 @@ public class PasswdSafeProvider extends ContentProvider
     public boolean onCreate()
     {
         PasswdSafeUtil.dbginfo(TAG, "onCreate");
-        itsDb = new SyncDb(getContext());
         itsListener = new OnAccountsUpdateListener()
         {
             @Override
@@ -292,15 +290,15 @@ public class PasswdSafeProvider extends ContentProvider
                     @Override
                     protected Void doInBackground(Void... params)
                     {
-                        SQLiteDatabase db = itsDb.getDb();
+                        SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
                         try {
-                            db.beginTransaction();
+                            SQLiteDatabase db = syncDb.beginTransaction();
                             ProviderSyncer.validateAccounts(db, getContext());
                             db.setTransactionSuccessful();
                         } catch (Exception e) {
                             Log.e(TAG, "Error validating accounts", e);
                         } finally {
-                            db.endTransaction();
+                            syncDb.endTransactionAndRelease();
                         }
                         return null;
                     }
@@ -397,12 +395,17 @@ public class PasswdSafeProvider extends ContentProvider
             throw new IllegalArgumentException("sortOrder not supported");
         }
 
-        SQLiteDatabase db = itsDb.getDb();
-        Cursor c = qb.query(db, projection, selection, selectionArgs,
-                            null, null, sortOrder);
-        c.setNotificationUri(getContext().getContentResolver(),
-                             PasswdSafeContract.CONTENT_URI);
-        return c;
+        SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+        try {
+            SQLiteDatabase db = syncDb.getDb();
+            Cursor c = qb.query(db, projection, selection, selectionArgs,
+                                null, null, sortOrder);
+            c.setNotificationUri(getContext().getContentResolver(),
+                                 PasswdSafeContract.CONTENT_URI);
+            return c;
+        } finally {
+            syncDb.release();
+        }
     }
 
     /* (non-Javadoc)
@@ -418,9 +421,9 @@ public class PasswdSafeProvider extends ContentProvider
         case PasswdSafeContract.MATCH_PROVIDER: {
             PasswdSafeUtil.dbginfo(TAG, "Update provider: %s", uri);
             Long id = Long.valueOf(uri.getPathSegments().get(1));
-            SQLiteDatabase db = itsDb.getDb();
+            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
             try {
-                db.beginTransaction();
+                SQLiteDatabase db = syncDb.beginTransaction();
                 DbProvider provider = SyncDb.getProvider(id, db);
                 if (provider == null) {
                     return 0;
@@ -440,7 +443,7 @@ public class PasswdSafeProvider extends ContentProvider
                 Log.e(TAG, msg, e);
                 throw new RuntimeException(msg, e);
             } finally {
-                db.endTransaction();
+                syncDb.endTransactionAndRelease();
             }
             return 1;
         }
@@ -454,9 +457,9 @@ public class PasswdSafeProvider extends ContentProvider
             }
 
             File tmpFile = null;
-            SQLiteDatabase db = itsDb.getDb();
+            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
             try {
-                db.beginTransaction();
+                SQLiteDatabase db = syncDb.beginTransaction();
                 Context ctx = getContext();
 
                 DbFile file = SyncDb.getFile(id, db);
@@ -494,7 +497,7 @@ public class PasswdSafeProvider extends ContentProvider
                 Log.e(TAG, "Error updating " + uri, e);
                 return 0;
             } finally {
-                db.endTransaction();
+                syncDb.endTransactionAndRelease();
                 if ((tmpFile != null) && !tmpFile.delete()) {
                     Log.e(TAG, "Error deleting tmp file " +
                             tmpFile.getAbsolutePath());
@@ -524,13 +527,13 @@ public class PasswdSafeProvider extends ContentProvider
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             long id = Long.valueOf(uri.getPathSegments().get(3));
             DbFile file;
-            SQLiteDatabase db = itsDb.getDb();
+            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
             try {
-                db.beginTransaction();
+                SQLiteDatabase db = syncDb.beginTransaction();
                 file = SyncDb.getFile(id, db);
                 db.setTransactionSuccessful();
             } finally {
-                db.endTransaction();
+                syncDb.endTransactionAndRelease();
             }
             if ((file == null) || (file.itsLocalFile == null)) {
                 throw new FileNotFoundException(uri.toString());

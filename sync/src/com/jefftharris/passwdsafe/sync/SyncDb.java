@@ -8,6 +8,7 @@ package com.jefftharris.passwdsafe.sync;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -75,6 +76,7 @@ public class SyncDb
             DB_COL_SYNC_LOGS_START + " < ?";
 
     private DbHelper itsDbHelper;
+    private ReentrantLock itsMutex = new ReentrantLock();
 
     /** Constructor */
     public SyncDb(Context ctx)
@@ -88,10 +90,42 @@ public class SyncDb
         itsDbHelper.close();
     }
 
+    /** Acquire a lock on the database */
+    public void acquire()
+    {
+        itsMutex.lock();
+    }
+
+    /** Release the lock on the database */
+    public void release()
+    {
+        itsMutex.unlock();
+    }
+
     /** Get the database */
     public SQLiteDatabase getDb()
     {
         return itsDbHelper.getWritableDatabase();
+    }
+
+    /** Begin a transaction */
+    public SQLiteDatabase beginTransaction()
+        throws SQLException
+    {
+        SQLiteDatabase db = getDb();
+        db.beginTransaction();
+        return db;
+    }
+
+    /** End a transaction and release the database */
+    public void endTransactionAndRelease()
+        throws SQLException
+    {
+        try {
+            getDb().endTransaction();
+        } finally {
+            release();
+        }
     }
 
     /** Add a provider */
