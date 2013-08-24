@@ -208,7 +208,7 @@ public class SyncApp extends Application
             DbxAccount acct = getDropboxAcct();
             if (acct != null) {
                 ProviderSyncer syncer = new ProviderSyncer(
-                        SyncApp.this, null,
+                        SyncApp.this,
                         new Account(acct.getUserId(),
                                     SyncDb.DROPBOX_ACCOUNT_TYPE));
                 syncer.performSync(itsIsManual);

@@ -44,7 +44,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
     {
         boolean manual = (extras != null) &&
                 extras.getBoolean(ContentResolver.SYNC_EXTRAS_MANUAL);
-        ProviderSyncer syncer = new ProviderSyncer(itsContext, provider, account);
+        ProviderSyncer syncer = new ProviderSyncer(itsContext, account);
         syncer.performSync(manual);
     }
 }

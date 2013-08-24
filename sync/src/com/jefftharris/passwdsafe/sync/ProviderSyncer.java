@@ -9,7 +9,6 @@ package com.jefftharris.passwdsafe.sync;
 import java.util.List;
 
 import android.accounts.Account;
-import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.SQLException;
@@ -34,9 +33,7 @@ public class ProviderSyncer
     private final Account itsAccount;
 
     /** Constructor */
-    public ProviderSyncer(Context context,
-                        ContentProviderClient provider,
-                        Account account)
+    public ProviderSyncer(Context context, Account account)
     {
         itsContext = context;
         itsAccount = account;
