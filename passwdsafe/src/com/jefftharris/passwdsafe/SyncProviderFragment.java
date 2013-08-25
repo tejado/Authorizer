@@ -18,6 +18,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +30,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -50,6 +50,8 @@ public class SyncProviderFragment extends ListFragment
         /** Does the activity have a menu */
         public boolean activityHasMenu();
     }
+
+    private static final String TAG = "SyncProviderFilesFragment";
 
     private SimpleCursorAdapter itsProviderAdapter;
     private boolean itsHasProvider = true;
@@ -189,9 +191,15 @@ public class SyncProviderFragment extends ListFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_sync: {
-            ApiCompat.requestManualSync(
-                    null, PasswdSafeContract.Providers.CONTENT_URI,
-                    getActivity());
+            try {
+                ContentResolver cr = getActivity().getContentResolver();
+                cr.query(PasswdSafeContract.Methods.CONTENT_URI,
+                         null, null,
+                         new String[] { PasswdSafeContract.Methods.METHOD_SYNC },
+                         null);
+            } catch (Exception e) {
+                Log.e(TAG, "Error syncing", e);
+            }
             return true;
         }
         default: {

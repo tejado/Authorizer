@@ -72,10 +72,17 @@ public class SyncApp extends Application
     }
 
 
+    /** Get the Sync application */
+    public static SyncApp getSyncApp(Context ctx)
+    {
+        return (SyncApp)ctx.getApplicationContext();
+    }
+
+
     /** Acquire the SyncDb */
     public static SyncDb acquireSyncDb(Context ctx)
     {
-        SyncApp app = (SyncApp)ctx.getApplicationContext();
+        SyncApp app = getSyncApp(ctx);
         app.itsSyncDb.acquire();
         return app.itsSyncDb;
     }
@@ -208,9 +215,8 @@ public class SyncApp extends Application
             DbxAccount acct = getDropboxAcct();
             if (acct != null) {
                 ProviderSyncer syncer = new ProviderSyncer(
-                        SyncApp.this,
-                        new Account(acct.getUserId(),
-                                    SyncDb.DROPBOX_ACCOUNT_TYPE));
+                        SyncApp.this, new Account(acct.getUserId(),
+                                                  SyncDb.DROPBOX_ACCOUNT_TYPE));
                 syncer.performSync(itsIsManual);
             }
             return null;

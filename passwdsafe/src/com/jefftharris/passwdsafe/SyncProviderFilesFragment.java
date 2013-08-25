@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,6 +20,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -242,9 +243,16 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_sync_files: {
-            // TODO: can't use account sync
-            ApiCompat.requestManualSync(null, itsProviderUri, getActivity());
-
+            try {
+                ContentResolver cr = getActivity().getContentResolver();
+                cr.query(PasswdSafeContract.Methods.CONTENT_URI,
+                         null, null,
+                         new String[] { PasswdSafeContract.Methods.METHOD_SYNC,
+                                        itsProviderUri.toString() },
+                         null);
+            } catch (Exception e) {
+                Log.e(TAG, "Error syncing", e);
+            }
             return true;
         }
         case R.id.menu_file_new: {

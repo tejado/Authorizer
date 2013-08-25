@@ -14,7 +14,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -32,6 +34,8 @@ import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -190,6 +194,9 @@ public class PasswdSafeProvider extends ContentProvider
         case PasswdSafeContract.MATCH_SYNC_LOGS: {
             return PasswdSafeContract.SyncLogs.CONTENT_TYPE;
         }
+        case PasswdSafeContract.MATCH_METHODS: {
+            return PasswdSafeContract.Methods.CONTENT_TYPE;
+        }
         default: {
             throw new IllegalArgumentException(
                     "type unknown match for uri: " + uri);
@@ -324,9 +331,7 @@ public class PasswdSafeProvider extends ContentProvider
         PasswdSafeUtil.dbginfo(TAG, "query uri: %s", uri);
 
         boolean selectionValid = (selection == null);
-        if (selectionArgs != null) {
-            throw new IllegalArgumentException("selectionArgs not supported");
-        }
+        boolean selectionArgsValid = (selectionArgs == null);
         boolean sortOrderValid = (sortOrder == null);
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
@@ -382,6 +387,15 @@ public class PasswdSafeProvider extends ContentProvider
             }
             break;
         }
+        case PasswdSafeContract.MATCH_METHODS: {
+            try {
+                return doMethod(selectionArgs);
+            } catch (Exception e) {
+                String msg = "Error executing method";
+                Log.e(TAG, msg, e);
+                throw new RuntimeException(msg, e);
+            }
+        }
         default: {
             throw new IllegalArgumentException(
                     "query unknown match for uri: " + uri);
@@ -390,6 +404,9 @@ public class PasswdSafeProvider extends ContentProvider
 
         if (!selectionValid) {
             throw new IllegalArgumentException("selection not supported");
+        }
+        if (!selectionArgsValid) {
+            throw new IllegalArgumentException("selectionArgs not supported");
         }
         if (!sortOrderValid) {
             throw new IllegalArgumentException("sortOrder not supported");
@@ -548,6 +565,75 @@ public class PasswdSafeProvider extends ContentProvider
         default: {
             return super.openFile(uri, mode);
         }
+        }
+    }
+
+
+    /** Execute a method */
+    private Cursor doMethod(String[] args)
+    {
+        if (args.length < 1) {
+            throw new IllegalArgumentException("No method args");
+        }
+
+        String name = args[0];
+        if (name.equals(PasswdSafeContract.Methods.METHOD_SYNC)) {
+            if (args.length > 2) {
+                throw new IllegalArgumentException("Invalid number of args");
+            }
+
+            Long id = null;
+            if (args.length > 1) {
+                Uri providerUri = Uri.parse(args[1]);
+                int match = PasswdSafeContract.MATCHER.match(providerUri);
+                if (match != PasswdSafeContract.MATCH_PROVIDER) {
+                    throw new IllegalArgumentException(
+                            "Invalid provider URI: " + providerUri);
+                }
+
+                id = Long.valueOf(providerUri.getPathSegments().get(1));
+            }
+
+            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            List<DbProvider> providers;
+            try {
+                SQLiteDatabase db = syncDb.beginTransaction();
+                if (id == null) {
+                    providers = SyncDb.getProviders(db);
+                } else {
+                    DbProvider provider = SyncDb.getProvider(id, db);
+                    if (provider == null) {
+                        return null;
+                    }
+                    providers = Collections.singletonList(provider);
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                syncDb.endTransactionAndRelease();
+            }
+
+            for (DbProvider provider: providers) {
+                switch (provider.itsType) {
+                case DROPBOX: {
+                    SyncApp app = SyncApp.getSyncApp(getContext());
+                    app.syncDropbox();
+                    break;
+                }
+                case GDRIVE: {
+                    GoogleAccountManager acctMgr =
+                            new GoogleAccountManager(getContext());
+                    Account acct = acctMgr.getAccountByName(provider.itsAcct);
+                    Uri uri = ContentUris.withAppendedId(
+                            PasswdSafeContract.Providers.CONTENT_URI,
+                            provider.itsId);
+                    ApiCompat.requestManualSync(acct, uri, getContext());
+                    break;
+                }
+                }
+            }
+            return null;
+        } else {
+            throw new IllegalArgumentException("Unknown method: " + name);
         }
     }
 

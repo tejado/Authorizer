@@ -33,6 +33,7 @@ public final class PasswdSafeContract
     public static final int MATCH_PROVIDER_FILES = 3;
     public static final int MATCH_PROVIDER_FILE = 4;
     public static final int MATCH_SYNC_LOGS = 5;
+    public static final int MATCH_METHODS = 6;
 
     static {
         MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
@@ -53,6 +54,9 @@ public final class PasswdSafeContract
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.SyncLogs.TABLE,
                        MATCH_SYNC_LOGS);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Methods.TABLE,
+                       MATCH_METHODS);
     }
 
     /** The table of providers */
@@ -170,6 +174,18 @@ public final class PasswdSafeContract
 
         public static final int FLAGS_IS_FULL = 1 << 0;
         public static final int FLAGS_IS_MANUAL = 1 << 1;
+    }
+
+    /** The 'table' for methods */
+    public static final class Methods
+    {
+        public static final String TABLE = "methods";
+        public static final Uri CONTENT_URI =
+                Uri.withAppendedPath(PasswdSafeContract.CONTENT_URI, TABLE);
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE;
+
+        public static final String METHOD_SYNC = "sync";
     }
 
     /** The client provider's authority */
