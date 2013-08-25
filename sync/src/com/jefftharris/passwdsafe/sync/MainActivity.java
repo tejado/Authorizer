@@ -141,8 +141,9 @@ public class MainActivity extends FragmentActivity
             }
             break;
         case DROPBOX_LINK_RC: {
-            getSyncApp().finishDropboxLink();
-            DbxAccount dbxacct = getSyncApp().getDropboxAcct();
+            SyncApp app = SyncApp.get(this);
+            app.finishDropboxLink();
+            DbxAccount dbxacct = app.getDropboxAcct();
             itsNewAccount = new NewAccountInfo(ProviderType.DROPBOX,
                                                (dbxacct == null) ? null :
                                                    dbxacct.getUserId(),
@@ -247,7 +248,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to choose a Dropbox account */
     public void onDropboxChoose(View view)
     {
-        SyncApp app = getSyncApp();
+        SyncApp app = SyncApp.get(this);
         try {
             if (app.getDropboxAcct() != null) {
                 app.unlinkDropbox();
@@ -263,7 +264,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to sync a Dropbox account */
     public void onDropboxSync(View view)
     {
-        getSyncApp().syncDropbox();
+        SyncApp.get(this).syncDropbox();
     }
 
 
@@ -414,12 +415,6 @@ public class MainActivity extends FragmentActivity
     private void setAccount(Uri currAcct, String newAcct, ProviderType acctType)
     {
         new AccountTask(currAcct, newAcct, acctType);
-    }
-
-    /** Get the SyncApp */
-    private final SyncApp getSyncApp()
-    {
-        return (SyncApp)getApplication();
     }
 
     /** Dialog to prompt when an account is cleared */

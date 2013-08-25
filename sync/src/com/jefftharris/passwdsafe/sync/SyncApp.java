@@ -73,7 +73,7 @@ public class SyncApp extends Application
 
 
     /** Get the Sync application */
-    public static SyncApp getSyncApp(Context ctx)
+    public static SyncApp get(Context ctx)
     {
         return (SyncApp)ctx.getApplicationContext();
     }
@@ -82,7 +82,7 @@ public class SyncApp extends Application
     /** Acquire the SyncDb */
     public static SyncDb acquireSyncDb(Context ctx)
     {
-        SyncApp app = getSyncApp(ctx);
+        SyncApp app = SyncApp.get(ctx);
         app.itsSyncDb.acquire();
         return app.itsSyncDb;
     }

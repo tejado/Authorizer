@@ -615,7 +615,7 @@ public class PasswdSafeProvider extends ContentProvider
             for (DbProvider provider: providers) {
                 switch (provider.itsType) {
                 case DROPBOX: {
-                    SyncApp app = SyncApp.getSyncApp(getContext());
+                    SyncApp app = SyncApp.get(getContext());
                     app.syncDropbox();
                     break;
                 }

@@ -81,7 +81,7 @@ public class DropboxProvider extends Provider
     @Override
     public void cleanupOnDelete(String acctName)
     {
-        getSyncApp().unlinkDropbox();
+        SyncApp.get(itsContext).unlinkDropbox();
     }
 
     /* (non-Javadoc)
@@ -94,7 +94,7 @@ public class DropboxProvider extends Provider
                      boolean manual,
                      SyncLogRecord logrec) throws Exception
     {
-        DbxFileSystem fs = getSyncApp().getDropboxFs();
+        DbxFileSystem fs = SyncApp.get(itsContext).getDropboxFs();
         if (fs == null) {
             PasswdSafeUtil.dbginfo(TAG, "sync: no fs");
             return;
