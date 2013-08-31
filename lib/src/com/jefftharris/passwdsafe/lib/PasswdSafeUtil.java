@@ -60,6 +60,9 @@ public class PasswdSafeUtil
         intent.setPackage(pkgName);
         PackageManager pm = act.getPackageManager();
         List<ResolveInfo> infos = pm.queryIntentActivities(intent, 0);
+        if (infos == null) {
+            return;
+        }
         for (ResolveInfo info: infos) {
             ActivityInfo actInfo = info.activityInfo;
             if ((actInfo != null) && (pkgName.equals(actInfo.packageName))) {
