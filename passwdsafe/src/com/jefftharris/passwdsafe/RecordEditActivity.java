@@ -132,6 +132,11 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsValidator = new Validator();
 
         PasswdFileData fileData = getPasswdFile().getFileData();
+        if (fileData == null) {
+            PasswdSafeUtil.showFatalMsg("File not open", this);
+            return;
+        }
+
         itsIsV3 = fileData.isV3();
         itsIsProtected = false;
         PasswdRecord passwdRecord = null;
