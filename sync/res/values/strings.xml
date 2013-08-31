@@ -7,6 +7,7 @@
     <string name="app_desc">Sync PasswordSafe databases from cloud services</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="automatic">automatic</string>
+    <string name="cant_launch_drive_file">Can\'t launch Google Drive file.  Typically the file has not been synced locally.</string>
     <string name="choose_account">Choose Account</string>
     <string name="clear">Clear</string>
     <string name="dropbox_passwdsafe_sync">Dropbox PasswdSafe Sync</string>

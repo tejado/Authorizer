@@ -40,6 +40,7 @@ public class GDriveLaunchActivity extends FragmentActivity
 
         Intent intent = getIntent();
         String action = intent.getAction();
+        boolean doFinish = true;
         if (action.equals("com.google.android.apps.drive.DRIVE_OPEN")) {
             String fileId = intent.getStringExtra("resourceId");
             PasswdSafeUtil.dbginfo(TAG, "Open GDrive file %s", fileId);
@@ -59,9 +60,15 @@ public class GDriveLaunchActivity extends FragmentActivity
                 } catch (ActivityNotFoundException e) {
                     Log.e(TAG, "Can not open file", e);
                 }
+            } else {
+                PasswdSafeUtil.showFatalMsg(
+                        getString(R.string.cant_launch_drive_file), this);
+                doFinish = false;
             }
         }
-        finish();
+        if (doFinish) {
+            finish();
+        }
     }
 
 
@@ -75,10 +82,11 @@ public class GDriveLaunchActivity extends FragmentActivity
             List<DbProvider> providers = SyncDb.getProviders(db);
             for (DbProvider provider: providers) {
                 if (provider.itsType == ProviderType.GDRIVE) {
-                    rc = new Pair<DbProvider, DbFile>(
-                            provider,
-                            SyncDb.getFileByRemoteId(provider.itsId, fileId,
-                                                     db));
+                    DbFile file = SyncDb.getFileByRemoteId(provider.itsId,
+                                                           fileId, db);
+                    if (file != null) {
+                        rc = new Pair<DbProvider, DbFile>(provider, file);
+                    }
                     break;
                 }
             }

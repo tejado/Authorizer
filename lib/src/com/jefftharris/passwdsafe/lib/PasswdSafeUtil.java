@@ -119,7 +119,7 @@ public class PasswdSafeUtil
 
     public static void showFatalMsg(String msg, Activity activity)
     {
-        showFatalMsg(null, msg, activity, true);
+        showFatalMsg(null, msg, activity, false);
     }
 
     public static void showFatalMsg(String msg,
