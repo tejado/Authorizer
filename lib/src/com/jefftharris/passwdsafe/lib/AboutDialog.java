@@ -29,14 +29,17 @@ public class AboutDialog extends DialogFragment
     {
         Activity act = getActivity();
         String name;
-        String version;
+        StringBuilder version = new StringBuilder();
         PackageInfo pkgInfo = PasswdSafeUtil.getAppPackageInfo(act);
         if (pkgInfo != null) {
             name = getString(pkgInfo.applicationInfo.labelRes);
-            version = pkgInfo.versionName;
+            version.append(pkgInfo.versionName);
         } else {
             name = null;
-            version = null;
+        }
+
+        if (PasswdSafeUtil.DEBUG) {
+            version.append(" (DEBUG)");
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
