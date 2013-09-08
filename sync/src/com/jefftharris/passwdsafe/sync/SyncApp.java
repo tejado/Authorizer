@@ -43,8 +43,7 @@ public class SyncApp extends Application
     private Handler itsTimerHandler = null;
     private DbxAccountManager itsDropboxAcctMgr = null;
     private DbxFileSystem itsDropboxFs = null;
-    private boolean itsDropboxSyncInProgress = false;
-    private Runnable itsDropboxSyncProgressHandler = null;
+    private DropboxSyncer itsDropboxSyncer = null;
     private PathListener itsDropboxPathListener = null;
     private Runnable itsDropboxSyncEndHandler = null;
     private PendingIntent itsSyncTimeoutIntent = null;
@@ -230,40 +229,58 @@ public class SyncApp extends Application
 
 
     /** Check whether to start a dropbox sync */
-    private void doDropboxSync(final boolean manual)
+    private void doDropboxSync(boolean manual)
     {
-        if (itsDropboxSyncProgressHandler != null) {
-            return;
+        if (itsDropboxSyncer == null) {
+            itsDropboxSyncer = new DropboxSyncer(manual);
         }
-        if (itsDropboxSyncInProgress) {
-            itsDropboxSyncProgressHandler = new Runnable()
-            {
-                public void run()
-                {
-                    PasswdSafeUtil.dbginfo(TAG, "doDropboxSync timer expired");
-                    itsDropboxSyncProgressHandler = null;
-                    doDropboxSync(manual);
-                }
-            };
-            PasswdSafeUtil.dbginfo(TAG, "doDropboxSync start timer");
-            itsTimerHandler.postDelayed(itsDropboxSyncProgressHandler, 15000);
-        } else {
-            PasswdSafeUtil.dbginfo(TAG, "doDropboxSync start");
-            new DropboxSyncer(manual).execute();
-        }
+        itsDropboxSyncer.checkSync();
     }
 
 
     /** Background syncer for Dropbox */
     private class DropboxSyncer extends AsyncTask<Void, Void, Void>
+            implements Runnable
     {
         private final boolean itsIsManual;
+        private boolean itsIsTimerPending = false;
+        private boolean itsIsRunning = true;
 
         /** Constructor */
         public DropboxSyncer(boolean manual)
         {
             itsIsManual = manual;
-            itsDropboxSyncInProgress = true;
+        }
+
+        /** Check the status of the sync */
+        public void checkSync()
+        {
+            switch (getStatus()) {
+            case PENDING: {
+                PasswdSafeUtil.dbginfo(TAG, "DropboxSyncer start");
+                execute();
+                break;
+            }
+            case RUNNING:
+            case FINISHED: {
+                if (!itsIsTimerPending) {
+                    PasswdSafeUtil.dbginfo(TAG, "DropboxSyncer start timer");
+                    itsIsTimerPending = true;
+                    itsTimerHandler.postDelayed(this, 15000);
+                }
+                break;
+            }
+            }
+        }
+
+        /** Timer expired */
+        @Override
+        public void run()
+        {
+            PasswdSafeUtil.dbginfo(TAG, "DropboxSyncer timer expired");
+            itsIsTimerPending = false;
+            checkSyncerDone();
+            doDropboxSync(itsIsManual);
         }
 
         /* (non-Javadoc)
@@ -289,7 +306,16 @@ public class SyncApp extends Application
         protected void onPostExecute(Void result)
         {
             super.onPostExecute(result);
-            itsDropboxSyncInProgress = false;
+            itsIsRunning = false;
+            checkSyncerDone();
+        }
+
+        /** Check whether the DropboxSyncer is finished */
+        private void checkSyncerDone()
+        {
+            if (!itsIsTimerPending && !itsIsRunning) {
+                itsDropboxSyncer = null;
+            }
         }
     }
 }
