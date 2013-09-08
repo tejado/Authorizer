@@ -14,11 +14,11 @@ import android.content.Intent;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
- *  Receiver for the startup event
+ *  Receiver for the manifest broadcast events
  */
-public class StartupReceiver extends BroadcastReceiver
+public class ManifestBroadcastReceiver extends BroadcastReceiver
 {
-    private static final String TAG = "StartupReceiver";
+    private static final String TAG = "ManifestBroadcastReceiver";
 
     /* (non-Javadoc)
      * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)

@@ -91,7 +91,7 @@
         </provider>
 
         <receiver
-            android:name=".StartupReceiver"
+            android:name=".ManifestBroadcastReceiver"
             tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
