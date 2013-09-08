@@ -95,6 +95,7 @@
             tools:ignore="ExportedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="com.jefftharris.passwdsafe.action.SYNC_EXPIRATION_TIMEOUT"/>
             </intent-filter>
         </receiver>
 

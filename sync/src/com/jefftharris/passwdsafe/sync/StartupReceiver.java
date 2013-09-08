@@ -26,7 +26,12 @@ public class StartupReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context ctx, Intent intent)
     {
-        PasswdSafeUtil.dbginfo(TAG, "onReceive");
-        // The app is created in order to launch the receiver
+        PasswdSafeUtil.dbginfo(TAG, "onReceive: %s", intent);
+        String action = intent.getAction();
+        if (action == SyncApp.ACTION_SYNC_EXPIRATION_TIMEOUT) {
+            SyncApp.get(ctx).syncDropbox(false);
+        } else {
+            // The app is created in order to launch the receiver
+        }
     }
 }

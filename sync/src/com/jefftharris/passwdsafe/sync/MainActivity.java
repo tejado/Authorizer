@@ -264,7 +264,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to sync a Dropbox account */
     public void onDropboxSync(View view)
     {
-        SyncApp.get(this).syncDropbox();
+        SyncApp.get(this).syncDropbox(true);
     }
 
 

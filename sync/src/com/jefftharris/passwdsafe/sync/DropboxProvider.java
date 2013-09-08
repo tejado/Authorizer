@@ -99,11 +99,6 @@ public class DropboxProvider extends Provider
             PasswdSafeUtil.dbginfo(TAG, "sync: no fs");
             return;
         }
-        if (!fs.hasSynced()) {
-            PasswdSafeUtil.dbginfo(TAG, "sync: not synced");
-            return;
-        }
-
         new Syncer(fs, provider, db, logrec, itsContext).sync();
     }
 
