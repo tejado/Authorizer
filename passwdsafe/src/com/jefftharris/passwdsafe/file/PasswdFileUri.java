@@ -131,16 +131,14 @@ public class PasswdFileUri implements Parcelable
     /** Constructor from parcelable data */
     private PasswdFileUri(Parcel source)
     {
+        String str;
         itsUri = source.readParcelable(null);
         itsType = Type.valueOf(source.readString());
-        itsFile = new File(source.readString());
+        str = source.readString();
+        itsFile = (str != null) ? new File(str) : null;
         itsTitle = source.readString();
-        String str = source.readString();
-        if (str != null) {
-            itsSyncType = ProviderType.valueOf(str);
-        } else {
-            itsSyncType = null;
-        }
+        str = source.readString();
+        itsSyncType = (str != null) ? ProviderType.valueOf(str) : null;
     }
 
 
