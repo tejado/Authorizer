@@ -119,10 +119,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <LinearLayout
+                android:id="@+id/dropbox_interval_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="6dp">
+
+                <TextView
+                    android:id="@+id/dropbox_interval_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/sync_interval_label"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <Spinner
+                    android:id="@+id/dropbox_interval"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/interval_array"/>
+            </LinearLayout>
+
             <Button
                 android:id="@+id/dropbox_sync"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/dropbox_interval_box"
                 android:drawableLeft="@android:drawable/ic_popup_sync"
                 android:onClick="onDropboxSync"
                 android:padding="12dp"
@@ -132,6 +155,7 @@
                 android:id="@+id/dropbox_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/dropbox_interval_box"
                 android:layout_toRightOf="@id/dropbox_sync"
                 android:drawableLeft="@android:drawable/ic_delete"
                 android:onClick="onDropboxClear"

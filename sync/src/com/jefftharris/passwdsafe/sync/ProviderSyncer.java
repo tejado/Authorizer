@@ -54,10 +54,7 @@ public class ProviderSyncer
 
         Account acct = providerImpl.getAccount(acctName);
         if (acct != null) {
-            ContentResolver.setSyncAutomatically(
-                    acct, PasswdSafeContract.AUTHORITY, true);
-            ContentResolver.addPeriodicSync(
-                    acct, PasswdSafeContract.AUTHORITY, new Bundle(), freq);
+            providerImpl.updateSyncFreq(acct, freq);
             ContentResolver.requestSync(acct, PasswdSafeContract.AUTHORITY,
                                         new Bundle());
         }
@@ -82,14 +79,7 @@ public class ProviderSyncer
         Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
         providerImpl.cleanupOnDelete(provider.itsAcct);
         Account acct = providerImpl.getAccount(provider.itsAcct);
-        if (acct != null) {
-            ContentResolver.removePeriodicSync(acct,
-                                               PasswdSafeContract.AUTHORITY,
-                                               new Bundle());
-            ContentResolver.setSyncAutomatically(acct,
-                                                 PasswdSafeContract.AUTHORITY,
-                                                 false);
-        }
+        providerImpl.updateSyncFreq(acct, 0);
         ctx.getContentResolver().notifyChange(PasswdSafeContract.CONTENT_URI,
                                               null);
     }
@@ -106,16 +96,7 @@ public class ProviderSyncer
 
         Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
         Account acct = providerImpl.getAccount(provider.itsAcct);
-        if (acct != null) {
-            ContentResolver.removePeriodicSync(acct,
-                                               PasswdSafeContract.AUTHORITY,
-                                               new Bundle());
-            if (freq > 0) {
-                ContentResolver.addPeriodicSync(acct,
-                                                PasswdSafeContract.AUTHORITY,
-                                                new Bundle(), freq);
-            }
-        }
+        providerImpl.updateSyncFreq(acct, freq);
     }
 
 

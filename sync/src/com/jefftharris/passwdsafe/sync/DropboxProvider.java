@@ -84,6 +84,13 @@ public class DropboxProvider extends Provider
         SyncApp.get(itsContext).unlinkDropbox();
     }
 
+    /** Update a provider's sync frequency */
+    @Override
+    public void updateSyncFreq(Account acct, int freq)
+    {
+        SyncApp.get(itsContext).updateDropboxSyncFreq(freq);
+    }
+
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.Provider#sync(android.accounts.Account, com.jefftharris.passwdsafe.sync.SyncDb.DbProvider, android.database.sqlite.SQLiteDatabase, com.jefftharris.passwdsafe.sync.SyncLogRecord)
      */

@@ -86,6 +86,22 @@ public class MainActivity extends FragmentActivity
             }
         });
 
+        freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
+        freqSpin.setOnItemSelectedListener(new OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id)
+            {
+                onDropboxFreqChanged(pos);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+            }
+        });
+
         // Check the state of Google Play services
         int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (rc != ConnectionResult.SUCCESS) {
@@ -242,7 +258,7 @@ public class MainActivity extends FragmentActivity
     private void onGdriveFreqChanged(int pos)
     {
         ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
-        new AccountTask(freq);
+        new AccountTask(freq, itsGdriveUri, ProviderType.GDRIVE);
     }
 
     /** Button onClick handler to choose a Dropbox account */
@@ -276,6 +292,13 @@ public class MainActivity extends FragmentActivity
         prompt.show(getSupportFragmentManager(), null);
     }
 
+
+    /** Dropbox sync frequency spinner changed */
+    private void onDropboxFreqChanged(int pos)
+    {
+        ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
+        new AccountTask(freq, itsDropboxUri, ProviderType.DROPBOX);
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
@@ -393,15 +416,24 @@ public class MainActivity extends FragmentActivity
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
+            int freqVal = cursor.getInt(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
+            ProviderSyncFreqPref freq =
+                    ProviderSyncFreqPref.freqValueOf(freqVal);
             itsDropboxUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
 
+            View freqSpinLabel = findViewById(R.id.dropbox_interval_label);
+            Spinner freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
+            freqSpin.setSelection(freq.getDisplayIdx());
             View syncBtn = findViewById(R.id.dropbox_sync);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             btns.setVisibility(View.VISIBLE);
 
             acctView.setText(getString(R.string.account_label, acct));
+            freqSpin.setEnabled(true);
+            freqSpinLabel.setEnabled(true);
             syncBtn.setEnabled(true);
         } else {
             itsDropboxUri = null;
@@ -493,12 +525,13 @@ public class MainActivity extends FragmentActivity
         }
 
         /** Constructor for updating the sync frequency */
-        public AccountTask(ProviderSyncFreqPref freq)
+        public AccountTask(ProviderSyncFreqPref freq,
+                           Uri currAccount, ProviderType type)
         {
             itsType = AccountTaskType.UPDATE_SYNC_FREQ;
-            itsCurrAccount = itsGdriveUri;
+            itsCurrAccount = currAccount;
             itsNewAccount = null;
-            itsProviderType = ProviderType.GDRIVE;
+            itsProviderType = type;
             itsUpdateFreq = freq;
             init(getString(R.string.updating_account));
         }

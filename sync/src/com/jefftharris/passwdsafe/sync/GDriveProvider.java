@@ -13,9 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.accounts.Account;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -95,6 +97,27 @@ public class GDriveProvider extends Provider
             }
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s", acctName);
+        }
+    }
+
+
+    /** Update a provider's sync frequency */
+    @Override
+    public void updateSyncFreq(Account acct, int freq)
+    {
+        if (acct != null) {
+            ContentResolver.removePeriodicSync(acct,
+                                               PasswdSafeContract.AUTHORITY,
+                                               new Bundle());
+            ContentResolver.setSyncAutomatically(
+                    acct, PasswdSafeContract.AUTHORITY, false);
+            if (freq > 0) {
+                ContentResolver.setSyncAutomatically(
+                        acct, PasswdSafeContract.AUTHORITY, true);
+                ContentResolver.addPeriodicSync(acct,
+                                                PasswdSafeContract.AUTHORITY,
+                                                new Bundle(), freq);
+            }
         }
     }
 

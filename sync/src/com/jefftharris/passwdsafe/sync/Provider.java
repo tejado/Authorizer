@@ -30,6 +30,9 @@ public abstract class Provider
     /** Cleanup a provider when deleted */
     public abstract void cleanupOnDelete(String acctName);
 
+    /** Update a provider's sync frequency */
+    public abstract void updateSyncFreq(Account acct, int freq);
+
     /** Sync a provider */
     public abstract void sync(Account acct, DbProvider provider,
                               SQLiteDatabase db,
