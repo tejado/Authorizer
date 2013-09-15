@@ -5,6 +5,8 @@
     <property name="rev.dir" value="${basedir}/gen/${pkg.dir}"/>
     <property name="rev.file" value="${rev.dir}/Rev.java"/>
 
+    <target name="-pre-compile" depends="genRev"/>
+
     <target name="genRev" depends="checkGenRev" unless="genRevUptodate">
         <exec dir="${basedir}" executable="hg" outputproperty="buildId">
             <arg value="id"/>
@@ -38,7 +40,7 @@ public class Rev
         </uptodate>
     </target>
 
-    <target name="clean">
+    <target name="-pre-clean">
         <delete file="${rev.file}"/>
         <delete file="${basedir}/bin/classes/${pkg.dir}/Rev.class"/>
     </target>
