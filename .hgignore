@@ -1,8 +1,11 @@
 ^lib/bin
+^lib/local.properties
 ^lib/gen
 ^passwdsafe/bin
+^passwdsafe/local.properties
 ^passwdsafe/gen
 ^sync/bin
+^sync/local.properties
 ^sync/gen
 ^tests/bin
 ^tests/gen
