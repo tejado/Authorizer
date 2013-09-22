@@ -246,6 +246,18 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".PasswdSafeIME"
+            android:label="PasswdSafe Input Method"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/input_method"/>
+        </service>
     </application>
 
 </manifest>
