@@ -324,6 +324,18 @@ public class PasswdSafeApp extends Application
     }
 
 
+    /** Access an open password file. The data returned should only be used for
+     * short durations. */
+    public synchronized PasswdFileData accessOpenFileData()
+    {
+        PasswdSafeUtil.dbgverb(TAG, "access open file data: %s", itsFileData);
+        if (itsFileData != null) {
+            touchFileDataTimer();
+        }
+        return itsFileData;
+    }
+
+
     /** Get the default password policy */
     public synchronized PasswdPolicy getDefaultPasswdPolicy()
     {
