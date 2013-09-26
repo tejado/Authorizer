@@ -82,6 +82,13 @@ public class PasswdSafeApp extends Application
             }
         }
 
+        /** Set the UUID of the last viewed record */
+        @Override
+        public final void setLastViewedRecord(String uuid)
+        {
+            PasswdSafeApp.this.setLastViewedRecord(uuid);
+        }
+
         /**
          * Save the file.  Will likely be called in a background thread.
          * @throws IOException
@@ -170,6 +177,7 @@ public class PasswdSafeApp extends Application
     public static final String RESULT_DATA_UUID = "uuid";
 
     private PasswdFileData itsFileData = null;
+    private String itsLastViewedRecord = null;
     private WeakHashMap<Activity, Object> itsFileDataActivities =
         new WeakHashMap<Activity, Object>();
     private PasswdPolicy itsDefaultPasswdPolicy = null;
@@ -335,6 +343,11 @@ public class PasswdSafeApp extends Application
         return itsFileData;
     }
 
+    /** Get the UUID of the last viewed record */
+    public synchronized String getLastViewedRecord()
+    {
+        return itsLastViewedRecord;
+    }
 
     /** Get the default password policy */
     public synchronized PasswdPolicy getDefaultPasswdPolicy()
@@ -487,6 +500,13 @@ public class PasswdSafeApp extends Application
         touchFileData(activity);
     }
 
+    /** Set the UUID of the last viewed record */
+    private synchronized final void setLastViewedRecord(String uuid)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "setViewedRecord: %s", uuid);
+        itsLastViewedRecord = uuid;
+    }
+
     private synchronized final void closeFileData(boolean isTimeout)
     {
         PasswdSafeUtil.dbginfo(TAG, "closeFileData data: %s", itsFileData);
@@ -502,6 +522,7 @@ public class PasswdSafeApp extends Application
                 PasswdSafeUtil.copyToClipboard("", this);
             }
         }
+        itsLastViewedRecord = null;
 
         cancelFileDataTimer();
 

@@ -512,6 +512,8 @@ public class RecordView extends AbstractRecordTabActivity
         if (rec == null) {
             PasswdSafeUtil.showFatalMsg("Unknown record: " + uuid, this);
             return;
+        } else {
+            getPasswdFile().setLastViewedRecord(uuid);
         }
         PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
 

@@ -114,6 +114,7 @@ public abstract class ActivityPasswdFile
     public abstract boolean isOpen();
 
     public abstract void setFileData(PasswdFileData fileData);
+    public abstract void setLastViewedRecord(String uuid);
 
     public abstract void touch();
     public abstract void release();

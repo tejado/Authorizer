@@ -15,6 +15,12 @@
         android:layout_height="wrap_content"
         android:textColor="?android:attr/textColorPrimaryInverse"/>
 
+    <TextView
+        android:id="@+id/record"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="?android:attr/textColorPrimaryInverse"/>
+
     <Button
         android:id="@+id/user"
         android:layout_width="match_parent"
