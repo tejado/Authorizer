@@ -9,6 +9,7 @@
     <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Au moins</string>
+    <string name="back">Retour</string>
     <string name="basic">"General"</string>
     <string name="cancel">Annuler</string>
     <string name="cannot_create_file">Impossible de créer un fichier: %1$s</string>
@@ -70,6 +71,7 @@
     <string name="enter_net_group">Entrer un nouveau groupe:</string>
     <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers logs</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
+    <string name="execute">Exécuter</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Notifications d\'Expiration</string>
     <string name="expiration_notifications_warning">L\'activation des notifications d\'expiration implique que PasswdSafe stocke les informations d\'expiration dans un fichier (titre de l\'entrée, le groupe et la date d\'expiration). Ces informations sont stockées en clair sur l\'appareil, mais aucun mot de passe n\'y est stockés.</string>
@@ -90,6 +92,7 @@
     <string name="font_size">Taille de la police</string>
     <string name="generate">Générer</string>
     <string name="generate_password">Générer un mot de passe</string>
+    <string name="go">OK</string>
     <string name="go_to">Aller à</string>
     <string name="group">Groupe</string>
     <string name="group_header">GROUPE</string>
@@ -130,6 +133,7 @@
     <string name="new_local_file">Nouveau fichier local</string>
     <string name="new_password_label">Nouveau mot de passe:</string>
     <string name="new_policy">Nouvelle stratégie</string>
+    <string name="next">Suivant</string>
     <string name="no_alias_chosen">Aucun alias choisi</string>
     <string name="no_shortcut_chosen">Aucun raccourci choisi</string>
     <string name="no_files">Aucun fichier</string>
@@ -200,6 +204,7 @@
     <string name="search_settings">Paramètres de recherche</string>
     <string name="select_accounts">Sélectionnez comptes</string>
     <string name="select_file_label">Sélectionnez la sauvegarde à ouvrir:</string>
+    <string name="send">Envoyer</string>
     <string name="set_password">Définir le mot de passe</string>
     <string name="shortcut_base_record_header">RACCOURCI</string>
     <string name="shortcut_base_record_label">Raccourci</string>

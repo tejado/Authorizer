@@ -30,6 +30,7 @@ import com.jefftharris.passwdsafe.util.Pair;
 public class PasswdSafeIME extends InputMethodService
 {
     private View itsView;
+    private int itsEnterAction = EditorInfo.IME_ACTION_NONE;
 
     /* (non-Javadoc)
      * @see android.inputmethodservice.InputMethodService#onCreateInputView()
@@ -64,6 +65,18 @@ public class PasswdSafeIME extends InputMethodService
             btn.setOnClickListener(fieldListener);
         }
 
+        OnClickListener commandListener = new OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                doBtnCommand(v.getId());
+            }
+        };
+        for (int id: new int[] {R.id.backspace, R.id.return_key, R.id.next}) {
+            btn = (Button)itsView.findViewById(id);
+            btn.setOnClickListener(commandListener);
+        }
+
         return itsView;
     }
 
@@ -75,6 +88,45 @@ public class PasswdSafeIME extends InputMethodService
     {
         super.onStartInputView(info, restarting);
         refresh();
+
+        int enterText;
+        itsEnterAction =
+                info.imeOptions & (EditorInfo.IME_MASK_ACTION |
+                                   EditorInfo.IME_FLAG_NO_ENTER_ACTION);
+        switch (itsEnterAction) {
+        case EditorInfo.IME_ACTION_DONE: {
+            enterText = R.string.done;
+            break;
+        }
+        case EditorInfo.IME_ACTION_GO: {
+            enterText = R.string.go;
+            break;
+        }
+        case EditorInfo.IME_ACTION_NEXT: {
+            enterText = R.string.next;
+            break;
+        }
+        case EditorInfo.IME_ACTION_SEARCH: {
+            enterText = R.string.search;
+            break;
+        }
+        case EditorInfo.IME_ACTION_SEND: {
+            enterText = R.string.send;
+            break;
+        }
+        default: {
+            enterText = R.string.execute;
+            itsEnterAction = EditorInfo.IME_ACTION_NONE;
+            break;
+        }
+        }
+        Button btn = (Button)itsView.findViewById(R.id.return_key);
+        btn.setText(enterText);
+
+        // TODO: remove next if doesn't work well
+        btn = (Button)itsView.findViewById(R.id.next);
+        btn.setVisibility((itsEnterAction != EditorInfo.IME_ACTION_NEXT) ?
+                View.VISIBLE : View.GONE);
     }
 
     /* (non-Javadoc)
@@ -149,6 +201,35 @@ public class PasswdSafeIME extends InputMethodService
         }
     }
 
+    /** Do a button command */
+    private final void doBtnCommand(int btnId)
+    {
+        InputConnection conn = getCurrentInputConnection();
+        if (conn == null) {
+            return;
+        }
+
+        switch (btnId) {
+        case R.id.backspace: {
+            conn.deleteSurroundingText(1, 0);
+            break;
+        }
+        case R.id.return_key: {
+            if (itsEnterAction == EditorInfo.IME_ACTION_NONE) {
+                conn.commitText("\n", 1);
+            } else {
+                conn.performEditorAction(itsEnterAction);
+            }
+            break;
+        }
+        case R.id.next: {
+            conn.performEditorAction(EditorInfo.IME_ACTION_NEXT);
+            break;
+        }
+        }
+    }
+
+    /** Refresh the fields from the current password data */
     private final Pair<PasswdFileData, PwsRecord> refresh()
     {
         // TODO: test file timeouts and file and record deletions

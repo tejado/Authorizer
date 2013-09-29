@@ -67,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:shrinkColumns="*"
-        android:stretchColumns="*">
+        android:stretchColumns="0,1">
 
         <TableRow
             android:id="@+id/tableRow1"
@@ -86,6 +86,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/url"
+                android:textColor="?android:attr/textColorPrimaryInverse"/>
+
+            <Button
+                android:id="@+id/backspace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/back"
                 android:textColor="?android:attr/textColorPrimaryInverse"/>
 
         </TableRow>
@@ -109,6 +116,12 @@
                 android:text="@string/email"
                 android:textColor="?android:attr/textColorPrimaryInverse"/>
 
+            <Button
+                android:id="@+id/return_key"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?android:attr/textColorPrimaryInverse"/>
+
         </TableRow>
 
         <TableRow
@@ -128,6 +141,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/notes"
+                android:textColor="?android:attr/textColorPrimaryInverse"/>
+
+            <Button
+                android:id="@+id/next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/next"
                 android:textColor="?android:attr/textColorPrimaryInverse"/>
 
         </TableRow>
