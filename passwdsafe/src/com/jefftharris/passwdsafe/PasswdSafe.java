@@ -880,6 +880,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 openRecord(itsRecToOpen);
             }
         }
+        itsRecToOpen = null;
         super.showFileData(mod);
 
         if (itsIsNotifyExpirations && ((mod & MOD_DATA) != 0)) {
