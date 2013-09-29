@@ -9,5 +9,6 @@
     <string name="dropbox">Dropbox</string>
     <string name="error">Error</string>
     <string name="google_drive">Google Drive</string>
+    <string name="open">Open</string>
 
 </resources>

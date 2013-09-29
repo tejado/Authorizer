@@ -19,9 +19,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:drawableTop="@drawable/ic_launcher_passwdsafe"
+            android:drawableLeft="@drawable/ic_launcher_passwdsafe"
             android:drawablePadding="6dp"
-            android:text="Open"
+            android:text="@string/open"
             android:textColor="?android:attr/textColorPrimaryInverse"/>
 
         <TextView
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="File:"
+            android:text="@string/file_label"
             android:textColor="?android:attr/textColorPrimaryInverse"/>
 
         <TextView
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/file"
-            android:text="Record:"
+            android:text="@string/record_label"
             android:textColor="?android:attr/textColorPrimaryInverse"/>
 
         <TextView
@@ -78,14 +78,14 @@
                 android:id="@+id/user"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="User"
+                android:text="@string/username"
                 android:textColor="?android:attr/textColorPrimaryInverse"/>
 
             <Button
                 android:id="@+id/url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="URL"
+                android:text="@string/url"
                 android:textColor="?android:attr/textColorPrimaryInverse"/>
 
         </TableRow>
@@ -99,14 +99,14 @@
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Password"
+                android:text="@string/password"
                 android:textColor="?android:attr/textColorPrimaryInverse"/>
 
             <Button
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Email"
+                android:text="@string/email"
                 android:textColor="?android:attr/textColorPrimaryInverse"/>
 
         </TableRow>

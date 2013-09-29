@@ -249,7 +249,7 @@
 
         <service
             android:name=".PasswdSafeIME"
-            android:label="PasswdSafe Input Method"
+            android:label="@string/app_name"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>
                 <action android:name="android.view.InputMethod"/>

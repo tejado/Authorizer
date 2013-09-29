@@ -181,6 +181,7 @@
     <string name="query_label">Search: %1$s</string>
     <string name="record">Record</string>
     <string name="record_has_references">Record has references</string>
+    <string name="record_label">Record:</string>
     <string name="record_not_found">Record not found</string>
     <string name="record_policy">Record Policy</string>
     <string name="record_settings">Record Settings</string>

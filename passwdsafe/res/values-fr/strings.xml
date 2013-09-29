@@ -182,6 +182,7 @@
     <string name="query_label">Recherche: %1$s</string>
     <string name="record">Entrée</string>
     <string name="record_has_references">L\'entrée contient des références</string>
+    <string name="record_label">Entrée:</string>
     <string name="record_not_found">Entrée introuvable</string>
     <string name="record_policy">Stratégie Entrée</string>
     <string name="record_settings">Paramètres des entrées</string>
