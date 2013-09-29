@@ -53,12 +53,12 @@ public class PasswdSafeUtil
     }
 
     /** Start the main activity for a package */
-    public static void startMainActivity(String pkgName, Activity act)
+    public static void startMainActivity(String pkgName, Context ctx)
     {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setPackage(pkgName);
-        PackageManager pm = act.getPackageManager();
+        PackageManager pm = ctx.getPackageManager();
         List<ResolveInfo> infos = pm.queryIntentActivities(intent, 0);
         if (infos == null) {
             return;
@@ -68,7 +68,10 @@ public class PasswdSafeUtil
             if ((actInfo != null) && (pkgName.equals(actInfo.packageName))) {
                 intent.setComponent(new ComponentName(actInfo.packageName,
                                                       actInfo.name));
-                act.startActivity(intent);
+                if (!(ctx instanceof Activity)) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
+                ctx.startActivity(intent);
                 return;
             }
         }
