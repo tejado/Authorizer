@@ -110,6 +110,27 @@
                 android:textColor="?android:attr/textColorPrimaryInverse"/>
 
         </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/title"
+                android:textColor="?android:attr/textColorPrimaryInverse"/>
+
+            <Button
+                android:id="@+id/notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/notes"
+                android:textColor="?android:attr/textColorPrimaryInverse"/>
+
+        </TableRow>
     </TableLayout>
 
 </LinearLayout>

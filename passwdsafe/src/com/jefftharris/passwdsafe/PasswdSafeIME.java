@@ -58,7 +58,8 @@ public class PasswdSafeIME extends InputMethodService
             }
         };
         for (int id: new int[] {
-                R.id.user, R.id.password, R.id.url, R.id.email }) {
+                R.id.user, R.id.password, R.id.url, R.id.email,
+                R.id.title, R.id.notes}) {
             btn = (Button)itsView.findViewById(id);
             btn.setOnClickListener(fieldListener);
         }
@@ -131,6 +132,14 @@ public class PasswdSafeIME extends InputMethodService
             }
             case R.id.email: {
                 str = rc.first.getEmail(rc.second);
+                break;
+            }
+            case R.id.title: {
+                str = rc.first.getTitle(rc.second);
+                break;
+            }
+            case R.id.notes: {
+                str = rc.first.getNotes(rc.second);
                 break;
             }
             }
