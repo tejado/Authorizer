@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import android.content.Intent;
 import android.inputmethodservice.InputMethodService;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,14 +29,6 @@ import com.jefftharris.passwdsafe.util.Pair;
  */
 public class PasswdSafeIME extends InputMethodService
 {
-    private static final String TAG = "PasswdSafeIME";
-
-    enum Field
-    {
-        USER,
-        PASSWORD
-    }
-
     private View itsView;
 
     /* (non-Javadoc)
@@ -47,27 +40,28 @@ public class PasswdSafeIME extends InputMethodService
         itsView = getLayoutInflater().inflate(R.layout.input_method, null);
         refresh();
 
-        Button btn = (Button)itsView.findViewById(R.id.user);
+        Button btn;
+        btn = (Button)itsView.findViewById(R.id.launch_passwdsafe);
         btn.setOnClickListener(new OnClickListener()
         {
-            @Override
             public void onClick(View v)
             {
-                PasswdSafeUtil.dbginfo(TAG, "user click");
-                sendText(Field.USER);
+                openPasswdSafe();
             }
         });
 
-        btn = (Button)itsView.findViewById(R.id.password);
-        btn.setOnClickListener(new OnClickListener()
+        OnClickListener fieldListener = new OnClickListener()
         {
-            @Override
             public void onClick(View v)
             {
-                PasswdSafeUtil.dbginfo(TAG, "password click");
-                sendText(Field.PASSWORD);
+                sendText(v.getId());
             }
-        });
+        };
+        for (int id: new int[] {
+                R.id.user, R.id.password, R.id.url, R.id.email }) {
+            btn = (Button)itsView.findViewById(id);
+            btn.setOnClickListener(fieldListener);
+        }
 
         return itsView;
     }
@@ -92,8 +86,27 @@ public class PasswdSafeIME extends InputMethodService
         return false;
     }
 
+    /** Open PasswdSafe */
+    private final void openPasswdSafe()
+    {
+        Pair<PasswdFileData, PwsRecord> rc = refresh();
+        if (rc.first == null) {
+            PasswdSafeUtil.startMainActivity("com.jefftharris.passwdsafe",
+                                             this);
+        } else {
+            String uuid = null;
+            if (rc.second != null) {
+                uuid = rc.first.getUUID(rc.second);
+            }
+            Intent intent = PasswdSafeUtil.createOpenIntent(
+                    rc.first.getUri().getUri(), uuid);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+    }
+
     /** Send text to the connected editor */
-    private final void sendText(Field field)
+    private final void sendText(int btnId)
     {
         InputConnection conn = getCurrentInputConnection();
         if (conn == null) {
@@ -103,13 +116,21 @@ public class PasswdSafeIME extends InputMethodService
         String str = null;
         Pair<PasswdFileData, PwsRecord> rc = refresh();
         if (rc.second != null) {
-            switch (field) {
-            case USER: {
+            switch (btnId) {
+            case R.id.user: {
                 str = rc.first.getUsername(rc.second);
                 break;
             }
-            case PASSWORD: {
+            case R.id.password: {
                 str = rc.first.getPassword(rc.second);
+                break;
+            }
+            case R.id.url: {
+                str = rc.first.getURL(rc.second);
+                break;
+            }
+            case R.id.email: {
+                str = rc.first.getEmail(rc.second);
                 break;
             }
             }
@@ -123,6 +144,8 @@ public class PasswdSafeIME extends InputMethodService
     {
         // TODO: test file timeouts and file and record deletions
         // TODO: Check field type for password pastes?
+        // TODO: show group
+        // TODO: disable blank fields?
 
         PasswdSafeApp app = getPasswdSafeApp();
         PasswdFileData fileData = app.accessOpenFileData();
