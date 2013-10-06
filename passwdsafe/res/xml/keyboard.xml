@@ -1,0 +1,59 @@
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+    android:horizontalGap="0px"
+    android:keyWidth="40%p"
+    android:verticalGap="0px">
+
+        <Row android:keyHeight="50dp">
+            <Key
+                android:codes="-1"
+                android:keyEdgeFlags="left"
+                android:keyLabel="User"/>
+
+            <Key
+                android:codes="-2"
+                android:keyLabel="URL"/>
+
+            <Key
+                android:codes="-3"
+                android:keyWidth="20%p"
+                android:keyEdgeFlags="right"
+                android:keyLabel="Back"/>
+
+        </Row>
+
+        <Row android:keyHeight="50dp">
+            <Key
+                android:codes="-11"
+                android:keyEdgeFlags="left"
+                android:keyLabel="Password"/>
+
+            <Key
+                android:codes="-12"
+                android:keyLabel="Email"/>
+
+            <Key
+                android:codes="-13"
+                android:keyWidth="20%p"
+                android:keyEdgeFlags="right"
+                android:keyLabel="Enter"/>
+
+        </Row>
+
+        <Row>
+            <Key
+                android:codes="-21"
+                android:keyEdgeFlags="left"
+                android:keyLabel="Title"/>
+
+            <Key
+                android:codes="-22"
+                android:keyLabel="Notes"/>
+
+            <Key
+                android:codes="32"
+                android:keyWidth="20%p"
+                android:keyEdgeFlags="right"/>
+
+        </Row>
+
+</Keyboard>

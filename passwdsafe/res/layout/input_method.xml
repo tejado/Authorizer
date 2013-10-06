@@ -63,94 +63,15 @@
 
     </RelativeLayout>
 
-    <TableLayout
+    <android.inputmethodservice.KeyboardView
+        android:id="@+id/keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+<!--
+    <view
+        android:id="@+id/keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:shrinkColumns="*"
-        android:stretchColumns="0,1">
-
-        <TableRow
-            android:id="@+id/tableRow1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/user"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/username"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-            <Button
-                android:id="@+id/url"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/url"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-            <Button
-                android:id="@+id/backspace"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/back"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/password"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-            <Button
-                android:id="@+id/email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/email"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-            <Button
-                android:id="@+id/return_key"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/title"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-            <Button
-                android:id="@+id/notes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/notes"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-            <Button
-                android:id="@+id/next"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/next"
-                android:textColor="?android:attr/textColorPrimaryInverse"/>
-
-        </TableRow>
-    </TableLayout>
-
+        class="com.jefftharris.passwdsafe.PasswdSafeIME$KeyboardView"/>
+-->
 </LinearLayout>
