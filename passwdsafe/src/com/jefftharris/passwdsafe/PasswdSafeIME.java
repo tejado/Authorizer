@@ -228,17 +228,16 @@ public class PasswdSafeIME extends InputMethodService
     /** Refresh the fields from the current password data */
     private final Pair<PasswdFileData, PwsRecord> refresh()
     {
-        // TODO: test file timeouts and file and record deletions
         // TODO: Check field type for password pastes?
-        // TODO: show group
         // TODO: disable blank fields?
+        // TODO: check back button behavior after launching passwdsafe
 
         PasswdSafeApp app = getPasswdSafeApp();
         PasswdFileData fileData = app.accessOpenFileData();
         PwsRecord rec = null;
         TextView filetv = (TextView)itsView.findViewById(R.id.file);
         if (fileData != null) {
-            filetv.setText(fileData.getUri().toString());
+            filetv.setText(fileData.getUri().getIdentifier(this, false));
 
             String uuid = app.getLastViewedRecord();
             if (uuid != null) {
@@ -250,7 +249,7 @@ public class PasswdSafeIME extends InputMethodService
 
         TextView rectv = (TextView)itsView.findViewById(R.id.record);
         if (rec != null) {
-            rectv.setText(fileData.getTitle(rec));
+            rectv.setText(fileData.getId(rec));
         } else if (fileData != null) {
             rectv.setText(R.string.none_selected_open);
         } else {
