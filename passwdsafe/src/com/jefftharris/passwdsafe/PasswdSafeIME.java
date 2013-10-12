@@ -245,14 +245,16 @@ public class PasswdSafeIME extends InputMethodService
                 rec = fileData.getRecord(uuid);
             }
         } else {
-            filetv.setText("NO FILE");
+            filetv.setText(R.string.none_selected_open);
         }
 
         TextView rectv = (TextView)itsView.findViewById(R.id.record);
         if (rec != null) {
             rectv.setText(fileData.getTitle(rec));
+        } else if (fileData != null) {
+            rectv.setText(R.string.none_selected_open);
         } else {
-            rectv.setText("NO RECORD");
+            rectv.setText(null);
         }
 
         return new Pair<PasswdFileData, PwsRecord>(fileData, rec);

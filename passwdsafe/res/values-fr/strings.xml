@@ -141,6 +141,7 @@
     <string name="no_records">Aucune entrée</string>
     <string name="no_records_open_file">Aucune entrée. Ouvrez un premier fichier, puis réessayez.</string>
     <string name="none">"Aucun"</string>
+    <string name="none_selected_open">Aucun sélectionné. Ouvrez PasswdSafe de choisir.</string>
     <string name="notes">Notes</string>
     <string name="num_records_label">Nombre d\'entrées:</string>
     <string name="ok">OK</string>

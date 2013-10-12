@@ -140,6 +140,7 @@
     <string name="no_records">No Records</string>
     <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
     <string name="none">None</string>
+    <string name="none_selected_open">None selected.  Open PasswdSafe to choose.</string>
     <string name="notes">Notes</string>
     <string name="num_records_label">Number of Records:</string>
     <string name="ok">OK</string>
