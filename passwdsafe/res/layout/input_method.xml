@@ -63,6 +63,18 @@
             android:layout_toRightOf="@id/record_label"
             android:paddingLeft="6dp"/>
 
+        <TextView
+            android:id="@+id/password_warning"
+            style="@style/InputMethodText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/record"
+            android:layout_toRightOf="@+id/icon"
+            android:contentDescription="?android:attr/textAppearance"
+            android:text="@string/press_password_warning"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
     <android.inputmethodservice.KeyboardView

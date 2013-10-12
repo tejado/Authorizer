@@ -17,6 +17,7 @@ import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -48,6 +49,8 @@ public class PasswdSafeIME extends InputMethodService
     private KeyboardView itsKeyboardView;
     private Keyboard itsKeyboard;
     private Keyboard.Key itsEnterKey;
+    private boolean itsAllowPassword = false;
+    private boolean itsIsPasswordField = false;
     private int itsEnterAction = EditorInfo.IME_ACTION_NONE;
 
     /* (non-Javadoc)
@@ -115,8 +118,34 @@ public class PasswdSafeIME extends InputMethodService
             itsEnterKey.icon = (enterIcon != -1) ?
                     getResources().getDrawable(enterIcon) : null;
         }
+
+        itsIsPasswordField = false;
+        switch (info.inputType & InputType.TYPE_MASK_CLASS) {
+        case InputType.TYPE_CLASS_NUMBER: {
+            switch (info.inputType & InputType.TYPE_MASK_VARIATION) {
+            case 0x10 /* TYPE_NUMBER_VARIATION_PASSWORD in API 11 */: {
+                itsIsPasswordField = true;
+                break;
+            }
+            }
+            break;
+        }
+        case InputType.TYPE_CLASS_TEXT: {
+            switch (info.inputType & InputType.TYPE_MASK_VARIATION) {
+            case InputType.TYPE_TEXT_VARIATION_PASSWORD:
+            case 0xE0 /* TYPE_TEXT_VARIATION_WEB_PASSWORD in API 11 */: {
+                itsIsPasswordField = true;
+                break;
+            }
+            }
+            break;
+        }
+        }
+        itsAllowPassword = itsIsPasswordField;
+        showPasswordWarning(false);
+
         // Reset keyboard to reflect key changes
-        itsKeyboardView.setKeyboard(itsKeyboard);
+        itsKeyboardView.invalidateAllKeys();
     }
 
     /* (non-Javadoc)
@@ -174,7 +203,13 @@ public class PasswdSafeIME extends InputMethodService
                 break;
             }
             case PASSWORD_KEY: {
-                str = rc.first.getPassword(rc.second);
+                showPasswordWarning(!itsAllowPassword);
+                if (itsAllowPassword) {
+                    str = rc.first.getPassword(rc.second);
+                    itsAllowPassword = itsIsPasswordField;
+                } else {
+                    itsAllowPassword = true;
+                }
                 break;
             }
             case TITLE_KEY: {
@@ -228,8 +263,6 @@ public class PasswdSafeIME extends InputMethodService
     /** Refresh the fields from the current password data */
     private final Pair<PasswdFileData, PwsRecord> refresh()
     {
-        // TODO: Check field type for password pastes?
-        // TODO: disable blank fields?
         // TODO: check back button behavior after launching passwdsafe
 
         PasswdSafeApp app = getPasswdSafeApp();
@@ -257,6 +290,13 @@ public class PasswdSafeIME extends InputMethodService
         }
 
         return new Pair<PasswdFileData, PwsRecord>(fileData, rec);
+    }
+
+    /** Show the password warning */
+    private final void showPasswordWarning(boolean show)
+    {
+        View v = itsView.findViewById(R.id.password_warning);
+        v.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     /** Get the PasswdSafeApp */

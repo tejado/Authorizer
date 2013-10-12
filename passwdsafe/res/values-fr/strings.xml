@@ -176,6 +176,7 @@
     <string name="policy_yes_sym_policy">Oui - Au moins %1$d des symboles de stratégie: %2$s</string>
     <string name="policy_yes_sym_pronounce">Oui - Au moins %1$d des symboles prononçables: %2$s</string>
     <string name="preferences">Préférences</string>
+    <string name="press_password_warning">Appuyez de nouveau Mot de passe pour coller dans le champ visible</string>
     <string name="protect_all">Protéger toutes les entrées</string>
     <string name="protect_group">Protéger un groupe d\'entrées</string>
     <string name="protected_record">Protégé</string>
