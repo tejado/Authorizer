@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="about">A propos</string>
     <string name="add">Ajouter</string>
     <string name="add_policy">Ajouter Stratégie</string>
     <string name="add_record">Ajouter Entrée</string>
@@ -9,7 +8,6 @@
     <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Au moins</string>
-    <string name="back">Retour</string>
     <string name="basic">"General"</string>
     <string name="cancel">Annuler</string>
     <string name="cannot_create_file">Impossible de créer un fichier: %1$s</string>
@@ -71,7 +69,6 @@
     <string name="enter_net_group">Entrer un nouveau groupe:</string>
     <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers logs</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
-    <string name="execute">Exécuter</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Notifications d\'Expiration</string>
     <string name="expiration_notifications_warning">L\'activation des notifications d\'expiration implique que PasswdSafe stocke les informations d\'expiration dans un fichier (titre de l\'entrée, le groupe et la date d\'expiration). Ces informations sont stockées en clair sur l\'appareil, mais aucun mot de passe n\'y est stockés.</string>

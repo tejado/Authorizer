@@ -8,7 +8,6 @@
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">At least</string>
-    <string name="back">Back</string>
     <string name="basic">Basic</string>
     <string name="cancel">Cancel</string>
     <string name="cannot_create_file">Cannot create file: %1$s</string>
@@ -70,7 +69,6 @@
     <string name="enter_net_group">Enter new group:</string>
     <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
-    <string name="execute">Execute</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Expiration Notifications</string>
     <string name="expiration_notifications_warning">Enabling expiration notifications requires PasswdSafe to store expiration information for the file (record title, group, and expiration date).  This information is stored unencrypted on the device.  No passwords are stored.</string>
