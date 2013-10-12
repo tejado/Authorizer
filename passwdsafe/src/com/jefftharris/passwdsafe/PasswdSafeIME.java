@@ -19,10 +19,8 @@ import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
@@ -44,6 +42,7 @@ public class PasswdSafeIME extends InputMethodService
     private static final int ENTER_KEY = -13;
     private static final int TITLE_KEY = -21;
     private static final int NOTES_KEY = -22;
+    private static final int PASSWDSAFE_KEY = -24;
 
     private View itsView;
     private KeyboardView itsKeyboardView;
@@ -59,16 +58,6 @@ public class PasswdSafeIME extends InputMethodService
     {
         itsView = getLayoutInflater().inflate(R.layout.input_method, null);
         refresh();
-
-        Button btn;
-        btn = (Button)itsView.findViewById(R.id.launch_passwdsafe);
-        btn.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                openPasswdSafe();
-            }
-        });
 
         itsKeyboard = new PasswdSafeKeyboard(this, R.xml.keyboard);
         itsKeyboardView = (KeyboardView)itsView.findViewById(R.id.keyboard);
@@ -222,6 +211,10 @@ public class PasswdSafeIME extends InputMethodService
             }
             break;
         }
+        case PASSWDSAFE_KEY: {
+            openPasswdSafe();
+            break;
+        }
         case 32: {
             str = " ";
             break;
@@ -239,7 +232,6 @@ public class PasswdSafeIME extends InputMethodService
         // TODO: Check field type for password pastes?
         // TODO: show group
         // TODO: disable blank fields?
-        // TODO: icons?
 
         PasswdSafeApp app = getPasswdSafeApp();
         PasswdFileData fileData = app.accessOpenFileData();

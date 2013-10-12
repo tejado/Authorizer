@@ -49,7 +49,7 @@
         
         <Key
             android:codes="-24"
-            android:keyIcon="@drawable/ic_stat_app"
+            android:keyIcon="@drawable/ic_action_passwdsafe"
             android:keyWidth="10%p"/>
     </Row>
 

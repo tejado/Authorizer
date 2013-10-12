@@ -11,17 +11,9 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/launch_passwdsafe"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:drawableTop="@drawable/ic_launcher_passwdsafe"
-            android:drawablePadding="6dp"
-            android:text="@string/open"/>
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/keyboard_header_margin"
+        android:paddingRight="@dimen/keyboard_header_margin">
 
         <TextView
             android:id="@+id/file_label"
@@ -37,8 +29,8 @@
             style="@style/InputMethodText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@id/launch_passwdsafe"
             android:layout_toRightOf="@id/file_label"
             android:paddingLeft="6dp"/>
 
@@ -55,8 +47,8 @@
             style="@style/InputMethodText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_alignTop="@id/record_label"
-            android:layout_toLeftOf="@id/launch_passwdsafe"
             android:layout_toRightOf="@id/record_label"
             android:paddingLeft="6dp"/>
 
@@ -66,11 +58,5 @@
         android:id="@+id/keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-<!--
-    <view
-        android:id="@+id/keyboard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        class="com.jefftharris.passwdsafe.PasswdSafeIME$KeyboardView"/>
--->
+
 </LinearLayout>
