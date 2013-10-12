@@ -4,6 +4,10 @@
         <item name="android:background">@android:drawable/list_selector_background</item>
     </style>
 
+    <style name="InputMethodText">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
     <style name="RecordRow">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>

@@ -88,7 +88,8 @@ public class PasswdSafeIME extends InputMethodService
         super.onStartInputView(info, restarting);
         refresh();
 
-        int enterText;
+        int enterText = -1;
+        int enterIcon = -1;
         itsEnterAction =
                 info.imeOptions & (EditorInfo.IME_MASK_ACTION |
                                    EditorInfo.IME_FLAG_NO_ENTER_ACTION);
@@ -106,7 +107,7 @@ public class PasswdSafeIME extends InputMethodService
             break;
         }
         case EditorInfo.IME_ACTION_SEARCH: {
-            enterText = R.string.search;
+            enterIcon = R.drawable.sym_keyboard_search;
             break;
         }
         case EditorInfo.IME_ACTION_SEND: {
@@ -114,14 +115,16 @@ public class PasswdSafeIME extends InputMethodService
             break;
         }
         default: {
-            enterText = R.string.execute;
+            enterIcon = R.drawable.sym_keyboard_return;
             itsEnterAction = EditorInfo.IME_ACTION_NONE;
             break;
         }
         }
 
         if (itsEnterKey != null) {
-            itsEnterKey.label = getString(enterText);
+            itsEnterKey.label = (enterText != -1) ? getString(enterText) : null;
+            itsEnterKey.icon = (enterIcon != -1) ?
+                    getResources().getDrawable(enterIcon) : null;
         }
         // Reset keyboard to reflect key changes
         itsKeyboardView.setKeyboard(itsKeyboard);
