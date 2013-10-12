@@ -7,10 +7,10 @@
         <Key
             android:codes="-1"
             android:keyEdgeFlags="left"
-            android:keyLabel="User"/>
+            android:keyLabel="@string/username"/>
         <Key
             android:codes="-2"
-            android:keyLabel="URL"/>
+            android:keyLabel="@string/url"/>
         <Key
             android:codes="-3"
             android:isRepeatable="true"
@@ -22,10 +22,10 @@
         <Key
             android:codes="-11"
             android:keyEdgeFlags="left"
-            android:keyLabel="Password"/>
+            android:keyLabel="@string/password"/>
         <Key
             android:codes="-12"
-            android:keyLabel="Email"/>
+            android:keyLabel="@string/email"/>
         <Key
             android:codes="-13"
             android:keyEdgeFlags="right"
@@ -36,17 +36,17 @@
         <Key
             android:codes="-21"
             android:keyEdgeFlags="left"
-            android:keyLabel="Title"/>
+            android:keyLabel="@string/title"/>
         <Key
             android:codes="-22"
-            android:keyLabel="Notes"/>
+            android:keyLabel="@string/notes"/>
         <Key
             android:codes="32"
             android:isRepeatable="true"
             android:keyEdgeFlags="right"
             android:keyIcon="@drawable/sym_keyboard_space"
             android:keyWidth="10%p"/>
-        
+
         <Key
             android:codes="-24"
             android:keyIcon="@drawable/ic_action_passwdsafe"
