@@ -49,6 +49,7 @@ import android.widget.TextView;
  * The FileListFragment allows the user to choose which file to open
  */
 public class FileListFragment extends ListFragment
+        implements LoaderCallbacks<List<Map<String, Object>>>
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -134,8 +135,6 @@ public class FileListFragment extends ListFragment
     }
 
 
-    private FileLoaderCb itsLoaderCb;
-
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
      */
@@ -147,9 +146,8 @@ public class FileListFragment extends ListFragment
             openFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE));
         }
 
-        itsLoaderCb = new FileLoaderCb();
         LoaderManager lm = getLoaderManager();
-        lm.initLoader(0, null, itsLoaderCb);
+        lm.initLoader(0, null, this);
     }
 
 
@@ -271,6 +269,27 @@ public class FileListFragment extends ListFragment
         }
     }
 
+    /** Create a loader for files */
+    @Override
+    public Loader<List<Map<String, Object>>> onCreateLoader(int id, Bundle args)
+    {
+        return new FileLoader(itsDir, getActivity());
+    }
+
+    /** Callback when a loader is finished */
+    @Override
+    public void onLoadFinished(Loader<List<Map<String, Object>>> loader,
+                               List<Map<String, Object>> data)
+    {
+        updateFiles(data);
+    }
+
+    /** Callback when a loader is reset */
+    @Override
+    public void onLoaderReset(Loader<List<Map<String, Object>>> loader)
+    {
+        updateFiles(null);
+    }
 
     /**
      * @return true if a directory was popped, false to use default behavior
@@ -344,9 +363,10 @@ public class FileListFragment extends ListFragment
         }
 
         LoaderManager lm = getLoaderManager();
-        lm.restartLoader(0, null, itsLoaderCb);
+        lm.restartLoader(0, null, this);
     }
 
+    /** Update files after the loader is complete */
     private final void updateFiles(List<Map<String, Object>> fileData)
     {
         ListAdapter adapter = null;
@@ -466,52 +486,42 @@ public class FileListFragment extends ListFragment
         Preferences.setFileDirPref(dir, prefs);
     }
 
+    /** Async class to load files in a directory */
     private static class FileLoader
             extends AsyncTaskLoader<List<Map<String, Object>>>
     {
-        private File itsDir;
+        private final File itsDir;
 
+        /** Constructor */
         public FileLoader(File dir, Context context)
         {
             super(context);
             itsDir = dir;
         }
 
-        @Override
-        protected void onAbandon()
-        {
-            // TODO Auto-generated method stub
-            super.onAbandon();
-        }
-
+        /** Handle when the loader is reset */
         @Override
         protected void onReset()
         {
-            // TODO Auto-generated method stub
             super.onReset();
+            onStopLoading();
         }
 
+        /** Handle when the loader is started */
         @Override
         protected void onStartLoading()
         {
-            // TODO Auto-generated method stub
-            super.onStartLoading();
+            forceLoad();
         }
 
+        /** Handle when the loader is stopped */
         @Override
         protected void onStopLoading()
         {
-            // TODO Auto-generated method stub
-            super.onStopLoading();
+            cancelLoad();
         }
 
-        @Override
-        public void onCanceled(List<Map<String, Object>> data)
-        {
-            // TODO Auto-generated method stub
-            super.onCanceled(data);
-        }
-
+        /** Load the files in the background */
         @Override
         public List<Map<String, Object>> loadInBackground()
         {
@@ -521,7 +531,7 @@ public class FileListFragment extends ListFragment
 
             FileData[] data = getFiles(itsDir, getContext());
             List<Map<String, Object>> fileData =
-                new ArrayList<Map<String, Object>>();
+                new ArrayList<Map<String, Object>>(data.length);
             for (FileData file: data) {
                 HashMap<String, Object> item = new HashMap<String, Object>();
                 item.put(TITLE, file);
@@ -530,30 +540,6 @@ public class FileListFragment extends ListFragment
                 fileData.add(item);
             }
             return fileData;
-        }
-    }
-
-    private class FileLoaderCb
-            implements LoaderCallbacks<List<Map<String, Object>>>
-    {
-        @Override
-        public Loader<List<Map<String, Object>>> onCreateLoader(int id,
-                                                                Bundle args)
-        {
-            return new FileLoader(itsDir, getActivity());
-        }
-
-        @Override
-        public void onLoadFinished(Loader<List<Map<String, Object>>> loader,
-                                   List<Map<String, Object>> data)
-        {
-            updateFiles(data);
-        }
-
-        @Override
-        public void onLoaderReset(Loader<List<Map<String, Object>>> loader)
-        {
-            updateFiles(null);
         }
     }
 }
