@@ -378,6 +378,10 @@ public class FileListFragment extends ListFragment
         }
 
         View rootView = getView();
+        if (rootView == null) {
+            // Fragment destroyed
+            return;
+        }
         View groupPanel = rootView.findViewById(R.id.current_group_panel);
         TextView groupLabel =
                 (TextView)rootView.findViewById(R.id.current_group_label);
