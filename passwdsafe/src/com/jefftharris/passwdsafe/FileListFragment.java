@@ -21,6 +21,7 @@ import com.jefftharris.passwdsafe.util.FileComparator;
 import com.jefftharris.passwdsafe.view.GuiUtils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -28,6 +29,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,6 +49,7 @@ import android.widget.TextView;
  * The FileListFragment allows the user to choose which file to open
  */
 public class FileListFragment extends ListFragment
+        implements LoaderCallbacks<List<Map<String, Object>>>
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -139,6 +145,9 @@ public class FileListFragment extends ListFragment
         if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
             openFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE));
         }
+
+        LoaderManager lm = getLoaderManager();
+        lm.initLoader(0, null, this);
     }
 
 
@@ -260,6 +269,27 @@ public class FileListFragment extends ListFragment
         }
     }
 
+    /** Create a loader for files */
+    @Override
+    public Loader<List<Map<String, Object>>> onCreateLoader(int id, Bundle args)
+    {
+        return new FileLoader(itsDir, getActivity());
+    }
+
+    /** Callback when a loader is finished */
+    @Override
+    public void onLoadFinished(Loader<List<Map<String, Object>>> loader,
+                               List<Map<String, Object>> data)
+    {
+        updateFiles(data);
+    }
+
+    /** Callback when a loader is reset */
+    @Override
+    public void onLoaderReset(Loader<List<Map<String, Object>>> loader)
+    {
+        updateFiles(null);
+    }
 
     /**
      * @return true if a directory was popped, false to use default behavior
@@ -321,28 +351,26 @@ public class FileListFragment extends ListFragment
         return data;
     }
 
-
     /** Show the files in the current directory */
     private final void showFiles()
     {
-        ListAdapter adapter = null;
         String state = Environment.getExternalStorageState();
         if (!Environment.MEDIA_MOUNTED.equals(state) &&
             !Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             itsDir = null;
         } else {
             itsDir = getFileDir();
-            FileData[] data = getFiles(itsDir);
-            List<Map<String, Object>> fileData =
-                new ArrayList<Map<String, Object>>();
-            for (FileData file: data) {
-                HashMap<String, Object> item = new HashMap<String, Object>();
-                item.put(TITLE, file);
-                item.put(ICON, file.itsFile.isDirectory() ?
-                               R.drawable.folder_rev : R.drawable.login_rev);
-                fileData.add(item);
-            }
+        }
 
+        LoaderManager lm = getLoaderManager();
+        lm.restartLoader(0, null, this);
+    }
+
+    /** Update files after the loader is complete */
+    private final void updateFiles(List<Map<String, Object>> fileData)
+    {
+        ListAdapter adapter = null;
+        if (fileData != null) {
             adapter = new SimpleAdapter(getActivity(), fileData,
                                         R.layout.file_list_item,
                                         new String[] { TITLE, ICON },
@@ -419,10 +447,10 @@ public class FileListFragment extends ListFragment
 
 
     /** Get the files in the given directory */
-    private final FileData[] getFiles(File dir)
+    private static FileData[] getFiles(File dir, Context ctx)
     {
         SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(getActivity());
+            PreferenceManager.getDefaultSharedPreferences(ctx);
         boolean showHiddenFiles =
             Preferences.getShowHiddenFilesPref(prefs);
         return getFiles(dir, showHiddenFiles, true);
@@ -456,5 +484,62 @@ public class FileListFragment extends ListFragment
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(getActivity());
         Preferences.setFileDirPref(dir, prefs);
+    }
+
+    /** Async class to load files in a directory */
+    private static class FileLoader
+            extends AsyncTaskLoader<List<Map<String, Object>>>
+    {
+        private final File itsDir;
+
+        /** Constructor */
+        public FileLoader(File dir, Context context)
+        {
+            super(context);
+            itsDir = dir;
+        }
+
+        /** Handle when the loader is reset */
+        @Override
+        protected void onReset()
+        {
+            super.onReset();
+            onStopLoading();
+        }
+
+        /** Handle when the loader is started */
+        @Override
+        protected void onStartLoading()
+        {
+            forceLoad();
+        }
+
+        /** Handle when the loader is stopped */
+        @Override
+        protected void onStopLoading()
+        {
+            cancelLoad();
+        }
+
+        /** Load the files in the background */
+        @Override
+        public List<Map<String, Object>> loadInBackground()
+        {
+            if (itsDir == null) {
+                return null;
+            }
+
+            FileData[] data = getFiles(itsDir, getContext());
+            List<Map<String, Object>> fileData =
+                new ArrayList<Map<String, Object>>(data.length);
+            for (FileData file: data) {
+                HashMap<String, Object> item = new HashMap<String, Object>();
+                item.put(TITLE, file);
+                item.put(ICON, file.itsFile.isDirectory() ?
+                               R.drawable.folder_rev : R.drawable.login_rev);
+                fileData.add(item);
+            }
+            return fileData;
+        }
     }
 }
