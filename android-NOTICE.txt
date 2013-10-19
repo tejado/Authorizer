@@ -7,6 +7,7 @@ passwdsafe/res/drawable-hdpi/spinner_default_holo_dark.9.png
 passwdsafe/res/drawable-hdpi/spinner_disabled_holo_dark.9.png
 passwdsafe/res/drawable-hdpi/spinner_focused_holo_dark.9.png
 passwdsafe/res/drawable-hdpi/spinner_pressed_holo_dark.9.png
+passwdsafe/res/drawable-hdpi/sym_keyboard_choose.png
 passwdsafe/res/drawable-hdpi/sym_keyboard_delete.png
 passwdsafe/res/drawable-hdpi/sym_keyboard_return.png
 passwdsafe/res/drawable-hdpi/sym_keyboard_search.png
@@ -23,6 +24,7 @@ passwdsafe/res/drawable-mdpi/spinner_default_holo_dark.9.png
 passwdsafe/res/drawable-mdpi/spinner_disabled_holo_dark.9.png
 passwdsafe/res/drawable-mdpi/spinner_focused_holo_dark.9.png
 passwdsafe/res/drawable-mdpi/spinner_pressed_holo_dark.9.png
+passwdsafe/res/drawable-mdpi/sym_keyboard_choose.png
 passwdsafe/res/drawable-mdpi/sym_keyboard_delete.png
 passwdsafe/res/drawable-mdpi/sym_keyboard_return.png
 passwdsafe/res/drawable-mdpi/sym_keyboard_search.png
@@ -35,6 +37,7 @@ passwdsafe/res/drawable-xhdpi/spinner_default_holo_dark.9.png
 passwdsafe/res/drawable-xhdpi/spinner_disabled_holo_dark.9.png
 passwdsafe/res/drawable-xhdpi/spinner_focused_holo_dark.9.png
 passwdsafe/res/drawable-xhdpi/spinner_pressed_holo_dark.9.png
+passwdsafe/res/drawable-xhdpi/sym_keyboard_choose.png
 passwdsafe/res/drawable-xhdpi/sym_keyboard_delete.png
 passwdsafe/res/drawable-xhdpi/sym_keyboard_return.png
 passwdsafe/res/drawable-xhdpi/sym_keyboard_search.png
