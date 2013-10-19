@@ -55,13 +55,22 @@ public class PasswdSafeUtil
     /** Start the main activity for a package */
     public static void startMainActivity(String pkgName, Context ctx)
     {
+        Intent intent = getMainActivityIntent(pkgName, ctx);
+        if (intent != null) {
+            ctx.startActivity(intent);
+        }
+    }
+
+    /** Get the intent to start the main activity for a package */
+    public static Intent getMainActivityIntent(String pkgName, Context ctx)
+    {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setPackage(pkgName);
         PackageManager pm = ctx.getPackageManager();
         List<ResolveInfo> infos = pm.queryIntentActivities(intent, 0);
         if (infos == null) {
-            return;
+            return null;
         }
         for (ResolveInfo info: infos) {
             ActivityInfo actInfo = info.activityInfo;
@@ -71,10 +80,10 @@ public class PasswdSafeUtil
                 if (!(ctx instanceof Activity)) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 }
-                ctx.startActivity(intent);
-                return;
+                return intent;
             }
         }
+        return null;
     }
 
     /** Get the app title */

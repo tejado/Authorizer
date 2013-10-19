@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +26,10 @@ public abstract class AbstractFileListActivity extends FragmentActivity
                    SyncProviderFilesFragment.Listener
 
 {
+    public static final String INTENT_EXTRA_CLOSE_ON_OPEN = "closeOnOpen";
+
+    protected boolean itsIsCloseOnOpen = false;
+
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
      */
@@ -33,6 +38,10 @@ public abstract class AbstractFileListActivity extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_list);
+
+        Intent intent = getIntent();
+        itsIsCloseOnOpen = intent.getBooleanExtra(INTENT_EXTRA_CLOSE_ON_OPEN,
+                                                  false);
 
         FragmentManager fragMgr = getSupportFragmentManager();
         FragmentTransaction txn = fragMgr.beginTransaction();

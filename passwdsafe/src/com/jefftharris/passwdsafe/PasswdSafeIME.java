@@ -173,19 +173,26 @@ public class PasswdSafeIME extends InputMethodService
     private final void openPasswdSafe()
     {
         Pair<PasswdFileData, PwsRecord> rc = refresh();
+        Intent intent;
         if (rc.first == null) {
-            PasswdSafeUtil.startMainActivity("com.jefftharris.passwdsafe",
-                                             this);
+            intent = PasswdSafeUtil.getMainActivityIntent(
+                    "com.jefftharris.passwdsafe", this);
+            if (intent == null) {
+                return;
+            }
+            intent.putExtra(FileListActivity.INTENT_EXTRA_CLOSE_ON_OPEN, true);
         } else {
             String uuid = null;
             if (rc.second != null) {
                 uuid = rc.first.getUUID(rc.second);
             }
-            Intent intent = PasswdSafeUtil.createOpenIntent(
+            intent = PasswdSafeUtil.createOpenIntent(
                     rc.first.getUri().getUri(), uuid);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+            //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            //intent.addFlags(0x00008000);
         }
+        startActivity(intent);
     }
 
     /** Handle a press of a keyboard key */

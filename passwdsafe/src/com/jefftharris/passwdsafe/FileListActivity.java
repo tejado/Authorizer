@@ -75,6 +75,9 @@ public class FileListActivity extends AbstractFileListActivity
     public void openFile(Uri uri, String fileName)
     {
         try {
+            if (itsIsCloseOnOpen) {
+                finish();
+            }
             startActivity(PasswdSafeUtil.createOpenIntent(uri, null));
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Can't open uri: " + uri, e);
