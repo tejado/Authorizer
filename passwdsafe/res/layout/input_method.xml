@@ -22,6 +22,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:contentDescription="@string/app_name"
+            android:paddingBottom="6dp"
             android:paddingRight="6dp"
             android:src="@drawable/ic_launcher_passwdsafe"/>
 

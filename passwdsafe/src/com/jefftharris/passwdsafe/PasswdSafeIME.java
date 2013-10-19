@@ -20,6 +20,7 @@ import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
@@ -67,6 +68,16 @@ public class PasswdSafeIME extends InputMethodService
         itsKeyboardView.setPreviewEnabled(false);
         itsKeyboardView.setKeyboard(itsKeyboard);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
+
+        View icon = itsView.findViewById(R.id.icon);
+        icon.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onKeyPress(PASSWDSAFE_KEY);
+            }
+        });
 
         return itsView;
     }
