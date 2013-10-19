@@ -1,9 +1,10 @@
 <Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
     android:horizontalGap="0px"
-    android:keyWidth="40%p"
+    android:keyHeight="50dp"
+    android:keyWidth="35%p"
     android:verticalGap="0px">
 
-    <Row android:keyHeight="50dp">
+    <Row>
         <Key
             android:codes="-1"
             android:keyEdgeFlags="left"
@@ -16,9 +17,9 @@
             android:isRepeatable="true"
             android:keyEdgeFlags="right"
             android:keyIcon="@drawable/sym_keyboard_delete"
-            android:keyWidth="20%p"/>
+            android:keyWidth="30%p"/>
     </Row>
-    <Row android:keyHeight="50dp">
+    <Row>
         <Key
             android:codes="-11"
             android:keyEdgeFlags="left"
@@ -30,27 +31,33 @@
             android:codes="-13"
             android:keyEdgeFlags="right"
             android:keyLabel="Enter"
-            android:keyWidth="20%p"/>
+            android:keyWidth="30%p"/>
     </Row>
     <Row>
         <Key
             android:codes="-21"
             android:keyEdgeFlags="left"
-            android:keyLabel="@string/title"/>
-        <Key
-            android:codes="-22"
-            android:keyLabel="@string/notes"/>
+            android:keyLabel="@string/title"
+            android:keyWidth="28%p"/>
         <Key
             android:codes="32"
             android:isRepeatable="true"
-            android:keyEdgeFlags="right"
             android:keyIcon="@drawable/sym_keyboard_space"
-            android:keyWidth="10%p"/>
-
+            android:keyWidth="14%p"/>
+        <Key
+            android:codes="-22"
+            android:keyLabel="@string/notes"
+            android:keyWidth="28%p"/>
         <Key
             android:codes="-24"
             android:keyIcon="@drawable/ic_action_passwdsafe"
-            android:keyWidth="10%p"/>
+            android:keyWidth="15%p"/>
+        <Key
+            android:codes="-25"
+            android:keyEdgeFlags="right"
+            android:keyIcon="@drawable/sym_keyboard_choose"
+            android:keyWidth="15%p"/>
+
     </Row>
 
 </Keyboard>

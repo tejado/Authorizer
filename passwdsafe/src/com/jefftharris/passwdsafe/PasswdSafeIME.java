@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
@@ -46,6 +47,7 @@ public class PasswdSafeIME extends InputMethodService
     private static final int TITLE_KEY = -21;
     private static final int NOTES_KEY = -22;
     private static final int PASSWDSAFE_KEY = -24;
+    private static final int KEYBOARD_CHOOSE_KEY = -25;
 
     private View itsView;
     private KeyboardView itsKeyboardView;
@@ -267,6 +269,12 @@ public class PasswdSafeIME extends InputMethodService
         }
         case PASSWDSAFE_KEY: {
             openPasswdSafe();
+            break;
+        }
+        case KEYBOARD_CHOOSE_KEY: {
+            InputMethodManager inputMgr =
+                    (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            inputMgr.showInputMethodPicker();
             break;
         }
         case 32: {
