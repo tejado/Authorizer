@@ -26,6 +26,7 @@ import android.view.inputmethod.InputConnection;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Pair;
 
@@ -189,8 +190,8 @@ public class PasswdSafeIME extends InputMethodService
             intent = PasswdSafeUtil.createOpenIntent(
                     rc.first.getUri().getUri(), uuid);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            //intent.addFlags(0x00008000);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(ApiCompat.INTENT_FLAG_ACTIVITY_CLEAR_TASK);
         }
         startActivity(intent);
     }
@@ -281,8 +282,6 @@ public class PasswdSafeIME extends InputMethodService
     /** Refresh the fields from the current password data */
     private final Pair<PasswdFileData, PwsRecord> refresh()
     {
-        // TODO: check back button behavior after launching passwdsafe
-
         PasswdSafeApp app = getPasswdSafeApp();
         PasswdFileData fileData = app.accessOpenFileData();
         PwsRecord rec = null;

@@ -27,6 +27,9 @@ public final class ApiCompat
         android.os.Build.VERSION_CODES.FROYO;
     public static final int SDK_HONEYCOMB = 11;
 
+    /** Copy of Intent.FLAG_ACTIVITY_CLEAR_TASK available on API 11 */
+    public static final int INTENT_FLAG_ACTIVITY_CLEAR_TASK = 0x00008000;
+
     public static final int SDK_VERSION;
     static {
         int sdk;
