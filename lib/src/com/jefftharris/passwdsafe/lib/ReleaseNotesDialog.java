@@ -64,7 +64,7 @@ public class ReleaseNotesDialog extends DialogFragment
                 "- Select the PasswdSafe icon to choose a different record if needed<br>";
 
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
-            .setTitle("Release Notes")
+            .setTitle(R.string.release_notes)
             .setIcon(android.R.drawable.ic_menu_info_details)
             .setMessage(Html.fromHtml(notes))
             .setPositiveButton(R.string.close,
