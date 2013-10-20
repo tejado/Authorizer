@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 
 
 /**
@@ -28,6 +29,16 @@ public class FileListActivity extends AbstractFileListActivity
 {
     private static final String TAG = "FileListActivity";
 
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
+     */
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        ReleaseNotesDialog.checkNotes(this);
+    }
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
