@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jefftharris.passwdsafe.lib.AboutDialog;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 
@@ -75,10 +76,13 @@ public class FileListActivity extends AbstractFileListActivity
     public void openFile(Uri uri, String fileName)
     {
         try {
+            Intent intent = PasswdSafeUtil.createOpenIntent(uri, null);
             if (itsIsCloseOnOpen) {
-                finish();
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(ApiCompat.INTENT_FLAG_ACTIVITY_CLEAR_TASK);
             }
-            startActivity(PasswdSafeUtil.createOpenIntent(uri, null));
+            startActivity(intent);
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Can't open uri: " + uri, e);
         }
