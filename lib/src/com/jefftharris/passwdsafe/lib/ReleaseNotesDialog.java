@@ -28,6 +28,9 @@ public class ReleaseNotesDialog extends DialogFragment
 
     public static void checkNotes(FragmentActivity act)
     {
+        if (itsAppVersion != null) {
+            return;
+        }
         itsAppVersion = PasswdSafeUtil.getAppVersion(act);
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(act);
@@ -35,6 +38,10 @@ public class ReleaseNotesDialog extends DialogFragment
         if (!itsAppVersion.equals(prefVersion)) {
             ReleaseNotesDialog dlg = new ReleaseNotesDialog();
             dlg.show(act.getSupportFragmentManager(), "ReleaseNotesDialog");
+
+            SharedPreferences.Editor prefEdit = prefs.edit();
+            prefEdit.putString(PREF_RELEASE_NOTES, itsAppVersion);
+            prefEdit.commit();
         }
     }
 
@@ -47,11 +54,14 @@ public class ReleaseNotesDialog extends DialogFragment
         Activity act = getActivity();
         String notes =
                 "<b>4.2.0</b> - An input method is available which can paste fields " +
-                "from the last selected password record.  To use, enable " +
-                "the input method in the system settings.  Then, select a " +
-                "record, switch to the app into which the fields are to be " +
-                "pasted, choose the PasswdSafe input method, and paste " +
-                "the desired fields.";
+                "from the last selected password record.  The input method " +
+                "must be enabled in the system settings before it can be used. " +
+                "<br><br>To use:<br>" +
+                "- Select a record in PasswdSafe<br>" +
+                "- Open the app which will use the record's fields<br>" +
+                "- Switch to the PasswdSafe input method<br>" +
+                "- Select the fields to paste values into the app<br>" +
+                "- Select the PasswdSafe icon to choose a different record if needed<br>";
 
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
             .setTitle("Release Notes")
