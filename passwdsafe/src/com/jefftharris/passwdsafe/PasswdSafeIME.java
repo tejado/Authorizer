@@ -17,6 +17,7 @@ import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
+import android.os.IBinder;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Pair;
+import com.jefftharris.passwdsafe.view.GuiUtils;
 
 /**
  *  Input method for selecting fields from a record
@@ -184,6 +186,11 @@ public class PasswdSafeIME extends InputMethodService
                 return;
             }
             intent.putExtra(FileListActivity.INTENT_EXTRA_CLOSE_ON_OPEN, true);
+
+            InputMethodManager inputMgr =
+                    (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            IBinder token = this.getWindow().getWindow().getAttributes().token;
+            GuiUtils.switchToLastInputMethod(inputMgr, token);
         } else {
             String uuid = null;
             if (rc.second != null) {
