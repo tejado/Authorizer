@@ -305,7 +305,10 @@ public class PasswdSafeIME extends InputMethodService
             filetv.setText(R.string.none_selected_open);
         }
 
+        View reclabel = itsView.findViewById(R.id.record_label);
+        reclabel.setVisibility((fileData == null) ? View.GONE : View.VISIBLE);
         TextView rectv = (TextView)itsView.findViewById(R.id.record);
+        rectv.setVisibility((fileData == null) ? View.GONE : View.VISIBLE);
         if (rec != null) {
             rectv.setText(fileData.getId(rec));
         } else if (fileData != null) {
