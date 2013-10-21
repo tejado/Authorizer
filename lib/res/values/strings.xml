@@ -10,6 +10,6 @@
     <string name="error">Error</string>
     <string name="google_drive">Google Drive</string>
     <string name="open">Open</string>
-    <string name="release_notes">Release Notes</string>
-
+    <string name="release_notes_title">Release Notes</string>
+    <string name="release_notes">(placeholder)</string>
 </resources>

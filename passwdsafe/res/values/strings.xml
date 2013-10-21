@@ -232,6 +232,18 @@
     <string name="username_header">USER NAME</string>
     <string name="yes">Yes</string>
 
+    <string name="release_notes">
+        &lt;b&gt;4.2.0&lt;/b&gt; - An input method is available which can paste 
+        fields from the last selected password record. The input method must be
+        enabled in the system settings before it can be used.
+        \n\nTo use:\n
+        - Select a record in PasswdSafe\n
+        - Open the app which will use the record\'s fields\n
+        - Switch to the PasswdSafe input method\n
+        - Select the fields to paste values into the app\n
+        - Select the PasswdSafe icon to choose a different record if needed\n
+    </string>
+
     <plurals name="expiring_passwords">
         <item quantity="one">One expiring password</item>
         <item quantity="other">%1$d expiring passwords</item>

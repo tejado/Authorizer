@@ -11,6 +11,6 @@
     <string name="error">Erreur</string>
     <string name="google_drive">Google Drive</string>
     <string name="open">Ouvrir</string>
-    <string name="release_notes">Notes de version</string>
+    <string name="release_notes_title">Notes de version</string>
 
 </resources>

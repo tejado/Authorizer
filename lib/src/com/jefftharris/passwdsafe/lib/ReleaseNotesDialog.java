@@ -52,19 +52,11 @@ public class ReleaseNotesDialog extends DialogFragment
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
         Activity act = getActivity();
-        String notes =
-                "<b>4.2.0</b> - An input method is available which can paste fields " +
-                "from the last selected password record.  The input method " +
-                "must be enabled in the system settings before it can be used. " +
-                "<br><br>To use:<br>" +
-                "- Select a record in PasswdSafe<br>" +
-                "- Open the app which will use the record's fields<br>" +
-                "- Switch to the PasswdSafe input method<br>" +
-                "- Select the fields to paste values into the app<br>" +
-                "- Select the PasswdSafe icon to choose a different record if needed<br>";
+        String notes = getString(R.string.release_notes);
+        notes = notes.replace("\n", "<br>");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
-            .setTitle(R.string.release_notes)
+            .setTitle(R.string.release_notes_title)
             .setIcon(android.R.drawable.ic_menu_info_details)
             .setMessage(Html.fromHtml(notes))
             .setPositiveButton(R.string.close,
