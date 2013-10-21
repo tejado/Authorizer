@@ -231,20 +231,20 @@
     <string name="use_uppercase">Utiliser majuscules</string>
     <string name="username_header">NOM UTILISATEUR</string>
     <string name="yes">Oui</string>
-    
+
     <string name="release_notes">
-        &lt;b&gt;4.2.0&lt;/b&gt; - Une méthode de saisie est disponible qui peut 
-        coller domaines de la dernière passe enregistrement sélectionné. La 
-        méthode de saisie doit être activée dans les paramètres du système 
+        &lt;b&gt;4.2.0&lt;/b&gt; - Une méthode de saisie est disponible qui peut
+        coller domaines de la dernière passe enregistrement sélectionné. La
+        méthode de saisie doit être activée dans les paramètres du système
         avant qu\'il puisse être utilisé.
         \n\nPour utiliser:\n
         - Sélectionnez un enregistrement dans PasswdSafe\n
         - Ouvrez l\'application qui va utiliser les champs de l\'enregistrement\n
         - Mettre à la méthode de saisie PasswdSafe\n
-        - Sélectionnez les champs à coller des valeurs dans l\'application
+        - Sélectionnez les champs à coller des valeurs dans l\'application\n
         - Sélectionnez l\'icône PasswdSafe de choisir un dossier différent si nécessaire\n
     </string>
-    
+
     <plurals name="expiring_passwords">
         <item quantity="one">Un mot de passe expire</item>
         <item quantity="other">%1$d mots de passe expirent</item>
