@@ -22,6 +22,7 @@ import android.text.Html;
  * The release notes dialog
  */
 public class ReleaseNotesDialog extends DialogFragment
+        implements DialogInterface.OnClickListener
 {
     private static final String PREF_RELEASE_NOTES = "releaseNotes";
     private static String itsAppVersion;
@@ -59,14 +60,13 @@ public class ReleaseNotesDialog extends DialogFragment
             .setTitle(R.string.release_notes_title)
             .setIcon(android.R.drawable.ic_menu_info_details)
             .setMessage(Html.fromHtml(notes))
-            .setPositiveButton(R.string.close,
-                               new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    dialog.dismiss();
-                }
-            });
+            .setPositiveButton(R.string.close, this);
         return builder.create();
+    }
+
+    /** Handle a click on the dialog button */
+    public void onClick(DialogInterface dialog, int which)
+    {
+        dialog.dismiss();
     }
 }
