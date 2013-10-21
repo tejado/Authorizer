@@ -8,8 +8,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.jefftharris.passwdsafe"
     android:installLocation="auto"
-    android:versionCode="40101"
-    android:versionName="4.1.1">
+    android:versionCode="40200"
+    android:versionName="4.2.0">
 
     <uses-sdk
         android:minSdkVersion="4"
