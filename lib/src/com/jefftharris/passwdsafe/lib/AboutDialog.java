@@ -21,6 +21,7 @@ import android.text.Html;
  *  The about dialog
  */
 public class AboutDialog extends DialogFragment
+        implements DialogInterface.OnClickListener
 {
     /* (non-Javadoc)
      * @see android.support.v4.app.DialogFragment#onCreateDialog(android.os.Bundle)
@@ -53,14 +54,13 @@ public class AboutDialog extends DialogFragment
             .setTitle(name)
             .setIcon(android.R.drawable.ic_menu_info_details)
             .setMessage(Html.fromHtml(msg))
-            .setPositiveButton(R.string.close,
-                               new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    dialog.dismiss();
-                }
-            });
+            .setPositiveButton(R.string.close, this);
         return builder.create();
+    }
+
+    /** Handle a click on the dialog button */
+    public void onClick(DialogInterface dialog, int which)
+    {
+        dialog.dismiss();
     }
 }
