@@ -47,6 +47,7 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 
 public class MainActivity extends FragmentActivity
         implements LoaderCallbacks<Cursor>
@@ -114,6 +115,16 @@ public class MainActivity extends FragmentActivity
         updateDropboxAccount(null);
         LoaderManager lm = getSupportLoaderManager();
         lm.initLoader(LOADER_PROVIDERS, null, this);
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onStart()
+     */
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        ReleaseNotesDialog.checkNotes(this);
     }
 
     /* (non-Javadoc)
