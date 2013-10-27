@@ -10,6 +10,7 @@
     <string name="cant_launch_drive_file">Can\'t launch Google Drive file.  Typically the file has not been synced locally.</string>
     <string name="choose_account">Choose Account</string>
     <string name="clear">Clear</string>
+    <string name="dropbox_acct_unlinked">App unlinked from Dropbox account.  Clear and re-add Dropbox access for PasswdSafe Sync.</string>
     <string name="dropbox_passwdsafe_sync">Dropbox PasswdSafe Sync</string>
     <string name="full_sync">Full sync</string>
     <string name="google_acct_not_available">Google account not available</string>

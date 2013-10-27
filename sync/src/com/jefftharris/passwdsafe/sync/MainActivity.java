@@ -37,6 +37,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.dropbox.sync.android.DbxAccount;
+import com.dropbox.sync.android.DbxFileSystem;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -137,6 +138,8 @@ public class MainActivity extends FragmentActivity
                        itsNewAccount.itsProviderType);
             itsNewAccount = null;
         }
+        LoaderManager lm = getSupportLoaderManager();
+        lm.restartLoader(LOADER_PROVIDERS, null, this);
     }
 
     @Override
@@ -356,6 +359,7 @@ public class MainActivity extends FragmentActivity
     public void onLoaderReset(Loader<Cursor> loader)
     {
         updateGdriveAccount(null);
+        updateDropboxAccount(null);
     }
 
     /** Update the UI when the GDrive account is changed */
@@ -422,19 +426,23 @@ public class MainActivity extends FragmentActivity
                     ProviderSyncFreqPref.freqValueOf(freqVal);
             itsDropboxUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
+            DbxFileSystem fs = SyncApp.get(this).getDropboxFs();
+            boolean hasFs = (fs != null) && !fs.isShutDown();
 
             View freqSpinLabel = findViewById(R.id.dropbox_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
             freqSpin.setSelection(freq.getDisplayIdx());
             View syncBtn = findViewById(R.id.dropbox_sync);
+            View acctWarning = findViewById(R.id.dropbox_acct_unlink);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             btns.setVisibility(View.VISIBLE);
+            acctWarning.setVisibility(hasFs ? View.GONE : View.VISIBLE);
 
             acctView.setText(getString(R.string.account_label, acct));
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
-            syncBtn.setEnabled(true);
+            syncBtn.setEnabled(hasFs);
         } else {
             itsDropboxUri = null;
             chooseBtn.setVisibility(View.VISIBLE);

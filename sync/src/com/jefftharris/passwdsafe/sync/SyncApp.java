@@ -168,6 +168,7 @@ public class SyncApp extends Application
         DbxFileSystem fs = getDropboxFs();
         if (fs == null) {
             PasswdSafeUtil.dbginfo(TAG, "syncDropbox no fs");
+            return;
         }
 
         PasswdSafeUtil.dbginfo(TAG, "syncDropbox");
