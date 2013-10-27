@@ -274,7 +274,7 @@ public class GDriveProvider extends Provider
 
             HashMap<String, File> allRemFiles = new HashMap<String, File>();
             Files.List request = itsDrive.files().list()
-                    .setQ("not trashed")
+                    .setQ("not trashed and fullText contains '.psafe3'")
                     .setFields("nextPageToken,items("+FILE_FIELDS+")");
             do {
                 FileList files = request.execute();
