@@ -10,7 +10,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import android.accounts.Account;
 import android.content.ContentResolver;
@@ -40,6 +43,7 @@ import com.google.api.services.drive.model.Change;
 import com.google.api.services.drive.model.ChangeList;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.ParentReference;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
@@ -52,11 +56,14 @@ public class GDriveProvider extends Provider
 
     public static final String ABOUT_FIELDS = "largestChangeId";
     public static final String FILE_FIELDS =
-            "id,title,mimeType,labels,fileExtension,modifiedDate,downloadUrl";
+            "id,title,mimeType,labels(trashed),fileExtension,modifiedDate," +
+            "downloadUrl,parents(id,isRoot)";
 
     private static final String TAG = "GDriveProvider";
 
     private final Context itsContext;
+    private final HashMap<String, FolderRefs> itsFolderRefs =
+            new HashMap<String, FolderRefs>();
 
 
     /** Constructor */
@@ -128,7 +135,8 @@ public class GDriveProvider extends Provider
                      SQLiteDatabase db,
                      boolean manual, SyncLogRecord logrec) throws Exception
     {
-        new Syncer(acct, provider, db, logrec, itsContext).sync();
+        new Syncer(acct, provider, db, logrec,
+                   itsFolderRefs, itsContext).sync();
     }
 
 
@@ -182,11 +190,15 @@ public class GDriveProvider extends Provider
         private final SQLiteDatabase itsDb;
         private final SyncLogRecord itsLogrec;
         private final Context itsContext;
+        private final HashMap<String, FolderRefs> itsFolderRefs;
+        private final HashMap<String, File> itsFileCache =
+                new HashMap<String, File>();
 
 
         /** Constructor */
         public Syncer(Account acct, DbProvider provider,
-                      SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
+                      SQLiteDatabase db, SyncLogRecord logrec,
+                      HashMap<String, FolderRefs> folderRefs, Context ctx)
         {
             Pair<Drive, String> drive = getDriveService(acct, ctx);
             itsDrive = drive.first;
@@ -195,6 +207,7 @@ public class GDriveProvider extends Provider
             itsDb = db;
             itsLogrec = logrec;
             itsContext = ctx;
+            itsFolderRefs = folderRefs;
         }
 
 
@@ -282,6 +295,9 @@ public class GDriveProvider extends Provider
                                        files.getItems().size());
                 for (File file: files.getItems()) {
                     if (!isSyncFile(file)) {
+                        if (isFolderFile(file)) {
+                            PasswdSafeUtil.dbginfo(TAG, "isdir %s", file);
+                        }
                         continue;
                     }
                     PasswdSafeUtil.dbginfo(TAG,
@@ -318,6 +334,9 @@ public class GDriveProvider extends Provider
                 for (Change change: changes.getItems()) {
                     File file = change.getFile();
                     if (change.getDeleted() || !isSyncFile(file)) {
+                        if (isFolderFile(file)) {
+                            PasswdSafeUtil.dbginfo(TAG, "isdir %s", file);
+                        }
                         file = null;
                     }
                     changedFiles.put(change.getFileId(), file);
@@ -341,10 +360,25 @@ public class GDriveProvider extends Provider
         /** Perform a sync of the files */
         private final List<GDriveSyncOper>
         performSync(HashMap<String, File> remfiles)
-                throws SQLException
+                throws SQLException, IOException
         {
-            HashMap<String, File> fileCache =
-                    new HashMap<String, File>(remfiles);
+            itsFileCache.putAll(remfiles);
+
+            HashMap<String, String> fileFolders =
+                    new HashMap<String, String>();
+            for (File remfile: remfiles.values()) {
+                if (remfile != null) {
+                    String folders = computeFolders(remfile);
+                    fileFolders.put(remfile.getId(), folders);
+                }
+            }
+            for (Map.Entry<String, FolderRefs> entry:
+                    itsFolderRefs.entrySet()) {
+                PasswdSafeUtil.dbginfo(TAG, "cached folder %s, refs [%s]",
+                                       entry.getKey(),
+                                       TextUtils.join(", ", entry.getValue().itsFileRefs));
+            }
+
             List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
                                                           itsDb);
             for (DbFile dbfile: dbfiles) {
@@ -392,10 +426,10 @@ public class GDriveProvider extends Provider
                                 TAG, "performSync recreate local removed %s",
                                 dbfile);
                         opers.add(new GDriveRemoteToLocalOper(dbfile,
-                                                              fileCache));
+                                                              itsFileCache));
                     } else {
                         opers.add(new GDriveRemoteToLocalOper(dbfile,
-                                                              fileCache));
+                                                              itsFileCache));
                     }
                 } else if (dbfile.itsLocalModDate > dbfile.itsRemoteModDate) {
                     if (dbfile.itsIsLocalDeleted) {
@@ -404,10 +438,12 @@ public class GDriveProvider extends Provider
                         PasswdSafeUtil.dbginfo(
                                 TAG, "performSync recreate remote removed %s",
                                 dbfile);
-                        opers.add(new GDriveLocalToRemoteOper(dbfile, fileCache,
+                        opers.add(new GDriveLocalToRemoteOper(dbfile,
+                                                              itsFileCache,
                                                               true));
                     } else {
-                        opers.add(new GDriveLocalToRemoteOper(dbfile, fileCache,
+                        opers.add(new GDriveLocalToRemoteOper(dbfile,
+                                                              itsFileCache,
                                                               false));
                     }
                 } else if (dbfile.itsIsRemoteDeleted ||
@@ -416,6 +452,55 @@ public class GDriveProvider extends Provider
                 }
             }
             return opers;
+        }
+
+
+        /** Compute the folders for a file */
+        private String computeFolders(File remfile)
+                throws IOException
+        {
+            String fileId = remfile.getId();
+            ArrayList<String> folders = new ArrayList<String>();
+            for (ParentReference parent: remfile.getParents()) {
+                traceParentRefs(parent, "", folders, fileId);
+            }
+            Collections.sort(folders);
+            String foldersStr = TextUtils.join(", ", folders);
+            PasswdSafeUtil.dbginfo(TAG, "compFolders %s: %s",
+                                   remfile.getTitle(), foldersStr);
+            return foldersStr;
+        }
+
+
+        /** Trace the parent references for a file to compute the full paths of
+         *  its folders */
+        private void traceParentRefs(ParentReference parent,
+                                     String suffix,
+                                     ArrayList<String> folders,
+                                     String fileId)
+                throws IOException
+        {
+            if (parent.getIsRoot()) {
+                folders.add(suffix);
+            } else {
+                String parentId = parent.getId();
+                File parentFile = itsFileCache.get(parentId);
+                if (parentFile == null) {
+                    parentFile = itsDrive.files().get(parentId)
+                        .setFields(FILE_FIELDS).execute();
+                    itsFileCache.put(parentId, parentFile);
+                }
+                FolderRefs refs = itsFolderRefs.get(parentId);
+                if (refs == null) {
+                    refs = new FolderRefs();
+                    itsFolderRefs.put(parentId, refs);
+                }
+                refs.addRef(fileId);
+                suffix = "/" + parentFile.getTitle() + suffix;
+                for (ParentReference parentParent: parentFile.getParents()) {
+                    traceParentRefs(parentParent, suffix, folders, fileId);
+                }
+            }
         }
 
 
@@ -443,13 +528,20 @@ public class GDriveProvider extends Provider
         /** Should the file be synced */
         private static boolean isSyncFile(File file)
         {
-            if (file.getLabels().getTrashed()) {
+            if (isFolderFile(file) || file.getLabels().getTrashed()) {
                 return false;
             }
             String ext = file.getFileExtension();
             return (ext != null) && ext.equals("psafe3");
         }
 
+
+        /** Is the file a folder */
+        private static boolean isFolderFile(File file)
+        {
+            return
+                "application/vnd.google-apps.folder".equals(file.getMimeType());
+        }
 
         /**
          * Retrieve a authorized service object to send requests to the Google
@@ -491,6 +583,22 @@ public class GDriveProvider extends Provider
                 Log.e(TAG, "Token exception", e);
             }
             return new Pair<Drive, String>(drive, token);
+        }
+    }
+
+
+    /** Information about the file references in a folder */
+    private static class FolderRefs
+    {
+        public final Set<String> itsFileRefs = new HashSet<String>();
+
+        public FolderRefs()
+        {
+        }
+
+        public void addRef(String fileId)
+        {
+            itsFileRefs.add(fileId);
         }
     }
 }
