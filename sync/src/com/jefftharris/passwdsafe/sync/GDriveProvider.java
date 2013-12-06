@@ -52,18 +52,16 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
  */
 public class GDriveProvider extends Provider
 {
-    // TODO: moving file to different folder doesn't update modDate
-
     public static final String ABOUT_FIELDS = "largestChangeId";
     public static final String FILE_FIELDS =
             "id,title,mimeType,labels(trashed),fileExtension,modifiedDate," +
             "downloadUrl,parents(id,isRoot)";
+    public static final String FOLDER_MIME =
+            "application/vnd.google-apps.folder";
 
     private static final String TAG = "GDriveProvider";
 
     private final Context itsContext;
-    private final HashMap<String, FolderRefs> itsFolderRefs =
-            new HashMap<String, FolderRefs>();
 
 
     /** Constructor */
@@ -94,6 +92,7 @@ public class GDriveProvider extends Provider
     @Override
     public void cleanupOnDelete(String acctName)
     {
+        Syncer.reset();
         try {
             GoogleAccountCredential credential = getAcctCredential(itsContext);
             String token = GoogleAuthUtil.getToken(itsContext, acctName,
@@ -135,8 +134,7 @@ public class GDriveProvider extends Provider
                      SQLiteDatabase db,
                      boolean manual, SyncLogRecord logrec) throws Exception
     {
-        new Syncer(acct, provider, db, logrec,
-                   itsFolderRefs, itsContext).sync();
+        new Syncer(acct, provider, db, logrec, itsContext).sync();
     }
 
 
@@ -190,15 +188,17 @@ public class GDriveProvider extends Provider
         private final SQLiteDatabase itsDb;
         private final SyncLogRecord itsLogrec;
         private final Context itsContext;
-        private final HashMap<String, FolderRefs> itsFolderRefs;
         private final HashMap<String, File> itsFileCache =
                 new HashMap<String, File>();
+
+        private static final HashMap<String, FolderRefs> itsFolderRefs =
+                new HashMap<String, FolderRefs>();
+        private static boolean itsFolderRefsInit = false;
 
 
         /** Constructor */
         public Syncer(Account acct, DbProvider provider,
-                      SQLiteDatabase db, SyncLogRecord logrec,
-                      HashMap<String, FolderRefs> folderRefs, Context ctx)
+                      SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
         {
             Pair<Drive, String> drive = getDriveService(acct, ctx);
             itsDrive = drive.first;
@@ -207,7 +207,6 @@ public class GDriveProvider extends Provider
             itsDb = db;
             itsLogrec = logrec;
             itsContext = ctx;
-            itsFolderRefs = folderRefs;
         }
 
 
@@ -225,11 +224,12 @@ public class GDriveProvider extends Provider
                     long changeId = itsProvider.itsSyncChange;
                     PasswdSafeUtil.dbginfo(TAG, "largest change %d", changeId);
                     Pair<Long, List<GDriveSyncOper>> syncrc;
-                    if (changeId == -1) {
-                        itsLogrec.setFullSync(true);
+                    boolean noSyncChange = (changeId == -1);
+                    itsLogrec.setFullSync(noSyncChange);
+                    if (!itsFolderRefsInit || noSyncChange) {
+                        itsFolderRefsInit = true;
                         syncrc = performFullSync();
                     } else {
-                        itsLogrec.setFullSync(false);
                         syncrc = performSyncSince(changeId);
                     }
                     long newChangeId = syncrc.first;
@@ -272,7 +272,18 @@ public class GDriveProvider extends Provider
                 Log.e(TAG, "Google auth error", e);
                 GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
                 throw e;
+            } catch (Exception e) {
+                reset();
+                throw e;
             }
+        }
+
+
+        /** Reset the syncer's cached information */
+        public static void reset()
+        {
+            itsFolderRefs.clear();
+            itsFolderRefsInit = false;
         }
 
 
@@ -333,10 +344,19 @@ public class GDriveProvider extends Provider
 
                 for (Change change: changes.getItems()) {
                     File file = change.getFile();
-                    if (change.getDeleted() || !isSyncFile(file)) {
-                        if (isFolderFile(file)) {
-                            PasswdSafeUtil.dbginfo(TAG, "isdir %s", file);
+                    if (change.getDeleted()) {
+                        file = null;
+                    } else if (isFolderFile(file)) {
+                        PasswdSafeUtil.dbginfo(TAG, "isdir %s", file);
+                        FolderRefs folderRefs = itsFolderRefs.get(file.getId());
+                        if (folderRefs != null) {
+                            for (String fileId: folderRefs.itsFileRefs) {
+                                File refFile = getCachedFile(fileId);
+                                changedFiles.put(fileId, refFile);
+                            }
                         }
+                        file = null;
+                    } else if (!isSyncFile(file)) {
                         file = null;
                     }
                     changedFiles.put(change.getFileId(), file);
@@ -484,12 +504,7 @@ public class GDriveProvider extends Provider
                 folders.add(suffix);
             } else {
                 String parentId = parent.getId();
-                File parentFile = itsFileCache.get(parentId);
-                if (parentFile == null) {
-                    parentFile = itsDrive.files().get(parentId)
-                        .setFields(FILE_FIELDS).execute();
-                    itsFileCache.put(parentId, parentFile);
-                }
+                File parentFile = getCachedFile(parentId);
                 FolderRefs refs = itsFolderRefs.get(parentId);
                 if (refs == null) {
                     refs = new FolderRefs();
@@ -501,6 +516,20 @@ public class GDriveProvider extends Provider
                     traceParentRefs(parentParent, suffix, folders, fileId);
                 }
             }
+        }
+
+
+        /** Get a cached file */
+        private final File getCachedFile(String id)
+                throws IOException
+        {
+            File file = itsFileCache.get(id);
+            if (file == null) {
+                file =
+                    itsDrive.files().get(id).setFields(FILE_FIELDS).execute();
+                itsFileCache.put(id, file);
+            }
+            return file;
         }
 
 
@@ -539,8 +568,8 @@ public class GDriveProvider extends Provider
         /** Is the file a folder */
         private static boolean isFolderFile(File file)
         {
-            return
-                "application/vnd.google-apps.folder".equals(file.getMimeType());
+            return !file.getLabels().getTrashed() &&
+                    FOLDER_MIME.equals(file.getMimeType());
         }
 
         /**
