@@ -96,6 +96,7 @@ public class DropboxRemoteToLocalOper extends DropboxSyncOper
             try {
                 SyncDb.updateLocalFile(itsFile.itsId, itsLocalFileName,
                                        itsFile.itsRemoteTitle,
+                                       itsFile.itsRemoteFolder,
                                        itsFile.itsRemoteModDate, db);
             } catch (SQLException e) {
                 ctx.deleteFile(itsLocalFileName);

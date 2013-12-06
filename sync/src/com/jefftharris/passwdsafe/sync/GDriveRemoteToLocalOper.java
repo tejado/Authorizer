@@ -68,6 +68,7 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
             try {
                 SyncDb.updateLocalFile(itsFile.itsId, itsLocalFileName,
                                        itsFile.itsRemoteTitle,
+                                       itsFile.itsRemoteFolder,
                                        itsFile.itsRemoteModDate, db);
             } catch (SQLException e) {
                 ctx.deleteFile(itsLocalFileName);
@@ -83,7 +84,8 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
     public String getDescription(Context ctx)
     {
         return ctx.getString(R.string.sync_oper_remote_to_local,
-                             itsFile.itsRemoteTitle);
+                             itsFile.itsRemoteTitle +
+                             " [" + itsFile.itsRemoteFolder + "]");
     }
 
 

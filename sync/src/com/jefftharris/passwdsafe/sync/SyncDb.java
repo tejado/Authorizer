@@ -53,10 +53,12 @@ public class SyncDb
     public static final String DB_COL_FILES_LOCAL_TITLE = "local_title";
     public static final String DB_COL_FILES_LOCAL_MOD_DATE = "local_mod_date";
     public static final String DB_COL_FILES_LOCAL_DELETED = "local_deleted";
+    public static final String DB_COL_FILES_LOCAL_FOLDER = "local_folder";
     public static final String DB_COL_FILES_REMOTE_ID = "remote_id";
     public static final String DB_COL_FILES_REMOTE_TITLE = "remote_title";
     public static final String DB_COL_FILES_REMOTE_MOD_DATE = "remote_mod_date";
     public static final String DB_COL_FILES_REMOTE_DELETED = "remote_deleted";
+    public static final String DB_COL_FILES_REMOTE_FOLDER = "remote_folder";
     public static final String DB_MATCH_FILES_ID =
         DB_COL_FILES_ID + " = ?";
     public static final String DB_MATCH_FILES_PROVIDER_ID =
@@ -284,7 +286,8 @@ public class SyncDb
     /** Add a remote file for a provider */
     public static void addRemoteFile(long providerId,
                                      String remId, String remTitle,
-                                     long remModDate, SQLiteDatabase db)
+                                     String remFolder, long remModDate,
+                                     SQLiteDatabase db)
         throws SQLException
     {
         ContentValues values = new ContentValues();
@@ -295,14 +298,15 @@ public class SyncDb
         values.put(DB_COL_FILES_REMOTE_TITLE, remTitle);
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, remModDate);
         values.put(DB_COL_FILES_REMOTE_DELETED, false);
+        values.put(DB_COL_FILES_REMOTE_FOLDER, remFolder);
         db.insertOrThrow(DB_TABLE_FILES, null, values);
     }
 
 
     /** Update a local file */
     public static void updateLocalFile(long fileId, String locFile,
-                                       String locTitle, long locModDate,
-                                       SQLiteDatabase db)
+                                       String locTitle, String locFolder,
+                                       long locModDate, SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
@@ -310,14 +314,15 @@ public class SyncDb
         values.put(DB_COL_FILES_LOCAL_TITLE, locTitle);
         values.put(DB_COL_FILES_LOCAL_MOD_DATE, locModDate);
         values.put(DB_COL_FILES_LOCAL_DELETED, false);
+        values.put(DB_COL_FILES_LOCAL_FOLDER, locFolder);
         db.update(DB_TABLE_FILES, values,
                   DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
     }
 
     /** Update a remote file */
     public static void updateRemoteFile(long fileId, String remId,
-                                        String remTitle, long remModDate,
-                                        SQLiteDatabase db)
+                                        String remTitle, String remFolder,
+                                        long remModDate, SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
@@ -325,6 +330,7 @@ public class SyncDb
         values.put(DB_COL_FILES_REMOTE_TITLE, remTitle);
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, remModDate);
         values.put(DB_COL_FILES_REMOTE_DELETED, false);
+        values.put(DB_COL_FILES_REMOTE_FOLDER, remFolder);
         db.update(DB_TABLE_FILES, values,
                   DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
     }
@@ -445,7 +451,7 @@ public class SyncDb
     private static final class DbHelper extends SQLiteOpenHelper
     {
         private static final String DB_NAME = "sync.db";
-        private static final int DB_VERSION = 2;
+        private static final int DB_VERSION = 3;
 
         /** Constructor */
         public DbHelper(Context context)
@@ -506,6 +512,16 @@ public class SyncDb
                 PasswdSafeUtil.dbginfo(TAG, "Upgrade to v2");
                 db.execSQL("ALTER TABLE " + DB_TABLE_PROVIDERS +
                            " ADD COLUMN " + DB_COL_PROVIDERS_DISPLAY_NAME +
+                           " TEXT;");
+            }
+
+            if (oldVersion < 3) {
+                PasswdSafeUtil.dbginfo(TAG, "Upgrade to v3");
+                db.execSQL("ALTER TABLE " + DB_TABLE_FILES +
+                           " ADD COLUMN " + DB_COL_FILES_LOCAL_FOLDER +
+                           " TEXT;");
+                db.execSQL("ALTER TABLE " + DB_TABLE_FILES +
+                           " ADD COLUMN " + DB_COL_FILES_REMOTE_FOLDER +
                            " TEXT;");
             }
         }

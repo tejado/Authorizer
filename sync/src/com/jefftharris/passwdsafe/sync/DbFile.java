@@ -20,10 +20,12 @@ public class DbFile
     public final String itsLocalTitle;
     public final long itsLocalModDate;
     public final boolean itsIsLocalDeleted;
+    public final String itsLocalFolder;
     public final String itsRemoteId;
     public final String itsRemoteTitle;
     public final long itsRemoteModDate;
     public final boolean itsIsRemoteDeleted;
+    public final String itsRemoteFolder;
 
     public static final String[] QUERY_FIELDS = {
         SyncDb.DB_COL_FILES_ID,
@@ -31,10 +33,12 @@ public class DbFile
         SyncDb.DB_COL_FILES_LOCAL_TITLE,
         SyncDb.DB_COL_FILES_LOCAL_MOD_DATE,
         SyncDb.DB_COL_FILES_LOCAL_DELETED,
+        SyncDb.DB_COL_FILES_LOCAL_FOLDER,
         SyncDb.DB_COL_FILES_REMOTE_ID,
         SyncDb.DB_COL_FILES_REMOTE_TITLE,
         SyncDb.DB_COL_FILES_REMOTE_MOD_DATE,
-        SyncDb.DB_COL_FILES_REMOTE_DELETED };
+        SyncDb.DB_COL_FILES_REMOTE_DELETED,
+        SyncDb.DB_COL_FILES_REMOTE_FOLDER };
 
     /** Constructor */
     public DbFile(Cursor cursor)
@@ -44,20 +48,23 @@ public class DbFile
         itsLocalTitle = cursor.getString(2);
         itsLocalModDate = cursor.getLong(3);
         itsIsLocalDeleted = cursor.getInt(4) != 0;
-        itsRemoteId = cursor.getString(5);
-        itsRemoteTitle = cursor.getString(6);
-        itsRemoteModDate = cursor.getLong(7);
-        itsIsRemoteDeleted = cursor.getInt(8) != 0;
+        itsLocalFolder = cursor.getString(5);
+        itsRemoteId = cursor.getString(6);
+        itsRemoteTitle = cursor.getString(7);
+        itsRemoteModDate = cursor.getLong(8);
+        itsIsRemoteDeleted = cursor.getInt(9) != 0;
+        itsRemoteFolder = cursor.getString(10);
     }
 
     @Override
     public String toString()
     {
         return String.format(Locale.US,
-                "{id:%d, local:{title:%s, file:%s, mod:%d, del:%b}, " +
-                "remote:{id:%s, title:'%s', mod:%d, del:%b}}",
-                itsId, itsLocalTitle, itsLocalFile, itsLocalModDate,
-                itsIsLocalDeleted, itsRemoteId, itsRemoteTitle,
+                "{id:%d, local:{title:%s, folder:%s, file:%s, mod:%d, del:%b}, " +
+                "remote:{id:%s, title:'%s', folder:%s, mod:%d, del:%b}}",
+                itsId, itsLocalTitle, itsLocalFolder, itsLocalFile,
+                itsLocalModDate, itsIsLocalDeleted,
+                itsRemoteId, itsRemoteTitle, itsRemoteFolder,
                 itsRemoteModDate, itsIsRemoteDeleted);
     }
 }

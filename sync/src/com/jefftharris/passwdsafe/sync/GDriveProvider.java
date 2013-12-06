@@ -158,7 +158,7 @@ public class GDriveProvider extends Provider
             throws Exception
     {
         SyncDb.updateLocalFile(file.itsId, localFileName,
-                               file.itsLocalTitle,
+                               file.itsLocalTitle, file.itsLocalFolder,
                                localFile.lastModified(), db);
     }
 
@@ -392,11 +392,13 @@ public class GDriveProvider extends Provider
                     fileFolders.put(remfile.getId(), folders);
                 }
             }
+            // TODO: handle removes from itsFolderRefs...
             for (Map.Entry<String, FolderRefs> entry:
                     itsFolderRefs.entrySet()) {
                 PasswdSafeUtil.dbginfo(TAG, "cached folder %s, refs [%s]",
                                        entry.getKey(),
-                                       TextUtils.join(", ", entry.getValue().itsFileRefs));
+                                       TextUtils.join(
+                                           ", ", entry.getValue().itsFileRefs));
             }
 
             List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
@@ -411,6 +413,7 @@ public class GDriveProvider extends Provider
                         SyncDb.updateRemoteFile(
                                 dbfile.itsId, dbfile.itsRemoteId,
                                 remfile.getTitle(),
+                                fileFolders.get(dbfile.itsRemoteId),
                                 remfile.getModifiedDate().getValue(), itsDb);
                     } else {
                         PasswdSafeUtil.dbginfo(TAG,
@@ -431,6 +434,7 @@ public class GDriveProvider extends Provider
                                        fileId);
                 SyncDb.addRemoteFile(itsProvider.itsId, fileId,
                                      remfile.getTitle(),
+                                     fileFolders.get(fileId),
                                      remfile.getModifiedDate().getValue(),
                                      itsDb);
             }
@@ -500,11 +504,12 @@ public class GDriveProvider extends Provider
                                      String fileId)
                 throws IOException
         {
+            String parentId = parent.getId();
+            File parentFile = getCachedFile(parentId);
             if (parent.getIsRoot()) {
+                suffix = parentFile.getTitle() + suffix;
                 folders.add(suffix);
             } else {
-                String parentId = parent.getId();
-                File parentFile = getCachedFile(parentId);
                 FolderRefs refs = itsFolderRefs.get(parentId);
                 if (refs == null) {
                     refs = new FolderRefs();
@@ -543,6 +548,10 @@ public class GDriveProvider extends Provider
                 return true;
             }
             if (TextUtils.isEmpty(dbfile.itsLocalFile)) {
+                return true;
+            }
+            if (!TextUtils.equals(dbfile.itsLocalFolder,
+                                  dbfile.itsRemoteFolder)) {
                 return true;
             }
             java.io.File localFile =

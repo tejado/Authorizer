@@ -89,9 +89,9 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
         String title = itsDriveFile.getTitle();
         long modDate = itsDriveFile.getModifiedDate().getValue();
         SyncDb.updateRemoteFile(itsFile.itsId, itsDriveFile.getId(),
-                                   title, modDate, db);
+                                   title, itsFile.itsLocalFolder, modDate, db);
         SyncDb.updateLocalFile(itsFile.itsId, itsFile.itsLocalFile,
-                                  title, modDate, db);
+                                  title, itsFile.itsLocalFolder, modDate, db);
         if (itsLocalFile != null) {
             itsLocalFile.setLastModified(modDate);
         }
@@ -104,6 +104,7 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
     public String getDescription(Context ctx)
     {
         return ctx.getString(R.string.sync_oper_local_to_remote,
-                             itsFile.itsLocalTitle);
+                             itsFile.itsLocalTitle +
+                             " [" + itsFile.itsLocalFolder + "]");
     }
 }
