@@ -195,6 +195,4 @@ public class ProviderSyncer
             db.endTransaction();
         }
     }
-
-    // TODO: show folders
 }

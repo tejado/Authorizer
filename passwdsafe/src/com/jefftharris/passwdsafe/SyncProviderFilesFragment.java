@@ -20,6 +20,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -117,22 +118,35 @@ public class SyncProviderFilesFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
 
         itsProviderAdapter = new SimpleCursorAdapter(
-               getActivity(), android.R.layout.simple_list_item_2, null,
+               getActivity(), R.layout.sync_provider_file_list_item, null,
                new String[] { PasswdSafeContract.Files.COL_TITLE,
-                              PasswdSafeContract.Files.COL_MOD_DATE },
-               new int[] { android.R.id.text1, android.R.id.text2 }, 0);
+                              PasswdSafeContract.Files.COL_MOD_DATE,
+                              PasswdSafeContract.Files.COL_FOLDER },
+               new int[] { R.id.title, R.id.mod_date, R.id.folder },
+               0);
 
         itsProviderAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder()
         {
             @Override
             public boolean setViewValue(View view, Cursor cursor, int colIdx)
             {
-                if (colIdx ==
-                        PasswdSafeContract.Files.PROJECTION_IDX_MOD_DATE) {
+                switch (colIdx) {
+                case PasswdSafeContract.Files.PROJECTION_IDX_MOD_DATE: {
                     long modDate = cursor.getLong(colIdx);
                     TextView tv = (TextView)view;
                     tv.setText(Utils.formatDate(modDate, getActivity()));
                     return true;
+                }
+                case PasswdSafeContract.Files.PROJECTION_IDX_FOLDER: {
+                    String folder = cursor.getString(colIdx);
+                    if (TextUtils.isEmpty(folder)) {
+                        view.setVisibility(View.GONE);
+                    } else {
+                        view.setVisibility(View.VISIBLE);
+                        ((TextView)view).setText(folder);
+                    }
+                    return true;
+                }
                 }
                 return false;
             }
