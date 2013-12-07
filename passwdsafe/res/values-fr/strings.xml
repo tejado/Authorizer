@@ -233,6 +233,8 @@
     <string name="yes">Oui</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.3.0&lt;/b&gt; - Afficher le dossier d\'un fichier
+        \n\n
         &lt;b&gt;4.2.0&lt;/b&gt; - Une méthode de saisie est disponible qui peut
         coller domaines de la dernière passe enregistrement sélectionné. La
         méthode de saisie doit être activée dans les paramètres du système

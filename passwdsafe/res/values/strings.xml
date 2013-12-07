@@ -233,7 +233,9 @@
     <string name="yes">Yes</string>
 
     <string name="release_notes">
-        &lt;b&gt;4.2.0&lt;/b&gt; - An input method is available which can paste 
+        &lt;b&gt;4.3.0&lt;/b&gt; - Show a file\'s folder.
+        \n\n
+        &lt;b&gt;4.2.0&lt;/b&gt; - An input method is available which can paste
         fields from the last selected password record. The input method must be
         enabled in the system settings before it can be used.
         \n\nTo use:\n
