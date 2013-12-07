@@ -116,6 +116,7 @@ public final class PasswdSafeContract
         public static final String COL_TITLE = "title";
         public static final String COL_MOD_DATE = "mod_date";
         public static final String COL_FILE = "file";
+        public static final String COL_FOLDER = "folder";
 
         public static final String NOT_DELETED_SELECTION =
                 "not local_deleted and not remote_deleted";
@@ -126,7 +127,8 @@ public final class PasswdSafeContract
             Files.COL_PROVIDER,
             Files.COL_TITLE,
             Files.COL_MOD_DATE,
-            Files.COL_FILE
+            Files.COL_FILE,
+            Files.COL_FOLDER
         };
 
         public static final int PROJECTION_IDX_ID = 0;
@@ -134,6 +136,7 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_TITLE = 2;
         public static final int PROJECTION_IDX_MOD_DATE = 3;
         public static final int PROJECTION_IDX_FILE = 4;
+        public static final int PROJECTION_IDX_FOLDER = 5;
     }
 
     /** The table of sync logs */
