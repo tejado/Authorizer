@@ -294,7 +294,7 @@ public class DropboxProvider extends Provider
                                            dbfile.itsRemoteId);
                     SyncDb.updateRemoteFile(
                             dbfile.itsId, dbfile.itsRemoteId,
-                            dbpath.getName(), null,
+                            dbpath.getName(), dbpath.getParent().toString(),
                             dbpathinfo.modifiedTime.getTime(), itsDb);
 
                     dbxfiles.remove(dbpath);
@@ -307,11 +307,13 @@ public class DropboxProvider extends Provider
             }
 
             for (Map.Entry<DbxPath, DbxFileInfo> entry: dbxfiles.entrySet()) {
-                String fileId = entry.getKey().toString();
+                DbxPath dbpath = entry.getKey();
+                String fileId = dbpath.toString();
                 PasswdSafeUtil.dbginfo(TAG, "performSync add remote %s",
                                        fileId);
                 SyncDb.addRemoteFile(itsProvider.itsId, fileId,
-                                     entry.getKey().getName(), null,
+                                     dbpath.getName(),
+                                     dbpath.getParent().toString(),
                                      entry.getValue().modifiedTime.getTime(),
                                      itsDb);
             }
@@ -337,6 +339,10 @@ public class DropboxProvider extends Provider
                 return false;
             }
             if (dbfile.itsRemoteModDate != dbfile.itsLocalModDate) {
+                return true;
+            }
+            if (!TextUtils.equals(dbfile.itsLocalFolder,
+                                  dbfile.itsRemoteFolder)) {
                 return true;
             }
 
