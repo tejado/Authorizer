@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -387,22 +388,37 @@ public class GDriveProvider extends Provider
             HashMap<String, String> fileFolders =
                     new HashMap<String, String>();
             for (File remfile: remfiles.values()) {
-                if (remfile != null) {
-                    String folders = computeFolders(remfile);
-                    fileFolders.put(remfile.getId(), folders);
+                if (remfile == null) {
+                    continue;
+                }
+
+                // Remove the file from the folder refs to handle moves.
+                // The file will be re-added to the correct refs
+                String id = remfile.getId();
+                for (FolderRefs refs: itsFolderRefs.values()) {
+                    refs.removeRef(id);
+                }
+
+                String folders = computeFolders(remfile);
+                fileFolders.put(id, folders);
+            }
+            // Purge empty folder references
+            Iterator<Map.Entry<String, FolderRefs>> iter =
+                    itsFolderRefs.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<String, FolderRefs> entry = iter.next();
+                Set<String> fileRefs = entry.getValue().itsFileRefs;
+                if (PasswdSafeUtil.DEBUG) {
+                    PasswdSafeUtil.dbginfo(TAG, "cached folder %s, refs [%s]",
+                                           entry.getKey(),
+                                           TextUtils.join(", ", fileRefs));
+                }
+                if (fileRefs.isEmpty()) {
+                    iter.remove();
                 }
             }
-            // TODO: handle removes from itsFolderRefs...
-            for (Map.Entry<String, FolderRefs> entry:
-                    itsFolderRefs.entrySet()) {
-                PasswdSafeUtil.dbginfo(TAG, "cached folder %s, refs [%s]",
-                                       entry.getKey(),
-                                       TextUtils.join(
-                                           ", ", entry.getValue().itsFileRefs));
-            }
 
-            List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
-                                                          itsDb);
+            List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
             for (DbFile dbfile: dbfiles) {
                 if (remfiles.containsKey(dbfile.itsRemoteId)) {
                     File remfile = remfiles.get(dbfile.itsRemoteId);
@@ -634,9 +650,14 @@ public class GDriveProvider extends Provider
         {
         }
 
-        public void addRef(String fileId)
+        public final void addRef(String fileId)
         {
             itsFileRefs.add(fileId);
+        }
+
+        public final void removeRef(String fileId)
+        {
+            itsFileRefs.remove(fileId);
         }
     }
 }
