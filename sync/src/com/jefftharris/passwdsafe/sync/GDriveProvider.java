@@ -626,6 +626,7 @@ public class GDriveProvider extends Provider
             } catch (UserRecoverableNotifiedException e) {
                 // User notified
                 PasswdSafeUtil.dbginfo(TAG, e, "User notified auth exception");
+                GoogleAuthUtil.invalidateToken(ctx, null);
             } catch (GoogleAuthException e) {
                 // Unrecoverable
                 Log.e(TAG, "Unrecoverable auth exception", e);
