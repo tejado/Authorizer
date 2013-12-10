@@ -84,6 +84,18 @@
                 android:onClick="onGdriveClear"
                 android:padding="12dp"
                 android:text="@string/clear"/>
+
+            <TextView
+                android:id="@+id/gdrive_sync_warning"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/gdrive_sync"
+                android:layout_below="@id/gdrive_sync"
+                android:drawableLeft="@android:drawable/ic_dialog_alert"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
         </RelativeLayout>
 
         <View

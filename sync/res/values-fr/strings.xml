@@ -13,6 +13,8 @@
     <string name="dropbox_acct_unlinked">App dissociée de compte Dropbox. Effacer et ajouter de nouveau accès Dropbox pour PasswdSafe Sync.</string>
     <string name="dropbox_passwdsafe_sync">Dropbox PasswdSafe Sync</string>
     <string name="full_sync">Synchronisation complète</string>
+    <string name="gdrive_state_auth_required">Compte Google authentification requise. Synchronisez à nouveau pour commencer le processus d\'authentification.</string>
+    <string name="gdrive_state_pending_auth">Authentification de compte Google est en cours. Sélectionnez la notification de la demande de session.</string>
     <string name="google_acct_not_available">Compte Google n\'est pas disponible</string>
     <string name="incremental_sync">Synchronisation incrémental</string>
     <string name="logs">Archives</string>

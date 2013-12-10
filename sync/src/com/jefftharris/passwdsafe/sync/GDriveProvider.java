@@ -135,7 +135,14 @@ public class GDriveProvider extends Provider
                      SQLiteDatabase db,
                      boolean manual, SyncLogRecord logrec) throws Exception
     {
-        new Syncer(acct, provider, db, logrec, itsContext).sync();
+        Syncer sync = new Syncer(acct, provider, db, logrec, itsContext);
+        SyncUpdateHandler.GDriveState syncState =
+                SyncUpdateHandler.GDriveState.OK;
+        try {
+            syncState = sync.sync();
+        } finally {
+            SyncApp.get(itsContext).updateGDriveSyncState(syncState);
+        }
     }
 
 
@@ -212,12 +219,14 @@ public class GDriveProvider extends Provider
 
 
         /** Sync the provider */
-        public final void sync() throws Exception
+        public SyncUpdateHandler.GDriveState sync() throws Exception
         {
             if (itsDrive == null) {
-                return;
+                return SyncUpdateHandler.GDriveState.PENDING_AUTH;
             }
 
+            SyncUpdateHandler.GDriveState syncState =
+                    SyncUpdateHandler.GDriveState.OK;
             try {
                 List<GDriveSyncOper> opers = null;
                 try {
@@ -269,6 +278,7 @@ public class GDriveProvider extends Provider
             } catch (UserRecoverableAuthIOException e) {
                 PasswdSafeUtil.dbginfo(TAG, e, "Recoverable google auth error");
                 GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
+                syncState = SyncUpdateHandler.GDriveState.AUTH_REQUIRED;
             } catch (GoogleAuthIOException e) {
                 Log.e(TAG, "Google auth error", e);
                 GoogleAuthUtil.invalidateToken(itsContext, itsDriveToken);
@@ -277,6 +287,8 @@ public class GDriveProvider extends Provider
                 reset();
                 throw e;
             }
+
+            return syncState;
         }
 
 

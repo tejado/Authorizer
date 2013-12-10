@@ -50,7 +50,7 @@ import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 
 public class MainActivity extends FragmentActivity
-        implements LoaderCallbacks<Cursor>
+        implements LoaderCallbacks<Cursor>, SyncUpdateHandler
 {
     private static final String TAG = "MainActivity";
 
@@ -137,6 +137,16 @@ public class MainActivity extends FragmentActivity
     }
 
     /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onPause()
+     */
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        SyncApp.get(this).setSyncUpdateHandler(null);
+    }
+
+    /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onResumeFragments()
      */
     @Override
@@ -151,6 +161,7 @@ public class MainActivity extends FragmentActivity
         }
         LoaderManager lm = getSupportLoaderManager();
         lm.restartLoader(LOADER_PROVIDERS, null, this);
+        SyncApp.get(this).setSyncUpdateHandler(this);
     }
 
     @Override
@@ -371,6 +382,32 @@ public class MainActivity extends FragmentActivity
     {
         updateGdriveAccount(null);
         updateDropboxAccount(null);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.SyncApp.SyncUpdateHandler#updateGDriveState(com.jefftharris.passwdsafe.sync.SyncApp.SyncUpdateHandler.GDriveState)
+     */
+    @Override
+    public void updateGDriveState(GDriveState state)
+    {
+        TextView warning = (TextView)findViewById(R.id.gdrive_sync_warning);
+        switch (state) {
+        case OK: {
+            warning.setVisibility(View.GONE);
+            break;
+        }
+        case AUTH_REQUIRED: {
+            warning.setVisibility(View.VISIBLE);
+            warning.setText(R.string.gdrive_state_auth_required);
+            break;
+        }
+        case PENDING_AUTH: {
+            warning.setVisibility(View.VISIBLE);
+            warning.setText(R.string.gdrive_state_pending_auth);
+            break;
+        }
+        }
     }
 
     /** Update the UI when the GDrive account is changed */

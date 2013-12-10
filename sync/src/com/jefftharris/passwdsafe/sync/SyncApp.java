@@ -49,6 +49,10 @@ public class SyncApp extends Application
     private Runnable itsDropboxSyncEndHandler = null;
     private PendingIntent itsSyncTimeoutIntent = null;
 
+    private SyncUpdateHandler itsSyncUpdateHandler;
+    private SyncUpdateHandler.GDriveState itsSyncGDriveState =
+            SyncUpdateHandler.GDriveState.OK;
+
     /* (non-Javadoc)
      * @see android.app.Application#onCreate()
      */
@@ -221,6 +225,31 @@ public class SyncApp extends Application
     public DbxFileSystem getDropboxFs()
     {
         return itsDropboxFs;
+    }
+
+
+    public void setSyncUpdateHandler(SyncUpdateHandler handler)
+    {
+        itsSyncUpdateHandler = handler;
+        if (itsSyncUpdateHandler != null) {
+            itsSyncUpdateHandler.updateGDriveState(itsSyncGDriveState);
+        }
+    }
+
+    /** Update the state of a Google Drive sync.  This method can be
+     * called from a background thread. */
+    public void updateGDriveSyncState(final SyncUpdateHandler.GDriveState state)
+    {
+        itsHandler.post(new Runnable() {
+            @Override
+            public void run()
+            {
+                itsSyncGDriveState = state;
+                if (itsSyncUpdateHandler != null) {
+                    itsSyncUpdateHandler.updateGDriveState(state);
+                }
+            }
+        });
     }
 
 
