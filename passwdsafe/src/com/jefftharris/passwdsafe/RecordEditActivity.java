@@ -89,6 +89,9 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private static final int RECORD_SELECTION_REQUEST = 0;
 
+    /** Insert intent extra field for the group of the new record */
+    public static final String INSERT_INTENT_EXTRA_GROUP = "group";
+
     private TreeSet<String> itsGroups =
         new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
     private String itsPrevGroup;
@@ -183,6 +186,9 @@ public class RecordEditActivity extends AbstractRecordActivity
                 setText(R.id.url, null);
                 setText(R.id.email, null);
             }
+
+            Intent newIntent = getIntent();
+            group = newIntent.getStringExtra(INSERT_INTENT_EXTRA_GROUP);
         }
         if (!itsIsV3) {
             setVisibility(R.id.url_row, false);

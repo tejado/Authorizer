@@ -320,10 +320,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         switch (item.getItemId()) {
         case MENU_ADD_RECORD:
         {
-            startActivityForResult(
+            Intent addIntent =
                 new Intent(Intent.ACTION_INSERT, getUri().getUri(),
-                           this, RecordEditActivity.class),
-                RECORD_ADD_REQUEST);
+                           this, RecordEditActivity.class);
+            addIntent.putExtra(RecordEditActivity.INSERT_INTENT_EXTRA_GROUP,
+                               getCurrGroupStr());
+            startActivityForResult(addIntent, RECORD_ADD_REQUEST);
             break;
         }
         case MENU_DETAILS:

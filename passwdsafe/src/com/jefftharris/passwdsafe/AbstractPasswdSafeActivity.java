@@ -378,6 +378,13 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     }
 
 
+    /** Get a string of the currently selected group */
+    protected String getCurrGroupStr()
+    {
+        return TextUtils.join(".", itsCurrGroups);
+    }
+
+
     /** Get the current group node */
     protected GroupNode getCurrGroupNode()
     {

@@ -237,7 +237,9 @@
     <string name="release_notes">
         &lt;b&gt;4.4.0&lt;/b&gt; - Ajouter une préférence de mot de passe pour
         l\'ensemble de symboles à utiliser par défaut dans les stratégies
-        de mot de passe.
+        de mot de passe.  Le groupe actuel est défini comme la valeur par
+        défaut pour les nouvelles entrées.
+        \n\n
         &lt;b&gt;4.3.0&lt;/b&gt; - Afficher le dossier d\'un fichier
         \n\n
         &lt;b&gt;4.2.0&lt;/b&gt; - Une méthode de saisie est disponible qui peut

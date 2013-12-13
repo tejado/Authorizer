@@ -236,7 +236,8 @@
 
     <string name="release_notes">
         &lt;b&gt;4.4.0&lt;/b&gt; - Add a password preference for the set of
-        symbols to use by default in password policies.
+        symbols to use by default in password policies.  The current group is
+        set as the default for new records.
         \n\n
         &lt;b&gt;4.3.0&lt;/b&gt; - Show a file\'s folder.
         \n\n
