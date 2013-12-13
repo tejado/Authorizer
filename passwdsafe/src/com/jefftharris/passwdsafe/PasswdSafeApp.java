@@ -240,6 +240,7 @@ public class PasswdSafeApp extends Application
         updateFileCloseTimeoutPref(prefs);
         updateFileCloseScreenOffPref(prefs);
         setPasswordEncodingPref(prefs);
+        setPasswordDefaultSymsPref(prefs);
         setFileCloseClearClipboardPref(prefs);
         itsDefaultPasswdPolicy = Preferences.getDefPasswdPolicyPref(prefs,
                                                                     this);
@@ -270,6 +271,8 @@ public class PasswdSafeApp extends Application
             updateFileCloseScreenOffPref(prefs);
         } else if (key.equals(Preferences.PREF_PASSWD_ENC)) {
             setPasswordEncodingPref(prefs);
+        } else if (key.equals(Preferences.PREF_PASSWD_DEFAULT_SYMS)) {
+            setPasswordDefaultSymsPref(prefs);
         } else if (key.equals(Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD)) {
             setFileCloseClearClipboardPref(prefs);
         } else if (key.equals(Preferences.PREF_PASSWD_EXPIRY_NOTIF)) {
@@ -420,6 +423,13 @@ public class PasswdSafeApp extends Application
     private static void setPasswordEncodingPref(SharedPreferences prefs)
     {
         PwsFile.setPasswordEncoding(Preferences.getPasswordEncodingPref(prefs));
+    }
+
+    /** Set the default password policy symbols from user preferences */
+    private static void setPasswordDefaultSymsPref(SharedPreferences prefs)
+    {
+        PasswdPolicy.setPrefsDefaultSymbols(
+                Preferences.getPasswdDefaultSymbolsPref(prefs));
     }
 
     private final void setFileCloseClearClipboardPref(SharedPreferences prefs)

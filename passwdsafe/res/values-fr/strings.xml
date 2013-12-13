@@ -40,6 +40,7 @@
     <string name="days">Journées</string>
     <string name="default_file_to_open">Fichier à ouvrir par défaut</string>
     <string name="default_policy">Stratégie par défaut</string>
+    <string name="default_symbols">Symboles par défaut</string>
     <string name="delete">Supprimer</string>
     <string name="delete_file">Supprimer base de données</string>
     <string name="delete_file_msg">Supprimer le fichier \"%1$s\"?</string>
@@ -212,6 +213,7 @@
     <string name="show_backup_files">Afficher les sauvegardes</string>
     <string name="show_password">Afficher mot de passe</string>
     <string name="show_passwords">Afficher mots de passe</string>
+    <string name="symbols_used_by_default">Les symboles utilisés par défaut dans de mot de passe stratégie: %1$s</string>
     <string name="sync">Synchroniser</string>
     <string name="times_header">TEMPS</string>
     <string name="title">Titre</string>
@@ -233,6 +235,9 @@
     <string name="yes">Oui</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.4.0&lt;/b&gt; - Ajouter une préférence de mot de passe pour
+        l\'ensemble de symboles à utiliser par défaut dans les stratégies
+        de mot de passe.
         &lt;b&gt;4.3.0&lt;/b&gt; - Afficher le dossier d\'un fichier
         \n\n
         &lt;b&gt;4.2.0&lt;/b&gt; - Une méthode de saisie est disponible qui peut

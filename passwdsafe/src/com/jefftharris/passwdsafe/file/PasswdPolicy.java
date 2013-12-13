@@ -41,6 +41,8 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     public static final String SYMBOLS_EASY = "+-=_@#$%^&<>/~\\?";
     public static final String SYMBOLS_PRONOUNCE = "@&(#!|$+";
 
+    public static String PREFS_DEFAULT_SYMBOLS = null;
+
     public static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
     public static final String UPPER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String DIGITS = "0123456789";
@@ -302,10 +304,19 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
                            UPPER_CHARS, passwd, allchars);
             addRandomChars(FLAG_USE_DIGITS, itsMinDigits,
                            DIGITS, passwd, allchars);
+
+            String syms;
+            if (itsSpecialSymbols == null) {
+                if (TextUtils.isEmpty(PREFS_DEFAULT_SYMBOLS)) {
+                    syms = SYMBOLS_DEFAULT;
+                } else {
+                    syms = PREFS_DEFAULT_SYMBOLS;
+                }
+            } else {
+                syms = itsSpecialSymbols;
+            }
             addRandomChars(FLAG_USE_SYMBOLS, itsMinSymbols,
-                           (itsSpecialSymbols == null) ?
-                               SYMBOLS_DEFAULT : itsSpecialSymbols,
-                           passwd, allchars);
+                           syms, passwd, allchars);
             break;
         }
         case EASY_TO_READ: {
@@ -534,6 +545,12 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         }
         }
         return null;
+    }
+
+    /** Set the default symbols from user preferences */
+    public static void setPrefsDefaultSymbols(String symbols)
+    {
+        PREFS_DEFAULT_SYMBOLS = symbols;
     }
 
     /** Fields parsed from a policy flags and length string */

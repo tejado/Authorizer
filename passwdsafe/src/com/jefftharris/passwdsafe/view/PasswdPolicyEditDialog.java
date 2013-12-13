@@ -11,19 +11,22 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
+import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -59,6 +62,7 @@ public class PasswdPolicyEditDialog
     private TextView[] itsOptionLens = new TextView[4];
     private CheckBox itsUseCustomSymbols;
     private TextView itsCustomSymbolsEdit;
+    private String itsDefaultSymbols;
 
     /** Constructor */
     public PasswdPolicyEditDialog(Editor editor)
@@ -72,6 +76,9 @@ public class PasswdPolicyEditDialog
         itsPolicy = policy;
         LayoutInflater factory = LayoutInflater.from(act);
         itsView = factory.inflate(R.layout.passwd_policy_edit, null);
+
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(act);
 
         itsIsNameEditable = true;
         itsNameEdit = (TextView)itsView.findViewById(R.id.name);
@@ -88,6 +95,7 @@ public class PasswdPolicyEditDialog
             (CheckBox)itsView.findViewById(R.id.use_custom_symbols);
         itsCustomSymbolsEdit =
             (TextView)itsView.findViewById(R.id.symbols_custom);
+        itsDefaultSymbols = Preferences.getPasswdDefaultSymbolsPref(prefs);
 
         int titleId;
         String name;
@@ -330,7 +338,7 @@ public class PasswdPolicyEditDialog
         switch (itsType) {
         case NORMAL: {
             optionsVisible = true;
-            defaultSymbols = PasswdPolicy.SYMBOLS_DEFAULT;
+            defaultSymbols = itsDefaultSymbols;
             break;
         }
         case EASY_TO_READ: {

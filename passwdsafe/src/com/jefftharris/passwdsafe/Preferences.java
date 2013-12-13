@@ -76,6 +76,8 @@ public class Preferences extends PreferenceActivity
         "passwordExpiryNotifyPref";
     public static final PasswdExpiryNotifPref PREF_PASSWD_EXPIRY_NOTIF_DEF =
         PasswdExpiryNotifPref.IN_TWO_WEEKS;
+    public static final String PREF_PASSWD_DEFAULT_SYMS =
+        "passwordDefaultSymbolsPref";
     public static final String PREF_PASSWD_CLEAR_ALL_NOTIFS =
         "passwordClearAllNotifsPref";
 
@@ -123,6 +125,7 @@ public class Preferences extends PreferenceActivity
     private ListPreference itsFileBackupPref;
     private ListPreference itsPasswdEncPref;
     private ListPreference itsPasswdExpiryNotifPref;
+    private EditTextPreference itsPasswdDefaultSymsPref;
     private ListPreference itsFontSizePref;
 
 
@@ -224,6 +227,16 @@ public class Preferences extends PreferenceActivity
         } catch (IllegalArgumentException e) {
             return PREF_PASSWD_EXPIRY_NOTIF_DEF;
         }
+    }
+
+    /** Get the symbols used by default in a password policy */
+    public static String getPasswdDefaultSymbolsPref(SharedPreferences prefs)
+    {
+        String val = prefs.getString(PREF_PASSWD_DEFAULT_SYMS, null);
+        if (TextUtils.isEmpty(val)) {
+            val = PasswdPolicy.SYMBOLS_DEFAULT;
+        }
+        return val;
     }
 
     /** Upgrade the default password policy preference if needed */
@@ -394,6 +407,13 @@ public class Preferences extends PreferenceActivity
             PasswdExpiryNotifPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_PASSWD_EXPIRY_NOTIF);
 
+        itsPasswdDefaultSymsPref =
+                (EditTextPreference)findPreference(PREF_PASSWD_DEFAULT_SYMS);
+        itsPasswdDefaultSymsPref.getEditText().setHint(
+                PasswdPolicy.SYMBOLS_DEFAULT);
+        itsPasswdDefaultSymsPref.setDefaultValue(PasswdPolicy.SYMBOLS_DEFAULT);
+        onSharedPreferenceChanged(prefs, PREF_PASSWD_DEFAULT_SYMS);
+
         Preference pref = findPreference(PREF_PASSWD_CLEAR_ALL_NOTIFS);
         pref.setOnPreferenceClickListener(
             new Preference.OnPreferenceClickListener()
@@ -458,6 +478,10 @@ public class Preferences extends PreferenceActivity
         } else if (key.equals(PREF_PASSWD_EXPIRY_NOTIF)) {
             itsPasswdExpiryNotifPref.setSummary(
                getPasswdExpiryNotifPref(prefs).getDisplayName(getResources()));
+        } else if (key.equals(PREF_PASSWD_DEFAULT_SYMS)) {
+            String val = getPasswdDefaultSymbolsPref(prefs);
+            itsPasswdDefaultSymsPref.setSummary(
+                getString(R.string.symbols_used_by_default, val));
         } else if (key.equals(PREF_FONT_SIZE)) {
             itsFontSizePref.setSummary(
                 getFontSizePref(prefs).getDisplayName(getResources()));

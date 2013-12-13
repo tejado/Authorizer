@@ -40,6 +40,7 @@
     <string name="days">Days</string>
     <string name="default_file_to_open">Default file to open</string>
     <string name="default_policy">Default Policy</string>
+    <string name="default_symbols">Default symbols</string>
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
     <string name="delete_file_msg">Delete file \"%1$s\"?</string>
@@ -212,6 +213,7 @@
     <string name="show_backup_files">Show backup files</string>
     <string name="show_password">Show Password</string>
     <string name="show_passwords">Show Passwords</string>
+    <string name="symbols_used_by_default">Symbols used by default in a password policy: %1$s</string>
     <string name="sync">Sync</string>
     <string name="times_header">TIMES</string>
     <string name="title">Title</string>
@@ -233,6 +235,9 @@
     <string name="yes">Yes</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.4.0&lt;/b&gt; - Add a password preference for the set of
+        symbols to use by default in password policies.
+        \n\n
         &lt;b&gt;4.3.0&lt;/b&gt; - Show a file\'s folder.
         \n\n
         &lt;b&gt;4.2.0&lt;/b&gt; - An input method is available which can paste
