@@ -11,6 +11,7 @@
         android:adjustViewBounds="true"
         android:layout_weight="0"
         android:maxHeight="?android:attr/listPreferredItemHeight"
+        android:minWidth="48dp"
         android:contentDescription="@string/file_type_icon"
         />
     <TextView android:id="@+id/text"

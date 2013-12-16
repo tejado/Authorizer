@@ -139,6 +139,7 @@
     <string name="no_records">No Records</string>
     <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
     <string name="none">None</string>
+    <string name="none_paren">(None)</string>
     <string name="none_selected_open">None selected.  Open PasswdSafe to choose.</string>
     <string name="notes">Notes</string>
     <string name="num_records_label">Number of Records:</string>
@@ -220,6 +221,7 @@
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
     <string name="toggle_monospace">Toggle Monospace</string>
     <string name="type">Type</string>
+    <string name="unknown_sync_file">Unknown sync file</string>
     <string name="unprotect_all">Unprotect All Records</string>
     <string name="unprotect_group">Unprotect Group Records</string>
     <string name="unprotect_to_modify">Unprotect to modify</string>
@@ -235,9 +237,11 @@
     <string name="yes">Yes</string>
 
     <string name="release_notes">
-        &lt;b&gt;4.4.0&lt;/b&gt; - Add a password preference for the set of
-        symbols to use by default in password policies.  The current group is
-        set as the default for new records.
+        &lt;b&gt;4.4.0&lt;/b&gt;\n
+        - Add a password preference for the set of symbols to use by default in
+        password policies\n
+        - The current group is set as the default for new records\n
+        - Synchronized files can be set as a default file
         \n\n
         &lt;b&gt;4.3.0&lt;/b&gt; - Show a file\'s folder.
         \n\n

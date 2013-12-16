@@ -59,20 +59,40 @@ public class FileListFragment extends ListFragment
 
         /** Does the activity have a menu */
         public boolean activityHasMenu();
+
+        /** Does the activity have a 'none' item */
+        public boolean activityHasNoneItem();
     }
 
     /** File data information for the list */
     public static final class FileData
     {
         public final File itsFile;
+        private final String itsName;
+
         public FileData(File f)
         {
             itsFile = f;
+            itsName = itsFile.getName();
         }
+
+        /** Constructor for a null file */
+        public FileData(Context ctx)
+        {
+            itsFile = null;
+            itsName = ctx.getString(R.string.none_paren);
+        }
+
         @Override
         public final String toString()
         {
-            return itsFile.getName();
+            return itsName;
+        }
+
+        /** Does the data indicate a directory */
+        public boolean isDirectory()
+        {
+            return (itsFile != null) && (itsFile.isDirectory());
         }
     }
 
@@ -261,7 +281,7 @@ public class FileListFragment extends ListFragment
             return;
         }
 
-        if (file.itsFile.isDirectory()) {
+        if (file.isDirectory()) {
             changeDir(file.itsFile, true);
         } else {
             PasswdSafeUtil.dbginfo(TAG, "Open file: %s", file.itsFile);
@@ -273,7 +293,8 @@ public class FileListFragment extends ListFragment
     @Override
     public Loader<List<Map<String, Object>>> onCreateLoader(int id, Bundle args)
     {
-        return new FileLoader(itsDir, getActivity());
+        return new FileLoader(itsDir, itsListener.activityHasNoneItem(),
+                              getActivity());
     }
 
     /** Callback when a loader is finished */
@@ -413,10 +434,9 @@ public class FileListFragment extends ListFragment
             if (app.checkOpenDefault()) {
                 SharedPreferences prefs =
                     PreferenceManager.getDefaultSharedPreferences(act);
-                String defFileName = Preferences.getDefFilePref(prefs);
-                File defFile = new File(itsDir, defFileName);
-                if (defFile.isFile() && defFile.canRead()) {
-                    openFile(defFile);
+                Uri defFile = Preferences.getDefFilePref(prefs);
+                if (defFile != null) {
+                    itsListener.openFile(defFile, null);
                 }
             }
         }
@@ -426,7 +446,11 @@ public class FileListFragment extends ListFragment
     /** Open the given file */
     private final void openFile(File file)
     {
-        itsListener.openFile(Uri.fromFile(file), file.getName());
+        if (file == null) {
+            itsListener.openFile(null, null);
+        } else {
+            itsListener.openFile(Uri.fromFile(file), file.getName());
+        }
     }
 
 
@@ -495,12 +519,14 @@ public class FileListFragment extends ListFragment
             extends AsyncTaskLoader<List<Map<String, Object>>>
     {
         private final File itsDir;
+        private final boolean itsIncludeNone;
 
         /** Constructor */
-        public FileLoader(File dir, Context context)
+        public FileLoader(File dir, boolean includeNone, Context context)
         {
             super(context);
             itsDir = dir;
+            itsIncludeNone = includeNone;
         }
 
         /** Handle when the loader is reset */
@@ -536,14 +562,33 @@ public class FileListFragment extends ListFragment
             FileData[] data = getFiles(itsDir, getContext());
             List<Map<String, Object>> fileData =
                 new ArrayList<Map<String, Object>>(data.length);
+
+            if (itsIncludeNone) {
+                fileData.add(createItem(new FileData(getContext())));
+            }
+
             for (FileData file: data) {
-                HashMap<String, Object> item = new HashMap<String, Object>();
-                item.put(TITLE, file);
-                item.put(ICON, file.itsFile.isDirectory() ?
-                               R.drawable.folder_rev : R.drawable.login_rev);
-                fileData.add(item);
+                fileData.add(createItem(file));
             }
             return fileData;
+        }
+
+        /** Create an adapter map for the file */
+        private final Map<String, Object> createItem(FileData file)
+        {
+            HashMap<String, Object> item = new HashMap<String, Object>(2);
+            item.put(TITLE, file);
+
+            int icon;
+            if (file.itsFile == null) {
+                icon = 0;
+            } else if (file.itsFile.isDirectory()) {
+                icon = R.drawable.folder_rev;
+            } else {
+                icon = R.drawable.login_rev;
+            }
+            item.put(ICON, icon);
+            return item;
         }
     }
 }

@@ -11,17 +11,12 @@ import java.io.File;
 
 import org.pwsafe.lib.file.PwsFile;
 
-import com.jefftharris.passwdsafe.file.PasswdPolicy;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.pref.FileBackupPref;
-import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
-import com.jefftharris.passwdsafe.pref.FontSizePref;
-import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.EditTextPreference;
@@ -30,6 +25,14 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.pref.FileBackupPref;
+import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
+import com.jefftharris.passwdsafe.pref.FontSizePref;
+import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 
 /**
  * The Preferences class defines the activity for managing preferences on the
@@ -119,8 +122,10 @@ public class Preferences extends PreferenceActivity
 
     private static final String TAG = "Preferences";
 
+    private static final int REQUEST_DEFAULT_FILE = 0;
+
     private EditTextPreference itsFileDirPref;
-    private ListPreference itsDefFilePref;
+    private Preference itsDefFilePref;
     private ListPreference itsFileClosePref;
     private ListPreference itsFileBackupPref;
     private ListPreference itsPasswdEncPref;
@@ -189,9 +194,13 @@ public class Preferences extends PreferenceActivity
         prefsEdit.commit();
     }
 
-    public static String getDefFilePref(SharedPreferences prefs)
+    public static Uri getDefFilePref(SharedPreferences prefs)
     {
-        return prefs.getString(PREF_DEF_FILE, PREF_DEF_FILE_DEF);
+        String defFile = prefs.getString(PREF_DEF_FILE, PREF_DEF_FILE_DEF);
+        if (TextUtils.isEmpty(defFile)) {
+            return null;
+        }
+        return Uri.parse(defFile);
     }
 
     public static FontSizePref getFontSizePref(SharedPreferences prefs)
@@ -305,6 +314,20 @@ public class Preferences extends PreferenceActivity
         prefsEdit.commit();
     }
 
+    /** Upgrade the default file preference if needed */
+    public static void upgradeDefaultFilePref(SharedPreferences prefs)
+    {
+        Uri defFileUri = getDefFilePref(prefs);
+        if ((defFileUri != null) && (defFileUri.getScheme() == null)) {
+            File defDir = getFileDirPref(prefs);
+            File def = new File(defDir, defFileUri.getPath());
+            defFileUri = Uri.fromFile(def);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(PREF_DEF_FILE, defFileUri.toString());
+            editor.commit();
+        }
+    }
+
     /** Get the default password policy preference */
     public static PasswdPolicy getDefPasswdPolicyPref(SharedPreferences prefs,
                                                       Context ctx)
@@ -358,7 +381,6 @@ public class Preferences extends PreferenceActivity
                                 PREF_SORT_CASE_SENSITIVE_DEF);
     }
 
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -371,15 +393,30 @@ public class Preferences extends PreferenceActivity
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         itsFileDirPref = (EditTextPreference)findPreference(PREF_FILE_DIR);
-        itsDefFilePref = (ListPreference)findPreference(PREF_DEF_FILE);
         itsFileClosePref = (ListPreference)
             findPreference(PREF_FILE_CLOSE_TIMEOUT);
         itsFileBackupPref = (ListPreference)
             findPreference(PREF_FILE_BACKUP);
 
         itsFileDirPref.setDefaultValue(PREF_FILE_DIR_DEF);
-        updateFileDirPrefs(getFileDirPref(prefs), prefs);
+        onSharedPreferenceChanged(prefs, PREF_FILE_DIR);
 
+        itsDefFilePref = findPreference(PREF_DEF_FILE);
+        itsDefFilePref.setOnPreferenceClickListener(
+            new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    Intent intent = new Intent(Intent.ACTION_CREATE_SHORTCUT,
+                                               null, Preferences.this,
+                                               LauncherFileShortcuts.class);
+                    intent.putExtra(LauncherFileShortcuts.EXTRA_IS_DEFAULT_FILE,
+                                    true);
+                    startActivityForResult(intent, REQUEST_DEFAULT_FILE);
+                    return true;
+                }
+            });
         onSharedPreferenceChanged(prefs, PREF_DEF_FILE);
 
         Resources res = getResources();
@@ -462,11 +499,13 @@ public class Preferences extends PreferenceActivity
                 pref = new File(PREF_FILE_DIR_DEF);
                 itsFileDirPref.setText(pref.toString());
             }
-            itsDefFilePref.setValue(PREF_DEF_FILE_DEF);
-            updateFileDirPrefs(pref, prefs);
+            // Make sure text editor is in sync with preference value
+            if (!pref.toString().equals(itsFileDirPref.getText())) {
+                itsFileDirPref.setText(pref.toString());
+            }
+            itsFileDirPref.setSummary(pref.toString());
         } else if (key.equals(PREF_DEF_FILE)) {
-            itsDefFilePref.setSummary(
-                defFileValueToEntry(getDefFilePref(prefs)));
+            new DefaultFileResolver().execute(getDefFilePref(prefs));
         } else if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
             itsFileClosePref.setSummary(
                 getFileCloseTimeoutPref(prefs).getDisplayName(getResources()));
@@ -488,32 +527,60 @@ public class Preferences extends PreferenceActivity
         }
     }
 
-    private final void updateFileDirPrefs(File fileDir,
-                                          SharedPreferences prefs)
+    /* (non-Javadoc)
+     * @see android.preference.PreferenceActivity#onActivityResult(int, int, android.content.Intent)
+     */
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode,
+                                    Intent data)
     {
-        itsFileDirPref.setSummary(fileDir.toString());
-
-        FileListFragment.FileData[] files =
-                FileListFragment.getFiles(fileDir, false, false);
-        String[] entries = new String[files.length + 1];
-        String[] entryValues = new String[files.length + 1];
-        entries[0] = getString(R.string.none);
-        entryValues[0] = PREF_DEF_FILE_DEF;
-        for (int i = 0; i < files.length; ++i) {
-            entries[i + 1] = files[i].toString();
-            entryValues[i + 1] = entries[i + 1];
+        if (requestCode == REQUEST_DEFAULT_FILE) {
+            if (resultCode == RESULT_OK) {
+                Intent val =
+                        data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
+                SharedPreferences.Editor editor = itsDefFilePref.getEditor();
+                String prefVal =
+                        (val != null) ? val.getData().toString() : null;
+                editor.putString(PREF_DEF_FILE, prefVal);
+                editor.commit();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-
-        itsDefFilePref.setEntries(entries);
-        itsDefFilePref.setEntryValues(entryValues);
     }
 
-    private final String defFileValueToEntry(String value)
+    /** Background task to resolve the default file URI and set the
+     * preference's summary */
+    private final class DefaultFileResolver
+            extends AsyncTask<Uri, Void, PasswdFileUri>
     {
-        if (value.equals(PREF_DEF_FILE_DEF)) {
-            return getString(R.string.none);
-        } else {
-            return value;
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected PasswdFileUri doInBackground(Uri... params)
+        {
+            Uri uri = params[0];
+            if (uri == null) {
+                return null;
+            }
+            return new PasswdFileUri(uri, Preferences.this);
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(PasswdFileUri result)
+        {
+            String summary;
+            if (result == null) {
+                summary = getString(R.string.none);
+            } else {
+                summary = result.getIdentifier(Preferences.this, false);
+            }
+            itsDefFilePref.setSummary(summary);
         }
     }
 }

@@ -107,4 +107,13 @@ public class FileListActivity extends AbstractFileListActivity
     {
         return true;
     }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#activityHasNoneItem()
+     */
+    @Override
+    public boolean activityHasNoneItem()
+    {
+        return false;
+    }
 }

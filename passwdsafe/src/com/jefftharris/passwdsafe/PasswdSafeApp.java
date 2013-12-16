@@ -236,6 +236,7 @@ public class PasswdSafeApp extends Application
             prefsEdit.commit();
         }
         Preferences.upgradePasswdPolicy(prefs, this);
+        Preferences.upgradeDefaultFilePref(prefs);
 
         updateFileCloseTimeoutPref(prefs);
         updateFileCloseScreenOffPref(prefs);

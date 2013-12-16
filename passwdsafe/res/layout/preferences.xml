@@ -17,7 +17,7 @@
             android:key="fileDirPref"
             android:title="@string/directory_for_files"/>
 
-        <ListPreference
+        <Preference
             android:name="defaultFile Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

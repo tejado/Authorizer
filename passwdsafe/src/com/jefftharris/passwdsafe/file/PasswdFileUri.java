@@ -354,6 +354,7 @@ public class PasswdFileUri implements Parcelable
                 return String.format("%s - %s",
                                      itsSyncType.getName(context), itsTitle);
             }
+            return context.getString(R.string.unknown_sync_file);
         }
         case EMAIL: {
             return context.getString(R.string.email_attachment);

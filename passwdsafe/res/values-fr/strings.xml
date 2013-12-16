@@ -139,6 +139,7 @@
     <string name="no_records">Aucune entrée</string>
     <string name="no_records_open_file">Aucune entrée. Ouvrez un premier fichier, puis réessayez.</string>
     <string name="none">"Aucun"</string>
+    <string name="none_paren">"(Aucun)"</string>
     <string name="none_selected_open">Aucun sélectionné. Ouvrez PasswdSafe de choisir.</string>
     <string name="notes">Notes</string>
     <string name="num_records_label">Nombre d\'entrées:</string>
@@ -220,6 +221,7 @@
     <string name="toggle_word_wrap">Adapter les retours-chariot</string>
     <string name="toggle_monospace">Adapter les espaces</string>
     <string name="type">Type</string>
+    <string name="unknown_sync_file">Inconnu fichier synchronisé</string>
     <string name="unprotect_all">Déprotéger les entrées</string>
     <string name="unprotect_group">Déprotéger les groupes</string>
     <string name="unprotect_to_modify">Déprotéger les modifications</string>
@@ -235,10 +237,13 @@
     <string name="yes">Oui</string>
 
     <string name="release_notes">
-        &lt;b&gt;4.4.0&lt;/b&gt; - Ajouter une préférence de mot de passe pour
-        l\'ensemble de symboles à utiliser par défaut dans les stratégies
-        de mot de passe.  Le groupe actuel est défini comme la valeur par
-        défaut pour les nouvelles entrées.
+        &lt;b&gt;4.4.0&lt;/b&gt;\n
+        - Ajouter une préférence de mot de passe pour l\'ensemble de symboles
+        à utiliser par défaut dans les stratégies de mot de passe\n
+        - Le groupe actuel est défini comme la valeur par défaut pour les
+        nouvelles entrées\n
+        - Fichiers synchronisés peuvent être définies comme un fichier par
+        défaut
         \n\n
         &lt;b&gt;4.3.0&lt;/b&gt; - Afficher le dossier d\'un fichier
         \n\n

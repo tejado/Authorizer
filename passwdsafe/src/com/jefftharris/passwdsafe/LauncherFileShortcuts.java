@@ -10,11 +10,16 @@ package com.jefftharris.passwdsafe;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 public class LauncherFileShortcuts extends AbstractFileListActivity
 {
+    public static final String EXTRA_IS_DEFAULT_FILE = "isDefFile";
+
+    private boolean itsIsDefaultFile = false;
+
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
      */
@@ -22,13 +27,24 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setTitle(R.string.shortcut_choose_file);
 
         Intent intent = getIntent();
         if (!Intent.ACTION_CREATE_SHORTCUT.equals(intent.getAction())) {
             finish();
             return;
         }
+
+        itsIsDefaultFile = intent.getBooleanExtra(EXTRA_IS_DEFAULT_FILE, false);
+        if (itsIsDefaultFile) {
+            setTitle(R.string.default_file_to_open);
+        } else {
+            setTitle(R.string.shortcut_choose_file);
+        }
+
+        // Remove the extra padding for tablets when used as a dialog style
+        View root = findViewById(R.id.content);
+        int topPad = root.getPaddingTop();
+        root.setPadding(topPad, topPad, topPad, topPad);
     }
 
 
@@ -39,10 +55,14 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
     @Override
     public void openFile(Uri uri, String fileName)
     {
-        if (uri != null) {
+        if (itsIsDefaultFile || (uri != null)) {
+            Intent openIntent = null;
+            if (uri != null) {
+                openIntent = PasswdSafeUtil.createOpenIntent(uri, null);
+            }
+
             Intent intent = new Intent();
-            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT,
-                            PasswdSafeUtil.createOpenIntent(uri, null));
+            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, openIntent);
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, fileName);
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(
@@ -61,5 +81,15 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
     public boolean activityHasMenu()
     {
         return false;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#activityHasNoneItem()
+     */
+    @Override
+    public boolean activityHasNoneItem()
+    {
+        return itsIsDefaultFile;
     }
 }
