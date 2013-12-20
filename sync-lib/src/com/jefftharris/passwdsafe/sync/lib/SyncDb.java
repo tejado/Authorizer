@@ -4,7 +4,7 @@
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.sync;
+package com.jefftharris.passwdsafe.sync.lib;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -30,8 +29,7 @@ public class SyncDb
 {
     private static final String TAG = "SyncDb";
 
-    public static final String GDRIVE_ACCOUNT_TYPE =
-            GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE;
+    public static final String GDRIVE_ACCOUNT_TYPE = "com.google";
     public static final String DROPBOX_ACCOUNT_TYPE = "com.jefftharris.dropbox";
 
     public static final String DB_TABLE_PROVIDERS = "providers";

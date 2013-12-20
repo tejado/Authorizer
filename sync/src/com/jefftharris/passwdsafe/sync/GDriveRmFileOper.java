@@ -10,6 +10,8 @@ import java.io.IOException;
 
 import com.google.api.services.drive.Drive;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
 import android.content.Context;
 import android.database.SQLException;

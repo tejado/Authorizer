@@ -7,5 +7,8 @@
 ^sync/bin
 ^sync/local.properties
 ^sync/gen
+^sync-lib/bin
+^sync-lib/local.properties
+^sync-lib/gen
 ^tests/bin
 ^tests/gen

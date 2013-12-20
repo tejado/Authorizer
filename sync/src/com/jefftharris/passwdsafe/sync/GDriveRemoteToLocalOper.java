@@ -22,6 +22,8 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
 /**
  * A Google Drive sync operation to sync a remote file to a local file

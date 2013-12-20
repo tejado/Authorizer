@@ -15,6 +15,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
 /**
  *  A Dropbox sync operation to remove a file

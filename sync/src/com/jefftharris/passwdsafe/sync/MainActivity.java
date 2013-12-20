@@ -48,6 +48,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
 public class MainActivity extends FragmentActivity
         implements LoaderCallbacks<Cursor>, SyncUpdateHandler

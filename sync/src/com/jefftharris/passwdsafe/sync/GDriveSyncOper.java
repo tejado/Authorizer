@@ -12,6 +12,8 @@ import android.content.Context;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncOper;
 
 
 /**

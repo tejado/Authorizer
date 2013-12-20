@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="automatic">automatique</string>
+    <string name="full_sync">Synchronisation complète</string>
+    <string name="incremental_sync">Synchronisation incrémental</string>
+    <string name="manual">manuel</string>
+    <string name="sync_log_record">Synchroniser %1$s, %2$s, %3$s, début: %4$tc, fin: %5$tc</string>
+
+</resources>

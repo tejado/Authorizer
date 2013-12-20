@@ -40,6 +40,10 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.Provider;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
 /**
  *  The PasswdSafeProvider class is a content provider for synced
@@ -153,8 +157,9 @@ public class PasswdSafeProvider extends ContentProvider
 
                 DbProvider dbProvider = SyncDb.getProvider(providerId,
                                                                   db);
-                Provider provider = Provider.getProvider(dbProvider.itsType,
-                                                         getContext());
+                Provider provider =
+                        ProviderFactory.getProvider(dbProvider.itsType,
+                                                    getContext());
                 provider.deleteLocalFile(file, db);
 
                 db.setTransactionSuccessful();
@@ -261,8 +266,9 @@ public class PasswdSafeProvider extends ContentProvider
                     throw new Exception("No provider for " + providerId);
                 }
 
-                Provider provider = Provider.getProvider(dbProvider.itsType,
-                                                         getContext());
+                Provider provider =
+                        ProviderFactory.getProvider(dbProvider.itsType,
+                                                    getContext());
                 long id = provider.insertLocalFile(providerId, title, db);
                 db.setTransactionSuccessful();
 
@@ -509,8 +515,9 @@ public class PasswdSafeProvider extends ContentProvider
 
                 DbProvider dbProvider = SyncDb.getProvider(providerId,
                                                                   db);
-                Provider provider = Provider.getProvider(dbProvider.itsType,
-                                                         getContext());
+                Provider provider =
+                        ProviderFactory.getProvider(dbProvider.itsType,
+                                                    getContext());
                 provider.updateLocalFile(file, localFileName, localFile, db);
                 db.setTransactionSuccessful();
 

@@ -11,6 +11,8 @@ import java.io.IOException;
 import android.content.Context;
 
 import com.dropbox.sync.android.DbxFileSystem;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncOper;
 
 /**
  *  A Dropbox sync operation

@@ -21,6 +21,11 @@ import android.util.Log;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.Provider;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
 /**
  *  The ProviderSyncer class syncs password files from cloud services
@@ -46,7 +51,7 @@ public class ProviderSyncer
         throws Exception
     {
         Log.i(TAG, "Add provider: " + acctName);
-        Provider providerImpl = Provider.getProvider(type, ctx);
+        Provider providerImpl = ProviderFactory.getProvider(type, ctx);
         providerImpl.checkProviderAdd(db);
 
         int freq = ProviderSyncFreqPref.DEFAULT.getFreq();
@@ -76,7 +81,8 @@ public class ProviderSyncer
         }
 
         SyncDb.deleteProvider(provider.itsId, db);
-        Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
+        Provider providerImpl =
+                ProviderFactory.getProvider(provider.itsType, ctx);
         providerImpl.cleanupOnDelete(provider.itsAcct);
         Account acct = providerImpl.getAccount(provider.itsAcct);
         providerImpl.updateSyncFreq(acct, 0);
@@ -94,7 +100,8 @@ public class ProviderSyncer
     {
         SyncDb.updateProviderSyncFreq(provider.itsId, freq, db);
 
-        Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
+        Provider providerImpl =
+                ProviderFactory.getProvider(provider.itsType, ctx);
         Account acct = providerImpl.getAccount(provider.itsAcct);
         providerImpl.updateSyncFreq(acct, freq);
     }
@@ -108,7 +115,8 @@ public class ProviderSyncer
 
         List<DbProvider> providers = SyncDb.getProviders(db);
         for (DbProvider provider: providers) {
-            Provider providerImpl = Provider.getProvider(provider.itsType, ctx);
+            Provider providerImpl =
+                    ProviderFactory.getProvider(provider.itsType, ctx);
             Account acct = providerImpl.getAccount(provider.itsAcct);
             if (acct == null) {
                 deleteProvider(provider, db, ctx);
@@ -166,7 +174,7 @@ public class ProviderSyncer
         }
 
         Provider providerImpl =
-                Provider.getProvider(provider.itsType, itsContext);
+                ProviderFactory.getProvider(provider.itsType, itsContext);
         String displayName = TextUtils.isEmpty(provider.itsDisplayName) ?
                 provider.itsAcct : provider.itsDisplayName;
         SyncLogRecord logrec =
