@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="PasswdSafeSync" default="help">
+<project name="PasswdSafeSyncDropbox" default="help">
 
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
@@ -67,19 +67,18 @@
             -pre-clean
     -->
     <import file="custom_rules.xml" optional="true" />
-    <import file="../lib/common_rules.xml"/>
-    
-    <target name="copyPluginFiles">
-        <mkdir dir="${asset.absolute.dir}"/>
+    <import file="../sync-lib/build-dex.xml"/>
 
-        <copy file="../sync-dropbox/bin/classes.dex"
-            tofile="${asset.absolute.dir}/dropbox-classes.dex"/>
+    <target name="genDex" depends="nodeps, -build-setup">
+        <path id="out.dex.jar.input.ref">
+            <fileset dir="${jar.libs.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+        <dex-helper-mod input-dir="${out.classes.absolute.dir}"
+            output-dex-file="${out.absolute.dir}/${dex.file.name}"/>
     </target>
     
-    <target name="cleanPluginFiles">
-        <delete dir="${asset.absolute.dir}"/>
-    </target>
-
     <!-- Import the actual build file.
 
          To customize existing targets, there are two options:

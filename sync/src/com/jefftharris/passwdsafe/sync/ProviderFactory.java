@@ -6,10 +6,20 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.lang.reflect.Constructor;
+
 import android.content.Context;
 
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.lib.Utils;
+//import com.jefftharris.passwdsafe.sync.dropbox.DropboxProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
+
+import dalvik.system.DexClassLoader;
 
 /**
  * Factory for creating Providers
@@ -24,20 +34,17 @@ public class ProviderFactory
             return new GDriveProvider(ctx);
         }
         case DROPBOX: {
-            /*
             try {
                 return createDropboxPlugin(ctx);
             } catch (Exception e) {
                 return null;
             }
-            */
-            return new DropboxProvider(ctx);
+            //return new DropboxProvider(ctx);
         }
         }
         return null;
     }
 
-    /*
     private static ClassLoader itsDbxClassLoader;
 
     private static synchronized Provider createDropboxPlugin(Context ctx)
@@ -64,10 +71,11 @@ public class ProviderFactory
                                        optimizedDir.getAbsolutePath(),
                                        null, ctx.getClassLoader());
         }
-        Class dbxClass = itsDbxClassLoader.loadClass(
+        Class<?> dbxClass = itsDbxClassLoader.loadClass(
                 "com.jefftharris.passwdsafe.sync.dropbox.DropboxProvider");
-        Constructor ctor = dbxClass.getDeclaredConstructor(Context.class);
-        return (Provider)ctor.newInstance(ctx);
+        @SuppressWarnings("unchecked")
+        Constructor<Provider> ctor = (Constructor<Provider>)
+                dbxClass.getDeclaredConstructor(Context.class);
+        return ctor.newInstance(ctx);
     }
-    */
 }
