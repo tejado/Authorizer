@@ -11,6 +11,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Constructor;
+import java.util.EnumMap;
 
 import android.content.Context;
 
@@ -26,28 +27,37 @@ import dalvik.system.DexClassLoader;
  */
 public class ProviderFactory
 {
-    /** Get the provider implementation for the type */
-    public static Provider getProvider(ProviderType type, Context ctx)
-    {
-        switch (type) {
-        case GDRIVE: {
-            return new GDriveProvider(ctx);
-        }
-        case DROPBOX: {
-            try {
-                return createDropboxPlugin(ctx);
-            } catch (Exception e) {
-                return null;
-            }
-            //return new DropboxProvider(ctx);
-        }
-        }
-        return null;
-    }
-
+    private static EnumMap<ProviderType, Provider> itsProviders =
+            new EnumMap<ProviderType, Provider>(ProviderType.class);
     private static ClassLoader itsDbxClassLoader;
 
-    private static synchronized Provider createDropboxPlugin(Context ctx)
+    /** Get the provider implementation for the type */
+    public static synchronized Provider getProvider(ProviderType type,
+                                                    Context ctx)
+    {
+        Provider provider = itsProviders.get(type);
+        if (provider == null) {
+            switch (type) {
+            case GDRIVE: {
+                provider = new GDriveProvider(ctx.getApplicationContext());
+                break;
+            }
+            case DROPBOX: {
+                try {
+                    //provider = createDropboxPlugin(ctx.getApplicationContext());
+                    provider = new DropboxProvider(ctx.getApplicationContext());
+                } catch (Exception e) {
+                }
+                break;
+            }
+            }
+
+            itsProviders.put(type, provider);
+        }
+        return provider;
+    }
+
+    private static Provider createDropboxPlugin(Context ctx)
             throws Exception
     {
         // TODO: optimize copy and dex optimization
