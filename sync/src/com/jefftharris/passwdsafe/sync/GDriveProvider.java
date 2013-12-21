@@ -56,7 +56,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 /**
  * The GDriveProvider class encapsulates Google Drive
  */
-public class GDriveProvider extends Provider
+public class GDriveProvider implements Provider
 {
     public static final String ABOUT_FIELDS = "largestChangeId";
     public static final String FILE_FIELDS =

@@ -44,7 +44,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 /**
  *  The DropboxProvider class encapsulates Dropbox
  */
-public class DropboxProvider extends Provider
+public class DropboxProvider implements Provider
 {
     private final Context itsContext;
 

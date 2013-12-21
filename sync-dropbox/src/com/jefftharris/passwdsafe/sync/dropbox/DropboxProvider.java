@@ -24,7 +24,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 /**
  *  The DropboxProvider class encapsulates Dropbox
  */
-public class DropboxProvider extends Provider
+public class DropboxProvider implements Provider
 {
     private final Context itsContext;
 
@@ -42,7 +42,6 @@ public class DropboxProvider extends Provider
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.Provider#getAccount(java.lang.String)
      */
-    @Override
     public Account getAccount(String acctName)
     {
         return new Account(acctName, SyncDb.DROPBOX_ACCOUNT_TYPE);
@@ -50,7 +49,6 @@ public class DropboxProvider extends Provider
 
 
     /** Check whether a provider can be added */
-    @Override
     public void checkProviderAdd(SQLiteDatabase db)
             throws Exception
     {
@@ -65,7 +63,6 @@ public class DropboxProvider extends Provider
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.Provider#cleanupOnDelete(java.lang.String)
      */
-    @Override
     public void cleanupOnDelete(String acctName)
     {
         //SyncApp.get(itsContext).unlinkDropbox();
@@ -73,7 +70,6 @@ public class DropboxProvider extends Provider
     }
 
     /** Update a provider's sync frequency */
-    @Override
     public void updateSyncFreq(Account acct, int freq)
     {
         PasswdSafeUtil.dbginfo(TAG, "updateSyncFreq");
@@ -82,7 +78,6 @@ public class DropboxProvider extends Provider
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.Provider#sync(android.accounts.Account, com.jefftharris.passwdsafe.sync.SyncDb.DbProvider, android.database.sqlite.SQLiteDatabase, com.jefftharris.passwdsafe.sync.SyncLogRecord)
      */
-    @Override
     public void sync(Account acct,
                      DbProvider provider,
                      SQLiteDatabase db,
@@ -94,7 +89,6 @@ public class DropboxProvider extends Provider
 
 
     /** Insert a local file */
-    @Override
     public long insertLocalFile(long providerId, String title,
                                 SQLiteDatabase db)
             throws Exception
@@ -111,7 +105,6 @@ public class DropboxProvider extends Provider
 
 
     /** Update a local file */
-    @Override
     public synchronized void updateLocalFile(DbFile file,
                                              String localFileName,
                                              java.io.File localFile,
@@ -123,7 +116,6 @@ public class DropboxProvider extends Provider
 
 
     /** Delete a local file */
-    @Override
     public void deleteLocalFile(DbFile file, SQLiteDatabase db)
             throws Exception
     {
