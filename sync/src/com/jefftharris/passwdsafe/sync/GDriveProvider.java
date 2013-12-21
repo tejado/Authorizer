@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import android.accounts.Account;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.SQLException;
@@ -77,6 +78,56 @@ public class GDriveProvider implements Provider
     }
 
 
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#init()
+     */
+    public void init()
+    {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#fini()
+     */
+    public void fini()
+    {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
+     */
+    public void startAccountLink(Activity activity, int requestCode)
+    {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
+     */
+    public String finishAccountLink()
+    {
+        return null;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#unlinkAccount()
+     */
+    public void unlinkAccount()
+    {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#isAccountAuthorized()
+     */
+    public boolean isAccountAuthorized()
+    {
+        return false;
+    }
+
+
     /** Get the account for the named provider */
     @Override
     public Account getAccount(String acctName)
@@ -131,6 +182,14 @@ public class GDriveProvider implements Provider
                                                 new Bundle(), freq);
             }
         }
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#requestSync(boolean)
+     */
+    public void requestSync(boolean manual)
+    {
     }
 
 

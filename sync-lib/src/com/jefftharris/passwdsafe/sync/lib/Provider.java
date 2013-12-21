@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.sync.lib;
 import java.io.File;
 
 import android.accounts.Account;
+import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
 
 /**
@@ -17,6 +18,27 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public interface Provider
 {
+    public static final String ACTION_SYNC_EXPIRATION_TIMEOUT =
+            "com.jefftharris.passwdsafe.action.SYNC_EXPIRATION_TIMEOUT";
+
+    /** Initialize the provider */
+    public void init();
+
+    /** Finalize the provider */
+    public void fini();
+
+    /** Start the process of linking to an account */
+    public void startAccountLink(Activity activity, int requestCode);
+
+    /** Finish the process of linking to an account */
+    public String finishAccountLink();
+
+    /** Unlink an account */
+    public void unlinkAccount();
+
+    /** Is the account fully authorized */
+    public boolean isAccountAuthorized();
+
     /** Get the account for the named provider */
     public Account getAccount(String acctName);
 
@@ -29,6 +51,8 @@ public interface Provider
 
     /** Update a provider's sync frequency */
     public void updateSyncFreq(Account acct, int freq);
+
+    public void requestSync(boolean manual);
 
     /** Sync a provider */
     public void sync(Account acct,

@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.Provider;
 
 /**
  *  Receiver for the manifest broadcast events
@@ -28,7 +29,7 @@ public class ManifestBroadcastReceiver extends BroadcastReceiver
     {
         PasswdSafeUtil.dbginfo(TAG, "onReceive: %s", intent);
         String action = intent.getAction();
-        if (action == SyncApp.ACTION_SYNC_EXPIRATION_TIMEOUT) {
+        if (action == Provider.ACTION_SYNC_EXPIRATION_TIMEOUT) {
             SyncApp.get(ctx).syncDropbox(false);
         } else {
             // The app is created in order to launch the receiver

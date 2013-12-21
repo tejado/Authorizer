@@ -36,8 +36,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.dropbox.sync.android.DbxAccount;
-import com.dropbox.sync.android.DbxFileSystem;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -184,11 +182,8 @@ public class MainActivity extends FragmentActivity
             break;
         case DROPBOX_LINK_RC: {
             SyncApp app = SyncApp.get(this);
-            app.finishDropboxLink();
-            DbxAccount dbxacct = app.getDropboxAcct();
-            itsNewAccount = new NewAccountInfo(ProviderType.DROPBOX,
-                                               (dbxacct == null) ? null :
-                                                   dbxacct.getUserId(),
+            String acctName = app.finishDropboxLink();
+            itsNewAccount = new NewAccountInfo(ProviderType.DROPBOX, acctName,
                                                itsDropboxUri);
             break;
         }
@@ -292,9 +287,6 @@ public class MainActivity extends FragmentActivity
     {
         SyncApp app = SyncApp.get(this);
         try {
-            if (app.getDropboxAcct() != null) {
-                app.unlinkDropbox();
-            }
             app.startDropboxLink(this, DROPBOX_LINK_RC);
         } catch (Exception e) {
             Log.e(TAG, "startDropboxLink failed", e);
@@ -475,8 +467,7 @@ public class MainActivity extends FragmentActivity
                     ProviderSyncFreqPref.freqValueOf(freqVal);
             itsDropboxUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
-            DbxFileSystem fs = SyncApp.get(this).getDropboxFs();
-            boolean hasFs = (fs != null) && !fs.isShutDown();
+            boolean authorized = SyncApp.get(this).isDropboxAuthorized();
 
             View freqSpinLabel = findViewById(R.id.dropbox_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
@@ -486,12 +477,12 @@ public class MainActivity extends FragmentActivity
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             btns.setVisibility(View.VISIBLE);
-            acctWarning.setVisibility(hasFs ? View.GONE : View.VISIBLE);
+            acctWarning.setVisibility(authorized ? View.GONE : View.VISIBLE);
 
             acctView.setText(getString(R.string.account_label, acct));
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
-            syncBtn.setEnabled(hasFs);
+            syncBtn.setEnabled(authorized);
         } else {
             itsDropboxUri = null;
             chooseBtn.setVisibility(View.VISIBLE);

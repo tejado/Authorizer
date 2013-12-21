@@ -18,18 +18,27 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import android.accounts.Account;
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.dropbox.sync.android.DbxAccount;
 import com.dropbox.sync.android.DbxAccountInfo;
+import com.dropbox.sync.android.DbxAccountManager;
 import com.dropbox.sync.android.DbxException;
 import com.dropbox.sync.android.DbxFile;
 import com.dropbox.sync.android.DbxFileInfo;
 import com.dropbox.sync.android.DbxFileSystem;
+import com.dropbox.sync.android.DbxFileSystem.PathListener;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -46,14 +55,93 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
  */
 public class DropboxProvider implements Provider
 {
-    private final Context itsContext;
+    private static final String DROPBOX_SYNC_APP_KEY = "ncrre47fqpcu42z";
+    private static final String DROPBOX_SYNC_APP_SECRET = "7wxt4myb2qut395";
 
     private static final String TAG = "DropboxProvider";
+
+    private final Context itsContext;
+    private Handler itsHandler = null;
+    private DbxAccountManager itsDropboxAcctMgr = null;
+    private DbxFileSystem itsDropboxFs = null;
+    private SyncRequestTask itsDropboxSyncer = null;
+    private PathListener itsDropboxPathListener = null;
+    private Runnable itsDropboxSyncEndHandler = null;
+    private PendingIntent itsSyncTimeoutIntent = null;
+
 
     /** Constructor */
     public DropboxProvider(Context ctx)
     {
         itsContext = ctx;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#init()
+     */
+    public void init()
+    {
+        itsHandler = new Handler(Looper.getMainLooper());
+        itsDropboxAcctMgr = DbxAccountManager.getInstance(
+                itsContext, DROPBOX_SYNC_APP_KEY, DROPBOX_SYNC_APP_SECRET);
+        updateDropboxAcct();
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#fini()
+     */
+    public void fini()
+    {
+        if (itsSyncTimeoutIntent != null) {
+            AlarmManager alarmMgr = (AlarmManager)
+                    itsContext.getSystemService(Context.ALARM_SERVICE);
+            alarmMgr.cancel(itsSyncTimeoutIntent);
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
+     */
+    public void startAccountLink(Activity activity, int requestCode)
+    {
+        if (itsDropboxAcctMgr.getLinkedAccount() != null) {
+            unlinkAccount();
+        }
+        itsDropboxAcctMgr.startLink(activity, requestCode);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
+     */
+    public String finishAccountLink()
+    {
+        updateDropboxAcct();
+        DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();
+        return (acct == null) ? null : acct.getUserId();
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#unlinkAccount()
+     */
+    public void unlinkAccount()
+    {
+        // TODO: cleanup unlinkAccount vs. cleanupOnDelete
+        itsDropboxAcctMgr.unlink();
+        updateDropboxAcct();
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#isAccountAuthorized()
+     */
+    public boolean isAccountAuthorized()
+    {
+        return (itsDropboxFs != null) && !itsDropboxFs.isShutDown();
     }
 
 
@@ -86,15 +174,98 @@ public class DropboxProvider implements Provider
     @Override
     public void cleanupOnDelete(String acctName)
     {
-        SyncApp.get(itsContext).unlinkDropbox();
+        unlinkAccount();
     }
 
     /** Update a provider's sync frequency */
     @Override
-    public void updateSyncFreq(Account acct, int freq)
+    public void updateSyncFreq(Account acct, final int freq)
     {
-        SyncApp.get(itsContext).updateDropboxSyncFreq(freq);
+        itsHandler.post(new Runnable() {
+            @Override
+            public void run()
+            {
+                DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();
+                PasswdSafeUtil.dbginfo(TAG,
+                                       "updateDropboxSyncFreq acct %s, freq %d",
+                                       acct, freq);
+
+                if ((acct != null) && (freq > 0)) {
+                    if (itsSyncTimeoutIntent == null) {
+                        Intent timeoutIntent =
+                                new Intent(ACTION_SYNC_EXPIRATION_TIMEOUT);
+                        itsSyncTimeoutIntent = PendingIntent.getBroadcast(
+                                itsContext, 0, timeoutIntent,
+                                PendingIntent.FLAG_CANCEL_CURRENT);
+                    }
+
+                    AlarmManager alarmMgr = (AlarmManager)
+                            itsContext.getSystemService(Context.ALARM_SERVICE);
+                    long interval = freq * 1000;
+                    alarmMgr.setInexactRepeating(
+                            AlarmManager.RTC,
+                            System.currentTimeMillis() + interval,
+                            interval, itsSyncTimeoutIntent);
+                } else {
+                    if (itsSyncTimeoutIntent != null) {
+                        itsSyncTimeoutIntent.cancel();
+                        itsSyncTimeoutIntent = null;
+                    }
+                }
+            }
+        });
     }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#requestSync(boolean)
+     */
+    public void requestSync(final boolean manual)
+    {
+        if (itsDropboxFs == null) {
+            PasswdSafeUtil.dbginfo(TAG, "syncDropbox no fs");
+            return;
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "syncDropbox");
+        if (itsDropboxPathListener != null) {
+            return;
+        }
+        itsDropboxPathListener = new PathListener()
+        {
+            @Override
+            public void onPathChange(DbxFileSystem fs,
+                                     DbxPath path, Mode mode)
+            {
+                PasswdSafeUtil.dbginfo(TAG, "syncDropbox path change");
+                doRequestSync(manual);
+            }
+        };
+
+        if (itsDropboxSyncEndHandler != null) {
+            itsHandler.removeCallbacks(itsDropboxSyncEndHandler);
+        }
+        itsDropboxSyncEndHandler = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                PasswdSafeUtil.dbginfo(TAG, "syncDropbox end timer");
+                if ((itsDropboxFs != null) &&
+                        (itsDropboxPathListener != null)) {
+                    itsDropboxFs.removePathListenerForAll(
+                        itsDropboxPathListener);
+                }
+                itsDropboxPathListener = null;
+                itsDropboxSyncEndHandler = null;
+            }
+        };
+        itsHandler.postDelayed(itsDropboxSyncEndHandler, 60 * 1000);
+        itsDropboxFs.addPathListener(itsDropboxPathListener, DbxPath.ROOT,
+                                     PathListener.Mode.PATH_OR_DESCENDANT);
+        doRequestSync(manual);
+    }
+
 
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.Provider#sync(android.accounts.Account, com.jefftharris.passwdsafe.sync.SyncDb.DbProvider, android.database.sqlite.SQLiteDatabase, com.jefftharris.passwdsafe.sync.SyncLogRecord)
@@ -106,12 +277,11 @@ public class DropboxProvider implements Provider
                      boolean manual,
                      SyncLogRecord logrec) throws Exception
     {
-        DbxFileSystem fs = SyncApp.get(itsContext).getDropboxFs();
-        if (fs == null) {
+        if (itsDropboxFs == null) {
             PasswdSafeUtil.dbginfo(TAG, "sync: no fs");
             return;
         }
-        new Syncer(fs, provider, db, logrec, itsContext).sync();
+        new Syncer(itsDropboxFs, provider, db, logrec, itsContext).sync();
     }
 
 
@@ -146,11 +316,10 @@ public class DropboxProvider implements Provider
         DbxPath path = new DbxPath(file.itsRemoteId);
         DbxFile dbxfile = null;
         try {
-            DbxFileSystem fs = getSyncApp().getDropboxFs();
-            if (fs.exists(path)) {
-                dbxfile = fs.open(path);
+            if (itsDropboxFs.exists(path)) {
+                dbxfile = itsDropboxFs.open(path);
             } else {
-                dbxfile = fs.create(path);
+                dbxfile = itsDropboxFs.create(path);
             }
 
             InputStream is = null;
@@ -177,8 +346,7 @@ public class DropboxProvider implements Provider
     {
         SyncDb.updateLocalFileDeleted(file.itsId, db);
 
-        DbxFileSystem fs = getSyncApp().getDropboxFs();
-        if (fs == null) {
+        if (itsDropboxFs == null) {
             PasswdSafeUtil.dbginfo(TAG, "deleteLocalFile: no fs");
             return;
         }
@@ -188,16 +356,145 @@ public class DropboxProvider implements Provider
         }
 
         DbxPath path = new DbxPath(file.itsRemoteId);
-        if (fs.exists(path)) {
-            fs.delete(path);
+        if (itsDropboxFs.exists(path)) {
+            itsDropboxFs.delete(path);
         }
     }
 
 
-    /** Get the SyncApp */
-    private final SyncApp getSyncApp()
+    /** Update after a Dropbox account change */
+    private void updateDropboxAcct()
     {
-        return (SyncApp)itsContext.getApplicationContext();
+        DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();
+        boolean shouldHaveFs = (acct != null);
+        boolean haveFs = (itsDropboxFs != null);
+
+        PasswdSafeUtil.dbginfo(TAG, "updateDropboxAcct should %b have %b",
+                               shouldHaveFs, haveFs);
+        if (shouldHaveFs && !haveFs) {
+            acct.addListener(new DbxAccount.Listener()
+            {
+                @Override
+                public void onAccountChange(DbxAccount acct)
+                {
+                    PasswdSafeUtil.dbginfo(TAG, "Dropbox acct change");
+                    doRequestSync(false);
+                }
+            });
+
+            SyncDb syncDb = SyncDb.acquire();
+            try {
+                SQLiteDatabase db = syncDb.beginTransaction();
+                DbProvider provider = SyncDb.getProvider(acct.getUserId(),
+                                                         ProviderType.DROPBOX,
+                                                         db);
+                updateSyncFreq(null,
+                               (provider != null) ? provider.itsSyncFreq : 0);
+
+                itsDropboxFs = DbxFileSystem.forAccount(acct);
+                requestSync(false);
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                Log.e(TAG, "updateDropboxAcct failure", e);
+            } finally {
+                syncDb.endTransactionAndRelease();
+            }
+        } else if (!shouldHaveFs && haveFs) {
+            itsDropboxFs = null;
+            updateSyncFreq(null, 0);
+        }
+    }
+
+
+    /** Check whether to start a dropbox sync */
+    private void doRequestSync(boolean manual)
+    {
+        if (itsDropboxSyncer == null) {
+            itsDropboxSyncer = new SyncRequestTask(manual);
+        }
+        itsDropboxSyncer.checkSync();
+    }
+
+
+    /** Background sync request for Dropbox */
+    private class SyncRequestTask extends AsyncTask<Void, Void, Void>
+            implements Runnable
+    {
+        private final boolean itsIsManual;
+        private boolean itsIsTimerPending = false;
+        private boolean itsIsRunning = true;
+
+        /** Constructor */
+        public SyncRequestTask(boolean manual)
+        {
+            itsIsManual = manual;
+        }
+
+        /** Check the status of the sync */
+        public void checkSync()
+        {
+            switch (getStatus()) {
+            case PENDING: {
+                PasswdSafeUtil.dbginfo(TAG, "DropboxSyncer start");
+                execute();
+                break;
+            }
+            case RUNNING:
+            case FINISHED: {
+                if (!itsIsTimerPending) {
+                    PasswdSafeUtil.dbginfo(TAG, "DropboxSyncer start timer");
+                    itsIsTimerPending = true;
+                    itsHandler.postDelayed(this, 15000);
+                }
+                break;
+            }
+            }
+        }
+
+        /** Timer expired */
+        @Override
+        public void run()
+        {
+            PasswdSafeUtil.dbginfo(TAG, "DropboxSyncer timer expired");
+            itsIsTimerPending = false;
+            checkSyncerDone();
+            doRequestSync(itsIsManual);
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();
+            if (acct != null) {
+                ProviderSyncer syncer = new ProviderSyncer(
+                        itsContext, new Account(acct.getUserId(),
+                                                SyncDb.DROPBOX_ACCOUNT_TYPE));
+                syncer.performSync(itsIsManual);
+            }
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            super.onPostExecute(result);
+            itsIsRunning = false;
+            checkSyncerDone();
+        }
+
+        /** Check whether the DropboxSyncer is finished */
+        private void checkSyncerDone()
+        {
+            if (!itsIsTimerPending && !itsIsRunning) {
+                itsDropboxSyncer = null;
+            }
+        }
     }
 
 

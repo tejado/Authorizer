@@ -75,8 +75,30 @@ public class SyncDb
     public static final String DB_MATCH_SYNC_LOGS_START_BEFORE =
             DB_COL_SYNC_LOGS_START + " < ?";
 
+    private static SyncDb itsDb = null;
+
     private DbHelper itsDbHelper;
     private ReentrantLock itsMutex = new ReentrantLock();
+
+    /** Initialize the single SyncDb instance */
+    public static void initializeDb(Context ctx)
+    {
+        itsDb = new SyncDb(ctx);
+    }
+
+    /** Finalize the single SyncDb instance */
+    public static void finalizeDb()
+    {
+        itsDb.close();
+        itsDb = null;
+    }
+
+    /** Acquire the single SyncDb instance */
+    public static SyncDb acquire()
+    {
+        itsDb.doAcquire();
+        return itsDb;
+    }
 
     /** Constructor */
     public SyncDb(Context ctx)
@@ -85,13 +107,13 @@ public class SyncDb
     }
 
     /** Close the DB */
-    public void close()
+    private void close()
     {
         itsDbHelper.close();
     }
 
     /** Acquire a lock on the database */
-    public void acquire()
+    private void doAcquire()
     {
         itsMutex.lock();
     }

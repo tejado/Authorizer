@@ -79,7 +79,7 @@ public class GDriveLaunchActivity extends FragmentActivity
     private final Pair<DbProvider, DbFile> getFile(String fileId)
     {
         Pair<DbProvider, DbFile> rc = null;
-        SyncDb syncDb = SyncApp.acquireSyncDb(this);
+        SyncDb syncDb = SyncDb.acquire();
         try {
             SQLiteDatabase db = syncDb.beginTransaction();
             List<DbProvider> providers = SyncDb.getProviders(db);

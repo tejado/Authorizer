@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.sync.dropbox;
 import java.util.List;
 
 import android.accounts.Account;
+import android.app.Activity;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -36,6 +37,56 @@ public class DropboxProvider implements Provider
         PasswdSafeUtil.dbginfo(TAG, "DEX DBX PROVIDER");
         itsContext = ctx;
         SyncLogRecord logrec = new SyncLogRecord("ff", "gg", true);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#init()
+     */
+    public void init()
+    {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#fini()
+     */
+    public void fini()
+    {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
+     */
+    public void startAccountLink(Activity activity, int requestCode)
+    {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
+     */
+    public String finishAccountLink()
+    {
+        return null;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#unlinkAccount()
+     */
+    public void unlinkAccount()
+    {
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#isAccountAuthorized()
+     */
+    public boolean isAccountAuthorized()
+    {
+        return false;
     }
 
 
@@ -73,6 +124,13 @@ public class DropboxProvider implements Provider
     public void updateSyncFreq(Account acct, int freq)
     {
         PasswdSafeUtil.dbginfo(TAG, "updateSyncFreq");
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#requestSync(boolean)
+     */
+    public void requestSync(boolean manual)
+    {
     }
 
     /* (non-Javadoc)

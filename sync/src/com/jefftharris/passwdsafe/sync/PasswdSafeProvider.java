@@ -124,7 +124,7 @@ public class PasswdSafeProvider extends ContentProvider
         case PasswdSafeContract.MATCH_PROVIDER: {
             PasswdSafeUtil.dbginfo(TAG, "Delete provider: %s", uri);
             Long id = Long.valueOf(uri.getPathSegments().get(1));
-            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 DbProvider provider = SyncDb.getProvider(id, db);
@@ -145,7 +145,7 @@ public class PasswdSafeProvider extends ContentProvider
         }
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             PasswdSafeUtil.dbginfo(TAG, "Delete file: %s", uri);
-            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 Long providerId = Long.valueOf(uri.getPathSegments().get(1));
@@ -231,7 +231,7 @@ public class PasswdSafeProvider extends ContentProvider
                 throw new IllegalArgumentException("Invalid type for provider");
             }
             PasswdSafeUtil.dbginfo(TAG, "Insert provider: %s", acct);
-            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 long id = ProviderSyncer.addProvider(acct, type, db,
@@ -256,7 +256,7 @@ public class PasswdSafeProvider extends ContentProvider
             }
             PasswdSafeUtil.dbginfo(TAG, "Insert file \"%s\" for %s",
                                    title, uri);
-            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 Long providerId = Long.valueOf(uri.getPathSegments().get(1));
@@ -306,7 +306,7 @@ public class PasswdSafeProvider extends ContentProvider
                     @Override
                     protected Void doInBackground(Void... params)
                     {
-                        SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+                        SyncDb syncDb = SyncDb.acquire();
                         try {
                             SQLiteDatabase db = syncDb.beginTransaction();
                             ProviderSyncer.validateAccounts(db, getContext());
@@ -421,7 +421,7 @@ public class PasswdSafeProvider extends ContentProvider
             throw new IllegalArgumentException("sortOrder not supported");
         }
 
-        SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+        SyncDb syncDb = SyncDb.acquire();
         try {
             SQLiteDatabase db = syncDb.getDb();
             Cursor c = qb.query(db, projection, selection, selectionArgs,
@@ -449,7 +449,7 @@ public class PasswdSafeProvider extends ContentProvider
         case PasswdSafeContract.MATCH_PROVIDER: {
             PasswdSafeUtil.dbginfo(TAG, "Update provider: %s", uri);
             Long id = Long.valueOf(uri.getPathSegments().get(1));
-            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 DbProvider provider = SyncDb.getProvider(id, db);
@@ -485,7 +485,7 @@ public class PasswdSafeProvider extends ContentProvider
             }
 
             File tmpFile = null;
-            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 Context ctx = getContext();
@@ -556,7 +556,7 @@ public class PasswdSafeProvider extends ContentProvider
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
             long id = Long.valueOf(uri.getPathSegments().get(3));
             DbFile file;
-            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 file = SyncDb.getFile(id, db);
@@ -606,7 +606,7 @@ public class PasswdSafeProvider extends ContentProvider
                 id = Long.valueOf(providerUri.getPathSegments().get(1));
             }
 
-            SyncDb syncDb = SyncApp.acquireSyncDb(getContext());
+            SyncDb syncDb = SyncDb.acquire();
             List<DbProvider> providers;
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();

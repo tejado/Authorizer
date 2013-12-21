@@ -135,7 +135,7 @@ public class ProviderSyncer
     /** Perform synchronization */
     public void performSync(boolean manual)
     {
-        SyncDb syncDb = SyncApp.acquireSyncDb(itsContext);
+        SyncDb syncDb = SyncDb.acquire();
         try {
             performSync(syncDb.getDb(), manual);
         } finally {
