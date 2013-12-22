@@ -44,6 +44,7 @@ import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 
 /**
  *  The PasswdSafeProvider class is a content provider for synced
@@ -497,7 +498,7 @@ public class PasswdSafeProvider extends ContentProvider
                 }
 
                 String localFileName = (file.itsLocalFile != null) ?
-                    file.itsLocalFile : ProviderSyncer.getLocalFileName(id);
+                    file.itsLocalFile : SyncHelper.getLocalFileName(id);
                 tmpFile = File.createTempFile("passwd", ".tmp",
                                               ctx.getFilesDir());
 

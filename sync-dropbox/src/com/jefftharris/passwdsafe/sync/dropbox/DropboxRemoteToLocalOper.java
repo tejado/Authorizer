@@ -4,7 +4,7 @@
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.sync;
+package com.jefftharris.passwdsafe.sync.dropbox;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,6 +28,8 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
+import com.jefftharris.passwdsafe.sync.lib.SyncLibR;
 
 /**
  *  A Dropbox sync operation to sync a remote file to a local file
@@ -52,7 +54,7 @@ public class DropboxRemoteToLocalOper extends DropboxSyncOper
     public void doOper(DbxFileSystem fs, Context ctx) throws IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "syncRemoteToLocal %s", itsFile);
-        itsLocalFileName = ProviderSyncer.getLocalFileName(itsFile.itsId);
+        itsLocalFileName = SyncHelper.getLocalFileName(itsFile.itsId);
 
         DbxPath path = new DbxPath(itsFile.itsRemoteId);
         DbxFile file = null;
@@ -113,7 +115,7 @@ public class DropboxRemoteToLocalOper extends DropboxSyncOper
     @Override
     public String getDescription(Context ctx)
     {
-        return ctx.getString(R.string.sync_oper_remote_to_local,
+        return ctx.getString(SyncLibR.string.sync_oper_remote_to_local,
                              itsFile.itsRemoteTitle +
                              " [" + itsFile.itsRemoteFolder + "]");
     }

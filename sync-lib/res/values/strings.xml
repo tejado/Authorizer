@@ -6,5 +6,10 @@
     <string name="incremental_sync">Incremental sync</string>
     <string name="manual">manual</string>
     <string name="sync_log_record">Sync %1$s, %2$s, %3$s, start: %4$tc, end: %5$tc</string>
+    <string name="sync_oper_local_to_remote">Upload file: %1$s</string>
+    <string name="sync_oper_remote_to_local">Download file: %1$s</string>
+    <string name="sync_oper_rmfile">Remove file: %1$s</string>
+    <string name="sync_oper_rmfile_local">Remove local file: %1$s</string>
+    <string name="sync_oper_rmfile_remote">Remove remote file: %1$s</string>
 
 </resources>

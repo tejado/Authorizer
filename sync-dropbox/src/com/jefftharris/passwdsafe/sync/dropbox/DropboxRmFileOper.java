@@ -4,7 +4,7 @@
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.sync;
+package com.jefftharris.passwdsafe.sync.dropbox;
 
 import java.io.IOException;
 
@@ -17,6 +17,7 @@ import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncLibR;
 
 /**
  *  A Dropbox sync operation to remove a file
@@ -80,11 +81,11 @@ public class DropboxRmFileOper extends DropboxSyncOper
         }
 
         if (itsIsRmLocal && !itsIsRmRemote) {
-            return ctx.getString(R.string.sync_oper_rmfile_local, name);
+            return ctx.getString(SyncLibR.string.sync_oper_rmfile_local, name);
         } else if (!itsIsRmLocal && itsIsRmRemote) {
-            return ctx.getString(R.string.sync_oper_rmfile_remote, name);
+            return ctx.getString(SyncLibR.string.sync_oper_rmfile_remote, name);
         } else {
-            return ctx.getString(R.string.sync_oper_rmfile, name);
+            return ctx.getString(SyncLibR.string.sync_oper_rmfile, name);
         }
     }
 }

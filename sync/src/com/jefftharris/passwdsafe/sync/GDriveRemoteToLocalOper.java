@@ -24,6 +24,7 @@ import com.google.api.services.drive.model.File;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 
 /**
  * A Google Drive sync operation to sync a remote file to a local file
@@ -55,7 +56,7 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
         if (itsDriveFile == null) {
             itsDriveFile = getFile(itsFile.itsRemoteId, drive);
         }
-        itsLocalFileName = ProviderSyncer.getLocalFileName(itsFile.itsId);
+        itsLocalFileName = SyncHelper.getLocalFileName(itsFile.itsId);
         itsIsDownloaded = downloadFile(drive, ctx);
     }
 

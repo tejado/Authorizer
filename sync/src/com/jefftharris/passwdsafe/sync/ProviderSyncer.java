@@ -14,8 +14,6 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
@@ -25,7 +23,7 @@ import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
-import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 
 /**
  *  The ProviderSyncer class syncs password files from cloud services
@@ -126,81 +124,23 @@ public class ProviderSyncer
                                               null);
     }
 
-    /** Get the filename for a local file */
-    public static String getLocalFileName(long fileId)
-    {
-        return "syncfile-" + Long.toString(fileId);
-    }
-
     /** Perform synchronization */
     public void performSync(boolean manual)
     {
         SyncDb syncDb = SyncDb.acquire();
+        SQLiteDatabase db = syncDb.getDb();
         try {
-            performSync(syncDb.getDb(), manual);
+            DbProvider provider = SyncHelper.getDbProviderForAcct(itsAccount,
+                                                                  db);
+            if (provider != null) {
+                Provider providerImpl =
+                        ProviderFactory.getProvider(provider.itsType,
+                                                    itsContext);
+                SyncHelper.performSync(itsAccount, provider, providerImpl,
+                                       manual, db, itsContext);
+            }
         } finally {
             syncDb.release();
-        }
-    }
-
-    /** Perform synchronization with the database */
-    private void performSync(SQLiteDatabase db, boolean manual)
-    {
-        PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s (%s), manual: %b",
-                               itsAccount.name, itsAccount.type, manual);
-
-        /** Check if the syncing account is a valid provider */
-        DbProvider provider = null;
-        try {
-            db.beginTransaction();
-            ProviderType providerType = null;
-            if (itsAccount.type.equals(SyncDb.GDRIVE_ACCOUNT_TYPE)) {
-                providerType = ProviderType.GDRIVE;
-            } else if (itsAccount.type.equals(SyncDb.DROPBOX_ACCOUNT_TYPE)) {
-                providerType = ProviderType.DROPBOX;
-            } else {
-                PasswdSafeUtil.dbginfo(TAG, "Unknown account type: ",
-                                       itsAccount.type);
-                return;
-            }
-            provider = SyncDb.getProvider(itsAccount.name, providerType, db);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-        if (provider == null) {
-            PasswdSafeUtil.dbginfo(TAG, "No provider for %s", itsAccount.name);
-            return;
-        }
-
-        Provider providerImpl =
-                ProviderFactory.getProvider(provider.itsType, itsContext);
-        String displayName = TextUtils.isEmpty(provider.itsDisplayName) ?
-                provider.itsAcct : provider.itsDisplayName;
-        SyncLogRecord logrec =
-                new SyncLogRecord(displayName,
-                                  provider.itsType.getName(itsContext), manual);
-        try {
-            providerImpl.sync(itsAccount, provider, db, manual, logrec);
-        } catch (Exception e) {
-            Log.e(TAG, "Sync error", e);
-            logrec.addFailure(e);
-        }
-        PasswdSafeUtil.dbginfo(TAG, "Sync finished for %s", itsAccount.name);
-        logrec.setEndTime();
-
-        try {
-            db.beginTransaction();
-            Log.i(TAG, logrec.toString(itsContext));
-            SyncDb.deleteSyncLogs(
-                    System.currentTimeMillis() - 2 * DateUtils.WEEK_IN_MILLIS,
-                    db);
-            SyncDb.addSyncLog(logrec, db);
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            Log.e(TAG, "Sync write log error", e);
-        } finally {
-            db.endTransaction();
         }
     }
 }
