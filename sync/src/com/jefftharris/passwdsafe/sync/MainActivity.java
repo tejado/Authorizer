@@ -46,6 +46,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
+import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
 public class MainActivity extends FragmentActivity
@@ -181,8 +182,7 @@ public class MainActivity extends FragmentActivity
             }
             break;
         case DROPBOX_LINK_RC: {
-            SyncApp app = SyncApp.get(this);
-            String acctName = app.finishDropboxLink();
+            String acctName = getDbxProvider().finishAccountLink();
             itsNewAccount = new NewAccountInfo(ProviderType.DROPBOX, acctName,
                                                itsDropboxUri);
             break;
@@ -285,12 +285,12 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to choose a Dropbox account */
     public void onDropboxChoose(View view)
     {
-        SyncApp app = SyncApp.get(this);
+        Provider dbxProvider = getDbxProvider();
         try {
-            app.startDropboxLink(this, DROPBOX_LINK_RC);
+            dbxProvider.startAccountLink(this, DROPBOX_LINK_RC);
         } catch (Exception e) {
             Log.e(TAG, "startDropboxLink failed", e);
-            app.unlinkDropbox();
+            dbxProvider.unlinkAccount();
         }
     }
 
@@ -298,7 +298,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to sync a Dropbox account */
     public void onDropboxSync(View view)
     {
-        SyncApp.get(this).syncDropbox(true);
+        getDbxProvider().requestSync(true);
     }
 
 
@@ -467,7 +467,7 @@ public class MainActivity extends FragmentActivity
                     ProviderSyncFreqPref.freqValueOf(freqVal);
             itsDropboxUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
-            boolean authorized = SyncApp.get(this).isDropboxAuthorized();
+            boolean authorized = getDbxProvider().isAccountAuthorized();
 
             View freqSpinLabel = findViewById(R.id.dropbox_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
@@ -495,6 +495,12 @@ public class MainActivity extends FragmentActivity
     private void setAccount(Uri currAcct, String newAcct, ProviderType acctType)
     {
         new AccountTask(currAcct, newAcct, acctType);
+    }
+
+    /** Get the Dropbox provider */
+    private Provider getDbxProvider()
+    {
+        return ProviderFactory.getProvider(ProviderType.DROPBOX, this);
     }
 
     /** Dialog to prompt when an account is cleared */

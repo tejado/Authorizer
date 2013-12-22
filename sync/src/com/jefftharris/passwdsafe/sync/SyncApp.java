@@ -6,7 +6,6 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
@@ -42,6 +41,8 @@ public class SyncApp extends Application
         itsHandler = new Handler(Looper.getMainLooper());
 
         getDbxProvider().init();
+
+        // TODO: kick off gdrive sync on startup?
     }
 
 
@@ -62,40 +63,6 @@ public class SyncApp extends Application
     public static SyncApp get(Context ctx)
     {
         return (SyncApp)ctx.getApplicationContext();
-    }
-
-
-    /** Start the process of linking to a Dropbox account */
-    public void startDropboxLink(Activity act, int requestCode)
-    {
-        getDbxProvider().startAccountLink(act, requestCode);
-    }
-
-
-    /** Finish the process of linking a Dropbox account */
-    public String finishDropboxLink()
-    {
-        return getDbxProvider().finishAccountLink();
-    }
-
-
-    /** Unlink the Dropbox account */
-    public void unlinkDropbox()
-    {
-        getDbxProvider().unlinkAccount();
-    }
-
-
-    public boolean isDropboxAuthorized()
-    {
-        return getDbxProvider().isAccountAuthorized();
-    }
-
-
-    /** Sync Dropbox */
-    public void syncDropbox(boolean manual)
-    {
-        getDbxProvider().requestSync(manual);
     }
 
 
@@ -128,7 +95,6 @@ public class SyncApp extends Application
     /** Get the Dropbox provider */
     private Provider getDbxProvider()
     {
-        return ProviderFactory.getProvider(ProviderType.DROPBOX,
-                                           getApplicationContext());
+        return ProviderFactory.getProvider(ProviderType.DROPBOX, this);
     }
 }

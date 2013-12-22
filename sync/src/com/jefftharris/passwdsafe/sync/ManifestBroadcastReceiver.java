@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 
 /**
@@ -30,7 +31,9 @@ public class ManifestBroadcastReceiver extends BroadcastReceiver
         PasswdSafeUtil.dbginfo(TAG, "onReceive: %s", intent);
         String action = intent.getAction();
         if (action == Provider.ACTION_SYNC_EXPIRATION_TIMEOUT) {
-            SyncApp.get(ctx).syncDropbox(false);
+            Provider providerImpl =
+                    ProviderFactory.getProvider(ProviderType.DROPBOX, ctx);
+            providerImpl.requestSync(false);
         } else {
             // The app is created in order to launch the receiver
         }
