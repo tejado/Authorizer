@@ -69,17 +69,6 @@
     <import file="custom_rules.xml" optional="true" />
     <import file="../lib/common_rules.xml"/>
     
-    <target name="copyPluginFiles">
-        <mkdir dir="${asset.absolute.dir}"/>
-
-        <copy file="../sync-dropbox/bin/classes.dex"
-            tofile="${asset.absolute.dir}/dropbox-classes.dex"/>
-    </target>
-    
-    <target name="cleanPluginFiles">
-        <delete dir="${asset.absolute.dir}"/>
-    </target>
-
     <!-- Import the actual build file.
 
          To customize existing targets, there are two options:
