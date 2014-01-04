@@ -4,7 +4,7 @@
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.sync;
+package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -22,6 +22,7 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;

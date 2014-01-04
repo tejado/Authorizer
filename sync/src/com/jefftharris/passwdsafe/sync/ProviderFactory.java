@@ -12,6 +12,7 @@ import android.content.Context;
 
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.dropbox.DropboxProvider;
+import com.jefftharris.passwdsafe.sync.gdrive.GDriveProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 
 /**
