@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>PasswdSafeLib</project>
-		<project>PasswdSafeSyncDropbox</project>
 		<project>PasswdSafeSyncLib</project>
 	</projects>
 	<buildSpec>
