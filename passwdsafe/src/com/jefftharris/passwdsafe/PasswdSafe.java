@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2014 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -574,6 +574,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 }
                 case DROPBOX: {
                     titleId = R.string.new_dropbox_file;
+                    break;
+                }
+                case BOX: {
+                    titleId = R.string.new_box_file;
                     break;
                 }
                 }

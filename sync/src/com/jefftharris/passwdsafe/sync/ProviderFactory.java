@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -11,6 +11,7 @@ import java.util.EnumMap;
 import android.content.Context;
 
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.sync.box.BoxProvider;
 import com.jefftharris.passwdsafe.sync.dropbox.DropboxProvider;
 import com.jefftharris.passwdsafe.sync.gdrive.GDriveProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
@@ -37,6 +38,10 @@ public class ProviderFactory
             }
             case DROPBOX: {
                 provider = new DropboxProvider(appCtx);
+                break;
+            }
+            case BOX: {
+                provider = new BoxProvider(appCtx);
                 break;
             }
             }

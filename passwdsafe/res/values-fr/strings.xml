@@ -122,6 +122,7 @@
     <string name="modified">Modifié</string>
     <string name="n_a">N/A</string>
     <string name="name">Nom</string>
+    <string name="new_box_file">Nouveau fichier de Box</string>
     <string name="new_entry">Nouvelle entrée</string>
     <string name="new_file">Nouveau fichier</string>
     <string name="new_drive_file">Nouveau fichier de Drive</string>

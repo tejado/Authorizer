@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -104,6 +104,22 @@ public class MainActivity extends FragmentActivity
             }
         });
 
+        freqSpin = (Spinner)findViewById(R.id.box_interval);
+        freqSpin.setOnItemSelectedListener(new OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id)
+            {
+                onBoxFreqChanged(pos);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+            }
+        });
+
         // Check the state of Google Play services
         int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (rc != ConnectionResult.SUCCESS) {
@@ -113,6 +129,7 @@ public class MainActivity extends FragmentActivity
 
         updateGdriveAccount(null);
         updateDropboxAccount(null);
+        updateBoxAccount(null);
         LoaderManager lm = getSupportLoaderManager();
         lm.initLoader(LOADER_PROVIDERS, null, this);
     }
@@ -318,6 +335,33 @@ public class MainActivity extends FragmentActivity
         new AccountTask(freq, itsDropboxUri, ProviderType.DROPBOX);
     }
 
+    /** Button onClick handler to choose a Box account */
+    public void onBoxChoose(View view)
+    {
+        // TODO: implement
+    }
+
+
+    /** Button onClick handler to sync a Box account */
+    public void onBoxSync(View view)
+    {
+        // TODO: implement
+    }
+
+
+    /** Button onClick handler to clear a Box account */
+    public void onBoxClear(View view)
+    {
+        // TODO: implement
+    }
+
+
+    /** Box sync frequency spinner changed */
+    private void onBoxFreqChanged(int pos)
+    {
+        // TODO: implement
+    }
+
     /* (non-Javadoc)
      * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
      */
@@ -337,6 +381,7 @@ public class MainActivity extends FragmentActivity
     {
         boolean hasGdrive = false;
         boolean hasDropbox = false;
+        boolean hasBox = false;
         for (boolean more = cursor.moveToFirst(); more;
                 more = cursor.moveToNext()) {
             String typeStr = cursor.getString(
@@ -354,6 +399,11 @@ public class MainActivity extends FragmentActivity
                     updateDropboxAccount(cursor);
                     break;
                 }
+                case BOX: {
+                    hasBox = true;
+                    updateBoxAccount(cursor);
+                    break;
+                }
                 }
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Unknown type: " + typeStr);
@@ -365,6 +415,9 @@ public class MainActivity extends FragmentActivity
         if (!hasDropbox) {
             updateDropboxAccount(null);
         }
+        if (!hasBox) {
+            updateBoxAccount(null);
+        }
     }
 
     /* (non-Javadoc)
@@ -375,6 +428,7 @@ public class MainActivity extends FragmentActivity
     {
         updateGdriveAccount(null);
         updateDropboxAccount(null);
+        updateBoxAccount(null);
     }
 
 
@@ -485,6 +539,58 @@ public class MainActivity extends FragmentActivity
             syncBtn.setEnabled(authorized);
         } else {
             itsDropboxUri = null;
+            chooseBtn.setVisibility(View.VISIBLE);
+            acctView.setVisibility(View.GONE);
+            btns.setVisibility(View.GONE);
+        }
+    }
+
+    /** Update the UI when the Box account is changed */
+    private final void updateBoxAccount(Cursor cursor)
+    {
+        View chooseBtn = findViewById(R.id.box_choose);
+        TextView acctView = (TextView)findViewById(R.id.box_acct);
+        View btns = findViewById(R.id.box_controls);
+        if (cursor != null) {
+            long id = cursor.getLong(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_ID);
+            String acct = cursor.getString(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+            int freqVal = cursor.getInt(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
+            ProviderSyncFreqPref freq =
+                    ProviderSyncFreqPref.freqValueOf(freqVal);
+            // TODO: implement
+            /*
+            GoogleAccountManager acctMgr = new GoogleAccountManager(this);
+            itsGdriveAccount = acctMgr.getAccountByName(acct);
+            itsGdriveUri = ContentUris.withAppendedId(
+                    PasswdSafeContract.Providers.CONTENT_URI, id);
+            */
+            View freqSpinLabel = findViewById(R.id.box_interval_label);
+            Spinner freqSpin = (Spinner)findViewById(R.id.box_interval);
+            freqSpin.setSelection(freq.getDisplayIdx());
+            View syncBtn = findViewById(R.id.box_sync);
+            chooseBtn.setVisibility(View.GONE);
+            acctView.setVisibility(View.VISIBLE);
+            btns.setVisibility(View.VISIBLE);
+
+            // TODO: implement
+            boolean haveAccount = false;//(itsGdriveAccount != null);
+            if (haveAccount) {
+//                acctView.setText(getString(R.string.account_label,
+//                                           itsGdriveAccount.name));
+            } else {
+                acctView.setText(getString(R.string.account_not_exists_label,
+                                           acct));
+            }
+            freqSpin.setEnabled(haveAccount);
+            freqSpinLabel.setEnabled(haveAccount);
+            syncBtn.setEnabled(haveAccount);
+        } else {
+            // TODO: implement
+            //itsGdriveAccount = null;
+            //itsGdriveUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
             btns.setVisibility(View.GONE);

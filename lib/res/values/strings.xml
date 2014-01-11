@@ -3,6 +3,7 @@
     <string name="about">About</string>
     <string name="about_details">Version: %1$s\nBuild ID: %2$s\nBuild Date: %3$s\n\n%4$s:\n%5$s</string>
     <string name="app_name">PasswdSafe LIBRARY</string>
+    <string name="box">Box</string>
     <string name="close">Close</string>
     <string name="copy_clipboard_error">%1$s - Error copying to the clipboard.  The error may be due to a known error in Samsung devices.</string>
     <string name="copy_trace_and_close">Copy Trace and Close</string>

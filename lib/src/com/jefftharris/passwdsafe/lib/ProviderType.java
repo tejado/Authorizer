@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -16,7 +16,8 @@ import android.widget.TextView;
 public enum ProviderType
 {
     GDRIVE,
-    DROPBOX;
+    DROPBOX,
+    BOX;
 
     /** Set the ImageView to the icon of the provider type */
     public void setIcon(ImageView iv)
@@ -28,6 +29,10 @@ public enum ProviderType
         }
         case DROPBOX: {
             iv.setImageResource(R.drawable.dropbox);
+            break;
+        }
+        case BOX: {
+            iv.setImageResource(R.drawable.box);
             break;
         }
         }
@@ -48,6 +53,9 @@ public enum ProviderType
         }
         case DROPBOX: {
             return context.getString(R.string.dropbox);
+        }
+        case BOX: {
+            return context.getString(R.string.box);
         }
         }
         return null;
