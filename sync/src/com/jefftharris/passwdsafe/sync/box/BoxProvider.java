@@ -11,8 +11,11 @@ import java.io.File;
 import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.box.boxandroidlibv2.BoxAndroidClient;
+import com.box.boxandroidlibv2.activities.OAuthActivity;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
@@ -23,12 +26,20 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
  */
 public class BoxProvider implements Provider
 {
+    private static final String BOX_CLIENT_ID =
+            "rjgu7xf2ih5fvzb1cdhdnfmr4ncw1jes";
+    private static final String BOX_CLIENT_SECRET =
+            "nuHnpyoGIEYceudysLyBvcBsWSHJdXUy";
+
     private final Context itsContext;
+    private final BoxAndroidClient itsClient;
 
     /** Constructor */
     public BoxProvider(Context ctx)
     {
         itsContext = ctx;
+        itsClient = new BoxAndroidClient(BOX_CLIENT_ID, BOX_CLIENT_SECRET,
+                                         null, null);
     }
 
     /* (non-Javadoc)
@@ -57,8 +68,9 @@ public class BoxProvider implements Provider
     @Override
     public void startAccountLink(Activity activity, int requestCode)
     {
-        // TODO Auto-generated method stub
-
+        Intent intent = OAuthActivity.createOAuthActivityIntent(
+                activity, BOX_CLIENT_ID, BOX_CLIENT_SECRET, false);
+        activity.startActivityForResult(intent, requestCode);
     }
 
     /* (non-Javadoc)

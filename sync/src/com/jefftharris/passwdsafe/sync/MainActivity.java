@@ -8,6 +8,7 @@ package com.jefftharris.passwdsafe.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -36,6 +37,8 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.box.boxandroidlibv2.activities.OAuthActivity;
+import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -56,6 +59,7 @@ public class MainActivity extends FragmentActivity
 
     private static final int CHOOSE_ACCOUNT_RC = 0;
     private static final int DROPBOX_LINK_RC = 1;
+    private static final int BOX_AUTH_RC = 2;
 
     private static final int LOADER_PROVIDERS = 0;
 
@@ -204,6 +208,24 @@ public class MainActivity extends FragmentActivity
                                                itsDropboxUri);
             break;
         }
+        case BOX_AUTH_RC: {
+            if (resultCode == Activity.RESULT_CANCELED) {
+                String failure = null;
+                if (data != null) {
+                    failure = data.getStringExtra(OAuthActivity.ERROR_MESSAGE);
+                }
+                Log.e(TAG, "Box auth failed: " + failure);
+            } else {
+                BoxAndroidOAuthData authdata =
+                        data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
+                PasswdSafeUtil.dbginfo(TAG, "Box auth succeeded: %s %d %s %s",
+                                       authdata.getAccessToken(),
+                                       authdata.getExpiresIn(),
+                                       authdata.getRefreshToken(),
+                                       authdata.getTokenType());
+            }
+            break;
+        }
         default: {
             super.onActivityResult(requestCode, resultCode, data);
             break;
@@ -338,7 +360,13 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to choose a Box account */
     public void onBoxChoose(View view)
     {
-        // TODO: implement
+        Provider boxProvider = getBoxProvider();
+        try {
+            boxProvider.startAccountLink(this, BOX_AUTH_RC);
+        } catch (Exception e) {
+            Log.e(TAG, "Box startAccountLink failed", e);
+            boxProvider.unlinkAccount();
+        }
     }
 
 
@@ -607,6 +635,12 @@ public class MainActivity extends FragmentActivity
     private Provider getDbxProvider()
     {
         return ProviderFactory.getProvider(ProviderType.DROPBOX, this);
+    }
+
+    /** Get the Box provider */
+    private Provider getBoxProvider()
+    {
+        return ProviderFactory.getProvider(ProviderType.BOX, this);
     }
 
     /** Dialog to prompt when an account is cleared */

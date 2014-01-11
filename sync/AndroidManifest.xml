@@ -81,6 +81,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="com.box.boxandroidlibv2.activities.OAuthActivity" />
+
         <provider
             android:name=".PasswdSafeProvider"
             android:authorities="com.jefftharris.passwdsafe.sync.provider"
