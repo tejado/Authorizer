@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -40,9 +40,9 @@ public class SyncApp extends Application
         SyncDb.initializeDb(getApplicationContext());
         itsHandler = new Handler(Looper.getMainLooper());
 
-        getDbxProvider().init();
-
-        // TODO: kick off gdrive sync on startup?
+        for (ProviderType type: ProviderType.values()) {
+            ProviderFactory.getProvider(type, this).init();
+        }
     }
 
 
@@ -53,7 +53,9 @@ public class SyncApp extends Application
     public void onTerminate()
     {
         PasswdSafeUtil.dbginfo(TAG, "onTerminate");
-        getDbxProvider().fini();
+        for (ProviderType type: ProviderType.values()) {
+            ProviderFactory.getProvider(type, this).fini();
+        }
         SyncDb.finalizeDb();
         super.onTerminate();
     }
@@ -89,12 +91,5 @@ public class SyncApp extends Application
                 }
             }
         });
-    }
-
-
-    /** Get the Dropbox provider */
-    private Provider getDbxProvider()
-    {
-        return ProviderFactory.getProvider(ProviderType.DROPBOX, this);
     }
 }
