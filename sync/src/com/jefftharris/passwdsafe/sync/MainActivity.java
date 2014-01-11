@@ -49,6 +49,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
+import com.jefftharris.passwdsafe.sync.lib.NewAccountInfo;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
@@ -175,7 +176,7 @@ public class MainActivity extends FragmentActivity
     {
         super.onResumeFragments();
         if (itsNewAccount != null) {
-            setAccount(itsNewAccount.itsCurrAccountUri,
+            setAccount(itsNewAccount.itsProviderAccountUri,
                        itsNewAccount.itsAccount,
                        itsNewAccount.itsProviderType);
             itsNewAccount = null;
@@ -787,22 +788,6 @@ public class MainActivity extends FragmentActivity
         {
             super.onPostExecute(arg);
             itsProgressFrag.dismiss();
-        }
-    }
-
-    /** Information for a new account */
-    private static class NewAccountInfo
-    {
-        public final ProviderType itsProviderType;
-        public final String itsAccount;
-        public final Uri itsCurrAccountUri;
-
-        /** Constructor */
-        public NewAccountInfo(ProviderType type, String acct, Uri currAcctUri)
-        {
-            itsProviderType = type;
-            itsAccount = acct;
-            itsCurrAccountUri = currAcctUri;
         }
     }
 }
