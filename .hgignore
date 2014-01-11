@@ -1,3 +1,6 @@
+^box-lib/bin
+^box-lib/local.properties
+^box-lib/gen
 ^lib/bin
 ^lib/local.properties
 ^lib/gen
