@@ -4,7 +4,6 @@
 ^passwdsafe/bin
 ^passwdsafe/local.properties
 ^passwdsafe/gen
-^sync/assets/.*-classes.dex
 ^sync/bin
 ^sync/local.properties
 ^sync/gen
