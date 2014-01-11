@@ -204,9 +204,7 @@ public class MainActivity extends FragmentActivity
             }
             break;
         case DROPBOX_LINK_RC: {
-            String acctName = getDbxProvider().finishAccountLink();
-            itsNewAccount = new NewAccountInfo(ProviderType.DROPBOX, acctName,
-                                               itsDropboxUri);
+            itsNewAccount = getDbxProvider().finishAccountLink(itsDropboxUri);
             break;
         }
         case BOX_AUTH_RC: {

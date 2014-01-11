@@ -13,11 +13,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.activities.OAuthActivity;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.NewAccountInfo;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
@@ -77,10 +80,10 @@ public class BoxProvider implements Provider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
      */
     @Override
-    public String finishAccountLink()
+    public NewAccountInfo finishAccountLink(Uri acctProviderUri)
     {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: implement
+        return new NewAccountInfo(ProviderType.BOX, null, acctProviderUri);
     }
 
     /* (non-Javadoc)

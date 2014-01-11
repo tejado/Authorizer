@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -46,6 +47,7 @@ import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.NewAccountInfo;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
@@ -122,11 +124,13 @@ public class DropboxProvider implements Provider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
      */
     @Override
-    public String finishAccountLink()
+    public NewAccountInfo finishAccountLink(Uri acctProviderUri)
     {
         updateDropboxAcct();
         DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();
-        return (acct == null) ? null : acct.getUserId();
+        return new NewAccountInfo(ProviderType.DROPBOX,
+                                  (acct == null) ? null : acct.getUserId(),
+                                  acctProviderUri);
     }
 
 

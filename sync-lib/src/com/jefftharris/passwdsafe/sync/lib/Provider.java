@@ -11,6 +11,7 @@ import java.io.File;
 import android.accounts.Account;
 import android.app.Activity;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 
 /**
  * The Provider interface encapsulates a service that provides files which are
@@ -31,7 +32,7 @@ public interface Provider
     public void startAccountLink(Activity activity, int requestCode);
 
     /** Finish the process of linking to an account */
-    public String finishAccountLink();
+    public NewAccountInfo finishAccountLink(Uri providerAcctUri);
 
     /** Unlink an account */
     public void unlinkAccount();
