@@ -294,8 +294,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to clear a GDrive account */
     public void onGdriveClear(View view)
     {
-        DialogFragment prompt = ClearPromptDlg.newInstance(itsGdriveUri,
-                                                           ProviderType.GDRIVE);
+        DialogFragment prompt = ClearPromptDlg.newInstance(itsGdriveUri);
         prompt.show(getSupportFragmentManager(), null);
     }
 
@@ -330,8 +329,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to clear a Dropbox account */
     public void onDropboxClear(View view)
     {
-        DialogFragment prompt =
-                ClearPromptDlg.newInstance(itsDropboxUri, ProviderType.DROPBOX);
+        DialogFragment prompt = ClearPromptDlg.newInstance(itsDropboxUri);
         prompt.show(getSupportFragmentManager(), null);
     }
 
@@ -597,31 +595,16 @@ public class MainActivity extends FragmentActivity
         }
     }
 
-    /** Set the new account to use with the app */
-    private void setAccount(Uri currAcct,
-                            final String newAcct,
-                            final ProviderType acctType)
+    /** Remove an account */
+    private void removeAccount(Uri currAcct)
     {
-        new AccountUpdateTask(
-                currAcct,
-                getString((newAcct == null) ?
-                        R.string.removing_account : R.string.adding_account))
+        new AccountUpdateTask(currAcct, getString(R.string.removing_account))
         {
             @Override
             protected void doAccountUpdate(ContentResolver cr)
             {
-                // Stop syncing for the previously selected account.
                 if (itsAccountUri != null) {
                     cr.delete(itsAccountUri, null, null);
-                }
-
-                if (newAcct != null) {
-                    ContentValues values = new ContentValues();
-                    values.put(PasswdSafeContract.Providers.COL_ACCT,
-                               newAcct);
-                    values.put(PasswdSafeContract.Providers.COL_TYPE,
-                               acctType.name());
-                    cr.insert(PasswdSafeContract.Providers.CONTENT_URI, values);
                 }
             }
         }.startTask(this);
@@ -659,13 +642,11 @@ public class MainActivity extends FragmentActivity
     public static class ClearPromptDlg extends DialogFragment
     {
         /** Create an instance of the dialog */
-        public static ClearPromptDlg newInstance(Uri currAcct,
-                                                 ProviderType providerType)
+        public static ClearPromptDlg newInstance(Uri currAcct)
         {
             ClearPromptDlg dlg = new ClearPromptDlg();
             Bundle args = new Bundle();
             args.putParcelable("currAcct", currAcct);
-            args.putString("providerType", providerType.name());
             dlg.setArguments(args);
             return dlg;
         }
@@ -678,8 +659,6 @@ public class MainActivity extends FragmentActivity
         {
             Bundle args = getArguments();
             final Uri currAcct = args.getParcelable("currAcct");
-            final ProviderType providerType =
-                    ProviderType.fromString(args.getString("providerType"));
 
             AlertDialog.Builder builder =
                     new AlertDialog.Builder(getActivity());
@@ -692,7 +671,7 @@ public class MainActivity extends FragmentActivity
                 public void onClick(DialogInterface dialog, int which)
                 {
                     MainActivity act = (MainActivity)getActivity();
-                    act.setAccount(currAcct, null, providerType);
+                    act.removeAccount(currAcct);
                 }
             })
             .setNegativeButton(android.R.string.no, null);
