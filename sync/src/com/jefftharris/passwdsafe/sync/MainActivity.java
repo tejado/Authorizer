@@ -18,7 +18,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -46,6 +45,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
+import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountInfo;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
@@ -670,11 +670,9 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Async task to set the account */
-    private class AccountTask extends AsyncTask<Void, Void, Void>
+    private class AccountTask extends AccountUpdateTask
     {
         private final AccountTaskType itsType;
-        private final Uri itsCurrAccount;
-        private ProgressFragment itsProgressFrag;
         private final String itsNewAccount;
         private final ProviderType itsProviderType;
         private final ProviderSyncFreqPref itsUpdateFreq;
@@ -682,85 +680,59 @@ public class MainActivity extends FragmentActivity
         /** Constructor for add/remove */
         public AccountTask(Uri currAcct, String newAcct, ProviderType type)
         {
+            super(currAcct,
+                  getString((newAcct == null) ?
+                          R.string.removing_account : R.string.adding_account));
             itsType = AccountTaskType.ADD_REMOVE;
-            itsCurrAccount = currAcct;
             itsNewAccount = newAcct;
             itsProviderType = type;
             itsUpdateFreq = null;
-            String msg = getString((newAcct == null) ?
-                    R.string.removing_account : R.string.adding_account);
-            init(msg);
+            startTask(MainActivity.this);
         }
 
         /** Constructor for updating the sync frequency */
         public AccountTask(ProviderSyncFreqPref freq,
                            Uri currAccount, ProviderType type)
         {
+            super(currAccount,
+                  getString(R.string.updating_account));
             itsType = AccountTaskType.UPDATE_SYNC_FREQ;
-            itsCurrAccount = currAccount;
             itsNewAccount = null;
             itsProviderType = type;
             itsUpdateFreq = freq;
-            init(getString(R.string.updating_account));
+            startTask(MainActivity.this);
         }
 
-        /** Initialize the task */
-        private void init(String msg)
-        {
-            itsProgressFrag = ProgressFragment.newInstance(msg);
-            itsProgressFrag.show(getSupportFragmentManager(), null);
-            execute();
-        }
 
-        /* (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
-        protected Void doInBackground(Void... params)
+        protected void doAccountUpdate(ContentResolver cr)
         {
-            try {
-                ContentResolver cr = MainActivity.this.getContentResolver();
-
-                switch (itsType) {
-                case ADD_REMOVE: {
-                    // Stop syncing for the previously selected account.
-                    if (itsCurrAccount != null) {
-                        cr.delete(itsCurrAccount, null, null);
-                    }
-
-                    if (itsNewAccount != null) {
-                        ContentValues values = new ContentValues();
-                        values.put(PasswdSafeContract.Providers.COL_ACCT,
-                                   itsNewAccount);
-                        values.put(PasswdSafeContract.Providers.COL_TYPE,
-                                   itsProviderType.name());
-                        cr.insert(PasswdSafeContract.Providers.CONTENT_URI,
-                                  values);
-                    }
-                    break;
+            switch (itsType) {
+            case ADD_REMOVE: {
+                // Stop syncing for the previously selected account.
+                if (itsAccountUri != null) {
+                    cr.delete(itsAccountUri, null, null);
                 }
-                case UPDATE_SYNC_FREQ: {
+
+                if (itsNewAccount != null) {
                     ContentValues values = new ContentValues();
-                    values.put(PasswdSafeContract.Providers.COL_SYNC_FREQ,
-                               itsUpdateFreq.getFreq());
-                    cr.update(itsCurrAccount, values, null, null);
-                    break;
+                    values.put(PasswdSafeContract.Providers.COL_ACCT,
+                               itsNewAccount);
+                    values.put(PasswdSafeContract.Providers.COL_TYPE,
+                               itsProviderType.name());
+                    cr.insert(PasswdSafeContract.Providers.CONTENT_URI,
+                              values);
                 }
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Account update error", e);
+                break;
             }
-            return null;
-        }
-
-        /* (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(Void arg)
-        {
-            super.onPostExecute(arg);
-            itsProgressFrag.dismiss();
+            case UPDATE_SYNC_FREQ: {
+                ContentValues values = new ContentValues();
+                values.put(PasswdSafeContract.Providers.COL_SYNC_FREQ,
+                           itsUpdateFreq.getFreq());
+                cr.update(itsAccountUri, values, null, null);
+                break;
+            }
+            }
         }
     }
 }

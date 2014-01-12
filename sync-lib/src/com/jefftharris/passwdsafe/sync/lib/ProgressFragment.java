@@ -5,7 +5,7 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.sync;
+package com.jefftharris.passwdsafe.sync.lib;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -17,7 +17,7 @@ import android.support.v4.app.DialogFragment;
  */
 public class ProgressFragment extends DialogFragment
 {
-    static ProgressFragment newInstance(String msg)
+    public static ProgressFragment newInstance(String msg)
     {
         ProgressFragment frag = new ProgressFragment();
         Bundle args = new Bundle();
