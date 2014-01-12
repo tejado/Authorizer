@@ -191,6 +191,7 @@ public class MainActivity extends FragmentActivity
     {
         switch (requestCode) {
         case CHOOSE_ACCOUNT_RC:
+            // TODO: use finishAccountLink
             if (data != null) {
                 Bundle b = data.getExtras();
                 String accountName =
@@ -204,7 +205,9 @@ public class MainActivity extends FragmentActivity
             }
             break;
         case DROPBOX_LINK_RC: {
-            itsNewAccount = getDbxProvider().finishAccountLink(itsDropboxUri);
+            itsNewAccount = getDbxProvider().finishAccountLink(resultCode,
+                                                               data,
+                                                               itsDropboxUri);
             break;
         }
         case BOX_AUTH_RC: {

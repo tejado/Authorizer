@@ -124,7 +124,9 @@ public class DropboxProvider implements Provider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
      */
     @Override
-    public NewAccountInfo finishAccountLink(Uri acctProviderUri)
+    public NewAccountInfo finishAccountLink(int activityResult,
+                                            Intent activityData,
+                                            Uri acctProviderUri)
     {
         updateDropboxAcct();
         DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();

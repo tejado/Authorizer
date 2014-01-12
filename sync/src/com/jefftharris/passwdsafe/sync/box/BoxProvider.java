@@ -80,7 +80,9 @@ public class BoxProvider implements Provider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
      */
     @Override
-    public NewAccountInfo finishAccountLink(Uri acctProviderUri)
+    public NewAccountInfo finishAccountLink(int activityResult,
+                                            Intent activityData,
+                                            Uri acctProviderUri)
     {
         // TODO: implement
         return new NewAccountInfo(ProviderType.BOX, null, acctProviderUri);

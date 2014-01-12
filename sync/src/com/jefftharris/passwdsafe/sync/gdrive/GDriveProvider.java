@@ -20,6 +20,7 @@ import android.accounts.Account;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -111,7 +112,9 @@ public class GDriveProvider implements Provider
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
      */
-    public NewAccountInfo finishAccountLink(Uri acctProviderUri)
+    public NewAccountInfo finishAccountLink(int activityResult,
+                                            Intent activityData,
+                                            Uri acctProviderUri)
     {
         return new NewAccountInfo(ProviderType.GDRIVE, null, acctProviderUri);
     }
