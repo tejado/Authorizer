@@ -19,7 +19,7 @@ import com.jefftharris.passwdsafe.lib.ProviderType;
  */
 public class NewAccountTask extends AccountUpdateTask
 {
-    private String itsNewAcct;
+    protected String itsNewAcct;
     private ProviderType itsAcctType;
 
     /** Constructor */

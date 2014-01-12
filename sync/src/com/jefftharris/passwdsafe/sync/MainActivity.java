@@ -364,7 +364,8 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to clear a Box account */
     public void onBoxClear(View view)
     {
-        // TODO: implement
+        DialogFragment prompt = ClearPromptDlg.newInstance(itsBoxUri);
+        prompt.show(getSupportFragmentManager(), null);
     }
 
 

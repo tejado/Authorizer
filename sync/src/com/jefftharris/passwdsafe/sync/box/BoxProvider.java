@@ -10,6 +10,7 @@ import java.io.File;
 
 import android.accounts.Account;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,6 +20,10 @@ import android.util.Log;
 import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.activities.OAuthActivity;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
+import com.box.boxjavalibv2.dao.BoxUser;
+import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
+import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
+import com.box.restclientv2.exceptions.BoxSDKException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
@@ -89,6 +94,7 @@ public class BoxProvider implements Provider
                                             Intent activityData,
                                             Uri acctProviderUri)
     {
+        BoxAndroidOAuthData authdata = null;
         if (activityResult == Activity.RESULT_CANCELED) {
             String failure = null;
             if (activityData != null) {
@@ -98,17 +104,35 @@ public class BoxProvider implements Provider
             Log.e(TAG, "Box auth failed: " + failure);
             // TODO: better error
         } else {
-            BoxAndroidOAuthData authdata = activityData.getParcelableExtra(
+            authdata = activityData.getParcelableExtra(
                     OAuthActivity.BOX_CLIENT_OAUTH);
-            PasswdSafeUtil.dbginfo(TAG, "Box auth succeeded: %s %d %s %s",
-                                   authdata.getAccessToken(),
-                                   authdata.getExpiresIn(),
-                                   authdata.getRefreshToken(),
-                                   authdata.getTokenType());
         }
+        itsClient.authenticate(authdata);
         // TODO: implement
         return new NewAccountTask(acctProviderUri, null, ProviderType.BOX,
-                                  itsContext);
+                                  itsContext)
+        {
+            /* (non-Javadoc)
+             * @see com.jefftharris.passwdsafe.sync.lib.NewAccountTask#doAccountUpdate(android.content.ContentResolver)
+             */
+            @Override
+            protected void doAccountUpdate(ContentResolver cr)
+            {
+                itsNewAcct = null;
+                if (itsClient.isAuthenticated()) {
+                    BoxUsersManager userMgr = itsClient.getUsersManager();
+                    BoxDefaultRequestObject req = new BoxDefaultRequestObject();
+                    try {
+                        BoxUser user = userMgr.getCurrentUser(req);
+                        itsNewAcct = user.getId();
+                    } catch (BoxSDKException e) {
+                        // TODO: better error
+                        Log.e(TAG, "Failed to get user", e);
+                    }
+                }
+                super.doAccountUpdate(cr);
+            }
+        };
     }
 
     /* (non-Javadoc)
