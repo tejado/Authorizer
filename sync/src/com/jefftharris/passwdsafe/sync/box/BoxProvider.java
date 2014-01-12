@@ -14,9 +14,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.activities.OAuthActivity;
+import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
@@ -33,6 +36,8 @@ public class BoxProvider implements Provider
             "rjgu7xf2ih5fvzb1cdhdnfmr4ncw1jes";
     private static final String BOX_CLIENT_SECRET =
             "nuHnpyoGIEYceudysLyBvcBsWSHJdXUy";
+
+    private static final String TAG = "BoxProvider";
 
     private final Context itsContext;
     private final BoxAndroidClient itsClient;
@@ -84,6 +89,23 @@ public class BoxProvider implements Provider
                                             Intent activityData,
                                             Uri acctProviderUri)
     {
+        if (activityResult == Activity.RESULT_CANCELED) {
+            String failure = null;
+            if (activityData != null) {
+                failure = activityData.getStringExtra(
+                        OAuthActivity.ERROR_MESSAGE);
+            }
+            Log.e(TAG, "Box auth failed: " + failure);
+            // TODO: better error
+        } else {
+            BoxAndroidOAuthData authdata = activityData.getParcelableExtra(
+                    OAuthActivity.BOX_CLIENT_OAUTH);
+            PasswdSafeUtil.dbginfo(TAG, "Box auth succeeded: %s %d %s %s",
+                                   authdata.getAccessToken(),
+                                   authdata.getExpiresIn(),
+                                   authdata.getRefreshToken(),
+                                   authdata.getTokenType());
+        }
         // TODO: implement
         return new NewAccountInfo(ProviderType.BOX, null, acctProviderUri);
     }

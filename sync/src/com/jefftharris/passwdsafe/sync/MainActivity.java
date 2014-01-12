@@ -8,7 +8,6 @@ package com.jefftharris.passwdsafe.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -37,8 +36,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.box.boxandroidlibv2.activities.OAuthActivity;
-import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -67,6 +64,7 @@ public class MainActivity extends FragmentActivity
     private Account itsGdriveAccount = null;
     private Uri itsGdriveUri = null;
     private Uri itsDropboxUri = null;
+    private Uri itsBoxUri = null;
 
     private NewAccountInfo itsNewAccount = null;
 
@@ -211,21 +209,9 @@ public class MainActivity extends FragmentActivity
             break;
         }
         case BOX_AUTH_RC: {
-            if (resultCode == Activity.RESULT_CANCELED) {
-                String failure = null;
-                if (data != null) {
-                    failure = data.getStringExtra(OAuthActivity.ERROR_MESSAGE);
-                }
-                Log.e(TAG, "Box auth failed: " + failure);
-            } else {
-                BoxAndroidOAuthData authdata =
-                        data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
-                PasswdSafeUtil.dbginfo(TAG, "Box auth succeeded: %s %d %s %s",
-                                       authdata.getAccessToken(),
-                                       authdata.getExpiresIn(),
-                                       authdata.getRefreshToken(),
-                                       authdata.getTokenType());
-            }
+            itsNewAccount = getBoxProvider().finishAccountLink(resultCode,
+                                                               data,
+                                                               itsBoxUri);
             break;
         }
         default: {
@@ -584,19 +570,15 @@ public class MainActivity extends FragmentActivity
         if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
-            String acct = cursor.getString(
-                    PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+            String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
             int freqVal = cursor.getInt(
                     PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
             ProviderSyncFreqPref freq =
                     ProviderSyncFreqPref.freqValueOf(freqVal);
-            // TODO: implement
-            /*
-            GoogleAccountManager acctMgr = new GoogleAccountManager(this);
-            itsGdriveAccount = acctMgr.getAccountByName(acct);
-            itsGdriveUri = ContentUris.withAppendedId(
+            itsBoxUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
-            */
+            boolean authorized = getBoxProvider().isAccountAuthorized();
+
             View freqSpinLabel = findViewById(R.id.box_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.box_interval);
             freqSpin.setSelection(freq.getDisplayIdx());
@@ -605,22 +587,12 @@ public class MainActivity extends FragmentActivity
             acctView.setVisibility(View.VISIBLE);
             btns.setVisibility(View.VISIBLE);
 
-            // TODO: implement
-            boolean haveAccount = false;//(itsGdriveAccount != null);
-            if (haveAccount) {
-//                acctView.setText(getString(R.string.account_label,
-//                                           itsGdriveAccount.name));
-            } else {
-                acctView.setText(getString(R.string.account_not_exists_label,
-                                           acct));
-            }
-            freqSpin.setEnabled(haveAccount);
-            freqSpinLabel.setEnabled(haveAccount);
-            syncBtn.setEnabled(haveAccount);
+            acctView.setText(getString(R.string.account_label, acct));
+            freqSpin.setEnabled(true);
+            freqSpinLabel.setEnabled(true);
+            syncBtn.setEnabled(authorized);
         } else {
-            // TODO: implement
-            //itsGdriveAccount = null;
-            //itsGdriveUri = null;
+            itsBoxUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
             btns.setVisibility(View.GONE);
