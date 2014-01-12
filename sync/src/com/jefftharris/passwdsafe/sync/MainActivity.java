@@ -306,7 +306,7 @@ public class MainActivity extends FragmentActivity
     private void onGdriveFreqChanged(int pos)
     {
         ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
-        new AccountTask(freq, itsGdriveUri, ProviderType.GDRIVE);
+        updateSyncFreq(freq, itsGdriveUri);
     }
 
     /** Button onClick handler to choose a Dropbox account */
@@ -342,7 +342,7 @@ public class MainActivity extends FragmentActivity
     private void onDropboxFreqChanged(int pos)
     {
         ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
-        new AccountTask(freq, itsDropboxUri, ProviderType.DROPBOX);
+        updateSyncFreq(freq, itsDropboxUri);
     }
 
     /** Button onClick handler to choose a Box account */
@@ -600,9 +600,49 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Set the new account to use with the app */
-    private void setAccount(Uri currAcct, String newAcct, ProviderType acctType)
+    private void setAccount(Uri currAcct,
+                            final String newAcct,
+                            final ProviderType acctType)
     {
-        new AccountTask(currAcct, newAcct, acctType);
+        new AccountUpdateTask(
+                currAcct,
+                getString((newAcct == null) ?
+                        R.string.removing_account : R.string.adding_account))
+        {
+            @Override
+            protected void doAccountUpdate(ContentResolver cr)
+            {
+                // Stop syncing for the previously selected account.
+                if (itsAccountUri != null) {
+                    cr.delete(itsAccountUri, null, null);
+                }
+
+                if (newAcct != null) {
+                    ContentValues values = new ContentValues();
+                    values.put(PasswdSafeContract.Providers.COL_ACCT,
+                               newAcct);
+                    values.put(PasswdSafeContract.Providers.COL_TYPE,
+                               acctType.name());
+                    cr.insert(PasswdSafeContract.Providers.CONTENT_URI, values);
+                }
+            }
+        }.startTask(this);
+    }
+
+    /** Update the sync frequency for an account */
+    private void updateSyncFreq(final ProviderSyncFreqPref freq, Uri acct)
+    {
+        new AccountUpdateTask(acct, getString(R.string.updating_account))
+        {
+            @Override
+            protected void doAccountUpdate(ContentResolver cr)
+            {
+                ContentValues values = new ContentValues();
+                values.put(PasswdSafeContract.Providers.COL_SYNC_FREQ,
+                           freq.getFreq());
+                cr.update(itsAccountUri, values, null, null);
+            }
+        }.startTask(this);
     }
 
     /** Get the Dropbox provider */
@@ -659,80 +699,6 @@ public class MainActivity extends FragmentActivity
             })
             .setNegativeButton(android.R.string.no, null);
             return builder.create();
-        }
-    }
-
-    /** The type of async account task */
-    private enum AccountTaskType
-    {
-        ADD_REMOVE,
-        UPDATE_SYNC_FREQ
-    }
-
-    /** Async task to set the account */
-    private class AccountTask extends AccountUpdateTask
-    {
-        private final AccountTaskType itsType;
-        private final String itsNewAccount;
-        private final ProviderType itsProviderType;
-        private final ProviderSyncFreqPref itsUpdateFreq;
-
-        /** Constructor for add/remove */
-        public AccountTask(Uri currAcct, String newAcct, ProviderType type)
-        {
-            super(currAcct,
-                  getString((newAcct == null) ?
-                          R.string.removing_account : R.string.adding_account));
-            itsType = AccountTaskType.ADD_REMOVE;
-            itsNewAccount = newAcct;
-            itsProviderType = type;
-            itsUpdateFreq = null;
-            startTask(MainActivity.this);
-        }
-
-        /** Constructor for updating the sync frequency */
-        public AccountTask(ProviderSyncFreqPref freq,
-                           Uri currAccount, ProviderType type)
-        {
-            super(currAccount,
-                  getString(R.string.updating_account));
-            itsType = AccountTaskType.UPDATE_SYNC_FREQ;
-            itsNewAccount = null;
-            itsProviderType = type;
-            itsUpdateFreq = freq;
-            startTask(MainActivity.this);
-        }
-
-
-        @Override
-        protected void doAccountUpdate(ContentResolver cr)
-        {
-            switch (itsType) {
-            case ADD_REMOVE: {
-                // Stop syncing for the previously selected account.
-                if (itsAccountUri != null) {
-                    cr.delete(itsAccountUri, null, null);
-                }
-
-                if (itsNewAccount != null) {
-                    ContentValues values = new ContentValues();
-                    values.put(PasswdSafeContract.Providers.COL_ACCT,
-                               itsNewAccount);
-                    values.put(PasswdSafeContract.Providers.COL_TYPE,
-                               itsProviderType.name());
-                    cr.insert(PasswdSafeContract.Providers.CONTENT_URI,
-                              values);
-                }
-                break;
-            }
-            case UPDATE_SYNC_FREQ: {
-                ContentValues values = new ContentValues();
-                values.put(PasswdSafeContract.Providers.COL_SYNC_FREQ,
-                           itsUpdateFreq.getFreq());
-                cr.update(itsAccountUri, values, null, null);
-                break;
-            }
-            }
         }
     }
 }
