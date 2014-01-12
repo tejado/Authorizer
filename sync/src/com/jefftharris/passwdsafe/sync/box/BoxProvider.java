@@ -23,7 +23,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
-import com.jefftharris.passwdsafe.sync.lib.NewAccountInfo;
+import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
@@ -85,7 +85,7 @@ public class BoxProvider implements Provider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
      */
     @Override
-    public NewAccountInfo finishAccountLink(int activityResult,
+    public NewAccountTask finishAccountLink(int activityResult,
                                             Intent activityData,
                                             Uri acctProviderUri)
     {
@@ -107,7 +107,8 @@ public class BoxProvider implements Provider
                                    authdata.getTokenType());
         }
         // TODO: implement
-        return new NewAccountInfo(ProviderType.BOX, null, acctProviderUri);
+        return new NewAccountTask(acctProviderUri, null, ProviderType.BOX,
+                                  itsContext);
     }
 
     /* (non-Javadoc)

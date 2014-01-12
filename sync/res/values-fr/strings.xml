@@ -3,7 +3,6 @@
 
     <string name="account_label">Compte: %1$s</string>
     <string name="account_not_exists_label">Compte: %1$s (n\'existe pas)</string>
-    <string name="adding_account">Ajout de compte&#8230;</string>
     <string name="app_desc">Synchroniser les données PasswordSafe de services de cloud computing</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="cant_launch_drive_file">Impossible de lancer le fichier de Google Drive. Typiquement, le fichier n\'a pas été synchronisés localement</string>

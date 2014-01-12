@@ -46,7 +46,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
-import com.jefftharris.passwdsafe.sync.lib.NewAccountInfo;
+import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
@@ -66,7 +66,7 @@ public class MainActivity extends FragmentActivity
     private Uri itsDropboxUri = null;
     private Uri itsBoxUri = null;
 
-    private NewAccountInfo itsNewAccount = null;
+    private NewAccountTask itsNewAccountTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -173,11 +173,9 @@ public class MainActivity extends FragmentActivity
     protected void onResumeFragments()
     {
         super.onResumeFragments();
-        if (itsNewAccount != null) {
-            setAccount(itsNewAccount.itsProviderAccountUri,
-                       itsNewAccount.itsAccount,
-                       itsNewAccount.itsProviderType);
-            itsNewAccount = null;
+        if (itsNewAccountTask != null) {
+            itsNewAccountTask.startTask(this);
+            itsNewAccountTask = null;
         }
         LoaderManager lm = getSupportLoaderManager();
         lm.restartLoader(LOADER_PROVIDERS, null, this);
@@ -196,22 +194,22 @@ public class MainActivity extends FragmentActivity
                         b.getString(AccountManager.KEY_ACCOUNT_NAME);
                 Log.i(TAG, "Selected account: " + accountName);
                 if (accountName != null && accountName.length() > 0) {
-                    itsNewAccount = new NewAccountInfo(ProviderType.GDRIVE,
-                                                       accountName,
-                                                       itsGdriveUri);
+                    itsNewAccountTask =
+                            new NewAccountTask(itsGdriveUri, accountName,
+                                               ProviderType.GDRIVE, this);
                 }
             }
             break;
         case DROPBOX_LINK_RC: {
-            itsNewAccount = getDbxProvider().finishAccountLink(resultCode,
-                                                               data,
-                                                               itsDropboxUri);
+            itsNewAccountTask =
+                    getDbxProvider().finishAccountLink(resultCode, data,
+                                                       itsDropboxUri);
             break;
         }
         case BOX_AUTH_RC: {
-            itsNewAccount = getBoxProvider().finishAccountLink(resultCode,
-                                                               data,
-                                                               itsBoxUri);
+            itsNewAccountTask =
+                    getBoxProvider().finishAccountLink(resultCode, data,
+                                                       itsBoxUri);
             break;
         }
         default: {

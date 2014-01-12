@@ -56,7 +56,7 @@ import com.jefftharris.passwdsafe.sync.SyncApp;
 import com.jefftharris.passwdsafe.sync.SyncUpdateHandler;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
-import com.jefftharris.passwdsafe.sync.lib.NewAccountInfo;
+import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
@@ -112,11 +112,12 @@ public class GDriveProvider implements Provider
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
      */
-    public NewAccountInfo finishAccountLink(int activityResult,
+    public NewAccountTask finishAccountLink(int activityResult,
                                             Intent activityData,
                                             Uri acctProviderUri)
     {
-        return new NewAccountInfo(ProviderType.GDRIVE, null, acctProviderUri);
+        return new NewAccountTask(acctProviderUri, null, ProviderType.GDRIVE,
+                                  itsContext);
     }
 
 

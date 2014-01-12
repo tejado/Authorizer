@@ -33,7 +33,7 @@ public interface Provider
     public void startAccountLink(Activity activity, int requestCode);
 
     /** Finish the process of linking to an account */
-    public NewAccountInfo finishAccountLink(int activityResult,
+    public NewAccountTask finishAccountLink(int activityResult,
                                             Intent activityData,
                                             Uri providerAcctUri);
 

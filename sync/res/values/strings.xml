@@ -3,7 +3,6 @@
 
     <string name="account_label">Account: %1$s</string>
     <string name="account_not_exists_label">Account: %1$s (does not exist)</string>
-    <string name="adding_account">Adding account&#8230;</string>
     <string name="app_desc">Sync PasswordSafe databases from cloud services</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="cant_launch_drive_file">Can\'t launch Google Drive file.  Typically the file has not been synced locally.</string>

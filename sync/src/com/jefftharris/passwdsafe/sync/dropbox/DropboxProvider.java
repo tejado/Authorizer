@@ -47,7 +47,7 @@ import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
-import com.jefftharris.passwdsafe.sync.lib.NewAccountInfo;
+import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
@@ -124,15 +124,15 @@ public class DropboxProvider implements Provider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
      */
     @Override
-    public NewAccountInfo finishAccountLink(int activityResult,
+    public NewAccountTask finishAccountLink(int activityResult,
                                             Intent activityData,
                                             Uri acctProviderUri)
     {
         updateDropboxAcct();
         DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();
-        return new NewAccountInfo(ProviderType.DROPBOX,
+        return new NewAccountTask(acctProviderUri,
                                   (acct == null) ? null : acct.getUserId(),
-                                  acctProviderUri);
+                                  ProviderType.DROPBOX, itsContext);
     }
 
 

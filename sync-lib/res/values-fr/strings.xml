@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="adding_account">Ajout de compte&#8230;</string>
     <string name="automatic">automatique</string>
     <string name="full_sync">Synchronisation complète</string>
     <string name="incremental_sync">Synchronisation incrémental</string>
