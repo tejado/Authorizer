@@ -13,14 +13,21 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.activities.OAuthActivity;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
+import com.box.boxjavalibv2.authorization.OAuthRefreshListener;
+import com.box.boxjavalibv2.dao.BoxOAuthToken;
+import com.box.boxjavalibv2.dao.BoxObject;
 import com.box.boxjavalibv2.dao.BoxUser;
+import com.box.boxjavalibv2.exceptions.BoxJSONException;
+import com.box.boxjavalibv2.interfaces.IAuthData;
 import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
 import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
 import com.box.restclientv2.exceptions.BoxSDKException;
@@ -30,6 +37,7 @@ import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
 /**
@@ -42,17 +50,20 @@ public class BoxProvider implements Provider
     private static final String BOX_CLIENT_SECRET =
             "nuHnpyoGIEYceudysLyBvcBsWSHJdXUy";
 
+    private static final String PREF_AUTH_ACCESS_TOKEN = "boxAccessToken";
+    private static final String PREF_AUTH_EXPIRES_IN = "boxExpiresIn";
+    private static final String PREF_AUTH_REFRESH_TOKEN = "boxRefreshToken";
+    private static final String PREF_AUTH_TOKEN_TYPE = "boxTokenType";
+
     private static final String TAG = "BoxProvider";
 
     private final Context itsContext;
-    private final BoxAndroidClient itsClient;
+    private BoxAndroidClient itsClient;
 
     /** Constructor */
     public BoxProvider(Context ctx)
     {
         itsContext = ctx;
-        itsClient = new BoxAndroidClient(BOX_CLIENT_ID, BOX_CLIENT_SECRET,
-                                         null, null);
     }
 
     /* (non-Javadoc)
@@ -61,8 +72,7 @@ public class BoxProvider implements Provider
     @Override
     public void init()
     {
-        // TODO Auto-generated method stub
-
+        updateBoxAcct();
     }
 
     /* (non-Javadoc)
@@ -107,8 +117,9 @@ public class BoxProvider implements Provider
             authdata = activityData.getParcelableExtra(
                     OAuthActivity.BOX_CLIENT_OAUTH);
         }
-        itsClient.authenticate(authdata);
-        // TODO: implement
+        saveAuthData(authdata);
+        updateBoxAcct();
+
         return new NewAccountTask(acctProviderUri, null, ProviderType.BOX,
                                   itsContext)
         {
@@ -118,17 +129,11 @@ public class BoxProvider implements Provider
             @Override
             protected void doAccountUpdate(ContentResolver cr)
             {
-                itsNewAcct = null;
-                if (itsClient.isAuthenticated()) {
-                    BoxUsersManager userMgr = itsClient.getUsersManager();
-                    BoxDefaultRequestObject req = new BoxDefaultRequestObject();
-                    try {
-                        BoxUser user = userMgr.getCurrentUser(req);
-                        itsNewAcct = user.getId();
-                    } catch (BoxSDKException e) {
-                        // TODO: better error
-                        Log.e(TAG, "Failed to get user", e);
-                    }
+                BoxUser user = getCurrentUser();
+                if (user != null) {
+                    itsNewAcct = user.getId();
+                } else {
+                    itsNewAcct = null;
                 }
                 super.doAccountUpdate(cr);
             }
@@ -141,18 +146,17 @@ public class BoxProvider implements Provider
     @Override
     public void unlinkAccount()
     {
-        // TODO Auto-generated method stub
-
+        saveAuthData(null);
+        updateBoxAcct();
     }
 
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#isAccountAuthorized()
      */
     @Override
-    public boolean isAccountAuthorized()
+    public synchronized boolean isAccountAuthorized()
     {
-        // TODO Auto-generated method stub
-        return false;
+        return (itsClient != null);
     }
 
     /* (non-Javadoc)
@@ -161,8 +165,7 @@ public class BoxProvider implements Provider
     @Override
     public Account getAccount(String acctName)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new Account(acctName, SyncDb.BOX_ACCOUNT_TYPE);
     }
 
     /* (non-Javadoc)
@@ -181,8 +184,7 @@ public class BoxProvider implements Provider
     @Override
     public void cleanupOnDelete(String acctName)
     {
-        // TODO Auto-generated method stub
-
+        unlinkAccount();
     }
 
     /* (non-Javadoc)
@@ -248,10 +250,107 @@ public class BoxProvider implements Provider
      */
     @Override
     public void deleteLocalFile(DbFile file, SQLiteDatabase db)
-                                                               throws Exception
+            throws Exception
     {
         // TODO Auto-generated method stub
 
     }
 
+    /** Get the current Box user */
+    private synchronized BoxUser getCurrentUser()
+    {
+        if ((itsClient == null) || !itsClient.isAuthenticated()) {
+            return null;
+        }
+        BoxUsersManager userMgr = itsClient.getUsersManager();
+        BoxDefaultRequestObject req = new BoxDefaultRequestObject();
+        try {
+            return userMgr.getCurrentUser(req);
+        } catch (BoxSDKException e) {
+            // TODO: better error
+            Log.e(TAG, "Failed to get user", e);
+        }
+        return null;
+    }
+
+    /** Update the Box account client based on availability of authentication
+     *  information. */
+    private synchronized void updateBoxAcct()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(itsContext);
+        String accessToken = prefs.getString(PREF_AUTH_ACCESS_TOKEN, null);
+        if (accessToken != null) {
+            int expiresIn = prefs.getInt(PREF_AUTH_EXPIRES_IN, 0);
+            String refreshToken = prefs.getString(PREF_AUTH_REFRESH_TOKEN, null);
+            String tokenType = prefs.getString(PREF_AUTH_TOKEN_TYPE, null);
+
+            BoxAndroidOAuthData authdata = new BoxAndroidOAuthData();
+            authdata.put(BoxOAuthToken.FIELD_ACCESS_TOKEN, accessToken);
+            authdata.put(BoxOAuthToken.FIELD_EXPIRES_IN, expiresIn);
+            authdata.put(BoxOAuthToken.FIELD_REFRESH_TOKEN, refreshToken);
+            authdata.put(BoxOAuthToken.FIELD_TOKEN_TYPE, tokenType);
+            itsClient = new BoxAndroidClient(BOX_CLIENT_ID, BOX_CLIENT_SECRET,
+                                             null, null);
+            itsClient.addOAuthRefreshListener(new OAuthRefreshListener()
+            {
+                @Override
+                public void onRefresh(IAuthData authdata)
+                {
+                    saveAuthData((BoxOAuthToken) authdata);
+                }
+            });
+
+            itsClient.authenticate(authdata);
+
+            new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    // TODO: temp check for user
+                    BoxUser user = getCurrentUser();
+                    if (user != null) {
+                        PasswdSafeUtil.dbginfo(TAG, "current user : %s",
+                                               boxObjectToString(user));
+                    }
+                }
+            }.start();
+        } else {
+            itsClient = null;
+        }
+    }
+
+    /** Save or clear the Box authentication data */
+    private synchronized void saveAuthData(BoxOAuthToken authData)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "saveAuthData: %b", authData);
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(itsContext);
+        SharedPreferences.Editor editor = prefs.edit();
+        if (authData != null) {
+            editor.putString(PREF_AUTH_ACCESS_TOKEN, authData.getAccessToken());
+            editor.putInt(PREF_AUTH_EXPIRES_IN, authData.getExpiresIn());
+            editor.putString(PREF_AUTH_REFRESH_TOKEN,
+                             authData.getRefreshToken());
+            editor.putString(PREF_AUTH_TOKEN_TYPE, authData.getTokenType());
+        } else {
+            editor.remove(PREF_AUTH_ACCESS_TOKEN);
+            editor.remove(PREF_AUTH_EXPIRES_IN);
+            editor.remove(PREF_AUTH_REFRESH_TOKEN);
+            editor.remove(PREF_AUTH_TOKEN_TYPE);
+        }
+        editor.commit();
+    }
+
+    /** Convert a Box object to a string for debugging */
+    private String boxObjectToString(BoxObject obj)
+    {
+        try {
+            return obj.toJSONString(itsClient.getJSONParser());
+        }
+        catch (BoxJSONException e) {
+            return null;
+        }
+    }
 }
