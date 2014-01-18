@@ -11,11 +11,16 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import com.box.boxjavalibv2.BoxClient;
+import com.box.boxjavalibv2.dao.BoxUser;
+import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
+import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
 /**
@@ -37,6 +42,18 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     protected List<AbstractSyncOper<BoxClient>> performSync()
             throws Exception
     {
+        BoxUsersManager userMgr = itsProviderClient.getUsersManager();
+        BoxDefaultRequestObject userReq = new BoxDefaultRequestObject();
+        BoxUser user = userMgr.getCurrentUser(userReq);
+        String displayName = null;
+        if (user != null) {
+            displayName = user.getName() + " (" + user.getLogin() + ")";
+        }
+        if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
+            SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
+                                             itsDb);
+        }
+
         List<AbstractSyncOper<BoxClient>> opers =
                 new ArrayList<AbstractSyncOper<BoxClient>>();
         return opers;
