@@ -20,9 +20,12 @@ import com.box.boxjavalibv2.dao.BoxFile;
 import com.box.boxjavalibv2.dao.BoxObject;
 import com.box.boxjavalibv2.dao.BoxTypedObject;
 import com.box.boxjavalibv2.dao.BoxUser;
+import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
+import com.box.boxjavalibv2.exceptions.BoxServerException;
 import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
 import com.box.boxjavalibv2.resourcemanagers.BoxSearchManager;
 import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
+import com.box.restclientv2.exceptions.BoxRestException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
@@ -49,22 +52,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     protected List<AbstractSyncOper<BoxClient>> performSync()
             throws Exception
     {
-        // Sync account display name
-        BoxUsersManager userMgr = itsProviderClient.getUsersManager();
-        BoxDefaultRequestObject userReq = new BoxDefaultRequestObject();
-        userReq.addField(BoxUser.FIELD_ID)
-               .addField(BoxUser.FIELD_NAME)
-               .addField(BoxUser.FIELD_LOGIN);
-        BoxUser user = userMgr.getCurrentUser(userReq);
-        PasswdSafeUtil.dbginfo(TAG, "user %s", boxToString(user));
-        String displayName = null;
-        if (user != null) {
-            displayName = user.getName() + " (" + user.getLogin() + ")";
-        }
-        if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
-            SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
-                                             itsDb);
-        }
+        syncDisplayName();
 
         // Sync files
         BoxSearchManager searchMgr = itsProviderClient.getSearchManager();
@@ -97,6 +85,28 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
         List<AbstractSyncOper<BoxClient>> opers =
                 new ArrayList<AbstractSyncOper<BoxClient>>();
         return opers;
+    }
+
+    /** Sync account display name */
+    private final void syncDisplayName()
+            throws BoxRestException, BoxServerException,
+                   AuthFatalFailureException
+    {
+        BoxUsersManager userMgr = itsProviderClient.getUsersManager();
+        BoxDefaultRequestObject userReq = new BoxDefaultRequestObject();
+        userReq.addField(BoxUser.FIELD_ID)
+               .addField(BoxUser.FIELD_NAME)
+               .addField(BoxUser.FIELD_LOGIN);
+        BoxUser user = userMgr.getCurrentUser(userReq);
+        PasswdSafeUtil.dbginfo(TAG, "user %s", boxToString(user));
+        String displayName = null;
+        if (user != null) {
+            displayName = user.getName() + " (" + user.getLogin() + ")";
+        }
+        if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
+            SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
+                                             itsDb);
+        }
     }
 
     /** Convert a Box object to a string for debugging */
