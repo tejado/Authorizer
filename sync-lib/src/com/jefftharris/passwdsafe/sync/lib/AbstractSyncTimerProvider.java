@@ -17,20 +17,27 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
 
 /**
  *  Abstract provider that uses a system timer to perform syncing
  */
 public abstract class AbstractSyncTimerProvider implements Provider
 {
+    private final int BROADCAST_REQUEST_SYNC_DROPBOX = 0;
+    private final int BROADCAST_REQUEST_SYNC_BOX = 1;
+
+    private final ProviderType itsProviderType;
     private final Context itsContext;
     private final String itsTag;
     private Handler itsHandler = null;
     private PendingIntent itsSyncTimeoutIntent = null;
     private SyncRequestTask itsSyncTask = null;
 
-    protected AbstractSyncTimerProvider(Context ctx, String tag)
+    protected AbstractSyncTimerProvider(ProviderType type,
+                                        Context ctx, String tag)
     {
+        itsProviderType = type;
         itsContext = ctx;
         itsTag = tag;
     }
@@ -76,8 +83,28 @@ public abstract class AbstractSyncTimerProvider implements Provider
                     if (itsSyncTimeoutIntent == null) {
                         Intent timeoutIntent =
                                 new Intent(ACTION_SYNC_EXPIRATION_TIMEOUT);
+                        timeoutIntent.putExtra(
+                                SYNC_EXPIRATION_TIMEOUT_EXTRA_TYPE,
+                                itsProviderType.toString());
+
+                        int requestCode;
+                        switch (itsProviderType) {
+                        case BOX: {
+                            requestCode = BROADCAST_REQUEST_SYNC_BOX;
+                            break;
+                        }
+                        case DROPBOX: {
+                            requestCode = BROADCAST_REQUEST_SYNC_DROPBOX;
+                            break;
+                        }
+                        case GDRIVE:
+                        default: {
+                            throw new IllegalStateException("GDRIVE not valid");
+                        }
+                        }
+
                         itsSyncTimeoutIntent = PendingIntent.getBroadcast(
-                                itsContext, 0, timeoutIntent,
+                                itsContext, requestCode, timeoutIntent,
                                 PendingIntent.FLAG_CANCEL_CURRENT);
                     }
 

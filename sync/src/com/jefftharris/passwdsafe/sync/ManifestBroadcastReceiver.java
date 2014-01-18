@@ -30,9 +30,10 @@ public class ManifestBroadcastReceiver extends BroadcastReceiver
     {
         PasswdSafeUtil.dbginfo(TAG, "onReceive: %s", intent);
         String action = intent.getAction();
-        if (action == Provider.ACTION_SYNC_EXPIRATION_TIMEOUT) {
-            Provider providerImpl =
-                    ProviderFactory.getProvider(ProviderType.DROPBOX, ctx);
+        if (action.equals(Provider.ACTION_SYNC_EXPIRATION_TIMEOUT)) {
+            ProviderType type = ProviderType.fromString(intent.getStringExtra(
+                    Provider.SYNC_EXPIRATION_TIMEOUT_EXTRA_TYPE));
+            Provider providerImpl = ProviderFactory.getProvider(type, ctx);
             providerImpl.requestSync(false);
         } else {
             // The app is created in order to launch the receiver

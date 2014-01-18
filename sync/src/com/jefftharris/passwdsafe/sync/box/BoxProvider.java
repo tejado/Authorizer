@@ -7,6 +7,7 @@
 package com.jefftharris.passwdsafe.sync.box;
 
 import java.io.File;
+import java.util.List;
 
 import android.accounts.Account;
 import android.app.Activity;
@@ -33,17 +34,17 @@ import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
 import com.box.restclientv2.exceptions.BoxSDKException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
-import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
 /**
  * Implements a provider for the Box.com service
  */
-public class BoxProvider implements Provider
+public class BoxProvider extends AbstractSyncTimerProvider
 {
     private static final String BOX_CLIENT_ID =
             "rjgu7xf2ih5fvzb1cdhdnfmr4ncw1jes";
@@ -54,16 +55,17 @@ public class BoxProvider implements Provider
     private static final String PREF_AUTH_EXPIRES_IN = "boxExpiresIn";
     private static final String PREF_AUTH_REFRESH_TOKEN = "boxRefreshToken";
     private static final String PREF_AUTH_TOKEN_TYPE = "boxTokenType";
+    private static final String PREF_AUTH_USER_ID = "boxUserId";
 
     private static final String TAG = "BoxProvider";
 
-    private final Context itsContext;
     private BoxAndroidClient itsClient;
+    private String itsUserId;
 
     /** Constructor */
     public BoxProvider(Context ctx)
     {
-        itsContext = ctx;
+        super(ProviderType.BOX, ctx, TAG);
     }
 
     /* (non-Javadoc)
@@ -72,17 +74,8 @@ public class BoxProvider implements Provider
     @Override
     public void init()
     {
+        super.init();
         updateBoxAcct();
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#fini()
-     */
-    @Override
-    public void fini()
-    {
-        // TODO Auto-generated method stub
-
     }
 
     /* (non-Javadoc)
@@ -121,7 +114,7 @@ public class BoxProvider implements Provider
         updateBoxAcct();
 
         return new NewAccountTask(acctProviderUri, null, ProviderType.BOX,
-                                  itsContext)
+                                  getContext())
         {
             /* (non-Javadoc)
              * @see com.jefftharris.passwdsafe.sync.lib.NewAccountTask#doAccountUpdate(android.content.ContentResolver)
@@ -135,6 +128,7 @@ public class BoxProvider implements Provider
                 } else {
                     itsNewAcct = null;
                 }
+                setUserId(user);
                 super.doAccountUpdate(cr);
             }
         };
@@ -147,6 +141,7 @@ public class BoxProvider implements Provider
     public void unlinkAccount()
     {
         saveAuthData(null);
+        setUserId(null);
         updateBoxAcct();
     }
 
@@ -174,8 +169,12 @@ public class BoxProvider implements Provider
     @Override
     public void checkProviderAdd(SQLiteDatabase db) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        List<DbProvider> providers = SyncDb.getProviders(db);
+        for (DbProvider provider: providers) {
+            if (provider.itsType == ProviderType.BOX) {
+                throw new Exception("Only one Box account allowed");
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -187,14 +186,10 @@ public class BoxProvider implements Provider
         unlinkAccount();
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#updateSyncFreq(android.accounts.Account, int)
-     */
     @Override
-    public void updateSyncFreq(Account acct, int freq)
+    protected String getAccountUserId()
     {
-        // TODO Auto-generated method stub
-
+        return itsUserId;
     }
 
     /* (non-Javadoc)
@@ -203,8 +198,11 @@ public class BoxProvider implements Provider
     @Override
     public void requestSync(boolean manual)
     {
-        // TODO Auto-generated method stub
-
+        PasswdSafeUtil.dbginfo(TAG, "requestSync client: %b", itsClient);
+        if (itsClient == null) {
+            return;
+        }
+        doRequestSync(manual);
     }
 
     /* (non-Javadoc)
@@ -217,8 +215,10 @@ public class BoxProvider implements Provider
                      boolean manual,
                      SyncLogRecord logrec) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        PasswdSafeUtil.dbginfo(TAG, "sync client: %b", itsClient);
+        if (itsClient == null) {
+            return;
+        }
     }
 
     /* (non-Javadoc)
@@ -278,7 +278,7 @@ public class BoxProvider implements Provider
     private synchronized void updateBoxAcct()
     {
         SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(itsContext);
+                PreferenceManager.getDefaultSharedPreferences(getContext());
         String accessToken = prefs.getString(PREF_AUTH_ACCESS_TOKEN, null);
         if (accessToken != null) {
             int expiresIn = prefs.getInt(PREF_AUTH_EXPIRES_IN, 0);
@@ -302,22 +302,10 @@ public class BoxProvider implements Provider
             });
 
             itsClient.authenticate(authdata);
-
-            new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    // TODO: temp check for user
-                    BoxUser user = getCurrentUser();
-                    if (user != null) {
-                        PasswdSafeUtil.dbginfo(TAG, "current user : %s",
-                                               boxObjectToString(user));
-                    }
-                }
-            }.start();
+            checkUserId();
         } else {
             itsClient = null;
+            setUserId(null);
         }
     }
 
@@ -326,7 +314,7 @@ public class BoxProvider implements Provider
     {
         PasswdSafeUtil.dbginfo(TAG, "saveAuthData: %b", authData);
         SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(itsContext);
+                PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = prefs.edit();
         if (authData != null) {
             editor.putString(PREF_AUTH_ACCESS_TOKEN, authData.getAccessToken());
@@ -343,9 +331,49 @@ public class BoxProvider implements Provider
         editor.commit();
     }
 
+    /** Check whether the user ID has been retrieved for the account */
+    private synchronized void checkUserId()
+    {
+        if (itsUserId == null) {
+            SharedPreferences prefs =
+                    PreferenceManager.getDefaultSharedPreferences(getContext());
+            itsUserId = prefs.getString(PREF_AUTH_USER_ID, null);
+            if (itsUserId == null) {
+                new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        // TODO: temp check for user
+                        BoxUser user = getCurrentUser();
+                        setUserId(user);
+                    }
+                }.start();
+            }
+        }
+    }
+
+    /** Update the account's user ID */
+    private synchronized void setUserId(BoxUser user)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "updateUserId: %s",
+                               boxObjectToString(user));
+
+        itsUserId = (user != null) ? user.getId() : null;
+
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(PREF_AUTH_USER_ID, itsUserId);
+        editor.commit();
+    }
+
     /** Convert a Box object to a string for debugging */
     private String boxObjectToString(BoxObject obj)
     {
+        if (obj == null) {
+            return null;
+        }
         try {
             return obj.toJSONString(itsClient.getJSONParser());
         }

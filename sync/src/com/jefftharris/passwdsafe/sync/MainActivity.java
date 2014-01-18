@@ -357,7 +357,7 @@ public class MainActivity extends FragmentActivity
     /** Button onClick handler to sync a Box account */
     public void onBoxSync(View view)
     {
-        // TODO: implement
+        getBoxProvider().requestSync(true);
     }
 
 
@@ -372,7 +372,8 @@ public class MainActivity extends FragmentActivity
     /** Box sync frequency spinner changed */
     private void onBoxFreqChanged(int pos)
     {
-        // TODO: implement
+        ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
+        updateSyncFreq(freq, itsBoxUri);
     }
 
     /* (non-Javadoc)

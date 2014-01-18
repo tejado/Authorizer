@@ -22,6 +22,8 @@ public interface Provider
 {
     public static final String ACTION_SYNC_EXPIRATION_TIMEOUT =
             "com.jefftharris.passwdsafe.action.SYNC_EXPIRATION_TIMEOUT";
+    public static final String SYNC_EXPIRATION_TIMEOUT_EXTRA_TYPE =
+            "com.jefftharris.passwdsafe.extra.providerType";
 
     /** Initialize the provider */
     public void init();

@@ -56,7 +56,7 @@ public class DropboxProvider extends AbstractSyncTimerProvider
     /** Constructor */
     public DropboxProvider(Context ctx)
     {
-        super(ctx, TAG);
+        super(ProviderType.DROPBOX, ctx, TAG);
     }
 
 
@@ -70,16 +70,6 @@ public class DropboxProvider extends AbstractSyncTimerProvider
         itsDropboxAcctMgr = DbxAccountManager.getInstance(
                 getContext(), DROPBOX_SYNC_APP_KEY, DROPBOX_SYNC_APP_SECRET);
         updateDropboxAcct();
-    }
-
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#fini()
-     */
-    @Override
-    public void fini()
-    {
-        super.fini();
     }
 
 
@@ -164,14 +154,6 @@ public class DropboxProvider extends AbstractSyncTimerProvider
     public void cleanupOnDelete(String acctName)
     {
         unlinkAccount();
-    }
-
-
-    /** Update a provider's sync frequency */
-    @Override
-    public void updateSyncFreq(Account acct, int freq)
-    {
-        super.updateSyncFreq(acct, freq);
     }
 
 
