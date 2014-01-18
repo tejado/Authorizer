@@ -34,7 +34,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 /** The Syncer class encapsulates a sync operation */
 public class DropboxSyncer
 {
-    private static final String TAG = "DropboxProvider";
+    private static final String TAG = "DropboxSyncer";
 
     private final DbxFileSystem itsFs;
     private final DbProvider itsProvider;
