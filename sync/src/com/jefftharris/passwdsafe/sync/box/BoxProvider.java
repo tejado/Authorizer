@@ -219,6 +219,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
         if (itsClient == null) {
             return;
         }
+        new BoxSyncer(itsClient, provider, db, logrec, getContext()).sync();
     }
 
     /* (non-Javadoc)
