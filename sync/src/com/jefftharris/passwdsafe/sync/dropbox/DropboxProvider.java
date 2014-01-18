@@ -332,22 +332,12 @@ public class DropboxProvider extends AbstractSyncTimerProvider
                 }
             });
 
-            SyncDb syncDb = SyncDb.acquire();
             try {
-                SQLiteDatabase db = syncDb.beginTransaction();
-                DbProvider provider = SyncDb.getProvider(acct.getUserId(),
-                                                         ProviderType.DROPBOX,
-                                                         db);
-                updateSyncFreq(null,
-                               (provider != null) ? provider.itsSyncFreq : 0);
-
+                updateProviderSyncFreq(acct.getUserId());
                 itsDropboxFs = DbxFileSystem.forAccount(acct);
                 requestSync(false);
-                db.setTransactionSuccessful();
             } catch (Exception e) {
                 Log.e(TAG, "updateDropboxAcct failure", e);
-            } finally {
-                syncDb.endTransactionAndRelease();
             }
         } else if (!shouldHaveFs && haveFs) {
             itsDropboxFs = null;

@@ -279,7 +279,9 @@ public class BoxProvider extends AbstractSyncTimerProvider
     {
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(getContext());
+
         String accessToken = prefs.getString(PREF_AUTH_ACCESS_TOKEN, null);
+        PasswdSafeUtil.dbginfo(TAG, "updateBoxAcct token %b", accessToken);
         if (accessToken != null) {
             int expiresIn = prefs.getInt(PREF_AUTH_EXPIRES_IN, 0);
             String refreshToken = prefs.getString(PREF_AUTH_REFRESH_TOKEN, null);
@@ -304,7 +306,14 @@ public class BoxProvider extends AbstractSyncTimerProvider
             itsClient.authenticate(authdata);
 
             itsUserId = prefs.getString(PREF_AUTH_USER_ID, null);
-            if (itsUserId == null) {
+            if (itsUserId != null) {
+                try {
+                    updateProviderSyncFreq(itsUserId);
+                    requestSync(false);
+                } catch (Exception e) {
+                    Log.e(TAG, "updateBoxAcct failure", e);
+                }
+            } else {
                 new Thread()
                 {
                     @Override
@@ -313,6 +322,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
                         // TODO: temp check for user
                         BoxUser user = getCurrentUser();
                         setUserId(user);
+                        updateProviderSyncFreq(itsUserId);
                     }
                 }.start();
             }

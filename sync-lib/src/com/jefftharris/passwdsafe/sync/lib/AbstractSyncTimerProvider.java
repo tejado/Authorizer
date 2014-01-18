@@ -11,6 +11,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -124,6 +125,23 @@ public abstract class AbstractSyncTimerProvider implements Provider
                 }
             }
         });
+    }
+
+    /** Update the sync frequency for this provider */
+    protected final void updateProviderSyncFreq(String userId)
+            throws SQLException
+    {
+        SyncDb syncDb = SyncDb.acquire();
+        try {
+            SQLiteDatabase db = syncDb.beginTransaction();
+            DbProvider provider = SyncDb.getProvider(userId, itsProviderType,
+                                                     db);
+            updateSyncFreq(null,
+                           (provider != null) ? provider.itsSyncFreq : 0);
+            db.setTransactionSuccessful();
+        } finally {
+            syncDb.endTransactionAndRelease();
+        }
     }
 
     /** Check whether to start a sync */
