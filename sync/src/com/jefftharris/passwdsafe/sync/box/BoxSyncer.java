@@ -8,15 +8,21 @@ package com.jefftharris.passwdsafe.sync.box;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
 import com.box.boxjavalibv2.BoxClient;
+import com.box.boxjavalibv2.dao.BoxCollection;
+import com.box.boxjavalibv2.dao.BoxFile;
+import com.box.boxjavalibv2.dao.BoxTypedObject;
 import com.box.boxjavalibv2.dao.BoxUser;
 import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
+import com.box.boxjavalibv2.resourcemanagers.BoxSearchManager;
 import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
@@ -42,6 +48,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     protected List<AbstractSyncOper<BoxClient>> performSync()
             throws Exception
     {
+        // Sync account display name
         BoxUsersManager userMgr = itsProviderClient.getUsersManager();
         BoxDefaultRequestObject userReq = new BoxDefaultRequestObject();
         BoxUser user = userMgr.getCurrentUser(userReq);
@@ -52,6 +59,36 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
         if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
                                              itsDb);
+        }
+
+        // Sync files
+        BoxSearchManager searchMgr = itsProviderClient.getSearchManager();
+        BoxDefaultRequestObject searchReq = new BoxDefaultRequestObject();
+        searchReq.addField(BoxFile.FIELD_ID)
+                 .addField(BoxFile.FIELD_TYPE)
+                 .addField(BoxFile.FIELD_NAME)
+                 .addField(BoxFile.FIELD_PATH_COLLECTION)
+                 .addField(BoxFile.FIELD_MODIFIED_AT)
+                 .addField(BoxFile.FIELD_ITEM_STATUS);
+        TreeMap<String, BoxFile> boxfiles = new TreeMap<String, BoxFile>();
+        int offset = 0;
+        boolean hasMoreFiles = true;
+        while (hasMoreFiles) {
+            // TODO: bigger page
+            searchReq.setPage(3, offset);
+            BoxCollection files = searchMgr.search("*.psafe3", searchReq);
+            List<BoxTypedObject> entries = files.getEntries();
+            for (BoxTypedObject obj: entries) {
+                PasswdSafeUtil.dbginfo(TAG, "file %s",
+                                       BoxProvider.boxToString(
+                                           obj, itsProviderClient));
+                if (obj instanceof BoxFile) {
+                    boxfiles.put(obj.getId(), (BoxFile)obj);
+                }
+            }
+            offset += entries.size();
+            hasMoreFiles =
+                    (offset < files.getTotalCount()) && !entries.isEmpty();
         }
 
         List<AbstractSyncOper<BoxClient>> opers =

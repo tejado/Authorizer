@@ -23,6 +23,7 @@ import android.util.Log;
 import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.activities.OAuthActivity;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
+import com.box.boxjavalibv2.BoxClient;
 import com.box.boxjavalibv2.authorization.OAuthRefreshListener;
 import com.box.boxjavalibv2.dao.BoxOAuthToken;
 import com.box.boxjavalibv2.dao.BoxObject;
@@ -361,7 +362,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
     private synchronized void setUserId(BoxUser user)
     {
         PasswdSafeUtil.dbginfo(TAG, "updateUserId: %s",
-                               boxObjectToString(user));
+                               boxToString(user, itsClient));
 
         itsUserId = (user != null) ? user.getId() : null;
 
@@ -373,13 +374,13 @@ public class BoxProvider extends AbstractSyncTimerProvider
     }
 
     /** Convert a Box object to a string for debugging */
-    private String boxObjectToString(BoxObject obj)
+    public static String boxToString(BoxObject obj, BoxClient client)
     {
         if (obj == null) {
             return null;
         }
         try {
-            return obj.toJSONString(itsClient.getJSONParser());
+            return obj.toJSONString(client.getJSONParser());
         }
         catch (BoxJSONException e) {
             return null;
