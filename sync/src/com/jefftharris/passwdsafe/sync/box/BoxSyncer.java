@@ -55,32 +55,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
         syncDisplayName();
 
         // Sync files
-        BoxSearchManager searchMgr = itsProviderClient.getSearchManager();
-        BoxDefaultRequestObject searchReq = new BoxDefaultRequestObject();
-        searchReq.addField(BoxFile.FIELD_ID)
-                 .addField(BoxFile.FIELD_TYPE)
-                 .addField(BoxFile.FIELD_NAME)
-                 .addField(BoxFile.FIELD_PATH_COLLECTION)
-                 .addField(BoxFile.FIELD_MODIFIED_AT)
-                 .addField(BoxFile.FIELD_ITEM_STATUS);
-        TreeMap<String, BoxFile> boxfiles = new TreeMap<String, BoxFile>();
-        int offset = 0;
-        boolean hasMoreFiles = true;
-        while (hasMoreFiles) {
-            // TODO: bigger page
-            searchReq.setPage(3, offset);
-            BoxCollection files = searchMgr.search("*.psafe3", searchReq);
-            List<BoxTypedObject> entries = files.getEntries();
-            for (BoxTypedObject obj: entries) {
-                PasswdSafeUtil.dbginfo(TAG, "file %s", boxToString(obj));
-                if (obj instanceof BoxFile) {
-                    boxfiles.put(obj.getId(), (BoxFile)obj);
-                }
-            }
-            offset += entries.size();
-            hasMoreFiles =
-                    (offset < files.getTotalCount()) && !entries.isEmpty();
-        }
+        TreeMap<String, BoxFile> boxfiles = getBoxFiles();
 
         List<AbstractSyncOper<BoxClient>> opers =
                 new ArrayList<AbstractSyncOper<BoxClient>>();
@@ -107,6 +82,40 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
                                              itsDb);
         }
+    }
+
+    /** Get the files from Box */
+    private final TreeMap<String, BoxFile> getBoxFiles()
+            throws BoxRestException, BoxServerException,
+                   AuthFatalFailureException
+    {
+        BoxSearchManager searchMgr = itsProviderClient.getSearchManager();
+        BoxDefaultRequestObject searchReq = new BoxDefaultRequestObject();
+        searchReq.addField(BoxFile.FIELD_ID)
+                 .addField(BoxFile.FIELD_TYPE)
+                 .addField(BoxFile.FIELD_NAME)
+                 .addField(BoxFile.FIELD_PATH_COLLECTION)
+                 .addField(BoxFile.FIELD_MODIFIED_AT)
+                 .addField(BoxFile.FIELD_ITEM_STATUS);
+        TreeMap<String, BoxFile> boxfiles = new TreeMap<String, BoxFile>();
+        int offset = 0;
+        boolean hasMoreFiles = true;
+        while (hasMoreFiles) {
+            // TODO: bigger page
+            searchReq.setPage(3, offset);
+            BoxCollection files = searchMgr.search("*.psafe3", searchReq);
+            List<BoxTypedObject> entries = files.getEntries();
+            for (BoxTypedObject obj: entries) {
+                PasswdSafeUtil.dbginfo(TAG, "file %s", boxToString(obj));
+                if (obj instanceof BoxFile) {
+                    boxfiles.put(obj.getId(), (BoxFile)obj);
+                }
+            }
+            offset += entries.size();
+            hasMoreFiles =
+                    (offset < files.getTotalCount()) && !entries.isEmpty();
+        }
+        return boxfiles;
     }
 
     /** Convert a Box object to a string for debugging */
