@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import com.box.boxjavalibv2.BoxClient;
 import com.box.boxjavalibv2.dao.BoxCollection;
 import com.box.boxjavalibv2.dao.BoxFile;
+import com.box.boxjavalibv2.dao.BoxObject;
 import com.box.boxjavalibv2.dao.BoxTypedObject;
 import com.box.boxjavalibv2.dao.BoxUser;
 import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
@@ -51,7 +52,11 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
         // Sync account display name
         BoxUsersManager userMgr = itsProviderClient.getUsersManager();
         BoxDefaultRequestObject userReq = new BoxDefaultRequestObject();
+        userReq.addField(BoxUser.FIELD_ID)
+               .addField(BoxUser.FIELD_NAME)
+               .addField(BoxUser.FIELD_LOGIN);
         BoxUser user = userMgr.getCurrentUser(userReq);
+        PasswdSafeUtil.dbginfo(TAG, "user %s", boxToString(user));
         String displayName = null;
         if (user != null) {
             displayName = user.getName() + " (" + user.getLogin() + ")";
@@ -79,9 +84,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             BoxCollection files = searchMgr.search("*.psafe3", searchReq);
             List<BoxTypedObject> entries = files.getEntries();
             for (BoxTypedObject obj: entries) {
-                PasswdSafeUtil.dbginfo(TAG, "file %s",
-                                       BoxProvider.boxToString(
-                                           obj, itsProviderClient));
+                PasswdSafeUtil.dbginfo(TAG, "file %s", boxToString(obj));
                 if (obj instanceof BoxFile) {
                     boxfiles.put(obj.getId(), (BoxFile)obj);
                 }
@@ -94,5 +97,11 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
         List<AbstractSyncOper<BoxClient>> opers =
                 new ArrayList<AbstractSyncOper<BoxClient>>();
         return opers;
+    }
+
+    /** Convert a Box object to a string for debugging */
+    private final String boxToString(BoxObject obj)
+    {
+        return BoxProvider.boxToString(obj, itsProviderClient);
     }
 }
