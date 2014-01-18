@@ -302,10 +302,25 @@ public class BoxProvider extends AbstractSyncTimerProvider
             });
 
             itsClient.authenticate(authdata);
-            checkUserId();
+
+            itsUserId = prefs.getString(PREF_AUTH_USER_ID, null);
+            if (itsUserId == null) {
+                new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        // TODO: temp check for user
+                        BoxUser user = getCurrentUser();
+                        setUserId(user);
+                    }
+                }.start();
+            }
+
         } else {
             itsClient = null;
             setUserId(null);
+            updateSyncFreq(null, 0);
         }
     }
 
@@ -329,28 +344,6 @@ public class BoxProvider extends AbstractSyncTimerProvider
             editor.remove(PREF_AUTH_TOKEN_TYPE);
         }
         editor.commit();
-    }
-
-    /** Check whether the user ID has been retrieved for the account */
-    private synchronized void checkUserId()
-    {
-        if (itsUserId == null) {
-            SharedPreferences prefs =
-                    PreferenceManager.getDefaultSharedPreferences(getContext());
-            itsUserId = prefs.getString(PREF_AUTH_USER_ID, null);
-            if (itsUserId == null) {
-                new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        // TODO: temp check for user
-                        BoxUser user = getCurrentUser();
-                        setUserId(user);
-                    }
-                }.start();
-            }
-        }
     }
 
     /** Update the account's user ID */
