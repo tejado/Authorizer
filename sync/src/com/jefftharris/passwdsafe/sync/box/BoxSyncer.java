@@ -52,6 +52,19 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
         super(client, provider, db, logrec, ctx, TAG);
     }
 
+    /** Get the folder for a file */
+    public static String getFileFolder(BoxItem file)
+    {
+        StringBuilder folderStr = new StringBuilder();
+        for (BoxTypedObject folder: file.getPathCollection().getEntries()) {
+            if (folderStr.length() > 0) {
+                folderStr.append("/");
+            }
+            folderStr.append(((BoxItem)folder).getName());
+        }
+        return folderStr.toString();
+    }
+
     /** Perform a sync of the files */
     @Override
     protected List<AbstractSyncOper<BoxClient>> performSync()
@@ -86,6 +99,9 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
                 new TreeMap<String, BoxFile>(boxfiles);
         List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
+            if (dbfile.itsRemoteId == null) {
+                continue;
+            }
             BoxFile boxfile = boxfiles.get(dbfile.itsRemoteId);
             if (boxfile != null) {
                 PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s",
@@ -120,7 +136,10 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
                 opers.add(new BoxRmFileOper(dbfile));
             } else if (isRemoteNewer(dbfile, allboxfiles)) {
                 opers.add(new BoxRemoteToLocalOper(dbfile));
-            } // TODO: local newer
+            } else if (isLocalNewer(dbfile, allboxfiles)) {
+                // TODO: handle local mod and remote deleted like gdrive?
+                opers.add(new BoxLocalToRemoteOper(dbfile));
+            }
         }
         return opers;
     }
@@ -171,7 +190,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             // TODO: handle box website delete where confirm box is still
             // visible and cause the total count to include the extra item
             // but a request failure
-            searchReq.setPage(3, offset);
+            searchReq.setPage(10, offset);
             BoxCollection files = searchMgr.search("*.psafe3", searchReq);
             PasswdSafeUtil.dbginfo(TAG, "total count %d",
                                    files.getTotalCount());
@@ -216,25 +235,19 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
         if (boxfile == null) {
             return true;
         }
-        if (boxfile.getSize() != localFile.length()) {
-            return true;
-        }
 
-        // TODO: sha1 checksum
+        // TODO: sha1 checksum, etag?
         return false;
     }
 
-    /** Get the folder for a file */
-    private final String getFileFolder(BoxItem file)
+    /** Is the local file newer than the remote */
+    private final boolean isLocalNewer(DbFile dbfile,
+                                       Map<String, BoxFile> boxfiles)
     {
-        StringBuilder folderStr = new StringBuilder();
-        for (BoxTypedObject folder: file.getPathCollection().getEntries()) {
-            if (folderStr.length() > 0) {
-                folderStr.append("/");
-            }
-            folderStr.append(((BoxItem)folder).getName());
+        if (dbfile.itsLocalModDate > dbfile.itsRemoteModDate) {
+            return true;
         }
-        return folderStr.toString();
+        return false;
     }
 
     /** Convert a Box object to a string for debugging */

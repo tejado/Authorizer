@@ -230,8 +230,8 @@ public class BoxProvider extends AbstractSyncTimerProvider
     public long insertLocalFile(long providerId, String title, SQLiteDatabase db)
                                                                                  throws Exception
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return SyncDb.addLocalFile(providerId, title,
+                                   System.currentTimeMillis(), db);
     }
 
     /* (non-Javadoc)
@@ -243,8 +243,9 @@ public class BoxProvider extends AbstractSyncTimerProvider
                                 File localFile,
                                 SQLiteDatabase db) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        SyncDb.updateLocalFile(file.itsId, localFileName,
+                               file.itsLocalTitle, file.itsLocalFolder,
+                               localFile.lastModified(), db);
     }
 
     /* (non-Javadoc)
@@ -254,8 +255,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
     public void deleteLocalFile(DbFile file, SQLiteDatabase db)
             throws Exception
     {
-        // TODO Auto-generated method stub
-
+        SyncDb.updateLocalFileDeleted(file.itsId, db);
     }
 
     /** Get the current Box user */
