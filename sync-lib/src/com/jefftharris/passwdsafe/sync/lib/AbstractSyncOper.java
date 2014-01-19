@@ -6,8 +6,6 @@
  */
 package com.jefftharris.passwdsafe.sync.lib;
 
-import java.io.IOException;
-
 import android.content.Context;
 
 /**
@@ -24,5 +22,5 @@ public abstract class AbstractSyncOper<ProviderClientT>
 
     /** Perform the sync operation */
     public abstract void doOper(ProviderClientT providerClient, Context ctx)
-            throws IOException;
+            throws Exception;
 }
