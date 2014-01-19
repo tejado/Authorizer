@@ -53,6 +53,8 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
             itsDb.beginTransaction();
             opers = performSync();
             itsDb.setTransactionSuccessful();
+        } catch (Exception e) {
+            throw updateSyncException(e);
         } finally {
             itsDb.endTransaction();
         }
@@ -70,6 +72,7 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
                         itsDb.endTransaction();
                     }
                 } catch (Exception e) {
+                    e = updateSyncException(e);
                     Log.e(itsTag, "Sync error for file " + oper.getFile(), e);
                     itsLogrec.addFailure(e);
                 }
@@ -83,4 +86,10 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
     /** Perform a sync of the files */
     protected abstract List<AbstractSyncOper<ProviderClientT>> performSync()
             throws Exception;
+
+    /** Update an exception thrown during syncing */
+    protected Exception updateSyncException(Exception e)
+    {
+        return e;
+    }
 }

@@ -29,7 +29,6 @@ import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
 import com.box.boxjavalibv2.resourcemanagers.BoxSearchManager;
 import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
 import com.box.restclientv2.exceptions.BoxRestException;
-import com.box.restclientv2.exceptions.BoxSDKException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
@@ -69,27 +68,6 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     @Override
     protected List<AbstractSyncOper<BoxClient>> performSync()
             throws Exception
-    {
-        try {
-            return doPerformSync();
-        } catch (BoxServerException e) {
-            // Massage server exceptions to get the error
-            BoxServerError serverError = e.getError();
-            if (serverError != null) {
-                String msg = e.getCustomMessage();
-                if (TextUtils.isEmpty(msg)) {
-                    msg = "Box server error";
-                }
-                throw new Exception(msg + ": " + boxToString(serverError), e);
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    /** Delegate method to perform a sync with raw Box errors */
-    private final List<AbstractSyncOper<BoxClient>> doPerformSync()
-            throws BoxSDKException
     {
         syncDisplayName();
 
@@ -142,6 +120,25 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             }
         }
         return opers;
+    }
+
+    /** Update an exception thrown during syncing */
+    @Override
+    protected Exception updateSyncException(Exception e)
+    {
+        if (e instanceof BoxServerException) {
+            BoxServerException boxExcept = (BoxServerException)e;
+            // Massage server exceptions to get the error
+            BoxServerError serverError = boxExcept.getError();
+            if (serverError != null) {
+                String msg = boxExcept.getCustomMessage();
+                if (TextUtils.isEmpty(msg)) {
+                    msg = "Box server error";
+                }
+                e = new Exception(msg + ": " + boxToString(serverError), e);
+            }
+        }
+        return e;
     }
 
     /** Sync account display name */
