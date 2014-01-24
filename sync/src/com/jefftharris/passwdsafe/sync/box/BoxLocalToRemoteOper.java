@@ -6,6 +6,7 @@
  */
 package com.jefftharris.passwdsafe.sync.box;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -56,19 +57,32 @@ public class BoxLocalToRemoteOper extends AbstractSyncOper<BoxClient>
     {
         PasswdSafeUtil.dbginfo(TAG, "syncLocalToRemote %s", itsFile);
 
-        itsLocalFile = ctx.getFileStreamPath(itsFile.itsLocalFile);
         BoxFilesManager fileMgr = providerClient.getFilesManager();
-        if (itsIsInsert) {
-            BoxFileUploadRequestObject req =
+        if (itsFile.itsLocalFile != null) {
+            itsLocalFile = ctx.getFileStreamPath(itsFile.itsLocalFile);
+            if (itsIsInsert) {
+                BoxFileUploadRequestObject req =
                     BoxFileUploadRequestObject.uploadFileRequestObject(
                         "0", itsFile.itsLocalTitle, itsLocalFile,
                         providerClient.getJSONParser());
-            itsUpdatedFile = fileMgr.uploadFile(req);
-        } else {
-            BoxFileUploadRequestObject req =
+                itsUpdatedFile = fileMgr.uploadFile(req);
+            } else {
+                BoxFileUploadRequestObject req =
                     BoxFileUploadRequestObject.uploadNewVersionRequestObject(
                         itsFile.itsLocalTitle, itsLocalFile);
-            itsUpdatedFile = fileMgr.uploadNewVersion(itsFile.itsRemoteId, req);
+                itsUpdatedFile =
+                        fileMgr.uploadNewVersion(itsFile.itsRemoteId, req);
+            }
+        } else {
+            ByteArrayInputStream is = new ByteArrayInputStream(new byte[0]);
+            BoxFileUploadRequestObject req =
+                    BoxFileUploadRequestObject.uploadFileRequestObject(
+                        "0", itsFile.itsLocalTitle, is);
+            try {
+                itsUpdatedFile = fileMgr.uploadFile(req);
+            } finally {
+                is.close();
+            }
         }
 
         PasswdSafeUtil.dbginfo(TAG, "syncLocalToRemote updated %s",
