@@ -106,7 +106,6 @@ public class BoxProvider extends AbstractSyncTimerProvider
                         OAuthActivity.ERROR_MESSAGE);
             }
             Log.e(TAG, "Box auth failed: " + failure);
-            // TODO: better error
         } else {
             authdata = activityData.getParcelableExtra(
                     OAuthActivity.BOX_CLIENT_OAUTH);
@@ -230,8 +229,10 @@ public class BoxProvider extends AbstractSyncTimerProvider
     public long insertLocalFile(long providerId, String title, SQLiteDatabase db)
                                                                                  throws Exception
     {
-        return SyncDb.addLocalFile(providerId, title,
-                                   System.currentTimeMillis(), db);
+        long id = SyncDb.addLocalFile(providerId, title,
+                                      System.currentTimeMillis(), db);
+        requestSync(false);
+        return id;
     }
 
     /* (non-Javadoc)
@@ -246,6 +247,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
         SyncDb.updateLocalFile(file.itsId, localFileName,
                                file.itsLocalTitle, file.itsLocalFolder,
                                localFile.lastModified(), db);
+        requestSync(false);
     }
 
     /* (non-Javadoc)
@@ -256,6 +258,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
             throws Exception
     {
         SyncDb.updateLocalFileDeleted(file.itsId, db);
+        requestSync(false);
     }
 
     /** Get the current Box user */
@@ -321,7 +324,6 @@ public class BoxProvider extends AbstractSyncTimerProvider
                     @Override
                     public void run()
                     {
-                        // TODO: temp check for user
                         BoxUser user = getCurrentUser();
                         setUserId(user);
                         updateProviderSyncFreq(itsUserId);
