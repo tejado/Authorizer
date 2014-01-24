@@ -145,7 +145,7 @@ public abstract class AbstractSyncTimerProvider implements Provider
     }
 
     /** Check whether to start a sync */
-    protected final void doRequestSync(boolean manual)
+    protected synchronized final void doRequestSync(boolean manual)
     {
         if (itsSyncTask == null) {
             itsSyncTask = new SyncRequestTask(manual);
@@ -255,7 +255,9 @@ public abstract class AbstractSyncTimerProvider implements Provider
         private void checkSyncerDone()
         {
             if (!itsIsTimerPending && !itsIsRunning) {
-                itsSyncTask = null;
+                synchronized (AbstractSyncTimerProvider.this) {
+                    itsSyncTask = null;
+                }
             }
         }
     }
