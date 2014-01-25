@@ -116,13 +116,30 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
                 new ArrayList<AbstractSyncOper<BoxClient>>();
         dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
-            if (dbfile.itsIsRemoteDeleted || dbfile.itsIsLocalDeleted) {
-                opers.add(new BoxRmFileOper(dbfile));
-            } else if (isRemoteNewer(dbfile, allboxfiles)) {
-                opers.add(new BoxRemoteToLocalOper(dbfile));
+            if (isRemoteNewer(dbfile, allboxfiles)) {
+                if (dbfile.itsIsRemoteDeleted) {
+                    opers.add(new BoxRmFileOper(dbfile));
+                } else {
+                    if (dbfile.itsIsLocalDeleted) {
+                        PasswdSafeUtil.dbginfo(
+                                TAG, "performSync recreate local removed %s",
+                                dbfile);
+                    }
+                    opers.add(new BoxRemoteToLocalOper(dbfile));
+                }
             } else if (isLocalNewer(dbfile, allboxfiles)) {
-                // TODO: handle local mod and remote deleted like gdrive?
-                opers.add(new BoxLocalToRemoteOper(dbfile));
+                if (dbfile.itsIsLocalDeleted) {
+                    opers.add(new BoxRmFileOper(dbfile));
+                } else {
+                    if (dbfile.itsIsRemoteDeleted) {
+                        PasswdSafeUtil.dbginfo(
+                                TAG, "performSync recreate remote removed %s",
+                                dbfile);
+                    }
+                    opers.add(new BoxLocalToRemoteOper(dbfile));
+                }
+            } else if (dbfile.itsIsRemoteDeleted || dbfile.itsIsLocalDeleted) {
+                opers.add(new BoxRmFileOper(dbfile));
             }
         }
         return opers;

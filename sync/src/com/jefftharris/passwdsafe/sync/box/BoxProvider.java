@@ -272,7 +272,6 @@ public class BoxProvider extends AbstractSyncTimerProvider
         try {
             return userMgr.getCurrentUser(req);
         } catch (BoxSDKException e) {
-            // TODO: better error
             Log.e(TAG, "Failed to get user", e);
         }
         return null;
