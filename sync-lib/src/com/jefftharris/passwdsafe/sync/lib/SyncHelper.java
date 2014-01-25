@@ -9,6 +9,8 @@ package com.jefftharris.passwdsafe.sync.lib;
 import android.accounts.Account;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -69,8 +71,14 @@ public class SyncHelper
                                    SQLiteDatabase db,
                                    Context ctx)
     {
-        PasswdSafeUtil.dbginfo(TAG, "Performing sync for %s (%s), manual: %b",
-                               acct.name, acct.type, manual);
+        ConnectivityManager connMgr = (ConnectivityManager)
+                ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
+        boolean online = (netInfo != null) && netInfo.isConnected();
+
+        PasswdSafeUtil.dbginfo(TAG,
+                               "Performing sync %s (%s), manual %b, online %b",
+                               acct.name, acct.type, manual, online);
 
         String displayName = TextUtils.isEmpty(provider.itsDisplayName) ?
                 provider.itsAcct : provider.itsDisplayName;
@@ -78,7 +86,10 @@ public class SyncHelper
                 new SyncLogRecord(displayName,
                                   provider.itsType.getName(ctx), manual);
         try {
-            providerImpl.sync(acct, provider, db, manual, logrec);
+            logrec.setNotConnected(!online);
+            if (online) {
+                providerImpl.sync(acct, provider, db, manual, logrec);
+            }
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
             logrec.addFailure(e);

@@ -24,6 +24,7 @@ public class SyncLogRecord
     private long itsEndTime = -1;
     private boolean itsIsFullSync = false;
     private boolean itsIsManualSync;
+    private boolean itsIsNotConnected = false;
     private List<String> itsEntries = new ArrayList<String>();
 
     /** Constructor */
@@ -82,6 +83,18 @@ public class SyncLogRecord
         itsIsFullSync = full;
     }
 
+    /** Get whether the network was not connected */
+    public boolean isNotConnected()
+    {
+        return itsIsNotConnected;
+    }
+
+    /** Set whether the network is not connected */
+    public void setNotConnected(boolean notConnected)
+    {
+        itsIsNotConnected = notConnected;
+    }
+
     /** Add a sync operation entry */
     public void addEntry(String entry)
     {
@@ -120,6 +133,9 @@ public class SyncLogRecord
                                  ctx.getString(itsIsManualSync ?
                                          R.string.manual :
                                          R.string.automatic),
+                                 ctx.getString(itsIsNotConnected ?
+                                         R.string.network_not_connected :
+                                         R.string.network_connected),
                                  itsStartTime, itsEndTime));
         str.append("\n");
         str.append(getActions());

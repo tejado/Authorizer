@@ -120,6 +120,14 @@ public class SyncLogsFragment extends ListFragment
                         str.append(getString(R.string.automatic));
                     }
 
+                    str.append(", ");
+                    if ((flags &
+                            PasswdSafeContract.SyncLogs.FLAGS_IS_NOT_CONNECTED) != 0) {
+                        str.append(getString(R.string.network_not_connected));
+                    } else {
+                        str.append(getString(R.string.network_connected));
+                    }
+
                     if (log.length() != 0) {
                         str.append("\n");
                     }

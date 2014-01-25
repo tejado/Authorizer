@@ -405,6 +405,9 @@ public class SyncDb
         if (logrec.isManualSync()) {
             flags |= PasswdSafeContract.SyncLogs.FLAGS_IS_MANUAL;
         }
+        if (logrec.isNotConnected()) {
+            flags |= PasswdSafeContract.SyncLogs.FLAGS_IS_NOT_CONNECTED;
+        }
         values.put(DB_COL_SYNC_LOGS_FLAGS, flags);
 
         db.insertOrThrow(DB_TABLE_SYNC_LOGS, null, values);
