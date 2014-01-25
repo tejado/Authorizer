@@ -46,6 +46,8 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
  */
 public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
 {
+    public static final String ROOT_FOLDER = "0";
+
     private static final String TAG = "BoxSyncer";
 
     /** Constructor */
@@ -185,7 +187,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
         TreeMap<String, BoxFile> boxfiles = new TreeMap<String, BoxFile>();
 
         // Get root files
-        retrieveBoxFolderFiles("0", folderMgr, folderReq, boxfiles);
+        retrieveBoxFolderFiles(ROOT_FOLDER, folderMgr, folderReq, boxfiles);
 
         // Get files in folders matching 'passwdsafe' search
         BoxSearchManager searchMgr = itsProviderClient.getSearchManager();

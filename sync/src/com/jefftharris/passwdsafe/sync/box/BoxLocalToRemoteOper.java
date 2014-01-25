@@ -63,8 +63,8 @@ public class BoxLocalToRemoteOper extends AbstractSyncOper<BoxClient>
             if (itsIsInsert) {
                 BoxFileUploadRequestObject req =
                     BoxFileUploadRequestObject.uploadFileRequestObject(
-                        "0", itsFile.itsLocalTitle, itsLocalFile,
-                        providerClient.getJSONParser());
+                        BoxSyncer.ROOT_FOLDER, itsFile.itsLocalTitle,
+                        itsLocalFile, providerClient.getJSONParser());
                 itsUpdatedFile = fileMgr.uploadFile(req);
             } else {
                 BoxFileUploadRequestObject req =
@@ -77,7 +77,7 @@ public class BoxLocalToRemoteOper extends AbstractSyncOper<BoxClient>
             ByteArrayInputStream is = new ByteArrayInputStream(new byte[0]);
             BoxFileUploadRequestObject req =
                     BoxFileUploadRequestObject.uploadFileRequestObject(
-                        "0", itsFile.itsLocalTitle, is);
+                        BoxSyncer.ROOT_FOLDER, itsFile.itsLocalTitle, is);
             try {
                 itsUpdatedFile = fileMgr.uploadFile(req);
             } finally {
