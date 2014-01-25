@@ -18,6 +18,7 @@ import android.text.TextUtils;
 import com.box.boxjavalibv2.BoxClient;
 import com.box.boxjavalibv2.dao.BoxCollection;
 import com.box.boxjavalibv2.dao.BoxFile;
+import com.box.boxjavalibv2.dao.BoxFolder;
 import com.box.boxjavalibv2.dao.BoxItem;
 import com.box.boxjavalibv2.dao.BoxObject;
 import com.box.boxjavalibv2.dao.BoxServerError;
@@ -26,9 +27,12 @@ import com.box.boxjavalibv2.dao.BoxUser;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
 import com.box.boxjavalibv2.exceptions.BoxServerException;
 import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
+import com.box.boxjavalibv2.requests.requestobjects.BoxFolderRequestObject;
+import com.box.boxjavalibv2.resourcemanagers.BoxFoldersManager;
 import com.box.boxjavalibv2.resourcemanagers.BoxSearchManager;
 import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
 import com.box.restclientv2.exceptions.BoxRestException;
+import com.box.restclientv2.exceptions.BoxSDKException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
@@ -165,44 +169,77 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
 
     /** Get the files from Box */
     private final TreeMap<String, BoxFile> getBoxFiles()
-            throws BoxRestException, BoxServerException,
-                   AuthFatalFailureException
+            throws BoxSDKException
     {
-        BoxSearchManager searchMgr = itsProviderClient.getSearchManager();
-        BoxDefaultRequestObject searchReq = new BoxDefaultRequestObject();
-        searchReq.addField(BoxFile.FIELD_ID)
+        BoxFoldersManager folderMgr = itsProviderClient.getFoldersManager();
+        BoxFolderRequestObject folderReq =
+                BoxFolderRequestObject.getFolderItemsRequestObject(100, 0);
+        folderReq.addField(BoxFile.FIELD_ID)
                  .addField(BoxFile.FIELD_TYPE)
                  .addField(BoxFile.FIELD_NAME)
                  .addField(BoxFile.FIELD_PATH_COLLECTION)
                  .addField(BoxFile.FIELD_MODIFIED_AT)
                  .addField(BoxFile.FIELD_ITEM_STATUS)
                  .addField(BoxFile.FIELD_SIZE);
+
         TreeMap<String, BoxFile> boxfiles = new TreeMap<String, BoxFile>();
+
+        // Get root files
+        retrieveBoxFolderFiles("0", folderMgr, folderReq, boxfiles);
+
+        // Get files in folders matching 'passwdsafe' search
+        BoxSearchManager searchMgr = itsProviderClient.getSearchManager();
+        BoxDefaultRequestObject searchReq = new BoxDefaultRequestObject();
+        searchReq.addField(BoxFolder.FIELD_ID)
+                 .addField(BoxFolder.FIELD_TYPE)
+                 .addField(BoxFolder.FIELD_NAME);
         int offset = 0;
         boolean hasMoreFiles = true;
         while (hasMoreFiles) {
-            // TODO: bigger page
-            // TODO: use search?? Can take a while for Box to update
-
-            // TODO: handle box website delete where confirm box is still
-            // visible and cause the total count to include the extra item
-            // but a request failure
-            searchReq.setPage(10, offset);
-            BoxCollection files = searchMgr.search("*.psafe3", searchReq);
-            PasswdSafeUtil.dbginfo(TAG, "total count %d",
-                                   files.getTotalCount());
-            List<BoxTypedObject> entries = files.getEntries();
+            searchReq.setPage(100, offset);
+            BoxCollection items = searchMgr.search("passwdsafe", searchReq);
+            List<BoxTypedObject> entries = items.getEntries();
             for (BoxTypedObject obj: entries) {
-                PasswdSafeUtil.dbginfo(TAG, "file %s", boxToString(obj));
-                if (obj instanceof BoxFile) {
-                    boxfiles.put(obj.getId(), (BoxFile)obj);
+                PasswdSafeUtil.dbginfo(TAG, "search item %s", boxToString(obj));
+                if (obj instanceof BoxFolder) {
+                    retrieveBoxFolderFiles(obj.getId(), folderMgr, folderReq,
+                                           boxfiles);
                 }
             }
             offset += entries.size();
             hasMoreFiles =
-                    (offset < files.getTotalCount()) && !entries.isEmpty();
+                    (offset < items.getTotalCount()) && !entries.isEmpty();
         }
+
         return boxfiles;
+    }
+
+    /** Retrieve the files in the given folder */
+    private final void retrieveBoxFolderFiles(String folderId,
+                                              BoxFoldersManager folderMgr,
+                                              BoxFolderRequestObject folderReq,
+                                              TreeMap<String, BoxFile> boxfiles)
+            throws BoxSDKException
+    {
+        int offset = 0;
+        boolean hasMoreItems = true;
+        while (hasMoreItems) {
+            folderReq.setPage(100, offset);
+            BoxCollection items = folderMgr.getFolderItems(folderId, folderReq);
+            List<BoxTypedObject> entries = items.getEntries();
+            for (BoxTypedObject obj: entries) {
+                PasswdSafeUtil.dbginfo(TAG, "item %s", boxToString(obj));
+                if (obj instanceof BoxFile) {
+                    BoxFile file = (BoxFile)obj;
+                    if (file.getName().endsWith(".psafe3")) {
+                        boxfiles.put(file.getId(), file);
+                    }
+                }
+            }
+            offset += entries.size();
+            hasMoreItems =
+                    (offset < items.getTotalCount()) && !entries.isEmpty();
+        }
     }
 
     /** Is the remote file newer than the local */
