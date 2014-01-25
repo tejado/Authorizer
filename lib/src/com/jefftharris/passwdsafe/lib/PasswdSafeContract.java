@@ -75,6 +75,9 @@ public final class PasswdSafeContract
         public static final String COL_SYNC_FREQ = "sync_freq";
         public static final String COL_DISPLAY_NAME = "display_name";
 
+        public static final String PROVIDER_SORT_ORDER =
+                COL_TYPE + " ASC, " + COL_DISPLAY_NAME + " ASC";
+
         public static final String[] PROJECTION = {
             Providers._ID,
             Providers.COL_TYPE,
@@ -120,7 +123,8 @@ public final class PasswdSafeContract
 
         public static final String NOT_DELETED_SELECTION =
                 "not local_deleted and not remote_deleted";
-        public static final String TITLE_SORT_ORDER = "title ASC";
+        public static final String TITLE_SORT_ORDER =
+                COL_FOLDER + " ASC, " + COL_TITLE + " ASC";
 
         public static final String[] PROJECTION = {
             Files._ID,

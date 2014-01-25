@@ -349,6 +349,11 @@ public class PasswdSafeProvider extends ContentProvider
         case PasswdSafeContract.MATCH_PROVIDERS: {
             qb.setTables(SyncDb.DB_TABLE_PROVIDERS);
             qb.setProjectionMap(PROVIDERS_MAP);
+
+            if (PasswdSafeContract.Providers.PROVIDER_SORT_ORDER.equals(
+                    sortOrder)) {
+                sortOrderValid = true;
+            }
             break;
         }
         case PasswdSafeContract.MATCH_PROVIDER: {

@@ -239,9 +239,9 @@ public class SyncProviderFragment extends ListFragment
         }
         v.setVisibility(View.VISIBLE);
         Uri uri = PasswdSafeContract.Providers.CONTENT_URI;
-        return new PasswdCursorLoader(getActivity(), uri,
-                                      PasswdSafeContract.Providers.PROJECTION,
-                                      null, null, null);
+        return new PasswdCursorLoader(
+                 getActivity(), uri, PasswdSafeContract.Providers.PROJECTION,
+                 null, null, PasswdSafeContract.Providers.PROVIDER_SORT_ORDER);
     }
 
 
