@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLibR;
@@ -22,7 +23,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLibR;
 /**
  *  A Dropbox sync operation to remove a file
  */
-public class DropboxRmFileOper extends DropboxSyncOper
+public class DropboxRmFileOper extends AbstractSyncOper<DbxFileSystem>
 {
     private static final String TAG = "DropboxRmFileOper";
 

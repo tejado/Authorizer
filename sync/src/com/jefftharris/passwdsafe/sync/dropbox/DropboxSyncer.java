@@ -26,6 +26,7 @@ import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
@@ -59,7 +60,7 @@ public class DropboxSyncer
             throws DbxException, SQLException
     {
         itsLogrec.setFullSync(true);
-        List<DropboxSyncOper> opers = null;
+        List<AbstractSyncOper<DbxFileSystem>> opers = null;
 
         try {
             itsDb.beginTransaction();
@@ -70,7 +71,7 @@ public class DropboxSyncer
         }
 
         if (opers != null) {
-            for (DropboxSyncOper oper: opers) {
+            for (AbstractSyncOper<DbxFileSystem> oper: opers) {
                 try {
                     itsLogrec.addEntry(oper.getDescription(itsContext));
                     oper.doOper(itsFs, itsContext);
@@ -94,7 +95,7 @@ public class DropboxSyncer
 
 
     /** Perform a sync of the files */
-    private final List<DropboxSyncOper> performSync()
+    private final List<AbstractSyncOper<DbxFileSystem>> performSync()
             throws DbxException, SQLException
     {
         DbxAccount acct = itsFs.getAccount();
@@ -151,7 +152,8 @@ public class DropboxSyncer
                                  itsDb);
         }
 
-        List<DropboxSyncOper> opers = new ArrayList<DropboxSyncOper>();
+        List<AbstractSyncOper<DbxFileSystem>> opers =
+                new ArrayList<AbstractSyncOper<DbxFileSystem>>();
         dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
             if (dbfile.itsIsRemoteDeleted || dbfile.itsIsLocalDeleted) {

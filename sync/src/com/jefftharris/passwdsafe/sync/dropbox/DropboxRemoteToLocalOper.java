@@ -26,6 +26,7 @@ import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
@@ -34,7 +35,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLibR;
 /**
  *  A Dropbox sync operation to sync a remote file to a local file
  */
-public class DropboxRemoteToLocalOper extends DropboxSyncOper
+public class DropboxRemoteToLocalOper extends AbstractSyncOper<DbxFileSystem>
 {
     private static final String TAG = "DropboxRemoteToLocalOper";
 

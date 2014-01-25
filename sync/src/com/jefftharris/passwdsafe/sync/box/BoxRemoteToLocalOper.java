@@ -43,8 +43,6 @@ public class BoxRemoteToLocalOper extends AbstractSyncOper<BoxClient>
         super(file);
     }
 
-    // TODO: refactor Box opers with Dropbox ones
-
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper#doOper(java.lang.Object, android.content.Context)
      */
