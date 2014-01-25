@@ -147,7 +147,7 @@ public abstract class AbstractSyncTimerProvider implements Provider
     /** Check whether to start a sync */
     protected synchronized final void doRequestSync(boolean manual)
     {
-        if (itsSyncTask == null) {
+        if ((itsSyncTask == null) || itsSyncTask.isFinished()) {
             itsSyncTask = new SyncRequestTask(manual);
         }
         itsSyncTask.checkSync();
@@ -183,7 +183,7 @@ public abstract class AbstractSyncTimerProvider implements Provider
         }
 
         /** Check the status of the sync */
-        public void checkSync()
+        public synchronized void checkSync()
         {
             Status status = getStatus();
             PasswdSafeUtil.dbginfo(
@@ -207,9 +207,15 @@ public abstract class AbstractSyncTimerProvider implements Provider
             }
         }
 
+        /** Get whether the task is finished */
+        public synchronized boolean isFinished()
+        {
+            return !itsIsTimerPending && !itsIsRunning;
+        }
+
         /** Timer expired */
         @Override
-        public void run()
+        public synchronized void run()
         {
             Status status = getStatus();
             PasswdSafeUtil.dbginfo(itsTag,
@@ -223,7 +229,6 @@ public abstract class AbstractSyncTimerProvider implements Provider
             }
             case RUNNING:
             case FINISHED: {
-                checkSyncerDone();
                 doRequestSync(itsIsManual);
                 break;
             }
@@ -260,21 +265,10 @@ public abstract class AbstractSyncTimerProvider implements Provider
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(Void result)
+        protected synchronized void onPostExecute(Void result)
         {
             super.onPostExecute(result);
             itsIsRunning = false;
-            checkSyncerDone();
-        }
-
-        /** Check whether the task is finished */
-        private void checkSyncerDone()
-        {
-            if (!itsIsTimerPending && !itsIsRunning) {
-                synchronized (AbstractSyncTimerProvider.this) {
-                    itsSyncTask = null;
-                }
-            }
         }
     }
 }
