@@ -185,22 +185,25 @@ public abstract class AbstractSyncTimerProvider implements Provider
         /** Check the status of the sync */
         public void checkSync()
         {
-            switch (getStatus()) {
+            Status status = getStatus();
+            PasswdSafeUtil.dbginfo(
+                    itsTag, "SyncRequestTask checkSync status %s timer %b",
+                    status, itsIsTimerPending);
+            long delay = 0;
+            switch (status) {
             case PENDING: {
-                PasswdSafeUtil.dbginfo(itsTag, "SyncRequestTask start");
-                execute();
+                delay = 3000;
                 break;
             }
             case RUNNING:
             case FINISHED: {
-                if (!itsIsTimerPending) {
-                    PasswdSafeUtil.dbginfo(itsTag,
-                                           "SyncRequestTask start timer");
-                    itsIsTimerPending = true;
-                    itsHandler.postDelayed(this, 15000);
-                }
+                delay = 15000;
                 break;
             }
+            }
+            if (!itsIsTimerPending) {
+                itsIsTimerPending = true;
+                itsHandler.postDelayed(this, delay);
             }
         }
 
@@ -208,10 +211,23 @@ public abstract class AbstractSyncTimerProvider implements Provider
         @Override
         public void run()
         {
-            PasswdSafeUtil.dbginfo(itsTag, "SyncRequestTask timer expired");
+            Status status = getStatus();
+            PasswdSafeUtil.dbginfo(itsTag,
+                                   "SyncRequestTask timer expired status %s",
+                                   status);
             itsIsTimerPending = false;
-            checkSyncerDone();
-            doRequestSync(itsIsManual);
+            switch (status) {
+            case PENDING: {
+                execute();
+                break;
+            }
+            case RUNNING:
+            case FINISHED: {
+                checkSyncerDone();
+                doRequestSync(itsIsManual);
+                break;
+            }
+            }
         }
 
         /* (non-Javadoc)
@@ -251,7 +267,7 @@ public abstract class AbstractSyncTimerProvider implements Provider
             checkSyncerDone();
         }
 
-        /** Check whether the DropboxSyncer is finished */
+        /** Check whether the task is finished */
         private void checkSyncerDone()
         {
             if (!itsIsTimerPending && !itsIsRunning) {
