@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -116,8 +117,18 @@ public class GDriveProvider implements Provider
                                             Intent activityData,
                                             Uri acctProviderUri)
     {
-        return new NewAccountTask(acctProviderUri, null, ProviderType.GDRIVE,
-                                  itsContext);
+        if (activityData == null) {
+            return null;
+        }
+
+        Bundle b = activityData.getExtras();
+        String accountName = b.getString(AccountManager.KEY_ACCOUNT_NAME);
+        Log.i(TAG, "Selected account: " + accountName);
+        if (TextUtils.isEmpty(accountName)) {
+            return null;
+        }
+        return new NewAccountTask(acctProviderUri, accountName,
+                                  ProviderType.GDRIVE, itsContext);
     }
 
 

@@ -7,7 +7,6 @@
 package com.jefftharris.passwdsafe.sync;
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -187,18 +186,9 @@ public class MainActivity extends FragmentActivity
     {
         switch (requestCode) {
         case CHOOSE_ACCOUNT_RC:
-            // TODO: use finishAccountLink
-            if (data != null) {
-                Bundle b = data.getExtras();
-                String accountName =
-                        b.getString(AccountManager.KEY_ACCOUNT_NAME);
-                Log.i(TAG, "Selected account: " + accountName);
-                if (accountName != null && accountName.length() > 0) {
-                    itsNewAccountTask =
-                            new NewAccountTask(itsGdriveUri, accountName,
-                                               ProviderType.GDRIVE, this);
-                }
-            }
+            itsNewAccountTask =
+                    getGDriveProvider().finishAccountLink(resultCode, data,
+                                                          itsGdriveUri);
             break;
         case DROPBOX_LINK_RC: {
             itsNewAccountTask =
@@ -626,6 +616,12 @@ public class MainActivity extends FragmentActivity
                 cr.update(itsAccountUri, values, null, null);
             }
         }.startTask(this);
+    }
+
+    /** Get the Google Drive provider */
+    private Provider getGDriveProvider()
+    {
+        return ProviderFactory.getProvider(ProviderType.GDRIVE, this);
     }
 
     /** Get the Dropbox provider */
