@@ -317,17 +317,6 @@ public class BoxProvider extends AbstractSyncTimerProvider
                 } catch (Exception e) {
                     Log.e(TAG, "updateBoxAcct failure", e);
                 }
-            } else {
-                new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        BoxUser user = getCurrentUser();
-                        setUserId(user);
-                        updateProviderSyncFreq(itsUserId);
-                    }
-                }.start();
             }
 
         } else {

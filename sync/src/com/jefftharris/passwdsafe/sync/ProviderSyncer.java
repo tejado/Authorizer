@@ -58,6 +58,7 @@ public class ProviderSyncer
         Account acct = providerImpl.getAccount(acctName);
         if (acct != null) {
             providerImpl.updateSyncFreq(acct, freq);
+            providerImpl.requestSync(false);
             ContentResolver.requestSync(acct, PasswdSafeContract.AUTHORITY,
                                         new Bundle());
         }
