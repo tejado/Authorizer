@@ -71,7 +71,6 @@ public abstract class AbstractSyncTimerProvider implements Provider
     @Override
     public void updateSyncFreq(Account acct, final int freq)
     {
-        // TODO: acct not needed??
         itsHandler.post(new Runnable() {
             @Override
             public void run()
