@@ -13,6 +13,8 @@ import java.util.List;
 
 import android.content.Context;
 
+import com.jefftharris.passwdsafe.sync.R;
+
 /**
  * The SyncLogRecord class contains a record in the sync log
  */

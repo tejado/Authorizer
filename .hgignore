@@ -13,8 +13,5 @@
 ^sync-dropbox/bin
 ^sync-dropbox/local.properties
 ^sync-dropbox/gen
-^sync-lib/bin
-^sync-lib/local.properties
-^sync-lib/gen
 ^tests/bin
 ^tests/gen

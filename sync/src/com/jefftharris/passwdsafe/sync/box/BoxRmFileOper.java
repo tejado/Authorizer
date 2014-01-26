@@ -17,10 +17,10 @@ import com.box.boxjavalibv2.requests.requestobjects.BoxFileRequestObject;
 import com.box.boxjavalibv2.resourcemanagers.BoxFilesManager;
 import com.box.restclientv2.exceptions.BoxSDKException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
-import com.jefftharris.passwdsafe.sync.lib.SyncLibR;
 
 /**
  * A Box sync operation to remove a file
@@ -82,11 +82,11 @@ public class BoxRmFileOper extends AbstractSyncOper<BoxClient>
         }
 
         if (itsIsRmLocal && !itsIsRmRemote) {
-            return ctx.getString(SyncLibR.string.sync_oper_rmfile_local, name);
+            return ctx.getString(R.string.sync_oper_rmfile_local, name);
         } else if (!itsIsRmLocal && itsIsRmRemote) {
-            return ctx.getString(SyncLibR.string.sync_oper_rmfile_remote, name);
+            return ctx.getString(R.string.sync_oper_rmfile_remote, name);
         } else {
-            return ctx.getString(SyncLibR.string.sync_oper_rmfile, name);
+            return ctx.getString(R.string.sync_oper_rmfile, name);
         }
     }
 }

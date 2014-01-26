@@ -21,11 +21,11 @@ import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
 import com.box.boxjavalibv2.resourcemanagers.BoxFilesManager;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
-import com.jefftharris.passwdsafe.sync.lib.SyncLibR;
 
 /**
  * A Box sync operation to sync a remote file to a local one
@@ -104,7 +104,7 @@ public class BoxRemoteToLocalOper extends AbstractSyncOper<BoxClient>
     @Override
     public String getDescription(Context ctx)
     {
-        return ctx.getString(SyncLibR.string.sync_oper_remote_to_local,
+        return ctx.getString(R.string.sync_oper_remote_to_local,
                              itsFile.itsRemoteTitle +
                              " [" + itsFile.itsRemoteFolder + "]");
     }

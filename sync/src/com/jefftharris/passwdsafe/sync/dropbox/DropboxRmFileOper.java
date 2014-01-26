@@ -15,10 +15,10 @@ import android.database.sqlite.SQLiteDatabase;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
-import com.jefftharris.passwdsafe.sync.lib.SyncLibR;
 
 /**
  *  A Dropbox sync operation to remove a file
@@ -82,11 +82,11 @@ public class DropboxRmFileOper extends AbstractSyncOper<DbxFileSystem>
         }
 
         if (itsIsRmLocal && !itsIsRmRemote) {
-            return ctx.getString(SyncLibR.string.sync_oper_rmfile_local, name);
+            return ctx.getString(R.string.sync_oper_rmfile_local, name);
         } else if (!itsIsRmLocal && itsIsRmRemote) {
-            return ctx.getString(SyncLibR.string.sync_oper_rmfile_remote, name);
+            return ctx.getString(R.string.sync_oper_rmfile_remote, name);
         } else {
-            return ctx.getString(SyncLibR.string.sync_oper_rmfile, name);
+            return ctx.getString(R.string.sync_oper_rmfile, name);
         }
     }
 }

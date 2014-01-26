@@ -13,6 +13,7 @@ import android.net.Uri;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.sync.R;
 
 /**
  * Task to complete the addition of a new account
