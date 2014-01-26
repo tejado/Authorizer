@@ -25,7 +25,7 @@
                 android:contentDescription="@string/clear"
                 android:onClick="onGdriveClear"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_delete"/>
+                android:src="@drawable/ic_action_delete"/>
 
             <TextView
                 android:id="@+id/gdrive_title"
@@ -124,7 +124,7 @@
                 android:contentDescription="@string/clear"
                 android:onClick="onDropboxClear"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_delete"/>
+                android:src="@drawable/ic_action_delete"/>
             
             <TextView
                 android:id="@+id/dropbox_title"
@@ -224,7 +224,7 @@
                 android:contentDescription="@string/clear"
                 android:onClick="onBoxClear"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_delete"/>
+                android:src="@drawable/ic_action_delete"/>
             
             <TextView
                 android:id="@+id/box_title"
