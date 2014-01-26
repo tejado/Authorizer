@@ -305,7 +305,7 @@
             android:drawableLeft="@drawable/ic_launcher_passwdsafe"
             android:drawablePadding="6dp"
             android:gravity="fill_vertical"
-            android:paddingBottom="6dp"
+            android:padding="6dp"
             android:paddingTop="12dp"
             android:text="@string/passwdsafe"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
