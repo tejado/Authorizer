@@ -466,7 +466,8 @@ public class MainActivity extends FragmentActivity
     {
         View chooseBtn = findViewById(R.id.gdrive_choose);
         TextView acctView = (TextView)findViewById(R.id.gdrive_acct);
-        View btns = findViewById(R.id.gdrive_controls);
+        View controls = findViewById(R.id.gdrive_controls);
+        View clearBtn = findViewById(R.id.gdrive_clear);
         if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
@@ -486,17 +487,18 @@ public class MainActivity extends FragmentActivity
             freqSpin.setSelection(freq.getDisplayIdx());
             View syncBtn = findViewById(R.id.gdrive_sync);
             chooseBtn.setVisibility(View.GONE);
-            acctView.setVisibility(View.VISIBLE);
-            btns.setVisibility(View.VISIBLE);
+            controls.setVisibility(View.VISIBLE);
+            clearBtn.setVisibility(View.VISIBLE);
 
             boolean haveAccount = (itsGdriveAccount != null);
             if (haveAccount) {
-                acctView.setText(getString(R.string.account_label,
-                                           itsGdriveAccount.name));
+                acctView.setText(itsGdriveAccount.name);
             } else {
                 acctView.setText(getString(R.string.account_not_exists_label,
                                            acct));
             }
+            acctView.setVisibility(View.VISIBLE);
+
             freqSpin.setEnabled(haveAccount);
             freqSpinLabel.setEnabled(haveAccount);
             syncBtn.setEnabled(haveAccount);
@@ -505,7 +507,8 @@ public class MainActivity extends FragmentActivity
             itsGdriveUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
-            btns.setVisibility(View.GONE);
+            controls.setVisibility(View.GONE);
+            clearBtn.setVisibility(View.GONE);
         }
     }
 
@@ -514,7 +517,9 @@ public class MainActivity extends FragmentActivity
     {
         View chooseBtn = findViewById(R.id.dropbox_choose);
         TextView acctView = (TextView)findViewById(R.id.dropbox_acct);
-        View btns = findViewById(R.id.dropbox_controls);
+        View controls = findViewById(R.id.dropbox_controls);
+        View clearBtn = findViewById(R.id.dropbox_clear);
+        View acctWarning = findViewById(R.id.dropbox_acct_unlink);
         if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
@@ -531,13 +536,13 @@ public class MainActivity extends FragmentActivity
             Spinner freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
             freqSpin.setSelection(freq.getDisplayIdx());
             View syncBtn = findViewById(R.id.dropbox_sync);
-            View acctWarning = findViewById(R.id.dropbox_acct_unlink);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
-            btns.setVisibility(View.VISIBLE);
+            acctView.setText(acct);
+            controls.setVisibility(View.VISIBLE);
+            clearBtn.setVisibility(View.VISIBLE);
             acctWarning.setVisibility(authorized ? View.GONE : View.VISIBLE);
 
-            acctView.setText(getString(R.string.account_label, acct));
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
             syncBtn.setEnabled(authorized);
@@ -545,7 +550,9 @@ public class MainActivity extends FragmentActivity
             itsDropboxUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
-            btns.setVisibility(View.GONE);
+            controls.setVisibility(View.GONE);
+            clearBtn.setVisibility(View.GONE);
+            acctWarning.setVisibility(View.GONE);
         }
     }
 
@@ -554,7 +561,8 @@ public class MainActivity extends FragmentActivity
     {
         View chooseBtn = findViewById(R.id.box_choose);
         TextView acctView = (TextView)findViewById(R.id.box_acct);
-        View btns = findViewById(R.id.box_controls);
+        View controls = findViewById(R.id.box_controls);
+        View clearBtn = findViewById(R.id.box_clear);
         if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
@@ -573,9 +581,10 @@ public class MainActivity extends FragmentActivity
             View syncBtn = findViewById(R.id.box_sync);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
-            btns.setVisibility(View.VISIBLE);
+            acctView.setText(acct);
+            controls.setVisibility(View.VISIBLE);
+            clearBtn.setVisibility(View.VISIBLE);
 
-            acctView.setText(getString(R.string.account_label, acct));
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
             syncBtn.setEnabled(authorized);
@@ -583,7 +592,8 @@ public class MainActivity extends FragmentActivity
             itsBoxUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
-            btns.setVisibility(View.GONE);
+            controls.setVisibility(View.GONE);
+            clearBtn.setVisibility(View.GONE);
         }
     }
 

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="account_label">Compte: %1$s</string>
-    <string name="account_not_exists_label">Compte: %1$s (n\'existe pas)</string>
+    <string name="account_not_exists_label">Compte %1$s n\'existe pas</string>
     <string name="adding_account">Ajout de compte&#8230;</string>
     <string name="app_desc">Synchroniser les données PasswordSafe de services de cloud computing</string>
     <string name="app_name">PasswdSafe Sync</string>
@@ -12,7 +11,6 @@
     <string name="clear">Effacer</string>
     <string name="dropbox_acct_unlinked">App dissociée de compte Dropbox. Effacer et ajouter de nouveau accès Dropbox pour PasswdSafe Sync.</string>
     <string name="dropbox_passwdsafe_sync">Dropbox PasswdSafe Sync</string>
-    <string name="automatic">Automatique</string>
     <string name="full_sync">Synchronisation complète</string>
     <string name="gdrive_state_auth_required">Compte Google authentification requise. Synchronisez à nouveau pour commencer le processus d\'authentification.</string>
     <string name="gdrive_state_pending_auth">Authentification de compte Google est en cours. Sélectionnez la notification de la demande de session.</string>
@@ -29,7 +27,7 @@
     <string name="removing_account">Retrait de compte&#8230;</string>
     <string name="show_all">Afficher Tout</string>
     <string name="sync">Synchroniser</string>
-    <string name="sync_interval_label">Synchroniser intervalle:</string>
+    <string name="sync_interval_label">Intervalle:</string>
     <string name="sync_log_record">Synchroniser %1$s, %2$s, %3$s, %4$s, début: %5$tc, fin: %6$tc</string>
     <string name="sync_oper_local_to_remote">Uploader le fichier: %1$s</string>
     <string name="sync_oper_remote_to_local">Télécharger le fichier: %1$s</string>

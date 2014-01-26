@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="account_label">Account: %1$s</string>
-    <string name="account_not_exists_label">Account: %1$s (does not exist)</string>
+    <string name="account_not_exists_label">Account %1$s does not exist</string>
     <string name="adding_account">Adding account&#8230;</string>
     <string name="app_desc">Sync PasswordSafe databases from cloud services</string>
     <string name="app_name">PasswdSafe Sync</string>
@@ -28,7 +27,7 @@
     <string name="removing_account">Removing account&#8230;</string>
     <string name="show_all">Show All</string>
     <string name="sync">Sync</string>
-    <string name="sync_interval_label">Sync interval:</string>
+    <string name="sync_interval_label">Interval:</string>
     <string name="sync_log_record">Sync %1$s, %2$s, %3$s, %4$s, start: %5$tc, end: %6$tc</string>
     <string name="sync_oper_local_to_remote">Upload file: %1$s</string>
     <string name="sync_oper_remote_to_local">Download file: %1$s</string>

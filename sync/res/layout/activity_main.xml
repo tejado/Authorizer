@@ -12,42 +12,69 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/google_drive"
-            android:drawablePadding="6dp"
-            android:gravity="fill_vertical"
-            android:text="@string/google_drive"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <Button
-            android:id="@+id/gdrive_choose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onGdriveChoose"
-            android:text="@string/choose_account"/>
-
-        <TextView
-            android:id="@+id/gdrive_acct"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="6dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textIsSelectable="false"/>
-
+        
         <RelativeLayout
-            android:id="@+id/gdrive_controls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            
+            <ImageButton
+                android:id="@+id/gdrive_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onGdriveClear"
+                android:padding="12dp"
+                android:src="@android:drawable/ic_delete"/>
 
-            <LinearLayout
-                android:id="@+id/gdrive_interval_box"
+            <TextView
+                android:id="@+id/gdrive_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="6dp">
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/gdrive_clear"
+                android:drawableLeft="@drawable/google_drive"
+                android:drawablePadding="6dp"
+                android:padding="6dp"
+                android:gravity="fill_vertical"
+                android:text="@string/google_drive"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+    
+            <Button
+                android:id="@+id/gdrive_choose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_title"
+                android:onClick="onGdriveChoose"
+                android:text="@string/choose_account"/>
+    
+            <TextView
+                android:id="@+id/gdrive_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_choose"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textIsSelectable="false"/>
+    
+            <LinearLayout
+                android:id="@+id/gdrive_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_acct"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/gdrive_sync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/sync"
+                    android:onClick="onGdriveSync"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_popup_sync"/>
 
                 <TextView
                     android:id="@+id/gdrive_interval_label"
@@ -61,39 +88,22 @@
                     android:id="@+id/gdrive_interval"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:entries="@array/interval_array"/>
+                    android:layout_gravity="center_vertical"
+                    android:entries="@array/interval_array"
+                    tools:listitem="@android:layout/simple_spinner_item"/>
+
             </LinearLayout>
-
-            <Button
-                android:id="@+id/gdrive_sync"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/gdrive_interval_box"
-                android:drawableLeft="@android:drawable/ic_popup_sync"
-                android:onClick="onGdriveSync"
-                android:padding="12dp"
-                android:text="@string/sync"/>
-
-            <Button
-                android:id="@+id/gdrive_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/gdrive_interval_box"
-                android:layout_toRightOf="@id/gdrive_sync"
-                android:drawableLeft="@android:drawable/ic_delete"
-                android:onClick="onGdriveClear"
-                android:padding="12dp"
-                android:text="@string/clear"/>
 
             <TextView
                 android:id="@+id/gdrive_sync_warning"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@id/gdrive_sync"
-                android:layout_below="@id/gdrive_sync"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_controls"
                 android:drawableLeft="@android:drawable/ic_dialog_alert"
-                android:drawablePadding="6dp"
+                android:drawablePadding="12dp"
                 android:gravity="center_vertical"
+                android:padding="6dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         </RelativeLayout>
@@ -102,41 +112,68 @@
             style="@style/Separator"
             android:layout_margin="6dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/dropbox"
-            android:drawablePadding="6dp"
-            android:gravity="fill_vertical"
-            android:text="@string/dropbox"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <Button
-            android:id="@+id/dropbox_choose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onDropboxChoose"
-            android:text="@string/choose_account"/>
-
-        <TextView
-            android:id="@+id/dropbox_acct"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="6dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textIsSelectable="false"/>
-
         <RelativeLayout
-            android:id="@+id/dropbox_controls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/dropbox_interval_box"
+            
+            <ImageButton
+                android:id="@+id/dropbox_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onDropboxClear"
+                android:padding="12dp"
+                android:src="@android:drawable/ic_delete"/>
+            
+            <TextView
+                android:id="@+id/dropbox_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="6dp">
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/dropbox_clear"
+                android:drawableLeft="@drawable/dropbox"
+                android:drawablePadding="6dp"
+                android:gravity="fill_vertical"
+                android:padding="6dp"
+                android:text="@string/dropbox"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <Button
+                android:id="@+id/dropbox_choose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/dropbox_title"
+                android:onClick="onDropboxChoose"
+                android:text="@string/choose_account"/>
+    
+            <TextView
+                android:id="@+id/dropbox_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/dropbox_choose"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textIsSelectable="false"/>
+    
+            <LinearLayout
+                android:id="@+id/dropbox_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/dropbox_acct"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/dropbox_sync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/sync"
+                    android:onClick="onDropboxSync"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_popup_sync"/>
 
                 <TextView
                     android:id="@+id/dropbox_interval_label"
@@ -150,38 +187,20 @@
                     android:id="@+id/dropbox_interval"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:entries="@array/interval_array"/>
+                    android:layout_gravity="center_vertical"
+                    android:entries="@array/interval_array"
+                    tools:listitem="@android:layout/simple_spinner_item"/>
+
             </LinearLayout>
-
-            <Button
-                android:id="@+id/dropbox_sync"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/dropbox_interval_box"
-                android:drawableLeft="@android:drawable/ic_popup_sync"
-                android:onClick="onDropboxSync"
-                android:padding="12dp"
-                android:text="@string/sync"/>
-
-            <Button
-                android:id="@+id/dropbox_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/dropbox_interval_box"
-                android:layout_toRightOf="@id/dropbox_sync"
-                android:drawableLeft="@android:drawable/ic_delete"
-                android:onClick="onDropboxClear"
-                android:padding="12dp"
-                android:text="@string/clear"/>
 
             <TextView
                 android:id="@+id/dropbox_acct_unlink"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/dropbox_sync"
+                android:layout_below="@id/dropbox_controls"
                 android:drawableLeft="@android:drawable/ic_dialog_alert"
-                android:drawablePadding="6dp"
+                android:drawablePadding="12dp"
                 android:gravity="center_vertical"
                 android:padding="6dp"
                 android:text="@string/dropbox_acct_unlinked"
@@ -193,41 +212,68 @@
             style="@style/Separator"
             android:layout_margin="6dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/box"
-            android:drawablePadding="6dp"
-            android:gravity="fill_vertical"
-            android:text="@string/box"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <Button
-            android:id="@+id/box_choose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onBoxChoose"
-            android:text="@string/choose_account"/>
-
-        <TextView
-            android:id="@+id/box_acct"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="6dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textIsSelectable="false"/>
-
         <RelativeLayout
-            android:id="@+id/box_controls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/box_interval_box"
+            
+            <ImageButton
+                android:id="@+id/box_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onBoxClear"
+                android:padding="12dp"
+                android:src="@android:drawable/ic_delete"/>
+            
+            <TextView
+                android:id="@+id/box_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="6dp">
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/box_clear"
+                android:drawableLeft="@drawable/box"
+                android:drawablePadding="6dp"
+                android:gravity="fill_vertical"
+                android:padding="6dp"
+                android:text="@string/box"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <Button
+                android:id="@+id/box_choose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/box_title"
+                android:onClick="onBoxChoose"
+                android:text="@string/choose_account"/>
+    
+            <TextView
+                android:id="@+id/box_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/box_choose"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textIsSelectable="false"/>
+    
+            <LinearLayout
+                android:id="@+id/box_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/box_acct"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/box_sync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/sync"
+                    android:onClick="onBoxSync"
+                    android:padding="12dp"
+                    android:src="@android:drawable/ic_popup_sync"/>
 
                 <TextView
                     android:id="@+id/box_interval_label"
@@ -241,29 +287,11 @@
                     android:id="@+id/box_interval"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:entries="@array/interval_array"/>
+                    android:layout_gravity="center_vertical"
+                    android:entries="@array/interval_array"
+                    tools:listitem="@android:layout/simple_spinner_item"/>
+
             </LinearLayout>
-
-            <Button
-                android:id="@+id/box_sync"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/box_interval_box"
-                android:drawableLeft="@android:drawable/ic_popup_sync"
-                android:onClick="onBoxSync"
-                android:padding="12dp"
-                android:text="@string/sync"/>
-
-            <Button
-                android:id="@+id/box_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/box_interval_box"
-                android:layout_toRightOf="@id/box_sync"
-                android:drawableLeft="@android:drawable/ic_delete"
-                android:onClick="onBoxClear"
-                android:padding="12dp"
-                android:text="@string/clear"/>
 
         </RelativeLayout>
 
