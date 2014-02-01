@@ -39,7 +39,7 @@
     <string name="release_notes">
         &lt;b&gt;1.5.0&lt;/b&gt; - Ajout du support de Box. Fichiers par mot de 
         passe (.psafe3) sont synchronisés dans le dossier haut et un dossier 
-        taggés avec 'passwdsafe'.
+        taggés avec \'passwdsafe\'.
         \n\n
         &lt;b&gt;1.4.0&lt;/b&gt; - Synchronisez le nom du dossier d\'un fichier.
         Mettre à jour les clients de Dropbox et Google pour leurs dernières

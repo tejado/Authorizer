@@ -38,7 +38,8 @@
 
     <string name="release_notes">
         &lt;b&gt;1.5.0&lt;/b&gt; - Add Box support.  Password files (.psafe3) 
-        are synced from the top folder and any folder tagged with 'passwdsafe'.
+        are synced from the top folder and any folder tagged with 
+        \'passwdsafe\'.
         \n\n
         &lt;b&gt;1.4.0&lt;/b&gt; - Sync a file\'s folder name.  Update the
         clients for Dropbox and Google to their latest versions.  Add some
