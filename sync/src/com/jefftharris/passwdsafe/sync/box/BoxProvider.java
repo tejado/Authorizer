@@ -87,6 +87,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
     {
         Intent intent = OAuthActivity.createOAuthActivityIntent(
                 activity, BOX_CLIENT_ID, BOX_CLIENT_SECRET, false);
+        intent.putExtra("redirecturl", "https://127.0.0.1");
         activity.startActivityForResult(intent, requestCode);
     }
 
