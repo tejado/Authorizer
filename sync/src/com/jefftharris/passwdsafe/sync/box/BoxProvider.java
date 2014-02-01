@@ -228,7 +228,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
      */
     @Override
     public long insertLocalFile(long providerId, String title, SQLiteDatabase db)
-                                                                                 throws Exception
+            throws Exception
     {
         long id = SyncDb.addLocalFile(providerId, title,
                                       System.currentTimeMillis(), db);
