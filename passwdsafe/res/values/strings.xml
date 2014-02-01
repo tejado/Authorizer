@@ -238,6 +238,10 @@
     <string name="yes">Yes</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.5.0&lt;/b&gt; - Add Box support with PasswdSafe Sync.  
+        Password files (.psafe3) are synced from the top folder and any folder 
+        tagged with \'passwdsafe\'.
+        \n\n
         &lt;b&gt;4.4.0&lt;/b&gt;\n
         - Add a password preference for the set of symbols to use by default in
         password policies\n
