@@ -74,7 +74,7 @@
                     android:contentDescription="@string/sync"
                     android:onClick="onGdriveSync"
                     android:padding="12dp"
-                    android:src="@android:drawable/ic_popup_sync"/>
+                    android:src="@drawable/ic_action_sync"/>
 
                 <TextView
                     android:id="@+id/gdrive_interval_label"
@@ -173,7 +173,7 @@
                     android:contentDescription="@string/sync"
                     android:onClick="onDropboxSync"
                     android:padding="12dp"
-                    android:src="@android:drawable/ic_popup_sync"/>
+                    android:src="@drawable/ic_action_sync"/>
 
                 <TextView
                     android:id="@+id/dropbox_interval_label"
@@ -273,7 +273,7 @@
                     android:contentDescription="@string/sync"
                     android:onClick="onBoxSync"
                     android:padding="12dp"
-                    android:src="@android:drawable/ic_popup_sync"/>
+                    android:src="@drawable/ic_action_sync"/>
 
                 <TextView
                     android:id="@+id/box_interval_label"
