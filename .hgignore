@@ -3,6 +3,9 @@
 ^box-lib/gen
 ^lib/bin
 ^lib/local.properties
+^lib-play/gen
+^lib-play/bin
+^lib-play/local.properties
 ^lib/gen
 ^passwdsafe/bin
 ^passwdsafe/local.properties
