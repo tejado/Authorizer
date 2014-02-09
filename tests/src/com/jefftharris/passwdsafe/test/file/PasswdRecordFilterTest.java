@@ -72,8 +72,12 @@ public class PasswdRecordFilterTest extends AndroidTestCase
     private final PasswdRecordFilter recreateFilter(PasswdRecordFilter filter)
     {
         Parcel parcel = Parcel.obtain();
-        parcel.writeParcelable(filter, 0);
-        parcel.setDataPosition(0);
-        return parcel.readParcelable(getClass().getClassLoader());
+        try {
+            parcel.writeParcelable(filter, 0);
+            parcel.setDataPosition(0);
+            return parcel.readParcelable(getClass().getClassLoader());
+        } finally {
+            parcel.recycle();
+        }
     }
 }
