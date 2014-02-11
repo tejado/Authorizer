@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2010-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2010-2012, 2014 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -12,15 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.jefftharris.passwdsafe.R;
-import com.jefftharris.passwdsafe.file.PasswdHistory;
-import com.jefftharris.passwdsafe.lib.ApiCompat;
-import com.jefftharris.passwdsafe.lib.Utils;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -36,10 +30,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.file.PasswdHistory;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.Utils;
 
 /**
  * @author jharris
@@ -285,18 +283,6 @@ public final class GuiUtils
     }
 
 
-    /** Remove the layout_centerVertical flag if it is not supported */
-    public static void removeUnsupportedCenterVertical(View v)
-    {
-        if (ApiCompat.SDK_VERSION <= ApiCompat.SDK_CUPCAKE) {
-            RelativeLayout.LayoutParams params =
-                (RelativeLayout.LayoutParams)v.getLayoutParams();
-            params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
-            v.setLayoutParams(params);
-        }
-    }
-
-
     /** Show a notification */
     public static void showNotification(NotificationManager notifyMgr,
                                         Context ctx,
@@ -308,38 +294,30 @@ public final class GuiUtils
                                         PendingIntent intent,
                                         int notifyId)
     {
-        Notification notif;
-        if (ApiCompat.SDK_VERSION == ApiCompat.SDK_CUPCAKE) {
-            notif = new Notification(iconId, tickerText,
-                                     System.currentTimeMillis());
-            notif.setLatestEventInfo(ctx, title, content, intent);
-        } else {
-            BitmapDrawable b = (BitmapDrawable)ctx.getResources().getDrawable(
-                    R.drawable.ic_launcher_passwdsafe);
-            NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(ctx)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setContentIntent(intent)
-                .setSmallIcon(iconId)
-                .setLargeIcon(b.getBitmap())
-                .setTicker(tickerText);
-            NotificationCompat.InboxStyle style =
-                new NotificationCompat.InboxStyle(builder)
-                .setBigContentTitle(title)
-                .setSummaryText(content);
+        BitmapDrawable b = (BitmapDrawable)ctx.getResources().getDrawable(
+                R.drawable.ic_launcher_passwdsafe);
+        NotificationCompat.Builder builder =
+            new NotificationCompat.Builder(ctx)
+            .setContentTitle(title)
+            .setContentText(content)
+            .setContentIntent(intent)
+            .setSmallIcon(iconId)
+            .setLargeIcon(b.getBitmap())
+            .setTicker(tickerText);
+        NotificationCompat.InboxStyle style =
+            new NotificationCompat.InboxStyle(builder)
+            .setBigContentTitle(title)
+            .setSummaryText(content);
 
-            int numLines = Math.min(bigLines.size(), 5);
-            for (int i = 0; i < numLines; ++i) {
-                style.addLine(bigLines.get(i));
-            }
-            if (numLines < bigLines.size()) {
-                style.addLine("…");
-            }
-
-            builder.setStyle(style);
-            notif = builder.build();
+        int numLines = Math.min(bigLines.size(), 5);
+        for (int i = 0; i < numLines; ++i) {
+            style.addLine(bigLines.get(i));
         }
-        notifyMgr.notify(notifyId, notif);
+        if (numLines < bigLines.size()) {
+            style.addLine("…");
+        }
+
+        builder.setStyle(style);
+        notifyMgr.notify(notifyId, builder.build());
     }
 }

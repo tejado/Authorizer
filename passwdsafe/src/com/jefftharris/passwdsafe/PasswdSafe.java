@@ -123,8 +123,6 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             }
         });
 
-        GuiUtils.removeUnsupportedCenterVertical(findViewById(R.id.expiry));
-
         String action = intent.getAction();
         if (action.equals(PasswdSafeUtil.VIEW_INTENT) ||
             action.equals(Intent.ACTION_VIEW)) {
