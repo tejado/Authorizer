@@ -1,12 +1,15 @@
 ^lib/bin
 ^lib/local.properties
+^lib/gen
 ^lib-box/gen
 ^lib-box/bin
 ^lib-box/local.properties
 ^lib-play/gen
 ^lib-play/bin
 ^lib-play/local.properties
-^lib/gen
+^lib-v7app/gen
+^lib-v7app/bin
+^lib-v7app/local.properties
 ^passwdsafe/bin
 ^passwdsafe/local.properties
 ^passwdsafe/gen
