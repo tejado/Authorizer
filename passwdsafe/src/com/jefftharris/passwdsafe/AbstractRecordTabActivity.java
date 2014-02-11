@@ -15,6 +15,7 @@ import android.app.Dialog;
 import android.app.TabActivity;
 import android.os.Bundle;
 
+@SuppressWarnings("deprecation")
 public class AbstractRecordTabActivity extends TabActivity implements
                 PasswdFileActivity
 {

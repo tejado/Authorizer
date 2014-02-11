@@ -167,6 +167,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onPause()
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected void onPause()
     {
@@ -182,6 +183,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
@@ -311,6 +313,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
      */
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -653,6 +656,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 .setItems(R.array.expire_filters,
                           new DialogInterface.OnClickListener()
                 {
+                    @SuppressWarnings("deprecation")
                     public void onClick(DialogInterface dialog, int which)
                     {
                         PasswdRecordFilter.ExpiryFilter filter =
@@ -711,6 +715,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         return dialog;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onPrepareDialog(int id, Dialog dialog)
     {
@@ -925,6 +930,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 return PasswdSafeApp.getFileUriFromIntent(intent, ctx);
             }
 
+            @SuppressWarnings("deprecation")
             @Override
             protected void handleOnPostExecute(Object result)
             {
@@ -959,12 +965,14 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         });
     }
 
+    @SuppressWarnings("deprecation")
     private final void onCreateNew(Intent intent)
     {
         initUri(PasswdSafeApp.getFileUriFromIntent(intent, this));
         showDialog(DIALOG_FILE_NEW);
     }
 
+    @SuppressWarnings("deprecation")
     private final void openFile(StringBuilder passwd, boolean readonly)
     {
         removeDialog(DIALOG_GET_PASSWD);
@@ -982,6 +990,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
     /** Run a background task */
+    @SuppressWarnings("deprecation")
     private final void runTask(AbstractTask task)
     {
         itsLoadTask = task;
@@ -1035,6 +1044,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 	}
     }
 
+    @SuppressWarnings("deprecation")
     private final void cancelFileTask()
     {
         removeDialog(DIALOG_PROGRESS);
@@ -1241,6 +1251,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         /* (non-Javadoc)
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
+        @SuppressWarnings("deprecation")
         @Override
         protected void onPostExecute(Object result)
         {

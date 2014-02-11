@@ -98,6 +98,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.PasswdFileActivity#showProgressDialog()
      */
+    @SuppressWarnings("deprecation")
     public void showProgressDialog()
     {
         showDialog(DIALOG_SAVE_PROGRESS);
@@ -106,6 +107,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.PasswdFileActivity#removeProgressDialog()
      */
+    @SuppressWarnings("deprecation")
     public void removeProgressDialog()
     {
         removeDialog(DIALOG_SAVE_PROGRESS);
@@ -157,6 +159,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateDialog(int)
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected Dialog onCreateDialog(int id)
     {

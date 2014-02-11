@@ -429,6 +429,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected void onPrepareDialog(int id, Dialog dialog)
     {
@@ -852,6 +853,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         Spinner s = (Spinner)findViewById(R.id.group);
         s.setOnItemSelectedListener(new OnItemSelectedListener()
         {
+            @SuppressWarnings("deprecation")
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id)
             {
@@ -943,6 +945,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         Button editBtn = (Button)findViewById(R.id.policy_edit);
         editBtn.setOnClickListener(new OnClickListener()
         {
+            @SuppressWarnings("deprecation")
             public void onClick(View v)
             {
                 removeDialog(DIALOG_EDIT_POLICY);
@@ -1052,6 +1055,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         OnClickListener dateListener = new OnClickListener()
         {
+            @SuppressWarnings("deprecation")
             public void onClick(View v)
             {
                 switch (v.getId()) {

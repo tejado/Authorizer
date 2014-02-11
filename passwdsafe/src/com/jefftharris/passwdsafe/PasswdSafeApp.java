@@ -39,6 +39,8 @@ import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 public class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
+    // TODO: Remove all @SuppressWarnings("deprecation")
+
     public class AppActivityPasswdFile extends ActivityPasswdFile
     {
         /// The file data

@@ -143,6 +143,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
      */
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -270,6 +271,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected void onPrepareDialog(int id, Dialog dialog)
     {
