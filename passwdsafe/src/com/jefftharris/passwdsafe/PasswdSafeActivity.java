@@ -31,6 +31,7 @@ import android.widget.ListView;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 
 /**
  *  Main activity for the PasswdSafe app
@@ -112,6 +113,17 @@ public class PasswdSafeActivity extends ActionBarActivity
         });
 
         setView(ViewState.MAIN);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onStart()
+     */
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        ReleaseNotesDialog.checkNotes(this);
     }
 
 
