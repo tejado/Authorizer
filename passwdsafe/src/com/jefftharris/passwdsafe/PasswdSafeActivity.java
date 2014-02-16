@@ -28,6 +28,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
@@ -141,6 +142,11 @@ public class PasswdSafeActivity extends ActionBarActivity
             Intent intent = new Intent(this, FileListActivity.class);
             startActivity(intent);
             break;
+        }
+        case R.id.menu_about: {
+            AboutDialog dlg = new AboutDialog();
+            dlg.show(getSupportFragmentManager(), "AboutDialog");
+            return true;
         }
         default: {
             return super.onOptionsItemSelected(item);
