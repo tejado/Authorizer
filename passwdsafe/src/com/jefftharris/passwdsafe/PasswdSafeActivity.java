@@ -7,19 +7,30 @@
  */
 package com.jefftharris.passwdsafe;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  *  Main activity for the PasswdSafe app
+ *
+ *  TODO: How to handle change of main activity name in manifest?  Launcher
+ *  icons disappear
+ *
+ *  TODO: Keep old PasswdSafe activity for shortcuts and stuff?
+ *
+ *  TODO: On gingerbread, the single pane layout margins are not used
  */
-public class PasswdSafeActivity extends FragmentActivity
+public class PasswdSafeActivity extends ActionBarActivity
 {
     private static final String TAG = PasswdSafeActivity.class.getName();
     private boolean itsIsTwoPane = false;
@@ -43,6 +54,38 @@ public class PasswdSafeActivity extends FragmentActivity
         itsIsTwoPane = findViewById(R.id.content_list) != null;
 
         setView(ViewState.MAIN);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_passwdsafe, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_passwdsafe: {
+            Intent intent = new Intent(this, FileListActivity.class);
+            startActivity(intent);
+            break;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+        return true;
     }
 
 

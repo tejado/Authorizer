@@ -20,6 +20,8 @@ import android.view.KeyEvent;
 
 import com.jefftharris.passwdsafe.view.GuiUtils;
 
+// TODO: rework using ActionBarActivity
+
 public abstract class AbstractFileListActivity extends FragmentActivity
         implements FileListFragment.Listener,
                    SyncProviderFragment.Listener,
