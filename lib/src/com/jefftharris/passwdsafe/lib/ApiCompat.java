@@ -8,9 +8,11 @@
 package com.jefftharris.passwdsafe.lib;
 
 import android.accounts.Account;
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -50,6 +52,18 @@ public final class ApiCompat
             } else {
                 w.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
             }
+        }
+    }
+
+
+    /** Get a list item 1 layout which may support the activated state */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static int getOptionalActivatedListItem1()
+    {
+        if (SDK_VERSION >= SDK_HONEYCOMB) {
+            return android.R.layout.simple_list_item_activated_1;
+        } else {
+            return android.R.layout.simple_list_item_1;
         }
     }
 }

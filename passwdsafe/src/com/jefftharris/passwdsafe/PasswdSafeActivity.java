@@ -8,16 +8,27 @@
 package com.jefftharris.passwdsafe;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
@@ -33,7 +44,11 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 public class PasswdSafeActivity extends ActionBarActivity
 {
     private static final String TAG = PasswdSafeActivity.class.getName();
+
     private boolean itsIsTwoPane = false;
+    private DrawerLayout itsDrawerLayout;
+    private ListView itsDrawerList;
+    private ActionBarDrawerToggle itsDrawerToggle;
 
     /// The state of the views in the activity
     enum ViewState
@@ -52,6 +67,48 @@ public class PasswdSafeActivity extends ActionBarActivity
 
         PasswdSafeUtil.dbginfo(TAG, "onCreate state: %b", savedInstanceState);
         itsIsTwoPane = findViewById(R.id.content_list) != null;
+
+        itsDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        itsDrawerToggle = new ActionBarDrawerToggle(this, itsDrawerLayout,
+                                                    R.drawable.ic_drawer,
+                                                    R.string.open,
+                                                    R.string.close) {
+            @Override
+            public void onDrawerClosed(View drawerView)
+            {
+                super.onDrawerClosed(drawerView);
+                ActivityCompat.invalidateOptionsMenu(PasswdSafeActivity.this);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView)
+            {
+                super.onDrawerOpened(drawerView);
+                ActivityCompat.invalidateOptionsMenu(PasswdSafeActivity.this);
+            }
+        };
+        itsDrawerLayout.setDrawerListener(itsDrawerToggle);
+        itsDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+                                        GravityCompat.START);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
+        itsDrawerList = (ListView)findViewById(R.id.left_drawer);
+        itsDrawerList.setAdapter(
+                new ArrayAdapter<String>(
+                        this, ApiCompat.getOptionalActivatedListItem1(),
+                        new String[] { "ITEM1", "ITEM2", "ITEM3" }));
+        itsDrawerList.setOnItemClickListener(new OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id)
+            {
+                itsDrawerList.setItemChecked(position, true);
+                itsDrawerLayout.closeDrawer(itsDrawerList);
+            }
+        });
 
         setView(ViewState.MAIN);
     }
@@ -75,6 +132,10 @@ public class PasswdSafeActivity extends ActionBarActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        if (itsDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         switch (item.getItemId()) {
         case R.id.menu_passwdsafe: {
             Intent intent = new Intent(this, FileListActivity.class);
@@ -88,6 +149,22 @@ public class PasswdSafeActivity extends ActionBarActivity
         return true;
     }
 
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+        itsDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState)
+    {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        itsDrawerToggle.syncState();
+    }
 
     /// Set the activity's views to the given state
     private void setView(ViewState view)
