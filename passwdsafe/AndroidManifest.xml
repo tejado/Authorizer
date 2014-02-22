@@ -43,7 +43,8 @@
             android:name=".FileListActivity"
             android:clearTaskOnLaunch="true"
             android:finishOnTaskLaunch="true"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat">
             <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -187,7 +188,8 @@
         </activity>
         <activity
             android:name=".FileChooseActivity"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat"/>
 
         <activity
             android:name=".PasswdPolicyActivity"
@@ -213,7 +215,7 @@
         <activity
             android:name=".LauncherFileShortcuts"
             android:label="@string/password_file"
-            android:theme="@android:style/Theme.Dialog"
+            android:theme="@style/Theme.AppCompat"
             tools:ignore="ExportedActivity">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT"/>

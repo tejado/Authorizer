@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -176,10 +175,6 @@ public class SyncProviderFragment extends ListFragment
     {
         inflater.inflate(R.menu.fragment_sync_provider, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem mi = menu.findItem(R.id.menu_sync);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
 
 

@@ -1,14 +1,17 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:passwdsafe="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menu_preferences"
         android:icon="@android:drawable/ic_menu_preferences"
         android:orderInCategory="100"
-        android:title="@string/preferences"/>
+        android:title="@string/preferences"
+        passwdsafe:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_about"
         android:icon="@android:drawable/ic_menu_info_details"
         android:orderInCategory="100"
-        android:title="@string/about"/>
+        android:title="@string/about"
+        passwdsafe:showAsAction="ifRoom"/>
 
 </menu>

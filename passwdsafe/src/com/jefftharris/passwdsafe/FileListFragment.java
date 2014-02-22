@@ -16,10 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.util.FileComparator;
-import com.jefftharris.passwdsafe.view.GuiUtils;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +29,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,6 +39,10 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.util.FileComparator;
+import com.jefftharris.passwdsafe.view.GuiUtils;
 
 /**
  * The FileListFragment allows the user to choose which file to open
@@ -214,10 +213,6 @@ public class FileListFragment extends ListFragment
     {
         inflater.inflate(R.menu.fragment_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem mi = menu.findItem(R.id.menu_file_new);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
 
 
@@ -416,13 +411,6 @@ public class FileListFragment extends ListFragment
             groupPanel.setVisibility(View.VISIBLE);
             groupLabel.setText(itsDir.toString());
             emptyLabel.setText(R.string.no_files);
-        }
-
-        View selectFileLabel = rootView.findViewById(R.id.select_file_label);
-        if ((adapter != null) && !adapter.isEmpty()) {
-            selectFileLabel.setVisibility(View.VISIBLE);
-        } else {
-            selectFileLabel.setVisibility(View.GONE);
         }
 
         setListAdapter(adapter);

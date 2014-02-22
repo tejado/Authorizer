@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,12 +49,6 @@ public class FileListActivity extends AbstractFileListActivity
 
         MenuItem item = menu.findItem(R.id.menu_preferences);
         item.setIntent(new Intent(this, Preferences.class));
-        MenuItemCompat.setShowAsAction(item,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
-        item = menu.findItem(R.id.menu_about);
-        MenuItemCompat.setShowAsAction(item,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         return super.onCreateOptionsMenu(menu);
     }
