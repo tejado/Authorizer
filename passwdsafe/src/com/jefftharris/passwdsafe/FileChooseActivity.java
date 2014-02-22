@@ -10,6 +10,8 @@ package com.jefftharris.passwdsafe;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 /**
  *  File choose activity
@@ -27,6 +29,36 @@ public class FileChooseActivity extends AbstractFileListActivity
 
         // TODO: new file support
     }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.activity_file_choose, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_close: {
+            finish();
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
+
 
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.FileListFragment.Listener#openFile(android.net.Uri, java.lang.String)
