@@ -16,6 +16,7 @@
     <string name="change_password">Changer mot de passe</string>
     <string name="check_box_to_confirm">Cocher la case pour confirmer</string>
     <string name="choose">Choisir</string>
+    <string name="choose_file">Choisir le fichier</string>
     <string name="choose_group">Choisir un groupe</string>
     <string name="choose_record">Choisir une entrée</string>
     <string name="choose_type">Choisir un type</string>

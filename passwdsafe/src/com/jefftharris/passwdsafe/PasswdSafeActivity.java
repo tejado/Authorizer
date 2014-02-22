@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
@@ -44,7 +45,10 @@ import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
  *  TODO: On gingerbread, the single pane layout margins are not used
  */
 public class PasswdSafeActivity extends ActionBarActivity
+        implements PasswdSafeMainFragment.Listener
 {
+    private static final int ACTIVITY_REQUEST_CHOOSE_FILE = 1;
+
     private static final String TAG = PasswdSafeActivity.class.getName();
 
     private boolean itsIsTwoPane = false;
@@ -113,6 +117,40 @@ public class PasswdSafeActivity extends ActionBarActivity
         });
 
         setView(ViewState.MAIN);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdSafeMainFragment.Listener#chooseOpenFile()
+     */
+    @Override
+    public void chooseOpenFile()
+    {
+        Intent intent = new Intent(this, FileChooseActivity.class);
+        startActivityForResult(intent, ACTIVITY_REQUEST_CHOOSE_FILE);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onActivityResult(int, int, android.content.Intent)
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data)
+    {
+        switch (requestCode) {
+        case ACTIVITY_REQUEST_CHOOSE_FILE: {
+            if (resultCode == RESULT_OK) {
+                Uri uri = data.getData();
+                PasswdSafeUtil.dbginfo(TAG, "file choice: %s", uri);
+            }
+            break;
+        }
+        default: {
+            super.onActivityResult(requestCode, resultCode, data);
+            break;
+        }
+        }
     }
 
 
