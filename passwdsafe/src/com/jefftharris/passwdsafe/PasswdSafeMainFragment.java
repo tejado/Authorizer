@@ -19,7 +19,8 @@ import android.widget.Button;
 /**
  *  Fragment containing the initial view of the PasswdSafe app
  */
-public class PasswdSafeMainFragment extends Fragment implements OnClickListener
+public class PasswdSafeMainFragment extends Fragment
+        implements OnClickListener
 {
     /** Listener interface for owning activity */
     public interface Listener
