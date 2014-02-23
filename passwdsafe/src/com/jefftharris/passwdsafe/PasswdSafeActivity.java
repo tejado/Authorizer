@@ -232,10 +232,9 @@ public class PasswdSafeActivity extends ActionBarActivity
             if (itsIsTwoPane) {
                 Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
                 if (listFrag != null) {
+                    txn.hide(listFrag);
                     txn.remove(listFrag);
                 }
-                View listView = findViewById(R.id.content_list);
-                listView.setVisibility(View.GONE);
             }
 
             txn.replace(R.id.content, new PasswdSafeMainFragment());
