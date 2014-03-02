@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+
 /**
  *  File choose activity
  */
@@ -26,8 +28,6 @@ public class FileChooseActivity extends AbstractFileListActivity
     {
         super.onCreate(savedInstanceState);
         setTitle(R.string.choose_file);
-
-        // TODO: new file support
     }
 
 
@@ -74,12 +74,28 @@ public class FileChooseActivity extends AbstractFileListActivity
     }
 
     /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#createNewFile(android.net.Uri)
+     * @see com.jefftharris.passwdsafe.SyncProviderFilesFragment.Listener#createNewFile(android.net.Uri)
+     */
+    @Override
+    public void createNewFile(Uri locationUri)
+    {
+        if (locationUri != null) {
+            Intent result = new Intent(PasswdSafeUtil.NEW_INTENT,
+                                       locationUri);
+            setResult(RESULT_OK, result);
+        }
+        finish();
+    }
+
+
+    /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.FileListFragment.Listener#activityHasMenu()
      */
     @Override
     public boolean activityHasMenu()
     {
-        return false;
+        return true;
     }
 
     /* (non-Javadoc)

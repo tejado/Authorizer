@@ -18,7 +18,6 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,6 +54,9 @@ public class FileListFragment extends ListFragment
     {
         /** Open a file */
         public void openFile(Uri uri, String fileName);
+
+        /** Create a new file */
+        public void createNewFile(Uri locationUri);
 
         /** Does the activity have a menu */
         public boolean activityHasMenu();
@@ -238,8 +240,7 @@ public class FileListFragment extends ListFragment
         switch (item.getItemId()) {
         case R.id.menu_file_new: {
             if (itsDir != null) {
-                startActivity(new Intent(PasswdSafeUtil.NEW_INTENT,
-                                         Uri.fromFile(itsDir)));
+                itsListener.createNewFile(Uri.fromFile(itsDir));
             }
             return true;
         }

@@ -46,7 +46,8 @@ import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
  */
 public class PasswdSafeActivity extends ActionBarActivity
         implements PasswdSafeMainFragment.Listener,
-                   PasswdSafeNewOpenFileFragment.Listener
+                   PasswdSafeNewOpenFileFragment.Listener,
+                   PasswdSafeNewFileFragment.Listener
 {
     private static final int ACTIVITY_REQUEST_CHOOSE_FILE = 1;
 
@@ -57,6 +58,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     private ListView itsDrawerList;
     private ActionBarDrawerToggle itsDrawerToggle;
     private Uri itsPendingOpenNewUri;
+    private boolean itsPendingOpenNewIsNew;
 
     /// The state of the views in the activity
     enum ViewState
@@ -143,9 +145,10 @@ public class PasswdSafeActivity extends ActionBarActivity
         switch (requestCode) {
         case ACTIVITY_REQUEST_CHOOSE_FILE: {
             if (resultCode == RESULT_OK) {
-                Uri uri = data.getData();
-                PasswdSafeUtil.dbginfo(TAG, "file choice: %s", uri);
-                itsPendingOpenNewUri = uri;
+                PasswdSafeUtil.dbginfo(TAG, "file choice: %s", data);
+                itsPendingOpenNewIsNew =
+                    (data.getAction().equals(PasswdSafeUtil.NEW_INTENT));
+                itsPendingOpenNewUri = data.getData();
             }
             break;
         }
@@ -176,8 +179,13 @@ public class PasswdSafeActivity extends ActionBarActivity
     {
         super.onResume();
         if (itsPendingOpenNewUri != null) {
-            setOpenUriView(itsPendingOpenNewUri);
+            if (itsPendingOpenNewIsNew) {
+                setNewUriView(itsPendingOpenNewUri);
+            } else {
+                setOpenUriView(itsPendingOpenNewUri);
+            }
             itsPendingOpenNewUri = null;
+            itsPendingOpenNewIsNew = false;
         }
     }
 
@@ -260,6 +268,36 @@ public class PasswdSafeActivity extends ActionBarActivity
 
         PasswdSafeNewOpenFileFragment fileFrag =
                 PasswdSafeNewOpenFileFragment.newInstance(uri);
+        txn.replace(R.id.content, fileFrag);
+        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        txn.addToBackStack(null);
+
+        if (!txn.isEmpty()) {
+            txn.commit();
+        }
+    }
+
+    /** Set the views to create a new file URI */
+    private void setNewUriView(Uri uri)
+    {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        FragmentTransaction txn = fragMgr.beginTransaction();
+
+        if (itsIsTwoPane) {
+            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
+            if (listFrag != null) {
+                txn.hide(listFrag);
+                txn.remove(listFrag);
+            }
+        }
+
+        Fragment contentFrag = fragMgr.findFragmentById(R.id.content);
+        if (contentFrag != null) {
+            txn.remove(contentFrag);
+        }
+
+        PasswdSafeNewFileFragment fileFrag =
+                PasswdSafeNewFileFragment.newInstance(uri);
         txn.replace(R.id.content, fileFrag);
         txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         txn.addToBackStack(null);

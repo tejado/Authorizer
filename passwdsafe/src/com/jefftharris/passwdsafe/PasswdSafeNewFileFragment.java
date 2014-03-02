@@ -9,18 +9,15 @@ package com.jefftharris.passwdsafe;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
@@ -28,10 +25,10 @@ import com.jefftharris.passwdsafe.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 /**
- *  Fragment for opening or specifying a new file
+ *  Fragment for creating a new file
  */
-public class PasswdSafeNewOpenFileFragment extends Fragment
-        implements OnClickListener
+public class PasswdSafeNewFileFragment extends Fragment implements
+        OnClickListener
 {
     /** Listener interface for owning activity */
     public interface Listener
@@ -46,10 +43,9 @@ public class PasswdSafeNewOpenFileFragment extends Fragment
 
 
     /** Create a new instance */
-    public static PasswdSafeNewOpenFileFragment newInstance(Uri fileUri)
+    public static PasswdSafeNewFileFragment newInstance(Uri fileUri)
     {
-        PasswdSafeNewOpenFileFragment frag =
-                new PasswdSafeNewOpenFileFragment();
+        PasswdSafeNewFileFragment frag = new PasswdSafeNewFileFragment();
         Bundle args = new Bundle();
         args.putParcelable("uri", fileUri);
         frag.setArguments(args);
@@ -64,7 +60,8 @@ public class PasswdSafeNewOpenFileFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        itsFileUri = getArguments().getParcelable("uri");
+        Bundle args = getArguments();
+        itsFileUri = args.getParcelable("uri");
 
         Uri.Builder builder = itsFileUri.buildUpon();
         builder.fragment("");
@@ -95,14 +92,47 @@ public class PasswdSafeNewOpenFileFragment extends Fragment
         final Context ctx = getActivity();
 
         LayoutInflater factory = getActivity().getLayoutInflater();
-        itsRoot = factory.inflate(
-                R.layout.fragment_passwdsafe_newopen_file, container,
-                false);
+        itsRoot = factory.inflate(R.layout.fragment_passwdsafe_new_file,
+                                  container, false);
 
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(ctx);
-        TextView tv = (TextView)itsRoot.findViewById(R.id.file);
-        tv.setText(itsPasswdUri.getIdentifier(ctx, false));
+        TextView titleView = (TextView)itsRoot.findViewById(R.id.title);
+        TextView locationView =
+                (TextView)itsRoot.findViewById(R.id.location);
+
+        int titleId = R.string.new_file;
+        String locationStr = null;
+        switch (itsPasswdUri.getType()) {
+        case FILE: {
+            titleId = R.string.new_local_file;
+            locationStr = itsPasswdUri.getIdentifier(ctx, false);
+            break;
+        }
+        case SYNC_PROVIDER: {
+            switch (itsPasswdUri.getSyncType()) {
+            case GDRIVE: {
+                titleId = R.string.new_drive_file;
+                break;
+            }
+            case DROPBOX: {
+                titleId = R.string.new_dropbox_file;
+                break;
+            }
+            case BOX: {
+                titleId = R.string.new_box_file;
+                break;
+            }
+            }
+        }
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            break;
+        }
+        }
+
+        titleView.setText(titleId);
+        locationView.setText(locationStr);
+        locationView.setVisibility(
+                (locationStr != null) ? View.VISIBLE : View.GONE);
 
         final TextView passwdView =
                 (TextView)itsRoot.findViewById(R.id.passwd_edit);
@@ -112,14 +142,6 @@ public class PasswdSafeNewOpenFileFragment extends Fragment
                 GuiUtils.setKeyboardVisible(passwdView, ctx, true);
             } }, 250);
 
-        CheckBox cb = (CheckBox)itsRoot.findViewById(R.id.read_only);
-        if (itsPasswdUri.isWritable()) {
-            cb.setEnabled(true);
-            cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
-        } else {
-            cb.setEnabled(false);
-            cb.setChecked(true);
-        }
 
         Button cancelBtn = (Button)itsRoot.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);
@@ -149,8 +171,7 @@ public class PasswdSafeNewOpenFileFragment extends Fragment
             GuiUtils.setKeyboardVisible(passwdView, act, false);
 
             // TODO: keyboard 'go' support
-            // TODO: save readonly pref
-            // TODO: finish open
+            // TODO: finish new
             break;
         }
         }

@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,6 +46,9 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         /** Open a file */
         public void openFile(Uri uri, String fileName);
+
+        /** Create a new file */
+        public void createNewFile(Uri locationUri);
     }
 
     private static final String TAG = "SyncProviderFilesFragment";
@@ -262,7 +264,7 @@ public class SyncProviderFilesFragment extends ListFragment
             return true;
         }
         case R.id.menu_file_new: {
-            startActivity(new Intent(PasswdSafeUtil.NEW_INTENT, itsFilesUri));
+            itsListener.createNewFile(itsFilesUri);
             return true;
         }
         default: {
