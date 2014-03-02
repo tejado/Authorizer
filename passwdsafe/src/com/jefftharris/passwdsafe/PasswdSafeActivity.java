@@ -45,7 +45,8 @@ import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
  *  TODO: On gingerbread, the single pane layout margins are not used
  */
 public class PasswdSafeActivity extends ActionBarActivity
-        implements PasswdSafeMainFragment.Listener
+        implements PasswdSafeMainFragment.Listener,
+                   PasswdSafeNewOpenFileFragment.Listener
 {
     private static final int ACTIVITY_REQUEST_CHOOSE_FILE = 1;
 
@@ -55,6 +56,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     private DrawerLayout itsDrawerLayout;
     private ListView itsDrawerList;
     private ActionBarDrawerToggle itsDrawerToggle;
+    private Uri itsPendingOpenNewUri;
 
     /// The state of the views in the activity
     enum ViewState
@@ -143,6 +145,7 @@ public class PasswdSafeActivity extends ActionBarActivity
             if (resultCode == RESULT_OK) {
                 Uri uri = data.getData();
                 PasswdSafeUtil.dbginfo(TAG, "file choice: %s", uri);
+                itsPendingOpenNewUri = uri;
             }
             break;
         }
@@ -162,6 +165,20 @@ public class PasswdSafeActivity extends ActionBarActivity
     {
         super.onStart();
         ReleaseNotesDialog.checkNotes(this);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onResume()
+     */
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if (itsPendingOpenNewUri != null) {
+            setOpenUriView(itsPendingOpenNewUri);
+            itsPendingOpenNewUri = null;
+        }
     }
 
 
@@ -222,7 +239,37 @@ public class PasswdSafeActivity extends ActionBarActivity
         itsDrawerToggle.syncState();
     }
 
-    /// Set the activity's views to the given state
+    /** Set the views to open a URI */
+    private void setOpenUriView(Uri uri)
+    {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        FragmentTransaction txn = fragMgr.beginTransaction();
+
+        if (itsIsTwoPane) {
+            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
+            if (listFrag != null) {
+                txn.hide(listFrag);
+                txn.remove(listFrag);
+            }
+        }
+
+        Fragment contentFrag = fragMgr.findFragmentById(R.id.content);
+        if (contentFrag != null) {
+            txn.remove(contentFrag);
+        }
+
+        PasswdSafeNewOpenFileFragment fileFrag =
+                PasswdSafeNewOpenFileFragment.newInstance(uri);
+        txn.replace(R.id.content, fileFrag);
+        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        txn.addToBackStack(null);
+
+        if (!txn.isEmpty()) {
+            txn.commit();
+        }
+    }
+
+    /** Set the activity's views to the given state */
     private void setView(ViewState view)
     {
         FragmentManager fragMgr = getSupportFragmentManager();
