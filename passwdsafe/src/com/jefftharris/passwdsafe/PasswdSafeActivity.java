@@ -60,11 +60,6 @@ public class PasswdSafeActivity extends ActionBarActivity
     private Uri itsPendingOpenNewUri;
     private boolean itsPendingOpenNewIsNew;
 
-    /// The state of the views in the activity
-    enum ViewState
-    {
-        MAIN
-    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
@@ -120,7 +115,7 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
         });
 
-        setView(ViewState.MAIN);
+        setMainView();
     }
 
 
@@ -250,36 +245,24 @@ public class PasswdSafeActivity extends ActionBarActivity
     /** Set the views to open a URI */
     private void setOpenUriView(Uri uri)
     {
-        FragmentManager fragMgr = getSupportFragmentManager();
-        FragmentTransaction txn = fragMgr.beginTransaction();
-
-        if (itsIsTwoPane) {
-            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
-            if (listFrag != null) {
-                txn.hide(listFrag);
-                txn.remove(listFrag);
-            }
-        }
-
-        Fragment contentFrag = fragMgr.findFragmentById(R.id.content);
-        if (contentFrag != null) {
-            txn.remove(contentFrag);
-        }
-
-        PasswdSafeNewOpenFileFragment fileFrag =
-                PasswdSafeNewOpenFileFragment.newInstance(uri);
-        txn.replace(R.id.content, fileFrag);
-        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        txn.addToBackStack(null);
-
-        if (!txn.isEmpty()) {
-            txn.commit();
-        }
+        setView(PasswdSafeNewOpenFileFragment.newInstance(uri), true);
     }
 
     /** Set the views to create a new file URI */
     private void setNewUriView(Uri uri)
     {
+        setView(PasswdSafeNewFileFragment.newInstance(uri), true);
+    }
+
+    /** Set the views to the main view */
+    private void setMainView()
+    {
+        setView(new PasswdSafeMainFragment(), false);
+    }
+
+    /** Update the view's fragments */
+    private void setView(Fragment contentFrag, boolean addBack)
+    {
         FragmentManager fragMgr = getSupportFragmentManager();
         FragmentTransaction txn = fragMgr.beginTransaction();
 
@@ -291,40 +274,15 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
         }
 
-        Fragment contentFrag = fragMgr.findFragmentById(R.id.content);
-        if (contentFrag != null) {
-            txn.remove(contentFrag);
+        Fragment currContentFrag = fragMgr.findFragmentById(R.id.content);
+        if (currContentFrag != null) {
+            txn.remove(currContentFrag);
         }
 
-        PasswdSafeNewFileFragment fileFrag =
-                PasswdSafeNewFileFragment.newInstance(uri);
-        txn.replace(R.id.content, fileFrag);
+        txn.replace(R.id.content, contentFrag);
         txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        txn.addToBackStack(null);
-
-        if (!txn.isEmpty()) {
-            txn.commit();
-        }
-    }
-
-    /** Set the activity's views to the given state */
-    private void setView(ViewState view)
-    {
-        FragmentManager fragMgr = getSupportFragmentManager();
-        FragmentTransaction txn = fragMgr.beginTransaction();
-        switch (view) {
-        case MAIN: {
-            if (itsIsTwoPane) {
-                Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
-                if (listFrag != null) {
-                    txn.hide(listFrag);
-                    txn.remove(listFrag);
-                }
-            }
-
-            txn.replace(R.id.content, new PasswdSafeMainFragment());
-            break;
-        }
+        if (addBack) {
+            txn.addToBackStack(null);
         }
 
         if (!txn.isEmpty()) {
