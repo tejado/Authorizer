@@ -11,7 +11,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,7 +88,7 @@ public class PasswdSafeNewFileFragment extends Fragment implements
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
-        final Context ctx = getActivity();
+        Context ctx = getActivity();
 
         LayoutInflater factory = getActivity().getLayoutInflater();
         itsRoot = factory.inflate(R.layout.fragment_passwdsafe_new_file,
@@ -134,19 +133,20 @@ public class PasswdSafeNewFileFragment extends Fragment implements
         locationView.setVisibility(
                 (locationStr != null) ? View.VISIBLE : View.GONE);
 
+        View filenameView = itsRoot.findViewById(R.id.file_name);
         final TextView passwdView =
-                (TextView)itsRoot.findViewById(R.id.passwd_edit);
-        PasswordVisibilityMenuHandler.set(passwdView);
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                GuiUtils.setKeyboardVisible(passwdView, ctx, true);
-            } }, 250);
-
+                (TextView)itsRoot.findViewById(R.id.password);
+        TextView confirmView =
+                (TextView)itsRoot.findViewById(R.id.password_confirm);
+        PasswordVisibilityMenuHandler.set(passwdView, confirmView);
 
         Button cancelBtn = (Button)itsRoot.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);
         Button okBtn = (Button)itsRoot.findViewById(R.id.ok);
         okBtn.setOnClickListener(this);
+
+        GuiUtils.setupFragmentKeyboard(filenameView, confirmView,
+                                       okBtn, ctx);
 
         return itsRoot;
     }
@@ -160,7 +160,7 @@ public class PasswdSafeNewFileFragment extends Fragment implements
     {
         Activity act = getActivity();
         TextView passwdView =
-                (TextView)itsRoot.findViewById(R.id.passwd_edit);
+                (TextView)itsRoot.findViewById(R.id.password);
         switch (v.getId()) {
         case R.id.cancel: {
             GuiUtils.setKeyboardVisible(passwdView, act, false);

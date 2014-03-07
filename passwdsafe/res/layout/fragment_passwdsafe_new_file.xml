@@ -21,43 +21,80 @@
         android:layout_marginTop="12dp"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:orientation="horizontal">
-        
-        <EditText
-            android:id="@+id/file_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/file_name_label"
-            android:inputType="textNoSuggestions"
-            android:singleLine="true"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/psafe3_ext"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-    </LinearLayout>
-    
-    <EditText
-        android:id="@+id/passwd_edit"
+    <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:gravity="fill_horizontal"
-        android:hint="@string/password"
-        android:imeOptions="actionGo"
-        android:inputType="textPassword"
-        android:scrollHorizontally="true"
-        android:singleLine="true"
-        android:textAppearance="?android:attr/textAppearanceMedium">
+        android:shrinkColumns="1"
+        android:stretchColumns="1">
 
-        <requestFocus />
-    </EditText>
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:layout_gravity="center_vertical"
+                android:text="@string/file_name_label"/>
+    
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                
+                <EditText
+                    android:id="@+id/file_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions"
+                    android:minWidth="100dp"
+                    android:singleLine="true"/>
+        
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/psafe3_ext"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+        
+            </LinearLayout>
+    
+        </TableRow>
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/password_label"/>
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:singleLine="true"/>
+
+        </TableRow>
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/confirm_label"/>
+
+            <EditText
+                android:id="@+id/password_confirm"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionGo"
+                android:inputType="textPassword"
+                android:singleLine="true"/>
+
+        </TableRow>
+    </TableLayout>
+
+    <View style="@style/Separator.Light"/>
+    
+    <TextView
+        android:id="@+id/error_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
