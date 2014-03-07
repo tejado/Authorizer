@@ -8,18 +8,37 @@
     android:paddingRight="@dimen/fullscreen_horizontal_margin"
     android:paddingTop="@dimen/fullscreen_vertical_margin">
 
-    <TextView
-        android:text="@string/open_file_title"
+    <RelativeLayout 
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        android:layout_height="wrap_content">
+        
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@android:style/Widget.ProgressBar.Large"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"/>
 
-    <TextView
-        android:id="@+id/file"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/progress"
+            android:text="@string/open_file_title"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+    
+        <TextView
+            android:id="@+id/file"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title"
+            android:layout_marginTop="12dp"
+            android:layout_toLeftOf="@id/progress"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/passwd_edit"
@@ -44,6 +63,17 @@
         android:layout_marginTop="12dp"
         android:text="@string/read_only"/>
 
+    <View
+        style="@style/Separator.Light"
+        android:layout_marginTop="12dp"/>
+    
+    <TextView
+        android:id="@+id/error_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,4 +95,5 @@
             android:text="@android:string/ok"/>
 
     </LinearLayout>
+
 </LinearLayout>

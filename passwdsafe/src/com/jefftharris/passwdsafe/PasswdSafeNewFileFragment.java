@@ -203,7 +203,6 @@ public class PasswdSafeNewFileFragment extends Fragment implements
         case R.id.ok: {
             GuiUtils.setKeyboardVisible(passwdView, act, false);
 
-            // TODO: keyboard 'go' support
             // TODO: finish new
             break;
         }

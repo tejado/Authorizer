@@ -7,13 +7,20 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.IOException;
+
+import org.pwsafe.lib.exception.InvalidPassphraseException;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,7 +29,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
@@ -42,6 +51,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
     private Uri itsFileUri;
     private PasswdFileUri itsPasswdUri;
     private View itsRoot;
+    private boolean itsIsReadonlyEnabled;
+    private AsyncTask<Void, Void, Object> itsLoadTask = null;
 
 
     /** Create a new instance */
@@ -104,15 +115,19 @@ public class PasswdSafeOpenFileFragment extends Fragment
         TextView passwdView = (TextView)itsRoot.findViewById(R.id.passwd_edit);
         PasswordVisibilityMenuHandler.set(passwdView);
 
+        View progress = itsRoot.findViewById(R.id.progress);
+        progress.setVisibility(View.GONE);
+
         CheckBox cb = (CheckBox)itsRoot.findViewById(R.id.read_only);
-        if (itsPasswdUri.isWritable()) {
-            cb.setEnabled(true);
+        itsIsReadonlyEnabled = itsPasswdUri.isWritable();
+        cb.setEnabled(itsIsReadonlyEnabled);
+        if (itsIsReadonlyEnabled) {
             cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
         } else {
-            cb.setEnabled(false);
             cb.setChecked(true);
         }
 
+        setErrorMsg(null);
         Button cancelBtn = (Button)itsRoot.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);
         Button okBtn = (Button)itsRoot.findViewById(R.id.ok);
@@ -130,23 +145,128 @@ public class PasswdSafeOpenFileFragment extends Fragment
     @Override
     public void onClick(View v)
     {
-        Activity act = getActivity();
+        final Activity act = getActivity();
         TextView passwdView =
                 (TextView)itsRoot.findViewById(R.id.passwd_edit);
         switch (v.getId()) {
         case R.id.cancel: {
-            GuiUtils.setKeyboardVisible(passwdView, act, false);
-            act.onBackPressed();
+            if (itsLoadTask == null) {
+                GuiUtils.setKeyboardVisible(passwdView, act, false);
+                act.onBackPressed();
+            } else {
+                cancelLoad();
+            }
             break;
         }
         case R.id.ok: {
             GuiUtils.setKeyboardVisible(passwdView, act, false);
 
-            // TODO: keyboard 'go' support
-            // TODO: save readonly pref
-            // TODO: finish open
+            CheckBox roCb = (CheckBox)itsRoot.findViewById(R.id.read_only);
+            boolean ro;
+            if (roCb.isEnabled()) {
+                ro = roCb.isChecked();
+                // TODO: save readonly pref
+            } else {
+                ro = true;
+            }
+
+            roCb.setEnabled(false);
+            passwdView.setEnabled(false);
+            View progress = itsRoot.findViewById(R.id.progress);
+            progress.setVisibility(View.VISIBLE);
+            setErrorMsg(null);
+
+            final StringBuilder passwd =
+                    new StringBuilder(passwdView.getText().toString());
+            final boolean readonly = ro;
+
+            itsLoadTask = new AsyncTask<Void, Void, Object>()
+            {
+                @Override
+                protected Object doInBackground(Void... params)
+                {
+                    try {
+                        PasswdFileData fileData =
+                                new PasswdFileData(itsPasswdUri);
+                        fileData.load(passwd, readonly, getActivity());
+                        return fileData;
+                    } catch (Exception e) {
+                        return e;
+                    }
+                }
+
+                /* (non-Javadoc)
+                 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+                 */
+                @Override
+                protected void onPostExecute(Object result)
+                {
+                    if (!(result instanceof Exception)) {
+                        setErrorMsg(null);
+                        // TODO: finish open
+                        // ok
+                    } else {
+                        String msg;
+                        Exception e = (Exception)result;
+                        if (((e instanceof IOException) &&
+                             TextUtils.equals(e.getMessage(),
+                                              "Invalid password")) ||
+                            (e instanceof InvalidPassphraseException)) {
+                            msg = getString(R.string.invalid_password);
+                        } else {
+                            msg = e.toString();
+                        }
+                        setErrorMsg(msg);
+                    }
+
+                    cancelLoad();
+                }
+            };
+            itsLoadTask.execute();
             break;
         }
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onPause()
+     */
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        cancelLoad();
+    }
+
+
+    /** Cancel a load operation */
+    private void cancelLoad()
+    {
+        if (itsLoadTask != null) {
+            itsLoadTask.cancel(false);
+            itsLoadTask = null;
+        }
+
+        View roCb = itsRoot.findViewById(R.id.read_only);
+        roCb.setEnabled(itsIsReadonlyEnabled);
+        View passwdView = itsRoot.findViewById(R.id.passwd_edit);
+        passwdView.setEnabled(true);
+        View progress = itsRoot.findViewById(R.id.progress);
+        progress.setVisibility(View.GONE);
+    }
+
+
+    /** Set the error message */
+    private void setErrorMsg(String msg)
+    {
+        TextView errorMsgView = (TextView)itsRoot.findViewById(R.id.error_msg);
+        if (msg != null) {
+            errorMsgView.setVisibility(View.VISIBLE);
+            errorMsgView.setText(
+                    Html.fromHtml(getString(R.string.error_msg, msg)));
+        } else {
+            errorMsgView.setVisibility(View.GONE);
         }
     }
 }
