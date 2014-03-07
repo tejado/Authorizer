@@ -46,7 +46,7 @@ import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
  */
 public class PasswdSafeActivity extends ActionBarActivity
         implements PasswdSafeMainFragment.Listener,
-                   PasswdSafeNewOpenFileFragment.Listener,
+                   PasswdSafeOpenFileFragment.Listener,
                    PasswdSafeNewFileFragment.Listener
 {
     private static final int ACTIVITY_REQUEST_CHOOSE_FILE = 1;
@@ -245,7 +245,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     /** Set the views to open a URI */
     private void setOpenUriView(Uri uri)
     {
-        setView(PasswdSafeNewOpenFileFragment.newInstance(uri), true);
+        setView(PasswdSafeOpenFileFragment.newInstance(uri), true);
     }
 
     /** Set the views to create a new file URI */

@@ -28,9 +28,9 @@ import com.jefftharris.passwdsafe.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 /**
- *  Fragment for opening or specifying a new file
+ *  Fragment for opening a file
  */
-public class PasswdSafeNewOpenFileFragment extends Fragment
+public class PasswdSafeOpenFileFragment extends Fragment
         implements OnClickListener
 {
     /** Listener interface for owning activity */
@@ -46,10 +46,9 @@ public class PasswdSafeNewOpenFileFragment extends Fragment
 
 
     /** Create a new instance */
-    public static PasswdSafeNewOpenFileFragment newInstance(Uri fileUri)
+    public static PasswdSafeOpenFileFragment newInstance(Uri fileUri)
     {
-        PasswdSafeNewOpenFileFragment frag =
-                new PasswdSafeNewOpenFileFragment();
+        PasswdSafeOpenFileFragment frag = new PasswdSafeOpenFileFragment();
         Bundle args = new Bundle();
         args.putParcelable("uri", fileUri);
         frag.setArguments(args);
@@ -95,9 +94,8 @@ public class PasswdSafeNewOpenFileFragment extends Fragment
         final Context ctx = getActivity();
 
         LayoutInflater factory = getActivity().getLayoutInflater();
-        itsRoot = factory.inflate(
-                R.layout.fragment_passwdsafe_newopen_file, container,
-                false);
+        itsRoot = factory.inflate(R.layout.fragment_passwdsafe_open_file,
+                                  container, false);
 
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(ctx);
