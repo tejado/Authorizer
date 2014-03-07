@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -102,13 +101,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
         TextView tv = (TextView)itsRoot.findViewById(R.id.file);
         tv.setText(itsPasswdUri.getIdentifier(ctx, false));
 
-        final TextView passwdView =
-                (TextView)itsRoot.findViewById(R.id.passwd_edit);
+        TextView passwdView = (TextView)itsRoot.findViewById(R.id.passwd_edit);
         PasswordVisibilityMenuHandler.set(passwdView);
-        new Handler().postDelayed(new Runnable() {
-            public void run() {
-                GuiUtils.setKeyboardVisible(passwdView, ctx, true);
-            } }, 250);
 
         CheckBox cb = (CheckBox)itsRoot.findViewById(R.id.read_only);
         if (itsPasswdUri.isWritable()) {
@@ -123,6 +117,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
         cancelBtn.setOnClickListener(this);
         Button okBtn = (Button)itsRoot.findViewById(R.id.ok);
         okBtn.setOnClickListener(this);
+
+        GuiUtils.setupFragmentKeyboard(passwdView, passwdView, okBtn, ctx);
 
         return itsRoot;
     }

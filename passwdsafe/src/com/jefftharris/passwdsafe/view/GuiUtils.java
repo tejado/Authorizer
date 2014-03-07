@@ -19,6 +19,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.text.InputType;
@@ -207,6 +208,41 @@ public final class GuiUtils
                             dialog.getButton(AlertDialog.BUTTON_POSITIVE);
                         if (btn.isEnabled()) {
                             btn.performClick();
+                        }
+                        return true;
+                    }
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+
+    /**
+     * Setup the keyboard on a fragment screen.  The initial field gets focus
+     * and shows the keyboard. The final field clicks the Ok button when enter
+     * is pressed.
+     */
+    public static void setupFragmentKeyboard(final View initialField,
+                                             TextView finalField,
+                                             final Button okButton,
+                                             final Context ctx)
+    {
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                GuiUtils.setKeyboardVisible(initialField, ctx, true);
+            } }, 250);
+        finalField.setOnKeyListener(new OnKeyListener()
+        {
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER: {
+                        if (okButton.isEnabled()) {
+                            okButton.performClick();
                         }
                         return true;
                     }
