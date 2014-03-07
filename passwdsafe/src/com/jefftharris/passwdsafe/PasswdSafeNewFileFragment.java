@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
@@ -39,6 +40,7 @@ public class PasswdSafeNewFileFragment extends Fragment implements
     private Uri itsFileUri;
     private PasswdFileUri itsPasswdUri;
     private View itsRoot;
+    private DialogValidator itsValidator;
 
 
     /** Create a new instance */
@@ -133,7 +135,8 @@ public class PasswdSafeNewFileFragment extends Fragment implements
         locationView.setVisibility(
                 (locationStr != null) ? View.VISIBLE : View.GONE);
 
-        View filenameView = itsRoot.findViewById(R.id.file_name);
+        final TextView filenameView =
+                (TextView)itsRoot.findViewById(R.id.file_name);
         final TextView passwdView =
                 (TextView)itsRoot.findViewById(R.id.password);
         TextView confirmView =
@@ -147,6 +150,36 @@ public class PasswdSafeNewFileFragment extends Fragment implements
 
         GuiUtils.setupFragmentKeyboard(filenameView, confirmView,
                                        okBtn, ctx);
+
+        itsValidator = new DialogValidator.FragmentValidator(itsRoot, okBtn,
+                                                             true, ctx)
+        {
+            @Override
+            protected final String doValidation()
+            {
+                CharSequence fileName = filenameView.getText();
+                if (fileName.length() == 0) {
+                    return getString(R.string.empty_file_name);
+                }
+
+                for (int i = 0; i < fileName.length(); ++i) {
+                    char c = fileName.charAt(i);
+                    if ((c == '/') || (c == '\\')) {
+                        return getString(R.string.invalid_file_name);
+                    }
+                }
+
+                String error = itsPasswdUri.validateNewChild(
+                        fileName.toString(), getContext());
+                if (error != null) {
+                    return error;
+                }
+
+                return super.doValidation();
+            }
+        };
+        itsValidator.registerTextView(filenameView);
+        itsValidator.reset();
 
         return itsRoot;
     }
