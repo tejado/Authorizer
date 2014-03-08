@@ -164,7 +164,9 @@ public class PasswdSafeOpenFileFragment extends Fragment
             boolean ro;
             if (roCb.isEnabled()) {
                 ro = roCb.isChecked();
-                // TODO: save readonly pref
+                SharedPreferences prefs =
+                        PreferenceManager.getDefaultSharedPreferences(act);
+                Preferences.setFileOpenReadOnlyPref(ro, prefs);
             } else {
                 ro = true;
             }
