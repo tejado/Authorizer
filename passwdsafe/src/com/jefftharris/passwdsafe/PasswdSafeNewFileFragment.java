@@ -44,6 +44,8 @@ public class PasswdSafeNewFileFragment extends Fragment implements
     /** Listener interface for owning activity */
     public interface Listener
     {
+        /** Set the open file */
+        void setOpenFile(PasswdFileData passwdFile);
     }
 
 
@@ -253,8 +255,7 @@ public class PasswdSafeNewFileFragment extends Fragment implements
                 {
                     if (!(result instanceof Exception)) {
                         setErrorMsg(null);
-                        // TODO: finish new
-                        // ok
+                        itsListener.setOpenFile((PasswdFileData)result);
                     } else {
                         String msg;
                         Exception e = (Exception)result;

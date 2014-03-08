@@ -29,6 +29,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -127,6 +128,17 @@ public class PasswdSafeActivity extends ActionBarActivity
     {
         Intent intent = new Intent(this, FileChooseActivity.class);
         startActivityForResult(intent, ACTIVITY_REQUEST_CHOOSE_FILE);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdSafeOpenFileFragment.Listener#setOpenFile(com.jefftharris.passwdsafe.file.PasswdFileData)
+     * @see com.jefftharris.passwdsafe.PasswdSafeNewFileFragment.Listener#setOpenFile(com.jefftharris.passwdsafe.file.PasswdFileData)
+     */
+    @Override
+    public void setOpenFile(PasswdFileData passwdFile)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "open file %s", passwdFile.getUri());
     }
 
 
