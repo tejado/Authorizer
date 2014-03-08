@@ -12,7 +12,9 @@ import java.io.IOException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -39,7 +41,7 @@ import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
  *  Fragment for opening a file
  */
 public class PasswdSafeOpenFileFragment extends Fragment
-        implements OnClickListener
+        implements OnClickListener, DialogInterface.OnCancelListener
 {
     /** Listener interface for owning activity */
     public interface Listener
@@ -51,8 +53,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
     private Uri itsFileUri;
     private PasswdFileUri itsPasswdUri;
     private View itsRoot;
-    private boolean itsIsReadonlyEnabled;
     private AsyncTask<Void, Void, Object> itsLoadTask = null;
+    private ProgressDialog itsProgress = null;
 
 
     /** Create a new instance */
@@ -115,13 +117,10 @@ public class PasswdSafeOpenFileFragment extends Fragment
         TextView passwdView = (TextView)itsRoot.findViewById(R.id.passwd_edit);
         PasswordVisibilityMenuHandler.set(passwdView);
 
-        View progress = itsRoot.findViewById(R.id.progress);
-        progress.setVisibility(View.GONE);
-
         CheckBox cb = (CheckBox)itsRoot.findViewById(R.id.read_only);
-        itsIsReadonlyEnabled = itsPasswdUri.isWritable();
-        cb.setEnabled(itsIsReadonlyEnabled);
-        if (itsIsReadonlyEnabled) {
+        boolean writable = itsPasswdUri.isWritable();
+        cb.setEnabled(writable);
+        if (writable) {
             cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
         } else {
             cb.setChecked(true);
@@ -170,15 +169,17 @@ public class PasswdSafeOpenFileFragment extends Fragment
                 ro = true;
             }
 
-            roCb.setEnabled(false);
-            passwdView.setEnabled(false);
-            View progress = itsRoot.findViewById(R.id.progress);
-            progress.setVisibility(View.VISIBLE);
             setErrorMsg(null);
 
             final StringBuilder passwd =
                     new StringBuilder(passwdView.getText().toString());
             final boolean readonly = ro;
+
+            itsProgress = ProgressDialog.show(
+                    act, PasswdSafeUtil.getAppTitle(act),
+                    getString(R.string.loading_file,
+                              itsPasswdUri.getIdentifier(act, false)),
+                    true, true, this);
 
             itsLoadTask = new AsyncTask<Void, Void, Object>()
             {
@@ -240,6 +241,16 @@ public class PasswdSafeOpenFileFragment extends Fragment
     }
 
 
+    /* (non-Javadoc)
+     * @see android.content.DialogInterface.OnCancelListener#onCancel(android.content.DialogInterface)
+     */
+    @Override
+    public void onCancel(DialogInterface dialog)
+    {
+        cancelLoad();
+    }
+
+
     /** Cancel a load operation */
     private void cancelLoad()
     {
@@ -248,12 +259,10 @@ public class PasswdSafeOpenFileFragment extends Fragment
             itsLoadTask = null;
         }
 
-        View roCb = itsRoot.findViewById(R.id.read_only);
-        roCb.setEnabled(itsIsReadonlyEnabled);
-        View passwdView = itsRoot.findViewById(R.id.passwd_edit);
-        passwdView.setEnabled(true);
-        View progress = itsRoot.findViewById(R.id.progress);
-        progress.setVisibility(View.GONE);
+        if (itsProgress != null) {
+            itsProgress.dismiss();
+            itsProgress = null;
+        }
     }
 
 
