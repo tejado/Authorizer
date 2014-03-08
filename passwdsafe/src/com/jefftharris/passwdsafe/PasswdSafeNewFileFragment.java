@@ -7,11 +7,20 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.IOException;
+
+import org.pwsafe.lib.exception.InvalidPassphraseException;
+
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,7 +28,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
@@ -28,7 +39,7 @@ import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
  *  Fragment for creating a new file
  */
 public class PasswdSafeNewFileFragment extends Fragment implements
-        OnClickListener
+        OnClickListener, DialogInterface.OnCancelListener
 {
     /** Listener interface for owning activity */
     public interface Listener
@@ -41,6 +52,8 @@ public class PasswdSafeNewFileFragment extends Fragment implements
     private PasswdFileUri itsPasswdUri;
     private View itsRoot;
     private DialogValidator itsValidator;
+    private AsyncTask<Void, Void, Object> itsNewTask = null;
+    private ProgressDialog itsProgress = null;
 
 
     /** Create a new instance */
@@ -143,6 +156,7 @@ public class PasswdSafeNewFileFragment extends Fragment implements
                 (TextView)itsRoot.findViewById(R.id.password_confirm);
         PasswordVisibilityMenuHandler.set(passwdView, confirmView);
 
+        setErrorMsg(null);
         Button cancelBtn = (Button)itsRoot.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);
         Button okBtn = (Button)itsRoot.findViewById(R.id.ok);
@@ -191,21 +205,127 @@ public class PasswdSafeNewFileFragment extends Fragment implements
     @Override
     public void onClick(View v)
     {
-        Activity act = getActivity();
+        final Activity act = getActivity();
         TextView passwdView =
                 (TextView)itsRoot.findViewById(R.id.password);
         switch (v.getId()) {
         case R.id.cancel: {
-            GuiUtils.setKeyboardVisible(passwdView, act, false);
-            act.onBackPressed();
+            if (itsNewTask == null) {
+                GuiUtils.setKeyboardVisible(passwdView, act, false);
+                act.onBackPressed();
+            } else {
+                cancelNew();
+            }
             break;
         }
         case R.id.ok: {
             GuiUtils.setKeyboardVisible(passwdView, act, false);
+            setErrorMsg(null);
+            TextView fileNameView =
+                    (TextView)itsRoot.findViewById(R.id.file_name);
+            final String fileName = fileNameView.getText().toString();
+            final StringBuilder passwd =
+                    new StringBuilder(passwdView.getText().toString());
+            itsProgress = ProgressDialog.show(
+                    act, PasswdSafeUtil.getAppTitle(act),
+                    getString(R.string.new_file), true, true, this);
+            itsNewTask = new AsyncTask<Void, Void, Object>()
+            {
+                @Override
+                protected Object doInBackground(Void... params)
+                {
+                    try {
+                        PasswdFileUri childUri = itsPasswdUri.createNewChild(
+                                fileName + ".psafe3", act);
+                        PasswdFileData fileData = new PasswdFileData(childUri);
+                        fileData.createNewFile(passwd, act);
+                        return fileData;
+                    } catch (Exception e) {
+                        return e;
+                    }
+                }
 
-            // TODO: finish new
+                /* (non-Javadoc)
+                 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+                 */
+                @Override
+                protected void onPostExecute(Object result)
+                {
+                    if (!(result instanceof Exception)) {
+                        setErrorMsg(null);
+                        // TODO: finish new
+                        // ok
+                    } else {
+                        String msg;
+                        Exception e = (Exception)result;
+                        if (((e instanceof IOException) &&
+                             TextUtils.equals(e.getMessage(),
+                                              "Invalid password")) ||
+                            (e instanceof InvalidPassphraseException)) {
+                            msg = getString(R.string.invalid_password);
+                        } else {
+                            msg = getString(R.string.cannot_create_file,
+                                            itsPasswdUri);
+                        }
+                        setErrorMsg(msg);
+                    }
+
+                    cancelNew();
+                }
+            };
+            itsNewTask.execute();
             break;
         }
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onPause()
+     */
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        cancelNew();
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.content.DialogInterface.OnCancelListener#onCancel(android.content.DialogInterface)
+     */
+    @Override
+    public void onCancel(DialogInterface dialog)
+    {
+        cancelNew();
+    }
+
+
+    /** Cancel a new operation */
+    private void cancelNew()
+    {
+        if (itsNewTask != null) {
+            itsNewTask.cancel(false);
+            itsNewTask = null;
+        }
+
+        if (itsProgress != null) {
+            itsProgress.dismiss();
+            itsProgress = null;
+        }
+    }
+
+
+    /** Set the error message */
+    private void setErrorMsg(String msg)
+    {
+        TextView errorMsgView = (TextView)itsRoot.findViewById(R.id.error_msg);
+        if (msg != null) {
+            errorMsgView.setVisibility(View.VISIBLE);
+            errorMsgView.setText(
+                    Html.fromHtml(getString(R.string.error_msg, msg)));
+        } else {
+            errorMsgView.setVisibility(View.GONE);
         }
     }
 }
