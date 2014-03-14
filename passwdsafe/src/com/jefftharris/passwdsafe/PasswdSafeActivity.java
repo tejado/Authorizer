@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -48,7 +49,8 @@ import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 public class PasswdSafeActivity extends ActionBarActivity
         implements PasswdSafeMainFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
-                   PasswdSafeNewFileFragment.Listener
+                   PasswdSafeNewFileFragment.Listener,
+                   PasswdFileActivity
 {
     private static final int ACTIVITY_REQUEST_CHOOSE_FILE = 1;
 
@@ -60,6 +62,9 @@ public class PasswdSafeActivity extends ActionBarActivity
     private ActionBarDrawerToggle itsDrawerToggle;
     private Uri itsPendingOpenNewUri;
     private boolean itsPendingOpenNewIsNew;
+
+    private ActivityPasswdFile itsAppFile = null;
+    private PasswdFileData itsFileData = null;
 
 
     /* (non-Javadoc)
@@ -116,6 +121,7 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
         });
 
+        // TODO: check open file on startup
         setMainView();
     }
 
@@ -138,7 +144,63 @@ public class PasswdSafeActivity extends ActionBarActivity
     @Override
     public void setOpenFile(PasswdFileData passwdFile)
     {
-        PasswdSafeUtil.dbginfo(TAG, "open file %s", passwdFile.getUri());
+        if (passwdFile != null) {
+            PasswdSafeUtil.dbginfo(TAG, "open file %s", passwdFile.getUri());
+            PasswdSafeApp app = (PasswdSafeApp)getApplication();
+            itsAppFile = app.accessPasswdFile(passwdFile.getUri(), this);
+            itsAppFile.setFileData(passwdFile);
+            itsFileData = passwdFile;
+        } else {
+            PasswdSafeUtil.dbginfo(TAG, "close file");
+            if (itsAppFile != null) {
+                itsAppFile.release();
+                itsAppFile.close();
+                itsAppFile = null;
+                itsFileData = null;
+            }
+            setMainView();
+        }
+        supportInvalidateOptionsMenu();
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#getActivity()
+     */
+    @Override
+    public Activity getActivity()
+    {
+        return this;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#showProgressDialog()
+     */
+    @Override
+    public void showProgressDialog()
+    {
+        // TODO save support
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#removeProgressDialog()
+     */
+    @Override
+    public void removeProgressDialog()
+    {
+        // TODO save support
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdFileActivity#saveFinished(boolean)
+     */
+    @Override
+    public void saveFinished(boolean success)
+    {
+        // TODO save support
     }
 
 
@@ -179,6 +241,32 @@ public class PasswdSafeActivity extends ActionBarActivity
 
 
     /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onDestroy()
+     */
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        if (itsAppFile != null) {
+            itsAppFile.onActivityDestroy();
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onPause()
+     */
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if (itsAppFile != null) {
+            itsAppFile.onActivityPause();
+        }
+    }
+
+
+    /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onResume()
      */
     @Override
@@ -193,6 +281,10 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
             itsPendingOpenNewUri = null;
             itsPendingOpenNewIsNew = false;
+        }
+
+        if (itsAppFile != null) {
+            itsAppFile.touch();
         }
     }
 
@@ -225,6 +317,10 @@ public class PasswdSafeActivity extends ActionBarActivity
             startActivity(intent);
             break;
         }
+        case R.id.menu_close: {
+            setOpenFile(null);
+            return true;
+        }
         case R.id.menu_about: {
             AboutDialog dlg = new AboutDialog();
             dlg.show(getSupportFragmentManager(), "AboutDialog");
@@ -235,6 +331,19 @@ public class PasswdSafeActivity extends ActionBarActivity
         }
         }
         return true;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem item = menu.findItem(R.id.menu_close);
+        item.setVisible((itsAppFile != null));
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
 
