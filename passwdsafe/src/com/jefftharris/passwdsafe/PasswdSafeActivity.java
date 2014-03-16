@@ -49,6 +49,7 @@ public class PasswdSafeActivity extends ActionBarActivity
         implements PasswdSafeMainFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
                    PasswdSafeNewFileFragment.Listener,
+                   PasswdSafeListFragment.Listener,
                    PasswdFileActivity
 {
     private static final int ACTIVITY_REQUEST_CHOOSE_FILE = 1;
@@ -59,8 +60,10 @@ public class PasswdSafeActivity extends ActionBarActivity
     private DrawerLayout itsDrawerLayout;
     private ListView itsDrawerList;
     private ActionBarDrawerToggle itsDrawerToggle;
+
     private Uri itsPendingOpenNewUri;
     private boolean itsPendingOpenNewIsNew;
+    private int itsOpenNewBackStackId = -1;
 
     private ActivityPasswdFile itsAppFile = null;
     private PasswdFileData itsFileData = null;
@@ -120,6 +123,7 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
         });
 
+        setMainView();
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         ActivityPasswdFile openFile = app.accessOpenFile(this);
         setOpenAppFile(openFile);
@@ -148,7 +152,11 @@ public class PasswdSafeActivity extends ActionBarActivity
         if (passwdFile != null) {
             PasswdSafeUtil.dbginfo(TAG, "open file %s", passwdFile.getUri());
             PasswdSafeApp app = (PasswdSafeApp)getApplication();
+            if (itsAppFile != null) {
+                itsAppFile.release();
+            }
             openFile = app.accessPasswdFile(passwdFile.getUri(), this);
+            openFile.release();
             openFile.setFileData(passwdFile);
         } else {
             PasswdSafeUtil.dbginfo(TAG, "close file");
@@ -372,6 +380,30 @@ public class PasswdSafeActivity extends ActionBarActivity
         if ((openFile != null) && (openFile.getFileData() != null)) {
             itsAppFile = openFile;
             itsFileData = itsAppFile.getFileData();
+
+            FragmentManager fragMgr = getSupportFragmentManager();
+            FragmentManager.enableDebugLogging(true);
+            // Clear the back stack from a open/new operation
+            if (itsOpenNewBackStackId >= 0) {
+                fragMgr.popBackStack(itsOpenNewBackStackId,
+                                     FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            }
+            itsOpenNewBackStackId = -1;
+
+            FragmentTransaction txn = fragMgr.beginTransaction();
+
+            if (itsIsTwoPane) {
+                Fragment groupFrag = PasswdSafeListFragment.newInstance();
+                txn.replace(R.id.content_list, groupFrag);
+                // TODO: fix 2 panel
+                txn.show(groupFrag);
+            }
+
+            Fragment itemsFrag = PasswdSafeListFragment.newInstance();
+            txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            txn.replace(R.id.content, itemsFrag);
+            txn.addToBackStack(null);
+            txn.commit();
         } else {
             if (itsAppFile != null) {
                 itsAppFile.release();
@@ -387,23 +419,29 @@ public class PasswdSafeActivity extends ActionBarActivity
     /** Set the views to open a URI */
     private void setOpenUriView(Uri uri)
     {
-        setView(PasswdSafeOpenFileFragment.newInstance(uri), true);
+        itsOpenNewBackStackId =
+                setView(PasswdSafeOpenFileFragment.newInstance(uri), true);
     }
 
     /** Set the views to create a new file URI */
     private void setNewUriView(Uri uri)
     {
-        setView(PasswdSafeNewFileFragment.newInstance(uri), true);
+        itsOpenNewBackStackId =
+                setView(PasswdSafeNewFileFragment.newInstance(uri), true);
     }
 
     /** Set the views to the main view */
     private void setMainView()
     {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        while (fragMgr.popBackStackImmediate()) {
+            // clear back stack to reset view to main
+        }
         setView(new PasswdSafeMainFragment(), false);
     }
 
     /** Update the view's fragments */
-    private void setView(Fragment contentFrag, boolean addBack)
+    private int setView(Fragment contentFrag, boolean addBack)
     {
         FragmentManager fragMgr = getSupportFragmentManager();
         FragmentTransaction txn = fragMgr.beginTransaction();
@@ -416,19 +454,12 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
         }
 
-        Fragment currContentFrag = fragMgr.findFragmentById(R.id.content);
-        if (currContentFrag != null) {
-            txn.remove(currContentFrag);
-        }
-
         txn.replace(R.id.content, contentFrag);
         txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         if (addBack) {
             txn.addToBackStack(null);
         }
 
-        if (!txn.isEmpty()) {
-            txn.commit();
-        }
+        return txn.commit();
     }
 }
