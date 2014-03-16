@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".PasswdSafeListFragment">
+    
+    <RelativeLayout
+        android:id="@+id/current_group_panel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:visible="false">
+
+        <ImageView
+            android:id="@+id/current_group_icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="@string/up"
+            android:src="@drawable/folder_up_rev"/>
+
+        <TextView
+            android:id="@+id/current_group_label"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/current_group_icon"
+            android:layout_alignTop="@id/current_group_icon"
+            android:layout_marginBottom="2dp"
+            android:layout_toRightOf="@id/current_group_icon"
+            android:gravity="center_vertical"
+            android:text="@string/group"/>
+
+        <View
+            style="@style/Separator.Light"
+            android:layout_below="@id/current_group_label"/>
+    </RelativeLayout>
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:drawSelectorOnTop="false"
+        android:fastScrollEnabled="true"/>
+
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="3dp"
+        android:layout_weight="1"
+        android:text="@string/no_records"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <RelativeLayout
+        android:id="@+id/query_panel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/query_sep"
+            style="@style/Separator.Light"/>
+
+        <ImageButton
+            android:id="@+id/query_clear_btn"
+            style="@style/BorderlessButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/query_sep"
+            android:layout_marginTop="2dp"
+            android:contentDescription="@string/clear"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+
+        <TextView
+            android:id="@+id/query"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/query_clear_btn"
+            android:gravity="center_vertical"
+            android:textSize="16sp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/expiry_panel"
+        style="@style/SelectableView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/expiry_sep"
+            style="@style/Separator.Light"/>
+
+        <ImageButton
+            android:id="@+id/expiry_clear_btn"
+            style="@style/BorderlessButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/expiry_sep"
+            android:layout_marginTop="2dp"
+            android:contentDescription="@string/clear"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+
+        <TextView
+            android:id="@+id/expiry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="4dp"
+            android:layout_toLeftOf="@id/expiry_clear_btn"
+            android:drawableLeft="@android:drawable/ic_dialog_alert"
+            android:drawablePadding="4dp"
+            android:gravity="center_vertical"
+            android:textSize="16sp"/>
+    </RelativeLayout>
+
+    
+</LinearLayout>
