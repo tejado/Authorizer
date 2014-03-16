@@ -120,8 +120,9 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
         });
 
-        // TODO: check open file on startup
-        setMainView();
+        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        ActivityPasswdFile openFile = app.accessOpenFile(this);
+        setOpenAppFile(openFile);
     }
 
 
@@ -143,23 +144,17 @@ public class PasswdSafeActivity extends ActionBarActivity
     @Override
     public void setOpenFile(PasswdFileData passwdFile)
     {
+        ActivityPasswdFile openFile;
         if (passwdFile != null) {
             PasswdSafeUtil.dbginfo(TAG, "open file %s", passwdFile.getUri());
             PasswdSafeApp app = (PasswdSafeApp)getApplication();
-            itsAppFile = app.accessPasswdFile(passwdFile.getUri(), this);
-            itsAppFile.setFileData(passwdFile);
-            itsFileData = passwdFile;
+            openFile = app.accessPasswdFile(passwdFile.getUri(), this);
+            openFile.setFileData(passwdFile);
         } else {
             PasswdSafeUtil.dbginfo(TAG, "close file");
-            if (itsAppFile != null) {
-                itsAppFile.release();
-                itsAppFile.close();
-                itsAppFile = null;
-                itsFileData = null;
-            }
-            setMainView();
+            openFile = null;
         }
-        supportInvalidateOptionsMenu();
+        setOpenAppFile(openFile);
     }
 
 
@@ -369,6 +364,24 @@ public class PasswdSafeActivity extends ActionBarActivity
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
         itsDrawerToggle.syncState();
+    }
+
+    /** Set the open file from the application */
+    private void setOpenAppFile(ActivityPasswdFile openFile)
+    {
+        if ((openFile != null) && (openFile.getFileData() != null)) {
+            itsAppFile = openFile;
+            itsFileData = itsAppFile.getFileData();
+        } else {
+            if (itsAppFile != null) {
+                itsAppFile.release();
+                itsAppFile.close();
+                itsAppFile = null;
+                itsFileData = null;
+            }
+            setMainView();
+        }
+        supportInvalidateOptionsMenu();
     }
 
     /** Set the views to open a URI */
