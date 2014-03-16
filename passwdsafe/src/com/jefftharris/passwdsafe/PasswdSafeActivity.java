@@ -13,7 +13,6 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -88,14 +87,14 @@ public class PasswdSafeActivity extends ActionBarActivity
             public void onDrawerClosed(View drawerView)
             {
                 super.onDrawerClosed(drawerView);
-                ActivityCompat.invalidateOptionsMenu(PasswdSafeActivity.this);
+                supportInvalidateOptionsMenu();
             }
 
             @Override
             public void onDrawerOpened(View drawerView)
             {
                 super.onDrawerOpened(drawerView);
-                ActivityCompat.invalidateOptionsMenu(PasswdSafeActivity.this);
+                supportInvalidateOptionsMenu();
             }
         };
         itsDrawerLayout.setDrawerListener(itsDrawerToggle);
@@ -340,8 +339,17 @@ public class PasswdSafeActivity extends ActionBarActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        MenuItem item = menu.findItem(R.id.menu_close);
-        item.setVisible((itsAppFile != null));
+        boolean drawerOpen = itsDrawerLayout.isDrawerOpen(itsDrawerList);
+        MenuItem item;
+
+        item = menu.findItem(R.id.menu_passwdsafe);
+        item.setVisible(!drawerOpen);
+
+        item = menu.findItem(R.id.menu_close);
+        item.setVisible((itsAppFile != null) && !drawerOpen);
+
+        item = menu.findItem(R.id.menu_about);
+        item.setVisible(!drawerOpen);
 
         return super.onPrepareOptionsMenu(menu);
     }
