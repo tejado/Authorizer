@@ -179,29 +179,6 @@ public class FileListFragment extends ListFragment
     public void onResume()
     {
         super.onResume();
-        PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
-        ActivityPasswdFile file =
-            app.accessPasswdFile(null, new PasswdFileActivity()
-            {
-                public void showProgressDialog()
-                {
-                }
-
-                public void removeProgressDialog()
-                {
-                }
-
-                public void saveFinished(boolean success)
-                {
-                }
-
-                public Activity getActivity()
-                {
-                    return FileListFragment.this.getActivity();
-                }
-            });
-        file.close();
-
         itsDirHistory.clear();
         showFiles();
     }

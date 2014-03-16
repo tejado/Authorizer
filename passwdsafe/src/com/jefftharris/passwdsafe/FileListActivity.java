@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -37,6 +38,38 @@ public class FileListActivity extends AbstractFileListActivity
     {
         super.onStart();
         ReleaseNotesDialog.checkNotes(this);
+    }
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onResume()
+     */
+    @Override
+    protected void onResume()
+    {
+        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        ActivityPasswdFile file =
+            app.accessPasswdFile(null, new PasswdFileActivity()
+            {
+                public void showProgressDialog()
+                {
+                }
+
+                public void removeProgressDialog()
+                {
+                }
+
+                public void saveFinished(boolean success)
+                {
+                }
+
+                public Activity getActivity()
+                {
+                    return FileListActivity.this;
+                }
+            });
+        file.close();
+
+        super.onResume();
     }
 
     /* (non-Javadoc)
