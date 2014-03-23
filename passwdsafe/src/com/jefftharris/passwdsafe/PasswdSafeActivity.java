@@ -29,6 +29,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.jefftharris.passwdsafe.PasswdSafeListFragment.Mode;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
@@ -392,14 +393,18 @@ public class PasswdSafeActivity extends ActionBarActivity
 
             FragmentTransaction txn = fragMgr.beginTransaction();
 
+            Fragment itemsFrag;
             if (itsIsTwoPane) {
-                Fragment groupFrag = PasswdSafeListFragment.newInstance();
+                Fragment groupFrag =
+                        PasswdSafeListFragment.newInstance(Mode.GROUPS);
                 txn.replace(R.id.content_list, groupFrag);
                 // TODO: fix 2 panel
                 txn.show(groupFrag);
+                itemsFrag = PasswdSafeListFragment.newInstance(Mode.RECORDS);
+            } else {
+                itemsFrag = PasswdSafeListFragment.newInstance(Mode.ALL);
             }
 
-            Fragment itemsFrag = PasswdSafeListFragment.newInstance();
             txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             txn.replace(R.id.content, itemsFrag);
             txn.addToBackStack(null);
