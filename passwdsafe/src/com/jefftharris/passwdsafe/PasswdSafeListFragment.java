@@ -46,7 +46,7 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
-    private Mode itsMode;
+    private Mode itsMode = Mode.NONE;
     private Listener itsListener;
     private ItemListAdapter itsAdapter;
 

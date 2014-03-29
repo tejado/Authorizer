@@ -64,7 +64,6 @@ public class PasswdSafeActivity extends ActionBarActivity
 
     private Uri itsPendingOpenNewUri;
     private boolean itsPendingOpenNewIsNew;
-    private int itsOpenNewBackStackId = -1;
 
     private ActivityPasswdFile itsAppFile = null;
     private PasswdFileData itsFileData = null;
@@ -124,7 +123,6 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
         });
 
-        setMainView();
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         ActivityPasswdFile openFile = app.accessOpenFile(this);
         setOpenAppFile(openFile);
@@ -378,34 +376,29 @@ public class PasswdSafeActivity extends ActionBarActivity
     /** Set the open file from the application */
     private void setOpenAppFile(ActivityPasswdFile openFile)
     {
+        setMainView();
         if ((openFile != null) && (openFile.getFileData() != null)) {
             itsAppFile = openFile;
             itsFileData = itsAppFile.getFileData();
 
             FragmentManager fragMgr = getSupportFragmentManager();
-            FragmentManager.enableDebugLogging(true);
-            // Clear the back stack from a open/new operation
-            if (itsOpenNewBackStackId >= 0) {
-                fragMgr.popBackStack(itsOpenNewBackStackId,
-                                     FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            }
-            itsOpenNewBackStackId = -1;
-
+            fragMgr.executePendingTransactions();
             FragmentTransaction txn = fragMgr.beginTransaction();
+            txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
             Fragment itemsFrag;
             if (itsIsTwoPane) {
-                Fragment groupFrag =
-                        PasswdSafeListFragment.newInstance(Mode.GROUPS);
-                txn.replace(R.id.content_list, groupFrag);
-                // TODO: fix 2 panel
-                txn.show(groupFrag);
+                Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
+                if ((listFrag != null) && listFrag.isHidden()) {
+                    txn.show(listFrag);
+                }
+                listFrag = PasswdSafeListFragment.newInstance(Mode.GROUPS);
+                txn.replace(R.id.content_list, listFrag);
                 itemsFrag = PasswdSafeListFragment.newInstance(Mode.RECORDS);
             } else {
                 itemsFrag = PasswdSafeListFragment.newInstance(Mode.ALL);
             }
 
-            txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             txn.replace(R.id.content, itemsFrag);
             txn.addToBackStack(null);
             txn.commit();
@@ -416,7 +409,6 @@ public class PasswdSafeActivity extends ActionBarActivity
                 itsAppFile = null;
                 itsFileData = null;
             }
-            setMainView();
         }
         supportInvalidateOptionsMenu();
     }
@@ -424,15 +416,13 @@ public class PasswdSafeActivity extends ActionBarActivity
     /** Set the views to open a URI */
     private void setOpenUriView(Uri uri)
     {
-        itsOpenNewBackStackId =
-                setView(PasswdSafeOpenFileFragment.newInstance(uri), true);
+        setView(PasswdSafeOpenFileFragment.newInstance(uri), true);
     }
 
     /** Set the views to create a new file URI */
     private void setNewUriView(Uri uri)
     {
-        itsOpenNewBackStackId =
-                setView(PasswdSafeNewFileFragment.newInstance(uri), true);
+        setView(PasswdSafeNewFileFragment.newInstance(uri), true);
     }
 
     /** Set the views to the main view */
@@ -446,25 +436,24 @@ public class PasswdSafeActivity extends ActionBarActivity
     }
 
     /** Update the view's fragments */
-    private int setView(Fragment contentFrag, boolean addBack)
+    private void setView(Fragment contentFrag, boolean addBack)
     {
         FragmentManager fragMgr = getSupportFragmentManager();
         FragmentTransaction txn = fragMgr.beginTransaction();
+        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
         if (itsIsTwoPane) {
             Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
-            if (listFrag != null) {
+            if ((listFrag != null) && !listFrag.isHidden()) {
                 txn.hide(listFrag);
-                txn.remove(listFrag);
             }
         }
 
         txn.replace(R.id.content, contentFrag);
-        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         if (addBack) {
             txn.addToBackStack(null);
         }
 
-        return txn.commit();
+        txn.commit();
     }
 }
