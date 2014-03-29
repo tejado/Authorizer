@@ -50,6 +50,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
         void setOpenFile(PasswdFileData passwdFile);
     }
 
+    // TODO: common code between open and new fragments?
 
     private Listener itsListener;
     private Uri itsFileUri;
