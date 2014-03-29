@@ -14,12 +14,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.file.ParsedPasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
@@ -78,8 +78,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     /** First change after a file has been opened from a new intent */
     protected static final int MOD_OPEN_NEW       = 1 << 4;
 
-    private GroupNode itsRootNode = null;
-    private GroupNode itsCurrGroupNode = null;
+    private ParsedPasswdFileData.GroupNode itsRootNode = null;
+    private ParsedPasswdFileData.GroupNode itsCurrGroupNode = null;
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
     private boolean itsIsSearchCaseSensitive = false;
@@ -384,7 +384,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
 
     /** Get the current group node */
-    protected GroupNode getCurrGroupNode()
+    protected ParsedPasswdFileData.GroupNode getCurrGroupNode()
     {
         return itsCurrGroupNode;
     }
@@ -411,7 +411,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         itsCurrGroupNode = itsRootNode;
         for (int i = 0; i < itsCurrGroups.size(); ++i) {
             String group = itsCurrGroups.get(i);
-            GroupNode childNode = itsCurrGroupNode.getGroup(group);
+            ParsedPasswdFileData.GroupNode childNode = itsCurrGroupNode.getGroup(group);
             if (childNode == null) {
                 // Prune groups from current item in the stack on down
                 for (int j = itsCurrGroups.size() - 1; j >= i; --j) {
@@ -423,9 +423,9 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
 
         // Build the list data
-        Map<String, GroupNode> entryGroups = itsCurrGroupNode.getGroups();
+        Map<String, ParsedPasswdFileData.GroupNode> entryGroups = itsCurrGroupNode.getGroups();
         if (entryGroups != null) {
-            for(Map.Entry<String, GroupNode> entry : entryGroups.entrySet()) {
+            for(Map.Entry<String, ParsedPasswdFileData.GroupNode> entry : entryGroups.entrySet()) {
                 HashMap<String, Object> recInfo = new HashMap<String, Object>();
                 recInfo.put(TITLE, entry.getKey());
                 recInfo.put(ICON,R.drawable.folder_rev);
@@ -439,9 +439,9 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             }
         }
 
-        List<MatchPwsRecord> entryRecs = itsCurrGroupNode.getRecords();
+        List<ParsedPasswdFileData.MatchPwsRecord> entryRecs = itsCurrGroupNode.getRecords();
         if (entryRecs != null) {
-            for (MatchPwsRecord rec : entryRecs) {
+            for (ParsedPasswdFileData.MatchPwsRecord rec : entryRecs) {
                 itsListData.add(createRecInfo(rec, fileData));
             }
         }
@@ -456,7 +456,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private final void populateRootNode(PasswdFileData fileData)
     {
         PasswdSafeUtil.dbginfo(TAG, "populateRootNode");
-        itsRootNode = new GroupNode();
+        itsRootNode = new ParsedPasswdFileData.GroupNode();
         itsNumExpired = 0;
         if (fileData == null) {
             return;
@@ -467,7 +467,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         if (itsGroupRecords) {
             Comparator<String> groupComp;
             if (itsIsSortCaseSensitive) {
-                groupComp = new StringComparator();
+                groupComp = new ParsedPasswdFileData.StringComparator();
             } else {
                 groupComp = String.CASE_INSENSITIVE_ORDER;
             }
@@ -482,16 +482,16 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                     group = "";
                 }
                 String[] groups = TextUtils.split(group, "\\.");
-                GroupNode node = itsRootNode;
+                ParsedPasswdFileData.GroupNode node = itsRootNode;
                 for (String g : groups) {
-                    GroupNode groupNode = node.getGroup(g);
+                    ParsedPasswdFileData.GroupNode groupNode = node.getGroup(g);
                     if (groupNode == null) {
-                        groupNode = new GroupNode();
+                        groupNode = new ParsedPasswdFileData.GroupNode();
                         node.putGroup(g, groupNode, groupComp);
                     }
                     node = groupNode;
                 }
-                node.addRecord(new MatchPwsRecord(rec, match));
+                node.addRecord(new ParsedPasswdFileData.MatchPwsRecord(rec, match));
             }
         } else {
             for (PwsRecord rec : records) {
@@ -499,7 +499,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                 if (match == null) {
                     continue;
                 }
-                itsRootNode.addRecord(new MatchPwsRecord(rec, match));
+                itsRootNode.addRecord(new ParsedPasswdFileData.MatchPwsRecord(rec, match));
             }
         }
 
@@ -521,7 +521,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
 
     private static final HashMap<String, Object>
-    createRecInfo(MatchPwsRecord rec, PasswdFileData fileData)
+    createRecInfo(ParsedPasswdFileData.MatchPwsRecord rec, PasswdFileData fileData)
     {
         HashMap<String, Object> recInfo = new HashMap<String, Object>();
         String title = fileData.getTitle(rec.itsRecord);
@@ -705,89 +705,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                     return str0.compareToIgnoreCase(str1);
                 }
             }
-        }
-    }
-
-
-    private static final class StringComparator implements Comparator<String>
-    {
-        public int compare(String arg0, String arg1)
-        {
-            return arg0.compareTo(arg1);
-        }
-    }
-
-
-    protected static final class MatchPwsRecord
-    {
-        public final PwsRecord itsRecord;
-        public final String itsMatch;
-
-        public MatchPwsRecord(PwsRecord rec, String match)
-        {
-            itsRecord = rec;
-            itsMatch = match;
-        }
-    }
-
-
-    protected static final class GroupNode
-    {
-        private List<MatchPwsRecord> itsRecords = null;
-        private TreeMap<String, GroupNode> itsGroups = null;
-
-        public GroupNode()
-        {
-        }
-
-        public final void addRecord(MatchPwsRecord rec)
-        {
-            if (itsRecords == null) {
-                itsRecords = new ArrayList<MatchPwsRecord>();
-            }
-            itsRecords.add(rec);
-        }
-
-        public final List<MatchPwsRecord> getRecords()
-        {
-            return itsRecords;
-        }
-
-        public final void putGroup(String name, GroupNode node,
-                                   Comparator<String> groupComp)
-        {
-            if (itsGroups == null) {
-                itsGroups = new TreeMap<String, GroupNode>(groupComp);
-            }
-            itsGroups.put(name, node);
-        }
-
-        public final GroupNode getGroup(String name)
-        {
-            if (itsGroups == null) {
-                return null;
-            } else {
-                return itsGroups.get(name);
-            }
-        }
-
-        public final Map<String, GroupNode> getGroups()
-        {
-            return itsGroups;
-        }
-
-        public final int getNumRecords()
-        {
-            int num = 0;
-            if (itsRecords != null) {
-                num += itsRecords.size();
-            }
-            if (itsGroups != null) {
-                for (GroupNode child: itsGroups.values()) {
-                    num += child.getNumRecords();
-                }
-            }
-            return num;
         }
     }
 

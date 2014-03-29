@@ -43,6 +43,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.file.ParsedPasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
@@ -1027,18 +1028,18 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     /** Protect or unprotect entries in the given group */
     private final void setProtectRecords(boolean prot,
                                          PasswdFileData fileData,
-                                         GroupNode node)
+                                         ParsedPasswdFileData.GroupNode node)
     {
-	Map<String, GroupNode> childGroups = node.getGroups();
+	Map<String, ParsedPasswdFileData.GroupNode> childGroups = node.getGroups();
 	if (childGroups != null) {
-	    for (GroupNode child : childGroups.values()) {
+	    for (ParsedPasswdFileData.GroupNode child : childGroups.values()) {
 	        setProtectRecords(prot, fileData, child);
 	    }
 	}
 
-	List<MatchPwsRecord> childRecords = node.getRecords();
+	List<ParsedPasswdFileData.MatchPwsRecord> childRecords = node.getRecords();
 	if (childRecords != null) {
-	    for (MatchPwsRecord matchRec : childRecords) {
+	    for (ParsedPasswdFileData.MatchPwsRecord matchRec : childRecords) {
 	        fileData.setProtected(prot, matchRec.itsRecord);
 	    }
 	}
