@@ -24,6 +24,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+
 /**
  *  Fragment showing lists of items from a PasswdSafe file
  */
@@ -46,6 +48,7 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
+    private static final String TAG = PasswdSafeListFragment.class.getName();
     private Mode itsMode = Mode.NONE;
     private Listener itsListener;
     private ItemListAdapter itsAdapter;
@@ -112,10 +115,25 @@ public class PasswdSafeListFragment extends ListFragment
     {
         super.onActivityCreated(savedInstanceState);
 
-        setHasOptionsMenu(true);
-        itsAdapter = new ItemListAdapter(getActivity());
-        LoaderManager lm = getLoaderManager();
-        lm.initLoader(0, null, this);
+        boolean hasMenu = false;
+        boolean hasItems = false;
+        switch (itsMode) {
+        case NONE: {
+            break;
+        }
+        case GROUPS:
+        case RECORDS:
+        case ALL: {
+            hasItems = true;
+            break;
+        }
+        }
+        setHasOptionsMenu(hasMenu);
+        if (hasItems) {
+            itsAdapter = new ItemListAdapter(getActivity());
+            LoaderManager lm = getLoaderManager();
+            lm.initLoader(0, null, this);
+        }
     }
 
 
@@ -125,7 +143,7 @@ public class PasswdSafeListFragment extends ListFragment
     @Override
     public Loader<List<Map<String, Object>>> onCreateLoader(int id, Bundle args)
     {
-        return new ItemLoader(getActivity());
+        return new ItemLoader(itsMode, getActivity());
     }
 
 
@@ -177,10 +195,13 @@ public class PasswdSafeListFragment extends ListFragment
     private static class ItemLoader
             extends AsyncTaskLoader<List<Map<String, Object>>>
     {
+        private final Mode itsMode;
+
         /** Constructor */
-        public ItemLoader(Context context)
+        public ItemLoader(Mode mode, Context context)
         {
             super(context);
+            itsMode = mode;
         }
 
 
@@ -212,6 +233,7 @@ public class PasswdSafeListFragment extends ListFragment
         @Override
         public List<Map<String, Object>> loadInBackground()
         {
+            PasswdSafeUtil.dbginfo(TAG, "loadInBackground %s", itsMode);
             List<Map<String, Object>> items =
                     new ArrayList<Map<String, Object>>();
             return items;
