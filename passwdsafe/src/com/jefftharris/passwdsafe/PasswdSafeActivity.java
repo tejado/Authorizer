@@ -498,13 +498,11 @@ public class PasswdSafeActivity extends ActionBarActivity
     {
         itsParsedFileData = parsedFile;
         FragmentManager mgr = getSupportFragmentManager();
-        Fragment frag = mgr.findFragmentById(R.id.content_list);
-        if ((frag != null) && (frag instanceof PasswdSafeListFragment)) {
-            ((PasswdSafeListFragment)frag).refreshList();
-        }
-        frag = mgr.findFragmentById(R.id.content);
-        if ((frag != null) && (frag instanceof PasswdSafeListFragment)) {
-            ((PasswdSafeListFragment)frag).refreshList();
+        for (int id: new int[] {R.id.content_list, R.id.content}) {
+            Fragment frag = mgr.findFragmentById(id);
+            if ((frag != null) && (frag instanceof PasswdSafeListFragment)) {
+                ((PasswdSafeListFragment)frag).refreshList();
+            }
         }
     }
 

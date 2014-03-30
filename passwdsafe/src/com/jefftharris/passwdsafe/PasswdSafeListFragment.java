@@ -118,9 +118,9 @@ public class PasswdSafeListFragment extends ListFragment
         setHasOptionsMenu(hasMenu);
 
         itsAdapter = new ItemListAdapter(getActivity());
+        setListAdapter(itsAdapter);
         LoaderManager lm = getLoaderManager();
         lm.initLoader(0, null, this);
-        setListAdapter(itsAdapter);
     }
 
 
