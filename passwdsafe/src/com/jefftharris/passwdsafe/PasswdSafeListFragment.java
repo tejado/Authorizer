@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,27 +34,28 @@ public class PasswdSafeListFragment extends ListFragment
     /** Listener interface for owning activity */
     public interface Listener
     {
-    }
+        /** Mode for which items are shown from the file */
+        public enum Mode
+        {
+            NONE,
+            GROUPS,
+            RECORDS,
+            ALL
+        }
 
-
-    /** Mode for which items are shown from the file */
-    public enum Mode
-    {
-        NONE,
-        GROUPS,
-        RECORDS,
-        ALL
+        /** Get the current record items in a background thread */
+        List<Map<String, Object>> getBackgroundRecordItems(Mode mode);
     }
 
 
     private static final String TAG = PasswdSafeListFragment.class.getName();
-    private Mode itsMode = Mode.NONE;
+    private Listener.Mode itsMode = Listener.Mode.NONE;
     private Listener itsListener;
     private ItemListAdapter itsAdapter;
 
 
     /** Create a new instance */
-    public static PasswdSafeListFragment newInstance(Mode mode)
+    public static PasswdSafeListFragment newInstance(Listener.Mode mode)
     {
         PasswdSafeListFragment frag = new PasswdSafeListFragment();
         Bundle args = new Bundle();
@@ -75,9 +75,9 @@ public class PasswdSafeListFragment extends ListFragment
         Bundle args = getArguments();
         String modestr = (args != null) ? args.getString("mode") : null;
         if (modestr == null) {
-            itsMode = Mode.NONE;
+            itsMode = Listener.Mode.NONE;
         } else {
-            itsMode = Mode.valueOf(modestr);
+            itsMode = Listener.Mode.valueOf(modestr);
         }
     }
 
@@ -134,6 +134,16 @@ public class PasswdSafeListFragment extends ListFragment
             LoaderManager lm = getLoaderManager();
             lm.initLoader(0, null, this);
         }
+        setListAdapter(itsAdapter);
+    }
+
+
+    public void refreshList()
+    {
+        if (itsAdapter != null) {
+            LoaderManager lm = getLoaderManager();
+            lm.restartLoader(0, null, this);
+        }
     }
 
 
@@ -143,7 +153,7 @@ public class PasswdSafeListFragment extends ListFragment
     @Override
     public Loader<List<Map<String, Object>>> onCreateLoader(int id, Bundle args)
     {
-        return new ItemLoader(itsMode, getActivity());
+        return new ItemLoader(itsMode, itsListener, getActivity());
     }
 
 
@@ -195,13 +205,16 @@ public class PasswdSafeListFragment extends ListFragment
     private static class ItemLoader
             extends AsyncTaskLoader<List<Map<String, Object>>>
     {
-        private final Mode itsMode;
+        private final Listener.Mode itsMode;
+        private final Listener itsActListener;
 
         /** Constructor */
-        public ItemLoader(Mode mode, Context context)
+        public ItemLoader(Listener.Mode mode, Listener actListener,
+                          Context context)
         {
             super(context);
             itsMode = mode;
+            itsActListener = actListener;
         }
 
 
@@ -234,9 +247,7 @@ public class PasswdSafeListFragment extends ListFragment
         public List<Map<String, Object>> loadInBackground()
         {
             PasswdSafeUtil.dbginfo(TAG, "loadInBackground %s", itsMode);
-            List<Map<String, Object>> items =
-                    new ArrayList<Map<String, Object>>();
-            return items;
+            return itsActListener.getBackgroundRecordItems(itsMode);
         }
     }
 }

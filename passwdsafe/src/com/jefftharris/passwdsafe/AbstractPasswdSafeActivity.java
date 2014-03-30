@@ -442,12 +442,12 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         List<ParsedPasswdFileData.MatchPwsRecord> entryRecs = itsCurrGroupNode.getRecords();
         if (entryRecs != null) {
             for (ParsedPasswdFileData.MatchPwsRecord rec : entryRecs) {
-                itsListData.add(createRecInfo(rec, fileData));
+                itsListData.add(ParsedPasswdFileData.createRecInfo(rec, fileData));
             }
         }
 
-        RecordMapComparator comp =
-            new RecordMapComparator(itsIsSortCaseSensitive);
+        ParsedPasswdFileData.RecordMapComparator comp =
+            new ParsedPasswdFileData.RecordMapComparator(itsIsSortCaseSensitive);
         Collections.sort(itsListData, comp);
     }
 
@@ -517,27 +517,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                 }
             }
         }
-    }
-
-
-    private static final HashMap<String, Object>
-    createRecInfo(ParsedPasswdFileData.MatchPwsRecord rec, PasswdFileData fileData)
-    {
-        HashMap<String, Object> recInfo = new HashMap<String, Object>();
-        String title = fileData.getTitle(rec.itsRecord);
-        if (title == null) {
-            title = "Untitled";
-        }
-        String user = fileData.getUsername(rec.itsRecord);
-        if (!TextUtils.isEmpty(user)) {
-            user = "[" + user + "]";
-        }
-        recInfo.put(TITLE, title);
-        recInfo.put(RECORD, rec.itsRecord);
-        recInfo.put(MATCH, rec.itsMatch);
-        recInfo.put(USERNAME, user);
-        recInfo.put(ICON, R.drawable.contact_rev);
-        return recInfo;
     }
 
 
@@ -649,62 +628,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             return true;
         } else {
             return false;
-        }
-    }
-
-
-    private static final class RecordMapComparator implements
-                    Comparator<HashMap<String, Object>>
-    {
-        private boolean itsIsSortCaseSensitive;
-
-        public RecordMapComparator(boolean sortCaseSensitive)
-        {
-            itsIsSortCaseSensitive = sortCaseSensitive;
-        }
-
-        public int compare(HashMap<String, Object> arg0,
-                           HashMap<String, Object> arg1)
-        {
-            // Sort groups first
-            Object rec0 = arg0.get(RECORD);
-            Object rec1 = arg1.get(RECORD);
-            if ((rec0 == null) && (rec1 != null)) {
-                return -1;
-            } else if ((rec0 != null) && (rec1 == null)) {
-                return 1;
-            }
-
-            int rc = compareField(arg0, arg1, TITLE);
-            if (rc == 0) {
-                rc = compareField(arg0, arg1, USERNAME);
-            }
-            return rc;
-        }
-
-        private final int compareField(HashMap<String, Object> arg0,
-                                       HashMap<String, Object> arg1,
-                                       String field)
-        {
-            Object obj0 = arg0.get(field);
-            Object obj1 = arg1.get(field);
-
-            if ((obj0 == null) && (obj1 == null)) {
-                return 0;
-            } else if (obj0 == null) {
-                return -1;
-            } else if (obj1 == null) {
-                return 1;
-            } else {
-                String str0 = obj0.toString();
-                String str1 = obj1.toString();
-
-                if (itsIsSortCaseSensitive) {
-                    return str0.compareTo(str1);
-                } else {
-                    return str0.compareToIgnoreCase(str1);
-                }
-            }
         }
     }
 
