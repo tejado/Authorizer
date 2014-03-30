@@ -37,7 +37,6 @@ public class PasswdSafeListFragment extends ListFragment
         /** Mode for which items are shown from the file */
         public enum Mode
         {
-            NONE,
             GROUPS,
             RECORDS,
             ALL
@@ -49,7 +48,7 @@ public class PasswdSafeListFragment extends ListFragment
 
 
     private static final String TAG = PasswdSafeListFragment.class.getName();
-    private Listener.Mode itsMode = Listener.Mode.NONE;
+    private Listener.Mode itsMode = Listener.Mode.GROUPS;
     private Listener itsListener;
     private ItemListAdapter itsAdapter;
 
@@ -75,7 +74,7 @@ public class PasswdSafeListFragment extends ListFragment
         Bundle args = getArguments();
         String modestr = (args != null) ? args.getString("mode") : null;
         if (modestr == null) {
-            itsMode = Listener.Mode.NONE;
+            itsMode = Listener.Mode.GROUPS;
         } else {
             itsMode = Listener.Mode.valueOf(modestr);
         }
@@ -116,31 +115,19 @@ public class PasswdSafeListFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
 
         boolean hasMenu = false;
-        boolean hasItems = false;
-        switch (itsMode) {
-        case NONE: {
-            break;
-        }
-        case GROUPS:
-        case RECORDS:
-        case ALL: {
-            hasItems = true;
-            break;
-        }
-        }
         setHasOptionsMenu(hasMenu);
-        if (hasItems) {
-            itsAdapter = new ItemListAdapter(getActivity());
-            LoaderManager lm = getLoaderManager();
-            lm.initLoader(0, null, this);
-        }
+
+        itsAdapter = new ItemListAdapter(getActivity());
+        LoaderManager lm = getLoaderManager();
+        lm.initLoader(0, null, this);
         setListAdapter(itsAdapter);
     }
 
 
+    /** Refresh the list due to file changes */
     public void refreshList()
     {
-        if (itsAdapter != null) {
+        if (isAdded()) {
             LoaderManager lm = getLoaderManager();
             lm.restartLoader(0, null, this);
         }

@@ -189,9 +189,6 @@ public class PasswdSafeActivity extends ActionBarActivity
     {
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
         switch (mode) {
-        case NONE: {
-            break;
-        }
         case GROUPS: {
             itsParsedFileData.addGroups(items, this);
             break;
@@ -454,8 +451,6 @@ public class PasswdSafeActivity extends ActionBarActivity
                 if ((listFrag != null) && listFrag.isHidden()) {
                     txn.show(listFrag);
                 }
-                listFrag = PasswdSafeListFragment.newInstance(Mode.GROUPS);
-                txn.replace(R.id.content_list, listFrag);
                 itemsFrag = PasswdSafeListFragment.newInstance(Mode.RECORDS);
             } else {
                 itemsFrag = PasswdSafeListFragment.newInstance(Mode.ALL);
