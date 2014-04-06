@@ -22,7 +22,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.file.ParsedPasswdFileData;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
@@ -169,10 +172,14 @@ public class PasswdSafeListFragment extends ListFragment
     private static class ItemListAdapter
             extends ArrayAdapter<Map<String, Object>>
     {
+        private final LayoutInflater itsInflater;
+
         /** Constructor */
         public ItemListAdapter(Context context)
         {
             super(context, R.layout.passwdsafe_list_item, android.R.id.text1);
+            itsInflater = (LayoutInflater)context.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
         }
 
         /** Set the list data */
@@ -184,6 +191,42 @@ public class PasswdSafeListFragment extends ListFragment
                     add(item);
                 }
             }
+        }
+
+        /* (non-Javadoc)
+         * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
+         */
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            View view;
+            if (convertView == null) {
+                PasswdSafeUtil.dbginfo(TAG, "getview");
+                view = itsInflater.inflate(R.layout.passwdsafe_list_item,
+                                           parent, false);
+            } else {
+                view = convertView;
+            }
+
+            Map<String, Object> item = getItem(position);
+            String title = (String)item.get(ParsedPasswdFileData.TITLE);
+            String user = (String)item.get(ParsedPasswdFileData.USERNAME);
+            Integer icon = (Integer)item.get(ParsedPasswdFileData.ICON);
+            String match = (String)item.get(ParsedPasswdFileData.MATCH);
+            setTextView(view, android.R.id.text1, title);
+            setTextView(view, android.R.id.text2, user);
+            setTextView(view, R.id.match, match);
+            ((ImageView)view.findViewById(R.id.icon)).setImageResource(icon);
+            return view;
+        }
+
+        /** Set a text view */
+        private static void setTextView(View view, int textId, String str)
+        {
+            if (str == null) {
+                str = "";
+            }
+            ((TextView)view.findViewById(textId)).setText(str);
         }
     }
 
