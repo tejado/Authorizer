@@ -228,6 +228,29 @@ public class PasswdSafeActivity extends ActionBarActivity
 
 
     /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#addGroupPath(java.lang.String)
+     */
+    @Override
+    public void addGroupPath(String entry)
+    {
+        itsParsedFileData.addGroupPath(entry);
+        refreshContent();
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#popGroupPath()
+     */
+    @Override
+    public void popGroupPath()
+    {
+        // TODO: back button?
+        itsParsedFileData.popGroupPath();
+        refreshContent();
+    }
+
+
+    /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.PasswdFileActivity#getActivity()
      */
     @Override
@@ -513,6 +536,12 @@ public class PasswdSafeActivity extends ActionBarActivity
     private void setParsedFileData(ParsedPasswdFileData parsedFile)
     {
         itsParsedFileData = parsedFile;
+        refreshContent();
+    }
+
+    /** Refresh the content lists */
+    private void refreshContent()
+    {
         FragmentManager mgr = getSupportFragmentManager();
         for (int id: new int[] {R.id.content_list, R.id.content}) {
             Fragment frag = mgr.findFragmentById(id);

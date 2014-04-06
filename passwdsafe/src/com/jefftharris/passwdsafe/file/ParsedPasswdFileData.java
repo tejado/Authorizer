@@ -298,6 +298,35 @@ public class ParsedPasswdFileData
         if (groups != null) {
             itsCurrGroups.addAll(groups);
         }
+        updateCurrentGroup();
+    }
+
+    /** Get the current groups */
+    public ArrayList<String> getCurrGroups()
+    {
+        return itsCurrGroups;
+    }
+
+    /** Add an entry to the current groups */
+    public void addGroupPath(String entry)
+    {
+        itsCurrGroups.add(entry);
+        updateCurrentGroup();
+    }
+
+    /** Pop an entry from the current groups */
+    public void popGroupPath()
+    {
+        int size = itsCurrGroups.size();
+        if (size > 0) {
+            itsCurrGroups.remove(size - 1);
+        }
+        updateCurrentGroup();
+    }
+
+    /** Update the current group */
+    private void updateCurrentGroup()
+    {
         itsCurrGroupNode = itsRootNode;
         for (int i = 0; i < itsCurrGroups.size(); ++i) {
             String group = itsCurrGroups.get(i);
@@ -311,12 +340,6 @@ public class ParsedPasswdFileData
             }
             itsCurrGroupNode = childNode;
         }
-    }
-
-    /** Get the current groups */
-    public ArrayList<String> getCurrGroups()
-    {
-        return itsCurrGroups;
     }
 
     /**

@@ -10,6 +10,8 @@ package com.jefftharris.passwdsafe;
 import java.util.List;
 import java.util.Map;
 
+import org.pwsafe.lib.file.PwsRecord;
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -21,9 +23,11 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.ParsedPasswdFileData;
@@ -33,7 +37,8 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
  *  Fragment showing lists of items from a PasswdSafe file
  */
 public class PasswdSafeListFragment extends ListFragment
-        implements LoaderCallbacks<List<Map<String, Object>>>
+        implements LoaderCallbacks<List<Map<String, Object>>>,
+        OnClickListener
 {
     /** Listener interface for owning activity */
     public interface Listener
@@ -51,6 +56,12 @@ public class PasswdSafeListFragment extends ListFragment
 
         /** Get the current group path */
         String getGroupPath();
+
+        /** Add an entry to the group path */
+        void addGroupPath(String entry);
+
+        /** Pop the last entry from the group path */
+        void popGroupPath();
     }
 
 
@@ -58,6 +69,7 @@ public class PasswdSafeListFragment extends ListFragment
     private Listener.Mode itsMode = Listener.Mode.GROUPS;
     private Listener itsListener;
     private ItemListAdapter itsAdapter;
+    private View itsRoot;
 
 
     /** Create a new instance */
@@ -107,8 +119,75 @@ public class PasswdSafeListFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
-        View root = inflater.inflate(R.layout.fragment_passwdsafe_list,
-                                     container, false);
+        itsRoot = inflater.inflate(R.layout.fragment_passwdsafe_list,
+                                   container, false);
+
+        View groupPanel = itsRoot.findViewById(R.id.current_group_panel);
+        groupPanel.setOnClickListener(this);
+
+        return itsRoot;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
+     */
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+
+        boolean hasMenu = false;
+        setHasOptionsMenu(hasMenu);
+
+        itsAdapter = new ItemListAdapter(getActivity());
+        setListAdapter(itsAdapter);
+        LoaderManager lm = getLoaderManager();
+        lm.initLoader(0, null, this);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     */
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id)
+    {
+        Map<String, Object> item = itsAdapter.getItem(position);
+        PwsRecord rec = (PwsRecord)item.get(ParsedPasswdFileData.RECORD);
+        if (rec != null) {
+            // TODO: record click
+        } else {
+            String childTitle = (String)item.get(ParsedPasswdFileData.TITLE);
+            itsListener.addGroupPath(childTitle);
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.view.View.OnClickListener#onClick(android.view.View)
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch(v.getId()) {
+        case R.id.current_group_panel: {
+            itsListener.popGroupPath();
+            break;
+        }
+        }
+    }
+
+
+    /** Refresh the list due to file changes */
+    public void refreshList()
+    {
+        if (!isAdded()) {
+            return;
+        }
+
+        LoaderManager lm = getLoaderManager();
+        lm.restartLoader(0, null, this);
 
         boolean groupVisible = false;
         switch (itsMode) {
@@ -131,44 +210,14 @@ public class PasswdSafeListFragment extends ListFragment
             if (TextUtils.isEmpty(groupPath)) {
                 groupVisible = false;
             } else {
-                TextView tv =
-                        (TextView)root.findViewById(R.id.current_group_label);
+                TextView tv = (TextView)
+                        itsRoot.findViewById(R.id.current_group_label);
                 tv.setText(groupPath);
             }
         }
 
-        View groupPanel = root.findViewById(R.id.current_group_panel);
+        View groupPanel = itsRoot.findViewById(R.id.current_group_panel);
         groupPanel.setVisibility(groupVisible ? View.VISIBLE : View.GONE);
-
-        return root;
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
-     */
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
-        super.onActivityCreated(savedInstanceState);
-
-        boolean hasMenu = false;
-        setHasOptionsMenu(hasMenu);
-
-        itsAdapter = new ItemListAdapter(getActivity());
-        setListAdapter(itsAdapter);
-        LoaderManager lm = getLoaderManager();
-        lm.initLoader(0, null, this);
-    }
-
-
-    /** Refresh the list due to file changes */
-    public void refreshList()
-    {
-        if (isAdded()) {
-            LoaderManager lm = getLoaderManager();
-            lm.restartLoader(0, null, this);
-        }
     }
 
 
