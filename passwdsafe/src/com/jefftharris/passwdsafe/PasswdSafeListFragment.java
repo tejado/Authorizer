@@ -201,7 +201,6 @@ public class PasswdSafeListFragment extends ListFragment
         {
             View view;
             if (convertView == null) {
-                PasswdSafeUtil.dbginfo(TAG, "getview");
                 view = itsInflater.inflate(R.layout.passwdsafe_list_item,
                                            parent, false);
             } else {
