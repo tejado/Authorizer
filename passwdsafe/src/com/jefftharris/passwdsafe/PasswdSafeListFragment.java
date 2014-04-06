@@ -105,6 +105,26 @@ public class PasswdSafeListFragment extends ListFragment
     {
         View root = inflater.inflate(R.layout.fragment_passwdsafe_list,
                                      container, false);
+
+        boolean groupVisible = false;
+        switch (itsMode) {
+        case GROUPS: {
+            groupVisible = true;
+            break;
+        }
+        case RECORDS: {
+            groupVisible = false;
+            break;
+        }
+        case ALL: {
+            groupVisible = true;
+            break;
+        }
+        }
+
+        View groupPanel = root.findViewById(R.id.current_group_panel);
+        groupPanel.setVisibility(groupVisible ? View.VISIBLE : View.GONE);
+
         return root;
     }
 
