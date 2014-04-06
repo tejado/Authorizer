@@ -135,7 +135,13 @@ public class PasswdSafeOpenFileFragment extends Fragment
         Button okBtn = (Button)itsRoot.findViewById(R.id.ok);
         okBtn.setOnClickListener(this);
 
-        GuiUtils.setupFragmentKeyboard(passwdView, passwdView, okBtn, ctx);
+
+        if (PasswdSafeApp.DEBUG_AUTO_FILE == null) {
+            GuiUtils.setupFragmentKeyboard(passwdView, passwdView, okBtn, ctx);
+        } else {
+            passwdView.setText("test123");
+            okBtn.performClick();
+        }
 
         return itsRoot;
     }

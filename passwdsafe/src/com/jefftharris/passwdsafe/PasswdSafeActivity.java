@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -150,8 +151,12 @@ public class PasswdSafeActivity extends ActionBarActivity
     @Override
     public void chooseOpenFile()
     {
-        Intent intent = new Intent(this, FileChooseActivity.class);
-        startActivityForResult(intent, ACTIVITY_REQUEST_CHOOSE_FILE);
+        if (PasswdSafeApp.DEBUG_AUTO_FILE == null) {
+            Intent intent = new Intent(this, FileChooseActivity.class);
+            startActivityForResult(intent, ACTIVITY_REQUEST_CHOOSE_FILE);
+        } else {
+            setOpenUriView(Uri.fromFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE)));
+        }
     }
 
 
