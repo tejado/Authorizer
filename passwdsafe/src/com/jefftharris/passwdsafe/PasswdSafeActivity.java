@@ -27,6 +27,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -213,6 +214,16 @@ public class PasswdSafeActivity extends ActionBarActivity
                 new ParsedPasswdFileData.RecordMapComparator(false);
         Collections.sort(items, comp);
         return items;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#getGroupPath()
+     */
+    @Override
+    public String getGroupPath()
+    {
+        return TextUtils.join(" / ", itsParsedFileData.getCurrGroups());
     }
 
 

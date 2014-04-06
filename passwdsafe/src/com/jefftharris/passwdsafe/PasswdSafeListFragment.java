@@ -18,6 +18,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,9 @@ public class PasswdSafeListFragment extends ListFragment
 
         /** Get the current record items in a background thread */
         List<Map<String, Object>> getBackgroundRecordItems(Mode mode);
+
+        /** Get the current group path */
+        String getGroupPath();
     }
 
 
@@ -120,6 +124,17 @@ public class PasswdSafeListFragment extends ListFragment
             groupVisible = true;
             break;
         }
+        }
+
+        if (groupVisible) {
+            String groupPath = itsListener.getGroupPath();
+            if (TextUtils.isEmpty(groupPath)) {
+                groupVisible = false;
+            } else {
+                TextView tv =
+                        (TextView)root.findViewById(R.id.current_group_label);
+                tv.setText(groupPath);
+            }
         }
 
         View groupPanel = root.findViewById(R.id.current_group_panel);
