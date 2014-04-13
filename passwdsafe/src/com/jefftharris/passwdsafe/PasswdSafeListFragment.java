@@ -31,6 +31,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.ParsedPasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
@@ -53,6 +54,12 @@ public class PasswdSafeListFragment extends ListFragment
 
         /** Get the current record items in a background thread */
         List<Map<String, Object>> getBackgroundRecordItems(Mode mode);
+
+        /** Get the file data */
+        PasswdFileData getFileData();
+
+        /** Select a record */
+        void selectRecord(String uuid);
 
         /** Get the current group path */
         String getGroupPath();
@@ -156,7 +163,12 @@ public class PasswdSafeListFragment extends ListFragment
         Map<String, Object> item = itsAdapter.getItem(position);
         PwsRecord rec = (PwsRecord)item.get(ParsedPasswdFileData.RECORD);
         if (rec != null) {
-            // TODO: record click
+            String uuid = null;
+            PasswdFileData fileData = itsListener.getFileData();
+            if (fileData != null) {
+                uuid = fileData.getUUID(rec);
+            }
+            itsListener.selectRecord(uuid);
         } else {
             String childTitle = (String)item.get(ParsedPasswdFileData.TITLE);
             itsListener.addGroupPath(childTitle);

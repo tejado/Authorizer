@@ -59,6 +59,7 @@ public class PasswdSafeActivity extends ActionBarActivity
                    PasswdSafeOpenFileFragment.Listener,
                    PasswdSafeNewFileFragment.Listener,
                    PasswdSafeListFragment.Listener,
+                   PasswdSafeRecordFragment.Listener,
                    PasswdFileActivity
 {
     private static final int ACTIVITY_REQUEST_CHOOSE_FILE = 1;
@@ -78,6 +79,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     private ActivityPasswdFile itsAppFile = null;
     private PasswdFileData itsFileData = null;
     private ParsedPasswdFileData itsParsedFileData = new ParsedPasswdFileData();
+    private String itsCurrentRecord = null;
 
 
     /* (non-Javadoc)
@@ -234,6 +236,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     public void addGroupPath(String entry)
     {
         itsParsedFileData.addGroupPath(entry);
+        itsCurrentRecord = null;
         refreshContent();
     }
 
@@ -246,6 +249,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     {
         // TODO: back button?
         itsParsedFileData.popGroupPath();
+        itsCurrentRecord = null;
         refreshContent();
     }
 
@@ -257,6 +261,28 @@ public class PasswdSafeActivity extends ActionBarActivity
     public Activity getActivity()
     {
         return this;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdSafeRecordFragment.Listener#getFileData()
+     */
+    @Override
+    public PasswdFileData getFileData()
+    {
+        return itsFileData;
+    }
+
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#selectRecord(java.lang.String)
+     */
+    @Override
+    public void selectRecord(String uuid)
+    {
+        itsCurrentRecord = uuid;
+        refreshContent();
     }
 
 
@@ -536,6 +562,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     private void setParsedFileData(ParsedPasswdFileData parsedFile)
     {
         itsParsedFileData = parsedFile;
+        itsCurrentRecord = null;
         refreshContent();
     }
 

@@ -165,8 +165,8 @@ public class PasswdSafeApp extends Application
     }
 
     public static final String DEBUG_AUTO_FILE =
-        null;
-        //Preferences.PREF_FILE_DIR_DEF + "/test.psafe3";
+        //null;
+        Preferences.PREF_FILE_DIR_DEF + "/test.psafe3";
 
     public static final String EXPIRATION_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.EXPIRATION_TIMEOUT";
