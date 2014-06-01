@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.util.ArrayList;
+
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.app.Activity;
@@ -18,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdLocation;
 
 /**
  *  Fragment containing the details of a record
@@ -29,19 +32,23 @@ public class PasswdSafeRecordFragment extends Fragment
     {
         /** Get the file data */
         PasswdFileData getFileData();
+
+        /** Update the view for the location in the password file */
+        void updateLocationView(PasswdLocation location);
     }
 
 
-    private String itsUuid;
+    private PasswdLocation itsLocation;
     private Listener itsListener;
 
 
     /** Create a new instance */
-    public static PasswdSafeRecordFragment newInstance(String uuid)
+    public static PasswdSafeRecordFragment newInstance(PasswdLocation location)
     {
         PasswdSafeRecordFragment frag = new PasswdSafeRecordFragment();
         Bundle args = new Bundle();
-        args.putString("uuid", uuid);
+        args.putStringArrayList("groups", location.getGroups());
+        args.putString("record", location.getRecord());
         frag.setArguments(args);
         return frag;
     }
@@ -55,7 +62,13 @@ public class PasswdSafeRecordFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-        itsUuid = (args != null) ? args.getString("uuid") : null;
+        ArrayList<String> groups = null;
+        String record = null;
+        if (args != null) {
+            groups = args.getStringArrayList("groups");
+            record = args.getString("record");
+        }
+        itsLocation = new PasswdLocation(groups, record);
     }
 
 
@@ -85,7 +98,7 @@ public class PasswdSafeRecordFragment extends Fragment
         if (fileData == null) {
             return root;
         }
-        PwsRecord rec = fileData.getRecord(itsUuid);
+        PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
         if (rec == null) {
             return root;
         } else {
@@ -97,5 +110,16 @@ public class PasswdSafeRecordFragment extends Fragment
         tv.setText(fileData.getTitle(rec));
 
         return root;
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onResume()
+     */
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsListener.updateLocationView(itsLocation);
     }
 }

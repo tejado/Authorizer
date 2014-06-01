@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.ParsedPasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.file.PasswdLocation;
 
 /**
  *  Fragment showing lists of items from a PasswdSafe file
@@ -58,33 +59,32 @@ public class PasswdSafeListFragment extends ListFragment
         /** Get the file data */
         PasswdFileData getFileData();
 
-        /** Select a record */
-        void selectRecord(String uuid);
+        /** Change the location in the password file */
+        void changeLocation(PasswdLocation location);
 
-        /** Get the current group path */
-        String getGroupPath();
-
-        /** Add an entry to the group path */
-        void addGroupPath(String entry);
-
-        /** Pop the last entry from the group path */
-        void popGroupPath();
+        /** Update the view for the location in the password file */
+        void updateLocationView(PasswdLocation location);
     }
 
 
-    private static final String TAG = PasswdSafeListFragment.class.getName();
     private Listener.Mode itsMode = Listener.Mode.GROUPS;
+    private PasswdLocation itsLocation;
+    private boolean itsIsContents = false;
     private Listener itsListener;
     private ItemListAdapter itsAdapter;
     private View itsRoot;
 
 
     /** Create a new instance */
-    public static PasswdSafeListFragment newInstance(Listener.Mode mode)
+    public static PasswdSafeListFragment newInstance(Listener.Mode mode,
+                                                     PasswdLocation location,
+                                                     boolean isContents)
     {
         PasswdSafeListFragment frag = new PasswdSafeListFragment();
         Bundle args = new Bundle();
         args.putString("mode", mode.toString());
+        args.putStringArrayList("groups", location.getGroups());
+        args.putBoolean("isContents", isContents);
         frag.setArguments(args);
         return frag;
     }
@@ -98,12 +98,19 @@ public class PasswdSafeListFragment extends ListFragment
     {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-        String modestr = (args != null) ? args.getString("mode") : null;
-        if (modestr == null) {
-            itsMode = Listener.Mode.GROUPS;
-        } else {
-            itsMode = Listener.Mode.valueOf(modestr);
+
+        String modestr = null;
+        ArrayList<String> groups = null;
+        boolean isContents = false;
+        if (args != null) {
+            modestr = args.getString("mode");
+            groups = args.getStringArrayList("groups");
+            isContents = args.getBoolean("isContents", false);
         }
+        itsMode = (modestr == null) ?
+                Listener.Mode.GROUPS : Listener.Mode.valueOf(modestr);
+        itsLocation = new PasswdLocation(groups);
+        itsIsContents = isContents;
     }
 
 
@@ -149,8 +156,21 @@ public class PasswdSafeListFragment extends ListFragment
 
         itsAdapter = new ItemListAdapter(getActivity());
         setListAdapter(itsAdapter);
-        LoaderManager lm = getLoaderManager();
-        lm.initLoader(0, null, this);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onResume()
+     */
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        if (itsIsContents) {
+            itsListener.updateLocationView(itsLocation);
+        }
+        refreshList();
     }
 
 
@@ -168,10 +188,10 @@ public class PasswdSafeListFragment extends ListFragment
             if (fileData != null) {
                 uuid = fileData.getUUID(rec);
             }
-            itsListener.selectRecord(uuid);
+            itsListener.changeLocation(itsLocation.selectRecord(uuid));
         } else {
             String childTitle = (String)item.get(ParsedPasswdFileData.TITLE);
-            itsListener.addGroupPath(childTitle);
+            itsListener.changeLocation(itsLocation.selectGroup(childTitle));
         }
     }
 
@@ -184,15 +204,24 @@ public class PasswdSafeListFragment extends ListFragment
     {
         switch(v.getId()) {
         case R.id.current_group_panel: {
-            itsListener.popGroupPath();
+            itsListener.changeLocation(itsLocation.popGroup());
             break;
         }
         }
     }
 
 
+    /** Update the location shown by the list */
+    public void updateLocationView(PasswdLocation location, Listener.Mode mode)
+    {
+        itsLocation = location;
+        itsMode = mode;
+        refreshList();
+    }
+
+
     /** Refresh the list due to file changes */
-    public void refreshList()
+    private void refreshList()
     {
         if (!isAdded()) {
             return;
@@ -218,7 +247,7 @@ public class PasswdSafeListFragment extends ListFragment
         }
 
         if (groupVisible) {
-            String groupPath = itsListener.getGroupPath();
+            String groupPath = itsLocation.getGroupPath();
             if (TextUtils.isEmpty(groupPath)) {
                 groupVisible = false;
             } else {
@@ -371,7 +400,6 @@ public class PasswdSafeListFragment extends ListFragment
         @Override
         public List<Map<String, Object>> loadInBackground()
         {
-            PasswdSafeUtil.dbginfo(TAG, "loadInBackground %s", itsMode);
             return itsActListener.getBackgroundRecordItems(itsMode);
         }
     }

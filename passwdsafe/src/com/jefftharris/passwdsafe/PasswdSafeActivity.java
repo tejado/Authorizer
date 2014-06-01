@@ -27,7 +27,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,6 +38,7 @@ import android.widget.ListView;
 
 import com.jefftharris.passwdsafe.file.ParsedPasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdLocation;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -64,8 +64,6 @@ public class PasswdSafeActivity extends ActionBarActivity
 {
     private static final int ACTIVITY_REQUEST_CHOOSE_FILE = 1;
 
-    private static final String BUNDLE_CURR_GROUPS = "passwdsafe.currGroups";
-
     private static final String TAG = PasswdSafeActivity.class.getName();
 
     private boolean itsIsTwoPane = false;
@@ -79,7 +77,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     private ActivityPasswdFile itsAppFile = null;
     private PasswdFileData itsFileData = null;
     private ParsedPasswdFileData itsParsedFileData = new ParsedPasswdFileData();
-    private String itsCurrentRecord = null;
+    private PasswdLocation itsLocation = new PasswdLocation();
 
 
     /* (non-Javadoc)
@@ -136,15 +134,9 @@ public class PasswdSafeActivity extends ActionBarActivity
             }
         });
 
-        List<String> currGroups = null;
-        if (savedInstanceState != null) {
-            currGroups =
-                    savedInstanceState.getStringArrayList(BUNDLE_CURR_GROUPS);
-        }
-
         PasswdSafeApp app = (PasswdSafeApp)getApplication();
         ActivityPasswdFile openFile = app.accessOpenFile(this);
-        setOpenAppFile(openFile, currGroups);
+        setOpenAppFile(openFile);
     }
 
 
@@ -184,7 +176,7 @@ public class PasswdSafeActivity extends ActionBarActivity
             PasswdSafeUtil.dbginfo(TAG, "close file");
             openFile = null;
         }
-        setOpenAppFile(openFile, null);
+        setOpenAppFile(openFile);
     }
 
 
@@ -220,37 +212,62 @@ public class PasswdSafeActivity extends ActionBarActivity
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#getGroupPath()
+     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#changeLocation(com.jefftharris.passwdsafe.file.PasswdLocation)
      */
     @Override
-    public String getGroupPath()
+    public void changeLocation(PasswdLocation location)
     {
-        return TextUtils.join(" / ", itsParsedFileData.getCurrGroups());
+        if (itsAppFile == null) {
+            return;
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "changeLocation loc: %s", location);
+        FragmentManager fragMgr = getSupportFragmentManager();
+        if (!itsLocation.equals(location)) {
+            FragmentTransaction txn = fragMgr.beginTransaction();
+            txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+            Fragment contentFrag;
+            if (location.getRecord() != null) {
+                contentFrag = PasswdSafeRecordFragment.newInstance(location);
+            } else {
+                contentFrag = PasswdSafeListFragment.newInstance(Mode.RECORDS,
+                                                                 location,
+                                                                 true);
+            }
+
+            txn.replace(R.id.content, contentFrag);
+            txn.addToBackStack(null);
+            txn.commit();
+        }
     }
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#addGroupPath(java.lang.String)
+     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#updateLocationView(com.jefftharris.passwdsafe.file.PasswdLocation)
      */
     @Override
-    public void addGroupPath(String entry)
+    public void updateLocationView(PasswdLocation location)
     {
-        itsParsedFileData.addGroupPath(entry);
-        itsCurrentRecord = null;
-        refreshContent();
-    }
+        PasswdSafeUtil.dbginfo(TAG, "updateLocationView: %s", location);
+        itsLocation = location;
+        itsParsedFileData.setCurrGroups(itsLocation.getGroups());
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#popGroupPath()
-     */
-    @Override
-    public void popGroupPath()
-    {
-        // TODO: back button?
-        itsParsedFileData.popGroupPath();
-        itsCurrentRecord = null;
-        refreshContent();
+        FragmentManager fragMgr = getSupportFragmentManager();
+        Fragment contentFrag = fragMgr.findFragmentById(R.id.content);
+        if (contentFrag instanceof PasswdSafeListFragment) {
+            ((PasswdSafeListFragment)contentFrag).updateLocationView(
+                    itsLocation, (itsIsTwoPane ? Mode.RECORDS : Mode.ALL));
+        }
+        if (itsIsTwoPane) {
+            Mode listMode =
+                    (itsLocation.getRecord() != null) ? Mode.ALL : Mode.GROUPS;
+            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
+            if (listFrag instanceof PasswdSafeListFragment) {
+                ((PasswdSafeListFragment)listFrag).updateLocationView(
+                        itsLocation, listMode);
+            }
+        }
     }
 
 
@@ -271,18 +288,6 @@ public class PasswdSafeActivity extends ActionBarActivity
     public PasswdFileData getFileData()
     {
         return itsFileData;
-    }
-
-
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.PasswdSafeListFragment.Listener#selectRecord(java.lang.String)
-     */
-    @Override
-    public void selectRecord(String uuid)
-    {
-        itsCurrentRecord = uuid;
-        refreshContent();
     }
 
 
@@ -402,18 +407,6 @@ public class PasswdSafeActivity extends ActionBarActivity
 
 
     /* (non-Javadoc)
-     * @see android.support.v4.app.FragmentActivity#onSaveInstanceState(android.os.Bundle)
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-        outState.putStringArrayList(BUNDLE_CURR_GROUPS,
-                                    itsParsedFileData.getCurrGroups());
-    }
-
-
-    /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
     @Override
@@ -497,8 +490,7 @@ public class PasswdSafeActivity extends ActionBarActivity
     }
 
     /** Set the open file from the application */
-    private void setOpenAppFile(ActivityPasswdFile openFile,
-                                final List<String> currGroups)
+    private void setOpenAppFile(ActivityPasswdFile openFile)
     {
         setMainView();
         if ((openFile != null) && (openFile.getFileData() != null)) {
@@ -516,9 +508,13 @@ public class PasswdSafeActivity extends ActionBarActivity
                 if ((listFrag != null) && listFrag.isHidden()) {
                     txn.show(listFrag);
                 }
-                itemsFrag = PasswdSafeListFragment.newInstance(Mode.RECORDS);
+                itemsFrag = PasswdSafeListFragment.newInstance(Mode.RECORDS,
+                                                               itsLocation,
+                                                               true);
             } else {
-                itemsFrag = PasswdSafeListFragment.newInstance(Mode.ALL);
+                itemsFrag = PasswdSafeListFragment.newInstance(Mode.ALL,
+                                                               itsLocation,
+                                                               true);
             }
 
             txn.replace(R.id.content, itemsFrag);
@@ -542,7 +538,7 @@ public class PasswdSafeActivity extends ActionBarActivity
                 // TODO: record grouping pref
                 // TODO: case sensitivty pref
                 return new ParsedPasswdFileData(params[0], true, false,
-                                                currGroups,
+                                                new ArrayList<String>(),
                                                 PasswdSafeActivity.this);
             }
 
@@ -562,20 +558,8 @@ public class PasswdSafeActivity extends ActionBarActivity
     private void setParsedFileData(ParsedPasswdFileData parsedFile)
     {
         itsParsedFileData = parsedFile;
-        itsCurrentRecord = null;
-        refreshContent();
-    }
-
-    /** Refresh the content lists */
-    private void refreshContent()
-    {
-        FragmentManager mgr = getSupportFragmentManager();
-        for (int id: new int[] {R.id.content_list, R.id.content}) {
-            Fragment frag = mgr.findFragmentById(id);
-            if ((frag != null) && (frag instanceof PasswdSafeListFragment)) {
-                ((PasswdSafeListFragment)frag).refreshList();
-            }
-        }
+        changeLocation(itsLocation);
+        updateLocationView(itsLocation);
     }
 
     /** Set the views to open a URI */
