@@ -18,7 +18,7 @@
     <item
         android:id="@+id/menu_about"
         android:icon="@android:drawable/ic_menu_info_details"
-        android:orderInCategory="100"
+        android:orderInCategory="255"
         android:title="@string/about"
         passwdsafe:showAsAction="ifRoom"/>
 

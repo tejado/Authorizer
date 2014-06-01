@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:passwdsafe="http://schemas.android.com/apk/res-auto">
+    
+    <item
+        android:id="@+id/menu_edit"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:orderInCategory="10"
+        android:title="@string/edit"
+        passwdsafe:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/menu_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:orderInCategory="10"
+        android:title="@string/delete"
+        passwdsafe:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/menu_toggle_password"
+        android:orderInCategory="100"
+        android:title="@string/show_password"/>
+    <item
+        android:id="@+id/menu_copy_user"
+        android:orderInCategory="100"
+        android:title="@string/copy_user"/>
+    <item
+        android:id="@+id/menu_copy_password"
+        android:orderInCategory="100"
+        android:title="@string/copy_password"/>
+    <item
+        android:id="@+id/menu_copy_notes"
+        android:orderInCategory="100"
+        android:title="@string/copy_notes"/>
+    <item
+        android:id="@+id/menu_toggle_monospace"
+        android:orderInCategory="100"
+        android:title="@string/toggle_monospace"/>
+    <item
+        android:id="@+id/menu_toggle_wrap_notes"
+        android:orderInCategory="100"
+        android:title="@string/toggle_word_wrap"/>
+            
+</menu>
