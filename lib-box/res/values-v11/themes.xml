@@ -1,0 +1,9 @@
+<resources>
+   
+    <style name="Theme.Boxandroidlibv2.DialogNoTitle"  parent="android:style/Theme.Holo.Light.Dialog">
+         <item name="android:windowNoTitle">true</item>
+         
+    </style>
+
+
+</resources>

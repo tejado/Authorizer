@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="IconColors">
+        <ignore path="res/drawable-hdpi-v11/ic_stat_app.png" />
+        <ignore path="res/drawable-ldpi-v11/ic_stat_app.png" />
+        <ignore path="res/drawable-mdpi-v11/ic_stat_app.png" />
+        <ignore path="res/drawable-xhdpi-v11/ic_stat_app.png" />
+    </issue>
+    <issue id="IconDuplicatesConfig">
+        <ignore path="res/drawable/ic_stat_app.png" />
+        <ignore path="res/drawable/list_focused_holo.9.png" />
+        <ignore path="res/drawable/list_longpressed_holo.9.png" />
+        <ignore path="res/drawable/list_pressed_holo_dark.9.png" />
+        <ignore path="res/drawable/list_selector_disabled_holo_dark.9.png" />
+        <ignore path="res/drawable/spinner_default_holo_dark.9.png" />
+        <ignore path="res/drawable/spinner_disabled_holo_dark.9.png" />
+        <ignore path="res/drawable/spinner_focused_holo_dark.9.png" />
+        <ignore path="res/drawable/spinner_pressed_holo_dark.9.png" />
+    </issue>
+    <issue id="TextViewEdits">
+        <ignore path="res/layout/record_edit.xml" />
+    </issue>
+</lint>
