@@ -154,6 +154,21 @@
                               android:layout_height="wrap_content"/>
                 </TableRow>
 
+                <TableRow android:id="@+id/password_current_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/current"/>
+
+                    <TextView
+                        android:id="@+id/password_current"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                </TableRow>
+
                 <TableRow
                     android:id="@+id/password_link_row"
                     android:visibility="gone">

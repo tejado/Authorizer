@@ -33,6 +33,7 @@
     <string name="copy_password">Copier le mot de passe</string>
     <string name="copy_user">Copier le nom d\'utilisateur</string>
     <string name="created">Créé</string>
+    <string name="current">Actuel</string>
     <string name="custom_symbols">Symboles personnalisés</string>
     <string name="custom_symbol_not_alphanum">Les symboles personnalisés ne doivent pas contenir d\'espaces, ni de caractères alphanumériques</string>
     <string name="database_policy">Base de données stratégie - %s</string>

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2011-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2011-2012, 2014 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -21,20 +21,8 @@ import android.widget.TextView;
 
 public class PasswordVisibilityMenuHandler
 {
-    public static void set(TextView view)
+    public static void set(TextView... views)
     {
-        set(view, null);
-    }
-
-    public static void set(TextView view1, TextView view2)
-    {
-        TextView[] views;
-        if (view2 == null) {
-            views = new TextView[] { view1 };
-        } else {
-            views = new TextView[] { view1, view2 };
-        }
-
         for (TextView tv : views) {
             tv.setOnCreateContextMenuListener(new MenuListener(tv, views));
         }

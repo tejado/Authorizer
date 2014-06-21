@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2010-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2010-2012, 2014 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -508,7 +508,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             setPasswordVisibility(
                 !GuiUtils.isPasswordVisible(passwdField),
                 passwdField,
-                (TextView)findViewById(R.id.password_confirm));
+                (TextView)findViewById(R.id.password_confirm),
+                (TextView)findViewById(R.id.password_current));
             break;
         }
         case MENU_GENERATE_PASSWORD:
@@ -699,7 +700,9 @@ public class RecordEditActivity extends AbstractRecordActivity
         setType(itsOrigType, true);
         TextView passwdField = setText(R.id.password, password);
         TextView confirmField = setText(R.id.password_confirm, password);
-        PasswordVisibilityMenuHandler.set(passwdField, confirmField);
+        TextView currentField = setText(R.id.password_current, password);
+        PasswordVisibilityMenuHandler.set(passwdField, confirmField,
+                                          currentField);
         setLinkRef(linkRef, fileData);
     }
 
@@ -757,6 +760,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
         setVisibility(R.id.password_row, itsTypeHasNormalPassword);
         setVisibility(R.id.password_confirm_row, itsTypeHasNormalPassword);
+        setVisibility(R.id.password_current, itsTypeHasNormalPassword);
         setVisibility(R.id.password_link_row, !itsTypeHasNormalPassword);
         if (passwordLinkLabel != 0) {
             TextView tv = (TextView)findViewById(R.id.password_link_label);
@@ -800,10 +804,12 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private final void setPasswordVisibility(boolean visible,
                                              TextView passwdField,
-                                             TextView confirmField)
+                                             TextView confirmField,
+                                             TextView currentField)
     {
         GuiUtils.setPasswordVisible(passwdField, visible);
         GuiUtils.setPasswordVisible(confirmField, visible);
+        GuiUtils.setPasswordVisible(currentField, visible);
     }
 
     private final void generatePassword()
@@ -822,9 +828,10 @@ public class RecordEditActivity extends AbstractRecordActivity
     {
         TextView passwdField = (TextView)findViewById(R.id.password);
         TextView confirmField = (TextView)findViewById(R.id.password_confirm);
+        TextView currentField = (TextView)findViewById(R.id.password_current);
         passwdField.setText(passwd);
         confirmField.setText(passwd);
-        setPasswordVisibility(true, passwdField, confirmField);
+        setPasswordVisibility(true, passwdField, confirmField, currentField);
     }
 
     private final void initGroup(PasswdFileData fileData,
