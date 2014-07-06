@@ -48,6 +48,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.GuiUtils;
@@ -726,12 +727,15 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             TextView tv = (TextView)dialog.findViewById(R.id.file);
             tv.setText(getString(R.string.file_label_val, getUriName(false)));
             CheckBox cb = (CheckBox)dialog.findViewById(R.id.read_only);
-            if (getUri().isWritable()) {
+            Pair<Boolean, Integer> rc = getUri().isWritable();
+            if (rc.first) {
                 cb.setEnabled(true);
                 cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
             } else {
                 cb.setEnabled(false);
                 cb.setChecked(true);
+                cb.setText(String.format("%s - %s", cb.getText(),
+                                         getString(rc.second)));
             }
             break;
         }

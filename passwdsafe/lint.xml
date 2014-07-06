@@ -17,6 +17,9 @@
         <ignore path="res/drawable/spinner_focused_holo_dark.9.png" />
         <ignore path="res/drawable/spinner_pressed_holo_dark.9.png" />
     </issue>
+    <issue id="ImpliedQuantity">
+        <ignore path="res/values-fr/strings.xml" />
+    </issue>
     <issue id="TextViewEdits">
         <ignore path="res/layout/record_edit.xml" />
     </issue>

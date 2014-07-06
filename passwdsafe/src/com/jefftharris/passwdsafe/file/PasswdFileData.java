@@ -93,7 +93,7 @@ public class PasswdFileData
         itsIsOpenReadOnly = readonly;
         itsPwsFile = itsUri.load(passwd, context);
 
-        if (itsIsOpenReadOnly || !itsUri.isWritable()) {
+        if (itsIsOpenReadOnly || !itsUri.isWritable().first) {
             itsPwsFile.setReadOnly(true);
         }
         finishOpenFile(passwd);

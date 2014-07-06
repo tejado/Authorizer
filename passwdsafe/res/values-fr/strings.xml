@@ -195,6 +195,7 @@
     <string name="record_settings">Paramètres des entrées</string>
     <string name="record_type">Type d\'entrée</string>
     <string name="read_only">Lecture seule</string>
+    <string name="read_only_media">Le fichier se trouve sur support en lecture seule. Cette situation peut se produire avec Kitkat et plus sur des cartes SD amovibles.</string>
     <string name="read_write">Lecture-écriture</string>
     <string name="references_label">RÉFÉRENCES</string>
     <string name="regular_expression">Expression régulière</string>
