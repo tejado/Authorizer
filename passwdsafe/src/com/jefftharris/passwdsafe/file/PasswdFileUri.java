@@ -35,17 +35,21 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.v4.os.EnvironmentCompat;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
+import com.jefftharris.passwdsafe.util.Pair;
 
 /**
  * The PasswdFileUri class encapsulates a URI to a password file
@@ -299,21 +303,39 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Is the file writable */
-    public boolean isWritable()
+    public Pair<Boolean, Integer> isWritable()
     {
+        boolean writable = false;
+        int extraMsgId = 0;
         switch (itsType) {
         case FILE: {
-            return (itsFile != null) && itsFile.canWrite();
+            if ((itsFile == null) || !itsFile.canWrite()) {
+                writable = false;
+                break;
+            }
+            // Check mount state on kitkat or higher
+            if (ApiCompat.SDK_VERSION < ApiCompat.SDK_KITKAT) {
+                writable = true;
+                break;
+            }
+            writable = !EnvironmentCompat.getStorageState(itsFile).equals(
+                    Environment.MEDIA_MOUNTED_READ_ONLY);
+            if (!writable) {
+                extraMsgId = R.string.read_only_media;
+            }
+            break;
         }
         case SYNC_PROVIDER: {
-            return true;
+            writable = true;
+            break;
         }
         case EMAIL:
         case GENERIC_PROVIDER: {
-            return false;
+            writable = false;
+            break;
         }
         }
-        return false;
+        return new Pair<Boolean, Integer>(writable, extraMsgId);
     }
 
 

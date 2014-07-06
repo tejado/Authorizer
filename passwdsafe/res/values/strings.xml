@@ -195,6 +195,7 @@
     <string name="record_settings">Record Settings</string>
     <string name="record_type">Record type</string>
     <string name="read_only">Read-only</string>
+    <string name="read_only_media">File is located on read-only media.  This situation can occur with Kitkat and higher on removable SD cards.</string>
     <string name="read_write">Read-write</string>
     <string name="references_label">REFERENCES</string>
     <string name="regular_expression">Regular expression</string>
