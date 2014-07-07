@@ -240,6 +240,14 @@
     <string name="yes">Oui</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.6.0&lt;/b&gt;\n
+        - Tenter de détecter fichiers en lecture seule sur des cartes SD avec 
+        Kitkat. S\'il vous plaît envoyer vos commentaires si la détection est 
+        ou ne fonctionne pas.\n
+        - Afficher le mot de passe actuel lors de l\'édition de référence\n
+        - Afficher la date de modification des fichiers locaux dans la liste 
+        des fichiers
+        \n\n
         &lt;b&gt;4.5.0&lt;/b&gt; - Ajout du support de Box avec PasswdSafe Sync.
         Fichiers par mot de passe (.psafe3) sont synchronisés dans le dossier
         haut et un dossier taggés avec \'passwdsafe\'.
