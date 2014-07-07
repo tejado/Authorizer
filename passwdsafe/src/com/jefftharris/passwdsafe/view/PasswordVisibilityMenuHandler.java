@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.TextView;
 
+@SuppressWarnings("deprecation")
 public class PasswordVisibilityMenuHandler
 {
     public static void set(TextView... views)

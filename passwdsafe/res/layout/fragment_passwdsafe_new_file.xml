@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/fullscreen_vertical_margin"
+    android:paddingLeft="@dimen/fullscreen_horizontal_margin"
+    android:paddingRight="@dimen/fullscreen_horizontal_margin"
+    android:paddingTop="@dimen/fullscreen_vertical_margin">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+    
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:shrinkColumns="1"
+        android:stretchColumns="1">
+
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:layout_gravity="center_vertical"
+                android:text="@string/file_name_label"/>
+    
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                
+                <EditText
+                    android:id="@+id/file_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions"
+                    android:minWidth="100dp"
+                    android:singleLine="true">
+
+                    <requestFocus/>
+
+                </EditText>
+        
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/psafe3_ext"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+        
+            </LinearLayout>
+    
+        </TableRow>
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/password_label"/>
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:singleLine="true"/>
+
+        </TableRow>
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/confirm_label"/>
+
+            <EditText
+                android:id="@+id/password_confirm"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionGo"
+                android:inputType="textPassword"
+                android:singleLine="true"/>
+
+        </TableRow>
+    </TableLayout>
+
+    <View style="@style/Separator.Light"/>
+    
+    <TextView
+        android:id="@+id/error_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@android:string/cancel"/>
+
+        <Button
+            android:id="@+id/ok"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@android:string/ok"/>
+
+    </LinearLayout>
+</LinearLayout>

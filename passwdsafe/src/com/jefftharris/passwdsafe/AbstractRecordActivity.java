@@ -118,6 +118,7 @@ public abstract class AbstractRecordActivity extends Activity
         super.onSaveInstanceState(outState);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected Dialog onCreateDialog(int id)
     {

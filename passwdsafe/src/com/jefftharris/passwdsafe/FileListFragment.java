@@ -18,7 +18,6 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,7 +28,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,6 +54,9 @@ public class FileListFragment extends ListFragment
     {
         /** Open a file */
         public void openFile(Uri uri, String fileName);
+
+        /** Create a new file */
+        public void createNewFile(Uri locationUri);
 
         /** Does the activity have a menu */
         public boolean activityHasMenu();
@@ -179,29 +180,6 @@ public class FileListFragment extends ListFragment
     public void onResume()
     {
         super.onResume();
-        PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
-        ActivityPasswdFile file =
-            app.accessPasswdFile(null, new PasswdFileActivity()
-            {
-                public void showProgressDialog()
-                {
-                }
-
-                public void removeProgressDialog()
-                {
-                }
-
-                public void saveFinished(boolean success)
-                {
-                }
-
-                public Activity getActivity()
-                {
-                    return FileListFragment.this.getActivity();
-                }
-            });
-        file.close();
-
         itsDirHistory.clear();
         showFiles();
     }
@@ -215,10 +193,6 @@ public class FileListFragment extends ListFragment
     {
         inflater.inflate(R.menu.fragment_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem mi = menu.findItem(R.id.menu_file_new);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
 
 
@@ -244,8 +218,7 @@ public class FileListFragment extends ListFragment
         switch (item.getItemId()) {
         case R.id.menu_file_new: {
             if (itsDir != null) {
-                startActivity(new Intent(PasswdSafeUtil.NEW_INTENT,
-                                         Uri.fromFile(itsDir)));
+                itsListener.createNewFile(Uri.fromFile(itsDir));
             }
             return true;
         }
@@ -436,13 +409,6 @@ public class FileListFragment extends ListFragment
             groupPanel.setVisibility(View.VISIBLE);
             groupLabel.setText(itsDir.toString());
             emptyLabel.setText(R.string.no_files);
-        }
-
-        View selectFileLabel = rootView.findViewById(R.id.select_file_label);
-        if ((adapter != null) && !adapter.isEmpty()) {
-            selectFileLabel.setVisibility(View.VISIBLE);
-        } else {
-            selectFileLabel.setVisibility(View.GONE);
         }
 
         setListAdapter(adapter);

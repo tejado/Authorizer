@@ -31,6 +31,7 @@ import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 /**
  * The PasswdSafeUtil class contains common helper methods
  */
+@SuppressWarnings("deprecation")
 public class PasswdSafeUtil
 {
     public static final String NEW_INTENT =

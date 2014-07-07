@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:passwdsafe="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_passwdsafe"
+        android:title="@string/app_name"
+        android:orderInCategory="100"
+        passwdsafe:showAsAction="ifRoom"/>
+    
+    <item
+        android:id="@+id/menu_close"
+        android:title="@string/close"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:orderInCategory="100"
+        passwdsafe:showAsAction="ifRoom"/>
+    
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:orderInCategory="255"
+        android:title="@string/about"
+        passwdsafe:showAsAction="ifRoom"/>
+
+</menu>

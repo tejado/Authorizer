@@ -36,19 +36,13 @@
             android:layout_toLeftOf="@id/home"
             android:layout_toRightOf="@id/up_icon"
             android:gravity="center_vertical"
-            android:text="@string/group"/>
+            android:text="@string/group"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         <View
             style="@style/Separator.Light"
             android:layout_below="@id/current_group_label"/>
     </RelativeLayout>
-
-    <TextView
-        android:id="@+id/select_file_label"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="3dp"
-        android:text="@string/select_file_label"/>
 
     <ListView
         android:id="@android:id/list"

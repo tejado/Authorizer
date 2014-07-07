@@ -38,11 +38,13 @@ public class RecordActivityHelper implements PasswdFileActivity
         return itsActivity;
     }
 
+    @SuppressWarnings("deprecation")
     public void showProgressDialog()
     {
         itsActivity.showDialog(DIALOG_PROGRESS);
     }
 
+    @SuppressWarnings("deprecation")
     public void removeProgressDialog()
     {
         itsActivity.removeDialog(DIALOG_PROGRESS);
@@ -113,6 +115,7 @@ public class RecordActivityHelper implements PasswdFileActivity
         }
     }
 
+    @SuppressWarnings("deprecation")
     public void onSaveInstanceState(Bundle outState)
     {
         itsActivity.removeDialog(DIALOG_PROGRESS);

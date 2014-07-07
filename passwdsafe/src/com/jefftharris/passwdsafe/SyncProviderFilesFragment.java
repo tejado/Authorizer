@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,6 +46,9 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         /** Open a file */
         public void openFile(Uri uri, String fileName);
+
+        /** Create a new file */
+        public void createNewFile(Uri locationUri);
     }
 
     private static final String TAG = "SyncProviderFilesFragment";
@@ -236,16 +237,9 @@ public class SyncProviderFilesFragment extends ListFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.fragment_sync_provider_files, menu);
-
-        MenuItem mi = menu.findItem(R.id.menu_sync_files);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
-        mi = menu.findItem(R.id.menu_file_new);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
         super.onCreateOptionsMenu(menu, inflater);
+
+        // TODO: no add file menu item when used with launcher shortcuts
     }
 
 
@@ -270,7 +264,7 @@ public class SyncProviderFilesFragment extends ListFragment
             return true;
         }
         case R.id.menu_file_new: {
-            startActivity(new Intent(PasswdSafeUtil.NEW_INTENT, itsFilesUri));
+            itsListener.createNewFile(itsFilesUri);
             return true;
         }
         default: {

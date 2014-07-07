@@ -145,6 +145,7 @@ public class RecordView extends AbstractRecordTabActivity
 
 
     /** Called when the activity is first created. */
+    @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -202,6 +203,7 @@ public class RecordView extends AbstractRecordTabActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onResume()
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected void onResume()
     {
@@ -289,6 +291,7 @@ public class RecordView extends AbstractRecordTabActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
      */
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
@@ -358,6 +361,7 @@ public class RecordView extends AbstractRecordTabActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
      */
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -463,6 +467,7 @@ public class RecordView extends AbstractRecordTabActivity
     /* (non-Javadoc)
      * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected void onPrepareDialog(int id, Dialog dialog)
     {
@@ -500,6 +505,7 @@ public class RecordView extends AbstractRecordTabActivity
         }
     }
 
+    @SuppressWarnings("deprecation")
     private final void refresh()
     {
         PasswdFileData fileData = getPasswdFile().getFileData();
@@ -967,6 +973,7 @@ public class RecordView extends AbstractRecordTabActivity
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void scrollTabToTop()
     {
         TabHost host = getTabHost();

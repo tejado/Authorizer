@@ -7,10 +7,10 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,6 +41,38 @@ public class FileListActivity extends AbstractFileListActivity
     }
 
     /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onResume()
+     */
+    @Override
+    protected void onResume()
+    {
+        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        ActivityPasswdFile file =
+            app.accessPasswdFile(null, new PasswdFileActivity()
+            {
+                public void showProgressDialog()
+                {
+                }
+
+                public void removeProgressDialog()
+                {
+                }
+
+                public void saveFinished(boolean success)
+                {
+                }
+
+                public Activity getActivity()
+                {
+                    return FileListActivity.this;
+                }
+            });
+        file.close();
+
+        super.onResume();
+    }
+
+    /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
     @Override
@@ -50,12 +82,6 @@ public class FileListActivity extends AbstractFileListActivity
 
         MenuItem item = menu.findItem(R.id.menu_preferences);
         item.setIntent(new Intent(this, Preferences.class));
-        MenuItemCompat.setShowAsAction(item,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
-        item = menu.findItem(R.id.menu_about);
-        MenuItemCompat.setShowAsAction(item,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -97,6 +123,16 @@ public class FileListActivity extends AbstractFileListActivity
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "Can't open uri: " + uri, e);
         }
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#createNewFile(android.net.Uri)
+     * @see com.jefftharris.passwdsafe.SyncProviderFilesFragment.Listener#createNewFile(android.net.Uri)
+     */
+    @Override
+    public void createNewFile(Uri locationUri)
+    {
+        startActivity(new Intent(PasswdSafeUtil.NEW_INTENT, locationUri));
     }
 
     /* (non-Javadoc)

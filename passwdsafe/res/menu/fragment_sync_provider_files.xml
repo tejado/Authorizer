@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/menu_sync_files"
-        android:icon="@drawable/ic_menu_refresh"
-        android:title="@string/sync"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:passwdsafe="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menu_file_new"
         android:icon="@android:drawable/ic_menu_add"
-        android:title="@string/new_drive_file"/>
+        android:title="@string/new_drive_file"
+        passwdsafe:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/menu_sync_files"
+        android:icon="@drawable/ic_menu_refresh"
+        android:title="@string/sync"
+        passwdsafe:showAsAction="ifRoom"/>
 
 </menu>

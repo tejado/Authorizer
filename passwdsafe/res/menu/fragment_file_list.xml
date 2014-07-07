@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:passwdsafe="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menu_file_new"
         android:icon="@android:drawable/ic_menu_add"
-        android:title="@string/new_local_file"/>
+        android:title="@string/new_local_file"
+        passwdsafe:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/menu_home"

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2011-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2011-2012, 2014 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -14,12 +14,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import com.jefftharris.passwdsafe.file.ParsedPasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
@@ -78,8 +78,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     /** First change after a file has been opened from a new intent */
     protected static final int MOD_OPEN_NEW       = 1 << 4;
 
-    private GroupNode itsRootNode = null;
-    private GroupNode itsCurrGroupNode = null;
+    private ParsedPasswdFileData.GroupNode itsRootNode = null;
+    private ParsedPasswdFileData.GroupNode itsCurrGroupNode = null;
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
     private boolean itsIsSearchCaseSensitive = false;
@@ -111,8 +111,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                 setPasswdRecordFilter(null, false);
             }
         });
-
-        GuiUtils.removeUnsupportedCenterVertical(findViewById(R.id.query));
 
         v = findViewById(R.id.current_group_panel);
         v.setOnClickListener(new View.OnClickListener()
@@ -386,7 +384,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
 
     /** Get the current group node */
-    protected GroupNode getCurrGroupNode()
+    protected ParsedPasswdFileData.GroupNode getCurrGroupNode()
     {
         return itsCurrGroupNode;
     }
@@ -413,7 +411,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         itsCurrGroupNode = itsRootNode;
         for (int i = 0; i < itsCurrGroups.size(); ++i) {
             String group = itsCurrGroups.get(i);
-            GroupNode childNode = itsCurrGroupNode.getGroup(group);
+            ParsedPasswdFileData.GroupNode childNode = itsCurrGroupNode.getGroup(group);
             if (childNode == null) {
                 // Prune groups from current item in the stack on down
                 for (int j = itsCurrGroups.size() - 1; j >= i; --j) {
@@ -425,9 +423,9 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
 
         // Build the list data
-        Map<String, GroupNode> entryGroups = itsCurrGroupNode.getGroups();
+        Map<String, ParsedPasswdFileData.GroupNode> entryGroups = itsCurrGroupNode.getGroups();
         if (entryGroups != null) {
-            for(Map.Entry<String, GroupNode> entry : entryGroups.entrySet()) {
+            for(Map.Entry<String, ParsedPasswdFileData.GroupNode> entry : entryGroups.entrySet()) {
                 HashMap<String, Object> recInfo = new HashMap<String, Object>();
                 recInfo.put(TITLE, entry.getKey());
                 recInfo.put(ICON,R.drawable.folder_rev);
@@ -441,15 +439,15 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             }
         }
 
-        List<MatchPwsRecord> entryRecs = itsCurrGroupNode.getRecords();
+        List<ParsedPasswdFileData.MatchPwsRecord> entryRecs = itsCurrGroupNode.getRecords();
         if (entryRecs != null) {
-            for (MatchPwsRecord rec : entryRecs) {
-                itsListData.add(createRecInfo(rec, fileData));
+            for (ParsedPasswdFileData.MatchPwsRecord rec : entryRecs) {
+                itsListData.add(ParsedPasswdFileData.createRecInfo(rec, fileData));
             }
         }
 
-        RecordMapComparator comp =
-            new RecordMapComparator(itsIsSortCaseSensitive);
+        ParsedPasswdFileData.RecordMapComparator comp =
+            new ParsedPasswdFileData.RecordMapComparator(itsIsSortCaseSensitive);
         Collections.sort(itsListData, comp);
     }
 
@@ -458,7 +456,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private final void populateRootNode(PasswdFileData fileData)
     {
         PasswdSafeUtil.dbginfo(TAG, "populateRootNode");
-        itsRootNode = new GroupNode();
+        itsRootNode = new ParsedPasswdFileData.GroupNode();
         itsNumExpired = 0;
         if (fileData == null) {
             return;
@@ -469,7 +467,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         if (itsGroupRecords) {
             Comparator<String> groupComp;
             if (itsIsSortCaseSensitive) {
-                groupComp = new StringComparator();
+                groupComp = new ParsedPasswdFileData.StringComparator();
             } else {
                 groupComp = String.CASE_INSENSITIVE_ORDER;
             }
@@ -484,16 +482,16 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                     group = "";
                 }
                 String[] groups = TextUtils.split(group, "\\.");
-                GroupNode node = itsRootNode;
+                ParsedPasswdFileData.GroupNode node = itsRootNode;
                 for (String g : groups) {
-                    GroupNode groupNode = node.getGroup(g);
+                    ParsedPasswdFileData.GroupNode groupNode = node.getGroup(g);
                     if (groupNode == null) {
-                        groupNode = new GroupNode();
+                        groupNode = new ParsedPasswdFileData.GroupNode();
                         node.putGroup(g, groupNode, groupComp);
                     }
                     node = groupNode;
                 }
-                node.addRecord(new MatchPwsRecord(rec, match));
+                node.addRecord(new ParsedPasswdFileData.MatchPwsRecord(rec, match));
             }
         } else {
             for (PwsRecord rec : records) {
@@ -501,7 +499,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                 if (match == null) {
                     continue;
                 }
-                itsRootNode.addRecord(new MatchPwsRecord(rec, match));
+                itsRootNode.addRecord(new ParsedPasswdFileData.MatchPwsRecord(rec, match));
             }
         }
 
@@ -519,27 +517,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                 }
             }
         }
-    }
-
-
-    private static final HashMap<String, Object>
-    createRecInfo(MatchPwsRecord rec, PasswdFileData fileData)
-    {
-        HashMap<String, Object> recInfo = new HashMap<String, Object>();
-        String title = fileData.getTitle(rec.itsRecord);
-        if (title == null) {
-            title = "Untitled";
-        }
-        String user = fileData.getUsername(rec.itsRecord);
-        if (!TextUtils.isEmpty(user)) {
-            user = "[" + user + "]";
-        }
-        recInfo.put(TITLE, title);
-        recInfo.put(RECORD, rec.itsRecord);
-        recInfo.put(MATCH, rec.itsMatch);
-        recInfo.put(USERNAME, user);
-        recInfo.put(ICON, R.drawable.contact_rev);
-        return recInfo;
     }
 
 
@@ -651,145 +628,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             return true;
         } else {
             return false;
-        }
-    }
-
-
-    private static final class RecordMapComparator implements
-                    Comparator<HashMap<String, Object>>
-    {
-        private boolean itsIsSortCaseSensitive;
-
-        public RecordMapComparator(boolean sortCaseSensitive)
-        {
-            itsIsSortCaseSensitive = sortCaseSensitive;
-        }
-
-        public int compare(HashMap<String, Object> arg0,
-                           HashMap<String, Object> arg1)
-        {
-            // Sort groups first
-            Object rec0 = arg0.get(RECORD);
-            Object rec1 = arg1.get(RECORD);
-            if ((rec0 == null) && (rec1 != null)) {
-                return -1;
-            } else if ((rec0 != null) && (rec1 == null)) {
-                return 1;
-            }
-
-            int rc = compareField(arg0, arg1, TITLE);
-            if (rc == 0) {
-                rc = compareField(arg0, arg1, USERNAME);
-            }
-            return rc;
-        }
-
-        private final int compareField(HashMap<String, Object> arg0,
-                                       HashMap<String, Object> arg1,
-                                       String field)
-        {
-            Object obj0 = arg0.get(field);
-            Object obj1 = arg1.get(field);
-
-            if ((obj0 == null) && (obj1 == null)) {
-                return 0;
-            } else if (obj0 == null) {
-                return -1;
-            } else if (obj1 == null) {
-                return 1;
-            } else {
-                String str0 = obj0.toString();
-                String str1 = obj1.toString();
-
-                if (itsIsSortCaseSensitive) {
-                    return str0.compareTo(str1);
-                } else {
-                    return str0.compareToIgnoreCase(str1);
-                }
-            }
-        }
-    }
-
-
-    private static final class StringComparator implements Comparator<String>
-    {
-        public int compare(String arg0, String arg1)
-        {
-            return arg0.compareTo(arg1);
-        }
-    }
-
-
-    protected static final class MatchPwsRecord
-    {
-        public final PwsRecord itsRecord;
-        public final String itsMatch;
-
-        public MatchPwsRecord(PwsRecord rec, String match)
-        {
-            itsRecord = rec;
-            itsMatch = match;
-        }
-    }
-
-
-    protected static final class GroupNode
-    {
-        private List<MatchPwsRecord> itsRecords = null;
-        private TreeMap<String, GroupNode> itsGroups = null;
-
-        public GroupNode()
-        {
-        }
-
-        public final void addRecord(MatchPwsRecord rec)
-        {
-            if (itsRecords == null) {
-                itsRecords = new ArrayList<MatchPwsRecord>();
-            }
-            itsRecords.add(rec);
-        }
-
-        public final List<MatchPwsRecord> getRecords()
-        {
-            return itsRecords;
-        }
-
-        public final void putGroup(String name, GroupNode node,
-                                   Comparator<String> groupComp)
-        {
-            if (itsGroups == null) {
-                itsGroups = new TreeMap<String, GroupNode>(groupComp);
-            }
-            itsGroups.put(name, node);
-        }
-
-        public final GroupNode getGroup(String name)
-        {
-            if (itsGroups == null) {
-                return null;
-            } else {
-                return itsGroups.get(name);
-            }
-        }
-
-        public final Map<String, GroupNode> getGroups()
-        {
-            return itsGroups;
-        }
-
-        public final int getNumRecords()
-        {
-            int num = 0;
-            if (itsRecords != null) {
-                num += itsRecords.size();
-            }
-            if (itsGroups != null) {
-                for (GroupNode child: itsGroups.values()) {
-                    num += child.getNumRecords();
-                }
-            }
-            return num;
         }
     }
 

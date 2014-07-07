@@ -75,6 +75,17 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
 
 
     /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#createNewFile(android.net.Uri)
+     * @see com.jefftharris.passwdsafe.SyncProviderFilesFragment.Listener#createNewFile(android.net.Uri)
+     */
+    @Override
+    public void createNewFile(Uri locationUri)
+    {
+        // TODO: remove launcher new file capability
+    }
+
+
+    /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.FileListFragment.Listener#activityHasMenu()
      */
     @Override
