@@ -306,7 +306,7 @@ public class PasswdFileUri implements Parcelable
     public Pair<Boolean, Integer> isWritable()
     {
         boolean writable = false;
-        int extraMsgId = 0;
+        Integer extraMsgId = null;
         switch (itsType) {
         case FILE: {
             if ((itsFile == null) || !itsFile.canWrite()) {

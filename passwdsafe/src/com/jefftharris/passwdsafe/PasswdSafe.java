@@ -734,8 +734,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             } else {
                 cb.setEnabled(false);
                 cb.setChecked(true);
-                cb.setText(String.format("%s - %s", cb.getText(),
-                                         getString(rc.second)));
+                if (rc.second != null) {
+                    cb.setText(String.format("%s - %s", cb.getText(),
+                                             getString(rc.second.intValue())));
+                }
             }
             break;
         }
