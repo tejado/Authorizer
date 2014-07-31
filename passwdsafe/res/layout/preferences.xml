@@ -10,28 +10,28 @@
         android:key="fileOptions"
         android:title="@string/file_settings">
 
-        <EditTextPreference
+        <com.jefftharris.passwdsafe.lib.view.LongEditTextPreference
             android:name="FileDir Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="fileDirPref"
             android:title="@string/directory_for_files"/>
 
-        <Preference
+        <com.jefftharris.passwdsafe.lib.view.LongPreference
             android:name="defaultFile Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="defFilePref"
             android:title="@string/default_file_to_open"/>
 
-        <ListPreference
+        <com.jefftharris.passwdsafe.lib.view.LongListPreference
             android:name="fileTimeout Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="fileCloseTimeoutPref"
             android:title="@string/file_close_timeout"/>
 
-        <CheckBoxPreference
+        <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="fileCloseScreenOff Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,14 +39,14 @@
             android:key="fileCloseScreenOffPref"
             android:title="@string/close_file_screen_off"/>
 
-        <ListPreference
+        <com.jefftharris.passwdsafe.lib.view.LongListPreference
             android:name="fileBackup Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="fileBackupPref"
             android:title="@string/file_backups"/>
 
-        <CheckBoxPreference
+        <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="showBackupFiles Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:key="showBackupFilesPref"
             android:title="@string/show_backup_files"/>
 
-        <CheckBoxPreference
+        <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="fileCloseClearClipboard Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,34 +70,34 @@
         android:key="passwordOptions"
         android:title="@string/password_settings">
 
-        <ListPreference
+        <com.jefftharris.passwdsafe.lib.view.LongListPreference
             android:name="passwordEncoding Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="passwordEncodingPref"
             android:title="@string/file_password_encoding"/>
 
-        <ListPreference
+        <com.jefftharris.passwdsafe.lib.view.LongListPreference
             android:name="passwordExpiryNotify Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="passwordExpiryNotifyPref"
             android:title="@string/expired_password_notification"/>
 
-        <EditTextPreference
+        <com.jefftharris.passwdsafe.lib.view.LongEditTextPreference
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="passwordDefaultSymbolsPref"
             android:title="@string/default_symbols"/>
 
-        <Preference
+        <com.jefftharris.passwdsafe.lib.view.LongPreference
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:key="passwordClearAllNotifsPref"
             android:summary="@string/erase_all_expiration_notifications"
             android:title="@string/clear_password_notifications"/>
 
-        <Preference
+        <com.jefftharris.passwdsafe.lib.view.LongPreference
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:selectable="false"
@@ -112,7 +112,7 @@
         android:key="recordOptions"
         android:title="@string/record_settings">
 
-        <CheckBoxPreference
+        <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="sortCaseSensitive Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
             android:key="sortCaseSensitivePref"
             android:title="@string/case_sensitive_sorting"/>
 
-        <CheckBoxPreference
+        <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="groupRecords Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -136,7 +136,7 @@
         android:key="searchOptions"
         android:title="@string/search_settings">
 
-        <CheckBoxPreference
+        <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="searchCaseSensitive Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -144,7 +144,7 @@
             android:key="searchCaseSensitivePref"
             android:title="@string/case_sensitive"/>
 
-        <CheckBoxPreference
+        <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="searchRegex Pref"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -155,7 +155,7 @@
 
     </PreferenceScreen>
 
-    <ListPreference
+    <com.jefftharris.passwdsafe.lib.view.LongListPreference
         android:name="fontSize Pref"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
