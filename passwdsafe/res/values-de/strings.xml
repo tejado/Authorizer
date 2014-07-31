@@ -240,6 +240,8 @@
     <string name="yes">Ja</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.7.0&lt;/b&gt; - Deutsche Übersetzung hinzugefügt
+        \n\n
         &lt;b&gt;4.6.0&lt;/b&gt;\n
         - Attempt to detect read-only files on SD cards with Kitkat.  Please
         send feedback if the detection is or is not working.\n

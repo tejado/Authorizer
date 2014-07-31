@@ -240,6 +240,8 @@
     <string name="yes">Oui</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.7.0&lt;/b&gt; - Ajouter une traduction en allemand
+        \n\n
         &lt;b&gt;4.6.0&lt;/b&gt;\n
         - Tenter de détecter fichiers en lecture seule sur des cartes SD avec 
         Kitkat. S\'il vous plaît envoyer vos commentaires si la détection est 
