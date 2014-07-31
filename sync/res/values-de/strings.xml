@@ -27,13 +27,13 @@
     <string name="removing_account">Lösche Konto &#8230;</string>
     <string name="show_all">Alles anzeigen</string>
     <string name="sync">Synchronisierung</string>
-    <string name="sync_interval_label">Alle:</string>
+    <string name="sync_interval_label">Intervall:</string>
     <string name="sync_log_record">Synchronisiere %1$s, %2$s, %3$s, %4$s, Beginn: %5$tc, Beendet: %6$tc</string>
-    <string name="sync_oper_local_to_remote">Lade Datei hoch: %1$s</string>
-    <string name="sync_oper_remote_to_local">Lade Datei herunter: %1$s</string>
-    <string name="sync_oper_rmfile">Lösche Datei: %1$s</string>
-    <string name="sync_oper_rmfile_local">Lösche lokale Datei: %1$s</string>
-    <string name="sync_oper_rmfile_remote">Lösche entfernte Datei: %1$s</string>
+    <string name="sync_oper_local_to_remote">Hochgeladene Datei: %1$s</string>
+    <string name="sync_oper_remote_to_local">Heruntergeladene Datei: %1$s</string>
+    <string name="sync_oper_rmfile">Gelöschte Datei: %1$s</string>
+    <string name="sync_oper_rmfile_local">Gelöschte lokale Datei: %1$s</string>
+    <string name="sync_oper_rmfile_remote">Gelöschte entfernte Datei: %1$s</string>
     <string name="updating_account">Aktualisiere Konto &#8230;</string>
 
     <string name="release_notes">
