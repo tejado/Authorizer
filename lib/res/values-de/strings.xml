@@ -10,6 +10,6 @@
     <string name="error">Fehler</string>
     <string name="google_drive">Google Drive</string>
     <string name="open">Öffnen</string>
-    <string name="release_notes_title">Release Notes</string>
+    <string name="release_notes_title">Versionshinweise</string>
     <string name="release_notes">(Platzhalter)</string>
 </resources>
