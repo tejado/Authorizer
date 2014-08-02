@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Version code format for version x.y.z and API base a: aaxxyyzz
-    If the API base is 3, a is blank and so is the first x.
-    E.g. 3.6.0 for API 3 is 30600 and API 11 is 11030600.
+    Version code format for version x.y.z: xxyyzz
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.jefftharris.passwdsafe"
     android:installLocation="auto"
-    android:versionCode="40700"
+    android:versionCode="40701"
     android:versionName="4.7.0">
 
     <uses-sdk
