@@ -39,12 +39,12 @@ public class LongEditTextPreference extends EditTextPreference
     }
 
     /* (non-Javadoc)
-     * @see android.preference.EditTextPreference#onBindDialogView(android.view.View)
+     * @see android.preference.Preference#onBindView(android.view.View)
      */
     @Override
-    protected void onBindDialogView(View view)
+    protected void onBindView(View view)
     {
-        super.onBindDialogView(view);
+        super.onBindView(view);
         TextView title = (TextView)view.findViewById(android.R.id.title);
         title.setSingleLine(false);
     }
