@@ -240,6 +240,8 @@
     <string name="yes">Ja</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.7.1&lt;/b&gt; - Fix Crash mit Einstellungen
+        \n\n
         &lt;b&gt;4.7.0&lt;/b&gt; - Deutsche Übersetzung hinzugefügt
         \n\n
         &lt;b&gt;4.6.0&lt;/b&gt;\n
