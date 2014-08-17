@@ -54,6 +54,12 @@
             unless="sdk.dir"
     />
 
+    <!-- quick check on ndk.dir -->
+    <fail
+            message="ndk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable."
+            unless="ndk.dir"
+    />
+
     <!--
         Import per project custom build rules if present at the root of the project.
         This is the place to put custom intermediary targets such as:
@@ -89,5 +95,15 @@
     -->
     <!-- version-tag: 1 -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
+
+    <target name="-pre-build">
+        <exec executable="${ndk.dir}/ndk-build" failonerror="true"/>
+    </target>
+
+    <target name="clean" depends="android_rules.clean">
+        <exec executable="${ndk.dir}/ndk-build" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+    </target>
 
 </project>

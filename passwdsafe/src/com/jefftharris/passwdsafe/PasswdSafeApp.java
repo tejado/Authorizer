@@ -198,6 +198,10 @@ public class PasswdSafeApp extends Application
         new Intent(FILE_TIMEOUT_INTENT);
     private static final String TAG = "PasswdSafeApp";
 
+    static {
+        System.loadLibrary("PasswdSafe");
+    }
+
     public PasswdSafeApp()
     {
     }
