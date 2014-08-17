@@ -10,6 +10,11 @@
 ^passwdsafe/bin
 ^passwdsafe/local.properties
 ^passwdsafe/gen
+^passwdsafe/libs/armeabi
+^passwdsafe/libs/armeabi-v7a
+^passwdsafe/libs/mips
+^passwdsafe/libs/x86
+^passwdsafe/obj
 ^sync/bin
 ^sync/local.properties
 ^sync/gen
