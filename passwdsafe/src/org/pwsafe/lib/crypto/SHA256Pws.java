@@ -16,28 +16,7 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
  */
 public class SHA256Pws {
 
-    public static byte[] digestN(byte[] p, int iter)
-    {
-        SHA256Digest digest = new SHA256Digest();
-        byte[] output = new byte[digest.getDigestSize()];
-        byte[] input = new byte[digest.getDigestSize()];
-        byte[] t;
-
-        digest.update(p, 0, p.length);
-        digest.doFinal(output, 0);
-
-        for (int i = 0; i < iter; ++i) {
-            t = input;
-            input = output;
-            output = t;
-
-            digest.reset();
-            digest.update(input, 0, input.length);
-            digest.doFinal(output, 0);
-        }
-
-        return output;
-    }
+    public static native byte[] digestN(byte[] p, int iter);
 
 
     public static byte[] digest(byte[] incoming) {
@@ -51,5 +30,4 @@ public class SHA256Pws {
     	return output;
 
     }
-
 }
