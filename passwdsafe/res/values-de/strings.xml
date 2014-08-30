@@ -240,6 +240,9 @@
     <string name="yes">Ja</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.7.3&lt;/b&gt; - Pflegen Sie eine offene Datei, wenn die App 
+        vom Startbildschirm aus gestartet
+        \n\n
         &lt;b&gt;4.7.2&lt;/b&gt; - Performance-Verbesserung beim Öffnen einer 
         Datei mit vielen Iterationen Passwort
         \n\n
