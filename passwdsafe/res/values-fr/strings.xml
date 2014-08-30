@@ -240,6 +240,9 @@
     <string name="yes">Oui</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.7.3&lt;/b&gt; - Maintenir un fichier ouvert lorsque 
+        l\'application est lancée à partir de l\'écran d\'accueil
+        \n\n
         &lt;b&gt;4.7.2&lt;/b&gt; - Amélioration des performances lors de 
         l\'ouverture d\'un fichier avec beaucoup d\'itérations de mot de passe
         \n\n

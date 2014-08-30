@@ -240,6 +240,9 @@
     <string name="yes">Yes</string>
 
     <string name="release_notes">
+        &lt;b&gt;4.7.3&lt;/b&gt; - Maintain an open file when the app is 
+        launched from the home screen
+        \n\n
         &lt;b&gt;4.7.2&lt;/b&gt; - Performance improvement when opening a file 
         with many password iterations.
         \n\n
