@@ -240,6 +240,7 @@
     <string name="username_header">USER NAME</string>
     <string name="yes">Yes</string>
     <string name="yubikey">YubiKey</string>
+    <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
 
     <string name="release_notes">
         &lt;b&gt;4.7.3&lt;/b&gt; - Maintain an open file when the app is 

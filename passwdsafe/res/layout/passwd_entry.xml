@@ -39,14 +39,23 @@
         android:text="@string/read_only"/>
 
     <LinearLayout
+        android:id="@+id/yubi_fields"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/yubi_fields"
+        <TextView
+            android:id="@+id/yubi_disabled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/yubikey_disabled"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+            
+        <LinearLayout
+            android:id="@+id/yubi_start_fields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <Button
