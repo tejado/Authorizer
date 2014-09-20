@@ -240,6 +240,7 @@
     <string name="username_header">BENUTZERNAME</string>
     <string name="yes">Ja</string>
     <string name="yubikey">YubiKey</string>
+    <string name="yubikey_disabled">YubiKey deaktiviert. Aktivieren NFC zu bedienen.</string>
     
     <string name="release_notes">
         &lt;b&gt;4.7.3&lt;/b&gt; - Pflegen Sie eine offene Datei, wenn die App 

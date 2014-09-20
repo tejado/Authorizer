@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 
 import org.pwsafe.lib.Util;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -18,15 +19,18 @@ import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.util.YubiState;
 
 
 /**
  * The YubikeyMgr class encapsulates the interaction with a YubiKey
  */
+@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
 public class YubikeyMgr
 {
     /// Command to select the app running on the key
@@ -69,6 +73,18 @@ public class YubikeyMgr
 
         /// Notification that the interaction has stopped
         void stopped();
+    }
+
+    /** Get the state of support for the Yubikey */
+    public YubiState getState(Activity act)
+    {
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
+        if (adapter == null) {
+            return YubiState.UNAVAILABLE;
+        } else if (!adapter.isEnabled()) {
+            return YubiState.DISABLED;
+        }
+        return YubiState.ENABLED;
     }
 
     /// Start the interaction with the YubiKey
@@ -117,7 +133,6 @@ public class YubikeyMgr
             @Override
             public void onTick(long millisUntilFinished)
             {
-                PasswdSafeUtil.dbginfo(TAG, "tick: %d", millisUntilFinished);
                 itsUser.timerTick(30, (int)(millisUntilFinished / 1000));
             }
         };
@@ -138,13 +153,7 @@ public class YubikeyMgr
 
         if (itsIsRegistered) {
             NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
-            if (adapter == null) {
-                Toast.makeText(act, "NO NFC", Toast.LENGTH_LONG).show();
-                return true;
-            }
-
-            if (!adapter.isEnabled()) {
-                Toast.makeText(act, "NFC DISABLED", Toast.LENGTH_LONG).show();
+            if ((adapter == null) || !adapter.isEnabled()) {
                 return true;
             }
 

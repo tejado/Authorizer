@@ -13,6 +13,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +28,10 @@ import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.YubikeyMgr;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.util.Pair;
+import com.jefftharris.passwdsafe.util.YubiState;
 
 /**
  *  The PasswdEntryDialog encapsulates the dialog for entering the password for
@@ -49,14 +52,19 @@ public class PasswdEntryDialog implements View.OnClickListener
     private Activity itsActivity;
     private User itsUser;
     private AlertDialog itsDialog;
-    private YubikeyMgr itsYubiMgr = new YubikeyMgr();
-    private YubikeyMgr.User itsYubiUser = new YubikeyUser();
+    private YubikeyMgr itsYubiMgr = null;
+    private YubikeyMgr.User itsYubiUser = null;
 
     /** Constructor */
     public PasswdEntryDialog(Activity act, User user)
     {
         itsActivity = act;
         itsUser = user;
+
+        if (ApiCompat.SDK_VERSION >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            itsYubiMgr = new YubikeyMgr();
+            itsYubiUser = new YubikeyUser();
+        }
     }
 
     /** Create the dialog */
@@ -73,7 +81,9 @@ public class PasswdEntryDialog implements View.OnClickListener
                 Dialog d = (Dialog)dialog;
                 CheckBox cb = (CheckBox)d.findViewById(R.id.read_only);
 
-                itsYubiMgr.stop();
+                if (itsYubiMgr != null) {
+                    itsYubiMgr.stop();
+                }
 
                 boolean readonly;
                 if (cb.isEnabled()) {
@@ -96,7 +106,9 @@ public class PasswdEntryDialog implements View.OnClickListener
             @Override
             public void onCancelClicked(DialogInterface dialog)
             {
-                itsYubiMgr.stop();
+                if (itsYubiMgr != null) {
+                    itsYubiMgr.stop();
+                }
                 itsUser.handleCancel();
             }
         };
@@ -106,9 +118,33 @@ public class PasswdEntryDialog implements View.OnClickListener
         PasswordVisibilityMenuHandler.set(passwordEdit);
         Spinner slotSpinner = (Spinner)passwdView.findViewById(R.id.yubi_slot);
         slotSpinner.setSelection(1);
-
         Button yubikey = (Button)passwdView.findViewById(R.id.yubi_start);
         yubikey.setOnClickListener(this);
+
+        YubiState state = YubiState.UNAVAILABLE;
+        if (itsYubiMgr != null) {
+            state = itsYubiMgr.getState(itsActivity);
+        }
+        switch (state) {
+        case UNAVAILABLE: {
+            setVisibility(R.id.yubi_disabled, false, passwdView);
+            setVisibility(R.id.yubi_start_fields, false, passwdView);
+            setVisibility(R.id.yubi_progress_fields, false, passwdView);
+            break;
+        }
+        case DISABLED: {
+            setVisibility(R.id.yubi_disabled, true, passwdView);
+            setVisibility(R.id.yubi_start_fields, false, passwdView);
+            setVisibility(R.id.yubi_progress_fields, false, passwdView);
+            break;
+        }
+        case ENABLED: {
+            setVisibility(R.id.yubi_disabled, false, passwdView);
+            setVisibility(R.id.yubi_start_fields, true, passwdView);
+            setVisibility(R.id.yubi_progress_fields, false, passwdView);
+            break;
+        }
+        }
 
         AlertDialog.Builder alert = new AlertDialog.Builder(itsActivity)
             .setTitle(R.string.open_file_title)
@@ -149,13 +185,19 @@ public class PasswdEntryDialog implements View.OnClickListener
      *  false otherwise */
     public boolean onPause()
     {
-        return itsYubiMgr.onPause();
+        if (itsYubiMgr != null) {
+            return itsYubiMgr.onPause();
+        }
+        return false;
     }
 
     /** Handle a new intent.  Return true if handled */
     public boolean onNewIntent(Intent intent)
     {
-        return itsYubiMgr.handleKeyIntent(intent);
+        if (itsYubiMgr != null) {
+            return itsYubiMgr.handleKeyIntent(intent);
+        }
+        return false;
     }
 
     /** Handle a click event */
@@ -165,6 +207,22 @@ public class PasswdEntryDialog implements View.OnClickListener
         if (view.getId() == R.id.yubi_start) {
             itsYubiMgr.start(itsYubiUser);
         }
+    }
+
+    /** Set visibility of a field */
+    private static void setVisibility(int id, boolean visible, View parent)
+    {
+        View v = parent.findViewById(id);
+        v.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    /** Set visibility of a field */
+    private static void setVisibility(int id,
+                                      boolean visible,
+                                      AlertDialog parent)
+    {
+        View v = parent.findViewById(id);
+        v.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     /** User of the YubikeyMgr */
@@ -214,19 +272,15 @@ public class PasswdEntryDialog implements View.OnClickListener
         @Override
         public void starting()
         {
-            View fields = itsDialog.findViewById(R.id.yubi_start_fields);
-            fields.setVisibility(View.GONE);
-            fields = itsDialog.findViewById(R.id.yubi_progress_fields);
-            fields.setVisibility(View.VISIBLE);
+            setVisibility(R.id.yubi_start_fields, false, itsDialog);
+            setVisibility(R.id.yubi_progress_fields, true, itsDialog);
         }
 
         @Override
         public void stopped()
         {
-            View fields = itsDialog.findViewById(R.id.yubi_start_fields);
-            fields.setVisibility(View.VISIBLE);
-            fields = itsDialog.findViewById(R.id.yubi_progress_fields);
-            fields.setVisibility(View.GONE);
+            setVisibility(R.id.yubi_start_fields, true, itsDialog);
+            setVisibility(R.id.yubi_progress_fields, false, itsDialog);
         }
     };
 }

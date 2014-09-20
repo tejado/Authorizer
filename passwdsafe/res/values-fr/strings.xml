@@ -240,6 +240,7 @@
     <string name="username_header">NOM UTILISATEUR</string>
     <string name="yes">Oui</string>
     <string name="yubikey">YubiKey</string>
+    <string name="yubikey_disabled">YubiKey désactivée. Activer NFC à utiliser.</string>
 
     <string name="release_notes">
         &lt;b&gt;4.7.3&lt;/b&gt; - Maintenir un fichier ouvert lorsque 
