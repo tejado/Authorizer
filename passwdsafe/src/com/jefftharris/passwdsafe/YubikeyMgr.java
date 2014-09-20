@@ -203,7 +203,6 @@ public class YubikeyMgr
                 byte[] resp = isotag.transceive(SELECT_CMD);
                 checkResponse(resp);
 
-                // TODO: test zero length
                 // TODO: wide char support
 
                 String pw = itsUser.getUserPassword();
@@ -220,6 +219,7 @@ public class YubikeyMgr
                     }
                     cmd.write((byte)pw.charAt(pwlen - 1));
                 } else {
+                    cmd.write((byte)1);
                     cmd.write((byte)0);
                 }
 
@@ -231,8 +231,8 @@ public class YubikeyMgr
                 } else {
                     cmdbytes[2] = SLOT_CHAL_HMAC2;
                 }
-                //PasswdSafeUtil.dbginfo(TAG, "cmd: %s",
-                //                       Util.bytesToHex(cmdbytes));
+//                PasswdSafeUtil.dbginfo(TAG, "cmd: %s",
+//                                       Util.bytesToHex(cmdbytes));
 
                 resp = isotag.transceive(cmdbytes);
                 checkResponse(resp);
@@ -240,7 +240,7 @@ public class YubikeyMgr
                 String pwstr = Util.bytesToHex(resp);
                 pwstr = pwstr.substring(0, pwstr.length() - 4);
 
-                // PasswdSafeUtil.dbginfo(TAG, "Pw: " + pwstr);
+//                PasswdSafeUtil.dbginfo(TAG, "Pw: " + pwstr);
                 itsUser.setHashedPassword(pwstr);
             } finally {
                 isotag.close();
