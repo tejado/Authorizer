@@ -181,6 +181,7 @@
     <string name="policy_yes_sym_pronounce">Oui - Au moins %1$d des symboles prononçables: %2$s</string>
     <string name="preferences">Préférences</string>
     <string name="press_password_warning">Appuyez de nouveau Mot de passe pour coller dans le champ visible</string>
+    <string name="press_yubikey">Appyuez sur la YubiKey</string>
     <string name="protect_all">Protéger toutes les entrées</string>
     <string name="protect_group">Protéger un groupe d\'entrées</string>
     <string name="protected_record">Protégé</string>
@@ -238,6 +239,7 @@
     <string name="use_uppercase">Utiliser majuscules</string>
     <string name="username_header">NOM UTILISATEUR</string>
     <string name="yes">Oui</string>
+    <string name="yubikey">YubiKey</string>
 
     <string name="release_notes">
         &lt;b&gt;4.7.3&lt;/b&gt; - Maintenir un fichier ouvert lorsque 
@@ -388,5 +390,10 @@
         <item>Facile-à-lire</item>
         <item>Prononçable</item>
         <item>Hexadécimal</item>
+    </string-array>
+    
+    <string-array name="yubikey_slots">
+        <item>Rainure 1</item>
+        <item>Rainure 2</item>
     </string-array>
 </resources>
