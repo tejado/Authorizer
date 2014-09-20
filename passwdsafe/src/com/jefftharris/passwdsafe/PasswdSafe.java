@@ -16,7 +16,6 @@ import java.util.Map;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -25,10 +24,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -39,12 +36,8 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
@@ -52,10 +45,10 @@ import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
-import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.PasswdEntryDialog;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 public class PasswdSafe extends AbstractPasswdSafeActivity
@@ -87,12 +80,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int POLICY_VIEW_REQUEST = 2;
 
     private AbstractTask itsLoadTask;
+    private PasswdEntryDialog itsPasswdEntryDialog;
     private DialogValidator itsChangePasswdValidator;
     private DialogValidator itsFileNewValidator;
     private DialogValidator itsDeleteValidator;
     private String itsRecToOpen;
     private boolean itsIsNotifyExpirations = true;
-    private YubikeyMgr itsYubiMgr = new YubikeyMgr();
 
 
     /** Called when the activity is first created. */
@@ -156,8 +149,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 initNewViewIntent();
                 showFileData(MOD_INIT);
                 onCreateView(intent);
-            } else {
-                itsYubiMgr.handleKeyIntent(intent);
+            } else if (itsPasswdEntryDialog != null) {
+                itsPasswdEntryDialog.onNewIntent(intent);
             }
         }
     }
@@ -180,9 +173,9 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void onPause()
     {
-        if (!itsYubiMgr.onPause()) {
-            removeDialog(DIALOG_GET_PASSWD);
-            removeDialog(DIALOG_DETAILS);
+        if ((itsPasswdEntryDialog == null) || !itsPasswdEntryDialog.onPause()) {
+            doRemoveDialog(DIALOG_GET_PASSWD);
+            doRemoveDialog(DIALOG_DETAILS);
             if (itsLoadTask != null) {
                 itsLoadTask.cancel(true);
             }
@@ -197,8 +190,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-        removeDialog(DIALOG_GET_PASSWD);
-        removeDialog(DIALOG_PROGRESS);
+        doRemoveDialog(DIALOG_GET_PASSWD);
+        doRemoveDialog(DIALOG_PROGRESS);
         removeProgressDialog();
         super.onSaveInstanceState(outState);
     }
@@ -686,23 +679,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         {
         case DIALOG_GET_PASSWD:
         {
-            SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-            TextView tv = (TextView)dialog.findViewById(R.id.file);
-            tv.setText(getString(R.string.file_label_val, getUriName(false)));
-            CheckBox cb = (CheckBox)dialog.findViewById(R.id.read_only);
-            Pair<Boolean, Integer> rc = getUri().isWritable();
-            if (rc.first) {
-                cb.setEnabled(true);
-                cb.setChecked(Preferences.getFileOpenReadOnlyPref(prefs));
-            } else {
-                cb.setEnabled(false);
-                cb.setChecked(true);
-                if (rc.second != null) {
-                    cb.setText(String.format("%s - %s", cb.getText(),
-                                             getString(rc.second.intValue())));
-                }
-            }
+            itsPasswdEntryDialog.reset(getUriName(false), getUri());
             break;
         }
         case DIALOG_DETAILS:
@@ -940,139 +917,27 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     /** Create a dialog for entering the password for a file */
     private Dialog createGetPasswdDialog()
     {
-        LayoutInflater factory = LayoutInflater.from(this);
-        View passwdView = factory.inflate(R.layout.passwd_entry, null);
-        AbstractDialogClickListener dlgClick =
-            new AbstractDialogClickListener()
-        {
-            @Override
-            public void onOkClicked(DialogInterface dialog)
-            {
-                Dialog d = (Dialog)dialog;
-                CheckBox cb = (CheckBox)d.findViewById(R.id.read_only);
+        itsPasswdEntryDialog = new PasswdEntryDialog(
+                this, new PasswdEntryDialog.User() {
+                    @Override
+                    public void handleOk(StringBuilder password,
+                                         boolean readonly)
+                    {
+                        openFile(password, readonly);
+                    }
 
-                itsYubiMgr.stop();
-
-                boolean readonly;
-                if (cb.isEnabled()) {
-                    readonly = cb.isChecked();
-                    SharedPreferences prefs =
-                        PreferenceManager.getDefaultSharedPreferences(PasswdSafe.this);
-                    Preferences.setFileOpenReadOnlyPref(readonly, prefs);
-                } else {
-                    readonly = true;
-                }
-
-                EditText passwdInput =
-                    (EditText)d.findViewById(R.id.passwd_edit);
-                openFile(
-                     new StringBuilder(passwdInput.getText().toString()),
-                     readonly);
-            }
-
-            @Override
-            public void onCancelClicked(DialogInterface dialog)
-            {
-                itsYubiMgr.stop();
-                cancelFileTask();
-            }
-        };
-
-        TextView passwordEdit =
-                (TextView)passwdView.findViewById(R.id.passwd_edit);
-        PasswordVisibilityMenuHandler.set(passwordEdit);
-        Spinner slotSpinner = (Spinner)passwdView.findViewById(R.id.yubi_slot);
-        slotSpinner.setSelection(1);
-
-        AlertDialog.Builder alert = new AlertDialog.Builder(this)
-            .setTitle(R.string.open_file_title)
-            .setView(passwdView)
-            .setPositiveButton(R.string.ok, dlgClick)
-            .setNegativeButton(R.string.cancel, dlgClick)
-            .setOnCancelListener(dlgClick);
-        final AlertDialog alertDialog = alert.create();
-        GuiUtils.setupDialogKeyboard(alertDialog, passwordEdit, passwordEdit,
-                                     this);
-
-        final YubikeyMgr.User user = new YubikeyMgr.User()
-        {
-            @Override
-            public Activity getActivity()
-            {
-                return PasswdSafe.this;
-            }
-
-            @Override
-            public String getUserPassword()
-            {
-                TextView passwordEdit =
-                        (TextView)alertDialog.findViewById(R.id.passwd_edit);
-                return passwordEdit.getText().toString();
-            }
-
-            @Override
-            public void setHashedPassword(String password)
-            {
-                TextView passwordEdit =
-                        (TextView)alertDialog.findViewById(R.id.passwd_edit);
-                passwordEdit.setText(password);
-                Button okbtn =
-                        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                okbtn.performClick();
-            }
-
-            @Override
-            public int getSlotNum()
-            {
-                Spinner slotSpinner =
-                        (Spinner)alertDialog.findViewById(R.id.yubi_slot);
-                return (slotSpinner.getSelectedItemPosition() == 0) ? 1 : 2;
-            }
-
-            @Override
-            public void timerTick(int totalTime, int remainingTime)
-            {
-                ProgressBar progress = (ProgressBar)
-                        alertDialog.findViewById(R.id.yubi_progress);
-                progress.setMax(totalTime);
-                progress.setProgress(remainingTime);
-            }
-
-            @Override
-            public void starting()
-            {
-                View fields = alertDialog.findViewById(R.id.yubi_fields);
-                fields.setVisibility(View.GONE);
-                fields = alertDialog.findViewById(R.id.yubi_progress_fields);
-                fields.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void stopped()
-            {
-                View fields = alertDialog.findViewById(R.id.yubi_fields);
-                fields.setVisibility(View.VISIBLE);
-                fields = alertDialog.findViewById(R.id.yubi_progress_fields);
-                fields.setVisibility(View.GONE);
-            }
-        };
-
-        Button yubikey = (Button)passwdView.findViewById(R.id.yubi_start);
-        yubikey.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                itsYubiMgr.start(user);
-            }
-        });
-
-        return alertDialog;
+                    @Override
+                    public void handleCancel()
+                    {
+                        cancelFileTask();
+                    }
+                });
+        return itsPasswdEntryDialog.create();
     }
 
     private final void openFile(StringBuilder passwd, boolean readonly)
     {
-        removeDialog(DIALOG_GET_PASSWD);
+        doRemoveDialog(DIALOG_GET_PASSWD);
         runTask(new OpenTask(passwd, readonly));
     }
 
@@ -1142,8 +1007,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
     private final void cancelFileTask()
     {
-        removeDialog(DIALOG_PROGRESS);
-        removeDialog(DIALOG_GET_PASSWD);
+        doRemoveDialog(DIALOG_PROGRESS);
+        doRemoveDialog(DIALOG_GET_PASSWD);
         finish();
     }
 
@@ -1152,6 +1017,15 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     {
         RecordView.startActivityForResult(getUri(), uuid, RECORD_VIEW_REQUEST,
                                           this);
+    }
+
+    /** Remove and cleanup a dialog */
+    private final void doRemoveDialog(int dialog)
+    {
+        if (dialog == DIALOG_GET_PASSWD) {
+            itsPasswdEntryDialog = null;
+        }
+        removeDialog(dialog);
     }
 
     /** Background task for opening a file */
@@ -1354,7 +1228,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 return;
             }
             PasswdSafeUtil.dbginfo(TAG, "LoadTask post execute");
-            removeDialog(DIALOG_PROGRESS);
+            doRemoveDialog(DIALOG_PROGRESS);
             itsLoadTask = null;
             if (!(result instanceof Exception)) {
                 handleOnPostExecute(result);
