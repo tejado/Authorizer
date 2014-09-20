@@ -181,6 +181,7 @@
     <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Ja - Symbole: %2$s</string>
     <string name="preferences">Einstellungen</string>
     <string name="press_password_warning">Passwort erneut berühren, um es in ein sichtbares Feld zu kopieren</string>
+    <string name="press_yubikey">Drücken Sie die YubiKey</string>
     <string name="protect_all">Alle Einträge schützen</string>
     <string name="protect_group">Gruppe schützen</string>
     <string name="protected_record">Geschützt</string>
@@ -238,7 +239,8 @@
     <string name="use_uppercase">Großbuchstaben</string>
     <string name="username_header">BENUTZERNAME</string>
     <string name="yes">Ja</string>
-
+    <string name="yubikey">YubiKey</string>
+    
     <string name="release_notes">
         &lt;b&gt;4.7.3&lt;/b&gt; - Pflegen Sie eine offene Datei, wenn die App 
         vom Startbildschirm aus gestartet
@@ -383,5 +385,10 @@
         <item>Einfach zu lesen</item>
         <item>Aussprechbar</item>
         <item>Hexadezimal</item>
+    </string-array>
+    
+    <string-array name="yubikey_slots">
+        <item>Rille 1</item>
+        <item>Rille 2</item>
     </string-array>
 </resources>

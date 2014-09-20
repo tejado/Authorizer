@@ -1,0 +1,258 @@
+/*
+ * Copyright (©) 2014 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
+ */
+package com.jefftharris.passwdsafe;
+
+import java.io.ByteArrayOutputStream;
+
+import org.pwsafe.lib.Util;
+
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.IsoDep;
+import android.os.CountDownTimer;
+import android.widget.Toast;
+
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+
+
+/**
+ * The YubikeyMgr class encapsulates the interaction with a YubiKey
+ */
+public class YubikeyMgr
+{
+    /// Command to select the app running on the key
+    private static final byte[] SELECT_CMD =
+        {0x00, (byte) 0xA4, 0x04, 0x00, 0x07,
+         (byte) 0xA0, 0x00, 0x00, 0x05, 0x27, 0x20, 0x01, 0x00};
+    /// Command to perform a hash operation
+    private static final byte[] HASH_CMD = {0x00, 0x01, 0x00, 0x00 };
+
+    private static final byte SLOT_CHAL_HMAC1 = 0x30;
+    private static final byte SLOT_CHAL_HMAC2 = 0x38;
+
+    private static final String TAG = "YubikeyMgr";
+
+    User itsUser = null;
+    boolean itsIsRegistered = false;
+    PendingIntent itsTagIntent = null;
+    CountDownTimer itsTimer = null;
+
+    /// Interface for a user of the YubikeyMgr
+    public interface User
+    {
+        /// Get the activity using the key
+        Activity getActivity();
+
+        /// Get the password to be sent to the key
+        String getUserPassword();
+
+        /// Get the slot number to use on the key
+        int getSlotNum();
+
+        /// Set the password computed by the key
+        void setHashedPassword(String password);
+
+        /// Handle an update on the timer until the start times out
+        void timerTick(int totalTime, int remainingTime);
+
+        /// Notification that the interaction is starting
+        void starting();
+
+        /// Notification that the interaction has stopped
+        void stopped();
+    }
+
+    /// Start the interaction with the YubiKey
+    public void start(User user)
+    {
+        if (itsUser != null) {
+            stop();
+        }
+
+        itsUser = user;
+        Activity act = itsUser.getActivity();
+        if (itsTagIntent == null) {
+            Intent intent = new Intent(act, act.getClass());
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            itsTagIntent = PendingIntent.getActivity(act, 0, intent, 0);
+        }
+
+        if (!itsIsRegistered) {
+            NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
+            if (adapter == null) {
+                Toast.makeText(act, "NO NFC", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            if (!adapter.isEnabled()) {
+                Toast.makeText(act, "NFC DISABLED", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            IntentFilter iso =
+                    new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
+            adapter.enableForegroundDispatch(
+                    act, itsTagIntent, new IntentFilter[] { iso },
+                    new String[][]
+                            { new String[] { IsoDep.class.getName() } });
+            itsIsRegistered = true;
+        }
+
+        itsTimer = new CountDownTimer(30 * 1000, 1 * 1000) {
+            @Override
+            public void onFinish()
+            {
+                stop();
+            }
+
+            @Override
+            public void onTick(long millisUntilFinished)
+            {
+                PasswdSafeUtil.dbginfo(TAG, "tick: %d", millisUntilFinished);
+                itsUser.timerTick(30, (int)(millisUntilFinished / 1000));
+            }
+        };
+        itsTimer.start();
+
+        itsUser.starting();
+    }
+
+    /** Handle a pause of the activity.  Return true if the manager is active;
+     *  false otherwise */
+    public boolean onPause()
+    {
+        PasswdSafeUtil.dbginfo(TAG, "onPause");
+        if (itsUser == null) {
+            return false;
+        }
+        Activity act = itsUser.getActivity();
+
+        if (itsIsRegistered) {
+            NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
+            if (adapter == null) {
+                Toast.makeText(act, "NO NFC", Toast.LENGTH_LONG).show();
+                return true;
+            }
+
+            if (!adapter.isEnabled()) {
+                Toast.makeText(act, "NFC DISABLED", Toast.LENGTH_LONG).show();
+                return true;
+            }
+
+            adapter.disableForegroundDispatch(act);
+            itsIsRegistered = false;
+        }
+
+        if (itsTagIntent != null) {
+            itsTagIntent.cancel();
+            itsTagIntent = null;
+        }
+
+        return true;
+    }
+
+    /// Stop the interaction with the key
+    public void stop()
+    {
+        onPause();
+        if (itsTimer != null) {
+            itsTimer.cancel();
+            itsTimer = null;
+        }
+        if (itsUser != null) {
+            itsUser.stopped();
+            itsUser = null;
+        }
+    }
+
+    /// Handle the intent for when the key is discovered
+    public boolean handleKeyIntent(Intent intent)
+    {
+        if (!NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
+            return false;
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "calculate");
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        if ((tag == null) || (itsUser == null)) {
+            return true;
+        }
+
+        IsoDep isotag = IsoDep.get(tag);
+        try {
+            isotag.connect();
+            try {
+                byte[] resp = isotag.transceive(SELECT_CMD);
+                checkResponse(resp);
+
+                // TODO: test zero length
+                // TODO: wide char support
+
+                String pw = itsUser.getUserPassword();
+                ByteArrayOutputStream cmd = new ByteArrayOutputStream();
+                cmd.write(HASH_CMD);
+
+                int pwlen = pw.length();
+                if (pwlen > 0) {
+                    cmd.write((byte)(pwlen * 2 - 1));
+
+                    for (int i = 0; i < pwlen - 1; ++i) {
+                        cmd.write((byte)pw.charAt(i));
+                        cmd.write(0);
+                    }
+                    cmd.write((byte)pw.charAt(pwlen - 1));
+                } else {
+                    cmd.write((byte)0);
+                }
+
+                byte[] cmdbytes = cmd.toByteArray();
+
+                int slot = itsUser.getSlotNum();
+                if (slot == 1) {
+                    cmdbytes[2] = SLOT_CHAL_HMAC1;
+                } else {
+                    cmdbytes[2] = SLOT_CHAL_HMAC2;
+                }
+                //PasswdSafeUtil.dbginfo(TAG, "cmd: %s",
+                //                       Util.bytesToHex(cmdbytes));
+
+                resp = isotag.transceive(cmdbytes);
+                checkResponse(resp);
+
+                String pwstr = Util.bytesToHex(resp);
+                pwstr = pwstr.substring(0, pwstr.length() - 4);
+
+                // PasswdSafeUtil.dbginfo(TAG, "Pw: " + pwstr);
+                itsUser.setHashedPassword(pwstr);
+            } finally {
+                isotag.close();
+            }
+        } catch (Exception e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "handleKeyIntent");
+        }
+
+        return true;
+    }
+
+    /// Check for a valid response
+    private static void checkResponse(byte[] resp) throws Exception
+    {
+        if ((resp.length >= 2) &&
+                (resp[resp.length - 2] == (byte)0x90) &&
+                (resp[resp.length - 1] == 0x00)) {
+            return;
+        }
+
+        throw new Exception("Invalid response: " +
+                            Util.bytesToHex(resp));
+    }
+}

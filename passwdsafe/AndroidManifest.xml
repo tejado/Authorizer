@@ -22,6 +22,9 @@
     <uses-permission android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"/>
     <uses-permission android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"/>
 
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
+
     <application
         android:name="PasswdSafeApp"
         android:allowBackup="true"
@@ -35,6 +38,9 @@
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.TECH_DISCOVERED"/>
             </intent-filter>
         </activity>
         <activity
