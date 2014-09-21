@@ -43,6 +43,8 @@ public class YubikeyMgr
     private static final byte SLOT_CHAL_HMAC1 = 0x30;
     private static final byte SLOT_CHAL_HMAC2 = 0x38;
 
+    private static final int SHA1_MAX_BLOCK_SIZE = 64;
+
     private static final String TAG = "YubikeyMgr";
 
     User itsUser = null;
@@ -203,34 +205,51 @@ public class YubikeyMgr
                 byte[] resp = isotag.transceive(SELECT_CMD);
                 checkResponse(resp);
 
-                // TODO: wide char support
-
                 String pw = itsUser.getUserPassword();
                 ByteArrayOutputStream cmd = new ByteArrayOutputStream();
                 cmd.write(HASH_CMD);
 
+                // Placeholder for length
+                byte datalen;
+                cmd.write(0);
+
                 int pwlen = pw.length();
                 if (pwlen > 0) {
-                    cmd.write((byte)(pwlen * 2 - 1));
-
-                    for (int i = 0; i < pwlen - 1; ++i) {
-                        cmd.write((byte)pw.charAt(i));
-                        cmd.write(0);
+                    if (pwlen > SHA1_MAX_BLOCK_SIZE / 2) {
+                        pwlen = SHA1_MAX_BLOCK_SIZE / 2;
                     }
-                    cmd.write((byte)pw.charAt(pwlen - 1));
+                    // Chars are encoded as little-endian UTF-16.  A trailing
+                    // zero must be skipped as the PC API will skip it.
+                    datalen = 0;
+                    for (int i = 0; i < pwlen - 1; ++i) {
+                        datalen += 2;
+                        char c = pw.charAt(i);
+                        cmd.write(c & 0xff);
+                        cmd.write((c >> 8) & 0xff);
+                    }
+
+                    char c = pw.charAt(pwlen - 1);
+                    cmd.write(c & 0xff);
+                    ++datalen;
+                    int last = (c >> 8) & 0xff;
+                    if (last != 0) {
+                        cmd.write(last);
+                        ++datalen;
+                    }
                 } else {
-                    cmd.write((byte)1);
-                    cmd.write((byte)0);
+                    // Empty password needs a single null byte
+                    datalen = 1;
+                    cmd.write(0);
                 }
 
                 byte[] cmdbytes = cmd.toByteArray();
-
                 int slot = itsUser.getSlotNum();
                 if (slot == 1) {
                     cmdbytes[2] = SLOT_CHAL_HMAC1;
                 } else {
                     cmdbytes[2] = SLOT_CHAL_HMAC2;
                 }
+                cmdbytes[HASH_CMD.length] = datalen;
 //                PasswdSafeUtil.dbginfo(TAG, "cmd: %s",
 //                                       Util.bytesToHex(cmdbytes));
 
