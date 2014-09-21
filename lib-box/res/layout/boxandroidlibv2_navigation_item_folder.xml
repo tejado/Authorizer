@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="32dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal" >
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:src="@drawable/boxandroidlibv2_ic_breadcrumb_arrow" />
+
+    <TextView
+        android:id="@+id/textView_navigationItem"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:ellipsize="middle"
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:textColor="#FF1A74B0"
+        android:textSize="20sp" />
+
+</LinearLayout>
