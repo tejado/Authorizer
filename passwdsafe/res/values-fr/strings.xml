@@ -260,6 +260,9 @@
     </string>
 
     <string name="release_notes">
+        &lt;b&gt;5.0.0&lt;/b&gt; - Soutenir YubiKey NEO pour les appareils avec
+        la technologie NFC
+        \n\n
         &lt;b&gt;4.7.3&lt;/b&gt; - Maintenir un fichier ouvert lorsque 
         l\'application est lancée à partir de l\'écran d\'accueil
         \n\n

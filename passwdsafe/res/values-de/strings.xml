@@ -261,6 +261,8 @@
     </string>
     
     <string name="release_notes">
+        &lt;b&gt;5.0.0&lt;/b&gt; - YubiKey NEO unterstützt für Geräte mit NFC
+        \n\n
         &lt;b&gt;4.7.3&lt;/b&gt; - Pflegen Sie eine offene Datei, wenn die App 
         vom Startbildschirm aus gestartet
         \n\n
