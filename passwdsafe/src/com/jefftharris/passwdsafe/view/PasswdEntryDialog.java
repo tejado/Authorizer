@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -120,6 +121,10 @@ public class PasswdEntryDialog implements View.OnClickListener
         slotSpinner.setSelection(1);
         Button yubikey = (Button)passwdView.findViewById(R.id.yubi_start);
         yubikey.setOnClickListener(this);
+        setVisibility(R.id.yubi_help_text, false, passwdView);
+        View yubihelp = passwdView.findViewById(R.id.yubi_help);
+        yubihelp.setOnClickListener(this);
+
 
         YubiState state = YubiState.UNAVAILABLE;
         if (itsYubiMgr != null) {
@@ -206,6 +211,10 @@ public class PasswdEntryDialog implements View.OnClickListener
     {
         if (view.getId() == R.id.yubi_start) {
             itsYubiMgr.start(itsYubiUser);
+        } else if (view.getId() == R.id.yubi_help) {
+            View help = itsDialog.findViewById(R.id.yubi_help_text);
+            help.setVisibility((help.getVisibility() == View.VISIBLE) ?
+                                View.GONE : View.VISIBLE);
         }
     }
 
