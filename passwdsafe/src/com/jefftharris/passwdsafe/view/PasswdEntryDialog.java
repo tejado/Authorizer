@@ -29,6 +29,7 @@ import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.YubikeyMgr;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.util.YubiState;
@@ -258,6 +259,14 @@ public class PasswdEntryDialog implements View.OnClickListener
             passwordEdit.setText(password);
             Button okbtn = itsDialog.getButton(DialogInterface.BUTTON_POSITIVE);
             okbtn.performClick();
+        }
+
+        @Override
+        public void handleHashException(Exception e)
+        {
+            PasswdSafeUtil.showFatalMsg(
+                    e, itsActivity.getString(R.string.yubikey_error),
+                    itsActivity);
         }
 
         @Override

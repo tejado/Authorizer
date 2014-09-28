@@ -242,6 +242,7 @@
     <string name="yes">Yes</string>
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
+    <string name="yubikey_error">Error communicating with the YubiKey</string>
     <string name="yubikey_help">
         To use a YubiKey NEO, follow these steps:\n
         - Enable NFC support in the device settings\n
