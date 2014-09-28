@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fields"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
@@ -41,7 +40,9 @@
             android:id="@+id/read_only"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/read_only" />
+            android:paddingBottom="6dp"
+            android:paddingTop="6dp"
+            android:text="@string/read_only"/>
 
         <LinearLayout
             android:id="@+id/yubi_fields"
