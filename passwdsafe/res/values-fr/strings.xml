@@ -96,6 +96,7 @@
     <string name="group">Groupe</string>
     <string name="group_header">GROUPE</string>
     <string name="group_records">Groupe d\'entrées</string>
+    <string name="help">Assistance</string>
     <string name="hidden_password_alias">***** (de alias, taper pour visualiser)</string>
     <string name="hidden_password_normal">***** (taper pour visualiser)</string>
     <string name="hidden_password_shortcut">***** (de raccourci, taper pour visualiser)</string>
