@@ -67,6 +67,9 @@ public class YubikeyMgr
         /// Set the password computed by the key
         void setHashedPassword(String password);
 
+        /// Handle an error while computing the hash
+        void handleHashException(Exception e);
+
         /// Handle an update on the timer until the start times out
         void timerTick(int totalTime, int remainingTime);
 
@@ -256,9 +259,8 @@ public class YubikeyMgr
                 resp = isotag.transceive(cmdbytes);
                 checkResponse(resp);
 
-                String pwstr = Util.bytesToHex(resp);
-                pwstr = pwstr.substring(0, pwstr.length() - 4);
-
+                // Prune response bytes and convert
+                String pwstr = Util.bytesToHex(resp, 0, resp.length - 2);
 //                PasswdSafeUtil.dbginfo(TAG, "Pw: " + pwstr);
                 itsUser.setHashedPassword(pwstr);
             } finally {
@@ -266,6 +268,7 @@ public class YubikeyMgr
             }
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo(TAG, e, "handleKeyIntent");
+            itsUser.handleHashException(e);
         }
 
         return true;
