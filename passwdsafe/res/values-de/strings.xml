@@ -245,7 +245,19 @@
     <string name="yubikey_help">
         Um eine YubiKey NEO zu verwenden, gehen Sie folgendermaßen vor:\n
         - Ermöglichen NFC-Unterstützung in den Geräteeinstellungen\n
-        - 
+        - Benutzerpasswort eintragen zu der Datei\n
+        - Wählen Sie die Steckplatz auf der YubiKey das 
+        Challenge-Response-Schlüssel hat. Normalerweise Slot 2 ist für 
+        Password Safe verwendet.\n
+        - Drücken Sie die Taste YubiKey\n
+        - Innerhalb von 30 Sekunden drücken Sie die YubiKey auf der Rückseite 
+        des Telefon oder Tablet. Es wird sein, wie Klänge der Schlüssel gelesen 
+        wird.  Wenn das Gerät nicht mit einem ansteigenden Ton zu reagieren, 
+        versuchen Sie, den Taster ca. Ein bisschen von Versuch-und-Irrtum 
+        benötigt wird, um die richtige Position zu finden. Die Taste auf der
+        YubiKey selbst nicht gedrückt werden.\n
+        - Sobald der Schlüssel gefunden ist, wird es verwendet, um mit Ihrem 
+        Passwort authentifizieren. Die Datei wird automatisch geöffnet.  
     </string>
     
     <string name="release_notes">
