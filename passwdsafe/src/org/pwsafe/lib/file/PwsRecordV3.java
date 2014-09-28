@@ -40,8 +40,11 @@ public class PwsRecordV3 extends PwsRecord
     /** Minor version for PasswordSafe 3.28 with password policy support */
     public static final byte DB_FMT_MINOR_3_28 = 10;
 
+    /** Minor version for PasswordSafe 3.30 */
+    public static final byte DB_FMT_MINOR_3_30 = 0x0D;
+
     /** Minor version of the max supported database format */
-    public static final byte DB_FMT_MINOR_VERSION = DB_FMT_MINOR_3_28;
+    public static final byte DB_FMT_MINOR_VERSION = DB_FMT_MINOR_3_30;
 
     /**
      * Constant for the Universally Unique ID (UUID) field.
@@ -151,8 +154,14 @@ public class PwsRecordV3 extends PwsRecord
     /** Own symbols for password */
     public static final int OWN_PASSWORD_SYMBOLS = 22;
 
+    /** Shift double-click action */
+    public static final int SHIFT_DOUBLE_CLICK_ACTION = 23;
+
     /** Password policy name */
     public static final int PASSWORD_POLICY_NAME = 24;
+
+    /** Entry keyboard shortcut */
+    public static final int ENTRY_KEYBOARD_SHORTCUT = 25;
 
     /**
      * Header database version
@@ -191,6 +200,9 @@ public class PwsRecordV3 extends PwsRecord
 
     /** Header named password policies */
     public static final int HEADER_NAMED_PASSWORD_POLICIES = 16;
+
+    /** Header for Yubico */
+    public static final int HEADER_YUBICO = 0x12;
 
     /**
      * Constant for the end of record marker field.
@@ -248,8 +260,12 @@ public class PwsRecordV3 extends PwsRecord
                             "PROTECTED_ENTRY", PwsByteField.class},
             new Object[] { Integer.valueOf(OWN_PASSWORD_SYMBOLS),
                             "OWN_PASSWORD_SYMBOLS", PwsStringUnicodeField.class },
+            new Object[] { Integer.valueOf(SHIFT_DOUBLE_CLICK_ACTION),
+                            "SHIFT_DOUBLE_CLICK_ACTION", PwsShortField.class },
             new Object[] { Integer.valueOf(PASSWORD_POLICY_NAME),
                             "PASSWORD_POLICY_NAME", PwsStringUnicodeField.class },
+            new Object[] { Integer.valueOf(ENTRY_KEYBOARD_SHORTCUT),
+                            "ENTRY_KEYBOARD_SHORTCUT", PwsIntegerField.class },
     };
 
     /**
@@ -566,11 +582,13 @@ public class PwsRecordV3 extends PwsRecord
                     break;
 
                 case PASSWORD_EXPIRY_INTERVAL:
+                case ENTRY_KEYBOARD_SHORTCUT:
                     itemVal = new PwsIntegerField(item.getType(),
                                                   item.getByteData());
                     break;
 
                 case DOUBLE_CLICK_ACTION:
+                case SHIFT_DOUBLE_CLICK_ACTION:
                     itemVal = new PwsShortField(item.getType(),
                                                 item.getByteData());
                     break;
