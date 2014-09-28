@@ -96,6 +96,7 @@
     <string name="group">Group</string>
     <string name="group_header">GROUP</string>
     <string name="group_records">Group records</string>
+    <string name="help">Help</string>
     <string name="hidden_password_alias">***** (from alias, tap to show)</string>
     <string name="hidden_password_normal">***** (tap to show)</string>
     <string name="hidden_password_shortcut">***** (from shortcut, tap to show)</string>
@@ -241,6 +242,21 @@
     <string name="yes">Yes</string>
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
+    <string name="yubikey_help">
+        To use a YubiKey NEO, follow these steps:\n
+        - Enable NFC support in the device settings\n
+        - Enter the user password to the file\n
+        - Choose which slot on the YubiKey has the challenge-response key.
+        Usually slot 2 is used for Password Safe.\n
+        - Press the YubiKey button\n
+        - Within 30 seconds, press the YubiKey to the back of the phone or
+        tablet.  There will be sounds as the key is being read.  If the device
+        doesn\'t respond with a rising tone, try moving the key around.  A bit
+        of trial-and-error is needed to find the correct location.  The button
+        on the YubiKey itself does not need to be pressed.\n
+        - Once the key is found, it will be used to authenticate with your
+        password.  The file will open automatically.
+    </string>
 
     <string name="release_notes">
         &lt;b&gt;4.7.3&lt;/b&gt; - Maintain an open file when the app is 
