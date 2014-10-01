@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Checked -->
+    <item android:drawable="@drawable/boxandroidlibv2_btn_round_blue_press" android:state_checked="true"/>
+    <!-- UnChecked -->
+    <item android:drawable="@drawable/boxandroidlibv2_btn_round_blue" android:state_checked="false"/>
+
+</selector>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="common_rules">
+    <!-- called through target 'release'. Only executed if the keystore and
+         key alias are known but not their password. -->
+    <target name="-release-prompt-for-password" if="has.keystore" unless="has.password">
+        <!-- Gets passwords -->
+        <input
+                message="Please enter keystore password (store:${key.store}):"
+                addproperty="key.store.password">
+            <handler type="secure"/>
+        </input>
+        <input
+                message="Please enter password for alias '${key.alias}':"
+                addproperty="key.alias.password">
+            <handler type="secure"/>
+        </input>
+    </target>
+</project>
+
+
