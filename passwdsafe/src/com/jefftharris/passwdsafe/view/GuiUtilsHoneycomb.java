@@ -13,6 +13,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.IBinder;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
@@ -26,6 +27,7 @@ public final class GuiUtilsHoneycomb
 {
     private static Method itsInvalidateOptionsMenuMeth;
     private static Method itsSwitchLastIMMeth;
+    private static Method itsSetTextIsSelectableMeth;
 
     static {
         try {
@@ -34,8 +36,10 @@ public final class GuiUtilsHoneycomb
             itsSwitchLastIMMeth =
                 InputMethodManager.class.getMethod("switchToLastInputMethod",
                                                    IBinder.class);
+            itsSetTextIsSelectableMeth =
+                TextView.class.getMethod("setTextIsSelectable", boolean.class);
         } catch (NoSuchMethodException e) {
-            // No method
+            e.printStackTrace();
         }
     }
 
@@ -58,6 +62,16 @@ public final class GuiUtilsHoneycomb
     {
         try {
             itsSwitchLastIMMeth.invoke(mgr, token);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Set the text in a TextView as selectable */
+    public static void setTextSelectable(TextView tv)
+    {
+        try {
+            itsSetTextIsSelectableMeth.invoke(tv, true);
         } catch (Exception e) {
             e.printStackTrace();
         }

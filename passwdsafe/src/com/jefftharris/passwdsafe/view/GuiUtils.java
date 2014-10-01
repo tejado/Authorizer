@@ -269,6 +269,14 @@ public final class GuiUtils
     }
 
 
+    /** Set the text in a TextView as selectable */
+    public static void setTextSelectable(TextView tv)
+    {
+        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
+            GuiUtilsHoneycomb.setTextSelectable(tv);
+        }
+    }
+
     /** Ensure the selected item in a ListView is visible */
     public static void ensureListViewSelectionVisible(final ListView lv,
                                                       final int pos)
