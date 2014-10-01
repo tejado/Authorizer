@@ -193,6 +193,9 @@ public class RecordView extends AbstractRecordTabActivity
             return;
         }
 
+        TextView tv = (TextView)findViewById(R.id.notes);
+        GuiUtils.setTextSelectable(tv);
+
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         isWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
         itsIsMonospace = prefs.getBoolean(MONOSPACE_PREF, false);
