@@ -187,8 +187,13 @@ public class GDriveSyncer
         long largestChangeId = about.getLargestChangeId();
 
         HashMap<String, File> allRemFiles = new HashMap<String, File>();
+        StringBuilder query = new StringBuilder();
+        query.append("not trashed");
+        query.append(" and ( mimeType = 'application/octet-stream' or ");
+        query.append("       mimeType = 'application/psafe3' )");
+        query.append(" and fullText contains '.psafe3'");
         Files.List request = itsDrive.files().list()
-                .setQ("not trashed and fullText contains '.psafe3'")
+                .setQ(query.toString())
                 .setFields("nextPageToken,items("+GDriveProvider.FILE_FIELDS+")");
         do {
             FileList files = request.execute();
