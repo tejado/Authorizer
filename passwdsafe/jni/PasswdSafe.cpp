@@ -15,7 +15,7 @@
 #include <vector>
 #include <string>
 
-JNIEXPORT jbyteArray JNICALL Java_org_pwsafe_lib_crypto_SHA256Pws_digestN
+JNIEXPORT jbyteArray JNICALL Java_org_pwsafe_lib_crypto_SHA256Pws_digestNNative
 (
     JNIEnv* env,
     jclass,
