@@ -261,6 +261,9 @@
     </string>
 
     <string name="release_notes">
+        &lt;b&gt;5.1.0&lt;/b&gt; -  Ajout du support pour les appareils Samsung
+        multifenêtré. Permettre la sélection de texte des notes.
+        \n\n
         &lt;b&gt;5.0.0&lt;/b&gt; - Soutenir YubiKey NEO pour les appareils avec
         la technologie NFC
         \n\n
