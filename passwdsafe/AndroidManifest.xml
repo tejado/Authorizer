@@ -6,8 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.jefftharris.passwdsafe"
     android:installLocation="auto"
-    android:versionCode="50000"
-    android:versionName="5.0.0">
+    android:versionCode="50100"
+    android:versionName="5.1.0">
 
     <uses-sdk
         android:minSdkVersion="4"
