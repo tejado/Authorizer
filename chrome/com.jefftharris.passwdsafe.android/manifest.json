@@ -1,0 +1,77 @@
+{
+  "app": {
+    "background": {
+      "page": "app_main.html"
+    }
+  },
+  "arc_metadata": {
+    "apkList": [
+      "PasswdSafe.apk"
+    ],
+    "enableExternalDirectory": true,
+    "enableAdb": false,
+    "formFactor": "phone",
+    "name": "com.jefftharris.passwdsafe",
+    "orientation": "portrait",
+    "packageName": "com.jefftharris.passwdsafe",
+    "resize": "scale",
+    "useGoogleContactsSyncAdapter": false,
+    "usePlayServices": [
+      "gcm"
+    ]
+  },
+  "default_locale": "en",
+  "icons": {
+    "16": "icon.png",
+    "128": "icon.png"
+  },
+  "import": [
+    {
+      "id": "mfaihdlpglflfgpfjcifdjdjcckigekc"
+    }
+  ],
+  "manifest_version": 2,
+  "name": "__MSG_extName__",
+  "oauth2": {
+    "client_id": "133701689125-jj0hr4gb0ff4ulsbrn0uk2i4th946d4c.apps.googleusercontent.com",
+    "scopes": []
+  },
+  "offline_enabled": true,
+  "permissions": [
+    "gcm",
+    {
+      "socket": [
+        "tcp-connect",
+        "tcp-listen",
+        "udp-bind",
+        "udp-send-to",
+        "resolve-host"
+      ]
+    },
+    "unlimitedStorage",
+    "notifications",
+    "clipboardRead",
+    {
+      "fileSystem": [
+        "write", "directory"
+      ]
+    },
+    "https://clients2.google.com/",
+    "videoCapture",
+    "clipboardWrite",
+    "identity.email",
+    "alarms",
+    "storage",
+    "identity",
+    "audioCapture"
+  ],
+  "requirements": {
+    "3D": {
+      "features": [
+        "webgl"
+      ]
+    }
+  },
+  "update_url": "https://localhost",
+  "version": "5.1.0"
+}
