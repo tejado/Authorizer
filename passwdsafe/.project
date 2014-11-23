@@ -74,6 +74,11 @@
 			<locationURI>HG_PROJECT/build.xml</locationURI>
 		</link>
 		<link>
+			<name>top/chrome</name>
+			<type>2</type>
+			<locationURI>HG_PROJECT/chrome</locationURI>
+		</link>
+		<link>
 			<name>top/doc</name>
 			<type>2</type>
 			<locationURI>HG_PROJECT/doc</locationURI>
