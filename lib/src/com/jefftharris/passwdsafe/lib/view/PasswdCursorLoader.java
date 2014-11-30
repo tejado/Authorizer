@@ -36,6 +36,9 @@ public class PasswdCursorLoader extends CursorLoader
     @Override
     public Cursor loadInBackground()
     {
+        if (getUri() == null) {
+            return null;
+        }
         try {
             return super.loadInBackground();
         } catch (Exception e) {
