@@ -45,6 +45,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
+import com.jefftharris.passwdsafe.sync.gdriveplay.GDrivePlayMainActivity;
 import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
@@ -309,7 +310,11 @@ public class MainActivity extends FragmentActivity
 
     public void onGdrivePlayChoose(View view)
     {
-
+        Intent intent = new Intent();
+        intent.putExtra(GDrivePlayMainActivity.INTENT_PROVIDER_URI,
+                        itsGdrivePlayUri);
+        intent.setClass(this, GDrivePlayMainActivity.class);
+        startActivity(intent);
     }
 
     /** Button onClick handler to choose a Dropbox account */

@@ -137,11 +137,9 @@
     <string name="next">Nächtes</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
     <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
-    <string name="no_files">Keine Datei</string>
     <string name="no_policies">Keine Regel</string>
     <string name="no_records">Keine Einträge</string>
     <string name="no_records_open_file">Keine Einträge. Öffne eine Datei und versuche es erneut.</string>
-    <string name="none">Keine</string>
     <string name="none_paren">(Keine)</string>
     <string name="none_selected_open">Nichts zum Öffnen ausgewählt.</string>
     <string name="notes">Notizen</string>
@@ -225,7 +223,6 @@
     <string name="title">Titel</string>
     <string name="toggle_word_wrap">Zeilenumbruch ein/aus</string>
     <string name="toggle_monospace">Schriftart wechseln</string>
-    <string name="type">Typ</string>
     <string name="unknown_sync_file">Unbekannte Datei</string>
     <string name="unprotect_all">Alle Einträge freigeben</string>
     <string name="unprotect_group">Gruppe freigeben</string>

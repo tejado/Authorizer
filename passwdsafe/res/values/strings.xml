@@ -137,11 +137,9 @@
     <string name="next">Next</string>
     <string name="no_alias_chosen">No alias chosen</string>
     <string name="no_shortcut_chosen">No shortcut chosen</string>
-    <string name="no_files">No Files</string>
     <string name="no_policies">No Policies</string>
     <string name="no_records">No Records</string>
     <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
-    <string name="none">None</string>
     <string name="none_paren">(None)</string>
     <string name="none_selected_open">None selected.  Open PasswdSafe to choose.</string>
     <string name="notes">Notes</string>
@@ -225,7 +223,6 @@
     <string name="title">Title</string>
     <string name="toggle_word_wrap">Toggle Word Wrap</string>
     <string name="toggle_monospace">Toggle Monospace</string>
-    <string name="type">Type</string>
     <string name="unknown_sync_file">Unknown sync file</string>
     <string name="unprotect_all">Unprotect All Records</string>
     <string name="unprotect_group">Unprotect Group Records</string>
