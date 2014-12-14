@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/textView_navigationItem"
+    android:layout_width="fill_parent"
+    android:layout_height="50dp"
+    android:background="@drawable/boxandroidlibv2_navigation_selector"
+    android:drawableLeft="@drawable/boxandroidlibv2_ic_breadcrumb_arrow"
+    android:ellipsize="middle"
+    android:gravity="center_vertical"
+    android:paddingLeft="12dp"
+    android:singleLine="true"
+    android:textColor="#FF1A74B0"
+    android:textSize="20sp" />
