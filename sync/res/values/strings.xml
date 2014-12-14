@@ -20,6 +20,7 @@
     <string name="manual">Manual</string>
     <string name="network_connected">Network connected</string>
     <string name="network_not_connected">Network not connected</string>
+    <string name="no_account">No Account</string>
     <string name="no_logs">No logs</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="passwdsafe_synced_file">PasswdSafe Synced File</string>

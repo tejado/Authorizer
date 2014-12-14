@@ -37,6 +37,10 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name">
@@ -51,7 +55,16 @@
         </activity>
 
         <activity android:name=".SyncLogsActivity"/>
-
+        
+        <activity
+            android:name=".gdriveplay.GDrivePlayMainActivity"
+            android:label="@string/google_drive"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jefftharris.passwdsafe.sync.MainActivity"/>
+        </activity>
+        
         <!-- Handle Google Drive file open events from the Drive app -->
         <activity
             android:name=".GDriveLaunchActivity"

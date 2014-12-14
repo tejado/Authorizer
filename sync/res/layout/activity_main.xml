@@ -18,6 +18,58 @@
             android:layout_height="wrap_content">
             
             <ImageButton
+                android:id="@+id/gdrive_play_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onGdrivePlayClear"
+                android:padding="12dp"
+                android:src="@drawable/ic_action_delete"/>
+
+            <TextView
+                android:id="@+id/gdrive_play_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/gdrive_play_clear"
+                android:drawableLeft="@drawable/google_drive"
+                android:drawablePadding="6dp"
+                android:padding="6dp"
+                android:gravity="fill_vertical"
+                android:text="GDRIVE PLAY"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+    
+            <Button
+                android:id="@+id/gdrive_play_choose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_play_title"
+                android:onClick="onGdrivePlayChoose"
+                android:text="@string/choose_account"/>
+    
+            <TextView
+                android:id="@+id/gdrive_play_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_play_choose"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textIsSelectable="false"/>
+            
+        </RelativeLayout>
+        
+        <View
+            style="@style/Separator"
+            android:layout_margin="6dp"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <ImageButton
                 android:id="@+id/gdrive_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
