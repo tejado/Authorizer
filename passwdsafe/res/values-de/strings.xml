@@ -137,11 +137,9 @@
     <string name="next">Nächtes</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
     <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
-    <string name="no_files">Keine Datei</string>
     <string name="no_policies">Keine Regel</string>
     <string name="no_records">Keine Einträge</string>
     <string name="no_records_open_file">Keine Einträge. Öffne eine Datei und versuche es erneut.</string>
-    <string name="none">Keine</string>
     <string name="none_paren">(Keine)</string>
     <string name="none_selected_open">Nichts zum Öffnen ausgewählt.</string>
     <string name="notes">Notizen</string>
@@ -225,7 +223,6 @@
     <string name="title">Titel</string>
     <string name="toggle_word_wrap">Zeilenumbruch ein/aus</string>
     <string name="toggle_monospace">Schriftart wechseln</string>
-    <string name="type">Typ</string>
     <string name="unknown_sync_file">Unbekannte Datei</string>
     <string name="unprotect_all">Alle Einträge freigeben</string>
     <string name="unprotect_group">Gruppe freigeben</string>
@@ -244,24 +241,23 @@
     <string name="yubikey_disabled">YubiKey deaktiviert. Aktivieren NFC zu bedienen.</string>
     <string name="yubikey_error">Fehler bei der Kommunikation mit dem YubiKey</string>
     <string name="yubikey_help">
-        Um eine YubiKey NEO zu verwenden, gehen Sie folgendermaßen vor:\n
-        - Ermöglichen NFC-Unterstützung in den Geräteeinstellungen\n
-        - Benutzerpasswort eintragen zu der Datei\n
-        - Wählen Sie die Steckplatz auf der YubiKey das 
-        Challenge-Response-Schlüssel hat. Normalerweise Slot 2 ist für 
-        Password Safe verwendet.\n
-        - Drücken Sie die Taste YubiKey\n
-        - Innerhalb von 30 Sekunden drücken Sie die YubiKey auf der Rückseite 
-        des Telefon oder Tablet. Es wird sein, wie Klänge der Schlüssel gelesen 
-        wird.  Wenn das Gerät nicht mit einem ansteigenden Ton zu reagieren, 
-        versuchen Sie, den Taster ca. Ein bisschen von Versuch-und-Irrtum 
-        benötigt wird, um die richtige Position zu finden. Die Taste auf der
-        YubiKey selbst nicht gedrückt werden.\n
-        - Sobald der Schlüssel gefunden ist, wird es verwendet, um mit Ihrem 
-        Passwort authentifizieren. Die Datei wird automatisch geöffnet.  
+        Um einen YubiKey mit PasswdSafe zu benutzen, befolgen bitte Sie 
+        folgende Schritte:
+        - NFC-Unterstützung in den Einstellungen aktivieren
+        - Passwort für die Passwortdatei eingeben
+        - Schlüssel-Slot auf dem YubiKey auswählen (Dies ist meistens Slot 2)
+        - Die YubiKey-Taste einmal drücken
+        - Innerhalb von 30 Sekunden, den YubiKey an den Rücken dieses Geräts 
+        halten. Dies ist erfolgreich abgeschlossen, wenn Sie eine akustische 
+        Rückmeldung erhalten.
+        - Jetzt kann der YubiKey zum automatischen öffnen der Passwortdatei
+        benutzt werden.
     </string>
     
     <string name="release_notes">
+        &lt;b&gt;5.1.0&lt;/b&gt; -  Fügen Sie Multi-Window-Unterstützung für 
+        Samsung-Geräte. Auswahl von Noten Text aktivieren.
+        \n\n
         &lt;b&gt;5.0.0&lt;/b&gt; - YubiKey NEO unterstützt für Geräte mit NFC
         \n\n
         &lt;b&gt;4.7.3&lt;/b&gt; - Pflegen Sie eine offene Datei, wenn die App 
@@ -410,7 +406,7 @@
     </string-array>
     
     <string-array name="yubikey_slots">
-        <item>Rille 1</item>
-        <item>Rille 2</item>
+        <item>Slot 1</item>
+        <item>Slot 2</item>
     </string-array>
 </resources>

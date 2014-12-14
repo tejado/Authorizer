@@ -12,7 +12,7 @@ extern "C" {
  * Method:    doDigestN
  * Signature: ([BI)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_org_pwsafe_lib_crypto_SHA256Pws_digestN
+JNIEXPORT jbyteArray JNICALL Java_org_pwsafe_lib_crypto_SHA256Pws_digestNNative
   (JNIEnv *, jclass, jbyteArray, jint);
 
 #ifdef __cplusplus

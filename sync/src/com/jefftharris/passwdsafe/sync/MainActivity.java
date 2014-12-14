@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -44,6 +45,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
+import com.jefftharris.passwdsafe.sync.gdriveplay.GDrivePlayMainActivity;
 import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
@@ -61,11 +63,14 @@ public class MainActivity extends FragmentActivity
     private static final int LOADER_PROVIDERS = 0;
 
     private Account itsGdriveAccount = null;
+    private Uri itsGdrivePlayUri = null;
     private Uri itsGdriveUri = null;
     private Uri itsDropboxUri = null;
     private Uri itsBoxUri = null;
 
     private NewAccountTask itsNewAccountTask = null;
+
+    // TODO: open source attribution
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -129,6 +134,7 @@ public class MainActivity extends FragmentActivity
             dlg.show();
         }
 
+        updateGdrivePlayAccount(null);
         updateGdriveAccount(null);
         updateDropboxAccount(null);
         updateBoxAccount(null);
@@ -296,6 +302,21 @@ public class MainActivity extends FragmentActivity
         updateSyncFreq(freq, itsGdriveUri);
     }
 
+    public void onGdrivePlayClear(View view)
+    {
+        DialogFragment prompt = ClearPromptDlg.newInstance(itsGdrivePlayUri);
+        prompt.show(getSupportFragmentManager(), null);
+    }
+
+    public void onGdrivePlayChoose(View view)
+    {
+        Intent intent = new Intent();
+        intent.putExtra(GDrivePlayMainActivity.INTENT_PROVIDER_URI,
+                        itsGdrivePlayUri);
+        intent.setClass(this, GDrivePlayMainActivity.class);
+        startActivity(intent);
+    }
+
     /** Button onClick handler to choose a Dropbox account */
     public void onDropboxChoose(View view)
     {
@@ -383,6 +404,7 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
     {
+        boolean hasGdrivePlay = false;
         boolean hasGdrive = false;
         boolean hasDropbox = false;
         boolean hasBox = false;
@@ -393,6 +415,11 @@ public class MainActivity extends FragmentActivity
             try {
                 ProviderType type = ProviderType.valueOf(typeStr);
                 switch (type) {
+                case GDRIVE_PLAY: {
+                    hasGdrivePlay = true;
+                    updateGdrivePlayAccount(cursor);
+                    break;
+                }
                 case GDRIVE: {
                     hasGdrive = true;
                     updateGdriveAccount(cursor);
@@ -413,6 +440,9 @@ public class MainActivity extends FragmentActivity
                 Log.e(TAG, "Unknown type: " + typeStr);
             }
         }
+        if (!hasGdrivePlay) {
+            updateGdrivePlayAccount(null);
+        }
         if (!hasGdrive) {
             updateGdriveAccount(null);
         }
@@ -430,6 +460,7 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onLoaderReset(Loader<Cursor> loader)
     {
+        updateGdrivePlayAccount(null);
         updateGdriveAccount(null);
         updateDropboxAccount(null);
         updateBoxAccount(null);
@@ -461,6 +492,35 @@ public class MainActivity extends FragmentActivity
         }
     }
 
+    /** Update the UI when the GDrive play account is changed */
+    private final void updateGdrivePlayAccount(Cursor cursor)
+    {
+        Button chooseBtn = (Button)findViewById(R.id.gdrive_play_choose);
+        TextView acctView = (TextView)findViewById(R.id.gdrive_play_acct);
+        // TODO controls?
+        View clearBtn = findViewById(R.id.gdrive_play_clear);
+        if (cursor != null) {
+            long id = cursor.getLong(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_ID);
+            String acct = cursor.getString(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+            itsGdrivePlayUri = ContentUris.withAppendedId(
+                    PasswdSafeContract.Providers.CONTENT_URI, id);
+
+            acctView.setText(acct);
+            acctView.setVisibility(View.VISIBLE);
+
+            // TODO string
+            chooseBtn.setText("Choose files");
+            clearBtn.setVisibility(View.VISIBLE);
+        } else {
+            itsGdrivePlayUri = null;
+            chooseBtn.setText(R.string.choose_account);
+            acctView.setVisibility(View.GONE);
+            clearBtn.setVisibility(View.GONE);
+        }
+    }
+
     /** Update the UI when the GDrive account is changed */
     private final void updateGdriveAccount(Cursor cursor)
     {
@@ -471,8 +531,7 @@ public class MainActivity extends FragmentActivity
         if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
-            String acct = cursor.getString(
-                    PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+            String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
             int freqVal = cursor.getInt(
                     PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
             ProviderSyncFreqPref freq =
