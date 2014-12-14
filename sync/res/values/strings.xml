@@ -37,6 +37,8 @@
     <string name="updating_account">Updating account&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;1.6.2&lt;/b&gt; - Update Dropbox sync library
+        \n\n
         &lt;b&gt;1.6.1&lt;/b&gt; - Improve Google Drive query performance
         when performing a full sync. Update Dropbox library.
         \n\n 
