@@ -22,9 +22,9 @@ import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.DialogValidator;
-import com.jefftharris.passwdsafe.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 
 import android.app.Activity;
@@ -940,7 +940,7 @@ public class RecordView extends AbstractRecordTabActivity
             historyEnabled = history.isEnabled();
             historyMaxSize = Integer.toString(history.getMaxSize());
             histView.setAdapter(
-                GuiUtils.createPasswdHistoryAdapter(history, this, true));
+                PasswdHistory.createAdapter(history, this, true));
         } else {
             historyMaxSize = getString(R.string.n_a);
             histView.setAdapter(null);

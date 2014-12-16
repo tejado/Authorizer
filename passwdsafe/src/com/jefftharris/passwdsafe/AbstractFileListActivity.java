@@ -18,7 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 
-import com.jefftharris.passwdsafe.view.GuiUtils;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 public abstract class AbstractFileListActivity extends FragmentActivity
         implements FileListFragment.Listener,

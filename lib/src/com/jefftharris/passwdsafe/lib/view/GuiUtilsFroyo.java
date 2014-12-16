@@ -5,8 +5,10 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.view;
+package com.jefftharris.passwdsafe.lib.view;
 
+
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 import android.annotation.TargetApi;
 import android.app.Dialog;

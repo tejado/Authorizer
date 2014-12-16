@@ -42,8 +42,8 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.FileComparator;
-import com.jefftharris.passwdsafe.view.GuiUtils;
 
 /**
  * The FileListFragment allows the user to choose which file to open
