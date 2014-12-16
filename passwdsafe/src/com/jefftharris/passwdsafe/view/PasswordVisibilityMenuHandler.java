@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe.view;
 
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 import android.content.Context;
 import android.text.ClipboardManager;

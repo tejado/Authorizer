@@ -27,10 +27,10 @@ import com.jefftharris.passwdsafe.file.PasswdRecord.Type;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.view.DialogValidator;
-import com.jefftharris.passwdsafe.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
@@ -1158,8 +1158,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             ListAdapter histAdapter =
-                GuiUtils.createPasswdHistoryAdapter(itsHistory, this,
-                                                    historyEnabled);
+                PasswdHistory.createAdapter(itsHistory, this, historyEnabled);
             histView.setAdapter(histAdapter);
             GuiUtils.setListViewHeightBasedOnChildren(histView);
             histView.setEnabled(historyEnabled);

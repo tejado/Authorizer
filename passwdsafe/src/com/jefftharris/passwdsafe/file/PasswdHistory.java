@@ -10,8 +10,15 @@ package com.jefftharris.passwdsafe.file;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import android.content.Context;
+import android.widget.ListAdapter;
+
+import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils.EnableAdapter;
 
 public class PasswdHistory
 {
@@ -53,6 +60,9 @@ public class PasswdHistory
 
     public static final int MAX_SIZE_MIN = 0;
     public static final int MAX_SIZE_MAX = 255;
+
+    private static final String PASSWD = "passwd";
+    private static final String DATE = "date";
 
     private boolean itsIsEnabled;
     private int itsMaxSize;
@@ -214,5 +224,30 @@ public class PasswdHistory
                 return true;
             }
         }
+    }
+
+
+    public static ListAdapter createAdapter(PasswdHistory history,
+                                            Context context,
+                                            boolean enabled)
+    {
+        ArrayList<HashMap<String, Object>> histData =
+            new ArrayList<HashMap<String, Object>>();
+        for (PasswdHistory.Entry entry : history.getPasswds()) {
+            HashMap<String, Object> entryData =
+                new HashMap<String, Object>();
+            entryData.put(PASSWD, entry.getPasswd());
+            entryData.put(DATE, Utils.formatDate(entry.getDate(), context));
+            histData.add(entryData);
+        }
+
+        ListAdapter adapter =
+            new EnableAdapter(context, histData,
+                              android.R.layout.simple_list_item_2,
+                              new String[] { PASSWD, DATE },
+                              new int[] { android.R.id.text1,
+                                          android.R.id.text2 },
+                              enabled);
+        return adapter;
     }
 }

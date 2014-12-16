@@ -5,17 +5,10 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.view;
+package com.jefftharris.passwdsafe.lib.view;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.jefftharris.passwdsafe.R;
-import com.jefftharris.passwdsafe.file.PasswdHistory;
-import com.jefftharris.passwdsafe.lib.ApiCompat;
-import com.jefftharris.passwdsafe.lib.Utils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,15 +34,15 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.R;
+
 /**
  * @author jharris
  *
  */
 public final class GuiUtils
 {
-    private static final String PASSWD = "passwd";
-    private static final String DATE = "date";
-
     public static final int INPUT_TEXT_PASSWORD =
         InputType.TYPE_CLASS_TEXT |
         InputType.TYPE_TEXT_VARIATION_PASSWORD;
@@ -138,31 +131,6 @@ public final class GuiUtils
         params.height = totalHeight +
             (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
-    }
-
-
-    public static ListAdapter createPasswdHistoryAdapter(PasswdHistory history,
-                                                         Context context,
-                                                         boolean enabled)
-    {
-        ArrayList<HashMap<String, Object>> histData =
-            new ArrayList<HashMap<String, Object>>();
-        for (PasswdHistory.Entry entry : history.getPasswds()) {
-            HashMap<String, Object> entryData =
-                new HashMap<String, Object>();
-            entryData.put(PASSWD, entry.getPasswd());
-            entryData.put(DATE, Utils.formatDate(entry.getDate(), context));
-            histData.add(entryData);
-        }
-
-        ListAdapter adapter =
-            new EnableAdapter(context, histData,
-                              android.R.layout.simple_list_item_2,
-                              new String[] { PASSWD, DATE },
-                              new int[] { android.R.id.text1,
-                                          android.R.id.text2 },
-                              enabled);
-        return adapter;
     }
 
 
