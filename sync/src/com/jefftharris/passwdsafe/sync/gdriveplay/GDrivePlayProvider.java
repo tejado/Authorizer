@@ -14,7 +14,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Pair;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
@@ -30,7 +36,7 @@ public class GDrivePlayProvider implements Provider
     private static final String TAG = "GDrivePlayProvider";
 
     private final Context itsContext;
-
+    private AccountLinker itsAcctLinker;
 
     /** Constructor */
     public GDrivePlayProvider(Context ctx)
@@ -61,6 +67,11 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void startAccountLink(Activity activity, int requestCode)
     {
+        if (itsAcctLinker != null) {
+            itsAcctLinker.disconnect();
+        }
+
+        itsAcctLinker = new AccountLinker(activity, requestCode);
     }
 
     /* (non-Javadoc)
@@ -71,7 +82,16 @@ public class GDrivePlayProvider implements Provider
                                             Intent activityData,
                                             Uri providerAcctUri)
     {
-        return null;
+        if (itsAcctLinker == null) {
+            return null;
+        }
+        Pair<Boolean, NewAccountTask> rc = itsAcctLinker.handleActivityResult(
+                activityResult, activityData, providerAcctUri);
+        if (rc.first) {
+            itsAcctLinker.disconnect();
+            itsAcctLinker = null;
+        }
+        return rc.second;
     }
 
     /* (non-Javadoc)
@@ -97,7 +117,7 @@ public class GDrivePlayProvider implements Provider
     @Override
     public Account getAccount(String acctName)
     {
-        return null;
+        return new Account(acctName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
     }
 
     /* (non-Javadoc)
@@ -114,6 +134,20 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void cleanupOnDelete(String acctName)
     {
+        // TODO: cleanup unlinkAccount vs. cleanupOnDelete
+        String scope = "oauth2:" + Scopes.DRIVE_FILE;
+        try {
+            String token = GoogleAuthUtil.getToken(
+                    itsContext, acctName, scope);
+            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s, scope: %s",
+                                   acctName, scope);
+            if (token != null) {
+                GoogleAuthUtil.clearToken(itsContext, token);
+            }
+        } catch (Exception e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s, scope: %s",
+                                   acctName, scope);
+        }
     }
 
     /* (non-Javadoc)
@@ -185,4 +219,20 @@ public class GDrivePlayProvider implements Provider
 
     }
 
+    /** Create a GDrive API client */
+    public static GoogleApiClient createClient(
+            Context ctx,
+            String acctName,
+            GoogleApiClient.ConnectionCallbacks connCbs,
+            GoogleApiClient.OnConnectionFailedListener connFailedListener)
+    {
+        GoogleApiClient.Builder builder =
+                new GoogleApiClient.Builder(ctx)
+                .addApi(Drive.API)
+                .addScope(Drive.SCOPE_FILE)
+                .setAccountName(acctName)
+                .addConnectionCallbacks(connCbs)
+                .addOnConnectionFailedListener(connFailedListener);
+        return builder.build();
+    }
 }

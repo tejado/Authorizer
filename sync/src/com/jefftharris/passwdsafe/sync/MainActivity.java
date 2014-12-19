@@ -59,11 +59,14 @@ public class MainActivity extends FragmentActivity
     private static final int CHOOSE_ACCOUNT_RC = 0;
     private static final int DROPBOX_LINK_RC = 1;
     private static final int BOX_AUTH_RC = 2;
+    private static final int GDRIVE_PLAY_LINK_RC = 3;
 
     private static final int LOADER_PROVIDERS = 0;
 
     private Account itsGdriveAccount = null;
     private Uri itsGdrivePlayUri = null;
+    private String itsGdrivePlayAcct = null;
+    private String itsGdrivePlayDisplay = null;
     private Uri itsGdriveUri = null;
     private Uri itsDropboxUri = null;
     private Uri itsBoxUri = null;
@@ -193,7 +196,7 @@ public class MainActivity extends FragmentActivity
         switch (requestCode) {
         case CHOOSE_ACCOUNT_RC:
             itsNewAccountTask =
-                    getGDriveProvider().finishAccountLink(resultCode, data,
+                    getGdriveProvider().finishAccountLink(resultCode, data,
                                                           itsGdriveUri);
             break;
         case DROPBOX_LINK_RC: {
@@ -206,6 +209,11 @@ public class MainActivity extends FragmentActivity
             itsNewAccountTask =
                     getBoxProvider().finishAccountLink(resultCode, data,
                                                        itsBoxUri);
+            break;
+        }
+        case GDRIVE_PLAY_LINK_RC: {
+            itsNewAccountTask = getGdrivePlayProvider().finishAccountLink(
+                    resultCode, data, itsGdrivePlayUri);
             break;
         }
         default: {
@@ -310,11 +318,25 @@ public class MainActivity extends FragmentActivity
 
     public void onGdrivePlayChoose(View view)
     {
-        Intent intent = new Intent();
-        intent.putExtra(GDrivePlayMainActivity.INTENT_PROVIDER_URI,
-                        itsGdrivePlayUri);
-        intent.setClass(this, GDrivePlayMainActivity.class);
-        startActivity(intent);
+        if (itsGdrivePlayUri == null) {
+            Provider gdriveProvider = getGdrivePlayProvider();
+            try {
+                gdriveProvider.startAccountLink(this, GDRIVE_PLAY_LINK_RC);
+            } catch (Exception e) {
+                Log.e(TAG, "onGdrivePlayChoose failed", e);
+                gdriveProvider.unlinkAccount();
+            }
+        } else {
+            Intent intent = new Intent();
+            intent.putExtra(GDrivePlayMainActivity.INTENT_PROVIDER_URI,
+                            itsGdrivePlayUri);
+            intent.putExtra(GDrivePlayMainActivity.INTENT_PROVIDER_ACCT,
+                            itsGdrivePlayAcct);
+            intent.putExtra(GDrivePlayMainActivity.INTENT_PROVIDER_DISPLAY,
+                            itsGdrivePlayDisplay);
+            intent.setClass(this, GDrivePlayMainActivity.class);
+            startActivity(intent);
+        }
     }
 
     /** Button onClick handler to choose a Dropbox account */
@@ -502,12 +524,14 @@ public class MainActivity extends FragmentActivity
         if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
-            String acct = cursor.getString(
+            itsGdrivePlayAcct = cursor.getString(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
+            itsGdrivePlayDisplay =
+                    PasswdSafeContract.Providers.getDisplayName(cursor);
             itsGdrivePlayUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
 
-            acctView.setText(acct);
+            acctView.setText(itsGdrivePlayDisplay);
             acctView.setVisibility(View.VISIBLE);
 
             // TODO string
@@ -515,6 +539,8 @@ public class MainActivity extends FragmentActivity
             clearBtn.setVisibility(View.VISIBLE);
         } else {
             itsGdrivePlayUri = null;
+            itsGdrivePlayAcct = null;
+            itsGdrivePlayDisplay = null;
             chooseBtn.setText(R.string.choose_account);
             acctView.setVisibility(View.GONE);
             clearBtn.setVisibility(View.GONE);
@@ -687,8 +713,14 @@ public class MainActivity extends FragmentActivity
         }.startTask(this);
     }
 
+    /** Get the Google Drive Play provider */
+    private Provider getGdrivePlayProvider()
+    {
+        return ProviderFactory.getProvider(ProviderType.GDRIVE_PLAY, this);
+    }
+
     /** Get the Google Drive provider */
-    private Provider getGDriveProvider()
+    private Provider getGdriveProvider()
     {
         return ProviderFactory.getProvider(ProviderType.GDRIVE, this);
     }

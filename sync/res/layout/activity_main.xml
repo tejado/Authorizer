@@ -40,25 +40,25 @@
                 android:text="GDRIVE PLAY"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
     
-            <Button
-                android:id="@+id/gdrive_play_choose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/gdrive_play_title"
-                android:onClick="onGdrivePlayChoose"
-                android:text="@string/choose_account"/>
-    
             <TextView
                 android:id="@+id/gdrive_play_acct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/gdrive_play_choose"
+                android:layout_below="@id/gdrive_play_title"
                 android:padding="6dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textIsSelectable="false"/>
             
+            <Button
+                android:id="@+id/gdrive_play_choose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_play_acct"
+                android:onClick="onGdrivePlayChoose"
+                android:text="@string/choose_account"/>
+    
         </RelativeLayout>
         
         <View

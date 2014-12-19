@@ -8,19 +8,27 @@
 package com.jefftharris.passwdsafe.sync.gdriveplay;
 
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.IntentSender.SendIntentException;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveId;
+import com.google.android.gms.drive.OpenFileActivityBuilder;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.sync.R;
 
 /**
@@ -32,12 +40,16 @@ public class GDrivePlayMainActivity extends FragmentActivity
     GoogleApiClient.OnConnectionFailedListener
 {
     public static final String INTENT_PROVIDER_URI = "provider_uri";
+    public static final String INTENT_PROVIDER_ACCT = "provider_acct";
+    public static final String INTENT_PROVIDER_DISPLAY = "provider_display";
 
     private static final String TAG = "GDrivePlayMainActivity";
-    private static final int REQUEST_CODE_RESOLUTION = 1;
+    private static final int GDRIVE_RESOLUTION_RC = 1;
+    private static final int OPEN_RC = 2;
 
-    GoogleApiClient itsClient;
-    boolean itsIsUserCanceled = false;
+    private String itsAcctId;
+    private String itsDisplay;
+    private GoogleApiClient itsClient;
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
@@ -48,12 +60,25 @@ public class GDrivePlayMainActivity extends FragmentActivity
         super.onCreate(args);
         setContentView(R.layout.activity_gdrive_play_main);
 
+        Uri uri = getIntent().getParcelableExtra(INTENT_PROVIDER_URI);
+        itsAcctId = getIntent().getStringExtra(INTENT_PROVIDER_ACCT);
+        itsDisplay = getIntent().getStringExtra(INTENT_PROVIDER_DISPLAY);
+        if ((uri == null) || (itsAcctId == null) || (itsDisplay == null)) {
+            Log.e(TAG, "Required args missing");
+            finish();
+            return;
+        }
         if (args == null) {
-            Uri uri = getIntent().getParcelableExtra(INTENT_PROVIDER_URI);
+            /*
             Fragment files = FilesFragment.newInstance(uri);
             FragmentManager mgr = getSupportFragmentManager();
             mgr.beginTransaction().add(R.id.content, files).commit();
+            */
         }
+
+        itsClient = GDrivePlayProvider.createClient(this, itsAcctId,
+                                                    this, this);
+        updateConnected();
     }
 
     /* (non-Javadoc)
@@ -63,7 +88,6 @@ public class GDrivePlayMainActivity extends FragmentActivity
     protected void onStart()
     {
         super.onStart();
-        itsIsUserCanceled = false;
     }
 
     /* (non-Javadoc)
@@ -73,15 +97,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
     protected void onResume()
     {
         super.onResume();
-        if (itsClient == null) {
-            itsClient = new GoogleApiClient.Builder(this)
-                .addApi(Drive.API)
-                .addScope(Drive.SCOPE_FILE)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-        }
-        if (!itsIsUserCanceled) {
+        if (itsClient != null) {
             itsClient.connect();
         }
     }
@@ -95,19 +111,22 @@ public class GDrivePlayMainActivity extends FragmentActivity
                                     Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        PasswdSafeUtil.dbginfo(TAG, "onActivityResult req %d res %d",
-                               requestCode, resultCode);
+        PasswdSafeUtil.dbginfo(TAG, "onActivityResult req %d res %d data %s",
+                               requestCode, resultCode, data);
         switch (requestCode) {
-        case REQUEST_CODE_RESOLUTION: {
-            switch (resultCode) {
-            case RESULT_OK: {
+        case GDRIVE_RESOLUTION_RC: {
+            if (resultCode == RESULT_OK) {
                 itsClient.connect();
-                break;
+            } else {
+                finish();
             }
-            default: {
-                itsIsUserCanceled = true;
-                break;
-            }
+            break;
+        }
+        case OPEN_RC: {
+            if (resultCode == RESULT_OK) {
+                DriveId driveId = (DriveId) data.getParcelableExtra(
+                        OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
+                PasswdSafeUtil.dbginfo(TAG, "open file id: %s", driveId);
             }
         }
         }
@@ -126,6 +145,69 @@ public class GDrivePlayMainActivity extends FragmentActivity
     }
 
     /* (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.activity_gdrive_play_main, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_sync);
+        MenuItemCompat.setShowAsAction(item,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem item = menu.findItem(R.id.menu_sync);
+        item.setEnabled(itsClient.isConnected());
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_sync: {
+            PasswdSafeUtil.dbginfo(TAG, "onOptionsItemSelected start sync");
+            PendingResult<Status> rc = Drive.DriveApi.requestSync(itsClient);
+            rc.setResultCallback(new ResultCallback<Status>()
+                    {
+                        @Override
+                        public void onResult(Status status)
+                        {
+                            PasswdSafeUtil.dbginfo(TAG, "sync done: %s",
+                                                   status);
+                        }
+                    });
+
+            // TODO: temp
+            IntentSender sender =
+                    Drive.DriveApi.newOpenFileActivityBuilder()
+                    .build(itsClient);
+            try {
+                startIntentSenderForResult(sender, OPEN_RC, null, 0, 0, 0);
+            } catch (SendIntentException e) {
+                PasswdSafeUtil.showFatalMsg(e, this);
+            }
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
+
+    /* (non-Javadoc)
      * @see com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener#onConnectionFailed(com.google.android.gms.common.ConnectionResult)
      */
     @Override
@@ -138,7 +220,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
             return;
         }
         try {
-            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+            result.startResolutionForResult(this, GDRIVE_RESOLUTION_RC);
         } catch (SendIntentException e) {
             Log.e(TAG, "Error starting resolution", e);
         }
@@ -151,6 +233,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
     public void onConnected(Bundle hint)
     {
         PasswdSafeUtil.dbginfo(TAG, "onConnected %s", hint);
+        updateConnected();
     }
 
     /* (non-Javadoc)
@@ -160,5 +243,12 @@ public class GDrivePlayMainActivity extends FragmentActivity
     public void onConnectionSuspended(int cause)
     {
         PasswdSafeUtil.dbginfo(TAG, "onConnectionSuspended %d", cause);
+        updateConnected();
+    }
+
+    /** Update the connected state of the GDrive client */
+    private void updateConnected()
+    {
+        GuiUtils.invalidateOptionsMenu(this);
     }
 }
