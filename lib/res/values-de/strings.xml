@@ -9,6 +9,7 @@
     <string name="dropbox">Dropbox</string>
     <string name="error">Fehler</string>
     <string name="google_drive">Google Drive</string>
+    <string name="new_drive_file">Neue Drive-Datei</string>
     <string name="no_files">Keine Datei</string>
     <string name="none">Keine</string>
     <string name="open">Öffnen</string>

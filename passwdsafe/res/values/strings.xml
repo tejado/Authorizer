@@ -127,7 +127,6 @@
     <string name="new_box_file">New Box File</string>
     <string name="new_entry">New Entry</string>
     <string name="new_file">New File</string>
-    <string name="new_drive_file">New Drive File</string>
     <string name="new_dropbox_file">New Dropbox File</string>
     <string name="new_file_not_supp_uri">New file not supported for URI %1$s</string>
     <string name="new_group_menu">New group…</string>
