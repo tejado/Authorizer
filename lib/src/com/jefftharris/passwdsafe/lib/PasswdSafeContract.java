@@ -28,7 +28,7 @@ public final class PasswdSafeContract
         Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + AUTHORITY);
 
     public static final UriMatcher MATCHER;
-    public  static final int MATCH_PROVIDERS = 1;
+    public static final int MATCH_PROVIDERS = 1;
     public static final int MATCH_PROVIDER = 2;
     public static final int MATCH_PROVIDER_FILES = 3;
     public static final int MATCH_PROVIDER_FILE = 4;
@@ -104,6 +104,18 @@ public final class PasswdSafeContract
             }
             return displayName;
         }
+
+        /** Get the provider id from the URI */
+        public static final long getId(Uri uri)
+        {
+            return Long.valueOf(getIdStr(uri));
+        }
+
+        /** Get the provider id string from the URI */
+        public static final String getIdStr(Uri uri)
+        {
+            return uri.getPathSegments().get(1);
+        }
     }
 
     /** The table of files */
@@ -141,6 +153,18 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_MOD_DATE = 3;
         public static final int PROJECTION_IDX_FILE = 4;
         public static final int PROJECTION_IDX_FOLDER = 5;
+
+        /** Get the file id from the URI */
+        public static final long getId(Uri uri)
+        {
+            return Long.valueOf(getIdStr(uri));
+        }
+
+        /** Get the file id string from the URI */
+        public static final String getIdStr(Uri uri)
+        {
+            return uri.getPathSegments().get(3);
+        }
     }
 
     /** The table of sync logs */
