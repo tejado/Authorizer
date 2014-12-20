@@ -7,13 +7,26 @@
  */
 package com.jefftharris.passwdsafe.sync.gdriveplay;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.IntentSender.SendIntentException;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,11 +38,19 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
+import com.google.android.gms.drive.DriveResource;
+import com.google.android.gms.drive.Metadata;
+import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.sync.R;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 
 /**
  *  Activity for accessing Google Drive
@@ -45,11 +66,13 @@ public class GDrivePlayMainActivity extends FragmentActivity
 
     private static final String TAG = "GDrivePlayMainActivity";
     private static final int GDRIVE_RESOLUTION_RC = 1;
-    private static final int OPEN_RC = 2;
+    private static final int ADD_FILE_RC = 2;
 
+    private Uri itsProviderUri;
     private String itsAcctId;
     private String itsDisplay;
     private GoogleApiClient itsClient;
+    private List<DriveId> itsAddFiles = new ArrayList<DriveId>();
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
@@ -60,25 +83,26 @@ public class GDrivePlayMainActivity extends FragmentActivity
         super.onCreate(args);
         setContentView(R.layout.activity_gdrive_play_main);
 
-        Uri uri = getIntent().getParcelableExtra(INTENT_PROVIDER_URI);
+        itsProviderUri = getIntent().getParcelableExtra(INTENT_PROVIDER_URI);
         itsAcctId = getIntent().getStringExtra(INTENT_PROVIDER_ACCT);
         itsDisplay = getIntent().getStringExtra(INTENT_PROVIDER_DISPLAY);
-        if ((uri == null) || (itsAcctId == null) || (itsDisplay == null)) {
+        if ((itsProviderUri == null) || (itsAcctId == null) ||
+                (itsDisplay == null)) {
             Log.e(TAG, "Required args missing");
             finish();
             return;
         }
-        if (args == null) {
-            /*
-            Fragment files = FilesFragment.newInstance(uri);
-            FragmentManager mgr = getSupportFragmentManager();
-            mgr.beginTransaction().add(R.id.content, files).commit();
-            */
-        }
 
         itsClient = GDrivePlayProvider.createClient(this, itsAcctId,
                                                     this, this);
-        updateConnected();
+
+        if (args == null) {
+            Fragment files = FilesFragment.newInstance(itsProviderUri);
+            FragmentManager mgr = getSupportFragmentManager();
+            mgr.beginTransaction().add(R.id.content, files).commit();
+        }
+
+        updateConnected(false);
     }
 
     /* (non-Javadoc)
@@ -122,12 +146,14 @@ public class GDrivePlayMainActivity extends FragmentActivity
             }
             break;
         }
-        case OPEN_RC: {
-            if (resultCode == RESULT_OK) {
-                DriveId driveId = (DriveId) data.getParcelableExtra(
-                        OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
-                PasswdSafeUtil.dbginfo(TAG, "open file id: %s", driveId);
+        case ADD_FILE_RC: {
+            if (resultCode != RESULT_OK) {
+                break;
             }
+            DriveId driveId = (DriveId) data.getParcelableExtra(
+                    OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
+            PasswdSafeUtil.dbginfo(TAG, "open file id: %s", driveId);
+            itsAddFiles.add(driveId);
         }
         }
     }
@@ -185,20 +211,11 @@ public class GDrivePlayMainActivity extends FragmentActivity
                         @Override
                         public void onResult(Status status)
                         {
+                            // TODO: user notification?
                             PasswdSafeUtil.dbginfo(TAG, "sync done: %s",
                                                    status);
                         }
                     });
-
-            // TODO: temp
-            IntentSender sender =
-                    Drive.DriveApi.newOpenFileActivityBuilder()
-                    .build(itsClient);
-            try {
-                startIntentSenderForResult(sender, OPEN_RC, null, 0, 0, 0);
-            } catch (SendIntentException e) {
-                PasswdSafeUtil.showFatalMsg(e, this);
-            }
             return true;
         }
         default: {
@@ -233,7 +250,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
     public void onConnected(Bundle hint)
     {
         PasswdSafeUtil.dbginfo(TAG, "onConnected %s", hint);
-        updateConnected();
+        updateConnected(true);
     }
 
     /* (non-Javadoc)
@@ -243,12 +260,181 @@ public class GDrivePlayMainActivity extends FragmentActivity
     public void onConnectionSuspended(int cause)
     {
         PasswdSafeUtil.dbginfo(TAG, "onConnectionSuspended %d", cause);
-        updateConnected();
+        updateConnected(false);
+    }
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.gdriveplay.FilesFragment.Listener#addFile()
+     */
+    public void addFile()
+    {
+        IntentSender sender = Drive.DriveApi.newOpenFileActivityBuilder()
+                .setMimeType(new String[] { "application/octet-stream",
+                                            "application/psafe3" })
+                .build(itsClient);
+        try {
+            startIntentSenderForResult(sender, ADD_FILE_RC, null, 0, 0, 0);
+        } catch (SendIntentException e) {
+            PasswdSafeUtil.showFatalMsg(e, this);
+        }
     }
 
     /** Update the connected state of the GDrive client */
-    private void updateConnected()
+    private void updateConnected(boolean connected)
     {
         GuiUtils.invalidateOptionsMenu(this);
+
+        if (connected) {
+            if (!itsAddFiles.isEmpty()) {
+                /* Start task to add any pending new sync files */
+                new AddFileTask(itsProviderUri, itsClient, this).execute(
+                        itsAddFiles.toArray(new DriveId[itsAddFiles.size()]));
+                itsAddFiles.clear();
+            }
+        }
+    }
+
+    /** Background task to add new sync files to the provider */
+    private static class AddFileTask extends AsyncTask<DriveId, Void, Object>
+    {
+        private final Uri itsProviderUri;
+        private final GoogleApiClient itsClient;
+        private final Activity itsActivity;
+
+        public AddFileTask(Uri providerUri,
+                           GoogleApiClient client,
+                           Activity act)
+        {
+            itsProviderUri = providerUri;
+            itsClient = client;
+            itsActivity = act;
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+         */
+        @Override
+        protected Object doInBackground(DriveId... params)
+        {
+            SyncDb syncDb = SyncDb.acquire();
+            try {
+                SQLiteDatabase db = syncDb.beginTransaction();
+                for (DriveId id: params) {
+                    DriveFile file = Drive.DriveApi.getFile(itsClient, id);
+                    Metadata meta = getFileMeta(file);
+                    String title = meta.getTitle();
+                    Date modTime = meta.getModifiedDate();
+                    String folders = computeFolders(file);
+
+                    PasswdSafeUtil.dbginfo(TAG,
+                                           "Add file %s, mod %s, folder %s",
+                                           title, modTime, folders);
+
+                    // TODO check for duplicates
+
+                    long providerId =
+                            PasswdSafeContract.Providers.getId(itsProviderUri);
+                    long fileId = SyncDb.addRemoteFile(
+                            providerId, id.encodeToString(), title, folders,
+                            modTime.getTime(), db);
+                    SyncDb.updateLocalFile(fileId, null, title, folders,
+                            modTime.getTime(), db);
+                }
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                Log.e(TAG, "Error adding file", e);
+                return e;
+            } finally {
+                syncDb.endTransactionAndRelease();
+            }
+
+            itsActivity.getContentResolver().notifyChange(itsProviderUri,
+                                                          null, false);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object rc)
+        {
+            if (rc instanceof Exception) {
+                PasswdSafeUtil.showFatalMsg((Exception)rc, itsActivity);
+            }
+        }
+
+        /** Compute the folder names for the file */
+        private String computeFolders(DriveFile file) throws IOException
+        {
+            // TODO: will folders work given app scope?
+            ArrayList<String> folders = new ArrayList<String>();
+
+            for (DriveId parent: getParents(file)) {
+                traceParentRefs(parent, "", folders);
+            }
+
+            Collections.sort(folders);
+            return TextUtils.join(", ", folders);
+        }
+
+        /** Get the parent folder IDs for the file */
+        private List<DriveId> getParents(DriveResource file)
+            throws IOException
+        {
+            ArrayList<DriveId> parents = new ArrayList<DriveId>();
+
+            PendingResult<DriveApi.MetadataBufferResult> metaPend =
+                    file.listParents(itsClient);
+            DriveApi.MetadataBufferResult metaRc =
+                    metaPend.await(10, TimeUnit.SECONDS);
+            if (!metaRc.getStatus().isSuccess()) {
+                throw new IOException("Error retrieving parents: " +
+                                      metaRc.getStatus().getStatusMessage());
+            }
+            MetadataBuffer metaBuffer = metaRc.getMetadataBuffer();
+            try {
+                for (Metadata meta: metaBuffer) {
+                    if (meta.isFolder()) {
+                        parents.add(meta.getDriveId());
+                    }
+                }
+            } finally {
+                metaBuffer.release();
+            }
+            return parents;
+        }
+
+        /** Recursively trace the parent references for their paths */
+        private void traceParentRefs(DriveId parentId,
+                                     String suffix,
+                                     ArrayList<String> folders)
+            throws IOException
+        {
+            DriveFolder parent = Drive.DriveApi.getFolder(itsClient, parentId);
+            Metadata meta = getFileMeta(parent);
+            List<DriveId> grandparents = getParents(parent);
+            if (grandparents.isEmpty()) {
+                suffix = meta.getTitle() + suffix;
+                folders.add(suffix);
+            } else {
+                suffix = "/" + meta.getTitle() + suffix;
+                for (DriveId grandparent: grandparents) {
+                    traceParentRefs(grandparent, suffix, folders);
+                }
+            }
+        }
+
+        /** Get the metadata for a file */
+        private Metadata getFileMeta(DriveResource file) throws IOException
+        {
+            PendingResult<DriveResource.MetadataResult> metaPend =
+                    file.getMetadata(itsClient);
+            DriveResource.MetadataResult metaRc =
+                    metaPend.await(10, TimeUnit.SECONDS);
+            if (!metaRc.getStatus().isSuccess()) {
+                throw new IOException(
+                        "Error retrieving metadata: " +
+                        metaRc.getStatus().getStatusMessage());
+            }
+            return metaRc.getMetadata();
+        }
     }
 }
