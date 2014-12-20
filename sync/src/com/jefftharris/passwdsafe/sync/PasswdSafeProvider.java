@@ -124,7 +124,7 @@ public class PasswdSafeProvider extends ContentProvider
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDER: {
             PasswdSafeUtil.dbginfo(TAG, "Delete provider: %s", uri);
-            Long id = Long.valueOf(uri.getPathSegments().get(1));
+            long id = PasswdSafeContract.Providers.getId(uri);
             SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
@@ -149,8 +149,8 @@ public class PasswdSafeProvider extends ContentProvider
             SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
-                Long providerId = Long.valueOf(uri.getPathSegments().get(1));
-                Long id = Long.valueOf(uri.getPathSegments().get(3));
+                long providerId = PasswdSafeContract.Providers.getId(uri);
+                long id = PasswdSafeContract.Files.getId(uri);
                 DbFile file = SyncDb.getFile(id, db);
                 if (file == null) {
                     return 0;
@@ -260,7 +260,7 @@ public class PasswdSafeProvider extends ContentProvider
             SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
-                Long providerId = Long.valueOf(uri.getPathSegments().get(1));
+                long providerId = PasswdSafeContract.Providers.getId(uri);
                 DbProvider dbProvider = SyncDb.getProvider(providerId,
                                                                   db);
                 if (dbProvider == null) {
@@ -360,7 +360,8 @@ public class PasswdSafeProvider extends ContentProvider
             qb.setTables(SyncDb.DB_TABLE_PROVIDERS);
             qb.setProjectionMap(PROVIDERS_MAP);
             selection = SyncDb.DB_MATCH_PROVIDERS_ID;
-            selectionArgs = new String[] { uri.getPathSegments().get(1) };
+            selectionArgs =
+                    new String[] { PasswdSafeContract.Providers.getIdStr(uri) };
             break;
         }
         case PasswdSafeContract.MATCH_PROVIDER_FILES: {
@@ -377,7 +378,8 @@ public class PasswdSafeProvider extends ContentProvider
             }
             selection = fullSelection.toString();
 
-            selectionArgs = new String[] { uri.getPathSegments().get(1) };
+            selectionArgs =
+                    new String[] { PasswdSafeContract.Providers.getIdStr(uri) };
             if (PasswdSafeContract.Files.TITLE_SORT_ORDER.equals(sortOrder)) {
                 sortOrderValid = true;
             }
@@ -387,7 +389,8 @@ public class PasswdSafeProvider extends ContentProvider
             qb.setTables(SyncDb.DB_TABLE_FILES);
             qb.setProjectionMap(FILES_MAP);
             selection = SyncDb.DB_MATCH_FILES_ID;
-            selectionArgs = new String[] { uri.getPathSegments().get(3) };
+            selectionArgs =
+                    new String[] { PasswdSafeContract.Files.getIdStr(uri) };
             break;
         }
         case PasswdSafeContract.MATCH_SYNC_LOGS: {
@@ -454,7 +457,7 @@ public class PasswdSafeProvider extends ContentProvider
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDER: {
             PasswdSafeUtil.dbginfo(TAG, "Update provider: %s", uri);
-            Long id = Long.valueOf(uri.getPathSegments().get(1));
+            long id = PasswdSafeContract.Providers.getId(uri);
             SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
@@ -482,8 +485,8 @@ public class PasswdSafeProvider extends ContentProvider
             return 1;
         }
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
-            Long providerId = Long.valueOf(uri.getPathSegments().get(1));
-            long id = Long.valueOf(uri.getPathSegments().get(3));
+            long providerId = PasswdSafeContract.Providers.getId(uri);
+            long id = PasswdSafeContract.Files.getId(uri);
             String updateUri =
                     values.getAsString(PasswdSafeContract.Files.COL_FILE);
             if (updateUri == null) {
@@ -560,7 +563,7 @@ public class PasswdSafeProvider extends ContentProvider
 
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDER_FILE: {
-            long id = Long.valueOf(uri.getPathSegments().get(3));
+            long id = PasswdSafeContract.Files.getId(uri);
             DbFile file;
             SyncDb syncDb = SyncDb.acquire();
             try {
@@ -609,7 +612,7 @@ public class PasswdSafeProvider extends ContentProvider
                             "Invalid provider URI: " + providerUri);
                 }
 
-                id = Long.valueOf(providerUri.getPathSegments().get(1));
+                id = PasswdSafeContract.Providers.getId(providerUri);
             }
 
             SyncDb syncDb = SyncDb.acquire();
