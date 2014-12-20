@@ -76,7 +76,9 @@ public class ProviderSyncer
     {
         List<DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
         for (DbFile dbfile: dbfiles) {
-            ctx.deleteFile(dbfile.itsLocalFile);
+            if (dbfile.itsLocalFile != null) {
+                ctx.deleteFile(dbfile.itsLocalFile);
+            }
         }
 
         SyncDb.deleteProvider(provider.itsId, db);
