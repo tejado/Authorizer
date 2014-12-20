@@ -211,7 +211,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
                         @Override
                         public void onResult(Status status)
                         {
-                            // TODO: user notification?
+                            // TODO play: user notification?
                             PasswdSafeUtil.dbginfo(TAG, "sync done: %s",
                                                    status);
                         }
@@ -330,7 +330,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
                                            "Add file %s, mod %s, folder %s",
                                            title, modTime, folders);
 
-                    // TODO check for duplicates
+                    // TODO play: check for duplicates
 
                     long providerId =
                             PasswdSafeContract.Providers.getId(itsProviderUri);
@@ -364,7 +364,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
         /** Compute the folder names for the file */
         private String computeFolders(DriveFile file) throws IOException
         {
-            // TODO: will folders work given app scope?
+            // TODO play: will folders work given app scope?
             ArrayList<String> folders = new ArrayList<String>();
 
             for (DriveId parent: getParents(file)) {

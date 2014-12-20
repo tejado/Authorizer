@@ -134,7 +134,7 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void cleanupOnDelete(String acctName)
     {
-        // TODO: cleanup unlinkAccount vs. cleanupOnDelete
+        // TODO play: cleanup unlinkAccount vs. cleanupOnDelete
         String scope = "oauth2:" + Scopes.DRIVE_FILE;
         try {
             String token = GoogleAuthUtil.getToken(
@@ -145,7 +145,7 @@ public class GDrivePlayProvider implements Provider
                 GoogleAuthUtil.clearToken(itsContext, token);
             }
 
-            // TODO: plus.Account.revokeAccessAndDisconnect(client)
+            // TODO play: plus.Account.revokeAccessAndDisconnect(client)
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s, scope: %s",
                                    acctName, scope);
@@ -158,8 +158,7 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void updateSyncFreq(Account acct, int freq)
     {
-        // TODO Auto-generated method stub
-
+        // TODO play: implement updateSyncFreq
     }
 
     /* (non-Javadoc)
@@ -168,8 +167,7 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void requestSync(boolean manual)
     {
-        // TODO Auto-generated method stub
-
+        // TODO play: implement requestSync
     }
 
     /* (non-Javadoc)
@@ -182,8 +180,7 @@ public class GDrivePlayProvider implements Provider
                      boolean manual,
                      SyncLogRecord logrec) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        // TODO play: implement sync
     }
 
     /* (non-Javadoc)
@@ -193,7 +190,7 @@ public class GDrivePlayProvider implements Provider
     public long insertLocalFile(long providerId, String title, SQLiteDatabase db)
             throws Exception
     {
-        // TODO Auto-generated method stub
+        // TODO play: implement insertLocalFile
         return 0;
     }
 
@@ -206,8 +203,7 @@ public class GDrivePlayProvider implements Provider
                                 File localFile,
                                 SQLiteDatabase db) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        // TODO play: implement updateLocalFile
     }
 
     /* (non-Javadoc)
@@ -217,8 +213,7 @@ public class GDrivePlayProvider implements Provider
     public void deleteLocalFile(DbFile file, SQLiteDatabase db)
             throws Exception
     {
-        // TODO Auto-generated method stub
-
+        // TODO play: implement deleteLocalFile
     }
 
     /** Create a GDrive API client */

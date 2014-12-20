@@ -145,7 +145,7 @@ public class AccountLinker
             break;
         }
         case CONNECTED: {
-            // TODO: use updated play services and acct id for unique value
+            // TODO play: use updated play services and acct id for unique value
             // with name as display name
             task = new NewAccountTask(providerAcctUri, itsAcctName,
                                       ProviderType.GDRIVE_PLAY,

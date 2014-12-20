@@ -63,6 +63,8 @@ public class MainActivity extends FragmentActivity
 
     private static final int LOADER_PROVIDERS = 0;
 
+    private static final boolean GDRIVE_PLAY_ENABLED = false;
+
     private Account itsGdriveAccount = null;
     private Uri itsGdrivePlayUri = null;
     private String itsGdrivePlayAcct = null;
@@ -73,7 +75,7 @@ public class MainActivity extends FragmentActivity
 
     private NewAccountTask itsNewAccountTask = null;
 
-    // TODO: open source attribution
+    // TODO play: open source attribution
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -135,6 +137,12 @@ public class MainActivity extends FragmentActivity
         if (rc != ConnectionResult.SUCCESS) {
             Dialog dlg = GooglePlayServicesUtil.getErrorDialog(rc, this, 0);
             dlg.show();
+        }
+
+        if (!GDRIVE_PLAY_ENABLED) {
+            // TODO play: Remove flag
+            findViewById(R.id.gdrive_play_container).setVisibility(View.GONE);
+            findViewById(R.id.gdrive_play_separator).setVisibility(View.GONE);
         }
 
         updateGdrivePlayAccount(null);
@@ -519,7 +527,7 @@ public class MainActivity extends FragmentActivity
     {
         Button chooseBtn = (Button)findViewById(R.id.gdrive_play_choose);
         TextView acctView = (TextView)findViewById(R.id.gdrive_play_acct);
-        // TODO controls?
+        // TODO play: controls?
         View clearBtn = findViewById(R.id.gdrive_play_clear);
         if (cursor != null) {
             long id = cursor.getLong(
@@ -534,7 +542,7 @@ public class MainActivity extends FragmentActivity
             acctView.setText(itsGdrivePlayDisplay);
             acctView.setVisibility(View.VISIBLE);
 
-            // TODO string
+            // TODO play: string
             chooseBtn.setText("Choose files");
             clearBtn.setVisibility(View.VISIBLE);
         } else {
