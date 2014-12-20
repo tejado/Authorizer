@@ -305,7 +305,7 @@ public class SyncDb
 
 
     /** Add a remote file for a provider */
-    public static void addRemoteFile(long providerId,
+    public static long addRemoteFile(long providerId,
                                      String remId, String remTitle,
                                      String remFolder, long remModDate,
                                      SQLiteDatabase db)
@@ -320,7 +320,7 @@ public class SyncDb
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, remModDate);
         values.put(DB_COL_FILES_REMOTE_DELETED, false);
         values.put(DB_COL_FILES_REMOTE_FOLDER, remFolder);
-        db.insertOrThrow(DB_TABLE_FILES, null, values);
+        return db.insertOrThrow(DB_TABLE_FILES, null, values);
     }
 
 
