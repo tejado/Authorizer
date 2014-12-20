@@ -11,6 +11,7 @@
     <string name="dropbox">Dropbox</string>
     <string name="error">Erreur</string>
     <string name="google_drive">Google Drive</string>
+    <string name="new_drive_file">Nouveau fichier de Drive</string>
     <string name="no_files">Aucun fichier</string>
     <string name="none">"Aucun"</string>
     <string name="open">Ouvrir</string>
