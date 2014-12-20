@@ -15,16 +15,18 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
-import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 import com.jefftharris.passwdsafe.sync.R;
@@ -37,6 +39,8 @@ public class FilesFragment extends ListFragment
     /** Listener interface for the owning activity */
     public interface Listener
     {
+        /** Add a new sync file */
+        void addFile();
     }
 
     private static final int LOADER_TITLE = 0;
@@ -219,4 +223,35 @@ public class FilesFragment extends ListFragment
     }
 
 
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_gdrive_play_files, menu);
+
+        MenuItem mi = menu.findItem(R.id.menu_add);
+        MenuItemCompat.setShowAsAction(mi,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_add: {
+            itsListener.addFile();
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
 }

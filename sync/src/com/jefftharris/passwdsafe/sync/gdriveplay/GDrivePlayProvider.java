@@ -144,6 +144,8 @@ public class GDrivePlayProvider implements Provider
             if (token != null) {
                 GoogleAuthUtil.clearToken(itsContext, token);
             }
+
+            // TODO: plus.Account.revokeAccessAndDisconnect(client)
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s, scope: %s",
                                    acctName, scope);
@@ -189,7 +191,7 @@ public class GDrivePlayProvider implements Provider
      */
     @Override
     public long insertLocalFile(long providerId, String title, SQLiteDatabase db)
-                                                                                 throws Exception
+            throws Exception
     {
         // TODO Auto-generated method stub
         return 0;
@@ -213,7 +215,7 @@ public class GDrivePlayProvider implements Provider
      */
     @Override
     public void deleteLocalFile(DbFile file, SQLiteDatabase db)
-                                                               throws Exception
+            throws Exception
     {
         // TODO Auto-generated method stub
 
