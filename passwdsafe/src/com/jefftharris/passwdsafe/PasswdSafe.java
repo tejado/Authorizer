@@ -526,7 +526,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             }
             case SYNC_PROVIDER: {
                 switch (uri.getSyncType()) {
-                case GDRIVE: {
+                case GDRIVE:
+                case GDRIVE_PLAY: {
                     titleId = R.string.new_drive_file;
                     break;
                 }

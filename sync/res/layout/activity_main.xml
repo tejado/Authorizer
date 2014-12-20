@@ -14,6 +14,7 @@
         android:orientation="vertical">
         
         <RelativeLayout
+            android:id="@+id/gdrive_play_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             
@@ -62,6 +63,7 @@
         </RelativeLayout>
         
         <View
+            android:id="@+id/gdrive_play_separator"
             style="@style/Separator"
             android:layout_margin="6dp"/>
 

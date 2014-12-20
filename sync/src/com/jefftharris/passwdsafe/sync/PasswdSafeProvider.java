@@ -653,6 +653,10 @@ public class PasswdSafeProvider extends ContentProvider
                     ApiCompat.requestManualSync(acct, uri, getContext());
                     break;
                 }
+                case GDRIVE_PLAY: {
+                    // TODO play: handle manual sync
+                    break;
+                }
                 }
             }
             return null;
