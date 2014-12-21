@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.util.Pair;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableNotifiedException;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
@@ -71,7 +72,7 @@ public class GDrivePlayProvider implements Provider
             itsAcctLinker.disconnect();
         }
 
-        itsAcctLinker = new AccountLinker(activity, requestCode);
+        itsAcctLinker = new AccountLinker(activity, requestCode, itsContext);
     }
 
     /* (non-Javadoc)
@@ -132,20 +133,22 @@ public class GDrivePlayProvider implements Provider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#cleanupOnDelete(java.lang.String)
      */
     @Override
-    public void cleanupOnDelete(String acctName)
+    public void cleanupOnDelete(String acctName) throws Exception
     {
         // TODO play: cleanup unlinkAccount vs. cleanupOnDelete
         String scope = "oauth2:" + Scopes.DRIVE_FILE;
         try {
-            String token = GoogleAuthUtil.getToken(
-                    itsContext, acctName, scope);
+            String token = GoogleAuthUtil.getTokenWithNotification(
+                    itsContext, acctName, scope, null);
             PasswdSafeUtil.dbginfo(TAG, "Remove token for %s, scope: %s",
                                    acctName, scope);
             if (token != null) {
-                GoogleAuthUtil.clearToken(itsContext, token);
+                GoogleAuthUtil.invalidateToken(itsContext, token);
             }
 
             // TODO play: plus.Account.revokeAccessAndDisconnect(client)
+        } catch (UserRecoverableNotifiedException e) {
+            throw e;
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s, scope: %s",
                                    acctName, scope);
