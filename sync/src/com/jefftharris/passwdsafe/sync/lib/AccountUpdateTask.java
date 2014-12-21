@@ -76,6 +76,6 @@ public abstract class AccountUpdateTask extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void arg)
     {
         super.onPostExecute(arg);
-        itsProgressFrag.dismiss();
+        itsProgressFrag.dismissAllowingStateLoss();
     }
 }
