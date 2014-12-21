@@ -53,7 +53,8 @@ public interface Provider
             throws Exception;
 
     /** Cleanup a provider when deleted */
-    public void cleanupOnDelete(String acctName);
+    public void cleanupOnDelete(String acctName)
+            throws Exception;
 
     /** Update a provider's sync frequency */
     public void updateSyncFreq(Account acct, int freq);

@@ -10,6 +10,7 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.net.Uri;
@@ -47,15 +48,17 @@ public class AccountLinker
 
     private final Activity itsActivity;
     private final int itsRequestCode;
+    private final Context itsContext;
     private AccountLinker.State itsState = State.CHOOSING_ACCOUNT;
     private GoogleApiClient itsClient;
     private String itsAcctName = null;
 
     /** Constructor */
-    public AccountLinker(Activity act, int requestCode)
+    public AccountLinker(Activity act, int requestCode, Context ctx)
     {
         itsActivity = act;
         itsRequestCode = requestCode;
+        itsContext = ctx;
         evalState();
     }
 
@@ -149,7 +152,7 @@ public class AccountLinker
             // with name as display name
             task = new NewAccountTask(providerAcctUri, itsAcctName,
                                       ProviderType.GDRIVE_PLAY,
-                                      itsActivity);
+                                      itsContext);
             break;
         }
         case FINISHED: {
@@ -180,7 +183,7 @@ public class AccountLinker
             try {
                 itsActivity.startActivityForResult(intent, itsRequestCode);
             } catch (ActivityNotFoundException e) {
-                String msg = itsActivity.getString(
+                String msg = itsContext.getString(
                         R.string.google_acct_not_available);
                 Log.e(TAG, msg, e);
                 PasswdSafeUtil.showErrorMsg(msg, itsActivity);
@@ -189,8 +192,8 @@ public class AccountLinker
         }
         case CONNECTING: {
             if (itsClient == null) {
-                itsClient = GDrivePlayProvider.createClient(itsActivity, itsAcctName,
-                                         this, this);
+                itsClient = GDrivePlayProvider.createClient(
+                        itsContext, itsAcctName, this, this);
             }
             itsClient.connect();
             break;
