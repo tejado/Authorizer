@@ -221,7 +221,7 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        List<GDriveSyncOper> opers = performSync(allRemFiles);
+        List<GDriveSyncOper> opers = performSync(allRemFiles, true);
         return new Pair<Long, List<GDriveSyncOper>>(largestChangeId, opers);
     }
 
@@ -271,14 +271,14 @@ public class GDriveSyncer
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        List<GDriveSyncOper> opers = performSync(changedFiles);
+        List<GDriveSyncOper> opers = performSync(changedFiles, false);
         return new Pair<Long, List<GDriveSyncOper>>(changeId, opers);
     }
 
 
     /** Perform a sync of the files */
     private final List<GDriveSyncOper>
-    performSync(HashMap<String, File> remfiles)
+    performSync(HashMap<String, File> remfiles, boolean isAllRemoteFiles)
             throws SQLException, IOException
     {
         itsFileCache.putAll(remfiles);
@@ -334,6 +334,12 @@ public class GDriveSyncer
                     SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
                 }
                 remfiles.remove(dbfile.itsRemoteId);
+            } else if (isAllRemoteFiles) {
+                // Any extra files should be deleted if remfiles has the full
+                // list
+                PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
+                                       dbfile.itsRemoteId);
+                SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
             }
         }
 
