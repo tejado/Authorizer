@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -72,6 +72,7 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
             if (itsIsInsert) {
                 itsDriveFile =
                         files.insert(itsDriveFile, fileMedia).execute();
+                // TODO on insert, compute folder from returned file and update
             } else {
                 itsDriveFile =
                         files.update(itsFile.itsRemoteId, itsDriveFile,
@@ -93,8 +94,13 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
         long modDate = itsDriveFile.getModifiedDate().getValue();
         SyncDb.updateRemoteFile(itsFile.itsId, itsDriveFile.getId(),
                                    title, itsFile.itsLocalFolder, modDate, db);
+        SyncDb.updateRemoteFileChange(itsFile.itsId,
+                                      DbFile.FileChange.NO_CHANGE, db);
         SyncDb.updateLocalFile(itsFile.itsId, itsFile.itsLocalFile,
                                   title, itsFile.itsLocalFolder, modDate, db);
+        SyncDb.updateLocalFileChange(itsFile.itsId,
+                                     DbFile.FileChange.NO_CHANGE, db);
+        // TODO: clear file changes for all provider types (make generic?)
         if (itsLocalFile != null) {
             itsLocalFile.setLastModified(modDate);
         }
