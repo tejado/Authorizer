@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -53,11 +53,13 @@ public class SyncDb
     public static final String DB_COL_FILES_LOCAL_MOD_DATE = "local_mod_date";
     public static final String DB_COL_FILES_LOCAL_DELETED = "local_deleted";
     public static final String DB_COL_FILES_LOCAL_FOLDER = "local_folder";
+    public static final String DB_COL_FILES_LOCAL_CHANGE = "local_change";
     public static final String DB_COL_FILES_REMOTE_ID = "remote_id";
     public static final String DB_COL_FILES_REMOTE_TITLE = "remote_title";
     public static final String DB_COL_FILES_REMOTE_MOD_DATE = "remote_mod_date";
     public static final String DB_COL_FILES_REMOTE_DELETED = "remote_deleted";
     public static final String DB_COL_FILES_REMOTE_FOLDER = "remote_folder";
+    public static final String DB_COL_FILES_REMOTE_CHANGE = "remote_change";
     public static final String DB_MATCH_FILES_ID =
         DB_COL_FILES_ID + " = ?";
     public static final String DB_MATCH_FILES_PROVIDER_ID =
@@ -298,6 +300,8 @@ public class SyncDb
         values.put(DB_COL_FILES_LOCAL_TITLE, title);
         values.put(DB_COL_FILES_LOCAL_MOD_DATE, modDate);
         values.put(DB_COL_FILES_LOCAL_DELETED, false);
+        values.put(DB_COL_FILES_LOCAL_CHANGE,
+                   DbFile.FileChange.toDbStr(DbFile.FileChange.ADDED));
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, -1);
         values.put(DB_COL_FILES_REMOTE_DELETED, false);
         return db.insertOrThrow(DB_TABLE_FILES, null, values);
@@ -320,6 +324,8 @@ public class SyncDb
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, remModDate);
         values.put(DB_COL_FILES_REMOTE_DELETED, false);
         values.put(DB_COL_FILES_REMOTE_FOLDER, remFolder);
+        values.put(DB_COL_FILES_REMOTE_CHANGE,
+                   DbFile.FileChange.toDbStr(DbFile.FileChange.ADDED));
         return db.insertOrThrow(DB_TABLE_FILES, null, values);
     }
 
@@ -340,6 +346,22 @@ public class SyncDb
                   DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
     }
 
+
+    /** Update the change for a local file */
+    public static void updateLocalFileChange(long fileId,
+                                             DbFile.FileChange change,
+                                             SQLiteDatabase db)
+            throws SQLException
+    {
+        // TODO: merge into updateLocalFile??
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_FILES_LOCAL_CHANGE,
+                   DbFile.FileChange.toDbStr(change));
+        db.update(DB_TABLE_FILES, values,
+                  DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
+    }
+
+
     /** Update a remote file */
     public static void updateRemoteFile(long fileId, String remId,
                                         String remTitle, String remFolder,
@@ -357,12 +379,29 @@ public class SyncDb
     }
 
 
+    /** Update the change for a remote file */
+    public static void updateRemoteFileChange(long fileId,
+                                              DbFile.FileChange change,
+                                              SQLiteDatabase db)
+            throws SQLException
+    {
+        // TODO: merge into updateRemoteFile??
+        ContentValues values = new ContentValues();
+        values.put(DB_COL_FILES_REMOTE_CHANGE,
+                   DbFile.FileChange.toDbStr(change));
+        db.update(DB_TABLE_FILES, values,
+                  DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
+    }
+
+
     /** Update a remote file as deleted */
     public static void updateRemoteFileDeleted(long fileId, SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_REMOTE_DELETED, true);
+        values.put(DB_COL_FILES_REMOTE_CHANGE,
+                DbFile.FileChange.toDbStr(DbFile.FileChange.REMOVED));
         db.update(DB_TABLE_FILES, values,
                   DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
     }
@@ -374,6 +413,8 @@ public class SyncDb
     {
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_LOCAL_DELETED, true);
+        values.put(DB_COL_FILES_LOCAL_CHANGE,
+                   DbFile.FileChange.toDbStr(DbFile.FileChange.REMOVED));
         db.update(DB_TABLE_FILES, values,
                   DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
     }
@@ -475,7 +516,7 @@ public class SyncDb
     private static final class DbHelper extends SQLiteOpenHelper
     {
         private static final String DB_NAME = "sync.db";
-        private static final int DB_VERSION = 3;
+        private static final int DB_VERSION = 4;
 
         /** Constructor */
         public DbHelper(Context context)
@@ -546,6 +587,16 @@ public class SyncDb
                            " TEXT;");
                 db.execSQL("ALTER TABLE " + DB_TABLE_FILES +
                            " ADD COLUMN " + DB_COL_FILES_REMOTE_FOLDER +
+                           " TEXT;");
+            }
+
+            if (oldVersion < 4) {
+                PasswdSafeUtil.dbginfo(TAG, "Upgrade to v4");
+                db.execSQL("ALTER TABLE " + DB_TABLE_FILES +
+                           " ADD COLUMN " + DB_COL_FILES_LOCAL_CHANGE +
+                           " TEXT;");
+                db.execSQL("ALTER TABLE " + DB_TABLE_FILES +
+                           " ADD COLUMN " + DB_COL_FILES_REMOTE_CHANGE +
                            " TEXT;");
             }
         }
