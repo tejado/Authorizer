@@ -62,6 +62,7 @@ public class GDriveSyncer
     private final String itsDriveToken;
     private final DbProvider itsProvider;
     private final SQLiteDatabase itsDb;
+    private final boolean itsIsManual;
     private final SyncLogRecord itsLogrec;
     private final Context itsContext;
     private final HashMap<String, File> itsFileCache =
@@ -75,14 +76,19 @@ public class GDriveSyncer
 
 
     /** Constructor */
-    public GDriveSyncer(Account acct, DbProvider provider,
-                        SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
+    public GDriveSyncer(Account acct,
+                        DbProvider provider,
+                        SQLiteDatabase db,
+                        boolean manual,
+                        SyncLogRecord logrec,
+                        Context ctx)
     {
         Pair<Drive, String> drive = getDriveService(acct, ctx);
         itsDrive = drive.first;
         itsDriveToken = drive.second;
         itsProvider = provider;
         itsDb = db;
+        itsIsManual = manual;
         itsLogrec = logrec;
         itsContext = ctx;
     }
@@ -104,7 +110,7 @@ public class GDriveSyncer
                 long changeId = itsProvider.itsSyncChange;
                 PasswdSafeUtil.dbginfo(TAG, "largest change %d", changeId);
                 Pair<Long, List<GDriveSyncOper>> syncrc;
-                boolean noSyncChange = (changeId == -1);
+                boolean noSyncChange = itsIsManual || (changeId == -1);
                 itsLogrec.setFullSync(noSyncChange);
                 if (!itsFolderRefsInit || noSyncChange) {
                     itsFolderRefsInit = true;

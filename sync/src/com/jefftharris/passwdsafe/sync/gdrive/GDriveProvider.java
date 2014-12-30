@@ -192,7 +192,8 @@ public class GDriveProvider implements Provider
                      SQLiteDatabase db,
                      boolean manual, SyncLogRecord logrec) throws Exception
     {
-        GDriveSyncer sync = new GDriveSyncer(acct, provider, db, logrec, itsContext);
+        GDriveSyncer sync = new GDriveSyncer(acct, provider, db,
+                                             manual, logrec, itsContext);
         SyncUpdateHandler.GDriveState syncState =
                 SyncUpdateHandler.GDriveState.OK;
         try {
