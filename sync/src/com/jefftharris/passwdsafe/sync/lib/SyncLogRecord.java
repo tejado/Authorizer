@@ -28,6 +28,7 @@ public class SyncLogRecord
     private boolean itsIsManualSync;
     private boolean itsIsNotConnected = false;
     private List<String> itsEntries = new ArrayList<String>();
+    private List<String> itsConflictFiles = new ArrayList<String>();
 
     /** Constructor */
     public SyncLogRecord(String account, String typeName, boolean manual)
@@ -101,6 +102,18 @@ public class SyncLogRecord
     public void addEntry(String entry)
     {
         itsEntries.add(entry);
+    }
+
+    /** Add a conflict file */
+    public void addConflictFile(String filename)
+    {
+        itsConflictFiles.add(filename);
+    }
+
+    /** Get the conflict files */
+    public List<String> getConflictFiles()
+    {
+        return itsConflictFiles;
     }
 
     /** Get a string representation of the actions in the record */

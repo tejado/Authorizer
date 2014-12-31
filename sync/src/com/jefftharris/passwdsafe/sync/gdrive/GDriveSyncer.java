@@ -395,6 +395,7 @@ public class GDriveSyncer
             switch (dbfile.itsRemoteChange) {
             case ADDED:
             case MODIFIED: {
+                logConflictFile(dbfile, true);
                 splitConflictedFile(dbfile, opers);
                 break;
             }
@@ -404,6 +405,7 @@ public class GDriveSyncer
                 break;
             }
             case REMOVED: {
+                logConflictFile(dbfile, true);
                 recreateRemoteRemovedFile(dbfile, opers);
                 break;
             }
@@ -414,6 +416,7 @@ public class GDriveSyncer
             switch (dbfile.itsRemoteChange) {
             case ADDED:
             case MODIFIED: {
+                logConflictFile(dbfile, true);
                 splitConflictedFile(dbfile, opers);
                 break;
             }
@@ -423,6 +426,7 @@ public class GDriveSyncer
                 break;
             }
             case REMOVED: {
+                logConflictFile(dbfile, true);
                 recreateRemoteRemovedFile(dbfile, opers);
                 break;
             }
@@ -451,13 +455,13 @@ public class GDriveSyncer
             switch (dbfile.itsRemoteChange) {
             case ADDED:
             case MODIFIED: {
+                logConflictFile(dbfile, false);
                 DbFile newRemfile = splitRemoteToNewFile(dbfile);
                 DbFile updatedLocalFile = SyncDb.getFile(dbfile.itsId, itsDb);
 
                 opers.add(new GDriveRemoteToLocalOper(newRemfile,
                                                       itsFileCache));
                 opers.add(new GDriveRmFileOper(updatedLocalFile));
-                // TODO: Show notification
                 break;
             }
             case NO_CHANGE:
@@ -488,8 +492,6 @@ public class GDriveSyncer
                                               itsFileCache));
         opers.add(new GDriveLocalToRemoteOper(updatedLocalFile,
                                               itsFileCache, true));
-
-        // TODO: notification
     }
 
 
@@ -503,8 +505,6 @@ public class GDriveSyncer
                 dbfile, itsContext.getString(R.string.recreated_local_copy));
         opers.add(new GDriveLocalToRemoteOper(updatedLocalFile,
                 itsFileCache, true));
-
-        // TODO: notification
     }
 
 
@@ -557,6 +557,21 @@ public class GDriveSyncer
                 dbfile.itsId, null, null, null, -1, itsDb);
         SyncDb.updateRemoteFileChange(
                 dbfile.itsId, DbFile.FileChange.NO_CHANGE, itsDb);
+    }
+
+
+    /** Log a conflicted file */
+    private final void logConflictFile(DbFile dbfile,
+                                       boolean localName)
+    {
+        String filename = localName ? dbfile.getLocalTitleAndFolder() :
+            dbfile.getRemoteTitleAndFolder();
+        itsLogrec.addConflictFile(filename);
+
+        String log = itsContext.getString(
+                R.string.sync_conflict_log,
+                filename, dbfile.itsLocalChange, dbfile.itsRemoteChange);
+        itsLogrec.addEntry(log);
     }
 
 

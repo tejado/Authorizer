@@ -24,12 +24,14 @@
     <string name="no_account">Keine Konto</string>
     <string name="no_logs">Keine Logs</string>
     <string name="passwdsafe">PasswdSafe</string>
+    <string name="passwdsafe_sync_conflict">PasswdSafe Synchronisierungskonflikt</string>
     <string name="passwdsafe_synced_file">PasswdSafe Synced Datei</string>
     <string name="recreated_local_copy">Erstellt lokale Kopie</string>
     <string name="remove_account">Konto löschen?</string>
     <string name="removing_account">Lösche Konto &#8230;</string>
     <string name="show_all">Alles anzeigen</string>
     <string name="sync">Synchronisierung</string>
+    <string name="sync_conflict_log">Sync Konflikt mit Datei %1$s, die lokal %2$s wurde als auch remote %3$s</string>
     <string name="sync_interval_label">Intervall:</string>
     <string name="sync_log_record">Synchronisiere %1$s, %2$s, %3$s, %4$s, Beginn: %5$tc, Beendet: %6$tc</string>
     <string name="sync_oper_local_to_remote">Hochgeladene Datei: %1$s</string>

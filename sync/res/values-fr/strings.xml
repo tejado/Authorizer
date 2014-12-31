@@ -24,12 +24,14 @@
     <string name="no_account">Aucun compte</string>
     <string name="no_logs">Pas de archives</string>
     <string name="passwdsafe">PasswdSafe</string>
+    <string name="passwdsafe_sync_conflict">Conflit de synchronisation PasswdSafe</string>
     <string name="passwdsafe_synced_file">PasswdSafe fichier synchronisé</string>
     <string name="recreated_local_copy">Copie locale recréé</string>
     <string name="remove_account">Supprimer un compte?</string>
     <string name="removing_account">Retrait de compte&#8230;</string>
     <string name="show_all">Afficher Tout</string>
     <string name="sync">Synchroniser</string>
+    <string name="sync_conflict_log">Conflit de synchronisation avec le fichier %1$s qui a été %2$s sur place et %3$s à distance</string>
     <string name="sync_interval_label">Intervalle:</string>
     <string name="sync_log_record">Synchroniser %1$s, %2$s, %3$s, %4$s, début: %5$tc, fin: %6$tc</string>
     <string name="sync_oper_local_to_remote">Uploader le fichier: %1$s</string>
