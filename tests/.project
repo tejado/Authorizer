@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>PasswdSafe</project>
+		<project>PasswdSafeLib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
