@@ -90,6 +90,26 @@ public class DbFile
         itsRemoteChange = FileChange.fromDbStr(cursor.getString(12));
     }
 
+    /** Get the local title and folder */
+    public String getLocalTitleAndFolder()
+    {
+        StringBuilder str = new StringBuilder(itsLocalTitle);
+        if (!TextUtils.isEmpty(itsLocalFolder)) {
+            str.append(" [").append(itsLocalFolder).append("]");
+        }
+        return str.toString();
+    }
+
+    /** Get the remote title and folder */
+    public String getRemoteTitleAndFolder()
+    {
+        StringBuilder str = new StringBuilder(itsRemoteTitle);
+        if (!TextUtils.isEmpty(itsRemoteFolder)) {
+            str.append(" [").append(itsRemoteFolder).append("]");
+        }
+        return str.toString();
+    }
+
     @Override
     public String toString()
     {

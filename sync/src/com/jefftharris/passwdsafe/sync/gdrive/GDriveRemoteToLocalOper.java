@@ -92,8 +92,7 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
     public String getDescription(Context ctx)
     {
         return ctx.getString(R.string.sync_oper_remote_to_local,
-                             itsFile.itsRemoteTitle +
-                             " [" + itsFile.itsRemoteFolder + "]");
+                             itsFile.getRemoteTitleAndFolder());
     }
 
 
