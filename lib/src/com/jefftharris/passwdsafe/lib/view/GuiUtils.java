@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2010-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2010-2014 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -35,7 +35,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
-import com.jefftharris.passwdsafe.lib.R;
 
 /**
  * @author jharris
@@ -279,10 +278,12 @@ public final class GuiUtils
                                         int iconId,
                                         String tickerText,
                                         String title,
+                                        int bigIcon,
                                         String content,
                                         List<String> bigLines,
                                         PendingIntent intent,
-                                        int notifyId)
+                                        int notifyId,
+                                        boolean autoCancel)
     {
         Notification notif;
         if (ApiCompat.SDK_VERSION == ApiCompat.SDK_CUPCAKE) {
@@ -290,8 +291,8 @@ public final class GuiUtils
                                      System.currentTimeMillis());
             notif.setLatestEventInfo(ctx, title, content, intent);
         } else {
-            BitmapDrawable b = (BitmapDrawable)ctx.getResources().getDrawable(
-                    R.drawable.ic_launcher_passwdsafe);
+            BitmapDrawable b =
+                    (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
             NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)
@@ -299,7 +300,8 @@ public final class GuiUtils
                 .setContentIntent(intent)
                 .setSmallIcon(iconId)
                 .setLargeIcon(b.getBitmap())
-                .setTicker(tickerText);
+                .setTicker(tickerText)
+                .setAutoCancel(autoCancel);
             NotificationCompat.InboxStyle style =
                 new NotificationCompat.InboxStyle(builder)
                 .setBigContentTitle(title)
