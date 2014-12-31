@@ -10,6 +10,7 @@
 package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -331,9 +332,6 @@ public class GDriveSyncer
                                              File remfile,
                                              Map<String, String> fileFolders)
     {
-        PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s",
-                               dbfile);
-
         boolean changed = true;
         do {
             // TODO: add md5 change support
@@ -359,6 +357,8 @@ public class GDriveSyncer
         if (!changed) {
             return;
         }
+
+        PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s", dbfile);
 
         // TODO: refine metadata vs. file contents modification?
         SyncDb.updateRemoteFile(dbfile.itsId, dbfile.itsRemoteId,
@@ -390,28 +390,21 @@ public class GDriveSyncer
             PasswdSafeUtil.dbginfo(TAG, "resolveSyncOper %s", dbfile);
         }
 
-        // TODO: complete all cases
         switch (dbfile.itsLocalChange) {
         case ADDED: {
             switch (dbfile.itsRemoteChange) {
-            case ADDED: {
-                // Duplicate local change as new file with updated name; sync both
-                // Show notification
-                break;
-            }
+            case ADDED:
             case MODIFIED: {
-                // Same as added/added case
+                splitConflictedFile(dbfile, opers);
                 break;
             }
             case NO_CHANGE: {
-                // Sync local to remote as new
                 opers.add(new GDriveLocalToRemoteOper(dbfile, itsFileCache,
                                                       false));
                 break;
             }
             case REMOVED: {
-                // Recreate file with updated name; sync local to remote
-                // Show notification
+                recreateRemoteRemovedFile(dbfile, opers);
                 break;
             }
             }
@@ -419,25 +412,18 @@ public class GDriveSyncer
         }
         case MODIFIED: {
             switch (dbfile.itsRemoteChange) {
-            case ADDED: {
-                // Duplicate local change as new file with updated name; sync both
-                // Show notification
-                break;
-            }
+            case ADDED:
             case MODIFIED: {
-                // Duplicate local change as new file with updated name; sync both
-                // Show notification
+                splitConflictedFile(dbfile, opers);
                 break;
             }
             case NO_CHANGE: {
-                // Sync local to remote
                 opers.add(new GDriveLocalToRemoteOper(dbfile, itsFileCache,
                                                       false));
                 break;
             }
             case REMOVED: {
-                // Recreate file with updated name; sync local to remote
-                // Show notification
+                recreateRemoteRemovedFile(dbfile, opers);
                 break;
             }
             }
@@ -447,7 +433,6 @@ public class GDriveSyncer
             switch (dbfile.itsRemoteChange) {
             case ADDED:
             case MODIFIED: {
-                // Sync remote to local
                 opers.add(new GDriveRemoteToLocalOper(dbfile, itsFileCache));
                 break;
             }
@@ -456,7 +441,6 @@ public class GDriveSyncer
                 break;
             }
             case REMOVED: {
-                // Remove file
                 opers.add(new GDriveRmFileOper(dbfile));
                 break;
             }
@@ -465,22 +449,19 @@ public class GDriveSyncer
         }
         case REMOVED: {
             switch (dbfile.itsRemoteChange) {
-            case ADDED: {
-                // Sync remote to local to recover file
-                // Show notification
-                break;
-            }
+            case ADDED:
             case MODIFIED: {
-                // Same as removed/modified
+                DbFile newRemfile = splitRemoteToNewFile(dbfile);
+                DbFile updatedLocalFile = SyncDb.getFile(dbfile.itsId, itsDb);
+
+                opers.add(new GDriveRemoteToLocalOper(newRemfile,
+                                                      itsFileCache));
+                opers.add(new GDriveRmFileOper(updatedLocalFile));
+                // TODO: Show notification
                 break;
             }
-            case NO_CHANGE: {
-                // Remove file
-                opers.add(new GDriveRmFileOper(dbfile));
-                break;
-            }
+            case NO_CHANGE:
             case REMOVED: {
-                // Remove file
                 opers.add(new GDriveRmFileOper(dbfile));
                 break;
             }
@@ -488,6 +469,94 @@ public class GDriveSyncer
             break;
         }
         }
+    }
+
+
+    /** Split the file.  A new added remote file is created with the remote id,
+     * and the file is updated to resemble a new local file with the same id but
+     * a different name indicating a conflict
+     */
+    private final void splitConflictedFile(DbFile dbfile,
+                                           List<GDriveSyncOper> opers)
+            throws SQLException
+    {
+        DbFile newRemfile = splitRemoteToNewFile(dbfile);
+        DbFile updatedLocalFile = updateFileAsLocallyAdded(
+                dbfile, itsContext.getString(R.string.conflicted_local_copy));
+
+        opers.add(new GDriveRemoteToLocalOper(newRemfile,
+                                              itsFileCache));
+        opers.add(new GDriveLocalToRemoteOper(updatedLocalFile,
+                                              itsFileCache, true));
+
+        // TODO: notification
+    }
+
+
+    /** Recreate a remotely deleted file from local updates */
+    private final void recreateRemoteRemovedFile(DbFile dbfile,
+                                                 List<GDriveSyncOper> opers)
+            throws SQLException
+    {
+        resetRemoteFields(dbfile);
+        DbFile updatedLocalFile = updateFileAsLocallyAdded(
+                dbfile, itsContext.getString(R.string.recreated_local_copy));
+        opers.add(new GDriveLocalToRemoteOper(updatedLocalFile,
+                itsFileCache, true));
+
+        // TODO: notification
+    }
+
+
+    /** Update a file to appear as a locally added file with a new name */
+    private final DbFile updateFileAsLocallyAdded(DbFile dbfile,
+                                                  String titlePrefix)
+            throws SQLException
+    {
+        // TODO: try to recreate in same dir(s) as original or at least
+        // set initial dir to root
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH-mm-ss", Locale.US);
+        String newTitle = String.format(Locale.US,
+                "%s (%s) - %s",
+                titlePrefix,
+                dateFormat.format(System.currentTimeMillis()),
+                dbfile.itsLocalTitle);
+        SyncDb.updateLocalFile(
+                dbfile.itsId, dbfile.itsLocalFile, newTitle,
+                null, dbfile.itsLocalModDate, itsDb);
+        SyncDb.updateLocalFileChange(
+                dbfile.itsId, DbFile.FileChange.ADDED, itsDb);
+        return SyncDb.getFile(dbfile.itsId, itsDb);
+    }
+
+
+    /** Split the remote information for the file into a new file.  The
+     * remote fields for the existing file are reset. */
+    private final DbFile splitRemoteToNewFile(DbFile dbfile)
+            throws SQLException
+    {
+        long newRemoteId = SyncDb.addRemoteFile(
+                itsProvider.itsId, dbfile.itsRemoteId,
+                dbfile.itsRemoteTitle, dbfile.itsRemoteFolder,
+                dbfile.itsRemoteModDate, itsDb);
+        DbFile newRemfile = SyncDb.getFile(newRemoteId, itsDb);
+
+        resetRemoteFields(dbfile);
+
+        return newRemfile;
+    }
+
+
+    /** Reset the remote fields for a file to their defaults */
+    private final void resetRemoteFields(DbFile dbfile)
+            throws SQLException
+    {
+        SyncDb.updateRemoteFile(
+                dbfile.itsId, null, null, null, -1, itsDb);
+        SyncDb.updateRemoteFileChange(
+                dbfile.itsId, DbFile.FileChange.NO_CHANGE, itsDb);
     }
 
 
