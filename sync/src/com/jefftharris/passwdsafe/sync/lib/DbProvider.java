@@ -8,7 +8,9 @@ package com.jefftharris.passwdsafe.sync.lib;
 
 import java.util.Locale;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.lib.ProviderType;
 
@@ -41,6 +43,19 @@ public class DbProvider
         itsSyncChange = cursor.getLong(3);
         itsSyncFreq = cursor.getInt(4);
         itsDisplayName = cursor.getString(5);
+    }
+
+    /** Get the type and display name */
+    public String getTypeAndDisplayName(Context ctx)
+    {
+        StringBuilder str = new StringBuilder(itsType.getName(ctx));
+        str.append(" - ");
+        if (!TextUtils.isEmpty(itsDisplayName)) {
+            str.append(itsDisplayName);
+        } else {
+            str.append(itsAcct);
+        }
+        return str.toString();
     }
 
     @Override
