@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2012-2013 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2012-2014 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -18,19 +18,6 @@ import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
 
-import com.jefftharris.passwdsafe.file.PasswdExpiration;
-import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
-import com.jefftharris.passwdsafe.file.PasswdFileUri;
-import com.jefftharris.passwdsafe.file.PasswdRecord;
-import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.lib.Utils;
-import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
-import com.jefftharris.passwdsafe.lib.view.GuiUtils;
-import com.jefftharris.passwdsafe.util.LongReference;
-import com.jefftharris.passwdsafe.view.DialogUtils;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
@@ -46,6 +33,20 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
+
+import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.file.PasswdExpiration;
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.util.LongReference;
+import com.jefftharris.passwdsafe.view.DialogUtils;
 
 /**
  * The NotificationMgr class encapsulates the notifications provided by the app
@@ -509,8 +510,9 @@ public class NotificationMgr implements PasswdFileDataObserver
         GuiUtils.showNotification(
             itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
             itsCtx.getString(R.string.expiring_password),
-            title, passwdUri.getIdentifier(itsCtx, false),
-            strs, intent, info.getNotifId());
+            title, R.drawable.ic_launcher_passwdsafe,
+            passwdUri.getIdentifier(itsCtx, false),
+            strs, intent, info.getNotifId(), false);
         return true;
     }
 
