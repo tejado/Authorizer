@@ -17,6 +17,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -518,10 +519,13 @@ public class SyncDb
         private static final String DB_NAME = "sync.db";
         private static final int DB_VERSION = 4;
 
+        private final Context itsContext;
+
         /** Constructor */
         public DbHelper(Context context)
         {
             super(context, DB_NAME, null, DB_VERSION);
+            itsContext = context;
         }
 
         /* (non-Javadoc)
@@ -598,6 +602,12 @@ public class SyncDb
                 db.execSQL("ALTER TABLE " + DB_TABLE_FILES +
                            " ADD COLUMN " + DB_COL_FILES_REMOTE_CHANGE +
                            " TEXT;");
+
+                for (DbProvider provider: getProviders(db)) {
+                    for (DbFile file: getFiles(provider.itsId, db)) {
+                        onUpgradeV4File(file, db);
+                    }
+                }
             }
         }
 
@@ -609,6 +619,40 @@ public class SyncDb
         {
             enableForeignKey(db);
             super.onOpen(db);
+        }
+
+        /** Upgrade a file for the v4 schema */
+        private void onUpgradeV4File(DbFile file, SQLiteDatabase db)
+                throws SQLException
+        {
+            DbFile.FileChange local = DbFile.FileChange.NO_CHANGE;
+            DbFile.FileChange remote = DbFile.FileChange.NO_CHANGE;
+            if (file.itsIsRemoteDeleted) {
+                remote = DbFile.FileChange.REMOVED;
+            } else if (TextUtils.isEmpty(file.itsLocalFile) ||
+                    (file.itsLocalModDate == -1) ||
+                    !itsContext.getFileStreamPath(file.itsLocalFile).exists()) {
+                remote = DbFile.FileChange.ADDED;
+            } else if (!TextUtils.equals(file.itsLocalFolder,
+                                         file.itsRemoteFolder) ||
+                    (file.itsRemoteModDate > file.itsLocalModDate)) {
+                remote = DbFile.FileChange.MODIFIED;
+            }
+
+            if (file.itsIsLocalDeleted) {
+                local = DbFile.FileChange.REMOVED;
+            } else if (TextUtils.isEmpty(file.itsRemoteId)) {
+                local = DbFile.FileChange.ADDED;
+            } else if (file.itsLocalModDate > file.itsRemoteModDate) {
+                local = DbFile.FileChange.MODIFIED;
+            }
+
+            if (local != DbFile.FileChange.NO_CHANGE) {
+                updateLocalFileChange(file.itsId, local, db);
+            }
+            if (remote != DbFile.FileChange.NO_CHANGE) {
+                updateRemoteFileChange(file.itsId, remote, db);
+            }
         }
 
         /** Enable support for foreign keys on the open database connection */
