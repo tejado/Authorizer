@@ -94,7 +94,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
                 SyncDb.updateRemoteFile(dbfile.itsId, dbfile.itsRemoteId,
                                         boxfile.getName(), folder,
                                         boxfile.dateModifiedAt().getTime(),
-                                        itsDb);
+                                        boxfile.getSha1(), itsDb);
                 boxfiles.remove(dbfile.itsRemoteId);
             } else {
                 PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
@@ -109,7 +109,8 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             PasswdSafeUtil.dbginfo(TAG, "performSync add remote %s", fileId);
             SyncDb.addRemoteFile(itsProvider.itsId, fileId,
                                  boxfile.getName(), getFileFolder(boxfile),
-                                 boxfile.dateModifiedAt().getTime(), itsDb);
+                                 boxfile.dateModifiedAt().getTime(),
+                                 boxfile.getSha1(), itsDb);
         }
 
         List<AbstractSyncOper<BoxClient>> opers =

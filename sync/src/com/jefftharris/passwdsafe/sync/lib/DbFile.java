@@ -56,6 +56,7 @@ public class DbFile
     public final boolean itsIsRemoteDeleted;
     public final String itsRemoteFolder;
     public final FileChange itsRemoteChange;
+    public final String itsRemoteHash;
 
     public static final String[] QUERY_FIELDS = {
         SyncDb.DB_COL_FILES_ID,
@@ -70,7 +71,8 @@ public class DbFile
         SyncDb.DB_COL_FILES_REMOTE_MOD_DATE,
         SyncDb.DB_COL_FILES_REMOTE_DELETED,
         SyncDb.DB_COL_FILES_REMOTE_FOLDER,
-        SyncDb.DB_COL_FILES_REMOTE_CHANGE };
+        SyncDb.DB_COL_FILES_REMOTE_CHANGE,
+        SyncDb.DB_COL_FILES_REMOTE_HASH };
 
     /** Constructor */
     public DbFile(Cursor cursor)
@@ -88,6 +90,7 @@ public class DbFile
         itsIsRemoteDeleted = cursor.getInt(10) != 0;
         itsRemoteFolder = cursor.getString(11);
         itsRemoteChange = FileChange.fromDbStr(cursor.getString(12));
+        itsRemoteHash = cursor.getString(13);
     }
 
     /** Get the local title and folder */
@@ -115,11 +118,14 @@ public class DbFile
     {
         return String.format(Locale.US,
                 "{id:%d, " +
-                "local:{title:%s, folder:%s, file:%s, mod:%d, del:%b, ch:%s}, " +
-                "remote:{id:%s, title:'%s', folder:%s, mod:%d, del:%b, ch:%s}}",
+                "local:{title:%s, folder:%s, file:%s, " +
+                    "mod:%d, del:%b, ch:%s}, " +
+                "remote:{id:%s, title:'%s', folder:%s, " +
+                    "mod:%d, hash:%s, del:%b, ch:%s}}",
                 itsId, itsLocalTitle, itsLocalFolder, itsLocalFile,
                 itsLocalModDate, itsIsLocalDeleted, itsLocalChange,
                 itsRemoteId, itsRemoteTitle, itsRemoteFolder,
-                itsRemoteModDate, itsIsRemoteDeleted, itsRemoteChange);
+                itsRemoteModDate, itsRemoteHash, itsIsRemoteDeleted,
+                itsRemoteChange);
     }
 }

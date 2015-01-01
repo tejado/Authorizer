@@ -306,7 +306,7 @@ public class GDriveSyncer
                                  remfile.getTitle(),
                                  fileFolders.get(fileId),
                                  remfile.getModifiedDate().getValue(),
-                                 itsDb);
+                                 remfile.getMd5Checksum(), itsDb);
         }
 
         List<GDriveSyncOper> opers = new ArrayList<GDriveSyncOper>();
@@ -326,13 +326,14 @@ public class GDriveSyncer
     {
         boolean changed = true;
         do {
-            // TODO: add md5 change support
             String remTitle = remfile.getTitle();
             String remFolder = fileFolders.get(dbfile.itsRemoteId);
             long remModDate = remfile.getModifiedDate().getValue();
+            String remHash = remfile.getMd5Checksum();
             if (!TextUtils.equals(dbfile.itsRemoteTitle, remTitle) ||
                     !TextUtils.equals(dbfile.itsRemoteFolder, remFolder) ||
                     (dbfile.itsRemoteModDate != remModDate) ||
+                    !TextUtils.equals(dbfile.itsRemoteHash, remHash) ||
                     TextUtils.isEmpty(dbfile.itsLocalFile)) {
                 break;
             }
@@ -354,7 +355,8 @@ public class GDriveSyncer
         SyncDb.updateRemoteFile(dbfile.itsId, dbfile.itsRemoteId,
                                 remfile.getTitle(),
                                 fileFolders.get(dbfile.itsRemoteId),
-                                remfile.getModifiedDate().getValue(), itsDb);
+                                remfile.getModifiedDate().getValue(),
+                                remfile.getMd5Checksum(), itsDb);
         switch (dbfile.itsRemoteChange) {
         case NO_CHANGE:
         case REMOVED: {
@@ -527,7 +529,7 @@ public class GDriveSyncer
         long newRemoteId = SyncDb.addRemoteFile(
                 itsProvider.itsId, dbfile.itsRemoteId,
                 dbfile.itsRemoteTitle, dbfile.itsRemoteFolder,
-                dbfile.itsRemoteModDate, itsDb);
+                dbfile.itsRemoteModDate, dbfile.itsRemoteHash, itsDb);
         DbFile newRemfile = SyncDb.getFile(newRemoteId, itsDb);
 
         resetRemoteFields(dbfile);
@@ -541,7 +543,7 @@ public class GDriveSyncer
             throws SQLException
     {
         SyncDb.updateRemoteFile(
-                dbfile.itsId, null, null, null, -1, itsDb);
+                dbfile.itsId, null, null, null, -1, null, itsDb);
         SyncDb.updateRemoteFileChange(
                 dbfile.itsId, DbFile.FileChange.NO_CHANGE, itsDb);
     }

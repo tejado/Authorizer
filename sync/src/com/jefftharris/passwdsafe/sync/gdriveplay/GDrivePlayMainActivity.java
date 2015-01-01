@@ -336,7 +336,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
                             PasswdSafeContract.Providers.getId(itsProviderUri);
                     long fileId = SyncDb.addRemoteFile(
                             providerId, id.encodeToString(), title, folders,
-                            modTime.getTime(), db);
+                            modTime.getTime(), null, db);
                     SyncDb.updateLocalFile(fileId, null, title, folders,
                             modTime.getTime(), db);
                 }

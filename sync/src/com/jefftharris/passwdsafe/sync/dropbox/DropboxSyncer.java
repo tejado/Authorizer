@@ -83,7 +83,7 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
                 SyncDb.updateRemoteFile(
                         dbfile.itsId, dbfile.itsRemoteId,
                         dbpath.getName(), dbpath.getParent().toString(),
-                        dbpathinfo.modifiedTime.getTime(), itsDb);
+                        dbpathinfo.modifiedTime.getTime(), null, itsDb);
 
                 dbxfiles.remove(dbpath);
             } else {
@@ -101,7 +101,7 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
                                  dbpath.getName(),
                                  dbpath.getParent().toString(),
                                  entry.getValue().modifiedTime.getTime(),
-                                 itsDb);
+                                 null, itsDb);
         }
 
         List<AbstractSyncOper<DbxFileSystem>> opers =
