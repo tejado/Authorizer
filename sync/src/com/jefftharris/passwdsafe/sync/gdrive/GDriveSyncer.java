@@ -193,8 +193,8 @@ public class GDriveSyncer
         HashMap<String, File> allRemFiles = new HashMap<String, File>();
         StringBuilder query = new StringBuilder();
         query.append("not trashed");
-        // TODO: check other mime types
         query.append(" and ( mimeType = 'application/octet-stream' or ");
+        query.append("       mimeType = 'binary/octet-stream' or ");
         query.append("       mimeType = 'application/psafe3' )");
         query.append(" and fullText contains '.psafe3'");
         Files.List request = itsDrive.files().list()
