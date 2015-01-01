@@ -351,8 +351,6 @@ public class GDriveSyncer
         }
 
         PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s", dbfile);
-
-        // TODO: refine metadata vs. file contents modification?
         SyncDb.updateRemoteFile(dbfile.itsId, dbfile.itsRemoteId,
                                 remfile.getTitle(),
                                 fileFolders.get(dbfile.itsRemoteId),
