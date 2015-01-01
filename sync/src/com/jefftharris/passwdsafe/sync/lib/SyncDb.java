@@ -354,7 +354,6 @@ public class SyncDb
                                              SQLiteDatabase db)
             throws SQLException
     {
-        // TODO: merge into updateLocalFile??
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_LOCAL_CHANGE,
                    DbFile.FileChange.toDbStr(change));
@@ -386,7 +385,6 @@ public class SyncDb
                                               SQLiteDatabase db)
             throws SQLException
     {
-        // TODO: merge into updateRemoteFile??
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_REMOTE_CHANGE,
                    DbFile.FileChange.toDbStr(change));
