@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -70,10 +70,9 @@ public class GDriveRmFileOper extends GDriveSyncOper
     @Override
     public String getDescription(Context ctx)
     {
-        String name = itsFile.itsLocalTitle;
-        if (name == null) {
-            name = itsFile.itsRemoteTitle;
-        }
+        String name = (itsFile.itsLocalTitle != null) ?
+                itsFile.getLocalTitleAndFolder() :
+                itsFile.getRemoteTitleAndFolder();
 
         if (itsIsRmLocal && !itsIsRmRemote) {
             return ctx.getString(R.string.sync_oper_rmfile_local, name);
