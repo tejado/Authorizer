@@ -4,9 +4,6 @@
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-/**
- *
- */
 package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.IOException;
@@ -14,11 +11,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import android.accounts.Account;
 import android.content.Context;
@@ -45,7 +40,6 @@ import com.google.api.services.drive.model.Change;
 import com.google.api.services.drive.model.ChangeList;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import com.google.api.services.drive.model.ParentReference;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.R;
@@ -69,6 +63,7 @@ public class GDriveSyncer
     private final Context itsContext;
     private final HashMap<String, File> itsFileCache =
             new HashMap<String, File>();
+    private final FileFolders itsFileFolders;
 
     private static final HashMap<String, FolderRefs> itsFolderRefs =
             new HashMap<String, FolderRefs>();
@@ -93,6 +88,7 @@ public class GDriveSyncer
         itsIsManual = manual;
         itsLogrec = logrec;
         itsContext = ctx;
+        itsFileFolders = new FileFolders(itsDrive, itsFileCache, itsFolderRefs);
     }
 
 
@@ -249,13 +245,7 @@ public class GDriveSyncer
                     file = null;
                 } else if (isFolderFile(file)) {
                     PasswdSafeUtil.dbginfo(TAG, "isdir %s", file);
-                    FolderRefs folderRefs = itsFolderRefs.get(file.getId());
-                    if (folderRefs != null) {
-                        for (String fileId: folderRefs.itsFileRefs) {
-                            File refFile = getCachedFile(fileId);
-                            changedFiles.put(fileId, refFile);
-                        }
-                    }
+                    itsFileFolders.checkFolderFiles(file, changedFiles);
                     file = null;
                 } else if (!isSyncFile(file)) {
                     file = null;
@@ -283,7 +273,8 @@ public class GDriveSyncer
             throws SQLException, IOException
     {
         itsFileCache.putAll(remfiles);
-        Map<String, String> fileFolders = computeFilesFolders(remfiles);
+        Map<String, String> fileFolders =
+                itsFileFolders.computeFilesFolders(remfiles);
 
         List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
@@ -513,9 +504,6 @@ public class GDriveSyncer
                                                   String titlePrefix)
             throws SQLException
     {
-        // TODO: try to recreate in same dir(s) as original or at least
-        // set initial dir to root
-
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd HH-mm-ss", Locale.US);
         String newTitle = String.format(Locale.US,
@@ -572,105 +560,6 @@ public class GDriveSyncer
                 R.string.sync_conflict_log,
                 filename, dbfile.itsLocalChange, dbfile.itsRemoteChange);
         itsLogrec.addEntry(log);
-    }
-
-
-    /** Compute the folders for the given files */
-    private Map<String, String> computeFilesFolders(Map<String, File> remfiles)
-            throws IOException
-    {
-        HashMap<String, String> fileFolders = new HashMap<String, String>();
-        for (File remfile: remfiles.values()) {
-            if (remfile == null) {
-                continue;
-            }
-
-            // Remove the file from the folder refs to handle moves.
-            // The file will be re-added to the correct refs
-            String id = remfile.getId();
-            for (FolderRefs refs: itsFolderRefs.values()) {
-                refs.removeRef(id);
-            }
-
-            String folders = computeFolders(remfile);
-            fileFolders.put(id, folders);
-        }
-        // Purge empty folder references
-        Iterator<Map.Entry<String, FolderRefs>> iter =
-                itsFolderRefs.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, FolderRefs> entry = iter.next();
-            Set<String> fileRefs = entry.getValue().itsFileRefs;
-            if (PasswdSafeUtil.DEBUG) {
-                PasswdSafeUtil.dbginfo(TAG, "cached folder %s, refs [%s]",
-                                       entry.getKey(),
-                                       TextUtils.join(", ", fileRefs));
-            }
-            if (fileRefs.isEmpty()) {
-                iter.remove();
-            }
-        }
-
-        return fileFolders;
-    }
-
-
-    /** Compute the folders for a file */
-    private String computeFolders(File remfile)
-            throws IOException
-    {
-        String fileId = remfile.getId();
-        ArrayList<String> folders = new ArrayList<String>();
-        for (ParentReference parent: remfile.getParents()) {
-            traceParentRefs(parent, "", folders, fileId);
-        }
-        Collections.sort(folders);
-        String foldersStr = TextUtils.join(", ", folders);
-        PasswdSafeUtil.dbginfo(TAG, "compFolders %s: %s",
-                               remfile.getTitle(), foldersStr);
-        return foldersStr;
-    }
-
-
-    /** Trace the parent references for a file to compute the full paths of
-     *  its folders */
-    private void traceParentRefs(ParentReference parent,
-                                 String suffix,
-                                 ArrayList<String> folders,
-                                 String fileId)
-            throws IOException
-    {
-        String parentId = parent.getId();
-        File parentFile = getCachedFile(parentId);
-        if (parent.getIsRoot()) {
-            suffix = parentFile.getTitle() + suffix;
-            folders.add(suffix);
-        } else {
-            FolderRefs refs = itsFolderRefs.get(parentId);
-            if (refs == null) {
-                refs = new FolderRefs();
-                itsFolderRefs.put(parentId, refs);
-            }
-            refs.addRef(fileId);
-            suffix = "/" + parentFile.getTitle() + suffix;
-            for (ParentReference parentParent: parentFile.getParents()) {
-                traceParentRefs(parentParent, suffix, folders, fileId);
-            }
-        }
-    }
-
-
-    /** Get a cached file */
-    private final File getCachedFile(String id)
-            throws IOException
-    {
-        File file = itsFileCache.get(id);
-        if (file == null) {
-            file = itsDrive.files().get(id).setFields(
-                    GDriveProvider.FILE_FIELDS).execute();
-            itsFileCache.put(id, file);
-        }
-        return file;
     }
 
 
