@@ -99,13 +99,9 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
                 itsUpdateFolders : itsFile.itsLocalFolder;
         SyncDb.updateRemoteFile(itsFile.itsId, itsDriveFile.getId(),
                                    title, folders, modDate, db);
-        SyncDb.updateRemoteFileChange(itsFile.itsId,
-                                      DbFile.FileChange.NO_CHANGE, db);
         SyncDb.updateLocalFile(itsFile.itsId, itsFile.itsLocalFile,
                                   title, folders, modDate, db);
-        SyncDb.updateLocalFileChange(itsFile.itsId,
-                                     DbFile.FileChange.NO_CHANGE, db);
-        // TODO: clear file changes for all provider types (make generic?)
+        clearFileChanges(db);
         if (itsLocalFile != null) {
             itsLocalFile.setLastModified(modDate);
         }

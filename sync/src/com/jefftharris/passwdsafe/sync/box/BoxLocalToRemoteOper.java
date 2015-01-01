@@ -107,6 +107,7 @@ public class BoxLocalToRemoteOper extends AbstractSyncOper<BoxClient>
                                 title, itsFolder, modDate, db);
         SyncDb.updateLocalFile(itsFile.itsId, itsFile.itsLocalFile,
                                title, itsFolder, modDate, db);
+        clearFileChanges(db);
         if (itsLocalFile != null) {
             itsLocalFile.setLastModified(modDate);
         }
