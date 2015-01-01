@@ -74,10 +74,7 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
                                        itsFile.itsRemoteTitle,
                                        itsFile.itsRemoteFolder,
                                        itsFile.itsRemoteModDate, db);
-                SyncDb.updateRemoteFileChange(itsFile.itsId,
-                                              DbFile.FileChange.NO_CHANGE, db);
-                SyncDb.updateLocalFileChange(itsFile.itsId,
-                                             DbFile.FileChange.NO_CHANGE, db);
+                clearFileChanges(db);
             } catch (SQLException e) {
                 ctx.deleteFile(itsLocalFileName);
                 throw e;

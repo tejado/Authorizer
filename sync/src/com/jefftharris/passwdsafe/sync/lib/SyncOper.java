@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -37,4 +37,14 @@ public abstract class SyncOper
 
     /** Get a description of the operation */
     public abstract String getDescription(Context ctx);
+
+    /** Clear the file change indications */
+    protected void clearFileChanges(SQLiteDatabase db)
+            throws SQLException
+    {
+        SyncDb.updateRemoteFileChange(itsFile.itsId,
+                                      DbFile.FileChange.NO_CHANGE, db);
+        SyncDb.updateLocalFileChange(itsFile.itsId,
+                                     DbFile.FileChange.NO_CHANGE, db);
+    }
 }

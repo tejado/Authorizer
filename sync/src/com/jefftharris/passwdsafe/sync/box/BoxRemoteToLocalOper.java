@@ -91,6 +91,7 @@ public class BoxRemoteToLocalOper extends AbstractSyncOper<BoxClient>
                                        itsFile.itsRemoteTitle,
                                        itsFile.itsRemoteFolder,
                                        itsFile.itsRemoteModDate, db);
+                clearFileChanges(db);
             } catch (SQLException e) {
                 ctx.deleteFile(itsLocalFileName);
                 throw e;
