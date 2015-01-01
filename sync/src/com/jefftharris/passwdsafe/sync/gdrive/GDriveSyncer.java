@@ -288,7 +288,8 @@ public class GDriveSyncer
                     SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
                 }
                 remfiles.remove(dbfile.itsRemoteId);
-            } else if (isAllRemoteFiles) {
+            } else if (isAllRemoteFiles &&
+                    (dbfile.itsLocalChange != DbFile.FileChange.ADDED)) {
                 PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
                                        dbfile);
                 SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
