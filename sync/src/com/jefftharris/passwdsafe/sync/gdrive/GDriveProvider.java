@@ -41,7 +41,7 @@ public class GDriveProvider implements Provider
     public static final String ABOUT_FIELDS = "largestChangeId";
     public static final String FILE_FIELDS =
             "id,title,mimeType,labels(trashed),fileExtension,modifiedDate," +
-            "downloadUrl,parents(id,isRoot)";
+            "downloadUrl,md5Checksum,parents(id,isRoot)";
     public static final String FOLDER_MIME =
             "application/vnd.google-apps.folder";
 

@@ -61,6 +61,7 @@ public class SyncDb
     public static final String DB_COL_FILES_REMOTE_DELETED = "remote_deleted";
     public static final String DB_COL_FILES_REMOTE_FOLDER = "remote_folder";
     public static final String DB_COL_FILES_REMOTE_CHANGE = "remote_change";
+    public static final String DB_COL_FILES_REMOTE_HASH = "remote_hash";
     public static final String DB_MATCH_FILES_ID =
         DB_COL_FILES_ID + " = ?";
     public static final String DB_MATCH_FILES_PROVIDER_ID =
@@ -313,7 +314,7 @@ public class SyncDb
     public static long addRemoteFile(long providerId,
                                      String remId, String remTitle,
                                      String remFolder, long remModDate,
-                                     SQLiteDatabase db)
+                                     String remHash, SQLiteDatabase db)
         throws SQLException
     {
         ContentValues values = new ContentValues();
@@ -323,6 +324,7 @@ public class SyncDb
         values.put(DB_COL_FILES_REMOTE_ID, remId);
         values.put(DB_COL_FILES_REMOTE_TITLE, remTitle);
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, remModDate);
+        values.put(DB_COL_FILES_REMOTE_HASH, remHash);
         values.put(DB_COL_FILES_REMOTE_DELETED, false);
         values.put(DB_COL_FILES_REMOTE_FOLDER, remFolder);
         values.put(DB_COL_FILES_REMOTE_CHANGE,
@@ -365,13 +367,15 @@ public class SyncDb
     /** Update a remote file */
     public static void updateRemoteFile(long fileId, String remId,
                                         String remTitle, String remFolder,
-                                        long remModDate, SQLiteDatabase db)
+                                        long remModDate, String remHash,
+                                        SQLiteDatabase db)
             throws SQLException
     {
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_REMOTE_ID, remId);
         values.put(DB_COL_FILES_REMOTE_TITLE, remTitle);
         values.put(DB_COL_FILES_REMOTE_MOD_DATE, remModDate);
+        values.put(DB_COL_FILES_REMOTE_HASH, remHash);
         values.put(DB_COL_FILES_REMOTE_DELETED, false);
         values.put(DB_COL_FILES_REMOTE_FOLDER, remFolder);
         db.update(DB_TABLE_FILES, values,
@@ -599,6 +603,9 @@ public class SyncDb
                            " TEXT;");
                 db.execSQL("ALTER TABLE " + DB_TABLE_FILES +
                            " ADD COLUMN " + DB_COL_FILES_REMOTE_CHANGE +
+                           " TEXT;");
+                db.execSQL("ALTER TABLE " + DB_TABLE_FILES +
+                           " ADD COLUMN " + DB_COL_FILES_REMOTE_HASH +
                            " TEXT;");
 
                 for (DbProvider provider: getProviders(db)) {

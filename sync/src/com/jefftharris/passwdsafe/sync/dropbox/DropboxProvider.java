@@ -246,7 +246,7 @@ public class DropboxProvider extends AbstractSyncTimerProvider
 
         DbxPath path = new DbxPath(DbxPath.ROOT, title);
         SyncDb.updateRemoteFile(fileId, path.toString(), path.getName(), null,
-                                -1, db);
+                                -1, null, db);
         return fileId;
     }
 

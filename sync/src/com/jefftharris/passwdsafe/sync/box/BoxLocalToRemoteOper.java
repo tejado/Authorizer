@@ -104,7 +104,8 @@ public class BoxLocalToRemoteOper extends AbstractSyncOper<BoxClient>
         // here to avoid the extra copy from remote.
         modDate += 1000;
         SyncDb.updateRemoteFile(itsFile.itsId, itsUpdatedFile.getId(),
-                                title, itsFolder, modDate, db);
+                                title, itsFolder, modDate,
+                                itsUpdatedFile.getSha1(), db);
         SyncDb.updateLocalFile(itsFile.itsId, itsFile.itsLocalFile,
                                title, itsFolder, modDate, db);
         clearFileChanges(db);
