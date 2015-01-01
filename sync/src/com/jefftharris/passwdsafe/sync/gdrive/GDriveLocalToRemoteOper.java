@@ -31,6 +31,7 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
 
     private final boolean itsIsInsert;
     private File itsDriveFile;
+    private String itsUpdateFolders;
     private java.io.File itsLocalFile;
 
     /** Constructor */
@@ -72,7 +73,6 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
             if (itsIsInsert) {
                 itsDriveFile =
                         files.insert(itsDriveFile, fileMedia).execute();
-                // TODO on insert, compute folder from returned file and update
             } else {
                 itsDriveFile =
                         files.update(itsFile.itsRemoteId, itsDriveFile,
@@ -81,6 +81,9 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
         } else {
             itsDriveFile = files.insert(itsDriveFile).execute();
         }
+
+        FileFolders fileFolders = new FileFolders(drive);
+        itsUpdateFolders = fileFolders.computeFileFolders(itsDriveFile);
     }
 
     /* (non-Javadoc)
@@ -92,12 +95,14 @@ public class GDriveLocalToRemoteOper extends GDriveSyncOper
     {
         String title = itsDriveFile.getTitle();
         long modDate = itsDriveFile.getModifiedDate().getValue();
+        String folders = (itsUpdateFolders != null) ?
+                itsUpdateFolders : itsFile.itsLocalFolder;
         SyncDb.updateRemoteFile(itsFile.itsId, itsDriveFile.getId(),
-                                   title, itsFile.itsLocalFolder, modDate, db);
+                                   title, folders, modDate, db);
         SyncDb.updateRemoteFileChange(itsFile.itsId,
                                       DbFile.FileChange.NO_CHANGE, db);
         SyncDb.updateLocalFile(itsFile.itsId, itsFile.itsLocalFile,
-                                  title, itsFile.itsLocalFolder, modDate, db);
+                                  title, folders, modDate, db);
         SyncDb.updateLocalFileChange(itsFile.itsId,
                                      DbFile.FileChange.NO_CHANGE, db);
         // TODO: clear file changes for all provider types (make generic?)
