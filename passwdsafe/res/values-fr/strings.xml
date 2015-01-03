@@ -111,6 +111,12 @@
     <string name="invalid_length">Longueur invalide</string>
     <string name="invalid_option_length">Longueur d\'option invalide</string>
     <string name="invalid_password">"Mot de passe incorrect"</string>
+    <string name="kitkat_sdcard_warning">
+        %1$s
+        \n\nSur Android KitKat et plus, les applications sont empêchés 
+        d\'écrire sur des cartes SD amovibles. Si le fichier est situé sur
+        une carte, il devra être déplacé vers la mémoire interne.
+    </string>
     <string name="last_save_app_label">Application utilisée:</string>
     <string name="last_save_by_label">Dernier enregistrement par:</string>
     <string name="last_save_time_label">Dernier enregistrement le:</string>

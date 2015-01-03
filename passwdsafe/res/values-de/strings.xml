@@ -111,6 +111,12 @@
     <string name="invalid_length">Ungültige Länge</string>
     <string name="invalid_option_length">Ungültige Optionslänge</string>
     <string name="invalid_password">Ungültiges Passwort</string>
+    <string name="kitkat_sdcard_warning">
+        %1$s
+        \n\nAuf Android KitKat und höher, werden Anwendungen von Schreiben auf 
+        entfernbaren Sd-Karten verhindert. Wenn die Datei auf einer Karte 
+        befindet, wird es zu dem internen Speicher verschoben werden.
+    </string>
     <string name="last_save_app_label">Letzte App:</string>
     <string name="last_save_by_label">Gespeichert von:</string>
     <string name="last_save_time_label">Gespeichert am:</string>
