@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -74,8 +74,6 @@ public class MainActivity extends FragmentActivity
     private Uri itsBoxUri = null;
 
     private NewAccountTask itsNewAccountTask = null;
-
-    // TODO play: open source attribution
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -252,7 +250,9 @@ public class MainActivity extends FragmentActivity
     {
         switch (item.getItemId()) {
         case R.id.menu_about: {
-            AboutDialog dlg = new AboutDialog();
+            String extraLicenses =
+                GooglePlayServicesUtil.getOpenSourceSoftwareLicenseInfo(this);
+            AboutDialog dlg = new AboutDialog(extraLicenses);
             dlg.show(getSupportFragmentManager(), "AboutDialog");
             return true;
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -68,7 +68,7 @@ public class FileListActivity extends AbstractFileListActivity
     {
         switch (item.getItemId()) {
         case R.id.menu_about: {
-            AboutDialog dlg = new AboutDialog();
+            AboutDialog dlg = new AboutDialog(null);
             dlg.show(getSupportFragmentManager(), "AboutDialog");
             return true;
         }
