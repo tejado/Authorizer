@@ -9,6 +9,8 @@
     <!--  Title for notification shown when GooglePlayServices needs to be updated for an
         application to work. [CHAR LIMIT=70] -->
     <string name="common_google_play_services_notification_needs_update_title">An application requires an update for Google Play services.</string>
+    <!--  Text for notification shown when the Android Wear apps needs to be updated. Only shown on the wearable. [CHAR LIMIT=NONE] -->
+    <string name="common_android_wear_notification_needs_update_text">An application requires an update to the Android Wear app.</string>
     <!--  Title for notification shown when GooglePlayServices needs to be enabled for an
         application to work. [CHAR LIMIT=70] -->
     <string name="common_google_play_services_needs_enabling_title">An application requires Google Play services to be enabled.</string>
@@ -46,11 +48,19 @@
 
     <!-- Title of confirmation dialog informing user that they need to update
         Google Play services (from Play Store) [CHAR LIMIT=40] -->
-    <string name="common_google_play_services_update_title" msgid="1788179980625863495">Update Google Play services</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Update Google Play services</string>
+    
+    <!-- Title of confirmation dialog informing user that they need to update
+        the Android Wear app (from Play Store) [CHAR LIMIT=40] -->
+    <string name="common_android_wear_update_title" msgid="6006316683626838685">Update Android Wear</string>
 
     <!-- Message in confirmation dialog informing user that they need to update
         Google Play services (from Play Store) [CHAR LIMIT=NONE] -->
     <string name="common_google_play_services_update_text" msgid="9053896323427875356">This app won\'t run unless you update Google Play services.</string>
+
+    <!-- Message in confirmation dialog informing user that they need to update
+        the Android Wear app [CHAR LIMIT=NONE] -->
+    <string name="common_android_wear_update_text">This app won\'t run unless you update the Android Wear app.</string>
 
     <!-- Title of confirmation dialog informing the user that a network error occurred. [CHAR LIMIT=40] -->
     <string name="common_google_play_services_network_error_title">Network Error</string>
@@ -74,10 +84,6 @@
     <!-- Message in confirmation dialog informing user that Google Play services is not supported on their device [CHAR LIMIT=NONE] -->
     <string name="common_google_play_services_unsupported_text">Google Play services, which some of your applications rely on, is not supported by your device. Please contact the manufacturer for assistance.</string>
 
-    <!-- Message in confirmation dialog informing user that date on the device is not correct,
-    causing certificate checks to fail. [CHAR LIMIT=NONE] -->
-    <string name="common_google_play_services_unsupported_date_text">The date on the device appears to be incorrect. Please check the date on the device.</string>
-
     <!-- Button in confirmation dialog for updating Google Play services [CHAR LIMIT=40] -->
     <string name="common_google_play_services_update_button" msgid="6556509956452265614">Update</string>
 
@@ -86,5 +92,8 @@
 
     <!-- Long form sign-in button text [CHAR LIMIT=30] -->
     <string name="common_signin_button_text_long">Sign in with Google</string>
+
+    <!-- Label for an action to open a notifications content on the phone [CHAR LIMIT=25] -->
+    <string name="common_open_on_phone">Open on phone</string>
 
 </resources>
