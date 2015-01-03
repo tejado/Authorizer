@@ -42,6 +42,13 @@
     <string name="updating_account">Updating account&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.0.0&lt;/b&gt; - Improve Google Drive syncing:\n
+        - Improved conflict detection and resolution\n
+        - Show a notification for a sync conflict\n
+        - Include file checksum in remote change detection\n
+        - Improved file deletion detection during a full sync\n
+        - Add additional MIME type for files
+        \n\n
         &lt;b&gt;1.6.2&lt;/b&gt; - Update Dropbox sync library
         \n\n
         &lt;b&gt;1.6.1&lt;/b&gt; - Improve Google Drive query performance
