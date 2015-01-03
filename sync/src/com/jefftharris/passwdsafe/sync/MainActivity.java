@@ -297,8 +297,11 @@ public class MainActivity extends FragmentActivity
     public void onGdriveSync(View view)
     {
         if (itsGdriveAccount != null) {
+            Bundle extras = new Bundle();
+            extras.putBoolean(SyncAdapter.SYNC_EXTRAS_FULL, true);
             ApiCompat.requestManualSync(itsGdriveAccount,
-                                        PasswdSafeContract.CONTENT_URI, this);
+                                        PasswdSafeContract.CONTENT_URI,
+                                        this, extras);
         }
     }
 

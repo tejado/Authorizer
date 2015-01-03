@@ -181,6 +181,7 @@ public class GDrivePlayProvider implements Provider
                      DbProvider provider,
                      SQLiteDatabase db,
                      boolean manual,
+                     boolean full,
                      SyncLogRecord logrec) throws Exception
     {
         // TODO play: implement sync

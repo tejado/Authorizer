@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe.lib;
 import android.accounts.Account;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -44,10 +45,13 @@ public final class ApiCompat
     }
 
     /** Request a manual sync of a content provider */
-    public static void requestManualSync(Account acct, Uri uri, Context ctx)
+    public static void requestManualSync(Account acct,
+                                         Uri uri,
+                                         Context ctx,
+                                         Bundle extras)
     {
         if (SDK_VERSION >= SDK_ECLAIR) {
-            ApiCompatEclair.requestManualSync(acct, uri.getAuthority());
+            ApiCompatEclair.requestManualSync(acct, uri.getAuthority(), extras);
         } else {
             ApiCompatCupcake.requestManualSync(uri, ctx);
         }

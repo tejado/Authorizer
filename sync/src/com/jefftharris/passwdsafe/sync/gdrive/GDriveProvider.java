@@ -190,10 +190,11 @@ public class GDriveProvider implements Provider
     @Override
     public void sync(Account acct, DbProvider provider,
                      SQLiteDatabase db,
-                     boolean manual, SyncLogRecord logrec) throws Exception
+                     boolean manual, boolean full,
+                     SyncLogRecord logrec) throws Exception
     {
         GDriveSyncer sync = new GDriveSyncer(acct, provider, db,
-                                             manual, logrec, itsContext);
+                                             full, logrec, itsContext);
         SyncUpdateHandler.GDriveState syncState =
                 SyncUpdateHandler.GDriveState.OK;
         try {

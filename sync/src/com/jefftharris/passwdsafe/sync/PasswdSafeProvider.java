@@ -650,7 +650,7 @@ public class PasswdSafeProvider extends ContentProvider
                     Uri uri = ContentUris.withAppendedId(
                             PasswdSafeContract.Providers.CONTENT_URI,
                             provider.itsId);
-                    ApiCompat.requestManualSync(acct, uri, getContext());
+                    ApiCompat.requestManualSync(acct, uri, getContext(), null);
                     break;
                 }
                 case GDRIVE_PLAY: {

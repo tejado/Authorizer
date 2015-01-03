@@ -251,7 +251,8 @@ public abstract class AbstractSyncTimerProvider implements Provider
                     if (provider != null) {
                         SyncHelper.performSync(acct, provider,
                                                AbstractSyncTimerProvider.this,
-                                               itsIsManual, db, itsContext);
+                                               itsIsManual, false, db,
+                                               itsContext);
                     }
                 } finally {
                     syncDb.release();

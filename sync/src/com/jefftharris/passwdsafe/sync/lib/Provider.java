@@ -66,6 +66,7 @@ public interface Provider
                      DbProvider provider,
                      SQLiteDatabase db,
                      boolean manual,
+                     boolean full,
                      SyncLogRecord logrec)
             throws Exception;
 
