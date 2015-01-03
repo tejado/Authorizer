@@ -12,13 +12,14 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 
-import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  * The ActivityPasswdFile interface provides access to the password file data
@@ -52,7 +53,14 @@ public abstract class ActivityPasswdFile
             itsActivity.removeProgressDialog();
             boolean success = !(result instanceof Exception);
             if (!success) {
-                PasswdSafeUtil.showFatalMsg(((Exception)result), getActivity());
+                Exception e = (Exception)result;
+                String msg = e.toString();
+                if ((e instanceof IOException) &&
+                        (ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT)) {
+                    msg = getActivity().getString(
+                            R.string.kitkat_sdcard_warning, msg);
+                }
+                PasswdSafeUtil.showFatalMsg(e, msg, getActivity(), true);
             }
             itsSaveTask = null;
             itsActivity.saveFinished(success);
