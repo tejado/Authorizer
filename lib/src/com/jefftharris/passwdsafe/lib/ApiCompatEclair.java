@@ -20,9 +20,14 @@ public final class ApiCompatEclair
 {
     /** Request a manual sync of a content provider */
     @TargetApi(Build.VERSION_CODES.ECLAIR)
-    public static void requestManualSync(Account acct, String authority)
+    public static void requestManualSync(Account acct,
+                                         String authority,
+                                         Bundle extras)
     {
         Bundle options = new Bundle();
+        if (extras != null) {
+            options.putAll(extras);
+        }
         options.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(acct, authority, options);
     }

@@ -214,6 +214,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
                      DbProvider provider,
                      SQLiteDatabase db,
                      boolean manual,
+                     boolean full,
                      SyncLogRecord logrec) throws Exception
     {
         PasswdSafeUtil.dbginfo(TAG, "sync client: %b", itsClient);
