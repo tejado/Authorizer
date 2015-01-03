@@ -5,8 +5,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.jefftharris.passwdsafe.sync"
-    android:versionCode="10603"
-    android:versionName="1.6.2">
+    android:versionCode="20000"
+    android:versionName="2.0.0">
 
     <uses-sdk
         android:minSdkVersion="10"
