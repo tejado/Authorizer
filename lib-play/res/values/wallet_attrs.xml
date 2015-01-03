@@ -4,7 +4,7 @@
     <!-- Attributes for the WalletFragment &lt;fragment&gt; tag -->
     <declare-styleable name="WalletFragmentOptions">
         <!-- Theme to be used for the Wallet selector -->
-        <attr name="theme" format="enum">
+        <attr name="appTheme" format="enum">
             <enum name="holo_dark" value="0"/>
             <enum name="holo_light" value="1"/>
         </attr>
@@ -40,13 +40,14 @@
             <enum name="match_parent" value="-1" />
             <enum name="wrap_content" value="-2" />
         </attr>
-        <!-- Text on the buy button. Must be one of "buy_with_google", "buy_now" and "book_now" -->
+        <!-- The text on the buy button -->
         <attr name="buyButtonText" format="enum">
             <enum name="buy_with_google" value="1"/>
             <enum name="buy_now" value="2"/>
             <enum name="book_now" value="3"/>
+            <enum name="donate_with_google" value="4" />
         </attr>
-        <!-- Appearance of the buy button. Must be one of "classic", "grayscale" and "monochrome" -->
+        <!-- The appearance of the buy button -->
         <attr name="buyButtonAppearance" format="enum">
             <enum name="classic" value="1"/>
             <enum name="grayscale" value="2"/>
