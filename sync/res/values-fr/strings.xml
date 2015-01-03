@@ -42,6 +42,15 @@
     <string name="updating_account">Mise à jour compte&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.0.0&lt;/b&gt; - Améliorer la synchronisation Google Drive:\n
+        - Amélioration de la détection des conflits et la résolution\n
+        - Afficher une notification de conflit de synchronisation\n
+        - Inclure fichier checksum dans la détection de modification à 
+        distance\n
+        - Amélioration de la détection de suppression de fichier lors d\'une 
+        synchronisation complète\n
+        - Ajouter un type MIME pour les fichiers supplémentaires
+        \n\n 
         &lt;b&gt;1.6.2&lt;/b&gt; - Mettre à jour la version Dropbox
         \n\n
         &lt;b&gt;1.6.1&lt;/b&gt; - Améliorer les performances des requêtes 

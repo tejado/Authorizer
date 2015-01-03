@@ -42,6 +42,14 @@
     <string name="updating_account">Aktualisiere Konto &#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.0.0&lt;/b&gt; - Verbessern Google Drive synchronisieren:\n
+        - Verbesserte Konflikterkennung und -lösung\n
+        - Zeigen Sie eine Benachrichtigung für einen Synchronisierungskonflikt\n
+        - Include-Datei-Prüfsumme in abgelegenen Änderungserkennung\n
+        - Verbesserte Dateilöschung Erkennung während einer vollständigen 
+        Synchronisierung\n
+        - Fügen Sie zusätzliche MIME-Typ für Dateien
+        \n\n
         &lt;b&gt;1.6.2&lt;/b&gt; - Aktualisieren Sie die Dropbox-Version
         \n\n
         &lt;b&gt;1.6.1&lt;/b&gt; - Erhöhen Sie Google Drive Abfrageleistung bei 
