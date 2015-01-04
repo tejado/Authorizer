@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2014-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -18,27 +18,15 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
  * Common implementation of the sync operation for a provider
  */
 public abstract class AbstractProviderSyncer<ProviderClientT>
+        extends ProviderSyncer<ProviderClientT>
 {
-    protected final ProviderClientT itsProviderClient;
-    protected final DbProvider itsProvider;
-    protected final SQLiteDatabase itsDb;
-    protected final SyncLogRecord itsLogrec;
-    protected final Context itsContext;
-    protected final String itsTag;
-
-
     /** Constructor */
     public AbstractProviderSyncer(ProviderClientT providerClient,
                                   DbProvider provider, SQLiteDatabase db,
                                   SyncLogRecord logrec, Context ctx,
                                   String tag)
     {
-        itsProviderClient = providerClient;
-        itsProvider = provider;
-        itsDb = db;
-        itsLogrec = logrec;
-        itsContext = ctx;
-        itsTag = tag;
+        super(providerClient, provider, db, logrec, ctx, tag);
     }
 
 
