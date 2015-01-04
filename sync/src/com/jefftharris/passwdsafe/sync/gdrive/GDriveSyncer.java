@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2014-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -7,7 +7,6 @@
 package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,21 +45,18 @@ import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.SyncUpdateHandler;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.ProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
 /**
  * The Syncer class encapsulates a sync operation
  */
-public class GDriveSyncer
+public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
 {
     private final Drive itsDrive;
     private final String itsDriveToken;
-    private final DbProvider itsProvider;
-    private final SQLiteDatabase itsDb;
     private final boolean itsIsFull;
-    private final SyncLogRecord itsLogrec;
-    private final Context itsContext;
     private final HashMap<String, File> itsFileCache =
             new HashMap<String, File>();
     private final FileFolders itsFileFolders;
@@ -80,14 +76,10 @@ public class GDriveSyncer
                         SyncLogRecord logrec,
                         Context ctx)
     {
-        Pair<Drive, String> drive = getDriveService(acct, ctx);
-        itsDrive = drive.first;
-        itsDriveToken = drive.second;
-        itsProvider = provider;
-        itsDb = db;
+        super(getDriveService(acct, ctx), provider, db, logrec, ctx, TAG);
+        itsDrive = itsProviderClient.first;
+        itsDriveToken = itsProviderClient.second;
         itsIsFull = full;
-        itsLogrec = logrec;
-        itsContext = ctx;
         itsFileFolders = new FileFolders(itsDrive, itsFileCache, itsFolderRefs);
     }
 
@@ -497,70 +489,6 @@ public class GDriveSyncer
                 dbfile, itsContext.getString(R.string.recreated_local_copy));
         opers.add(new GDriveLocalToRemoteOper(updatedLocalFile,
                 itsFileCache, true));
-    }
-
-
-    /** Update a file to appear as a locally added file with a new name */
-    private final DbFile updateFileAsLocallyAdded(DbFile dbfile,
-                                                  String titlePrefix)
-            throws SQLException
-    {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd HH-mm-ss", Locale.US);
-        String newTitle = String.format(Locale.US,
-                "%s (%s) - %s",
-                titlePrefix,
-                dateFormat.format(System.currentTimeMillis()),
-                dbfile.itsLocalTitle);
-        SyncDb.updateLocalFile(
-                dbfile.itsId, dbfile.itsLocalFile, newTitle,
-                null, dbfile.itsLocalModDate, itsDb);
-        SyncDb.updateLocalFileChange(
-                dbfile.itsId, DbFile.FileChange.ADDED, itsDb);
-        return SyncDb.getFile(dbfile.itsId, itsDb);
-    }
-
-
-    /** Split the remote information for the file into a new file.  The
-     * remote fields for the existing file are reset. */
-    private final DbFile splitRemoteToNewFile(DbFile dbfile)
-            throws SQLException
-    {
-        long newRemoteId = SyncDb.addRemoteFile(
-                itsProvider.itsId, dbfile.itsRemoteId,
-                dbfile.itsRemoteTitle, dbfile.itsRemoteFolder,
-                dbfile.itsRemoteModDate, dbfile.itsRemoteHash, itsDb);
-        DbFile newRemfile = SyncDb.getFile(newRemoteId, itsDb);
-
-        resetRemoteFields(dbfile);
-
-        return newRemfile;
-    }
-
-
-    /** Reset the remote fields for a file to their defaults */
-    private final void resetRemoteFields(DbFile dbfile)
-            throws SQLException
-    {
-        SyncDb.updateRemoteFile(
-                dbfile.itsId, null, null, null, -1, null, itsDb);
-        SyncDb.updateRemoteFileChange(
-                dbfile.itsId, DbFile.FileChange.NO_CHANGE, itsDb);
-    }
-
-
-    /** Log a conflicted file */
-    private final void logConflictFile(DbFile dbfile,
-                                       boolean localName)
-    {
-        String filename = localName ? dbfile.getLocalTitleAndFolder() :
-            dbfile.getRemoteTitleAndFolder();
-        itsLogrec.addConflictFile(filename);
-
-        String log = itsContext.getString(
-                R.string.sync_conflict_log,
-                filename, dbfile.itsLocalChange, dbfile.itsRemoteChange);
-        itsLogrec.addEntry(log);
     }
 
 
