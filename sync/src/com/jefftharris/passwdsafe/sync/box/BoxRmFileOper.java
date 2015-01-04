@@ -76,10 +76,9 @@ public class BoxRmFileOper extends AbstractSyncOper<BoxClient>
     @Override
     public String getDescription(Context ctx)
     {
-        String name = itsFile.itsLocalTitle;
-        if (name == null) {
-            name = itsFile.itsRemoteTitle;
-        }
+        String name = (itsFile.itsLocalTitle != null) ?
+                itsFile.getLocalTitleAndFolder() :
+                itsFile.getRemoteTitleAndFolder();
 
         if (itsIsRmLocal && !itsIsRmRemote) {
             return ctx.getString(R.string.sync_oper_rmfile_local, name);

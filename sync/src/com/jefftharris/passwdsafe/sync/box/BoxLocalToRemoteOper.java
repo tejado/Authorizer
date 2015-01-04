@@ -121,6 +121,6 @@ public class BoxLocalToRemoteOper extends AbstractSyncOper<BoxClient>
     public String getDescription(Context ctx)
     {
         return ctx.getString(R.string.sync_oper_local_to_remote,
-                             itsFile.itsLocalTitle + " [" + itsFolder + "]");
+                             itsFile.getLocalTitleAndFolder());
     }
 }
