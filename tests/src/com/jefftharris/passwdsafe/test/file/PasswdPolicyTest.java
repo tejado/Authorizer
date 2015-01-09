@@ -11,17 +11,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import com.jefftharris.passwdsafe.file.PasswdPolicy;
-
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
+
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  * Tests for the PasswdPolicy class
  */
 public class PasswdPolicyTest extends AndroidTestCase
 {
-    //private static final String TAG = "PasswdPolicyTest";
+    private static final String TAG = "PasswdPolicyTest";
 
     /** Constructor */
     public PasswdPolicyTest()
@@ -82,6 +83,32 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(policiesStr, PasswdPolicy.hdrPoliciesToString(policies));
     }
 
+    /** Test one valid header policy with zero min lengths */
+    public void testHdrOneValidZeros()
+    {
+        String policiesStr = "0107Policy1fe00abc00000000000003!@#";
+        List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies(policiesStr);
+        assertEquals(1, policies.size());
+        PasswdPolicy policy = policies.get(0);
+        assertEquals("Policy1", policy.getName());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
+        assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
+                     PasswdPolicy.FLAG_USE_UPPERCASE |
+                     PasswdPolicy.FLAG_USE_DIGITS |
+                     PasswdPolicy.FLAG_USE_SYMBOLS |
+                     PasswdPolicy.FLAG_USE_HEX_DIGITS |
+                     PasswdPolicy.FLAG_USE_EASY_VISION |
+                     PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE, policy.getFlags());
+        assertEquals(0xabc, policy.getLength());
+        assertEquals(0x000, policy.getMinDigits());
+        assertEquals(0x000, policy.getMinLowercase());
+        assertEquals(0x000, policy.getMinSymbols());
+        assertEquals(0x000, policy.getMinUppercase());
+        assertEquals("!@#", policy.getSpecialSymbols());
+
+        assertEquals(policiesStr, PasswdPolicy.hdrPoliciesToString(policies));
+    }
+
     /** Test a default header policy */
     public void testHdrDefault()
     {
@@ -109,9 +136,9 @@ public class PasswdPolicyTest extends AndroidTestCase
     /** Test multiple valid header policies */
     public void testHdrMultiValid()
     {
-        String policiesStr = "050ceasy to readb40000a0010010010010008hex only08000140010010010010008policy 1f00000f0040020050030009pronounced200008001001001001000dspecial charsf00000d0030010040020a!@#$%^&*()";
+        String policiesStr = "060ceasy to readb40000a0010010010010008hex only08000140010010010010008policy 1f00000f0040020050030009pronounced200008001001001001000dspecial charsf00000d0030010040020a!@#$%^&*()05zerosf00000e00000000000000";
         List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies(policiesStr);
-        assertEquals(5, policies.size());
+        assertEquals(6, policies.size());
 
         PasswdPolicy policy;
         policy = policies.get(0);
@@ -185,6 +212,21 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(3, policy.getMinDigits());
         assertEquals(4, policy.getMinSymbols());
         assertEquals("!@#$%^&*()", policy.getSpecialSymbols());
+
+        policy = policies.get(5);
+        assertEquals("zeros", policy.getName());
+        assertEquals(PasswdPolicy.Location.HEADER, policy.getLocation());
+        assertEquals(PasswdPolicy.FLAG_USE_LOWERCASE |
+                     PasswdPolicy.FLAG_USE_UPPERCASE |
+                     PasswdPolicy.FLAG_USE_DIGITS |
+                     PasswdPolicy.FLAG_USE_SYMBOLS, policy.getFlags());
+        assertEquals(PasswdPolicy.Type.NORMAL, policy.getType());
+        assertEquals(14, policy.getLength());
+        assertEquals(0, policy.getMinLowercase());
+        assertEquals(0, policy.getMinUppercase());
+        assertEquals(0, policy.getMinDigits());
+        assertEquals(0, policy.getMinSymbols());
+        assertNull(policy.getSpecialSymbols());
     }
 
     /** Test max valid header policies */
@@ -404,6 +446,14 @@ public class PasswdPolicyTest extends AndroidTestCase
                            PasswdPolicy.FLAG_USE_DIGITS |
                            PasswdPolicy.FLAG_USE_SYMBOLS,
                            13, PasswdPolicy.Type.NORMAL, 1, 2, 3, 4);
+
+        // zero lengths
+        doTestRecordPolicy(null, "f00000e000000000000", null,
+                           PasswdPolicy.FLAG_USE_LOWERCASE |
+                           PasswdPolicy.FLAG_USE_UPPERCASE |
+                           PasswdPolicy.FLAG_USE_DIGITS |
+                           PasswdPolicy.FLAG_USE_SYMBOLS,
+                           14, PasswdPolicy.Type.NORMAL, 0, 0, 0, 0);
     }
 
     /** Test an invalid record policy */
@@ -475,7 +525,7 @@ public class PasswdPolicyTest extends AndroidTestCase
             PasswdPolicy policy =
                 new PasswdPolicy("", PasswdPolicy.Location.DEFAULT,
                                  PasswdPolicy.FLAG_USE_HEX_DIGITS,
-                                 len, 1, 1, 1, 1, null);
+                                 len, 0, 0, 0, 0, null);
             assertEquals(PasswdPolicy.Type.HEXADECIMAL, policy.getType());
             verifyGenPasswd(policy);
         }
@@ -634,12 +684,13 @@ public class PasswdPolicyTest extends AndroidTestCase
                 flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
                 ++minLen;
             }
+            minLen = 0;
 
             switch (type) {
             case NORMAL:
             case EASY_TO_READ: {
                 final int MAX_LEN = 16;
-                final int LEN_STEP = MAX_LEN / 2;
+                final int LEN_STEP = MAX_LEN / 4;
                 for (int lowerIdx = 0; lowerIdx <= MAX_LEN;
                      lowerIdx += LEN_STEP) {
                     for (int upperIdx = 0;
@@ -651,14 +702,14 @@ public class PasswdPolicyTest extends AndroidTestCase
                                 symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
                                 symbolIdx += LEN_STEP) {
                                 /*
-                            PasswdSafeApp.dbginfo(TAG, "Iter %x %d %d %d %d",
+                                 */
+                            PasswdSafeUtil.dbginfo(TAG, "Iter %x %d %d %d %d",
                                                   flags, lowerIdx, upperIdx,
                                                   digitIdx, symbolIdx);
-                                 */
                                 policy = new PasswdPolicy(
                                     "", PasswdPolicy.Location.DEFAULT,
-                                    flags, MAX_LEN + minLen, 1 + lowerIdx,
-                                    1 + upperIdx, 1 + digitIdx, 1 + symbolIdx,
+                                    flags, MAX_LEN + minLen, lowerIdx,
+                                    upperIdx, digitIdx, symbolIdx,
                                     null);
                                 assertEquals(type, policy.getType());
                                 verifyGenPasswd(policy);
