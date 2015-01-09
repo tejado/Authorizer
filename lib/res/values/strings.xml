@@ -1,0 +1,23 @@
+<resources>
+
+    <string name="about">About</string>
+    <string name="app_name">PasswdSafe LIBRARY</string>
+    <string name="box">Box</string>
+    <string name="build_date">Build Date: %s</string>
+    <string name="build_id">Build ID: %s</string>
+    <string name="close">Close</string>
+    <string name="copy_clipboard_error">%1$s - Error copying to the clipboard.  The error may be due to a known error in Samsung devices.</string>
+    <string name="copy_trace_and_close">Copy Trace and Close</string>
+    <string name="dropbox">Dropbox</string>
+    <string name="error">Error</string>
+    <string name="google_drive">Google Drive</string>
+    <string name="licenses">Licenses</string>
+    <string name="new_drive_file">New Drive File</string>
+    <string name="no_files">No Files</string>
+    <string name="none">None</string>
+    <string name="open">Open</string>
+    <string name="release_notes_title">Release Notes</string>
+    <string name="release_notes">(placeholder)</string>
+    <string name="type">Type</string>
+    <string name="version">Version: %s</string>
+</resources>

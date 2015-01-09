@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="account_not_exists_label">Account %1$s does not exist</string>
+    <string name="adding_account">Adding account&#8230;</string>
+    <string name="app_desc">Sync PasswordSafe databases from cloud services</string>
+    <string name="app_name">PasswdSafe Sync</string>
+    <string name="automatic">Automatic</string>
+    <string name="cant_launch_drive_file">Can\'t launch Google Drive file.  Typically the file has not been synced locally.</string>
+    <string name="choose_account">Choose Account</string>
+    <string name="clear">Clear</string>
+    <string name="conflicted_local_copy">Conflicted local copy</string>
+    <string name="dropbox_acct_unlinked">App unlinked from Dropbox account.  Clear and re-add Dropbox access for PasswdSafe Sync.</string>
+    <string name="dropbox_passwdsafe_sync">Dropbox PasswdSafe Sync</string>
+    <string name="full_sync">Full sync</string>
+    <string name="gdrive_state_auth_required">Google account authentication required.  Sync again to begin the authentication process.</string>
+    <string name="gdrive_state_pending_auth">Google account authentication is pending.  Select the sign-in request notification.</string>
+    <string name="google_acct_not_available">Google account not available</string>
+    <string name="incremental_sync">Incremental sync</string>
+    <string name="logs">Logs</string>
+    <string name="manual">Manual</string>
+    <string name="network_connected">Network connected</string>
+    <string name="network_not_connected">Network not connected</string>
+    <string name="no_account">No Account</string>
+    <string name="no_logs">No logs</string>
+    <string name="passwdsafe">PasswdSafe</string>
+    <string name="passwdsafe_sync_conflict">PasswdSafe sync conflict</string>
+    <string name="passwdsafe_synced_file">PasswdSafe Synced File</string>
+    <string name="recreated_local_copy">Recreated local copy</string>
+    <string name="remove_account">Remove account?</string>
+    <string name="removing_account">Removing account&#8230;</string>
+    <string name="show_all">Show All</string>
+    <string name="sync">Sync</string>
+    <string name="sync_conflict_log">Sync conflict with file %1$s which was locally %2$s and remotely %3$s</string>
+    <string name="sync_interval_label">Interval:</string>
+    <string name="sync_log_record">Sync %1$s, %2$s, %3$s, %4$s, start: %5$tc, end: %6$tc</string>
+    <string name="sync_oper_local_to_remote">Upload file: %1$s</string>
+    <string name="sync_oper_remote_to_local">Download file: %1$s</string>
+    <string name="sync_oper_rmfile">Remove file: %1$s</string>
+    <string name="sync_oper_rmfile_local">Remove local file: %1$s</string>
+    <string name="sync_oper_rmfile_remote">Remove remote file: %1$s</string>
+    <string name="updating_account">Updating account&#8230;</string>
+
+    <string name="release_notes">
+        &lt;b&gt;2.0.0&lt;/b&gt; - Improve Google Drive syncing:\n
+        - Improved conflict detection and resolution\n
+        - Show a notification for a sync conflict\n
+        - Include file checksum in remote change detection\n
+        - Improved file deletion detection during a full sync\n
+        - Add additional MIME type for files
+        \n\n
+        &lt;b&gt;1.6.2&lt;/b&gt; - Update Dropbox sync library
+        \n\n
+        &lt;b&gt;1.6.1&lt;/b&gt; - Improve Google Drive query performance
+        when performing a full sync. Update Dropbox library.
+        \n\n 
+        &lt;b&gt;1.6.0&lt;/b&gt; - Add German translation
+        \n\n
+        &lt;b&gt;1.5.0&lt;/b&gt; - Add Box support.  Password files (.psafe3) 
+        are synced from the top folder and any folder tagged with 
+        \'passwdsafe\'.
+        \n\n
+        &lt;b&gt;1.4.0&lt;/b&gt; - Sync a file\'s folder name.  Update the
+        clients for Dropbox and Google to their latest versions.  Add some
+        warning messages to help users with Google account authentication.
+        \n\n
+        &lt;b&gt;1.3.1&lt;/b&gt; - Fix crash when the app is unlinked from the
+        user\'s Dropbox account.
+    </string>
+
+    <string-array name="interval_array">
+        <item>None</item>
+        <item>15 Minutes</item>
+        <item>30 Minutes</item>
+        <item>1 Hour</item>
+        <item>1 Day</item>
+    </string-array>
+
+</resources>

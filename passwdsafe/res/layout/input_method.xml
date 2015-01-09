@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/keyboard_background"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/keyboard_vertical_margin"
+    android:paddingLeft="@dimen/keyboard_horizontal_margin"
+    android:paddingRight="@dimen/keyboard_horizontal_margin"
+    android:paddingTop="@dimen/keyboard_vertical_margin">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/keyboard_header_margin"
+        android:paddingRight="@dimen/keyboard_header_margin">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/app_name"
+            android:paddingBottom="6dp"
+            android:paddingRight="6dp"
+            android:src="@drawable/ic_launcher_passwdsafe"/>
+
+        <TextView
+            android:id="@+id/file_label"
+            style="@style/InputMethodText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/icon"
+            android:text="@string/file_label"/>
+
+        <TextView
+            android:id="@+id/file"
+            style="@style/InputMethodText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/file_label"
+            android:paddingLeft="6dp"/>
+
+        <TextView
+            android:id="@+id/record_label"
+            style="@style/InputMethodText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/file"
+            android:layout_toRightOf="@+id/icon"
+            android:text="@string/record_label"/>
+
+        <TextView
+            android:id="@+id/record"
+            style="@style/InputMethodText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/record_label"
+            android:layout_toRightOf="@id/record_label"
+            android:paddingLeft="6dp"/>
+
+        <TextView
+            android:id="@+id/password_warning"
+            style="@style/InputMethodText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/record"
+            android:layout_toRightOf="@+id/icon"
+            android:contentDescription="?android:attr/textAppearance"
+            android:text="@string/press_password_warning"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <android.inputmethodservice.KeyboardView
+        android:id="@+id/keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
