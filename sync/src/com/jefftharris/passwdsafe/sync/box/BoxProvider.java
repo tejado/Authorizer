@@ -249,6 +249,18 @@ public class BoxProvider extends AbstractSyncTimerProvider
         SyncDb.updateLocalFile(file.itsId, localFileName,
                                file.itsLocalTitle, file.itsLocalFolder,
                                localFile.lastModified(), db);
+        switch (file.itsLocalChange) {
+        case NO_CHANGE:
+        case REMOVED: {
+            SyncDb.updateLocalFileChange(file.itsId, DbFile.FileChange.MODIFIED,
+                                         db);
+            break;
+        }
+        case ADDED:
+        case MODIFIED: {
+            break;
+        }
+        }
         requestSync(false);
     }
 
