@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -244,6 +244,7 @@ public class DropboxProvider extends AbstractSyncTimerProvider
     {
         long fileId = SyncDb.addLocalFile(providerId, title,
                                           System.currentTimeMillis(), db);
+        SyncDb.updateLocalFileChange(fileId, DbFile.FileChange.NO_CHANGE, db);
 
         DbxPath path = new DbxPath(DbxPath.ROOT, title);
         SyncDb.updateRemoteFile(fileId, path.toString(), path.getName(), null,
@@ -263,6 +264,8 @@ public class DropboxProvider extends AbstractSyncTimerProvider
         SyncDb.updateLocalFile(file.itsId, localFileName,
                                file.itsLocalTitle, file.itsLocalFolder,
                                localFile.lastModified(), db);
+        SyncDb.updateLocalFileChange(file.itsId, DbFile.FileChange.NO_CHANGE,
+                                     db);
 
         DbxPath path = new DbxPath(file.itsRemoteId);
         DbxFile dbxfile = null;

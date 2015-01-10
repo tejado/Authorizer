@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -69,22 +69,17 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
         TreeMap<DbxPath, DbxFileInfo> dbxfiles =
                 new TreeMap<DbxPath, DbxFileInfo>();
         getDirFiles(DbxPath.ROOT, dbxfiles);
-        TreeMap<DbxPath, DbxFileInfo> allDbxfiles =
-                new TreeMap<DbxPath, DbxFileInfo>(dbxfiles);
 
-        List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId,
-                                                      itsDb);
+        List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
+            if ((dbfile.itsRemoteId == null) ||
+                    (dbfile.itsLocalChange == DbFile.FileChange.ADDED)) {
+                continue;
+            }
             DbxPath dbpath = new DbxPath(dbfile.itsRemoteId);
             DbxFileInfo dbpathinfo = dbxfiles.get(dbpath);
             if (dbpathinfo != null) {
-                PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s",
-                                       dbfile.itsRemoteId);
-                SyncDb.updateRemoteFile(
-                        dbfile.itsId, dbfile.itsRemoteId,
-                        dbpath.getName(), dbpath.getParent().toString(),
-                        dbpathinfo.modifiedTime.getTime(), null, itsDb);
-
+                checkRemoteFileChange(dbfile, dbpath, dbpathinfo);
                 dbxfiles.remove(dbpath);
             } else {
                 PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
@@ -108,53 +103,119 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
                 new ArrayList<AbstractSyncOper<DbxFileSystem>>();
         dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
-            if (dbfile.itsIsRemoteDeleted || dbfile.itsIsLocalDeleted) {
-                opers.add(new DropboxRmFileOper(dbfile));
-            } else if (isRemoteNewer(dbfile, allDbxfiles)) {
-                opers.add(new DropboxRemoteToLocalOper(dbfile));
-            }
+            resolveSyncOper(dbfile, opers);
         }
         return opers;
     }
 
 
-    /** Is the remote file newer than the local */
-    private final boolean isRemoteNewer(DbFile dbfile,
-                                        Map<DbxPath, DbxFileInfo> dbxfiles)
+    /** Check for a remote file change and update */
+    private final void checkRemoteFileChange(DbFile dbfile,
+                                             DbxPath dbpath,
+                                             DbxFileInfo dbpathinfo)
     {
-        if (dbfile.itsRemoteId == null) {
-            return false;
-        }
-        if (dbfile.itsRemoteModDate != dbfile.itsLocalModDate) {
-            return true;
-        }
-        if (!TextUtils.equals(dbfile.itsLocalFolder,
-                              dbfile.itsRemoteFolder)) {
-            return true;
+        String remTitle = dbpath.getName();
+        String remFolder = dbpath.getParent().toString();
+        long remModDate = dbpathinfo.modifiedTime.getTime();
+        String remHash = null;
+        boolean changed = true;
+        do {
+            if (!TextUtils.equals(dbfile.itsRemoteTitle, remTitle) ||
+                    !TextUtils.equals(dbfile.itsRemoteFolder, remFolder) ||
+                    (dbfile.itsRemoteModDate != remModDate) ||
+                    !TextUtils.equals(dbfile.itsRemoteHash, remHash) ||
+                    TextUtils.isEmpty(dbfile.itsLocalFile)) {
+                break;
+            }
+
+            java.io.File localFile =
+                    itsContext.getFileStreamPath(dbfile.itsLocalFile);
+            if (!localFile.exists()) {
+                break;
+            }
+
+            changed = false;
+        } while(false);
+
+        if (!changed) {
+            return;
         }
 
-        if (TextUtils.isEmpty(dbfile.itsLocalFile)) {
-            return true;
+        PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s", dbfile);
+        SyncDb.updateRemoteFile(dbfile.itsId, dbfile.itsRemoteId,
+                                remTitle, remFolder, remModDate, remHash,
+                                itsDb);
+        switch (dbfile.itsRemoteChange) {
+        case NO_CHANGE:
+        case REMOVED: {
+            SyncDb.updateRemoteFileChange(dbfile.itsId,
+                                          DbFile.FileChange.MODIFIED, itsDb);
+            break;
         }
-        java.io.File localFile =
-                itsContext.getFileStreamPath(dbfile.itsLocalFile);
-        if (!localFile.exists()) {
-            return true;
+        case ADDED:
+        case MODIFIED: {
+            break;
+        }
+        }
+    }
+
+
+    /** Resolve the sync operations for a file */
+    private final void resolveSyncOper(
+            DbFile dbfile,
+            List<AbstractSyncOper<DbxFileSystem>> opers)
+            throws SQLException
+    {
+        if ((dbfile.itsLocalChange != DbFile.FileChange.NO_CHANGE) ||
+                (dbfile.itsRemoteChange != DbFile.FileChange.NO_CHANGE)) {
+            PasswdSafeUtil.dbginfo(TAG, "resolveSyncOper %s", dbfile);
         }
 
-        DbxPath path = new DbxPath(dbfile.itsRemoteId);
-        DbxFileInfo pathinfo = dbxfiles.get(path);
-        if (pathinfo == null) {
-            return true;
+        switch (dbfile.itsLocalChange) {
+        case ADDED:
+        case MODIFIED: {
+            // Adds and modifications handled immediately in the provider
+            break;
         }
-
-        if (pathinfo.size != localFile.length()) {
-            return true;
+        case NO_CHANGE: {
+            switch (dbfile.itsRemoteChange) {
+            case ADDED:
+            case MODIFIED: {
+                opers.add(new DropboxRemoteToLocalOper(dbfile));
+                break;
+            }
+            case NO_CHANGE: {
+                // Nothing
+                break;
+            }
+            case REMOVED: {
+                opers.add(new DropboxRmFileOper(dbfile));
+                break;
+            }
+            }
+            break;
         }
+        case REMOVED: {
+            switch (dbfile.itsRemoteChange) {
+            case ADDED:
+            case MODIFIED: {
+                logConflictFile(dbfile, false);
+                DbFile newRemfile = splitRemoteToNewFile(dbfile);
+                DbFile updatedLocalFile = SyncDb.getFile(dbfile.itsId, itsDb);
 
-        // TODO: checksum files for changes?
-
-        return false;
+                opers.add(new DropboxRemoteToLocalOper(newRemfile));
+                opers.add(new DropboxRmFileOper(updatedLocalFile));
+                break;
+            }
+            case NO_CHANGE:
+            case REMOVED: {
+                opers.add(new DropboxRmFileOper(dbfile));
+                break;
+            }
+            }
+            break;
+        }
+        }
     }
 
 
