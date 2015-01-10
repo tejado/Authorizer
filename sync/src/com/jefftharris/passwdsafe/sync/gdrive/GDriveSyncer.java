@@ -174,6 +174,15 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
     }
 
 
+    /** Get a file's metadata */
+    public static File getFile(String id, Drive drive)
+            throws IOException
+    {
+        return drive.files().get(id)
+                .setFields(GDriveProvider.FILE_FIELDS).execute();
+    }
+
+
     /** Perform a full sync of the files */
     private final Pair<Long, List<AbstractSyncOper<Drive>>> performFullSync()
             throws SQLException, IOException
