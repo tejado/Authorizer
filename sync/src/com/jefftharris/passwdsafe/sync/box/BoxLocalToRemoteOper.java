@@ -35,13 +35,11 @@ public class BoxLocalToRemoteOper extends AbstractSyncOper<BoxClient>
     private final boolean itsIsInsert;
     private File itsLocalFile;
     private BoxFile itsUpdatedFile;
-    private String itsFolder;
 
     /** Constructor */
     public BoxLocalToRemoteOper(DbFile file)
     {
         super(file);
-        itsFolder = file.itsLocalFolder;
         if (TextUtils.isEmpty(itsFile.itsRemoteId)) {
             itsIsInsert = true;
         } else {
@@ -99,15 +97,12 @@ public class BoxLocalToRemoteOper extends AbstractSyncOper<BoxClient>
     {
         String title = itsUpdatedFile.getName();
         long modDate = itsUpdatedFile.dateModifiedAt().getTime();
-        itsFolder = BoxSyncer.getFileFolder(itsUpdatedFile);
-        // Box seems to add a second to the time at the next sync, so increment
-        // here to avoid the extra copy from remote.
-        modDate += 1000;
+        String folder = BoxSyncer.getFileFolder(itsUpdatedFile);
         SyncDb.updateRemoteFile(itsFile.itsId, itsUpdatedFile.getId(),
-                                title, itsFolder, modDate,
+                                title, folder, modDate,
                                 itsUpdatedFile.getSha1(), db);
         SyncDb.updateLocalFile(itsFile.itsId, itsFile.itsLocalFile,
-                               title, itsFolder, modDate, db);
+                               title, folder, modDate, db);
         clearFileChanges(db);
         if (itsLocalFile != null) {
             itsLocalFile.setLastModified(modDate);
