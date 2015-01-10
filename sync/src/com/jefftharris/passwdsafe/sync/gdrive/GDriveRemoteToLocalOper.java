@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -12,8 +12,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.google.api.client.googleapis.media.MediaHttpDownloader;
@@ -22,21 +20,19 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.sync.R;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
-import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 
 /**
  * A Google Drive sync operation to sync a remote file to a local file
  */
-public class GDriveRemoteToLocalOper extends GDriveSyncOper
+public class GDriveRemoteToLocalOper
+        extends AbstractRemoteToLocalSyncOper<Drive>
 {
     private static final String TAG = "GDriveRemoteToLocalOper";
 
     private File itsDriveFile;
-    private String itsLocalFileName;
-    private boolean itsIsDownloaded = false;
 
     /** Constructor */
     public GDriveRemoteToLocalOper(DbFile file,
@@ -48,48 +44,17 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.GDriveSyncOper#doOper(com.google.api.services.drive.Drive, android.content.Context)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper#doOper(java.lang.Object, android.content.Context)
      */
     @Override
     public void doOper(Drive drive, Context ctx) throws IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "syncRemoteToLocal %s", itsFile);
         if (itsDriveFile == null) {
-            itsDriveFile = getFile(itsFile.itsRemoteId, drive);
+            itsDriveFile = GDriveSyncer.getFile(itsFile.itsRemoteId, drive);
         }
-        itsLocalFileName = SyncHelper.getLocalFileName(itsFile.itsId);
-        itsIsDownloaded = downloadFile(drive, ctx);
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.GDriveSyncOper#doPostOperUpdate(android.database.sqlite.SQLiteDatabase)
-     */
-    @Override
-    public void doPostOperUpdate(SQLiteDatabase db, Context ctx)
-            throws IOException, SQLException
-    {
-        if (itsIsDownloaded && (itsLocalFileName != null)) {
-            try {
-                SyncDb.updateLocalFile(itsFile.itsId, itsLocalFileName,
-                                       itsFile.itsRemoteTitle,
-                                       itsFile.itsRemoteFolder,
-                                       itsFile.itsRemoteModDate, db);
-                clearFileChanges(db);
-            } catch (SQLException e) {
-                ctx.deleteFile(itsLocalFileName);
-                throw e;
-            }
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.GDriveSyncOper#getDescription(android.content.Context)
-     */
-    @Override
-    public String getDescription(Context ctx)
-    {
-        return ctx.getString(R.string.sync_oper_remote_to_local,
-                             itsFile.getRemoteTitleAndFolder());
+        setLocalFileName(SyncHelper.getLocalFileName(itsFile.itsId));
+        setDownloaded(downloadFile(drive, ctx));
     }
 
 
@@ -108,7 +73,8 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
             OutputStream os = null;
             try {
                 os = new BufferedOutputStream(
-                    ctx.openFileOutput(itsLocalFileName, Context.MODE_PRIVATE));
+                        ctx.openFileOutput(getLocalFileName(),
+                                           Context.MODE_PRIVATE));
                 HttpRequestFactory reqFactory = drive.getRequestFactory();
                 MediaHttpDownloader dl = new MediaHttpDownloader(
                     reqFactory.getTransport(), reqFactory.getInitializer());
@@ -120,11 +86,11 @@ public class GDriveRemoteToLocalOper extends GDriveSyncOper
                 }
             }
 
-            java.io.File localFile = ctx.getFileStreamPath(itsLocalFileName);
+            java.io.File localFile = ctx.getFileStreamPath(getLocalFileName());
             localFile.setLastModified(
                     itsDriveFile.getModifiedDate().getValue());
         } catch (IOException e) {
-            ctx.deleteFile(itsLocalFileName);
+            ctx.deleteFile(getLocalFileName());
             Log.e(TAG, "Sync failed to download " + itsDriveFile.getTitle(), e);
             return false;
         }

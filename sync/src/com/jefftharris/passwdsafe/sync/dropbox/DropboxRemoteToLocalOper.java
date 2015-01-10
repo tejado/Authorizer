@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.content.Context;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.dropbox.sync.android.DbxException;
@@ -26,21 +24,17 @@ import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
-import com.jefftharris.passwdsafe.sync.R;
-import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
-import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 
 /**
  *  A Dropbox sync operation to sync a remote file to a local file
  */
-public class DropboxRemoteToLocalOper extends AbstractSyncOper<DbxFileSystem>
+public class DropboxRemoteToLocalOper
+        extends AbstractRemoteToLocalSyncOper<DbxFileSystem>
 {
     private static final String TAG = "DropboxRemoteToLocalOper";
-
-    private String itsLocalFileName;
-    private boolean itsIsDownloaded = false;
 
     /** Constructor */
     protected DropboxRemoteToLocalOper(DbFile file)
@@ -49,13 +43,13 @@ public class DropboxRemoteToLocalOper extends AbstractSyncOper<DbxFileSystem>
     }
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.DropboxSyncOper#doOper(com.dropbox.sync.android.DbxFileSystem, android.content.Context)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper#doOper(java.lang.Object, android.content.Context)
      */
     @Override
     public void doOper(DbxFileSystem fs, Context ctx) throws IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "syncRemoteToLocal %s", itsFile);
-        itsLocalFileName = SyncHelper.getLocalFileName(itsFile.itsId);
+        setLocalFileName(SyncHelper.getLocalFileName(itsFile.itsId));
 
         DbxPath path = new DbxPath(itsFile.itsRemoteId);
         DbxFile file = null;
@@ -68,57 +62,26 @@ public class DropboxRemoteToLocalOper extends AbstractSyncOper<DbxFileSystem>
             try {
                 is = new BufferedInputStream(file.getReadStream());
                 os = new BufferedOutputStream(
-                        ctx.openFileOutput(itsLocalFileName,
+                        ctx.openFileOutput(getLocalFileName(),
                                            Context.MODE_PRIVATE));
                 Utils.copyStream(is, os);
             } finally {
                 Utils.closeStreams(is, os);
             }
 
-            java.io.File localFile = ctx.getFileStreamPath(itsLocalFileName);
+            java.io.File localFile = ctx.getFileStreamPath(getLocalFileName());
             DbxFileInfo fileInfo = file.getInfo();
             localFile.setLastModified(fileInfo.modifiedTime.getTime());
-            itsIsDownloaded = true;
+            setDownloaded(true);
         } catch (Exception e) {
-            ctx.deleteFile(itsLocalFileName);
-            itsIsDownloaded = false;
+            ctx.deleteFile(getLocalFileName());
+            setDownloaded(false);
             Log.e(TAG, "Sync failed to download " + path, e);
         } finally {
             if (file != null) {
                 file.close();
             }
         }
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.SyncOper#doPostOperUpdate(android.database.sqlite.SQLiteDatabase, android.content.Context)
-     */
-    @Override
-    public void doPostOperUpdate(SQLiteDatabase db, Context ctx)
-            throws IOException, SQLException
-    {
-        if (itsIsDownloaded && (itsLocalFileName != null)) {
-            try {
-                SyncDb.updateLocalFile(itsFile.itsId, itsLocalFileName,
-                                       itsFile.itsRemoteTitle,
-                                       itsFile.itsRemoteFolder,
-                                       itsFile.itsRemoteModDate, db);
-                clearFileChanges(db);
-            } catch (SQLException e) {
-                ctx.deleteFile(itsLocalFileName);
-                throw e;
-            }
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.SyncOper#getDescription(android.content.Context)
-     */
-    @Override
-    public String getDescription(Context ctx)
-    {
-        return ctx.getString(R.string.sync_oper_remote_to_local,
-                             itsFile.getRemoteTitleAndFolder());
     }
 
     /** Wait until the latest version of a file is downloaded */
