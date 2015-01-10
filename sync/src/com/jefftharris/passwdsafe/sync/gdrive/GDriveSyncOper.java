@@ -12,14 +12,14 @@ import android.content.Context;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
-import com.jefftharris.passwdsafe.sync.lib.SyncOper;
 
 
 /**
  *  A Google Drive sync operation
  */
-public abstract class GDriveSyncOper extends SyncOper
+public abstract class GDriveSyncOper extends AbstractSyncOper<Drive>
 {
     /** Constructor */
     protected GDriveSyncOper(DbFile file)
@@ -28,6 +28,7 @@ public abstract class GDriveSyncOper extends SyncOper
     }
 
     /** Perform the sync operation */
+    @Override
     public abstract void doOper(Drive drive, Context ctx) throws IOException;
 
     /** Get a file's metadata */
