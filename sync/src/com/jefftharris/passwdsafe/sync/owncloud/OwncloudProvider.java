@@ -7,19 +7,30 @@
 package com.jefftharris.passwdsafe.sync.owncloud;
 
 import java.io.File;
+import java.util.List;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.google.android.gms.common.AccountPicker;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
 /**
@@ -27,7 +38,13 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
  */
 public class OwncloudProvider extends AbstractSyncTimerProvider
 {
+    private static final String PREF_AUTH_ACCOUNT = "owncloudAccount";
+
     private static final String TAG = "OwncloudProvider";
+
+    private String itsAccountName = null;
+    private String itsUserName = null;
+    private Uri itsUri = null;
 
     /** Constructor */
     public OwncloudProvider(Context ctx)
@@ -36,13 +53,32 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     }
 
     /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.Provider#init()
+     */
+    @Override
+    public void init()
+    {
+        super.init();
+        updateOwncloudAcct();
+    }
+
+    /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
      */
     @Override
     public void startAccountLink(Activity activity, int requestCode)
     {
-        // TODO Auto-generated method stub
-
+        Intent intent = AccountPicker.newChooseAccountIntent(
+                null, null, new String[] { SyncDb.OWNCLOUD_ACCOUNT_TYPE },
+                true, null, null, null, null);
+        try {
+            activity.startActivityForResult(intent, requestCode);
+        } catch (ActivityNotFoundException e) {
+            // TODO: fix string
+            String msg = "R.string.google_acct_not_available";
+            Log.e(TAG, msg, e);
+            PasswdSafeUtil.showErrorMsg(msg, activity);
+        }
     }
 
     /* (non-Javadoc)
@@ -53,8 +89,30 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                                             Intent activityData,
                                             Uri providerAcctUri)
     {
-        // TODO Auto-generated method stub
-        return null;
+        String accountName = null;
+        do {
+            if ((activityResult != Activity.RESULT_OK) ||
+                    (activityData == null)) {
+                break;
+            }
+
+            Bundle b = activityData.getExtras();
+            accountName = b.getString(AccountManager.KEY_ACCOUNT_NAME);
+            Log.i(TAG, "Selected account: " + accountName);
+            if (TextUtils.isEmpty(accountName)) {
+                accountName = null;
+                break;
+            }
+        } while(false);
+
+        saveAuthData(accountName);
+        updateOwncloudAcct();
+
+        if (accountName == null) {
+            return null;
+        }
+        return new NewAccountTask(providerAcctUri, accountName,
+                ProviderType.OWNCLOUD, getContext());
     }
 
     /* (non-Javadoc)
@@ -63,8 +121,8 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public void unlinkAccount()
     {
-        // TODO Auto-generated method stub
-
+        saveAuthData(null);
+        updateOwncloudAcct();
     }
 
     /* (non-Javadoc)
@@ -73,8 +131,8 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public boolean isAccountAuthorized()
     {
-        // TODO Auto-generated method stub
-        return false;
+        // TODO: authorized??
+        return itsAccountName != null;
     }
 
     /* (non-Javadoc)
@@ -83,8 +141,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public Account getAccount(String acctName)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new Account(acctName, SyncDb.OWNCLOUD_ACCOUNT_TYPE);
     }
 
     /* (non-Javadoc)
@@ -93,8 +150,12 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public void checkProviderAdd(SQLiteDatabase db) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        List<DbProvider> providers = SyncDb.getProviders(db);
+        for (DbProvider provider: providers) {
+            if (provider.itsType == ProviderType.OWNCLOUD) {
+                throw new Exception("Only one ownCloud account allowed");
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -103,8 +164,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public void cleanupOnDelete(String acctName) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        unlinkAccount();
     }
 
     /* (non-Javadoc)
@@ -113,8 +173,11 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public void requestSync(boolean manual)
     {
-        // TODO Auto-generated method stub
-
+        PasswdSafeUtil.dbginfo(TAG, "requestSync client: %b", itsAccountName);
+        if (itsAccountName == null) {
+            return;
+        }
+        doRequestSync(manual);
     }
 
     /* (non-Javadoc)
@@ -128,19 +191,26 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        PasswdSafeUtil.dbginfo(TAG, "sync client: %b", itsAccountName);
+        if (itsAccountName == null) {
+            return;
+        }
+        //new OwncloudSyncer(itsUserName, itsUri, provider, db, logrec,
+          //                 getContext()).sync();
     }
 
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#insertLocalFile(long, java.lang.String, android.database.sqlite.SQLiteDatabase)
      */
     @Override
-    public long insertLocalFile(long providerId, String title, SQLiteDatabase db)
-                                                                                 throws Exception
+    public long insertLocalFile(long providerId, String title,
+                                SQLiteDatabase db)
+            throws Exception
     {
-        // TODO Auto-generated method stub
-        return 0;
+        long id = SyncDb.addLocalFile(providerId, title,
+                System.currentTimeMillis(), db);
+        requestSync(false);
+        return id;
     }
 
     /* (non-Javadoc)
@@ -152,8 +222,23 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                                 File localFile,
                                 SQLiteDatabase db) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        // TODO: refactor some common code between providers
+        SyncDb.updateLocalFile(file.itsId, localFileName,
+                file.itsLocalTitle, file.itsLocalFolder,
+                localFile.lastModified(), db);
+        switch (file.itsLocalChange) {
+        case NO_CHANGE:
+        case REMOVED: {
+            SyncDb.updateLocalFileChange(file.itsId, DbFile.FileChange.MODIFIED,
+                                         db);
+            break;
+        }
+        case ADDED:
+        case MODIFIED: {
+            break;
+        }
+        }
+        requestSync(false);
     }
 
     /* (non-Javadoc)
@@ -161,10 +246,10 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
      */
     @Override
     public void deleteLocalFile(DbFile file, SQLiteDatabase db)
-                                                               throws Exception
+            throws Exception
     {
-        // TODO Auto-generated method stub
-
+        SyncDb.updateLocalFileDeleted(file.itsId, db);
+        requestSync(false);
     }
 
     /* (non-Javadoc)
@@ -173,8 +258,63 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     protected String getAccountUserId()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return itsAccountName;
     }
 
+    /** Update the ownCloud account client based on availability of
+     *  authentication information. */
+    private synchronized void updateOwncloudAcct()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        itsAccountName = prefs.getString(PREF_AUTH_ACCOUNT, null);
+        PasswdSafeUtil.dbginfo(TAG, "updateOwncloudAcct token %b",
+                               itsAccountName);
+
+        String userName = null;
+        Uri uri = null;
+
+        if (itsAccountName != null) {
+            int pos = itsAccountName.indexOf('@');
+            if (pos != -1) {
+                userName = itsAccountName.substring(0, pos);
+                Uri.Builder builder = new Uri.Builder();
+                builder.scheme("http");
+                builder.authority(itsAccountName.substring(pos + 1));
+                builder.path("/owncloud");
+                uri = builder.build();
+            } else {
+                itsAccountName = null;
+            }
+        }
+
+        itsUserName = userName;
+        itsUri = uri;
+        if (itsUri != null) {
+            try {
+                updateProviderSyncFreq(itsAccountName);
+                requestSync(false);
+            } catch (Exception e) {
+                Log.e(TAG, "updateOwncloudAcct failure", e);
+            }
+        } else {
+            updateSyncFreq(null, 0);
+        }
+    }
+
+    /** Save or clear the ownCloud authentication data */
+    private synchronized void saveAuthData(String accountName)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "saveAuthData: %b", accountName);
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        if (accountName != null) {
+            editor.putString(PREF_AUTH_ACCOUNT, accountName);
+        } else {
+            editor.remove(PREF_AUTH_ACCOUNT);
+        }
+        editor.commit();
+    }
 }
