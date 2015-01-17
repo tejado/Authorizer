@@ -82,53 +82,42 @@ public class MainActivity extends FragmentActivity
         setContentView(R.layout.activity_main);
         Log.i(TAG, "onCreate");
 
-        Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
-        freqSpin.setOnItemSelectedListener(new OnItemSelectedListener()
+        OnItemSelectedListener freqSelListener = new OnItemSelectedListener()
         {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
-                                       int pos, long id)
+                                       int position, long id)
             {
-                onGdriveFreqChanged(pos);
+                switch (parent.getId()) {
+                case R.id.gdrive_interval: {
+                    onGdriveFreqChanged(position);
+                    break;
+                }
+                case R.id.dropbox_interval: {
+                    onDropboxFreqChanged(position);
+                    break;
+                }
+                case R.id.box_interval: {
+                    onBoxFreqChanged(position);
+                    break;
+                }
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent)
             {
             }
-        });
+        };
+
+        Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
+        freqSpin.setOnItemSelectedListener(freqSelListener);
 
         freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
-        freqSpin.setOnItemSelectedListener(new OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int pos, long id)
-            {
-                onDropboxFreqChanged(pos);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent)
-            {
-            }
-        });
+        freqSpin.setOnItemSelectedListener(freqSelListener);
 
         freqSpin = (Spinner)findViewById(R.id.box_interval);
-        freqSpin.setOnItemSelectedListener(new OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int pos, long id)
-            {
-                onBoxFreqChanged(pos);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent)
-            {
-            }
-        });
+        freqSpin.setOnItemSelectedListener(freqSelListener);
 
         // Check the state of Google Play services
         int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
