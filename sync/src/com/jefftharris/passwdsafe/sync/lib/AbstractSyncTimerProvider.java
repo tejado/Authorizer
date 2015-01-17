@@ -27,6 +27,7 @@ public abstract class AbstractSyncTimerProvider implements Provider
 {
     private final int BROADCAST_REQUEST_SYNC_DROPBOX = 0;
     private final int BROADCAST_REQUEST_SYNC_BOX = 1;
+    private final int BROADCAST_REQUEST_SYNC_OWNCLOUD = 2;
 
     private final ProviderType itsProviderType;
     private final Context itsContext;
@@ -96,6 +97,10 @@ public abstract class AbstractSyncTimerProvider implements Provider
                         }
                         case DROPBOX: {
                             requestCode = BROADCAST_REQUEST_SYNC_DROPBOX;
+                            break;
+                        }
+                        case OWNCLOUD: {
+                            requestCode = BROADCAST_REQUEST_SYNC_OWNCLOUD;
                             break;
                         }
                         case GDRIVE:
