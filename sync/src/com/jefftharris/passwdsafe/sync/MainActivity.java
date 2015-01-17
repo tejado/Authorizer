@@ -60,6 +60,7 @@ public class MainActivity extends FragmentActivity
     private static final int DROPBOX_LINK_RC = 1;
     private static final int BOX_AUTH_RC = 2;
     private static final int GDRIVE_PLAY_LINK_RC = 3;
+    private static final int OWNCLOUD_LINK_RC = 4;
 
     private static final int LOADER_PROVIDERS = 0;
 
@@ -72,6 +73,7 @@ public class MainActivity extends FragmentActivity
     private Uri itsGdriveUri = null;
     private Uri itsDropboxUri = null;
     private Uri itsBoxUri = null;
+    private Uri itsOwncloudUri = null;
 
     private NewAccountTask itsNewAccountTask = null;
 
@@ -101,6 +103,10 @@ public class MainActivity extends FragmentActivity
                     onBoxFreqChanged(position);
                     break;
                 }
+                case R.id.owncloud_interval: {
+                    onOwncloudFreqChanged(position);
+                    break;
+                }
                 }
             }
 
@@ -117,6 +123,9 @@ public class MainActivity extends FragmentActivity
         freqSpin.setOnItemSelectedListener(freqSelListener);
 
         freqSpin = (Spinner)findViewById(R.id.box_interval);
+        freqSpin.setOnItemSelectedListener(freqSelListener);
+
+        freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
         freqSpin.setOnItemSelectedListener(freqSelListener);
 
         // Check the state of Google Play services
@@ -136,6 +145,7 @@ public class MainActivity extends FragmentActivity
         updateGdriveAccount(null);
         updateDropboxAccount(null);
         updateBoxAccount(null);
+        updateOwncloudAccount(null);
         LoaderManager lm = getSupportLoaderManager();
         lm.initLoader(LOADER_PROVIDERS, null, this);
     }
@@ -209,6 +219,11 @@ public class MainActivity extends FragmentActivity
         case GDRIVE_PLAY_LINK_RC: {
             itsNewAccountTask = getGdrivePlayProvider().finishAccountLink(
                     resultCode, data, itsGdrivePlayUri);
+            break;
+        }
+        case OWNCLOUD_LINK_RC: {
+            itsNewAccountTask = getOwncloudProvider().finishAccountLink(
+                    resultCode, data, itsOwncloudUri);
             break;
         }
         default: {
@@ -409,6 +424,42 @@ public class MainActivity extends FragmentActivity
         updateSyncFreq(freq, itsBoxUri);
     }
 
+
+    /** Button onClick handler to choose an ownCloud account */
+    public void onOwncloudChoose(View view)
+    {
+        Provider owncloudProvider = getOwncloudProvider();
+        try {
+            owncloudProvider.startAccountLink(this, OWNCLOUD_LINK_RC);
+        } catch (Exception e) {
+            Log.e(TAG, "ownCloud startAccountLink failed", e);
+            owncloudProvider.unlinkAccount();
+        }
+    }
+
+
+    /** Button onClick handler to sync an ownCloud account */
+    public void onOwncloudSync(View view)
+    {
+        getOwncloudProvider().requestSync(true);
+    }
+
+
+    /** Button onClick handler to clear an ownCloud account */
+    public void onOwncloudClear(View view)
+    {
+        DialogFragment prompt = ClearPromptDlg.newInstance(itsOwncloudUri);
+        prompt.show(getSupportFragmentManager(), null);
+    }
+
+
+    /** ownCloud sync frequency spinner changed */
+    private void onOwncloudFreqChanged(int pos)
+    {
+        ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
+        updateSyncFreq(freq, itsOwncloudUri);
+    }
+
     /* (non-Javadoc)
      * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
      */
@@ -430,6 +481,7 @@ public class MainActivity extends FragmentActivity
         boolean hasGdrive = false;
         boolean hasDropbox = false;
         boolean hasBox = false;
+        boolean hasOwncloud = false;
         for (boolean more = cursor.moveToFirst(); more;
                 more = cursor.moveToNext()) {
             String typeStr = cursor.getString(
@@ -457,6 +509,11 @@ public class MainActivity extends FragmentActivity
                     updateBoxAccount(cursor);
                     break;
                 }
+                case OWNCLOUD: {
+                    hasOwncloud = true;
+                    updateOwncloudAccount(cursor);
+                    break;
+                }
                 }
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Unknown type: " + typeStr);
@@ -474,6 +531,9 @@ public class MainActivity extends FragmentActivity
         if (!hasBox) {
             updateBoxAccount(null);
         }
+        if (!hasOwncloud) {
+            updateOwncloudAccount(null);
+        }
     }
 
     /* (non-Javadoc)
@@ -486,6 +546,7 @@ public class MainActivity extends FragmentActivity
         updateGdriveAccount(null);
         updateDropboxAccount(null);
         updateBoxAccount(null);
+        updateOwncloudAccount(null);
     }
 
 
@@ -682,6 +743,47 @@ public class MainActivity extends FragmentActivity
         }
     }
 
+    /** Update the UI when the ownCloud account is changed */
+    private final void updateOwncloudAccount(Cursor cursor)
+    {
+        View chooseBtn = findViewById(R.id.owncloud_choose);
+        TextView acctView = (TextView)findViewById(R.id.owncloud_acct);
+        View controls = findViewById(R.id.owncloud_controls);
+        View clearBtn = findViewById(R.id.owncloud_clear);
+        if (cursor != null) {
+            long id = cursor.getLong(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_ID);
+            String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
+            int freqVal = cursor.getInt(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
+            ProviderSyncFreqPref freq =
+                    ProviderSyncFreqPref.freqValueOf(freqVal);
+            itsOwncloudUri = ContentUris.withAppendedId(
+                    PasswdSafeContract.Providers.CONTENT_URI, id);
+            boolean authorized = getOwncloudProvider().isAccountAuthorized();
+
+            View freqSpinLabel = findViewById(R.id.owncloud_interval_label);
+            Spinner freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
+            freqSpin.setSelection(freq.getDisplayIdx());
+            View syncBtn = findViewById(R.id.owncloud_sync);
+            chooseBtn.setVisibility(View.GONE);
+            acctView.setVisibility(View.VISIBLE);
+            acctView.setText(acct);
+            controls.setVisibility(View.VISIBLE);
+            clearBtn.setVisibility(View.VISIBLE);
+
+            freqSpin.setEnabled(true);
+            freqSpinLabel.setEnabled(true);
+            syncBtn.setEnabled(authorized);
+        } else {
+            itsOwncloudUri = null;
+            chooseBtn.setVisibility(View.VISIBLE);
+            acctView.setVisibility(View.GONE);
+            controls.setVisibility(View.GONE);
+            clearBtn.setVisibility(View.GONE);
+        }
+    }
+
     /** Remove an account */
     private void removeAccount(Uri currAcct)
     {
@@ -735,6 +837,12 @@ public class MainActivity extends FragmentActivity
     private Provider getBoxProvider()
     {
         return ProviderFactory.getProvider(ProviderType.BOX, this);
+    }
+
+    /** Get the ownCloud provider */
+    private Provider getOwncloudProvider()
+    {
+        return ProviderFactory.getProvider(ProviderType.OWNCLOUD, this);
     }
 
     /** Dialog to prompt when an account is cleared */
