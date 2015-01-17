@@ -353,6 +353,93 @@
             style="@style/Separator"
             android:layout_margin="6dp"/>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <ImageButton
+                android:id="@+id/owncloud_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onOwncloudClear"
+                android:padding="12dp"
+                android:src="@drawable/ic_action_delete"/>
+            
+            <TextView
+                android:id="@+id/owncloud_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/owncloud_clear"
+                android:drawableLeft="@drawable/owncloud"
+                android:drawablePadding="6dp"
+                android:gravity="fill_vertical"
+                android:padding="6dp"
+                android:text="@string/owncloud"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <Button
+                android:id="@+id/owncloud_choose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/owncloud_title"
+                android:onClick="onOwncloudChoose"
+                android:text="@string/choose_account"/>
+    
+            <TextView
+                android:id="@+id/owncloud_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/owncloud_choose"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textIsSelectable="false"/>
+    
+            <LinearLayout
+                android:id="@+id/owncloud_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/owncloud_acct"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/owncloud_sync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/sync"
+                    android:onClick="onOwncloudSync"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_action_sync"/>
+
+                <TextView
+                    android:id="@+id/owncloud_interval_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="@string/sync_interval_label"
+                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <Spinner
+                    android:id="@+id/owncloud_interval"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:entries="@array/interval_array"
+                    tools:listitem="@android:layout/simple_spinner_item"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <View
+            style="@style/Separator"
+            android:layout_margin="6dp"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
