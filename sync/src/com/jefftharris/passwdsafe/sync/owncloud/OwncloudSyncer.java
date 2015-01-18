@@ -108,7 +108,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     protected AbstractRemoteToLocalSyncOper<OwnCloudClient>
     createRemoteToLocalOper(DbFile dbfile)
     {
-        return null;
+        return new OwncloudRemoteToLocalOper(dbfile);
     }
 
 
