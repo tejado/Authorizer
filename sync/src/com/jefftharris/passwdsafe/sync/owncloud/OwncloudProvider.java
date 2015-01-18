@@ -32,6 +32,7 @@ import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
 
 /**
  *  Implements a provider for the ownCloud service
@@ -113,6 +114,8 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         }
         return new NewAccountTask(providerAcctUri, accountName,
                 ProviderType.OWNCLOUD, getContext());
+
+        // TODO: get auth token now to show dialog
     }
 
     /* (non-Javadoc)
@@ -123,6 +126,11 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     {
         saveAuthData(null);
         updateOwncloudAcct();
+        AccountManager acctMgr = AccountManager.get(getContext());
+        acctMgr.invalidateAuthToken(
+                SyncDb.OWNCLOUD_ACCOUNT_TYPE,
+                AccountTypeUtils.getAuthTokenTypePass(
+                        SyncDb.OWNCLOUD_ACCOUNT_TYPE));
     }
 
     /* (non-Javadoc)
@@ -195,8 +203,8 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         if (itsAccountName == null) {
             return;
         }
-        //new OwncloudSyncer(itsUserName, itsUri, provider, db, logrec,
-          //                 getContext()).sync();
+        new OwncloudSyncer(getAccount(itsAccountName), itsUserName, itsUri,
+                           provider, db, logrec, getContext()).sync();
     }
 
     /* (non-Javadoc)
@@ -280,6 +288,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             if (pos != -1) {
                 userName = itsAccountName.substring(0, pos);
                 Uri.Builder builder = new Uri.Builder();
+                // TODO: can't hard-code this
                 builder.scheme("http");
                 builder.authority(itsAccountName.substring(pos + 1));
                 builder.path("/owncloud");
