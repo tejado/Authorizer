@@ -137,6 +137,7 @@
     <string name="new_file_not_supp_uri">New file not supported for URI %1$s</string>
     <string name="new_group_menu">New group…</string>
     <string name="new_local_file">New Local File</string>
+    <string name="new_owncloud_file">New ownCloud File</string>
     <string name="new_password_label">New Password:</string>
     <string name="new_policy">New Policy</string>
     <string name="next">Next</string>
