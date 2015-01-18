@@ -24,7 +24,10 @@ import com.dropbox.sync.android.DbxFileInfo;
 import com.dropbox.sync.android.DbxFileSystem;
 import com.dropbox.sync.android.DbxPath;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
@@ -114,7 +117,7 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createLocalToRemoteOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<DbxFileSystem>
+    protected AbstractLocalToRemoteSyncOper<DbxFileSystem>
     createLocalToRemoteOper(DbFile dbfile)
     {
         return null;
@@ -125,7 +128,7 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRemoteToLocalOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<DbxFileSystem>
+    protected AbstractRemoteToLocalSyncOper<DbxFileSystem>
     createRemoteToLocalOper(DbFile dbfile)
     {
         return new DropboxRemoteToLocalOper(dbfile);
@@ -136,7 +139,7 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRmFileOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<DbxFileSystem>
+    protected AbstractRmSyncOper<DbxFileSystem>
     createRmFileOper(DbFile dbfile)
     {
         return new DropboxRmFileOper(dbfile);

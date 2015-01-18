@@ -19,7 +19,10 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
@@ -56,6 +59,23 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     }
 
 
+    /** Check the result of an operation; An exception is thrown on an error */
+    public static void checkOperationResult(RemoteOperationResult result)
+            throws IOException
+    {
+        if (result.isSuccess()) {
+            return;
+        }
+
+        // TODO i18n msg
+        String msg = String.format(
+                "ownCloud error result %s, HTTP code %d: %s",
+                result.getCode(), result.getHttpCode(),
+                result.getLogMessage());
+        throw new IOException(msg, result.getException());
+    }
+
+
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#performSync()
      */
@@ -74,7 +94,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createLocalToRemoteOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<OwnCloudClient>
+    protected AbstractLocalToRemoteSyncOper<OwnCloudClient>
     createLocalToRemoteOper(DbFile dbfile)
     {
         return null;
@@ -85,7 +105,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRemoteToLocalOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<OwnCloudClient>
+    protected AbstractRemoteToLocalSyncOper<OwnCloudClient>
     createRemoteToLocalOper(DbFile dbfile)
     {
         return null;
@@ -96,7 +116,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRmFileOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<OwnCloudClient>
+    protected AbstractRmSyncOper<OwnCloudClient>
     createRmFileOper(DbFile dbfile)
     {
         return null;
@@ -143,23 +163,6 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
                       new OwncloudProviderFile(remfile));
         }
         return files;
-    }
-
-
-    /** Check the result of an operation; An exception is thrown on an error */
-    private void checkOperationResult(RemoteOperationResult result)
-            throws IOException
-    {
-        if (result.isSuccess()) {
-            return;
-        }
-
-        // TODO i18n msg
-        String msg = String.format(
-                "ownCloud error result %s, HTTP code %d: %s",
-                result.getCode(), result.getHttpCode(),
-                result.getLogMessage());
-        throw new IOException(msg, result.getException());
     }
 
 
