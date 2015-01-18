@@ -1,22 +1,22 @@
 /* ownCloud Android Library is available under MIT license
  *   Copyright (C) 2014 ownCloud Inc.
- *   
+ *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
  *   in the Software without restriction, including without limitation the rights
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- *   
+ *
  *   The above copyright notice and this permission notice shall be included in
  *   all copies or substantial portions of the Software.
- *   
- *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  *   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
- *   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN 
- *   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ *   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ *   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  *   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *   THE SOFTWARE.
  *
@@ -49,35 +49,44 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 
 /**
  * Remote operation performing the download of a remote file in the ownCloud server.
- * 
+ *
  * @author David A. Velasco
  * @author masensio
  */
 
 public class DownloadRemoteFileOperation extends RemoteOperation {
-	
+
 	private static final String TAG = DownloadRemoteFileOperation.class.getSimpleName();
-    
+
 	private Set<OnDatatransferProgressListener> mDataTransferListeners = new HashSet<OnDatatransferProgressListener>();
     private final AtomicBoolean mCancellationRequested = new AtomicBoolean(false);
     private long mModificationTimestamp = 0;
     private GetMethod mGet;
-    
+
     private String mRemotePath;
     private String mLocalFolderPath;
-	
+    private File mLocalPath;
+
 	public DownloadRemoteFileOperation(String remotePath, String localFolderPath) {
 		mRemotePath = remotePath;
 		mLocalFolderPath = localFolderPath;
 	}
 
+        public DownloadRemoteFileOperation(String remotePath,
+                                           File localPath,
+                                           boolean useLocalFileTag) {
+            mRemotePath = remotePath;
+            mLocalPath = localPath;
+        }
+
 	@Override
 	protected RemoteOperationResult run(OwnCloudClient client) {
 		RemoteOperationResult result = null;
-        
+
         /// download will be performed to a temporal file, then moved to the final location
-        File tmpFile = new File(getTmpPath());
-        
+        File tmpFile = (mLocalPath != null) ?
+                mLocalPath : new File(getTmpPath());
+
         /// perform the download
         try {
         	tmpFile.getParentFile().mkdirs();
@@ -89,17 +98,17 @@ public class DownloadRemoteFileOperation extends RemoteOperation {
             result = new RemoteOperationResult(e);
             Log_OC.e(TAG, "Download of " + mRemotePath + " to " + getTmpPath() + ": " + result.getLogMessage(), e);
         }
-        
+
         return result;
 	}
 
-	
+
     protected int downloadFile(OwnCloudClient client, File targetFile) throws HttpException, IOException, OperationCancelledException {
         int status = -1;
         boolean savedFile = false;
         mGet = new GetMethod(client.getWebdavUri() + WebdavUtils.encodePath(mRemotePath));
         Iterator<OnDatatransferProgressListener> it = null;
-        
+
         FileOutputStream fos = null;
         try {
             status = client.executeMethod(mGet);
@@ -108,7 +117,7 @@ public class DownloadRemoteFileOperation extends RemoteOperation {
                 BufferedInputStream bis = new BufferedInputStream(mGet.getResponseBodyAsStream());
                 fos = new FileOutputStream(targetFile);
                 long transferred = 0;
-                
+
                 Header contentLength = mGet.getResponseHeader("Content-Length");
                 long totalToTransfer = (contentLength != null && contentLength.getValue().length() >0) ? Long.parseLong(contentLength.getValue()) : 0;
 
@@ -140,11 +149,11 @@ public class DownloadRemoteFileOperation extends RemoteOperation {
                 } else {
                 	client.exhaustResponse(mGet.getResponseBodyAsStream());
                 }
-                
+
             } else {
                 client.exhaustResponse(mGet.getResponseBodyAsStream());
             }
-                
+
         } finally {
             if (fos != null) fos.close();
             if (!savedFile && targetFile.exists()) {
@@ -154,27 +163,27 @@ public class DownloadRemoteFileOperation extends RemoteOperation {
         }
         return status;
     }
-    
+
     private boolean isSuccess(int status) {
         return (status == HttpStatus.SC_OK);
     }
-    
+
     private String getTmpPath() {
         return mLocalFolderPath + mRemotePath;
     }
-    
+
     public void addDatatransferProgressListener (OnDatatransferProgressListener listener) {
         synchronized (mDataTransferListeners) {
             mDataTransferListeners.add(listener);
         }
     }
-    
+
     public void removeDatatransferProgressListener(OnDatatransferProgressListener listener) {
         synchronized (mDataTransferListeners) {
             mDataTransferListeners.remove(listener);
         }
     }
-    
+
     public void cancel() {
         mCancellationRequested.set(true);   // atomic set; there is no need of synchronizing it
     }
