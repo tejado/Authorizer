@@ -36,13 +36,14 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
 {
     private static final String TAG = "DropboxSyncer";
 
+    // TODO refactor to use base class sync opers
+
     /** Constructor */
     public DropboxSyncer(DbxFileSystem fs, DbProvider provider,
                          SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
     {
         super(fs, provider, db, logrec, ctx, TAG);
     }
-
 
 
     /** Perform a sync of the files */
@@ -106,6 +107,39 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
             resolveSyncOper(dbfile, opers);
         }
         return opers;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createLocalToRemoteOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<DbxFileSystem>
+    createLocalToRemoteOper(DbFile dbfile)
+    {
+        return null;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRemoteToLocalOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<DbxFileSystem>
+    createRemoteToLocalOper(DbFile dbfile)
+    {
+        return new DropboxRemoteToLocalOper(dbfile);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRmFileOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<DbxFileSystem>
+    createRmFileOper(DbFile dbfile)
+    {
+        return new DropboxRmFileOper(dbfile);
     }
 
 
