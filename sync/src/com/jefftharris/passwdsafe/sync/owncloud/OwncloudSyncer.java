@@ -67,11 +67,10 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
             return;
         }
 
-        // TODO i18n msg
-        String msg = String.format(
-                "ownCloud error result %s, HTTP code %d: %s",
-                result.getCode(), result.getHttpCode(),
-                result.getLogMessage());
+        String msg = String.format(Locale.US,
+                                   "ownCloud ERROR result %s, HTTP code %d: %s",
+                                   result.getCode(), result.getHttpCode(),
+                                   result.getLogMessage());
         throw new IOException(msg, result.getException());
     }
 
