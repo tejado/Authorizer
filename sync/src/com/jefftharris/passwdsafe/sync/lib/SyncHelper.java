@@ -52,6 +52,8 @@ public class SyncHelper
                 providerType = ProviderType.DROPBOX;
             } else if (acct.type.equals(SyncDb.BOX_ACCOUNT_TYPE)) {
                 providerType = ProviderType.BOX;
+            } else if (acct.type.equals(SyncDb.OWNCLOUD_ACCOUNT_TYPE)) {
+                providerType = ProviderType.OWNCLOUD;
             } else {
                 PasswdSafeUtil.dbginfo(TAG, "Unknown account type: ",
                                        acct.type);
