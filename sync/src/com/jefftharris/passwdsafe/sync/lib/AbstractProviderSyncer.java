@@ -104,17 +104,17 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
 
 
     /** Create an operation to sync local to remote */
-    protected abstract AbstractSyncOper<ProviderClientT>
+    protected abstract AbstractLocalToRemoteSyncOper<ProviderClientT>
     createLocalToRemoteOper(DbFile dbfile);
 
 
     /** Create an operation to sync remote to local */
-    protected abstract AbstractSyncOper<ProviderClientT>
+    protected abstract AbstractRemoteToLocalSyncOper<ProviderClientT>
     createRemoteToLocalOper(DbFile dbfile);
 
 
     /** Create an operation to remove a file */
-    protected abstract AbstractSyncOper<ProviderClientT>
+    protected abstract AbstractRmSyncOper<ProviderClientT>
     createRmFileOper(DbFile dbfile);
 
 

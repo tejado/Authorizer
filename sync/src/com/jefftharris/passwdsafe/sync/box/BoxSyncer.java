@@ -36,7 +36,10 @@ import com.box.restclientv2.exceptions.BoxRestException;
 import com.box.restclientv2.exceptions.BoxSDKException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.R;
+import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
@@ -124,7 +127,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createLocalToRemoteOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<BoxClient>
+    protected AbstractLocalToRemoteSyncOper<BoxClient>
     createLocalToRemoteOper(DbFile dbfile)
     {
         return new BoxLocalToRemoteOper(dbfile);
@@ -135,7 +138,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRemoteToLocalOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<BoxClient>
+    protected AbstractRemoteToLocalSyncOper<BoxClient>
     createRemoteToLocalOper(DbFile dbfile)
     {
         return new BoxRemoteToLocalOper(dbfile);
@@ -146,7 +149,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRmFileOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
     @Override
-    protected AbstractSyncOper<BoxClient>
+    protected AbstractRmSyncOper<BoxClient>
     createRmFileOper(DbFile dbfile)
     {
         return new BoxRmFileOper(dbfile);
