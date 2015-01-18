@@ -7,18 +7,21 @@
 package com.jefftharris.passwdsafe.sync.owncloud;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
@@ -27,6 +30,9 @@ import com.owncloud.android.lib.common.OwnCloudClientFactory;
 import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
 import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
+import com.owncloud.android.lib.resources.files.FileUtils;
+import com.owncloud.android.lib.resources.files.ReadRemoteFolderOperation;
+import com.owncloud.android.lib.resources.files.RemoteFile;
 import com.owncloud.android.lib.resources.users.GetRemoteUserNameOperation;
 
 /**
@@ -58,18 +64,42 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
             throws Exception
     {
         syncDisplayName();
-        syncFiles();
-
-        List<AbstractSyncOper<OwnCloudClient>> opers =
-                new ArrayList<AbstractSyncOper<OwnCloudClient>>();
-        return opers;
+        HashMap<String, ProviderRemoteFile> owncloudFiles = getOwncloudFiles();
+        updateDbFiles(owncloudFiles);
+        return resolveSyncOpers();
     }
 
 
-    /** Sync the files from the server */
-    private void syncFiles()
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createLocalToRemoteOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<OwnCloudClient>
+    createLocalToRemoteOper(DbFile dbfile)
     {
-        //HashMap<String, RemoteFile> owncloudFiles = getOwncloudFiles();
+        return null;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRemoteToLocalOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<OwnCloudClient>
+    createRemoteToLocalOper(DbFile dbfile)
+    {
+        return null;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRmFileOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<OwnCloudClient>
+    createRmFileOper(DbFile dbfile)
+    {
+        return null;
     }
 
 
@@ -91,14 +121,29 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     }
 
 
-//    private HashMap<String, RemoteFile> getOwncloudFiles()
-//    {
-//        HashMap<String, RemoteFile> files = new HashMap<String, RemoteFile>();
-//
-//
-//
-//        return files;
-//    }
+    private HashMap<String, ProviderRemoteFile> getOwncloudFiles()
+            throws IOException
+    {
+        // TODO: check files in other folders?
+        ReadRemoteFolderOperation oper = new ReadRemoteFolderOperation(
+                FileUtils.PATH_SEPARATOR);
+        RemoteOperationResult res = oper.execute(itsProviderClient);
+        checkOperationResult(res);
+
+        HashMap<String, ProviderRemoteFile> files =
+                new HashMap<String, ProviderRemoteFile>();
+        for (Object obj: res.getData()) {
+            RemoteFile remfile = (RemoteFile)obj;
+            if (!isPasswordFile(remfile)) {
+                continue;
+            }
+            PasswdSafeUtil.dbginfo(TAG, "owncloud file: %s",
+                                   fileToString(remfile));
+            files.put(remfile.getRemotePath(),
+                      new OwncloudProviderFile(remfile));
+        }
+        return files;
+    }
 
 
     /** Check the result of an operation; An exception is thrown on an error */
@@ -118,17 +163,42 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     }
 
 
+    /** Is a file a password file */
+    private static boolean isPasswordFile(RemoteFile file)
+    {
+        return !isFolder(file) && file.getRemotePath().endsWith(".psafe3");
+    }
+
+    /** Is a file a folder */
+    private static boolean isFolder(RemoteFile file)
+    {
+        return TextUtils.equals(file.getMimeType(), "DIR");
+    }
+
+
+    /** Get a string form for a remote file */
+    private static String fileToString(RemoteFile file)
+    {
+        if (file == null) {
+            return "{null}";
+        }
+        return String.format(Locale.US,
+                             "{path:%s, mime:%s, hash:%s}",
+                             file.getRemotePath(), file.getMimeType(),
+                             file.getEtag());
+    }
+
+
     /** Set the credentials for the client */
     private void setCredentials(Account account, String userName)
     {
         itsProviderClient.clearCredentials();
         AccountManager acctMgr = AccountManager.get(itsContext);
         try {
+            String authType = AccountTypeUtils.getAuthTokenTypePass(
+                    SyncDb.OWNCLOUD_ACCOUNT_TYPE);
             String authToken = acctMgr.blockingGetAuthToken(
-                    account,
-                    AccountTypeUtils.getAuthTokenTypePass(
-                            SyncDb.OWNCLOUD_ACCOUNT_TYPE),
-                    true);
+                    account, authType, true);
             PasswdSafeUtil.dbginfo(TAG, "setCredentials %b",
                                    (authToken != null));
             if (authToken != null) {

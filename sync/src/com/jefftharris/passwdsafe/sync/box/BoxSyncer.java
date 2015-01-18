@@ -52,6 +52,8 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
 
     private static final String TAG = "BoxSyncer";
 
+    // TODO refactor to use base class sync opers
+
     /** Constructor */
     public BoxSyncer(BoxClient client, DbProvider provider,
                      SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
@@ -115,6 +117,39 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             resolveSyncOper(dbfile, opers);
         }
         return opers;
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createLocalToRemoteOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<BoxClient>
+    createLocalToRemoteOper(DbFile dbfile)
+    {
+        return new BoxLocalToRemoteOper(dbfile);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRemoteToLocalOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<BoxClient>
+    createRemoteToLocalOper(DbFile dbfile)
+    {
+        return new BoxRemoteToLocalOper(dbfile);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRmFileOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractSyncOper<BoxClient>
+    createRmFileOper(DbFile dbfile)
+    {
+        return new BoxRmFileOper(dbfile);
     }
 
 
