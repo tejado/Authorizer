@@ -119,7 +119,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     protected AbstractRmSyncOper<OwnCloudClient>
     createRmFileOper(DbFile dbfile)
     {
-        return null;
+        return new OwncloudRmFileOper(dbfile);
     }
 
 
