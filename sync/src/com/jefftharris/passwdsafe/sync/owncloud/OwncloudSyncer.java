@@ -13,9 +13,12 @@ import java.util.Locale;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.app.Activity;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -56,6 +59,38 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     {
         super(getClient(serverUri, ctx), provider, db, logrec, ctx, TAG);
         setCredentials(account, userName);
+    }
+
+
+    /** Get the ownCloud authentication for an account.  If the activity is
+     *  given, a dialog is shown if needed.  Otherwise, a notification may be
+     *  presented. Must be called from a background thread. */
+    @SuppressWarnings("deprecation")
+    public static String getAuthToken(Account account,
+                                      Context ctx,
+                                      Activity activity)
+    {
+        String authToken = null;
+        AccountManager acctMgr = AccountManager.get(ctx);
+        String authType = AccountTypeUtils.getAuthTokenTypePass(
+                SyncDb.OWNCLOUD_ACCOUNT_TYPE);
+        AccountManagerFuture<Bundle> fut;
+        if (activity != null) {
+            fut = acctMgr.getAuthToken(account, authType, null,
+                                       activity, null, null);
+        } else {
+            fut = acctMgr.getAuthToken(account, authType, true, null, null);
+        }
+        try {
+            Bundle b = fut.getResult();
+            authToken = b.getString(AccountManager.KEY_AUTHTOKEN);
+        }
+        catch (Exception e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "getAuthToken");
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "getAuthToken: %b", (authToken != null));
+        return authToken;
     }
 
 
@@ -195,23 +230,13 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     private void setCredentials(Account account, String userName)
     {
         itsProviderClient.clearCredentials();
-        AccountManager acctMgr = AccountManager.get(itsContext);
-        try {
-            String authType = AccountTypeUtils.getAuthTokenTypePass(
-                    SyncDb.OWNCLOUD_ACCOUNT_TYPE);
-            String authToken = acctMgr.blockingGetAuthToken(
-                    account, authType, true);
-            PasswdSafeUtil.dbginfo(TAG, "setCredentials %b",
-                                   (authToken != null));
-            if (authToken != null) {
-                itsProviderClient.setCredentials(
-                        OwnCloudCredentialsFactory.newBasicCredentials(
-                                userName, authToken));
-            }
-            // TODO if null returned, need message for user to handle notif
-        } catch (Exception e) {
-            PasswdSafeUtil.dbginfo(TAG, e, "setCredentials");
+        String authToken = getAuthToken(account, itsContext, null);
+        if (authToken != null) {
+            itsProviderClient.setCredentials(
+                    OwnCloudCredentialsFactory.newBasicCredentials(
+                            userName, authToken));
         }
+        // TODO if null returned, need message for user to handle notif
     }
 
 
