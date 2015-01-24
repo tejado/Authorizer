@@ -1,22 +1,22 @@
 /* ownCloud Android Library is available under MIT license
  *   Copyright (C) 2014 ownCloud Inc.
- *   
+ *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
  *   in the Software without restriction, including without limitation the rights
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- *   
+ *
  *   The above copyright notice and this permission notice shall be included in
  *   all copies or substantial portions of the Software.
- *   
- *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  *   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
- *   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN 
- *   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ *   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ *   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  *   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *   THE SOFTWARE.
  *
@@ -46,7 +46,7 @@ import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 
 /**
  * Remote operation performing the upload of a remote file to the ownCloud server.
- * 
+ *
  * @author David A. Velasco
  * @author masensio
  */
@@ -58,7 +58,7 @@ public class UploadRemoteFileOperation extends RemoteOperation {
 	protected String mRemotePath;
 	protected String mMimeType;
 	protected PutMethod mPutMethod = null;
-	
+
 	private final AtomicBoolean mCancellationRequested = new AtomicBoolean(false);
 	protected Set<OnDatatransferProgressListener> mDataTransferListeners = new HashSet<OnDatatransferProgressListener>();
 
@@ -67,7 +67,7 @@ public class UploadRemoteFileOperation extends RemoteOperation {
 	public UploadRemoteFileOperation(String localPath, String remotePath, String mimeType) {
 		mLocalPath = localPath;
 		mRemotePath = remotePath;
-		mMimeType = mimeType;	
+		mMimeType = mimeType;
 	}
 
 	@Override
@@ -89,7 +89,6 @@ public class UploadRemoteFileOperation extends RemoteOperation {
 			result  = new RemoteOperationResult(isSuccess(status), status, (mPutMethod != null ? mPutMethod.getResponseHeaders() : null));
 
 		} catch (Exception e) {
-			// TODO something cleaner with cancellations
 			if (mCancellationRequested.get()) {
 				result = new RemoteOperationResult(new OperationCancelledException());
 			} else {
@@ -120,11 +119,11 @@ public class UploadRemoteFileOperation extends RemoteOperation {
 		}
 		return status;
 	}
-	
+
     public Set<OnDatatransferProgressListener> getDataTransferListeners() {
         return mDataTransferListeners;
     }
-    
+
     public void addDatatransferProgressListener (OnDatatransferProgressListener listener) {
         synchronized (mDataTransferListeners) {
             mDataTransferListeners.add(listener);
@@ -133,7 +132,7 @@ public class UploadRemoteFileOperation extends RemoteOperation {
             ((ProgressiveDataTransferer)mEntity).addDatatransferProgressListener(listener);
         }
     }
-    
+
     public void removeDatatransferProgressListener(OnDatatransferProgressListener listener) {
         synchronized (mDataTransferListeners) {
             mDataTransferListeners.remove(listener);
@@ -142,7 +141,7 @@ public class UploadRemoteFileOperation extends RemoteOperation {
             ((ProgressiveDataTransferer)mEntity).removeDatatransferProgressListener(listener);
         }
     }
-    
+
     public void cancel() {
         synchronized (mCancellationRequested) {
             mCancellationRequested.set(true);

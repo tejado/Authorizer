@@ -1,23 +1,23 @@
 /* ownCloud Android Library is available under MIT license
  *   Copyright (C) 2014 ownCloud Inc.
  *   Copyright (C) 2012  Bartek Przybylski
- *   
+ *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
  *   in the Software without restriction, including without limitation the rights
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- *   
+ *
  *   The above copyright notice and this permission notice shall be included in
  *   all copies or substantial portions of the Software.
- *   
- *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  *   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
- *   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN 
- *   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ *   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ *   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  *   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *   THE SOFTWARE.
  *
@@ -44,7 +44,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 
 /**
  * A RequestEntity that represents a File.
- * 
+ *
  */
 public class FileRequestEntity implements RequestEntity, ProgressiveDataTransferer {
 
@@ -60,7 +60,7 @@ public class FileRequestEntity implements RequestEntity, ProgressiveDataTransfer
             throw new IllegalArgumentException("File may not be null");
         }
     }
-    
+
     @Override
     public long getContentLength() {
         return mFile.length();
@@ -82,29 +82,28 @@ public class FileRequestEntity implements RequestEntity, ProgressiveDataTransfer
             mDataTransferListeners.add(listener);
         }
     }
-    
+
     @Override
     public void addDatatransferProgressListeners(Collection<OnDatatransferProgressListener> listeners) {
         synchronized (mDataTransferListeners) {
             mDataTransferListeners.addAll(listeners);
         }
     }
-    
+
     @Override
     public void removeDatatransferProgressListener(OnDatatransferProgressListener listener) {
         synchronized (mDataTransferListeners) {
             mDataTransferListeners.remove(listener);
         }
     }
-    
-    
+
+
     @Override
     public void writeRequest(final OutputStream out) throws IOException {
         //byte[] tmp = new byte[4096];
         ByteBuffer tmp = ByteBuffer.allocate(4096);
         int readResult = 0;
-        
-        // TODO(bprzybylski): each mem allocation can throw OutOfMemoryError we need to handle it
+
         //                    globally in some fashionable manner
         RandomAccessFile raf = new RandomAccessFile(mFile, "r");
         FileChannel channel = raf.getChannel();
@@ -124,11 +123,11 @@ public class FileRequestEntity implements RequestEntity, ProgressiveDataTransfer
                     }
                 }
             }
-            
+
         } catch (IOException io) {
             Log_OC.e("FileRequestException", io.getMessage());
-            throw new RuntimeException("Ugly solution to workaround the default policy of retries when the server falls while uploading ; temporal fix; really", io);   
-            
+            throw new RuntimeException("Ugly solution to workaround the default policy of retries when the server falls while uploading ; temporal fix; really", io);
+
         } finally {
             channel.close();
             raf.close();
