@@ -1,11 +1,12 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.lib;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -77,5 +78,11 @@ public abstract class AccountUpdateTask extends AsyncTask<Void, Void, Void>
     {
         super.onPostExecute(arg);
         itsProgressFrag.dismissAllowingStateLoss();
+    }
+
+    /** Get the activity for the task */
+    protected final Activity getActivity()
+    {
+        return itsActivity;
     }
 }

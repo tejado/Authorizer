@@ -13,6 +13,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -113,9 +114,19 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             return null;
         }
         return new NewAccountTask(providerAcctUri, accountName,
-                ProviderType.OWNCLOUD, getContext());
-
-        // TODO: get auth token now to show dialog
+                ProviderType.OWNCLOUD, getContext())
+        {
+            @Override
+            protected void doAccountUpdate(ContentResolver cr)
+            {
+                Activity act = getActivity();
+                String authToken = OwncloudSyncer.getAuthToken(
+                        getAccount(itsNewAcct), act, act);
+                if (authToken != null) {
+                    super.doAccountUpdate(cr);
+                }
+            }
+        };
     }
 
     /* (non-Javadoc)
