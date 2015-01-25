@@ -61,40 +61,43 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
         List<AbstractSyncOper<ProviderClientT>> opers = null;
 
         try {
-            itsDb.beginTransaction();
-            opers = performSync();
-            itsDb.setTransactionSuccessful();
-        } catch (Exception e) {
-            throw updateSyncException(e);
-        } finally {
-            itsDb.endTransaction();
-        }
+            try {
+                itsDb.beginTransaction();
+                opers = performSync();
+                itsDb.setTransactionSuccessful();
+            } catch (Exception e) {
+                throw updateSyncException(e);
+            } finally {
+                itsDb.endTransaction();
+            }
 
-        if (opers != null) {
-            for (AbstractSyncOper<ProviderClientT> oper: opers) {
-                if (oper == null) {
-                    continue;
-                }
-                try {
-                    itsLogrec.addEntry(oper.getDescription(itsContext));
-                    oper.doOper(itsProviderClient, itsContext);
-                    try {
-                        itsDb.beginTransaction();
-                        oper.doPostOperUpdate(itsDb, itsContext);
-                        itsDb.setTransactionSuccessful();
-                    } finally {
-                        itsDb.endTransaction();
+            if (opers != null) {
+                for (AbstractSyncOper<ProviderClientT> oper: opers) {
+                    if (oper == null) {
+                        continue;
                     }
-                } catch (Exception e) {
-                    e = updateSyncException(e);
-                    Log.e(itsTag, "Sync error for file " + oper.getFile(), e);
-                    itsLogrec.addFailure(e);
+                    try {
+                        itsLogrec.addEntry(oper.getDescription(itsContext));
+                        oper.doOper(itsProviderClient, itsContext);
+                        try {
+                            itsDb.beginTransaction();
+                            oper.doPostOperUpdate(itsDb, itsContext);
+                            itsDb.setTransactionSuccessful();
+                        } finally {
+                            itsDb.endTransaction();
+                        }
+                    } catch (Exception e) {
+                        e = updateSyncException(e);
+                        Log.e(itsTag, "Sync error for file " + oper.getFile(),
+                              e);
+                        itsLogrec.addFailure(e);
+                    }
                 }
             }
+        } finally {
+            itsContext.getContentResolver().notifyChange(
+                    PasswdSafeContract.CONTENT_URI, null, false);
         }
-
-        itsContext.getContentResolver().notifyChange(
-                PasswdSafeContract.CONTENT_URI, null, false);
     }
 
 
