@@ -48,6 +48,8 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
 {
     private static final String TAG = "OwncloudSyncer";
 
+    private boolean itsIsAuthorized = false;
+
     /** Constructor */
     public OwncloudSyncer(Account account,
                           String userName,
@@ -107,6 +109,13 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
                                    result.getCode(), result.getHttpCode(),
                                    result.getLogMessage());
         throw new IOException(msg, result.getException());
+    }
+
+
+    /** Get whether the sync is authorized */
+    public final boolean isAuthorized()
+    {
+        return itsIsAuthorized;
     }
 
 
@@ -231,12 +240,12 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     {
         itsProviderClient.clearCredentials();
         String authToken = getAuthToken(account, itsContext, null);
-        if (authToken != null) {
+        itsIsAuthorized = (authToken != null);
+        if (itsIsAuthorized) {
             itsProviderClient.setCredentials(
                     OwnCloudCredentialsFactory.newBasicCredentials(
                             userName, authToken));
         }
-        // TODO if null returned, need message for user to handle notif
     }
 
 

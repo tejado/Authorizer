@@ -750,6 +750,7 @@ public class MainActivity extends FragmentActivity
         TextView acctView = (TextView)findViewById(R.id.owncloud_acct);
         View controls = findViewById(R.id.owncloud_controls);
         View clearBtn = findViewById(R.id.owncloud_clear);
+        View authReqWarning = findViewById(R.id.owncloud_auth_required);
         if (cursor != null) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
@@ -765,22 +766,22 @@ public class MainActivity extends FragmentActivity
             View freqSpinLabel = findViewById(R.id.owncloud_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
             freqSpin.setSelection(freq.getDisplayIdx());
-            View syncBtn = findViewById(R.id.owncloud_sync);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             acctView.setText(acct);
             controls.setVisibility(View.VISIBLE);
             clearBtn.setVisibility(View.VISIBLE);
+            authReqWarning.setVisibility(authorized ? View.GONE : View.VISIBLE);
 
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
-            syncBtn.setEnabled(authorized);
         } else {
             itsOwncloudUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
             acctView.setVisibility(View.GONE);
             controls.setVisibility(View.GONE);
             clearBtn.setVisibility(View.GONE);
+            authReqWarning.setVisibility(View.GONE);
         }
     }
 

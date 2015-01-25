@@ -434,6 +434,19 @@
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/owncloud_auth_required"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/owncloud_controls"
+                android:drawableLeft="@android:drawable/ic_dialog_alert"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:padding="6dp"
+                android:text="@string/owncloud_auth_required"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
         </RelativeLayout>
 
         <View
