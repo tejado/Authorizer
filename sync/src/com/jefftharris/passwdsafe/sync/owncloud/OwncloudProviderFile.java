@@ -29,6 +29,10 @@ class OwncloudProviderFile implements ProviderRemoteFile
         itsFolder = f.getParent();
     }
 
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.ProviderRemoteFile#getRemoteId()
+     */
+    @Override
     public String getRemoteId()
     {
         return itsFile.getRemotePath();
