@@ -77,10 +77,8 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         try {
             activity.startActivityForResult(intent, requestCode);
         } catch (ActivityNotFoundException e) {
-            // TODO: fix string
-            String msg = "R.string.google_acct_not_available";
-            Log.e(TAG, msg, e);
-            PasswdSafeUtil.showErrorMsg(msg, activity);
+            Log.e(TAG, "Error starting account picker", e);
+            PasswdSafeUtil.showErrorMsg(e.getMessage(), activity);
         }
     }
 
