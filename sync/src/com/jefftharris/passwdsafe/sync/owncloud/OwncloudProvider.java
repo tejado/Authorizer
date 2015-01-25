@@ -47,6 +47,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     private String itsAccountName = null;
     private String itsUserName = null;
     private Uri itsUri = null;
+    private boolean itsIsSyncAuthError= false;
 
     /** Constructor */
     public OwncloudProvider(Context ctx)
@@ -150,8 +151,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public boolean isAccountAuthorized()
     {
-        // TODO: authorized??
-        return itsAccountName != null;
+        return (itsAccountName != null) && !itsIsSyncAuthError;
     }
 
     /* (non-Javadoc)
@@ -214,8 +214,14 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         if (itsAccountName == null) {
             return;
         }
-        new OwncloudSyncer(getAccount(itsAccountName), itsUserName, itsUri,
-                           provider, db, logrec, getContext()).sync();
+        OwncloudSyncer syncer =
+                new OwncloudSyncer(getAccount(itsAccountName), itsUserName,
+                                   itsUri, provider, db, logrec, getContext());
+        try {
+            syncer.sync();
+        } finally {
+            itsIsSyncAuthError = !syncer.isAuthorized();
+        }
     }
 
     /* (non-Javadoc)

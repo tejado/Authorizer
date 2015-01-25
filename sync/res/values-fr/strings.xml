@@ -23,6 +23,11 @@
     <string name="network_not_connected">Le réseau n\'est pas connecté</string>
     <string name="no_account">Aucun compte</string>
     <string name="no_logs">Pas de archives</string>
+    <string name="owncloud_auth_required">
+        Autorisation requise pour accéder au compte ownCloud. Sélectionnez la 
+        notification est en attente pour permettre l\'accès, puis synchroniser 
+        le compte.
+    </string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="passwdsafe_sync_conflict">Conflit de synchronisation PasswdSafe</string>
     <string name="passwdsafe_synced_file">PasswdSafe fichier synchronisé</string>

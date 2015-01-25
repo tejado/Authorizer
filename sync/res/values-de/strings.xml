@@ -23,6 +23,11 @@
     <string name="network_not_connected">Netzwerk nicht verbunden</string>
     <string name="no_account">Keine Konto</string>
     <string name="no_logs">Keine Logs</string>
+    <string name="owncloud_auth_required">
+        Die Zulassung zum ownCloud-Konto erforderlich. Wählen Sie das 
+        ausstehende Benachrichtigung Zugriff aktivieren und synchronisieren 
+        Sie das Konto.
+    </string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="passwdsafe_sync_conflict">PasswdSafe Synchronisierungskonflikt</string>
     <string name="passwdsafe_synced_file">PasswdSafe Synced Datei</string>
