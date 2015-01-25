@@ -29,6 +29,9 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
     /** Abstraction of a remote file for operations */
     public interface ProviderRemoteFile
     {
+        /** Get the file's remote identifier */
+        public String getRemoteId();
+
         /** Get the file's title */
         public String getTitle();
 
