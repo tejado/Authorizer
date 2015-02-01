@@ -6,7 +6,6 @@
  */
 package com.jefftharris.passwdsafe.sync.box;
 
-import java.io.File;
 import java.util.List;
 
 import android.accounts.Account;
@@ -36,7 +35,6 @@ import com.box.restclientv2.exceptions.BoxSDKException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
-import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
@@ -222,57 +220,6 @@ public class BoxProvider extends AbstractSyncTimerProvider
             return;
         }
         new BoxSyncer(itsClient, provider, db, logrec, getContext()).sync();
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#insertLocalFile(long, java.lang.String, android.database.sqlite.SQLiteDatabase)
-     */
-    @Override
-    public long insertLocalFile(long providerId, String title, SQLiteDatabase db)
-            throws Exception
-    {
-        long id = SyncDb.addLocalFile(providerId, title,
-                                      System.currentTimeMillis(), db);
-        requestSync(false);
-        return id;
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#updateLocalFile(com.jefftharris.passwdsafe.sync.lib.DbFile, java.lang.String, java.io.File, android.database.sqlite.SQLiteDatabase)
-     */
-    @Override
-    public void updateLocalFile(DbFile file,
-                                String localFileName,
-                                File localFile,
-                                SQLiteDatabase db) throws Exception
-    {
-        SyncDb.updateLocalFile(file.itsId, localFileName,
-                               file.itsLocalTitle, file.itsLocalFolder,
-                               localFile.lastModified(), db);
-        switch (file.itsLocalChange) {
-        case NO_CHANGE:
-        case REMOVED: {
-            SyncDb.updateLocalFileChange(file.itsId, DbFile.FileChange.MODIFIED,
-                                         db);
-            break;
-        }
-        case ADDED:
-        case MODIFIED: {
-            break;
-        }
-        }
-        requestSync(false);
-    }
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#deleteLocalFile(com.jefftharris.passwdsafe.sync.lib.DbFile, android.database.sqlite.SQLiteDatabase)
-     */
-    @Override
-    public void deleteLocalFile(DbFile file, SQLiteDatabase db)
-            throws Exception
-    {
-        SyncDb.updateLocalFileDeleted(file.itsId, db);
-        requestSync(false);
     }
 
     /** Get the current Box user */
