@@ -1,22 +1,22 @@
 /* ownCloud Android Library is available under MIT license
  *   Copyright (C) 2014 ownCloud Inc.
- *   
+ *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
  *   in the Software without restriction, including without limitation the rights
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- *   
+ *
  *   The above copyright notice and this permission notice shall be included in
  *   all copies or substantial portions of the Software.
- *   
- *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ *
+ *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  *   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
- *   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN 
- *   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
+ *   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ *   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ *   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  *   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *   THE SOFTWARE.
  *
@@ -49,37 +49,37 @@ import android.content.Context;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
 public class NetworkUtils {
-    
+
     final private static String TAG = NetworkUtils.class.getSimpleName();
-    
+
     /** Default timeout for waiting data from the server */
     public static final int DEFAULT_DATA_TIMEOUT = 60000;
-    
+
     /** Default timeout for establishing a connection */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 60000;
-    
+
     /** Standard name for protocol TLS version 1.2 in Java Secure Socket Extension (JSSE) API */
     public static final String PROTOCOL_TLSv1_2 = "TLSv1.2";
-    
+
     /** Standard name for protocol TLS version 1.0 in JSSE API */
     public static final String PROTOCOL_TLSv1_0 = "TLSv1";
 
     /** Connection manager for all the OwnCloudClients */
     private static MultiThreadedHttpConnectionManager mConnManager = null;
-    
+
     private static Protocol mDefaultHttpsProtocol = null;
 
     private static AdvancedSslSocketFactory mAdvancedSslSocketFactory = null;
 
     private static X509HostnameVerifier mHostnameVerifier = null;
-    
-    
+
+
     /**
      * Registers or unregisters the proper components for advanced SSL handling.
-     * @throws IOException 
+     * @throws IOException
      */
     @SuppressWarnings("deprecation")
-	public static void registerAdvancedSslContext(boolean register, Context context) 
+	public static void registerAdvancedSslContext(boolean register, Context context)
     		throws GeneralSecurityException, IOException {
         Protocol pr = null;
         try {
@@ -93,32 +93,32 @@ public class NetworkUtils {
         boolean isRegistered = (pr != null && pr.getSocketFactory() instanceof AdvancedSslSocketFactory);
         if (register && !isRegistered) {
             Protocol.registerProtocol("https", new Protocol("https", getAdvancedSslSocketFactory(context), 443));
-            
+
         } else if (!register && isRegistered) {
             if (mDefaultHttpsProtocol != null) {
                 Protocol.registerProtocol("https", mDefaultHttpsProtocol);
             }
         }
     }
-    
-    public static AdvancedSslSocketFactory getAdvancedSslSocketFactory(Context context) 
+
+    public static AdvancedSslSocketFactory getAdvancedSslSocketFactory(Context context)
     		throws GeneralSecurityException, IOException {
         if (mAdvancedSslSocketFactory  == null) {
             KeyStore trustStore = getKnownServersStore(context);
             AdvancedX509TrustManager trustMgr = new AdvancedX509TrustManager(trustStore);
             TrustManager[] tms = new TrustManager[] { trustMgr };
-                
+
             SSLContext sslContext;
             try {
             	sslContext = SSLContext.getInstance("TLSv1.2");
             } catch (NoSuchAlgorithmException e) {
             	Log_OC.w(TAG, "TLSv1.2 is not supported in this device; falling through TLSv1.0");
             	sslContext = SSLContext.getInstance("TLSv1");
-            	// should be available in any device; see reference of supported protocols in 
+            	// should be available in any device; see reference of supported protocols in
             	// http://developer.android.com/reference/javax/net/ssl/SSLSocket.html
             }
             sslContext.init(null, tms, null);
-                    
+
             mHostnameVerifier = new BrowserCompatHostnameVerifier();
             mAdvancedSslSocketFactory = new AdvancedSslSocketFactory(sslContext, trustMgr, mHostnameVerifier);
         }
@@ -127,27 +127,27 @@ public class NetworkUtils {
 
 
     private static String LOCAL_TRUSTSTORE_FILENAME = "knownServers.bks";
-    
+
     private static String LOCAL_TRUSTSTORE_PASSWORD = "password";
 
     private static KeyStore mKnownServersStore = null;
-    
+
     /**
      * Returns the local store of reliable server certificates, explicitly accepted by the user.
-     * 
+     *
      * Returns a KeyStore instance with empty content if the local store was never created.
-     * 
+     *
      * Loads the store from the storage environment if needed.
-     * 
+     *
      * @param context                       Android context where the operation is being performed.
-     * @return                              KeyStore instance with explicitly-accepted server certificates. 
+     * @return                              KeyStore instance with explicitly-accepted server certificates.
      * @throws KeyStoreException            When the KeyStore instance could not be created.
      * @throws IOException                  When an existing local trust store could not be loaded.
      * @throws NoSuchAlgorithmException     When the existing local trust store was saved with an unsupported algorithm.
-     * @throws CertificateException         When an exception occurred while loading the certificates from the local 
+     * @throws CertificateException         When an exception occurred while loading the certificates from the local
      * 										trust store.
      */
-    private static KeyStore getKnownServersStore(Context context) 
+    private static KeyStore getKnownServersStore(Context context)
     		throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         if (mKnownServersStore == null) {
             //mKnownServersStore = KeyStore.getInstance("BKS");
@@ -163,18 +163,37 @@ public class NetworkUtils {
                 }
             } else {
             	// next is necessary to initialize an empty KeyStore instance
-            	mKnownServersStore.load(null, LOCAL_TRUSTSTORE_PASSWORD.toCharArray()); 
+            	mKnownServersStore.load(null, LOCAL_TRUSTSTORE_PASSWORD.toCharArray());
             }
         }
         return mKnownServersStore;
     }
-    
-    
-    public static void addCertToKnownServersStore(Certificate cert, Context context) 
+
+
+    public static String addCertToKnownServersStore(Certificate cert, Context context)
     		throws  KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
-    	
+
         KeyStore knownServers = getKnownServersStore(context);
-        knownServers.setCertificateEntry(Integer.toString(cert.hashCode()), cert);
+        String alias = Integer.toString(cert.hashCode());
+        knownServers.setCertificateEntry(alias, cert);
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput(LOCAL_TRUSTSTORE_FILENAME, Context.MODE_PRIVATE);
+            knownServers.store(fos, LOCAL_TRUSTSTORE_PASSWORD.toCharArray());
+        } finally {
+            fos.close();
+        }
+        return alias;
+    }
+
+
+    public static void removeCertFromKnownServersStore(String alias, Context context)
+            throws  KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+
+        KeyStore knownServers = getKnownServersStore(context);
+        if (knownServers.containsAlias(alias)) {
+            knownServers.deleteEntry(alias);
+        }
         FileOutputStream fos = null;
         try {
             fos = context.openFileOutput(LOCAL_TRUSTSTORE_FILENAME, Context.MODE_PRIVATE);
@@ -183,8 +202,8 @@ public class NetworkUtils {
             fos.close();
         }
     }
-    
-    
+
+
     static public MultiThreadedHttpConnectionManager getMultiThreadedConnManager() {
         if (mConnManager == null) {
             mConnManager = new MultiThreadedHttpConnectionManager();
@@ -194,9 +213,9 @@ public class NetworkUtils {
         return mConnManager;
     }
 
-    public static boolean isCertInKnownServersStore(Certificate cert, Context context) 
+    public static boolean isCertInKnownServersStore(Certificate cert, Context context)
     		throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
-    	
+
     	KeyStore knownServers = getKnownServersStore(context);
     	Log_OC.d(TAG, "Certificate - HashCode: " + cert.hashCode() + " "
     			+ Boolean.toString(knownServers.isCertificateEntry(Integer.toString(cert.hashCode()))));
