@@ -117,11 +117,14 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
 
         if (result.getCode() ==
             RemoteOperationResult.ResultCode.SSL_RECOVERABLE_PEER_UNVERIFIED) {
+            // TODO: reschedule another sync
             try {
                 CertificateCombinedException certExc =
                         (CertificateCombinedException)result.getException();
                 X509Certificate cert = certExc.getServerCertificate();
-                NetworkUtils.addCertToKnownServersStore(cert, ctx);
+                String alias =
+                        NetworkUtils.addCertToKnownServersStore(cert, ctx);
+                OwncloudProvider.saveCertAlias(alias, ctx);
 
                 NotificationManager notifMgr =
                         (NotificationManager) ctx.getSystemService(

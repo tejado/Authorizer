@@ -32,6 +32,7 @@ import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
+import com.owncloud.android.lib.common.network.NetworkUtils;
 
 /**
  *  Implements a provider for the ownCloud service
@@ -39,6 +40,7 @@ import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
 public class OwncloudProvider extends AbstractSyncTimerProvider
 {
     private static final String PREF_AUTH_ACCOUNT = "owncloudAccount";
+    private static final String PREF_CERT_ALIAS = "owncloudCertAlias";
 
     private static final String TAG = "OwncloudProvider";
 
@@ -132,6 +134,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public void unlinkAccount()
     {
+        saveCertAlias(null, getContext());
         saveAuthData(null);
         updateOwncloudAcct();
         AccountManager acctMgr = AccountManager.get(getContext());
@@ -273,17 +276,46 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     }
 
     /** Save or clear the ownCloud authentication data */
-    private synchronized void saveAuthData(String accountName)
+    private void saveAuthData(String accountName)
     {
-        PasswdSafeUtil.dbginfo(TAG, "saveAuthData: %b", accountName);
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = prefs.edit();
-        if (accountName != null) {
-            editor.putString(PREF_AUTH_ACCOUNT, accountName);
-        } else {
-            editor.remove(PREF_AUTH_ACCOUNT);
+        synchronized (OwncloudProvider.class) {
+            PasswdSafeUtil.dbginfo(TAG, "saveAuthData: %b", accountName);
+            SharedPreferences prefs =
+                    PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences.Editor editor = prefs.edit();
+            if (accountName != null) {
+                editor.putString(PREF_AUTH_ACCOUNT, accountName);
+            } else {
+                editor.remove(PREF_AUTH_ACCOUNT);
+            }
+            editor.commit();
         }
-        editor.commit();
+    }
+
+    /** Save or clear the ownCloud SSL certificate */
+    public static void saveCertAlias(String certAlias, Context ctx)
+    {
+        synchronized (OwncloudProvider.class) {
+            PasswdSafeUtil.dbginfo(TAG, "saveCertAlias: %s", certAlias);
+            SharedPreferences prefs =
+                    PreferenceManager.getDefaultSharedPreferences(ctx);
+            SharedPreferences.Editor editor = prefs.edit();
+            if (certAlias != null) {
+                editor.putString(PREF_CERT_ALIAS, certAlias);
+            } else {
+                String currAlias = prefs.getString(PREF_CERT_ALIAS, null);
+                if (currAlias != null) {
+                    try {
+                        NetworkUtils.removeCertFromKnownServersStore(currAlias,
+                                                                     ctx);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error clearing certificate: " + currAlias,
+                              e);
+                    }
+                }
+                editor.remove(PREF_CERT_ALIAS);
+            }
+            editor.commit();
+        }
     }
 }
