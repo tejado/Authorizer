@@ -7,6 +7,7 @@
 package com.jefftharris.passwdsafe.sync.owncloud;
 
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -15,13 +16,20 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerFuture;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.sync.MainActivity;
+import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
@@ -35,6 +43,8 @@ import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientFactory;
 import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
 import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
+import com.owncloud.android.lib.common.network.CertificateCombinedException;
+import com.owncloud.android.lib.common.network.NetworkUtils;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.FileUtils;
 import com.owncloud.android.lib.resources.files.ReadRemoteFolderOperation;
@@ -97,13 +107,41 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
 
 
     /** Check the result of an operation; An exception is thrown on an error */
-    public static void checkOperationResult(RemoteOperationResult result)
+    public static void checkOperationResult(RemoteOperationResult result,
+                                            Context ctx)
             throws IOException
     {
         if (result.isSuccess()) {
             return;
         }
 
+        if (result.getCode() ==
+            RemoteOperationResult.ResultCode.SSL_RECOVERABLE_PEER_UNVERIFIED) {
+            try {
+                CertificateCombinedException certExc =
+                        (CertificateCombinedException)result.getException();
+                X509Certificate cert = certExc.getServerCertificate();
+                NetworkUtils.addCertToKnownServersStore(cert, ctx);
+
+                NotificationManager notifMgr =
+                        (NotificationManager) ctx.getSystemService(
+                                Context.NOTIFICATION_SERVICE);
+
+                PendingIntent mainIntent = PendingIntent.getActivity(
+                        ctx, 0,
+                        new Intent(ctx, MainActivity.class),
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+                String title = ctx.getString(R.string.owncloud_cert_trusted);
+                GuiUtils.showSimpleNotification(
+                        notifMgr, ctx, R.drawable.ic_stat_app,
+                        title, R.drawable.ic_launcher_sync,
+                        cert.getSubjectDN().toString(), mainIntent, 0, true);
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving certificate", e);
+            }
+        }
         String msg = String.format(Locale.US,
                                    "ownCloud ERROR result %s, HTTP code %d: %s",
                                    result.getCode(), result.getHttpCode(),
@@ -172,7 +210,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     {
         GetRemoteUserNameOperation oper = new GetRemoteUserNameOperation();
         RemoteOperationResult res = oper.execute(itsProviderClient);
-        checkOperationResult(res);
+        checkOperationResult(res, itsContext);
 
         PasswdSafeUtil.dbginfo(TAG, "syncDisplayName %s", oper.getUserName());
         StringBuilder displayName = new StringBuilder(oper.getUserName());
@@ -191,7 +229,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
         ReadRemoteFolderOperation oper = new ReadRemoteFolderOperation(
                 FileUtils.PATH_SEPARATOR);
         RemoteOperationResult res = oper.execute(itsProviderClient);
-        checkOperationResult(res);
+        checkOperationResult(res, itsContext);
 
         HashMap<String, ProviderRemoteFile> files =
                 new HashMap<String, ProviderRemoteFile>();

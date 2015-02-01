@@ -36,6 +36,6 @@ public class OwncloudRmFileOper extends AbstractRmSyncOper<OwnCloudClient>
         RemoveRemoteFileOperation oper =
                 new RemoveRemoteFileOperation(itsFile.itsRemoteId);
         RemoteOperationResult res = oper.execute(providerClient);
-        OwncloudSyncer.checkOperationResult(res);
+        OwncloudSyncer.checkOperationResult(res, ctx);
     }
 }

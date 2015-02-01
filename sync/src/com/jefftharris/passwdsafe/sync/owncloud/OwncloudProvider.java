@@ -249,7 +249,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                 userName = itsAccountName.substring(0, pos);
                 Uri.Builder builder = new Uri.Builder();
                 // TODO: can't hard-code this
-                builder.scheme("http");
+                builder.scheme("https");
                 builder.authority(itsAccountName.substring(pos + 1));
                 builder.path("/owncloud");
                 uri = builder.build();

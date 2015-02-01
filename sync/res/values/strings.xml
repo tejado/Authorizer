@@ -27,6 +27,7 @@
         Authorization required for access to ownCloud account.  Select the 
         pending notification to enable access and then sync the account.
     </string>
+    <string name="owncloud_cert_trusted">Certificate trusted for ownCloud account</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="passwdsafe_sync_conflict">PasswdSafe sync conflict</string>
     <string name="passwdsafe_synced_file">PasswdSafe Synced File</string>

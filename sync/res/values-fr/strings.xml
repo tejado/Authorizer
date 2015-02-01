@@ -28,6 +28,7 @@
         notification est en attente pour permettre l\'accès, puis synchroniser 
         le compte.
     </string>
+    <string name="owncloud_cert_trusted">Certificat est approuvé pour le compte ownCloud</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="passwdsafe_sync_conflict">Conflit de synchronisation PasswdSafe</string>
     <string name="passwdsafe_synced_file">PasswdSafe fichier synchronisé</string>
