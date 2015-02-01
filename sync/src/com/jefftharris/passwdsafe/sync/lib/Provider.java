@@ -59,6 +59,7 @@ public interface Provider
     /** Update a provider's sync frequency */
     public void updateSyncFreq(Account acct, int freq);
 
+    /** Request a sync */
     public void requestSync(boolean manual);
 
     /** Sync a provider */
