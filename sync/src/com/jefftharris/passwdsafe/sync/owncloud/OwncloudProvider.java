@@ -30,6 +30,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncIOException;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
 import com.owncloud.android.lib.common.network.NetworkUtils;
@@ -218,6 +219,11 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                                    itsUri, provider, db, logrec, getContext());
         try {
             syncer.sync();
+        } catch (SyncIOException e) {
+            if (e.isRetry()) {
+                requestSync(false);
+            }
+            throw e;
         } finally {
             itsIsSyncAuthError = !syncer.isAuthorized();
         }
