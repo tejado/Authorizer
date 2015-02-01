@@ -32,6 +32,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -50,6 +53,7 @@ import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 
 public class MainActivity extends FragmentActivity
         implements LoaderCallbacks<Cursor>, SyncUpdateHandler
@@ -127,6 +131,17 @@ public class MainActivity extends FragmentActivity
 
         freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
         freqSpin.setOnItemSelectedListener(freqSelListener);
+
+        CheckBox httpsCb = (CheckBox)findViewById(R.id.owncloud_use_https);
+        httpsCb.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked)
+            {
+                onOwncloudUseHttpsChanged(isChecked);
+            }
+        });
 
         // Check the state of Google Play services
         int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -460,6 +475,13 @@ public class MainActivity extends FragmentActivity
         updateSyncFreq(freq, itsOwncloudUri);
     }
 
+
+    /** ownCloud use HTTPS changed */
+    private void onOwncloudUseHttpsChanged(boolean useHttps)
+    {
+        getOwncloudProvider().setUseHttps(useHttps);
+    }
+
     /* (non-Javadoc)
      * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
      */
@@ -761,11 +783,17 @@ public class MainActivity extends FragmentActivity
                     ProviderSyncFreqPref.freqValueOf(freqVal);
             itsOwncloudUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
-            boolean authorized = getOwncloudProvider().isAccountAuthorized();
+
+            OwncloudProvider provider = getOwncloudProvider();
+            boolean authorized = provider.isAccountAuthorized();
+            boolean useHttps = provider.useHttps();
 
             View freqSpinLabel = findViewById(R.id.owncloud_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
+            CheckBox httpsCb = (CheckBox)findViewById(R.id.owncloud_use_https);
+
             freqSpin.setSelection(freq.getDisplayIdx());
+            httpsCb.setChecked(useHttps);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             acctView.setText(acct);
@@ -841,9 +869,10 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Get the ownCloud provider */
-    private Provider getOwncloudProvider()
+    private OwncloudProvider getOwncloudProvider()
     {
-        return ProviderFactory.getProvider(ProviderType.OWNCLOUD, this);
+        return (OwncloudProvider)
+                ProviderFactory.getProvider(ProviderType.OWNCLOUD, this);
     }
 
     /** Dialog to prompt when an account is cleared */

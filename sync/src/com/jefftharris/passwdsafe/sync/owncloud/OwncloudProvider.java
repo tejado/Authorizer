@@ -42,12 +42,14 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
 {
     private static final String PREF_AUTH_ACCOUNT = "owncloudAccount";
     private static final String PREF_CERT_ALIAS = "owncloudCertAlias";
+    private static final String PREF_USE_HTTPS = "owncloudUseHttps";
 
     private static final String TAG = "OwncloudProvider";
 
     private String itsAccountName = null;
     private String itsUserName = null;
     private Uri itsUri = null;
+    private boolean itsUseHttps = true;
     private boolean itsIsSyncAuthError= false;
 
     /** Constructor */
@@ -107,7 +109,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             }
         } while(false);
 
-        saveAuthData(accountName);
+        saveAuthData(accountName, true);
         updateOwncloudAcct();
 
         if (accountName == null) {
@@ -136,7 +138,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     public void unlinkAccount()
     {
         saveCertAlias(null, getContext());
-        saveAuthData(null);
+        saveAuthData(null, true);
         updateOwncloudAcct();
         AccountManager acctMgr = AccountManager.get(getContext());
         acctMgr.invalidateAuthToken(
@@ -229,6 +231,23 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         }
     }
 
+
+    /** Get whether to use HTTPS */
+    public final boolean useHttps()
+    {
+        return itsUseHttps;
+    }
+
+
+    /** Set whether to use HTTPS */
+    public final void setUseHttps(boolean useHttps)
+    {
+        itsUseHttps = useHttps;
+        saveAuthData(itsAccountName, itsUseHttps);
+        updateOwncloudAcct();
+    }
+
+
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider#getAccountUserId()
      */
@@ -246,8 +265,9 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                 PreferenceManager.getDefaultSharedPreferences(getContext());
 
         itsAccountName = prefs.getString(PREF_AUTH_ACCOUNT, null);
-        PasswdSafeUtil.dbginfo(TAG, "updateOwncloudAcct token %b",
-                               itsAccountName);
+        itsUseHttps = prefs.getBoolean(PREF_USE_HTTPS, true);
+        PasswdSafeUtil.dbginfo(TAG, "updateOwncloudAcct token %b, https %b",
+                               itsAccountName, itsUseHttps);
 
         String userName = null;
         Uri uri = null;
@@ -257,8 +277,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             if (pos != -1) {
                 userName = itsAccountName.substring(0, pos);
                 Uri.Builder builder = new Uri.Builder();
-                // TODO: can't hard-code this
-                builder.scheme("https");
+                builder.scheme(itsUseHttps ? "https" : "http");
                 builder.authority(itsAccountName.substring(pos + 1));
                 builder.path("/owncloud");
                 uri = builder.build();
@@ -282,7 +301,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     }
 
     /** Save or clear the ownCloud authentication data */
-    private void saveAuthData(String accountName)
+    private void saveAuthData(String accountName, boolean useHttps)
     {
         synchronized (OwncloudProvider.class) {
             PasswdSafeUtil.dbginfo(TAG, "saveAuthData: %b", accountName);
@@ -291,8 +310,10 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             SharedPreferences.Editor editor = prefs.edit();
             if (accountName != null) {
                 editor.putString(PREF_AUTH_ACCOUNT, accountName);
+                editor.putBoolean(PREF_USE_HTTPS, useHttps);
             } else {
                 editor.remove(PREF_AUTH_ACCOUNT);
+                editor.remove(PREF_USE_HTTPS);
             }
             editor.commit();
         }

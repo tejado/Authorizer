@@ -431,6 +431,13 @@
                     android:layout_gravity="center_vertical"
                     android:entries="@array/interval_array"
                     tools:listitem="@android:layout/simple_spinner_item"/>
+                
+                <CheckBox
+                    android:id="@+id/owncloud_use_https"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Use HTTPS"/>
 
             </LinearLayout>
 
