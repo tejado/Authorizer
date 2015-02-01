@@ -38,6 +38,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncIOException;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientFactory;
@@ -111,13 +112,13 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
                                             Context ctx)
             throws IOException
     {
+        boolean retry = false;
         if (result.isSuccess()) {
             return;
         }
 
         if (result.getCode() ==
             RemoteOperationResult.ResultCode.SSL_RECOVERABLE_PEER_UNVERIFIED) {
-            // TODO: reschedule another sync
             try {
                 CertificateCombinedException certExc =
                         (CertificateCombinedException)result.getException();
@@ -125,6 +126,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
                 String alias =
                         NetworkUtils.addCertToKnownServersStore(cert, ctx);
                 OwncloudProvider.saveCertAlias(alias, ctx);
+                retry = true;
 
                 NotificationManager notifMgr =
                         (NotificationManager) ctx.getSystemService(
@@ -149,7 +151,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
                                    "ownCloud ERROR result %s, HTTP code %d: %s",
                                    result.getCode(), result.getHttpCode(),
                                    result.getLogMessage());
-        throw new IOException(msg, result.getException());
+        throw new SyncIOException(msg, result.getException(), retry);
     }
 
 
