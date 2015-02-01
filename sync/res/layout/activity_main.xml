@@ -38,7 +38,7 @@
                 android:drawablePadding="6dp"
                 android:padding="6dp"
                 android:gravity="fill_vertical"
-                android:text="GDRIVE PLAY"
+                android:text="@string/google_drive"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
     
             <TextView
