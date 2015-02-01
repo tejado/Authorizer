@@ -73,12 +73,12 @@ public class OwncloudLocalToRemoteOper extends
                     uploadFile.getAbsolutePath(),
                     remotePath, "application/psafe3");
             RemoteOperationResult res = oper.execute(providerClient);
-            OwncloudSyncer.checkOperationResult(res);
+            OwncloudSyncer.checkOperationResult(res, ctx);
 
             ReadRemoteFileOperation fileOper =
                     new ReadRemoteFileOperation(remotePath);
             res = fileOper.execute(providerClient);
-            OwncloudSyncer.checkOperationResult(res);
+            OwncloudSyncer.checkOperationResult(res, ctx);
             itsUpdatedFile =
                     new OwncloudProviderFile((RemoteFile)res.getData().get(0));
         } finally {

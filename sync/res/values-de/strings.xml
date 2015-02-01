@@ -28,6 +28,7 @@
         ausstehende Benachrichtigung Zugriff aktivieren und synchronisieren 
         Sie das Konto.
     </string>
+    <string name="owncloud_cert_trusted">Zertifikat vertrauenswürdige für ownCloud Konto</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="passwdsafe_sync_conflict">PasswdSafe Synchronisierungskonflikt</string>
     <string name="passwdsafe_synced_file">PasswdSafe Synced Datei</string>

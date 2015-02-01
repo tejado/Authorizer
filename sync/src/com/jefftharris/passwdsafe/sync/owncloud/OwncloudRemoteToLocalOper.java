@@ -49,7 +49,7 @@ public class OwncloudRemoteToLocalOper extends
             DownloadRemoteFileOperation oper = new DownloadRemoteFileOperation(
                     itsFile.itsRemoteId, localFile, true);
             RemoteOperationResult res = oper.execute(providerClient);
-            OwncloudSyncer.checkOperationResult(res);
+            OwncloudSyncer.checkOperationResult(res, ctx);
 
             localFile.setLastModified(itsFile.itsRemoteModDate);
             setDownloaded(true);

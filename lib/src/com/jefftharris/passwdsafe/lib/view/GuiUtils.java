@@ -320,4 +320,38 @@ public final class GuiUtils
         }
         notifyMgr.notify(notifyId, notif);
     }
+
+
+    /** Show a simple notification */
+    public static void showSimpleNotification(NotificationManager notifyMgr,
+                                              Context ctx,
+                                              int iconId,
+                                              String title,
+                                              int bigIcon,
+                                              String content,
+                                              PendingIntent intent,
+                                              int notifyId,
+                                              boolean autoCancel)
+    {
+        Notification notif;
+        if (ApiCompat.SDK_VERSION == ApiCompat.SDK_CUPCAKE) {
+            notif = new Notification(iconId, title,
+                                     System.currentTimeMillis());
+            notif.setLatestEventInfo(ctx, title, content, intent);
+        } else {
+            BitmapDrawable b =
+                    (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
+            NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(ctx)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setContentIntent(intent)
+                .setSmallIcon(iconId)
+                .setLargeIcon(b.getBitmap())
+                .setTicker(title)
+                .setAutoCancel(autoCancel);
+            notif = builder.build();
+        }
+        notifyMgr.notify(notifyId, notif);
+    }
 }
