@@ -47,9 +47,9 @@ import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
 import com.owncloud.android.lib.common.network.CertificateCombinedException;
 import com.owncloud.android.lib.common.network.NetworkUtils;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
-import com.owncloud.android.lib.resources.files.FileUtils;
-import com.owncloud.android.lib.resources.files.ReadRemoteFolderOperation;
+import com.owncloud.android.lib.resources.files.ReadRemoteFileOperation;
 import com.owncloud.android.lib.resources.files.RemoteFile;
+import com.owncloud.android.lib.resources.files.SearchOperation;
 import com.owncloud.android.lib.resources.users.GetRemoteUserNameOperation;
 
 /**
@@ -230,23 +230,32 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     private HashMap<String, ProviderRemoteFile> getOwncloudFiles()
             throws IOException
     {
-        // TODO: check files in other folders?
-        ReadRemoteFolderOperation oper = new ReadRemoteFolderOperation(
-                FileUtils.PATH_SEPARATOR);
-        RemoteOperationResult res = oper.execute(itsProviderClient);
-        checkOperationResult(res, itsContext);
-
         HashMap<String, ProviderRemoteFile> files =
                 new HashMap<String, ProviderRemoteFile>();
-        for (Object obj: res.getData()) {
-            RemoteFile remfile = (RemoteFile)obj;
-            if (!isPasswordFile(remfile)) {
+
+        SearchOperation searchOper = new SearchOperation("psafe3");
+        RemoteOperationResult searchRes = searchOper.execute(itsProviderClient);
+        checkOperationResult(searchRes, itsContext);
+        for (Object obj: searchRes.getData()) {
+            SearchOperation.Result result = (SearchOperation.Result)obj;
+            if (!TextUtils.equals(result.itsType, "file") ||
+                    (result.itsPath == null)) {
                 continue;
             }
-            PasswdSafeUtil.dbginfo(TAG, "owncloud file: %s",
-                                   fileToString(remfile));
-            files.put(remfile.getRemotePath(),
-                      new OwncloudProviderFile(remfile));
+            ReadRemoteFileOperation fileOper =
+                    new ReadRemoteFileOperation(result.itsPath);
+            RemoteOperationResult fileRes = fileOper.execute(itsProviderClient);
+            checkOperationResult(fileRes, itsContext);
+            for (Object fileObj: fileRes.getData()) {
+                RemoteFile remfile = (RemoteFile)fileObj;
+                if (!isPasswordFile(remfile)) {
+                    continue;
+                }
+                PasswdSafeUtil.dbginfo(TAG, "owncloud file: %s",
+                                       fileToString(remfile));
+                files.put(remfile.getRemotePath(),
+                          new OwncloudProviderFile(remfile));
+            }
         }
         return files;
     }
