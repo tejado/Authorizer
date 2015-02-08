@@ -9,7 +9,6 @@
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Au moins</string>
     <string name="basic">"General"</string>
-    <string name="cancel">Annuler</string>
     <string name="cannot_create_file">Impossible de créer un fichier: %1$s</string>
     <string name="case_sensitive">Sensible à la casse</string>
     <string name="case_sensitive_sorting">Tri sensible à la casse</string>
