@@ -262,6 +262,10 @@
     </string>
 
     <string name="release_notes">
+        &lt;b&gt;5.2.0&lt;/b&gt; - Add ownCloud support.  Accounts are chosen
+        from the list in the ownCloud app.  Password files are synced from any
+        location matching a search for \'psafe3\'. 
+        \n\n
         &lt;b&gt;5.1.0&lt;/b&gt; - Add multi-window support for Samsung devices.
         Enable selection of notes text.
         \n\n
