@@ -11,7 +11,6 @@ import java.util.List;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,10 +23,11 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.android.gms.common.AccountPicker;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
+import com.jefftharris.passwdsafe.sync.lib.AccountChooserDlg;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
@@ -69,21 +69,17 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         updateOwncloudAcct();
     }
 
+
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
      */
     @Override
     public void startAccountLink(FragmentActivity activity, int requestCode)
     {
-        Intent intent = AccountPicker.newChooseAccountIntent(
-                null, null, new String[] { SyncDb.OWNCLOUD_ACCOUNT_TYPE },
-                true, null, null, null, null);
-        try {
-            activity.startActivityForResult(intent, requestCode);
-        } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Error starting account picker", e);
-            PasswdSafeUtil.showErrorMsg(e.getMessage(), activity);
-        }
+        AccountChooserDlg dialog = AccountChooserDlg.newInstance(
+                SyncDb.OWNCLOUD_ACCOUNT_TYPE, requestCode,
+                activity.getString(R.string.no_owncloud_accts));
+        dialog.show(activity.getSupportFragmentManager(), null);
     }
 
     /* (non-Javadoc)
