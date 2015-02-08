@@ -14,11 +14,11 @@ import java.io.OutputStream;
 import java.util.List;
 
 import android.accounts.Account;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.dropbox.sync.android.DbxAccount;
@@ -77,7 +77,7 @@ public class DropboxProvider extends AbstractSyncTimerProvider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
      */
     @Override
-    public void startAccountLink(Activity activity, int requestCode)
+    public void startAccountLink(FragmentActivity activity, int requestCode)
     {
         if (itsDropboxAcctMgr.getLinkedAccount() != null) {
             unlinkAccount();

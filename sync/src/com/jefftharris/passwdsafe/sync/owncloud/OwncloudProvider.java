@@ -20,6 +20,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -72,7 +73,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
      */
     @Override
-    public void startAccountLink(Activity activity, int requestCode)
+    public void startAccountLink(FragmentActivity activity, int requestCode)
     {
         Intent intent = AccountPicker.newChooseAccountIntent(
                 null, null, new String[] { SyncDb.OWNCLOUD_ACCOUNT_TYPE },
