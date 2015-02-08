@@ -17,6 +17,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
@@ -81,7 +82,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
      */
     @Override
-    public void startAccountLink(Activity activity, int requestCode)
+    public void startAccountLink(FragmentActivity activity, int requestCode)
     {
         Intent intent = OAuthActivity.createOAuthActivityIntent(
                 activity, BOX_CLIENT_ID, BOX_CLIENT_SECRET, false);

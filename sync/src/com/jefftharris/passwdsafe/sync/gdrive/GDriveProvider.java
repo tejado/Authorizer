@@ -8,13 +8,13 @@ package com.jefftharris.passwdsafe.sync.gdrive;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -74,7 +74,7 @@ public class GDriveProvider extends AbstractProvider
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
      */
-    public void startAccountLink(Activity activity, int requestCode)
+    public void startAccountLink(FragmentActivity activity, int requestCode)
     {
     }
 
