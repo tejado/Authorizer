@@ -4,6 +4,7 @@
     <string name="box">Box</string>
     <string name="build_date">Erstellungsdatum: %s</string>
     <string name="build_id">Schaffung Kennung: %s</string>
+    <string name="cancel">Abbrechen</string>
     <string name="close">Schließen</string>
     <string name="copy_clipboard_error">%1$s - Fehler beim Kopieren in die Zwischenablage. Grund ist wahrscheinlich ein Fehler in manchen Samsung-Geräten.</string>
     <string name="copy_trace_and_close">Trace kopieren und schließen</string>

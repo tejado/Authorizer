@@ -9,7 +9,6 @@
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Mind.</string>
     <string name="basic">Allgemein</string>
-    <string name="cancel">Abbrechen</string>
     <string name="cannot_create_file">Kann Datei nicht erstellen: %1$s</string>
     <string name="case_sensitive">Groß- und Kleinschreibung</string>
     <string name="case_sensitive_sorting">Nach Groß- und Kleinschreibung sortieren</string>

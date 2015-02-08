@@ -6,6 +6,7 @@
     <string name="box">Box</string>
     <string name="build_date">Date de création: %s</string>
     <string name="build_id">Identificateur de création: %s</string>
+    <string name="cancel">Annuler</string>
     <string name="close">Fermer</string>
     <string name="copy_clipboard_error">%1$s - Erreur de copie dans le presse papier. Elle peut être due à une erreur propre aux appareils Samsung.</string>
     <string name="copy_trace_and_close">Copier et fermer</string>
