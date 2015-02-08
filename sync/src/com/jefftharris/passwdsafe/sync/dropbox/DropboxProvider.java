@@ -108,7 +108,6 @@ public class DropboxProvider extends AbstractSyncTimerProvider
     @Override
     public void unlinkAccount()
     {
-        // TODO: cleanup unlinkAccount vs. cleanupOnDelete
         itsDropboxAcctMgr.unlink();
         updateDropboxAcct();
     }
