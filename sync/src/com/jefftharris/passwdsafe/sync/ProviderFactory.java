@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
+ * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
  * Use of the code is allowed under the Artistic License 2.0 terms, as specified
  * in the LICENSE file distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
@@ -16,6 +16,7 @@ import com.jefftharris.passwdsafe.sync.dropbox.DropboxProvider;
 import com.jefftharris.passwdsafe.sync.gdrive.GDriveProvider;
 import com.jefftharris.passwdsafe.sync.gdriveplay.GDrivePlayProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
+import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 
 /**
  * Factory for creating Providers
@@ -47,6 +48,10 @@ public class ProviderFactory
             }
             case BOX: {
                 provider = new BoxProvider(appCtx);
+                break;
+            }
+            case OWNCLOUD: {
+                provider = new OwncloudProvider(appCtx);
                 break;
             }
             }

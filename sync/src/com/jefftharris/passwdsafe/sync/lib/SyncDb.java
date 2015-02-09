@@ -33,6 +33,7 @@ public class SyncDb
     public static final String GDRIVE_ACCOUNT_TYPE = "com.google";
     public static final String DROPBOX_ACCOUNT_TYPE = "com.jefftharris.dropbox";
     public static final String BOX_ACCOUNT_TYPE = "com.jefftharris.box";
+    public static final String OWNCLOUD_ACCOUNT_TYPE = "owncloud";
 
     public static final String DB_TABLE_PROVIDERS = "providers";
     public static final String DB_COL_PROVIDERS_ID = BaseColumns._ID;

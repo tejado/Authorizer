@@ -9,10 +9,10 @@ package com.jefftharris.passwdsafe.sync.lib;
 import java.io.File;
 
 import android.accounts.Account;
-import android.app.Activity;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * The Provider interface encapsulates a service that provides files which are
@@ -32,7 +32,7 @@ public interface Provider
     public void fini();
 
     /** Start the process of linking to an account */
-    public void startAccountLink(Activity activity, int requestCode);
+    public void startAccountLink(FragmentActivity activity, int requestCode);
 
     /** Finish the process of linking to an account */
     public NewAccountTask finishAccountLink(int activityResult,
@@ -59,6 +59,7 @@ public interface Provider
     /** Update a provider's sync frequency */
     public void updateSyncFreq(Account acct, int freq);
 
+    /** Request a sync */
     public void requestSync(boolean manual);
 
     /** Sync a provider */

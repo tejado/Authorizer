@@ -539,6 +539,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     titleId = R.string.new_box_file;
                     break;
                 }
+                case OWNCLOUD: {
+                    titleId = R.string.new_owncloud_file;
+                    break;
+                }
                 }
             }
             case EMAIL:
