@@ -23,6 +23,15 @@
     <string name="network_not_connected">Network not connected</string>
     <string name="no_account">No Account</string>
     <string name="no_logs">No logs</string>
+    <string name="no_owncloud_accts">
+        No ownCloud accounts available.  Add an account in the ownCloud app
+        first.  Then, it can be selected for PasswdSafe Sync.
+    </string>
+    <string name="owncloud_auth_required">
+        Authorization required for access to ownCloud account.  Select the 
+        pending notification to enable access and then sync the account.
+    </string>
+    <string name="owncloud_cert_trusted">Certificate trusted for ownCloud account</string>
     <string name="passwdsafe">PasswdSafe</string>
     <string name="passwdsafe_sync_conflict">PasswdSafe sync conflict</string>
     <string name="passwdsafe_synced_file">PasswdSafe Synced File</string>
@@ -42,6 +51,10 @@
     <string name="updating_account">Updating account&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.1.0&lt;/b&gt; - Add ownCloud support.  Accounts are chosen
+        from the list in the ownCloud app.  Password files are synced from any
+        location matching a search for \'psafe3\'. 
+        \n\n
         &lt;b&gt;2.0.0&lt;/b&gt; - Improve Google Drive syncing:\n
         - Improved conflict detection and resolution\n
         - Show a notification for a sync conflict\n

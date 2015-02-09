@@ -8,13 +8,13 @@ package com.jefftharris.passwdsafe.sync.gdrive;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -26,17 +26,15 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.SyncApp;
 import com.jefftharris.passwdsafe.sync.SyncUpdateHandler;
-import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.AbstractProvider;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
-import com.jefftharris.passwdsafe.sync.lib.Provider;
-import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
 /**
  * The GDriveProvider class encapsulates Google Drive
  */
-public class GDriveProvider implements Provider
+public class GDriveProvider extends AbstractProvider
 {
     public static final String ABOUT_FIELDS = "largestChangeId";
     public static final String FILE_FIELDS =
@@ -76,7 +74,7 @@ public class GDriveProvider implements Provider
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
      */
-    public void startAccountLink(Activity activity, int requestCode)
+    public void startAccountLink(FragmentActivity activity, int requestCode)
     {
     }
 
@@ -202,50 +200,5 @@ public class GDriveProvider implements Provider
         } finally {
             SyncApp.get(itsContext).updateGDriveSyncState(syncState);
         }
-    }
-
-
-    /** Insert a local file */
-    @Override
-    public long insertLocalFile(long providerId, String title,
-                                SQLiteDatabase db)
-            throws Exception
-    {
-        return SyncDb.addLocalFile(providerId, title,
-                                   System.currentTimeMillis(), db);
-    }
-
-
-    /** Update a local file */
-    @Override
-    public void updateLocalFile(DbFile file,
-                                String localFileName,
-                                java.io.File localFile,
-                                SQLiteDatabase db)
-            throws Exception
-    {
-        SyncDb.updateLocalFile(file.itsId, localFileName,
-                               file.itsLocalTitle, file.itsLocalFolder,
-                               localFile.lastModified(), db);
-        switch (file.itsLocalChange) {
-        case NO_CHANGE:
-        case REMOVED: {
-            SyncDb.updateLocalFileChange(file.itsId, DbFile.FileChange.MODIFIED,
-                                         db);
-            break;
-        }
-        case ADDED:
-        case MODIFIED: {
-            break;
-        }
-        }
-    }
-
-
-    /** Delete a local file */
-    @Override
-    public void deleteLocalFile(DbFile file, SQLiteDatabase db)
-    {
-        SyncDb.updateLocalFileDeleted(file.itsId, db);
     }
 }

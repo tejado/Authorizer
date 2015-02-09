@@ -9,7 +9,6 @@
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Au moins</string>
     <string name="basic">"General"</string>
-    <string name="cancel">Annuler</string>
     <string name="cannot_create_file">Impossible de créer un fichier: %1$s</string>
     <string name="case_sensitive">Sensible à la casse</string>
     <string name="case_sensitive_sorting">Tri sensible à la casse</string>
@@ -137,6 +136,7 @@
     <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
     <string name="new_group_menu">Nouveau groupe…</string>
     <string name="new_local_file">Nouveau fichier local</string>
+    <string name="new_owncloud_file">Nouveau fichier de ownCloud</string>
     <string name="new_password_label">Nouveau mot de passe:</string>
     <string name="new_policy">Nouvelle stratégie</string>
     <string name="next">Suivant</string>
@@ -263,6 +263,11 @@
     </string>
 
     <string name="release_notes">
+        &lt;b&gt;5.2.0&lt;/b&gt; - Ajout du support ownCloud. Les comptes sont
+        choisis parmi la liste dans l\'application ownCloud. Fichiers de mot 
+        de passe sont synchronisés à partir ne importe quel endroit 
+        correspondant une recherche pour \'psafe3\'.
+        \n\n
         &lt;b&gt;5.1.0&lt;/b&gt; -  Ajout du support pour les appareils Samsung
         multifenêtré. Permettre la sélection de texte des notes.
         \n\n

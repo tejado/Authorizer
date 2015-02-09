@@ -6,13 +6,10 @@
  */
 package com.jefftharris.passwdsafe.sync.box;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import android.content.Context;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 
@@ -35,8 +32,10 @@ import com.box.boxjavalibv2.resourcemanagers.BoxUsersManager;
 import com.box.restclientv2.exceptions.BoxRestException;
 import com.box.restclientv2.exceptions.BoxSDKException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.sync.R;
+import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
@@ -78,220 +77,42 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             throws Exception
     {
         syncDisplayName();
-
-        // Sync files
-        TreeMap<String, BoxFile> boxfiles = getBoxFiles();
-        List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
-        for (DbFile dbfile: dbfiles) {
-            if ((dbfile.itsRemoteId == null) ||
-                    (dbfile.itsLocalChange == DbFile.FileChange.ADDED)) {
-                continue;
-            }
-            BoxFile boxfile = boxfiles.get(dbfile.itsRemoteId);
-            if (boxfile != null) {
-                checkRemoteFileChange(dbfile, boxfile);
-                boxfiles.remove(dbfile.itsRemoteId);
-            } else {
-                PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
-                                       dbfile.itsRemoteId);
-                SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
-            }
-        }
-
-        for (Map.Entry<String, BoxFile> entry: boxfiles.entrySet()) {
-            String fileId = entry.getKey();
-            BoxFile boxfile = entry.getValue();
-            PasswdSafeUtil.dbginfo(TAG, "performSync add remote %s", fileId);
-            SyncDb.addRemoteFile(itsProvider.itsId, fileId,
-                                 boxfile.getName(), getFileFolder(boxfile),
-                                 boxfile.dateModifiedAt().getTime(),
-                                 boxfile.getSha1(), itsDb);
-        }
-
-        List<AbstractSyncOper<BoxClient>> opers =
-                new ArrayList<AbstractSyncOper<BoxClient>>();
-        dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
-        for (DbFile dbfile: dbfiles) {
-            resolveSyncOper(dbfile, opers);
-        }
-        return opers;
+        HashMap<String, ProviderRemoteFile> owncloudFiles = getBoxFiles();
+        updateDbFiles(owncloudFiles);
+        return resolveSyncOpers();
     }
 
 
-    /** Check for a remote file change and update */
-    private final void checkRemoteFileChange(DbFile dbfile, BoxFile remfile)
-    {
-        String remTitle = remfile.getName();
-        String remFolder = getFileFolder(remfile);
-        long remModDate = remfile.dateModifiedAt().getTime();
-        String remHash = remfile.getSha1();
-        boolean changed = true;
-        do {
-            if (!TextUtils.equals(dbfile.itsRemoteTitle, remTitle) ||
-                    !TextUtils.equals(dbfile.itsRemoteFolder, remFolder) ||
-                    (dbfile.itsRemoteModDate != remModDate) ||
-                    !TextUtils.equals(dbfile.itsRemoteHash, remHash) ||
-                    TextUtils.isEmpty(dbfile.itsLocalFile)) {
-                break;
-            }
-
-            java.io.File localFile =
-                    itsContext.getFileStreamPath(dbfile.itsLocalFile);
-            if (!localFile.exists()) {
-                break;
-            }
-
-            changed = false;
-        } while(false);
-
-        if (!changed) {
-            return;
-        }
-
-        PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s", dbfile);
-        SyncDb.updateRemoteFile(dbfile.itsId, dbfile.itsRemoteId,
-                                remTitle, remFolder, remModDate, remHash,
-                                itsDb);
-        switch (dbfile.itsRemoteChange) {
-        case NO_CHANGE:
-        case REMOVED: {
-            SyncDb.updateRemoteFileChange(dbfile.itsId,
-                                          DbFile.FileChange.MODIFIED, itsDb);
-            break;
-        }
-        case ADDED:
-        case MODIFIED: {
-            break;
-        }
-        }
-    }
-
-
-    /** Resolve the sync operations for a file */
-    private final void resolveSyncOper(DbFile dbfile,
-                                       List<AbstractSyncOper<BoxClient>> opers)
-            throws SQLException
-    {
-        if ((dbfile.itsLocalChange != DbFile.FileChange.NO_CHANGE) ||
-                (dbfile.itsRemoteChange != DbFile.FileChange.NO_CHANGE)) {
-            PasswdSafeUtil.dbginfo(TAG, "resolveSyncOper %s", dbfile);
-        }
-
-        switch (dbfile.itsLocalChange) {
-        case ADDED: {
-            switch (dbfile.itsRemoteChange) {
-            case ADDED:
-            case MODIFIED: {
-                logConflictFile(dbfile, true);
-                splitConflictedFile(dbfile, opers);
-                break;
-            }
-            case NO_CHANGE: {
-                opers.add(new BoxLocalToRemoteOper(dbfile));
-                break;
-            }
-            case REMOVED: {
-                logConflictFile(dbfile, true);
-                recreateRemoteRemovedFile(dbfile, opers);
-                break;
-            }
-            }
-            break;
-        }
-        case MODIFIED: {
-            switch (dbfile.itsRemoteChange) {
-            case ADDED:
-            case MODIFIED: {
-                logConflictFile(dbfile, true);
-                splitConflictedFile(dbfile, opers);
-                break;
-            }
-            case NO_CHANGE: {
-                opers.add(new BoxLocalToRemoteOper(dbfile));
-                break;
-            }
-            case REMOVED: {
-                logConflictFile(dbfile, true);
-                recreateRemoteRemovedFile(dbfile, opers);
-                break;
-            }
-            }
-            break;
-        }
-        case NO_CHANGE: {
-            switch (dbfile.itsRemoteChange) {
-            case ADDED:
-            case MODIFIED: {
-                opers.add(new BoxRemoteToLocalOper(dbfile));
-                break;
-            }
-            case NO_CHANGE: {
-                // Nothing
-                break;
-            }
-            case REMOVED: {
-                opers.add(new BoxRmFileOper(dbfile));
-                break;
-            }
-            }
-            break;
-        }
-        case REMOVED: {
-            switch (dbfile.itsRemoteChange) {
-            case ADDED:
-            case MODIFIED: {
-                logConflictFile(dbfile, false);
-                DbFile newRemfile = splitRemoteToNewFile(dbfile);
-                DbFile updatedLocalFile = SyncDb.getFile(dbfile.itsId, itsDb);
-
-                opers.add(new BoxRemoteToLocalOper(newRemfile));
-                opers.add(new BoxRmFileOper(updatedLocalFile));
-                break;
-            }
-            case NO_CHANGE:
-            case REMOVED: {
-                opers.add(new BoxRmFileOper(dbfile));
-                break;
-            }
-            }
-            break;
-        }
-        }
-    }
-
-
-    /** Split the file.  A new added remote file is created with the remote id,
-     * and the file is updated to resemble a new local file with the same id but
-     * a different name indicating a conflict
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createLocalToRemoteOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
      */
-    private final void splitConflictedFile
-    (
-            DbFile dbfile,
-            List<AbstractSyncOper<BoxClient>> opers
-    )
-            throws SQLException
+    @Override
+    protected AbstractLocalToRemoteSyncOper<BoxClient>
+    createLocalToRemoteOper(DbFile dbfile)
     {
-        DbFile newRemfile = splitRemoteToNewFile(dbfile);
-        DbFile updatedLocalFile = updateFileAsLocallyAdded(
-                dbfile, itsContext.getString(R.string.conflicted_local_copy));
-
-        opers.add(new BoxRemoteToLocalOper(newRemfile));
-        opers.add(new BoxLocalToRemoteOper(updatedLocalFile));
+        return new BoxLocalToRemoteOper(dbfile);
     }
 
 
-    /** Recreate a remotely deleted file from local updates */
-    private final void recreateRemoteRemovedFile
-    (
-            DbFile dbfile,
-            List<AbstractSyncOper<BoxClient>> opers
-    )
-            throws SQLException
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRemoteToLocalOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractRemoteToLocalSyncOper<BoxClient>
+    createRemoteToLocalOper(DbFile dbfile)
     {
-        resetRemoteFields(dbfile);
-        DbFile updatedLocalFile = updateFileAsLocallyAdded(
-                dbfile, itsContext.getString(R.string.recreated_local_copy));
-        opers.add(new BoxLocalToRemoteOper(updatedLocalFile));
+        return new BoxRemoteToLocalOper(dbfile);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer#createRmFileOper(com.jefftharris.passwdsafe.sync.lib.DbFile)
+     */
+    @Override
+    protected AbstractRmSyncOper<BoxClient>
+    createRmFileOper(DbFile dbfile)
+    {
+        return new BoxRmFileOper(dbfile);
     }
 
 
@@ -337,7 +158,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     }
 
     /** Get the files from Box */
-    private final TreeMap<String, BoxFile> getBoxFiles()
+    private final HashMap<String, ProviderRemoteFile> getBoxFiles()
             throws BoxSDKException
     {
         BoxFoldersManager folderMgr = itsProviderClient.getFoldersManager();
@@ -352,7 +173,8 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
                  .addField(BoxFile.FIELD_SIZE)
                  .addField(BoxFile.FIELD_SHA1);
 
-        TreeMap<String, BoxFile> boxfiles = new TreeMap<String, BoxFile>();
+        HashMap<String, ProviderRemoteFile> boxfiles =
+                new HashMap<String, ProviderRemoteFile>();
 
         // Get root files
         retrieveBoxFolderFiles(ROOT_FOLDER, folderMgr, folderReq, boxfiles);
@@ -385,10 +207,11 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     }
 
     /** Retrieve the files in the given folder */
-    private final void retrieveBoxFolderFiles(String folderId,
-                                              BoxFoldersManager folderMgr,
-                                              BoxFolderRequestObject folderReq,
-                                              TreeMap<String, BoxFile> boxfiles)
+    private final void retrieveBoxFolderFiles(
+            String folderId,
+            BoxFoldersManager folderMgr,
+            BoxFolderRequestObject folderReq,
+            HashMap<String, ProviderRemoteFile> boxfiles)
             throws BoxSDKException
     {
         int offset = 0;
@@ -402,7 +225,8 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
                 if (obj instanceof BoxFile) {
                     BoxFile file = (BoxFile)obj;
                     if (file.getName().endsWith(".psafe3")) {
-                        boxfiles.put(file.getId(), file);
+                        BoxProviderFile provFile = new BoxProviderFile(file);
+                        boxfiles.put(provFile.getRemoteId(), provFile);
                     }
                 }
             }
