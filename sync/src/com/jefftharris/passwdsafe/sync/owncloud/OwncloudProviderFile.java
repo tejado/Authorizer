@@ -7,6 +7,9 @@
 package com.jefftharris.passwdsafe.sync.owncloud;
 
 import java.io.File;
+import java.util.Locale;
+
+import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.ProviderRemoteFile;
 import com.owncloud.android.lib.resources.files.RemoteFile;
@@ -72,5 +75,35 @@ class OwncloudProviderFile implements ProviderRemoteFile
     public String getHash()
     {
         return itsFile.getEtag();
+    }
+
+    /** Get the remote file */
+    public final RemoteFile getRemoteFile()
+    {
+        return itsFile;
+    }
+
+    /** Get a string form for a remote file */
+    public static String fileToString(RemoteFile file)
+    {
+        if (file == null) {
+            return "{null}";
+        }
+        return String.format(Locale.US,
+                             "{path:%s, mime:%s, hash:%s}",
+                             file.getRemotePath(), file.getMimeType(),
+                             file.getEtag());
+    }
+
+    /** Is a file a folder */
+    public static boolean isFolder(RemoteFile file)
+    {
+        return TextUtils.equals(file.getMimeType(), "DIR");
+    }
+
+    /** Is a file a password file */
+    public static boolean isPasswordFile(RemoteFile file)
+    {
+        return !isFolder(file) && file.getRemotePath().endsWith(".psafe3");
     }
 }
