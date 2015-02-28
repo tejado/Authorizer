@@ -10,6 +10,7 @@ import java.util.List;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -33,6 +34,9 @@ import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncIOException;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+import com.owncloud.android.lib.common.OwnCloudClient;
+import com.owncloud.android.lib.common.OwnCloudClientFactory;
+import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
 import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
 import com.owncloud.android.lib.common.network.NetworkUtils;
 
@@ -119,8 +123,8 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             protected void doAccountUpdate(ContentResolver cr)
             {
                 Activity act = getActivity();
-                String authToken = OwncloudSyncer.getAuthToken(
-                        getAccount(itsNewAcct), act, act);
+                String authToken = getAuthToken(getAccount(itsNewAcct),
+                                                act, act);
                 if (authToken != null) {
                     super.doAccountUpdate(cr);
                 }
@@ -214,8 +218,8 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             return;
         }
         OwncloudSyncer syncer =
-                new OwncloudSyncer(getAccount(itsAccountName), itsUserName,
-                                   itsUri, provider, db, logrec, getContext());
+                new OwncloudSyncer(getClient(getContext()),
+                                   provider, db, logrec, getContext());
         try {
             syncer.sync();
         } catch (SyncIOException e) {
@@ -226,6 +230,26 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         } finally {
             itsIsSyncAuthError = !syncer.isAuthorized();
         }
+    }
+
+
+    /** Create a ownCloud client to a server */
+    public final OwnCloudClient getClient(Context ctx)
+    {
+        Account account = getAccount(itsAccountName);
+
+        OwnCloudClient client = OwnCloudClientFactory.createOwnCloudClient(
+                itsUri, ctx, true);
+        client.setFollowRedirects(true);
+
+        client.clearCredentials();
+        String authToken = getAuthToken(account, ctx, null);
+        if (authToken != null) {
+            client.setCredentials(
+                    OwnCloudCredentialsFactory.newBasicCredentials(
+                            itsUserName, authToken));
+        }
+        return client;
     }
 
 
@@ -316,6 +340,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         }
     }
 
+
     /** Save or clear the ownCloud SSL certificate */
     public static void saveCertAlias(String certAlias, Context ctx)
     {
@@ -341,5 +366,37 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             }
             editor.commit();
         }
+    }
+
+
+    /** Get the ownCloud authentication for an account.  If the activity is
+     *  given, a dialog is shown if needed.  Otherwise, a notification may be
+     *  presented. Must be called from a background thread. */
+    @SuppressWarnings("deprecation")
+    private static String getAuthToken(Account account,
+                                      Context ctx,
+                                      Activity activity)
+    {
+        String authToken = null;
+        AccountManager acctMgr = AccountManager.get(ctx);
+        String authType = AccountTypeUtils.getAuthTokenTypePass(
+                SyncDb.OWNCLOUD_ACCOUNT_TYPE);
+        AccountManagerFuture<Bundle> fut;
+        if (activity != null) {
+            fut = acctMgr.getAuthToken(account, authType, null,
+                                       activity, null, null);
+        } else {
+            fut = acctMgr.getAuthToken(account, authType, true, null, null);
+        }
+        try {
+            Bundle b = fut.getResult();
+            authToken = b.getString(AccountManager.KEY_AUTHTOKEN);
+        }
+        catch (Exception e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "getAuthToken");
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "getAuthToken: %b", (authToken != null));
+        return authToken;
     }
 }

@@ -134,6 +134,11 @@ public class OwnCloudClient extends HttpClient {
 		mCredentials.applyTo(this);
 	}
 
+    public boolean hasCredentials() {
+        return (mCredentials != null) &&
+                !(mCredentials instanceof OwnCloudAnonymousCredentials);
+    }
+
     /**
      * Check if a file exists in the OC server
      *
