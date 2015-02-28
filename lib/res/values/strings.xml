@@ -11,6 +11,7 @@
     <string name="copy_trace_and_close">Copy Trace and Close</string>
     <string name="dropbox">Dropbox</string>
     <string name="error">Error</string>
+    <string name="file_type_icon">File type icon</string>
     <string name="google_drive">Google Drive</string>
     <string name="licenses">Licenses</string>
     <string name="new_drive_file">New Drive File</string>

@@ -10,6 +10,7 @@
     <string name="copy_trace_and_close">Trace kopieren und schließen</string>
     <string name="dropbox">Dropbox</string>
     <string name="error">Fehler</string>
+    <string name="file_type_icon">Dateitypicon</string>
     <string name="google_drive">Google Drive</string>
     <string name="licenses">Lizenzen</string>
     <string name="new_drive_file">Neue Drive-Datei</string>
