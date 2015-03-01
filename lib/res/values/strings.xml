@@ -20,6 +20,7 @@
     <string name="none">None</string>
     <string name="open">Open</string>
     <string name="owncloud">ownCloud</string>
+    <string name="parent_directory">Parent Directory</string>
     <string name="release_notes_title">Release Notes</string>
     <string name="release_notes">(placeholder)</string>
     <string name="type">Type</string>
