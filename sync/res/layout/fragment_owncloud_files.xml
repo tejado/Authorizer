@@ -4,17 +4,31 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     
-    <TextView
-        android:id="@+id/title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:paddingLeft="6dip"
-        android:paddingRight="6dip"
-        android:text="@string/none"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        android:orientation="horizontal">
+    
+        <ImageButton
+            android:id="@+id/parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/parent_directory"
+            android:gravity="center_vertical"
+            android:src="@drawable/folder_up_rev"/>
 
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:paddingLeft="6dip"
+            android:paddingRight="6dip"
+            android:text="@string/none"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+    </LinearLayout>
+    
     <View
         style="@style/Separator.Light"/>
 

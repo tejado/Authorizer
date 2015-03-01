@@ -19,6 +19,7 @@
     <string name="none">Keine</string>
     <string name="open">Öffnen</string>
     <string name="owncloud">ownCloud</string>
+    <string name="parent_directory">Übergeordneter Ordner</string>
     <string name="release_notes_title">Versionshinweise</string>
     <string name="release_notes">(Platzhalter)</string>
     <string name="type">Typ</string>

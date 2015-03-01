@@ -208,6 +208,17 @@ public class OwncloudFilesActivity extends FragmentActivity
     }
 
 
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#changeParentDir()
+     */
+    public void changeParentDir()
+    {
+        PasswdSafeUtil.dbginfo(TAG, "changeParentDir");
+        FragmentManager fragmgr = getSupportFragmentManager();
+        fragmgr.popBackStack();
+    }
+
+
     /** Reload the files shown by the activity */
     private void reloadFiles()
     {

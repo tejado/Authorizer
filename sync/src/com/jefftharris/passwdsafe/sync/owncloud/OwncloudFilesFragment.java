@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -25,11 +26,13 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.R;
+import com.owncloud.android.lib.resources.files.FileUtils;
 
 /**
  *  Fragment to show ownCloud password files
  */
 public class OwncloudFilesFragment extends ListFragment
+        implements OnClickListener
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -45,6 +48,9 @@ public class OwncloudFilesFragment extends ListFragment
 
         /** Change directory to the given path */
         void changeDir(String path);
+
+        /** Change directory to the parent path */
+        void changeParentDir();
     }
 
     private static final String TAG = "OwncloudFilesFragment";
@@ -101,6 +107,13 @@ public class OwncloudFilesFragment extends ListFragment
         TextView title = (TextView)rootView.findViewById(R.id.title);
         title.setText(getString(R.string.choose_files_from_dir, itsPath));
 
+        View parent = rootView.findViewById(R.id.parent);
+        if (FileUtils.PATH_SEPARATOR.equals(itsPath)) {
+            parent.setVisibility(View.GONE);
+        } else {
+            parent.setOnClickListener(this);
+        }
+
         itsProgressBar = (ProgressBar)rootView.findViewById(R.id.progress);
         itsProgressBar.setVisibility(View.GONE);
 
@@ -145,9 +158,23 @@ public class OwncloudFilesFragment extends ListFragment
 
         if (OwncloudProviderFile.isFolder(file)) {
             itsListener.changeDir(file.getRemoteId());
-            // TODO: chdir to parent
         } else {
             // TODO: select file
+        }
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.view.View.OnClickListener#onClick(android.view.View)
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.parent: {
+            itsListener.changeParentDir();
+            break;
+        }
         }
     }
 

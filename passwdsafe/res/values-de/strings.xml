@@ -151,7 +151,6 @@
     <string name="ok">OK</string>
     <string name="open_file_title">Datei öffnen</string>
     <string name="option_not_selected">Mindestens 1 Option auswählen</string>
-    <string name="parent_directory">Übergeordneter Ordner</string>
     <string name="parent_group">Übergeordnete Gruppe</string>
     <string name="password">Passwort</string>
     <string name="password_encoding_label">Passwortkodierung:</string>
