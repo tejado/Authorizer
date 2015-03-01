@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -50,6 +51,7 @@ public class OwncloudFilesFragment extends ListFragment
     private String itsPath;
     private Listener itsListener;
     private ArrayAdapter<OwncloudProviderFile> itsFilesAdapter;
+    private ProgressBar itsProgressBar;
 
     /** Create a new instance of the fragment */
     public static OwncloudFilesFragment newInstance(String path)
@@ -92,9 +94,15 @@ public class OwncloudFilesFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
-        View rootView = super.onCreateView(inflater, container,
-                                           savedInstanceState);
-        // TODO: show current dir
+        View rootView = inflater.inflate(R.layout.fragment_owncloud_files,
+                                         container, false);
+
+        TextView title = (TextView)rootView.findViewById(R.id.title);
+        title.setText(getString(R.string.choose_files_from_dir, itsPath));
+
+        itsProgressBar = (ProgressBar)rootView.findViewById(R.id.progress);
+        itsProgressBar.setVisibility(View.GONE);
+
         return rootView;
     }
 
@@ -106,8 +114,6 @@ public class OwncloudFilesFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-
-        setEmptyText("No files!!!!");
 
         itsFilesAdapter = new FilesAdapter(getActivity());
         setListAdapter(itsFilesAdapter);
@@ -148,6 +154,7 @@ public class OwncloudFilesFragment extends ListFragment
     /** Reload the files shown by the fragment */
     public void reload()
     {
+        itsProgressBar.setVisibility(View.VISIBLE);
         // TODO: reload menu option
         itsListener.listFiles(itsPath, new Listener.ListFilesCb()
         {
@@ -161,6 +168,9 @@ public class OwncloudFilesFragment extends ListFragment
                             OwncloudProviderFile.fileToString(file.getRemoteFile()));
                     itsFilesAdapter.add(file);
                 }
+                // TODO: sort
+                itsFilesAdapter.notifyDataSetChanged();
+                itsProgressBar.setVisibility(View.GONE);
             }
         });
     }
@@ -175,6 +185,7 @@ public class OwncloudFilesFragment extends ListFragment
         public FilesAdapter(Activity act)
         {
             super(act, R.layout.listview_sync_file_item);
+            setNotifyOnChange(false);
             itsInflater = act.getLayoutInflater();
         }
 
