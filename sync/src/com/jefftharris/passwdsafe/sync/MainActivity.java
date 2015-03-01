@@ -53,6 +53,7 @@ import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesActivity;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 
 public class MainActivity extends FragmentActivity
@@ -480,6 +481,17 @@ public class MainActivity extends FragmentActivity
     private void onOwncloudUseHttpsChanged(boolean useHttps)
     {
         getOwncloudProvider().setUseHttps(useHttps);
+    }
+
+
+    /** Button onClick handler to select ownCloud files */
+    public void onOwncloudChooseFiles(View view)
+    {
+        Intent intent = new Intent();
+        intent.putExtra(OwncloudFilesActivity.INTENT_PROVIDER_URI,
+                        itsOwncloudUri);
+        intent.setClass(this, OwncloudFilesActivity.class);
+        startActivity(intent);
     }
 
     /* (non-Javadoc)
