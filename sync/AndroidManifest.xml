@@ -67,7 +67,7 @@
         
         <activity
             android:name=".owncloud.OwncloudFilesActivity"
-            android:label="ownCloud Files"
+            android:label="@string/owncloud_synced_files"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
