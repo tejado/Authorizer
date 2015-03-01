@@ -119,7 +119,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/gdrive_acct"
-                android:orientation="horizontal">
+                android:divider="@drawable/spacer_medium"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                tools:ignore="UnusedAttribute">
 
                 <ImageButton
                     android:id="@+id/gdrive_sync"
@@ -130,22 +133,26 @@
                     android:padding="12dp"
                     android:src="@drawable/ic_action_sync"/>
 
-                <TextView
-                    android:id="@+id/gdrive_interval_label"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/sync_interval_label"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:layout_gravity="center_vertical">
 
-                <Spinner
-                    android:id="@+id/gdrive_interval"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:entries="@array/interval_array"
-                    tools:listitem="@android:layout/simple_spinner_item"/>
-
+                    <TextView
+                        android:id="@+id/gdrive_interval_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_interval_label"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    
+                    <Spinner
+                        android:id="@+id/gdrive_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/interval_array"
+                        tools:listitem="@android:layout/simple_spinner_item"/>
+                </LinearLayout>
+                
             </LinearLayout>
 
             <TextView
@@ -218,7 +225,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/dropbox_acct"
-                android:orientation="horizontal">
+                android:divider="@drawable/spacer_medium"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                tools:ignore="UnusedAttribute">
 
                 <ImageButton
                     android:id="@+id/dropbox_sync"
@@ -229,22 +239,26 @@
                     android:padding="12dp"
                     android:src="@drawable/ic_action_sync"/>
 
-                <TextView
-                    android:id="@+id/dropbox_interval_label"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/sync_interval_label"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:layout_gravity="center_vertical">
 
-                <Spinner
-                    android:id="@+id/dropbox_interval"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:entries="@array/interval_array"
-                    tools:listitem="@android:layout/simple_spinner_item"/>
-
+                    <TextView
+                        android:id="@+id/dropbox_interval_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_interval_label"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    
+                    <Spinner
+                        android:id="@+id/dropbox_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/interval_array"
+                        tools:listitem="@android:layout/simple_spinner_item"/>
+                </LinearLayout>
+                
             </LinearLayout>
 
             <TextView
@@ -318,7 +332,10 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/box_acct"
-                android:orientation="horizontal">
+                android:divider="@drawable/spacer_medium"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                tools:ignore="UnusedAttribute">
 
                 <ImageButton
                     android:id="@+id/box_sync"
@@ -329,22 +346,26 @@
                     android:padding="12dp"
                     android:src="@drawable/ic_action_sync"/>
 
-                <TextView
-                    android:id="@+id/box_interval_label"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/sync_interval_label"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:layout_gravity="center_vertical">
 
-                <Spinner
-                    android:id="@+id/box_interval"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:entries="@array/interval_array"
-                    tools:listitem="@android:layout/simple_spinner_item"/>
-
+                    <TextView
+                        android:id="@+id/box_interval_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_interval_label"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    
+                    <Spinner
+                        android:id="@+id/box_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/interval_array"
+                        tools:listitem="@android:layout/simple_spinner_item"/>
+                </LinearLayout>
+                
             </LinearLayout>
 
         </RelativeLayout>
@@ -405,39 +426,69 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/owncloud_acct"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/owncloud_sync"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/sync"
-                    android:onClick="onOwncloudSync"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_action_sync"/>
-
-                <TextView
-                    android:id="@+id/owncloud_interval_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/sync_interval_label"
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-                <Spinner
-                    android:id="@+id/owncloud_interval"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:entries="@array/interval_array"
-                    tools:listitem="@android:layout/simple_spinner_item"/>
+                android:orientation="vertical">
                 
-                <CheckBox
-                    android:id="@+id/owncloud_use_https"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="Use HTTPS"/>
+                    android:divider="@drawable/spacer_medium"
+                    android:orientation="horizontal"
+                    android:showDividers="middle"
+                    tools:ignore="UnusedAttribute">
+
+                    <ImageButton
+                        android:id="@+id/owncloud_sync"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/sync"
+                        android:onClick="onOwncloudSync"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_action_sync"/>
+
+                    <Button
+                        android:id="@+id/owncloud_choose_files"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:onClick="onOwncloudChooseFiles"
+                        android:text="@string/choose_files"/>
+                </LinearLayout>
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@drawable/spacer_medium"
+                    android:orientation="horizontal"
+                    android:showDividers="middle"
+                    tools:ignore="UnusedAttribute">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/owncloud_interval_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/sync_interval_label"
+                            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                        <Spinner
+                            android:id="@+id/owncloud_interval"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/interval_array"
+                            tools:listitem="@android:layout/simple_spinner_item"/>
+                    </LinearLayout>
+
+                    <CheckBox
+                        android:id="@+id/owncloud_use_https"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="Use HTTPS"/>
+                </LinearLayout>
 
             </LinearLayout>
 

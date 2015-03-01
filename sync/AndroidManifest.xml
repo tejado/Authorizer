@@ -65,6 +65,15 @@
                 android:value="com.jefftharris.passwdsafe.sync.MainActivity"/>
         </activity>
         
+        <activity
+            android:name=".owncloud.OwncloudFilesActivity"
+            android:label="ownCloud Files"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jefftharris.passwdsafe.sync.MainActivity"/>
+        </activity>
+        
         <!-- Handle Google Drive file open events from the Drive app -->
         <activity
             android:name=".GDriveLaunchActivity"
