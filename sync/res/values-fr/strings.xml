@@ -51,7 +51,8 @@
     <string name="sync_oper_rmfile_local">Supprimer le fichier local: %1$s</string>
     <string name="sync_oper_rmfile_remote">Supprimer le fichier distant: %1$s</string>
     <string name="updating_account">Mise à jour compte&#8230;</string>
-
+    <string name="use_https">Utilisez HTTPS</string>
+    
     <string name="release_notes">
         &lt;b&gt;2.1.0&lt;/b&gt; - Ajout du support ownCloud. Les comptes sont
         choisis parmi la liste dans l\'application ownCloud. Fichiers de mot 
