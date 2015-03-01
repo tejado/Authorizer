@@ -90,9 +90,9 @@ class OwncloudProviderFile implements ProviderRemoteFile
             return "{null}";
         }
         return String.format(Locale.US,
-                             "{path:%s, mime:%s, hash:%s}",
-                             file.getRemotePath(), file.getMimeType(),
-                             file.getEtag());
+                             "{id: %s, path:%s, mime:%s, hash:%s}",
+                             file.getRemoteId(), file.getRemotePath(),
+                             file.getMimeType(), file.getEtag());
     }
 
     /** Is a file a folder */
