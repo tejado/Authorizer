@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe.sync.owncloud;
 
+import java.util.Comparator;
 import java.util.List;
 
 import android.app.Activity;
@@ -142,7 +143,7 @@ public class OwncloudFilesFragment extends ListFragment
             return;
         }
 
-        if (OwncloudProviderFile.isFolder(file.getRemoteFile())) {
+        if (OwncloudProviderFile.isFolder(file)) {
             itsListener.changeDir(file.getRemoteId());
             // TODO: chdir to parent
         } else {
@@ -163,12 +164,13 @@ public class OwncloudFilesFragment extends ListFragment
             {
                 itsFilesAdapter.clear();
                 for (OwncloudProviderFile file: files) {
-                    PasswdSafeUtil.dbginfo(
-                            TAG, "list file: %s",
-                            OwncloudProviderFile.fileToString(file.getRemoteFile()));
+                    PasswdSafeUtil.dbginfo(TAG, "list file: %s",
+                                           OwncloudProviderFile.fileToString(
+                                                   file.getRemoteFile()));
                     itsFilesAdapter.add(file);
                 }
-                // TODO: sort
+
+                itsFilesAdapter.sort(new FileComparator());
                 itsFilesAdapter.notifyDataSetChanged();
                 itsProgressBar.setVisibility(View.GONE);
             }
@@ -209,7 +211,7 @@ public class OwncloudFilesFragment extends ListFragment
             OwncloudProviderFile file = getItem(position);
             views.itsText.setText(file.getTitle());
 
-            if (OwncloudProviderFile.isFolder(file.getRemoteFile())) {
+            if (OwncloudProviderFile.isFolder(file)) {
                 views.itsModDate.setVisibility(View.GONE);
                 views.itsIcon.setImageResource(R.drawable.folder_rev);
             } else {
@@ -235,6 +237,26 @@ public class OwncloudFilesFragment extends ListFragment
                 itsText = (TextView)view.findViewById(R.id.text);
                 itsModDate = (TextView)view.findViewById(R.id.mod_date);
                 itsIcon = (ImageView)view.findViewById(R.id.icon);
+            }
+        }
+    }
+
+
+    /** File comparator */
+    private static final class FileComparator
+            implements Comparator<OwncloudProviderFile>
+    {
+        @Override
+        public int compare(OwncloudProviderFile lhs, OwncloudProviderFile rhs)
+        {
+            boolean lhsFolder = OwncloudProviderFile.isFolder(lhs);
+            boolean rhsFolder = OwncloudProviderFile.isFolder(rhs);
+            if (lhsFolder && !rhsFolder) {
+                return -1;
+            } else if (rhsFolder && !lhsFolder) {
+                return 1;
+            } else {
+                return lhs.getTitle().compareTo(rhs.getTitle());
             }
         }
     }

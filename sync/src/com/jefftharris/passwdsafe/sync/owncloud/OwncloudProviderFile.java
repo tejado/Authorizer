@@ -101,6 +101,12 @@ class OwncloudProviderFile implements ProviderRemoteFile
         return TextUtils.equals(file.getMimeType(), "DIR");
     }
 
+    /** Is a file a folder */
+    public static boolean isFolder(OwncloudProviderFile file)
+    {
+        return isFolder(file.getRemoteFile());
+    }
+
     /** Is a file a password file */
     public static boolean isPasswordFile(RemoteFile file)
     {
