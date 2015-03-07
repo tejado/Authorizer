@@ -22,6 +22,7 @@
     <string name="parent_directory">Übergeordneter Ordner</string>
     <string name="release_notes_title">Versionshinweise</string>
     <string name="release_notes">(Platzhalter)</string>
+    <string name="reload">Nachladen</string>
     <string name="type">Typ</string>
     <string name="version">Version: %s</string>
 </resources>
