@@ -205,6 +205,10 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
 
         List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
+            if (dbfile.itsRemoteId == null) {
+                continue;
+            }
+
             switch (dbfile.itsRemoteChange) {
             case NO_CHANGE:
             case ADDED:
