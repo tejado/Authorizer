@@ -17,7 +17,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -40,7 +39,6 @@ import com.owncloud.android.lib.common.network.NetworkUtils;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.ReadRemoteFileOperation;
 import com.owncloud.android.lib.resources.files.RemoteFile;
-import com.owncloud.android.lib.resources.files.SearchOperation;
 import com.owncloud.android.lib.resources.users.GetRemoteUserNameOperation;
 
 /**
@@ -69,8 +67,22 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
                                             Context ctx)
             throws IOException
     {
+        checkOperationResult(result, false, ctx);
+    }
+
+
+    /** Check the result of an operation; An exception is thrown on an error */
+    public static void checkOperationResult(RemoteOperationResult result,
+                                            boolean ignoreFileNotFound,
+                                            Context ctx)
+            throws IOException
+    {
         boolean retry = false;
         if (result.isSuccess()) {
+            return;
+        } else if (ignoreFileNotFound &&
+                (result.getCode() ==
+                 RemoteOperationResult.ResultCode.FILE_NOT_FOUND)) {
             return;
         }
 
@@ -191,31 +203,39 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
         HashMap<String, ProviderRemoteFile> files =
                 new HashMap<String, ProviderRemoteFile>();
 
-        SearchOperation searchOper = new SearchOperation("psafe3");
-        RemoteOperationResult searchRes = searchOper.execute(itsProviderClient);
-        checkOperationResult(searchRes, itsContext);
-        for (Object obj: searchRes.getData()) {
-            SearchOperation.Result result = (SearchOperation.Result)obj;
-            if (!TextUtils.equals(result.itsType, "file") ||
-                    (result.itsPath == null)) {
-                continue;
-            }
-            ReadRemoteFileOperation fileOper =
-                    new ReadRemoteFileOperation(result.itsPath);
-            RemoteOperationResult fileRes = fileOper.execute(itsProviderClient);
-            checkOperationResult(fileRes, itsContext);
-            for (Object fileObj: fileRes.getData()) {
-                RemoteFile remfile = (RemoteFile)fileObj;
-                if (!OwncloudProviderFile.isPasswordFile(remfile)) {
+        List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
+        for (DbFile dbfile: dbfiles) {
+            switch (dbfile.itsRemoteChange) {
+            case NO_CHANGE:
+            case ADDED:
+            case MODIFIED: {
+                ReadRemoteFileOperation fileOper =
+                        new ReadRemoteFileOperation(dbfile.itsRemoteId);
+                RemoteOperationResult fileRes =
+                        fileOper.execute(itsProviderClient);
+                checkOperationResult(fileRes, true, itsContext);
+                if (fileRes.getData() == null) {
                     continue;
                 }
-                PasswdSafeUtil.dbginfo(
-                        TAG, "owncloud file: %s",
-                        OwncloudProviderFile.fileToString(remfile));
-                files.put(remfile.getRemotePath(),
-                          new OwncloudProviderFile(remfile));
+                for (Object fileObj: fileRes.getData()) {
+                    RemoteFile remfile = (RemoteFile)fileObj;
+                    if (!OwncloudProviderFile.isPasswordFile(remfile)) {
+                        continue;
+                    }
+                    PasswdSafeUtil.dbginfo(
+                            TAG, "owncloud file: %s",
+                            OwncloudProviderFile.fileToString(remfile));
+                    files.put(remfile.getRemotePath(),
+                              new OwncloudProviderFile(remfile));
+                }
+                break;
+            }
+            case REMOVED: {
+                break;
+            }
             }
         }
+
         return files;
     }
 }
