@@ -5,6 +5,15 @@
     android:orientation="horizontal"
     tools:ignore="InefficientWeight">
 
+    <CheckBox
+        android:id="@+id/selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"/>
+    
     <ImageView
         android:id="@+id/icon"
         android:layout_width="wrap_content"
