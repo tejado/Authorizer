@@ -172,8 +172,8 @@ public class PasswdSafeProvider extends ContentProvider
                 provider.deleteLocalFile(file, db);
 
                 db.setTransactionSuccessful();
-                getContext().getContentResolver().notifyChange(uri, null);
-                // TODO: notify both files and remote files URIs
+
+                notifyFileChanges(providerId, id);
                 return 1;
             } catch (Exception e) {
                 String msg = "Error deleting file: " + uri;
@@ -288,8 +288,7 @@ public class PasswdSafeProvider extends ContentProvider
                 long id = provider.insertLocalFile(providerId, title, db);
                 db.setTransactionSuccessful();
 
-                ContentResolver cr = getContext().getContentResolver();
-                cr.notifyChange(uri, null);
+                notifyFileChanges(providerId, -1);
                 return ContentUris.withAppendedId(uri, id);
             } catch (Exception e) {
                 String msg = "Error adding file: " + title;
@@ -571,7 +570,7 @@ public class PasswdSafeProvider extends ContentProvider
                 provider.updateLocalFile(file, localFileName, localFile, db);
                 db.setTransactionSuccessful();
 
-                cr.notifyChange(uri, null);
+                notifyFileChanges(providerId, id);
             } catch (Exception e) {
                 Log.e(TAG, "Error updating " + uri, e);
                 return 0;
@@ -705,6 +704,30 @@ public class PasswdSafeProvider extends ContentProvider
         } else {
             throw new IllegalArgumentException("Unknown method: " + name);
         }
+    }
+
+
+    /** Notify both files and remote files listeners for changes */
+    private void notifyFileChanges(long providerId, long fileId)
+    {
+        ContentResolver cr = getContext().getContentResolver();
+
+        Uri providerUri = ContentUris.withAppendedId(
+                PasswdSafeContract.Providers.CONTENT_URI, providerId);
+
+        Uri.Builder builder = providerUri.buildUpon();
+        builder.appendPath(PasswdSafeContract.Files.TABLE);
+        if (fileId >= 0) {
+            ContentUris.appendId(builder, fileId);
+        }
+        cr.notifyChange(builder.build(), null);
+
+        builder = providerUri.buildUpon();
+        builder.appendPath(PasswdSafeContract.RemoteFiles.TABLE);
+        if (fileId >= 0) {
+            ContentUris.appendId(builder, fileId);
+        }
+        cr.notifyChange(builder.build(), null);
     }
 
 
