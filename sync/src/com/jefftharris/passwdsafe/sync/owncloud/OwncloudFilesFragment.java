@@ -55,6 +55,8 @@ public class OwncloudFilesFragment extends ListFragment
 
         /** Is the given file selected to be synced */
         boolean isSelected(String filePath);
+
+        void updateFileSynced(OwncloudProviderFile file, boolean synced);
     }
 
     private static final String TAG = "OwncloudFilesFragment";
@@ -164,12 +166,13 @@ public class OwncloudFilesFragment extends ListFragment
         if (OwncloudProviderFile.isFolder(file)) {
             itsListener.changeDir(file.getRemoteId());
         } else {
-            PasswdSafeUtil.dbginfo(TAG, "item selected: %s",
+            boolean newSelected = !item.itsIsSelected;
+            PasswdSafeUtil.dbginfo(TAG, "item selected %b: %s",
+                                   newSelected,
                                    OwncloudProviderFile.fileToString(
                                            file.getRemoteFile()));
-            item.itsIsSelected = !item.itsIsSelected;
-            itsFilesAdapter.notifyDataSetChanged();
-            // TODO: select file
+            item.itsIsSelected = newSelected;
+            itsListener.updateFileSynced(file, newSelected);
         }
     }
 
