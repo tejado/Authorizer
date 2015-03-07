@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -37,7 +38,7 @@ public class OwncloudFilesFragment extends ListFragment
     /** Listener interface for the owning activity */
     public interface Listener
     {
-        /** Callback to handle the result of listinf files */
+        /** Callback to handle the result of listing files */
         public interface ListFilesCb
         {
             public void handleFiles(List<OwncloudProviderFile> files);
@@ -51,13 +52,16 @@ public class OwncloudFilesFragment extends ListFragment
 
         /** Change directory to the parent path */
         void changeParentDir();
+
+        /** Is the given file selected to be synced */
+        boolean isSelected(String filePath);
     }
 
     private static final String TAG = "OwncloudFilesFragment";
 
     private String itsPath;
     private Listener itsListener;
-    private ArrayAdapter<OwncloudProviderFile> itsFilesAdapter;
+    private ArrayAdapter<ListItem> itsFilesAdapter;
     private ProgressBar itsProgressBar;
 
     /** Create a new instance of the fragment */
@@ -151,14 +155,20 @@ public class OwncloudFilesFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-        OwncloudProviderFile file = itsFilesAdapter.getItem(position);
-        if (file == null) {
+        ListItem item = itsFilesAdapter.getItem(position);
+        if (item == null) {
             return;
         }
 
+        OwncloudProviderFile file = item.itsFile;
         if (OwncloudProviderFile.isFolder(file)) {
             itsListener.changeDir(file.getRemoteId());
         } else {
+            PasswdSafeUtil.dbginfo(TAG, "item selected: %s",
+                                   OwncloudProviderFile.fileToString(
+                                           file.getRemoteFile()));
+            item.itsIsSelected = !item.itsIsSelected;
+            itsFilesAdapter.notifyDataSetChanged();
             // TODO: select file
         }
     }
@@ -182,6 +192,7 @@ public class OwncloudFilesFragment extends ListFragment
     /** Reload the files shown by the fragment */
     public void reload()
     {
+        PasswdSafeUtil.dbginfo(TAG, "reload");
         itsProgressBar.setVisibility(View.VISIBLE);
         // TODO: reload menu option
         itsListener.listFiles(itsPath, new Listener.ListFilesCb()
@@ -194,10 +205,12 @@ public class OwncloudFilesFragment extends ListFragment
                     PasswdSafeUtil.dbginfo(TAG, "list file: %s",
                                            OwncloudProviderFile.fileToString(
                                                    file.getRemoteFile()));
-                    itsFilesAdapter.add(file);
+                    boolean selected =
+                            itsListener.isSelected(file.getRemoteId());
+                    itsFilesAdapter.add(new ListItem(file, selected));
                 }
 
-                itsFilesAdapter.sort(new FileComparator());
+                itsFilesAdapter.sort(new ListItemComparator());
                 itsFilesAdapter.notifyDataSetChanged();
                 itsProgressBar.setVisibility(View.GONE);
             }
@@ -205,8 +218,37 @@ public class OwncloudFilesFragment extends ListFragment
     }
 
 
+    /** Update the state of synced files */
+    public void updateSyncedFiles()
+    {
+        PasswdSafeUtil.dbginfo(TAG, "updateSyncedFiles count %d",
+                               itsFilesAdapter.getCount());
+        for (int i = 0; i < itsFilesAdapter.getCount(); ++i) {
+            ListItem item = itsFilesAdapter.getItem(i);
+            item.itsIsSelected =
+                    itsListener.isSelected(item.itsFile.getRemoteId());
+        }
+        itsFilesAdapter.notifyDataSetChanged();
+    }
+
+
+    /** Holder for each item in the list view */
+    private static class ListItem
+    {
+        public final OwncloudProviderFile itsFile;
+        public boolean itsIsSelected;
+
+        /** Constructor */
+        public ListItem(OwncloudProviderFile file, boolean selected)
+        {
+            itsFile = file;
+            itsIsSelected = selected;
+        }
+    }
+
+
     /** Adapter for files shown in the list */
-    private static class FilesAdapter extends ArrayAdapter<OwncloudProviderFile>
+    private static class FilesAdapter extends ArrayAdapter<ListItem>
     {
         private final LayoutInflater itsInflater;
 
@@ -235,13 +277,17 @@ public class OwncloudFilesFragment extends ListFragment
                 views = (ViewHolder)convertView.getTag();
             }
 
-            OwncloudProviderFile file = getItem(position);
+            ListItem item = getItem(position);
+            OwncloudProviderFile file = item.itsFile;
             views.itsText.setText(file.getTitle());
 
             if (OwncloudProviderFile.isFolder(file)) {
+                views.itsSelected.setVisibility(View.GONE);
                 views.itsModDate.setVisibility(View.GONE);
                 views.itsIcon.setImageResource(R.drawable.folder_rev);
             } else {
+                views.itsSelected.setVisibility(View.VISIBLE);
+                views.itsSelected.setChecked(item.itsIsSelected);
                 views.itsModDate.setVisibility(View.VISIBLE);
                 views.itsModDate.setText(Utils.formatDate(file.getModTime(),
                                                           getContext()));
@@ -257,6 +303,7 @@ public class OwncloudFilesFragment extends ListFragment
             public final TextView itsText;
             public final TextView itsModDate;
             public final ImageView itsIcon;
+            public final CheckBox itsSelected;
 
             /** Constructor */
             public ViewHolder(View view)
@@ -264,26 +311,29 @@ public class OwncloudFilesFragment extends ListFragment
                 itsText = (TextView)view.findViewById(R.id.text);
                 itsModDate = (TextView)view.findViewById(R.id.mod_date);
                 itsIcon = (ImageView)view.findViewById(R.id.icon);
+                itsSelected = (CheckBox)view.findViewById(R.id.selected);
             }
         }
     }
 
 
     /** File comparator */
-    private static final class FileComparator
-            implements Comparator<OwncloudProviderFile>
+    private static final class ListItemComparator
+            implements Comparator<ListItem>
     {
         @Override
-        public int compare(OwncloudProviderFile lhs, OwncloudProviderFile rhs)
+        public int compare(ListItem lhs, ListItem rhs)
         {
-            boolean lhsFolder = OwncloudProviderFile.isFolder(lhs);
-            boolean rhsFolder = OwncloudProviderFile.isFolder(rhs);
+            OwncloudProviderFile lhsFile = lhs.itsFile;
+            OwncloudProviderFile rhsFile = rhs.itsFile;
+            boolean lhsFolder = OwncloudProviderFile.isFolder(lhsFile);
+            boolean rhsFolder = OwncloudProviderFile.isFolder(rhsFile);
             if (lhsFolder && !rhsFolder) {
                 return -1;
             } else if (rhsFolder && !lhsFolder) {
                 return 1;
             } else {
-                return lhs.getTitle().compareTo(rhs.getTitle());
+                return lhsFile.getTitle().compareTo(rhsFile.getTitle());
             }
         }
     }

@@ -131,6 +131,7 @@ public class OwncloudFilesActivity extends FragmentActivity
     {
         PasswdSafeUtil.dbginfo(TAG, "listFiles client %b, path: %s",
                                (itsClient != null), path);
+        // TODO: keep track and cancel pending async tasks
         new AsyncTask<String, Void, List<OwncloudProviderFile>>()
         {
             @Override
@@ -219,6 +220,16 @@ public class OwncloudFilesActivity extends FragmentActivity
     }
 
 
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#isSelected(java.lang.String)
+     */
+    @Override
+    public boolean isSelected(String filePath)
+    {
+        return itsSyncedFiles.containsKey(filePath);
+    }
+
+
     /** Reload the files shown by the activity */
     private void reloadFiles()
     {
@@ -230,7 +241,18 @@ public class OwncloudFilesActivity extends FragmentActivity
     }
 
 
-    /** Loader callbacks for the provider */
+    /** Update the state of the synced files shown by the activity */
+    private void updateSyncedFiles()
+    {
+        FragmentManager fragmgr = getSupportFragmentManager();
+        Fragment filesfrag = fragmgr.findFragmentById(R.id.content);
+        if (filesfrag instanceof OwncloudFilesFragment) {
+            ((OwncloudFilesFragment)filesfrag).updateSyncedFiles();
+        }
+    }
+
+
+   /** Loader callbacks for the provider */
     private class ProviderLoaderCb implements LoaderCallbacks<Cursor>
     {
         @Override
@@ -309,15 +331,15 @@ public class OwncloudFilesActivity extends FragmentActivity
         private void updateFiles(Cursor cursor)
         {
             itsSyncedFiles.clear();
-            if (cursor == null) {
-                return;
+            if (cursor != null) {
+                for (boolean more = cursor.moveToFirst(); more;
+                        more = cursor.moveToNext()) {
+                    DbFile file = new DbFile(cursor);
+                    PasswdSafeUtil.dbginfo(TAG, "sync file: %s", file);
+                    itsSyncedFiles.put(file.itsRemoteId, file);
+                }
             }
-            for (boolean more = cursor.moveToFirst(); more;
-                    more = cursor.moveToNext()) {
-                DbFile file = new DbFile(cursor);
-                PasswdSafeUtil.dbginfo(TAG, "sync file: %s", file);
-                itsSyncedFiles.put(file.itsRemoteId, file);
-            }
+            updateSyncedFiles();
         }
     }
 }
