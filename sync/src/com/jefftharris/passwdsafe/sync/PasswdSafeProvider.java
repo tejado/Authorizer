@@ -56,6 +56,7 @@ public class PasswdSafeProvider extends ContentProvider
 
     private static final HashMap<String, String> PROVIDERS_MAP;
     private static final HashMap<String, String> FILES_MAP;
+    private static final HashMap<String, String> REMOTE_FILES_MAP;
     private static final HashMap<String, String> SYNC_LOGS_MAP;
 
     private OnAccountsUpdateListener itsListener;
@@ -91,6 +92,13 @@ public class PasswdSafeProvider extends ContentProvider
         FILES_MAP.put(PasswdSafeContract.Files.COL_FOLDER,
                       SyncDb.DB_COL_FILES_LOCAL_FOLDER + " AS " +
                               PasswdSafeContract.Files.COL_FOLDER);
+
+        REMOTE_FILES_MAP = new HashMap<String, String>();
+        REMOTE_FILES_MAP.put(PasswdSafeContract.RemoteFiles._ID,
+                             SyncDb.DB_COL_FILES_ID);
+        REMOTE_FILES_MAP.put(PasswdSafeContract.RemoteFiles.COL_REMOTE_ID,
+                             SyncDb.DB_COL_FILES_REMOTE_ID + " AS " +
+                                 PasswdSafeContract.RemoteFiles.COL_REMOTE_ID);
 
         SYNC_LOGS_MAP = new HashMap<String, String>();
         SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs._ID,
@@ -165,6 +173,7 @@ public class PasswdSafeProvider extends ContentProvider
 
                 db.setTransactionSuccessful();
                 getContext().getContentResolver().notifyChange(uri, null);
+                // TODO: notify both files and remote files URIs
                 return 1;
             } catch (Exception e) {
                 String msg = "Error deleting file: " + uri;
@@ -205,6 +214,12 @@ public class PasswdSafeProvider extends ContentProvider
         }
         case PasswdSafeContract.MATCH_METHODS: {
             return PasswdSafeContract.Methods.CONTENT_TYPE;
+        }
+        case PasswdSafeContract.MATCH_PROVIDER_REMOTE_FILES: {
+            return PasswdSafeContract.RemoteFiles.CONTENT_TYPE;
+        }
+        case PasswdSafeContract.MATCH_PROVIDER_REMOTE_FILE: {
+            return PasswdSafeContract.RemoteFiles.CONTENT_ITEM_TYPE;
         }
         default: {
             throw new IllegalArgumentException(
@@ -414,7 +429,33 @@ public class PasswdSafeProvider extends ContentProvider
                 throw new RuntimeException(msg, e);
             }
         }
-        default: {
+        case PasswdSafeContract.MATCH_PROVIDER_REMOTE_FILES: {
+            qb.setTables(SyncDb.DB_TABLE_FILES);
+            qb.setProjectionMap(REMOTE_FILES_MAP);
+
+            StringBuffer fullSelection =
+                    new StringBuffer(SyncDb.DB_MATCH_FILES_PROVIDER_ID);
+            if (PasswdSafeContract.RemoteFiles.NOT_DELETED_SELECTION.equals(
+                        selection)) {
+                selectionValid = true;
+                fullSelection.append(" and ");
+                fullSelection.append(selection);
+            }
+            selection = fullSelection.toString();
+
+            selectionArgs =
+                    new String[] { PasswdSafeContract.Providers.getIdStr(uri) };
+            break;
+        }
+        case PasswdSafeContract.MATCH_PROVIDER_REMOTE_FILE: {
+            qb.setTables(SyncDb.DB_TABLE_FILES);
+            qb.setProjectionMap(REMOTE_FILES_MAP);
+            selection = SyncDb.DB_MATCH_FILES_ID;
+            selectionArgs =
+                new String[] { PasswdSafeContract.RemoteFiles.getIdStr(uri) };
+            break;
+        }
+       default: {
             throw new IllegalArgumentException(
                     "query unknown match for uri: " + uri);
         }
