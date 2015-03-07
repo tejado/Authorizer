@@ -34,6 +34,8 @@ public final class PasswdSafeContract
     public static final int MATCH_PROVIDER_FILE = 4;
     public static final int MATCH_SYNC_LOGS = 5;
     public static final int MATCH_METHODS = 6;
+    public static final int MATCH_PROVIDER_REMOTE_FILES = 7;
+    public static final int MATCH_PROVIDER_REMOTE_FILE = 8;
 
     static {
         MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
@@ -57,6 +59,14 @@ public final class PasswdSafeContract
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.Methods.TABLE,
                        MATCH_METHODS);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE + "/#/" +
+                               PasswdSafeContract.RemoteFiles.TABLE,
+                       MATCH_PROVIDER_REMOTE_FILES);
+        MATCHER.addURI(PasswdSafeContract.AUTHORITY,
+                       PasswdSafeContract.Providers.TABLE + "/#/" +
+                               PasswdSafeContract.RemoteFiles.TABLE + "/#",
+                       MATCH_PROVIDER_REMOTE_FILE);
     }
 
     /** The table of providers */
@@ -153,6 +163,41 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_MOD_DATE = 3;
         public static final int PROJECTION_IDX_FILE = 4;
         public static final int PROJECTION_IDX_FOLDER = 5;
+
+        /** Get the file id from the URI */
+        public static final long getId(Uri uri)
+        {
+            return Long.valueOf(getIdStr(uri));
+        }
+
+        /** Get the file id string from the URI */
+        public static final String getIdStr(Uri uri)
+        {
+            return uri.getPathSegments().get(3);
+        }
+    }
+
+    /** The table of remote files */
+    public static final class RemoteFiles implements BaseColumns
+    {
+        public static final String TABLE = "remote_files";
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE;
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE;
+
+        public static final String COL_REMOTE_ID = "remote_id";
+
+        public static final String NOT_DELETED_SELECTION =
+                "not local_deleted and not remote_deleted";
+
+        public static final String[] PROJECTION = {
+            RemoteFiles._ID,
+            RemoteFiles.COL_REMOTE_ID
+        };
+
+        public static final int PROJECTION_IDX_ID = 0;
+        public static final int PROJECTION_IDX_REMOTE_ID = 1;
 
         /** Get the file id from the URI */
         public static final long getId(Uri uri)
