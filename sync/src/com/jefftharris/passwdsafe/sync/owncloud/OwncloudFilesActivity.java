@@ -25,8 +25,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -63,6 +66,8 @@ public class OwncloudFilesActivity extends FragmentActivity
     private HashMap<String, Long> itsSyncedFiles =
             new HashMap<String, Long>();
     private AsyncTask<Void, Void, OwnCloudClient> itsClientLoadTask;
+    private LoaderCallbacks<Cursor> itsProviderLoaderCb;
+    private LoaderCallbacks<Cursor> itsFilesLoaderCb;
 
 
     /* (non-Javadoc)
@@ -87,9 +92,11 @@ public class OwncloudFilesActivity extends FragmentActivity
             changeDir(FileUtils.PATH_SEPARATOR);
         }
 
+        itsProviderLoaderCb = new ProviderLoaderCb();
+        itsFilesLoaderCb = new FilesLoaderCb();
         LoaderManager lm = getSupportLoaderManager();
-        lm.initLoader(LOADER_TITLE, null, new ProviderLoaderCb());
-        lm.initLoader(LOADER_FILES, null, new FilesLoaderCb());
+        lm.initLoader(LOADER_TITLE, null, itsProviderLoaderCb);
+        lm.initLoader(LOADER_FILES, null, itsFilesLoaderCb);
 
         itsClientLoadTask = new AsyncTask<Void, Void, OwnCloudClient>()
         {
@@ -123,6 +130,41 @@ public class OwncloudFilesActivity extends FragmentActivity
     {
         super.onDestroy();
         itsClientLoadTask.cancel(true);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.activity_owncloud_files, menu);
+        MenuItem item = menu.findItem(R.id.menu_reload);
+        MenuItemCompat.setShowAsAction(item,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_reload: {
+            reloadFiles();
+            LoaderManager lm = getSupportLoaderManager();
+            lm.restartLoader(LOADER_TITLE, null, itsProviderLoaderCb);
+            lm.restartLoader(LOADER_FILES, null, itsFilesLoaderCb);
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
     }
 
 

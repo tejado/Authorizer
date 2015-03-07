@@ -197,7 +197,6 @@ public class OwncloudFilesFragment extends ListFragment
     {
         PasswdSafeUtil.dbginfo(TAG, "reload");
         itsProgressBar.setVisibility(View.VISIBLE);
-        // TODO: reload menu option
         itsListener.listFiles(itsPath, new Listener.ListFilesCb()
         {
             @Override
