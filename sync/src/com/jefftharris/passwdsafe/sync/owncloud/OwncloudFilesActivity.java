@@ -14,6 +14,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -33,6 +35,7 @@ import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 import com.jefftharris.passwdsafe.sync.ProviderFactory;
 import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.FileUtils;
@@ -57,8 +60,8 @@ public class OwncloudFilesActivity extends FragmentActivity
 
     // TODO: need to close client??
     private OwnCloudClient itsClient = null;
-    private HashMap<String, DbFile> itsSyncedFiles =
-            new HashMap<String, DbFile>();
+    private HashMap<String, Long> itsSyncedFiles =
+            new HashMap<String, Long>();
     private AsyncTask<Void, Void, OwnCloudClient> itsClientLoadTask;
 
 
@@ -78,7 +81,7 @@ public class OwncloudFilesActivity extends FragmentActivity
         }
 
         itsFilesUri = itsProviderUri.buildUpon().appendPath(
-                PasswdSafeContract.Files.TABLE).build();
+                PasswdSafeContract.RemoteFiles.TABLE).build();
 
         if (args == null) {
             changeDir(FileUtils.PATH_SEPARATOR);
@@ -230,6 +233,60 @@ public class OwncloudFilesActivity extends FragmentActivity
     }
 
 
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#updateFileSynced(com.jefftharris.passwdsafe.sync.owncloud.OwncloudProviderFile, boolean)
+     */
+    @Override
+    public void updateFileSynced(OwncloudProviderFile file, boolean synced)
+    {
+        PasswdSafeUtil.dbginfo(
+                TAG, "updateFileSynced sync %b, file: %s", synced,
+                OwncloudProviderFile.fileToString(file.getRemoteFile()));
+        // TODO: use provider calls to update db or do in bg thread
+        SyncDb syncDb = SyncDb.acquire();
+        try {
+            SQLiteDatabase db = syncDb.beginTransaction();
+
+            long providerId =
+                    PasswdSafeContract.Providers.getId(itsProviderUri);
+
+            DbFile remfile = SyncDb.getFileByRemoteId(providerId,
+                                                      file.getRemoteId(), db);
+            if (synced) {
+                long remFileId;
+                if (remfile != null) {
+                    SyncDb.updateRemoteFileChange(remfile.itsId,
+                                                  DbFile.FileChange.ADDED, db);
+                    remFileId = remfile.itsId;
+                } else {
+                    remFileId = SyncDb.addRemoteFile(
+                            providerId, file.getRemoteId(), file.getTitle(),
+                            file.getFolder(), file.getModTime(), file.getHash(),
+                            db);
+                }
+                itsSyncedFiles.put(file.getRemoteId(), remFileId);
+            } else {
+                if (remfile != null) {
+                    SyncDb.updateRemoteFileDeleted(remfile.itsId, db);
+                }
+                itsSyncedFiles.remove(file.getRemoteId());
+            }
+
+            db.setTransactionSuccessful();
+            getContentResolver().notifyChange(itsFilesUri, null);
+            OwncloudProvider provider = (OwncloudProvider)
+                    ProviderFactory.getProvider(ProviderType.OWNCLOUD, this);
+            provider.requestSync(false);
+        } catch (Exception e) {
+            String msg = "Error updating sync for " + file.getRemoteId();
+            Log.e(TAG, msg, e);
+            PasswdSafeUtil.showErrorMsg(msg, this);
+        } finally {
+            syncDb.endTransactionAndRelease();
+        }
+    }
+
+
     /** Reload the files shown by the activity */
     private void reloadFiles()
     {
@@ -297,7 +354,7 @@ public class OwncloudFilesActivity extends FragmentActivity
     }
 
 
-    /** Loader callbacks for the synced files for a provider */
+    /** Loader callbacks for the synced remote files for a provider */
     private class FilesLoaderCb implements LoaderCallbacks<Cursor>
     {
         @Override
@@ -305,9 +362,9 @@ public class OwncloudFilesActivity extends FragmentActivity
         {
             return new PasswdCursorLoader(
                     OwncloudFilesActivity.this, itsFilesUri,
-                    PasswdSafeContract.Files.PROJECTION,
-                    PasswdSafeContract.Files.NOT_DELETED_SELECTION,
-                    null, PasswdSafeContract.Files.TITLE_SORT_ORDER);
+                    PasswdSafeContract.RemoteFiles.PROJECTION,
+                    PasswdSafeContract.RemoteFiles.NOT_DELETED_SELECTION,
+                    null, null);
         }
 
         @Override
@@ -334,9 +391,13 @@ public class OwncloudFilesActivity extends FragmentActivity
             if (cursor != null) {
                 for (boolean more = cursor.moveToFirst(); more;
                         more = cursor.moveToNext()) {
-                    DbFile file = new DbFile(cursor);
-                    PasswdSafeUtil.dbginfo(TAG, "sync file: %s", file);
-                    itsSyncedFiles.put(file.itsRemoteId, file);
+                    long id = cursor.getLong(
+                        PasswdSafeContract.RemoteFiles.PROJECTION_IDX_ID);
+                    String remoteId = cursor.getString(
+                        PasswdSafeContract.RemoteFiles.PROJECTION_IDX_REMOTE_ID);
+
+                    PasswdSafeUtil.dbginfo(TAG, "sync file: %s", remoteId);
+                    itsSyncedFiles.put(remoteId, id);
                 }
             }
             updateSyncedFiles();
