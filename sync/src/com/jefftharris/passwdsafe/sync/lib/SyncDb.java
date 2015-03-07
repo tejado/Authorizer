@@ -393,6 +393,20 @@ public class SyncDb
         ContentValues values = new ContentValues();
         values.put(DB_COL_FILES_REMOTE_CHANGE,
                    DbFile.FileChange.toDbStr(change));
+        switch (change) {
+        case ADDED:
+        case MODIFIED: {
+            values.put(DB_COL_FILES_REMOTE_DELETED, false);
+            break;
+        }
+        case REMOVED: {
+            values.put(DB_COL_FILES_REMOTE_DELETED, true);
+            break;
+        }
+        case NO_CHANGE: {
+            break;
+        }
+        }
         db.update(DB_TABLE_FILES, values,
                   DB_MATCH_FILES_ID, new String[] { Long.toString(fileId) });
     }
