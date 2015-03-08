@@ -33,10 +33,9 @@ import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
  */
 public class PasswdSafeUtil
 {
-    public static final String NEW_INTENT =
-        "com.jefftharris.passwdsafe.action.NEW";
-    public static final String VIEW_INTENT =
-        "com.jefftharris.passwdsafe.action.VIEW";
+    public static final String PACKAGE = "com.jefftharris.passwdsafe";
+    public static final String NEW_INTENT = PACKAGE + ".action.NEW";
+    public static final String VIEW_INTENT = PACKAGE + ".action.VIEW";
 
     public static final boolean DEBUG = BuildConfig.DEBUG;
 
@@ -49,7 +48,9 @@ public class PasswdSafeUtil
         if (recToOpen != null) {
             builder.appendQueryParameter("recToOpen", recToOpen);
         }
-        return new Intent(VIEW_INTENT, builder.build());
+        Intent intent = new Intent(VIEW_INTENT, builder.build());
+        intent.setClassName(PACKAGE, PACKAGE + ".PasswdSafe");
+        return intent;
     }
 
     /** Start the main activity for a package */
