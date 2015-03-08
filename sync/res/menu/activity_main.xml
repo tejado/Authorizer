@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_logs"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:orderInCategory="100"
+        android:title="@string/logs"/>
+
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:orderInCategory="100"
+        android:title="@string/about"/>
+
+</menu>

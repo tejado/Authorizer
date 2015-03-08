@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="ContentDescription" severity="ignore" />
+    <issue id="DisableBaselineAlignment" severity="ignore" />
+    <issue id="InefficientWeight" severity="ignore" />
+    <issue id="MissingTranslation" severity="ignore" />
+    <issue id="Overdraw" severity="ignore" />
+    <issue id="SpUsage" severity="ignore" />
+    <issue id="UnusedResources" severity="ignore" />
+    <issue id="UseCompoundDrawables" severity="ignore" />
+    <issue id="UselessParent" severity="ignore" />
+</lint>
