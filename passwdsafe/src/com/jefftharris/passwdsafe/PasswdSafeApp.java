@@ -351,6 +351,14 @@ public class PasswdSafeApp extends Application
         return itsFileData;
     }
 
+    /** Close an open file */
+    public synchronized void closeOpenFile()
+    {
+        PasswdSafeUtil.dbgverb(TAG, "close file");
+        checkScreenOffReceiver();
+        closeFileData(false);
+    }
+
     /** Get the UUID of the last viewed record */
     public synchronized String getLastViewedRecord()
     {
