@@ -11,8 +11,8 @@ import android.provider.OpenableColumns;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
@@ -27,7 +27,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 public class StorageFileListFragment extends ListFragment
         implements OnClickListener
 {
-    // TODO: menu option for showing old chooser
     // TODO: new file support
     // TODO: remove file support
     // TODO: recent files list

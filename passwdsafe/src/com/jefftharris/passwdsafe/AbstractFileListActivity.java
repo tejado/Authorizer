@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2011-2013 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2011-2013, 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -9,15 +9,19 @@ package com.jefftharris.passwdsafe;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 
+import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 public abstract class AbstractFileListActivity extends FragmentActivity
@@ -29,7 +33,11 @@ public abstract class AbstractFileListActivity extends FragmentActivity
 {
     public static final String INTENT_EXTRA_CLOSE_ON_OPEN = "closeOnOpen";
 
+    private static final String TAG = "AbstractFileListActivity";
+
     protected boolean itsIsCloseOnOpen = false;
+    private Boolean itsIsStorageFrag = null;
+
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
@@ -48,7 +56,23 @@ public abstract class AbstractFileListActivity extends FragmentActivity
         FragmentTransaction txn = fragMgr.beginTransaction();
         txn.replace(R.id.sync, new SyncProviderFragment());
         txn.commit();
+
+        if (savedInstanceState == null) {
+            setFileChooseFrag();
+        }
     }
+
+
+    /* (non-Javadoc)
+     * @see android.support.v4.app.FragmentActivity#onResume()
+     */
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        setFileChooseFrag();
+    }
+
 
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.SyncProviderFragment.Listener#showSyncProviderFiles(android.net.Uri)
@@ -110,5 +134,31 @@ public abstract class AbstractFileListActivity extends FragmentActivity
             return ((FileListFragment)frag).doBackPressed();
         }
         return false;
+    }
+
+
+    /** Set the file chooser fragment */
+    private void setFileChooseFrag()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        boolean storageFrag =
+                ((ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT) &&
+                 !Preferences.getFileLegacyFileChooserPref(prefs));
+        if ((itsIsStorageFrag == null) || (itsIsStorageFrag != storageFrag)) {
+            PasswdSafeUtil.dbginfo(TAG, "setFileChooseFrag storage %b",
+                                   storageFrag);
+            Fragment frag;
+            if (storageFrag) {
+                frag = new StorageFileListFragment();
+            } else {
+                frag = new FileListFragment();
+            }
+            FragmentManager fragMgr = getSupportFragmentManager();
+            FragmentTransaction txn = fragMgr.beginTransaction();
+            txn.replace(R.id.files, frag);
+            txn.commit();
+            itsIsStorageFrag = storageFrag;
+        }
     }
 }

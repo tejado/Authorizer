@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013, 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -68,6 +68,10 @@ public class Preferences extends PreferenceActivity
 
     public static final String PREF_DEF_FILE = "defFilePref";
     public static final String PREF_DEF_FILE_DEF = "";
+
+    public static final String PREF_FILE_LEGACY_FILE_CHOOSER =
+            "fileLegacyFileChooserPref";
+    public static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = false;
 
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     public static final boolean PREF_GROUP_RECORDS_DEF = true;
@@ -201,6 +205,13 @@ public class Preferences extends PreferenceActivity
             return null;
         }
         return Uri.parse(defFile);
+    }
+
+    /** Get the preference for use of the legacy file chooser */
+    public static boolean getFileLegacyFileChooserPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_LEGACY_FILE_CHOOSER,
+                                PREF_FILE_LEGACY_FILE_CHOOSER_DEF);
     }
 
     public static FontSizePref getFontSizePref(SharedPreferences prefs)
