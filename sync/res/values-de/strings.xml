@@ -8,7 +8,7 @@
     <string name="automatic">Automatisch</string>
     <string name="cant_launch_drive_file">Kann Google-Drive-Datei nicht öffnen. Die Datei wurde möglichweise nicht synchronisiert.</string>
     <string name="choose_account">Konto wählen</string>
-    <string name="choose_files_from_dir">Wählen Sie Dateien von %1$s</string>
+    <string name="choose_sync_files_from_dir">Wählen Sie Dateien von %1$s zu synchronisieren</string>
     <string name="clear">Leeren</string>
     <string name="conflicted_local_copy">Konflikt lokale Kopie</string>
     <string name="dropbox_acct_unlinked">Verbindung mit Dropbox entfernt.</string>

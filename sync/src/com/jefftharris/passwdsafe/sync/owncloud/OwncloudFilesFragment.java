@@ -56,6 +56,7 @@ public class OwncloudFilesFragment extends ListFragment
         /** Is the given file selected to be synced */
         boolean isSelected(String filePath);
 
+        /** Update whether a file is synced */
         void updateFileSynced(OwncloudProviderFile file, boolean synced);
     }
 
@@ -112,7 +113,7 @@ public class OwncloudFilesFragment extends ListFragment
                                          container, false);
 
         TextView title = (TextView)rootView.findViewById(R.id.title);
-        title.setText(getString(R.string.choose_files_from_dir, itsPath));
+        title.setText(getString(R.string.choose_sync_files_from_dir, itsPath));
 
         View parent = rootView.findViewById(R.id.parent);
         if (FileUtils.PATH_SEPARATOR.equals(itsPath)) {

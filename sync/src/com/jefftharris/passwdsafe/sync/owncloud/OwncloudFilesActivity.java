@@ -62,7 +62,6 @@ public class OwncloudFilesActivity extends FragmentActivity
     private Uri itsProviderUri;
     private Uri itsFilesUri;
 
-    // TODO: need to close client??
     private OwnCloudClient itsClient = null;
     private HashMap<String, Long> itsSyncedFiles =
             new HashMap<String, Long>();
