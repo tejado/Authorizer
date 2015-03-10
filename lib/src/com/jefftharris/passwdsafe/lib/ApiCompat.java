@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe.lib;
 
 import android.accounts.Account;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -69,6 +70,17 @@ public final class ApiCompat
             } else {
                 w.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
             }
+        }
+    }
+
+
+    /** API compatible call for ContentResolver.takePersistableUriPermission */
+    public static void takePersistableUriPermission(ContentResolver cr,
+                                                    Uri uri,
+                                                    int flags)
+    {
+        if (SDK_VERSION >= SDK_KITKAT) {
+            ApiCompatKitkat.takePersistableUriPermission(cr, uri, flags);
         }
     }
 }

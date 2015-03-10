@@ -10,6 +10,9 @@ package com.jefftharris.passwdsafe;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Menu;
@@ -29,6 +32,26 @@ public class FileListActivity extends AbstractFileListActivity
 {
     private static final String TAG = "FileListActivity";
 
+
+    /* (non-Javadoc)
+     * @see com.jefftharris.passwdsafe.AbstractFileListActivity#onCreate(android.os.Bundle)
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            FragmentManager fragMgr = getSupportFragmentManager();
+            FragmentTransaction txn = fragMgr.beginTransaction();
+
+            if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT) {
+                txn.replace(R.id.files, new StorageFileListFragment());
+            } else {
+                txn.replace(R.id.files, new FileListFragment());
+            }
+            txn.commit();
+        }
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
