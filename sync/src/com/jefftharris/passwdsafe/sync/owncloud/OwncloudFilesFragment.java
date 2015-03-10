@@ -65,6 +65,7 @@ public class OwncloudFilesFragment extends ListFragment
     private Listener itsListener;
     private ArrayAdapter<ListItem> itsFilesAdapter;
     private ProgressBar itsProgressBar;
+    private int itsProgressBarRefCount = 0;
 
     /** Create a new instance of the fragment */
     public static OwncloudFilesFragment newInstance(String path)
@@ -196,25 +197,34 @@ public class OwncloudFilesFragment extends ListFragment
     public void reload()
     {
         PasswdSafeUtil.dbginfo(TAG, "reload");
-        itsProgressBar.setVisibility(View.VISIBLE);
+        if (itsProgressBarRefCount++ <= 0) {
+            itsProgressBar.setVisibility(View.VISIBLE);
+            itsProgressBarRefCount = 1;
+        }
         itsListener.listFiles(itsPath, new Listener.ListFilesCb()
         {
             @Override
             public void handleFiles(List<OwncloudProviderFile> files)
             {
-                itsFilesAdapter.clear();
-                for (OwncloudProviderFile file: files) {
-                    PasswdSafeUtil.dbginfo(TAG, "list file: %s",
-                                           OwncloudProviderFile.fileToString(
-                                                   file.getRemoteFile()));
-                    boolean selected =
-                            itsListener.isSelected(file.getRemoteId());
-                    itsFilesAdapter.add(new ListItem(file, selected));
+                if (files != null) {
+                    itsFilesAdapter.clear();
+                    for (OwncloudProviderFile file: files) {
+                        PasswdSafeUtil.dbginfo(
+                                TAG, "list file: %s",
+                                OwncloudProviderFile.fileToString(
+                                        file.getRemoteFile()));
+                        boolean selected =
+                                itsListener.isSelected(file.getRemoteId());
+                        itsFilesAdapter.add(new ListItem(file, selected));
+                    }
+                    itsFilesAdapter.sort(new ListItemComparator());
+                    itsFilesAdapter.notifyDataSetChanged();
                 }
 
-                itsFilesAdapter.sort(new ListItemComparator());
-                itsFilesAdapter.notifyDataSetChanged();
-                itsProgressBar.setVisibility(View.GONE);
+                if (--itsProgressBarRefCount <= 0) {
+                    itsProgressBar.setVisibility(View.GONE);
+                    itsProgressBarRefCount = 0;
+                }
             }
         });
     }

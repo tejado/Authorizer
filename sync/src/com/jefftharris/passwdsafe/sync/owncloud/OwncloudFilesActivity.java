@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe.sync.owncloud;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +27,10 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -68,6 +69,7 @@ public class OwncloudFilesActivity extends FragmentActivity
     private AsyncTask<Void, Void, OwnCloudClient> itsClientLoadTask;
     private LoaderCallbacks<Cursor> itsProviderLoaderCb;
     private LoaderCallbacks<Cursor> itsFilesLoaderCb;
+    private List<ListFilesTask> itsListTasks = new ArrayList<ListFilesTask>();
 
 
     /* (non-Javadoc)
@@ -112,9 +114,7 @@ public class OwncloudFilesActivity extends FragmentActivity
             @Override
             protected void onPostExecute(OwnCloudClient result)
             {
-                synchronized (OwncloudFilesActivity.this) {
-                    itsClient = result;
-                }
+                itsClient = result;
                 reloadFiles();
             }
         };
@@ -130,6 +130,9 @@ public class OwncloudFilesActivity extends FragmentActivity
     {
         super.onDestroy();
         itsClientLoadTask.cancel(true);
+        for (ListFilesTask task: itsListTasks) {
+            task.cancel(true);
+        }
     }
 
 
@@ -176,63 +179,24 @@ public class OwncloudFilesActivity extends FragmentActivity
     {
         PasswdSafeUtil.dbginfo(TAG, "listFiles client %b, path: %s",
                                (itsClient != null), path);
-        // TODO: keep track and cancel pending async tasks
-        new AsyncTask<String, Void, List<OwncloudProviderFile>>()
-        {
-            @Override
-            protected List<OwncloudProviderFile>
-            doInBackground(String... params)
-            {
-                List<OwncloudProviderFile> files =
-                        new ArrayList<OwncloudProviderFile>();
-                synchronized (OwncloudFilesActivity.this) {
-                    if (itsClient == null) {
-                        return files;
+        for (ListFilesTask task: itsListTasks) {
+            task.cancel(true);
+        }
+        itsListTasks.clear();
+
+        ListFilesTask task =
+                new ListFilesTask(itsClient, this, new ListFilesTask.Callback()
+                {
+                    @Override
+                    public void handleFiles(List<OwncloudProviderFile> files,
+                                            ListFilesTask task)
+                    {
+                        itsListTasks.remove(task);
+                        cb.handleFiles(files);
                     }
-
-                    try {
-                        ReadRemoteFolderOperation oper =
-                                new ReadRemoteFolderOperation(params[0]);
-                        RemoteOperationResult statusRes =
-                                oper.execute(itsClient);
-                        OwncloudSyncer.checkOperationResult(
-                                statusRes, OwncloudFilesActivity.this);
-
-                        for (Object obj: statusRes.getData()) {
-                            if (!(obj instanceof RemoteFile)) {
-                                continue;
-                            }
-                            RemoteFile remfile = (RemoteFile)obj;
-
-                            // Filter out the directory being listed
-                            if (TextUtils.equals(params[0],
-                                                 remfile.getRemotePath())) {
-                                continue;
-                            }
-
-                            if (OwncloudProviderFile.isFolder(remfile) ||
-                                OwncloudProviderFile.isPasswordFile(remfile)) {
-                                files.add(new OwncloudProviderFile(remfile));
-                            }
-                        }
-                    } catch (IOException e) {
-                        //  TODO: handle
-                        PasswdSafeUtil.dbginfo(TAG, e, "Error listing files");
-                    }
-                }
-                return files;
-            }
-
-            /* (non-Javadoc)
-             * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-             */
-            @Override
-            protected void onPostExecute(List<OwncloudProviderFile> result)
-            {
-                cb.handleFiles(result);
-            }
-
-        }.execute(path);
+                });
+        itsListTasks.add(task);
+        task.execute(path);
     }
 
 
@@ -443,6 +407,106 @@ public class OwncloudFilesActivity extends FragmentActivity
                 }
             }
             updateSyncedFiles();
+        }
+    }
+
+
+    /** Background task for listing files from ownCloud */
+    private static class ListFilesTask
+            extends AsyncTask<String, Void,
+                              Pair<List<OwncloudProviderFile>, Exception>>
+    {
+        /** Callback for when the task is finished; null files if cancelled
+         *  or an error occurred.
+         */
+        public interface Callback
+        {
+            public void handleFiles(List<OwncloudProviderFile> files,
+                                    ListFilesTask task);
+        }
+
+        private final OwnCloudClient itsClient;
+        private final Callback itsCb;
+        private final Context itsContext;
+
+
+        /** Constructor */
+        public ListFilesTask(OwnCloudClient client, Context ctx, Callback cb)
+        {
+            itsClient = client;
+            itsCb = cb;
+            itsContext = ctx;
+        }
+
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+         */
+        @Override
+        protected Pair<List<OwncloudProviderFile>, Exception>
+        doInBackground(String... params)
+        {
+            List<OwncloudProviderFile> files =
+                    new ArrayList<OwncloudProviderFile>();
+            Pair<List<OwncloudProviderFile>, Exception> result =
+                    Pair.create(files, (Exception)null);
+            if (itsClient == null) {
+                return result;
+            }
+
+            try {
+                ReadRemoteFolderOperation oper =
+                        new ReadRemoteFolderOperation(params[0]);
+                RemoteOperationResult statusRes = oper.execute(itsClient);
+                OwncloudSyncer.checkOperationResult(statusRes, itsContext);
+
+                for (Object obj: statusRes.getData()) {
+                    if (!(obj instanceof RemoteFile)) {
+                        continue;
+                    }
+                    RemoteFile remfile = (RemoteFile)obj;
+
+                    // Filter out the directory being listed
+                    if (TextUtils.equals(params[0], remfile.getRemotePath())) {
+                        continue;
+                    }
+
+                    if (OwncloudProviderFile.isFolder(remfile) ||
+                            OwncloudProviderFile.isPasswordFile(remfile)) {
+                        files.add(new OwncloudProviderFile(remfile));
+                    }
+                }
+            } catch (Exception e) {
+                result = Pair.create(null, e);
+            }
+            return result;
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(
+                Pair<List<OwncloudProviderFile>, Exception> result)
+        {
+            if (result.second != null) {
+                Log.e(TAG, "Error listing files", result.second);
+                Toast.makeText(
+                        itsContext,
+                        "Error listing files: " + result.second.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+            itsCb.handleFiles(result.first, this);
+        }
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onCancelled(java.lang.Object)
+         */
+        @Override
+        protected void onCancelled(
+                Pair<List<OwncloudProviderFile>, Exception> result)
+        {
+            itsCb.handleFiles(null, this);
         }
     }
 }
