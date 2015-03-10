@@ -340,9 +340,9 @@ public class OwncloudFilesFragment extends ListFragment
             OwncloudProviderFile rhsFile = rhs.itsFile;
             boolean lhsFolder = OwncloudProviderFile.isFolder(lhsFile);
             boolean rhsFolder = OwncloudProviderFile.isFolder(rhsFile);
-            if (lhsFolder && !rhsFolder) {
+            if (!lhsFolder && rhsFolder) {
                 return -1;
-            } else if (rhsFolder && !lhsFolder) {
+            } else if (!rhsFolder && lhsFolder) {
                 return 1;
             } else {
                 return lhsFile.getTitle().compareTo(rhsFile.getTitle());
