@@ -62,7 +62,16 @@
             android:key="fileCloseClearClipboardPref"
             android:title="@string/clear_clipboard_on_close"/>
 
-    </PreferenceScreen>
+        <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
+            android:name="fileLegacyFileChooser Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:defaultValue="false"
+            android:key="fileLegacyFileChooserPref"
+            android:title="@string/legacy_file_chooser"
+            android:summary="@string/legacy_file_chooser_summary"/>
+
+        </PreferenceScreen>
 
     <PreferenceScreen
         android:layout_width="match_parent"

@@ -119,6 +119,8 @@
     <string name="last_save_app_label">Letzte App:</string>
     <string name="last_save_by_label">Gespeichert von:</string>
     <string name="last_save_time_label">Gespeichert am:</string>
+    <string name="legacy_file_chooser">Vermächtnis Auswahl von Dateien</string>
+    <string name="legacy_file_chooser_summary">Verwendbar mit Kitkat und höher</string>
     <string name="length">Länge</string>
     <string name="length_even_hex">Bei Hexadezimal muss die Länge gerade sein.</string>
     <string name="length_min_val">Länge min. %1$d</string>
