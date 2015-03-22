@@ -70,6 +70,8 @@ public class OwncloudFilesActivity extends FragmentActivity
     private LoaderCallbacks<Cursor> itsProviderLoaderCb;
     private LoaderCallbacks<Cursor> itsFilesLoaderCb;
     private List<ListFilesTask> itsListTasks = new ArrayList<ListFilesTask>();
+    private List<FileSyncedUpdateTask> itsUpdateTasks =
+            new ArrayList<FileSyncedUpdateTask>();
 
 
     /* (non-Javadoc)
@@ -131,6 +133,9 @@ public class OwncloudFilesActivity extends FragmentActivity
         super.onDestroy();
         itsClientLoadTask.cancel(true);
         for (ListFilesTask task: itsListTasks) {
+            task.cancel(true);
+        }
+        for (FileSyncedUpdateTask task: itsUpdateTasks) {
             task.cancel(true);
         }
     }
@@ -243,53 +248,47 @@ public class OwncloudFilesActivity extends FragmentActivity
      * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#updateFileSynced(com.jefftharris.passwdsafe.sync.owncloud.OwncloudProviderFile, boolean)
      */
     @Override
-    public void updateFileSynced(OwncloudProviderFile file, boolean synced)
+    public void updateFileSynced(final OwncloudProviderFile file,
+                                 final boolean synced)
     {
         PasswdSafeUtil.dbginfo(
                 TAG, "updateFileSynced sync %b, file: %s", synced,
                 OwncloudProviderFile.fileToString(file.getRemoteFile()));
-        // TODO: use provider calls to update db or do in bg thread
-        SyncDb syncDb = SyncDb.acquire();
-        try {
-            SQLiteDatabase db = syncDb.beginTransaction();
 
-            long providerId =
-                    PasswdSafeContract.Providers.getId(itsProviderUri);
-
-            DbFile remfile = SyncDb.getFileByRemoteId(providerId,
-                                                      file.getRemoteId(), db);
-            if (synced) {
-                long remFileId;
-                if (remfile != null) {
-                    SyncDb.updateRemoteFileChange(remfile.itsId,
-                                                  DbFile.FileChange.ADDED, db);
-                    remFileId = remfile.itsId;
-                } else {
-                    remFileId = SyncDb.addRemoteFile(
-                            providerId, file.getRemoteId(), file.getTitle(),
-                            file.getFolder(), file.getModTime(), file.getHash(),
-                            db);
-                }
-                itsSyncedFiles.put(file.getRemoteId(), remFileId);
-            } else {
-                if (remfile != null) {
-                    SyncDb.updateRemoteFileDeleted(remfile.itsId, db);
-                }
-                itsSyncedFiles.remove(file.getRemoteId());
-            }
-
-            db.setTransactionSuccessful();
-            getContentResolver().notifyChange(itsFilesUri, null);
-            OwncloudProvider provider = (OwncloudProvider)
-                    ProviderFactory.getProvider(ProviderType.OWNCLOUD, this);
-            provider.requestSync(false);
-        } catch (Exception e) {
-            String msg = "Error updating sync for " + file.getRemoteId();
-            Log.e(TAG, msg, e);
-            PasswdSafeUtil.showErrorMsg(msg, this);
-        } finally {
-            syncDb.endTransactionAndRelease();
-        }
+        FileSyncedUpdateTask task = new FileSyncedUpdateTask(
+                itsProviderUri, file, synced,
+                new FileSyncedUpdateTask.Callback()
+                {
+                    @Override
+                    public void updateComplete(Exception error,
+                                               long remFileId,
+                                               FileSyncedUpdateTask task)
+                    {
+                        itsUpdateTasks.remove(task);
+                        if (error == null) {
+                            if (synced) {
+                                itsSyncedFiles.put(file.getRemoteId(),
+                                                   remFileId);
+                            } else {
+                                itsSyncedFiles.remove(file.getRemoteId());
+                            }
+                        } else {
+                            String msg = "Error updating sync for " +
+                                    file.getRemoteId();
+                            Log.e(TAG, msg, error);
+                            PasswdSafeUtil.showErrorMsg(
+                                    msg, OwncloudFilesActivity.this);
+                        }
+                        getContentResolver().notifyChange(itsFilesUri, null);
+                        OwncloudProvider provider = (OwncloudProvider)
+                                ProviderFactory.getProvider(
+                                        ProviderType.OWNCLOUD,
+                                        OwncloudFilesActivity.this);
+                        provider.requestSync(false);
+                    }
+                });
+        itsUpdateTasks.add(task);
+        task.execute();
     }
 
 
@@ -507,6 +506,90 @@ public class OwncloudFilesActivity extends FragmentActivity
                 Pair<List<OwncloudProviderFile>, Exception> result)
         {
             itsCb.handleFiles(null, this);
+        }
+    }
+
+
+    /** Background task for updating the synced state of a file from ownCloud */
+    private static class FileSyncedUpdateTask
+            extends AsyncTask<Void, Void, Pair<Exception, Long>>
+    {
+        /** Callback for when the update is complete */
+        public interface Callback
+        {
+            public void updateComplete(Exception error,
+                                       long remFileId,
+                                       FileSyncedUpdateTask task);
+        }
+
+
+        private final Uri itsProviderUri;
+        private final OwncloudProviderFile itsFile;
+        private final boolean itsIsSynced;
+        private final Callback itsCb;
+
+
+        /** Constructor */
+        public FileSyncedUpdateTask(Uri providerUri, OwncloudProviderFile file,
+                                    boolean synced, Callback cb)
+        {
+            itsProviderUri = providerUri;
+            itsFile = file;
+            itsIsSynced = synced;
+            itsCb = cb;
+        }
+
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+         */
+        @Override
+        protected Pair<Exception, Long> doInBackground(Void... params)
+        {
+            Exception error = null;
+            long remFileId = -1;
+            SyncDb syncDb = SyncDb.acquire();
+            try {
+                SQLiteDatabase db = syncDb.beginTransaction();
+
+                long providerId =
+                        PasswdSafeContract.Providers.getId(itsProviderUri);
+
+                DbFile remfile = SyncDb.getFileByRemoteId(
+                        providerId, itsFile.getRemoteId(), db);
+                if (itsIsSynced) {
+                    if (remfile != null) {
+                        SyncDb.updateRemoteFileChange(
+                                remfile.itsId, DbFile.FileChange.ADDED, db);
+                        remFileId = remfile.itsId;
+                    } else {
+                        remFileId = SyncDb.addRemoteFile(
+                                providerId, itsFile.getRemoteId(),
+                                itsFile.getTitle(), itsFile.getFolder(),
+                                itsFile.getModTime(), itsFile.getHash(), db);
+                    }
+                } else {
+                    if (remfile != null) {
+                        SyncDb.updateRemoteFileDeleted(remfile.itsId, db);
+                    }
+                }
+                db.setTransactionSuccessful();
+            } catch (Exception e) {
+                error = e;
+            } finally {
+                syncDb.endTransactionAndRelease();
+            }
+            return Pair.create(error, remFileId);
+        }
+
+
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Pair<Exception, Long> result)
+        {
+            itsCb.updateComplete(result.first, result.second, this);
         }
     }
 }
