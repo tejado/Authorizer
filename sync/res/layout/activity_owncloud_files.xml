@@ -9,6 +9,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".owncloud.OwncloudFilesActivity">
 
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="6dip"
+        android:paddingRight="6dip"
+        android:text="@string/no_account"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+    
     <FrameLayout
         android:id="@+id/content"
         android:layout_width="match_parent"

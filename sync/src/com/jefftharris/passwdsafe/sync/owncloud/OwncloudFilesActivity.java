@@ -30,6 +30,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
@@ -348,13 +349,13 @@ public class OwncloudFilesActivity extends FragmentActivity
         {
             String name;
             if ((cursor != null) && cursor.moveToFirst()) {
-                name = PasswdSafeContract.Providers.getDisplayName(
-                        cursor);
-                // TODO: show account info
+                name = PasswdSafeContract.Providers.getDisplayName(cursor);
             } else {
                 name = getString(R.string.no_account);
             }
             PasswdSafeUtil.dbginfo(TAG, "provider: %s", name);
+            TextView title = (TextView)findViewById(R.id.title);
+            title.setText(name);
         }
     }
 
