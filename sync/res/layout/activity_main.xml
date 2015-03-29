@@ -48,7 +48,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/gdrive_play_title"
                 android:padding="6dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textIsSelectable="false"/>
             
             <Button
@@ -110,7 +110,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/gdrive_choose"
                 android:padding="6dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textIsSelectable="false"/>
     
             <LinearLayout
@@ -216,7 +216,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/dropbox_choose"
                 android:padding="6dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textIsSelectable="false"/>
     
             <LinearLayout
@@ -323,7 +323,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/box_choose"
                 android:padding="6dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textIsSelectable="false"/>
     
             <LinearLayout
@@ -442,7 +442,6 @@
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/sync"
                         android:onClick="onOwncloudSync"
-                        android:padding="12dp"
                         android:src="@drawable/ic_action_sync"/>
 
                     <Button
@@ -459,7 +458,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="6dp">
 
                     <TextView
                         android:id="@+id/owncloud_interval_label"
