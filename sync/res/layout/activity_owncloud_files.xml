@@ -16,7 +16,7 @@
         android:paddingLeft="6dip"
         android:paddingRight="6dip"
         android:text="@string/no_account"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
     
     <FrameLayout
         android:id="@+id/content"
