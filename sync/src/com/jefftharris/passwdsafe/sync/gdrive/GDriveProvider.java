@@ -97,7 +97,7 @@ public class GDriveProvider extends AbstractProvider
             return null;
         }
         return new NewAccountTask(acctProviderUri, accountName,
-                                  ProviderType.GDRIVE, itsContext);
+                                  ProviderType.GDRIVE, false, itsContext);
     }
 
 

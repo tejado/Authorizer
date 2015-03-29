@@ -3,6 +3,7 @@
 
     <string name="account_not_exists_label">Account %1$s does not exist</string>
     <string name="adding_account">Adding account&#8230;</string>
+    <string name="adding_account_notification">Adding account&#8230;  Select notification within 60s to authorize access.</string>
     <string name="app_desc">Sync PasswordSafe databases from cloud services</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="automatic">Automatic</string>

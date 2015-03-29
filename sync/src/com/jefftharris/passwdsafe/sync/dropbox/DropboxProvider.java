@@ -98,7 +98,7 @@ public class DropboxProvider extends AbstractSyncTimerProvider
         DbxAccount acct = itsDropboxAcctMgr.getLinkedAccount();
         return new NewAccountTask(acctProviderUri,
                                   (acct == null) ? null : acct.getUserId(),
-                                  ProviderType.DROPBOX, getContext());
+                                  ProviderType.DROPBOX, false, getContext());
     }
 
 
