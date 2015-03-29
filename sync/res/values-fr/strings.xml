@@ -57,10 +57,10 @@
     <string name="use_https">Utilisez HTTPS</string>
     
     <string name="release_notes">
-        &lt;b&gt;2.1.0&lt;/b&gt; - Ajout du support ownCloud. Les comptes sont
-        choisis parmi la liste dans l\'application ownCloud. Fichiers de mot 
-        de passe sont synchronisés à partir ne importe quel endroit 
-        correspondant une recherche pour \'psafe3\'.
+        &lt;b&gt;2.1.0&lt;/b&gt; - Ajout du support ownCloud.  Les comptes sont
+        choisis parmi la liste dans l\'application ownCloud.  Une fois l\'accès 
+        est autorisé, les fichiers de mot de passe peuvent être choisis à 
+        synchroniser.
         \n\n
         &lt;b&gt;2.0.0&lt;/b&gt; - Améliorer la synchronisation Google Drive:\n
         - Amélioration de la détection des conflits et la résolution\n

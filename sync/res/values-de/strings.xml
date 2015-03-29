@@ -57,8 +57,8 @@
 
     <string name="release_notes">
         &lt;b&gt;2.1.0&lt;/b&gt; - Fügen ownCloud Support. Konten werden aus 
-        der Liste in der ownCloud App gewählt. Passwort-Dateien von jedem Ort 
-        einen passenden Suche nach \'psafe3\' synchronisiert.
+        der Liste in der ownCloud App gewählt.  Sobald eine Zugangsberechtigung 
+        besteht, kann Passwort-Dateien ausgewählt, um zu synchronisieren.
         \n\n
         &lt;b&gt;2.0.0&lt;/b&gt; - Verbessern Google Drive synchronisieren:\n
         - Verbesserte Konflikterkennung und -lösung\n
