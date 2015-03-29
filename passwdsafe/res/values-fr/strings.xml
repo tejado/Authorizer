@@ -261,10 +261,10 @@
     </string>
 
     <string name="release_notes">
-        &lt;b&gt;5.2.0&lt;/b&gt; - Ajout du support ownCloud. Les comptes sont
-        choisis parmi la liste dans l\'application ownCloud. Fichiers de mot 
-        de passe sont synchronisés à partir ne importe quel endroit 
-        correspondant une recherche pour \'psafe3\'.
+        &lt;b&gt;5.2.0&lt;/b&gt; - Ajout du support ownCloud.  Les comptes sont
+        choisis parmi la liste dans l\'application ownCloud.   Une fois l\'accès 
+        est autorisé, les fichiers de mot de passe peuvent être choisis à 
+        synchroniser.
         \n\n
         &lt;b&gt;5.1.0&lt;/b&gt; -  Ajout du support pour les appareils Samsung
         multifenêtré. Permettre la sélection de texte des notes.
