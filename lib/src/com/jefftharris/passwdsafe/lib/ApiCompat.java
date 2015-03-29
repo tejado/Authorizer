@@ -71,4 +71,11 @@ public final class ApiCompat
             }
         }
     }
+
+
+    /** Can the account manager get an auth token with showing a dialog */
+    public static boolean canAccountMgrGetAuthTokenWithDialog()
+    {
+        return SDK_VERSION < SDK_KITKAT;
+    }
 }

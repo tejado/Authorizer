@@ -27,9 +27,13 @@ public class NewAccountTask extends AccountUpdateTask
     public NewAccountTask(Uri currAcctUri,
                           String newAcct,
                           ProviderType acctType,
+                          boolean hasNotification,
                           Context ctx)
     {
-        super(currAcctUri, ctx.getString(R.string.adding_account));
+        super(currAcctUri,
+              ctx.getString(hasNotification ?
+                                R.string.adding_account_notification :
+                                R.string.adding_account));
         itsNewAcct = newAcct;
         itsAcctType = acctType;
     }

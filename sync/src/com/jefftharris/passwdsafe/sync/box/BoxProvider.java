@@ -114,7 +114,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
         updateBoxAcct();
 
         return new NewAccountTask(acctProviderUri, null, ProviderType.BOX,
-                                  getContext())
+                                  false, getContext())
         {
             /* (non-Javadoc)
              * @see com.jefftharris.passwdsafe.sync.lib.NewAccountTask#doAccountUpdate(android.content.ContentResolver)

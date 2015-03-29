@@ -152,7 +152,7 @@ public class AccountLinker
             // with name as display name
             task = new NewAccountTask(providerAcctUri, itsAcctName,
                                       ProviderType.GDRIVE_PLAY,
-                                      itsContext);
+                                      false, itsContext);
             break;
         }
         case FINISHED: {

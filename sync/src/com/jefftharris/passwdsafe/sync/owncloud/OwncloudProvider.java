@@ -7,6 +7,7 @@
 package com.jefftharris.passwdsafe.sync.owncloud;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -24,6 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.R;
@@ -117,14 +119,14 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             return null;
         }
         return new NewAccountTask(providerAcctUri, accountName,
-                ProviderType.OWNCLOUD, getContext())
+                                  ProviderType.OWNCLOUD, true, getContext())
         {
             @Override
             protected void doAccountUpdate(ContentResolver cr)
             {
                 Activity act = getActivity();
-                String authToken = getAuthToken(getAccount(itsNewAcct),
-                                                act, act);
+                String authToken =
+                        getAuthToken(getAccount(itsNewAcct), act, act);
                 if (authToken != null) {
                     super.doAccountUpdate(cr);
                 }
@@ -369,30 +371,32 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     }
 
 
-    /** Get the ownCloud authentication for an account.  If the activity is
-     *  given, a dialog is shown if needed.  Otherwise, a notification may be
-     *  presented. Must be called from a background thread. */
+    /**
+     * Get the ownCloud authentication for an account. A notification may be
+     * presented if authorization is required. Must be called from a background
+     * thread.
+     */
     @SuppressWarnings("deprecation")
     private static String getAuthToken(Account account,
-                                      Context ctx,
-                                      Activity activity)
+                                       Context ctx,
+                                       Activity activity)
     {
         String authToken = null;
-        AccountManager acctMgr = AccountManager.get(ctx);
-        String authType = AccountTypeUtils.getAuthTokenTypePass(
-                SyncDb.OWNCLOUD_ACCOUNT_TYPE);
-        AccountManagerFuture<Bundle> fut;
-        if (activity != null) {
-            fut = acctMgr.getAuthToken(account, authType, null,
-                                       activity, null, null);
-        } else {
-            fut = acctMgr.getAuthToken(account, authType, true, null, null);
-        }
         try {
-            Bundle b = fut.getResult();
+            AccountManager acctMgr = AccountManager.get(ctx);
+            String authType = AccountTypeUtils.getAuthTokenTypePass(
+                    SyncDb.OWNCLOUD_ACCOUNT_TYPE);
+            AccountManagerFuture<Bundle> fut;
+            if ((activity != null) &&
+                    ApiCompat.canAccountMgrGetAuthTokenWithDialog()) {
+                fut = acctMgr.getAuthToken(account, authType, null,
+                                           activity, null, null);
+            } else {
+                fut = acctMgr.getAuthToken(account, authType, true, null, null);
+            }
+            Bundle b = fut.getResult(60, TimeUnit.SECONDS);
             authToken = b.getString(AccountManager.KEY_AUTHTOKEN);
-        }
-        catch (Exception e) {
+        } catch (Throwable e) {
             PasswdSafeUtil.dbginfo(TAG, e, "getAuthToken");
         }
 
