@@ -265,9 +265,12 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     /** Set whether to use HTTPS */
     public final void setUseHttps(boolean useHttps)
     {
-        itsUseHttps = useHttps;
-        saveAuthData(itsAccountName, itsUseHttps);
-        updateOwncloudAcct();
+        // TODO: test deadlock with this update and gdrive on startup
+        if (itsUseHttps != useHttps) {
+            itsUseHttps = useHttps;
+            saveAuthData(itsAccountName, itsUseHttps);
+            updateOwncloudAcct();
+        }
     }
 
 
