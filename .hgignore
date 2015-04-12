@@ -2,9 +2,7 @@
 ^chrome/.*\.zip$
 ^chrome/com.jefftharris.passwdsafe.android/vendor/chromium/crx/PasswdSafe.apk$
 ^lib/build/
-^lib-box/gen
-^lib-box/bin
-^lib-box/local.properties
+^lib-box/build/
 ^lib-owncloud/gen
 ^lib-owncloud/bin
 ^lib-owncloud/local.properties

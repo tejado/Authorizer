@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PasswdSafe-studio.iml" filepath="$PROJECT_DIR$/PasswdSafe-studio.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib-box/lib-box.iml" filepath="$PROJECT_DIR$/lib-box/lib-box.iml" />
       <module fileurl="file://$PROJECT_DIR$/passwdsafe/passwdsafe.iml" filepath="$PROJECT_DIR$/passwdsafe/passwdsafe.iml" />
     </modules>
   </component>
