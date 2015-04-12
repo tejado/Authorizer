@@ -62,14 +62,14 @@ public class GetRemoteSharesForFileOperation extends RemoteOperation {
 	private boolean mSubfiles;
 	
 	/**
-	 * Constructor
-	 * 
-	 * @param remoteFilePath	Path to file or folder
-	 * @param reshares			If set to ‘false’ (default), only shares from the current user are returned
-	 * 							If set to ‘true’, all shares from the given file are returned
-	 * @param subfiles			If set to ‘false’ (default), lists only the folder being shared
-	 * 							If set to ‘true’, all shared files within the folder are returned.
-	 */
+         * Constructor
+         *
+         * @param remoteFilePath        Path to file or folder
+         * @param reshares                        If set to false (default), only shares from the current user are returned
+         * 							If set to true, all shares from the given file are returned
+         * @param subfiles                        If set to false (default), lists only the folder being shared
+         * 							If set to true, all shared files within the folder are returned.
+         */
 	public GetRemoteSharesForFileOperation(String remoteFilePath, boolean reshares, boolean subfiles) {
 		mRemoteFilePath = remoteFilePath;
 		mReshares = reshares;

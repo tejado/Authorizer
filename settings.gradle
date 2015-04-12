@@ -1,3 +1,4 @@
 include ':lib'
 include ':lib-box'
+include ':lib-owncloud'
 include ':passwdsafe'

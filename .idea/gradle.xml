@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/lib" />
             <option value="$PROJECT_DIR$/lib-box" />
+            <option value="$PROJECT_DIR$/lib-owncloud" />
             <option value="$PROJECT_DIR$/passwdsafe" />
           </set>
         </option>
