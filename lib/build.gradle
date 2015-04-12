@@ -1,0 +1,36 @@
+import java.text.SimpleDateFormat
+
+apply plugin: 'com.android.library'
+
+def hgId() {
+    return 'hg id'.execute().text.trim();
+}
+
+def buildTime() {
+    def df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss Z");
+    return df.format(new Date());
+}
+
+android {
+    compileSdkVersion 10
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 17
+        buildConfigField 'String', 'BUILD_ID', "\"${hgId()}\""
+        buildConfigField 'String', 'BUILD_DATE', "\"${buildTime()}\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //compile 'com.android.support:support-v4:18.+'
+}
