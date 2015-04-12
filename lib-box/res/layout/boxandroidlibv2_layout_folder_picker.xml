@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/transfersLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <include layout="@layout/boxandroidlibv2_custom_title" />
+
+    <Spinner
+        android:id="@+id/folderChooserSpinner"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/boxandroidlibv2_btn_bar_selector"
+        android:gravity="center" />
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:src="@drawable/boxandroidlibv2_modal_divider" />
+
+    <ListView
+        android:id="@+id/PickerListView"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#FFFFFF"
+        android:cacheColorHint="#FFFFFF"
+        android:descendantFocusability="beforeDescendants"
+        android:divider="@drawable/boxandroidlibv2_list_item_divider"
+        android:orientation="vertical" />
+
+    <Button
+        android:id="@+id/btnChoose"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/boxandroidlibv2_btn_cta_states"
+        android:gravity="center"
+        android:padding="12dip"
+        android:text="@string/boxandroidlibv2_Select"
+        android:textColor="#FFFFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
