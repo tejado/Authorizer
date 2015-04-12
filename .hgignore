@@ -4,9 +4,7 @@
 ^lib/build/
 ^lib-box/build/
 ^lib-owncloud/build/
-^lib-play/gen
-^lib-play/bin
-^lib-play/local.properties
+^lib-play/build/
 ^local.properties$
 ^passwdsafe/build/
 ^passwdsafe/src/main/libs/armeabi/
