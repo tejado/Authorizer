@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:padding="10sp"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content">
+    <ScrollView android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp">
+        <TableLayout android:layout_width="fill_parent"
+                     android:layout_height="wrap_content"
+                     android:stretchColumns="1"
+                     android:shrinkColumns="1">
+            <TableRow>
+
+                <TextView
+                    style="@style/TableLabelColumn"
+                    android:text="@string/file_name_label"/>
+
+                <EditText android:id="@+id/file_name"
+                          android:singleLine="true"
+                          android:inputType="textNoSuggestions"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"/>
+                <TextView android:text="@string/psafe3_ext"/>
+            </TableRow>
+            <TableRow>
+
+                <TextView
+                    style="@style/TableLabelColumn"
+                    android:text="@string/password_label"/>
+
+                <EditText android:id="@+id/password"
+                          android:singleLine="true"
+                          android:inputType="textPassword"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"/>
+            </TableRow>
+            <TableRow>
+
+                <TextView
+                    style="@style/TableLabelColumn"
+                    android:text="@string/confirm_label"/>
+
+                <EditText android:id="@+id/password_confirm"
+                          android:singleLine="true"
+                          android:inputType="textPassword"
+                          android:imeOptions="actionGo"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"/>
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+    
+    <View style="@style/Separator.Light"/>
+    
+    <TextView android:id="@+id/error_msg"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"/> 
+</LinearLayout>

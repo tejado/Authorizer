@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Version code format for version x.y.z: xxyyzz
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.jefftharris.passwdsafe.sync"
+    android:versionCode="20100"
+    android:versionName="2.1.0">
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="17"/>
+
+    <permission
+        android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    <uses-permission android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"/>
+    <uses-permission android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+
+    <application
+        android:name=".SyncApp"
+        android:allowBackup="true"
+        android:description="@string/app_desc"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/ic_launcher_sync"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <meta-data
+                android:name="com.google.android.apps.drive.APP_ID"
+                android:value="id=704216087822" />
+        </activity>
+
+        <activity android:name=".SyncLogsActivity"/>
+        
+        <activity
+            android:name=".gdriveplay.GDrivePlayMainActivity"
+            android:label="@string/google_drive"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jefftharris.passwdsafe.sync.MainActivity"/>
+        </activity>
+        
+        <activity
+            android:name=".owncloud.OwncloudFilesActivity"
+            android:label="@string/owncloud_synced_files"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jefftharris.passwdsafe.sync.MainActivity"/>
+        </activity>
+        
+        <!-- Handle Google Drive file open events from the Drive app -->
+        <activity
+            android:name=".GDriveLaunchActivity"
+            android:label="@string/passwdsafe_synced_file"
+            android:exported="true">
+
+            <meta-data
+                android:name="com.google.android.apps.drive.APP_ID"
+                android:value="id=704216087822"/>
+
+            <intent-filter>
+                <action android:name="com.google.android.apps.drive.DRIVE_OPEN"/>
+                <data android:mimeType="application/vnd.google-apps.drive-sdk.704216087822"/>
+                <data android:mimeType="*/*"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.dropbox.sync.android.DbxAuthActivity"/>
+
+        <activity
+            android:name="com.dropbox.client2.android.AuthActivity"
+            android:launchMode="singleTask">
+
+            <intent-filter>
+                <data android:scheme="db-ncrre47fqpcu42z"/>
+
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.box.boxandroidlibv2.activities.OAuthActivity" />
+
+        <provider
+            android:name=".PasswdSafeProvider"
+            android:authorities="com.jefftharris.passwdsafe.sync.provider"
+            android:permission="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"
+            android:exported="true"
+            android:syncable="true">
+
+            <grant-uri-permission android:pathPattern=".*" />
+        </provider>
+
+        <receiver
+            android:name=".ManifestBroadcastReceiver"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="com.jefftharris.passwdsafe.action.SYNC_EXPIRATION_TIMEOUT"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.dropbox.sync.android.DbxSyncService"
+            android:enabled="true"
+            android:exported="false"
+            android:label="@string/dropbox_passwdsafe_sync"/>
+
+        <service
+            android:name="com.jefftharris.passwdsafe.sync.SyncService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+    </application>
+
+</manifest>
