@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/lib-owncloud" />
             <option value="$PROJECT_DIR$/lib-play" />
             <option value="$PROJECT_DIR$/passwdsafe" />
+            <option value="$PROJECT_DIR$/sync" />
           </set>
         </option>
       </GradleProjectSettings>
