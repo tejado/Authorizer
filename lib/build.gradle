@@ -14,6 +14,7 @@ def buildTime() {
 android {
     compileSdkVersion 10
     buildToolsVersion "21.1.2"
+    publishNonDefault true
 
     defaultConfig {
         minSdkVersion 8

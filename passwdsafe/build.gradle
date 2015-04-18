@@ -60,5 +60,6 @@ tasks.withType(JavaCompile) {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //compile 'com.android.support:appcompat-v7:22.0.0'
-    compile project(':lib')
+    debugCompile project(path: ':lib', configuration: 'debug')
+    releaseCompile project(path: ':lib', configuration: 'release')
 }

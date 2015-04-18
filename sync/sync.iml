@@ -103,8 +103,8 @@
     <orderEntry type="library" exported="" name="guava-jdk5-13.0" level="project" />
     <orderEntry type="module" module-name="lib-play" exported="" />
     <orderEntry type="module" module-name="lib-box" exported="" />
-    <orderEntry type="module" module-name="lib" exported="" />
     <orderEntry type="module" module-name="lib-owncloud" exported="" />
+    <orderEntry type="module" module-name="lib" exported="" />
   </component>
 </module>
 
