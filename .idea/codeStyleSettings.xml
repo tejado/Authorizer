@@ -52,6 +52,8 @@
         </XML>
         <codeStyleSettings language="JAVA">
           <option name="INDENT_CASE_FROM_SWITCH" value="false" />
+          <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
           <indentOptions>
             <option name="TAB_SIZE" value="8" />
           </indentOptions>
