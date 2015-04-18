@@ -1,4 +1,4 @@
-package com.jefftharris.passwdsafe;
+package com.jefftharris.passwdsafe.test;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
@@ -11,5 +11,4 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         super(Application.class);
     }
 
-    // TODO: Refactor test projects for android studio
 }
