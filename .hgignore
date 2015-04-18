@@ -15,12 +15,7 @@
 ^passwdsafe/src/main/libs/x86/
 ^passwdsafe/src/main/libs/x86_64/
 ^passwdsafe/src/main/obj/
-^sync/bin
-^sync/local.properties
-^sync/gen
-^sync-dropbox/bin
-^sync-dropbox/local.properties
-^sync-dropbox/gen
+^sync/build/
 ^tests/bin
 ^tests/gen
 ^\.gradle/
