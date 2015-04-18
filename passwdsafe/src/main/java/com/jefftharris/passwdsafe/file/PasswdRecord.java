@@ -32,8 +32,7 @@ public class PasswdRecord
     private final String itsUUID;
     private Type itsType;
     private PwsRecord itsRef;
-    private final ArrayList<PwsRecord> itsRefsToRecord =
-        new ArrayList<PwsRecord>();
+    private final ArrayList<PwsRecord> itsRefsToRecord = new ArrayList<>();
     private PasswdPolicy itsPasswdPolicy;
     private PasswdExpiration itsPasswdExpiry;
 
@@ -133,9 +132,8 @@ public class PasswdRecord
     }
 
     /** Get an identifier for a record from its naming fields */
-    public static final String getRecordId(String group,
-                                           String title,
-                                           String username)
+    public static String getRecordId(String group, String title,
+                                     String username)
     {
         StringBuilder id = new StringBuilder();
 

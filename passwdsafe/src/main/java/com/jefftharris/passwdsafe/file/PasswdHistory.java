@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.widget.ListAdapter;
 
 import com.jefftharris.passwdsafe.lib.Utils;
@@ -43,7 +44,7 @@ public class PasswdHistory
             return itsPasswd;
         }
 
-        public int compareTo(Entry arg0)
+        public int compareTo(@NonNull Entry arg0)
         {
             // Sort descending
             return -itsDate.compareTo(arg0.itsDate);
@@ -52,9 +53,7 @@ public class PasswdHistory
         @Override
         public String toString()
         {
-            StringBuilder str = new StringBuilder(itsPasswd);
-            str.append(" [").append(itsDate).append("]");
-            return str.toString();
+            return itsPasswd + " [" + itsDate + "]";
         }
     }
 
@@ -67,7 +66,7 @@ public class PasswdHistory
     private boolean itsIsEnabled;
     private int itsMaxSize;
     // Sorted with newest entry first
-    private List<Entry> itsPasswds = new ArrayList<Entry>();
+    private List<Entry> itsPasswds = new ArrayList<>();
 
     public PasswdHistory(String historyStr)
         throws IllegalArgumentException
@@ -231,23 +230,19 @@ public class PasswdHistory
                                             Context context,
                                             boolean enabled)
     {
-        ArrayList<HashMap<String, Object>> histData =
-            new ArrayList<HashMap<String, Object>>();
+        ArrayList<HashMap<String, Object>> histData = new ArrayList<>();
         for (PasswdHistory.Entry entry : history.getPasswds()) {
-            HashMap<String, Object> entryData =
-                new HashMap<String, Object>();
+            HashMap<String, Object> entryData = new HashMap<>();
             entryData.put(PASSWD, entry.getPasswd());
             entryData.put(DATE, Utils.formatDate(entry.getDate(), context));
             histData.add(entryData);
         }
 
-        ListAdapter adapter =
-            new EnableAdapter(context, histData,
-                              android.R.layout.simple_list_item_2,
-                              new String[] { PASSWD, DATE },
-                              new int[] { android.R.id.text1,
-                                          android.R.id.text2 },
-                              enabled);
-        return adapter;
+        return new EnableAdapter(context, histData,
+                                 android.R.layout.simple_list_item_2,
+                                 new String[] { PASSWD, DATE },
+                                 new int[] { android.R.id.text1,
+                                             android.R.id.text2 },
+                                 enabled);
     }
 }
