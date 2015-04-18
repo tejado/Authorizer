@@ -31,7 +31,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':lib')
+    debugCompile project(path: ':lib', configuration: 'debug')
+    releaseCompile project(path: ':lib', configuration: 'release')
     compile project(':lib-box')
     compile project(':lib-owncloud')
     compile project(':lib-play')
