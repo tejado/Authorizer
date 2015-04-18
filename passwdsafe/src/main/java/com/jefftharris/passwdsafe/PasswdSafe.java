@@ -26,6 +26,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -126,14 +127,21 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         GuiUtils.removeUnsupportedCenterVertical(findViewById(R.id.expiry));
 
         String action = intent.getAction();
-        if (action.equals(PasswdSafeUtil.VIEW_INTENT) ||
-            action.equals(Intent.ACTION_VIEW)) {
+        switch (action) {
+        case PasswdSafeUtil.VIEW_INTENT:
+        case Intent.ACTION_VIEW: {
             onCreateView(intent);
-        } else if (action.equals(PasswdSafeUtil.NEW_INTENT)) {
+            break;
+        }
+        case PasswdSafeUtil.NEW_INTENT: {
             onCreateNew(intent);
-        } else {
+            break;
+        }
+        default: {
             Log.e(TAG, "Unknown action for intent: " + intent);
             finish();
+            break;
+        }
         }
     }
 
@@ -215,14 +223,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         addCloseMenuItem(menu);
 
         if (isV3) {
-            mi = menu.add(0, MENU_PASSWD_POLICIES, 0,
-                          R.string.password_policies);
+            menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
+            menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.expired_passwords);
 
-            mi = menu.add(0, MENU_PASSWD_EXPIRYS, 0, R
-                          .string.expired_passwords);
-
-            mi = menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
-                          R.string.expiration_notifications);
+            menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
+                     R.string.expiration_notifications);
             mi.setCheckable(true);
         }
 
@@ -235,8 +240,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         mi = submenu.add(0, MENU_DELETE, 0, R.string.delete_file);
         mi.setIcon(android.R.drawable.ic_menu_delete);
 
-        mi = submenu.add(0, MENU_PROTECT, 0, R.string.protect_all);
-        mi = submenu.add(0, MENU_UNPROTECT, 0, R.string.unprotect_all);
+        submenu.add(0, MENU_PROTECT, 0, R.string.protect_all);
+        submenu.add(0, MENU_UNPROTECT, 0, R.string.unprotect_all);
         // End file operations submenu
 
         mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
@@ -406,7 +411,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     @Override
     protected Dialog onCreateDialog(int id)
     {
-        Dialog dialog = null;
+        Dialog dialog;
         switch (id) {
         case DIALOG_GET_PASSWD:
         {
@@ -677,7 +682,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
     @Override
-    protected void onPrepareDialog(int id, Dialog dialog)
+    protected void onPrepareDialog(int id, @NonNull Dialog dialog)
     {
         super.onPrepareDialog(id, dialog);
         switch (id)
@@ -861,7 +866,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
 
-    private final void onCreateView(final Intent intent)
+    private void onCreateView(final Intent intent)
     {
         runTask(new AbstractTask()
         {
@@ -913,7 +918,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         });
     }
 
-    private final void onCreateNew(Intent intent)
+    private void onCreateNew(Intent intent)
     {
         initUri(PasswdSafeApp.getFileUriFromIntent(intent, this));
         showDialog(DIALOG_FILE_NEW);
@@ -940,31 +945,31 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         return itsPasswdEntryDialog.create();
     }
 
-    private final void openFile(StringBuilder passwd, boolean readonly)
+    private void openFile(StringBuilder passwd, boolean readonly)
     {
         doRemoveDialog(DIALOG_GET_PASSWD);
         runTask(new OpenTask(passwd, readonly));
     }
 
-    private final void createNewFile(String fileName, StringBuilder passwd)
+    private void createNewFile(String fileName, StringBuilder passwd)
     {
         runTask(new NewTask(fileName, passwd));
     }
 
-    private final void deleteFile()
+    private void deleteFile()
     {
         runTask(new DeleteTask());
     }
 
     /** Run a background task */
-    private final void runTask(AbstractTask task)
+    private void runTask(AbstractTask task)
     {
         itsLoadTask = task;
         itsLoadTask.execute();
         showDialog(DIALOG_PROGRESS);
     }
 
-    private final void changePasswd(StringBuilder passwd)
+    private void changePasswd(StringBuilder passwd)
     {
         PasswdFileData fileData = getPasswdFileData();
         if (fileData != null) {
@@ -979,7 +984,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     /**
      * Protect or unprotect entries
      */
-    private final void setProtectRecords(boolean prot)
+    private void setProtectRecords(boolean prot)
     {
         PasswdFileData fileData = getPasswdFileData();
         if (fileData == null) {
@@ -991,7 +996,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
     /** Protect or unprotect entries in the given group */
-    private final void setProtectRecords(boolean prot,
+    private void setProtectRecords(boolean prot,
                                          PasswdFileData fileData,
                                          GroupNode node)
     {
@@ -1010,7 +1015,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 	}
     }
 
-    private final void cancelFileTask()
+    private void cancelFileTask()
     {
         doRemoveDialog(DIALOG_PROGRESS);
         doRemoveDialog(DIALOG_GET_PASSWD);
@@ -1025,7 +1030,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     }
 
     /** Remove and cleanup a dialog */
-    private final void doRemoveDialog(int dialog)
+    private void doRemoveDialog(int dialog)
     {
         if (dialog == DIALOG_GET_PASSWD) {
             itsPasswdEntryDialog = null;
