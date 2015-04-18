@@ -64,16 +64,15 @@ public class PasswdFileData
 {
     private PasswdFileUri itsUri;
     private PwsFile itsPwsFile;
-    private final HashMap<String, PwsRecord> itsRecordsByUUID =
-        new HashMap<String, PwsRecord>();
+    private final HashMap<String, PwsRecord> itsRecordsByUUID = new HashMap<>();
     private final Map<PwsRecord, PasswdRecord> itsPasswdRecords =
-        new IdentityHashMap<PwsRecord, PasswdRecord>();
-    private final ArrayList<PwsRecord> itsRecords = new ArrayList<PwsRecord>();
+        new IdentityHashMap<>();
+    private final ArrayList<PwsRecord> itsRecords = new ArrayList<>();
     private HeaderPasswdPolicies itsHdrPolicies = new HeaderPasswdPolicies();
     private boolean itsIsOpenReadOnly = false;
 
     private static List<PasswdFileDataObserver> itsObservers =
-        new ArrayList<PasswdFileDataObserver>();
+            new ArrayList<>();
 
     private static final String TAG = "PasswdFileData";
 
@@ -386,8 +385,7 @@ public class PasswdFileData
             Integer expInt =
                 getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
             boolean haveInt = (expInt != null);
-            expiry = new PasswdExpiration(expTime,
-                                          haveInt ? expInt.intValue() : 0,
+            expiry = new PasswdExpiration(expTime, haveInt ? expInt : 0,
                                           haveInt);
         }
         return expiry;
@@ -604,7 +602,7 @@ public class PasswdFileData
         }
     }
 
-    public static final int hexBytesToInt(byte[] bytes, int pos, int len)
+    public static int hexBytesToInt(byte[] bytes, int pos, int len)
     {
         int i = 0;
         for (int idx = pos; idx < (pos + len); ++idx) {
@@ -620,7 +618,7 @@ public class PasswdFileData
         itsObservers.add(observer);
     }
 
-    private final void setSaveHdrFields(Context context)
+    private void setSaveHdrFields(Context context)
     {
         setHdrLastSaveApp(PasswdSafeUtil.getAppTitle(context) +
                           " " +
@@ -630,7 +628,7 @@ public class PasswdFileData
         setHdrLastSaveTime(new Date());
     }
 
-    private final void updateFormatVersion(byte minMinor)
+    private void updateFormatVersion(byte minMinor)
     {
         if (isV3()) {
             PwsRecord rec = ((PwsFileV3)itsPwsFile).getHeaderRecord();
@@ -642,7 +640,7 @@ public class PasswdFileData
     }
 
     /** Set the password policy for a record and optionally update indexes */
-    private final void setPasswdPolicyImpl(PasswdPolicy policy,
+    private void setPasswdPolicyImpl(PasswdPolicy policy,
                                            PwsRecord rec,
                                            boolean index)
     {
@@ -666,7 +664,7 @@ public class PasswdFileData
     }
 
     /** Get a field value as a string */
-    private final String getField(PwsRecord rec, int fieldId)
+    private String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
             return "";
@@ -681,7 +679,7 @@ public class PasswdFileData
     }
 
     /** Get a field value as an 4 byte integer */
-    private final Integer getIntField(PwsRecord rec, int fieldId)
+    private Integer getIntField(PwsRecord rec, int fieldId)
     {
         Integer val = null;
         PwsField field = doGetRecField(rec, fieldId);
@@ -692,7 +690,7 @@ public class PasswdFileData
     }
 
     /** Get a field value as a Date */
-    private final Date getDateField(PwsRecord rec, int fieldId)
+    private Date getDateField(PwsRecord rec, int fieldId)
     {
         Date date = null;
         PwsField field = doGetRecField(rec, fieldId);
@@ -702,12 +700,12 @@ public class PasswdFileData
         return date;
     }
 
-    private final boolean hasField(PwsRecord rec, int fieldId)
+    private boolean hasField(PwsRecord rec, int fieldId)
     {
         return doGetRecField(rec, fieldId) != null;
     }
 
-    private final int getVersionFieldId(int fieldId)
+    private int getVersionFieldId(int fieldId)
     {
         if (itsPwsFile == null) {
             return FIELD_NOT_PRESENT;
@@ -839,7 +837,7 @@ public class PasswdFileData
     }
 
 
-    private final String getHdrField(int fieldId)
+    private String getHdrField(int fieldId)
     {
         if (itsPwsFile == null) {
             return "";
@@ -928,7 +926,7 @@ public class PasswdFileData
         }
     }
 
-    private final void setHdrField(int fieldId, Object value)
+    private void setHdrField(int fieldId, Object value)
     {
         if (itsPwsFile == null) {
             return;
@@ -1017,18 +1015,19 @@ public class PasswdFileData
             setOrRemoveField(field, fieldId, rec);
         }
         catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "Invalid encoding", e);
         }
     }
 
     /** Get a non-header record's field after translating its field
      * identifier */
-    private final PwsField doGetRecField(PwsRecord rec, int fieldId)
+    private PwsField doGetRecField(PwsRecord rec, int fieldId)
     {
         return doGetField(rec, getVersionFieldId(fieldId));
     }
 
     /** Get a field from a record */
-    private static final PwsField doGetField(PwsRecord rec, int fieldId)
+    private static PwsField doGetField(PwsRecord rec, int fieldId)
     {
         switch (fieldId)
         {
@@ -1044,13 +1043,13 @@ public class PasswdFileData
         }
     }
 
-    private final void setField(Object val, PwsRecord rec, int fieldId)
+    private void setField(Object val, PwsRecord rec, int fieldId)
     {
         setField(val, rec, fieldId, true);
     }
 
-    private final void setField(Object val, PwsRecord rec, int fieldId,
-                                boolean updateModTime)
+    private void setField(Object val, PwsRecord rec, int fieldId,
+                          boolean updateModTime)
     {
         PwsField field = null;
         switch (itsPwsFile.getFileVersionMajor())
@@ -1086,8 +1085,8 @@ public class PasswdFileData
             }
             case PwsRecordV3.PROTECTED_ENTRY: {
                 Byte b = (Byte)val;
-                if ((b != null) && (b.byteValue() != 0)) {
-                    field = new PwsByteField(fieldId, b.byteValue());
+                if ((b != null) && (b != 0)) {
+                    field = new PwsByteField(fieldId, b);
                 }
                 break;
             }
@@ -1100,7 +1099,7 @@ public class PasswdFileData
             }
             case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL: {
                 Integer ival = (Integer)val;
-                if ((ival != null) && (ival.intValue() != 0)) {
+                if ((ival != null) && (ival != 0)) {
                     field = new PwsIntegerField(fieldId, ival);
                 }
                 break;
@@ -1161,8 +1160,8 @@ public class PasswdFileData
         }
     }
 
-    private static final void setOrRemoveField(PwsField field, int fieldId,
-                                               PwsRecord rec)
+    private static void setOrRemoveField(PwsField field, int fieldId,
+                                         PwsRecord rec)
     {
         if (field != null) {
             rec.setField(field);
@@ -1171,7 +1170,7 @@ public class PasswdFileData
         }
     }
 
-    private final void finishOpenFile(StringBuilder passwd)
+    private void finishOpenFile(StringBuilder passwd)
     {
         for (int i = 0; i < passwd.length(); ++i) {
             passwd.setCharAt(i, '\0');
@@ -1183,7 +1182,7 @@ public class PasswdFileData
         PasswdSafeUtil.dbginfo(TAG, "file loaded");
     }
 
-    private final void indexRecords()
+    private void indexRecords()
     {
         itsRecords.clear();
         itsRecordsByUUID.clear();
@@ -1228,7 +1227,7 @@ public class PasswdFileData
     }
 
     /** Index the password policies */
-    private final void indexPasswdPolicies()
+    private void indexPasswdPolicies()
     {
         List<PasswdPolicy> hdrPolicies =
             PasswdPolicy.parseHdrPolicies(
@@ -1238,7 +1237,7 @@ public class PasswdFileData
     }
 
 
-    private static final int getHdrMinorVersion(PwsRecord rec)
+    private static int getHdrMinorVersion(PwsRecord rec)
     {
         PwsField ver = doGetField(rec, PwsRecordV3.HEADER_VERSION);
         if (ver == null) {
@@ -1251,7 +1250,7 @@ public class PasswdFileData
         return bytes[0];
     }
 
-    private static final void setHdrMinorVersion(PwsRecord rec, byte minor)
+    private static void setHdrMinorVersion(PwsRecord rec, byte minor)
     {
         PwsField ver = doGetField(rec, PwsRecordV3.HEADER_VERSION);
         if (ver == null) {
@@ -1270,9 +1269,8 @@ public class PasswdFileData
         rec.setField(newVer);
     }
 
-    private static final String getHdrLastSaveWhoField(PwsRecord rec,
-                                                       boolean isUser)
-    {
+    private static String getHdrLastSaveWhoField(PwsRecord rec,
+                                                 boolean isUser) {
         PwsField field = doGetField(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO);
         if (field == null) {
             return null;
@@ -1302,15 +1300,11 @@ public class PasswdFileData
     }
 
 
-    private static final void setHdrLastSaveWhoField(PwsRecord rec,
-                                                     String user, String host)
+    private static void setHdrLastSaveWhoField(PwsRecord rec,
+                                               String user, String host)
     {
-        StringBuilder who = new StringBuilder();
-        who.append(String.format("%04x", user.length()));
-        who.append(user);
-        who.append(host);
-        doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO,
-                            who.toString());
+        String who = String.format("%04x%s%s", user.length(), user, host);
+        doSetHdrFieldString(rec, PwsRecordV3.HEADER_LAST_SAVE_WHO, who);
     }
 
 

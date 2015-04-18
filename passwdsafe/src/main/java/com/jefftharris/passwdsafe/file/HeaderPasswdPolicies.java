@@ -49,8 +49,7 @@ public class HeaderPasswdPolicies
         }
     }
 
-    private final TreeMap<String, HdrPolicy> itsPolicies =
-        new TreeMap<String, HdrPolicy>();
+    private final TreeMap<String, HdrPolicy> itsPolicies = new TreeMap<>();
 
     /** Default constructor */
     public HeaderPasswdPolicies()

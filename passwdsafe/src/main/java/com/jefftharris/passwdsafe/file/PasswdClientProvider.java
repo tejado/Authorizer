@@ -30,7 +30,7 @@ public class PasswdClientProvider extends ContentProvider
     private static final int MATCH_FILES = 1;
 
     private static PasswdClientProvider itsProvider = null;
-    private Set<String> itsFiles = new HashSet<String>();
+    private Set<String> itsFiles = new HashSet<>();
 
     static {
         MATCHER = new UriMatcher(UriMatcher.NO_MATCH);

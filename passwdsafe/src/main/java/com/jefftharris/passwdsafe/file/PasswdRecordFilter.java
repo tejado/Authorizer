@@ -412,14 +412,14 @@ public final class PasswdRecordFilter implements Parcelable
 
 
     /** Does the filter have the given options */
-    private final boolean hasOptions(int opts)
+    private boolean hasOptions(int opts)
     {
         return (itsOptions & opts) != 0;
     }
 
 
     /** Match a field against the search query */
-    private final boolean filterField(String field)
+    private boolean filterField(String field)
     {
         if (field != null) {
             Matcher m = itsSearchQuery.matcher(field);

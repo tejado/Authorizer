@@ -335,7 +335,7 @@ public class PasswdFileUri implements Parcelable
             break;
         }
         }
-        return new Pair<Boolean, Integer>(writable, extraMsgId);
+        return new Pair<>(writable, extraMsgId);
     }
 
 
@@ -527,7 +527,7 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Get the URI type */
-    private static final Type getUriType(Uri uri)
+    private static Type getUriType(Uri uri)
     {
         if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
             return Type.FILE;
@@ -535,7 +535,7 @@ public class PasswdFileUri implements Parcelable
         String auth = uri.getAuthority();
         if (PasswdSafeContract.AUTHORITY.equals(auth)) {
             return Type.SYNC_PROVIDER;
-        } else if (auth.indexOf("mail") != -1) {
+        } else if (auth.contains("mail")) {
             return Type.EMAIL;
         }
         return Type.GENERIC_PROVIDER;

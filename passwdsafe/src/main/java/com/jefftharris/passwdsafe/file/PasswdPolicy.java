@@ -18,6 +18,7 @@ import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.util.Pair;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 /**
@@ -123,7 +124,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     private final String itsSpecialSymbols;
 
     private static final Random itsRandom = getRandom();
-    private static final Random getRandom()
+    private static Random getRandom()
     {
         Random random;
         try {
@@ -371,7 +372,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     /* (non-Javadoc)
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(PasswdPolicy policy)
+    public int compareTo(@NonNull PasswdPolicy policy)
     {
         if (itsLocation != policy.itsLocation) {
             return (itsLocation.itsSortOrder < policy.itsLocation.itsSortOrder)
@@ -383,16 +384,13 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     /** Are the policies equal for the fields used by a record policy */
     public boolean recordPolicyEquals(PasswdPolicy policy)
     {
-        if ((itsFlags != policy.itsFlags) ||
-            (itsLength != policy.itsLength) ||
-            (itsMinLowercase != policy.itsMinLowercase) ||
-            (itsMinUppercase != policy.itsMinUppercase) ||
-            (itsMinDigits != policy.itsMinDigits) ||
-            (itsMinSymbols != policy.itsMinSymbols) ||
-            !TextUtils.equals(itsSpecialSymbols, policy.itsSpecialSymbols)) {
-            return false;
-        }
-        return true;
+        return ((itsFlags == policy.itsFlags) &&
+                (itsLength == policy.itsLength) &&
+                (itsMinLowercase == policy.itsMinLowercase) &&
+                (itsMinUppercase == policy.itsMinUppercase) &&
+                (itsMinDigits == policy.itsMinDigits) &&
+                (itsMinSymbols == policy.itsMinSymbols) &&
+                TextUtils.equals(itsSpecialSymbols, policy.itsSpecialSymbols));
     }
 
     /** Convert the object to a string formatted as a header policy */
@@ -416,7 +414,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
                                                              int pos,
                                                              int policyNum,
                                                              Location loc)
-        throws IllegalArgumentException, NumberFormatException
+        throws IllegalArgumentException
     {
         int fieldStart = pos;
         int nameLen = getPolicyStrInt(policyStr, policyNum, fieldStart, 2,
@@ -446,16 +444,15 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
                              fields.itsMinLowercase, fields.itsMinUppercase,
                              fields.itsMinDigits, fields.itsMinSymbols,
                              specialSyms);
-        return new Pair<PasswdPolicy, Integer>(policy, fieldStart);
+        return new Pair<>(policy, fieldStart);
     }
 
     /** Parse policies from the header named policies field */
     public static List<PasswdPolicy> parseHdrPolicies(String policyStr)
-        throws IllegalArgumentException, NumberFormatException
+        throws IllegalArgumentException
     {
-        List<PasswdPolicy> policies = null;
         if (TextUtils.isEmpty(policyStr)) {
-            return policies;
+            return null;
         }
 
         int policyLen = policyStr.length();
@@ -465,7 +462,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         }
 
         int numPolicies = Integer.parseInt(policyStr.substring(0, 2), 16);
-        policies = new ArrayList<PasswdPolicy>(numPolicies);
+        List<PasswdPolicy> policies = new ArrayList<>(numPolicies);
         int policyStart = 2;
         int fieldStart = policyStart;
         for (int i = 0; i < numPolicies; ++i, policyStart = fieldStart) {
@@ -650,13 +647,13 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     }
 
     /** Constrain a length from 0 to LENGTH_MAX */
-    private static final int minmaxLength(int length)
+    private static int minmaxLength(int length)
     {
         return Math.min(Math.max(length, 0), LENGTH_MAX);
     }
 
     /** Generate a pronounceable password */
-    private final String generatePronounceable()
+    private String generatePronounceable()
     {
         // Pronounceable passwords generation code copied from
         // CPasswordCharPool::MakePronounceable from Password Safe project
@@ -747,7 +744,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         boolean useDigits = checkFlags(FLAG_USE_DIGITS);
         if (useSymbols || useDigits) {
             // fill a vector with indices of substitution candidates
-            ArrayList<Integer> sc = new ArrayList<Integer>(password.length);
+            ArrayList<Integer> sc = new ArrayList<>(password.length);
             for (int i = 0; i < password.length; ++i) {
                 int idx = password[i] - 'a';
                 if ((useDigits && (LEETS_DIGITS[idx] != 0)) ||
@@ -784,9 +781,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         // case
         boolean useLower = checkFlags(FLAG_USE_LOWERCASE);
         boolean useUpper = checkFlags(FLAG_USE_UPPERCASE);
-        if (useLower && !useUpper) {
-          // nothing to do here
-        } else if (!useLower && useUpper) {
+        if (!useLower && useUpper) {
             for (int i = 0; i < itsLength; i++) {
                 if (Character.isLowerCase(password[i])) {
                     password[i] = Character.toUpperCase(password[i]);
@@ -806,12 +801,8 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
 
     /** Randomly add a number of characters to the password and add the
      *  character set to the returned all list if the flags match */
-    private final void addRandomChars(int flag,
-                                      int numChars,
-                                      String chars,
-                                      StringBuilder passwd,
-                                      StringBuilder allchars)
-    {
+    private void addRandomChars(int flag, int numChars, String chars,
+                                StringBuilder passwd, StringBuilder allchars) {
         if (checkFlags(flag)) {
             int charsLen = chars.length();
             for (int i = 0; i < numChars; ++i) {
