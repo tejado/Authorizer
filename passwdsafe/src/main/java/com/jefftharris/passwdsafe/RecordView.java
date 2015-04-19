@@ -27,6 +27,7 @@ import com.jefftharris.passwdsafe.view.DialogUtils;
 import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -38,6 +39,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -117,7 +119,6 @@ public class RecordView extends AbstractRecordTabActivity
         }
     }
 
-    private TextView itsUserView;
     private boolean isPasswordShown = false;
     private TextView itsPasswordView;
     private String itsHiddenPasswordStr;
@@ -431,7 +432,7 @@ public class RecordView extends AbstractRecordTabActivity
     @Override
     protected Dialog onCreateDialog(int id)
     {
-        Dialog dialog = null;
+        Dialog dialog;
         switch (id) {
         case DIALOG_DELETE:
         {
@@ -468,7 +469,7 @@ public class RecordView extends AbstractRecordTabActivity
      * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
      */
     @Override
-    protected void onPrepareDialog(int id, Dialog dialog)
+    protected void onPrepareDialog(int id, @NonNull Dialog dialog)
     {
         super.onPrepareDialog(id, dialog);
         switch (id)
@@ -504,7 +505,7 @@ public class RecordView extends AbstractRecordTabActivity
         }
     }
 
-    private final void refresh()
+    private void refresh()
     {
         PasswdFileData fileData = getPasswdFile().getFileData();
         if (fileData == null) {
@@ -526,10 +527,10 @@ public class RecordView extends AbstractRecordTabActivity
         setBaseRecord(passwdRec, fileData);
         setText(R.id.title, View.NO_ID, fileData.getTitle(rec));
         setText(R.id.group, R.id.group_row, fileData.getGroup(rec));
-        itsUserView =
-            setText(R.id.user, R.id.user_row, fileData.getUsername(rec));
-        if (itsUserView != null) {
-            registerForContextMenu(itsUserView);
+        TextView userView = setText(R.id.user, R.id.user_row,
+                                    fileData.getUsername(rec));
+        if (userView != null) {
+            registerForContextMenu(userView);
             View v = findViewById(R.id.username_label);
             registerForContextMenu(v);
             v = findViewById(R.id.username_sep);
@@ -537,12 +538,12 @@ public class RecordView extends AbstractRecordTabActivity
         }
 
         setBasicFields(passwdRec, fileData);
-        setPasswordFields(passwdRec, fileData, tabs);
+        setPasswordFields(passwdRec, fileData);
         setNotesFields(passwdRec, fileData, tabs);
         GuiUtils.invalidateOptionsMenu(this);
     }
 
-    private final void deleteRecord()
+    private void deleteRecord()
     {
         boolean removed = false;
         do {
@@ -565,7 +566,7 @@ public class RecordView extends AbstractRecordTabActivity
     }
 
     /** Update whether the password is shown */
-    private final void updatePasswordShown(boolean isToggle, int progress)
+    private void updatePasswordShown(boolean isToggle, int progress)
     {
         String password;
         if (isToggle) {
@@ -590,7 +591,7 @@ public class RecordView extends AbstractRecordTabActivity
                 isPasswordShown ? Typeface.MONOSPACE : Typeface.DEFAULT);
     }
 
-    private final String getPassword()
+    private String getPassword()
     {
         String password = null;
 
@@ -616,7 +617,7 @@ public class RecordView extends AbstractRecordTabActivity
         return password;
     }
 
-    private final void saveNotesOptionsPrefs()
+    private void saveNotesOptionsPrefs()
     {
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -625,7 +626,7 @@ public class RecordView extends AbstractRecordTabActivity
         editor.commit();
     }
 
-    private final void setNotesOptions()
+    private void setNotesOptions()
     {
         TextView tv = (TextView)findViewById(R.id.notes);
         tv.setHorizontallyScrolling(!isWordWrap);
@@ -633,7 +634,7 @@ public class RecordView extends AbstractRecordTabActivity
                        itsIsMonospace ? Typeface.MONOSPACE : Typeface.DEFAULT);
     }
 
-    private final TextView setText(int id, int rowId, String text)
+    private TextView setText(int id, int rowId, String text)
     {
         if (rowId != View.NO_ID) {
             setVisibility(rowId, (text != null));
@@ -645,7 +646,7 @@ public class RecordView extends AbstractRecordTabActivity
     }
 
     /// Set the contents of a text field with a date
-    private final TextView setDateText(int id, int rowId, Date date)
+    private TextView setDateText(int id, int rowId, Date date)
     {
         String str = null;
         if (date != null) {
@@ -654,7 +655,7 @@ public class RecordView extends AbstractRecordTabActivity
         return setText(id, rowId, str);
     }
 
-    private final void setVisibility(int id, boolean visible)
+    private void setVisibility(int id, boolean visible)
     {
         View v = findViewById(id);
         if (v != null) {
@@ -662,7 +663,7 @@ public class RecordView extends AbstractRecordTabActivity
         }
     }
 
-    private final void setBaseRecord(PasswdRecord passwdRec,
+    private void setBaseRecord(PasswdRecord passwdRec,
                                      PasswdFileData fileData)
     {
         View baseRow = findViewById(R.id.base_row);
@@ -703,7 +704,7 @@ public class RecordView extends AbstractRecordTabActivity
         baseBtn.setOnClickListener(onclick);
     }
 
-    private final void showRefRec(boolean baseRef, int referencingPos)
+    private void showRefRec(boolean baseRef, int referencingPos)
     {
         PasswdFileData fileData = getPasswdFile().getFileData();
         if (fileData == null) {
@@ -734,8 +735,7 @@ public class RecordView extends AbstractRecordTabActivity
         startActivityForResult(getUri(), uuid, RECORD_VIEW_REQUEST, this);
     }
 
-    private final void setBasicFields(PasswdRecord passwdRec,
-                                      PasswdFileData fileData)
+    private void setBasicFields(PasswdRecord passwdRec, PasswdFileData fileData)
     {
         PwsRecord rec = passwdRec.getRecord();
 
@@ -849,6 +849,7 @@ public class RecordView extends AbstractRecordTabActivity
         });
 
         if (referencesView.getHeaderViewsCount() == 0) {
+            @SuppressLint("InflateParams")
             View header = getLayoutInflater().inflate(R.layout.listview_header,
                                                       null);
             TextView tv = (TextView)header.findViewById(R.id.text);
@@ -860,8 +861,7 @@ public class RecordView extends AbstractRecordTabActivity
         itsHasReferences = (references != null) && !references.isEmpty();
         if (itsHasReferences) {
             ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(this,
-                                         R.layout.normal_list_item1);
+                new ArrayAdapter<>(this, R.layout.normal_list_item1);
             for (PwsRecord refRec: references) {
                 adapter.add(fileData.getId(refRec));
             }
@@ -879,9 +879,8 @@ public class RecordView extends AbstractRecordTabActivity
         scrollTabToTop();
     }
 
-    private final void setNotesFields(PasswdRecord passwdRec,
-                                      PasswdFileData fileData,
-                                      TabWidget tabs)
+    private void setNotesFields(PasswdRecord passwdRec, PasswdFileData fileData,
+                                TabWidget tabs)
     {
         PwsRecord rec = passwdRec.getRecord();
 
@@ -909,9 +908,8 @@ public class RecordView extends AbstractRecordTabActivity
         setNotesOptions();
     }
 
-    private final void setPasswordFields(PasswdRecord passwdRec,
-                                         PasswdFileData fileData,
-                                         TabWidget tabs)
+    private void setPasswordFields(PasswdRecord passwdRec,
+                                   PasswdFileData fileData)
     {
         PasswdPolicy policy = null;
         String policyLoc = null;
