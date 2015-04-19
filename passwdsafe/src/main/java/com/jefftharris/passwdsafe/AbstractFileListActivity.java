@@ -126,14 +126,13 @@ public abstract class AbstractFileListActivity extends FragmentActivity
     /**
      * @return true if a directory was popped, false to use default behavior
      */
-    private final boolean doBackPressed()
+    private boolean doBackPressed()
     {
         FragmentManager mgr = getSupportFragmentManager();
         Fragment frag = mgr.findFragmentById(R.id.files);
-        if ((frag instanceof FileListFragment) && frag.isVisible()) {
-            return ((FileListFragment)frag).doBackPressed();
-        }
-        return false;
+        return (frag instanceof FileListFragment) &&
+                frag.isVisible() &&
+                ((FileListFragment) frag).doBackPressed();
     }
 
 
