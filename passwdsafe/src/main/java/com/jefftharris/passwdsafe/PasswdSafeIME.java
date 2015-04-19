@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -18,6 +19,7 @@ import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
@@ -53,7 +55,6 @@ public class PasswdSafeIME extends InputMethodService
 
     private View itsView;
     private KeyboardView itsKeyboardView;
-    private Keyboard itsKeyboard;
     private Keyboard.Key itsEnterKey;
     private boolean itsAllowPassword = false;
     private boolean itsIsPasswordField = false;
@@ -62,16 +63,17 @@ public class PasswdSafeIME extends InputMethodService
     /* (non-Javadoc)
      * @see android.inputmethodservice.InputMethodService#onCreateInputView()
      */
+    @SuppressLint("InflateParams")
     @Override
     public View onCreateInputView()
     {
         itsView = getLayoutInflater().inflate(R.layout.input_method, null);
         refresh();
 
-        itsKeyboard = new PasswdSafeKeyboard(this, R.xml.keyboard);
+        Keyboard keyboard = new PasswdSafeKeyboard(this, R.xml.keyboard);
         itsKeyboardView = (KeyboardView)itsView.findViewById(R.id.keyboard);
         itsKeyboardView.setPreviewEnabled(false);
-        itsKeyboardView.setKeyboard(itsKeyboard);
+        itsKeyboardView.setKeyboard(keyboard);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
         View icon = itsView.findViewById(R.id.icon);
@@ -175,7 +177,7 @@ public class PasswdSafeIME extends InputMethodService
     }
 
     /** Open PasswdSafe */
-    private final void openPasswdSafe()
+    private void openPasswdSafe()
     {
         Pair<PasswdFileData, PwsRecord> rc = refresh();
         Intent intent;
@@ -206,7 +208,7 @@ public class PasswdSafeIME extends InputMethodService
     }
 
     /** Handle a press of a keyboard key */
-    private final void onKeyPress(int keycode)
+    private void onKeyPress(int keycode)
     {
         InputConnection conn = getCurrentInputConnection();
         if (conn == null) {
@@ -306,7 +308,7 @@ public class PasswdSafeIME extends InputMethodService
     }
 
     /** Refresh the fields from the current password data */
-    private final Pair<PasswdFileData, PwsRecord> refresh()
+    private Pair<PasswdFileData, PwsRecord> refresh()
     {
         PasswdSafeApp app = getPasswdSafeApp();
         PasswdFileData fileData = app.accessOpenFileData();
@@ -335,18 +337,18 @@ public class PasswdSafeIME extends InputMethodService
             rectv.setText(null);
         }
 
-        return new Pair<PasswdFileData, PwsRecord>(fileData, rec);
+        return new Pair<>(fileData, rec);
     }
 
     /** Show the password warning */
-    private final void showPasswordWarning(boolean show)
+    private void showPasswordWarning(boolean show)
     {
         View v = itsView.findViewById(R.id.password_warning);
         v.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     /** Get the PasswdSafeApp */
-    private final PasswdSafeApp getPasswdSafeApp()
+    private PasswdSafeApp getPasswdSafeApp()
     {
         return (PasswdSafeApp)getApplication();
     }
@@ -364,11 +366,9 @@ public class PasswdSafeIME extends InputMethodService
          * @see android.inputmethodservice.Keyboard#createKeyFromXml(android.content.res.Resources, android.inputmethodservice.Keyboard.Row, int, int, android.content.res.XmlResourceParser)
          */
         @Override
-        protected Key createKeyFromXml(Resources res,
-                                       Row parent,
-                                       int x,
-                                       int y,
-                                       XmlResourceParser parser)
+        protected Key createKeyFromXml(@NonNull Resources res,
+                                       @NonNull Row parent,
+                                       int x, int y, XmlResourceParser parser)
         {
             Key key = super.createKeyFromXml(res, parent, x, y, parser);
             if (key.codes[0] == ENTER_KEY) {
