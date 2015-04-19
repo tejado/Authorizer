@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'com.android.application'
 
 android {
@@ -36,7 +38,8 @@ android {
 
 task buildNative(type: Exec, description: 'Compile JNI source') {
     def ndkDir = project.plugins.findPlugin('android').sdkHandler.ndkFolder
-    commandLine "$ndkDir/ndk-build.cmd",
+    def ndkBuild = Os.isFamily(Os.FAMILY_WINDOWS) ? "ndk-build.cmd" : "ndk-build"
+    commandLine "$ndkDir/$ndkBuild",
             '-C', file('src/main/jni').absolutePath,
             '-j', Runtime.runtime.availableProcessors(),
             'all'
@@ -46,7 +49,8 @@ task buildNative(type: Exec, description: 'Compile JNI source') {
 
 task cleanNative(type: Exec, description: 'Clean JNI object files') {
     def ndkDir = project.plugins.findPlugin('android').sdkHandler.ndkFolder
-    commandLine "$ndkDir/ndk-build",
+    def ndkBuild = Os.isFamily(Os.FAMILY_WINDOWS) ? "ndk-build.cmd" : "ndk-build"
+    commandLine "$ndkDir/$ndkBuild",
             '-C', file('src/main/jni').absolutePath,
             'clean'
 }
