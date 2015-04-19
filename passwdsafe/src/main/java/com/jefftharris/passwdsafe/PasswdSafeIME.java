@@ -213,6 +213,17 @@ public class PasswdSafeIME extends InputMethodService
             return;
         }
 
+        switch (keycode) {
+        case PASSWORD_KEY: {
+            break;
+        }
+        default: {
+            itsAllowPassword = itsIsPasswordField;
+            showPasswordWarning(false);
+            break;
+        }
+        }
+
         String str = null;
         switch (keycode) {
         case USER_KEY:
