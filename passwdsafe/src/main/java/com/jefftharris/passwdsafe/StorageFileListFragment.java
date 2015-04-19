@@ -165,7 +165,9 @@ public class StorageFileListFragment extends ListFragment
                 itsListener.openFile(uri, title);
             }
         } finally {
-            cursor.close();
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 }
