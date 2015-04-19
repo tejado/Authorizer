@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Version code format for version x.y.z: xxyyzz
--->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.jefftharris.passwdsafe.sync"
-    android:versionCode="20100"
-    android:versionName="2.1.0">
+    package="com.jefftharris.passwdsafe.sync">
 
     <permission
         android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"

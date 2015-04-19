@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Version code format for version x.y.z: xxyyzz
--->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.jefftharris.passwdsafe"
-    android:installLocation="auto"
-    android:versionCode="50200"
-    android:versionName="5.2.0">
+    android:installLocation="auto">
 
     <permission
         android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"
