@@ -121,11 +121,25 @@
                             android:id="@+id/password_sep"
                             style="@style/Separator"/>
 
-                        <TextView
-                            android:id="@+id/password"
+                        <LinearLayout
                             style="@style/RecordField.Large"
-                            android:clickable="true"/>
+                            android:orientation="vertical">
 
+                            <TextView
+                                android:id="@+id/password"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clickable="true"
+                                android:textAppearance="?android:textAppearanceLarge"
+                                />
+
+                            <SeekBar
+                                android:id="@+id/password_seek"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                />
+
+                        </LinearLayout>
                     </LinearLayout>
 
                     <LinearLayout

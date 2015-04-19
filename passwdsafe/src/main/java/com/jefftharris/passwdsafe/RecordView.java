@@ -49,6 +49,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
@@ -380,7 +381,7 @@ public class RecordView extends AbstractRecordTabActivity
         }
         case MENU_TOGGLE_PASSWORD:
         {
-            togglePasswordShown();
+            updatePasswordShown(true, 0);
             break;
         }
         case MENU_COPY_USER:
@@ -563,15 +564,30 @@ public class RecordView extends AbstractRecordTabActivity
         }
     }
 
-    private final void togglePasswordShown()
+    /** Update whether the password is shown */
+    private final void updatePasswordShown(boolean isToggle, int progress)
     {
+        String password;
+        if (isToggle) {
+            isPasswordShown = !isPasswordShown;
+            password = isPasswordShown ? getPassword() : itsHiddenPasswordStr;
+            SeekBar passwordSeek = (SeekBar)findViewById(R.id.password_seek);
+            passwordSeek.setProgress(
+                    isPasswordShown ? passwordSeek.getMax() : 0);
+        } else if (progress == 0) {
+            isPasswordShown = false;
+            password = itsHiddenPasswordStr;
+        } else {
+            isPasswordShown = true;
+            password = getPassword();
+            if (progress < password.length()) {
+                password = password.substring(0, progress) + "…";
+            }
+        }
         TextView passwordField = (TextView)findViewById(R.id.password);
-        isPasswordShown = !isPasswordShown;
-        passwordField.setText(
-            isPasswordShown ? getPassword() : itsHiddenPasswordStr);
+        passwordField.setText(password);
         passwordField.setTypeface(
-            isPasswordShown ? Typeface.MONOSPACE : Typeface.DEFAULT);
-
+                isPasswordShown ? Typeface.MONOSPACE : Typeface.DEFAULT);
     }
 
     private final String getPassword()
@@ -767,12 +783,13 @@ public class RecordView extends AbstractRecordTabActivity
         itsPasswordView = setText(R.id.password, R.id.password_row,
                                   (fileData.hasPassword(recForPassword)
                                       ? itsHiddenPasswordStr : null));
+        SeekBar passwordSeek = (SeekBar)findViewById(R.id.password_seek);
         if (itsPasswordView != null) {
             View.OnClickListener listener = new View.OnClickListener()
             {
                 public void onClick(View v)
                 {
-                    togglePasswordShown();
+                    updatePasswordShown(true, 0);
                 }
             };
             View v = findViewById(R.id.password_label);
@@ -784,7 +801,34 @@ public class RecordView extends AbstractRecordTabActivity
             itsPasswordView.setOnClickListener(listener);
             registerForContextMenu(itsPasswordView);
 
+            passwordSeek.setOnSeekBarChangeListener(
+                    new SeekBar.OnSeekBarChangeListener()
+                    {
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar)
+                        {
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar)
+                        {
+                        }
+
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar,
+                                                      int progress,
+                                                      boolean fromUser)
+                        {
+                            if (fromUser) {
+                                updatePasswordShown(false, progress);
+                            }
+                        }
+                    });
         }
+
+        int passwordLen = getPassword().length();
+        passwordSeek.setMax(passwordLen);
+        passwordSeek.setProgress(0);
 
         setVisibility(R.id.times_row,
                       (creationTime != null) || (lastModTime != null));
