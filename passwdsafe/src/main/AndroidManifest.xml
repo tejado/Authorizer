@@ -9,10 +9,6 @@
     android:versionCode="50200"
     android:versionName="5.2.0">
 
-    <uses-sdk
-        android:minSdkVersion="4"
-        android:targetSdkVersion="11"/>
-
     <permission
         android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"
         android:protectionLevel="signature"/>

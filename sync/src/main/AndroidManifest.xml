@@ -8,10 +8,6 @@
     android:versionCode="20100"
     android:versionName="2.1.0">
 
-    <uses-sdk
-        android:minSdkVersion="10"
-        android:targetSdkVersion="17"/>
-
     <permission
         android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"
         android:protectionLevel="signature"/>

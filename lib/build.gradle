@@ -17,8 +17,8 @@ android {
     publishNonDefault true
 
     defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 17
+        minSdkVersion 4
+        targetSdkVersion 11
         buildConfigField 'String', 'BUILD_ID', "\"${hgId()}\""
         buildConfigField 'String', 'BUILD_DATE', "\"${buildTime()}\""
     }
