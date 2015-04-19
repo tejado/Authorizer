@@ -5,8 +5,8 @@ android {
     buildToolsVersion "21.1.2"
     defaultConfig {
         applicationId "com.jefftharris.passwdsafe"
-        minSdkVersion 8
-        targetSdkVersion 17
+        minSdkVersion 4
+        targetSdkVersion 11
         versionCode 50200
         versionName "5.2.0"
 

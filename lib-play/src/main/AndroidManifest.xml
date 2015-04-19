@@ -15,7 +15,6 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.google.android.gms">
-    <uses-sdk android:minSdkVersion="9"/>
 
     <application>
         <meta-data
