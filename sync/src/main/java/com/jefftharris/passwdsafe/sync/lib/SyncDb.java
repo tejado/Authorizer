@@ -235,7 +235,7 @@ public class SyncDb
     public static List<DbProvider> getProviders(SQLiteDatabase db)
             throws SQLException
     {
-        List<DbProvider> providers = new ArrayList<DbProvider>();
+        List<DbProvider> providers = new ArrayList<>();
         Cursor cursor = db.query(DB_TABLE_PROVIDERS, DbProvider.QUERY_FIELDS,
                                  null, null, null, null, null);
         try {
@@ -275,7 +275,7 @@ public class SyncDb
     public static List<DbFile> getFiles(long providerId, SQLiteDatabase db)
             throws SQLException
     {
-        List<DbFile> files = new ArrayList<DbFile>();
+        List<DbFile> files = new ArrayList<>();
         Cursor cursor = db.query(DB_TABLE_FILES, DbFile.QUERY_FIELDS,
                                  DB_MATCH_FILES_PROVIDER_ID,
                                  new String[] { Long.toString(providerId) },
