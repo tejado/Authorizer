@@ -1,3 +1,10 @@
+/*
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
+ */
 package com.jefftharris.passwdsafe;
 
 import android.annotation.TargetApi;
@@ -8,12 +15,19 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.DocumentsContractCompat;
@@ -24,12 +38,13 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
  *  the storage access framework on Kitkat and higher
  */
 @TargetApi(19)
-public class StorageFileListFragment extends ListFragment
-        implements OnClickListener
+public final class StorageFileListFragment extends ListFragment
+        implements OnClickListener, LoaderManager.LoaderCallbacks<Cursor>
 {
     // TODO: new file support
     // TODO: remove file support
-    // TODO: recent files list
+    // TODO: clear recent files
+    // TODO: recent sync files
 
     /** Listener interface for the owning activity */
     public interface Listener
@@ -45,7 +60,11 @@ public class StorageFileListFragment extends ListFragment
 
     private static final int OPEN_RC = 1;
 
+    private static final int LOADER_FILES = 0;
+
     private Listener itsListener;
+    private RecentFilesDb itsRecentFilesDb;
+    private SimpleCursorAdapter itsFilesAdapter;
 
 
     /* (non-Javadoc)
@@ -58,6 +77,12 @@ public class StorageFileListFragment extends ListFragment
         itsListener = (Listener)activity;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        itsRecentFilesDb = new RecentFilesDb(getActivity());
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
@@ -80,6 +105,20 @@ public class StorageFileListFragment extends ListFragment
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        itsFilesAdapter = new SimpleCursorAdapter(
+                getActivity(), android.R.layout.simple_list_item_1, null,
+                new String[] { RecentFilesDb.DB_COL_FILES_TITLE },
+                new int[] { android.R.id.text1 }, 0);
+
+        setListAdapter(itsFilesAdapter);
+
+        LoaderManager lm = getLoaderManager();
+        lm.initLoader(LOADER_FILES, null, this);
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onResume()
@@ -92,6 +131,15 @@ public class StorageFileListFragment extends ListFragment
         app.closeOpenFile();
     }
 
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        if (itsRecentFilesDb != null) {
+            itsRecentFilesDb.close();
+        }
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onActivityResult(int, int, android.content.Intent)
@@ -115,6 +163,15 @@ public class StorageFileListFragment extends ListFragment
         }
     }
 
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id)
+    {
+        Cursor item = (Cursor)l.getItemAtPosition(position);
+        String uristr = item.getString(RecentFilesDb.QUERY_COL_URI);
+        String title = item.getString(RecentFilesDb.QUERY_COL_TITLE);
+        Uri uri = Uri.parse(uristr);
+        openUri(uri, title);
+    }
 
     /* (non-Javadoc)
      * @see android.view.View.OnClickListener#onClick(android.view.View)
@@ -129,6 +186,58 @@ public class StorageFileListFragment extends ListFragment
         }
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle)
+    {
+        return new AsyncTaskLoader<Cursor>(getActivity())
+        {
+            /** Handle when the loader is reset */
+            @Override
+            protected void onReset()
+            {
+                super.onReset();
+                onStopLoading();
+            }
+
+            /** Handle when the loader is started */
+            @Override
+            protected void onStartLoading()
+            {
+                forceLoad();
+            }
+
+            /** Handle when the loader is stopped */
+            @Override
+            protected void onStopLoading()
+            {
+                cancelLoad();
+            }
+
+            /** Load the files in the background */
+            @Override
+            public Cursor loadInBackground()
+            {
+                try {
+                    return itsRecentFilesDb.queryFiles();
+                } catch (Exception e) {
+                    Log.e(TAG, "Files load error", e);
+                }
+                return null;
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor)
+    {
+        itsFilesAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader)
+    {
+        itsFilesAdapter.swapCursor(null);
+    }
 
     /** Start the intent to open a file */
     private void startOpenFile()
@@ -146,7 +255,7 @@ public class StorageFileListFragment extends ListFragment
     }
 
 
-    /** Open a password file URI */
+    /** Open a password file URI from an intent */
     private void openUri(Intent openIntent)
     {
         ContentResolver cr = getActivity().getContentResolver();
@@ -160,9 +269,7 @@ public class StorageFileListFragment extends ListFragment
             if ((cursor != null) && (cursor.moveToFirst())) {
                 String title = cursor.getString(
                         cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                PasswdSafeUtil.dbginfo(TAG, "openUri %s: %s",
-                                       uri, title);
-                itsListener.openFile(uri, title);
+                openUri(uri, title);
             }
         } finally {
             if (cursor != null) {
@@ -170,4 +277,21 @@ public class StorageFileListFragment extends ListFragment
             }
         }
     }
+
+
+    /** Open a password file URI */
+    private void openUri(Uri uri, String title)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "openUri %s: %s", uri, title);
+
+        try {
+            itsRecentFilesDb.insertOrUpdateFile(uri, title);
+        } catch (Exception e) {
+            Log.e(TAG, "Error inserting recent file", e);
+        }
+
+        itsListener.openFile(uri, title);
+    }
+
+
 }
