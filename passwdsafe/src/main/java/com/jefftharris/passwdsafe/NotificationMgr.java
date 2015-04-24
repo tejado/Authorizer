@@ -32,9 +32,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataObserver;
@@ -77,9 +77,8 @@ public class NotificationMgr implements PasswdFileDataObserver
     private final AlarmManager itsAlarmMgr;
     private final NotificationManager itsNotifyMgr;
     private final DbHelper itsDbHelper;
-    private final HashMap<Long, UriNotifInfo> itsUriNotifs =
-        new HashMap<Long, UriNotifInfo>();
-    private final HashSet<Uri> itsNotifUris = new HashSet<Uri>();
+    private final HashMap<Long, UriNotifInfo> itsUriNotifs = new HashMap<>();
+    private final HashSet<Uri> itsNotifUris = new HashSet<>();
     private int itsNextNotifId = 1;
     private PasswdRecordFilter.ExpiryFilter itsExpiryFilter = null;
     private PendingIntent itsTimerIntent;
@@ -303,7 +302,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         PasswdSafeUtil.dbginfo(TAG, "Update %s, id: %d",
                                fileData.getUri(), uriId);
 
-        TreeMap<ExpiryEntry, Long> entries = new TreeMap<ExpiryEntry, Long>();
+        TreeMap<ExpiryEntry, Long> entries = new TreeMap<>();
         Cursor cursor =
             db.query(DB_TABLE_EXPIRYS,
                      new String[] { DB_COL_EXPIRYS_ID, DB_COL_EXPIRYS_UUID,
@@ -390,8 +389,8 @@ public class NotificationMgr implements PasswdFileDataObserver
         LongReference nextExpiration = new LongReference(Long.MAX_VALUE);
 
         itsNotifUris.clear();
-        HashSet<Long> uris = new HashSet<Long>();
-        ArrayList<Long> removeUriIds = new ArrayList<Long>();
+        HashSet<Long> uris = new HashSet<>();
+        ArrayList<Long> removeUriIds = new ArrayList<>();
         Cursor uriCursor =
             db.query(DB_TABLE_URIS,
                      new String[] { DB_COL_URIS_ID, DB_COL_URIS_URI },
@@ -490,7 +489,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
         info.setEntries(expired);
         int numExpired = info.getEntries().size();
-        ArrayList<String> strs = new ArrayList<String>(numExpired);
+        ArrayList<String> strs = new ArrayList<>(numExpired);
         for (ExpiryEntry entry: info.getEntries()) {
             strs.add(entry.toString(itsCtx));
         }
@@ -525,7 +524,7 @@ public class NotificationMgr implements PasswdFileDataObserver
                    final SQLiteDatabase db)
         throws SQLException
     {
-        TreeSet<ExpiryEntry> expired = new TreeSet<ExpiryEntry>();
+        TreeSet<ExpiryEntry> expired = new TreeSet<>();
         Cursor cursor = db.query(DB_TABLE_EXPIRYS,
                                  new String[] { DB_COL_EXPIRYS_UUID,
                                                 DB_COL_EXPIRYS_TITLE,
@@ -678,7 +677,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         /* (non-Javadoc)
          * @see java.lang.Comparable#compareTo(java.lang.Object)
          */
-        public int compareTo(ExpiryEntry another)
+        public int compareTo(@NonNull ExpiryEntry another)
         {
             int rc;
             // Reverse sort on expiration time
@@ -728,8 +727,7 @@ public class NotificationMgr implements PasswdFileDataObserver
     private static final class UriNotifInfo
     {
         private final int itsNotifId;
-        private final TreeSet<ExpiryEntry> itsEntries =
-            new TreeSet<ExpiryEntry>();
+        private final TreeSet<ExpiryEntry> itsEntries = new TreeSet<>();
 
         /** Constructor */
         public UriNotifInfo(int notifId)
