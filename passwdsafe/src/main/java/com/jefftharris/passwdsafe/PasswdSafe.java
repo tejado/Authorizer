@@ -227,8 +227,8 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             menu.add(0, MENU_PASSWD_POLICIES, 0, R.string.password_policies);
             menu.add(0, MENU_PASSWD_EXPIRYS, 0, R.string.expired_passwords);
 
-            menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
-                     R.string.expiration_notifications);
+            mi = menu.add(0, MENU_PASSWD_EXPIRY_NOTIF, 0,
+                          R.string.expiration_notifications);
             mi.setCheckable(true);
         }
 
