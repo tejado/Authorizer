@@ -21,6 +21,7 @@
     <string name="clear">Leeren</string>
     <string name="clear_clipboard_on_close">Zwischenablage beim Schließen leeren</string>
     <string name="clear_password_notifications">Mitteilung beim Leeren der Zwischenablage</string>
+    <string name="clear_recent">Klar Letzte</string>
     <string name="close_file_screen_off">Datei schließen, wenn Bildschirm abschaltet</string>
     <string name="confirm">Bestätigen</string>
     <string name="confirm_label">Bestätigen:</string>

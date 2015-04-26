@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -17,7 +18,6 @@ import android.provider.BaseColumns;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
-import java.sql.SQLException;
 
 /**
  * Database helper class to manage the recent files list
@@ -110,6 +110,19 @@ public final class RecentFilesDb extends SQLiteOpenHelper
             } finally {
                 delCursor.close();
             }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    /** Clear the recent files */
+    public void clear() throws SQLException
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            db.beginTransaction();
+            db.delete(DB_TABLE_FILES, null, null);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

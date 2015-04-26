@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
@@ -23,6 +24,9 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -43,7 +47,6 @@ public final class StorageFileListFragment extends ListFragment
 {
     // TODO: new file support
     // TODO: remove file support
-    // TODO: clear recent files
     // TODO: recent sync files
 
     /** Listener interface for the owning activity */
@@ -173,9 +176,35 @@ public final class StorageFileListFragment extends ListFragment
         openUri(uri, title);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_storage_file_list, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_clear_recent: {
+            try {
+                itsRecentFilesDb.clear();
+                getLoaderManager().restartLoader(LOADER_FILES, null, this);
+            } catch (SQLException e) {
+                Log.e(TAG, "Clear recent error", e);
+            }
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
+
     /* (non-Javadoc)
-     * @see android.view.View.OnClickListener#onClick(android.view.View)
-     */
+         * @see android.view.View.OnClickListener#onClick(android.view.View)
+         */
     public final void onClick(View v)
     {
         switch (v.getId()) {
