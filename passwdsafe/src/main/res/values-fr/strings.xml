@@ -119,6 +119,8 @@
     <string name="last_save_app_label">Application utilisée:</string>
     <string name="last_save_by_label">Dernier enregistrement par:</string>
     <string name="last_save_time_label">Dernier enregistrement le:</string>
+    <string name="legacy_file_chooser">Héritage de sélection de fichier</string>
+    <string name="legacy_file_chooser_summary">Utilisable avec KitKat et plus</string>
     <string name="length">Longueur</string>
     <string name="length_even_hex">La longueur doit être en hexadécimal</string>
     <string name="length_min_val">La longueur doit être au moins %1$d</string>
