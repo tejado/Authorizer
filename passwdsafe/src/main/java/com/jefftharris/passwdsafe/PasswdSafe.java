@@ -17,6 +17,7 @@ import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -25,6 +26,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,6 +47,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.DocumentsContractCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
@@ -80,6 +83,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private static final int RECORD_VIEW_REQUEST = 0;
     private static final int RECORD_ADD_REQUEST = 1;
     private static final int POLICY_VIEW_REQUEST = 2;
+    private static final int CREATE_DOCUMENT_REQUEST = 3;
 
     private AbstractTask itsLoadTask;
     private PasswdEntryDialog itsPasswdEntryDialog;
@@ -88,6 +92,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     private DialogValidator itsDeleteValidator;
     private String itsRecToOpen;
     private boolean itsIsNotifyExpirations = true;
+    private NewTask itsPendingNewTask = null;
 
 
     /** Called when the activity is first created. */
@@ -396,14 +401,30 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     {
         PasswdSafeUtil.dbginfo(TAG, "onActivityResult req: %d, rc: %d",
                                requestCode, resultCode);
-         if (((requestCode == RECORD_VIEW_REQUEST) ||
-              (requestCode == RECORD_ADD_REQUEST) ||
-              (requestCode == POLICY_VIEW_REQUEST)) &&
-             (resultCode == PasswdSafeApp.RESULT_MODIFIED)) {
-             showFileData(MOD_DATA);
-         } else {
-             super.onActivityResult(requestCode, resultCode, data);
-         }
+        switch (requestCode) {
+        case RECORD_VIEW_REQUEST:
+        case RECORD_ADD_REQUEST:
+        case POLICY_VIEW_REQUEST: {
+            if (resultCode == PasswdSafeApp.RESULT_MODIFIED) {
+                showFileData(MOD_DATA);
+            }
+            break;
+        }
+        case CREATE_DOCUMENT_REQUEST: {
+            if (resultCode == Activity.RESULT_OK) {
+                PasswdSafeUtil.dbginfo(TAG, "data: %s", data);
+                Uri newUri = data.getData();
+                itsPendingNewTask.setNewUri(newUri);
+                runTask(itsPendingNewTask);
+            }
+            itsPendingNewTask = null;
+            break;
+        }
+        default: {
+            super.onActivityResult(requestCode, resultCode, data);
+            break;
+        }
+        }
     }
 
     /* (non-Javadoc)
@@ -528,12 +549,15 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
             int titleId = R.string.new_file;
             PasswdFileUri uri = getUri();
-            switch (uri.getType()) {
+            PasswdFileUri.Type type =
+                    (uri != null) ? uri.getType() : PasswdFileUri.Type.FILE;
+            switch (type) {
             case FILE: {
                 titleId = R.string.new_local_file;
                 break;
             }
             case SYNC_PROVIDER: {
+                assert uri != null;
                 switch (uri.getSyncType()) {
                 case GDRIVE:
                 case GDRIVE_PLAY: {
@@ -586,10 +610,13 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         }
                     }
 
-                    String error = getUri().validateNewChild(fileName.toString(),
-                                                        PasswdSafe.this);
-                    if (error != null) {
-                        return error;
+                    PasswdFileUri uri = getUri();
+                    if (uri != null) {
+                        String error = uri.validateNewChild(fileName.toString(),
+                                                            PasswdSafe.this);
+                        if (error != null) {
+                            return error;
+                        }
                     }
 
                     return super.doValidation();
@@ -924,7 +951,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
     private void onCreateNew(Intent intent)
     {
-        initUri(PasswdSafeApp.getFileUriFromIntent(intent, this));
+        Uri data = intent.getData();
+        if (data != null) {
+            initUri(PasswdSafeApp.getFileUriFromIntent(intent, this));
+        }
         showDialog(DIALOG_FILE_NEW);
     }
 
@@ -957,7 +987,23 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
 
     private void createNewFile(String fileName, StringBuilder passwd)
     {
-        runTask(new NewTask(fileName, passwd));
+        if (getUri() == null) {
+            Intent createIntent = new Intent(
+                    DocumentsContractCompat.INTENT_ACTION_CREATE_DOCUMENT);
+
+            // Filter to only show results that can be "opened", such as
+            // a file (as opposed to a list of contacts or timezones).
+            createIntent.addCategory(Intent.CATEGORY_OPENABLE);
+
+            // Create a file with the requested MIME type and name.
+            createIntent.setType("application/psafe3");
+            createIntent.putExtra(Intent.EXTRA_TITLE, fileName + ".psafe3");
+
+            itsPendingNewTask = new NewTask(null, passwd);
+            startActivityForResult(createIntent, CREATE_DOCUMENT_REQUEST);
+        } else {
+            runTask(new NewTask(fileName, passwd));
+        }
     }
 
     private void deleteFile()
@@ -1093,6 +1139,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
     {
         private final String itsFileName;
         private final StringBuilder itsPasswd;
+        private Uri itsNewUri = null;
 
         /** Constructor */
         public NewTask(String fileName, StringBuilder passwd)
@@ -1110,6 +1157,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             return ctx.getString(R.string.new_file);
         }
 
+        /** Set the explicit new file URI */
+        public void setNewUri(Uri uri)
+        {
+            itsNewUri = uri;
+        }
+
         /* (non-Javadoc)
          * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
          */
@@ -1117,9 +1170,13 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         protected Object handleDoInBackground(PasswdFileUri uri, Context ctx)
                 throws Exception
         {
-            PasswdFileUri childUri =
-                    uri.createNewChild(itsFileName + ".psafe3", ctx);
-            PasswdFileData fileData = new PasswdFileData(childUri);
+            PasswdFileUri fileUri;
+            if (itsNewUri != null) {
+                fileUri = new PasswdFileUri(itsNewUri, ctx);
+            } else {
+                fileUri = uri.createNewChild(itsFileName + ".psafe3", ctx);
+            }
+            PasswdFileData fileData = new PasswdFileData(fileUri);
             fileData.createNewFile(itsPasswd, ctx);
             return fileData;
         }

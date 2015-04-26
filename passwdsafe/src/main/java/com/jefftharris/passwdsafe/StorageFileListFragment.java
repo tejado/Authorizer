@@ -21,6 +21,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,9 +46,13 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 public final class StorageFileListFragment extends ListFragment
         implements OnClickListener, LoaderManager.LoaderCallbacks<Cursor>
 {
-    // TODO: new file support
+    // TODO: add new file to recent list
+    // TODO: persistable uri permissions on new files and check when opening
     // TODO: remove file support
     // TODO: recent sync files
+    // TODO: fix sync files layout
+    // TODO: fix sync new file menu text
+    // TODO: menu item setup between storage and sync items
 
     /** Listener interface for the owning activity */
     public interface Listener
@@ -181,12 +186,20 @@ public final class StorageFileListFragment extends ListFragment
     {
         inflater.inflate(R.menu.fragment_storage_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem mi = menu.findItem(R.id.menu_file_new);
+        MenuItemCompat.setShowAsAction(mi,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
+        case R.id.menu_file_new: {
+            startActivity(new Intent(PasswdSafeUtil.NEW_INTENT));
+            return true;
+        }
         case R.id.menu_clear_recent: {
             try {
                 itsRecentFilesDb.clear();

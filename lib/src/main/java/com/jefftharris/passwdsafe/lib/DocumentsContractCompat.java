@@ -17,6 +17,9 @@ public interface DocumentsContractCompat
     public static final String INTENT_ACTION_OPEN_DOCUMENT =
             "android.intent.action.OPEN_DOCUMENT";
 
+    public static final String INTENT_ACTION_CREATE_DOCUMENT =
+            "android.intent.action.CREATE_DOCUMENT";
+
     /** Column for DocumentsContract.Document.COLUMN_FLAGS available on
      * API 19 */
     public static final String COLUMN_FLAGS = "flags";
