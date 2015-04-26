@@ -272,7 +272,7 @@ public final class StorageFileListFragment extends ListFragment
     private void startOpenFile()
     {
         Intent intent = new Intent(
-                DocumentsContractCompat.INTENT_ACTION_OPEN_DOCUEMENT);
+                DocumentsContractCompat.INTENT_ACTION_OPEN_DOCUMENT);
 
         // Filter to only show results that can be "opened", such as a
         // file (as opposed to a list of contacts or timezones)

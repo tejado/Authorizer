@@ -14,7 +14,7 @@ package com.jefftharris.passwdsafe.lib;
 public interface DocumentsContractCompat
 {
     /** Intent action for opening a document available on API 19 */
-    public static final String INTENT_ACTION_OPEN_DOCUEMENT =
+    public static final String INTENT_ACTION_OPEN_DOCUMENT =
             "android.intent.action.OPEN_DOCUMENT";
 
     /** Column for DocumentsContract.Document.COLUMN_FLAGS available on
