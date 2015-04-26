@@ -210,8 +210,14 @@ public class PasswdFileUri implements Parcelable
             file.setStorage(new PasswdFileSyncStorage(itsUri, id, null));
             return file;
         }
-        case EMAIL:
         case GENERIC_PROVIDER: {
+            PwsFile file = PwsFileFactory.newFile();
+            file.setPassphrase(passwd);
+            String id = getIdentifier(context, false);
+            file.setStorage(new PasswdFileGenProviderStorage(itsUri, id, null));
+            return file;
+        }
+        case EMAIL: {
             throw new IOException("no file");
         }
         }
