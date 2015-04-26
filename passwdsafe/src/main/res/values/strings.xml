@@ -21,6 +21,7 @@
     <string name="clear">Clear</string>
     <string name="clear_clipboard_on_close">Clear clipboard on close</string>
     <string name="clear_password_notifications">Clear password notifications</string>
+    <string name="clear_recent">Clear Recent</string>
     <string name="close_file_screen_off">Close file on screen off</string>
     <string name="confirm">Confirm</string>
     <string name="confirm_label">Confirm:</string>
