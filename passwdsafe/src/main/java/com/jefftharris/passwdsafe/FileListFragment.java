@@ -48,7 +48,7 @@ import com.jefftharris.passwdsafe.util.FileComparator;
 /**
  * The FileListFragment allows the user to choose which file to open
  */
-public class FileListFragment extends ListFragment
+public final class FileListFragment extends ListFragment
         implements LoaderCallbacks<List<Map<String, Object>>>
 {
     /** Listener interface for the owning activity */
@@ -103,7 +103,7 @@ public class FileListFragment extends ListFragment
     private static final String MOD_DATE = "mod_date";
 
     private File itsDir;
-    private LinkedList<File> itsDirHistory = new LinkedList<File>();
+    private LinkedList<File> itsDirHistory = new LinkedList<>();
     private Listener itsListener;
 
     /* (non-Javadoc)
@@ -315,26 +315,17 @@ public class FileListFragment extends ListFragment
             public final boolean accept(File pathname) {
                 String filename = pathname.getName();
                 if (pathname.isDirectory()) {
-                    if (!showDirs) {
-                        return false;
-                    }
-                    if (!showHiddenFiles &&
-                        (filename.startsWith(".") ||
-                         filename.equalsIgnoreCase("LOST.DIR"))) {
-                        return false;
-                    }
-                    return true;
+                    return showDirs &&
+                            (showHiddenFiles ||
+                             !(filename.startsWith(".") ||
+                               filename.equalsIgnoreCase("LOST.DIR")));
                 }
-                if (filename.endsWith(".psafe3") || filename.endsWith(".dat")) {
-                    return true;
-                }
-                if (showHiddenFiles &&
-                    (filename.endsWith(".psafe3~") ||
-                     filename.endsWith(".dat~") ||
-                     filename.endsWith(".ibak"))) {
-                    return true;
-                }
-                return false;
+                return filename.endsWith(".psafe3") ||
+                        filename.endsWith(".dat") ||
+                        (showHiddenFiles &&
+                                (filename.endsWith(".psafe3~") ||
+                                 filename.endsWith(".dat~") ||
+                                 filename.endsWith(".ibak")));
             }
         });
 
@@ -353,7 +344,7 @@ public class FileListFragment extends ListFragment
     }
 
     /** Show the files in the current directory */
-    private final void showFiles()
+    private void showFiles()
     {
         String state = Environment.getExternalStorageState();
         if (!Environment.MEDIA_MOUNTED.equals(state) &&
@@ -368,7 +359,7 @@ public class FileListFragment extends ListFragment
     }
 
     /** Update files after the loader is complete */
-    private final void updateFiles(List<Map<String, Object>> fileData)
+    private void updateFiles(List<Map<String, Object>> fileData)
     {
         SimpleAdapter adapter = null;
         if (fileData != null) {
@@ -443,7 +434,7 @@ public class FileListFragment extends ListFragment
 
 
     /** Open the given file */
-    private final void openFile(File file)
+    private void openFile(File file)
     {
         if (file == null) {
             itsListener.openFile(null, null);
@@ -454,7 +445,7 @@ public class FileListFragment extends ListFragment
 
 
     /** Handle the action to navigate to the parent directory */
-    private final void doParentPressed()
+    private void doParentPressed()
     {
         PasswdSafeUtil.dbginfo(TAG, "doParentPressed");
         if (itsDir != null) {
@@ -467,7 +458,7 @@ public class FileListFragment extends ListFragment
 
 
     /** Handle the action to navigate to the home directory */
-    private final void doHomePressed()
+    private void doHomePressed()
     {
         changeDir(Environment.getExternalStorageDirectory(), true);
     }
@@ -485,7 +476,7 @@ public class FileListFragment extends ListFragment
 
 
     /** Change to the given directory */
-    private final void changeDir(File newDir, boolean saveHistory)
+    private void changeDir(File newDir, boolean saveHistory)
     {
         if (saveHistory && (itsDir != null)) {
             itsDirHistory.addFirst(itsDir);
@@ -497,7 +488,7 @@ public class FileListFragment extends ListFragment
 
 
     /** Get the directory for listing files */
-    private final File getFileDir()
+    private File getFileDir()
     {
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -506,7 +497,7 @@ public class FileListFragment extends ListFragment
 
 
     /** Set the directory for listing files */
-    private final void setFileDir(File dir)
+    private void setFileDir(File dir)
     {
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -559,8 +550,7 @@ public class FileListFragment extends ListFragment
             }
 
             FileData[] data = getFiles(itsDir, getContext());
-            List<Map<String, Object>> fileData =
-                new ArrayList<Map<String, Object>>(data.length);
+            List<Map<String, Object>> fileData = new ArrayList<>(data.length);
 
             if (itsIncludeNone) {
                 fileData.add(createItem(new FileData(getContext())));
@@ -573,9 +563,9 @@ public class FileListFragment extends ListFragment
         }
 
         /** Create an adapter map for the file */
-        private final Map<String, Object> createItem(FileData file)
+        private Map<String, Object> createItem(FileData file)
         {
-            HashMap<String, Object> item = new HashMap<String, Object>(3);
+            HashMap<String, Object> item = new HashMap<>(3);
             item.put(TITLE, file);
 
             int icon;
