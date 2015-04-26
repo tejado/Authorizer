@@ -320,17 +320,17 @@
     </string>
 
     <plurals name="expiring_passwords">
-        <item quantity="one">Un mot de passe expire</item>
+        <item quantity="one">%1$d mot de passe expire</item>
         <item quantity="other">%1$d mots de passe expirent</item>
     </plurals>
 
     <plurals name="group_items">
-        <item quantity="one">[Une entrée]</item>
+        <item quantity="one">[%d entrée]</item>
         <item quantity="other">[%d entrées]</item>
     </plurals>
 
     <plurals name="interval_days">
-        <item quantity="one">Quotidien</item>
+        <item quantity="one">%d jour</item>
         <item quantity="other">%d jours</item>
     </plurals>
 
