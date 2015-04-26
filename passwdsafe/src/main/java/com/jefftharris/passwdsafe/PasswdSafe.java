@@ -16,6 +16,7 @@ import java.util.Map;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.file.PwsRecord;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -435,6 +436,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case DIALOG_DETAILS:
         {
             LayoutInflater factory = LayoutInflater.from(this);
+            @SuppressLint("InflateParams")
             View detailsView = factory.inflate(R.layout.file_details, null);
             AlertDialog.Builder alert = new AlertDialog.Builder(this)
                 .setTitle(getUriName(true))
@@ -452,6 +454,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case DIALOG_CHANGE_PASSWD:
         {
             LayoutInflater factory = LayoutInflater.from(this);
+            @SuppressLint("InflateParams")
             View passwdView = factory.inflate(R.layout.change_passwd, null);
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
@@ -491,6 +494,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case DIALOG_FILE_NEW:
         {
             LayoutInflater factory = LayoutInflater.from(this);
+            @SuppressLint("InflateParams")
             final View fileNewView = factory.inflate(R.layout.file_new, null);
             final TextView fileNameView =
                 (TextView)fileNewView.findViewById(R.id.file_name);
