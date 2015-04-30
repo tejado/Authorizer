@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.TabActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 public class AbstractRecordTabActivity extends TabActivity implements
                 PasswdFileActivity
@@ -100,7 +101,7 @@ public class AbstractRecordTabActivity extends TabActivity implements
      * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
      */
     @Override
-    protected void onSaveInstanceState(Bundle outState)
+    protected void onSaveInstanceState(@NonNull Bundle outState)
     {
         itsHelper.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
