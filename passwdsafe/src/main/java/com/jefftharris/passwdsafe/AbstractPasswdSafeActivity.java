@@ -35,6 +35,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -181,7 +182,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
      * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
      */
     @Override
-    protected void onSaveInstanceState(Bundle outState)
+    protected void onSaveInstanceState(@NonNull Bundle outState)
     {
         super.onSaveInstanceState(outState);
         outState.putParcelable(BUNDLE_FILTER_QUERY,

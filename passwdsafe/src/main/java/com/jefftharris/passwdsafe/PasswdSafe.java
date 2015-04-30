@@ -202,7 +202,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
      * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
      */
     @Override
-    protected void onSaveInstanceState(Bundle outState)
+    protected void onSaveInstanceState(@NonNull Bundle outState)
     {
         doRemoveDialog(DIALOG_GET_PASSWD);
         doRemoveDialog(DIALOG_PROGRESS);

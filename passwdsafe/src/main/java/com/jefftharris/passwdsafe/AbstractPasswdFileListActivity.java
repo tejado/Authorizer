@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 public abstract class AbstractPasswdFileListActivity extends ListActivity
     implements PasswdFileActivity
@@ -47,7 +48,7 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
      * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
      */
     @Override
-    protected void onSaveInstanceState(Bundle outState)
+    protected void onSaveInstanceState(@NonNull Bundle outState)
     {
         super.onSaveInstanceState(outState);
         outState.putParcelable(SAVED_URI, itsUri);
@@ -160,20 +161,16 @@ public abstract class AbstractPasswdFileListActivity extends ListActivity
     @Override
     protected Dialog onCreateDialog(int id)
     {
-        Dialog dialog = null;
         switch (id) {
         case DIALOG_SAVE_PROGRESS:
         {
-            dialog = itsPasswdFile.createProgressDialog();
-            break;
+            return itsPasswdFile.createProgressDialog();
         }
         default:
         {
-            dialog = super.onCreateDialog(id);
-            break;
+            return super.onCreateDialog(id);
         }
         }
-        return dialog;
     }
 
 
