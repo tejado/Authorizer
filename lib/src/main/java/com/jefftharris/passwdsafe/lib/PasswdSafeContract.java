@@ -103,7 +103,7 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_DISPLAY_NAME = 4;
 
         /** Get the provider's display name */
-        public static final String getDisplayName(Cursor cursor)
+        public static String getDisplayName(Cursor cursor)
         {
             String displayName = null;
             if (cursor.getColumnCount() > PROJECTION_IDX_DISPLAY_NAME) {
@@ -116,13 +116,13 @@ public final class PasswdSafeContract
         }
 
         /** Get the provider id from the URI */
-        public static final long getId(Uri uri)
+        public static long getId(Uri uri)
         {
             return Long.valueOf(getIdStr(uri));
         }
 
         /** Get the provider id string from the URI */
-        public static final String getIdStr(Uri uri)
+        public static String getIdStr(Uri uri)
         {
             return uri.getPathSegments().get(1);
         }
@@ -157,21 +157,21 @@ public final class PasswdSafeContract
             Files.COL_FOLDER
         };
 
-        public static final int PROJECTION_IDX_ID = 0;
-        public static final int PROJECTION_IDX_PROVIDER = 1;
+        //public static final int PROJECTION_IDX_ID = 0;
+        //public static final int PROJECTION_IDX_PROVIDER = 1;
         public static final int PROJECTION_IDX_TITLE = 2;
         public static final int PROJECTION_IDX_MOD_DATE = 3;
-        public static final int PROJECTION_IDX_FILE = 4;
+        //public static final int PROJECTION_IDX_FILE = 4;
         public static final int PROJECTION_IDX_FOLDER = 5;
 
         /** Get the file id from the URI */
-        public static final long getId(Uri uri)
+        public static long getId(Uri uri)
         {
             return Long.valueOf(getIdStr(uri));
         }
 
         /** Get the file id string from the URI */
-        public static final String getIdStr(Uri uri)
+        public static String getIdStr(Uri uri)
         {
             return uri.getPathSegments().get(3);
         }
@@ -200,13 +200,13 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_REMOTE_ID = 1;
 
         /** Get the file id from the URI */
-        public static final long getId(Uri uri)
+        public static long getId(Uri uri)
         {
             return Long.valueOf(getIdStr(uri));
         }
 
         /** Get the file id string from the URI */
-        public static final String getIdStr(Uri uri)
+        public static String getIdStr(Uri uri)
         {
             return uri.getPathSegments().get(3);
         }
@@ -220,8 +220,8 @@ public final class PasswdSafeContract
                 Uri.withAppendedPath(PasswdSafeContract.CONTENT_URI, TABLE);
         public static final String CONTENT_TYPE =
                 "vnd.android.cursor.dir/vnd." + AUTHORITY + "." + TABLE;
-        public static final String CONTENT_ITEM_TYPE =
-                "vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE;
+        //public static final String CONTENT_ITEM_TYPE =
+        //"vnd.android.cursor.item/vnd." + AUTHORITY + "." + TABLE;
 
         public static final String COL_ACCT = "acct";
         public static final String COL_START = "start";
@@ -241,7 +241,7 @@ public final class PasswdSafeContract
             SyncLogs.COL_LOG
         };
 
-        public static final int PROJECTION_IDX_ID = 0;
+        //public static final int PROJECTION_IDX_ID = 0;
         public static final int PROJECTION_IDX_ACCT = 1;
         public static final int PROJECTION_IDX_START = 2;
         public static final int PROJECTION_IDX_END = 3;
