@@ -15,6 +15,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -44,7 +45,8 @@ public class AboutDialog extends DialogFragment
      */
     @SuppressLint("InflateParams")
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState)
+    public @NonNull
+    Dialog onCreateDialog(Bundle savedInstanceState)
     {
         Activity act = getActivity();
         LayoutInflater factory = LayoutInflater.from(act);
