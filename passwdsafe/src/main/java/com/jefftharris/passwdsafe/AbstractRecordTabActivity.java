@@ -73,7 +73,7 @@ public class AbstractRecordTabActivity extends TabActivity implements
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        itsHelper.onCreate(savedInstanceState);
+        itsHelper.onCreate();
         ApiCompat.setRecentAppsVisible(getWindow(), false);
     }
 
@@ -103,7 +103,7 @@ public class AbstractRecordTabActivity extends TabActivity implements
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState)
     {
-        itsHelper.onSaveInstanceState(outState);
+        itsHelper.onSaveInstanceState();
         super.onSaveInstanceState(outState);
     }
 
