@@ -25,6 +25,7 @@ import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -210,7 +211,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
      * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
      */
     @Override
-    protected void onSaveInstanceState(Bundle outState)
+    protected void onSaveInstanceState(@NonNull Bundle outState)
     {
         super.onSaveInstanceState(outState);
         outState.putString(SAVE_SEL_POLICY, itsSelPolicyName);
