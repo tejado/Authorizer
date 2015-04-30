@@ -14,7 +14,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.os.Bundle;
 
 public class RecordActivityHelper implements PasswdFileActivity
 {
@@ -71,7 +70,7 @@ public class RecordActivityHelper implements PasswdFileActivity
         return itsPasswdFile;
     }
 
-    public void onCreate(Bundle savedInstanceState)
+    public void onCreate()
     {
         Intent intent = itsActivity.getIntent();
         PasswdSafeUtil.dbginfo(TAG, "onCreate intent: %s", intent);
@@ -113,7 +112,7 @@ public class RecordActivityHelper implements PasswdFileActivity
         }
     }
 
-    public void onSaveInstanceState(Bundle outState)
+    public void onSaveInstanceState()
     {
         itsActivity.removeDialog(DIALOG_PROGRESS);
     }

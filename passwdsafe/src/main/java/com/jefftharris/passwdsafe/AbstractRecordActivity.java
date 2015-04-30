@@ -85,7 +85,7 @@ public abstract class AbstractRecordActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        itsHelper.onCreate(savedInstanceState);
+        itsHelper.onCreate();
         ApiCompat.setRecentAppsVisible(getWindow(), false);
     }
 
@@ -115,7 +115,7 @@ public abstract class AbstractRecordActivity extends Activity
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState)
     {
-        itsHelper.onSaveInstanceState(outState);
+        itsHelper.onSaveInstanceState();
         super.onSaveInstanceState(outState);
     }
 
