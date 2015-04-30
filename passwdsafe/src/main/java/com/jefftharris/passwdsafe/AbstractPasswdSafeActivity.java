@@ -91,11 +91,11 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected int itsNumExpired = 0;
 
     protected final ArrayList<HashMap<String, Object>> itsListData =
-        new ArrayList<HashMap<String, Object>>();
+            new ArrayList<>();
 
     private PasswdRecordFilter itsFilter = null;
 
-    private final ArrayList<String> itsCurrGroups = new ArrayList<String>();
+    private final ArrayList<String> itsCurrGroups = new ArrayList<>();
 
     /** Called when the activity is first created. */
     @Override
@@ -278,7 +278,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, @NonNull KeyEvent event)  {
         if (GuiUtils.isBackKeyDown(keyCode, event)) {
             // Take care of calling this method on earlier versions of
             // the platform where it doesn't exist.
@@ -393,7 +393,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     }
 
 
-    private final void populateFileData(int mod)
+    private void populateFileData(int mod)
     {
         itsListData.clear();
         PasswdFileData fileData;
@@ -429,7 +429,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         Map<String, GroupNode> entryGroups = itsCurrGroupNode.getGroups();
         if (entryGroups != null) {
             for(Map.Entry<String, GroupNode> entry : entryGroups.entrySet()) {
-                HashMap<String, Object> recInfo = new HashMap<String, Object>();
+                HashMap<String, Object> recInfo = new HashMap<>();
                 recInfo.put(TITLE, entry.getKey());
                 recInfo.put(ICON,R.drawable.folder_rev);
 
@@ -456,7 +456,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
 
     /** Populate the contents of the root node from the file data */
-    private final void populateRootNode(PasswdFileData fileData)
+    private void populateRootNode(PasswdFileData fileData)
     {
         PasswdSafeUtil.dbginfo(TAG, "populateRootNode");
         itsRootNode = new GroupNode();
@@ -523,10 +523,10 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     }
 
 
-    private static final HashMap<String, Object>
+    private static HashMap<String, Object>
     createRecInfo(MatchPwsRecord rec, PasswdFileData fileData)
     {
-        HashMap<String, Object> recInfo = new HashMap<String, Object>();
+        HashMap<String, Object> recInfo = new HashMap<>();
         String title = fileData.getTitle(rec.itsRecord);
         if (title == null) {
             title = "Untitled";
@@ -567,6 +567,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                 }
                 queryPattern = Pattern.compile(query, flags);
             } catch(PatternSyntaxException e) {
+                PasswdSafeUtil.dbginfo(TAG, e, "Invalid query regex");
             }
         }
         if ((queryPattern != null) ||
@@ -591,8 +592,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     }
 
     /** Set the record filter */
-    private final void setPasswdRecordFilter(PasswdRecordFilter filter,
-                                             boolean init)
+    private void setPasswdRecordFilter(PasswdRecordFilter filter, boolean init)
     {
         itsFilter = filter;
         View panel = findViewById(R.id.query_panel);
@@ -612,12 +612,9 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
 
 
     /** Does the record filter have a search query */
-    private final boolean hasFilterSearchQuery()
+    private boolean hasFilterSearchQuery()
     {
-        if (itsFilter == null) {
-            return false;
-        }
-        return itsFilter.hasSearchQuery();
+        return (itsFilter != null) && itsFilter.hasSearchQuery();
     }
 
 
@@ -626,7 +623,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
      * @return A non-null string if the record matches the filter; null if it
      * does not
      */
-    private final String filterRecord(PwsRecord rec, PasswdFileData fileData)
+    private String filterRecord(PwsRecord rec, PasswdFileData fileData)
     {
         if (itsFilter == null) {
             return PasswdRecordFilter.QUERY_MATCH;
@@ -639,7 +636,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
      * @return true if a group was popped or filter removed, false to use
      *         default behavior
      */
-    private final boolean doBackPressed()
+    private boolean doBackPressed()
     {
         PasswdSafeUtil.dbginfo(TAG, "doBackPressed");
         int size = itsCurrGroups.size();
@@ -685,9 +682,9 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             return rc;
         }
 
-        private final int compareField(HashMap<String, Object> arg0,
-                                       HashMap<String, Object> arg1,
-                                       String field)
+        private int compareField(HashMap<String, Object> arg0,
+                                 HashMap<String, Object> arg1,
+                                 String field)
         {
             Object obj0 = arg0.get(field);
             Object obj1 = arg1.get(field);
@@ -746,7 +743,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         public final void addRecord(MatchPwsRecord rec)
         {
             if (itsRecords == null) {
-                itsRecords = new ArrayList<MatchPwsRecord>();
+                itsRecords = new ArrayList<>();
             }
             itsRecords.add(rec);
         }
@@ -760,7 +757,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                                    Comparator<String> groupComp)
         {
             if (itsGroups == null) {
-                itsGroups = new TreeMap<String, GroupNode>(groupComp);
+                itsGroups = new TreeMap<>(groupComp);
             }
             itsGroups.put(name, node);
         }
@@ -823,7 +820,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                                   boolean caseSensitive)
         {
             super(context, data, resource, from, to);
-            ArrayList<Section> sections = new ArrayList<Section>();
+            ArrayList<Section> sections = new ArrayList<>();
             char compChar = '\0';
             char first;
             char compFirst;
