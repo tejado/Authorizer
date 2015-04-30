@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.Html;
@@ -50,7 +51,7 @@ public class ReleaseNotesDialog extends DialogFragment
      * @see android.support.v4.app.DialogFragment#onCreateDialog(android.os.Bundle)
      */
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState)
+    public @NonNull Dialog onCreateDialog(Bundle savedInstanceState)
     {
         Activity act = getActivity();
         String notes = getString(R.string.release_notes);
