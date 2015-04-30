@@ -122,7 +122,6 @@ public class Preferences extends PreferenceActivity
     public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
 
     public static final String INTENT_SCREEN = "screen";
-    public static final String SCREEN_PASSWORD_OPTIONS = "passwordOptions";
 
     private static final String TAG = "Preferences";
 
@@ -440,8 +439,8 @@ public class Preferences extends PreferenceActivity
         onSharedPreferenceChanged(prefs, PREF_FILE_BACKUP);
 
         itsPasswdEncPref = (ListPreference)findPreference(PREF_PASSWD_ENC);
-        String[] charsets =
-            PwsFile.ALL_PASSWORD_CHARSETS.toArray(new String[0]);
+        String[] charsets =  PwsFile.ALL_PASSWORD_CHARSETS.toArray(
+                new String[PwsFile.ALL_PASSWORD_CHARSETS.size()]);
         itsPasswdEncPref.setEntries(charsets);
         itsPasswdEncPref.setEntryValues(charsets);
         itsPasswdEncPref.setDefaultValue(PREF_PASSWD_ENC_DEF);
@@ -504,7 +503,8 @@ public class Preferences extends PreferenceActivity
      */
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
-        if (key.equals(PREF_FILE_DIR)) {
+        switch (key) {
+        case PREF_FILE_DIR: {
             File pref = getFileDirPref(prefs);
             if (pref.toString().length() == 0) {
                 pref = new File(PREF_FILE_DIR_DEF);
@@ -515,26 +515,44 @@ public class Preferences extends PreferenceActivity
                 itsFileDirPref.setText(pref.toString());
             }
             itsFileDirPref.setSummary(pref.toString());
-        } else if (key.equals(PREF_DEF_FILE)) {
+            break;
+        }
+        case PREF_DEF_FILE: {
             new DefaultFileResolver().execute(getDefFilePref(prefs));
-        } else if (key.equals(PREF_FILE_CLOSE_TIMEOUT)) {
+            break;
+        }
+        case PREF_FILE_CLOSE_TIMEOUT: {
             itsFileClosePref.setSummary(
-                getFileCloseTimeoutPref(prefs).getDisplayName(getResources()));
-        } else if (key.equals(PREF_FILE_BACKUP)) {
+                    getFileCloseTimeoutPref(prefs).getDisplayName(
+                            getResources()));
+            break;
+        }
+        case PREF_FILE_BACKUP: {
             itsFileBackupPref.setSummary(
-                getFileBackupPref(prefs).getDisplayName(getResources()));
-        } else if (key.equals(PREF_PASSWD_ENC)) {
+                    getFileBackupPref(prefs).getDisplayName(getResources()));
+            break;
+        }
+        case PREF_PASSWD_ENC: {
             itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
-        } else if (key.equals(PREF_PASSWD_EXPIRY_NOTIF)) {
+            break;
+        }
+        case PREF_PASSWD_EXPIRY_NOTIF: {
             itsPasswdExpiryNotifPref.setSummary(
-               getPasswdExpiryNotifPref(prefs).getDisplayName(getResources()));
-        } else if (key.equals(PREF_PASSWD_DEFAULT_SYMS)) {
+                    getPasswdExpiryNotifPref(prefs).getDisplayName(
+                            getResources()));
+            break;
+        }
+        case PREF_PASSWD_DEFAULT_SYMS: {
             String val = getPasswdDefaultSymbolsPref(prefs);
             itsPasswdDefaultSymsPref.setSummary(
-                getString(R.string.symbols_used_by_default, val));
-        } else if (key.equals(PREF_FONT_SIZE)) {
+                    getString(R.string.symbols_used_by_default, val));
+            break;
+        }
+        case PREF_FONT_SIZE: {
             itsFontSizePref.setSummary(
-                getFontSizePref(prefs).getDisplayName(getResources()));
+                    getFontSizePref(prefs).getDisplayName(getResources()));
+            break;
+        }
         }
     }
 
