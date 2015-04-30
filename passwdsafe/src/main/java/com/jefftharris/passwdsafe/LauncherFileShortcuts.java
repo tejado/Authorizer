@@ -43,8 +43,8 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
 
         // Remove the extra padding for tablets when used as a dialog style
         View root = findViewById(R.id.content);
-        int topPad = root.getPaddingTop();
-        root.setPadding(topPad, topPad, topPad, topPad);
+        int pad = root.getPaddingTop();
+        root.setPadding(pad, pad, pad, pad);
     }
 
 
