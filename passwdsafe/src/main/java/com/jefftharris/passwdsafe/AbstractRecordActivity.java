@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
@@ -112,7 +113,7 @@ public abstract class AbstractRecordActivity extends Activity
      * @see android.app.Activity#onSaveInstanceState(android.os.Bundle)
      */
     @Override
-    protected void onSaveInstanceState(Bundle outState)
+    protected void onSaveInstanceState(@NonNull Bundle outState)
     {
         itsHelper.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
