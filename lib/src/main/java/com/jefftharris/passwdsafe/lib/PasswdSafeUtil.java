@@ -88,13 +88,13 @@ public class PasswdSafeUtil
     }
 
     /** Get the app title */
-    public static final String getAppTitle(Context ctx)
+    public static String getAppTitle(Context ctx)
     {
         return ctx.getString(R.string.app_name);
     }
 
     /** Get the app's version */
-    public static final String getAppVersion(Context ctx)
+    public static String getAppVersion(Context ctx)
     {
         PackageInfo info = getAppPackageInfo(ctx);
         if (info != null) {
@@ -104,7 +104,7 @@ public class PasswdSafeUtil
     }
 
     /** Get the package info for the app */
-    public static final PackageInfo getAppPackageInfo(Context ctx)
+    public static PackageInfo getAppPackageInfo(Context ctx)
     {
         try {
             PackageManager pkgMgr = ctx.getPackageManager();
