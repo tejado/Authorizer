@@ -24,7 +24,7 @@ public class PasswdExpiration
         INTERVAL    (2);
 
         /** Constructor */
-        private Type(int strIdx)
+        Type(int strIdx)
         {
             itsStrIdx = strIdx;
         }
