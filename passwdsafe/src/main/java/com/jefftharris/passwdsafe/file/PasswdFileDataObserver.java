@@ -13,5 +13,5 @@ package com.jefftharris.passwdsafe.file;
 public interface PasswdFileDataObserver
 {
     /** Notification that the password file has changed */
-    public void passwdFileDataChanged(PasswdFileData fileData);
+    void passwdFileDataChanged(PasswdFileData fileData);
 }
