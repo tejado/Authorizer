@@ -62,7 +62,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
 
         public final int itsSortOrder;
 
-        private Location(int sortOrder)
+        Location(int sortOrder)
         {
             itsSortOrder = sortOrder;
         }
@@ -93,7 +93,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         PRONOUNCEABLE   (2),
         HEXADECIMAL     (3);
 
-        private Type(int strIdx)
+        Type(int strIdx)
         {
             itsStrIdx = strIdx;
         }
