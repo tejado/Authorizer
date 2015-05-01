@@ -48,7 +48,7 @@ public final class PasswdRecordFilter implements Parcelable
         private final int itsExpireRecordsIdx;
 
         /** Constructor */
-        private ExpiryFilter(int expireRecordsIdx)
+        ExpiryFilter(int expireRecordsIdx)
         {
             itsExpireRecordsIdx = expireRecordsIdx;
         }
