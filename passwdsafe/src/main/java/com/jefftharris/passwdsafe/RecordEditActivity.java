@@ -35,6 +35,7 @@ import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -42,6 +43,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -92,10 +94,10 @@ public class RecordEditActivity extends AbstractRecordActivity
     /** Insert intent extra field for the group of the new record */
     public static final String INSERT_INTENT_EXTRA_GROUP = "group";
 
-    private TreeSet<String> itsGroups =
-        new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+    private final TreeSet<String> itsGroups =
+            new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     private String itsPrevGroup;
-    private HashSet<V3Key> itsRecordKeys = new HashSet<V3Key>();
+    private final HashSet<V3Key> itsRecordKeys = new HashSet<>();
     private DialogValidator itsValidator;
     private PasswdPolicyEditDialog itsPolicyEditDialog;
     private List<PasswdPolicy> itsPolicies;
@@ -111,7 +113,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     private boolean itsTypeHasDetails = true;
     private PasswdRecord.Type itsOrigType = Type.NORMAL;
     private PwsRecord itsLinkRef = null;
-    private ArrayList<View> itsProtectViews = new ArrayList<View>();
+    private final ArrayList<View> itsProtectViews = new ArrayList<>();
     private boolean itsIsProtected = false;
 
     // Constants must match record_type strings
@@ -143,7 +145,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsIsV3 = fileData.isV3();
         itsIsProtected = false;
         PasswdRecord passwdRecord = null;
-        String group = null;
+        String group;
         String uuid = getUUID();
         CheckBox protCb = (CheckBox)findViewById(R.id.protected_record);
         if (uuid != null) {
@@ -199,7 +201,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         initTypeAndPassword(fileData, passwdRecord);
         initGroup(fileData, passwdRecord, group);
         initPasswdPolicy(fileData, passwdRecord);
-        initPasswdExpiry(fileData, passwdRecord);
+        initPasswdExpiry(passwdRecord);
 
         if (itsIsV3) {
             TextView tv = (TextView)findViewById(R.id.history_max_size);
@@ -336,11 +338,12 @@ public class RecordEditActivity extends AbstractRecordActivity
     @Override
     protected Dialog onCreateDialog(int id)
     {
-        Dialog dialog = null;
+        Dialog dialog;
         switch (id) {
         case DIALOG_NEW_GROUP:
         {
             LayoutInflater factory = LayoutInflater.from(this);
+            @SuppressLint("InflateParams")
             final View view = factory.inflate(R.layout.new_group, null);
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()
@@ -430,7 +433,7 @@ public class RecordEditActivity extends AbstractRecordActivity
      * @see android.app.Activity#onPrepareDialog(int, android.app.Dialog)
      */
     @Override
-    protected void onPrepareDialog(int id, Dialog dialog)
+    protected void onPrepareDialog(int id, @NonNull Dialog dialog)
     {
         switch (id) {
         case DIALOG_EDIT_POLICY: {
@@ -605,8 +608,8 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
 
-    private final void initTypeAndPassword(PasswdFileData fileData,
-                                           PasswdRecord record)
+    private void initTypeAndPassword(PasswdFileData fileData,
+                                     PasswdRecord record)
     {
         itsOrigType = Type.NORMAL;
         PwsRecord linkRef = null;
@@ -706,7 +709,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         setLinkRef(linkRef, fileData);
     }
 
-    private final void setType(PasswdRecord.Type type, boolean init)
+    private void setType(PasswdRecord.Type type, boolean init)
     {
         if ((type == itsType) && !init) {
             return;
@@ -802,17 +805,17 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsValidator.validate();
     }
 
-    private final void setPasswordVisibility(boolean visible,
-                                             TextView passwdField,
-                                             TextView confirmField,
-                                             TextView currentField)
+    private void setPasswordVisibility(boolean visible,
+                                       TextView passwdField,
+                                       TextView confirmField,
+                                       TextView currentField)
     {
         GuiUtils.setPasswordVisible(passwdField, visible);
         GuiUtils.setPasswordVisible(confirmField, visible);
         GuiUtils.setPasswordVisible(currentField, visible);
     }
 
-    private final void generatePassword()
+    private void generatePassword()
     {
         if (itsCurrPolicy != null) {
             try {
@@ -824,7 +827,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
     }
 
-    private final void setPassword(String passwd)
+    private void setPassword(String passwd)
     {
         TextView passwdField = (TextView)findViewById(R.id.password);
         TextView confirmField = (TextView)findViewById(R.id.password_confirm);
@@ -834,9 +837,9 @@ public class RecordEditActivity extends AbstractRecordActivity
         setPasswordVisibility(true, passwdField, confirmField, currentField);
     }
 
-    private final void initGroup(PasswdFileData fileData,
-                                 PasswdRecord editRecord,
-	    			 String group)
+    private void initGroup(PasswdFileData fileData,
+                           PasswdRecord editRecord,
+                           String group)
     {
         PwsRecord editRec =
             (editRecord != null) ? editRecord.getRecord() : null;
@@ -877,7 +880,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         });
     }
 
-    private final void setGroup(String newGroup)
+    private void setGroup(String newGroup)
     {
         if ((newGroup != null) && (newGroup.length() != 0)) {
             itsGroups.add(newGroup);
@@ -887,10 +890,9 @@ public class RecordEditActivity extends AbstractRecordActivity
         itsValidator.validate();
     }
 
-    private final void updateGroups(String selGroup)
+    private void updateGroups(String selGroup)
     {
-        ArrayList<String> groupList =
-            new ArrayList<String>(itsGroups.size() + 2);
+        ArrayList<String> groupList = new ArrayList<>(itsGroups.size() + 2);
         groupList.add("");
         int pos = 1;
         int groupPos = 0;
@@ -910,15 +912,14 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /** Initialize the password policy */
-    private final void initPasswdPolicy(PasswdFileData fileData,
-                                        PasswdRecord record)
+    private void initPasswdPolicy(PasswdFileData fileData, PasswdRecord record)
     {
         itsOrigPolicy = null;
         if (record != null) {
             itsOrigPolicy = record.getPasswdPolicy();
         }
 
-        itsPolicies = new ArrayList<PasswdPolicy>();
+        itsPolicies = new ArrayList<>();
         PasswdPolicy defPolicy = getPasswdSafeApp().getDefaultPasswdPolicy();
         itsPolicies.add(defPolicy);
         HeaderPasswdPolicies hdrPolicies =
@@ -972,12 +973,16 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
         });
 
-        PasswdPolicy selPolicy = null;
+        PasswdPolicy selPolicy;
         if (itsOrigPolicy != null) {
             if (itsOrigPolicy.getLocation() ==
-                PasswdPolicy.Location.RECORD_NAME) {
-                selPolicy =
-                    hdrPolicies.getPasswdPolicy(itsOrigPolicy.getName());
+                    PasswdPolicy.Location.RECORD_NAME) {
+                if (hdrPolicies != null) {
+                    selPolicy = hdrPolicies.getPasswdPolicy(
+                            itsOrigPolicy.getName());
+                } else {
+                    selPolicy = null;
+                }
             } else {
                 selPolicy = customPolicy;
             }
@@ -989,7 +994,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /** Update the password policies */
-    private final void updatePasswdPolicies(PasswdPolicy selPolicy)
+    private void updatePasswdPolicies(PasswdPolicy selPolicy)
     {
         Collections.sort(itsPolicies);
         Spinner spin = setSpinnerItems(R.id.policy, itsPolicies);
@@ -1003,7 +1008,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /** Select a password policy */
-    private final void selectPolicy(PasswdPolicy policy)
+    private void selectPolicy(PasswdPolicy policy)
     {
         itsCurrPolicy = policy;
         PasswdPolicyView view =
@@ -1017,8 +1022,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /** Initialize password expiration fields */
-    private final void initPasswdExpiry(PasswdFileData fileData,
-                                        PasswdRecord passwdRecord)
+    private void initPasswdExpiry(PasswdRecord passwdRecord)
     {
         if (!itsIsV3) {
             setVisibility(R.id.expire_sep, false);
@@ -1104,7 +1108,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /** Update fields based on the password expiration choice changing */
-    private final void updatePasswdExpiryChoice(PasswdExpiration.Type type)
+    private void updatePasswdExpiryChoice(PasswdExpiration.Type type)
     {
         itsExpiryType = type;
         setVisibility(R.id.expire_date_fields,
@@ -1115,7 +1119,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /** Update fields after the password expiration date changes */
-    private final void updatePasswdExpiryDate()
+    private void updatePasswdExpiryDate()
     {
         long expiryDate = itsExpiryDate.getTimeInMillis();
         setText(R.id.expire_date_time,
@@ -1128,7 +1132,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     /**
      * Update the view when the history changes
      */
-    private final void historyChanged(boolean updateMaxSize)
+    private void historyChanged(boolean updateMaxSize)
     {
         boolean historyExists = (itsHistory != null);
         int visibility = historyExists ? View.VISIBLE : View.GONE;
@@ -1170,7 +1174,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     /**
      * Update the UI when the protected state changes
      */
-    private final void updateProtected()
+    private void updateProtected()
     {
         for (View v: itsProtectViews) {
             v.setEnabled(!itsIsProtected);
@@ -1179,7 +1183,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         GuiUtils.invalidateOptionsMenu(this);
     }
 
-    private final void saveRecord()
+    private void saveRecord()
     {
         PasswdFileData fileData = getPasswdFile().getFileData();
         if (fileData == null) {
@@ -1188,7 +1192,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             return;
         }
 
-        PwsRecord record = null;
+        PwsRecord record;
         boolean newRecord = false;
         String uuid = getUUID();
         if (uuid != null) {
@@ -1285,7 +1289,7 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         // Update password after history so update is shown in new history
         String currPasswd = fileData.getPassword(record);
-        String newPasswd = null;
+        String newPasswd;
         if (itsTypeHasNormalPassword) {
             newPasswd = getUpdatedField(currPasswd, R.id.password);
             switch (itsOrigType) {
@@ -1339,7 +1343,7 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /** Get the password expiration that may have been updated */
-    private final Pair<Boolean, PasswdExpiration> getUpdatedExpiry()
+    private Pair<Boolean, PasswdExpiration> getUpdatedExpiry()
     {
         // Get the updated expiration
         PasswdExpiration updatedExpiry = null;
@@ -1393,7 +1397,7 @@ public class RecordEditActivity extends AbstractRecordActivity
                 break;
             }
 
-            if ((itsOrigExpiry == null) && (updatedExpiry == null)) {
+            if (itsOrigExpiry == null) {
                 break;
             }
 
@@ -1418,11 +1422,11 @@ public class RecordEditActivity extends AbstractRecordActivity
 
         } while(false);
 
-        return new Pair<Boolean, PasswdExpiration>(changed, updatedExpiry);
+        return new Pair<>(changed, updatedExpiry);
     }
 
     /** Get the password policy that may have been updated */
-    private final Pair<Boolean, PasswdPolicy> getUpdatedPolicy()
+    private Pair<Boolean, PasswdPolicy> getUpdatedPolicy()
     {
         PasswdPolicy.Location origLoc = PasswdPolicy.Location.DEFAULT;
         if (itsOrigPolicy != null) {
@@ -1484,22 +1488,22 @@ public class RecordEditActivity extends AbstractRecordActivity
             updatedPolicy = itsCurrPolicy;
         }
 
-        return new Pair<Boolean, PasswdPolicy>(policyChanged, updatedPolicy);
+        return new Pair<>(policyChanged, updatedPolicy);
     }
 
-    private final String getUpdatedField(String currStr, int viewId)
+    private String getUpdatedField(String currStr, int viewId)
     {
         return getUpdatedField(currStr,
                                GuiUtils.getTextViewStr(this, viewId));
     }
 
-    private final String getUpdatedSpinnerField(String currStr, int viewId)
+    private String getUpdatedSpinnerField(String currStr, int viewId)
     {
         return getUpdatedField(currStr,
                                GuiUtils.getSpinnerStr(this, viewId));
     }
 
-    private final String getUpdatedField(String currStr, String newStr)
+    private String getUpdatedField(String currStr, String newStr)
     {
         if (currStr == null) {
             currStr = "";
@@ -1512,13 +1516,13 @@ public class RecordEditActivity extends AbstractRecordActivity
         return newStr;
     }
 
-    private final int getHistMaxSize()
+    private int getHistMaxSize()
     {
         return getIntegerTextField(R.id.history_max_size, -1);
     }
 
     /** Get the value of a text field as an integer */
-    private final int getIntegerTextField(int fieldId, int defaultValue)
+    private int getIntegerTextField(int fieldId, int defaultValue)
     {
         String str = GuiUtils.getTextViewStr(this, fieldId);
         try {
@@ -1528,7 +1532,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
     }
 
-    private final boolean isPasswdHistoryUpdated(PasswdHistory currHistory)
+    private boolean isPasswdHistoryUpdated(PasswdHistory currHistory)
     {
         if (itsHistory != null) {
             CheckBox enabledCb = (CheckBox)findViewById(R.id.history_enabled);
@@ -1539,14 +1543,15 @@ public class RecordEditActivity extends AbstractRecordActivity
         if (((currHistory == null) && (itsHistory != null)) ||
             ((currHistory != null) && (itsHistory == null))) {
             return true;
-        } else if ((currHistory == null) && (itsHistory == null)) {
+        } else //noinspection SimplifiableIfStatement
+            if ((currHistory == null) && (itsHistory == null)) {
             return false;
         } else {
             return !itsHistory.equals(currHistory);
         }
     }
 
-    private final TextView setText(int id, String text)
+    private TextView setText(int id, String text)
     {
         TextView tv = (TextView)findViewById(id);
         if (text != null) {
@@ -1566,12 +1571,11 @@ public class RecordEditActivity extends AbstractRecordActivity
     }
 
     /** Set the items in a spinner */
-    private final Spinner setSpinnerItems(int id, List<?> items)
+    private Spinner setSpinnerItems(int id, List<?> items)
     {
         ArrayAdapter<Object> adapter =
-            new ArrayAdapter<Object>(this,
-                                     android.R.layout.simple_spinner_item,
-                                     Collections.unmodifiableList(items));
+            new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                               Collections.unmodifiableList(items));
         adapter.setDropDownViewResource(
             android.R.layout.simple_spinner_dropdown_item);
         Spinner s = (Spinner)findViewById(id);
@@ -1584,7 +1588,7 @@ public class RecordEditActivity extends AbstractRecordActivity
      * Initialize the list of views which are enabled based on whether the
      * record is protected
      */
-    private final void initProtViews(View v)
+    private void initProtViews(View v)
     {
         if (v.getId() == R.id.protected_record) {
             // Don't include the protected checkbox itself
@@ -1605,7 +1609,7 @@ public class RecordEditActivity extends AbstractRecordActivity
         }
     }
 
-    private final void setVisibility(int viewId, boolean visible)
+    private void setVisibility(int viewId, boolean visible)
     {
         View v = findViewById(viewId);
         v.setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -1703,9 +1707,9 @@ public class RecordEditActivity extends AbstractRecordActivity
 
     private static class V3Key
     {
-        private String itsTitle;
-        private String itsGroup;
-        private String itsUser;
+        private final String itsTitle;
+        private final String itsGroup;
+        private final String itsUser;
 
         public V3Key(String title, String group, String user)
         {
