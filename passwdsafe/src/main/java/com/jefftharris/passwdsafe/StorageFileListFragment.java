@@ -29,11 +29,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.DocumentsContractCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.Utils;
 
 import java.util.List;
 
@@ -106,9 +109,38 @@ public final class StorageFileListFragment extends ListFragment
     {
         super.onActivityCreated(savedInstanceState);
         itsFilesAdapter = new SimpleCursorAdapter(
-                getActivity(), android.R.layout.simple_list_item_1, null,
-                new String[] { RecentFilesDb.DB_COL_FILES_TITLE },
-                new int[] { android.R.id.text1 }, 0);
+                getActivity(), R.layout.file_list_item, null,
+                new String[] { RecentFilesDb.DB_COL_FILES_TITLE,
+                               RecentFilesDb.DB_COL_FILES_ID,
+                               RecentFilesDb.DB_COL_FILES_DATE },
+                new int[] { R.id.text, R.id.icon, R.id.mod_date }, 0);
+        itsFilesAdapter.setViewBinder(
+                new SimpleCursorAdapter.ViewBinder()
+                {
+                    @Override
+                    public boolean setViewValue(View view, Cursor cursor,
+                                                int columnIdx)
+                    {
+                        switch (view.getId()) {
+                        case R.id.text: {
+                            return false;
+                        }
+                        case R.id.icon: {
+                            ImageView iv = (ImageView)view;
+                            iv.setImageResource(R.drawable.login_rev);
+                            return true;
+                        }
+                        case R.id.mod_date: {
+                            TextView tv = (TextView)view;
+                            long date = cursor.getLong(
+                                    RecentFilesDb.QUERY_COL_DATE);
+                            tv.setText(Utils.formatDate(date, getActivity()));
+                            return true;
+                        }
+                        }
+                        return false;
+                    }
+                });
 
         setListAdapter(itsFilesAdapter);
 
