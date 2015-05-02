@@ -4,17 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
+    <TextView
+        style="@android:style/TextAppearance.Medium"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <Button
-            android:id="@+id/open"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Open File" />
-    </LinearLayout>
+        android:text="@string/recent_files"
+        />
 
     <View
         style="@style/Separator.Light"/>
@@ -33,7 +28,7 @@
         android:layout_height="fill_parent"
         android:layout_margin="3dp"
         android:layout_weight="1"
-        android:text="@string/no_files"
+        android:text="@string/no_files_select_to_open"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
