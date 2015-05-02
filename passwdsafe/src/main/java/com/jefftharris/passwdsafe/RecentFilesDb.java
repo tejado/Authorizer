@@ -34,11 +34,13 @@ public final class RecentFilesDb extends SQLiteOpenHelper
     public static final String DB_COL_FILES_DATE = "date";
 
     private static final String[] QUERY_COLUMNS = new String[] {
-            DB_COL_FILES_ID, DB_COL_FILES_TITLE, DB_COL_FILES_URI };
+            DB_COL_FILES_ID, DB_COL_FILES_TITLE,
+            DB_COL_FILES_URI, DB_COL_FILES_DATE };
 
     public static final int QUERY_COL_ID = 0;
     public static final int QUERY_COL_TITLE = 1;
     public static final int QUERY_COL_URI = 2;
+    public static final int QUERY_COL_DATE = 3;
 
     private static final int NUM_RECENT_FILES = 10;
 
