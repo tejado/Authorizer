@@ -48,10 +48,8 @@ public final class StorageFileListFragment extends ListFragment
 {
     // TODO: add new file to recent list
     // TODO: persistable uri permissions on new files and check when opening
-    // TODO: remove file support
     // TODO: recent sync files
     // TODO: fix sync files layout
-    // TODO: fix sync new file menu text
     // TODO: menu item setup between storage and sync items
     // TODO: recent files updates for inserted or deleted files
 
