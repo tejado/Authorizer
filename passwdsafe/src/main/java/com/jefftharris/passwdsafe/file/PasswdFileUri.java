@@ -125,7 +125,7 @@ public class PasswdFileUri implements Parcelable
         case EMAIL:
         default: {
             itsFile = null;
-            itsWritableInfo = new Pair<Boolean, Integer>(false, null);
+            itsWritableInfo = new Pair<>(false, null);
             break;
         }
         }
@@ -133,7 +133,7 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Constructor from a File */
-    public PasswdFileUri(File file)
+    private PasswdFileUri(File file)
     {
         itsUri = Uri.fromFile(file);
         itsType = Type.FILE;
@@ -149,9 +149,11 @@ public class PasswdFileUri implements Parcelable
         itsUri = source.readParcelable(null);
         itsType = Type.valueOf(source.readString());
         str = source.readString();
+        //noinspection ConstantConditions
         itsFile = (str != null) ? new File(str) : null;
         itsTitle = source.readString();
         str = source.readString();
+        //noinspection ConstantConditions
         itsSyncType = (str != null) ? ProviderType.valueOf(str) : null;
     }
 
@@ -438,7 +440,7 @@ public class PasswdFileUri implements Parcelable
     /** Resolve fields for a file URI */
     private void resolveFileUri()
     {
-        boolean writable = false;
+        boolean writable;
         Integer extraMsgId = null;
         do {
             if ((itsFile == null) || !itsFile.canWrite()) {
@@ -456,7 +458,7 @@ public class PasswdFileUri implements Parcelable
                 extraMsgId = R.string.read_only_media;
             }
         } while(false);
-        itsWritableInfo = new Pair<Boolean, Integer>(writable, extraMsgId);
+        itsWritableInfo = new Pair<>(writable, extraMsgId);
     }
 
 
@@ -487,16 +489,18 @@ public class PasswdFileUri implements Parcelable
                     (flags & DocumentsContractCompat.FLAG_SUPPORTS_WRITE) != 0;
             }
         } finally {
-            cursor.close();
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-        itsWritableInfo = new Pair<Boolean, Integer>(writable, null);
+        itsWritableInfo = new Pair<>(writable, null);
     }
 
 
     /** Resolve fields for a sync provider URI */
     private void resolveSyncProviderUri(Context context)
     {
-        itsWritableInfo = new Pair<Boolean, Integer>(true, null);
+        itsWritableInfo = new Pair<>(true, null);
         if (itsSyncType != null) {
             return;
         }
@@ -616,6 +620,7 @@ public class PasswdFileUri implements Parcelable
             String name = file.getName();
             Pattern pat = Pattern.compile("^(.*)_\\d{8}_\\d{6}\\.ibak$");
             Matcher match = pat.matcher(name);
+            //noinspection ConstantConditions
             if ((match != null) && match.matches()) {
                 name = match.group(1);
                 if (isV3) {
@@ -663,7 +668,10 @@ public class PasswdFileUri implements Parcelable
                 for (int i = 0, numFiles = backupFiles.length;
                         numFiles > numBackups; ++i, --numFiles) {
                     if (!backupFiles[i].equals(fromFile)) {
-                        backupFiles[i].delete();
+                        if (!backupFiles[i].delete()) {
+                            Log.e(TAG,
+                                  "Error removing backup: " + backupFiles[i]);
+                        }
                     }
                 }
             }
@@ -671,12 +679,9 @@ public class PasswdFileUri implements Parcelable
             if (backupPref != FileBackupPref.BACKUP_NONE) {
                 SimpleDateFormat bakTime =
                         new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
-                StringBuilder bakName = new StringBuilder(fileName);
-                bakName.append("_");
-                bakName.append(bakTime.format(new Date()));
-                bakName.append(".ibak");
-
-                File bakFile = new File(dir, bakName.toString());
+                String bakName =
+                        fileName + "_" + bakTime.format(new Date()) + ".ibak";
+                File bakFile = new File(dir, bakName);
                 if (!toFile.renameTo(bakFile)) {
                     throw new IOException("Can not create backup file: " +
                                           bakFile);
@@ -726,7 +731,9 @@ public class PasswdFileUri implements Parcelable
             } finally {
                 if (file != null) {
                     PasswdClientProvider.removeFile(file);
-                    file.delete();
+                    if (!file.delete()) {
+                        Log.e(TAG, "Error deleting " + file);
+                    }
                 }
             }
         }
