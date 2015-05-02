@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,7 +16,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.provider.OpenableColumns;
 
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 
@@ -144,6 +147,27 @@ public final class RecentFilesDb extends SQLiteOpenHelper
             db.endTransaction();
         }
     }
+
+
+    /** Update an opened storage access file */
+    public static String updateOpenedSafFile(Uri uri, int flags, Context ctx)
+    {
+        ContentResolver cr = ctx.getContentResolver();
+        ApiCompat.takePersistableUriPermission(cr, uri, flags);
+        Cursor cursor = cr.query(uri, null, null, null, null);
+        try {
+            if ((cursor != null) && (cursor.moveToFirst())) {
+                return cursor.getString(
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public void onCreate(SQLiteDatabase db)

@@ -414,6 +414,21 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             if (resultCode == Activity.RESULT_OK) {
                 PasswdSafeUtil.dbginfo(TAG, "data: %s", data);
                 Uri newUri = data.getData();
+
+                String title = RecentFilesDb.updateOpenedSafFile(
+                        newUri, (Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
+                        getActivity());
+                if (title != null) {
+                    RecentFilesDb recentFilesDb =
+                            new RecentFilesDb(getActivity());
+                    try {
+                        recentFilesDb.insertOrUpdateFile(newUri, title);
+                    } finally {
+                        recentFilesDb.close();
+                    }
+                }
+
                 itsPendingNewTask.setNewUri(newUri);
                 runTask(itsPendingNewTask);
             }
@@ -909,7 +924,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             @Override
             protected Object handleDoInBackground(PasswdFileUri uri,
                                                   Context ctx)
-                                                                                 throws Exception
+                    throws Exception
             {
                 return PasswdSafeApp.getFileUriFromIntent(intent, ctx);
             }
@@ -1229,6 +1244,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         protected Object handleDoInBackground(PasswdFileUri uri, Context ctx)
                 throws Exception
         {
+            RecentFilesDb recentFilesDb = new RecentFilesDb(ctx);
+            try {
+                recentFilesDb.removeUri(uri.getUri());
+            } finally {
+                recentFilesDb.close();
+            }
             uri.delete(ctx);
             return null;
         }
