@@ -15,6 +15,7 @@
             <option name="USE_RELATIVE_INDENTS" value="false" />
           </value>
         </option>
+        <option name="LINE_SEPARATOR" value="&#10;" />
         <option name="FIELD_NAME_PREFIX" value="its" />
         <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
         <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
