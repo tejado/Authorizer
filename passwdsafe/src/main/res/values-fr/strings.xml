@@ -143,6 +143,7 @@
     <string name="new_policy">Nouvelle stratégie</string>
     <string name="next">Suivant</string>
     <string name="no_alias_chosen">Aucun alias choisi</string>
+    <string name="no_files_select_to_open">Aucun fichier - Sélectionner une action ouverte</string>
     <string name="no_shortcut_chosen">Aucun raccourci choisi</string>
     <string name="no_policies">Aucune stratégie</string>
     <string name="no_records">Aucune entrée</string>
@@ -193,6 +194,7 @@
     <string name="protected_record_header">ENTRÉE PROTEGÉE</string>
     <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Recherche: %1$s</string>
+    <string name="recent_files">Fichiers Récents</string>
     <string name="record">Entrée</string>
     <string name="record_has_references">L\'entrée contient des références</string>
     <string name="record_label">Entrée:</string>

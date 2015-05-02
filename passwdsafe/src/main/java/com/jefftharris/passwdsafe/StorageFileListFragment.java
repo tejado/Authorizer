@@ -28,9 +28,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
@@ -45,7 +43,7 @@ import java.util.List;
  */
 @TargetApi(19)
 public final class StorageFileListFragment extends ListFragment
-        implements OnClickListener, LoaderManager.LoaderCallbacks<Cursor>
+        implements LoaderManager.LoaderCallbacks<Cursor>
 {
     // TODO: recent sync files
 
@@ -99,13 +97,8 @@ public final class StorageFileListFragment extends ListFragment
             setHasOptionsMenu(true);
         }
 
-        View view = inflater.inflate(R.layout.fragment_storage_file_list,
-                                     container, false);
-
-        Button btn = (Button)view.findViewById(R.id.open);
-        btn.setOnClickListener(this);
-
-        return view;
+        return inflater.inflate(R.layout.fragment_storage_file_list,
+                                container, false);
     }
 
     @Override
@@ -182,7 +175,10 @@ public final class StorageFileListFragment extends ListFragment
         inflater.inflate(R.menu.fragment_storage_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        MenuItem mi = menu.findItem(R.id.menu_file_new);
+        MenuItem mi = menu.findItem(R.id.menu_file_open);
+        MenuItemCompat.setShowAsAction(mi,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        mi = menu.findItem(R.id.menu_file_new);
         MenuItemCompat.setShowAsAction(mi,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
@@ -191,6 +187,10 @@ public final class StorageFileListFragment extends ListFragment
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
+        case R.id.menu_file_open: {
+            startOpenFile();
+            return true;
+        }
         case R.id.menu_file_new: {
             startActivity(new Intent(PasswdSafeUtil.NEW_INTENT));
             return true;
@@ -210,18 +210,6 @@ public final class StorageFileListFragment extends ListFragment
         }
     }
 
-    /* (non-Javadoc)
-         * @see android.view.View.OnClickListener#onClick(android.view.View)
-         */
-    public final void onClick(View v)
-    {
-        switch (v.getId()) {
-        case R.id.open: {
-            startOpenFile();
-            break;
-        }
-        }
-    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle)
