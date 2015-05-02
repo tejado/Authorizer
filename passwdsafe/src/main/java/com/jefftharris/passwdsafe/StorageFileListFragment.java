@@ -49,6 +49,7 @@ public final class StorageFileListFragment extends ListFragment
         implements LoaderManager.LoaderCallbacks<Cursor>
 {
     // TODO: recent sync files
+    // TODO: clear recent should drop permissions
 
     /** Listener interface for the owning activity */
     public interface Listener
@@ -123,6 +124,10 @@ public final class StorageFileListFragment extends ListFragment
                     {
                         switch (view.getId()) {
                         case R.id.text: {
+                            TextView tv = (TextView)view;
+                            String title = cursor.getString(columnIdx);
+                            tv.setText(title);
+                            tv.requestLayout();
                             return false;
                         }
                         case R.id.icon: {
