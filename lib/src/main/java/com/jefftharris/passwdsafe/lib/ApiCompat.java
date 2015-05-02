@@ -90,4 +90,13 @@ public final class ApiCompat
     {
         return SDK_VERSION < SDK_KITKAT;
     }
+
+
+    /** API compatible call for DocumentsContract.deleteDocument */
+    public static boolean documentsContractDeleteDocument(ContentResolver cr,
+                                                          Uri uri)
+    {
+        return (SDK_VERSION >= SDK_KITKAT) &&
+                ApiCompatKitkat.documentsContractDeleteDocument(cr, uri);
+    }
 }

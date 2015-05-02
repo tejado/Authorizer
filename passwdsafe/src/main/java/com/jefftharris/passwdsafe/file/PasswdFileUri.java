@@ -296,8 +296,14 @@ public class PasswdFileUri implements Parcelable
             }
             break;
         }
-        case EMAIL:
         case GENERIC_PROVIDER: {
+            ContentResolver cr = context.getContentResolver();
+            if (!ApiCompat.documentsContractDeleteDocument(cr, itsUri)) {
+                throw new IOException("Could not delete file: " + toString());
+            }
+            break;
+        }
+        case EMAIL: {
             throw new IOException("Delete not supported for " + toString());
         }
         }

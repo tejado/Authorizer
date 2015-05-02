@@ -18,9 +18,11 @@ import android.net.Uri;
  *  and higher
  */
 @TargetApi(19)
+@SuppressWarnings("unchecked")
 public final class ApiCompatKitkat
 {
     private static Method itsTakePersistableUriPermissionMeth;
+    private static Method itsDeleteDocumentMeth;
 
     static {
         try {
@@ -29,10 +31,18 @@ public final class ApiCompatKitkat
                             "takePersistableUriPermission",
                             Uri.class,
                             int.class);
-        } catch (NoSuchMethodException e) {
+
+            ClassLoader loader = ApiCompatKitkat.class.getClassLoader();
+            Class docContractClass =
+                    loader.loadClass("android.provider.DocumentsContract");
+
+            itsDeleteDocumentMeth = docContractClass.getMethod(
+                    "deleteDocument", ContentResolver.class, Uri.class);
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
+
 
     /** API compatible call for ContentResolver.takePersistableUriPermission */
     public static void takePersistableUriPermission(ContentResolver cr,
@@ -43,6 +53,20 @@ public final class ApiCompatKitkat
             itsTakePersistableUriPermissionMeth.invoke(cr, uri, flags);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+
+    /** API compatible call for DocumentsContract.deleteDocument */
+    public static boolean documentsContractDeleteDocument(ContentResolver cr,
+                                                          Uri uri)
+    {
+        try {
+            Object rc = itsDeleteDocumentMeth.invoke(null, cr, uri);
+            return (Boolean)rc;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
