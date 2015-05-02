@@ -53,15 +53,16 @@ public final class StorageFileListFragment extends ListFragment
     // TODO: fix sync files layout
     // TODO: fix sync new file menu text
     // TODO: menu item setup between storage and sync items
+    // TODO: recent files updates for inserted or deleted files
 
     /** Listener interface for the owning activity */
     public interface Listener
     {
         /** Open a file */
-        public void openFile(Uri uri, String fileName);
+        void openFile(Uri uri, String fileName);
 
         /** Does the activity have a menu */
-        public boolean activityHasMenu();
+        boolean activityHasMenu();
     }
 
     private static final String TAG = "StorageFileListFragment";
