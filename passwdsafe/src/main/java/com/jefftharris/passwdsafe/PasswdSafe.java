@@ -557,7 +557,6 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 break;
             }
             case SYNC_PROVIDER: {
-                assert uri != null;
                 switch (uri.getSyncType()) {
                 case GDRIVE:
                 case GDRIVE_PLAY: {
@@ -927,6 +926,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 openFile(uri);
                 String title = PasswdSafeApp.getAppFileTitle(getUri(),
                                                              PasswdSafe.this);
+                //noinspection ConstantConditions
                 if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
                     title += " - AUTOOPEN!!!!!";
                 }
@@ -935,6 +935,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 itsRecToOpen = intent.getData().getQueryParameter("recToOpen");
 
                 if (!getPasswdFile().isOpen()) {
+                    //noinspection ConstantConditions
                     if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
                         (getUri().getUri().getPath().equals(
                              PasswdSafeApp.DEBUG_AUTO_FILE))) {
@@ -1198,7 +1199,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
          * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleGetExceptionMsg(java.lang.Exception)
          */
         @Override
-        protected String handleGetExceptionMsg(Exception e, Context ctx)
+        protected String handleGetExceptionMsg(Context ctx)
         {
             return ctx.getString(R.string.cannot_create_file, getUri());
         }
@@ -1257,7 +1258,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         protected abstract void handleOnPostExecute(Object result);
 
         /** Get a message for an exception during the task */
-        protected String handleGetExceptionMsg(Exception e, Context ctx)
+        protected String handleGetExceptionMsg(Context ctx)
         {
             return null;
         }
@@ -1312,7 +1313,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                         getString(R.string.invalid_password), PasswdSafe.this,
                         false);
                 } else {
-                    String msg = handleGetExceptionMsg(e, PasswdSafe.this);
+                    String msg = handleGetExceptionMsg(PasswdSafe.this);
                     if (msg == null) {
                         msg = e.toString();
                     }
