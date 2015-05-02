@@ -30,6 +30,7 @@ public class PasswdClientProvider extends ContentProvider
     private static final int MATCH_FILES = 1;
 
     private static PasswdClientProvider itsProvider = null;
+    private static final Object itsProviderLock = new Object();
     private Set<String> itsFiles = new HashSet<>();
 
     static {
@@ -47,7 +48,7 @@ public class PasswdClientProvider extends ContentProvider
                 .appendPath(PasswdSafeContract.ClientFiles.TABLE)
                 .appendPath(name)
                 .build();
-        synchronized (itsProvider) {
+        synchronized (itsProviderLock) {
             itsProvider.itsFiles.add(name);
         }
         return uri;
@@ -56,7 +57,7 @@ public class PasswdClientProvider extends ContentProvider
     /** Remove a file from those provided */
     public static void removeFile(File file)
     {
-        synchronized (itsProvider) {
+        synchronized (itsProviderLock) {
             itsProvider.itsFiles.remove(file.getAbsolutePath());
         }
     }
