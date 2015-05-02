@@ -81,14 +81,14 @@ public abstract class AbstractFileListActivity extends FragmentActivity
     public void showSyncProviderFiles(Uri uri)
     {
         FragmentManager fragMgr = getSupportFragmentManager();
-        Fragment filesFrag = fragMgr.findFragmentById(R.id.files);
+        Fragment syncFrag = fragMgr.findFragmentById(R.id.sync);
 
-        SyncProviderFilesFragment syncFrag =
+        SyncProviderFilesFragment syncFilesFrag =
                 SyncProviderFilesFragment.newInstance(uri);
 
         FragmentTransaction txn = fragMgr.beginTransaction();
-        txn.hide(filesFrag);
-        txn.replace(R.id.sync, syncFrag);
+        txn.remove(syncFrag);
+        txn.replace(R.id.files, syncFilesFrag);
         txn.addToBackStack(null);
         txn.commit();
     }

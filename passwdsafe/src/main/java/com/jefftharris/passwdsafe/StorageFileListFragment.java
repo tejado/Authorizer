@@ -48,7 +48,6 @@ public final class StorageFileListFragment extends ListFragment
         implements OnClickListener, LoaderManager.LoaderCallbacks<Cursor>
 {
     // TODO: recent sync files
-    // TODO: fix sync files layout
     // TODO: menu item setup between storage and sync items
 
     /** Listener interface for the owning activity */
