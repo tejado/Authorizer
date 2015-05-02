@@ -15,7 +15,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -48,11 +47,9 @@ import java.util.List;
 public final class StorageFileListFragment extends ListFragment
         implements OnClickListener, LoaderManager.LoaderCallbacks<Cursor>
 {
-    // TODO: add new file to recent list
     // TODO: recent sync files
     // TODO: fix sync files layout
     // TODO: menu item setup between storage and sync items
-    // TODO: recent files updates for inserted or deleted files
 
     /** Listener interface for the owning activity */
     public interface Listener
@@ -328,23 +325,14 @@ public final class StorageFileListFragment extends ListFragment
     /** Open a password file URI from an intent */
     private void openUri(Intent openIntent)
     {
-        ContentResolver cr = getActivity().getContentResolver();
         Uri uri = openIntent.getData();
         int flags = openIntent.getFlags() &
-            (Intent.FLAG_GRANT_READ_URI_PERMISSION |
-             Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        ApiCompat.takePersistableUriPermission(cr, uri, flags);
-        Cursor cursor = cr.query(uri, null, null, null, null);
-        try {
-            if ((cursor != null) && (cursor.moveToFirst())) {
-                String title = cursor.getString(
-                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                openUri(uri, title);
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+                    (Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        String title = RecentFilesDb.updateOpenedSafFile(uri, flags,
+                                                         getActivity());
+        if (title != null) {
+            openUri(uri, title);
         }
     }
 
