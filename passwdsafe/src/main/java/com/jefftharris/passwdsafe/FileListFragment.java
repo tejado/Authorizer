@@ -55,13 +55,13 @@ public final class FileListFragment extends ListFragment
     public interface Listener
     {
         /** Open a file */
-        public void openFile(Uri uri, String fileName);
+        void openFile(Uri uri, String fileName);
 
         /** Does the activity have a menu */
-        public boolean activityHasMenu();
+        boolean activityHasMenu();
 
         /** Does the activity have a 'none' item */
-        public boolean activityHasNoneItem();
+        boolean activityHasNoneItem();
     }
 
     /** File data information for the list */
@@ -103,7 +103,7 @@ public final class FileListFragment extends ListFragment
     private static final String MOD_DATE = "mod_date";
 
     private File itsDir;
-    private LinkedList<File> itsDirHistory = new LinkedList<>();
+    private final LinkedList<File> itsDirHistory = new LinkedList<>();
     private Listener itsListener;
 
     /* (non-Javadoc)
@@ -163,6 +163,7 @@ public final class FileListFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+        //noinspection ConstantConditions
         if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
             openFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE));
         }
