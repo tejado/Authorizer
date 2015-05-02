@@ -38,6 +38,8 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.DocumentsContractCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
+import java.util.List;
+
 /**
  *  The StorageFileListFragment fragment allows the user to open files using
  *  the storage access framework on Kitkat and higher
@@ -47,7 +49,6 @@ public final class StorageFileListFragment extends ListFragment
         implements OnClickListener, LoaderManager.LoaderCallbacks<Cursor>
 {
     // TODO: add new file to recent list
-    // TODO: persistable uri permissions on new files and check when opening
     // TODO: recent sync files
     // TODO: fix sync files layout
     // TODO: menu item setup between storage and sync items
@@ -258,6 +259,34 @@ public final class StorageFileListFragment extends ListFragment
             @Override
             public Cursor loadInBackground()
             {
+                PasswdSafeUtil.dbginfo(TAG, "loadInBackground");
+                int flags =
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+                ContentResolver cr = getContext().getContentResolver();
+                List<Uri> permUris = ApiCompat.getPersistedUriPermissions(cr);
+                for (Uri permUri: permUris) {
+                    PasswdSafeUtil.dbginfo(TAG, "Checking persist perm %s",
+                                           permUri);
+                    Cursor cursor = cr.query(permUri, null, null, null, null);
+                    try {
+                        if ((cursor != null) && (cursor.moveToFirst())) {
+                            ApiCompat.takePersistableUriPermission(
+                                    cr, permUri, flags);
+                        } else {
+                            ApiCompat.releasePersistableUriPermission(
+                                    cr, permUri, flags);
+                            itsRecentFilesDb.removeUri(permUri);
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "File remove error", e);
+                    } finally {
+                        if (cursor != null) {
+                            cursor.close();
+                        }
+                    }
+                }
+
                 try {
                     return itsRecentFilesDb.queryFiles();
                 } catch (Exception e) {
@@ -333,6 +362,4 @@ public final class StorageFileListFragment extends ListFragment
 
         itsListener.openFile(uri, title);
     }
-
-
 }

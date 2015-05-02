@@ -15,6 +15,9 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * The ApiCompat class provides a compatibility interface for different Android
  * versions
@@ -82,6 +85,28 @@ public final class ApiCompat
         if (SDK_VERSION >= SDK_KITKAT) {
             ApiCompatKitkat.takePersistableUriPermission(cr, uri, flags);
         }
+    }
+
+
+    /** API compatible call for
+     * ContentResolver.releasePersistableUriPermission */
+    public static void releasePersistableUriPermission(ContentResolver cr,
+                                                       Uri uri,
+                                                       int flags)
+    {
+        if (SDK_VERSION >= SDK_KITKAT) {
+            ApiCompatKitkat.releasePersistableUriPermission(cr, uri, flags);
+        }
+    }
+
+
+    /** API compatible call for ContentResolver.getPersistedUriPermissions */
+    public static List<Uri> getPersistedUriPermissions(ContentResolver cr)
+    {
+        if (SDK_VERSION >= SDK_KITKAT) {
+            return ApiCompatKitkat.getPersistedUriPermissions(cr);
+        }
+        return Collections.emptyList();
     }
 
 

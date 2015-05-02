@@ -42,6 +42,7 @@ public final class RecentFilesDb extends SQLiteOpenHelper
     private static final String TAG = "RecentFilesDb";
 
     private static final String WHERE_BY_ID = DB_COL_FILES_ID + " = ?";
+    private static final String WHERE_BY_URI = DB_COL_FILES_URI + " = ?";
     private static final String ORDER_BY_DATE = DB_COL_FILES_DATE + " DESC";
 
     private static final String DB_NAME = "recent_files.db";
@@ -75,8 +76,7 @@ public final class RecentFilesDb extends SQLiteOpenHelper
             long uriId = -1;
             {
                 Cursor cursor = db.query(DB_TABLE_FILES, QUERY_COLUMNS,
-                                         DB_COL_FILES_URI + " = ?",
-                                         new String[]{uristr},
+                                         WHERE_BY_URI, new String[]{ uristr },
                                          null, null, null);
                 try {
                     if (cursor.moveToFirst()) {
@@ -115,6 +115,22 @@ public final class RecentFilesDb extends SQLiteOpenHelper
             db.endTransaction();
         }
     }
+
+
+    /** Delete a recent file with the given uri */
+    public void removeUri(Uri permUri) throws SQLException
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        try {
+            db.beginTransaction();
+            db.delete(DB_TABLE_FILES, WHERE_BY_URI,
+                      new String[]{ permUri.toString() });
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
 
     /** Clear the recent files */
     public void clear() throws SQLException

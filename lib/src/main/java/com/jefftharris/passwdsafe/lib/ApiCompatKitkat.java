@@ -8,6 +8,9 @@
 package com.jefftharris.passwdsafe.lib;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
@@ -22,7 +25,10 @@ import android.net.Uri;
 public final class ApiCompatKitkat
 {
     private static Method itsTakePersistableUriPermissionMeth;
+    private static Method itsReleasePersistableUriPermissionMeth;
+    private static Method itsGetPersistedUriPermissionsMeth;
     private static Method itsDeleteDocumentMeth;
+    private static Method itsUriPermissionsGetUriMeth;
 
     static {
         try {
@@ -32,12 +38,28 @@ public final class ApiCompatKitkat
                             Uri.class,
                             int.class);
 
+
+            itsReleasePersistableUriPermissionMeth =
+                    ContentResolver.class.getMethod(
+                            "takePersistableUriPermission",
+                            Uri.class,
+                            int.class);
+
+            itsGetPersistedUriPermissionsMeth =
+                    ContentResolver.class.getMethod(
+                            "getPersistedUriPermissions");
+
             ClassLoader loader = ApiCompatKitkat.class.getClassLoader();
             Class docContractClass =
                     loader.loadClass("android.provider.DocumentsContract");
 
             itsDeleteDocumentMeth = docContractClass.getMethod(
                     "deleteDocument", ContentResolver.class, Uri.class);
+
+            Class uriPermissionsClass =
+                    loader.loadClass("android.content.UriPermission");
+            itsUriPermissionsGetUriMeth =
+                    uriPermissionsClass.getMethod("getUri");
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -67,6 +89,39 @@ public final class ApiCompatKitkat
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+
+    /** API compatible call for
+     * ContentResolver.releasePersistableUriPermission */
+    public static void releasePersistableUriPermission(ContentResolver cr,
+                                                       Uri uri,
+                                                       int flags)
+    {
+        try {
+            itsReleasePersistableUriPermissionMeth.invoke(cr, uri, flags);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /** API compatible call for ContentResolver.getPersistedUriPermissions */
+    public static List<Uri> getPersistedUriPermissions(ContentResolver cr)
+    {
+        try {
+            List<Object> perms =
+                    (List<Object>) itsGetPersistedUriPermissionsMeth.invoke(cr);
+
+            List<Uri> uris = new ArrayList<>(perms.size());
+            for (Object perm: perms) {
+                uris.add((Uri)itsUriPermissionsGetUriMeth.invoke(perm));
+            }
+            return uris;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
         }
     }
 }
