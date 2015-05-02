@@ -376,13 +376,22 @@ public final class FileListFragment extends ListFragment
                                             Object data,
                                             String textRepresentation)
                 {
-                    if (view.getId() == R.id.mod_date) {
+                    switch (view.getId()) {
+                    case R.id.text: {
+                        TextView tv = (TextView)view;
+                        tv.setText(textRepresentation);
+                        tv.requestLayout();
+                        return true;
+                    }
+                    case R.id.mod_date: {
                         if (data == null) {
                             view.setVisibility(View.GONE);
                             return true;
                         } else {
                             view.setVisibility(View.VISIBLE);
+                            return false;
                         }
+                    }
                     }
                     return false;
                 }
