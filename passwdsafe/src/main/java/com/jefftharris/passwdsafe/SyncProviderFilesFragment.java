@@ -47,10 +47,10 @@ public class SyncProviderFilesFragment extends ListFragment
     public interface Listener
     {
         /** Open a file */
-        public void openFile(Uri uri, String fileName);
+        void openFile(Uri uri, String fileName);
     }
 
-    private static final String TAG = "SyncProviderFilesFragment";
+    private static final String TAG = "SyncProviderFilesFrag";
     private static final int LOADER_TITLE = 0;
     private static final int LOADER_FILES = 1;
 
@@ -173,6 +173,9 @@ public class SyncProviderFilesFragment extends ListFragment
                         return;
                     }
                     View view = getView();
+                    if (view == null) {
+                        return;
+                    }
                     String str;
                     ImageView icon = (ImageView)view.findViewById(R.id.icon);
                     if (cursor.moveToFirst()) {
@@ -183,6 +186,7 @@ public class SyncProviderFilesFragment extends ListFragment
                             ProviderType type = ProviderType.valueOf(typeStr);
                             type.setIcon(icon);
                         } catch (IllegalArgumentException e) {
+                            Log.e(TAG, "Unknown provider type", e);
                         }
                     } else {
                         str = getString(R.string.none);
