@@ -9,6 +9,8 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -36,7 +38,6 @@ public class PwsStringUnicodeField extends PwsField
 	 *
 	 * @param type  the field's type.
 	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException
 	 */
 	public PwsStringUnicodeField( int type, String value ) {
 		super( type, value);
@@ -47,7 +48,6 @@ public class PwsStringUnicodeField extends PwsField
 	 *
 	 * @param type  the field's type.
 	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException
 	 */
 	public PwsStringUnicodeField( int type, StringBuilder value ) {
 		// TODOlib: allow StringBuilder or CharSequence as value further up.
@@ -59,19 +59,6 @@ public class PwsStringUnicodeField extends PwsField
 	 *
 	 * @param type  the field's type.
 	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException
-	 */
-	public PwsStringUnicodeField( PwsFieldType type, byte[] value ) throws UnsupportedEncodingException
-	{
-		super( type, new String(value, "UTF-8" ));
-	}
-
-	/**
-	 * Constructor
-	 *
-	 * @param type  the field's type.
-	 * @param value the field's value.
-	 * @throws UnsupportedEncodingException
 	 */
 	public PwsStringUnicodeField( PwsFieldType type, String value ) {
 		super( type, value);
@@ -105,7 +92,7 @@ public class PwsStringUnicodeField extends PwsField
 	 *         zero if they're equal and greater than zero if <code>this</code> is "greater
 	 *         than" <code>that</code>.
 	 */
-	public int compareTo( Object that )
+	public int compareTo( @NonNull Object that )
 	{
 		return ((String) this.getValue()).compareTo((String) ((PwsStringUnicodeField) that).getValue());
 	}
@@ -142,7 +129,7 @@ public class PwsStringUnicodeField extends PwsField
 	 */
 	public boolean equals( PwsStringUnicodeField arg0 )
 	{
-		return ((String) super.getValue()).equals(arg0.getValue());
+		return super.getValue().equals(arg0.getValue());
 	}
 
 	/**
@@ -155,6 +142,6 @@ public class PwsStringUnicodeField extends PwsField
 	 */
 	public boolean equals( String arg0 )
 	{
-		return ((String) super.getValue()).equals(arg0);
+		return super.getValue().equals(arg0);
 	}
 }

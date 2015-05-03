@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 
@@ -48,7 +49,7 @@ public class AccountChooserDlg extends DialogFragment
      * @see android.support.v4.app.DialogFragment#onCreateDialog(android.os.Bundle)
      */
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState)
+    public @NonNull Dialog onCreateDialog(Bundle savedInstanceState)
     {
         Bundle args = getArguments();
         String accountType = args.getString("accountType");

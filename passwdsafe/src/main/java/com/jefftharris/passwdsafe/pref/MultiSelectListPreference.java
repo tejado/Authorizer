@@ -11,30 +11,29 @@ import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.ListPreference;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 
 /**
  * @author jharris
  * Patterned off of class from http://blog.350nice.com/wp/archives/240
  */
+@SuppressWarnings("unused")
 public class MultiSelectListPreference extends ListPreference
 {
     private static final String SEPARATOR = "|";
 
     private boolean[] itsSelectedItems;
 
-    /**
-     * @param context
-     */
+    /** Constructor */
+    @SuppressWarnings("unused")
     public MultiSelectListPreference(Context context)
     {
         this(context, null);
     }
 
-    /**
-     * @param context
-     * @param attrs
-     */
+    /** Constructor */
+    @SuppressWarnings("unused")
     public MultiSelectListPreference(Context context, AttributeSet attrs)
     {
         super(context, attrs);
@@ -63,7 +62,7 @@ public class MultiSelectListPreference extends ListPreference
      * @see android.preference.ListPreference#onPrepareDialogBuilder(android.app.AlertDialog.Builder)
      */
     @Override
-    protected void onPrepareDialogBuilder(Builder builder)
+    protected void onPrepareDialogBuilder(@NonNull Builder builder)
     {
         CharSequence[] entries = getEntries();
         CharSequence[] entryValues = getEntryValues();

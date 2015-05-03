@@ -9,6 +9,8 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
 import java.util.Date;
 
 import org.pwsafe.lib.Util;
@@ -35,7 +37,7 @@ public class PwsTimeField extends PwsField
 	 * Constructor
 	 * 
 	 * @param type  the field's type.
-	 * @param value the field's value.
+	 * @param aDate the field's value.
 	 */
 	public PwsTimeField( int type, Date aDate)
 	{
@@ -46,18 +48,7 @@ public class PwsTimeField extends PwsField
 	 * Constructor
 	 * 
 	 * @param type  the field's type.
-	 * @param value the field's value.
-	 */
-	public PwsTimeField( PwsFieldType type, byte [] value )
-	{
-		super( type, new Date( Util.getMillisFromByteArray(value, 0)) );
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param type  the field's type.
-	 * @param value the field's value.
+	 * @param aDate the field's value.
 	 */
 	public PwsTimeField( PwsFieldType type, Date aDate)
 	{
@@ -99,7 +90,7 @@ public class PwsTimeField extends PwsField
 	 *         zero if they're equal and greater than zero if <code>this</code> is "greater
 	 *         than" <code>that</code>.
 	 */
-	public int compareTo( Object that )
+	public int compareTo( @NonNull Object that )
 	{
 		return ((Date) this.getValue()).compareTo((Date) ((PwsTimeField) that).getValue());
 	}
@@ -136,7 +127,7 @@ public class PwsTimeField extends PwsField
 	 */
 	public boolean equals( PwsTimeField arg0 )
 	{
-		return ((Date) getValue()).equals(arg0.getValue());
+		return getValue().equals(arg0.getValue());
 	}
 
 	/**
@@ -149,6 +140,6 @@ public class PwsTimeField extends PwsField
 	 */
 	public boolean equals( Date arg0 )
 	{
-		return ((Date) getValue()).equals(arg0);
+		return getValue().equals(arg0);
 	}
 }

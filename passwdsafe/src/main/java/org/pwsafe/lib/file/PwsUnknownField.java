@@ -7,6 +7,8 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
 import org.pwsafe.lib.Util;
 
 /**
@@ -33,18 +35,6 @@ public class PwsUnknownField extends PwsField
 		super( type, value );
 	}
 
-	/**
-	 * Constructor
-	 * 
-	 * @param type  the field's type.
-	 * @param value the field's value.
-	 */
-	public PwsUnknownField( PwsFieldType type, byte [] value )
-	{
-		super( type, value );
-	}
-
-	
 
 	/**
 	 * Returns the field's value as a byte array.
@@ -70,7 +60,7 @@ public class PwsUnknownField extends PwsField
 	 *         zero if they're equal and greater than zero if <code>this</code> is "greater
 	 *         than" <code>that</code>.
 	 */
-	public int compareTo( Object that )
+	public int compareTo( @NonNull Object that )
 	{
 		byte[] thisB = (byte[]) this.getValue();
 		byte[] thatB = (byte[]) ((PwsUnknownField) that).getValue();
@@ -78,7 +68,7 @@ public class PwsUnknownField extends PwsField
 	}
 
 	/**
-	 * Compares this object to another <code>PwsUUIDField</code> or {@link UUID} returning
+	 * Compares this object to another <code>PwsUUIDField</code> or UUID returning
 	 * <code>true</code> if they're equal or <code>false</code> otherwise.
 	 * 
 	 * @param arg0 the other object to compare to.

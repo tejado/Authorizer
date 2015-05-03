@@ -7,6 +7,8 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
 import org.pwsafe.lib.Util;
 
 /**
@@ -33,20 +35,7 @@ public class PwsShortField extends PwsField
      */
     public PwsShortField( int type, byte [] value )
     {
-        super( type, new Short( Util.getShortFromByteArray(value, 0) ) );
-    }
-
-    /**
-     * Constructs the object
-     *
-     * @param type  the field type.  Values depend on the version of the file being read.
-     * @param value the byte array holding the integer value.
-     *
-     * @throws IndexOutOfBoundsException If <code>value.length</code> &lt; 2.
-     */
-    public PwsShortField( PwsFieldType type, byte [] value )
-    {
-        super( type, new Short( Util.getShortFromByteArray(value, 0) ) );
+        super( type, Util.getShortFromByteArray(value, 0));
     }
 
     /**
@@ -64,7 +53,7 @@ public class PwsShortField extends PwsField
         short     value;
         byte    retval[];
 
-        value   = ((Short) super.getValue()).shortValue();
+        value   = (Short) super.getValue();
         // Force a size of 2, otherwise it would be set to a size of blocklength
         retval  = new byte[2];
 
@@ -88,7 +77,7 @@ public class PwsShortField extends PwsField
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo( Object other )
+    public int compareTo( @NonNull Object other )
     {
         return ((Short) getValue()).compareTo((Short) ((PwsShortField) other).getValue());
     }
@@ -135,7 +124,7 @@ public class PwsShortField extends PwsField
      */
     public boolean equals( PwsShortField arg0 )
     {
-        return ((Short) getValue()).equals(arg0.getValue());
+        return getValue().equals(arg0.getValue());
     }
 
     /**
@@ -153,6 +142,6 @@ public class PwsShortField extends PwsField
      */
     public boolean equals( Short arg0 )
     {
-        return ((Short) getValue()).equals(arg0);
+        return getValue().equals(arg0);
     }
 }

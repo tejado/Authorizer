@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe.sync.lib;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 
 /**
@@ -31,7 +32,7 @@ public class ProgressFragment extends DialogFragment
      * @see android.support.v4.app.DialogFragment#onCreateDialog(android.os.Bundle)
      */
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState)
+    public @NonNull Dialog onCreateDialog(Bundle savedInstanceState)
     {
         setCancelable(false);
         ProgressDialog dlg = new ProgressDialog(getActivity());

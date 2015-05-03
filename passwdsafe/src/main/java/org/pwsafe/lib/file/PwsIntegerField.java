@@ -9,6 +9,8 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
 import org.pwsafe.lib.Util;
 
 /**
@@ -35,7 +37,7 @@ public class PwsIntegerField extends PwsField
 	 */
 	public PwsIntegerField( int type, byte [] value )
 	{
-		super( type, Integer.valueOf( Util.getIntFromByteArray(value, 0) ) );
+		super( type, Util.getIntFromByteArray(value, 0));
 	}
 
 	/** Constructor */
@@ -54,7 +56,7 @@ public class PwsIntegerField extends PwsField
 	 */
 	public PwsIntegerField( PwsFieldType type, byte [] value )
 	{
-		super( type, Integer.valueOf( Util.getIntFromByteArray(value, 0) ) );
+		super( type, Util.getIntFromByteArray(value, 0));
 	}
 
 	/**
@@ -72,7 +74,7 @@ public class PwsIntegerField extends PwsField
 		int		value;
 		byte	retval[];
 
-		value	= ((Integer) super.getValue()).intValue();
+		value	= (Integer) super.getValue();
         // Force a size of 4, otherwise it would be set to a size of blocklength
 		retval	= new byte[4];
 
@@ -96,7 +98,7 @@ public class PwsIntegerField extends PwsField
 	 *
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo( Object other )
+	public int compareTo( @NonNull Object other )
 	{
 		return ((Integer) getValue()).compareTo((Integer) ((PwsIntegerField) other).getValue());
 	}
@@ -143,7 +145,7 @@ public class PwsIntegerField extends PwsField
 	 */
 	public boolean equals( PwsIntegerField arg0 )
 	{
-		return ((Integer) getValue()).equals(arg0.getValue());
+		return getValue().equals(arg0.getValue());
 	}
 
 	/**
@@ -161,6 +163,6 @@ public class PwsIntegerField extends PwsField
 	 */
 	public boolean equals( Integer arg0 )
 	{
-		return ((Integer) getValue()).equals(arg0);
+		return getValue().equals(arg0);
 	}
 }
