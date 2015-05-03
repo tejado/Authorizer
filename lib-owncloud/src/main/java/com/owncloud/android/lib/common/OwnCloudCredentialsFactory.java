@@ -1,5 +1,6 @@
 package com.owncloud.android.lib.common;
 
+@SuppressWarnings("ALL")
 public class OwnCloudCredentialsFactory {
 
 	private static OwnCloudAnonymousCredentials sAnonymousCredentials;

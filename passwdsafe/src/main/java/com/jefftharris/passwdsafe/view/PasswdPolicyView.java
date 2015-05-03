@@ -176,8 +176,7 @@ public class PasswdPolicyView extends LinearLayout
     }
 
     /** Set the text on a policy detail string */
-    private final void setTextStr(int id, int labelId,
-                                  String str, boolean visible)
+    private void setTextStr(int id, int labelId, String str, boolean visible)
     {
         View label = findViewById(labelId);
         TextView tv = (TextView)findViewById(id);
@@ -193,7 +192,7 @@ public class PasswdPolicyView extends LinearLayout
     }
 
     /** Get a string for a particular policy option flag */
-    private final String getPolicyOption(PasswdPolicy policy, int flag)
+    private String getPolicyOption(PasswdPolicy policy, int flag)
     {
         Context ctx = getContext();
         String str = null;

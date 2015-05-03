@@ -25,7 +25,7 @@ public enum FileBackupPref
     private final String itsValue;
     private final int itsDisplayNameIdx;
 
-    private FileBackupPref(int num, String value, int displayNameIdx)
+    FileBackupPref(int num, String value, int displayNameIdx)
     {
         itsNumBackups = num;
         itsValue = value;
@@ -83,7 +83,7 @@ public enum FileBackupPref
         return strs;
     }
 
-    private static final String[] getDisplayNamesArray(Resources res)
+    private static String[] getDisplayNamesArray(Resources res)
     {
         return res.getStringArray(R.array.file_backup_pref);
     }

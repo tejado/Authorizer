@@ -76,7 +76,7 @@ public class GDriveLaunchActivity extends FragmentActivity
 
 
     /** Get the database info for the drive file */
-    private final Pair<DbProvider, DbFile> getFile(String fileId)
+    private Pair<DbProvider, DbFile> getFile(String fileId)
     {
         Pair<DbProvider, DbFile> rc = null;
         SyncDb syncDb = SyncDb.acquire();
@@ -88,7 +88,7 @@ public class GDriveLaunchActivity extends FragmentActivity
                     DbFile file = SyncDb.getFileByRemoteId(provider.itsId,
                                                            fileId, db);
                     if (file != null) {
-                        rc = new Pair<DbProvider, DbFile>(provider, file);
+                        rc = new Pair<>(provider, file);
                     }
                     break;
                 }

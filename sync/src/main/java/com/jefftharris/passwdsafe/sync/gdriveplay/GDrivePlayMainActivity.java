@@ -69,10 +69,8 @@ public class GDrivePlayMainActivity extends FragmentActivity
     private static final int ADD_FILE_RC = 2;
 
     private Uri itsProviderUri;
-    private String itsAcctId;
-    private String itsDisplay;
     private GoogleApiClient itsClient;
-    private List<DriveId> itsAddFiles = new ArrayList<DriveId>();
+    private List<DriveId> itsAddFiles = new ArrayList<>();
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
@@ -84,16 +82,16 @@ public class GDrivePlayMainActivity extends FragmentActivity
         setContentView(R.layout.activity_gdrive_play_main);
 
         itsProviderUri = getIntent().getParcelableExtra(INTENT_PROVIDER_URI);
-        itsAcctId = getIntent().getStringExtra(INTENT_PROVIDER_ACCT);
-        itsDisplay = getIntent().getStringExtra(INTENT_PROVIDER_DISPLAY);
-        if ((itsProviderUri == null) || (itsAcctId == null) ||
-                (itsDisplay == null)) {
+        String acctId = getIntent().getStringExtra(INTENT_PROVIDER_ACCT);
+        String display = getIntent().getStringExtra(INTENT_PROVIDER_DISPLAY);
+        if ((itsProviderUri == null) || (acctId == null) ||
+                (display == null)) {
             Log.e(TAG, "Required args missing");
             finish();
             return;
         }
 
-        itsClient = GDrivePlayProvider.createClient(this, itsAcctId,
+        itsClient = GDrivePlayProvider.createClient(this, acctId,
                                                     this, this);
 
         if (args == null) {
@@ -150,7 +148,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
             if (resultCode != RESULT_OK) {
                 break;
             }
-            DriveId driveId = (DriveId) data.getParcelableExtra(
+            DriveId driveId = data.getParcelableExtra(
                     OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
             PasswdSafeUtil.dbginfo(TAG, "open file id: %s", driveId);
             itsAddFiles.add(driveId);
@@ -365,7 +363,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
         private String computeFolders(DriveFile file) throws IOException
         {
             // TODO play: will folders work given app scope?
-            ArrayList<String> folders = new ArrayList<String>();
+            ArrayList<String> folders = new ArrayList<>();
 
             for (DriveId parent: getParents(file)) {
                 traceParentRefs(parent, "", folders);
@@ -379,7 +377,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
         private List<DriveId> getParents(DriveResource file)
             throws IOException
         {
-            ArrayList<DriveId> parents = new ArrayList<DriveId>();
+            ArrayList<DriveId> parents = new ArrayList<>();
 
             PendingResult<DriveApi.MetadataBufferResult> metaPend =
                     file.listParents(itsClient);

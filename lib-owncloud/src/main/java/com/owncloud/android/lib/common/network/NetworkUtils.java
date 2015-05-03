@@ -48,6 +48,7 @@ import android.content.Context;
 
 import com.owncloud.android.lib.common.utils.Log_OC;
 
+@SuppressWarnings("ALL")
 public class NetworkUtils {
 
     final private static String TAG = NetworkUtils.class.getSimpleName();

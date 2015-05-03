@@ -27,6 +27,7 @@ import org.pwsafe.lib.exception.PasswordSafeException;
  * @author mtiller
  *
  */
+@SuppressWarnings("ALL")
 public class CryptoInputStream extends InputStream {
 	private static final Log LOG = Log.getInstance(CryptoInputStream.class.getPackage().getName());
 	

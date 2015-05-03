@@ -33,6 +33,7 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class PwsFileFactory {
 
 	private static final Log LOG = Log.getInstance(PwsFileFactory.class.getPackage().getName());

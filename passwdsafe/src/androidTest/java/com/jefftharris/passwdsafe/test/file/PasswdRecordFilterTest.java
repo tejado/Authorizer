@@ -56,8 +56,8 @@ public class PasswdRecordFilterTest extends AndroidTestCase
 
 
     /** Test a parceled filter */
-    private final void doParcelTest(PasswdRecordFilter filter,
-                                    String expectedToString)
+    private void doParcelTest(PasswdRecordFilter filter,
+                              String expectedToString)
     {
         PasswdRecordFilter filter2 = recreateFilter(filter);
         assertNotSame(filter, filter2);
@@ -69,11 +69,14 @@ public class PasswdRecordFilterTest extends AndroidTestCase
 
 
     /** Recreate the filter from a parcel */
-    private final PasswdRecordFilter recreateFilter(PasswdRecordFilter filter)
+    private PasswdRecordFilter recreateFilter(PasswdRecordFilter filter)
     {
         Parcel parcel = Parcel.obtain();
         parcel.writeParcelable(filter, 0);
         parcel.setDataPosition(0);
-        return parcel.readParcelable(getClass().getClassLoader());
+        PasswdRecordFilter newFilter =
+                parcel.readParcelable(getClass().getClassLoader());
+        parcel.recycle();
+        return newFilter;
     }
 }
