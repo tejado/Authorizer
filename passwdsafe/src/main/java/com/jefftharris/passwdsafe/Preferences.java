@@ -187,7 +187,8 @@ public class Preferences extends PreferenceActivity
 
     public static File getFileDirPref(SharedPreferences prefs)
     {
-        return new File(prefs.getString(PREF_FILE_DIR, PREF_FILE_DIR_DEF));
+        String prefstr = prefs.getString(PREF_FILE_DIR, PREF_FILE_DIR_DEF);
+        return (prefstr != null) ? new File(prefstr) : null;
     }
 
     public static void setFileDirPref(File dir, SharedPreferences prefs)

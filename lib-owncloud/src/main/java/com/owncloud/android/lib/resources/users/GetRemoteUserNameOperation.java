@@ -44,7 +44,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * 		display-name
  * 		email
  */
-
+@SuppressWarnings("ALL")
 public class GetRemoteUserNameOperation extends RemoteOperation {
 	
 	private static final String TAG = GetRemoteUserNameOperation.class.getSimpleName();

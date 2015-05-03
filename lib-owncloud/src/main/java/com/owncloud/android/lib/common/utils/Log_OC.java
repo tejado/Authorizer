@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.util.Log;
 
 
+@SuppressWarnings("ALL")
 public class Log_OC {
     private static final String SIMPLE_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
     private static final String LOG_FOLDER_NAME = "log";
