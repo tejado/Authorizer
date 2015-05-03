@@ -45,13 +45,13 @@ public class SyncProviderFragment extends ListFragment
     public interface Listener
     {
         /** Show the files for a provider's URI */
-        public void showSyncProviderFiles(Uri uri);
+        void showSyncProviderFiles(Uri uri);
 
         /** Does the activity have a menu */
-        public boolean activityHasMenu();
+        boolean activityHasMenu();
     }
 
-    private static final String TAG = "SyncProviderFilesFragment";
+    private static final String TAG = "SyncProviderFilesFrag";
 
     private SimpleCursorAdapter itsProviderAdapter;
     private boolean itsHasProvider = true;
@@ -233,6 +233,9 @@ public class SyncProviderFragment extends ListFragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args)
     {
         View v = getView();
+        if (v == null) {
+            return null;
+        }
         if (!itsHasProvider) {
             v.setVisibility(View.GONE);
             return null;
@@ -270,7 +273,7 @@ public class SyncProviderFragment extends ListFragment
 
 
     /** Check whether the sync provider is present */
-    private final boolean checkProvider()
+    private boolean checkProvider()
     {
         ContentResolver res = getActivity().getContentResolver();
         String type = res.getType(PasswdSafeContract.Providers.CONTENT_URI);
