@@ -20,6 +20,7 @@ import org.pwsafe.lib.exception.UnimplementedConversionException;
 /**
  * @author Kevin
  */
+@SuppressWarnings("ALL")
 public class PwsRecordV2 extends PwsRecord
 {
 	/**

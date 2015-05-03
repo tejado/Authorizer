@@ -29,11 +29,7 @@ public abstract class AbstractLocalToRemoteSyncOper<ProviderClientT> extends
     public AbstractLocalToRemoteSyncOper(DbFile file, boolean forceInsert)
     {
         super(file);
-        if (forceInsert || TextUtils.isEmpty(itsFile.itsRemoteId)) {
-            itsIsInsert = true;
-        } else {
-            itsIsInsert = false;
-        }
+        itsIsInsert = forceInsert || TextUtils.isEmpty(itsFile.itsRemoteId);
     }
 
 
@@ -63,6 +59,7 @@ public abstract class AbstractLocalToRemoteSyncOper<ProviderClientT> extends
                                title, folders, modDate, db);
         clearFileChanges(db);
         if (itsLocalFile != null) {
+            //noinspection ResultOfMethodCallIgnored
             itsLocalFile.setLastModified(modDate);
         }
     }

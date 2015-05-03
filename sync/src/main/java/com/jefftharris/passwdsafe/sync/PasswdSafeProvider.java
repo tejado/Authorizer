@@ -59,10 +59,11 @@ public class PasswdSafeProvider extends ContentProvider
     private static final HashMap<String, String> REMOTE_FILES_MAP;
     private static final HashMap<String, String> SYNC_LOGS_MAP;
 
+    @SuppressWarnings("FieldCanBeLocal")
     private OnAccountsUpdateListener itsListener;
 
     static {
-        PROVIDERS_MAP = new HashMap<String, String>();
+        PROVIDERS_MAP = new HashMap<>();
         PROVIDERS_MAP.put(PasswdSafeContract.Providers._ID,
                           SyncDb.DB_COL_PROVIDERS_ID);
         PROVIDERS_MAP.put(PasswdSafeContract.Providers.COL_TYPE,
@@ -74,7 +75,7 @@ public class PasswdSafeProvider extends ContentProvider
         PROVIDERS_MAP.put(PasswdSafeContract.Providers.COL_DISPLAY_NAME,
                           SyncDb.DB_COL_PROVIDERS_DISPLAY_NAME);
 
-        FILES_MAP = new HashMap<String, String>();
+        FILES_MAP = new HashMap<>();
         FILES_MAP.put(PasswdSafeContract.Files._ID,
                       SyncDb.DB_COL_FILES_ID);
         FILES_MAP.put(PasswdSafeContract.Files.COL_PROVIDER,
@@ -93,14 +94,14 @@ public class PasswdSafeProvider extends ContentProvider
                       SyncDb.DB_COL_FILES_LOCAL_FOLDER + " AS " +
                               PasswdSafeContract.Files.COL_FOLDER);
 
-        REMOTE_FILES_MAP = new HashMap<String, String>();
+        REMOTE_FILES_MAP = new HashMap<>();
         REMOTE_FILES_MAP.put(PasswdSafeContract.RemoteFiles._ID,
                              SyncDb.DB_COL_FILES_ID);
         REMOTE_FILES_MAP.put(PasswdSafeContract.RemoteFiles.COL_REMOTE_ID,
                              SyncDb.DB_COL_FILES_REMOTE_ID + " AS " +
                                  PasswdSafeContract.RemoteFiles.COL_REMOTE_ID);
 
-        SYNC_LOGS_MAP = new HashMap<String, String>();
+        SYNC_LOGS_MAP = new HashMap<>();
         SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs._ID,
                           SyncDb.DB_COL_SYNC_LOGS_ID);
         SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_ACCT,
@@ -382,8 +383,8 @@ public class PasswdSafeProvider extends ContentProvider
             qb.setTables(SyncDb.DB_TABLE_FILES);
             qb.setProjectionMap(FILES_MAP);
 
-            StringBuffer fullSelection =
-                    new StringBuffer(SyncDb.DB_MATCH_FILES_PROVIDER_ID);
+            StringBuilder fullSelection =
+                    new StringBuilder(SyncDb.DB_MATCH_FILES_PROVIDER_ID);
             if (PasswdSafeContract.Files.NOT_DELETED_SELECTION.equals(
                         selection)) {
                 selectionValid = true;
@@ -421,7 +422,8 @@ public class PasswdSafeProvider extends ContentProvider
         }
         case PasswdSafeContract.MATCH_METHODS: {
             try {
-                return doMethod(selectionArgs);
+                doMethod(selectionArgs);
+                return null;
             } catch (Exception e) {
                 String msg = "Error executing method";
                 Log.e(TAG, msg, e);
@@ -432,8 +434,8 @@ public class PasswdSafeProvider extends ContentProvider
             qb.setTables(SyncDb.DB_TABLE_FILES);
             qb.setProjectionMap(REMOTE_FILES_MAP);
 
-            StringBuffer fullSelection =
-                    new StringBuffer(SyncDb.DB_MATCH_FILES_PROVIDER_ID);
+            StringBuilder fullSelection =
+                    new StringBuilder(SyncDb.DB_MATCH_FILES_PROVIDER_ID);
             if (PasswdSafeContract.RemoteFiles.NOT_DELETED_SELECTION.equals(
                         selection)) {
                 selectionValid = true;
@@ -552,7 +554,7 @@ public class PasswdSafeProvider extends ContentProvider
 
                 ContentResolver cr = ctx.getContentResolver();
                 writeToFile(cr.openInputStream(Uri.parse(updateUri)),
-                            updateUri, tmpFile);
+                            tmpFile);
 
                 File localFile = ctx.getFileStreamPath(localFileName);
                 if (!tmpFile.renameTo(localFile)) {
@@ -619,9 +621,8 @@ public class PasswdSafeProvider extends ContentProvider
             File localFile = getContext().getFileStreamPath(file.itsLocalFile);
             PasswdSafeUtil.dbginfo(TAG, "openFile uri %s, file %s",
                                    uri, localFile);
-            ParcelFileDescriptor fd = ParcelFileDescriptor.open(
+            return ParcelFileDescriptor.open(
                     localFile, ParcelFileDescriptor.MODE_READ_ONLY);
-            return fd;
         }
         default: {
             return super.openFile(uri, mode);
@@ -631,7 +632,7 @@ public class PasswdSafeProvider extends ContentProvider
 
 
     /** Execute a method */
-    private Cursor doMethod(String[] args)
+    private void doMethod(String[] args)
     {
         if (args.length < 1) {
             throw new IllegalArgumentException("No method args");
@@ -664,7 +665,7 @@ public class PasswdSafeProvider extends ContentProvider
                 } else {
                     DbProvider provider = SyncDb.getProvider(id, db);
                     if (provider == null) {
-                        return null;
+                        return;
                     }
                     providers = Collections.singletonList(provider);
                 }
@@ -700,7 +701,6 @@ public class PasswdSafeProvider extends ContentProvider
                 }
                 }
             }
-            return null;
         } else {
             throw new IllegalArgumentException("Unknown method: " + name);
         }
@@ -732,7 +732,7 @@ public class PasswdSafeProvider extends ContentProvider
 
 
     /** Write a source stream to a file.  The source is closed. */
-    private static void writeToFile(InputStream src, String srcName, File file)
+    private static void writeToFile(InputStream src, File file)
         throws IOException
     {
         InputStream is = null;

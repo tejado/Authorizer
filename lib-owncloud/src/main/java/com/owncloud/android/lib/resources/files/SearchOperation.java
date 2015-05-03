@@ -24,6 +24,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 /**
  * The SearchOperation searches for files matching a query
  */
+@SuppressWarnings("ALL")
 public class SearchOperation extends RemoteOperation
 {
     /** Information for each search result */
@@ -112,6 +113,7 @@ public class SearchOperation extends RemoteOperation
             throw new Exception("No content-type header");
         }
 
+        //noinspection LoopStatementThatDoesntLoop
         do {
             HeaderElement[] elements = header.getElements();
             if (elements.length != 1) {

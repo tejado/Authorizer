@@ -119,6 +119,7 @@ public abstract class ActivityPasswdFile
      */
     public abstract PasswdFileData getFileData();
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public abstract boolean isOpen();
 
     public abstract void setFileData(PasswdFileData fileData);

@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -151,6 +152,7 @@ public class MainActivity extends FragmentActivity
             dlg.show();
         }
 
+        //noinspection PointlessBooleanExpression
         if (!GDRIVE_PLAY_ENABLED) {
             // TODO play: Remove flag
             findViewById(R.id.gdrive_play_container).setVisibility(View.GONE);
@@ -610,7 +612,7 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Update the UI when the GDrive play account is changed */
-    private final void updateGdrivePlayAccount(Cursor cursor)
+    private void updateGdrivePlayAccount(Cursor cursor)
     {
         Button chooseBtn = (Button)findViewById(R.id.gdrive_play_choose);
         TextView acctView = (TextView)findViewById(R.id.gdrive_play_acct);
@@ -643,7 +645,7 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Update the UI when the GDrive account is changed */
-    private final void updateGdriveAccount(Cursor cursor)
+    private void updateGdriveAccount(Cursor cursor)
     {
         View chooseBtn = findViewById(R.id.gdrive_choose);
         TextView acctView = (TextView)findViewById(R.id.gdrive_acct);
@@ -693,7 +695,7 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Update the UI when the Dropbox account is changed */
-    private final void updateDropboxAccount(Cursor cursor)
+    private void updateDropboxAccount(Cursor cursor)
     {
         View chooseBtn = findViewById(R.id.dropbox_choose);
         TextView acctView = (TextView)findViewById(R.id.dropbox_acct);
@@ -737,7 +739,7 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Update the UI when the Box account is changed */
-    private final void updateBoxAccount(Cursor cursor)
+    private void updateBoxAccount(Cursor cursor)
     {
         View chooseBtn = findViewById(R.id.box_choose);
         TextView acctView = (TextView)findViewById(R.id.box_acct);
@@ -778,7 +780,7 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Update the UI when the ownCloud account is changed */
-    private final void updateOwncloudAccount(Cursor cursor)
+    private void updateOwncloudAccount(Cursor cursor)
     {
         View chooseBtn = findViewById(R.id.owncloud_choose);
         TextView acctView = (TextView)findViewById(R.id.owncloud_acct);
@@ -904,7 +906,8 @@ public class MainActivity extends FragmentActivity
          * @see android.support.v4.app.DialogFragment#onCreateDialog(android.os.Bundle)
          */
         @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState)
+        public @NonNull
+        Dialog onCreateDialog(Bundle savedInstanceState)
         {
             Bundle args = getArguments();
             final Uri currAcct = args.getParcelable("currAcct");

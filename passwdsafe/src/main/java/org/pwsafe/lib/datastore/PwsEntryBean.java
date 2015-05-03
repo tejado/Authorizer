@@ -35,6 +35,7 @@ import org.pwsafe.lib.file.PwsUUIDField;
  *
  * @author roxon
  */
+@SuppressWarnings("ALL")
 public class PwsEntryBean implements Cloneable {
     private final static Log log = Log.getInstance(PwsEntryBean.class);
 
@@ -271,7 +272,8 @@ public class PwsEntryBean implements Cloneable {
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
-	protected PwsEntryBean clone() {
+	protected PwsEntryBean clone() throws CloneNotSupportedException
+	{
 		try {
 			return (PwsEntryBean) super.clone();
 		} catch (CloneNotSupportedException e) {

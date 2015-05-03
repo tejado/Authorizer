@@ -45,6 +45,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 /**
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class AdvancedX509TrustManager implements X509TrustManager {
     
     private static final String TAG = AdvancedX509TrustManager.class.getSimpleName();

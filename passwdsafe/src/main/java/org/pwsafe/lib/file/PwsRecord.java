@@ -48,6 +48,7 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public abstract class PwsRecord implements Comparable<Object>, Serializable, Cloneable {
 
 	/**
@@ -532,7 +533,6 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 			         " - maybe a new version is needed?");
 			attributes.put (Integer.valueOf(theType), value);
 			setModified();
-			return;
 		} else {
 			throw new IllegalArgumentException(
 					I18nHelper.getInstance().formatMessage("E00003",

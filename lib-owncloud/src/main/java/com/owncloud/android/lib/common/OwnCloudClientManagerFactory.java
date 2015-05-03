@@ -1,5 +1,6 @@
 package com.owncloud.android.lib.common;
 
+@SuppressWarnings("ALL")
 public class OwnCloudClientManagerFactory {
 	
 	public static enum Policy {
