@@ -60,7 +60,7 @@ clean.dependsOn 'cleanNative'
 
 
 tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn ":buildNative"
+    compileTask -> compileTask.dependsOn "buildNative"
 }
 
 
