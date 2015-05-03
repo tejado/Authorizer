@@ -33,6 +33,7 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  * @author mueller
  *
  */
+@SuppressWarnings("ALL")
 public abstract class PwsFileV1V2 extends PwsFile {
 
 	private static final Log LOG = Log.getInstance(PwsFileV1V2.class.getPackage().getName());

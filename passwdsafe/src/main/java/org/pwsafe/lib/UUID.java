@@ -20,6 +20,7 @@ import java.util.TimeZone;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class UUID implements Comparable<Object>, Serializable
 {
 	/**

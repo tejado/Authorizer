@@ -28,6 +28,7 @@ import org.pwsafe.lib.file.PwsRecordV2;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class FileConverter
 {
 	/**

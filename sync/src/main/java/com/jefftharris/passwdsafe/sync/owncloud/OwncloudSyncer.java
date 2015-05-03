@@ -89,6 +89,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
         if (result.getCode() ==
             RemoteOperationResult.ResultCode.SSL_RECOVERABLE_PEER_UNVERIFIED) {
             try {
+                @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
                 CertificateCombinedException certExc =
                         (CertificateCombinedException)result.getException();
                 X509Certificate cert = certExc.getServerCertificate();
@@ -187,12 +188,10 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
         checkOperationResult(res, itsContext);
 
         PasswdSafeUtil.dbginfo(TAG, "syncDisplayName %s", oper.getUserName());
-        StringBuilder displayName = new StringBuilder(oper.getUserName());
-        displayName.append(" (");
-        displayName.append(itsProviderClient.getBaseUri().toString());
-        displayName.append(")");
-        SyncDb.updateProviderDisplayName(itsProvider.itsId,
-                                         displayName.toString(), itsDb);
+        String displayName =
+                oper.getUserName() +
+                " (" + itsProviderClient.getBaseUri().toString() + ")";
+        SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName, itsDb);
     }
 
 
@@ -200,8 +199,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     private HashMap<String, ProviderRemoteFile> getOwncloudFiles()
             throws IOException
     {
-        HashMap<String, ProviderRemoteFile> files =
-                new HashMap<String, ProviderRemoteFile>();
+        HashMap<String, ProviderRemoteFile> files = new HashMap<>();
 
         List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {

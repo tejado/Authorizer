@@ -22,13 +22,13 @@ public class SyncLogRecord
 {
     private String itsAccount;
     private long itsStartTime;
-    private List<Exception> itsFailures = new ArrayList<Exception>();
+    private List<Exception> itsFailures = new ArrayList<>();
     private long itsEndTime = -1;
     private boolean itsIsFullSync = false;
     private boolean itsIsManualSync;
     private boolean itsIsNotConnected = false;
-    private List<String> itsEntries = new ArrayList<String>();
-    private List<String> itsConflictFiles = new ArrayList<String>();
+    private List<String> itsEntries = new ArrayList<>();
+    private List<String> itsConflictFiles = new ArrayList<>();
 
     /** Constructor */
     public SyncLogRecord(String account, String typeName, boolean manual)
@@ -140,20 +140,19 @@ public class SyncLogRecord
     /** Get a string representation of the record */
     public String toString(Context ctx)
     {
-        StringBuilder str = new StringBuilder();
-        str.append(ctx.getString(R.string.sync_log_record, itsAccount,
-                                 ctx.getString(itsIsFullSync ?
-                                         R.string.full_sync :
-                                         R.string.incremental_sync),
-                                 ctx.getString(itsIsManualSync ?
-                                         R.string.manual :
-                                         R.string.automatic),
-                                 ctx.getString(itsIsNotConnected ?
-                                         R.string.network_not_connected :
-                                         R.string.network_connected),
-                                 itsStartTime, itsEndTime));
-        str.append("\n");
-        str.append(getActions());
-        return str.toString();
+        return ctx.getString(
+                R.string.sync_log_record, itsAccount,
+                ctx.getString(itsIsFullSync ?
+                                      R.string.full_sync :
+                                      R.string.incremental_sync),
+                ctx.getString(itsIsManualSync ?
+                                      R.string.manual :
+                                      R.string.automatic),
+                ctx.getString(itsIsNotConnected ?
+                                      R.string.network_not_connected :
+                                      R.string.network_connected),
+                itsStartTime, itsEndTime) +
+               "\n" +
+               getActions();
     }
 }
