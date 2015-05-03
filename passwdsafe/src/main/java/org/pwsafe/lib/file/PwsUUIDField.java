@@ -9,6 +9,8 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
 import org.pwsafe.lib.UUID;
 
 /**
@@ -46,17 +48,6 @@ public class PwsUUIDField extends PwsField
 	 * @param type  the field's type.
 	 * @param value the field's value.
 	 */
-	public PwsUUIDField( PwsFieldType type, byte [] value )
-	{
-		super( type, new UUID(value) );
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param type  the field's type.
-	 * @param value the field's value.
-	 */
 	public PwsUUIDField( PwsFieldType type, UUID value )
 	{
 		super( type, value );
@@ -86,7 +77,7 @@ public class PwsUUIDField extends PwsField
 	 *         zero if they're equal and greater than zero if <code>this</code> is "greater
 	 *         than" <code>that</code>.
 	 */
-	public int compareTo( Object that )
+	public int compareTo( @NonNull Object that )
 	{
 		return ((UUID) this.getValue()).compareTo( (UUID) ((PwsUUIDField) that).getValue() );
 	}
@@ -123,7 +114,7 @@ public class PwsUUIDField extends PwsField
 	 */
 	public boolean equals( PwsUUIDField arg0 )
 	{
-		return ((UUID) getValue()).equals(arg0.getValue());
+		return getValue().equals(arg0.getValue());
 	}
 
 	/**

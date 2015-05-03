@@ -20,6 +20,7 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class PwsFileV2 extends PwsFileV1V2 {
 
 	/**

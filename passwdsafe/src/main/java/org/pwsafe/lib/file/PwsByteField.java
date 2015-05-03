@@ -7,6 +7,8 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
 /**
  * Provides a wrapper for fields that hold a byte value. Byte values
  * are stored in the database in little-endian order and are converted to and
@@ -31,7 +33,7 @@ public class PwsByteField extends PwsField
      */
     public PwsByteField( int type, byte [] value )
     {
-        super(type, Byte.valueOf(value[0]));
+        super(type, value[0]);
     }
 
     /**
@@ -42,20 +44,7 @@ public class PwsByteField extends PwsField
      */
     public PwsByteField( int type, byte value )
     {
-        super(type, Byte.valueOf(value));
-    }
-
-    /**
-     * Constructs the object
-     *
-     * @param type  the field type.  Values depend on the version of the file being read.
-     * @param value the byte array holding the byte value.
-     *
-     * @throws IndexOutOfBoundsException If <code>value.length</code> &lt; 1.
-     */
-    public PwsByteField( PwsFieldType type, byte [] value )
-    {
-        super(type, Byte.valueOf(value[0]));
+        super(type, value);
     }
 
     /**
@@ -73,7 +62,7 @@ public class PwsByteField extends PwsField
         byte value;
         byte    retval[];
 
-        value   = ((Byte) super.getValue()).byteValue();
+        value   = (Byte) super.getValue();
         // Force a size of 1, otherwise it would be set to a size of blocklength
         retval  = new byte[1];
         retval[0] = value;
@@ -95,7 +84,7 @@ public class PwsByteField extends PwsField
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo( Object other )
+    public int compareTo( @NonNull Object other )
     {
         return ((Byte) getValue()).compareTo((Byte) ((PwsByteField) other).getValue());
     }
@@ -142,7 +131,7 @@ public class PwsByteField extends PwsField
      */
     public boolean equals( PwsByteField arg0 )
     {
-        return ((Byte) getValue()).equals(arg0.getValue());
+        return getValue().equals(arg0.getValue());
     }
 
     /**
@@ -160,6 +149,6 @@ public class PwsByteField extends PwsField
      */
     public boolean equals( Byte arg0 )
     {
-        return ((Byte) getValue()).equals(arg0);
+        return getValue().equals(arg0);
     }
 }

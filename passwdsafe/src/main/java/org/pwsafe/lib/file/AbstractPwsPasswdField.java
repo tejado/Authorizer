@@ -7,6 +7,8 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -53,9 +55,9 @@ public abstract class AbstractPwsPasswdField extends PwsField
     }
 
 
-    public int compareTo(Object arg0)
+    public int compareTo(@NonNull Object arg0)
     {
-        return toString().compareTo(((AbstractPwsPasswdField)arg0).toString());
+        return toString().compareTo(arg0.toString());
     }
 
 
@@ -119,17 +121,11 @@ public abstract class AbstractPwsPasswdField extends PwsField
                 return (String) sealValue.getObject(itsReadCipher);
             }
         }
-        catch (IllegalBlockSizeException e) {
+        catch (IllegalBlockSizeException | BadPaddingException |
+                ClassNotFoundException e) {
             throw new RuntimeCryptoException(e.getMessage());
-        }
-        catch (BadPaddingException e) {
-            throw new RuntimeCryptoException(e.getMessage());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        catch (ClassNotFoundException e) {
-            throw new RuntimeCryptoException(e.getMessage());
         }
     }
 
@@ -163,10 +159,7 @@ public abstract class AbstractPwsPasswdField extends PwsField
         try {
             return new SealedObject(value, cipher);
         }
-        catch (IllegalBlockSizeException e) {
-            throw new RuntimeCryptoException(e.getMessage());
-        }
-        catch (IOException e) {
+        catch (IllegalBlockSizeException | IOException e) {
             throw new RuntimeCryptoException(e.getMessage());
         }
     }

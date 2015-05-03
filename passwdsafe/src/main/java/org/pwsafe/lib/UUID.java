@@ -9,6 +9,8 @@
  */
 package org.pwsafe.lib;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -20,7 +22,6 @@ import java.util.TimeZone;
  *
  * @author Kevin Preece
  */
-@SuppressWarnings("ALL")
 public class UUID implements Comparable<Object>, Serializable
 {
 	/**
@@ -87,11 +88,7 @@ public class UUID implements Comparable<Object>, Serializable
 	@Override
 	public boolean equals( Object ob )
 	{
-		if ( ob instanceof UUID )
-		{
-			return equals( (UUID) ob );
-		}
-		return false;
+	    return ob instanceof UUID && equals((UUID) ob);
 	}
 
 	/**
@@ -135,7 +132,7 @@ public class UUID implements Comparable<Object>, Serializable
 	 *         zero if they're equal and greater than zero if <code>this</code> is "greater
 	 *         than" <code>other</code>.
 	 */
-	public int compareTo( Object other )
+	public int compareTo( @NonNull Object other )
 	{
 		return compareTo( (UUID) other );
 	}
@@ -207,20 +204,10 @@ public class UUID implements Comparable<Object>, Serializable
 			throw new IllegalArgumentException();
 		}
 
-		final StringBuilder sb = new StringBuilder(38);
-
-		sb.append( '{' );
-		sb.append( Util.bytesToHex(uuid, 0, 4) );
-		sb.append( '-' );
-		sb.append( Util.bytesToHex(uuid, 4, 2) );
-		sb.append( '-' );
-		sb.append( Util.bytesToHex(uuid, 6, 2) );
-		sb.append( '-' );
-		sb.append( Util.bytesToHex(uuid, 8, 2) );
-		sb.append( '-' );
-		sb.append( Util.bytesToHex(uuid, 10, 6) );
-		sb.append( '}' );
-
-		return sb.toString();
+	    return "{" + Util.bytesToHex(uuid, 0, 4) + '-' +
+		   Util.bytesToHex(uuid, 4, 2) + '-' +
+		   Util.bytesToHex(uuid, 6, 2) + '-' +
+		   Util.bytesToHex(uuid, 8, 2) + '-' +
+		   Util.bytesToHex(uuid, 10, 6) + '}';
 	}
 }

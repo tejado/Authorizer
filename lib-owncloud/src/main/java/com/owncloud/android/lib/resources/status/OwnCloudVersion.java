@@ -25,6 +25,7 @@
 
 package com.owncloud.android.lib.resources.status;
 
+@SuppressWarnings("ALL")
 public class OwnCloudVersion implements Comparable<OwnCloudVersion> {
     public static final OwnCloudVersion owncloud_v1 = new OwnCloudVersion(
             0x01000000);
