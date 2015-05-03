@@ -43,7 +43,7 @@ import com.owncloud.android.lib.resources.files.FileUtils;
  * @author masensio
  *
  */
-
+@SuppressWarnings("ALL")
 public class ShareXMLParser {
 
 	//private static final String TAG = ShareXMLParser.class.getSimpleName();

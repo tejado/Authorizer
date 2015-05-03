@@ -40,6 +40,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertNull(policies);
 
         String str = PasswdPolicy.hdrPoliciesToString(null);
+        //noinspection ConstantConditions
         assertNull(str);
     }
 
@@ -62,6 +63,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     {
         String policiesStr = "0107Policy1fe00abc111aaa000fff03!@#";
         List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies(policiesStr);
+        assertNotNull(policies);
         assertEquals(1, policies.size());
         PasswdPolicy policy = policies.get(0);
         assertEquals("Policy1", policy.getName());
@@ -88,6 +90,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     {
         String policiesStr = "0107Policy1fe00abc00000000000003!@#";
         List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies(policiesStr);
+        assertNotNull(policies);
         assertEquals(1, policies.size());
         PasswdPolicy policy = policies.get(0);
         assertEquals("Policy1", policy.getName());
@@ -138,6 +141,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     {
         String policiesStr = "060ceasy to readb40000a0010010010010008hex only08000140010010010010008policy 1f00000f0040020050030009pronounced200008001001001001000dspecial charsf00000d0030010040020a!@#$%^&*()05zerosf00000e00000000000000";
         List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies(policiesStr);
+        assertNotNull(policies);
         assertEquals(6, policies.size());
 
         PasswdPolicy policy;
@@ -240,6 +244,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         }
         List<PasswdPolicy> policies =
             PasswdPolicy.parseHdrPolicies(policiesStr.toString());
+        assertNotNull(policies);
         assertEquals(255, policies.size());
         for (int i = 0; i < 255; ++i) {
             PasswdPolicy policy = policies.get(i);
@@ -395,6 +400,7 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         PasswdPolicy.RecordPolicyStrs strs =
             PasswdPolicy.recordPolicyToString(null);
+        //noinspection ConstantConditions
         assertNull(strs);
     }
 
@@ -593,12 +599,11 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Check a record with its own password policy */
-    private static void doTestRecordPolicy(String policyName, String policyStr,
-                                           String ownSymbols,
-                                           int flags, int length,
-                                           PasswdPolicy.Type type,
-                                           int minLower, int minUpper,
-                                           int minDigits, int minSymbols)
+    private static void doTestRecordPolicy(
+            @SuppressWarnings("SameParameterValue") String policyName,
+            String policyStr, String ownSymbols, int flags, int length,
+            PasswdPolicy.Type type, int minLower, int minUpper,
+            int minDigits, int minSymbols)
     {
         doTestRecordPolicy(policyName, policyStr, ownSymbols, flags, length,
                            type, minLower, minUpper, minDigits, minSymbols, 0);
@@ -739,6 +744,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Verify a generated password */
+    @SuppressWarnings("ConstantConditions")
     private static void verifyGenPasswd(PasswdPolicy policy)
     {
         boolean useLower = policy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);

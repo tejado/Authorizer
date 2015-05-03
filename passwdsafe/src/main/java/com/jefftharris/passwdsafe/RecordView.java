@@ -964,6 +964,7 @@ public class RecordView extends AbstractRecordTabActivity
                                                      val, val);
             }
         }
+        //noinspection ConstantConditions
         setVisibility(R.id.password_times_row,
                       (passwdExpiry != null) || (lastModTime != null) ||
                       (expiryIntStr != null));
