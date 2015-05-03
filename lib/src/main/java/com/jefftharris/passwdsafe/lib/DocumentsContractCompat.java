@@ -14,17 +14,16 @@ package com.jefftharris.passwdsafe.lib;
 public interface DocumentsContractCompat
 {
     /** Intent action for opening a document available on API 19 */
-    public static final String INTENT_ACTION_OPEN_DOCUMENT =
-            "android.intent.action.OPEN_DOCUMENT";
+    String INTENT_ACTION_OPEN_DOCUMENT = "android.intent.action.OPEN_DOCUMENT";
 
-    public static final String INTENT_ACTION_CREATE_DOCUMENT =
+    String INTENT_ACTION_CREATE_DOCUMENT =
             "android.intent.action.CREATE_DOCUMENT";
 
     /** Column for DocumentsContract.Document.COLUMN_FLAGS available on
      * API 19 */
-    public static final String COLUMN_FLAGS = "flags";
+    String COLUMN_FLAGS = "flags";
 
     /** Bit field in flags for whether a document is writable available on
      * API 19 */
-    public static final int FLAG_SUPPORTS_WRITE = 0x02;
+    int FLAG_SUPPORTS_WRITE = 0x02;
 }
