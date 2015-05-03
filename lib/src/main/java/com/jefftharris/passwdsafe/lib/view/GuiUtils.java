@@ -293,6 +293,9 @@ public final class GuiUtils
         } else {
             BitmapDrawable b =
                     (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
+            if (b == null) {
+                return;
+            }
             NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)
@@ -341,6 +344,9 @@ public final class GuiUtils
         } else {
             BitmapDrawable b =
                     (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
+            if (b == null) {
+                return;
+            }
             NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)

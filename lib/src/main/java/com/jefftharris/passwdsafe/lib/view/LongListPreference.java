@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.lib.view;
 
 import android.content.Context;
 import android.preference.ListPreference;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
@@ -35,7 +36,7 @@ public class LongListPreference extends ListPreference
      * @see android.preference.Preference#onBindView(android.view.View)
      */
     @Override
-    protected void onBindView(View view)
+    protected void onBindView(@NonNull View view)
     {
         super.onBindView(view);
         TextView title = (TextView)view.findViewById(android.R.id.title);

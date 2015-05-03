@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--suppress XmlUnboundNsPrefix -->
 <lint>
     <issue id="UnusedResources">
         <ignore path="res/drawable-hdpi/ic_launcher_sync.png" />
