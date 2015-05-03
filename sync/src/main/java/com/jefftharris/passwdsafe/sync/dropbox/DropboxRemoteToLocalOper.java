@@ -34,7 +34,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 public class DropboxRemoteToLocalOper
         extends AbstractRemoteToLocalSyncOper<DbxFileSystem>
 {
-    private static final String TAG = "DropboxRemoteToLocalOper";
+    private static final String TAG = "DropboxRemToLocalOper";
 
     /** Constructor */
     protected DropboxRemoteToLocalOper(DbFile file)
@@ -71,7 +71,9 @@ public class DropboxRemoteToLocalOper
 
             java.io.File localFile = ctx.getFileStreamPath(getLocalFileName());
             DbxFileInfo fileInfo = file.getInfo();
-            localFile.setLastModified(fileInfo.modifiedTime.getTime());
+            if (!localFile.setLastModified(fileInfo.modifiedTime.getTime())) {
+                Log.e(TAG, "Can't set mod time on " + itsFile);
+            }
             setDownloaded(true);
         } catch (Exception e) {
             ctx.deleteFile(getLocalFileName());
@@ -101,6 +103,7 @@ public class DropboxRemoteToLocalOper
             }
         };
         file.addListener(l);
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized(monitor) {
             while (true) {
                 DbxFileStatus stat = file.getNewerStatus();
