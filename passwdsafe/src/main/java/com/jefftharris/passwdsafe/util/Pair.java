@@ -26,9 +26,6 @@ public class Pair<T, U>
     @Override
     public String toString()
     {
-        StringBuilder str = new StringBuilder();
-        str.append("[[").append(first).append("], [");
-        str.append(second).append("]]");
-        return str.toString();
+        return "[[" + first + "], [" + second + "]]";
     }
 }
