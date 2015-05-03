@@ -37,8 +37,7 @@ public enum PasswdExpiryNotifPref
     private final PasswdRecordFilter.ExpiryFilter itsFilter;
 
     /** Constructor */
-    private PasswdExpiryNotifPref(String value,
-                                  PasswdRecordFilter.ExpiryFilter filter)
+    PasswdExpiryNotifPref(String value, PasswdRecordFilter.ExpiryFilter filter)
     {
         itsValue = value;
         itsFilter = filter;
@@ -97,7 +96,7 @@ public enum PasswdExpiryNotifPref
     }
 
     /** Get the display names array for the preferences */
-    private static final String[] getDisplayNamesArray(Resources res)
+    private static String[] getDisplayNamesArray(Resources res)
     {
         return res.getStringArray(R.array.passwd_expiry_notif_pref);
     }

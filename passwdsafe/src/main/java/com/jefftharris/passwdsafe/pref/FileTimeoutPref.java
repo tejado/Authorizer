@@ -25,7 +25,7 @@ public enum FileTimeoutPref
     private final String itsValue;
     private final int itsDisplayNameIdx;
 
-    private FileTimeoutPref(int timeout, String value, int displayNameIdx)
+    FileTimeoutPref(int timeout, String value, int displayNameIdx)
     {
         itsTimeout = timeout;
         itsValue = value;
@@ -84,7 +84,7 @@ public enum FileTimeoutPref
         return strs;
     }
 
-    private static final String[] getDisplayNamesArray(Resources res)
+    private static String[] getDisplayNamesArray(Resources res)
     {
         return res.getStringArray(R.array.file_timeout_pref);
     }

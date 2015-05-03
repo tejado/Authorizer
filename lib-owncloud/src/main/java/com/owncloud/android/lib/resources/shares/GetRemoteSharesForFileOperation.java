@@ -46,7 +46,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * @author masensio
  *
  */
-
+@SuppressWarnings("ALL")
 public class GetRemoteSharesForFileOperation extends RemoteOperation {
 
 	private static final String TAG = GetRemoteSharesForFileOperation.class.getSimpleName();

@@ -39,6 +39,7 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  *
  * @author Glen Smith (based on Kevin Preece's v2 implementation).
  */
+@SuppressWarnings("ALL")
 public final class PwsFileV3 extends PwsFile {
 
 	/**

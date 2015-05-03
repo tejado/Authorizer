@@ -30,19 +30,19 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
     public interface ProviderRemoteFile
     {
         /** Get the file's remote identifier */
-        public String getRemoteId();
+        String getRemoteId();
 
         /** Get the file's title */
-        public String getTitle();
+        String getTitle();
 
         /** Get the file's folder */
-        public String getFolder();
+        String getFolder();
 
         /** Get the file's modification time */
-        public long getModTime();
+        long getModTime();
 
         /** Get the file's hash code */
-        public String getHash();
+        String getHash();
     }
 
 
@@ -160,8 +160,7 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
     /** Resolve the sync operations after the database files are updated */
     protected List<AbstractSyncOper<ProviderClientT>> resolveSyncOpers()
     {
-        List<AbstractSyncOper<ProviderClientT>> opers =
-                new ArrayList<AbstractSyncOper<ProviderClientT>>();
+        List<AbstractSyncOper<ProviderClientT>> opers = new ArrayList<>();
         List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
             resolveSyncOper(dbfile, opers);
@@ -228,9 +227,8 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
 
 
     /** Resolve the sync operations for a file */
-    private final void resolveSyncOper(
-            DbFile dbfile,
-            List<AbstractSyncOper<ProviderClientT>> opers)
+    private void resolveSyncOper(DbFile dbfile,
+                                 List<AbstractSyncOper<ProviderClientT>> opers)
             throws SQLException
     {
         if ((dbfile.itsLocalChange != DbFile.FileChange.NO_CHANGE) ||
@@ -325,7 +323,7 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
      * and the file is updated to resemble a new local file with the same id but
      * a different name indicating a conflict
      */
-    private final void splitConflictedFile
+    private void splitConflictedFile
     (
             DbFile dbfile,
             List<AbstractSyncOper<ProviderClientT>> opers
@@ -342,7 +340,7 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
 
 
     /** Recreate a remotely deleted file from local updates */
-    private final void recreateRemoteRemovedFile
+    private void recreateRemoteRemovedFile
     (
             DbFile dbfile,
             List<AbstractSyncOper<ProviderClientT>> opers

@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -41,18 +42,17 @@ public class PasswdPolicyEditDialog
     public interface Editor
     {
         /** Callback when the policy has finished being edited */
-        public void onPolicyEditComplete(PasswdPolicy oldPolicy,
-                                         PasswdPolicy newPolicy);
+        void onPolicyEditComplete(PasswdPolicy oldPolicy,
+                                  PasswdPolicy newPolicy);
 
         /** Check whether the policy name already exists */
-        public boolean isDuplicatePolicy(String name);
+        boolean isDuplicatePolicy(String name);
     }
 
     private final Editor itsEditor;
     private PasswdPolicy itsPolicy;
     private View itsView;
     private DialogValidator itsValidator;
-    private PasswdPolicy.Type itsOrigType = PasswdPolicy.Type.NORMAL;
     private PasswdPolicy.Type itsType = PasswdPolicy.Type.NORMAL;
     private boolean itsIsNameEditable;
     private TextView itsNameEdit;
@@ -71,6 +71,7 @@ public class PasswdPolicyEditDialog
     }
 
     /** Create a dialog to edit the give policy (null for an add) */
+    @SuppressLint("InflateParams")
     public Dialog create(PasswdPolicy policy, Activity act)
     {
         itsPolicy = policy;
@@ -103,6 +104,7 @@ public class PasswdPolicyEditDialog
         boolean[] useOptions = new boolean[4];
         int[] optionLens = new int[4];
         String customSymbols;
+        PasswdPolicy.Type origType;
         if (policy != null) {
             switch (policy.getLocation()) {
             case DEFAULT: {
@@ -122,7 +124,7 @@ public class PasswdPolicyEditDialog
             titleId = R.string.edit_policy;
             name = policy.getName();
             len = policy.getLength();
-            itsOrigType = policy.getType();
+            origType = policy.getType();
             useOptions[0] =
                 policy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
             useOptions[1] =
@@ -140,7 +142,7 @@ public class PasswdPolicyEditDialog
             titleId = R.string.new_policy;
             name = "";
             len = 12;
-            itsOrigType = PasswdPolicy.Type.NORMAL;
+            origType = PasswdPolicy.Type.NORMAL;
             for (int i = 0; i < useOptions.length; ++i) {
                 useOptions[i] = true;
                 optionLens[i] = 1;
@@ -177,7 +179,7 @@ public class PasswdPolicyEditDialog
         setTextView(itsLengthEdit, len);
         itsValidator.registerTextView(itsLengthEdit);
 
-        setType(itsOrigType, true);
+        setType(origType, true);
         for (int i = 0; i < itsOptions.length; ++i) {
             setOption(itsOptions[i], useOptions[i], true);
             setTextView(itsOptionLens[i], optionLens[i]);
@@ -308,7 +310,7 @@ public class PasswdPolicyEditDialog
     }
 
     /** Set the type of policy and update the UI */
-    private final void setType(PasswdPolicy.Type type, boolean init)
+    private void setType(PasswdPolicy.Type type, boolean init)
     {
         if ((type == itsType) && !init) {
             return;
@@ -374,7 +376,7 @@ public class PasswdPolicyEditDialog
 
 
     /** Set whether an option is used */
-    private final void setOption(CheckBox option, boolean use, boolean init)
+    private void setOption(CheckBox option, boolean use, boolean init)
     {
         if (init) {
             option.setChecked(use);
@@ -400,8 +402,7 @@ public class PasswdPolicyEditDialog
 
 
     /** Set the custom symbols option */
-    private final void setCustomSymbolsOption(boolean useCustom,
-                                              boolean init)
+    private void setCustomSymbolsOption(boolean useCustom, boolean init)
     {
         if (init) {
             itsUseCustomSymbols.setChecked(useCustom);
@@ -433,7 +434,7 @@ public class PasswdPolicyEditDialog
 
 
     /** Set the visibility of the custom symbols options */
-    private final void setCustomSymbolsVisible()
+    private void setCustomSymbolsVisible()
     {
         boolean visible = false;
         switch (itsType) {
@@ -454,14 +455,10 @@ public class PasswdPolicyEditDialog
 
 
     /** Set the visibility on an option's length field */
-    private final void setOptionLenVisible(CheckBox option)
+    private void setOptionLenVisible(CheckBox option)
     {
-        boolean visible;
-        if (itsType == PasswdPolicy.Type.NORMAL) {
-            visible = option.isChecked();
-        } else {
-            visible = false;
-        }
+        boolean visible =
+                (itsType == PasswdPolicy.Type.NORMAL) && option.isChecked();
 
         int labelId = 0;
         int lengthId = 0;
@@ -496,7 +493,7 @@ public class PasswdPolicyEditDialog
 
 
     /** Set the visibility of a view */
-    private final void setVisible(int id, boolean visible)
+    private void setVisible(int id, boolean visible)
     {
         View v = itsView.findViewById(id);
         v.setVisibility(visible ? View.VISIBLE : View.GONE);
@@ -504,7 +501,7 @@ public class PasswdPolicyEditDialog
 
 
     /** Get an integer value from a text view */
-    private final int getTextViewInt(TextView tv)
+    private int getTextViewInt(TextView tv)
         throws NumberFormatException
     {
         return Integer.valueOf(tv.getText().toString(), 10);
@@ -512,14 +509,14 @@ public class PasswdPolicyEditDialog
 
 
     /** Set a text view to an integer value */
-    private final void setTextView(TextView tv, int value)
+    private void setTextView(TextView tv, int value)
     {
         tv.setText(Integer.toString(value));
     }
 
 
     /** Set a text view to a value */
-    private final void setTextView(int id, String value)
+    private void setTextView(int id, String value)
     {
         TextView tv = (TextView)itsView.findViewById(id);
         tv.setText(value);

@@ -19,7 +19,7 @@ public enum FontSizePref
 
     private final int itsDisplayNameIdx;
 
-    private FontSizePref(int displayNameIdx)
+    FontSizePref(int displayNameIdx)
     {
         itsDisplayNameIdx = displayNameIdx;
     }
@@ -55,7 +55,7 @@ public enum FontSizePref
         return strs;
     }
 
-    private static final String[] getDisplayNamesArray(Resources res)
+    private static String[] getDisplayNamesArray(Resources res)
     {
         return res.getStringArray(R.array.font_size_pref);
     }

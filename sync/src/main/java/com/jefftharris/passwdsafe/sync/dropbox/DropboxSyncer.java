@@ -51,8 +51,7 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
     {
         syncDisplayName();
 
-        HashMap<String, ProviderRemoteFile> dbxfiles =
-                new HashMap<String, ProviderRemoteFile>();
+        HashMap<String, ProviderRemoteFile> dbxfiles = new HashMap<>();
         getDirFiles(DbxPath.ROOT, dbxfiles);
 
         updateDbFiles(dbxfiles);
@@ -116,8 +115,8 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
 
 
     /** Get all of the files under the path */
-    private final void getDirFiles(DbxPath path,
-                                   HashMap<String, ProviderRemoteFile> files)
+    private void getDirFiles(DbxPath path,
+                             HashMap<String, ProviderRemoteFile> files)
             throws DbxException
     {
         List<DbxFileInfo> children = itsProviderClient.listFolder(path);

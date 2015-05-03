@@ -136,7 +136,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     }
 
     /** Sync account display name */
-    private final void syncDisplayName()
+    private void syncDisplayName()
             throws BoxRestException, BoxServerException,
                    AuthFatalFailureException
     {
@@ -158,7 +158,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     }
 
     /** Get the files from Box */
-    private final HashMap<String, ProviderRemoteFile> getBoxFiles()
+    private HashMap<String, ProviderRemoteFile> getBoxFiles()
             throws BoxSDKException
     {
         BoxFoldersManager folderMgr = itsProviderClient.getFoldersManager();
@@ -173,8 +173,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
                  .addField(BoxFile.FIELD_SIZE)
                  .addField(BoxFile.FIELD_SHA1);
 
-        HashMap<String, ProviderRemoteFile> boxfiles =
-                new HashMap<String, ProviderRemoteFile>();
+        HashMap<String, ProviderRemoteFile> boxfiles = new HashMap<>();
 
         // Get root files
         retrieveBoxFolderFiles(ROOT_FOLDER, folderMgr, folderReq, boxfiles);
@@ -207,7 +206,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
     }
 
     /** Retrieve the files in the given folder */
-    private final void retrieveBoxFolderFiles(
+    private void retrieveBoxFolderFiles(
             String folderId,
             BoxFoldersManager folderMgr,
             BoxFolderRequestObject folderReq,
@@ -238,7 +237,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
 
 
     /** Convert a Box object to a string for debugging */
-    private final String boxToString(BoxObject obj)
+    private String boxToString(BoxObject obj)
     {
         return BoxProvider.boxToString(obj, itsProviderClient);
     }
