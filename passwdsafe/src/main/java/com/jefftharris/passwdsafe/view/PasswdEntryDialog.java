@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -45,10 +46,10 @@ public class PasswdEntryDialog implements View.OnClickListener
     public interface User
     {
         /** Handle the user clicking Ok */
-        public void handleOk(StringBuilder password, boolean readonly);
+        void handleOk(StringBuilder password, boolean readonly);
 
         /** Handle the user clicking cancel */
-        public void handleCancel();
+        void handleCancel();
     }
 
     private Activity itsActivity;
@@ -73,6 +74,7 @@ public class PasswdEntryDialog implements View.OnClickListener
     public Dialog create()
     {
         LayoutInflater factory = LayoutInflater.from(itsActivity);
+        @SuppressLint("InflateParams")
         View passwdView = factory.inflate(R.layout.passwd_entry, null);
         AbstractDialogClickListener dlgClick =
             new AbstractDialogClickListener()
@@ -191,19 +193,13 @@ public class PasswdEntryDialog implements View.OnClickListener
      *  false otherwise */
     public boolean onPause()
     {
-        if (itsYubiMgr != null) {
-            return itsYubiMgr.onPause();
-        }
-        return false;
+        return (itsYubiMgr != null) && itsYubiMgr.onPause();
     }
 
     /** Handle a new intent.  Return true if handled */
     public boolean onNewIntent(Intent intent)
     {
-        if (itsYubiMgr != null) {
-            return itsYubiMgr.handleKeyIntent(intent);
-        }
-        return false;
+        return (itsYubiMgr != null) && itsYubiMgr.handleKeyIntent(intent);
     }
 
     /** Handle a click event */
@@ -300,5 +296,5 @@ public class PasswdEntryDialog implements View.OnClickListener
             setVisibility(R.id.yubi_start_fields, true, itsDialog);
             setVisibility(R.id.yubi_progress_fields, false, itsDialog);
         }
-    };
+    }
 }

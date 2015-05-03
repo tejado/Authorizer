@@ -23,6 +23,7 @@ package org.pwsafe.util;
  * In addition it also specifies whether certain confusable characters should
  * be removed from the password.  These are characters such as '1' and 'I'.
  */
+@SuppressWarnings("ALL")
 public class PassphrasePolicy
 {
 	/**
@@ -87,11 +88,7 @@ public class PassphrasePolicy
 		if ( DigitChars )		++count;
 		if ( SymbolChars )		++count;
 
-		if ( (count > 0) && (Length >= count) )
-		{
-			return true;
-		}
-		return false;
+	    return (count > 0) && (Length >= count);
 	}
 
 	/**

@@ -19,6 +19,7 @@ import org.pwsafe.lib.exception.EndOfFileException;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
 {
 	/**

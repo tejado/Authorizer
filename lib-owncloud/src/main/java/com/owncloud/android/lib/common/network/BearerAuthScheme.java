@@ -44,6 +44,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * @author David A. Velasco
  */
 
+@SuppressWarnings("ALL")
 public class BearerAuthScheme implements AuthScheme /*extends RFC2617Scheme*/ {
     
     private static final String TAG = BearerAuthScheme.class.getSimpleName();

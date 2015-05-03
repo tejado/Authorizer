@@ -313,6 +313,7 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Does the file exist at the URI */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean exists()
     {
         switch (itsType) {

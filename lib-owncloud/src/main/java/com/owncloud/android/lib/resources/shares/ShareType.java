@@ -47,7 +47,7 @@ public enum ShareType {
     
     private int value;
     
-    private ShareType(int value)
+    ShareType(int value)
     {
         this.value = value;
     }
@@ -75,4 +75,4 @@ public enum ShareType {
         }
         return null;
     }
-};
+}

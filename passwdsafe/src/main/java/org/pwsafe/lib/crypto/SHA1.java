@@ -20,6 +20,7 @@ package org.pwsafe.lib.crypto;
  * SHA-1 message digest implementation, translated from C source code (the
  * origin is unknown).
  */
+@SuppressWarnings("ALL")
 public class SHA1
 {
 	/**

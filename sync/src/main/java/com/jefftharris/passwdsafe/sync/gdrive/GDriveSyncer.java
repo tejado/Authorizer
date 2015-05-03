@@ -58,12 +58,11 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
     private final Drive itsDrive;
     private final String itsDriveToken;
     private final boolean itsIsFull;
-    private final HashMap<String, File> itsFileCache =
-            new HashMap<String, File>();
+    private final HashMap<String, File> itsFileCache = new HashMap<>();
     private final FileFolders itsFileFolders;
 
     private static final HashMap<String, FolderRefs> itsFolderRefs =
-            new HashMap<String, FolderRefs>();
+            new HashMap<>();
     private static boolean itsFolderRefsInit = false;
 
     private static final String TAG = "GDriveSyncer";
@@ -184,7 +183,7 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
 
 
     /** Perform a full sync of the files */
-    private final Pair<Long, List<AbstractSyncOper<Drive>>> performFullSync()
+    private Pair<Long, List<AbstractSyncOper<Drive>>> performFullSync()
             throws SQLException, IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "Perform full sync");
@@ -192,15 +191,15 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
                 .setFields(GDriveProvider.ABOUT_FIELDS).execute();
         long largestChangeId = about.getLargestChangeId();
 
-        HashMap<String, File> allRemFiles = new HashMap<String, File>();
-        StringBuilder query = new StringBuilder();
-        query.append("not trashed");
-        query.append(" and ( mimeType = 'application/octet-stream' or ");
-        query.append("       mimeType = 'binary/octet-stream' or ");
-        query.append("       mimeType = 'application/psafe3' )");
-        query.append(" and fullText contains '.psafe3'");
+        HashMap<String, File> allRemFiles = new HashMap<>();
+        String query =
+                "not trashed" +
+                " and ( mimeType = 'application/octet-stream' or " +
+                "       mimeType = 'binary/octet-stream' or " +
+                "       mimeType = 'application/psafe3' )" +
+                " and fullText contains '.psafe3'";
         Files.List request = itsDrive.files().list()
-                .setQ(query.toString())
+                .setQ(query)
                 .setFields("nextPageToken,items("+GDriveProvider.FILE_FIELDS+")");
         do {
             FileList files = request.execute();
@@ -221,26 +220,24 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
                 (request.getPageToken().length() > 0));
 
         List<AbstractSyncOper<Drive>> opers = performSync(allRemFiles, true);
-        return new Pair<Long, List<AbstractSyncOper<Drive>>>(largestChangeId,
-                                                             opers);
+        return new Pair<>(largestChangeId, opers);
     }
 
 
     /** Perform a sync of files since the given change id */
-    private final Pair<Long, List<AbstractSyncOper<Drive>>>
+    private Pair<Long, List<AbstractSyncOper<Drive>>>
     performSyncSince(long changeId)
             throws SQLException, IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "performSyncSince %d", changeId);
-        HashMap<String, File> changedFiles = new HashMap<String, File>();
+        HashMap<String, File> changedFiles = new HashMap<>();
         Changes.List request =
             itsDrive.changes().list().setStartChangeId(changeId + 1)
             .setFields("largestChangeId,nextPageToken," +
                     "items(deleted,fileId,file("+GDriveProvider.FILE_FIELDS+"))");
         do {
             ChangeList changes = request.execute();
-            long changesLargestId =
-                    changes.getLargestChangeId().longValue();
+            long changesLargestId = changes.getLargestChangeId();
 
             for (Change change: changes.getItems()) {
                 File file = change.getFile();
@@ -266,12 +263,12 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
                 (request.getPageToken().length() > 0));
 
         List<AbstractSyncOper<Drive>> opers = performSync(changedFiles, false);
-        return new Pair<Long, List<AbstractSyncOper<Drive>>>(changeId, opers);
+        return new Pair<>(changeId, opers);
     }
 
 
     /** Perform a sync of the files */
-    private final List<AbstractSyncOper<Drive>>
+    private List<AbstractSyncOper<Drive>>
     performSync(HashMap<String, File> remfiles, boolean isAllRemoteFiles)
             throws SQLException, IOException
     {
@@ -312,8 +309,7 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
                                  remfile.getMd5Checksum(), itsDb);
         }
 
-        List<AbstractSyncOper<Drive>> opers =
-                new ArrayList<AbstractSyncOper<Drive>>();
+        List<AbstractSyncOper<Drive>> opers = new ArrayList<>();
         dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
         for (DbFile dbfile: dbfiles) {
             resolveSyncOper(dbfile, opers);
@@ -324,9 +320,9 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
 
 
     /** Check for a remote file change and update */
-    private final void checkRemoteFileChange(DbFile dbfile,
-                                             File remfile,
-                                             Map<String, String> fileFolders)
+    private void checkRemoteFileChange(DbFile dbfile,
+                                       File remfile,
+                                       Map<String, String> fileFolders)
     {
         boolean changed = true;
         do {
@@ -377,8 +373,8 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
 
 
     /** Resolve the sync operations for a file */
-    private final void resolveSyncOper(DbFile dbfile,
-                                       List<AbstractSyncOper<Drive>> opers)
+    private void resolveSyncOper(DbFile dbfile,
+                                 List<AbstractSyncOper<Drive>> opers)
             throws SQLException
     {
         if ((dbfile.itsLocalChange != DbFile.FileChange.NO_CHANGE) ||
@@ -476,8 +472,8 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
      * and the file is updated to resemble a new local file with the same id but
      * a different name indicating a conflict
      */
-    private final void splitConflictedFile(DbFile dbfile,
-                                           List<AbstractSyncOper<Drive>> opers)
+    private void splitConflictedFile(DbFile dbfile,
+                                     List<AbstractSyncOper<Drive>> opers)
             throws SQLException
     {
         DbFile newRemfile = splitRemoteToNewFile(dbfile);
@@ -492,9 +488,8 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
 
 
     /** Recreate a remotely deleted file from local updates */
-    private final void recreateRemoteRemovedFile(
-            DbFile dbfile,
-            List<AbstractSyncOper<Drive>> opers)
+    private void recreateRemoteRemovedFile(DbFile dbfile,
+                                           List<AbstractSyncOper<Drive>> opers)
             throws SQLException
     {
         resetRemoteFields(dbfile);
@@ -506,6 +501,7 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
 
 
     /** Should the file be synced */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean isSyncFile(File file)
     {
         if (isFolderFile(file) || file.getLabels().getTrashed()) {
@@ -576,6 +572,6 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
         } catch (Exception e) {
             Log.e(TAG, "Token exception", e);
         }
-        return new Pair<Drive, String>(drive, token);
+        return new Pair<>(drive, token);
     }
 }

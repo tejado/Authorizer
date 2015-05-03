@@ -57,6 +57,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * 
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class RemoteOperationResult implements Serializable {
 	
 	/** Generated - should be refreshed every time the class changes!! */;
@@ -167,7 +168,8 @@ public class RemoteOperationResult implements Serializable {
                 }
                 if ("www-authenticate".equals(current.getName().toLowerCase())) {
                 	mAuthenticate = current.getValue();
-                	continue;
+                    //noinspection UnnecessaryContinue
+                    continue;
                 }
             }
         }

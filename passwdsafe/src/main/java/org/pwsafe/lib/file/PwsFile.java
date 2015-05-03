@@ -70,6 +70,7 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  * </tt>
  * </p>
  */
+@SuppressWarnings("ALL")
 public abstract class PwsFile
 {
 	private static final Log LOG = Log.getInstance(PwsFile.class.getPackage().getName());
@@ -510,7 +511,8 @@ public abstract class PwsFile
 	 */
 	void readAll() throws IOException, UnsupportedFileVersionException {
 		try {
-			for ( ;; ) {
+		    //noinspection InfiniteLoopStatement
+		    for ( ;; ) {
 				final PwsRecord	rec = PwsRecord.read( this );
 
 				if ( rec.isValid() ){

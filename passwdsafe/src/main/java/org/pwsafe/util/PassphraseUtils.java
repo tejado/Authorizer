@@ -17,6 +17,7 @@ import org.pwsafe.lib.exception.InvalidPassphrasePolicy;
 /**
  *
  */
+@SuppressWarnings("ALL")
 public class PassphraseUtils
 {
 	/**
@@ -202,10 +203,6 @@ public class PassphraseUtils
 			else 									hasSymbol	= true;
 		}
 
-		if ( hasUC && hasLC && (hasDigit || hasSymbol) )
-		{
-			return false;
-		}
-		return true;
+	    return !(hasUC && hasLC && (hasDigit || hasSymbol));
 	}
 }
