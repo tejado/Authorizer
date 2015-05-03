@@ -87,8 +87,10 @@ public class GDriveRemoteToLocalOper
             }
 
             java.io.File localFile = ctx.getFileStreamPath(getLocalFileName());
-            localFile.setLastModified(
-                    itsDriveFile.getModifiedDate().getValue());
+            if (!localFile.setLastModified(
+                    itsDriveFile.getModifiedDate().getValue())) {
+                Log.e(TAG, "Can't set mod time on " + itsFile);
+            }
         } catch (IOException e) {
             ctx.deleteFile(getLocalFileName());
             Log.e(TAG, "Sync failed to download " + itsDriveFile.getTitle(), e);

@@ -63,7 +63,9 @@ public class BoxRemoteToLocalOper
             }
 
             java.io.File localFile = ctx.getFileStreamPath(getLocalFileName());
-            localFile.setLastModified(itsFile.itsRemoteModDate);
+            if (!localFile.setLastModified(itsFile.itsRemoteModDate)) {
+                Log.e(TAG, "Can't set mod time on " + itsFile);
+            }
             setDownloaded(true);
         } catch (Exception e) {
             ctx.deleteFile(getLocalFileName());
