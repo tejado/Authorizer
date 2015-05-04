@@ -12,6 +12,7 @@ package org.pwsafe.lib.exception;
 /**
  *
  */
+@SuppressWarnings("ALL")
 public class InvalidPassphrasePolicy extends Exception
 {
 	/**

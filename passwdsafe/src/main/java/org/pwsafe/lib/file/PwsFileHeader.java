@@ -133,7 +133,6 @@ public class PwsFileHeader
 	 * Updates the header ready for saving.
 	 * 
 	 * @param passphrase the passphrase to be used to encrypt the database.
-	 * @throws NoSuchAlgorithmException If no SHA-1 implementation is found.
 	 */
 	private void update( String passphrase )
 	{

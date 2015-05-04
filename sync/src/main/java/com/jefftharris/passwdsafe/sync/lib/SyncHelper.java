@@ -45,19 +45,29 @@ public class SyncHelper
         DbProvider provider = null;
         try {
             db.beginTransaction();
-            ProviderType providerType = null;
-            if (acct.type.equals(SyncDb.GDRIVE_ACCOUNT_TYPE)) {
+            ProviderType providerType;
+            switch (acct.type) {
+            case SyncDb.GDRIVE_ACCOUNT_TYPE: {
                 providerType = ProviderType.GDRIVE;
-            } else if (acct.type.equals(SyncDb.DROPBOX_ACCOUNT_TYPE)) {
+                break;
+            }
+            case SyncDb.DROPBOX_ACCOUNT_TYPE: {
                 providerType = ProviderType.DROPBOX;
-            } else if (acct.type.equals(SyncDb.BOX_ACCOUNT_TYPE)) {
+                break;
+            }
+            case SyncDb.BOX_ACCOUNT_TYPE: {
                 providerType = ProviderType.BOX;
-            } else if (acct.type.equals(SyncDb.OWNCLOUD_ACCOUNT_TYPE)) {
+                break;
+            }
+            case SyncDb.OWNCLOUD_ACCOUNT_TYPE: {
                 providerType = ProviderType.OWNCLOUD;
-            } else {
+                break;
+            }
+            default: {
                 PasswdSafeUtil.dbginfo(TAG, "Unknown account type: ",
                                        acct.type);
                 return null;
+            }
             }
             provider = SyncDb.getProvider(acct.name, providerType, db);
             db.setTransactionSuccessful();

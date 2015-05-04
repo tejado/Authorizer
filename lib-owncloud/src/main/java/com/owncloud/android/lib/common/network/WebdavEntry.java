@@ -36,6 +36,7 @@ import android.net.Uri;
 
 import com.owncloud.android.lib.common.utils.Log_OC;
 
+@SuppressWarnings("ALL")
 public class WebdavEntry {
 	private static final String NAMESPACE_OC = "http://owncloud.org/ns";
 	private static final String EXTENDED_PROPERTY_NAME_PERMISSIONS = "permissions";

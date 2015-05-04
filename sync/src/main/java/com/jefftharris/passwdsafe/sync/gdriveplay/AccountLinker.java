@@ -159,7 +159,7 @@ public class AccountLinker
             break;
         }
         }
-        return new Pair<Boolean, NewAccountTask>(finished, task);
+        return new Pair<>(finished, task);
     }
 
     /** Disconnect the linker and shut down */

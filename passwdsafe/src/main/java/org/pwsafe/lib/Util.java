@@ -19,6 +19,7 @@ import org.pwsafe.lib.crypto.SHA256Pws;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public final class Util
 {
 	private static final Log LOG = Log.getInstance(Util.class.getPackage().getName());

@@ -13,6 +13,7 @@ package org.pwsafe.lib.exception;
  * @author mueller
  *
  */
+@SuppressWarnings("ALL")
 public class MemoryKeyException extends RuntimeException {
 
 	/**

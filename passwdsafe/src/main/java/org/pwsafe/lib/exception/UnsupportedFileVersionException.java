@@ -15,6 +15,7 @@ package org.pwsafe.lib.exception;
  * 
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class UnsupportedFileVersionException extends Exception
 {
 

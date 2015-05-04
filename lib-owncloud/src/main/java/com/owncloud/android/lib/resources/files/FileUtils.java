@@ -28,6 +28,7 @@ import java.io.File;
 
 import com.owncloud.android.lib.common.utils.Log_OC;
 
+@SuppressWarnings("ALL")
 public class FileUtils {
 
 	public static final String PATH_SEPARATOR = "/";

@@ -14,6 +14,7 @@ package org.pwsafe.lib;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class Log
 {
     private String itsTag = "Log";

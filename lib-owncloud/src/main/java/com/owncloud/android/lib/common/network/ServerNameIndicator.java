@@ -42,6 +42,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * 
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class ServerNameIndicator {
 	
 	private static final String TAG = ServerNameIndicator.class.getSimpleName();
