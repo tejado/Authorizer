@@ -27,6 +27,7 @@ public class PwsPasswdUnicodeField extends AbstractPwsPasswdField
     }
 
 
+    @SuppressWarnings("SameParameterValue")
     public PwsPasswdUnicodeField(PwsFieldType type)
     {
         super(type, ENCODING);

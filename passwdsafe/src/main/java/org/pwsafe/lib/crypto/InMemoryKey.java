@@ -21,6 +21,7 @@ import java.util.Arrays;
  *
  * @author roxon
  */
+@SuppressWarnings("ALL")
 public class InMemoryKey {
 	private final static int BUFFER_SIZE = 1024;
 	final short[] access;

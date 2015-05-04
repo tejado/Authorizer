@@ -24,9 +24,10 @@ public class PasswdCursorLoader extends CursorLoader
     private Exception itsLoadException;
 
     /** Constructor */
-    public PasswdCursorLoader(Activity activity, Uri uri, String[] projection,
-                              String selection, String[] selectionArgs,
-                              String sortOrder)
+    public PasswdCursorLoader(
+            Activity activity, Uri uri, String[] projection, String selection,
+            @SuppressWarnings("SameParameterValue") String[] selectionArgs,
+            String sortOrder)
     {
         super(activity, uri, projection, selection, selectionArgs, sortOrder);
         itsActivity = activity;

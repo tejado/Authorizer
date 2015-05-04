@@ -37,6 +37,7 @@ public class PwsUUIDField extends PwsField
 	 * @param type  the field's type.
 	 * @param value the field's value.
 	 */
+	@SuppressWarnings("SameParameterValue")
 	public PwsUUIDField( int type, UUID value )
 	{
 		super( type, value );

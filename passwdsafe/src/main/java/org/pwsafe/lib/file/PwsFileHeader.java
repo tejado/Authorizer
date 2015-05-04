@@ -112,10 +112,9 @@ public class PwsFileHeader
 	 * @param file the file to write the header to.
 	 * 
 	 * @throws IOException
-	 * @throws NoSuchAlgorithmException If no SHA-1 implementation is found.
 	 */
 	public void save( PwsFile file )
-	throws IOException, NoSuchAlgorithmException
+	throws IOException
 	{
 		LOG.enterMethod( "PwsFileHeader.save" );
 

@@ -28,7 +28,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
     private static final String TAG = "SyncAdapter";
 
     /** Constructor */
-    public SyncAdapter(Context context, boolean autoInitialize)
+    public SyncAdapter(
+            Context context,
+            @SuppressWarnings("SameParameterValue") boolean autoInitialize)
     {
         super(context, autoInitialize);
         itsContext = context;

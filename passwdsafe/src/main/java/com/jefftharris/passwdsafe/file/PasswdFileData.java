@@ -60,6 +60,7 @@ import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.util.Pair;
 
+@SuppressWarnings("SameParameterValue")
 public class PasswdFileData
 {
     private PasswdFileUri itsUri;

@@ -16,7 +16,7 @@ public class LongReference
     public long itsValue;
 
     /** Constructor */
-    public LongReference(long l)
+    public LongReference(@SuppressWarnings("SameParameterValue") long l)
     {
         itsValue = l;
     }

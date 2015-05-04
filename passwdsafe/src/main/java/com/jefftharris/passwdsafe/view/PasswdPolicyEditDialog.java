@@ -516,7 +516,8 @@ public class PasswdPolicyEditDialog
 
 
     /** Set a text view to a value */
-    private void setTextView(int id, String value)
+    private void setTextView(@SuppressWarnings("SameParameterValue") int id,
+                             String value)
     {
         TextView tv = (TextView)itsView.findViewById(id);
         tv.setText(value);

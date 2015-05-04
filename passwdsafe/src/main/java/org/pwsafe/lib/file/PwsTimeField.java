@@ -50,6 +50,7 @@ public class PwsTimeField extends PwsField
 	 * @param type  the field's type.
 	 * @param aDate the field's value.
 	 */
+	@SuppressWarnings("SameParameterValue")
 	public PwsTimeField( PwsFieldType type, Date aDate)
 	{
 		super( type, aDate);

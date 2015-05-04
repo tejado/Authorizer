@@ -32,6 +32,7 @@ public abstract class SyncOper
     }
 
     /** Perform the database update after the sync operation */
+    @SuppressWarnings("RedundantThrows")
     public abstract void doPostOperUpdate(SQLiteDatabase db, Context ctx)
             throws IOException, SQLException;
 

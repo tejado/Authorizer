@@ -71,7 +71,8 @@ public class YubikeyMgr
         void handleHashException(Exception e);
 
         /// Handle an update on the timer until the start times out
-        void timerTick(int totalTime, int remainingTime);
+        void timerTick(@SuppressWarnings("SameParameterValue") int totalTime,
+                       int remainingTime);
 
         /// Notification that the interaction is starting
         void starting();
