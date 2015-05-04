@@ -26,6 +26,7 @@ import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsRecord;
 
+@SuppressWarnings("ALL")
 public class PwsEntryStoreImpl implements PwsEntryStore {
 
 	private final static Log LOGGER = Log.getInstance(PwsEntryStoreImpl.class);

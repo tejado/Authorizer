@@ -17,6 +17,7 @@ import org.pwsafe.lib.file.PwsRecordV2;
  * Swing helper class, will be moved to PasswordJ project.
  * @deprecated
  */
+@SuppressWarnings("ALL")
 @Deprecated
 public class DefaultRecordWrapper
 {

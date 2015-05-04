@@ -32,6 +32,7 @@ import java.util.Locale;
 
 import android.net.Uri;
 
+@SuppressWarnings("ALL")
 public class WebdavUtils {
     public static final SimpleDateFormat DISPLAY_DATE_FORMAT = new SimpleDateFormat(
             "dd.MM.yyyy hh:mm");

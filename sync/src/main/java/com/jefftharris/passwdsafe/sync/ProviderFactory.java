@@ -24,7 +24,7 @@ import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 public class ProviderFactory
 {
     private static final EnumMap<ProviderType, Provider> itsProviders =
-            new EnumMap<ProviderType, Provider>(ProviderType.class);
+            new EnumMap<>(ProviderType.class);
 
     /** Get the provider implementation for the type */
     public static synchronized Provider getProvider(ProviderType type,

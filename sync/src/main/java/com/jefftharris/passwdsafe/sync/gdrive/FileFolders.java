@@ -83,7 +83,7 @@ public class FileFolders
     computeFilesFolders(Map<String, File> remfiles)
             throws IOException
     {
-        HashMap<String, String> fileFolders = new HashMap<String, String>();
+        HashMap<String, String> fileFolders = new HashMap<>();
         for (File remfile: remfiles.values()) {
             if (remfile == null) {
                 continue;
@@ -123,7 +123,7 @@ public class FileFolders
             throws IOException
     {
         String fileId = remfile.getId();
-        ArrayList<String> folders = new ArrayList<String>();
+        ArrayList<String> folders = new ArrayList<>();
         for (ParentReference parent: remfile.getParents()) {
             traceParentRefs(parent, "", folders, fileId);
         }
