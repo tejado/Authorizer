@@ -1176,6 +1176,7 @@ public class PasswdFileData
             passwd.setCharAt(i, '\0');
         }
         passwd.delete(0, passwd.length());
+        //noinspection UnusedAssignment
         passwd = null;
         indexRecords();
         notifyObservers(this);

@@ -34,7 +34,7 @@ public class PwsStreamStorage implements PwsStorage
         itsLoadStream.mark(headerLen);
         byte[] bytes = new byte[headerLen];
         int offset = 0;
-        int numread = 0;
+        int numread;
         while (offset < bytes.length) {
             numread = itsLoadStream.read(bytes, offset,
                                          bytes.length - offset);
@@ -53,7 +53,7 @@ public class PwsStreamStorage implements PwsStorage
         if (itsLoadBytes == null) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             byte[] buf = new byte[1024];
-            int numread = 0;
+            int numread;
 
             for (;;) {
                 numread = itsLoadStream.read(buf);

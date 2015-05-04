@@ -50,6 +50,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  *
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public abstract class RemoteOperation implements Runnable {
 
     private static final String TAG = RemoteOperation.class.getSimpleName();

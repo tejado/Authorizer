@@ -49,9 +49,9 @@ public class OwncloudLocalToRemoteOper extends
         PasswdSafeUtil.dbginfo(TAG, "syncLocalToRemote %s", itsFile);
 
         File tmpFile = null;
-        File uploadFile = null;
-        String remotePath = null;
         try {
+            File uploadFile;
+            String remotePath;
             if (itsFile.itsLocalFile != null) {
                 uploadFile = ctx.getFileStreamPath(itsFile.itsLocalFile);
                 setLocalFile(uploadFile);
