@@ -30,6 +30,7 @@ public class ManifestBroadcastReceiver extends BroadcastReceiver
     {
         PasswdSafeUtil.dbginfo(TAG, "onReceive: %s", intent);
         String action = intent.getAction();
+        //noinspection StatementWithEmptyBody
         if (action.equals(Provider.ACTION_SYNC_EXPIRATION_TIMEOUT)) {
             ProviderType type = ProviderType.fromString(intent.getStringExtra(
                     Provider.SYNC_EXPIRATION_TIMEOUT_EXTRA_TYPE));
