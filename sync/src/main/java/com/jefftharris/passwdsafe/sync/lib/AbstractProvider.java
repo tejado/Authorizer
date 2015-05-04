@@ -8,6 +8,7 @@ package com.jefftharris.passwdsafe.sync.lib;
 
 import java.io.File;
 
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 /**
@@ -22,7 +23,7 @@ public abstract class AbstractProvider implements Provider
     public long insertLocalFile(long providerId,
                                 String title,
                                 SQLiteDatabase db)
-            throws Exception
+            throws SQLException
     {
         long id = SyncDb.addLocalFile(providerId, title,
                                       System.currentTimeMillis(), db);

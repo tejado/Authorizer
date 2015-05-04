@@ -51,6 +51,7 @@ import com.owncloud.android.lib.common.operations.RemoteOperationResult;
  * @author masensio
  */
 
+@SuppressWarnings("ALL")
 public class UploadRemoteFileOperation extends RemoteOperation {
 
 

@@ -34,8 +34,8 @@ public class PasswordVisibilityMenuHandler
     {
         private static final int MENU_TOGGLE_PASSWORD = 0;
 
-        private TextView itsViews[];
-        private TextView itsView;
+        private final TextView[] itsViews;
+        private final TextView itsView;
 
         public MenuListener(TextView view, TextView[] views)
         {

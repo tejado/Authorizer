@@ -21,6 +21,7 @@ import org.pwsafe.lib.file.PwsFieldType;
  * @author roxon
  * @see PwsEntryBean
  */
+@SuppressWarnings("ALL")
 public interface PwsEntryStore {
 	
 	void setSparseFields (Set<PwsFieldType> fieldTypes);

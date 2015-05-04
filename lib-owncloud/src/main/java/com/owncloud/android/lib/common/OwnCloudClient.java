@@ -49,6 +49,7 @@ import com.owncloud.android.lib.common.accounts.AccountUtils;
 import com.owncloud.android.lib.common.network.WebdavUtils;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
+@SuppressWarnings("ALL")
 @SuppressLint("DefaultLocale")
 public class OwnCloudClient extends HttpClient {
 

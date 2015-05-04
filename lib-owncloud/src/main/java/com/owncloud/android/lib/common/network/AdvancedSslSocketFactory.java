@@ -58,6 +58,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * @author David A. Velasco
  */
 
+@SuppressWarnings("ALL")
 public class AdvancedSslSocketFactory implements SecureProtocolSocketFactory {
 
     private static final String TAG = AdvancedSslSocketFactory.class.getSimpleName();

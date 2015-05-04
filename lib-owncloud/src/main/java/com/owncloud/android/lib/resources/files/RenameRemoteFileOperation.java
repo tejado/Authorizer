@@ -42,6 +42,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * @author David A. Velasco
  * @author masensio
  */
+@SuppressWarnings("ALL")
 public class RenameRemoteFileOperation extends RemoteOperation {
 
 	private static final String TAG = RenameRemoteFileOperation.class.getSimpleName();

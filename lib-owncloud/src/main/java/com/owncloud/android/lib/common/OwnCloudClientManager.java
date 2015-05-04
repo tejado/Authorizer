@@ -40,6 +40,7 @@ import com.owncloud.android.lib.common.accounts.AccountUtils.AccountNotFoundExce
  * @author masensio
  */
 
+@SuppressWarnings("ALL")
 public interface OwnCloudClientManager {
 
 	public OwnCloudClient getClientFor(OwnCloudAccount account, Context context);

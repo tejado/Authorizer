@@ -21,7 +21,7 @@ import com.jefftharris.passwdsafe.sync.R;
 public class NewAccountTask extends AccountUpdateTask
 {
     protected String itsNewAcct;
-    private ProviderType itsAcctType;
+    private final ProviderType itsAcctType;
 
     /** Constructor */
     public NewAccountTask(Uri currAcctUri,

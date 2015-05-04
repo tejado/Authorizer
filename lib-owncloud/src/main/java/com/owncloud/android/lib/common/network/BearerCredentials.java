@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.util.LangUtils;
  *
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class BearerCredentials implements Credentials {
 
     

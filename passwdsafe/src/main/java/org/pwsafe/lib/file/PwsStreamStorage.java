@@ -21,7 +21,7 @@ public class PwsStreamStorage implements PwsStorage
     private SaveHelper itsSaveHelper;
     private BufferedInputStream itsLoadStream;
     private byte[] itsLoadBytes;
-    private String itsIdentifier;
+    private final String itsIdentifier;
 
     public PwsStreamStorage(String identifier, InputStream stream)
     {

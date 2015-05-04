@@ -40,6 +40,7 @@ import com.owncloud.android.lib.common.network.WebdavUtils;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
 
+@SuppressWarnings("ALL")
 public class ChunkedUploadRemoteFileOperation extends UploadRemoteFileOperation {
     
     public static final long CHUNK_SIZE = 1024000;

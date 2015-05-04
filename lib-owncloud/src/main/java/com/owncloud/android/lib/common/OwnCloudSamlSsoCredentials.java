@@ -5,6 +5,7 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 
 import android.net.Uri;
 
+@SuppressWarnings("ALL")
 public class OwnCloudSamlSsoCredentials implements OwnCloudCredentials {
 
 	private String mSessionCookie;

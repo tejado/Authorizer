@@ -51,11 +51,8 @@ public class SyncLogsFragment extends ListFragment
     {
         setHasOptionsMenu(true);
 
-        if (savedInstanceState != null) {
-            itsIsShowAll = savedInstanceState.getBoolean(STATE_SHOW_ALL, false);
-        } else {
-            itsIsShowAll = false;
-        }
+        itsIsShowAll = (savedInstanceState != null) &&
+                       savedInstanceState.getBoolean(STATE_SHOW_ALL, false);
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }

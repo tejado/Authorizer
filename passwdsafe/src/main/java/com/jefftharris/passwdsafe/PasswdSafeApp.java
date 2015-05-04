@@ -178,7 +178,7 @@ public class PasswdSafeApp extends Application
 
     private PasswdFileData itsFileData = null;
     private String itsLastViewedRecord = null;
-    private WeakHashMap<Activity, Object> itsFileDataActivities =
+    private final WeakHashMap<Activity, Object> itsFileDataActivities =
             new WeakHashMap<>();
     private PasswdPolicy itsDefaultPasswdPolicy = null;
     private AlarmManager itsAlarmMgr;

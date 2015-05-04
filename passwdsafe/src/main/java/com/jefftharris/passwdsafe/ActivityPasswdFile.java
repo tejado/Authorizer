@@ -67,7 +67,7 @@ public abstract class ActivityPasswdFile
         }
     }
 
-    private PasswdFileActivity itsActivity;
+    private final PasswdFileActivity itsActivity;
     private SaveTask itsSaveTask;
 
     protected ActivityPasswdFile(PasswdFileActivity activity)

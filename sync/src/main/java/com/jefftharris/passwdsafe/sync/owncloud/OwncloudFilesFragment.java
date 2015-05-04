@@ -39,9 +39,9 @@ public class OwncloudFilesFragment extends ListFragment
     public interface Listener
     {
         /** Callback to handle the result of listing files */
-        public interface ListFilesCb
+        interface ListFilesCb
         {
-            public void handleFiles(List<OwncloudProviderFile> files);
+            void handleFiles(List<OwncloudProviderFile> files);
         }
 
         /** List files for a given path */

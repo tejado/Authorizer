@@ -64,14 +64,12 @@ public class OwncloudFilesActivity extends FragmentActivity
     private Uri itsFilesUri;
 
     private OwnCloudClient itsClient = null;
-    private HashMap<String, Long> itsSyncedFiles =
-            new HashMap<String, Long>();
+    private final HashMap<String, Long> itsSyncedFiles = new HashMap<>();
     private AsyncTask<Void, Void, OwnCloudClient> itsClientLoadTask;
     private LoaderCallbacks<Cursor> itsProviderLoaderCb;
     private LoaderCallbacks<Cursor> itsFilesLoaderCb;
-    private List<ListFilesTask> itsListTasks = new ArrayList<ListFilesTask>();
-    private List<FileSyncedUpdateTask> itsUpdateTasks =
-            new ArrayList<FileSyncedUpdateTask>();
+    private final List<ListFilesTask> itsListTasks = new ArrayList<>();
+    private final List<FileSyncedUpdateTask> itsUpdateTasks = new ArrayList<>();
 
 
     /* (non-Javadoc)
@@ -420,8 +418,8 @@ public class OwncloudFilesActivity extends FragmentActivity
          */
         public interface Callback
         {
-            public void handleFiles(List<OwncloudProviderFile> files,
-                                    ListFilesTask task);
+            void handleFiles(List<OwncloudProviderFile> files,
+                             ListFilesTask task);
         }
 
         private final OwnCloudClient itsClient;
@@ -445,8 +443,7 @@ public class OwncloudFilesActivity extends FragmentActivity
         protected Pair<List<OwncloudProviderFile>, Exception>
         doInBackground(String... params)
         {
-            List<OwncloudProviderFile> files =
-                    new ArrayList<OwncloudProviderFile>();
+            List<OwncloudProviderFile> files = new ArrayList<>();
             Pair<List<OwncloudProviderFile>, Exception> result =
                     Pair.create(files, (Exception)null);
             if (itsClient == null) {
@@ -517,9 +514,9 @@ public class OwncloudFilesActivity extends FragmentActivity
         /** Callback for when the update is complete */
         public interface Callback
         {
-            public void updateComplete(Exception error,
-                                       long remFileId,
-                                       FileSyncedUpdateTask task);
+            void updateComplete(Exception error,
+                                long remFileId,
+                                FileSyncedUpdateTask task);
         }
 
 

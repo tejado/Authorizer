@@ -10,6 +10,7 @@ import java.io.File;
 
 import android.accounts.Account;
 import android.content.Intent;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
@@ -20,71 +21,68 @@ import android.support.v4.app.FragmentActivity;
  */
 public interface Provider
 {
-    public static final String ACTION_SYNC_EXPIRATION_TIMEOUT =
+    String ACTION_SYNC_EXPIRATION_TIMEOUT =
             "com.jefftharris.passwdsafe.action.SYNC_EXPIRATION_TIMEOUT";
-    public static final String SYNC_EXPIRATION_TIMEOUT_EXTRA_TYPE =
+    String SYNC_EXPIRATION_TIMEOUT_EXTRA_TYPE =
             "com.jefftharris.passwdsafe.extra.providerType";
 
     /** Initialize the provider */
-    public void init();
+    void init();
 
     /** Finalize the provider */
-    public void fini();
+    void fini();
 
     /** Start the process of linking to an account */
-    public void startAccountLink(FragmentActivity activity, int requestCode);
+    void startAccountLink(FragmentActivity activity, int requestCode);
 
     /** Finish the process of linking to an account */
-    public NewAccountTask finishAccountLink(int activityResult,
-                                            Intent activityData,
-                                            Uri providerAcctUri);
+    NewAccountTask finishAccountLink(int activityResult,
+                                     Intent activityData,
+                                     Uri providerAcctUri);
 
     /** Unlink an account */
-    public void unlinkAccount();
+    void unlinkAccount();
 
     /** Is the account fully authorized */
-    public boolean isAccountAuthorized();
+    boolean isAccountAuthorized();
 
     /** Get the account for the named provider */
-    public Account getAccount(String acctName);
+    Account getAccount(String acctName);
 
     /** Check whether a provider can be added */
-    public void checkProviderAdd(SQLiteDatabase db)
+    void checkProviderAdd(SQLiteDatabase db)
             throws Exception;
 
     /** Cleanup a provider when deleted */
-    public void cleanupOnDelete(String acctName)
+    void cleanupOnDelete(String acctName)
             throws Exception;
 
     /** Update a provider's sync frequency */
-    public void updateSyncFreq(Account acct, int freq);
+    void updateSyncFreq(Account acct, int freq);
 
     /** Request a sync */
-    public void requestSync(boolean manual);
+    void requestSync(boolean manual);
 
     /** Sync a provider */
-    public void sync(Account acct,
-                     DbProvider provider,
-                     SQLiteDatabase db,
-                     boolean manual,
-                     boolean full,
-                     SyncLogRecord logrec)
+    void sync(Account acct,
+              DbProvider provider,
+              SQLiteDatabase db,
+              boolean full,
+              SyncLogRecord logrec)
             throws Exception;
 
     /** Insert a local file */
-    public long insertLocalFile(long providerId,
-                                String title,
-                                SQLiteDatabase db)
-            throws Exception;
+    long insertLocalFile(long providerId, String title, SQLiteDatabase db)
+            throws SQLException;
 
     /** Update a local file */
-    public void updateLocalFile(DbFile file,
-                                String localFileName,
-                                File localFile,
-                                SQLiteDatabase db)
+    void updateLocalFile(DbFile file,
+                         String localFileName,
+                         File localFile,
+                         SQLiteDatabase db)
             throws Exception;
 
     /** Delete a local file */
-    public void deleteLocalFile(DbFile file, SQLiteDatabase db)
+    void deleteLocalFile(DbFile file, SQLiteDatabase db)
             throws Exception;
 }

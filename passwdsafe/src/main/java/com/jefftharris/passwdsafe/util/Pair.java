@@ -12,8 +12,8 @@ package com.jefftharris.passwdsafe.util;
  */
 public class Pair<T, U>
 {
-    public T first;
-    public U second;
+    public final T first;
+    public final U second;
 
     /** Constructor */
     public Pair(T t, U u)

@@ -31,7 +31,7 @@ public class PasswdClientProvider extends ContentProvider
 
     private static PasswdClientProvider itsProvider = null;
     private static final Object itsProviderLock = new Object();
-    private Set<String> itsFiles = new HashSet<>();
+    private final Set<String> itsFiles = new HashSet<>();
 
     static {
         MATCHER = new UriMatcher(UriMatcher.NO_MATCH);

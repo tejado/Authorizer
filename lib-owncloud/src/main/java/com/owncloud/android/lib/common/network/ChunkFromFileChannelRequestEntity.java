@@ -44,6 +44,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * 
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class ChunkFromFileChannelRequestEntity implements RequestEntity, ProgressiveDataTransferer {
 
     private static final String TAG = ChunkFromFileChannelRequestEntity.class.getSimpleName();

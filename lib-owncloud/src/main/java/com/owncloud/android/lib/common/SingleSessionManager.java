@@ -50,6 +50,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * @author masensio
  */
 
+@SuppressWarnings("ALL")
 public class SingleSessionManager implements OwnCloudClientManager {
 
 	private static final String TAG = SingleSessionManager.class.getSimpleName();

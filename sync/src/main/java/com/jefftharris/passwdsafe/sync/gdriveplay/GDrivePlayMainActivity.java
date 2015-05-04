@@ -70,7 +70,7 @@ public class GDrivePlayMainActivity extends FragmentActivity
 
     private Uri itsProviderUri;
     private GoogleApiClient itsClient;
-    private List<DriveId> itsAddFiles = new ArrayList<>();
+    private final List<DriveId> itsAddFiles = new ArrayList<>();
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
@@ -101,15 +101,6 @@ public class GDrivePlayMainActivity extends FragmentActivity
         }
 
         updateConnected(false);
-    }
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.FragmentActivity#onStart()
-     */
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
     }
 
     /* (non-Javadoc)

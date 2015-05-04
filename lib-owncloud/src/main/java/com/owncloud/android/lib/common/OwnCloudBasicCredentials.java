@@ -7,6 +7,7 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 
+@SuppressWarnings("ALL")
 public class OwnCloudBasicCredentials implements OwnCloudCredentials {
 
 	private String mUsername;

@@ -188,7 +188,7 @@ public class GDriveProvider extends AbstractProvider
     @Override
     public void sync(Account acct, DbProvider provider,
                      SQLiteDatabase db,
-                     boolean manual, boolean full,
+                     boolean full,
                      SyncLogRecord logrec) throws Exception
     {
         GDriveSyncer sync = new GDriveSyncer(acct, provider, db,

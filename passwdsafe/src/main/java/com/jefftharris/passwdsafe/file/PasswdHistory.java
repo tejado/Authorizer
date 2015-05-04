@@ -66,7 +66,7 @@ public class PasswdHistory
     private boolean itsIsEnabled;
     private int itsMaxSize;
     // Sorted with newest entry first
-    private List<Entry> itsPasswds = new ArrayList<>();
+    private final List<Entry> itsPasswds = new ArrayList<>();
 
     public PasswdHistory(String historyStr)
         throws IllegalArgumentException

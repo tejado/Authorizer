@@ -43,6 +43,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  *
  */
 
+@SuppressWarnings("ALL")
 public class RemoveRemoteShareOperation extends RemoteOperation {
 
 	private static final String TAG = RemoveRemoteShareOperation.class.getSimpleName();

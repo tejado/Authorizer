@@ -17,6 +17,7 @@ import java.util.ResourceBundle;
 /**
  *
  */
+@SuppressWarnings("ALL")
 public class I18nHelperBase
 {
 	/**

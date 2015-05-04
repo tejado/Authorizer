@@ -58,8 +58,8 @@ public class PasswdPolicyEditDialog
     private TextView itsNameEdit;
     private TextView itsLengthEdit;
     // Lower, upper, digits, symbols
-    private CheckBox[] itsOptions = new CheckBox[4];
-    private TextView[] itsOptionLens = new TextView[4];
+    private final CheckBox[] itsOptions = new CheckBox[4];
+    private final TextView[] itsOptionLens = new TextView[4];
     private CheckBox itsUseCustomSymbols;
     private TextView itsCustomSymbolsEdit;
     private String itsDefaultSymbols;

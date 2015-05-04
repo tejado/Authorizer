@@ -83,8 +83,8 @@ public class SyncDb
 
     private static SyncDb itsDb = null;
 
-    private DbHelper itsDbHelper;
-    private ReentrantLock itsMutex = new ReentrantLock();
+    private final DbHelper itsDbHelper;
+    private final ReentrantLock itsMutex = new ReentrantLock();
 
     /** Initialize the single SyncDb instance */
     public static void initializeDb(Context ctx)

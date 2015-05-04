@@ -11,6 +11,7 @@ import java.io.File;
 import android.accounts.Account;
 import android.content.Context;
 import android.content.Intent;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
@@ -180,7 +181,6 @@ public class GDrivePlayProvider implements Provider
     public void sync(Account acct,
                      DbProvider provider,
                      SQLiteDatabase db,
-                     boolean manual,
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {
@@ -192,7 +192,7 @@ public class GDrivePlayProvider implements Provider
      */
     @Override
     public long insertLocalFile(long providerId, String title, SQLiteDatabase db)
-            throws Exception
+            throws SQLException
     {
         // TODO play: implement insertLocalFile
         return 0;

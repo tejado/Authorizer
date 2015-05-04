@@ -20,15 +20,15 @@ import com.jefftharris.passwdsafe.sync.R;
  */
 public class SyncLogRecord
 {
-    private String itsAccount;
-    private long itsStartTime;
-    private List<Exception> itsFailures = new ArrayList<>();
+    private final String itsAccount;
+    private final long itsStartTime;
+    private final List<Exception> itsFailures = new ArrayList<>();
     private long itsEndTime = -1;
     private boolean itsIsFullSync = false;
-    private boolean itsIsManualSync;
+    private final boolean itsIsManualSync;
     private boolean itsIsNotConnected = false;
-    private List<String> itsEntries = new ArrayList<>();
-    private List<String> itsConflictFiles = new ArrayList<>();
+    private final List<String> itsEntries = new ArrayList<>();
+    private final List<String> itsConflictFiles = new ArrayList<>();
 
     /** Constructor */
     public SyncLogRecord(String account, String typeName, boolean manual)

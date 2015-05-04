@@ -43,6 +43,7 @@ import org.pwsafe.lib.exception.EndOfFileException;
  *
  * @author Glen Smith (based on the work of Kevin Preece)
  */
+@SuppressWarnings("ALL")
 public class PwsFileHeaderV3 implements Serializable
 {
 	/**
@@ -108,7 +109,7 @@ public class PwsFileHeaderV3 implements Serializable
 	 * @throws EndOfFileException If end of file is reached before reading all the data.
 	 */
 	public PwsFileHeaderV3( InputStream stream )
-	throws IOException, EndOfFileException
+	throws IOException
 	{
 		stream.read( tag );
 		stream.read( salt );

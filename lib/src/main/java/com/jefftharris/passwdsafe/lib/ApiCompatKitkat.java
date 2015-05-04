@@ -21,7 +21,7 @@ import android.net.Uri;
  *  and higher
  */
 @TargetApi(19)
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "CanBeFinal"})
 public final class ApiCompatKitkat
 {
     private static Method itsTakePersistableUriPermissionMeth;

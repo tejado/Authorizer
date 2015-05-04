@@ -25,7 +25,7 @@ public enum ProviderSyncFreqPref
     public static final ProviderSyncFreqPref DEFAULT = FREQ_1_HOUR;
 
     /** Constructor */
-    private ProviderSyncFreqPref(int freq, int displayIdx)
+    ProviderSyncFreqPref(int freq, int displayIdx)
     {
         itsFreq = freq;
         itsDisplayIdx = displayIdx;

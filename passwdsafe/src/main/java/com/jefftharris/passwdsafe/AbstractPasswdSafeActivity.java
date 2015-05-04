@@ -656,7 +656,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private static final class RecordMapComparator implements
                     Comparator<HashMap<String, Object>>
     {
-        private boolean itsIsSortCaseSensitive;
+        private final boolean itsIsSortCaseSensitive;
 
         public RecordMapComparator(boolean sortCaseSensitive)
         {
@@ -812,7 +812,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             }
         }
 
-        private Section[] itsSections;
+        private final Section[] itsSections;
 
         public SectionListAdapter(Context context,
                                   List<? extends Map<String, ?>> data,

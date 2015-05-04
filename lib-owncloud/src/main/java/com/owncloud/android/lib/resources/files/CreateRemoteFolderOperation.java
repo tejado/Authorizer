@@ -42,6 +42,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * @author masensio
  *
  */
+@SuppressWarnings("ALL")
 public class CreateRemoteFolderOperation extends RemoteOperation {
 
     private static final String TAG = CreateRemoteFolderOperation.class.getSimpleName();
