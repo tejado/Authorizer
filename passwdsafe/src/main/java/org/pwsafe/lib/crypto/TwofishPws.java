@@ -20,6 +20,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  *
  * @author Glen Smith
  */
+@SuppressWarnings("ALL")
 public class TwofishPws {
 
 	CBCBlockCipher cipher;

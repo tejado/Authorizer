@@ -94,7 +94,7 @@ public class DropboxSyncer extends AbstractProviderSyncer<DbxFileSystem>
 
     /** Sync the display name of the user */
     private void syncDisplayName()
-            throws DbxException, SQLException
+            throws SQLException
     {
         DbxAccount acct = itsProviderClient.getAccount();
         if (acct != null) {

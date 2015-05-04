@@ -9,6 +9,7 @@
  */
 package org.pwsafe.lib.file;
 
+@SuppressWarnings("ALL")
 public enum PwsFieldTypeV2 implements PwsFieldType {
 
 	V2_ID_STRING (0),
@@ -29,14 +30,9 @@ public enum PwsFieldTypeV2 implements PwsFieldType {
 	private int id;
 	private String name;
 
-	private PwsFieldTypeV2(int anId) {
+	PwsFieldTypeV2(int anId) {
 		id = anId;
 		name = toString();
-	}
-
-	private PwsFieldTypeV2(int anId, String aName) {
-		id = anId;
-		name = aName;
 	}
 
 	public int getId() {

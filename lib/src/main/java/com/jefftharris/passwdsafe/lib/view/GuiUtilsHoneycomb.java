@@ -22,6 +22,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
  * The GuiUtilsHoneycomb class contains helper GUI methods that are usable on
  * Honeycomb and higher
  */
+@SuppressWarnings("CanBeFinal")
 @TargetApi(11)
 public final class GuiUtilsHoneycomb
 {

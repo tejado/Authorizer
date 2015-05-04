@@ -71,7 +71,7 @@ public class PasswdFileData
     private HeaderPasswdPolicies itsHdrPolicies = new HeaderPasswdPolicies();
     private boolean itsIsOpenReadOnly = false;
 
-    private static List<PasswdFileDataObserver> itsObservers =
+    private static final List<PasswdFileDataObserver> itsObservers =
             new ArrayList<>();
 
     private static final String TAG = "PasswdFileData";

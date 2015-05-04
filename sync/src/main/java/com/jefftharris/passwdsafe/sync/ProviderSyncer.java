@@ -72,7 +72,7 @@ public class ProviderSyncer
     public static void deleteProvider(DbProvider provider,
                                       SQLiteDatabase db,
                                       Context ctx)
-        throws SQLException, Exception
+        throws Exception
     {
         List<DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
         for (DbFile dbfile: dbfiles) {
@@ -110,7 +110,7 @@ public class ProviderSyncer
 
     /** Validate the provider accounts */
     public static void validateAccounts(SQLiteDatabase db, Context ctx)
-            throws SQLException, Exception
+            throws Exception
     {
         PasswdSafeUtil.dbginfo(TAG, "Validating accounts");
 

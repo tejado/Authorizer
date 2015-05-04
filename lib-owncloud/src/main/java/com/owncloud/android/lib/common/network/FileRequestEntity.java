@@ -46,6 +46,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * A RequestEntity that represents a File.
  *
  */
+@SuppressWarnings("ALL")
 public class FileRequestEntity implements RequestEntity, ProgressiveDataTransferer {
 
     final File mFile;

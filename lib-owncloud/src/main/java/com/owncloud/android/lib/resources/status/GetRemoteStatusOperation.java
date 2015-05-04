@@ -49,6 +49,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  *
  */
 
+@SuppressWarnings("ALL")
 public class GetRemoteStatusOperation extends RemoteOperation {
     
     /** 

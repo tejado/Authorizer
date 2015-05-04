@@ -13,7 +13,7 @@ package com.jefftharris.passwdsafe.sync;
  */
 public interface SyncUpdateHandler
 {
-    public enum GDriveState
+    enum GDriveState
     {
         OK,
         AUTH_REQUIRED,
@@ -22,5 +22,5 @@ public interface SyncUpdateHandler
 
     /** Update the state of Google Drive syncing.  Will be called from the
      * main thread */
-    public void updateGDriveState(SyncUpdateHandler.GDriveState state);
+    void updateGDriveState(SyncUpdateHandler.GDriveState state);
 }

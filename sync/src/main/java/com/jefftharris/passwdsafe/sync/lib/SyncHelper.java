@@ -97,7 +97,7 @@ public class SyncHelper
         try {
             logrec.setNotConnected(!online);
             if (online) {
-                providerImpl.sync(acct, provider, db, manual, full, logrec);
+                providerImpl.sync(acct, provider, db, full, logrec);
             }
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);

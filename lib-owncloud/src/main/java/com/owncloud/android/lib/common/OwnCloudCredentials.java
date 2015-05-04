@@ -17,6 +17,7 @@
 
 package com.owncloud.android.lib.common;
 
+@SuppressWarnings("ALL")
 public interface OwnCloudCredentials {
 
 	public void applyTo(OwnCloudClient ownCloudClient);

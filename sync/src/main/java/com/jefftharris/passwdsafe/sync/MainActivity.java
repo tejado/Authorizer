@@ -179,15 +179,6 @@ public class MainActivity extends FragmentActivity
     }
 
     /* (non-Javadoc)
-     * @see android.app.Activity#onDestroy()
-     */
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-    }
-
-    /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onPause()
      */
     @Override
@@ -292,6 +283,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to launch PasswdSafe */
+    @SuppressWarnings("UnusedParameters")
     public void onLaunchPasswdSafeClick(View view)
     {
         PasswdSafeUtil.startMainActivity("com.jefftharris.passwdsafe", this);
@@ -299,6 +291,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to choose a GDrive account */
+    @SuppressWarnings("UnusedParameters")
     public void onGdriveChoose(View view)
     {
         Intent intent = AccountPicker.newChooseAccountIntent(
@@ -316,6 +309,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to sync a GDrive account */
+    @SuppressWarnings("UnusedParameters")
     public void onGdriveSync(View view)
     {
         if (itsGdriveAccount != null) {
@@ -329,6 +323,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to clear a GDrive account */
+    @SuppressWarnings("UnusedParameters")
     public void onGdriveClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsGdriveUri);
@@ -343,12 +338,14 @@ public class MainActivity extends FragmentActivity
         updateSyncFreq(freq, itsGdriveUri);
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void onGdrivePlayClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsGdrivePlayUri);
         prompt.show(getSupportFragmentManager(), null);
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void onGdrivePlayChoose(View view)
     {
         if (itsGdrivePlayUri == null) {
@@ -373,6 +370,7 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Button onClick handler to choose a Dropbox account */
+    @SuppressWarnings("UnusedParameters")
     public void onDropboxChoose(View view)
     {
         Provider dbxProvider = getDbxProvider();
@@ -386,6 +384,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to sync a Dropbox account */
+    @SuppressWarnings("UnusedParameters")
     public void onDropboxSync(View view)
     {
         getDbxProvider().requestSync(true);
@@ -393,6 +392,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to clear a Dropbox account */
+    @SuppressWarnings("UnusedParameters")
     public void onDropboxClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsDropboxUri);
@@ -408,6 +408,7 @@ public class MainActivity extends FragmentActivity
     }
 
     /** Button onClick handler to choose a Box account */
+    @SuppressWarnings("UnusedParameters")
     public void onBoxChoose(View view)
     {
         Provider boxProvider = getBoxProvider();
@@ -421,6 +422,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to sync a Box account */
+    @SuppressWarnings("UnusedParameters")
     public void onBoxSync(View view)
     {
         getBoxProvider().requestSync(true);
@@ -428,6 +430,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to clear a Box account */
+    @SuppressWarnings("UnusedParameters")
     public void onBoxClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsBoxUri);
@@ -444,6 +447,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to choose an ownCloud account */
+    @SuppressWarnings("UnusedParameters")
     public void onOwncloudChoose(View view)
     {
         Provider owncloudProvider = getOwncloudProvider();
@@ -457,6 +461,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to sync an ownCloud account */
+    @SuppressWarnings("UnusedParameters")
     public void onOwncloudSync(View view)
     {
         getOwncloudProvider().requestSync(true);
@@ -464,6 +469,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to clear an ownCloud account */
+    @SuppressWarnings("UnusedParameters")
     public void onOwncloudClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsOwncloudUri);
@@ -487,6 +493,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to select ownCloud files */
+    @SuppressWarnings("UnusedParameters")
     public void onOwncloudChooseFiles(View view)
     {
         Intent intent = new Intent();

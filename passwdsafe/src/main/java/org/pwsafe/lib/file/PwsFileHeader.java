@@ -135,7 +135,7 @@ public class PwsFileHeader
 	 * @param passphrase the passphrase to be used to encrypt the database.
 	 * @throws NoSuchAlgorithmException If no SHA-1 implementation is found.
 	 */
-	private void update( String passphrase ) throws NoSuchAlgorithmException
+	private void update( String passphrase )
 	{
 		LOG.enterMethod( "PwsFileHeader.update" );
 

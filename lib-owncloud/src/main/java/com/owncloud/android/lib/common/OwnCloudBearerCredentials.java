@@ -9,6 +9,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import com.owncloud.android.lib.common.network.BearerAuthScheme;
 import com.owncloud.android.lib.common.network.BearerCredentials;
 
+@SuppressWarnings("ALL")
 public class OwnCloudBearerCredentials implements OwnCloudCredentials {
 
 	private String mAccessToken;

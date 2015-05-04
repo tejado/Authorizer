@@ -212,7 +212,6 @@ public class BoxProvider extends AbstractSyncTimerProvider
     public void sync(Account acct,
                      DbProvider provider,
                      SQLiteDatabase db,
-                     boolean manual,
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {

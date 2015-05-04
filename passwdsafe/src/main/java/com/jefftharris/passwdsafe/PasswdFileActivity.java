@@ -11,8 +11,8 @@ import android.app.Activity;
 
 public interface PasswdFileActivity
 {
-    public Activity getActivity();
-    public void showProgressDialog();
-    public void removeProgressDialog();
-    public void saveFinished(boolean success);
+    Activity getActivity();
+    void showProgressDialog();
+    void removeProgressDialog();
+    void saveFinished(boolean success);
 }

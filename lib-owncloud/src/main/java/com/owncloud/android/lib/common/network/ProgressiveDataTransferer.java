@@ -28,6 +28,7 @@ import java.util.Collection;
 
 
 
+@SuppressWarnings("ALL")
 public interface ProgressiveDataTransferer {
 
     public void addDatatransferProgressListener (OnDatatransferProgressListener listener);

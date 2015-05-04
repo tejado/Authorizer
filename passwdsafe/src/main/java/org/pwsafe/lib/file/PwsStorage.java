@@ -28,6 +28,7 @@ import java.util.Date;
  * @author mtiller
  *
  */
+@SuppressWarnings("ALL")
 public interface PwsStorage {
 
         public interface SaveHelper

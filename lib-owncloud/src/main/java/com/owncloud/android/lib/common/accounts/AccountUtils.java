@@ -43,6 +43,7 @@ import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 
+@SuppressWarnings("ALL")
 public class AccountUtils {
 	
 	private static final String TAG = AccountUtils.class.getSimpleName();

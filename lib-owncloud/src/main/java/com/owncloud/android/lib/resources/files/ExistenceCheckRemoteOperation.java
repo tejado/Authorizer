@@ -41,6 +41,7 @@ import com.owncloud.android.lib.common.utils.Log_OC;
  * 
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class ExistenceCheckRemoteOperation extends RemoteOperation {
     
     /** Maximum time to wait for a response from the server in MILLISECONDs.  */

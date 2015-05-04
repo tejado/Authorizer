@@ -25,6 +25,7 @@ import org.pwsafe.lib.exception.PasswordSafeException;
  * 
  * @author Michael Tiller
  */
+@SuppressWarnings("ALL")
 public class BlowfishPws
 { 
 	private BlockCipher decipher;

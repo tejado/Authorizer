@@ -12,6 +12,7 @@ package org.pwsafe.lib.crypto;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.PasswordSafeException;
 
+@SuppressWarnings("ALL")
 public class BlowfishPwsECB extends BlowfishPws {
 	/**
 	 * Constructor, sets the initial vector to zero.

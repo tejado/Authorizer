@@ -646,13 +646,13 @@ public class RecordView extends AbstractRecordTabActivity
     }
 
     /// Set the contents of a text field with a date
-    private TextView setDateText(int id, int rowId, Date date)
+    private void setDateText(int id, int rowId, Date date)
     {
         String str = null;
         if (date != null) {
             str = Utils.formatDate(date, this);
         }
-        return setText(id, rowId, str);
+        setText(id, rowId, str);
     }
 
     private void setVisibility(int id, boolean visible)

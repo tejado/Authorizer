@@ -26,7 +26,7 @@ public abstract class AbstractLocalToRemoteSyncOper<ProviderClientT> extends
     private File itsLocalFile;
 
     /** Constructor */
-    public AbstractLocalToRemoteSyncOper(DbFile file, boolean forceInsert)
+    protected AbstractLocalToRemoteSyncOper(DbFile file, boolean forceInsert)
     {
         super(file);
         itsIsInsert = forceInsert || TextUtils.isEmpty(itsFile.itsRemoteId);
@@ -51,7 +51,7 @@ public abstract class AbstractLocalToRemoteSyncOper<ProviderClientT> extends
                                                long modDate,
                                                String remHash,
                                                SQLiteDatabase db)
-            throws IOException, SQLException
+            throws SQLException
     {
         SyncDb.updateRemoteFile(itsFile.itsId, remId, title, folders, modDate,
                                 remHash, db);

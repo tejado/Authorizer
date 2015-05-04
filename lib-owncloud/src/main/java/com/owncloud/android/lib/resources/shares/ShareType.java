@@ -37,6 +37,7 @@ package com.owncloud.android.lib.resources.shares;
  *
  */
 
+@SuppressWarnings("ALL")
 public enum ShareType {
     NO_SHARED (-1),
     USER (0),

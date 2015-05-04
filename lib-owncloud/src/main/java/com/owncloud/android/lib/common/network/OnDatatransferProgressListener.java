@@ -25,6 +25,7 @@
 
 package com.owncloud.android.lib.common.network;
 
+@SuppressWarnings("ALL")
 public interface OnDatatransferProgressListener {
     public void onTransferProgress(long progressRate, long totalTransferredSoFar, long totalToTransfer, String fileAbsoluteName);
 }

@@ -22,6 +22,7 @@ import org.pwsafe.lib.Log;
  * @author mtiller
  *
  */
+@SuppressWarnings("ALL")
 public class PwsFileStorage extends PwsStreamStorage {
 
     /**
@@ -112,12 +113,6 @@ public class PwsFileStorage extends PwsStreamStorage {
      * @return Name of the file used for storage.
      */
     public String getFilename() { return getIdentifier(); }
-
-    public void setPassphrase(String passphrase) {
-        /* Do nothing since there is no additional encrypted information associated
-         * with this storage mechanism
-         */
-    }
 
     @Override
     public Date getModifiedDate() {

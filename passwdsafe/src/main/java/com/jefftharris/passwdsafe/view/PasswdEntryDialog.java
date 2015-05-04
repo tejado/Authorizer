@@ -52,8 +52,8 @@ public class PasswdEntryDialog implements View.OnClickListener
         void handleCancel();
     }
 
-    private Activity itsActivity;
-    private User itsUser;
+    private final Activity itsActivity;
+    private final User itsUser;
     private AlertDialog itsDialog;
     private YubikeyMgr itsYubiMgr = null;
     private YubikeyMgr.User itsYubiUser = null;
@@ -197,9 +197,11 @@ public class PasswdEntryDialog implements View.OnClickListener
     }
 
     /** Handle a new intent.  Return true if handled */
-    public boolean onNewIntent(Intent intent)
+    public void onNewIntent(Intent intent)
     {
-        return (itsYubiMgr != null) && itsYubiMgr.handleKeyIntent(intent);
+        if (itsYubiMgr != null) {
+            itsYubiMgr.handleKeyIntent(intent);
+        }
     }
 
     /** Handle a click event */

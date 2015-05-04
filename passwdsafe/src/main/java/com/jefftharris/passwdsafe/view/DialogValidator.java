@@ -64,9 +64,9 @@ public abstract class DialogValidator
     private TextView itsPassword = null;
     private TextView itsPasswordConfirm = null;
     private boolean itsAllowEmptyPassword = false;
-    private TextView itsErrorMsgView;
-    private String itsErrorFmt;
-    private TextWatcher itsTextWatcher = new AbstractTextWatcher()
+    private final TextView itsErrorMsgView;
+    private final String itsErrorFmt;
+    private final TextWatcher itsTextWatcher = new AbstractTextWatcher()
     {
         public final void afterTextChanged(Editable s)
         {

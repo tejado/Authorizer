@@ -49,6 +49,7 @@ import com.owncloud.android.lib.common.operations.RemoteOperationResult.ResultCo
  *
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class MoveRemoteFileOperation extends RemoteOperation {
 
 	private static final String TAG = MoveRemoteFileOperation.class.getSimpleName();
