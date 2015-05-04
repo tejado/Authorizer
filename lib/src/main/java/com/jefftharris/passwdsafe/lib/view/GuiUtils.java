@@ -40,6 +40,7 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
  * @author jharris
  *
  */
+@SuppressWarnings("SameParameterValue")
 public final class GuiUtils
 {
     public static final int INPUT_TEXT_PASSWORD =
@@ -54,6 +55,7 @@ public final class GuiUtils
      * The EnableAdapter class is a SimpleAdapter that can show its items in a
      * disabled state
      */
+    @SuppressWarnings("SameParameterValue")
     public static class EnableAdapter extends SimpleAdapter
     {
         private final boolean itsIsEnabled;

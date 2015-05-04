@@ -31,9 +31,9 @@ public class AccountChooserDlg extends DialogFragment
     private static final String TAG = "AccountChooserDlg";
 
     /** Create a new instance of the dialog */
-    public static AccountChooserDlg newInstance(String accountType,
-                                                int requestCode,
-                                                String noAccountsMsg)
+    public static AccountChooserDlg newInstance(
+            @SuppressWarnings("SameParameterValue") String accountType,
+            int requestCode, String noAccountsMsg)
     {
         AccountChooserDlg dialog = new AccountChooserDlg();
         Bundle args = new Bundle();

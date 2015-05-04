@@ -31,6 +31,7 @@ import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 /**
  * The PasswdSafeUtil class contains common helper methods
  */
+@SuppressWarnings("SameParameterValue")
 public class PasswdSafeUtil
 {
     public static final String PACKAGE = "com.jefftharris.passwdsafe";

@@ -357,7 +357,9 @@ public class PasswdSafeIME extends InputMethodService
     private final class PasswdSafeKeyboard extends Keyboard
     {
         /** Constructor */
-        public PasswdSafeKeyboard(Context context, int xmlLayoutResId)
+        public PasswdSafeKeyboard(
+                Context context,
+                @SuppressWarnings("SameParameterValue") int xmlLayoutResId)
         {
             super(context, xmlLayoutResId);
         }

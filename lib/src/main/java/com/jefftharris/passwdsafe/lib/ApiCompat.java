@@ -63,7 +63,8 @@ public final class ApiCompat
 
 
     /** Set whether the window is visible in the recent apps list */
-    public static void setRecentAppsVisible(Window w, boolean visible)
+    public static void setRecentAppsVisible(
+            Window w, @SuppressWarnings("SameParameterValue") boolean visible)
     {
         /* The screen appears garbled before honeycomb, and the screenshot
          * feature started with honeycomb */

@@ -308,9 +308,10 @@ public final class FileListFragment extends ListFragment
 
 
     /** Get the files in a directory */
-    public static FileData[] getFiles(File dir,
-                                      final boolean showHiddenFiles,
-                                      final boolean showDirs)
+    public static FileData[] getFiles(
+            File dir,
+            final boolean showHiddenFiles,
+            @SuppressWarnings("SameParameterValue") final boolean showDirs)
     {
         File[] files = dir.listFiles(new FileFilter() {
             public final boolean accept(File pathname) {

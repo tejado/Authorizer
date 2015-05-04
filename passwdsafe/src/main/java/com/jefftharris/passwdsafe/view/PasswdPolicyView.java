@@ -103,7 +103,8 @@ public class PasswdPolicyView extends LinearLayout
     }
 
     /** Set whether generation is enabled */
-    public void setGenerateEnabled(boolean enabled)
+    public void setGenerateEnabled(
+            @SuppressWarnings("SameParameterValue") boolean enabled)
     {
         View row = findViewById(R.id.policy_view_generate_row);
         row.setVisibility(enabled ? View.VISIBLE : View.GONE);
