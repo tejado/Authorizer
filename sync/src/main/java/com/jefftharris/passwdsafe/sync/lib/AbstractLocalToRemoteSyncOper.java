@@ -16,7 +16,7 @@ import android.text.TextUtils;
 import com.jefftharris.passwdsafe.sync.R;
 
 /**
- * Abstrct sync operation to sync a local file to a remote file
+ * Abstract sync operation to sync a local file to a remote file
  */
 public abstract class AbstractLocalToRemoteSyncOper<ProviderClientT> extends
         AbstractSyncOper<ProviderClientT>

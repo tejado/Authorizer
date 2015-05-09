@@ -18,6 +18,7 @@ import org.pwsafe.lib.Util;
 /**
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class PwsTimeField extends PwsField
 {
 	private static final long serialVersionUID = -3091539688166386331L;

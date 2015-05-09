@@ -39,6 +39,7 @@ import com.owncloud.android.lib.resources.files.FileUtils;
  * @author masensio
  *
  */
+@SuppressWarnings("ALL")
 public class OCShare implements Parcelable, Serializable {
 	
 	/** Generated - should be refreshed every time the class changes!! */

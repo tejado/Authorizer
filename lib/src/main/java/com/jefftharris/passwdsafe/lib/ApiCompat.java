@@ -26,7 +26,7 @@ public final class ApiCompat
 {
     public static final int SDK_CUPCAKE =
         android.os.Build.VERSION_CODES.CUPCAKE;
-    public static final int SDK_ECLAIR =
+    private static final int SDK_ECLAIR =
             android.os.Build.VERSION_CODES.ECLAIR;
     public static final int SDK_FROYO =
         android.os.Build.VERSION_CODES.FROYO;

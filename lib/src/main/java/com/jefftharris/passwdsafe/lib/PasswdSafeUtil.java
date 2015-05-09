@@ -34,7 +34,7 @@ import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 @SuppressWarnings("SameParameterValue")
 public class PasswdSafeUtil
 {
-    public static final String PACKAGE = "com.jefftharris.passwdsafe";
+    private static final String PACKAGE = "com.jefftharris.passwdsafe";
     public static final String NEW_INTENT = PACKAGE + ".action.NEW";
     public static final String VIEW_INTENT = PACKAGE + ".action.VIEW";
 

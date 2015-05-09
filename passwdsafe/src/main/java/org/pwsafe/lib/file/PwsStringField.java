@@ -16,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class PwsStringField extends PwsField
 {
 	/**

@@ -31,6 +31,7 @@ import org.pwsafe.lib.Log;
  *
  * @author roxon
  */
+@SuppressWarnings("ALL")
 public class MemoryMappedKey {
 	private final static Log LOG = Log.getInstance(MemoryMappedKey.class);
 

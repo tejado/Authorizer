@@ -91,7 +91,7 @@ public abstract class DialogValidator
     /**
      * Constructor with a specific view and optional password fields
      */
-    public DialogValidator(View view, Activity act, boolean hasPasswords)
+    protected DialogValidator(View view, Activity act, boolean hasPasswords)
     {
         itsContext = act;
         if (hasPasswords) {

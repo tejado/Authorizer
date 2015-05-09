@@ -28,10 +28,10 @@ public abstract class ProviderSyncer<ProviderClientT>
     protected final String itsTag;
 
     /** Constructor */
-    public ProviderSyncer(ProviderClientT providerClient,
-                          DbProvider provider, SQLiteDatabase db,
-                          SyncLogRecord logrec, Context ctx,
-                          String tag)
+    protected ProviderSyncer(ProviderClientT providerClient,
+                             DbProvider provider, SQLiteDatabase db,
+                             SyncLogRecord logrec, Context ctx,
+                             String tag)
     {
         itsProviderClient = providerClient;
         itsProvider = provider;

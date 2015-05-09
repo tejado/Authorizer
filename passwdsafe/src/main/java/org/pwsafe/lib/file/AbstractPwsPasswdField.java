@@ -21,6 +21,7 @@ import javax.crypto.SealedObject;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 
 
+@SuppressWarnings("ALL")
 public abstract class AbstractPwsPasswdField extends PwsField
 {
     private static final long serialVersionUID = -5633832199601878672L;

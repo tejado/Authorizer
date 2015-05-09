@@ -259,7 +259,7 @@ public class PasswdFileData
             (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
     }
 
-    public final boolean isV2()
+    private boolean isV2()
     {
         return (itsPwsFile != null) &&
             (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION);
@@ -525,7 +525,7 @@ public class PasswdFileData
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_USER);
     }
 
-    public final void setHdrLastSaveUser(String user)
+    private void setHdrLastSaveUser(String user)
     {
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_USER, user);
     }
@@ -535,7 +535,7 @@ public class PasswdFileData
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_HOST);
     }
 
-    public final void setHdrLastSaveHost(String host)
+    private void setHdrLastSaveHost(String host)
     {
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_HOST, host);
     }
@@ -545,7 +545,7 @@ public class PasswdFileData
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_WHAT);
     }
 
-    public final void setHdrLastSaveApp(String app)
+    private void setHdrLastSaveApp(String app)
     {
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_WHAT, app);
     }
@@ -555,7 +555,7 @@ public class PasswdFileData
         return getHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME);
     }
 
-    public final void setHdrLastSaveTime(Date date)
+    private void setHdrLastSaveTime(Date date)
     {
         setHdrField(PwsRecordV3.HEADER_LAST_SAVE_TIME, date);
     }
@@ -603,7 +603,7 @@ public class PasswdFileData
         }
     }
 
-    public static int hexBytesToInt(byte[] bytes, int pos, int len)
+    private static int hexBytesToInt(byte[] bytes, int pos, int len)
     {
         int i = 0;
         for (int idx = pos; idx < (pos + len); ++idx) {

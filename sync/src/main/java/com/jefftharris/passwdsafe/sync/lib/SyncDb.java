@@ -68,7 +68,7 @@ public class SyncDb
         DB_COL_FILES_ID + " = ?";
     public static final String DB_MATCH_FILES_PROVIDER_ID =
         DB_COL_FILES_PROVIDER + " = ?";
-    public static final String DB_MATCH_FILES_PROVIDER_REMOTE_ID =
+    private static final String DB_MATCH_FILES_PROVIDER_REMOTE_ID =
         DB_COL_FILES_PROVIDER + " = ? AND " +
         DB_COL_FILES_REMOTE_ID + " = ?";
 
@@ -79,7 +79,7 @@ public class SyncDb
     public static final String DB_COL_SYNC_LOGS_END = "end";
     public static final String DB_COL_SYNC_LOGS_FLAGS = "flags";
     public static final String DB_COL_SYNC_LOGS_LOG = "log";
-    public static final String DB_MATCH_SYNC_LOGS_START_BEFORE =
+    private static final String DB_MATCH_SYNC_LOGS_START_BEFORE =
             DB_COL_SYNC_LOGS_START + " < ?";
 
     private static SyncDb itsDb = null;
@@ -108,7 +108,7 @@ public class SyncDb
     }
 
     /** Constructor */
-    public SyncDb(Context ctx)
+    private SyncDb(Context ctx)
     {
         itsDbHelper = new DbHelper(ctx);
     }

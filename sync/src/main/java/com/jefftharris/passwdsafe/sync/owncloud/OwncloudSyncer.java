@@ -72,9 +72,9 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
 
 
     /** Check the result of an operation; An exception is thrown on an error */
-    public static void checkOperationResult(RemoteOperationResult result,
-                                            boolean ignoreFileNotFound,
-                                            Context ctx)
+    private static void checkOperationResult(RemoteOperationResult result,
+                                             boolean ignoreFileNotFound,
+                                             Context ctx)
             throws IOException
     {
         boolean retry = false;

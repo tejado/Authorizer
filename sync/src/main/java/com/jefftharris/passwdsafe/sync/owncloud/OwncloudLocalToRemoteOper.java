@@ -12,6 +12,7 @@ import java.io.IOException;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
@@ -29,7 +30,7 @@ import com.owncloud.android.lib.resources.files.UploadRemoteFileOperation;
 public class OwncloudLocalToRemoteOper extends
         AbstractLocalToRemoteSyncOper<OwnCloudClient>
 {
-    private static final String TAG = "OwncloudLocalToRemoteOper";
+    private static final String TAG = "OwncloudLocalToRemoteOp";
 
     private OwncloudProviderFile itsUpdatedFile = null;
 
@@ -84,7 +85,9 @@ public class OwncloudLocalToRemoteOper extends
                     new OwncloudProviderFile((RemoteFile)res.getData().get(0));
         } finally {
             if (tmpFile != null) {
-                tmpFile.delete();
+                if (!tmpFile.delete()) {
+                    Log.e(TAG, "Can't delete temp file " + tmpFile);
+                }
             }
         }
     }

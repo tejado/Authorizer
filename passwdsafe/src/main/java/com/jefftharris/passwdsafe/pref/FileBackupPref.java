@@ -42,7 +42,7 @@ public enum FileBackupPref
         return itsValue;
     }
 
-    public final int getDisplayNameIdx()
+    private int getDisplayNameIdx()
     {
         return itsDisplayNameIdx;
     }
