@@ -106,7 +106,7 @@ public class SyncProviderFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
 
         itsProviderAdapter = new SimpleCursorAdapter(
-               getActivity(), R.layout.passwdsafe_list_item, null,
+               getActivity(), R.layout.sync_provider_list_item, null,
                new String[] { PasswdSafeContract.Providers.COL_ACCT,
                               PasswdSafeContract.Providers.COL_TYPE,
                               PasswdSafeContract.Providers.COL_TYPE},
