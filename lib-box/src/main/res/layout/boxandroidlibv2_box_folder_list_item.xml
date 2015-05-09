@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="fill_parent"
     android:layout_height="50dp" >
 
     <LinearLayout
@@ -10,7 +11,8 @@
         android:background="@drawable/boxandroidlibv2_list_item_selector"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingLeft="4dp" >
+        android:paddingLeft="4dp"
+        tools:ignore="RtlSymmetry">
 
         <FrameLayout
             android:layout_marginLeft="6dp"
@@ -50,7 +52,8 @@
                 android:singleLine="true"
                 android:textColor="#000000"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:ignore="RtlSymmetry"/>
         </LinearLayout>
     </LinearLayout>
 
