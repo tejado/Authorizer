@@ -68,7 +68,7 @@ public class FileListActivity extends AbstractFileListActivity
     {
         switch (item.getItemId()) {
         case R.id.menu_about: {
-            AboutDialog dlg = new AboutDialog(null);
+            AboutDialog dlg = AboutDialog.newInstance(null);
             dlg.show(getSupportFragmentManager(), "AboutDialog");
             return true;
         }

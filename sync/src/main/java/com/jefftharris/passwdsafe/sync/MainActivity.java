@@ -265,7 +265,7 @@ public class MainActivity extends FragmentActivity
         case R.id.menu_about: {
             String extraLicenses =
                 GooglePlayServicesUtil.getOpenSourceSoftwareLicenseInfo(this);
-            AboutDialog dlg = new AboutDialog(extraLicenses);
+            AboutDialog dlg = AboutDialog.newInstance(extraLicenses);
             dlg.show(getSupportFragmentManager(), "AboutDialog");
             return true;
         }
