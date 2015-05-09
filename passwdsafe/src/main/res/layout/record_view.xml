@@ -338,6 +338,7 @@
                             android:id="@+id/history_enabled"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
                             android:text="@string/enabled"
                             android:textAppearance="?android:textAppearanceSmall"/>
 
@@ -358,7 +359,8 @@
                             android:layout_alignBottom="@id/history_enabled"
                             android:layout_alignTop="@id/history_enabled"
                             android:layout_toLeftOf="@id/history_max_size"
-                            android:gravity="center_vertical"
+                            android:layout_toRightOf="@id/history_enabled"
+                            android:gravity="center_vertical|right"
                             android:text="@string/max_size_label"/>
 
                         <ListView
