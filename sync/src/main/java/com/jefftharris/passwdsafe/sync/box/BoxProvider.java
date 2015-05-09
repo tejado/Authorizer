@@ -306,7 +306,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
             editor.remove(PREF_AUTH_REFRESH_TOKEN);
             editor.remove(PREF_AUTH_TOKEN_TYPE);
         }
-        editor.commit();
+        editor.apply();
     }
 
     /** Update the account's user ID */
@@ -321,7 +321,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(PREF_AUTH_USER_ID, itsUserId);
-        editor.commit();
+        editor.apply();
     }
 
     /** Convert a Box object to a string for debugging */
