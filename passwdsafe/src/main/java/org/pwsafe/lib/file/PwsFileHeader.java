@@ -10,7 +10,6 @@
 package org.pwsafe.lib.file;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;

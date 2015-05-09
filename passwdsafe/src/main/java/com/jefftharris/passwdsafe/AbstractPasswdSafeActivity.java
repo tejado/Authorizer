@@ -47,6 +47,7 @@ import android.widget.SectionIndexer;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListActivity
     implements PasswdFileActivity
 {

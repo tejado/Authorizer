@@ -1497,7 +1497,9 @@ public class RecordEditActivity extends AbstractRecordActivity
                                GuiUtils.getTextViewStr(this, viewId));
     }
 
-    private String getUpdatedSpinnerField(String currStr, int viewId)
+    private String getUpdatedSpinnerField(
+            String currStr,
+            @SuppressWarnings("SameParameterValue") int viewId)
     {
         return getUpdatedField(currStr,
                                GuiUtils.getSpinnerStr(this, viewId));

@@ -24,7 +24,7 @@ public enum FontSizePref
         itsDisplayNameIdx = displayNameIdx;
     }
 
-    public final int getDisplayNameIdx()
+    private int getDisplayNameIdx()
     {
         return itsDisplayNameIdx;
     }

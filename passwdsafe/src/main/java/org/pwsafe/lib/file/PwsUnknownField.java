@@ -17,6 +17,7 @@ import org.pwsafe.lib.Util;
  * 
  * @author Glen Smith (based on the work of Kevin Preece)
  */
+@SuppressWarnings("ALL")
 public class PwsUnknownField extends PwsField
 {
 	/**

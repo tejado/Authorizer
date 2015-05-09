@@ -33,16 +33,16 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     public static final int FLAG_USE_HEX_DIGITS         = 0x0800;
     public static final int FLAG_USE_EASY_VISION        = 0x0400;
     public static final int FLAG_MAKE_PRONOUNCEABLE     = 0x0200;
-    public static final int FLAGS_VALID                 = 0xffff;
+    private static final int FLAGS_VALID                 = 0xffff;
 
     /** Maximum value for length fields */
-    public static final int LENGTH_MAX = 4095;
+    private static final int LENGTH_MAX = 4095;
 
     public static final String SYMBOLS_DEFAULT = "+-=_@#$%^&;:,.<>/~\\[](){}?!|";
     public static final String SYMBOLS_EASY = "+-=_@#$%^&<>/~\\?";
     public static final String SYMBOLS_PRONOUNCE = "@&(#!|$+";
 
-    public static String PREFS_DEFAULT_SYMBOLS = null;
+    private static String PREFS_DEFAULT_SYMBOLS = null;
 
     public static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";
     public static final String UPPER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

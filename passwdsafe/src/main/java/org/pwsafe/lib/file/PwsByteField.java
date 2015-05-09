@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
  *
  * @author Jeff Harris
  */
+@SuppressWarnings("ALL")
 public class PwsByteField extends PwsField
 {
     /**

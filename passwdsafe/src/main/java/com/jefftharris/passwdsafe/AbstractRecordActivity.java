@@ -22,7 +22,7 @@ public abstract class AbstractRecordActivity extends Activity
 
     private final RecordActivityHelper itsHelper;
 
-    public AbstractRecordActivity()
+    protected AbstractRecordActivity()
     {
         itsHelper = new RecordActivityHelper(this);
     }

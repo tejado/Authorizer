@@ -20,6 +20,7 @@ import org.pwsafe.lib.Util;
  *
  * @author Kevin Preece
  */
+@SuppressWarnings("ALL")
 public class PwsIntegerField extends PwsField
 {
 	/**

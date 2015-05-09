@@ -308,7 +308,7 @@ public final class FileListFragment extends ListFragment
 
 
     /** Get the files in a directory */
-    public static FileData[] getFiles(
+    private static FileData[] getFiles(
             File dir,
             final boolean showHiddenFiles,
             @SuppressWarnings("SameParameterValue") final boolean showDirs)

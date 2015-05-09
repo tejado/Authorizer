@@ -24,7 +24,7 @@ public abstract class AbstractRemoteToLocalSyncOper<ProviderClientT> extends
     private boolean itsIsDownloaded = false;
 
     /** Constructor */
-    public AbstractRemoteToLocalSyncOper(DbFile dbfile)
+    protected AbstractRemoteToLocalSyncOper(DbFile dbfile)
     {
         super(dbfile);
     }

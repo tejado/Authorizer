@@ -44,7 +44,7 @@ public class Preferences extends PreferenceActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     public static final String PREF_FILE_DIR = "fileDirPref";
-    public static final String PREF_FILE_DIR_DEF =
+    private static final String PREF_FILE_DIR_DEF =
         Environment.getExternalStorageDirectory().toString();
 
     public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
@@ -54,30 +54,30 @@ public class Preferences extends PreferenceActivity
                     "fileCloseScreenOffPref";
     public static final boolean PREF_FILE_CLOSE_SCREEN_OFF_DEF = false;
 
-    public static final String PREF_FILE_BACKUP = "fileBackupPref";
-    public static final FileBackupPref PREF_FILE_BACKUP_DEF =
+    private static final String PREF_FILE_BACKUP = "fileBackupPref";
+    private static final FileBackupPref PREF_FILE_BACKUP_DEF =
         FileBackupPref.BACKUP_1;
 
     public static final String PREF_FILE_CLOSE_CLEAR_CLIPBOARD =
         "fileCloseClearClipboardPref";
     public static final boolean PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF = true;
 
-    public static final String PREF_FILE_OPEN_READ_ONLY =
+    private static final String PREF_FILE_OPEN_READ_ONLY =
         "fileOpenReadOnly";
-    public static final boolean PREF_FILE_OPEN_READ_ONLY_DEF = false;
+    private static final boolean PREF_FILE_OPEN_READ_ONLY_DEF = false;
 
-    public static final String PREF_DEF_FILE = "defFilePref";
-    public static final String PREF_DEF_FILE_DEF = "";
+    private static final String PREF_DEF_FILE = "defFilePref";
+    private static final String PREF_DEF_FILE_DEF = "";
 
-    public static final String PREF_FILE_LEGACY_FILE_CHOOSER =
+    private static final String PREF_FILE_LEGACY_FILE_CHOOSER =
             "fileLegacyFileChooserPref";
-    public static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = false;
+    private static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = false;
 
-    public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
-    public static final boolean PREF_GROUP_RECORDS_DEF = true;
+    private static final String PREF_GROUP_RECORDS = "groupRecordsPref";
+    private static final boolean PREF_GROUP_RECORDS_DEF = true;
 
     public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
-    public static final String PREF_PASSWD_ENC_DEF =
+    private static final String PREF_PASSWD_ENC_DEF =
         PwsFile.DEFAULT_PASSWORD_CHARSET;
     public static final String PREF_PASSWD_EXPIRY_NOTIF =
         "passwordExpiryNotifyPref";
@@ -85,21 +85,21 @@ public class Preferences extends PreferenceActivity
         PasswdExpiryNotifPref.IN_TWO_WEEKS;
     public static final String PREF_PASSWD_DEFAULT_SYMS =
         "passwordDefaultSymbolsPref";
-    public static final String PREF_PASSWD_CLEAR_ALL_NOTIFS =
+    private static final String PREF_PASSWD_CLEAR_ALL_NOTIFS =
         "passwordClearAllNotifsPref";
 
-    public static final String PREF_SEARCH_CASE_SENSITIVE =
+    private static final String PREF_SEARCH_CASE_SENSITIVE =
         "searchCaseSensitivePref";
-    public static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
-    public static final String PREF_SEARCH_REGEX = "searchRegexPref";
-    public static final boolean PREF_SEARCH_REGEX_DEF = false;
+    private static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
+    private static final String PREF_SEARCH_REGEX = "searchRegexPref";
+    private static final boolean PREF_SEARCH_REGEX_DEF = false;
 
-    public static final String PREF_SHOW_HIDDEN_FILES = "showBackupFilesPref";
-    public static final boolean PREF_SHOW_HIDDEN_FILES_DEF = false;
+    private static final String PREF_SHOW_HIDDEN_FILES = "showBackupFilesPref";
+    private static final boolean PREF_SHOW_HIDDEN_FILES_DEF = false;
 
-    public static final String PREF_SORT_CASE_SENSITIVE =
+    private static final String PREF_SORT_CASE_SENSITIVE =
         "sortCaseSensitivePref";
-    public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
+    private static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
 
     private static final String PREF_GEN_LOWER = "passwdGenLower";
     private static final boolean PREF_GEN_LOWER_DEF = true;
@@ -115,13 +115,13 @@ public class Preferences extends PreferenceActivity
     private static final boolean PREF_GEN_HEX_DEF = false;
     private static final String PREF_GEN_LENGTH = "passwdGenLength";
     private static final String PREF_GEN_LENGTH_DEF = "8";
-    public static final String PREF_DEF_PASSWD_POLICY = "defaultPasswdPolicy";
-    public static final String PREF_DEF_PASSWD_POLICY_DEF = "";
+    private static final String PREF_DEF_PASSWD_POLICY = "defaultPasswdPolicy";
+    private static final String PREF_DEF_PASSWD_POLICY_DEF = "";
 
-    public static final String PREF_FONT_SIZE = "fontSizePref";
+    private static final String PREF_FONT_SIZE = "fontSizePref";
     public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
 
-    public static final String INTENT_SCREEN = "screen";
+    private static final String INTENT_SCREEN = "screen";
 
     private static final String TAG = "Preferences";
 

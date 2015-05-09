@@ -43,6 +43,7 @@ import com.owncloud.android.lib.common.accounts.AccountUtils.AccountNotFoundExce
 import com.owncloud.android.lib.common.network.NetworkUtils;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
+@SuppressWarnings("ALL")
 public class OwnCloudClientFactory {
 
     final private static String TAG = OwnCloudClientFactory.class.getSimpleName();

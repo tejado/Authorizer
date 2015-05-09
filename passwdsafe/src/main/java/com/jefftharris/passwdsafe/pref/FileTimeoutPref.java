@@ -43,7 +43,7 @@ public enum FileTimeoutPref
         return itsValue;
     }
 
-    public final int getDisplayNameIdx()
+    private int getDisplayNameIdx()
     {
         return itsDisplayNameIdx;
     }

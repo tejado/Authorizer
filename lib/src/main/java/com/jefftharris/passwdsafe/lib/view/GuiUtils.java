@@ -43,10 +43,10 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 @SuppressWarnings("SameParameterValue")
 public final class GuiUtils
 {
-    public static final int INPUT_TEXT_PASSWORD =
+    private static final int INPUT_TEXT_PASSWORD =
         InputType.TYPE_CLASS_TEXT |
         InputType.TYPE_TEXT_VARIATION_PASSWORD;
-    public static final int INPUT_TEXT_PASSWORD_VISIBLE =
+    private static final int INPUT_TEXT_PASSWORD_VISIBLE =
         InputType.TYPE_CLASS_TEXT |
         InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
 
@@ -208,8 +208,8 @@ public final class GuiUtils
      * Set a listener to show the keyboard when the dialog is shown. Only works
      * on Froyo and higher.
      */
-    public static void setShowKeyboardListener(Dialog dialog, View view,
-                                               Context ctx)
+    private static void setShowKeyboardListener(Dialog dialog, View view,
+                                                Context ctx)
     {
         if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_FROYO) {
             GuiUtilsFroyo.setShowKeyboardListener(dialog, view, ctx);

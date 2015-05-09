@@ -18,6 +18,7 @@ import org.pwsafe.lib.Util;
  *
  * @author Jeff Harris
  */
+@SuppressWarnings("ALL")
 public class PwsShortField extends PwsField
 {
     /**

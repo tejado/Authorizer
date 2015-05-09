@@ -20,7 +20,7 @@ public abstract class SyncOper
     protected final DbFile itsFile;
 
     /** Constructor */
-    public SyncOper(DbFile file)
+    protected SyncOper(DbFile file)
     {
         itsFile = file;
     }

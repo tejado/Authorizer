@@ -47,10 +47,10 @@ public class YubikeyMgr
 
     private static final String TAG = "YubikeyMgr";
 
-    User itsUser = null;
-    boolean itsIsRegistered = false;
-    PendingIntent itsTagIntent = null;
-    CountDownTimer itsTimer = null;
+    private User itsUser = null;
+    private boolean itsIsRegistered = false;
+    private PendingIntent itsTagIntent = null;
+    private CountDownTimer itsTimer = null;
 
     /// Interface for a user of the YubikeyMgr
     public interface User
@@ -190,16 +190,16 @@ public class YubikeyMgr
     }
 
     /// Handle the intent for when the key is discovered
-    public boolean handleKeyIntent(Intent intent)
+    public void handleKeyIntent(Intent intent)
     {
         if (!NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
-            return false;
+            return;
         }
 
         PasswdSafeUtil.dbginfo(TAG, "calculate");
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         if ((tag == null) || (itsUser == null)) {
-            return true;
+            return;
         }
 
         IsoDep isotag = IsoDep.get(tag);
@@ -272,7 +272,6 @@ public class YubikeyMgr
             itsUser.handleHashException(e);
         }
 
-        return true;
     }
 
     /// Check for a valid response

@@ -26,7 +26,7 @@ import com.owncloud.android.lib.resources.files.DownloadRemoteFileOperation;
 public class OwncloudRemoteToLocalOper extends
         AbstractRemoteToLocalSyncOper<OwnCloudClient>
 {
-    private static final String TAG = "OwncloudRemoteToLocalOper";
+    private static final String TAG = "OwncloudRemoteToLocalOp";
 
     /** Constructor */
     public OwncloudRemoteToLocalOper(DbFile file)
@@ -51,7 +51,9 @@ public class OwncloudRemoteToLocalOper extends
             RemoteOperationResult res = oper.execute(providerClient);
             OwncloudSyncer.checkOperationResult(res, ctx);
 
-            localFile.setLastModified(itsFile.itsRemoteModDate);
+            if (!localFile.setLastModified(itsFile.itsRemoteModDate)) {
+                Log.e(TAG, "Can't set mod time on " + itsFile);
+            }
             setDownloaded(true);
         } catch (IOException e) {
             ctx.deleteFile(getLocalFileName());
