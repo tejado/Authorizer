@@ -16,14 +16,14 @@ import android.app.TabActivity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-public class AbstractRecordTabActivity extends TabActivity implements
+public abstract class AbstractRecordTabActivity extends TabActivity implements
                 PasswdFileActivity
 {
     protected static final int MAX_DIALOG = RecordActivityHelper.MAX_DIALOG;
 
     private final RecordActivityHelper itsHelper;
 
-    public AbstractRecordTabActivity()
+    protected AbstractRecordTabActivity()
     {
         itsHelper = new RecordActivityHelper(this);
     }
