@@ -64,8 +64,6 @@ public class OwncloudLocalToRemoteOper extends
                 }
             } else {
                 tmpFile = File.createTempFile("passwd", ".psafe3");
-                // TODO: Check whether this create is needed?
-                tmpFile.createNewFile();
                 tmpFile.deleteOnExit();
                 uploadFile = tmpFile;
                 remotePath = FileUtils.PATH_SEPARATOR + itsFile.itsLocalTitle;
