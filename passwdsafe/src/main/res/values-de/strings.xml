@@ -143,7 +143,7 @@
     <string name="new_policy">Neue Regel</string>
     <string name="next">Nächtes</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
-    <string name="no_files_select_to_open">Keine Dateien - Wählen Sie offene Aktion</string>
+    <string name="no_files_select_to_open">Keine Dateien - Aktion auswählen zu öffnen oder erstellen Sie eine neue Datei</string>
     <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
     <string name="no_policies">Keine Regel</string>
     <string name="no_records">Keine Einträge</string>
