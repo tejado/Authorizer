@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -28,6 +29,7 @@ import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
@@ -71,7 +73,8 @@ public class Preferences extends PreferenceActivity
 
     private static final String PREF_FILE_LEGACY_FILE_CHOOSER =
             "fileLegacyFileChooserPref";
-    private static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = false;
+    private static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF =
+            (ApiCompat.SDK_VERSION < ApiCompat.SDK_LOLLIPOP);
 
     private static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     private static final boolean PREF_GROUP_RECORDS_DEF = true;
@@ -438,6 +441,11 @@ public class Preferences extends PreferenceActivity
         itsFileBackupPref.setEntries(FileBackupPref.getDisplayNames(res));
         itsFileBackupPref.setEntryValues(FileBackupPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_FILE_BACKUP);
+
+        CheckBoxPreference fileChoosePref = (CheckBoxPreference)
+                findPreference(PREF_FILE_LEGACY_FILE_CHOOSER);
+        fileChoosePref.setDefaultValue(PREF_FILE_LEGACY_FILE_CHOOSER_DEF);
+        fileChoosePref.setChecked(PREF_FILE_LEGACY_FILE_CHOOSER_DEF);
 
         itsPasswdEncPref = (ListPreference)findPreference(PREF_PASSWD_ENC);
         String[] charsets =  PwsFile.ALL_PASSWORD_CHARSETS.toArray(
