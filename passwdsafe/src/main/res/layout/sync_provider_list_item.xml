@@ -1,3 +1,10 @@
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -27,7 +34,7 @@
         <TextView android:id="@android:id/text1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:paddingRight="6dip"
             />
             
@@ -40,18 +47,6 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             />
     
-        <TextView android:id="@+id/match"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@android:id/text1"
-            android:layout_toRightOf="@android:id/text2"
-            android:gravity="right"
-            android:paddingRight="6dip"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            />
-            
     </RelativeLayout>
     
 </LinearLayout>
