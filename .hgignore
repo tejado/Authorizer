@@ -16,8 +16,6 @@
 ^passwdsafe/src/main/libs/x86_64/
 ^passwdsafe/src/main/obj/
 ^sync/build/
-^tests/bin
-^tests/gen
 ^\.gradle/
 ^\.idea/workspace.xml$
 ^\.idea/libraries/
