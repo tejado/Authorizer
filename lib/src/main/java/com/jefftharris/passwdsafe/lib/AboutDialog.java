@@ -31,12 +31,14 @@ import android.widget.ToggleButton;
 public class AboutDialog extends DialogFragment
         implements DialogInterface.OnClickListener
 {
-    private final String itsExtraLicenseInfo;
-
-    /** Constructor */
-    public AboutDialog(String extraLicenseInfo)
+    /** Create a new instance */
+    public static AboutDialog newInstance(String extraLicenseInfo)
     {
-        itsExtraLicenseInfo = extraLicenseInfo;
+        AboutDialog frag = new AboutDialog();
+        Bundle args = new Bundle();
+        args.putString("extraLicenses", extraLicenseInfo);
+        frag.setArguments(args);
+        return frag;
     }
 
 
@@ -48,6 +50,9 @@ public class AboutDialog extends DialogFragment
     public @NonNull
     Dialog onCreateDialog(Bundle savedInstanceState)
     {
+        final String extraLicenseInfo =
+                getArguments().getString("extraLicenses");
+
         Activity act = getActivity();
         LayoutInflater factory = LayoutInflater.from(act);
         View detailsView = factory.inflate(R.layout.fragment_about_dialog,
@@ -87,12 +92,12 @@ public class AboutDialog extends DialogFragment
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked)
             {
-                licenseView.setText(itsExtraLicenseInfo);
+                licenseView.setText(extraLicenseInfo);
                 licenseView.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             }
         });
         btn.setVisibility(
-                (itsExtraLicenseInfo != null) ? View.VISIBLE : View.GONE);
+                (extraLicenseInfo != null) ? View.VISIBLE : View.GONE);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
             .setTitle(name)
