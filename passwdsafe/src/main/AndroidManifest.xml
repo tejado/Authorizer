@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.jefftharris.passwdsafe"
-    android:installLocation="auto">
+    android:installLocation="auto"
+    tools:ignore="UnusedAttribute">
 
     <permission
         android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"
