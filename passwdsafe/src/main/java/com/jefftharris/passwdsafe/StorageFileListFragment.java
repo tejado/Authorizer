@@ -48,7 +48,6 @@ public final class StorageFileListFragment extends ListFragment
         implements LoaderManager.LoaderCallbacks<Cursor>
 {
     // TODO: recent sync files
-    // TODO: not all files can be deleted (e.g. google drive)
     // TODO: swipe to remove an individual recent item
 
     /** Listener interface for the owning activity */

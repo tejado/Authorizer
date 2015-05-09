@@ -26,4 +26,8 @@ public interface DocumentsContractCompat
     /** Bit field in flags for whether a document is writable available on
      * API 19 */
     int FLAG_SUPPORTS_WRITE = 0x02;
+
+    /** Bit field in flags for whether a document is deletable available on
+     * API 19 */
+    int FLAG_SUPPORTS_DELETE = 0x04;
 }
