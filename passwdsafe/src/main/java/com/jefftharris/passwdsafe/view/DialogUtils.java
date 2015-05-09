@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe.view;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -54,6 +55,7 @@ public class DialogUtils
     )
     {
         LayoutInflater factory = LayoutInflater.from(act);
+        @SuppressLint("InflateParams")
         View dlgView = factory.inflate(R.layout.confirm_prompt, null);
 
         TextView prompt = (TextView)dlgView.findViewById(R.id.prompt);
