@@ -143,7 +143,7 @@
     <string name="new_policy">New Policy</string>
     <string name="next">Next</string>
     <string name="no_alias_chosen">No alias chosen</string>
-    <string name="no_files_select_to_open">No Files - Select open action</string>
+    <string name="no_files_select_to_open">No Files - Select action to open or create a new file</string>
     <string name="no_shortcut_chosen">No shortcut chosen</string>
     <string name="no_policies">No Policies</string>
     <string name="no_records">No Records</string>
