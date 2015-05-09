@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/keyboard_background"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/keyboard_vertical_margin"
-    android:paddingLeft="@dimen/keyboard_horizontal_margin"
-    android:paddingRight="@dimen/keyboard_horizontal_margin"
-    android:paddingTop="@dimen/keyboard_vertical_margin">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/keyboard_background"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/keyboard_vertical_margin"
+              android:paddingLeft="@dimen/keyboard_horizontal_margin"
+              android:paddingRight="@dimen/keyboard_horizontal_margin"
+              android:paddingTop="@dimen/keyboard_vertical_margin"
+              tools:ignore="Overdraw">
 
     <RelativeLayout
         android:layout_width="match_parent"
