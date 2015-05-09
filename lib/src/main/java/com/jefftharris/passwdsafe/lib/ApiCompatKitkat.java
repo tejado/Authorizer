@@ -41,7 +41,7 @@ public final class ApiCompatKitkat
 
             itsReleasePersistableUriPermissionMeth =
                     ContentResolver.class.getMethod(
-                            "takePersistableUriPermission",
+                            "releasePersistableUriPermission",
                             Uri.class,
                             int.class);
 
