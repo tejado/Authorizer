@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/textView_navigationItem"
+          xmlns:tools="http://schemas.android.com/tools"
+          android:id="@+id/textView_navigationItem"
     android:layout_width="fill_parent"
     android:layout_height="50dp"
     android:background="@drawable/boxandroidlibv2_navigation_selector"
@@ -10,4 +11,5 @@
     android:paddingLeft="12dp"
     android:singleLine="true"
     android:textColor="#FF1A74B0"
-    android:textSize="20sp" />
+    android:textSize="20sp"
+          tools:ignore="RtlSymmetry"/>
