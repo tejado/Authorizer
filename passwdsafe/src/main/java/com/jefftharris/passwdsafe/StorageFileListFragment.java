@@ -48,6 +48,8 @@ public final class StorageFileListFragment extends ListFragment
         implements LoaderManager.LoaderCallbacks<Cursor>
 {
     // TODO: recent sync files
+    // TODO: not all files can be deleted (e.g. google drive)
+    // TODO: swipe to remove an individual recent item
 
     /** Listener interface for the owning activity */
     public interface Listener
@@ -362,7 +364,7 @@ public final class StorageFileListFragment extends ListFragment
         // file (as opposed to a list of contacts or timezones)
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-        intent.setType("application/octet-stream");
+        intent.setType("application/*");
 
         startActivityForResult(intent, OPEN_RC);
     }
