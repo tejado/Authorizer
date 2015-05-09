@@ -340,7 +340,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                 editor.remove(PREF_AUTH_ACCOUNT);
                 editor.remove(PREF_USE_HTTPS);
             }
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -368,7 +368,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                 }
                 editor.remove(PREF_CERT_ALIAS);
             }
-            editor.commit();
+            editor.apply();
         }
     }
 
