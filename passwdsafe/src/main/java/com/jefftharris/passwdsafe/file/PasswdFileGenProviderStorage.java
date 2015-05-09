@@ -22,7 +22,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 /** A PwsStreamStorage implementation for a generic provider */
 public class PasswdFileGenProviderStorage extends PwsStreamStorage
 {
-    private static final String TAG = "PasswdFileGenProviderStorage";
+    private static final String TAG = "PasswdFileGenProviderSt";
     private final Uri itsUri;
 
     /** Constructor */
