@@ -250,7 +250,8 @@ public class PasswdFileData
 
     public final boolean canDelete()
     {
-        return (itsPwsFile != null) && !itsPwsFile.isReadOnly();
+        return (itsPwsFile != null) && !itsPwsFile.isReadOnly() &&
+               itsUri.isDeletable();
     }
 
     public final boolean isV3()

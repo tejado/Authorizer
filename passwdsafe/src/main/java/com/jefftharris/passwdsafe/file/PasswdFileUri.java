@@ -65,6 +65,7 @@ public class PasswdFileUri implements Parcelable
     private final File itsFile;
     private String itsTitle = null;
     private Pair<Boolean, Integer> itsWritableInfo;
+    private boolean itsIsDeletable;
     private ProviderType itsSyncType = null;
 
     /** The type of URI */
@@ -126,6 +127,7 @@ public class PasswdFileUri implements Parcelable
         default: {
             itsFile = null;
             itsWritableInfo = new Pair<>(false, null);
+            itsIsDeletable = false;
             break;
         }
         }
@@ -338,6 +340,12 @@ public class PasswdFileUri implements Parcelable
         return itsWritableInfo;
     }
 
+    /** Is the file deletable */
+    public boolean isDeletable()
+    {
+        return itsIsDeletable;
+    }
+
 
     /** Get the URI of the file */
     public Uri getUri()
@@ -460,6 +468,7 @@ public class PasswdFileUri implements Parcelable
             }
         } while(false);
         itsWritableInfo = new Pair<>(writable, extraMsgId);
+        itsIsDeletable = writable;
     }
 
 
@@ -468,6 +477,7 @@ public class PasswdFileUri implements Parcelable
     {
         ContentResolver cr = context.getContentResolver();
         boolean writable = false;
+        boolean deletable = false;
         itsTitle = "(unknown)";
         Cursor cursor = cr.query(itsUri, null, null, null, null);
         try {
@@ -488,6 +498,9 @@ public class PasswdFileUri implements Parcelable
                 PasswdSafeUtil.dbginfo(TAG, "file %s, %x", itsTitle, flags);
                 writable =
                     (flags & DocumentsContractCompat.FLAG_SUPPORTS_WRITE) != 0;
+                deletable =
+                        (flags & DocumentsContractCompat.FLAG_SUPPORTS_DELETE)
+                        != 0;
             }
         } finally {
             if (cursor != null) {
@@ -495,6 +508,7 @@ public class PasswdFileUri implements Parcelable
             }
         }
         itsWritableInfo = new Pair<>(writable, null);
+        itsIsDeletable = deletable;
     }
 
 
@@ -502,6 +516,7 @@ public class PasswdFileUri implements Parcelable
     private void resolveSyncProviderUri(Context context)
     {
         itsWritableInfo = new Pair<>(true, null);
+        itsIsDeletable = true;
         if (itsSyncType != null) {
             return;
         }
