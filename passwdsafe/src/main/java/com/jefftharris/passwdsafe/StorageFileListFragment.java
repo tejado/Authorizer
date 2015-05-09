@@ -12,7 +12,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -49,7 +48,6 @@ public final class StorageFileListFragment extends ListFragment
         implements LoaderManager.LoaderCallbacks<Cursor>
 {
     // TODO: recent sync files
-    // TODO: clear recent should drop permissions
 
     /** Listener interface for the owning activity */
     public interface Listener
@@ -234,10 +232,34 @@ public final class StorageFileListFragment extends ListFragment
         }
         case R.id.menu_clear_recent: {
             try {
+                ContentResolver cr = getActivity().getContentResolver();
+                int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+                Cursor cursor = itsRecentFilesDb.queryFiles();
+                if (cursor != null) {
+                    try {
+                        while (cursor.moveToNext()) {
+                            Uri uri = Uri.parse(cursor.getString(
+                                    RecentFilesDb.QUERY_COL_URI));
+                            ApiCompat.releasePersistableUriPermission(cr, uri,
+                                                                      flags);
+                        }
+                    } finally {
+                        cursor.close();
+                    }
+                }
                 itsRecentFilesDb.clear();
+
+                List<Uri> permUris = ApiCompat.getPersistedUriPermissions(cr);
+                for (Uri permUri: permUris) {
+                    ApiCompat.releasePersistableUriPermission(cr, permUri,
+                                                              flags);
+                }
+
                 getLoaderManager().restartLoader(LOADER_FILES, null, this);
-            } catch (SQLException e) {
-                Log.e(TAG, "Clear recent error", e);
+            } catch (Exception e) {
+                PasswdSafeUtil.showFatalMsg(e, "Clear recent error",
+                                            getActivity());
             }
             return true;
         }
@@ -288,8 +310,9 @@ public final class StorageFileListFragment extends ListFragment
                 for (Uri permUri: permUris) {
                     PasswdSafeUtil.dbginfo(TAG, "Checking persist perm %s",
                                            permUri);
-                    Cursor cursor = cr.query(permUri, null, null, null, null);
+                    Cursor cursor = null;
                     try {
+                        cursor = cr.query(permUri, null, null, null, null);
                         if ((cursor != null) && (cursor.moveToFirst())) {
                             ApiCompat.takePersistableUriPermission(
                                     cr, permUri, flags);
@@ -299,7 +322,7 @@ public final class StorageFileListFragment extends ListFragment
                             itsRecentFilesDb.removeUri(permUri);
                         }
                     } catch (Exception e) {
-                        Log.e(TAG, "File remove error", e);
+                        Log.e(TAG, "File remove error: " + permUri, e);
                     } finally {
                         if (cursor != null) {
                             cursor.close();
