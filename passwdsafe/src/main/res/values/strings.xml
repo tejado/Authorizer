@@ -265,6 +265,10 @@
     </string>
 
     <string name="release_notes">
+        &lt;b&gt;5.3.0&lt;/b&gt; - Add slider to reveal parts of a password. On
+        Kitkat and higher, use the built-in document manager to open or create
+        files.
+        \n\n
         &lt;b&gt;5.2.0&lt;/b&gt; - Add ownCloud support.  Accounts are chosen
         from the list in the ownCloud app.  Once access is authorized, password
         files can be chosen to sync. 
