@@ -77,8 +77,8 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             throws Exception
     {
         syncDisplayName();
-        HashMap<String, ProviderRemoteFile> owncloudFiles = getBoxFiles();
-        updateDbFiles(owncloudFiles);
+        HashMap<String, ProviderRemoteFile> boxFiles = getBoxFiles();
+        updateDbFiles(boxFiles);
         return resolveSyncOpers();
     }
 
