@@ -9,8 +9,8 @@ android {
         applicationId "com.jefftharris.passwdsafe"
         minSdkVersion 4
         targetSdkVersion 11
-        versionCode 50200
-        versionName "5.2.0"
+        versionCode 50300
+        versionName "5.3.0"
 
         ndk {
             moduleName "PasswdSafe"

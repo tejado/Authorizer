@@ -266,6 +266,10 @@
     </string>
 
     <string name="release_notes">
+        &lt;b&gt;5.3.0&lt;/b&gt; - Ajouter curseur pour révéler des parties
+        d\'un mot de passe. Sur Kitkat et plus, utiliser le gestionnaire de
+        documents intégrée à ouvrir ou créer des fichiers.
+        \n\n
         &lt;b&gt;5.2.0&lt;/b&gt; - Ajout du support ownCloud.  Les comptes sont
         choisis parmi la liste dans l\'application ownCloud.   Une fois l\'accès 
         est autorisé, les fichiers de mot de passe peuvent être choisis à 
