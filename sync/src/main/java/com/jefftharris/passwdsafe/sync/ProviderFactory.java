@@ -12,7 +12,7 @@ import android.content.Context;
 
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.box.BoxProvider;
-import com.jefftharris.passwdsafe.sync.dropbox.DropboxProvider;
+import com.jefftharris.passwdsafe.sync.dropbox.DropboxCoreProvider;
 import com.jefftharris.passwdsafe.sync.gdrive.GDriveProvider;
 import com.jefftharris.passwdsafe.sync.gdriveplay.GDrivePlayProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
@@ -43,7 +43,7 @@ public class ProviderFactory
                 break;
             }
             case DROPBOX: {
-                provider = new DropboxProvider(appCtx);
+                provider = new DropboxCoreProvider(appCtx);
                 break;
             }
             case BOX: {
