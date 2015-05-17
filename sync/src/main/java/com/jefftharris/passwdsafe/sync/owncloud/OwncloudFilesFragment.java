@@ -13,9 +13,12 @@ import java.util.List;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -34,7 +37,6 @@ import com.owncloud.android.lib.resources.files.FileUtils;
  *  Fragment to show ownCloud password files
  */
 public class OwncloudFilesFragment extends ListFragment
-        implements OnClickListener
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -110,18 +112,12 @@ public class OwncloudFilesFragment extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
+        setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.fragment_owncloud_files,
                                          container, false);
 
-        TextView title = (TextView)rootView.findViewById(R.id.title);
-        title.setText(getString(R.string.choose_sync_files_from_dir, itsPath));
-
-        View parent = rootView.findViewById(R.id.parent);
-        if (FileUtils.PATH_SEPARATOR.equals(itsPath)) {
-            parent.setVisibility(View.GONE);
-        } else {
-            parent.setOnClickListener(this);
-        }
+        TextView path = (TextView)rootView.findViewById(R.id.path);
+        path.setText(getString(R.string.choose_sync_files_from_dir, itsPath));
 
         itsProgressBar = (ProgressBar)rootView.findViewById(R.id.progress);
         itsProgressBar.setVisibility(View.GONE);
@@ -153,6 +149,39 @@ public class OwncloudFilesFragment extends ListFragment
         reload();
     }
 
+    /**
+     * Initialize the contents of the Activity's standard options menu
+     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_owncloud_files, menu);
+
+        boolean parentEnabled = !itsPath.equals(FileUtils.PATH_SEPARATOR);
+
+        MenuItem item = menu.findItem(R.id.menu_parent_dir);
+        MenuItemCompat.setShowAsAction(item,
+                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        item.setVisible(parentEnabled);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    /**
+     * This hook is called whenever an item in your options menu is selected
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_parent_dir: {
+            itsListener.changeParentDir();
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
@@ -174,21 +203,6 @@ public class OwncloudFilesFragment extends ListFragment
                                    newSelected, file.toDebugString());
             item.itsIsSelected = newSelected;
             itsListener.updateFileSynced(file, newSelected);
-        }
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.view.View.OnClickListener#onClick(android.view.View)
-     */
-    @Override
-    public void onClick(View v)
-    {
-        switch (v.getId()) {
-        case R.id.parent: {
-            itsListener.changeParentDir();
-            break;
-        }
         }
     }
 
