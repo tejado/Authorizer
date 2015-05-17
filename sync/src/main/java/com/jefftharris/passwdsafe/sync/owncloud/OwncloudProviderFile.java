@@ -17,7 +17,7 @@ import com.owncloud.android.lib.resources.files.RemoteFile;
 /**
  * Abstraction of an ownCloud remote file
  */
-class OwncloudProviderFile implements ProviderRemoteFile
+public class OwncloudProviderFile implements ProviderRemoteFile
 {
     private final RemoteFile itsFile;
     private final String itsTitle;
@@ -80,11 +80,6 @@ class OwncloudProviderFile implements ProviderRemoteFile
         return fileToString(itsFile);
     }
 
-    /** Get the remote file */
-    public final RemoteFile getRemoteFile()
-    {
-        return itsFile;
-    }
 
     /** Get a string form for a remote file */
     public static String fileToString(RemoteFile file)
