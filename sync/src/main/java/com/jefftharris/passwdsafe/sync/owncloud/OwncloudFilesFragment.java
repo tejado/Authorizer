@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.R;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.owncloud.android.lib.resources.files.FileUtils;
 
 /**
@@ -41,7 +42,7 @@ public class OwncloudFilesFragment extends ListFragment
         /** Callback to handle the result of listing files */
         interface ListFilesCb
         {
-            void handleFiles(List<OwncloudProviderFile> files);
+            void handleFiles(List<ProviderRemoteFile> files);
         }
 
         /** List files for a given path */
@@ -57,7 +58,7 @@ public class OwncloudFilesFragment extends ListFragment
         boolean isSelected(String filePath);
 
         /** Update whether a file is synced */
-        void updateFileSynced(OwncloudProviderFile file, boolean synced);
+        void updateFileSynced(ProviderRemoteFile file, boolean synced);
     }
 
     private static final String TAG = "OwncloudFilesFragment";
@@ -164,15 +165,13 @@ public class OwncloudFilesFragment extends ListFragment
             return;
         }
 
-        OwncloudProviderFile file = item.itsFile;
-        if (OwncloudProviderFile.isFolder(file)) {
+        ProviderRemoteFile file = item.itsFile;
+        if (file.isFolder()) {
             itsListener.changeDir(file.getRemoteId());
         } else {
             boolean newSelected = !item.itsIsSelected;
             PasswdSafeUtil.dbginfo(TAG, "item selected %b: %s",
-                                   newSelected,
-                                   OwncloudProviderFile.fileToString(
-                                           file.getRemoteFile()));
+                                   newSelected, file.toDebugString());
             item.itsIsSelected = newSelected;
             itsListener.updateFileSynced(file, newSelected);
         }
@@ -205,15 +204,13 @@ public class OwncloudFilesFragment extends ListFragment
         itsListener.listFiles(itsPath, new Listener.ListFilesCb()
         {
             @Override
-            public void handleFiles(List<OwncloudProviderFile> files)
+            public void handleFiles(List<ProviderRemoteFile> files)
             {
                 if (files != null) {
                     itsFilesAdapter.clear();
-                    for (OwncloudProviderFile file: files) {
-                        PasswdSafeUtil.dbginfo(
-                                TAG, "list file: %s",
-                                OwncloudProviderFile.fileToString(
-                                        file.getRemoteFile()));
+                    for (ProviderRemoteFile file: files) {
+                        PasswdSafeUtil.dbginfo(TAG, "list file: %s",
+                                               file.toDebugString());
                         boolean selected =
                                 itsListener.isSelected(file.getRemoteId());
                         itsFilesAdapter.add(new ListItem(file, selected));
@@ -248,11 +245,11 @@ public class OwncloudFilesFragment extends ListFragment
     /** Holder for each item in the list view */
     private static class ListItem
     {
-        public final OwncloudProviderFile itsFile;
+        public final ProviderRemoteFile itsFile;
         public boolean itsIsSelected;
 
         /** Constructor */
-        public ListItem(OwncloudProviderFile file, boolean selected)
+        public ListItem(ProviderRemoteFile file, boolean selected)
         {
             itsFile = file;
             itsIsSelected = selected;
@@ -291,10 +288,10 @@ public class OwncloudFilesFragment extends ListFragment
             }
 
             ListItem item = getItem(position);
-            OwncloudProviderFile file = item.itsFile;
+            ProviderRemoteFile file = item.itsFile;
             views.itsText.setText(file.getTitle());
 
-            if (OwncloudProviderFile.isFolder(file)) {
+            if (file.isFolder()) {
                 views.itsSelected.setVisibility(View.GONE);
                 views.itsModDate.setVisibility(View.GONE);
                 views.itsIcon.setImageResource(R.drawable.folder_rev);
@@ -337,10 +334,10 @@ public class OwncloudFilesFragment extends ListFragment
         @Override
         public int compare(ListItem lhs, ListItem rhs)
         {
-            OwncloudProviderFile lhsFile = lhs.itsFile;
-            OwncloudProviderFile rhsFile = rhs.itsFile;
-            boolean lhsFolder = OwncloudProviderFile.isFolder(lhsFile);
-            boolean rhsFolder = OwncloudProviderFile.isFolder(rhsFile);
+            ProviderRemoteFile lhsFile = lhs.itsFile;
+            ProviderRemoteFile rhsFile = rhs.itsFile;
+            boolean lhsFolder = lhsFile.isFolder();
+            boolean rhsFolder = rhsFile.isFolder();
             if (!lhsFolder && rhsFolder) {
                 return -1;
             } else if (!rhsFolder && lhsFolder) {
