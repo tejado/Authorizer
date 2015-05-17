@@ -43,6 +43,7 @@ import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncedFilesFragment;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.ReadRemoteFolderOperation;
@@ -52,7 +53,7 @@ import com.owncloud.android.lib.resources.files.RemoteFile;
  *  Activity for managing files synced from ownCloud
  */
 public class OwncloudFilesActivity extends FragmentActivity
-        implements OwncloudFilesFragment.Listener
+        implements SyncedFilesFragment.Listener
 {
     public static final String INTENT_PROVIDER_URI = "provider_uri";
 
@@ -176,7 +177,7 @@ public class OwncloudFilesActivity extends FragmentActivity
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#listFiles(java.lang.String, com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener.ListFilesCb)
+     * @see com.jefftharris.passwdsafe.sync.lib.SyncedFilesFragment.Listener#listFiles(java.lang.String, com.jefftharris.passwdsafe.sync.lib.SyncedFilesFragment.Listener.ListFilesCb)
      */
     @Override
     public void listFiles(String path, final ListFilesCb cb)
@@ -205,13 +206,13 @@ public class OwncloudFilesActivity extends FragmentActivity
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#changeDir(java.lang.String)
+     * @see com.jefftharris.passwdsafe.sync.lib.SyncedFilesFragment.Listener#changeDir(java.lang.String)
      */
     @Override
     public void changeDir(String path)
     {
         PasswdSafeUtil.dbginfo(TAG, "changeDir: %s", path);
-        Fragment files = OwncloudFilesFragment.newInstance(path);
+        Fragment files = SyncedFilesFragment.newInstance(path);
         FragmentManager fragmgr = getSupportFragmentManager();
         FragmentTransaction txn = fragmgr.beginTransaction();
         txn.replace(R.id.content, files);
@@ -223,7 +224,7 @@ public class OwncloudFilesActivity extends FragmentActivity
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#changeParentDir()
+     * @see com.jefftharris.passwdsafe.sync.lib.SyncedFilesFragment.Listener#changeParentDir()
      */
     public void changeParentDir()
     {
@@ -234,7 +235,7 @@ public class OwncloudFilesActivity extends FragmentActivity
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#isSelected(java.lang.String)
+     * @see com.jefftharris.passwdsafe.sync.lib.SyncedFilesFragment.Listener#isSelected(java.lang.String)
      */
     @Override
     public boolean isSelected(String filePath)
@@ -292,8 +293,8 @@ public class OwncloudFilesActivity extends FragmentActivity
     {
         FragmentManager fragmgr = getSupportFragmentManager();
         Fragment filesfrag = fragmgr.findFragmentById(R.id.content);
-        if (filesfrag instanceof OwncloudFilesFragment) {
-            ((OwncloudFilesFragment)filesfrag).reload();
+        if (filesfrag instanceof SyncedFilesFragment) {
+            ((SyncedFilesFragment)filesfrag).reload();
         }
     }
 
@@ -303,8 +304,8 @@ public class OwncloudFilesActivity extends FragmentActivity
     {
         FragmentManager fragmgr = getSupportFragmentManager();
         Fragment filesfrag = fragmgr.findFragmentById(R.id.content);
-        if (filesfrag instanceof OwncloudFilesFragment) {
-            ((OwncloudFilesFragment)filesfrag).updateSyncedFiles();
+        if (filesfrag instanceof SyncedFilesFragment) {
+            ((SyncedFilesFragment)filesfrag).updateSyncedFiles();
         }
     }
 

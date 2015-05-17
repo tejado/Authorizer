@@ -5,7 +5,7 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.sync.owncloud;
+package com.jefftharris.passwdsafe.sync.lib;
 
 import java.util.Comparator;
 import java.util.List;
@@ -31,12 +31,11 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.R;
-import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 
 /**
- *  Fragment to show ownCloud password files
+ *  Fragment to show synced password files
  */
-public class OwncloudFilesFragment extends ListFragment
+public class SyncedFilesFragment extends ListFragment
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -63,7 +62,7 @@ public class OwncloudFilesFragment extends ListFragment
         void updateFileSynced(ProviderRemoteFile file, boolean synced);
     }
 
-    private static final String TAG = "OwncloudFilesFragment";
+    private static final String TAG = "SyncedFilesFragment";
 
     private String itsPath;
     private Listener itsListener;
@@ -72,9 +71,9 @@ public class OwncloudFilesFragment extends ListFragment
     private int itsProgressBarRefCount = 0;
 
     /** Create a new instance of the fragment */
-    public static OwncloudFilesFragment newInstance(String path)
+    public static SyncedFilesFragment newInstance(String path)
     {
-        OwncloudFilesFragment frag = new OwncloudFilesFragment();
+        SyncedFilesFragment frag = new SyncedFilesFragment();
         Bundle args = new Bundle();
         args.putString("path", path);
         frag.setArguments(args);
@@ -113,7 +112,7 @@ public class OwncloudFilesFragment extends ListFragment
                              Bundle savedInstanceState)
     {
         setHasOptionsMenu(true);
-        View rootView = inflater.inflate(R.layout.fragment_owncloud_files,
+        View rootView = inflater.inflate(R.layout.fragment_synced_files,
                                          container, false);
 
         TextView path = (TextView)rootView.findViewById(R.id.path);
@@ -155,7 +154,7 @@ public class OwncloudFilesFragment extends ListFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        inflater.inflate(R.menu.fragment_owncloud_files, menu);
+        inflater.inflate(R.menu.fragment_synced_files, menu);
 
         boolean parentEnabled =
                 !TextUtils.equals(ProviderRemoteFile.PATH_SEPARATOR, itsPath);
