@@ -3,32 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    
-    <LinearLayout
+
+    <TextView
+        android:id="@+id/path"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-    
-        <ImageButton
-            android:id="@+id/parent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/parent_directory"
-            android:gravity="center_vertical"
-            android:src="@drawable/folder_up_rev"/>
+        android:paddingLeft="6dip"
+        android:paddingRight="6dip"
+        android:text="@string/none"
+        android:textAppearance="?android:attr/textAppearanceSmall"/>
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:minHeight="?android:attr/listPreferredItemHeight"
-            android:paddingLeft="6dip"
-            android:paddingRight="6dip"
-            android:text="@string/none"
-            android:textAppearance="?android:attr/textAppearanceMedium"/>
-    </LinearLayout>
-    
     <View
         style="@style/Separator.Light"/>
 

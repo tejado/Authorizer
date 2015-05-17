@@ -9,15 +9,31 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".owncloud.OwncloudFilesActivity">
 
-    <TextView
-        android:id="@+id/title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="6dip"
-        android:paddingRight="6dip"
-        android:text="@string/no_account"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/type"
+            android:scaleType="center"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:paddingLeft="6dip"
+            android:paddingRight="6dip"
+            android:text="@string/no_account"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
     
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/content"
         android:layout_width="match_parent"

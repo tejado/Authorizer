@@ -30,6 +30,7 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -92,6 +93,7 @@ public class OwncloudFilesActivity extends FragmentActivity
                 PasswdSafeContract.RemoteFiles.TABLE).build();
 
         if (args == null) {
+            // TODO: need to use constant other than owncloud here and in frag
             changeDir(FileUtils.PATH_SEPARATOR);
         }
 
@@ -344,6 +346,11 @@ public class OwncloudFilesActivity extends FragmentActivity
             String name;
             if ((cursor != null) && cursor.moveToFirst()) {
                 name = PasswdSafeContract.Providers.getDisplayName(cursor);
+
+                String typeStr = cursor.getString(
+                        PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
+                ProviderType type = ProviderType.valueOf(typeStr);
+                type.setIcon((ImageView)findViewById(R.id.icon));
             } else {
                 name = getString(R.string.no_account);
             }
