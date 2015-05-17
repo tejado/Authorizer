@@ -12,6 +12,8 @@ package com.jefftharris.passwdsafe.sync.lib;
  */
 public interface ProviderRemoteFile
 {
+    String PATH_SEPARATOR = "/";
+
     /** Get the file's remote identifier */
     String getRemoteId();
 

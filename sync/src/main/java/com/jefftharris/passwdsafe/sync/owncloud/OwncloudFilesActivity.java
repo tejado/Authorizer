@@ -45,7 +45,6 @@ import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
-import com.owncloud.android.lib.resources.files.FileUtils;
 import com.owncloud.android.lib.resources.files.ReadRemoteFolderOperation;
 import com.owncloud.android.lib.resources.files.RemoteFile;
 
@@ -93,8 +92,7 @@ public class OwncloudFilesActivity extends FragmentActivity
                 PasswdSafeContract.RemoteFiles.TABLE).build();
 
         if (args == null) {
-            // TODO: need to use constant other than owncloud here and in frag
-            changeDir(FileUtils.PATH_SEPARATOR);
+            changeDir(ProviderRemoteFile.PATH_SEPARATOR);
         }
 
         itsProviderLoaderCb = new ProviderLoaderCb();
@@ -217,7 +215,7 @@ public class OwncloudFilesActivity extends FragmentActivity
         FragmentManager fragmgr = getSupportFragmentManager();
         FragmentTransaction txn = fragmgr.beginTransaction();
         txn.replace(R.id.content, files);
-        if (!TextUtils.equals(path, FileUtils.PATH_SEPARATOR)) {
+        if (!TextUtils.equals(path, ProviderRemoteFile.PATH_SEPARATOR)) {
             txn.addToBackStack(null);
         }
         txn.commit();

@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +32,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
-import com.owncloud.android.lib.resources.files.FileUtils;
 
 /**
  *  Fragment to show ownCloud password files
@@ -157,7 +157,8 @@ public class OwncloudFilesFragment extends ListFragment
     {
         inflater.inflate(R.menu.fragment_owncloud_files, menu);
 
-        boolean parentEnabled = !itsPath.equals(FileUtils.PATH_SEPARATOR);
+        boolean parentEnabled =
+                !TextUtils.equals(ProviderRemoteFile.PATH_SEPARATOR, itsPath);
 
         MenuItem item = menu.findItem(R.id.menu_parent_dir);
         MenuItemCompat.setShowAsAction(item,
