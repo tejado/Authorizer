@@ -40,6 +40,7 @@ import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 import com.jefftharris.passwdsafe.sync.ProviderFactory;
 import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
@@ -191,7 +192,7 @@ public class OwncloudFilesActivity extends FragmentActivity
                 new ListFilesTask(itsClient, this, new ListFilesTask.Callback()
                 {
                     @Override
-                    public void handleFiles(List<OwncloudProviderFile> files,
+                    public void handleFiles(List<ProviderRemoteFile> files,
                                             ListFilesTask task)
                     {
                         itsListTasks.remove(task);
@@ -242,16 +243,12 @@ public class OwncloudFilesActivity extends FragmentActivity
     }
 
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesFragment.Listener#updateFileSynced(com.jefftharris.passwdsafe.sync.owncloud.OwncloudProviderFile, boolean)
-     */
     @Override
-    public void updateFileSynced(final OwncloudProviderFile file,
+    public void updateFileSynced(final ProviderRemoteFile file,
                                  final boolean synced)
     {
-        PasswdSafeUtil.dbginfo(
-                TAG, "updateFileSynced sync %b, file: %s", synced,
-                OwncloudProviderFile.fileToString(file.getRemoteFile()));
+        PasswdSafeUtil.dbginfo(TAG, "updateFileSynced sync %b, file: %s",
+                               synced, file.toDebugString());
 
         FileSyncedUpdateTask task = new FileSyncedUpdateTask(
                 itsProviderUri, file, synced,
@@ -411,14 +408,14 @@ public class OwncloudFilesActivity extends FragmentActivity
     /** Background task for listing files from ownCloud */
     private static class ListFilesTask
             extends AsyncTask<String, Void,
-                              Pair<List<OwncloudProviderFile>, Exception>>
+                              Pair<List<ProviderRemoteFile>, Exception>>
     {
         /** Callback for when the task is finished; null files if cancelled
          *  or an error occurred.
          */
         public interface Callback
         {
-            void handleFiles(List<OwncloudProviderFile> files,
+            void handleFiles(List<ProviderRemoteFile> files,
                              ListFilesTask task);
         }
 
@@ -440,11 +437,11 @@ public class OwncloudFilesActivity extends FragmentActivity
          * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
          */
         @Override
-        protected Pair<List<OwncloudProviderFile>, Exception>
+        protected Pair<List<ProviderRemoteFile>, Exception>
         doInBackground(String... params)
         {
-            List<OwncloudProviderFile> files = new ArrayList<>();
-            Pair<List<OwncloudProviderFile>, Exception> result =
+            List<ProviderRemoteFile> files = new ArrayList<>();
+            Pair<List<ProviderRemoteFile>, Exception> result =
                     Pair.create(files, (Exception)null);
             if (itsClient == null) {
                 return result;
@@ -483,7 +480,7 @@ public class OwncloudFilesActivity extends FragmentActivity
          */
         @Override
         protected void onPostExecute(
-                Pair<List<OwncloudProviderFile>, Exception> result)
+                Pair<List<ProviderRemoteFile>, Exception> result)
         {
             if (result.second != null) {
                 Log.e(TAG, "Error listing files", result.second);
@@ -500,7 +497,7 @@ public class OwncloudFilesActivity extends FragmentActivity
          */
         @Override
         protected void onCancelled(
-                Pair<List<OwncloudProviderFile>, Exception> result)
+                Pair<List<ProviderRemoteFile>, Exception> result)
         {
             itsCb.handleFiles(null, this);
         }
@@ -521,13 +518,13 @@ public class OwncloudFilesActivity extends FragmentActivity
 
 
         private final Uri itsProviderUri;
-        private final OwncloudProviderFile itsFile;
+        private final ProviderRemoteFile itsFile;
         private final boolean itsIsSynced;
         private final Callback itsCb;
 
 
         /** Constructor */
-        public FileSyncedUpdateTask(Uri providerUri, OwncloudProviderFile file,
+        public FileSyncedUpdateTask(Uri providerUri, ProviderRemoteFile file,
                                     boolean synced, Callback cb)
         {
             itsProviderUri = providerUri;

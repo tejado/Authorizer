@@ -39,6 +39,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 

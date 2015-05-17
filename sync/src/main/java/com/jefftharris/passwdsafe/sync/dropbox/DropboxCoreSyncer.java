@@ -61,6 +61,7 @@ public class DropboxCoreSyncer
         // TODO: choose sync files
         // TODO: sync files
         // TODO: update sync exception?
+        // TODO: lowercase remote id to match dbx path case insensitivity
         return resolveSyncOpers();
     }
 
@@ -114,7 +115,8 @@ public class DropboxCoreSyncer
     /** Create a string form of a file entry */
     private String entryToString(DropboxAPI.Entry entry)
     {
-        return String.format("{name: %s, hash: %s, rev: %s, modified: %s}",
-                             entry.path, entry.hash, entry.rev, entry.modified);
+        return String.format(
+                "{name: %s, hash: %s, rev: %s, dir: %b, modified: %s}",
+                entry.path, entry.hash, entry.rev, entry.isDir, entry.modified);
     }
 }

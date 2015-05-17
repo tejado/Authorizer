@@ -11,7 +11,7 @@ import java.util.Locale;
 
 import android.text.TextUtils;
 
-import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.ProviderRemoteFile;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.owncloud.android.lib.resources.files.RemoteFile;
 
 /**
@@ -32,49 +32,52 @@ class OwncloudProviderFile implements ProviderRemoteFile
         itsFolder = f.getParent();
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.ProviderRemoteFile#getRemoteId()
-     */
     @Override
     public String getRemoteId()
     {
         return itsFile.getRemotePath();
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.RemoteProviderFile#getTitle()
-     */
     @Override
     public String getTitle()
     {
         return itsTitle;
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.RemoteProviderFile#getFolder()
-     */
     @Override
     public String getFolder()
     {
         return itsFolder;
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.RemoteProviderFile#getModTime()
-     */
     @Override
     public long getModTime()
     {
         return itsFile.getModifiedTimestamp();
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.RemoteProviderFile#getHash()
-     */
     @Override
     public String getHash()
     {
         return itsFile.getEtag();
+    }
+
+    /**
+     * Is the file a folder
+     */
+    @Override
+    public boolean isFolder()
+    {
+        return isFolder(itsFile);
+    }
+
+    /**
+     * Get a debugging string for the file
+     */
+    @Override
+    public String toDebugString()
+    {
+        return fileToString(itsFile);
     }
 
     /** Get the remote file */
@@ -99,12 +102,6 @@ class OwncloudProviderFile implements ProviderRemoteFile
     public static boolean isFolder(RemoteFile file)
     {
         return TextUtils.equals(file.getMimeType(), "DIR");
-    }
-
-    /** Is a file a folder */
-    public static boolean isFolder(OwncloudProviderFile file)
-    {
-        return isFolder(file.getRemoteFile());
     }
 
     /** Is a file a password file */
