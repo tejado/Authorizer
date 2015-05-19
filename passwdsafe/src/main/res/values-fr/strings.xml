@@ -274,6 +274,9 @@
     </string>
 
     <string name="release_notes">
+        &lt;b&gt;5.3.1&lt;/b&gt; - Ajouter aide pour permettre le stockage
+        interne pour le nouveau sélecteur ou permettant le sélecteur de legs.
+        \n\n
         &lt;b&gt;5.3.0&lt;/b&gt; - Ajouter curseur pour révéler des parties
         d\'un mot de passe. Sur Kitkat et plus, utiliser le gestionnaire de
         documents intégrée à ouvrir ou créer des fichiers.
