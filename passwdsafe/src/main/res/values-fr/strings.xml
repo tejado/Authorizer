@@ -143,7 +143,15 @@
     <string name="new_policy">Nouvelle stratégie</string>
     <string name="next">Suivant</string>
     <string name="no_alias_chosen">Aucun alias choisi</string>
-    <string name="no_files_select_to_open">Aucun fichier - Sélectionnez l\'action d\'ouvrir ou de créer un nouveau fichier</string>
+    <string name="no_files_select_to_open">
+        Aucun fichier - Sélectionnez l\'action d\'ouvrir ou de créer un nouveau
+        fichier
+        \n\nSi les fichiers ne sont pas affichés dans l\'écran des documents,
+        utiliser le menu pour montrer le stockage interne ou sur la carte SD.
+        \n\nLe sélecteur de fichier précédent peut être activée en ouvrant le
+        menu et en sélectionnant Préférences, Paramètres du fichier, et le
+        fichier de l\'héritage sélecteur.
+    </string>
     <string name="no_shortcut_chosen">Aucun raccourci choisi</string>
     <string name="no_policies">Aucune stratégie</string>
     <string name="no_records">Aucune entrée</string>
