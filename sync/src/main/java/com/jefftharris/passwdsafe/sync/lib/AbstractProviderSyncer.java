@@ -26,26 +26,6 @@ import com.jefftharris.passwdsafe.sync.R;
 public abstract class AbstractProviderSyncer<ProviderClientT>
         extends ProviderSyncer<ProviderClientT>
 {
-    /** Abstraction of a remote file for operations */
-    public interface ProviderRemoteFile
-    {
-        /** Get the file's remote identifier */
-        String getRemoteId();
-
-        /** Get the file's title */
-        String getTitle();
-
-        /** Get the file's folder */
-        String getFolder();
-
-        /** Get the file's modification time */
-        long getModTime();
-
-        /** Get the file's hash code */
-        String getHash();
-    }
-
-
     /** Constructor */
     protected AbstractProviderSyncer(ProviderClientT providerClient,
                                      DbProvider provider, SQLiteDatabase db,

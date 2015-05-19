@@ -7,6 +7,7 @@
 package com.jefftharris.passwdsafe.sync;
 
 import android.accounts.Account;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -78,6 +79,7 @@ public class MainActivity extends FragmentActivity
     private String itsGdrivePlayDisplay = null;
     private Uri itsGdriveUri = null;
     private Uri itsDropboxUri = null;
+    private boolean itsDropboxPendingAcctLink = false;
     private Uri itsBoxUri = null;
     private Uri itsOwncloudUri = null;
 
@@ -195,6 +197,11 @@ public class MainActivity extends FragmentActivity
     protected void onResumeFragments()
     {
         super.onResumeFragments();
+        if (itsDropboxPendingAcctLink) {
+            itsDropboxPendingAcctLink = false;
+            itsNewAccountTask = getDbxProvider().finishAccountLink(
+                    Activity.RESULT_OK, null, itsDropboxUri);
+        }
         if (itsNewAccountTask != null) {
             itsNewAccountTask.startTask(this);
             itsNewAccountTask = null;
@@ -213,12 +220,6 @@ public class MainActivity extends FragmentActivity
                     getGdriveProvider().finishAccountLink(resultCode, data,
                                                           itsGdriveUri);
             break;
-        case DROPBOX_LINK_RC: {
-            itsNewAccountTask =
-                    getDbxProvider().finishAccountLink(resultCode, data,
-                                                       itsDropboxUri);
-            break;
-        }
         case BOX_AUTH_RC: {
             itsNewAccountTask =
                     getBoxProvider().finishAccountLink(resultCode, data,
@@ -376,6 +377,7 @@ public class MainActivity extends FragmentActivity
         Provider dbxProvider = getDbxProvider();
         try {
             dbxProvider.startAccountLink(this, DROPBOX_LINK_RC);
+            itsDropboxPendingAcctLink = true;
         } catch (Exception e) {
             Log.e(TAG, "startDropboxLink failed", e);
             dbxProvider.unlinkAccount();

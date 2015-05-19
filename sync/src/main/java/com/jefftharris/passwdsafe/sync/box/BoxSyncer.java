@@ -39,6 +39,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
@@ -77,8 +78,8 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxClient>
             throws Exception
     {
         syncDisplayName();
-        HashMap<String, ProviderRemoteFile> owncloudFiles = getBoxFiles();
-        updateDbFiles(owncloudFiles);
+        HashMap<String, ProviderRemoteFile> boxFiles = getBoxFiles();
+        updateDbFiles(boxFiles);
         return resolveSyncOpers();
     }
 
