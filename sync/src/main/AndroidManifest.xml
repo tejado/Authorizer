@@ -83,14 +83,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.dropbox.sync.android.DbxAuthActivity"/>
-
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
             android:launchMode="singleTask">
 
             <intent-filter>
-                <data android:scheme="db-ncrre47fqpcu42z"/>
+                <data android:scheme="db-jaafb7iju45c60f"/>
 
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -118,12 +116,6 @@
                 <action android:name="com.jefftharris.passwdsafe.action.SYNC_EXPIRATION_TIMEOUT"/>
             </intent-filter>
         </receiver>
-
-        <service
-            android:name="com.dropbox.sync.android.DbxSyncService"
-            android:enabled="true"
-            android:exported="false"
-            android:label="@string/dropbox_passwdsafe_sync"/>
 
         <service
             android:name="com.jefftharris.passwdsafe.sync.SyncService"

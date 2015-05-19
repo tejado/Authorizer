@@ -7,7 +7,7 @@
 package com.jefftharris.passwdsafe.sync.box;
 
 import com.box.boxjavalibv2.dao.BoxFile;
-import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.ProviderRemoteFile;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 
 /**
  * Abstraction of a Box remote file
@@ -23,48 +23,51 @@ class BoxProviderFile implements ProviderRemoteFile
     }
 
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.ProviderRemoteFile#getRemoteId()
-     */
     @Override
     public String getRemoteId()
     {
         return itsFile.getId();
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.RemoteProviderFile#getTitle()
-     */
     @Override
     public String getTitle()
     {
         return itsFile.getName();
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.RemoteProviderFile#getFolder()
-     */
     @Override
     public String getFolder()
     {
         return BoxSyncer.getFileFolder(itsFile);
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.RemoteProviderFile#getModTime()
-     */
     @Override
     public long getModTime()
     {
         return itsFile.dateModifiedAt().getTime();
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.RemoteProviderFile#getHash()
-     */
     @Override
     public String getHash()
     {
         return itsFile.getSha1();
+    }
+
+    /**
+     * Is the file a folder
+     */
+    @Override
+    public boolean isFolder()
+    {
+        return false;
+    }
+
+    /**
+     * Get a debugging string for the file
+     */
+    @Override
+    public String toDebugString()
+    {
+        return null;
     }
 }

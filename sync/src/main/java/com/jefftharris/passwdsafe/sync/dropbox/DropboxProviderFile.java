@@ -7,7 +7,7 @@
 package com.jefftharris.passwdsafe.sync.dropbox;
 
 import com.dropbox.sync.android.DbxFileInfo;
-import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer.ProviderRemoteFile;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 
 /**
  * Abstraction of a Dropbox remote file

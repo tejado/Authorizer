@@ -9,11 +9,10 @@
     <string name="automatic">Automatic</string>
     <string name="cant_launch_drive_file">Can\'t launch Google Drive file.  Typically the file has not been synced locally.</string>
     <string name="choose_account">Choose Account</string>
-    <string name="choose_sync_files_from_dir">Choose files to synchronize from %1$s</string>
+    <string name="choose_sync_files_from_dir">Choose files from %1$s</string>
     <string name="clear">Clear</string>
     <string name="conflicted_local_copy">Conflicted local copy</string>
     <string name="dropbox_acct_unlinked">App unlinked from Dropbox account.  Clear and re-add Dropbox access for PasswdSafe Sync.</string>
-    <string name="dropbox_passwdsafe_sync">Dropbox PasswdSafe Sync</string>
     <string name="full_sync">Full sync</string>
     <string name="gdrive_state_auth_required">Google account authentication required.  Sync again to begin the authentication process.</string>
     <string name="gdrive_state_pending_auth">Google account authentication is pending.  Select the sign-in request notification.</string>
