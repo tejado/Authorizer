@@ -271,6 +271,9 @@
     </string>
     
     <string name="release_notes">
+        &lt;b&gt;5.3.1&lt;/b&gt; - Suche Hilfe zur Aktivierung interner Speicher
+        für die neue Auswahl oder ermöglicht das Erbe chooser.
+        \n\n
         &lt;b&gt;5.3.0&lt;/b&gt; - Fügen Sie Schieberegler, um Teile eines
         Passwort verraten. Auf Kitkat und höher, verwenden Sie die integrierte
         Dokumentenmanager zu öffnen oder zu erstellen Dateien.
