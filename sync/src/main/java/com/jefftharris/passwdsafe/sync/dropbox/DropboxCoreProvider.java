@@ -28,9 +28,11 @@ import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -190,6 +192,22 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
             new DropboxCoreSyncer(itsApi, provider, db,
                                   logrec, getContext()).sync();
         }
+    }
+
+
+    /** List files */
+    public List<ProviderRemoteFile> listFiles(String path)
+            throws DropboxException
+    {
+
+        DropboxAPI.Entry pathEntry = itsApi.metadata(path, 0, null, true, null);
+        List<ProviderRemoteFile> files =
+                new ArrayList<>(pathEntry.contents.size());
+        for (DropboxAPI.Entry child: pathEntry.contents) {
+            files.add(new DropboxCoreProviderFile(child));
+        }
+
+        return files;
     }
 
 

@@ -13,6 +13,7 @@
     <string name="clear">Clear</string>
     <string name="conflicted_local_copy">Conflicted local copy</string>
     <string name="dropbox_acct_unlinked">App unlinked from Dropbox account.  Clear and re-add Dropbox access for PasswdSafe Sync.</string>
+    <string name="dropbox_synced_files">Dropbox Synced Files</string>
     <string name="full_sync">Full sync</string>
     <string name="gdrive_state_auth_required">Google account authentication required.  Sync again to begin the authentication process.</string>
     <string name="gdrive_state_pending_auth">Google account authentication is pending.  Select the sign-in request notification.</string>
