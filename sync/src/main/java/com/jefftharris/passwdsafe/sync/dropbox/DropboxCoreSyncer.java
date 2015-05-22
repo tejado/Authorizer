@@ -58,7 +58,6 @@ public class DropboxCoreSyncer
             PasswdSafeUtil.dbginfo(TAG, "child: %s", entryToString(child));
         }
 
-        // TODO: choose sync files
         // TODO: sync files
         // TODO: update sync exception?
         // TODO: lowercase remote id to match dbx path case insensitivity

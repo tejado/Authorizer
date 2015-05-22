@@ -36,8 +36,8 @@
                 android:layout_toLeftOf="@id/gdrive_play_clear"
                 android:drawableLeft="@drawable/google_drive"
                 android:drawablePadding="6dp"
-                android:padding="6dp"
                 android:gravity="fill_vertical"
+                android:padding="6dp"
                 android:text="@string/google_drive"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
     
@@ -89,8 +89,8 @@
                 android:layout_toLeftOf="@id/gdrive_clear"
                 android:drawableLeft="@drawable/google_drive"
                 android:drawablePadding="6dp"
-                android:padding="6dp"
                 android:gravity="fill_vertical"
+                android:padding="6dp"
                 android:text="@string/google_drive"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
     
@@ -225,24 +225,42 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/dropbox_acct"
-                android:divider="@drawable/spacer_medium"
-                android:orientation="horizontal"
-                android:showDividers="middle"
-                tools:ignore="UnusedAttribute">
+                android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/dropbox_sync"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/sync"
-                    android:onClick="onDropboxSync"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_action_sync"/>
+                    android:divider="@drawable/spacer_medium"
+                    android:orientation="horizontal"
+                    android:showDividers="middle"
+                    tools:ignore="UnusedAttribute">
+
+                    <ImageButton
+                        android:id="@+id/dropbox_sync"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/sync"
+                        android:onClick="onDropboxSync"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_action_sync"/>
+
+                    <Button
+                        android:id="@+id/dropbox_choose_files"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:onClick="onDropboxChooseFiles"
+                        android:text="@string/choose_files"/>
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical">
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="6dp">
 
                     <TextView
                         android:id="@+id/dropbox_interval_label"

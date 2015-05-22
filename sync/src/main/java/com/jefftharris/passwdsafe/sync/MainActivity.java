@@ -50,6 +50,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
+import com.jefftharris.passwdsafe.sync.dropbox.DropboxFilesActivity;
 import com.jefftharris.passwdsafe.sync.gdriveplay.GDrivePlayMainActivity;
 import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
@@ -407,6 +408,18 @@ public class MainActivity extends FragmentActivity
     {
         ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
         updateSyncFreq(freq, itsDropboxUri);
+    }
+
+
+    /** Button onClick handler to select Dropbox files */
+    @SuppressWarnings("UnusedParameters")
+    public void onDropboxChooseFiles(View view)
+    {
+        Intent intent = new Intent();
+        intent.putExtra(DropboxFilesActivity.INTENT_PROVIDER_URI,
+                        itsDropboxUri);
+        intent.setClass(this, DropboxFilesActivity.class);
+        startActivity(intent);
     }
 
     /** Button onClick handler to choose a Box account */

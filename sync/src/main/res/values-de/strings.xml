@@ -13,6 +13,7 @@
     <string name="clear">Leeren</string>
     <string name="conflicted_local_copy">Konflikt lokale Kopie</string>
     <string name="dropbox_acct_unlinked">Verbindung mit Dropbox entfernt.</string>
+    <string name="dropbox_synced_files">Dropbox Synchronisiert Dateien</string>
     <string name="full_sync">Vollständige Synchronisierung</string>
     <string name="gdrive_state_auth_required">Authenfizierung mit Google-Konto notwendig. Starten Sie die Synchronisierung, um sich zu anzumelden.</string>
     <string name="gdrive_state_pending_auth">Warten auf Authenfizierung mit Google-Konto. Klicken Sie auf die Anmelde-Aufforderung in den Mitteilungen.</string>
