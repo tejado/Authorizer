@@ -22,10 +22,13 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The DropboxCoreSyncer class encapsulates a Dropbox sync operation
@@ -50,17 +53,11 @@ public class DropboxCoreSyncer
     performSync() throws Exception
     {
         syncDisplayName();
-
-        DropboxAPI.Entry root = itsProviderClient.metadata("/", 0, null,
-                                                           true, null);
-        PasswdSafeUtil.dbginfo(TAG, "root: %s", entryToString(root));
-        for (DropboxAPI.Entry child: root.contents) {
-            PasswdSafeUtil.dbginfo(TAG, "child: %s", entryToString(child));
-        }
-
-        // TODO: sync files
+        updateDbFiles(getDropboxFiles());
+        // TODO: handle remote file moves/renames?
         // TODO: update sync exception?
         // TODO: lowercase remote id to match dbx path case insensitivity
+        // TODO: handle revoked access (from dev best practices)
         return resolveSyncOpers();
     }
 
@@ -70,8 +67,7 @@ public class DropboxCoreSyncer
     protected AbstractLocalToRemoteSyncOper<DropboxAPI<AndroidAuthSession>>
     createLocalToRemoteOper(DbFile dbfile)
     {
-        // TODO: local to remote
-        return null;
+        return new DropboxCoreLocalToRemoteOper(dbfile);
     }
 
 
@@ -80,8 +76,7 @@ public class DropboxCoreSyncer
     protected AbstractRemoteToLocalSyncOper<DropboxAPI<AndroidAuthSession>>
     createRemoteToLocalOper(DbFile dbfile)
     {
-        // TODO: remote to local
-        return null;
+        return new DropboxCoreRemoteToLocalOper(dbfile);
     }
 
 
@@ -90,8 +85,7 @@ public class DropboxCoreSyncer
     protected AbstractRmSyncOper<DropboxAPI<AndroidAuthSession>>
     createRmFileOper(DbFile dbfile)
     {
-        // TODO: remove file
-        return null;
+        return new DropboxCoreRmFileOper(dbfile);
     }
 
 
@@ -111,11 +105,40 @@ public class DropboxCoreSyncer
     }
 
 
-    /** Create a string form of a file entry */
-    private String entryToString(DropboxAPI.Entry entry)
+    /** Get the remote Dropbox files to sync */
+    private Map<String, ProviderRemoteFile> getDropboxFiles()
+            throws DropboxException
     {
-        return String.format(
-                "{name: %s, hash: %s, rev: %s, dir: %b, modified: %s}",
-                entry.path, entry.hash, entry.rev, entry.isDir, entry.modified);
+        Map<String, ProviderRemoteFile> files = new HashMap<>();
+
+        for (DbFile dbfile: SyncDb.getFiles(itsProvider.itsId, itsDb)) {
+            if (dbfile.itsRemoteId == null) {
+                continue;
+            }
+
+            switch (dbfile.itsRemoteChange) {
+            case NO_CHANGE:
+            case ADDED:
+            case MODIFIED: {
+                DropboxAPI.Entry entry = itsProviderClient.metadata(
+                        dbfile.itsRemoteId, 1, null, false, null);
+                PasswdSafeUtil.dbginfo(
+                        TAG, "dbx file: %s",
+                        DropboxCoreProviderFile.entryToString(entry));
+
+                if (!entry.isDeleted) {
+                    DropboxCoreProviderFile remfile =
+                            new DropboxCoreProviderFile(entry);
+                    files.put(remfile.getRemoteId(), remfile);
+                }
+                break;
+            }
+            case REMOVED: {
+                break;
+            }
+            }
+        }
+
+        return files;
     }
 }
