@@ -84,8 +84,19 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
     @Override
     public String toDebugString()
     {
+        return entryToString(itsFile);
+    }
+
+    /** Create a string form of a file entry */
+    public static String entryToString(DropboxAPI.Entry entry)
+    {
+        if (entry == null) {
+            return "{null}";
+        }
         return String.format(
-                "{id: %s, hash: %s, modified: %s, mime: %s",
-                getRemoteId(), getHash(), itsFile.modified, itsFile.mimeType);
+                "{path: %s, hash: %s, rev: %s, dir: %b, modified: %s, " +
+                "mime: %s, deleted: %b}",
+                entry.path, entry.hash, entry.rev, entry.isDir, entry.modified,
+                entry.mimeType, entry.isDeleted);
     }
 }
