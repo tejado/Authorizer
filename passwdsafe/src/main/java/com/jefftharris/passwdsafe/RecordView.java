@@ -581,7 +581,7 @@ public class RecordView extends AbstractRecordTabActivity
         } else {
             isPasswordShown = true;
             password = getPassword();
-            if (progress < password.length()) {
+            if ((password != null) && (progress < password.length())) {
                 password = password.substring(0, progress) + "…";
             }
         }
@@ -826,8 +826,8 @@ public class RecordView extends AbstractRecordTabActivity
                     });
         }
 
-        int passwordLen = getPassword().length();
-        passwordSeek.setMax(passwordLen);
+        String password = getPassword();
+        passwordSeek.setMax((password != null) ? password.length() : 0);
         passwordSeek.setProgress(0);
 
         setVisibility(R.id.times_row,
