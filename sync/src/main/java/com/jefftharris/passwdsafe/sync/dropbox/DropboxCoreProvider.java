@@ -22,6 +22,8 @@ import android.util.Log;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.client2.exception.DropboxServerException;
+import com.dropbox.client2.exception.DropboxUnlinkedException;
 import com.dropbox.client2.session.AbstractSession;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
@@ -198,11 +200,25 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {
-        boolean authorized = isAccountAuthorized();
-        PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
-        if (authorized) {
-            new DropboxCoreSyncer(itsApi, provider, db,
-                                  logrec, getContext()).sync();
+        try {
+            boolean authorized = isAccountAuthorized();
+            PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
+            if (authorized) {
+                new DropboxCoreSyncer(itsApi, provider, db,
+                                      logrec, getContext()).sync();
+            }
+        } catch (DropboxUnlinkedException e) {
+            Log.e(TAG, "unlinked error", e);
+            saveAuthData(null);
+            updateDropboxAcct();
+            throw e;
+        } catch (DropboxServerException e) {
+            if (e.error == DropboxServerException._401_UNAUTHORIZED) {
+                Log.e(TAG, "unauthorized error", e);
+                saveAuthData(null);
+                updateDropboxAcct();
+            }
+            throw e;
         }
     }
 

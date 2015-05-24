@@ -58,7 +58,6 @@ public class DropboxCoreSyncer
         // TODO: handle remote file moves/renames?
         // TODO: update sync exception?
         // TODO: lowercase remote id to match dbx path case insensitivity
-        // TODO: handle revoked access (from dev best practices)
         return resolveSyncOpers();
     }
 

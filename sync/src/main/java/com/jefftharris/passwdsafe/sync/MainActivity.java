@@ -743,12 +743,14 @@ public class MainActivity extends FragmentActivity
 
             View freqSpinLabel = findViewById(R.id.dropbox_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
+            View chooseFilesBtn = findViewById(R.id.dropbox_choose_files);
             freqSpin.setSelection(freq.getDisplayIdx());
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             acctView.setText(acct);
             controls.setVisibility(View.VISIBLE);
             clearBtn.setVisibility(View.VISIBLE);
+            chooseFilesBtn.setEnabled(authorized);
             acctWarning.setVisibility(authorized ? View.GONE : View.VISIBLE);
 
             freqSpin.setEnabled(true);
