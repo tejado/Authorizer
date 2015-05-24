@@ -6,23 +6,11 @@
  */
 package com.jefftharris.passwdsafe.sync.owncloud;
 
-import java.io.IOException;
-import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.lib.view.GuiUtils;
-import com.jefftharris.passwdsafe.sync.MainActivity;
-import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
 import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
@@ -30,6 +18,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.NotifUtils;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncIOException;
@@ -41,6 +30,12 @@ import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.ReadRemoteFileOperation;
 import com.owncloud.android.lib.resources.files.RemoteFile;
 import com.owncloud.android.lib.resources.users.GetRemoteUserNameOperation;
+
+import java.io.IOException;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The OwncloudSyncer class encapsulates an ownCloud sync operation
@@ -99,21 +94,8 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
                 OwncloudProvider.saveCertAlias(alias, ctx);
                 retry = true;
 
-                NotificationManager notifMgr =
-                        (NotificationManager) ctx.getSystemService(
-                                Context.NOTIFICATION_SERVICE);
-
-                PendingIntent mainIntent = PendingIntent.getActivity(
-                        ctx, 0,
-                        new Intent(ctx, MainActivity.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-
-                String title = ctx.getString(R.string.owncloud_cert_trusted);
-                GuiUtils.showSimpleNotification(
-                        notifMgr, ctx, R.drawable.ic_stat_app,
-                        title, R.drawable.ic_launcher_sync,
-                        cert.getSubjectDN().toString(), mainIntent, 0, true);
-
+                NotifUtils.showNotif(NotifUtils.Type.OWNCLOUD_CERT_TRUSTED,
+                                     cert.getSubjectDN().toString(), ctx);
             } catch (Exception e) {
                 Log.e(TAG, "Error saving certificate", e);
             }
