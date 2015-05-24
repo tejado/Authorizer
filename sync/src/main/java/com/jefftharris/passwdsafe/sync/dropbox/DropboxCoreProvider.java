@@ -12,6 +12,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -22,15 +23,21 @@ import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AbstractSession;
+import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
+import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
+import com.jefftharris.passwdsafe.sync.lib.NotifUtils;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +47,14 @@ import java.util.List;
  */
 public class DropboxCoreProvider extends AbstractSyncTimerProvider
 {
-    // TODO migrate auth token
-    // TODO oauth 1 tokens from migration
     // TODO: remove old dbx classes and gradle exclusions
 
     private static final String DROPBOX_SYNC_APP_KEY = "jaafb7iju45c60f";
     private static final String DROPBOX_SYNC_APP_SECRET = "gabkj5758t39urh";
+    private static final String PREF_MIGRATE_TOKEN = "dropboxMigrateToken";
     private static final String PREF_OAUTH2_TOKEN = "dropboxOAuth2Token";
+    private static final String PREF_OATH_KEY = "dropboxOAuthKey";
+    private static final String PREF_OATH_SECRET = "dropboxOAuthSecret";
     private static final String PREF_USER_ID = "dropboxUserId";
 
     private static final String TAG = "DropboxCoreProvider";
@@ -65,6 +73,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     public void init()
     {
         super.init();
+        doMigration();
         itsApi = new DropboxAPI<>(new AndroidAuthSession(
                 new AppKeyPair(DROPBOX_SYNC_APP_KEY, DROPBOX_SYNC_APP_SECRET)));
         updateDropboxAcct();
@@ -103,6 +112,9 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
             session.finishAuthentication();
             saveAuthData(session.getOAuth2AccessToken());
             updateDropboxAcct();
+            if (itsUserId != null) {
+                return null;
+            }
             return new NewAccountTask(providerAcctUri, null,
                                       ProviderType.DROPBOX, false, getContext())
             {
@@ -219,22 +231,35 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
                 PreferenceManager.getDefaultSharedPreferences(getContext());
 
         AbstractSession session = itsApi.getSession();
+        boolean haveAuth = false;
         String authToken = prefs.getString(PREF_OAUTH2_TOKEN, null);
         if (authToken != null) {
             session.setOAuth2AccessToken(authToken);
+            haveAuth = true;
+        } else {
+            String authKey = prefs.getString(PREF_OATH_KEY, null);
+            String authSecret = prefs.getString(PREF_OATH_SECRET, null);
+            if ((authKey != null) && (authSecret != null)) {
+                session.setAccessTokenPair(new AccessTokenPair(authKey,
+                                                               authSecret));
+                haveAuth = true;
+            } else {
+                session.unlink();
+            }
+        }
 
+        if (haveAuth) {
             itsUserId = prefs.getString(PREF_USER_ID, null);
             if (itsUserId != null) {
                 try {
                     updateProviderSyncFreq(itsUserId);
-                    requestSync(false);
                 } catch (Exception e) {
                     Log.e(TAG, "updateDropboxAcct failure", e);
                 }
             }
+            requestSync(false);
         } else {
             itsUserId = null;
-            session.unlink();
             updateSyncFreq(null, 0);
         }
 
@@ -268,6 +293,68 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         } else {
             editor.remove(PREF_OAUTH2_TOKEN);
         }
+        editor.remove(PREF_OATH_KEY);
+        editor.remove(PREF_OATH_SECRET);
         editor.apply();
+    }
+
+
+    /** Migrate from previous Dropbox */
+    private void doMigration()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        boolean migrate = prefs.getBoolean(PREF_MIGRATE_TOKEN, true);
+        if (migrate) {
+            PasswdSafeUtil.dbginfo(TAG, "doMigration");
+            SharedPreferences.Editor editor = prefs.edit();
+
+            try {
+                Context appctx = getContext().getApplicationContext();
+                JSONArray jsonAccounts = new JSONArray(
+                        appctx.getSharedPreferences("dropbox-credentials",
+                                                    Context.MODE_PRIVATE)
+                              .getString("accounts", null));
+                if (jsonAccounts.length() > 0) {
+                    JSONObject acct = jsonAccounts.getJSONObject(0);
+                    String userId = acct.getString("userId");
+                    PasswdSafeUtil.dbginfo(TAG, "migrate user: %s", userId);
+                    editor.putString(PREF_USER_ID, userId);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error migrating token", e);
+            }
+
+            editor.putBoolean(PREF_MIGRATE_TOKEN, false);
+            editor.apply();
+
+            SyncDb syncDb = SyncDb.acquire();
+            try {
+                SQLiteDatabase db = syncDb.getDb();
+                for (DbProvider provider: SyncDb.getProviders(db)) {
+                    if (provider.itsType != ProviderType.DROPBOX) {
+                        continue;
+                    }
+
+                    String dirpfx = "/Apps/PasswdSafe Sync";
+                    for (DbFile dbfile: SyncDb.getFiles(provider.itsId, db)) {
+                        SyncDb.updateRemoteFile(
+                                dbfile.itsId, dirpfx + dbfile.itsRemoteId,
+                                dbfile.itsRemoteTitle,
+                                dirpfx + dbfile.itsRemoteFolder,
+                                dbfile.itsRemoteModDate, dbfile.itsRemoteHash,
+                                db);
+                    }
+                }
+            } catch (SQLException e) {
+                Log.e(TAG, "Error migrating files", e);
+            } finally {
+                syncDb.release();
+            }
+
+            NotifUtils.showNotif(NotifUtils.Type.DROPBOX_MIGRATED,
+                                 getContext());
+        }
     }
 }

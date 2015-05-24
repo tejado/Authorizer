@@ -12,7 +12,8 @@
     <string name="choose_sync_files_from_dir">Wählen Sie Dateien von %1$s</string>
     <string name="clear">Leeren</string>
     <string name="conflicted_local_copy">Konflikt lokale Kopie</string>
-    <string name="dropbox_acct_unlinked">Verbindung mit Dropbox entfernt.</string>
+    <string name="dropbox_acct_unlinked">App unverknüpft von Dropbox-Konto. Synchronisieren Sie erneut, um Dropbox-Zugang für PasswdSafe Sync ermöglichen.</string>
+    <string name="dropbox_service_updated">Dropbox-Dienstes aktualisiert</string>
     <string name="dropbox_synced_files">Dropbox Synchronisiert Dateien</string>
     <string name="full_sync">Vollständige Synchronisierung</string>
     <string name="gdrive_state_auth_required">Authenfizierung mit Google-Konto notwendig. Starten Sie die Synchronisierung, um sich zu anzumelden.</string>
@@ -29,6 +30,7 @@
         Kein ownCloud Konten zur Verfügung. Fügen Sie ein Konto in der ownCloud
         App zuerst. Dann kann es für PasswdSafe Sync ausgewählt werden.
     </string>
+    <string name="open_app_reauthorize">Öffnen Sie App, die neu aktivieren</string>
     <string name="owncloud_auth_required">
         Die Zulassung zum ownCloud-Konto erforderlich. Wählen Sie das 
         ausstehende Benachrichtigung Zugriff aktivieren und synchronisieren 

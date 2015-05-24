@@ -12,7 +12,8 @@
     <string name="choose_sync_files_from_dir">Choose files from %1$s</string>
     <string name="clear">Clear</string>
     <string name="conflicted_local_copy">Conflicted local copy</string>
-    <string name="dropbox_acct_unlinked">App unlinked from Dropbox account.  Clear and re-add Dropbox access for PasswdSafe Sync.</string>
+    <string name="dropbox_acct_unlinked">App unlinked from Dropbox account.  Sync again to allow Dropbox access for PasswdSafe Sync.</string>
+    <string name="dropbox_service_updated">Dropbox service updated</string>
     <string name="dropbox_synced_files">Dropbox Synced Files</string>
     <string name="full_sync">Full sync</string>
     <string name="gdrive_state_auth_required">Google account authentication required.  Sync again to begin the authentication process.</string>
@@ -29,6 +30,7 @@
         No ownCloud accounts available.  Add an account in the ownCloud app
         first.  Then, it can be selected for PasswdSafe Sync.
     </string>
+    <string name="open_app_reauthorize">Open app to reauthorize</string>
     <string name="owncloud_auth_required">
         Authorization required for access to ownCloud account.  Select the 
         pending notification to enable access and then sync the account.
