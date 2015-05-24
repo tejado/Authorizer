@@ -390,7 +390,12 @@ public class MainActivity extends FragmentActivity
     @SuppressWarnings("UnusedParameters")
     public void onDropboxSync(View view)
     {
-        getDbxProvider().requestSync(true);
+        Provider dbxProvider = getDbxProvider();
+        if (dbxProvider.isAccountAuthorized()) {
+            dbxProvider.requestSync(true);
+        } else {
+            onDropboxChoose(view);
+        }
     }
 
 
@@ -739,7 +744,6 @@ public class MainActivity extends FragmentActivity
             View freqSpinLabel = findViewById(R.id.dropbox_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
             freqSpin.setSelection(freq.getDisplayIdx());
-            View syncBtn = findViewById(R.id.dropbox_sync);
             chooseBtn.setVisibility(View.GONE);
             acctView.setVisibility(View.VISIBLE);
             acctView.setText(acct);
@@ -749,7 +753,6 @@ public class MainActivity extends FragmentActivity
 
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
-            syncBtn.setEnabled(authorized);
         } else {
             itsDropboxUri = null;
             chooseBtn.setVisibility(View.VISIBLE);
