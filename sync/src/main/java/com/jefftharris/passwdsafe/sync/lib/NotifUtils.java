@@ -23,6 +23,7 @@ public final class NotifUtils
 {
     public enum Type
     {
+        OWNCLOUD_CERT_TRUSTED(0),
         DROPBOX_MIGRATED(1);
 
         public final int itsNotifId;
@@ -36,6 +37,23 @@ public final class NotifUtils
     /** Show a notification */
     public static void showNotif(Type type, Context ctx)
     {
+        String content = "";
+        switch (type) {
+        case OWNCLOUD_CERT_TRUSTED: {
+            break;
+        }
+        case DROPBOX_MIGRATED: {
+            content = ctx.getString(R.string.open_app_reauthorize);
+            break;
+        }
+        }
+        showNotif(type, content, ctx);
+    }
+
+
+    /** Show a notification with a custom content*/
+    public static void showNotif(Type type, String content, Context ctx)
+    {
         NotificationManager notifMgr = (NotificationManager)
                 ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -44,11 +62,13 @@ public final class NotifUtils
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         String title = "";
-        String content = "";
         switch (type) {
+        case OWNCLOUD_CERT_TRUSTED: {
+            title = ctx.getString(R.string.owncloud_cert_trusted);
+            break;
+        }
         case DROPBOX_MIGRATED: {
             title = ctx.getString(R.string.dropbox_service_updated);
-            content = ctx.getString(R.string.open_app_reauthorize);
             break;
         }
         }
