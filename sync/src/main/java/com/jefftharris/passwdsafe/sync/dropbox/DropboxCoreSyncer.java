@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.client2.exception.DropboxServerException;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
@@ -120,16 +121,22 @@ public class DropboxCoreSyncer
             case NO_CHANGE:
             case ADDED:
             case MODIFIED: {
-                DropboxAPI.Entry entry = itsProviderClient.metadata(
-                        dbfile.itsRemoteId, 1, null, false, null);
-                PasswdSafeUtil.dbginfo(
-                        TAG, "dbx file: %s",
-                        DropboxCoreProviderFile.entryToString(entry));
+                try {
+                    DropboxAPI.Entry entry = itsProviderClient.metadata(
+                            dbfile.itsRemoteId, 1, null, false, null);
+                    PasswdSafeUtil.dbginfo(
+                            TAG, "dbx file: %s",
+                            DropboxCoreProviderFile.entryToString(entry));
 
-                if (!entry.isDeleted) {
-                    DropboxCoreProviderFile remfile =
-                            new DropboxCoreProviderFile(entry);
-                    files.put(remfile.getRemoteId(), remfile);
+                    if (!entry.isDeleted) {
+                        DropboxCoreProviderFile remfile =
+                                new DropboxCoreProviderFile(entry);
+                        files.put(remfile.getRemoteId(), remfile);
+                    }
+                } catch (DropboxServerException e) {
+                    if (e.error != DropboxServerException._404_NOT_FOUND) {
+                        throw e;
+                    }
                 }
                 break;
             }
