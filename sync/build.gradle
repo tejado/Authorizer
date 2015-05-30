@@ -15,17 +15,6 @@ android {
             moduleName "DropboxSync"
         }
     }
-    sourceSets {
-        main {
-            java {
-                exclude '**/dropbox/DropboxProvider.java'
-                exclude '**/dropbox/DropboxProviderFile.java'
-                exclude '**/dropbox/DropboxRemoteToLocalOper.java'
-                exclude '**/dropbox/DropboxRmFileOper.java'
-                exclude '**/dropbox/DropboxSyncer.java'
-            }
-        }
-    }
     buildTypes {
         release {
             minifyEnabled false
