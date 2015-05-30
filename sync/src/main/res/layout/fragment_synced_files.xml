@@ -11,7 +11,7 @@
         android:paddingLeft="6dip"
         android:paddingRight="6dip"
         android:text="@string/none"
-        android:textAppearance="?android:attr/textAppearanceSmall"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <View
         style="@style/Separator.Light"/>
