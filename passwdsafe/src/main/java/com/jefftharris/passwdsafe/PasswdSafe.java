@@ -572,6 +572,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 break;
             }
             case SYNC_PROVIDER: {
+                if (uri.getSyncType() == null) {
+                    PasswdSafeUtil.showFatalMsg("Unknown sync type", this);
+                    break;
+                }
                 switch (uri.getSyncType()) {
                 case GDRIVE:
                 case GDRIVE_PLAY: {
