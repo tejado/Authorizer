@@ -59,6 +59,11 @@
     <string name="use_https">Utilisez HTTPS</string>
     
     <string name="release_notes">
+        &lt;b&gt;2.2.0&lt;/b&gt; - Mise à jour pour utiliser l\'API de core
+        Dropbox. Les fichiers peuvent être synchronisés partir d\'un dossier.
+        Le dossier Apps ne sont plus nécessaires. L\'application doit être
+        autorisé à accéder.
+        \n\n
         &lt;b&gt;2.1.0&lt;/b&gt; - Ajout du support ownCloud.  Les comptes sont
         choisis parmi la liste dans l\'application ownCloud.  Une fois l\'accès 
         est autorisé, les fichiers de mot de passe peuvent être choisis à 
