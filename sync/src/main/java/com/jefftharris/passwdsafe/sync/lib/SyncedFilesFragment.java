@@ -309,6 +309,7 @@ public class SyncedFilesFragment extends ListFragment
             ListItem item = getItem(position);
             ProviderRemoteFile file = item.itsFile;
             views.itsText.setText(file.getTitle());
+            views.itsText.requestLayout();
 
             if (file.isFolder()) {
                 views.itsSelected.setVisibility(View.GONE);
