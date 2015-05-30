@@ -58,6 +58,11 @@
     <string name="use_https">Verwenden Sie HTTPS</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.2.0&lt;/b&gt; - Aktualisieren, um die Dropbox core API zu
+        verwenden. Dateien können aus einem beliebigen Ordner synchronisiert
+        werden. Der Ordner Apps nicht mehr benötigt wird. Die App muss für
+        den Zugriff autorisiert werden.
+        \n\n
         &lt;b&gt;2.1.0&lt;/b&gt; - Fügen ownCloud Support. Konten werden aus 
         der Liste in der ownCloud App gewählt.  Sobald eine Zugangsberechtigung 
         besteht, kann Passwort-Dateien ausgewählt, um zu synchronisieren.
