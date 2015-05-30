@@ -59,8 +59,12 @@ import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesActivity;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends FragmentActivity
-        implements LoaderCallbacks<Cursor>, SyncUpdateHandler
+        implements LoaderCallbacks<Cursor>, SyncUpdateHandler,
+                   AccountUpdateTask.Listener
 {
     private static final String TAG = "MainActivity";
 
@@ -85,6 +89,7 @@ public class MainActivity extends FragmentActivity
     private Uri itsOwncloudUri = null;
 
     private NewAccountTask itsNewAccountTask = null;
+    private List<AccountUpdateTask> itsUpdateTasks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -171,6 +176,19 @@ public class MainActivity extends FragmentActivity
         lm.initLoader(LOADER_PROVIDERS, null, this);
     }
 
+    /**
+     * Destroy all fragments and loaders.
+     */
+    @Override
+    protected void onDestroy()
+    {
+        for (AccountUpdateTask task: itsUpdateTasks) {
+            task.cancel(true);
+        }
+        itsUpdateTasks.clear();
+        super.onDestroy();
+    }
+
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onStart()
      */
@@ -204,7 +222,7 @@ public class MainActivity extends FragmentActivity
                     Activity.RESULT_OK, null, itsDropboxUri);
         }
         if (itsNewAccountTask != null) {
-            itsNewAccountTask.startTask(this);
+            itsNewAccountTask.startTask(this, this);
             itsNewAccountTask = null;
         }
         LoaderManager lm = getSupportLoaderManager();
@@ -638,6 +656,24 @@ public class MainActivity extends FragmentActivity
         }
     }
 
+    /**
+     * Notification the task is starting
+     */
+    @Override
+    public final void notifyUpdateStarted(AccountUpdateTask task)
+    {
+        itsUpdateTasks.add(task);
+    }
+
+    /**
+     * Notification the task is finished
+     */
+    @Override
+    public final void notifyUpdateFinished(AccountUpdateTask task)
+    {
+        itsUpdateTasks.remove(task);
+    }
+
     /** Update the UI when the GDrive play account is changed */
     private void updateGdrivePlayAccount(Cursor cursor)
     {
@@ -866,7 +902,7 @@ public class MainActivity extends FragmentActivity
                     cr.delete(itsAccountUri, null, null);
                 }
             }
-        }.startTask(this);
+        }.startTask(this, this);
     }
 
     /** Update the sync frequency for an account */
@@ -882,7 +918,7 @@ public class MainActivity extends FragmentActivity
                            freq.getFreq());
                 cr.update(itsAccountUri, values, null, null);
             }
-        }.startTask(this);
+        }.startTask(this, this);
     }
 
     /** Get the Google Drive Play provider */

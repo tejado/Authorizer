@@ -18,18 +18,29 @@ import android.util.Log;
  */
 public abstract class AccountUpdateTask extends AsyncTask<Void, Void, Void>
 {
+    public interface Listener
+    {
+        /** Notification the task is starting */
+        void notifyUpdateStarted(AccountUpdateTask task);
+
+        /** Notification the task is finished */
+        void notifyUpdateFinished(AccountUpdateTask task);
+    }
+
     private static final String TAG = "AccountUpdateTask";
 
     protected final Uri itsAccountUri;
 
     private final String itsProgressMsg;
     private FragmentActivity itsActivity;
+    private Listener itsListener;
     private ProgressFragment itsProgressFrag;
 
     /** Start the update task */
-    public void startTask(FragmentActivity activity)
+    public void startTask(FragmentActivity activity, Listener listener)
     {
         itsActivity = activity;
+        itsListener = listener;
         execute();
     }
 
@@ -47,6 +58,7 @@ public abstract class AccountUpdateTask extends AsyncTask<Void, Void, Void>
     protected void onPreExecute()
     {
         super.onPreExecute();
+        itsListener.notifyUpdateStarted(this);
         itsProgressFrag = ProgressFragment.newInstance(itsProgressMsg);
         itsProgressFrag.show(itsActivity.getSupportFragmentManager(), null);
     }
@@ -78,6 +90,7 @@ public abstract class AccountUpdateTask extends AsyncTask<Void, Void, Void>
     {
         super.onPostExecute(arg);
         itsProgressFrag.dismissAllowingStateLoss();
+        itsListener.notifyUpdateFinished(this);
     }
 
     /** Get the activity for the task */
