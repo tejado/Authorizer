@@ -39,6 +39,12 @@ public class OwncloudProviderFile implements ProviderRemoteFile
     }
 
     @Override
+    public String getPath()
+    {
+        return getRemoteId();
+    }
+
+    @Override
     public String getTitle()
     {
         return itsTitle;

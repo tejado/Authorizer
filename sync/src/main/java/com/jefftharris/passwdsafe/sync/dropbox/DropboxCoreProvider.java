@@ -356,7 +356,8 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
                     String dirpfx = "/Apps/PasswdSafe Sync";
                     for (DbFile dbfile: SyncDb.getFiles(provider.itsId, db)) {
                         SyncDb.updateRemoteFile(
-                                dbfile.itsId, dirpfx + dbfile.itsRemoteId,
+                                dbfile.itsId,
+                                (dirpfx + dbfile.itsRemoteId).toLowerCase(),
                                 dbfile.itsRemoteTitle,
                                 dirpfx + dbfile.itsRemoteFolder,
                                 dbfile.itsRemoteModDate, dbfile.itsRemoteHash,
