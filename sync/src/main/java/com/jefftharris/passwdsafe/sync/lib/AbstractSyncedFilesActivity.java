@@ -63,9 +63,6 @@ public abstract class AbstractSyncedFilesActivity extends FragmentActivity
     private final List<AbstractListFilesTask> itsListTasks = new ArrayList<>();
     private final List<FileSyncedUpdateTask> itsUpdateTasks = new ArrayList<>();
 
-    // TODO: filter psafe3 files?
-    // TODO: remove key?
-
     /** Constructor */
     protected AbstractSyncedFilesActivity(ProviderType providerType)
     {
