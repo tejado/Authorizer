@@ -363,7 +363,8 @@ public class SyncedFilesFragment extends ListFragment
             } else if (!rhsFolder && lhsFolder) {
                 return 1;
             } else {
-                return lhsFile.getTitle().compareTo(rhsFile.getTitle());
+                return lhsFile.getTitle().compareToIgnoreCase(
+                        rhsFile.getTitle());
             }
         }
     }
