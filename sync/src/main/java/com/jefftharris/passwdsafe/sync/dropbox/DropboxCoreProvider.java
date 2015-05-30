@@ -49,8 +49,6 @@ import java.util.List;
  */
 public class DropboxCoreProvider extends AbstractSyncTimerProvider
 {
-    // TODO: remove old dbx classes and gradle exclusions
-
     private static final String DROPBOX_SYNC_APP_KEY = "jaafb7iju45c60f";
     private static final String DROPBOX_SYNC_APP_SECRET = "gabkj5758t39urh";
     private static final String PREF_MIGRATE_TOKEN = "dropboxMigrateToken";
