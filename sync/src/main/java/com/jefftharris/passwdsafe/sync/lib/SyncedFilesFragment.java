@@ -50,7 +50,7 @@ public class SyncedFilesFragment extends ListFragment
         void listFiles(String path, ListFilesCb cb);
 
         /** Change directory to the given path */
-        void changeDir(String path);
+        void changeDir(String pathName, String pathId);
 
         /** Change directory to the parent path */
         void changeParentDir();
@@ -64,18 +64,21 @@ public class SyncedFilesFragment extends ListFragment
 
     private static final String TAG = "SyncedFilesFragment";
 
-    private String itsPath;
+    private String itsPathName;
+    private String itsPathId;
     private Listener itsListener;
     private ArrayAdapter<ListItem> itsFilesAdapter;
     private ProgressBar itsProgressBar;
     private int itsProgressBarRefCount = 0;
 
     /** Create a new instance of the fragment */
-    public static SyncedFilesFragment newInstance(String path)
+    public static SyncedFilesFragment newInstance(String pathName,
+                                                  String pathId)
     {
         SyncedFilesFragment frag = new SyncedFilesFragment();
         Bundle args = new Bundle();
-        args.putString("path", path);
+        args.putString("pathName", pathName);
+        args.putString("pathId", pathId);
         frag.setArguments(args);
         return frag;
     }
@@ -99,7 +102,8 @@ public class SyncedFilesFragment extends ListFragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        itsPath = getArguments().getString("path");
+        itsPathName = getArguments().getString("pathName");
+        itsPathId = getArguments().getString("pathId");
     }
 
 
@@ -116,7 +120,8 @@ public class SyncedFilesFragment extends ListFragment
                                          container, false);
 
         TextView path = (TextView)rootView.findViewById(R.id.path);
-        path.setText(getString(R.string.choose_sync_files_from_dir, itsPath));
+        path.setText(getString(R.string.choose_sync_files_from_dir,
+                               itsPathName));
 
         itsProgressBar = (ProgressBar)rootView.findViewById(R.id.progress);
         itsProgressBar.setVisibility(View.GONE);
@@ -157,7 +162,7 @@ public class SyncedFilesFragment extends ListFragment
         inflater.inflate(R.menu.fragment_synced_files, menu);
 
         boolean parentEnabled =
-                !TextUtils.equals(ProviderRemoteFile.PATH_SEPARATOR, itsPath);
+                !TextUtils.equals(ProviderRemoteFile.PATH_SEPARATOR, itsPathId);
 
         MenuItem item = menu.findItem(R.id.menu_parent_dir);
         MenuItemCompat.setShowAsAction(item,
@@ -196,7 +201,7 @@ public class SyncedFilesFragment extends ListFragment
 
         ProviderRemoteFile file = item.itsFile;
         if (file.isFolder()) {
-            itsListener.changeDir(file.getRemoteId());
+            itsListener.changeDir(file.getPath(), file.getRemoteId());
         } else {
             boolean newSelected = !item.itsIsSelected;
             PasswdSafeUtil.dbginfo(TAG, "item selected %b: %s",
@@ -215,7 +220,7 @@ public class SyncedFilesFragment extends ListFragment
             itsProgressBar.setVisibility(View.VISIBLE);
             itsProgressBarRefCount = 1;
         }
-        itsListener.listFiles(itsPath, new Listener.ListFilesCb()
+        itsListener.listFiles(itsPathId, new Listener.ListFilesCb()
         {
             @Override
             public void handleFiles(List<ProviderRemoteFile> files)

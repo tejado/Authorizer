@@ -57,7 +57,7 @@ public class DropboxCoreSyncer
         updateDbFiles(getDropboxFiles());
         // TODO: handle remote file moves/renames?
         // TODO: update sync exception?
-        // TODO: lowercase remote id to match dbx path case insensitivity
+        // TODO: Entry readonly flag
         return resolveSyncOpers();
     }
 

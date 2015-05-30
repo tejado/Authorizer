@@ -30,6 +30,12 @@ class BoxProviderFile implements ProviderRemoteFile
     }
 
     @Override
+    public String getPath()
+    {
+        return getFolder() + PATH_SEPARATOR + getTitle();
+    }
+
+    @Override
     public String getTitle()
     {
         return itsFile.getName();

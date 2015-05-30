@@ -17,6 +17,9 @@ public interface ProviderRemoteFile
     /** Get the file's remote identifier */
     String getRemoteId();
 
+    /** Get the file's path for display */
+    String getPath();
+
     /** Get the file's title */
     String getTitle();
 

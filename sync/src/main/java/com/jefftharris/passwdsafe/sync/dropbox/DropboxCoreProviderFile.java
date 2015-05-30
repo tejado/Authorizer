@@ -17,11 +17,13 @@ import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 public class DropboxCoreProviderFile implements ProviderRemoteFile
 {
     private final DropboxAPI.Entry itsFile;
+    private final String itsRemoteId;
 
     /** Constructor */
     public DropboxCoreProviderFile(DropboxAPI.Entry file)
     {
         itsFile = file;
+        itsRemoteId = itsFile.path.toLowerCase();
     }
 
     /**
@@ -29,6 +31,15 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
      */
     @Override
     public String getRemoteId()
+    {
+        return itsRemoteId;
+    }
+
+    /**
+     * Get the file's path for display
+     */
+    @Override
+    public String getPath()
     {
         return itsFile.path;
     }

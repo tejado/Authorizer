@@ -92,7 +92,8 @@ public abstract class AbstractSyncedFilesActivity extends FragmentActivity
                 PasswdSafeContract.RemoteFiles.TABLE).build();
 
         if (args == null) {
-            changeDir(ProviderRemoteFile.PATH_SEPARATOR);
+            changeDir(ProviderRemoteFile.PATH_SEPARATOR,
+                      ProviderRemoteFile.PATH_SEPARATOR);
         }
 
         itsProviderLoaderCb = new ProviderLoaderCb();
@@ -186,14 +187,14 @@ public abstract class AbstractSyncedFilesActivity extends FragmentActivity
      * @see com.jefftharris.passwdsafe.sync.lib.SyncedFilesFragment.Listener#changeDir(java.lang.String)
      */
     @Override
-    public void changeDir(String path)
+    public void changeDir(String pathName, String pathId)
     {
-        PasswdSafeUtil.dbginfo(TAG, "changeDir: %s", path);
-        Fragment files = SyncedFilesFragment.newInstance(path);
+        PasswdSafeUtil.dbginfo(TAG, "changeDir: %s", pathName);
+        Fragment files = SyncedFilesFragment.newInstance(pathName, pathId);
         FragmentManager fragmgr = getSupportFragmentManager();
         FragmentTransaction txn = fragmgr.beginTransaction();
         txn.replace(R.id.content, files);
-        if (!TextUtils.equals(path, ProviderRemoteFile.PATH_SEPARATOR)) {
+        if (!TextUtils.equals(pathId, ProviderRemoteFile.PATH_SEPARATOR)) {
             txn.addToBackStack(null);
         }
         txn.commit();
