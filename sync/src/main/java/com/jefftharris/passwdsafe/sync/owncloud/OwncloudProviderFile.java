@@ -108,7 +108,6 @@ public class OwncloudProviderFile implements ProviderRemoteFile
     /** Is a file a password file */
     public static boolean isPasswordFile(RemoteFile file)
     {
-        // TODO: refactor generic?
         return !isFolder(file) && file.getRemotePath().endsWith(".psafe3");
     }
 }

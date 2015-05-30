@@ -55,8 +55,6 @@ public class DropboxCoreSyncer
     {
         syncDisplayName();
         updateDbFiles(getDropboxFiles());
-        // TODO: handle remote file moves/renames?
-        // TODO: update sync exception?
         // TODO: Entry readonly flag
         return resolveSyncOpers();
     }
