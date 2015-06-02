@@ -73,8 +73,7 @@ public class Preferences extends PreferenceActivity
 
     private static final String PREF_FILE_LEGACY_FILE_CHOOSER =
             "fileLegacyFileChooserPref";
-    private static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF =
-            (ApiCompat.SDK_VERSION < ApiCompat.SDK_LOLLIPOP);
+    private static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = true;
 
     private static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     private static final boolean PREF_GROUP_RECORDS_DEF = true;
