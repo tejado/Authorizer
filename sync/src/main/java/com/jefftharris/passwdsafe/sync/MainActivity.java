@@ -580,10 +580,9 @@ public class MainActivity extends FragmentActivity
             updateOwncloudAccount(null);
         }
 
-        View noAccountsMsg = findViewById(R.id.no_accounts_msg);
-        noAccountsMsg.setVisibility(
-                (hasGdrive || hasDropbox || hasBox || hasOwncloud) ?
-                        View.GONE : View.VISIBLE);
+        GuiUtils.setVisible(
+                findViewById(R.id.no_accounts_msg),
+                !(hasGdrive || hasDropbox || hasBox || hasOwncloud));
         GuiUtils.invalidateOptionsMenu(this);
     }
 
@@ -597,8 +596,7 @@ public class MainActivity extends FragmentActivity
         updateDropboxAccount(null);
         updateBoxAccount(null);
         updateOwncloudAccount(null);
-        View noAccountsMsg = findViewById(R.id.no_accounts_msg);
-        noAccountsMsg.setVisibility(View.VISIBLE);
+        GuiUtils.setVisible(findViewById(R.id.no_accounts_msg), true);
         GuiUtils.invalidateOptionsMenu(this);
     }
 
@@ -649,11 +647,10 @@ public class MainActivity extends FragmentActivity
     /** Update the UI when the GDrive account is changed */
     private void updateGdriveAccount(Cursor cursor)
     {
-        View container = findViewById(R.id.gdrive_container);
-        View separator = findViewById(R.id.gdrive_separator);
-        if (cursor != null) {
-            container.setVisibility(View.VISIBLE);
-            separator.setVisibility(View.VISIBLE);
+        boolean haveCursor = (cursor != null);
+        GuiUtils.setVisible(findViewById(R.id.gdrive_container), haveCursor);
+        GuiUtils.setVisible(findViewById(R.id.gdrive_separator), haveCursor);
+        if (haveCursor) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
@@ -686,19 +683,16 @@ public class MainActivity extends FragmentActivity
         } else {
             itsGdriveAccount = null;
             itsGdriveUri = null;
-            container.setVisibility(View.GONE);
-            separator.setVisibility(View.GONE);
         }
     }
 
     /** Update the UI when the Dropbox account is changed */
     private void updateDropboxAccount(Cursor cursor)
     {
-        View container = findViewById(R.id.dropbox_container);
-        View separator = findViewById(R.id.dropbox_separator);
-        if (cursor != null) {
-            container.setVisibility(View.VISIBLE);
-            separator.setVisibility(View.VISIBLE);
+        boolean haveCursor = (cursor != null);
+        GuiUtils.setVisible(findViewById(R.id.dropbox_container), haveCursor);
+        GuiUtils.setVisible(findViewById(R.id.dropbox_separator), haveCursor);
+        if (haveCursor) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
@@ -721,23 +715,20 @@ public class MainActivity extends FragmentActivity
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
 
-            View acctWarning = findViewById(R.id.dropbox_acct_unlink);
-            acctWarning.setVisibility(authorized ? View.GONE : View.VISIBLE);
+            GuiUtils.setVisible(findViewById(R.id.dropbox_acct_unlink),
+                                !authorized);
         } else {
             itsDropboxUri = null;
-            container.setVisibility(View.GONE);
-            separator.setVisibility(View.GONE);
         }
     }
 
     /** Update the UI when the Box account is changed */
     private void updateBoxAccount(Cursor cursor)
     {
-        View container = findViewById(R.id.box_container);
-        View separator = findViewById(R.id.box_separator);
-        if (cursor != null) {
-            container.setVisibility(View.VISIBLE);
-            separator.setVisibility(View.VISIBLE);
+        boolean haveCursor = (cursor != null);
+        GuiUtils.setVisible(findViewById(R.id.box_container), haveCursor);
+        GuiUtils.setVisible(findViewById(R.id.box_separator), haveCursor);
+        if (haveCursor) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
@@ -762,19 +753,16 @@ public class MainActivity extends FragmentActivity
             syncBtn.setEnabled(authorized);
         } else {
             itsBoxUri = null;
-            container.setVisibility(View.GONE);
-            separator.setVisibility(View.GONE);
         }
     }
 
     /** Update the UI when the ownCloud account is changed */
     private void updateOwncloudAccount(Cursor cursor)
     {
-        View container = findViewById(R.id.owncloud_container);
-        View separator = findViewById(R.id.owncloud_separator);
-        if (cursor != null) {
-            container.setVisibility(View.VISIBLE);
-            separator.setVisibility(View.VISIBLE);
+        boolean haveCursor = (cursor != null);
+        GuiUtils.setVisible(findViewById(R.id.owncloud_container), haveCursor);
+        GuiUtils.setVisible(findViewById(R.id.owncloud_separator), haveCursor);
+        if (haveCursor) {
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
@@ -791,8 +779,9 @@ public class MainActivity extends FragmentActivity
 
             TextView acctView = (TextView)findViewById(R.id.owncloud_acct);
             acctView.setText(acct);
-            View authReqWarning = findViewById(R.id.owncloud_auth_required);
-            authReqWarning.setVisibility(authorized ? View.GONE : View.VISIBLE);
+
+            GuiUtils.setVisible(findViewById(R.id.owncloud_auth_required),
+                                !authorized);
 
             View freqSpinLabel = findViewById(R.id.owncloud_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
@@ -804,8 +793,6 @@ public class MainActivity extends FragmentActivity
             freqSpinLabel.setEnabled(true);
         } else {
             itsOwncloudUri = null;
-            container.setVisibility(View.GONE);
-            separator.setVisibility(View.GONE);
         }
     }
 
