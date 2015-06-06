@@ -14,60 +14,7 @@
         android:orientation="vertical">
         
         <RelativeLayout
-            android:id="@+id/gdrive_play_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            
-            <ImageButton
-                android:id="@+id/gdrive_play_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:contentDescription="@string/clear"
-                android:onClick="onGdrivePlayClear"
-                android:padding="12dp"
-                android:src="@drawable/ic_action_delete"/>
-
-            <TextView
-                android:id="@+id/gdrive_play_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@id/gdrive_play_clear"
-                android:drawableLeft="@drawable/google_drive"
-                android:drawablePadding="6dp"
-                android:gravity="fill_vertical"
-                android:padding="6dp"
-                android:text="@string/google_drive"
-                android:textAppearance="?android:attr/textAppearanceLarge"/>
-    
-            <TextView
-                android:id="@+id/gdrive_play_acct"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/gdrive_play_title"
-                android:padding="6dp"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textIsSelectable="false"/>
-            
-            <Button
-                android:id="@+id/gdrive_play_choose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/gdrive_play_acct"
-                android:onClick="onGdrivePlayChoose"
-                android:text="@string/choose_account"/>
-    
-        </RelativeLayout>
-        
-        <View
-            android:id="@+id/gdrive_play_separator"
-            style="@style/Separator"
-            android:layout_margin="6dp"/>
-
-        <RelativeLayout
+            android:id="@+id/gdrive_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             
@@ -94,21 +41,12 @@
                 android:text="@string/google_drive"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
     
-            <Button
-                android:id="@+id/gdrive_choose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/gdrive_title"
-                android:onClick="onGdriveChoose"
-                android:text="@string/choose_account"/>
-    
             <TextView
                 android:id="@+id/gdrive_acct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/gdrive_choose"
+                android:layout_below="@id/gdrive_title"
                 android:padding="6dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textIsSelectable="false"/>
@@ -170,10 +108,12 @@
         </RelativeLayout>
 
         <View
+            android:id="@+id/gdrive_separator"
             style="@style/Separator"
             android:layout_margin="6dp"/>
 
         <RelativeLayout
+            android:id="@+id/dropbox_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             
@@ -200,21 +140,12 @@
                 android:text="@string/dropbox"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <Button
-                android:id="@+id/dropbox_choose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/dropbox_title"
-                android:onClick="onDropboxChoose"
-                android:text="@string/choose_account"/>
-    
             <TextView
                 android:id="@+id/dropbox_acct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/dropbox_choose"
+                android:layout_below="@id/dropbox_title"
                 android:padding="6dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textIsSelectable="false"/>
@@ -295,10 +226,12 @@
         </RelativeLayout>
 
         <View
+            android:id="@+id/dropbox_separator"
             style="@style/Separator"
             android:layout_margin="6dp"/>
 
         <RelativeLayout
+            android:id="@+id/box_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             
@@ -325,21 +258,12 @@
                 android:text="@string/box"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <Button
-                android:id="@+id/box_choose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/box_title"
-                android:onClick="onBoxChoose"
-                android:text="@string/choose_account"/>
-    
             <TextView
                 android:id="@+id/box_acct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/box_choose"
+                android:layout_below="@id/box_title"
                 android:padding="6dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textIsSelectable="false"/>
@@ -389,10 +313,12 @@
         </RelativeLayout>
 
         <View
+            android:id="@+id/box_separator"
             style="@style/Separator"
             android:layout_margin="6dp"/>
 
         <RelativeLayout
+            android:id="@+id/owncloud_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             
@@ -419,21 +345,12 @@
                 android:text="@string/owncloud"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <Button
-                android:id="@+id/owncloud_choose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/owncloud_title"
-                android:onClick="onOwncloudChoose"
-                android:text="@string/choose_account"/>
-    
             <TextView
                 android:id="@+id/owncloud_acct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/owncloud_choose"
+                android:layout_below="@id/owncloud_title"
                 android:padding="6dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textIsSelectable="false"/>
@@ -518,6 +435,7 @@
         </RelativeLayout>
 
         <View
+            android:id="@+id/owncloud_separator"
             style="@style/Separator"
             android:layout_margin="6dp"/>
 

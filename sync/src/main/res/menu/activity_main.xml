@@ -1,5 +1,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <item android:id="@+id/menu_add"
+          android:icon="@android:drawable/ic_menu_add"
+          android:orderInCategory="100"
+          android:title="@string/add_account">
+        <menu>
+            <item android:id="@+id/menu_add_box"
+                  android:icon="@drawable/box"
+                  android:title="@string/box"/>
+
+            <item android:id="@+id/menu_add_dropbox"
+                  android:icon="@drawable/dropbox"
+                  android:title="@string/dropbox"/>
+
+            <item android:id="@+id/menu_add_google_drive"
+                  android:icon="@drawable/google_drive"
+                  android:title="@string/google_drive"/>
+
+            <item android:id="@+id/menu_add_owncloud"
+                  android:icon="@drawable/owncloud"
+                  android:title="@string/owncloud"/>
+        </menu>
+    </item>
+
     <item
         android:id="@+id/menu_logs"
         android:icon="@android:drawable/ic_menu_recent_history"

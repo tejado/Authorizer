@@ -2,6 +2,7 @@
 <resources>
 
     <string name="account_not_exists_label">Konto %1$s existiert nicht</string>
+    <string name="add_account">Konto hinzufügen</string>
     <string name="adding_account">Füge Konto hinzu &#8230;</string>
     <string name="adding_account_notification">Füge Konto hinzu &#8230;  Wählen Sie Benachrichtigung innerhalb von 60s den Zugriff gestatten.</string>
     <string name="app_desc">Synchronisiert PasswordSafe-Datenbanken von Cloudspeichern</string>
