@@ -12,6 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/no_accounts_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text="@string/no_accounts"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
         
         <RelativeLayout
             android:id="@+id/gdrive_container"
