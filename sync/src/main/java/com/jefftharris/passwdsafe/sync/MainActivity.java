@@ -580,6 +580,10 @@ public class MainActivity extends FragmentActivity
             updateOwncloudAccount(null);
         }
 
+        View noAccountsMsg = findViewById(R.id.no_accounts_msg);
+        noAccountsMsg.setVisibility(
+                (hasGdrive || hasDropbox || hasBox || hasOwncloud) ?
+                        View.GONE : View.VISIBLE);
         GuiUtils.invalidateOptionsMenu(this);
     }
 
@@ -593,6 +597,8 @@ public class MainActivity extends FragmentActivity
         updateDropboxAccount(null);
         updateBoxAccount(null);
         updateOwncloudAccount(null);
+        View noAccountsMsg = findViewById(R.id.no_accounts_msg);
+        noAccountsMsg.setVisibility(View.VISIBLE);
         GuiUtils.invalidateOptionsMenu(this);
     }
 
