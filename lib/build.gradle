@@ -13,7 +13,7 @@ def buildTime() {
 
 android {
     compileSdkVersion 10
-    buildToolsVersion "21.1.2"
+    buildToolsVersion "22.0.1"
     publishNonDefault true
 
     defaultConfig {
