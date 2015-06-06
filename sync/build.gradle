@@ -40,4 +40,5 @@ dependencies {
     compile project(':lib-box')
     compile project(':lib-owncloud')
     compile project(':lib-play')
+    compile 'com.google.code.gson:gson:2.3.1'
 }
