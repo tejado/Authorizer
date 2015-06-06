@@ -156,6 +156,13 @@ public final class GuiUtils
     }
 
 
+    /** Set whether a view is visible */
+    public static void setVisible(View view, boolean visible)
+    {
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+
     /**
      * Setup the keyboard on a dialog. The initial field gets focus and shows
      * the keyboard. The final field clicks the Ok button when enter is pressed.
