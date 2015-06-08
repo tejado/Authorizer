@@ -75,27 +75,7 @@ public class PwsFileHeader
 		return Util.cloneByteArray( IpThing );
 	}
 
-	/**
-	 * Gets a copy of RandHash.
-	 * 
-	 * @return A copy of RandHash
-	 */
-	public byte [] getRandHash()
-	{
-		return Util.cloneByteArray( RandHash );
-	}
-
-	/**
-	 * Gets a copy of RandStuff.
-	 * 
-	 * @return A copy of RandStuff
-	 */
-	public byte [] getRandStuff()
-	{
-		return Util.cloneByteArray( RandStuff );
-	}
-
-	/**
+    /**
 	 * Gets a copy of Salt.
 	 * 
 	 * @return a copy of Salt.

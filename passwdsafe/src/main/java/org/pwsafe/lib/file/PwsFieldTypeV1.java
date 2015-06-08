@@ -31,8 +31,4 @@ public enum PwsFieldTypeV1 implements PwsFieldType {
 		return id;
 	}
 
-	public String getName() {
-		return name;
-	}
-
 }

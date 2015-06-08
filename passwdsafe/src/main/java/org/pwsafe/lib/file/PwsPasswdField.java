@@ -9,7 +9,6 @@ package org.pwsafe.lib.file;
 
 public class PwsPasswdField extends AbstractPwsPasswdField
 {
-    private static final long serialVersionUID = -1158519996771525132L;
 
     private static final String ENCODING = "ISO-8859-1";
 

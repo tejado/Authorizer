@@ -29,10 +29,6 @@ public abstract class PwsField implements Comparable<Object>, Serializable
 {
 //	private static final Log LOG = Log.getInstance(PwsField.class.getPackage().getName());
 
-	/**
-     *
-     */
-    private static final long serialVersionUID = 1L;
     private Object	Value	= null;
 	private final int Type;
 
