@@ -205,7 +205,7 @@ public class GDrivePlayProvider implements Provider
     public void updateLocalFile(DbFile file,
                                 String localFileName,
                                 File localFile,
-                                SQLiteDatabase db) throws Exception
+                                SQLiteDatabase db)
     {
         // TODO play: implement updateLocalFile
     }
@@ -215,7 +215,6 @@ public class GDrivePlayProvider implements Provider
      */
     @Override
     public void deleteLocalFile(DbFile file, SQLiteDatabase db)
-            throws Exception
     {
         // TODO play: implement deleteLocalFile
     }

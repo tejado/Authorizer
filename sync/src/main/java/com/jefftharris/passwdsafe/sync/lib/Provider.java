@@ -79,10 +79,8 @@ public interface Provider
     void updateLocalFile(DbFile file,
                          String localFileName,
                          File localFile,
-                         SQLiteDatabase db)
-            throws Exception;
+                         SQLiteDatabase db);
 
     /** Delete a local file */
-    void deleteLocalFile(DbFile file, SQLiteDatabase db)
-            throws Exception;
+    void deleteLocalFile(DbFile file, SQLiteDatabase db);
 }
