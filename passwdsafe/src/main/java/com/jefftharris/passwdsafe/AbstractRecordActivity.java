@@ -12,7 +12,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 
 public abstract class AbstractRecordActivity extends Activity
@@ -59,11 +58,6 @@ public abstract class AbstractRecordActivity extends Activity
         itsHelper.saveFinished(success);
     }
 
-
-    protected final PasswdFileUri getUri()
-    {
-        return itsHelper.getUri();
-    }
 
     protected final String getUUID()
     {

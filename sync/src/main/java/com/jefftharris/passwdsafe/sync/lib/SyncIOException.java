@@ -14,7 +14,6 @@ import java.io.IOException;
  */
 public class SyncIOException extends IOException
 {
-    private static final long serialVersionUID = -2450506282560144437L;
 
     private final boolean itsIsRetry;
 

@@ -168,12 +168,6 @@ public abstract class AbstractSyncTimerProvider extends AbstractProvider
         return itsContext;
     }
 
-    /** Get the handler */
-    protected final Handler getHandler()
-    {
-        return itsHandler;
-    }
-
     /** Background sync request for a timer provider */
     private class SyncRequestTask extends AsyncTask<Void, Void, Void>
             implements Runnable
