@@ -34,6 +34,7 @@ import android.net.Uri;
  * 
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class OwnCloudAccount {
 
     private Uri mBaseUri; 

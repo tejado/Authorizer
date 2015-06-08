@@ -49,6 +49,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
  * 
  * @author David A. Velasco
  */
+@SuppressWarnings("ALL")
 public class CertificateCombinedException extends RuntimeException {
 
     /** Generated - to refresh every time the class changes */

@@ -37,6 +37,7 @@ import com.owncloud.android.lib.common.network.WebdavEntry;
  *  @author masensio
  */
 
+@SuppressWarnings("ALL")
 public class RemoteFile implements Parcelable, Serializable {
 
 	/** Generated - should be refreshed every time the class changes!! */
