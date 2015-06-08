@@ -21,6 +21,7 @@ public abstract class AbstractRecordActivity extends Activity
 
     private final RecordActivityHelper itsHelper;
 
+    @SuppressWarnings("unused")
     protected AbstractRecordActivity()
     {
         itsHelper = new RecordActivityHelper(this);
