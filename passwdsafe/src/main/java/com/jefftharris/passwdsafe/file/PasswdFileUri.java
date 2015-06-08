@@ -124,6 +124,7 @@ public class PasswdFileUri implements Parcelable
             break;
         }
         case EMAIL:
+            //noinspection UnnecessaryDefault
         default: {
             itsFile = null;
             itsWritableInfo = new Pair<>(false, null);

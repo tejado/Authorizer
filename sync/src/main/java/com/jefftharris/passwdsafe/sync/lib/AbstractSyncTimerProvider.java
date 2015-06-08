@@ -104,6 +104,8 @@ public abstract class AbstractSyncTimerProvider extends AbstractProvider
                             break;
                         }
                         case GDRIVE:
+                        case GDRIVE_PLAY:
+                            //noinspection UnnecessaryDefault
                         default: {
                             throw new IllegalStateException("GDRIVE not valid");
                         }
