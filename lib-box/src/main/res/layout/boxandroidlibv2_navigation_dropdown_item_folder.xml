@@ -12,4 +12,4 @@
     android:singleLine="true"
     android:textColor="#FF1A74B0"
     android:textSize="20sp"
-          tools:ignore="RtlSymmetry"/>
+          tools:ignore="RtlHardcoded,RtlSymmetry"/>
