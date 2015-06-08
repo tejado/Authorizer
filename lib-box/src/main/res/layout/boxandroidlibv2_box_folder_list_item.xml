@@ -12,13 +12,14 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingLeft="4dp"
-        tools:ignore="RtlSymmetry">
+        tools:ignore="RtlHardcoded,RtlSymmetry">
 
         <FrameLayout
             android:layout_marginLeft="6dp"
             android:layout_width="36dip"
             android:layout_height="36dip"
-            android:adjustViewBounds="true" >
+            android:adjustViewBounds="true"
+            tools:ignore="RtlHardcoded">
 
             <ImageView
                 android:id="@+id/icon"
@@ -53,7 +54,7 @@
                 android:textColor="#000000"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                tools:ignore="RtlSymmetry"/>
+                tools:ignore="RtlHardcoded,RtlSymmetry"/>
         </LinearLayout>
     </LinearLayout>
 

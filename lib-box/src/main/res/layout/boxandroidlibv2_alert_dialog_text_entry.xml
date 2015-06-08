@@ -16,7 +16,8 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
@@ -28,7 +29,8 @@
         android:layout_marginRight="20dip"
         android:gravity="left"
         android:text="@string/boxandroidlibv2_alert_dialog_username"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        tools:ignore="RtlHardcoded"/>
 
     <EditText
         android:id="@+id/username_edit"
@@ -50,7 +52,8 @@
         android:layout_marginRight="20dip"
         android:gravity="left"
         android:text="@string/boxandroidlibv2_alert_dialog_password"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        tools:ignore="RtlHardcoded"/>
 
     <EditText
         android:id="@+id/password_edit"
