@@ -82,7 +82,7 @@ public class MainActivity extends FragmentActivity
     private Uri itsOwncloudUri = null;
 
     private NewAccountTask itsNewAccountTask = null;
-    private List<AccountUpdateTask> itsUpdateTasks = new ArrayList<>();
+    private final List<AccountUpdateTask> itsUpdateTasks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
