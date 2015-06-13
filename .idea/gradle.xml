@@ -12,6 +12,9 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/lib" />
             <option value="$PROJECT_DIR$/lib-box" />
+            <option value="$PROJECT_DIR$/lib-onedrive" />
+            <option value="$PROJECT_DIR$/lib-onedrive/authenticate" />
+            <option value="$PROJECT_DIR$/lib-onedrive/onedriveaccess" />
             <option value="$PROJECT_DIR$/lib-owncloud" />
             <option value="$PROJECT_DIR$/lib-play" />
             <option value="$PROJECT_DIR$/passwdsafe" />
