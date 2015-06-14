@@ -2,6 +2,7 @@ package com.microsoft.authenticate;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -578,6 +579,7 @@ public class AuthClient {
         mSession.setRefreshToken(null);
         mSession.setScopes(null);
         mSession.setTokenType(null);
+        mSession.setExpiresIn(new Date(0));
 
         clearRefreshTokenFromPreferences();
 
