@@ -59,6 +59,10 @@ public class SyncHelper
                 providerType = ProviderType.BOX;
                 break;
             }
+            case SyncDb.ONEDRIVE_ACCOUNT_TYPE: {
+                providerType = ProviderType.ONEDRIVE;
+                break;
+            }
             case SyncDb.OWNCLOUD_ACCOUNT_TYPE: {
                 providerType = ProviderType.OWNCLOUD;
                 break;

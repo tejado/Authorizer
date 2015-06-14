@@ -17,6 +17,10 @@
                   android:icon="@drawable/google_drive"
                   android:title="@string/google_drive"/>
 
+            <item android:id="@+id/menu_add_onedrive"
+                  android:icon="@drawable/onedrive"
+                  android:title="@string/onedrive"/>
+
             <item android:id="@+id/menu_add_owncloud"
                   android:icon="@drawable/owncloud"
                   android:title="@string/owncloud"/>
