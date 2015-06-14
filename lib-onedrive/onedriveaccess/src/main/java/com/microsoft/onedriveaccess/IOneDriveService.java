@@ -38,6 +38,13 @@ public interface IOneDriveService {
     void getDrive(final Callback<Drive> driveCallback);
 
     /**
+     * Gets the default drive synchronously
+     */
+    @GET("/v1.0/drive")
+    @Headers("Accept: application/json")
+    Drive getDrive();
+
+    /**
      * Gets the specified drive
      * @param driveId the id of the drive to be retrieved
      * @param driveCallback The callback when the drive has been retrieved
