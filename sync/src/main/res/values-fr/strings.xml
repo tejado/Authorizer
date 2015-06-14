@@ -33,6 +33,7 @@
         l\'application ownCloud premier. Ensuite, il peut être sélectionné 
         pour PasswdSafe Sync.
     </string>
+    <string name="onedrive_synced_files">OneDrive Fichiers Synchronisé</string>
     <string name="open_app_reauthorize">Ouvrir l\'application d\'autoriser à nouveau</string>
     <string name="owncloud_auth_required">
         Autorisation requise pour accéder au compte ownCloud. Sélectionnez la 

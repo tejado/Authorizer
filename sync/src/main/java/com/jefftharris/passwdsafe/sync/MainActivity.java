@@ -55,6 +55,7 @@ import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.onedrive.OnedriveFilesActivity;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesActivity;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 
@@ -511,15 +512,13 @@ public class MainActivity extends FragmentActivity
     @SuppressWarnings("UnusedParameters")
     public void onOnedriveChooseFiles(View view)
     {
-        // TODO: onedrive choose files
-        /*
         Intent intent = new Intent();
-        intent.putExtra(OwncloudFilesActivity.INTENT_PROVIDER_URI,
-                        itsOwncloudUri);
-        intent.setClass(this, OwncloudFilesActivity.class);
+        intent.putExtra(OnedriveFilesActivity.INTENT_PROVIDER_URI,
+                        itsOnedriveUri);
+        intent.setClass(this, OnedriveFilesActivity.class);
         startActivity(intent);
-        */
     }
+
 
     /** Handler to choose an ownCloud account */
     private void onOwncloudChoose()
