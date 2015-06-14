@@ -138,6 +138,7 @@
     <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
     <string name="new_group_menu">Nouveau groupe…</string>
     <string name="new_local_file">Nouveau fichier local</string>
+    <string name="new_onedrive_file">Nouveau fichier de OneDrive</string>
     <string name="new_owncloud_file">Nouveau fichier de ownCloud</string>
     <string name="new_password_label">Nouveau mot de passe:</string>
     <string name="new_policy">Nouvelle stratégie</string>

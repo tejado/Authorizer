@@ -138,6 +138,7 @@
     <string name="new_file_not_supp_uri">Datei inkompatibel mit URI %1$s</string>
     <string name="new_group_menu">Neue Gruppe …</string>
     <string name="new_local_file">Neue lokale Datei</string>
+    <string name="new_onedrive_file">Neue OneDrive-Datei</string>
     <string name="new_owncloud_file">Neue ownCloud-Datei</string>
     <string name="new_password_label">Neues Passwort:</string>
     <string name="new_policy">Neue Regel</string>
