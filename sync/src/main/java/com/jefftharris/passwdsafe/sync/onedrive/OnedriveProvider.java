@@ -253,22 +253,22 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     }
 
     /**
+     * Get a OneDrive service for the client
+     */
+    public IOneDriveService getOnedriveService()
+    {
+        ODConnection conn = new ODConnection(itsAuthClient);
+        conn.setVerboseLogcatOutput(PasswdSafeUtil.DEBUG);
+        return conn.getService();
+    }
+
+    /**
      * Get the account user identifier
      */
     @Override
     protected String getAccountUserId()
     {
         return itsUserId;
-    }
-
-    /**
-     * Get a OneDrive service for the client
-     */
-    private IOneDriveService getOnedriveService()
-    {
-        ODConnection conn = new ODConnection(itsAuthClient);
-        conn.setVerboseLogcatOutput(PasswdSafeUtil.DEBUG);
-        return conn.getService();
     }
 
     /**
@@ -350,6 +350,8 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
             {
                 Log.e(TAG, "update auth error", exception);
 
+                itsUserId = null;
+                updateSyncFreq(null, 0);
                 if (completeCb != null) {
                     completeCb.run();
                 }

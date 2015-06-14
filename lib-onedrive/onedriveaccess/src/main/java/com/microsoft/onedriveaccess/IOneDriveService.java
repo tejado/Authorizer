@@ -83,6 +83,14 @@ public interface IOneDriveService {
                    final Callback<Item> itemCallback);
 
     /**
+     * Gets an item by path synchronously
+     */
+    @GET("/v1.0/drive/root:{item-path}")
+    @Headers("Accept: application/json")
+    Item getItemByPath(@Path("item-path") final String itemPath,
+                       @QueryMap Map<String, String> options);
+
+    /**
      * Deletes an item
      * @param itemId the item id
      * @param callback The callback when the delete has been finished

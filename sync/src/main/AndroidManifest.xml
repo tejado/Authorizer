@@ -67,6 +67,15 @@
         </activity>
 
         <activity
+            android:name=".onedrive.OnedriveFilesActivity"
+            android:label="@string/onedrive_synced_files"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jefftharris.passwdsafe.sync.MainActivity"/>
+        </activity>
+
+        <activity
             android:name=".owncloud.OwncloudFilesActivity"
             android:label="@string/owncloud_synced_files"
             android:parentActivityName=".MainActivity">
