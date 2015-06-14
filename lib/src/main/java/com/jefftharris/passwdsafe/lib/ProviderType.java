@@ -19,6 +19,7 @@ public enum ProviderType
     GDRIVE_PLAY,
     DROPBOX,
     BOX,
+    ONEDRIVE,
     OWNCLOUD;
 
     /** Set the ImageView to the icon of the provider type */
@@ -36,6 +37,10 @@ public enum ProviderType
         }
         case BOX: {
             iv.setImageResource(R.drawable.box);
+            break;
+        }
+        case ONEDRIVE: {
+            iv.setImageResource(R.drawable.onedrive);
             break;
         }
         case OWNCLOUD: {
@@ -64,6 +69,9 @@ public enum ProviderType
         }
         case BOX: {
             return context.getString(R.string.box);
+        }
+        case ONEDRIVE: {
+            return context.getString(R.string.onedrive);
         }
         case OWNCLOUD: {
             return context.getString(R.string.owncloud);
