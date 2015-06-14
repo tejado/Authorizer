@@ -40,6 +40,8 @@ import com.microsoft.onedriveaccess.model.Drive;
 import java.util.Arrays;
 import java.util.List;
 
+import retrofit.RetrofitError;
+
 /**
  * Implements a provider for the OneDrive service
  */
@@ -151,15 +153,18 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
         {
             @Override
             protected void doAccountUpdate(ContentResolver cr)
+                    throws RetrofitError
             {
-                ODConnection conn = new ODConnection(itsAuthClient);
-                conn.setVerboseLogcatOutput(true);
-                IOneDriveService service = conn.getService();
-
-                Drive drive = service.getDrive();
-                itsNewAcct = drive.Owner.User.Id;
-                setUserId(itsNewAcct);
-                super.doAccountUpdate(cr);
+                try {
+                    IOneDriveService service = getOnedriveService();
+                    Drive drive = service.getDrive();
+                    itsNewAcct = drive.Owner.User.Id;
+                    setUserId(itsNewAcct);
+                    super.doAccountUpdate(cr);
+                } catch (RetrofitError e) {
+                    Log.e(TAG, "Error retrieving drive", e);
+                    throw e;
+                }
             }
         };
     }
@@ -171,29 +176,6 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     public void unlinkAccount()
     {
         unlinkAccount(null);
-    }
-
-    private void unlinkAccount(final Runnable completeCb)
-    {
-        // TODO: authclient logout expire time update is new
-        itsAuthClient.logout(new AuthListener()
-        {
-            @Override
-            public void onAuthComplete(AuthStatus status,
-                                       AuthSession session,
-                                       Object userState)
-            {
-                setUserId(null);
-                updateOnedriveAcct(completeCb);
-            }
-
-            @Override
-            public void onAuthError(AuthException exception, Object userState)
-            {
-                Log.e(TAG, "logout auth error", exception);
-                completeCb.run();
-            }
-        });
     }
 
     /**
@@ -263,6 +245,10 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
         boolean authorized = isAccountAuthorized();
         PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
         if (authorized) {
+            // TODO onedrive: check unauthorized errors to clear data and
+            // update account
+            new OnedriveSyncer(getOnedriveService(), provider, db, logrec,
+                               getContext()).sync();
         }
     }
 
@@ -275,7 +261,47 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
         return itsUserId;
     }
 
+    /**
+     * Get a OneDrive service for the client
+     */
+    private IOneDriveService getOnedriveService()
+    {
+        ODConnection conn = new ODConnection(itsAuthClient);
+        conn.setVerboseLogcatOutput(PasswdSafeUtil.DEBUG);
+        return conn.getService();
+    }
 
+    /**
+     * Asynchronously unlink the account
+     * @param completeCb The callback to run when the unlink is complete
+     */
+    private void unlinkAccount(final Runnable completeCb)
+    {
+        itsAuthClient.logout(new AuthListener()
+        {
+            @Override
+            public void onAuthComplete(AuthStatus status,
+                                       AuthSession session,
+                                       Object userState)
+            {
+                setUserId(null);
+                updateOnedriveAcct(completeCb);
+            }
+
+            @Override
+            public void onAuthError(AuthException exception, Object userState)
+            {
+                Log.e(TAG, "logout auth error", exception);
+                completeCb.run();
+            }
+        });
+    }
+
+    /**
+     * Asynchronously update the OneDrive account client based on availability
+     * of authentication information
+     * @param completeCb The callback to run when the update is complete
+     */
     private synchronized void updateOnedriveAcct(final Runnable completeCb)
     {
         AuthListener authCb = new AuthListener()
@@ -334,7 +360,6 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
                               "onedrive.readwrite"),
                 authCb, null, null);
     }
-
 
     /** Update the account's user ID */
     private synchronized void setUserId(String user)
