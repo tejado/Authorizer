@@ -678,6 +678,7 @@ public class PasswdSafeProvider extends ContentProvider
                 switch (provider.itsType) {
                 case DROPBOX:
                 case BOX:
+                case ONEDRIVE:
                 case OWNCLOUD: {
                     Provider providerImpl =
                             ProviderFactory.getProvider(provider.itsType,
