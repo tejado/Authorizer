@@ -18,6 +18,7 @@ import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.QueryMap;
 import retrofit.mime.TypedByteArray;
+import retrofit.mime.TypedFile;
 
 /**
  * Service interface that will connect to OneDrive
@@ -99,6 +100,12 @@ public interface IOneDriveService {
     void deleteItemId(@Path("item-id") final String itemId, final Callback<Response> callback);
 
     /**
+     * Deletes an item by path synchronously
+     */
+    @DELETE("/v1.0/drive/root:{item-path}")
+    Response deleteItemByPath(@Path("item-path") final String itemPath);
+
+    /**
      * Updates an item
      * @param itemId the item id
      * @param updatedItem the updated item
@@ -132,6 +139,13 @@ public interface IOneDriveService {
                       @Path("file-name") final String fileName,
                       @Body TypedByteArray fileBody,
                       final Callback<Item> itemCallback);
+
+    /**
+     * Create or update a file by path synchronously
+     */
+    @PUT("/v1.0/drive/root:{item-path}:/content")
+    Item uploadItemByPath(@Path("item-path") final String itemPath,
+                          @Body TypedFile fileBody);
 
     /**
      * Creates a large file upload session

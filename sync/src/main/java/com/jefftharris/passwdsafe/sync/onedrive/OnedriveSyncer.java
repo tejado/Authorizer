@@ -18,12 +18,16 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.microsoft.onedriveaccess.IOneDriveService;
 import com.microsoft.onedriveaccess.model.Drive;
+import com.microsoft.onedriveaccess.model.Item;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit.RetrofitError;
 
@@ -46,6 +50,15 @@ public class OnedriveSyncer
     }
 
 
+    /** Is the error a 404 not-found error */
+    public static boolean is404Error(RetrofitError e)
+    {
+        return (!e.isNetworkError() &&
+                (e.getResponse() != null) &&
+                (e.getResponse().getStatus() == 404));
+    }
+
+
     /**
      * Perform a sync of the files
      */
@@ -54,6 +67,7 @@ public class OnedriveSyncer
             throws Exception
     {
         syncDisplayName();
+        updateDbFiles(getOnedriveFiles());
         return resolveSyncOpers();
     }
 
@@ -65,7 +79,7 @@ public class OnedriveSyncer
     protected AbstractLocalToRemoteSyncOper<IOneDriveService>
     createLocalToRemoteOper(DbFile dbfile)
     {
-        return null;
+        return new OnedriveLocalToRemoteOper(dbfile);
     }
 
 
@@ -76,7 +90,7 @@ public class OnedriveSyncer
     protected AbstractRemoteToLocalSyncOper<IOneDriveService>
     createRemoteToLocalOper(DbFile dbfile)
     {
-        return null;
+        return new OnedriveRemoteToLocalOper(dbfile);
     }
 
 
@@ -87,7 +101,7 @@ public class OnedriveSyncer
     protected AbstractRmSyncOper<IOneDriveService>
     createRmFileOper(DbFile dbfile)
     {
-        return null;
+        return new OnedriveRmFileOper(dbfile);
     }
 
 
@@ -107,5 +121,46 @@ public class OnedriveSyncer
         } else {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, null, itsDb);
         }
+    }
+
+
+    /**
+     * Get the remote OneDrive files to sync
+     */
+    private Map<String, ProviderRemoteFile> getOnedriveFiles()
+    {
+        Map<String, ProviderRemoteFile> files = new HashMap<>();
+
+        for (DbFile dbfile: SyncDb.getFiles(itsProvider.itsId, itsDb)) {
+            if (dbfile.itsRemoteId == null) {
+                continue;
+            }
+
+            switch (dbfile.itsRemoteChange) {
+            case NO_CHANGE:
+            case ADDED:
+            case MODIFIED: {
+                try {
+                    Item item = itsProviderClient.getItemByPath(
+                            dbfile.itsRemoteId, null);
+                    if (item.Deleted == null) {
+                        OnedriveProviderFile remfile =
+                                new OnedriveProviderFile(item);
+                        files.put(remfile.getRemoteId(), remfile);
+                    }
+                } catch (RetrofitError e) {
+                    if (!is404Error(e)) {
+                        throw e;
+                    }
+                }
+                break;
+            }
+            case REMOVED: {
+                break;
+            }
+            }
+         }
+
+        return files;
     }
 }
