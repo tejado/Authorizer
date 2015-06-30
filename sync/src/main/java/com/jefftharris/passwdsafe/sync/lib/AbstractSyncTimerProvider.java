@@ -110,6 +110,7 @@ public abstract class AbstractSyncTimerProvider extends AbstractProvider
                         }
                         case GDRIVE:
                         case GDRIVE_PLAY:
+                            //noinspection UnnecessaryDefault
                         default: {
                             throw new IllegalStateException("GDRIVE not valid");
                         }
@@ -170,12 +171,6 @@ public abstract class AbstractSyncTimerProvider extends AbstractProvider
     protected final Context getContext()
     {
         return itsContext;
-    }
-
-    /** Get the handler */
-    protected final Handler getHandler()
-    {
-        return itsHandler;
     }
 
     /** Background sync request for a timer provider */

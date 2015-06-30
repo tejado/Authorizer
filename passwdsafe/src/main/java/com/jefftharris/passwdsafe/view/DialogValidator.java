@@ -137,11 +137,6 @@ public abstract class DialogValidator
 
     protected abstract View getDoneButton();
 
-    protected final TextView getPassword()
-    {
-        return itsPassword;
-    }
-
     protected String doValidation()
     {
         if (itsPassword != null) {

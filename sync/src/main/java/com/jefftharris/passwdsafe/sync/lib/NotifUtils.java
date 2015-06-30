@@ -35,7 +35,9 @@ public final class NotifUtils
     }
 
     /** Show a notification */
-    public static void showNotif(Type type, Context ctx)
+    public static void showNotif(
+            @SuppressWarnings("SameParameterValue") Type type,
+            Context ctx)
     {
         String content = "";
         switch (type) {

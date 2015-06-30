@@ -86,7 +86,7 @@ public class MainActivity extends FragmentActivity
     private Uri itsOwncloudUri = null;
 
     private NewAccountTask itsNewAccountTask = null;
-    private List<AccountUpdateTask> itsUpdateTasks = new ArrayList<>();
+    private final List<AccountUpdateTask> itsUpdateTasks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -322,7 +322,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to launch PasswdSafe */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onLaunchPasswdSafeClick(View view)
     {
         PasswdSafeUtil.startMainActivity("com.jefftharris.passwdsafe", this);
@@ -347,7 +347,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to sync a GDrive account */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onGdriveSync(View view)
     {
         if (itsGdriveAccount != null) {
@@ -361,7 +361,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to clear a GDrive account */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onGdriveClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsGdriveUri);
@@ -391,7 +391,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to sync a Dropbox account */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onDropboxSync(View view)
     {
         Provider dbxProvider = getDbxProvider();
@@ -404,7 +404,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to clear a Dropbox account */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onDropboxClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsDropboxUri);
@@ -421,7 +421,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to select Dropbox files */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onDropboxChooseFiles(View view)
     {
         Intent intent = new Intent();
@@ -445,7 +445,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to sync a Box account */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onBoxSync(View view)
     {
         getBoxProvider().requestSync(true);
@@ -453,7 +453,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to clear a Box account */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onBoxClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsBoxUri);
@@ -534,7 +534,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to sync an ownCloud account */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onOwncloudSync(View view)
     {
         getOwncloudProvider().requestSync(true);
@@ -542,7 +542,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to clear an ownCloud account */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onOwncloudClear(View view)
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsOwncloudUri);
@@ -566,7 +566,7 @@ public class MainActivity extends FragmentActivity
 
 
     /** Button onClick handler to select ownCloud files */
-    @SuppressWarnings("UnusedParameters")
+    @SuppressWarnings({"UnusedParameters", "unused"})
     public void onOwncloudChooseFiles(View view)
     {
         Intent intent = new Intent();

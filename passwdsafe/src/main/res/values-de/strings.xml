@@ -210,6 +210,7 @@
     <string name="record_not_found">Eintrag nicht gefunden</string>
     <string name="record_policy">Eintragsregeln</string>
     <string name="record_settings">Eintrags-Einstellungen</string>
+    <string name="record_sort_order">Eintrag Sortierreihenfolge</string>
     <string name="record_type">Eintragstyp</string>
     <string name="read_only">Nur Lesen</string>
     <string name="read_only_media">Datei befindet sich auf einem Speicher, der nur gelesen werden kann. Dies kann auf KitKat auf austauschbaren SD-Karten passieren.</string>
@@ -369,6 +370,13 @@
     <string-array name="font_size_pref">
         <item>Normal</item>
         <item>Klein</item>
+    </string-array>
+
+    <!-- Order must match constants in RecordSortOrderPref -->
+    <string-array name="record_sort_order_pref">
+        <item>Gruppen ersten</item>
+        <item>Gruppen gemischt</item>
+        <item>Gruppen letzten</item>
     </string-array>
 
     <!-- Order must match constants in RecordEditActivity -->

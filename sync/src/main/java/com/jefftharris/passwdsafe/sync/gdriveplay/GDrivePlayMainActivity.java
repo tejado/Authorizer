@@ -60,9 +60,9 @@ public class GDrivePlayMainActivity extends FragmentActivity
     GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener
 {
-    public static final String INTENT_PROVIDER_URI = "provider_uri";
-    public static final String INTENT_PROVIDER_ACCT = "provider_acct";
-    public static final String INTENT_PROVIDER_DISPLAY = "provider_display";
+    private static final String INTENT_PROVIDER_URI = "provider_uri";
+    private static final String INTENT_PROVIDER_ACCT = "provider_acct";
+    private static final String INTENT_PROVIDER_DISPLAY = "provider_display";
 
     private static final String TAG = "GDrivePlayMainActivity";
     private static final int GDRIVE_RESOLUTION_RC = 1;

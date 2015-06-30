@@ -199,12 +199,6 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_ID = 0;
         public static final int PROJECTION_IDX_REMOTE_ID = 1;
 
-        /** Get the file id from the URI */
-        public static long getId(Uri uri)
-        {
-            return Long.valueOf(getIdStr(uri));
-        }
-
         /** Get the file id string from the URI */
         public static String getIdStr(Uri uri)
         {

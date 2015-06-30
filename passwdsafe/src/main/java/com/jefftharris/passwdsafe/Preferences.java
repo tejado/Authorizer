@@ -29,12 +29,12 @@ import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
-import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 import com.jefftharris.passwdsafe.pref.FontSizePref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
+import com.jefftharris.passwdsafe.pref.RecordSortOrderPref;
 
 /**
  * The Preferences class defines the activity for managing preferences on the
@@ -90,6 +90,10 @@ public class Preferences extends PreferenceActivity
     private static final String PREF_PASSWD_CLEAR_ALL_NOTIFS =
         "passwordClearAllNotifsPref";
 
+    private static final String PREF_RECORD_SORT_ORDER = "recordSortOrderPref";
+    public static final RecordSortOrderPref PREF_RECORD_SORT_ORDER_DEF =
+            RecordSortOrderPref.GROUP_FIRST;
+
     private static final String PREF_SEARCH_CASE_SENSITIVE =
         "searchCaseSensitivePref";
     private static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
@@ -136,6 +140,7 @@ public class Preferences extends PreferenceActivity
     private ListPreference itsPasswdEncPref;
     private ListPreference itsPasswdExpiryNotifPref;
     private EditTextPreference itsPasswdDefaultSymsPref;
+    private ListPreference itsRecordSortOrderPref;
     private ListPreference itsFontSizePref;
 
 
@@ -371,6 +376,18 @@ public class Preferences extends PreferenceActivity
         prefsEdit.commit();
     }
 
+    public static RecordSortOrderPref getRecordSortOrderPref(
+            SharedPreferences prefs)
+    {
+        try {
+            return RecordSortOrderPref.valueOf(
+                    prefs.getString(PREF_RECORD_SORT_ORDER,
+                                    PREF_RECORD_SORT_ORDER_DEF.toString()));
+        } catch (IllegalArgumentException e) {
+            return RecordSortOrderPref.GROUP_FIRST;
+        }
+    }
+
     public static boolean getSearchCaseSensitivePref(SharedPreferences prefs)
     {
         return prefs.getBoolean(PREF_SEARCH_CASE_SENSITIVE,
@@ -416,20 +433,22 @@ public class Preferences extends PreferenceActivity
 
         itsDefFilePref = findPreference(PREF_DEF_FILE);
         itsDefFilePref.setOnPreferenceClickListener(
-            new Preference.OnPreferenceClickListener()
-            {
-                @Override
-                public boolean onPreferenceClick(Preference preference)
+                new Preference.OnPreferenceClickListener()
                 {
-                    Intent intent = new Intent(Intent.ACTION_CREATE_SHORTCUT,
-                                               null, Preferences.this,
-                                               LauncherFileShortcuts.class);
-                    intent.putExtra(LauncherFileShortcuts.EXTRA_IS_DEFAULT_FILE,
-                                    true);
-                    startActivityForResult(intent, REQUEST_DEFAULT_FILE);
-                    return true;
-                }
-            });
+                    @Override
+                    public boolean onPreferenceClick(Preference preference)
+                    {
+                        Intent intent = new Intent(
+                                Intent.ACTION_CREATE_SHORTCUT,
+                                null, Preferences.this,
+                                LauncherFileShortcuts.class);
+                        intent.putExtra(
+                                LauncherFileShortcuts.EXTRA_IS_DEFAULT_FILE,
+                                true);
+                        startActivityForResult(intent, REQUEST_DEFAULT_FILE);
+                        return true;
+                    }
+                });
         onSharedPreferenceChanged(prefs, PREF_DEF_FILE);
 
         Resources res = getResources();
@@ -457,9 +476,9 @@ public class Preferences extends PreferenceActivity
         itsPasswdExpiryNotifPref =
             (ListPreference)findPreference(PREF_PASSWD_EXPIRY_NOTIF);
         itsPasswdExpiryNotifPref.setEntries(
-            PasswdExpiryNotifPref.getDisplayNames(res));
+                PasswdExpiryNotifPref.getDisplayNames(res));
         itsPasswdExpiryNotifPref.setEntryValues(
-            PasswdExpiryNotifPref.getValues());
+                PasswdExpiryNotifPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_PASSWD_EXPIRY_NOTIF);
 
         itsPasswdDefaultSymsPref =
@@ -471,15 +490,24 @@ public class Preferences extends PreferenceActivity
 
         Preference pref = findPreference(PREF_PASSWD_CLEAR_ALL_NOTIFS);
         pref.setOnPreferenceClickListener(
-            new Preference.OnPreferenceClickListener()
-        {
-            public boolean onPreferenceClick(Preference preference)
-            {
-                PasswdSafeApp app = (PasswdSafeApp)getApplication();
-                app.getNotifyMgr().clearAllNotifications(Preferences.this);
-                return true;
-            }
-        });
+                new Preference.OnPreferenceClickListener()
+                {
+                    public boolean onPreferenceClick(Preference preference)
+                    {
+                        PasswdSafeApp app = (PasswdSafeApp) getApplication();
+                        app.getNotifyMgr()
+                           .clearAllNotifications(Preferences.this);
+                        return true;
+                    }
+                });
+
+        itsRecordSortOrderPref = (ListPreference)
+                findPreference(PREF_RECORD_SORT_ORDER);
+        itsRecordSortOrderPref.setEntries(
+                RecordSortOrderPref.getDisplayNames(res));
+        itsRecordSortOrderPref.setEntryValues(
+                RecordSortOrderPref.getValues());
+        onSharedPreferenceChanged(prefs, PREF_RECORD_SORT_ORDER);
 
         itsFontSizePref = (ListPreference) findPreference(PREF_FONT_SIZE);
         itsFontSizePref.setEntries(FontSizePref.getDisplayNames(res));
@@ -554,6 +582,12 @@ public class Preferences extends PreferenceActivity
             String val = getPasswdDefaultSymbolsPref(prefs);
             itsPasswdDefaultSymsPref.setSummary(
                     getString(R.string.symbols_used_by_default, val));
+            break;
+        }
+        case PREF_RECORD_SORT_ORDER: {
+            itsRecordSortOrderPref.setSummary(
+                    getRecordSortOrderPref(prefs)
+                            .getDisplayName(getResources()));
             break;
         }
         case PREF_FONT_SIZE: {

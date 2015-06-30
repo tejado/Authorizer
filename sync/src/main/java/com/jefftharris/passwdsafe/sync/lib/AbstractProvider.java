@@ -39,7 +39,6 @@ public abstract class AbstractProvider implements Provider
                                 String localFileName,
                                 File localFile,
                                 SQLiteDatabase db)
-            throws Exception
     {
         SyncDb.updateLocalFile(file.itsId, localFileName,
                                file.itsLocalTitle, file.itsLocalFolder,
@@ -64,7 +63,6 @@ public abstract class AbstractProvider implements Provider
      */
     @Override
     public void deleteLocalFile(DbFile file, SQLiteDatabase db)
-            throws Exception
     {
         SyncDb.updateLocalFileDeleted(file.itsId, db);
         requestSync(false);

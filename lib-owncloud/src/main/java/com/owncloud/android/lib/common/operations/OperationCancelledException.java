@@ -24,6 +24,7 @@
 
 package com.owncloud.android.lib.common.operations;
 
+@SuppressWarnings("ALL")
 public class OperationCancelledException extends Exception {
 
     /**

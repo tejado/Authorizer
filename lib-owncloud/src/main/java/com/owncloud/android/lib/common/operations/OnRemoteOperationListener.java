@@ -25,6 +25,7 @@
 package com.owncloud.android.lib.common.operations;
 
 
+@SuppressWarnings("ALL")
 public interface OnRemoteOperationListener {
 
 	void onRemoteOperationFinish(RemoteOperation caller, RemoteOperationResult result);
