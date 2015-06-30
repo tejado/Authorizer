@@ -55,6 +55,7 @@ import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.onedrive.OnedriveFilesActivity;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesActivity;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 
@@ -70,7 +71,8 @@ public class MainActivity extends FragmentActivity
     private static final int CHOOSE_ACCOUNT_RC = 0;
     private static final int DROPBOX_LINK_RC = 1;
     private static final int BOX_AUTH_RC = 2;
-    private static final int OWNCLOUD_LINK_RC = 3;
+    private static final int ONEDRIVE_LINK_RC = 3;
+    private static final int OWNCLOUD_LINK_RC = 4;
 
     private static final int LOADER_PROVIDERS = 0;
 
@@ -79,6 +81,8 @@ public class MainActivity extends FragmentActivity
     private Uri itsDropboxUri = null;
     private boolean itsDropboxPendingAcctLink = false;
     private Uri itsBoxUri = null;
+    private Uri itsOnedriveUri = null;
+    private boolean itsOnedrivePendingAcctLink = false;
     private Uri itsOwncloudUri = null;
 
     private NewAccountTask itsNewAccountTask = null;
@@ -110,6 +114,10 @@ public class MainActivity extends FragmentActivity
                     onBoxFreqChanged(position);
                     break;
                 }
+                case R.id.onedrive_interval: {
+                    onOnedriveFreqChanged(position);
+                    break;
+                }
                 case R.id.owncloud_interval: {
                     onOwncloudFreqChanged(position);
                     break;
@@ -123,17 +131,12 @@ public class MainActivity extends FragmentActivity
             }
         };
 
-        Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
-        freqSpin.setOnItemSelectedListener(freqSelListener);
-
-        freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
-        freqSpin.setOnItemSelectedListener(freqSelListener);
-
-        freqSpin = (Spinner)findViewById(R.id.box_interval);
-        freqSpin.setOnItemSelectedListener(freqSelListener);
-
-        freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
-        freqSpin.setOnItemSelectedListener(freqSelListener);
+        for (int id: new int[]{R.id.box_interval, R.id.dropbox_interval,
+                               R.id.gdrive_interval, R.id.onedrive_interval,
+                               R.id.owncloud_interval}) {
+            Spinner freqSpin = (Spinner)findViewById(id);
+            freqSpin.setOnItemSelectedListener(freqSelListener);
+        }
 
         CheckBox httpsCb = (CheckBox)findViewById(R.id.owncloud_use_https);
         httpsCb.setOnCheckedChangeListener(new OnCheckedChangeListener()
@@ -156,6 +159,7 @@ public class MainActivity extends FragmentActivity
         updateGdriveAccount(null);
         updateDropboxAccount(null);
         updateBoxAccount(null);
+        updateOnedriveAccount(null);
         updateOwncloudAccount(null);
         LoaderManager lm = getSupportLoaderManager();
         lm.initLoader(LOADER_PROVIDERS, null, this);
@@ -205,7 +209,12 @@ public class MainActivity extends FragmentActivity
             itsDropboxPendingAcctLink = false;
             itsNewAccountTask = getDbxProvider().finishAccountLink(
                     Activity.RESULT_OK, null, itsDropboxUri);
+        } else if (itsOnedrivePendingAcctLink) {
+            itsOnedrivePendingAcctLink = false;
+            itsNewAccountTask = getOnedriveProvider().finishAccountLink(
+                    Activity.RESULT_OK, null, itsOnedriveUri);
         }
+
         if (itsNewAccountTask != null) {
             itsNewAccountTask.startTask(this, this);
             itsNewAccountTask = null;
@@ -263,6 +272,7 @@ public class MainActivity extends FragmentActivity
         setProviderMenuEnabled(menu, R.id.menu_add_box, itsBoxUri);
         setProviderMenuEnabled(menu, R.id.menu_add_dropbox, itsDropboxUri);
         setProviderMenuEnabled(menu, R.id.menu_add_google_drive, itsGdriveUri);
+        setProviderMenuEnabled(menu, R.id.menu_add_onedrive, itsOnedriveUri);
         setProviderMenuEnabled(menu, R.id.menu_add_owncloud, itsOwncloudUri);
         return super.onPrepareOptionsMenu(menu);
     }
@@ -294,6 +304,10 @@ public class MainActivity extends FragmentActivity
         }
         case R.id.menu_add_google_drive: {
             onGdriveChoose();
+            return true;
+        }
+        case R.id.menu_add_onedrive: {
+            onOnedriveChoose();
             return true;
         }
         case R.id.menu_add_owncloud: {
@@ -455,6 +469,57 @@ public class MainActivity extends FragmentActivity
     }
 
 
+    /** Handler to choose an OneDrive account */
+    private void onOnedriveChoose()
+    {
+        Provider onedriveProvider = getOnedriveProvider();
+        try {
+            onedriveProvider.startAccountLink(this, ONEDRIVE_LINK_RC);
+            itsOnedrivePendingAcctLink = true;
+        } catch (Exception e) {
+            Log.e(TAG, "OneDrive startAccountLink failed", e);
+            onedriveProvider.unlinkAccount();
+        }
+    }
+
+
+    /** Button onClick handler to sync an OneDrive account */
+    @SuppressWarnings("UnusedParameters")
+    public void onOnedriveSync(View view)
+    {
+        getOnedriveProvider().requestSync(true);
+    }
+
+
+    /** Button onClick handler to clear an OneDrive account */
+    @SuppressWarnings("UnusedParameters")
+    public void onOnedriveClear(View view)
+    {
+        DialogFragment prompt = ClearPromptDlg.newInstance(itsOnedriveUri);
+        prompt.show(getSupportFragmentManager(), null);
+    }
+
+
+    /** OneDrive sync frequency spinner changed */
+    private void onOnedriveFreqChanged(int pos)
+    {
+        ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
+        updateSyncFreq(freq, itsOnedriveUri);
+    }
+
+
+   /** Button onClick handler to select OneDrive files */
+    @SuppressWarnings("UnusedParameters")
+    public void onOnedriveChooseFiles(View view)
+    {
+        Intent intent = new Intent();
+        intent.putExtra(OnedriveFilesActivity.INTENT_PROVIDER_URI,
+                        itsOnedriveUri);
+        intent.setClass(this, OnedriveFilesActivity.class);
+        startActivity(intent);
+    }
+
+
     /** Handler to choose an ownCloud account */
     private void onOwncloudChoose()
     {
@@ -531,6 +596,7 @@ public class MainActivity extends FragmentActivity
         boolean hasGdrive = false;
         boolean hasDropbox = false;
         boolean hasBox = false;
+        boolean hasOnedrive = false;
         boolean hasOwncloud = false;
         for (boolean more = cursor.moveToFirst(); more;
                 more = cursor.moveToNext()) {
@@ -557,6 +623,11 @@ public class MainActivity extends FragmentActivity
                     updateBoxAccount(cursor);
                     break;
                 }
+                case ONEDRIVE: {
+                    hasOnedrive = true;
+                    updateOnedriveAccount(cursor);
+                    break;
+                }
                 case OWNCLOUD: {
                     hasOwncloud = true;
                     updateOwncloudAccount(cursor);
@@ -576,13 +647,17 @@ public class MainActivity extends FragmentActivity
         if (!hasBox) {
             updateBoxAccount(null);
         }
+        if (!hasOnedrive) {
+            updateOnedriveAccount(null);
+        }
         if (!hasOwncloud) {
             updateOwncloudAccount(null);
         }
 
         GuiUtils.setVisible(
                 findViewById(R.id.no_accounts_msg),
-                !(hasGdrive || hasDropbox || hasBox || hasOwncloud));
+                !(hasGdrive || hasDropbox || hasBox || 
+                  hasOnedrive || hasOwncloud));
         GuiUtils.invalidateOptionsMenu(this);
     }
 
@@ -595,6 +670,7 @@ public class MainActivity extends FragmentActivity
         updateGdriveAccount(null);
         updateDropboxAccount(null);
         updateBoxAccount(null);
+        updateOnedriveAccount(null);
         updateOwncloudAccount(null);
         GuiUtils.setVisible(findViewById(R.id.no_accounts_msg), true);
         GuiUtils.invalidateOptionsMenu(this);
@@ -755,6 +831,44 @@ public class MainActivity extends FragmentActivity
             itsBoxUri = null;
         }
     }
+    
+    /** Update the UI when the OneDrive account is changed */
+    private void updateOnedriveAccount(Cursor cursor) 
+    {
+        boolean haveCursor = (cursor != null);
+        GuiUtils.setVisible(findViewById(R.id.onedrive_container), haveCursor);
+        GuiUtils.setVisible(findViewById(R.id.onedrive_separator), haveCursor);
+        if (haveCursor) {
+            long id = cursor.getLong(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_ID);
+            String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
+            int freqVal = cursor.getInt(
+                    PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
+            ProviderSyncFreqPref freq =
+                    ProviderSyncFreqPref.freqValueOf(freqVal);
+            itsOnedriveUri = ContentUris.withAppendedId(
+                    PasswdSafeContract.Providers.CONTENT_URI, id);
+
+            Provider provider = getOnedriveProvider();
+            boolean authorized = provider.isAccountAuthorized();
+
+            TextView acctView = (TextView)findViewById(R.id.onedrive_acct);
+            acctView.setText(acct);
+
+            // TODO: check onedrive auth required text and behavior
+            GuiUtils.setVisible(findViewById(R.id.onedrive_auth_required),
+                                !authorized);
+
+            View freqSpinLabel = findViewById(R.id.onedrive_interval_label);
+            Spinner freqSpin = (Spinner) findViewById(R.id.onedrive_interval);
+            freqSpin.setSelection(freq.getDisplayIdx());
+
+            freqSpin.setEnabled(true);
+            freqSpinLabel.setEnabled(true);
+        } else {
+            itsOnedriveUri = null;
+        }
+    }
 
     /** Update the UI when the ownCloud account is changed */
     private void updateOwncloudAccount(Cursor cursor)
@@ -850,6 +964,12 @@ public class MainActivity extends FragmentActivity
     {
         return (OwncloudProvider)
                 ProviderFactory.getProvider(ProviderType.OWNCLOUD, this);
+    }
+
+    /** Get the OneDrive provider */
+    private Provider getOnedriveProvider()
+    {
+        return ProviderFactory.getProvider(ProviderType.ONEDRIVE, this);
     }
 
     /** Update a menu item based on the presence of a provider */

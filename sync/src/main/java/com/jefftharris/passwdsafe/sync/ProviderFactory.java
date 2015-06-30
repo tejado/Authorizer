@@ -16,6 +16,7 @@ import com.jefftharris.passwdsafe.sync.dropbox.DropboxCoreProvider;
 import com.jefftharris.passwdsafe.sync.gdrive.GDriveProvider;
 import com.jefftharris.passwdsafe.sync.gdriveplay.GDrivePlayProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
+import com.jefftharris.passwdsafe.sync.onedrive.OnedriveProvider;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 
 /**
@@ -48,6 +49,10 @@ public class ProviderFactory
             }
             case BOX: {
                 provider = new BoxProvider(appCtx);
+                break;
+            }
+            case ONEDRIVE: {
+                provider = new OnedriveProvider(appCtx);
                 break;
             }
             case OWNCLOUD: {

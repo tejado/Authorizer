@@ -32,6 +32,7 @@
         Kein ownCloud Konten zur Verfügung. Fügen Sie ein Konto in der ownCloud
         App zuerst. Dann kann es für PasswdSafe Sync ausgewählt werden.
     </string>
+    <string name="onedrive_synced_files">OneDrive Synchronisiert Dateien</string>
     <string name="open_app_reauthorize">Öffnen Sie App, die neu aktivieren</string>
     <string name="owncloud_auth_required">
         Die Zulassung zum ownCloud-Konto erforderlich. Wählen Sie das 

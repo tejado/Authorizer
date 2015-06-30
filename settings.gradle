@@ -1,5 +1,8 @@
 include ':lib'
 include ':lib-box'
+include ':lib-onedrive'
+include ':lib-onedrive:authenticate'
+include ':lib-onedrive:onedriveaccess'
 include ':lib-owncloud'
 include ':lib-play'
 include ':passwdsafe'

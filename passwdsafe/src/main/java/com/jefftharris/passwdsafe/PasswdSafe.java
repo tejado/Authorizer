@@ -413,6 +413,11 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         case CREATE_DOCUMENT_REQUEST: {
             if (resultCode == Activity.RESULT_OK) {
                 PasswdSafeUtil.dbginfo(TAG, "data: %s", data);
+
+                if (itsPendingNewTask == null) {
+                    Log.e(TAG, "Null pending new task after create document");
+                    break;
+                }
                 Uri newUri = data.getData();
 
                 String title = RecentFilesDb.updateOpenedSafFile(
@@ -588,6 +593,10 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 }
                 case BOX: {
                     titleId = R.string.new_box_file;
+                    break;
+                }
+                case ONEDRIVE: {
+                    titleId = R.string.new_onedrive_file;
                     break;
                 }
                 case OWNCLOUD: {
