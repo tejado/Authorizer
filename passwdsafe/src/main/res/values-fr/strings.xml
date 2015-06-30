@@ -209,6 +209,7 @@
     <string name="record_not_found">Entrée introuvable</string>
     <string name="record_policy">Stratégie Entrée</string>
     <string name="record_settings">Paramètres des entrées</string>
+    <string name="record_sort_order">Entrée ordre de tri</string>
     <string name="record_type">Type d\'entrée</string>
     <string name="read_only">Lecture seule</string>
     <string name="read_only_media">Le fichier se trouve sur support en lecture seule. Cette situation peut se produire avec Kitkat et plus sur des cartes SD amovibles.</string>
@@ -378,6 +379,13 @@
     <string-array name="font_size_pref">
         <item>Normale</item>
         <item>Petite</item>
+    </string-array>
+
+    <!-- Order must match constants in RecordSortOrderPref -->
+    <string-array name="record_sort_order_pref">
+        <item>Groupes premières</item>
+        <item>Groupes mélangé</item>
+        <item>Groupes dernière</item>
     </string-array>
 
     <!-- Order must match constants in RecordEditActivity -->

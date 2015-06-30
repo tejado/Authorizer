@@ -136,6 +136,13 @@
             android:key="groupRecordsPref"
             android:title="@string/group_records"/>
 
+        <com.jefftharris.passwdsafe.lib.view.LongListPreference
+            android:name="recordSortOrder Pref"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:key="recordSortOrderPref"
+            android:title="@string/record_sort_order"/>
+
     </PreferenceScreen>
 
     <PreferenceScreen
