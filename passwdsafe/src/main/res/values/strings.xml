@@ -207,6 +207,7 @@
     <string name="record_not_found">Record not found</string>
     <string name="record_policy">Record Policy</string>
     <string name="record_settings">Record Settings</string>
+    <string name="record_sort_order">Record sort order</string>
     <string name="record_type">Record type</string>
     <string name="read_only">Read-only</string>
     <string name="read_only_media">File is located on read-only media.  This situation can occur with Kitkat and higher on removable SD cards.</string>
@@ -367,6 +368,13 @@
     <string-array name="font_size_pref">
         <item>Normal</item>
         <item>Small</item>
+    </string-array>
+
+    <!-- Order must match constants in RecordSortOrderPref -->
+    <string-array name="record_sort_order_pref">
+        <item>Groups first</item>
+        <item>Groups mixed</item>
+        <item>Groups last</item>
     </string-array>
 
     <!-- Order must match constants in RecordEditActivity -->

@@ -28,6 +28,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.pref.FontSizePref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
+import com.jefftharris.passwdsafe.pref.RecordSortOrderPref;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -84,6 +85,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     private GroupNode itsCurrGroupNode = null;
     private boolean itsGroupRecords = true;
     private boolean itsIsSortCaseSensitive = true;
+    private RecordSortOrderPref itsRecordSortOrder =
+            Preferences.PREF_RECORD_SORT_ORDER_DEF;
     private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = false;
     private FontSizePref itsFontSize = Preferences.PREF_FONT_SIZE_DEF;
@@ -141,6 +144,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             PreferenceManager.getDefaultSharedPreferences(this);
         itsGroupRecords = Preferences.getGroupRecordsPref(prefs);
         itsIsSortCaseSensitive = Preferences.getSortCaseSensitivePref(prefs);
+        itsRecordSortOrder = Preferences.getRecordSortOrderPref(prefs);
         itsIsSearchCaseSensitive =
             Preferences.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
@@ -450,8 +454,8 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             }
         }
 
-        RecordMapComparator comp =
-            new RecordMapComparator(itsIsSortCaseSensitive);
+        RecordMapComparator comp = new RecordMapComparator(
+                itsIsSortCaseSensitive, itsRecordSortOrder);
         Collections.sort(itsListData, comp);
     }
 
@@ -658,29 +662,45 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                     Comparator<HashMap<String, Object>>
     {
         private final boolean itsIsSortCaseSensitive;
+        private final RecordSortOrderPref itsSortOrder;
 
-        public RecordMapComparator(boolean sortCaseSensitive)
+        public RecordMapComparator(boolean sortCaseSensitive,
+                                   RecordSortOrderPref sortOrder)
         {
             itsIsSortCaseSensitive = sortCaseSensitive;
+            itsSortOrder = sortOrder;
         }
 
         public int compare(HashMap<String, Object> arg0,
                            HashMap<String, Object> arg1)
         {
-            // Sort groups first
-            Object rec0 = arg0.get(RECORD);
-            Object rec1 = arg1.get(RECORD);
-            if ((rec0 == null) && (rec1 != null)) {
-                return -1;
-            } else if ((rec0 != null) && (rec1 == null)) {
-                return 1;
+            int rc;
+            // Compare group order
+            switch (itsSortOrder) {
+            case GROUP_FIRST: {
+                rc = compareIsGroup(arg0, arg1);
+                if (rc != 0) {
+                    return rc;
+                }
+                break;
+            }
+            case GROUP_INLINE: {
+                break;
+            }
+            case GROUP_LAST: {
+                rc = -compareIsGroup(arg0, arg1);
+                if (rc != 0) {
+                    return rc;
+                }
+                break;
+            }
             }
 
-            int rc = compareField(arg0, arg1, TITLE);
-            if (rc == 0) {
-                rc = compareField(arg0, arg1, USERNAME);
+            rc = compareField(arg0, arg1, TITLE);
+            if (rc != 0) {
+                return rc;
             }
-            return rc;
+            return compareField(arg0, arg1, USERNAME);
         }
 
         private int compareField(HashMap<String, Object> arg0,
@@ -706,6 +726,19 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
                     return str0.compareToIgnoreCase(str1);
                 }
             }
+        }
+
+        private int compareIsGroup(HashMap<String, Object> arg0,
+                                   HashMap<String, Object> arg1)
+        {
+            Object rec0 = arg0.get(RECORD);
+            Object rec1 = arg1.get(RECORD);
+            if ((rec0 == null) && (rec1 != null)) {
+                return -1;
+            } else if ((rec0 != null) && (rec1 == null)) {
+                return 1;
+            }
+            return 0;
         }
     }
 
