@@ -115,6 +115,6 @@ public class OnedriveProviderFile implements ProviderRemoteFile
                 (itsItem.ParentReference != null) ?
                         itsItem.ParentReference.Path : "null",
                 itsItem.Id,
-                (itsItem.Folder != null), itsItem.LastModifiedBy);
+                (itsItem.Folder != null), itsItem.LastModifiedDateTime);
     }
 }

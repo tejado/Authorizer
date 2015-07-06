@@ -18,7 +18,7 @@ import com.microsoft.onedriveaccess.IOneDriveService;
 import com.microsoft.onedriveaccess.model.Item;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +29,14 @@ public class OnedriveFilesActivity extends AbstractSyncedFilesActivity
 {
     private final IOneDriveService itsService;
 
-    private static final Map<String, String> QUERY_OPTIONS =
-            Collections.singletonMap("expand", "children");
+    private static final Map<String, String> QUERY_OPTIONS;
+
+    static {
+        QUERY_OPTIONS = new HashMap<>();
+        QUERY_OPTIONS.put("expand", "children");
+        QUERY_OPTIONS.put("select", "id,name,lastModifiedDateTime,eTag," +
+                                    "parentReference,children,folder,file");
+    }
 
     /**
      * Constructor
