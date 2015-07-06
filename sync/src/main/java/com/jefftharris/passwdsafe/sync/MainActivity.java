@@ -487,7 +487,12 @@ public class MainActivity extends FragmentActivity
     @SuppressWarnings("UnusedParameters")
     public void onOnedriveSync(View view)
     {
-        getOnedriveProvider().requestSync(true);
+        Provider onedriveProvider = getOnedriveProvider();
+        if (onedriveProvider.isAccountAuthorized()) {
+            onedriveProvider.requestSync(true);
+        } else {
+            onOnedriveChoose();
+        }
     }
 
 
