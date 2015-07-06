@@ -54,9 +54,12 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
 
     private AuthClient itsAuthClient;
     private String itsUserId = null;
+    private boolean itsIsPendingAdd = false;
 
     // TODO: test revoking permission
     // TODO: test expired and renewed tokens
+
+    // TODO: test startup w/o network access
 
     /** Constructor */
     public OnedriveProvider(Context ctx)
@@ -155,6 +158,7 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
             protected void doAccountUpdate(ContentResolver cr)
                     throws RetrofitError
             {
+                itsIsPendingAdd = true;
                 try {
                     IOneDriveService service = getOnedriveService();
                     Drive drive = service.getDrive();
@@ -164,6 +168,8 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
                 } catch (RetrofitError e) {
                     Log.e(TAG, "Error retrieving drive", e);
                     throw e;
+                } finally {
+                    itsIsPendingAdd = false;
                 }
             }
         };
@@ -216,7 +222,9 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     @Override
     public void cleanupOnDelete(String acctName) throws Exception
     {
-        unlinkAccount();
+        if (!itsIsPendingAdd) {
+            unlinkAccount();
+        }
     }
 
     /**
