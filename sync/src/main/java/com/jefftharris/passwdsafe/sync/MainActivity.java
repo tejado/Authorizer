@@ -860,7 +860,6 @@ public class MainActivity extends FragmentActivity
             TextView acctView = (TextView)findViewById(R.id.onedrive_acct);
             acctView.setText(acct);
 
-            // TODO: check onedrive auth required text and behavior
             GuiUtils.setVisible(findViewById(R.id.onedrive_auth_required),
                                 !authorized);
 

@@ -432,7 +432,7 @@
                 android:drawablePadding="12dp"
                 android:gravity="center_vertical"
                 android:padding="6dp"
-                android:text="ONEDRIVE AUTH REQUIRED TODO RESOURCE"
+                android:text="@string/onedrive_acct_unlinked"
                 android:textAppearance="?android:attr/textAppearanceMedium"/>
 
         </RelativeLayout>
