@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class OnedriveFilesActivity extends AbstractSyncedFilesActivity
 {
-    private final IOneDriveService itsService;
+    private final OnedriveProvider itsProvider;
 
     private static final Map<String, String> QUERY_OPTIONS;
 
@@ -44,9 +44,8 @@ public class OnedriveFilesActivity extends AbstractSyncedFilesActivity
     public OnedriveFilesActivity()
     {
         super(ProviderType.ONEDRIVE);
-        OnedriveProvider provider = (OnedriveProvider)
+        itsProvider = (OnedriveProvider)
                 ProviderFactory.getProvider(ProviderType.ONEDRIVE, this);
-        itsService = provider.getOnedriveService();
     }
 
     /**
@@ -57,21 +56,22 @@ public class OnedriveFilesActivity extends AbstractSyncedFilesActivity
             Context ctx,
             AbstractListFilesTask.Callback cb)
     {
-        return new ListFilesTask(itsService, ctx, cb);
+        return new ListFilesTask(itsProvider, ctx, cb);
     }
 
 
     /** Background task for listing files from OneDrive */
     private static class ListFilesTask extends AbstractListFilesTask
     {
-        private final IOneDriveService itsService;
+        private final OnedriveProvider itsProvider;
 
 
         /** Constructor */
-        public ListFilesTask(IOneDriveService service, Context ctx, Callback cb)
+        public ListFilesTask(OnedriveProvider provider,
+                             Context ctx, Callback cb)
         {
             super(ctx, cb);
-            itsService = service;
+            itsProvider = provider;
         }
 
 
@@ -85,17 +85,20 @@ public class OnedriveFilesActivity extends AbstractSyncedFilesActivity
             List<ProviderRemoteFile> files = new ArrayList<>();
             Pair<List<ProviderRemoteFile>, Exception> result =
                     Pair.create(files, (Exception)null);
-            if (itsService == null) {
+            if (itsProvider == null) {
                 return result;
             }
 
             try {
-                Item item = itsService.getItemByPath(params[0], QUERY_OPTIONS);
+                IOneDriveService service = itsProvider.acquireOnedriveService();
+                Item item = service.getItemByPath(params[0], QUERY_OPTIONS);
                 for (Item child: item.Children) {
                     files.add(new OnedriveProviderFile(child));
                 }
             } catch (Exception e) {
                 result = Pair.create(null, e);
+            } finally {
+                itsProvider.releaseOnedriveService();
             }
             return result;
         }
