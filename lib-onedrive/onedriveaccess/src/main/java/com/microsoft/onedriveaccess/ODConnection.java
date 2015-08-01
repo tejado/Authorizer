@@ -54,7 +54,7 @@ public class ODConnection extends GsonODConnection {
         if (mVerboseLogcatOutput) {
             return RestAdapter.LogLevel.FULL;
         }
-        return RestAdapter.LogLevel.BASIC;
+        return RestAdapter.LogLevel.NONE;
     }
 
     @Override
