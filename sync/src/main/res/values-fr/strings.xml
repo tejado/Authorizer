@@ -63,6 +63,9 @@
     <string name="use_https">Utilisez HTTPS</string>
     
     <string name="release_notes">
+        &lt;b&gt;2.3.0&lt;/b&gt; - Ajout du support OneDrive. Après avoir
+        authentifié un compte, choisir les fichiers à synchroniser.
+        \n\n
         &lt;b&gt;2.2.0&lt;/b&gt; - Mise à jour pour utiliser l\'API de core
         Dropbox. Les fichiers peuvent être synchronisés partir d\'un dossier.
         Le dossier Apps ne sont plus nécessaires. L\'application doit être

@@ -276,6 +276,12 @@
     </string>
 
     <string name="release_notes">
+        &lt;b&gt;5.4.0&lt;/b&gt;\n
+        - Ajout du support OneDrive. Après avoir authentifié un compte, choisir
+        les fichiers à synchroniser.\n
+        - Ajouter préférence record pour trier les groupes avant, après, ou
+        mélangé avec des enregistrements
+        \n\n
         &lt;b&gt;5.3.2&lt;/b&gt; - Utilisez le sélecteur de fichier précédent
         par défaut
         \n\n

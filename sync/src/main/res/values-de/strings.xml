@@ -62,6 +62,10 @@
     <string name="use_https">Verwenden Sie HTTPS</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.3.0&lt;/b&gt; - Fügen Sie Microsoft OneDrive Unterstützung.
+        Nach der Authentifizierung ein Konto, wählen Sie die Dateien, die
+        synchronisiert werden.
+        \n\n
         &lt;b&gt;2.2.0&lt;/b&gt; - Aktualisieren, um die Dropbox core API zu
         verwenden. Dateien können aus einem beliebigen Ordner synchronisiert
         werden. Der Ordner Apps nicht mehr benötigt wird. Die App muss für
