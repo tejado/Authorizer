@@ -615,13 +615,29 @@ public class AuthClient {
     }
 
     /**
+     * Gets whether the client has a refresh token
+     */
+    public boolean hasRefreshToken()
+    {
+        return !TextUtils.isEmpty(getRefreshTokenFromPreferences());
+    }
+
+    /**
      * Refreshes the previously created mSession.
      *
      * @return true if the mSession was successfully refreshed.
      */
     boolean refresh() {
-        final String scope = TextUtils.join(OAuth.SCOPE_DELIMITER, mSession.getScopes());
-        final String refreshToken = mSession.getRefreshToken();
+        Iterable<String> scopes = mSession.getScopes();
+        if (scopes == null) {
+            scopes = mScopesFromInitialize;
+        }
+        final String scope = TextUtils.join(OAuth.SCOPE_DELIMITER, scopes);
+
+        String sessionRefreshToken = mSession.getRefreshToken();
+        final String refreshToken =
+                (sessionRefreshToken != null) ?
+                        sessionRefreshToken : getRefreshTokenFromPreferences();
 
         if (TextUtils.isEmpty(refreshToken)) {
             return false;

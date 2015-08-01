@@ -272,7 +272,7 @@ public class AuthSession {
      *
      * @return true if it was able to refresh the refresh token.
      */
-    boolean refresh() {
+    public boolean refresh() {
         return mCreator.refresh();
     }
 

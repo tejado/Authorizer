@@ -56,11 +56,6 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     private String itsUserId = null;
     private boolean itsIsPendingAdd = false;
 
-    // TODO: test revoking permission
-    // TODO: test expired and renewed tokens
-
-    // TODO: test startup w/o network access
-
     /** Constructor */
     public OnedriveProvider(Context ctx)
     {
@@ -190,7 +185,7 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     @Override
     public boolean isAccountAuthorized()
     {
-        return !itsAuthClient.getSession().isExpired();
+        return itsAuthClient.hasRefreshToken();
     }
 
     /**
@@ -253,8 +248,10 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
         boolean authorized = isAccountAuthorized();
         PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
         if (authorized) {
-            // TODO onedrive: check unauthorized errors to clear data and
-            // update account
+            if (itsAuthClient.getSession().isExpired()) {
+                PasswdSafeUtil.dbginfo(TAG, "sync refreshing auth token");
+                itsAuthClient.getSession().refresh();
+            }
             new OnedriveSyncer(getOnedriveService(), provider, db, logrec,
                                getContext()).sync();
         }
@@ -265,6 +262,8 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
      */
     public IOneDriveService getOnedriveService()
     {
+        // TODO: check thread safety
+
         ODConnection conn = new ODConnection(itsAuthClient);
         conn.setVerboseLogcatOutput(PasswdSafeUtil.DEBUG);
         return conn.getService();
@@ -312,6 +311,19 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
      */
     private synchronized void updateOnedriveAcct(final Runnable completeCb)
     {
+        if (isAccountAuthorized()) {
+            SharedPreferences prefs =
+                    PreferenceManager.getDefaultSharedPreferences(getContext());
+            itsUserId = prefs.getString(PREF_USER_ID, null);
+            if (itsUserId != null) {
+                try {
+                    updateProviderSyncFreq(itsUserId);
+                } catch (Exception e) {
+                    Log.e(TAG, "updateOnedriveAcct failure", e);
+                }
+            }
+        }
+
         AuthListener authCb = new AuthListener()
         {
             @Override
@@ -325,17 +337,6 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
                         (session != null) ? session.getExpiresIn() : "(none)");
                 switch (status) {
                 case CONNECTED: {
-                    SharedPreferences prefs =
-                            PreferenceManager.getDefaultSharedPreferences(
-                                    getContext());
-                    itsUserId = prefs.getString(PREF_USER_ID, null);
-                    if (itsUserId != null) {
-                        try {
-                            updateProviderSyncFreq(itsUserId);
-                        } catch (Exception e) {
-                            Log.e(TAG, "updateOnedriveAcct failure", e);
-                        }
-                    }
                     requestSync(false);
                     break;
                 }
@@ -357,9 +358,6 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
                                     Object userState)
             {
                 Log.e(TAG, "update auth error", exception);
-
-                itsUserId = null;
-                updateSyncFreq(null, 0);
                 if (completeCb != null) {
                     completeCb.run();
                 }
