@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -39,8 +40,9 @@ import com.microsoft.onedriveaccess.model.Drive;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
-import retrofit.RetrofitError;
 
 /**
  * Implements a provider for the OneDrive service
@@ -53,6 +55,7 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     private static final String TAG = "OnedriveProvider";
 
     private AuthClient itsAuthClient;
+    final private ReentrantLock itsServiceLock = new ReentrantLock();
     private String itsUserId = null;
     private boolean itsIsPendingAdd = false;
 
@@ -151,19 +154,18 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
         {
             @Override
             protected void doAccountUpdate(ContentResolver cr)
-                    throws RetrofitError
             {
                 itsIsPendingAdd = true;
                 try {
-                    IOneDriveService service = getOnedriveService();
+                    IOneDriveService service = acquireOnedriveService();
                     Drive drive = service.getDrive();
                     itsNewAcct = drive.Owner.User.Id;
                     setUserId(itsNewAcct);
                     super.doAccountUpdate(cr);
-                } catch (RetrofitError e) {
+                } catch (Exception e) {
                     Log.e(TAG, "Error retrieving drive", e);
-                    throw e;
                 } finally {
+                    releaseOnedriveService();
                     itsIsPendingAdd = false;
                 }
             }
@@ -248,25 +250,46 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
         boolean authorized = isAccountAuthorized();
         PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
         if (authorized) {
-            if (itsAuthClient.getSession().isExpired()) {
-                PasswdSafeUtil.dbginfo(TAG, "sync refreshing auth token");
-                itsAuthClient.getSession().refresh();
+            try {
+                IOneDriveService service = acquireOnedriveService();
+                new OnedriveSyncer(service, provider, db, logrec,
+                                   getContext()).sync();
+            } finally {
+                releaseOnedriveService();
             }
-            new OnedriveSyncer(getOnedriveService(), provider, db, logrec,
-                               getContext()).sync();
         }
     }
 
     /**
      * Get a OneDrive service for the client
      */
-    public IOneDriveService getOnedriveService()
+    public IOneDriveService acquireOnedriveService()
+            throws Exception
     {
-        // TODO: check thread safety
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            throw new Exception("Can't invoke getOnedriveService in ui thread");
+        }
+
+        if (!itsServiceLock.tryLock(15, TimeUnit.MINUTES)) {
+            throw new Exception("Timeout waiting for OneDrive service");
+        }
+
+        if (itsAuthClient.getSession().isExpired()) {
+            PasswdSafeUtil.dbginfo(TAG, "sync refreshing auth token");
+            itsAuthClient.getSession().refresh();
+        }
 
         ODConnection conn = new ODConnection(itsAuthClient);
         conn.setVerboseLogcatOutput(PasswdSafeUtil.DEBUG);
         return conn.getService();
+    }
+
+    /**
+     * Release the OneDrive service
+     */
+    public void releaseOnedriveService()
+    {
+        itsServiceLock.unlock();
     }
 
     /**
