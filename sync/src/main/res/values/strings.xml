@@ -32,6 +32,7 @@
         No ownCloud accounts available.  Add an account in the ownCloud app
         first.  Then, it can be selected for PasswdSafe Sync.
     </string>
+    <string name="onedrive_acct_unlinked">App unlinked from OneDrive account.  Sync again to allow OneDrive access for PasswdSafe Sync.</string>
     <string name="onedrive_synced_files">OneDrive Synced Files</string>
     <string name="open_app_reauthorize">Open app to reauthorize</string>
     <string name="owncloud_auth_required">

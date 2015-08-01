@@ -32,6 +32,7 @@
         Kein ownCloud Konten zur Verfügung. Fügen Sie ein Konto in der ownCloud
         App zuerst. Dann kann es für PasswdSafe Sync ausgewählt werden.
     </string>
+    <string name="onedrive_acct_unlinked">App unverknüpft von OneDrive-Konto. Synchronisieren Sie erneut, um OneDrive-Zugang für PasswdSafe Sync ermöglichen.</string>
     <string name="onedrive_synced_files">OneDrive Synchronisiert Dateien</string>
     <string name="open_app_reauthorize">Öffnen Sie App, die neu aktivieren</string>
     <string name="owncloud_auth_required">
