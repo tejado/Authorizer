@@ -63,6 +63,9 @@
     <string name="use_https">Utilisez HTTPS</string>
     
     <string name="release_notes">
+        &lt;b&gt;2.3.1&lt;/b&gt; - Fixer synchronisation OneDrive des fichiers
+        et des dossiers avec des espaces
+        \n\n
         &lt;b&gt;2.3.0&lt;/b&gt; - Ajout du support OneDrive. Après avoir
         authentifié un compte, choisir les fichiers à synchroniser.
         \n\n
