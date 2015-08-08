@@ -61,6 +61,9 @@
     <string name="use_https">Use HTTPS</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.3.1&lt;/b&gt; - Fix OneDrive sync of files and folders with
+        spaces
+        \n\n
         &lt;b&gt;2.3.0&lt;/b&gt; - Add OneDrive support.  After authenticating
         an account, choose the files to sync.
         \n\n
