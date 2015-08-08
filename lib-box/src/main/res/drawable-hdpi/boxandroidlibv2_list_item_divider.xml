@@ -1,0 +1,5 @@
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:src="@drawable/boxandroidlibv2_line_divider"
+    android:tileMode="repeat" />
