@@ -7,6 +7,8 @@
  */
 package com.jefftharris.passwdsafe.sync.onedrive;
 
+import android.net.Uri;
+
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.microsoft.onedriveaccess.model.Item;
 
@@ -18,7 +20,8 @@ public class OnedriveProviderFile implements ProviderRemoteFile
     public static final String DRIVE_ROOT_PATH = "/drive/root:";
 
     private final Item itsItem;
-    private final String itsFolder;
+    private final String itsRemoteId;
+    private final String itsPath;
 
     /**
      * Constructor
@@ -26,13 +29,16 @@ public class OnedriveProviderFile implements ProviderRemoteFile
     public OnedriveProviderFile(Item item)
     {
         itsItem = item;
-
-        if (itsItem.ParentReference == null) {
-            itsFolder = PATH_SEPARATOR;
-        } else {
-            itsFolder = itsItem.ParentReference.Path.substring(
-                    DRIVE_ROOT_PATH.length());
+        Uri.Builder builder = new Uri.Builder();
+        if (itsItem.ParentReference != null) {
+            builder.encodedPath(
+                    itsItem.ParentReference.Path.substring(
+                            DRIVE_ROOT_PATH.length()));
         }
+        builder.appendPath(itsItem.Name);
+        Uri uri = builder.build();
+        itsPath = uri.getPath();
+        itsRemoteId = uri.getEncodedPath().toLowerCase();
     }
 
     /**
@@ -41,7 +47,7 @@ public class OnedriveProviderFile implements ProviderRemoteFile
     @Override
     public String getRemoteId()
     {
-        return getPath().toLowerCase();
+        return itsRemoteId;
     }
 
     /**
@@ -50,11 +56,7 @@ public class OnedriveProviderFile implements ProviderRemoteFile
     @Override
     public String getPath()
     {
-        if (itsItem.ParentReference == null) {
-            return PATH_SEPARATOR;
-        } else {
-            return itsFolder + "/" + itsItem.Name;
-        }
+        return itsPath;
     }
 
     /**
@@ -72,7 +74,12 @@ public class OnedriveProviderFile implements ProviderRemoteFile
     @Override
     public String getFolder()
     {
-        return itsFolder;
+        int pos = itsPath.lastIndexOf(PATH_SEPARATOR);
+        if (pos >= 0) {
+            return itsPath.substring(0, pos);
+        } else {
+            return itsPath;
+        }
     }
 
     /**
@@ -110,11 +117,11 @@ public class OnedriveProviderFile implements ProviderRemoteFile
     public String toDebugString()
     {
         return String.format(
-                "{name: %s, parent: %s, id: %s, folder: %b, mod: %s}",
+                "{name: %s, parent: %s, id: %s, folder: %b, remid: %s, mod: %s}",
                 itsItem.Name,
                 (itsItem.ParentReference != null) ?
                         itsItem.ParentReference.Path : "null",
-                itsItem.Id,
+                itsItem.Id, itsRemoteId,
                 (itsItem.Folder != null), itsItem.LastModifiedDateTime);
     }
 }

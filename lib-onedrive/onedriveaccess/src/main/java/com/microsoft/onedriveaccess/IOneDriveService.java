@@ -10,6 +10,7 @@ import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
+import retrofit.http.EncodedPath;
 import retrofit.http.GET;
 import retrofit.http.Headers;
 import retrofit.http.PATCH;
@@ -88,7 +89,7 @@ public interface IOneDriveService {
      */
     @GET("/v1.0/drive/root:{item-path}")
     @Headers("Accept: application/json")
-    Item getItemByPath(@Path("item-path") final String itemPath,
+    Item getItemByPath(@EncodedPath("item-path") final String itemPath,
                        @QueryMap Map<String, String> options);
 
     /**
@@ -103,7 +104,7 @@ public interface IOneDriveService {
      * Deletes an item by path synchronously
      */
     @DELETE("/v1.0/drive/root:{item-path}")
-    Response deleteItemByPath(@Path("item-path") final String itemPath);
+    Response deleteItemByPath(@EncodedPath("item-path") final String itemPath);
 
     /**
      * Updates an item
@@ -144,7 +145,7 @@ public interface IOneDriveService {
      * Create or update a file by path synchronously
      */
     @PUT("/v1.0/drive/root:{item-path}:/content")
-    Item uploadItemByPath(@Path("item-path") final String itemPath,
+    Item uploadItemByPath(@EncodedPath("item-path") final String itemPath,
                           @Body TypedFile fileBody);
 
     /**

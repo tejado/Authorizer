@@ -92,8 +92,10 @@ public class OnedriveFilesActivity extends AbstractSyncedFilesActivity
             try {
                 IOneDriveService service = itsProvider.acquireOnedriveService();
                 Item item = service.getItemByPath(params[0], QUERY_OPTIONS);
-                for (Item child: item.Children) {
-                    files.add(new OnedriveProviderFile(child));
+                if (item.Children != null) {
+                    for (Item child : item.Children) {
+                        files.add(new OnedriveProviderFile(child));
+                    }
                 }
             } catch (Exception e) {
                 result = Pair.create(null, e);

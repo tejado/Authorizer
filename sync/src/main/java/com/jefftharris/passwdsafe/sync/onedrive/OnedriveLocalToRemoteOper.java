@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe.sync.onedrive;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -56,7 +57,7 @@ public class OnedriveLocalToRemoteOper
                 setLocalFile(uploadFile);
                 if (isInsert()) {
                     remotePath = ProviderRemoteFile.PATH_SEPARATOR +
-                                 itsFile.itsLocalTitle;
+                                 Uri.encode(itsFile.itsLocalTitle);
                 } else {
                     remotePath = itsFile.itsRemoteId;
                 }
@@ -65,7 +66,7 @@ public class OnedriveLocalToRemoteOper
                 tmpFile.deleteOnExit();
                 uploadFile = tmpFile;
                 remotePath = ProviderRemoteFile.PATH_SEPARATOR +
-                             itsFile.itsLocalTitle;
+                             Uri.encode(itsFile.itsLocalTitle);
             }
 
             Item updatedItem = providerClient.uploadItemByPath(
