@@ -3,12 +3,12 @@ import org.apache.tools.ant.taskdefs.condition.Os
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 10
+    compileSdkVersion 22
     buildToolsVersion "22.0.1"
     defaultConfig {
         applicationId "com.jefftharris.passwdsafe"
-        minSdkVersion 4
-        targetSdkVersion 11
+        minSdkVersion 10
+        targetSdkVersion 22
         versionCode 50400
         versionName "5.4.0"
 
@@ -68,4 +68,5 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     debugCompile project(path: ':lib', configuration: 'debug')
     releaseCompile project(path: ':lib', configuration: 'release')
+    compile 'com.android.support:appcompat-v7:22.2.1'
 }

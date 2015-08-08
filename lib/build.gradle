@@ -12,13 +12,13 @@ def buildTime() {
 }
 
 android {
-    compileSdkVersion 10
+    compileSdkVersion 22
     buildToolsVersion "22.0.1"
     publishNonDefault true
 
     defaultConfig {
-        minSdkVersion 4
-        targetSdkVersion 11
+        minSdkVersion 10
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         buildConfigField 'String', 'BUILD_ID', "\"${hgId()}\""
@@ -38,5 +38,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:22.1.1'
+    compile 'com.android.support:support-v4:22.2.1'
+    compile 'com.android.support:support-annotations:22.2.1'
 }
