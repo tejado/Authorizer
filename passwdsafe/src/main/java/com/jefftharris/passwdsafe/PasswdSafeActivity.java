@@ -21,6 +21,21 @@ import android.widget.Toast;
 public class PasswdSafeActivity extends AppCompatActivity
         implements PasswdSafeNavDrawerFragment.Listener
 {
+    // TODO: file open
+    // TODO: new files
+    // TODO: search
+    // TODO: 3rdparty file open
+    // TODO: record view
+    // TODO: policies
+    // TODO: expired passwords
+    // TODO: preferences
+    // TODO: about
+    // TODO: add record
+    // TODO: edit record
+    // TODO: expiry notifications
+    // TODO: details
+    // TODO: file operations
+
     /** Fragment managing the behaviors, interactions and presentation of the
      * navigation drawer. */
     private PasswdSafeNavDrawerFragment itsNavDrawerFrag;
@@ -87,7 +102,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showFileRecords()
     {
-        // TODO: records
         Toast.makeText(this, "showFileRecords", Toast.LENGTH_SHORT).show();
     }
 
@@ -97,7 +111,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showFilePasswordPolicies()
     {
-        // TODO: policies
         Toast.makeText(this, "showFilePasswordPolicies", Toast.LENGTH_SHORT).show();
     }
 
@@ -107,7 +120,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showFileExpiredPasswords()
     {
-        // TODO: expired passwords
         Toast.makeText(this, "showFileExpiredPasswords", Toast.LENGTH_SHORT).show();
     }
 
@@ -117,7 +129,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showPreferences()
     {
-        // TODO: preferences
         Toast.makeText(this, "showPreferences", Toast.LENGTH_SHORT).show();
     }
 
@@ -127,7 +138,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showAbout()
     {
-        // TODO: about
         Toast.makeText(this, "showAbout", Toast.LENGTH_SHORT).show();
     }
 
