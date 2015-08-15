@@ -7,9 +7,11 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/menu_drawer_file_group"
+           android:enabled="false"
+           android:checkableBehavior="single">
         <item android:id="@+id/menu_drawer_records"
-              android:title="Entries"/>
+              android:title="@string/records"/>
 
         <item android:id="@+id/menu_drawer_passwd_policies"
               android:title="@string/password_policies"/>
@@ -19,10 +21,12 @@
 
     </group>
 
-    <item android:id="@+id/menu_drawer_preferences"
-          android:title="@string/preferences"/>
+    <group android:id="@+id/menu_drawer_common_group"
+           android:checkableBehavior="none">
+        <item android:id="@+id/menu_drawer_preferences"
+              android:title="@string/preferences"/>
 
-    <item android:id="@+id/menu_drawer_about"
-          android:title="@string/about"/>
-
+        <item android:id="@+id/menu_drawer_about"
+              android:title="@string/about"/>
+    </group>
 </menu>

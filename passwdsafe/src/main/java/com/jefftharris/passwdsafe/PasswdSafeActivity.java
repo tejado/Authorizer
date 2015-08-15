@@ -7,18 +7,13 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.Toast;
 
 /**
  * The main PasswdSafe activity for showing a password file
@@ -57,19 +52,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position)
-    {
-        // TODO: real nav items
-
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                       .replace(R.id.container,
-                                PlaceholderFragment.newInstance(position + 1))
-                       .commit();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         if (!itsNavDrawerFrag.isDrawerOpen()) {
@@ -90,17 +72,70 @@ public class PasswdSafeActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-        /*
-        case R.id.action_settings: {
+        case R.id.action_activity_example: {
+            Toast.makeText(this, "Action activity example", Toast.LENGTH_SHORT)
+                    .show();
             return true;
         }
-        */
         default: {
             return super.onOptionsItemSelected(item);
         }
         }
     }
 
+    /**
+     * Show the file records
+     */
+    @Override
+    public void showFileRecords()
+    {
+        // TODO: records
+        Toast.makeText(this, "showFileRecords", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Show the file password policies
+     */
+    @Override
+    public void showFilePasswordPolicies()
+    {
+        // TODO: policies
+        Toast.makeText(this, "showFilePasswordPolicies", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Show the file expired passwords
+     */
+    @Override
+    public void showFileExpiredPasswords()
+    {
+        // TODO: expired passwords
+        Toast.makeText(this, "showFileExpiredPasswords", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Show the preferences
+     */
+    @Override
+    public void showPreferences()
+    {
+        // TODO: preferences
+        Toast.makeText(this, "showPreferences", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Show the about dialog
+     */
+    @Override
+    public void showAbout()
+    {
+        // TODO: about
+        Toast.makeText(this, "showAbout", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Restore the action bar from the nav drawer
+     */
     private void restoreActionBar()
     {
         ActionBar actionBar = getSupportActionBar();
@@ -109,66 +144,4 @@ public class PasswdSafeActivity extends AppCompatActivity
             actionBar.setTitle(itsTitle);
         }
     }
-
-
-    public void onSectionAttached(int number)
-    {
-        switch (number) {
-        case 1:
-            itsTitle = "Section 1";
-            break;
-        case 2:
-            itsTitle = "Section 2";
-            break;
-        case 3:
-            itsTitle = "Section 3";
-            break;
-        }
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment
-    {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber)
-        {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment()
-        {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState)
-        {
-            return inflater
-                    .inflate(R.layout.fragment_passwd_safe, container, false);
-        }
-
-        @Override
-        public void onAttach(Activity activity)
-        {
-            super.onAttach(activity);
-            ((PasswdSafeActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
-    }
-
 }
