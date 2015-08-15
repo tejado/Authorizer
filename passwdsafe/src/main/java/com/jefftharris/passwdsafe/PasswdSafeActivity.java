@@ -40,8 +40,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         itsTitle = getTitle();
 
         // Set up the drawer.
-        itsNavDrawerFrag.setUp(
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+        itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
     }
 
     @Override
@@ -72,9 +71,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
-        case R.id.action_activity_example: {
-            Toast.makeText(this, "Action activity example", Toast.LENGTH_SHORT)
-                    .show();
+        case R.id.menu_close: {
+            finish();
             return true;
         }
         default: {
