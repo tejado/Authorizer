@@ -35,6 +35,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: expiry notifications
     // TODO: details
     // TODO: file operations
+    // TODO: modern theme
+    // TODO: file close/lock timeout
 
     /** Fragment managing the behaviors, interactions and presentation of the
      * navigation drawer. */
