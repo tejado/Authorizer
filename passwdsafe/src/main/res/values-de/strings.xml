@@ -131,6 +131,8 @@
     <string name="modified">Geändert</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
+    <string name="navigation_drawer_open">Öffnen Navigation Schublade</string>
+    <string name="navigation_drawer_close">Schließen Navigation Schublade</string>
     <string name="new_box_file">Neue Box-Datei</string>
     <string name="new_entry">Neuer Eintrag</string>
     <string name="new_file">Neue Datei</string>

@@ -131,6 +131,8 @@
     <string name="modified">Modifié</string>
     <string name="n_a">N/A</string>
     <string name="name">Nom</string>
+    <string name="navigation_drawer_open">Ouvrir le tiroir de navigation</string>
+    <string name="navigation_drawer_close">Fermer le tiroir de navigation</string>
     <string name="new_box_file">Nouveau fichier de Box</string>
     <string name="new_entry">Nouvelle entrée</string>
     <string name="new_file">Nouveau fichier</string>

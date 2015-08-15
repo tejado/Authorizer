@@ -17,6 +17,11 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <!-- New application theme -->
+    <style name="NewAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- TODO: use new theme everywhere -->
+    </style>
+
     <style name="BorderlessButton">
         <item name="android:background">@android:drawable/list_selector_background</item>
     </style>
