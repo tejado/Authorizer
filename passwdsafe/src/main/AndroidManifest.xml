@@ -84,7 +84,6 @@
             android:launchMode="singleTop"
             tools:ignore="ExportedActivity">
             <!-- View files -->
-            <!--
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -97,7 +96,6 @@
                 <data android:scheme="content"/>
                 <data android:mimeType="vnd.android.cursor.item/vnd.com.jefftharris.passwdsafe.sync.provider.files"/>
             </intent-filter>
-            -->
 
             <!-- New files -->
             <intent-filter>
