@@ -25,7 +25,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 /**
  * Fragment for the navigation drawer of the PasswdSafe activity
@@ -36,29 +35,36 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     /** Listener interface for the owning activity */
     public interface Listener
     {
-        /** Called when an item in the navigation drawer is selected */
-        void onNavigationDrawerItemSelected(int pos);
-    }
+        /** Show the file records */
+        void showFileRecords();
 
-    /** Remember the position of the selected item. */
-    private static final String STATE_SELECTED_POSITION =
-            "passwdsafe_selected_navigation_drawer_position";
+        /** Show the file password policies */
+        void showFilePasswordPolicies();
+
+        /** Show the file expired passwords */
+        void showFileExpiredPasswords();
+
+        /** Show the preferences */
+        void showPreferences();
+
+        /** Show the about dialog */
+        void showAbout();
+    }
 
     /** Per the design guidelines, you should show the drawer on launch until
      * the user manually expands it. This shared preference tracks this. */
     private static final String PREF_USER_LEARNED_DRAWER =
             "passwdsafe_navigation_drawer_learned";
 
+    // TODO: remember selected item? (or init from activity state)
 
     /** Helper component that ties the action bar to the navigation drawer. */
     private ActionBarDrawerToggle itsDrawerToggle;
 
     private DrawerLayout itsDrawerLayout;
-    private NavigationView itsNavView;
     private View itsFragmentContainerView;
     private Listener itsListener;
 
-    private int itsCurrentSelectedPosition = 0;
     private boolean itsFromSavedInstanceState;
     private boolean itsUserLearnedDrawer;
 
@@ -77,15 +83,8 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         itsUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
         if (savedInstanceState != null) {
-            itsCurrentSelectedPosition =
-                    savedInstanceState.getInt(STATE_SELECTED_POSITION);
             itsFromSavedInstanceState = true;
         }
-
-        // TODO: need selected item??
-
-        // Select either the default item (0) or the last selected item.
-        selectItem(itsCurrentSelectedPosition);
     }
 
     @Override
@@ -101,9 +100,8 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     {
         View fragView = inflater.inflate(
                 R.layout.fragment_passwd_safe_nav_drawer, container, false);
-        itsNavView = (NavigationView)fragView;
-        itsNavView.setNavigationItemSelectedListener(this);
-        selectNavViewItem(itsCurrentSelectedPosition);
+        NavigationView navView = (NavigationView)fragView;
+        navView.setNavigationItemSelectedListener(this);
         return fragView;
     }
 
@@ -191,33 +189,6 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         itsDrawerToggle.syncState();
     }
 
-    private void selectItem(int position)
-    {
-        itsCurrentSelectedPosition = position;
-        if (itsDrawerLayout != null) {
-            itsDrawerLayout.closeDrawer(itsFragmentContainerView);
-        }
-        if (itsListener != null) {
-            itsListener.onNavigationDrawerItemSelected(position);
-        }
-    }
-
-    /** Select an item in the nav view */
-    private void selectNavViewItem(int position)
-    {
-        if (itsNavView != null) {
-            Menu menu = itsNavView.getMenu();
-            int numItems = menu.size();
-            for (int i = 0; i < numItems; ++i) {
-                MenuItem item = menu.getItem(i);
-                if (item.getOrder() == position) {
-                    item.setChecked(true);
-                    break;
-                }
-            }
-        }
-    }
-
     @Override
     public void onAttach(Activity activity)
     {
@@ -230,13 +201,6 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     {
         super.onDetach();
         itsListener = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_POSITION, itsCurrentSelectedPosition);
     }
 
     @Override
@@ -263,41 +227,45 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        if (itsDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        // TODO: needed?
-        if (item.getItemId() == R.id.action_example) {
-            Toast.makeText(getActivity(), "Example action.", Toast.LENGTH_SHORT)
-                 .show();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        return itsDrawerToggle.onOptionsItemSelected(item) ||
+               super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem)
     {
+        itsDrawerLayout.closeDrawers();
+
         switch(menuItem.getItemId()) {
         case R.id.menu_drawer_records: {
-            // TODO: records
+            menuItem.setChecked(true);
+            itsListener.showFileRecords();
+            break;
         }
         case R.id.menu_drawer_passwd_policies: {
-            // TODO: policies
+            menuItem.setChecked(true);
+            itsListener.showFilePasswordPolicies();
+            break;
+        }
+        case R.id.menu_drawer_expired_passwords: {
+            menuItem.setChecked(true);
+            itsListener.showFileExpiredPasswords();
+            break;
         }
         case R.id.menu_drawer_preferences: {
-            // TODO: preferences
+            itsListener.showPreferences();
+            break;
         }
         case R.id.menu_drawer_about: {
-            // TODO: about
+            itsListener.showAbout();
+            break;
         }
         }
+
         return true;
     }
 
-
+    /** Get the action bar */
     private ActionBar getActionBar()
     {
         return ((AppCompatActivity) getActivity()).getSupportActionBar();

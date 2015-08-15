@@ -207,6 +207,7 @@
     <string name="query_label">Recherche: %1$s</string>
     <string name="recent_files">Fichiers Récents</string>
     <string name="record">Entrée</string>
+    <string name="records">Entrées</string>
     <string name="record_has_references">L\'entrée contient des références</string>
     <string name="record_label">Entrée:</string>
     <string name="record_not_found">Entrée introuvable</string>
