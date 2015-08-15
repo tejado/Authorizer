@@ -131,6 +131,8 @@
     <string name="modified">Modified</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="new_box_file">New Box File</string>
     <string name="new_entry">New Entry</string>
     <string name="new_file">New File</string>

@@ -7,4 +7,8 @@
     <dimen name="keyboard_horizontal_margin">0dp</dimen>
     <dimen name="keyboard_vertical_margin">6dp</dimen>
     <dimen name="keyboard_header_margin">6dp</dimen>
+
+    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+         https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <dimen name="navigation_drawer_width">240dp</dimen>
 </resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/menu_drawer_records"
+              android:title="Entries"/>
+
+        <item android:id="@+id/menu_drawer_passwd_policies"
+              android:title="@string/password_policies"/>
+
+        <item android:id="@+id/menu_drawer_expired_passwords"
+              android:title="@string/expired_passwords"/>
+
+    </group>
+
+    <item android:id="@+id/menu_drawer_preferences"
+          android:title="@string/preferences"/>
+
+    <item android:id="@+id/menu_drawer_about"
+          android:title="@string/about"/>
+
+</menu>
