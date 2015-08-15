@@ -55,7 +55,11 @@
         <activity
             android:name=".PasswdSafeActivity"
             android:theme="@style/NewAppTheme"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:parentActivityName=".FileListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".FileListActivity"/>
             <!-- View files -->
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.VIEW"/>
