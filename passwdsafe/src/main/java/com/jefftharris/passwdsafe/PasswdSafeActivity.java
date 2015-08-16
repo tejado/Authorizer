@@ -7,6 +7,9 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -159,13 +162,34 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Set the mode of the activity */
     private void setMode(Mode mode)
     {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        //FragmentManager.enableDebugLogging(true);
+        FragmentTransaction txn = fragMgr.beginTransaction();
+
         boolean fileOpen = false;
+        boolean showLeftList = false;
         switch (mode) {
         case INIT: {
+            //noinspection StatementWithEmptyBody
+            while (fragMgr.popBackStackImmediate()) {
+                // Clear back stack
+            }
             break;
         }
         }
         itsNavDrawerFrag.setFileOpen(fileOpen);
+
+        if (itsIsTwoPane) {
+            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
+            if (listFrag != null) {
+                if (showLeftList) {
+                    txn.show(listFrag);
+                } else {
+                    txn.hide(listFrag);
+                }
+            }
+        }
+        txn.commit();
     }
 
     /**
