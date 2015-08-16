@@ -62,6 +62,7 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     private ActionBarDrawerToggle itsDrawerToggle;
 
     private DrawerLayout itsDrawerLayout;
+    private NavigationView itsNavView;
     private View itsFragmentContainerView;
     private Listener itsListener;
 
@@ -100,8 +101,8 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     {
         View fragView = inflater.inflate(
                 R.layout.fragment_passwd_safe_nav_drawer, container, false);
-        NavigationView navView = (NavigationView)fragView;
-        navView.setNavigationItemSelectedListener(this);
+        itsNavView = (NavigationView)fragView;
+        itsNavView.setNavigationItemSelectedListener(this);
         return fragView;
     }
 
@@ -181,6 +182,13 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         }
 
         itsDrawerLayout.setDrawerListener(itsDrawerToggle);
+    }
+
+    /** Update drawer for whether a file is open */
+    public void setFileOpen(boolean open)
+    {
+        Menu menu = itsNavView.getMenu();
+        menu.setGroupEnabled(R.id.menu_drawer_file_group, open);
     }
 
     /** Call from activity's onPostCreate callback */

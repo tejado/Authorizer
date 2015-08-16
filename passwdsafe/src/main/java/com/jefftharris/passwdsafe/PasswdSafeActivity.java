@@ -37,6 +37,14 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: file operations
     // TODO: modern theme
     // TODO: file close/lock timeout
+    // TODO: autobackup
+    // TODO: release notes dialog
+
+    enum Mode
+    {
+        /** Initial mode with no file open */
+        INIT
+    }
 
     /** Fragment managing the behaviors, interactions and presentation of the
      * navigation drawer. */
@@ -58,6 +66,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         // Set up the drawer.
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
+        setMode(Mode.INIT);
     }
 
     @Override
@@ -141,6 +150,18 @@ public class PasswdSafeActivity extends AppCompatActivity
     public void showAbout()
     {
         Toast.makeText(this, "showAbout", Toast.LENGTH_SHORT).show();
+    }
+
+    /** Set the mode of the activity */
+    private void setMode(Mode mode)
+    {
+        boolean fileOpen = false;
+        switch (mode) {
+        case INIT: {
+            break;
+        }
+        }
+        itsNavDrawerFrag.setFileOpen(fileOpen);
     }
 
     /**
