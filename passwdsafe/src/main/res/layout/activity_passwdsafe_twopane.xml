@@ -57,6 +57,6 @@
         android:layout_width="@dimen/navigation_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        tools:layout="@layout/fragment_passwd_safe_nav_drawer"/>
+        tools:layout="@layout/fragment_passwdsafe_nav_drawer"/>
 
 </android.support.v4.widget.DrawerLayout>
