@@ -19,7 +19,8 @@ import android.widget.Toast;
  * The main PasswdSafe activity for showing a password file
  */
 public class PasswdSafeActivity extends AppCompatActivity
-        implements PasswdSafeNavDrawerFragment.Listener
+        implements PasswdSafeNavDrawerFragment.Listener,
+                   PasswdSafeListFragment.Listener
 {
     // TODO: file open
     // TODO: new files
@@ -53,11 +54,14 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Used to store the last screen title */
     private CharSequence itsTitle;
 
+    private boolean itsIsTwoPane = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passwd_safe);
+        itsIsTwoPane = (findViewById(R.id.content_list) != null);
 
         itsNavDrawerFrag = (PasswdSafeNavDrawerFragment)
                 getSupportFragmentManager().findFragmentById(
