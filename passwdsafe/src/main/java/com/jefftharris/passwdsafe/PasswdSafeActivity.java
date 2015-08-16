@@ -60,7 +60,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_passwd_safe);
+        setContentView(R.layout.activity_passwdsafe);
         itsIsTwoPane = (findViewById(R.id.content_list) != null);
 
         itsNavDrawerFrag = (PasswdSafeNavDrawerFragment)
@@ -87,7 +87,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.activity_passwd_safe, menu);
+            getMenuInflater().inflate(R.menu.activity_passwdsafe, menu);
             restoreActionBar();
             return true;
         }

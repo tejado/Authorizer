@@ -100,7 +100,7 @@ public class PasswdSafeNavDrawerFragment extends Fragment
                              Bundle savedInstanceState)
     {
         View fragView = inflater.inflate(
-                R.layout.fragment_passwd_safe_nav_drawer, container, false);
+                R.layout.fragment_passwdsafe_nav_drawer, container, false);
         itsNavView = (NavigationView)fragView;
         itsNavView.setNavigationItemSelectedListener(this);
         return fragView;
