@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="add">Add</string>
+    <string name="add_policy">Add Policy</string>
+    <string name="add_record">Add Record</string>
+    <string name="alias_base_record_header">ALIAS</string>
+    <string name="alias_base_record_label">Alias</string>
+    <string name="app_desc">Access PasswordSafe databases on Android</string>
+    <string name="app_name">PasswdSafe</string>
+    <string name="at_least">At least</string>
+    <string name="basic">Basic</string>
+    <string name="cannot_create_file">Cannot create file: %1$s</string>
+    <string name="case_sensitive">Case sensitive</string>
+    <string name="case_sensitive_sorting">Case-sensitive sorting</string>
+    <string name="change_password">Change Password</string>
+    <string name="check_box_to_confirm">Check box to confirm</string>
+    <string name="choose">Choose</string>
+    <string name="choose_group">Choose Group</string>
+    <string name="choose_record">Choose Record</string>
+    <string name="choose_type">Choose Type</string>
+    <string name="clear">Clear</string>
+    <string name="clear_clipboard_on_close">Clear clipboard on close</string>
+    <string name="clear_password_notifications">Clear password notifications</string>
+    <string name="clear_recent">Clear Recent</string>
+    <string name="close_file_screen_off">Close file on screen off</string>
+    <string name="confirm">Confirm</string>
+    <string name="confirm_label">Confirm:</string>
+    <string name="confirm_password_label">Confirm Password:</string>
+    <string name="cannot_delete_record">Cannot delete record - %1$s</string>
+    <string name="content_file">Content File</string>
+    <string name="copy_clipboard">Copy to Clipboard</string>
+    <string name="copy_notes">Copy Notes</string>
+    <string name="copy_password">Copy Password</string>
+    <string name="copy_user">Copy User Name</string>
+    <string name="created">Created</string>
+    <string name="current">Current</string>
+    <string name="custom_symbols">Custom Symbols</string>
+    <string name="custom_symbol_not_alphanum">Custom symbols must not be alphanumeric or whitespace</string>
+    <string name="database_policy">Database Policy - %s</string>
+    <string name="database_version_label">Database version:</string>
+    <string name="days">Days</string>
+    <string name="default_file_to_open">Default file to open</string>
+    <string name="default_policy">Default Policy</string>
+    <string name="default_symbols">Default symbols</string>
+    <string name="delete">Delete</string>
+    <string name="delete_file">Delete File</string>
+    <string name="delete_file_msg">Delete file \"%1$s\"?</string>
+    <string name="delete_file_title">Confirm File Deletion</string>
+    <string name="delete_policy">Delete Policy</string>
+    <string name="delete_policy_msg">Delete policy \"%1$s\"?</string>
+    <string name="delete_policy_title">Confirm Policy Deletion</string>
+    <string name="delete_record_msg">Delete record \"%1$s\"?</string>
+    <string name="delete_record_title">Confirm Record Deletion</string>
+    <string name="details">Details</string>
+    <string name="directory_for_files">Directory for files</string>
+    <string name="done">Done</string>
+    <string name="duplicate_entry">Duplicate entry</string>
+    <string name="duplicate_name">Duplicate name</string>
+    <string name="edit">Edit</string>
+    <string name="edit_item">Edit %s</string>
+    <string name="edit_policy">Edit Policy</string>
+    <string name="email">Email</string>
+    <string name="email_attachment">Email Attachment</string>
+    <string name="email_header">EMAIL</string>
+    <string name="empty_custom_symbols">Empty custom symbols</string>
+    <string name="empty_file_name">Empty file name</string>
+    <string name="empty_name">Empty name</string>
+    <string name="empty_password">Empty password</string>
+    <string name="empty_title">Empty title</string>
+    <string name="enabled">Enabled</string>
+    <string name="enter_net_group">Enter new group:</string>
+    <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
+    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
+    <string name="expiration">Expiration</string>
+    <string name="expiration_notifications">Expiration Notifications</string>
+    <string name="expiration_notifications_warning">Enabling expiration notifications requires PasswdSafe to store expiration information for the file (record title, group, and expiration date).  This information is stored unencrypted on the device.  No passwords are stored.</string>
+    <string name="expired_passwords">Expired Passwords</string>
+    <string name="expired_password_notification">Expired password notification</string>
+    <string name="expiring_password">Expiring password</string>
+    <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
+    <string name="file_backups">File backups</string>
+    <string name="file_close_timeout">File close timeout</string>
+    <string name="file_exists">File exists</string>
+    <string name="file_label">File:</string>
+    <string name="file_label_val">File: %1$s</string>
+    <string name="file_name_label">File Name:</string>
+    <string name="file_operations">File Operations…</string>
+    <string name="file_password_encoding">File password encoding</string>
+    <string name="file_settings">File Settings</string>
+    <string name="font_size">Font size</string>
+    <string name="generate">Generate</string>
+    <string name="generate_password">Generate Password</string>
+    <string name="go">Go</string>
+    <string name="go_to">Goto</string>
+    <string name="group">Group</string>
+    <string name="group_header">GROUP</string>
+    <string name="group_records">Group records</string>
+    <string name="help">Help</string>
+    <string name="hidden_password_alias">***** (from alias, tap to show)</string>
+    <string name="hidden_password_normal">***** (tap to show)</string>
+    <string name="hidden_password_shortcut">***** (from shortcut, tap to show)</string>
+    <string name="hide_password">Hide Password</string>
+    <string name="hide_passwords">Hide Passwords</string>
+    <string name="history">History</string>
+    <string name="history_header">HISTORY</string>
+    <string name="home">Home</string>
+    <string name="interval">Interval</string>
+    <string name="invalid_file_name">Invalid file name</string>
+    <string name="invalid_history_max_size">Invalid history maximum size</string>
+    <string name="invalid_length">Invalid length</string>
+    <string name="invalid_option_length">Invalid option length</string>
+    <string name="invalid_password">Invalid password</string>
+    <string name="kitkat_sdcard_warning">
+        %1$s
+        \n\nOn Android KitKat and higher, apps are prevented from writing to 
+        removable SD cards.  If the file is located on a card, it will have to
+        be moved to the internal storage.
+    </string>
+    <string name="last_save_app_label">Last saved app:</string>
+    <string name="last_save_by_label">Last saved by:</string>
+    <string name="last_save_time_label">Last save time:</string>
+    <string name="legacy_file_chooser">Legacy file chooser</string>
+    <string name="legacy_file_chooser_summary">Usable with Kitkat and higher</string>
+    <string name="length">Length</string>
+    <string name="length_even_hex">Length must be even for hexadecimal</string>
+    <string name="length_min_val">Length must be at least %1$d</string>
+    <string name="length_max_val">Length must be at most %1$d</string>
+    <string name="loading_file">Loading %s…</string>
+    <string name="location">Location</string>
+    <string name="max_size_label">Maximum size:</string>
+    <string name="modified">Modified</string>
+    <string name="n_a">N/A</string>
+    <string name="name">Name</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="new_box_file">New Box File</string>
+    <string name="new_entry">New Entry</string>
+    <string name="new_file">New File</string>
+    <string name="new_dropbox_file">New Dropbox File</string>
+    <string name="new_file_not_supp_uri">New file not supported for URI %1$s</string>
+    <string name="new_group_menu">New group…</string>
+    <string name="new_local_file">New Local File</string>
+    <string name="new_onedrive_file">New OneDrive File</string>
+    <string name="new_owncloud_file">New ownCloud File</string>
+    <string name="new_password_label">New Password:</string>
+    <string name="new_policy">New Policy</string>
+    <string name="next">Next</string>
+    <string name="no_alias_chosen">No alias chosen</string>
+    <string name="no_files_select_to_open">
+        No Files - Select action to open or create a new file
+        \n\nIf files are not showing in the documents screen, use the menu to
+        show internal storage or the SD card.
+        \n\nThe previous file chooser can be enabled by opening the menu and
+        selecting Preferences, File Settings, and the legacy file chooser.
+    </string>
+    <string name="no_shortcut_chosen">No shortcut chosen</string>
+    <string name="no_policies">No Policies</string>
+    <string name="no_records">No Records</string>
+    <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
+    <string name="none_paren">(None)</string>
+    <string name="none_selected_open">None selected.  Open PasswdSafe to choose.</string>
+    <string name="notes">Notes</string>
+    <string name="num_records_label">Number of Records:</string>
+    <string name="ok">OK</string>
+    <string name="open_file_title">Open File</string>
+    <string name="option_not_selected">At least one option must be selected</string>
+    <string name="parent_group">Parent Group</string>
+    <string name="password">Password</string>
+    <string name="password_encoding_label">Password Encoding:</string>
+    <string name="password_expiration">Password Expiration</string>
+    <string name="password_expiration_in_past">Password expiration is in the past</string>
+    <string name="password_expiration_invalid_interval">Password expiration interval must be in the range 1&#8211;3650</string>
+    <string name="password_expired">Password expired</string>
+    <string name="password_expires_before">Password expires before %1$s</string>
+    <string name="password_expires_today">Password expires today</string>
+    <string name="password_file">Password file</string>
+    <string name="password_generation">Password generation</string>
+    <string name="password_gen_prefs_moved">Password generation options have moved.  Open a file and edit the default policy.</string>
+    <string name="password_header">PASSWORD</string>
+    <string name="password_label">Password:</string>
+    <string name="password_len_short_opt">Password length too short for options</string>
+    <string name="password_policy">Password Policy</string>
+    <string name="password_policies">Password Policies</string>
+    <string name="password_record">Password record</string>
+    <string name="password_settings">Password Settings</string>
+    <string name="password_times_header">PASSWORD TIMES</string>
+    <string name="password_with_expiration">Password with expiration date</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="permissions_label">Permissions:</string>
+    <string name="policy_header">POLICY</string>
+    <string name="policy_no">No</string>
+    <string name="policy_yes_len">Yes - At least %1$d</string>
+    <string name="policy_yes_sym_default">Yes - At least %1$d from default symbols: %2$s</string>
+    <string name="policy_yes_sym_easy">Yes - At least %1$d from easy symbols: %2$s</string>
+    <string name="policy_yes_sym_policy">Yes - At least %1$d from policy symbols: %2$s</string>
+    <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Yes - Symbols: %2$s</string>
+    <string name="preferences">Preferences</string>
+    <string name="press_password_warning">Press Password again to paste into visible field</string>
+    <string name="press_yubikey">Press YubiKey</string>
+    <string name="protect_all">Protect All Records</string>
+    <string name="protect_group">Protect Group Records</string>
+    <string name="protected_record">Protected</string>
+    <string name="protected_record_header">PROTECTED RECORD</string>
+    <string name="psafe3_ext">.psafe3</string>
+    <string name="query_label">Search: %1$s</string>
+    <string name="recent_files">Recent Files</string>
+    <string name="record">Record</string>
+    <string name="records">Records</string>
+    <string name="record_has_references">Record has references</string>
+    <string name="record_label">Record:</string>
+    <string name="record_not_found">Record not found</string>
+    <string name="record_policy">Record Policy</string>
+    <string name="record_settings">Record Settings</string>
+    <string name="record_sort_order">Record sort order</string>
+    <string name="record_type">Record type</string>
+    <string name="read_only">Read-only</string>
+    <string name="read_only_media">File is located on read-only media.  This situation can occur with Kitkat and higher on removable SD cards.</string>
+    <string name="read_write">Read-write</string>
+    <string name="references_label">REFERENCES</string>
+    <string name="regular_expression">Regular expression</string>
+    <string name="regular_expression_summary">Use a regular expression to search instead of a sub-string</string>
+    <string name="remove">Remove</string>
+    <string name="recurring">Recurring</string>
+    <string name="saving_file">Saving %s…</string>
+    <string name="search">Search</string>
+    <string name="search_hint">Search PasswdSafe</string>
+    <string name="search_settings">Search Settings</string>
+    <string name="select_accounts">Select accounts</string>
+    <string name="select_file_label">Select password file to open:</string>
+    <string name="send">Send</string>
+    <string name="set_password">Set Password</string>
+    <string name="shortcut_base_record_header">SHORTCUT</string>
+    <string name="shortcut_base_record_label">Shortcut</string>
+    <string name="shortcut_choose_file">Choose shortcut password file</string>
+    <string name="shortcut_choose_record">Choose shortcut password record</string>
+    <string name="show_backup_files">Show backup files</string>
+    <string name="show_password">Show Password</string>
+    <string name="show_passwords">Show Passwords</string>
+    <string name="symbols_used_by_default">Symbols used by default in a password policy: %1$s</string>
+    <string name="sync">Sync</string>
+    <string name="times_header">TIMES</string>
+    <string name="title">Title</string>
+    <string name="toggle_word_wrap">Toggle Word Wrap</string>
+    <string name="toggle_monospace">Toggle Monospace</string>
+    <string name="unknown_sync_file">Unknown sync file</string>
+    <string name="unprotect_all">Unprotect All Records</string>
+    <string name="unprotect_group">Unprotect Group Records</string>
+    <string name="unprotect_to_modify">Unprotect to modify</string>
+    <string name="up">Up</string>
+    <string name="url">URL</string>
+    <string name="username">User Name</string>
+    <string name="use_count">Use Count</string>
+    <string name="use_digits">Use Digits</string>
+    <string name="use_lowercase">Use Lowercase</string>
+    <string name="use_symbols">Use Symbols</string>
+    <string name="use_uppercase">Use Uppercase</string>
+    <string name="username_header">USER NAME</string>
+    <string name="yes">Yes</string>
+    <string name="yubikey">YubiKey</string>
+    <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
+    <string name="yubikey_error">Error communicating with the YubiKey</string>
+    <string name="yubikey_help">
+        To use a YubiKey NEO, follow these steps:\n
+        - Enable NFC support in the device settings\n
+        - Enter the user password to the file\n
+        - Choose which slot on the YubiKey has the challenge-response key.
+        Usually slot 2 is used for Password Safe.\n
+        - Press the YubiKey button\n
+        - Within 30 seconds, press the YubiKey to the back of the phone or
+        tablet.  There will be sounds as the key is being read.  If the device
+        doesn\'t respond with a rising tone, try moving the key around.  A bit
+        of trial-and-error is needed to find the correct location.  The button
+        on the YubiKey itself does not need to be pressed.\n
+        - Once the key is found, it will be used to authenticate with your
+        password.  The file will open automatically.
+    </string>
+
+    <string name="release_notes">
+        &lt;b&gt;5.4.0&lt;/b&gt;\n
+        - Add OneDrive support.  After authenticating an account, choose the
+        files to sync.\n
+        - Add record preference to sort groups before, after, or mixed with
+        records
+        \n\n
+        &lt;b&gt;5.3.2&lt;/b&gt; - Use previous file chooser by default
+        \n\n
+        &lt;b&gt;5.3.1&lt;/b&gt; - Add help for enabling internal storage for
+        the new chooser or enabling the legacy chooser.
+        \n\n
+        &lt;b&gt;5.3.0&lt;/b&gt; - Add slider to reveal parts of a password. On
+        Kitkat and higher, use the built-in document manager to open or create
+        files.
+        \n\n
+        &lt;b&gt;5.2.0&lt;/b&gt; - Add ownCloud support.  Accounts are chosen
+        from the list in the ownCloud app.  Once access is authorized, password
+        files can be chosen to sync. 
+        \n\n
+        &lt;b&gt;5.1.0&lt;/b&gt; - Add multi-window support for Samsung devices.
+        Enable selection of notes text.
+        \n\n
+        &lt;b&gt;5.0.0&lt;/b&gt; - YubiKey NEO support for devices with NFC
+        \n\n
+        &lt;b&gt;4.7.3&lt;/b&gt; - Maintain an open file when the app is 
+        launched from the home screen
+        \n\n
+        &lt;b&gt;4.7.2&lt;/b&gt; - Performance improvement when opening a file 
+        with many password iterations.
+        \n\n
+        &lt;b&gt;4.7.1&lt;/b&gt; - Fix crash with preferences
+        \n\n
+        &lt;b&gt;4.7.0&lt;/b&gt; - Add German translation
+        \n\n        
+        &lt;b&gt;4.6.0&lt;/b&gt;\n
+        - Attempt to detect read-only files on SD cards with Kitkat.  Please
+        send feedback if the detection is or is not working.\n
+        - Show the current password while editing for reference\n
+        - Show modification time of local files in file list
+        \n\n
+        &lt;b&gt;4.5.0&lt;/b&gt; - Add Box support with PasswdSafe Sync.  
+        Password files (.psafe3) are synced from the top folder and any folder 
+        tagged with \'passwdsafe\'.
+        \n\n
+        &lt;b&gt;4.4.0&lt;/b&gt;\n
+        - Add a password preference for the set of symbols to use by default in
+        password policies\n
+        - The current group is set as the default for new records\n
+        - Synchronized files can be set as a default file
+        \n\n
+        &lt;b&gt;4.3.0&lt;/b&gt; - Show a file\'s folder.
+        \n\n
+        &lt;b&gt;4.2.0&lt;/b&gt; - An input method is available which can paste
+        fields from the last selected password record. The input method must be
+        enabled in the system settings before it can be used.
+        \n\nTo use:\n
+        - Select a record in PasswdSafe\n
+        - Open the app which will use the record\'s fields\n
+        - Switch to the PasswdSafe input method\n
+        - Select the fields to paste values into the app\n
+        - Select the PasswdSafe icon to choose a different record if needed\n
+    </string>
+
+    <plurals name="expiring_passwords">
+        <item quantity="one">One expiring password</item>
+        <item quantity="other">%1$d expiring passwords</item>
+    </plurals>
+
+    <plurals name="group_items">
+        <item quantity="one">[One item]</item>
+        <item quantity="other">[%d items]</item>
+    </plurals>
+
+    <plurals name="interval_days">
+        <item quantity="one">Daily</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+
+    <!-- Order must match FileBackupPref enum values -->
+    <string-array name="file_backup_pref">
+        <item>None</item>
+        <item>1 backup</item>
+        <item>2 backups</item>
+        <item>5 backups</item>
+        <item>10 backups</item>
+        <item>All</item>
+    </string-array>
+
+    <!-- Order must match FileTimeoutPref enum values -->
+    <string-array name="file_timeout_pref">
+        <item>None</item>
+        <item>30 seconds</item>
+        <item>2 minutes</item>
+        <item>5 minutes</item>
+        <item>15 minutes</item>
+        <item>1 hour</item>
+    </string-array>
+
+    <!-- Order must match FontSizePref enum values -->
+    <string-array name="font_size_pref">
+        <item>Normal</item>
+        <item>Small</item>
+    </string-array>
+
+    <!-- Order must match constants in RecordSortOrderPref -->
+    <string-array name="record_sort_order_pref">
+        <item>Groups first</item>
+        <item>Groups mixed</item>
+        <item>Groups last</item>
+    </string-array>
+
+    <!-- Order must match constants in RecordEditActivity -->
+    <string-array name="record_type">
+        <item>Normal</item>
+        <item>Alias</item>
+        <item>Shortcut</item>
+    </string-array>
+
+    <!-- Order must match values of PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filters">
+        <item>Expired</item>
+        <item>Today</item>
+        <item>In a Week</item>
+        <item>In Two Weeks</item>
+        <item>In a Month</item>
+        <item>In a Year</item>
+        <item>Any</item>
+        <item>Custom</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_record">
+        <item>One password has expired</item>
+        <item>One password expires today</item>
+        <item>One password expires within a week</item>
+        <item>One password expires within two weeks</item>
+        <item>One password expires within a month</item>
+        <item>One password expires within a year</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_records">
+        <item>%1$s passwords have expired</item>
+        <item>%1$s passwords expire today</item>
+        <item>%1$s passwords expire within a week</item>
+        <item>%1$s passwords expire within two weeks</item>
+        <item>%1$s passwords expire within a month</item>
+        <item>%1$s passwords expire within a year</item>
+    </string-array>
+
+    <!-- Order must match PasswdExpiryNotifPref enum values -->
+    <string-array name="passwd_expiry_notif_pref">
+        <item>None</item>
+        <item>Expired</item>
+        <item>Today</item>
+        <item>In a Week</item>
+        <item>In Two Weeks</item>
+        <item>In a Month</item>
+        <item>In a Year</item>
+     </string-array>
+
+    <!-- Order must match constants in PasswdExpiration.Type -->
+    <string-array name="expire_type">
+        <item>Never</item>
+        <item>Date</item>
+        <item>Interval</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdPolicy.Type -->
+    <string-array name="policy_type">
+        <item>Normal</item>
+        <item>Easy-to-read</item>
+        <item>Pronounceable</item>
+        <item>Hexadecimal</item>
+    </string-array>
+    
+    <string-array name="yubikey_slots">
+        <item>Slot 1</item>
+        <item>Slot 2</item>
+    </string-array>
+</resources>
