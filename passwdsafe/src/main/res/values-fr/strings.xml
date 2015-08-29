@@ -164,6 +164,7 @@
     <string name="notes">Notes</string>
     <string name="num_records_label">Nombre d\'entrées:</string>
     <string name="ok">OK</string>
+    <string name="open_file">Ouvrir %s</string>
     <string name="open_file_title">Ouvrir un fichier</string>
     <string name="option_not_selected">Au moins une option doit être sélectionnée</string>
     <string name="parent_group">Groupe parent</string>
