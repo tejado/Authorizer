@@ -42,15 +42,26 @@ public class PasswdSafeUtil
 
     private static final String TAG = "PasswdSafeUtil";
 
-    /** Create an intent to open a URI */
     public static Intent createOpenIntent(Uri uri, String recToOpen)
+    {
+        // TODO: remove old activity support
+        return createOpenIntent(uri, recToOpen, true);
+    }
+
+    /** Create an intent to open a URI */
+    public static Intent createOpenIntent(Uri uri, String recToOpen,
+                                          boolean newAct)
     {
         Uri.Builder builder = uri.buildUpon();
         if (recToOpen != null) {
             builder.appendQueryParameter("recToOpen", recToOpen);
         }
         Intent intent = new Intent(VIEW_INTENT, builder.build());
-        intent.setClassName(PACKAGE, PACKAGE + ".PasswdSafe");
+
+        intent.setClassName(PACKAGE,
+                            PACKAGE +
+                            (newAct ? ".PasswdSafeActivity" : ".PasswdSafe"));
+
         return intent;
     }
 
