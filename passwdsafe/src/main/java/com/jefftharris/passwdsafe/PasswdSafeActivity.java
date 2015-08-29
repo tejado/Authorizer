@@ -7,23 +7,30 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+
 /**
  * The main PasswdSafe activity for showing a password file
  */
 public class PasswdSafeActivity extends AppCompatActivity
-        implements PasswdSafeNavDrawerFragment.Listener,
-                   PasswdSafeListFragment.Listener
+        implements PasswdSafeListFragment.Listener,
+                   PasswdSafeOpenFileFragment.Listener,
+                   PasswdSafeNavDrawerFragment.Listener
 {
     // TODO: file open
     // TODO: new files
@@ -42,7 +49,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: modern theme
     // TODO: file close/lock timeout
     // TODO: autobackup
-    // TODO: release notes dialog
 
     enum Mode
     {
@@ -57,7 +63,11 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Used to store the last screen title */
     private CharSequence itsTitle;
 
+    /** Does the UI show two panes */
     private boolean itsIsTwoPane = false;
+
+    /** Logging tag */
+    private static final String TAG = "PasswdSafeActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -74,6 +84,21 @@ public class PasswdSafeActivity extends AppCompatActivity
         // Set up the drawer.
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
         setMode(Mode.INIT);
+
+        Intent intent = getIntent();
+        PasswdSafeUtil.dbginfo(TAG, "onCreate: %s", intent);
+        switch (intent.getAction()) {
+        case PasswdSafeUtil.VIEW_INTENT:
+        case Intent.ACTION_VIEW: {
+            openFile(intent);
+            break;
+        }
+        default: {
+            Log.e(TAG, "Unknown action for intent: " + intent);
+            finish();
+            break;
+        }
+        }
     }
 
     @Override
@@ -159,6 +184,44 @@ public class PasswdSafeActivity extends AppCompatActivity
         Toast.makeText(this, "showAbout", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Handle when the file open is canceled
+     */
+    @Override
+    public void handleFileOpenCanceled()
+    {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileOpenCanceled");
+        finish();
+    }
+
+    /**
+     * Handle when the file was successfully opened
+     */
+    @Override
+    public void handleFileOpen(PasswdFileData fileData, String recToOpen)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileOpen: %s, rec: %s",
+                               fileData.getUri(), recToOpen);
+    }
+
+    /**
+     * Open a file
+     */
+    private void openFile(Intent intent)
+    {
+        Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
+        String recToOpen = intent.getData().getQueryParameter("recToOpen");
+        Fragment openFrag = PasswdSafeOpenFileFragment.newInstance(openUri,
+                                                                   recToOpen);
+
+        FragmentManager fragMgr = getSupportFragmentManager();
+        FragmentTransaction txn = fragMgr.beginTransaction();
+        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        txn.replace(R.id.content, openFrag);
+        setLeftListVisible(false, txn, fragMgr);
+        txn.commit();
+    }
+
     /** Set the mode of the activity */
     private void setMode(Mode mode)
     {
@@ -179,17 +242,27 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
         itsNavDrawerFrag.setFileOpen(fileOpen);
 
+        setLeftListVisible(showLeftList, txn, fragMgr);
+        txn.commit();
+    }
+
+    /**
+     *  Set whether the left pane is visible
+     */
+    private void setLeftListVisible(boolean visible,
+                                    FragmentTransaction txn,
+                                    FragmentManager fragMgr)
+    {
         if (itsIsTwoPane) {
             Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
             if (listFrag != null) {
-                if (showLeftList) {
+                if (visible) {
                     txn.show(listFrag);
                 } else {
                     txn.hide(listFrag);
                 }
             }
         }
-        txn.commit();
     }
 
     /**
