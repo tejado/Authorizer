@@ -15,12 +15,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
@@ -60,7 +62,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
     private TextView itsTitle;
     private TextView itsPasswordEdit;
     private CheckBox itsReadonlyCb;
-    private Spinner itsYubiSlotSpinner;
     private ProgressBar itsProgress;
     private Button itsOkBtn;
     private PasswdFileUri itsPasswdFileUri;
@@ -68,6 +69,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
     private OpenTask itsOpenTask;
     private YubikeyMgr itsYubiMgr;
     private YubikeyMgr.User itsYubiUser;
+    private int itsYubiSlot = 2;
+    private int itsNumProgressUsers = 0;
 
     /**
      * Create a new instance
@@ -98,7 +101,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
+
         View rootView = inflater.inflate(R.layout.fragment_passwdsafe_open_file,
                                          container, false);
 
@@ -109,6 +113,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
 
         itsReadonlyCb = (CheckBox)rootView.findViewById(R.id.read_only);
         itsProgress = (ProgressBar)rootView.findViewById(R.id.progress);
+        itsProgress.setVisibility(View.INVISIBLE);
         Button cancelBtn = (Button)rootView.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);
         itsOkBtn = (Button)rootView.findViewById(R.id.ok);
@@ -119,37 +124,31 @@ public class PasswdSafeOpenFileFragment extends Fragment
 
         itsYubiMgr = new YubikeyMgr();
         itsYubiUser = new YubikeyUser();
-        itsYubiSlotSpinner = (Spinner)rootView.findViewById(R.id.yubi_slot);
-        itsYubiSlotSpinner.setSelection(1);
         Button yubikey = (Button)rootView.findViewById(R.id.yubi_start);
         yubikey.setOnClickListener(this);
         setVisibility(R.id.yubi_help_text, false, rootView);
-        View yubihelp = rootView.findViewById(R.id.yubi_help);
-        yubihelp.setOnClickListener(this);
         YubiState state = YubiState.UNAVAILABLE;
         if (itsYubiMgr != null) {
             state = itsYubiMgr.getState(getActivity());
         }
+        boolean showDisabled = false;
+        boolean showStart = false;
         switch (state) {
         case UNAVAILABLE: {
-            setVisibility(R.id.yubi_disabled, false, rootView);
-            setVisibility(R.id.yubi_start_fields, false, rootView);
-            setVisibility(R.id.yubi_progress_fields, false, rootView);
             break;
         }
         case DISABLED: {
-            setVisibility(R.id.yubi_disabled, true, rootView);
-            setVisibility(R.id.yubi_start_fields, false, rootView);
-            setVisibility(R.id.yubi_progress_fields, false, rootView);
+            showDisabled = true;
             break;
         }
         case ENABLED: {
-            setVisibility(R.id.yubi_disabled, false, rootView);
-            setVisibility(R.id.yubi_start_fields, true, rootView);
-            setVisibility(R.id.yubi_progress_fields, false, rootView);
+            showStart = true;
             break;
         }
         }
+        setVisibility(R.id.yubi_disabled, showDisabled, rootView);
+        setVisibility(R.id.yubi_start, showStart, rootView);
+        setVisibility(R.id.yubi_progress_text, false, rootView);
 
         return rootView;
     }
@@ -204,6 +203,59 @@ public class PasswdSafeOpenFileFragment extends Fragment
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_passwdsafe_open_file, menu);
+
+        View root = getView();
+        if (root != null) {
+            View yubiStart = root.findViewById(R.id.yubi_start);
+            boolean startVisible = (yubiStart.getVisibility() == View.VISIBLE);
+            menu.setGroupVisible(R.id.menu_group_slots, startVisible);
+
+            View yubiDisabled = root.findViewById(R.id.yubi_disabled);
+            MenuItem item = menu.findItem(R.id.menu_yubi_help);
+            item.setVisible((yubiDisabled.getVisibility() == View.VISIBLE) ||
+                            startVisible);
+        }
+
+        MenuItem item = menu.findItem(R.id.menu_slot_2);
+        item.setChecked(true);
+        itsYubiSlot = 2;
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_yubi_help: {
+            View root = getView();
+            if (root != null) {
+                View help = root.findViewById(R.id.yubi_help_text);
+                help.setVisibility((help.getVisibility() == View.VISIBLE) ?
+                                           View.GONE : View.VISIBLE);
+            }
+            return true;
+        }
+        case R.id.menu_slot_1: {
+            item.setChecked(true);
+            itsYubiSlot = 1;
+            return true;
+        }
+        case R.id.menu_slot_2: {
+            item.setChecked(true);
+            itsYubiSlot = 2;
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
+
+    @Override
     public void onClick(View view)
     {
         switch (view.getId()) {
@@ -231,16 +283,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
         }
         case R.id.yubi_start: {
             itsYubiMgr.start(itsYubiUser);
-            break;
-        }
-        case R.id.yubi_help: {
-            View root = getView();
-            if (root == null) {
-                break;
-            }
-            View help = root.findViewById(R.id.yubi_help_text);
-            help.setVisibility((help.getVisibility() == View.VISIBLE) ?
-                                View.GONE : View.VISIBLE);
             break;
         }
         }
@@ -432,13 +474,13 @@ public class PasswdSafeOpenFileFragment extends Fragment
         @Override
         protected void onPreExecute()
         {
-            itsProgress.setVisibility(View.VISIBLE);
+            setProgressVisible(true, true);
         }
 
         @Override
         protected void onPostExecute(ResultT data)
         {
-            itsProgress.setVisibility(View.INVISIBLE);
+            setProgressVisible(false, true);
         }
     }
 
@@ -477,35 +519,46 @@ public class PasswdSafeOpenFileFragment extends Fragment
         @Override
         public int getSlotNum()
         {
-            return (itsYubiSlotSpinner.getSelectedItemPosition() == 0) ? 1 : 2;
+            return itsYubiSlot;
         }
 
         @Override
         public void timerTick(int totalTime, int remainingTime)
         {
-            View root = getView();
-            if (root != null) {
-                ProgressBar progress = (ProgressBar)
-                        root.findViewById(R.id.yubi_progress);
-                progress.setMax(totalTime);
-                progress.setProgress(remainingTime);
-            }
+            itsProgress.setMax(totalTime);
+            itsProgress.setProgress(remainingTime);
         }
 
         @Override
         public void starting()
         {
             View root = getView();
-            setVisibility(R.id.yubi_start_fields, false, root);
-            setVisibility(R.id.yubi_progress_fields, true, root);
+            setVisibility(R.id.yubi_progress_text, true, root);
+            setProgressVisible(true, false);
         }
 
         @Override
         public void stopped()
         {
             View root = getView();
-            setVisibility(R.id.yubi_start_fields, true, root);
-            setVisibility(R.id.yubi_progress_fields, false, root);
+            setVisibility(R.id.yubi_progress_text, false, root);
+            setProgressVisible(false, false);
+        }
+    }
+
+    /** Show or hide the progress bar */
+    private void setProgressVisible(boolean visible, boolean indeterminate)
+    {
+        if (visible) {
+            if (++itsNumProgressUsers == 1) {
+                itsProgress.setIndeterminate(indeterminate);
+                itsProgress.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (--itsNumProgressUsers <= 0) {
+                itsNumProgressUsers = 0;
+                itsProgress.setVisibility(View.INVISIBLE);
+            }
         }
     }
 }

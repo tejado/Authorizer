@@ -47,106 +47,74 @@
             </EditText>
         </android.support.design.widget.TextInputLayout>
 
-        <CheckBox
-            android:id="@+id/read_only"
+        <RelativeLayout
             android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/yubi_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:drawableLeft="@drawable/yubikey"
+                android:drawablePadding="6dp"
+                android:drawableStart="@drawable/yubikey"
+                android:text="@string/yubikey" />
+
+            <CheckBox
+                android:id="@+id/read_only"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@id/yubi_start"
+                android:layout_toStartOf="@id/yubi_start"
+                android:text="@string/read_only"
+                android:checked="true"
+                android:layout_centerVertical="true"
+                android:layout_alignTop="@+id/yubi_start"
+                android:layout_alignBottom="@+id/yubi_start"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/yubi_disabled"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/read_only"
-            android:checked="true"/>
+            android:text="@string/yubikey_disabled"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/yubi_help_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/yubikey_help"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <LinearLayout
-            android:id="@+id/yubi_fields"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="horizontal"
+            >
 
             <TextView
-                android:id="@+id/yubi_disabled"
+                android:id="@+id/yubi_progress_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/press_yubikey"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:layout_marginRight="6dp"
+                android:layout_marginEnd="6dp"/>
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/yubikey_disabled"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:indeterminate="true"
+                android:layout_gravity="center_vertical"/>
 
-            <RelativeLayout
-                android:id="@+id/yubi_start_fields"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <Button
-                    android:id="@+id/yubi_start"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:drawableLeft="@drawable/yubikey"
-                    android:drawablePadding="6dp"
-                    android:drawableStart="@drawable/yubikey"
-                    android:text="@string/yubikey" />
-
-                <ImageButton
-                    android:id="@+id/yubi_help"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="@string/help"
-                    android:src="@drawable/ic_action_help" />
-
-                <Spinner
-                    android:id="@+id/yubi_slot"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toEndOf="@+id/yubi_start"
-                    android:layout_toLeftOf="@+id/yubi_help"
-                    android:layout_toRightOf="@+id/yubi_start"
-                    android:layout_toStartOf="@+id/yubi_help"
-                    android:entries="@array/yubikey_slots"
-                    tools:listitem="@android:layout/simple_spinner_dropdown_item" />
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/yubi_progress_fields"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone" >
-
-                <TextView
-                    android:id="@+id/yubi_progress_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/press_yubikey"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <ProgressBar
-                    android:id="@+id/yubi_progress"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="6dp"
-                    android:paddingRight="6dp" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/yubi_help_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/yubikey_help"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
