@@ -58,6 +58,8 @@ public class PasswdSafeNavDrawerFragment extends Fragment
 
     // TODO: remember selected item? (or init from activity state)
 
+    // TODO: test initial state of autoshow drawer.  Does it conflict with file open?
+
     /** Helper component that ties the action bar to the navigation drawer. */
     private ActionBarDrawerToggle itsDrawerToggle;
 

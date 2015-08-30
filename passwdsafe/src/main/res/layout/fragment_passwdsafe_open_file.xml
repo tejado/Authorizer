@@ -51,8 +51,6 @@
             android:id="@+id/read_only"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="6dp"
-            android:paddingTop="6dp"
             android:text="@string/read_only"
             android:checked="true"/>
 
@@ -148,13 +146,11 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:indeterminate="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:orientation="horizontal">
 
             <Button

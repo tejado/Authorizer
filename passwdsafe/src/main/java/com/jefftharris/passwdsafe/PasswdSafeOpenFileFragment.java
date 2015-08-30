@@ -28,6 +28,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.util.YubiState;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import org.pwsafe.lib.exception.InvalidPassphraseException;
@@ -59,13 +60,14 @@ public class PasswdSafeOpenFileFragment extends Fragment
     private TextView itsTitle;
     private TextView itsPasswordEdit;
     private CheckBox itsReadonlyCb;
+    private Spinner itsYubiSlotSpinner;
     private ProgressBar itsProgress;
     private Button itsOkBtn;
     private PasswdFileUri itsPasswdFileUri;
     private ResolveTask itsResolveTask;
     private OpenTask itsOpenTask;
-    private YubikeyMgr itsYubiMgr = null;
-    private YubikeyMgr.User itsYubiUser = null;
+    private YubikeyMgr itsYubiMgr;
+    private YubikeyMgr.User itsYubiUser;
 
     /**
      * Create a new instance
@@ -105,14 +107,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
         PasswordVisibilityMenuHandler.set(itsPasswordEdit);
         itsPasswordEdit.setEnabled(false);
 
-        // TODO: YubiKey
-        Spinner slotSpinner = (Spinner)rootView.findViewById(R.id.yubi_slot);
-        slotSpinner.setSelection(1);
-        setVisibility(R.id.yubi_help_text, false, rootView);
-        setVisibility(R.id.yubi_disabled, false, rootView);
-        setVisibility(R.id.yubi_start_fields, false, rootView);
-        setVisibility(R.id.yubi_progress_fields, false, rootView);
-
         itsReadonlyCb = (CheckBox)rootView.findViewById(R.id.read_only);
         itsProgress = (ProgressBar)rootView.findViewById(R.id.progress);
         Button cancelBtn = (Button)rootView.findViewById(R.id.cancel);
@@ -122,6 +116,40 @@ public class PasswdSafeOpenFileFragment extends Fragment
         itsOkBtn.setEnabled(false);
         Button oldBtn = (Button)rootView.findViewById(R.id.old);
         oldBtn.setOnClickListener(this);
+
+        itsYubiMgr = new YubikeyMgr();
+        itsYubiUser = new YubikeyUser();
+        itsYubiSlotSpinner = (Spinner)rootView.findViewById(R.id.yubi_slot);
+        itsYubiSlotSpinner.setSelection(1);
+        Button yubikey = (Button)rootView.findViewById(R.id.yubi_start);
+        yubikey.setOnClickListener(this);
+        setVisibility(R.id.yubi_help_text, false, rootView);
+        View yubihelp = rootView.findViewById(R.id.yubi_help);
+        yubihelp.setOnClickListener(this);
+        YubiState state = YubiState.UNAVAILABLE;
+        if (itsYubiMgr != null) {
+            state = itsYubiMgr.getState(getActivity());
+        }
+        switch (state) {
+        case UNAVAILABLE: {
+            setVisibility(R.id.yubi_disabled, false, rootView);
+            setVisibility(R.id.yubi_start_fields, false, rootView);
+            setVisibility(R.id.yubi_progress_fields, false, rootView);
+            break;
+        }
+        case DISABLED: {
+            setVisibility(R.id.yubi_disabled, true, rootView);
+            setVisibility(R.id.yubi_start_fields, false, rootView);
+            setVisibility(R.id.yubi_progress_fields, false, rootView);
+            break;
+        }
+        case ENABLED: {
+            setVisibility(R.id.yubi_disabled, false, rootView);
+            setVisibility(R.id.yubi_start_fields, true, rootView);
+            setVisibility(R.id.yubi_progress_fields, false, rootView);
+            break;
+        }
+        }
 
         return rootView;
     }
@@ -145,7 +173,19 @@ public class PasswdSafeOpenFileFragment extends Fragment
     public void onPause()
     {
         super.onPause();
+        if (itsYubiMgr != null) {
+            itsYubiMgr.onPause();
+        }
         cancelOpen(false);
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        if (itsYubiMgr != null) {
+            itsYubiMgr.stop();
+        }
     }
 
     @Override
@@ -153,6 +193,14 @@ public class PasswdSafeOpenFileFragment extends Fragment
     {
         super.onDetach();
         itsListener = null;
+    }
+
+    /** Handle a new intent */
+    public void onNewIntent(Intent intent)
+    {
+        if (itsYubiMgr != null) {
+            itsYubiMgr.handleKeyIntent(intent);
+        }
     }
 
     @Override
@@ -179,6 +227,20 @@ public class PasswdSafeOpenFileFragment extends Fragment
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(ApiCompat.INTENT_FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
+            break;
+        }
+        case R.id.yubi_start: {
+            itsYubiMgr.start(itsYubiUser);
+            break;
+        }
+        case R.id.yubi_help: {
+            View root = getView();
+            if (root == null) {
+                break;
+            }
+            View help = root.findViewById(R.id.yubi_help_text);
+            help.setVisibility((help.getVisibility() == View.VISIBLE) ?
+                                View.GONE : View.VISIBLE);
             break;
         }
         }
@@ -219,6 +281,11 @@ public class PasswdSafeOpenFileFragment extends Fragment
             return;
         }
         itsOpenTask = null;
+
+        if (itsYubiMgr != null) {
+            itsYubiMgr.stop();
+        }
+
         if (result == null) {
             cancelOpen(false);
             return;
@@ -372,6 +439,73 @@ public class PasswdSafeOpenFileFragment extends Fragment
         protected void onPostExecute(ResultT data)
         {
             itsProgress.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    /**
+     * User of the YubikeyMgr
+     */
+    private class YubikeyUser implements YubikeyMgr.User
+    {
+        @Override
+        public Activity getActivity()
+        {
+            return PasswdSafeOpenFileFragment.this.getActivity();
+        }
+
+        @Override
+        public String getUserPassword()
+        {
+            return itsPasswordEdit.getText().toString();
+        }
+
+        @Override
+        public void setHashedPassword(String password)
+        {
+            itsPasswordEdit.setText(password);
+            itsOkBtn.performClick();
+        }
+
+        @Override
+        public void handleHashException(Exception e)
+        {
+            Activity act = getActivity();
+            PasswdSafeUtil.showFatalMsg(
+                    e, act.getString(R.string.yubikey_error), act);
+        }
+
+        @Override
+        public int getSlotNum()
+        {
+            return (itsYubiSlotSpinner.getSelectedItemPosition() == 0) ? 1 : 2;
+        }
+
+        @Override
+        public void timerTick(int totalTime, int remainingTime)
+        {
+            View root = getView();
+            if (root != null) {
+                ProgressBar progress = (ProgressBar)
+                        root.findViewById(R.id.yubi_progress);
+                progress.setMax(totalTime);
+                progress.setProgress(remainingTime);
+            }
+        }
+
+        @Override
+        public void starting()
+        {
+            View root = getView();
+            setVisibility(R.id.yubi_start_fields, false, root);
+            setVisibility(R.id.yubi_progress_fields, true, root);
+        }
+
+        @Override
+        public void stopped()
+        {
+            View root = getView();
+            setVisibility(R.id.yubi_start_fields, true, root);
+            setVisibility(R.id.yubi_progress_fields, false, root);
         }
     }
 }
