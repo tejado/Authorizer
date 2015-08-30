@@ -102,6 +102,18 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+
+        FragmentManager fragMgr = getSupportFragmentManager();
+        Fragment frag = fragMgr.findFragmentById(R.id.content);
+        if (frag instanceof PasswdSafeOpenFileFragment) {
+            ((PasswdSafeOpenFileFragment)frag).onNewIntent(intent);
+        }
+    }
+
+    @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
         itsNavDrawerFrag.onPostCreate();
