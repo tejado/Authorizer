@@ -278,6 +278,8 @@
         - Une fois que la clé est trouvée, elle sera utilisée pour authentifier
         avec votre mot de passe. Le fichier s\'ouvrira automatiquement.
     </string>
+    <string name="yubikey_slot_1">YubiKey Rainure 1</string>
+    <string name="yubikey_slot_2">YubiKey Rainure 2</string>
 
     <string name="release_notes">
         &lt;b&gt;5.4.0&lt;/b&gt;\n
