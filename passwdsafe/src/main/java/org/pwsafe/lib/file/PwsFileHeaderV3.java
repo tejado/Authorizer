@@ -254,6 +254,12 @@ public class PwsFileHeaderV3 implements Serializable
     {
         LOG.enterMethod("PwsFileHeaderV3.update");
 
+        // According to the spec, salt is just random data. I don't think though,
+        // that it's good practice to directly expose the generated randomness
+        // to the attacker. Therefore, we'll hash the salt.
+        updateRandHashedBytes(salt);
+        updateRandHashedBytes(IV);
+
         final byte[] stretchedPassword =
                 Util.stretchPassphrase(
                         aPassphrase
@@ -286,5 +292,16 @@ public class PwsFileHeaderV3 implements Serializable
         file.hasher = new HmacPws(file.decryptedHmacKey);
 
         LOG.leaveMethod("PwsFileHeaderV3.update");
+    }
+
+    /**
+     * Update random bytes that are also hashed with SHA256
+     * @param bytes The bytes which are updated
+     */
+    private void updateRandHashedBytes(byte[] bytes)
+    {
+        Util.newRandBytes(bytes);
+        byte[] newBytes = SHA256Pws.digest(bytes);
+        System.arraycopy(newBytes, 0, bytes, 0, bytes.length);
     }
 }
