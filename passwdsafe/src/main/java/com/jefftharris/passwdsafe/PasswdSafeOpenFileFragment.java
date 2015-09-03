@@ -63,6 +63,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
     private TextView itsPasswordEdit;
     private CheckBox itsReadonlyCb;
     private ProgressBar itsProgress;
+    private Button itsYubiStartBtn;
     private Button itsOkBtn;
     private PasswdFileUri itsPasswdFileUri;
     private ResolveTask itsResolveTask;
@@ -124,8 +125,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
 
         itsYubiMgr = new YubikeyMgr();
         itsYubiUser = new YubikeyUser();
-        Button yubikey = (Button)rootView.findViewById(R.id.yubi_start);
-        yubikey.setOnClickListener(this);
+        itsYubiStartBtn = (Button)rootView.findViewById(R.id.yubi_start);
+        itsYubiStartBtn.setOnClickListener(this);
         setVisibility(R.id.yubi_help_text, false, rootView);
         YubiState state = YubiState.UNAVAILABLE;
         if (itsYubiMgr != null) {
@@ -475,12 +476,14 @@ public class PasswdSafeOpenFileFragment extends Fragment
         protected void onPreExecute()
         {
             setProgressVisible(true, true);
+            setFieldsEnabled(false);
         }
 
         @Override
         protected void onPostExecute(ResultT data)
         {
             setProgressVisible(false, true);
+            setFieldsEnabled(true);
         }
     }
 
@@ -535,6 +538,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
             View root = getView();
             setVisibility(R.id.yubi_progress_text, true, root);
             setProgressVisible(true, false);
+            setFieldsEnabled(false);
         }
 
         @Override
@@ -543,6 +547,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
             View root = getView();
             setVisibility(R.id.yubi_progress_text, false, root);
             setProgressVisible(false, false);
+            // TODO: test yubikey with disabled fields
+            setFieldsEnabled(true);
         }
     }
 
@@ -560,5 +566,14 @@ public class PasswdSafeOpenFileFragment extends Fragment
                 itsProgress.setVisibility(View.INVISIBLE);
             }
         }
+    }
+
+    /** Enable/disable field controls during background operations */
+    private void setFieldsEnabled(boolean enabled)
+    {
+        itsPasswordEdit.setEnabled(enabled);
+        itsReadonlyCb.setEnabled(enabled);
+        itsYubiStartBtn.setEnabled(enabled);
+        itsOkBtn.setEnabled(enabled);
     }
 }
