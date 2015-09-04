@@ -151,6 +151,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
         setVisibility(R.id.yubi_start, showStart, rootView);
         setVisibility(R.id.yubi_progress_text, false, rootView);
 
+        GuiUtils.setupFormKeyboard(itsPasswordEdit, itsPasswordEdit, itsOkBtn,
+                                   getActivity());
         return rootView;
     }
 
@@ -367,6 +369,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
             itsOpenTask = null;
             task.cancel(false);
         }
+        GuiUtils.setKeyboardVisible(itsPasswordEdit, getActivity(), false);
         if (userCancel && itsListener != null) {
             itsListener.handleFileOpenCanceled();
         }
