@@ -59,7 +59,6 @@
     <string name="sync_oper_rmfile_local">Gelöschte lokale Datei: %1$s</string>
     <string name="sync_oper_rmfile_remote">Gelöschte entfernte Datei: %1$s</string>
     <string name="updating_account">Aktualisiere Konto &#8230;</string>
-    <string name="use_https">Verwenden Sie HTTPS</string>
 
     <string name="release_notes">
         &lt;b&gt;2.3.1&lt;/b&gt; - Fix Onedrive sync von Dateien und

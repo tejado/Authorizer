@@ -33,9 +33,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -56,6 +53,7 @@ import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.onedrive.OnedriveFilesActivity;
+import com.jefftharris.passwdsafe.sync.owncloud.OwncloudEditDialog;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesActivity;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudProvider;
 
@@ -137,17 +135,6 @@ public class MainActivity extends FragmentActivity
             Spinner freqSpin = (Spinner)findViewById(id);
             freqSpin.setOnItemSelectedListener(freqSelListener);
         }
-
-        CheckBox httpsCb = (CheckBox)findViewById(R.id.owncloud_use_https);
-        httpsCb.setOnCheckedChangeListener(new OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked)
-            {
-                onOwncloudUseHttpsChanged(isChecked);
-            }
-        });
 
         // Check the state of Google Play services
         int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -545,6 +532,13 @@ public class MainActivity extends FragmentActivity
         getOwncloudProvider().requestSync(true);
     }
 
+    /** Button onClick handler to edit an ownCloud account */
+    @SuppressWarnings({"UnusedParameters", "unused"})
+    public void onOwncloudEdit(View view)
+    {
+        DialogFragment dlg = OwncloudEditDialog.newInstance();
+        dlg.show(getSupportFragmentManager(), null);
+    }
 
     /** Button onClick handler to clear an ownCloud account */
     @SuppressWarnings({"UnusedParameters", "unused"})
@@ -560,13 +554,6 @@ public class MainActivity extends FragmentActivity
     {
         ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
         updateSyncFreq(freq, itsOwncloudUri);
-    }
-
-
-    /** ownCloud use HTTPS changed */
-    private void onOwncloudUseHttpsChanged(boolean useHttps)
-    {
-        getOwncloudProvider().setUseHttps(useHttps);
     }
 
 
@@ -893,7 +880,6 @@ public class MainActivity extends FragmentActivity
 
             OwncloudProvider provider = getOwncloudProvider();
             boolean authorized = provider.isAccountAuthorized();
-            boolean useHttps = provider.useHttps();
 
             TextView acctView = (TextView)findViewById(R.id.owncloud_acct);
             acctView.setText(acct);
@@ -903,10 +889,7 @@ public class MainActivity extends FragmentActivity
 
             View freqSpinLabel = findViewById(R.id.owncloud_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
-            CheckBox httpsCb = (CheckBox)findViewById(R.id.owncloud_use_https);
             freqSpin.setSelection(freq.getDisplayIdx());
-            httpsCb.setChecked(useHttps);
-
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
         } else {

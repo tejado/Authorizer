@@ -504,6 +504,14 @@
                         android:onClick="onOwncloudSync"
                         android:src="@drawable/ic_action_sync"/>
 
+                    <ImageButton
+                        android:id="@+id/owncloud_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/edit"
+                        android:onClick="onOwncloudEdit"
+                        android:src="@drawable/ic_action_edit"/>
+
                     <Button
                         android:id="@+id/owncloud_choose_files"
                         android:layout_width="wrap_content"
@@ -511,6 +519,7 @@
                         android:layout_gravity="center_vertical"
                         android:onClick="onOwncloudChooseFiles"
                         android:text="@string/choose_files"/>
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -536,12 +545,6 @@
                         tools:listitem="@android:layout/simple_spinner_item"/>
                 </LinearLayout>
 
-                <CheckBox
-                    android:id="@+id/owncloud_use_https"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/use_https"/>
             </LinearLayout>
 
             <TextView

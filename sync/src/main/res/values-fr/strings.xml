@@ -60,8 +60,7 @@
     <string name="sync_oper_rmfile_local">Supprimer le fichier local: %1$s</string>
     <string name="sync_oper_rmfile_remote">Supprimer le fichier distant: %1$s</string>
     <string name="updating_account">Mise à jour compte&#8230;</string>
-    <string name="use_https">Utilisez HTTPS</string>
-    
+
     <string name="release_notes">
         &lt;b&gt;2.3.1&lt;/b&gt; - Fixer synchronisation OneDrive des fichiers
         et des dossiers avec des espaces

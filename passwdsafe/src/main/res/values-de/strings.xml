@@ -56,7 +56,6 @@
     <string name="done">Fertig</string>
     <string name="duplicate_entry">Eintrag schon vorhanden</string>
     <string name="duplicate_name">Name schon vergeben</string>
-    <string name="edit">Bearbeiten</string>
     <string name="edit_item">Bearbeite %s</string>
     <string name="edit_policy">Regel bearbeiten</string>
     <string name="email">E-Mail</string>
@@ -249,7 +248,6 @@
     <string name="unprotect_group">Gruppe freigeben</string>
     <string name="unprotect_to_modify">Zum Freigeben Eintrag bearbeiten</string>
     <string name="up">Oben</string>
-    <string name="url">URL</string>
     <string name="username">Benutzername</string>
     <string name="use_count">Anzahl</string>
     <string name="use_digits">Ziffern</string>
