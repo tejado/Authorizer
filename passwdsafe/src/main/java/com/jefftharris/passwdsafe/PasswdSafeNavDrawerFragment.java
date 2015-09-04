@@ -58,10 +58,13 @@ public class PasswdSafeNavDrawerFragment extends Fragment
 
     // TODO: remember selected item? (or init from activity state)
 
+    // TODO: test initial state of autoshow drawer.  Does it conflict with file open?
+
     /** Helper component that ties the action bar to the navigation drawer. */
     private ActionBarDrawerToggle itsDrawerToggle;
 
     private DrawerLayout itsDrawerLayout;
+    private NavigationView itsNavView;
     private View itsFragmentContainerView;
     private Listener itsListener;
 
@@ -99,9 +102,9 @@ public class PasswdSafeNavDrawerFragment extends Fragment
                              Bundle savedInstanceState)
     {
         View fragView = inflater.inflate(
-                R.layout.fragment_passwd_safe_nav_drawer, container, false);
-        NavigationView navView = (NavigationView)fragView;
-        navView.setNavigationItemSelectedListener(this);
+                R.layout.fragment_passwdsafe_nav_drawer, container, false);
+        itsNavView = (NavigationView)fragView;
+        itsNavView.setNavigationItemSelectedListener(this);
         return fragView;
     }
 
@@ -181,6 +184,13 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         }
 
         itsDrawerLayout.setDrawerListener(itsDrawerToggle);
+    }
+
+    /** Update drawer for whether a file is open */
+    public void setFileOpen(boolean open)
+    {
+        Menu menu = itsNavView.getMenu();
+        menu.setGroupEnabled(R.id.menu_drawer_file_group, open);
     }
 
     /** Call from activity's onPostCreate callback */

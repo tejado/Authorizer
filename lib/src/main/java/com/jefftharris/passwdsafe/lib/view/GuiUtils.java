@@ -152,7 +152,7 @@ public final class GuiUtils
     public static void setPasswordVisible(TextView tv, boolean visible)
     {
         tv.setInputType(visible ? INPUT_TEXT_PASSWORD_VISIBLE :
-                        INPUT_TEXT_PASSWORD);
+                                INPUT_TEXT_PASSWORD);
     }
 
 
@@ -182,9 +182,40 @@ public final class GuiUtils
                     case KeyEvent.KEYCODE_DPAD_CENTER:
                     case KeyEvent.KEYCODE_ENTER: {
                         Button btn =
-                            dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE);
                         if (btn.isEnabled()) {
                             btn.performClick();
+                        }
+                        return true;
+                    }
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+
+    /**
+     * Setup the keyboard on a form.  The final field clicks the supplied OK
+     * button when enter is pressed.
+     */
+    public static void setupFormKeyboard(TextView firstField,
+                                         TextView finalField,
+                                         final Button okBtn,
+                                         Context ctx)
+    {
+        GuiUtilsFroyo.showKeyboard(firstField, ctx);
+        finalField.setOnKeyListener(new OnKeyListener()
+        {
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER: {
+                        if (okBtn.isEnabled()) {
+                            okBtn.performClick();
                         }
                         return true;
                     }
@@ -204,7 +235,12 @@ public final class GuiUtils
         InputMethodManager imm = (InputMethodManager)
             ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (visible) {
-            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+            if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
+                imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+            } else {
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                                    InputMethodManager.HIDE_IMPLICIT_ONLY);
+            }
         } else {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }

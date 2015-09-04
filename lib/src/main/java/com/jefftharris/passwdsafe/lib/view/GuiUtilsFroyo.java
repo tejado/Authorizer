@@ -8,8 +8,6 @@
 package com.jefftharris.passwdsafe.lib.view;
 
 
-import com.jefftharris.passwdsafe.lib.view.GuiUtils;
-
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
@@ -24,10 +22,11 @@ import android.view.View;
 public final class GuiUtilsFroyo
 {
     /**
-     * The KeyboardViewer class shows the soft keyboard when the dialog is
-     * shown.
+     * The KeyboardViewer class shows the soft keyboard when run or the dialog
+     * is shown.
      */
-    public static class KeyboardViewer implements DialogInterface.OnShowListener
+    public static class KeyboardViewer implements DialogInterface.OnShowListener,
+                                                  Runnable
     {
         private final View itsView;
         private final Context itsContext;
@@ -46,6 +45,12 @@ public final class GuiUtilsFroyo
          */
         public void onShow(DialogInterface dialog)
         {
+            run();
+        }
+
+        @Override
+        public void run()
+        {
             itsView.requestFocus();
             GuiUtils.setKeyboardVisible(itsView, itsContext, true);
         }
@@ -58,5 +63,13 @@ public final class GuiUtilsFroyo
                                                Context ctx)
     {
         dialog.setOnShowListener(new KeyboardViewer(view, ctx));
+    }
+
+    /**
+     * Cause the keyboard to be shown for the view
+     */
+    public static void showKeyboard(View view, Context ctx)
+    {
+        view.post(new KeyboardViewer(view, ctx));
     }
 }

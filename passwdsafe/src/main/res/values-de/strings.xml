@@ -162,6 +162,7 @@
     <string name="notes">Notizen</string>
     <string name="num_records_label">Eintragsanzahl:</string>
     <string name="ok">OK</string>
+    <string name="open_file">Öffnen %s</string>
     <string name="open_file_title">Datei öffnen</string>
     <string name="option_not_selected">Mindestens 1 Option auswählen</string>
     <string name="parent_group">Übergeordnete Gruppe</string>
@@ -271,7 +272,9 @@
         - Jetzt kann der YubiKey zum automatischen öffnen der Passwortdatei
         benutzt werden.
     </string>
-    
+    <string name="yubikey_slot_1">YubiKey Slot 1</string>
+    <string name="yubikey_slot_2">YubiKey Slot 2</string>
+
     <string name="release_notes">
         &lt;b&gt;5.4.0&lt;/b&gt;\n
         - Fügen Sie Microsoft OneDrive Unterstützung. Nach der Authentifizierung
