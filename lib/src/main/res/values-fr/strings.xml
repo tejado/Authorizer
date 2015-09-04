@@ -14,6 +14,7 @@
     <string name="dropbox">Dropbox</string>
     <string name="edit">Modifier</string>
     <string name="error">Erreur</string>
+    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="file_type_icon">Icône des types de fichier</string>
     <string name="google_drive">Google Drive</string>
     <string name="licenses">Licenses</string>

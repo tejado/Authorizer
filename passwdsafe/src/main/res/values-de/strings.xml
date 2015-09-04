@@ -69,7 +69,6 @@
     <string name="enabled">Eingeschaltet</string>
     <string name="enter_net_group">Neue Gruppe:</string>
     <string name="erase_all_expiration_notifications">Lösche alle Mitteilungen für abgelaufende Passwörter</string>
-    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="expiration">Ablaufdatum</string>
     <string name="expiration_notifications">Ablaufmitteilungen</string>
     <string name="expiration_notifications_warning">Mitteilungen über das Ablaufdatum von Passwörtern erfordert, dass PasswdSafe Informationen (Eintragstitel, Gruppe und Ablaufdatum) auf dem Gerät unverschlüsselt speichert. Passwörter werden nicht gespeichert.</string>
