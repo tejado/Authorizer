@@ -24,6 +24,23 @@
               android:layout_height="wrap_content"
               android:inputType="textUri"/>
 
+    <View style="@style/Separator"/>
+
+    <TextView
+        android:id="@+id/owncloud_interval_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/interval"
+        android:layout_marginLeft="6dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <Spinner
+        android:id="@+id/owncloud_interval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/interval_array"
+        tools:listitem="@android:layout/simple_spinner_item"/>
+
     <View style="@style/Separator.Light"/>
 
     <TextView

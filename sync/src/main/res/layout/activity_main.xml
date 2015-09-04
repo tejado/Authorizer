@@ -486,64 +486,34 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@id/owncloud_acct"
-                android:orientation="vertical">
+                android:divider="@drawable/spacer_medium"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                tools:ignore="UnusedAttribute">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <ImageButton
+                    android:id="@+id/owncloud_sync"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:divider="@drawable/spacer_medium"
-                    android:orientation="horizontal"
-                    android:showDividers="middle"
-                    tools:ignore="UnusedAttribute">
+                    android:contentDescription="@string/sync"
+                    android:onClick="onOwncloudSync"
+                    android:src="@drawable/ic_action_sync"/>
 
-                    <ImageButton
-                        android:id="@+id/owncloud_sync"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/sync"
-                        android:onClick="onOwncloudSync"
-                        android:src="@drawable/ic_action_sync"/>
+                <ImageButton
+                    android:id="@+id/owncloud_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/edit"
+                    android:onClick="onOwncloudEdit"
+                    android:src="@drawable/ic_action_edit"/>
 
-                    <ImageButton
-                        android:id="@+id/owncloud_edit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/edit"
-                        android:onClick="onOwncloudEdit"
-                        android:src="@drawable/ic_action_edit"/>
-
-                    <Button
-                        android:id="@+id/owncloud_choose_files"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:onClick="onOwncloudChooseFiles"
-                        android:text="@string/choose_files"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <Button
+                    android:id="@+id/owncloud_choose_files"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="6dp">
-
-                    <TextView
-                        android:id="@+id/owncloud_interval_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sync_interval_label"
-                        android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-                    <Spinner
-                        android:id="@+id/owncloud_interval"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:entries="@array/interval_array"
-                        tools:listitem="@android:layout/simple_spinner_item"/>
-                </LinearLayout>
+                    android:onClick="onOwncloudChooseFiles"
+                    android:text="@string/choose_files"/>
 
             </LinearLayout>
 

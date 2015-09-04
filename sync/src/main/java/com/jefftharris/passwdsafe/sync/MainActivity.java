@@ -62,7 +62,8 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity
         implements LoaderCallbacks<Cursor>, SyncUpdateHandler,
-                   AccountUpdateTask.Listener
+                   AccountUpdateTask.Listener,
+                   OwncloudEditDialog.Listener
 {
     private static final String TAG = "MainActivity";
 
@@ -82,6 +83,7 @@ public class MainActivity extends FragmentActivity
     private Uri itsOnedriveUri = null;
     private boolean itsOnedrivePendingAcctLink = false;
     private Uri itsOwncloudUri = null;
+    private int itsOwncloudSyncFreq = 0;
 
     private NewAccountTask itsNewAccountTask = null;
     private final List<AccountUpdateTask> itsUpdateTasks = new ArrayList<>();
@@ -116,10 +118,6 @@ public class MainActivity extends FragmentActivity
                     onOnedriveFreqChanged(position);
                     break;
                 }
-                case R.id.owncloud_interval: {
-                    onOwncloudFreqChanged(position);
-                    break;
-                }
                 }
             }
 
@@ -130,8 +128,7 @@ public class MainActivity extends FragmentActivity
         };
 
         for (int id: new int[]{R.id.box_interval, R.id.dropbox_interval,
-                               R.id.gdrive_interval, R.id.onedrive_interval,
-                               R.id.owncloud_interval}) {
+                               R.id.gdrive_interval, R.id.onedrive_interval}) {
             Spinner freqSpin = (Spinner)findViewById(id);
             freqSpin.setOnItemSelectedListener(freqSelListener);
         }
@@ -532,13 +529,31 @@ public class MainActivity extends FragmentActivity
         getOwncloudProvider().requestSync(true);
     }
 
+
     /** Button onClick handler to edit an ownCloud account */
     @SuppressWarnings({"UnusedParameters", "unused"})
     public void onOwncloudEdit(View view)
     {
-        DialogFragment dlg = OwncloudEditDialog.newInstance();
-        dlg.show(getSupportFragmentManager(), null);
+        String url = getOwncloudProvider().getUrl().toString();
+        DialogFragment dialog =
+                OwncloudEditDialog.newInstance(url, itsOwncloudSyncFreq);
+        dialog.show(getSupportFragmentManager(), null);
     }
+
+
+    /** Handle changed settings for ownCloud */
+    @Override
+    public void handleOwncloudSettingsChanged(String url,
+                                              ProviderSyncFreqPref freq)
+    {
+        getOwncloudProvider().setSettings(url);
+        int freqVal = freq.getFreq();
+        if (freqVal != itsOwncloudSyncFreq) {
+            itsOwncloudSyncFreq = freqVal;
+            updateSyncFreq(freq, itsOwncloudUri);
+        }
+    }
+
 
     /** Button onClick handler to clear an ownCloud account */
     @SuppressWarnings({"UnusedParameters", "unused"})
@@ -546,14 +561,6 @@ public class MainActivity extends FragmentActivity
     {
         DialogFragment prompt = ClearPromptDlg.newInstance(itsOwncloudUri);
         prompt.show(getSupportFragmentManager(), null);
-    }
-
-
-    /** ownCloud sync frequency spinner changed */
-    private void onOwncloudFreqChanged(int pos)
-    {
-        ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
-        updateSyncFreq(freq, itsOwncloudUri);
     }
 
 
@@ -648,7 +655,7 @@ public class MainActivity extends FragmentActivity
 
         GuiUtils.setVisible(
                 findViewById(R.id.no_accounts_msg),
-                !(hasGdrive || hasDropbox || hasBox || 
+                !(hasGdrive || hasDropbox || hasBox ||
                   hasOnedrive || hasOwncloud));
         GuiUtils.invalidateOptionsMenu(this);
     }
@@ -871,10 +878,8 @@ public class MainActivity extends FragmentActivity
             long id = cursor.getLong(
                     PasswdSafeContract.Providers.PROJECTION_IDX_ID);
             String acct = PasswdSafeContract.Providers.getDisplayName(cursor);
-            int freqVal = cursor.getInt(
+            itsOwncloudSyncFreq = cursor.getInt(
                     PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
-            ProviderSyncFreqPref freq =
-                    ProviderSyncFreqPref.freqValueOf(freqVal);
             itsOwncloudUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
 
@@ -886,12 +891,6 @@ public class MainActivity extends FragmentActivity
 
             GuiUtils.setVisible(findViewById(R.id.owncloud_auth_required),
                                 !authorized);
-
-            View freqSpinLabel = findViewById(R.id.owncloud_interval_label);
-            Spinner freqSpin = (Spinner)findViewById(R.id.owncloud_interval);
-            freqSpin.setSelection(freq.getDisplayIdx());
-            freqSpin.setEnabled(true);
-            freqSpinLabel.setEnabled(true);
         } else {
             itsOwncloudUri = null;
         }

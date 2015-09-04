@@ -21,6 +21,7 @@
     <string name="gdrive_state_pending_auth">Google account authentication is pending.  Select the sign-in request notification.</string>
     <string name="google_acct_not_available">Google account not available</string>
     <string name="incremental_sync">Incremental sync</string>
+    <string name="interval">Interval</string>
     <string name="logs">Logs</string>
     <string name="manual">Manual</string>
     <string name="network_connected">Network connected</string>

@@ -17,10 +17,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.jefftharris.passwdsafe.lib.ProviderType;
-import com.jefftharris.passwdsafe.sync.ProviderFactory;
+import com.jefftharris.passwdsafe.sync.ProviderSyncFreqPref;
 import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.lib.DialogValidator;
 
@@ -33,13 +33,27 @@ import java.net.URISyntaxException;
 public class OwncloudEditDialog extends DialogFragment
         implements DialogInterface.OnClickListener
 {
+    public interface Listener
+    {
+        /** Handle changed settings for ownCloud */
+        void handleOwncloudSettingsChanged(String url,
+                                           ProviderSyncFreqPref freq);
+    }
+
+    private Listener itsListener;
     private TextView itsUrlEdit;
+    private Spinner itsSyncInterval;
     private DialogValidator itsValidator;
 
     /** Create an instance of the dialog */
-    public static OwncloudEditDialog newInstance()
+    public static OwncloudEditDialog newInstance(String url, int syncFreq)
     {
-        return new OwncloudEditDialog();
+        OwncloudEditDialog dialog = new OwncloudEditDialog();
+        Bundle args = new Bundle();
+        args.putString("url", url);
+        args.putInt("syncFreq", syncFreq);
+        dialog.setArguments(args);
+        return dialog;
     }
 
     @Override
@@ -47,11 +61,16 @@ public class OwncloudEditDialog extends DialogFragment
     public @NonNull
     Dialog onCreateDialog(Bundle savedInstanceState)
     {
+        Bundle args = getArguments();
+        String url = args.getString("url");
+        int syncFreq = args.getInt("syncFreq");
+
         Activity act = getActivity();
         LayoutInflater factory = LayoutInflater.from(act);
         View view = factory.inflate(R.layout.fragment_owncloud_edit_dialog,
                                     null);
         itsUrlEdit = (TextView)view.findViewById(R.id.url);
+        itsSyncInterval = (Spinner)view.findViewById(R.id.owncloud_interval);
 
         AlertDialog.Builder builder =
                 new AlertDialog.Builder(getActivity());
@@ -76,11 +95,20 @@ public class OwncloudEditDialog extends DialogFragment
 
         // Must set text before registering view so validation isn't
         // triggered right away
-        OwncloudProvider provider = getOwncloudProvider();
-        itsUrlEdit.setText(provider.getUrl().toString());
+        itsUrlEdit.setText(url);
         itsValidator.registerTextView(itsUrlEdit);
 
+        ProviderSyncFreqPref freq = ProviderSyncFreqPref.freqValueOf(syncFreq);
+        itsSyncInterval.setSelection(freq.getDisplayIdx());
+
         return dialog;
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        itsListener = (Listener)activity;
     }
 
     @Override
@@ -90,20 +118,24 @@ public class OwncloudEditDialog extends DialogFragment
         itsValidator.reset();
     }
 
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+        itsListener = null;
+    }
+
     /** Handle a click on the dialog button */
     public void onClick(DialogInterface dialog, int which)
     {
-        if (which == AlertDialog.BUTTON_POSITIVE) {
-            OwncloudProvider provider = getOwncloudProvider();
-            provider.setSettings(itsUrlEdit.getText().toString());
+        if ((which == AlertDialog.BUTTON_POSITIVE) && (itsListener != null)) {
+            int freqPos = itsSyncInterval.getSelectedItemPosition();
+            ProviderSyncFreqPref freq =
+                    ProviderSyncFreqPref.displayValueOf(freqPos);
+
+            itsListener.handleOwncloudSettingsChanged(
+                    itsUrlEdit.getText().toString(), freq);
         }
         dialog.dismiss();
-    }
-
-    /** Get the ownCloud provider */
-    private OwncloudProvider getOwncloudProvider()
-    {
-        return (OwncloudProvider)ProviderFactory.getProvider(
-                ProviderType.OWNCLOUD, getActivity());
     }
 }

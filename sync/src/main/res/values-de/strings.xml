@@ -21,6 +21,7 @@
     <string name="gdrive_state_pending_auth">Warten auf Authenfizierung mit Google-Konto. Klicken Sie auf die Anmelde-Aufforderung in den Mitteilungen.</string>
     <string name="google_acct_not_available">Google-Konto nicht verfügbar</string>
     <string name="incremental_sync">Inkrementelle Synchronisierung</string>
+    <string name="interval">Intervall</string>
     <string name="logs">Log</string>
     <string name="manual">Manuell</string>
     <string name="network_connected">Netzwerk verbunden</string>
