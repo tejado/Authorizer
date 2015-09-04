@@ -340,6 +340,9 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     private static String createUrlFromAccount(String accountName,
                                                boolean useHttps)
     {
+        if (accountName == null) {
+            return null;
+        }
         int pos = accountName.indexOf('@');
         if (pos == -1) {
             return null;
