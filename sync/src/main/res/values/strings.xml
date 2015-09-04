@@ -58,7 +58,6 @@
     <string name="sync_oper_rmfile_local">Remove local file: %1$s</string>
     <string name="sync_oper_rmfile_remote">Remove remote file: %1$s</string>
     <string name="updating_account">Updating account&#8230;</string>
-    <string name="use_https">Use HTTPS</string>
 
     <string name="release_notes">
         &lt;b&gt;2.3.1&lt;/b&gt; - Fix OneDrive sync of files and folders with

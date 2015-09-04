@@ -56,7 +56,6 @@
     <string name="done">Done</string>
     <string name="duplicate_entry">Duplicate entry</string>
     <string name="duplicate_name">Duplicate name</string>
-    <string name="edit">Edit</string>
     <string name="edit_item">Edit %s</string>
     <string name="edit_policy">Edit Policy</string>
     <string name="email">Email</string>
@@ -247,7 +246,6 @@
     <string name="unprotect_group">Unprotect Group Records</string>
     <string name="unprotect_to_modify">Unprotect to modify</string>
     <string name="up">Up</string>
-    <string name="url">URL</string>
     <string name="username">User Name</string>
     <string name="use_count">Use Count</string>
     <string name="use_digits">Use Digits</string>

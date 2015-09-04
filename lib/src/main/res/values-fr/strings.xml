@@ -12,6 +12,7 @@
     <string name="copy_clipboard_error">%1$s - Erreur de copie dans le presse papier. Elle peut être due à une erreur propre aux appareils Samsung.</string>
     <string name="copy_trace_and_close">Copier et fermer</string>
     <string name="dropbox">Dropbox</string>
+    <string name="edit">Modifier</string>
     <string name="error">Erreur</string>
     <string name="file_type_icon">Icône des types de fichier</string>
     <string name="google_drive">Google Drive</string>
@@ -27,6 +28,7 @@
     <string name="release_notes">(placeholder)</string>
     <string name="reload">Recharger</string>
     <string name="type">Type</string>
+    <string name="url">URL</string>
     <string name="version">Version</string>
 
 </resources>

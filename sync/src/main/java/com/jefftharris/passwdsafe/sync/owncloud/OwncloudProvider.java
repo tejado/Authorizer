@@ -49,14 +49,14 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
 {
     private static final String PREF_AUTH_ACCOUNT = "owncloudAccount";
     private static final String PREF_CERT_ALIAS = "owncloudCertAlias";
+    private static final String PREF_URL = "owncloudUrl";
     private static final String PREF_USE_HTTPS = "owncloudUseHttps";
 
     private static final String TAG = "OwncloudProvider";
 
     private String itsAccountName = null;
     private String itsUserName = null;
-    private Uri itsUri = null;
-    private boolean itsUseHttps = true;
+    private Uri itsUrl = null;
     private boolean itsIsSyncAuthError= false;
 
     /** Constructor */
@@ -112,7 +112,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             }
         } while(false);
 
-        saveAuthData(accountName, true);
+        saveAuthData(accountName, createUrlFromAccount(accountName, true));
         updateOwncloudAcct();
 
         if (accountName == null) {
@@ -141,7 +141,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     public void unlinkAccount()
     {
         saveCertAlias(null, getContext());
-        saveAuthData(null, true);
+        saveAuthData(null, null);
         updateOwncloudAcct();
         AccountManager acctMgr = AccountManager.get(getContext());
         acctMgr.invalidateAuthToken(
@@ -240,7 +240,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         Account account = getAccount(itsAccountName);
 
         OwnCloudClient client = OwnCloudClientFactory.createOwnCloudClient(
-                itsUri, ctx, true);
+                itsUrl, ctx, true);
         client.setFollowRedirects(true);
 
         client.clearCredentials();
@@ -254,20 +254,19 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     }
 
 
-    /** Get whether to use HTTPS */
-    public final boolean useHttps()
+    /** Get the ownCloud URL */
+    public final Uri getUrl()
     {
-        return itsUseHttps;
+        return itsUrl;
     }
 
 
-    /** Set whether to use HTTPS */
-    public final void setUseHttps(boolean useHttps)
+    /** Set account settings */
+    public final void setSettings(String url)
     {
         // TODO: test deadlock with this update and gdrive on startup
-        if (itsUseHttps != useHttps) {
-            itsUseHttps = useHttps;
-            saveAuthData(itsAccountName, itsUseHttps);
+        if (!TextUtils.equals(itsUrl.toString(), url)) {
+            saveAuthData(itsAccountName, url);
             updateOwncloudAcct();
         }
     }
@@ -290,30 +289,40 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
                 PreferenceManager.getDefaultSharedPreferences(getContext());
 
         itsAccountName = prefs.getString(PREF_AUTH_ACCOUNT, null);
-        itsUseHttps = prefs.getBoolean(PREF_USE_HTTPS, true);
-        PasswdSafeUtil.dbginfo(TAG, "updateOwncloudAcct token %b, https %b",
-                               itsAccountName, itsUseHttps);
+        String urlStr = prefs.getString(PREF_URL, null);
+        PasswdSafeUtil.dbginfo(TAG, "updateOwncloudAcct token %b, url %s",
+                               itsAccountName, urlStr);
 
         String userName = null;
-        Uri uri = null;
+        Uri url = null;
 
         if (itsAccountName != null) {
             int pos = itsAccountName.indexOf('@');
             if (pos != -1) {
                 userName = itsAccountName.substring(0, pos);
-                Uri.Builder builder = new Uri.Builder();
-                builder.scheme(itsUseHttps ? "https" : "http");
-                builder.authority(itsAccountName.substring(pos + 1));
-                builder.path("/owncloud");
-                uri = builder.build();
+
+                // Check upgrade
+                if ((urlStr == null) && prefs.contains(PREF_USE_HTTPS)) {
+                    boolean useHttps = prefs.getBoolean(PREF_USE_HTTPS, true);
+                    urlStr = createUrlFromAccount(itsAccountName, useHttps);
+
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove(PREF_USE_HTTPS);
+                    editor.putString(PREF_URL, urlStr);
+                    editor.apply();
+                }
+
+                if (urlStr != null) {
+                    url = Uri.parse(urlStr);
+                }
             } else {
                 itsAccountName = null;
             }
         }
 
         itsUserName = userName;
-        itsUri = uri;
-        if (itsUri != null) {
+        itsUrl = url;
+        if (itsUrl != null) {
             try {
                 updateProviderSyncFreq(itsAccountName);
                 requestSync(false);
@@ -325,8 +334,25 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
         }
     }
 
+    /**
+     * Create the ownCloud URL from the account name
+     */
+    private static String createUrlFromAccount(String accountName,
+                                               boolean useHttps)
+    {
+        int pos = accountName.indexOf('@');
+        if (pos == -1) {
+            return null;
+        }
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(useHttps ? "https" : "http");
+        builder.authority(accountName.substring(pos + 1));
+        builder.path("/owncloud");
+        return builder.build().toString();
+    }
+
     /** Save or clear the ownCloud authentication data */
-    private void saveAuthData(String accountName, boolean useHttps)
+    private void saveAuthData(String accountName, String url)
     {
         synchronized (OwncloudProvider.class) {
             PasswdSafeUtil.dbginfo(TAG, "saveAuthData: %b", accountName);
@@ -335,9 +361,10 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             SharedPreferences.Editor editor = prefs.edit();
             if (accountName != null) {
                 editor.putString(PREF_AUTH_ACCOUNT, accountName);
-                editor.putBoolean(PREF_USE_HTTPS, useHttps);
+                editor.putString(PREF_URL, url);
             } else {
                 editor.remove(PREF_AUTH_ACCOUNT);
+                editor.remove(PREF_URL);
                 editor.remove(PREF_USE_HTTPS);
             }
             editor.apply();
