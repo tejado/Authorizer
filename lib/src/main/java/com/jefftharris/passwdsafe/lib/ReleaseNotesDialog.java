@@ -43,7 +43,7 @@ public class ReleaseNotesDialog extends DialogFragment
 
             SharedPreferences.Editor prefEdit = prefs.edit();
             prefEdit.putString(PREF_RELEASE_NOTES, itsAppVersion);
-            prefEdit.commit();
+            prefEdit.apply();
         }
     }
 

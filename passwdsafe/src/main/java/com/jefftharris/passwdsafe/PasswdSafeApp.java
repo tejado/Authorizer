@@ -315,11 +315,20 @@ public class PasswdSafeApp extends Application
     public static PasswdFileUri getFileUriFromIntent(Intent intent,
                                                      Context ctx)
     {
+        return new PasswdFileUri(getOpenUriFromIntent(intent), ctx);
+    }
+
+    /**
+     * Sanitize an intent URI for a file to open. Removes fragments and query
+     * params
+     */
+    public static Uri getOpenUriFromIntent(Intent intent)
+    {
         Uri uri = intent.getData();
         Uri.Builder builder = uri.buildUpon();
         builder.fragment("");
         builder.query("");
-        return new PasswdFileUri(builder.build(), ctx);
+        return builder.build();
     }
 
     public synchronized ActivityPasswdFile accessPasswdFile

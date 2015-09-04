@@ -160,6 +160,7 @@
     <string name="notes">Notes</string>
     <string name="num_records_label">Number of Records:</string>
     <string name="ok">OK</string>
+    <string name="open_file">Open %s</string>
     <string name="open_file_title">Open File</string>
     <string name="option_not_selected">At least one option must be selected</string>
     <string name="parent_group">Parent Group</string>
@@ -271,6 +272,8 @@
         - Once the key is found, it will be used to authenticate with your
         password.  The file will open automatically.
     </string>
+    <string name="yubikey_slot_1">YubiKey Slot 1</string>
+    <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
         &lt;b&gt;5.4.0&lt;/b&gt;\n
