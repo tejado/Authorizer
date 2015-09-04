@@ -62,6 +62,8 @@
     <string name="updating_account">Aktualisiere Konto &#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.3.2&lt;/b&gt; - In Konfiguration des URL für ownCloud
+        \n\n
         &lt;b&gt;2.3.1&lt;/b&gt; - Fix Onedrive sync von Dateien und
         Ordnern mit Leerzeichen
         \n\n

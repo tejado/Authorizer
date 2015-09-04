@@ -63,6 +63,9 @@
     <string name="updating_account">Mise à jour compte&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;2.3.2&lt;/b&gt; - Ajouter la configuration de l\'URL de
+        ownCloud
+        \n\n
         &lt;b&gt;2.3.1&lt;/b&gt; - Fixer synchronisation OneDrive des fichiers
         et des dossiers avec des espaces
         \n\n
