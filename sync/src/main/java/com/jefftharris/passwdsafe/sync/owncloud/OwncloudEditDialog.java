@@ -22,6 +22,10 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.ProviderFactory;
 import com.jefftharris.passwdsafe.sync.R;
+import com.jefftharris.passwdsafe.sync.lib.DialogValidator;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Dialog to edit an ownCloud account
@@ -30,6 +34,7 @@ public class OwncloudEditDialog extends DialogFragment
         implements DialogInterface.OnClickListener
 {
     private TextView itsUrlEdit;
+    private DialogValidator itsValidator;
 
     /** Create an instance of the dialog */
     public static OwncloudEditDialog newInstance()
@@ -48,16 +53,41 @@ public class OwncloudEditDialog extends DialogFragment
                                     null);
         itsUrlEdit = (TextView)view.findViewById(R.id.url);
 
-        OwncloudProvider provider = getOwncloudProvider();
-        itsUrlEdit.setText(provider.getUrl().toString());
-
         AlertDialog.Builder builder =
                 new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.owncloud)
                .setView(view)
                .setPositiveButton(android.R.string.ok, this)
                .setNegativeButton(android.R.string.cancel, this);
-        return builder.create();
+        AlertDialog dialog = builder.create();
+        itsValidator = new DialogValidator.AlertValidator(dialog, view, act)
+        {
+            @Override
+            protected String doValidation()
+            {
+                try {
+                    new URI(itsUrlEdit.getText().toString());
+                } catch (URISyntaxException e) {
+                    return e.getMessage();
+                }
+                return null;
+            }
+        };
+
+        // Must set text before registering view so validation isn't
+        // triggered right away
+        OwncloudProvider provider = getOwncloudProvider();
+        itsUrlEdit.setText(provider.getUrl().toString());
+        itsValidator.registerTextView(itsUrlEdit);
+
+        return dialog;
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsValidator.reset();
     }
 
     /** Handle a click on the dialog button */

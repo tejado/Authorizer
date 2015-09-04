@@ -13,6 +13,7 @@
     <string name="dropbox">Dropbox</string>
     <string name="edit">Edit</string>
     <string name="error">Error</string>
+    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="file_type_icon">File type icon</string>
     <string name="google_drive">Google Drive</string>
     <string name="licenses">Licenses</string>
