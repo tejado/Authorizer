@@ -146,8 +146,6 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	protected void open( String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		LOG.enterMethod( "PwsFile.init" );
-
 		setPassphrase(new StringBuilder(aPassphrase));
 
 		if (storage!=null) {
@@ -161,9 +159,6 @@ public abstract class PwsFileV1V2 extends PwsFile {
 
 		setOpenPasswordEncoding(
 		    (encoding == null) ? Charset.defaultCharset().name() : encoding);
-
-
-		LOG.leaveMethod( "PwsFile.init" );
 	}
 
 	/**

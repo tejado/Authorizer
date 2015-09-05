@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Set;
 
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
@@ -63,8 +62,6 @@ public class PwsFileFactory {
 	                                           String passphrase )
 	    throws InvalidPassphraseException, NoSuchAlgorithmException
 	{
-	    LOG.enterMethod( "PwsFileFactory.checkPassword" );
-
 	    byte []			phash;
 	    String encoding = null;
 
@@ -95,12 +92,10 @@ public class PwsFileFactory {
 	    if ( !validPassword )
 	    {
 	        LOG.debug1( "Password is incorrect - throwing InvalidPassphraseException" );
-	        LOG.leaveMethod( "PwsFileFactory.checkPassword" );
 	        throw new InvalidPassphraseException();
 	    }
 
 	    LOG.debug1( "Password is OK" );
-	    LOG.leaveMethod( "PwsFileFactory.checkPassword" );
 	    return encoding;
 	}
 
@@ -127,8 +122,6 @@ public class PwsFileFactory {
 	                                  byte [] stuff )
 	    throws UnsupportedEncodingException
 	{
-		LOG.enterMethod( "PwsFileFactory.genRandHash" );
-
 		SHA1			md;
 		BlowfishPwsECB	ecb;
 		byte []			pw;
@@ -165,8 +158,6 @@ public class PwsFileFactory {
 		} catch (PasswordSafeException e) {
 			LOG.error(e.getMessage()); // This should not happen!
 		}
-
-		LOG.leaveMethod( "PwsFileFactory.genRandHash" );
 		return md.getDigest();
 	}
 
@@ -211,12 +202,8 @@ public class PwsFileFactory {
 	public static final PwsFile loadFile( String filename, StringBuilder aPassphrase )
 	throws EndOfFileException, FileNotFoundException, InvalidPassphraseException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-	    LOG.enterMethod( "PwsFileFactory.loadFile" );
-
 	    PwsStorage storage = new PwsFileStorage(filename, filename);
 	    PwsFile file = loadFromStorage(storage, aPassphrase);
-
-	    LOG.leaveMethod( "PwsFileFactory.loadFile" );
 	    return file;
 	}
 
@@ -239,8 +226,6 @@ public class PwsFileFactory {
             throws EndOfFileException, InvalidPassphraseException, IOException,
                    UnsupportedFileVersionException, NoSuchAlgorithmException
         {
-            LOG.enterMethod( "PwsFileFactory.loadFromStorage" );
-
             PwsFile file;
 
             //TODOlib change to StringBuilder Constructors
@@ -285,7 +270,6 @@ public class PwsFileFactory {
                 file.close();
 
                 LOG.debug1( "File contains " + file.getRecordCount() + " records." );
-                LOG.leaveMethod( "PwsFileFactory.loadFile" );
                 return file;
             } finally {
                 try {

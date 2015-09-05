@@ -214,7 +214,6 @@ public final class Util
 			msg = I18nHelper.getInstance().formatMessage( "E00009", new Object [] { Integer.valueOf(src.length) } );
 
 			LOG.error( msg );
-			LOG.leaveMethod( "Util.bytesToLittleEndian(byte[]) - by throwing IllegalArgumentException" );
 			throw new IllegalArgumentException( msg );
 		}
 
@@ -232,8 +231,6 @@ public final class Util
 		}
 
 		if (LOG.isDebug2Enabled()) LOG.debug2( "Bytes after swapping = " + bytesToString(src) );
-
-		LOG.leaveMethod( "Util.bytesToLittleEndian(byte[])" );
 	}
 
 	/**

@@ -11,7 +11,6 @@ package org.pwsafe.lib.file;
 
 import java.io.IOException;
 
-import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.EndOfFileException;
 
@@ -34,8 +33,6 @@ import org.pwsafe.lib.exception.EndOfFileException;
  */
 public class PwsFileHeader
 {
-	private static final Log LOG = Log.getInstance(PwsFileHeader.class.getPackage().getName());
-
 	private final byte []	RandStuff	= new byte[8];
 	private byte []	RandHash	= new byte[20];
 	private final byte [] Salt		= new byte[20];
@@ -95,16 +92,12 @@ public class PwsFileHeader
 	public void save( PwsFile file )
 	throws IOException
 	{
-		LOG.enterMethod( "PwsFileHeader.save" );
-
 		update( file.getPassphrase() );
 
 		file.writeBytes( RandStuff );
 		file.writeBytes( RandHash );
 		file.writeBytes( Salt );
 		file.writeBytes( IpThing );
-
-		LOG.leaveMethod( "PwsFileHeader.save" );
 	}
 
 	/**
@@ -114,30 +107,14 @@ public class PwsFileHeader
 	 */
 	private void update( String passphrase )
 	{
-		LOG.enterMethod( "PwsFileHeader.update" );
-
 		byte	temp[];
 
-//		for ( int ii = 0; ii < RandStuff.length; ++ii )
-//		{
-//			RandStuff[ii] = Util.newRand();
-//		}
 		Util.newRandBytes(RandStuff);
 		temp		= Util.cloneByteArray( RandStuff, 10 );
 		RandHash	= PwsFileFactory.genRandHash( passphrase, temp );
 		
-//		for ( int ii = 0; ii < Salt.length; ++ii )
-//		{
-//			Salt[ii] = Util.newRand();
-//		}
 		Util.newRandBytes(Salt);
 		
-//		for ( int ii = 0; ii < IpThing.length; ++ii )
-//		{
-//			IpThing[ii] = Util.newRand();
-//		}
 		Util.newRandBytes(IpThing);
-
-		LOG.leaveMethod( "PwsFileHeader.update" );
 	}
 }

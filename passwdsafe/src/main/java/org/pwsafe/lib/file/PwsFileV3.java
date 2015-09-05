@@ -150,8 +150,6 @@ public final class PwsFileV3 extends PwsFile {
 	protected void open( String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException
 	{
-		LOG.enterMethod( "PwsFileV3.init" );
-
 		setPassphrase(new StringBuilder(aPassphrase));
 
 		if (storage!=null) {
@@ -214,8 +212,6 @@ public final class PwsFileV3 extends PwsFile {
 		twofishCbc = new TwofishPws(decryptedRecordKey, false, theHeaderV3.getIV());
 
 		readExtraHeader( this );
-
-		LOG.leaveMethod( "PwsFileV3.init" );
 	}
 
 
