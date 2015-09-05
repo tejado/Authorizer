@@ -19,8 +19,6 @@ import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.crypto.BlowfishPwsECB;
 import org.pwsafe.lib.crypto.SHA1;
-import org.pwsafe.lib.datastore.PwsEntryStore;
-import org.pwsafe.lib.datastore.PwsEntryStoreImpl;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.PasswordSafeException;
@@ -309,15 +307,5 @@ public class PwsFileFactory {
 	{
 		return new PwsFileV3();
 	}
-
-	public static PwsEntryStore getStore (PwsFile aFile) {
-		return new PwsEntryStoreImpl(aFile);
-	}
-
-	public static PwsEntryStore getStore (PwsFile aFile, Set<PwsFieldType> sparseFields) {
-		return new PwsEntryStoreImpl(aFile, sparseFields);
-
-	}
-
 
 }
