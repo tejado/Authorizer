@@ -46,7 +46,7 @@ public class Preferences extends PreferenceActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     public static final String PREF_FILE_DIR = "fileDirPref";
-    private static final String PREF_FILE_DIR_DEF =
+    public static final String PREF_FILE_DIR_DEF =
         Environment.getExternalStorageDirectory().toString();
 
     public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
