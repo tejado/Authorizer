@@ -11,7 +11,7 @@ package org.pwsafe.lib.file;
 
 
 /**
- * Provides a wrapper for fields that holds the passwordsafe file version.  
+ * Provides a wrapper for fields that holds the password safe file version.
  * Integer values are stored in the database in little-endian
  * order and are converted to and from this format on writing and reading.
  * 
