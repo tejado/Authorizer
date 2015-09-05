@@ -128,6 +128,16 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        if (itsFileData != null) {
+            itsFileData.close();
+            itsFileData = null;
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         if (!itsNavDrawerFrag.isDrawerOpen()) {
