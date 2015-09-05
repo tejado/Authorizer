@@ -199,11 +199,8 @@ public abstract class PwsFile
 	protected PwsFile( PwsStorage aStorage, String aPassphrase, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		LOG.enterMethod( "PwsFile.PwsFile( String )" );
 		this.storage = aStorage;
 		open( aPassphrase, encoding );
-
-		LOG.leaveMethod( "PwsFile.PwsFile( String )" );
 	}
 
 	/**
@@ -214,15 +211,11 @@ public abstract class PwsFile
 	 * @throws PasswordSafeException if the record has already been added to another file.
 	 */
 	public void add(final PwsRecord rec ) throws PasswordSafeException {
-		LOG.enterMethod( "PwsFile.add" );
-
 		if (isReadOnly())
 			LOG.error("Illegal add on read only file - saving won't be possible");
 
 		this.doAdd(rec);
 		setModified();
-
-		LOG.leaveMethod( "PwsFile.add" );
 	}
 
 	protected void doAdd(final PwsRecord rec) {
@@ -240,14 +233,8 @@ public abstract class PwsFile
 	 */
 	static final byte [] allocateBuffer( int length )
 	{
-		LOG.enterMethod( "PwsFile.allocateBuffer" );
-
 		int	bLen;
-
 		bLen	= calcBlockLength( length );
-
-		LOG.leaveMethod( "PwsFile.allocateBuffer" );
-
 		return new byte[ bLen ];
 	}
 
@@ -264,22 +251,15 @@ public abstract class PwsFile
 	 */
 	static final int calcBlockLength( int length )
 	{
-		LOG.enterMethod( "PwsFile.calcBlockLength" );
-
 		int result;
-
 		if ( length < 0 )
 		{
 			LOG.error( I18nHelper.getInstance().formatMessage("E00004") );
-			LOG.leaveMethod( "PwsFile.calcBlockLength" );
 			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00004") );
 		}
 		result = ( length == 0 ) ? BLOCK_LENGTH : ( (length + (BLOCK_LENGTH - 1)) / BLOCK_LENGTH ) * BLOCK_LENGTH;
 
 		LOG.debug1( "Length = " + length + ", BlockLength = " + result );
-
-		LOG.leaveMethod( "PwsFile.calcBlockLength" );
-
 		return result;
 	}
 
@@ -291,16 +271,12 @@ public abstract class PwsFile
 	void close()
 	throws IOException
 	{
-		LOG.enterMethod( "PwsFile.close" );
-
 		if ( inStream != null )
 		{
 			inStream.close();
 
 			inStream	= null;
 		}
-
-		LOG.leaveMethod( "PwsFile.close" );
 	}
 
     /**
@@ -427,13 +403,7 @@ public abstract class PwsFile
 	 */
 	public int getRecordCount()
 	{
-		LOG.enterMethod( "PwsFile.getRecordCount" );
-
-		int size = records.size();
-
-		LOG.leaveMethod( "PwsFile.getRecordCount" );
-
-		return size;
+		return records.size();
 	}
 
 	/**
@@ -831,15 +801,11 @@ public abstract class PwsFile
          */
         public final void remove()
         {
-            LOG.enterMethod( "PwsFile$FileIterator.remove" );
-
             if (isReadOnly())
                 LOG.error("Illegal remove on read only file - saving won't be possible");
 
             recDelegate.remove();
             file.setModified();
-
-            LOG.leaveMethod( "PwsFile$FileIterator.remove" );
         }
     }
 

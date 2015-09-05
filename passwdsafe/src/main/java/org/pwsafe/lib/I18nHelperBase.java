@@ -104,8 +104,6 @@ public class I18nHelperBase
 	 */
 	private synchronized ResourceBundle getBundle()
 	{
-		LOG.enterMethod( "getBundle" );
-
 		if ( TheBundle == null )
 		{
 			LOG.debug1( "Loading resource bundle for locale " + TheLocale.toString() );
@@ -113,9 +111,6 @@ public class I18nHelperBase
 			// TODOlib handle the case where the file cannot be found
 			// catch MissingResourceException
 		}
-
-		LOG.leaveMethod( "getBundle" );
-
 		return TheBundle;
 	}
 
@@ -151,13 +146,9 @@ public class I18nHelperBase
 	 */
 	public synchronized void setLocale( Locale locale )
 	{
-		LOG.enterMethod( "setLocale" );
-
 		TheLocale	= locale;
 		TheBundle	= null;
 
 		LOG.debug1( "Locale set to " + locale.toString() );
-
-		LOG.leaveMethod( "setLocale" );
 	}
 }

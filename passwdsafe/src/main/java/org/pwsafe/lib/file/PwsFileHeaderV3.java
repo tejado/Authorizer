@@ -224,8 +224,6 @@ public class PwsFileHeaderV3 implements Serializable
     public void save(PwsFile file)
             throws IOException
     {
-        LOG.enterMethod("PwsFileHeaderV3.save");
-
         update(file.getPassphrase(), (PwsFileV3)file);
 
         file.writeBytes(tag);
@@ -239,8 +237,6 @@ public class PwsFileHeaderV3 implements Serializable
         file.writeBytes(b3);
         file.writeBytes(b4);
         file.writeBytes(IV);
-
-        LOG.leaveMethod("PwsFileHeaderV3.save");
     }
 
     /**
@@ -252,8 +248,6 @@ public class PwsFileHeaderV3 implements Serializable
     private void update(String aPassphrase, PwsFileV3 file)
             throws UnsupportedEncodingException
     {
-        LOG.enterMethod("PwsFileHeaderV3.update");
-
         // According to the spec, salt is just random data. I don't think though,
         // that it's good practice to directly expose the generated randomness
         // to the attacker. Therefore, we'll hash the salt.
@@ -290,8 +284,6 @@ public class PwsFileHeaderV3 implements Serializable
 
         file.decryptedHmacKey = Util.mergeBytes(b3pt, b4pt);
         file.hasher = new HmacPws(file.decryptedHmacKey);
-
-        LOG.leaveMethod("PwsFileHeaderV3.update");
     }
 
     /**

@@ -116,23 +116,6 @@ public class Log
 	}
 
 	/**
-	 * Logs entry to a method.
-	 *
-	 * @param method the method name.
-	 */
-	public final void enterMethod( String method )
-	{
-		if ( isDebug1Enabled() )
-		{
-			if ( !method.endsWith( ")" ) )
-			{
-				method = method + "()";
-			}
-			android.util.Log.d( itsTag, "Entering method " + method );
-		}
-	}
-
-	/**
 	 * Writes a message at error level
 	 *
 	 * @param msg the message to issue.
@@ -231,23 +214,6 @@ public class Log
 	public final boolean isDebug5Enabled()
 	{
 		return isDebug1Enabled() && (DebugLevel >= 5);
-	}
-
-	/**
-	 * Logs exit from a method.
-	 *
-	 * @param method the method name.
-	 */
-	public final void leaveMethod( String method )
-	{
-		if ( isDebug1Enabled() )
-		{
-			if ( !method.endsWith( ")" ) )
-			{
-				method = method + "()";
-			}
-			android.util.Log.d( itsTag, "Leaving method " + method );
-		}
 	}
 
 	/**
