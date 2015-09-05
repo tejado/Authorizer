@@ -30,7 +30,8 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 public class PasswdSafeActivity extends AppCompatActivity
         implements PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
-                   PasswdSafeNavDrawerFragment.Listener
+                   PasswdSafeNavDrawerFragment.Listener,
+                   PasswdSafeNewFileFragment.Listener
 {
     // TODO: file open
     // TODO: new files
@@ -56,6 +57,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         INIT,
         /** Opening a file */
         FILE_OPEN,
+        /** Creating a new file */
+        FILE_NEW,
         /** An open file */
         OPEN
     }
@@ -98,6 +101,10 @@ public class PasswdSafeActivity extends AppCompatActivity
         case PasswdSafeUtil.VIEW_INTENT:
         case Intent.ACTION_VIEW: {
             setFileOpenView(intent);
+            break;
+        }
+        case PasswdSafeUtil.NEW_INTENT: {
+            setFileNewView(intent);
             break;
         }
         default: {
@@ -241,6 +248,25 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /**
+     * Handle when the file new is canceled
+     */
+    @Override
+    public void handleFileNewCanceled()
+    {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileNewCanceled");
+        finish();
+    }
+
+    /**
+     * Handle when the file was successfully created
+     */
+    @Override
+    public void handleFileNew(PasswdFileData fileData)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileNew: %s", fileData.getUri());
+    }
+
+    /**
      * Set the initial view
      */
     private void setInitialView()
@@ -258,6 +284,16 @@ public class PasswdSafeActivity extends AppCompatActivity
         Fragment openFrag = PasswdSafeOpenFileFragment.newInstance(openUri,
                                                                    recToOpen);
         setView(Mode.FILE_OPEN, openFrag);
+    }
+
+    /**
+     * Set the view for creating a new file
+     */
+    private void setFileNewView(Intent intent)
+    {
+        Uri newUri = PasswdSafeApp.getOpenUriFromIntent(intent);
+        Fragment newFrag = PasswdSafeNewFileFragment.newInstance(newUri);
+        setView(Mode.FILE_NEW, newFrag);
     }
 
     /**
@@ -282,7 +318,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         boolean clearBackStack = false;
         switch (mode) {
         case INIT:
-        case FILE_OPEN: {
+        case FILE_OPEN:
+        case FILE_NEW: {
             break;
         }
         case OPEN: {
