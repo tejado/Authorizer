@@ -8,5 +8,5 @@
   -->
 <resources>
     <!-- TODO: remove test land layout? -->
-    <item type="layout" name="activity_passwd_safe">@layout/activity_passwdsafe_twopane</item>
+    <item type="layout" name="activity_passwdsafe">@layout/activity_passwdsafe_twopane</item>
 </resources>

@@ -7,5 +7,5 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <resources>
-    <item type="layout" name="activity_passwd_safe">@layout/activity_passwdsafe_twopane</item>
+    <item type="layout" name="activity_passwdsafe">@layout/activity_passwdsafe_twopane</item>
 </resources>
