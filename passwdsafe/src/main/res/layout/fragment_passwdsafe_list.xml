@@ -52,8 +52,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:text="@string/no_records"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     <!--
     <RelativeLayout
