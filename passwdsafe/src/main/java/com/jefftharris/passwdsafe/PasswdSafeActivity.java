@@ -53,8 +53,15 @@ public class PasswdSafeActivity extends AppCompatActivity
     enum Mode
     {
         /** Initial mode with no file open */
-        INIT
+        INIT,
+        /** Opening a file */
+        FILE_OPEN,
+        /** An open file */
+        OPEN
     }
+
+    /** The open password file */
+    PasswdFileData itsFileData;
 
     /** Fragment managing the behaviors, interactions and presentation of the
      * navigation drawer. */
@@ -83,14 +90,14 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         // Set up the drawer.
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
-        setMode(Mode.INIT);
+        setInitialView();
 
         Intent intent = getIntent();
         PasswdSafeUtil.dbginfo(TAG, "onCreate: %s", intent);
         switch (intent.getAction()) {
         case PasswdSafeUtil.VIEW_INTENT:
         case Intent.ACTION_VIEW: {
-            openFile(intent);
+            setFileOpenView(intent);
             break;
         }
         default: {
@@ -214,28 +221,47 @@ public class PasswdSafeActivity extends AppCompatActivity
     {
         PasswdSafeUtil.dbginfo(TAG, "handleFileOpen: %s, rec: %s",
                                fileData.getUri(), recToOpen);
+
+        // TODO: recToOpen
+        if (itsFileData != null) {
+            itsFileData.close();
+        }
+        itsFileData = fileData;
+        setOpenView();
     }
 
     /**
-     * Open a file
+     * Set the initial view
      */
-    private void openFile(Intent intent)
+    private void setInitialView()
+    {
+        setView(Mode.INIT, null);
+    }
+
+    /**
+     * Set the view for opening a file
+     */
+    private void setFileOpenView(Intent intent)
     {
         Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
         String recToOpen = intent.getData().getQueryParameter("recToOpen");
         Fragment openFrag = PasswdSafeOpenFileFragment.newInstance(openUri,
                                                                    recToOpen);
-
-        FragmentManager fragMgr = getSupportFragmentManager();
-        FragmentTransaction txn = fragMgr.beginTransaction();
-        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        txn.replace(R.id.content, openFrag);
-        setLeftListVisible(false, txn, fragMgr);
-        txn.commit();
+        setView(Mode.FILE_OPEN, openFrag);
     }
 
-    /** Set the mode of the activity */
-    private void setMode(Mode mode)
+    /**
+     * Set the view for an open file
+     */
+    private void setOpenView()
+    {
+        setView(Mode.OPEN, null);
+    }
+
+    /**
+     * Set the view of the activity
+     */
+    private void setView(Mode mode, Fragment contentFrag)
     {
         FragmentManager fragMgr = getSupportFragmentManager();
         //FragmentManager.enableDebugLogging(true);
@@ -243,17 +269,35 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         boolean fileOpen = false;
         boolean showLeftList = false;
+        boolean clearBackStack = false;
         switch (mode) {
-        case INIT: {
-            //noinspection StatementWithEmptyBody
-            while (fragMgr.popBackStackImmediate()) {
-                // Clear back stack
-            }
+        case INIT:
+        case FILE_OPEN: {
+            break;
+        }
+        case OPEN: {
+            fileOpen = true;
+            showLeftList = true;
             break;
         }
         }
         itsNavDrawerFrag.setFileOpen(fileOpen);
+        if (clearBackStack) {
+            //noinspection StatementWithEmptyBody
+            while (fragMgr.popBackStackImmediate()) {
+                // Clear back stack
+            }
+        }
 
+        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        if (contentFrag != null) {
+            txn.replace(R.id.content, contentFrag);
+        } else {
+            Fragment currFrag = fragMgr.findFragmentById(R.id.content);
+            if (currFrag != null) {
+                txn.remove(currFrag);
+            }
+        }
         setLeftListVisible(showLeftList, txn, fragMgr);
         txn.commit();
     }
