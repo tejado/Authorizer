@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="PasswdSafe" basedir=".">
+    <target name="hg-push">
+        <do-hg-push dest=""/>
+        <do-hg-push dest="win"/>
+        <do-hg-push dest="sf"/>
+        <do-hg-push dest="bb"/>
+    </target>
+
+    <macrodef name="do-hg-push">
+        <attribute name="dest"/>
+        <sequential>
+            <exec dir="${basedir}" executable="hg">
+                <arg value="push"/>
+                <arg value="@{dest}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+</project>
