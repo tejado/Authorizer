@@ -315,6 +315,10 @@ public class PasswdSafeOpenFileFragment extends Fragment
         setTitle(R.string.open_file);
         itsPasswordEdit.setEnabled(true);
         itsOkBtn.setEnabled(true);
+        if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
+            itsPasswordEdit.setText("test123");
+            itsOkBtn.performClick();
+        }
     }
 
     /**
