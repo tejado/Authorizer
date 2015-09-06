@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.view.PasswdLocation;
@@ -65,6 +66,8 @@ public class PasswdSafeListFragment extends ListFragment
     private View itsGroupPanel;
     private TextView itsGroupLabel;
     private ItemListAdapter itsAdapter;
+    // TODO: sort case pref
+    private boolean itsIsSortCaseSensitive = false;
 
 
     /** Create a new instance */
@@ -143,7 +146,7 @@ public class PasswdSafeListFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        itsAdapter = new ItemListAdapter(getActivity());
+        itsAdapter = new ItemListAdapter(itsIsSortCaseSensitive, getActivity());
         setListAdapter(itsAdapter);
     }
 
@@ -280,29 +283,49 @@ public class PasswdSafeListFragment extends ListFragment
 
     /** List adapter for file items */
     private static class ItemListAdapter
-            extends ArrayAdapter<PasswdRecordListData>
+            extends ArrayAdapter<PasswdRecordListData> implements SectionIndexer
     {
         private final LayoutInflater itsInflater;
+        private final boolean itsIsCaseSensitive;
+        private Section[] itsSections;
 
         /** Constructor */
-        public ItemListAdapter(Context context)
+        public ItemListAdapter(boolean caseSensitive, Context context)
         {
             super(context, R.layout.passwdsafe_list_item, android.R.id.text1);
             itsInflater = (LayoutInflater)context.getSystemService(
                     Context.LAYOUT_INFLATER_SERVICE);
-
-            // TODO: section list
+            itsIsCaseSensitive = caseSensitive;
         }
 
         /** Set the list data */
         public void setData(List<PasswdRecordListData> data)
         {
+            setNotifyOnChange(false);
             clear();
+            ArrayList<Section> sections = new ArrayList<>();
             if (data != null) {
+                char compChar = '\0';
+                int idx = 0;
                 for (PasswdRecordListData item: data) {
                     add(item);
+
+                    char first = TextUtils.isEmpty(item.itsTitle) ?
+                            ' ' : item.itsTitle.charAt(0);
+                    char compFirst = itsIsCaseSensitive ?
+                            first : Character.toUpperCase(first);
+                    if (compChar != compFirst) {
+                        Section s = new Section(Character.toString(compFirst), idx);
+                        sections.add(s);
+                        compChar = compFirst;
+                    }
+                    ++idx;
                 }
             }
+
+            itsSections = sections.toArray(new Section[sections.size()]);
+            setNotifyOnChange(true);
+            notifyDataSetChanged();
         }
 
         /* (non-Javadoc)
@@ -329,6 +352,35 @@ public class PasswdSafeListFragment extends ListFragment
             return view;
         }
 
+        @Override
+        public int getPositionForSection(int section)
+        {
+            if (section < itsSections.length) {
+                return itsSections[section].itsPos;
+            } else {
+                return 0;
+            }
+        }
+
+        @Override
+        public Object[] getSections()
+        {
+            return itsSections;
+        }
+
+        @Override
+        public int getSectionForPosition(int position)
+        {
+            // Section positions in increasing order
+            for (int i = 0; i < itsSections.length; ++i) {
+                Section s = itsSections[i];
+                if (position <= s.itsPos) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+
         /** Set a text view */
         private static void setTextView(View view, int textId, String str)
         {
@@ -336,6 +388,28 @@ public class PasswdSafeListFragment extends ListFragment
                 str = "";
             }
             ((TextView)view.findViewById(textId)).setText(str);
+        }
+
+        /**
+         * A section object
+         */
+        private static final class Section
+        {
+            public final String itsName;
+            public final int itsPos;
+
+            /** Constructor */
+            public Section(String name, int pos)
+            {
+                itsName = name;
+                itsPos = pos;
+            }
+
+            @Override
+            public final String toString()
+            {
+                return itsName;
+            }
         }
     }
 
