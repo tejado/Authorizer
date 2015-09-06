@@ -6,7 +6,6 @@
     android:orientation="vertical"
     tools:context=".PasswdSafeListFragment">
 
-    <!--
     <RelativeLayout
         android:id="@+id/current_group_panel"
         android:layout_width="fill_parent"
@@ -29,6 +28,7 @@
             android:layout_alignTop="@id/current_group_icon"
             android:layout_marginBottom="2dp"
             android:layout_toRightOf="@id/current_group_icon"
+            android:layout_toEndOf="@id/current_group_icon"
             android:gravity="center_vertical"
             android:text="@string/group"/>
 
@@ -36,7 +36,6 @@
             style="@style/Separator.Light"
             android:layout_below="@id/current_group_label"/>
     </RelativeLayout>
-    -->
 
     <ListView
         android:id="@android:id/list"
