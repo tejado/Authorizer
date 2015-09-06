@@ -316,7 +316,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
         itsPasswordEdit.setEnabled(true);
         itsOkBtn.setEnabled(true);
         //noinspection ConstantConditions
-        if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
+        if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
+            (itsFileUri.getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
             itsPasswordEdit.setText("test123");
             itsOkBtn.performClick();
         }
