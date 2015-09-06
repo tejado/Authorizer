@@ -143,6 +143,7 @@ public class PasswdFileDataView
 
         itsRootNode = new GroupNode();
         if (itsFileData == null) {
+            updateCurrentGroup();
             return;
         }
 
