@@ -288,6 +288,7 @@ public class PasswdSafeListFragment extends ListFragment
         private final LayoutInflater itsInflater;
         private final boolean itsIsCaseSensitive;
         private Section[] itsSections;
+        // TODO: keep fast scrolling??
 
         /** Constructor */
         public ItemListAdapter(boolean caseSensitive, Context context)
@@ -334,22 +335,18 @@ public class PasswdSafeListFragment extends ListFragment
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            View view;
+            ViewHolder itemViews;
             if (convertView == null) {
-                view = itsInflater.inflate(R.layout.passwdsafe_list_item,
-                                           parent, false);
+                convertView = itsInflater.inflate(R.layout.passwdsafe_list_item,
+                                                  parent, false);
+                itemViews = new ViewHolder(convertView);
+                convertView.setTag(itemViews);
             } else {
-                view = convertView;
+                itemViews = (ViewHolder)convertView.getTag();
             }
 
-            // TODO: view holder
-
-            PasswdRecordListData item = getItem(position);
-            setTextView(view, android.R.id.text1, item.itsTitle);
-            setTextView(view, android.R.id.text2, item.itsUser);
-            setTextView(view, R.id.match, item.itsMatch);
-            ((ImageView)view.findViewById(R.id.icon)).setImageResource(item.itsIcon);
-            return view;
+            itemViews.update(getItem(position));
+            return convertView;
         }
 
         @Override
@@ -381,13 +378,46 @@ public class PasswdSafeListFragment extends ListFragment
             return 0;
         }
 
-        /** Set a text view */
-        private static void setTextView(View view, int textId, String str)
+        /**
+         * Holder for the views for an item in the list
+         */
+        private static class ViewHolder
         {
-            if (str == null) {
-                str = "";
+            private final TextView itsTitle;
+            private final TextView itsUser;
+            private final TextView itsMatch;
+            private final ImageView itsIcon;
+            private int itsLastIconImage;
+
+            /** Constructor */
+            public ViewHolder(View view)
+            {
+                itsTitle = (TextView)view.findViewById(android.R.id.text1);
+                itsUser = (TextView)view.findViewById(android.R.id.text2);
+                itsMatch = (TextView)view.findViewById(R.id.match);
+                itsIcon = (ImageView)view.findViewById(R.id.icon);
+                itsLastIconImage = -1;
             }
-            ((TextView)view.findViewById(textId)).setText(str);
+
+            /** Update the fields for a list item */
+            public void update(PasswdRecordListData item)
+            {
+                setText(itsTitle, item.itsTitle);
+                setText(itsUser, item.itsUser);
+                setText(itsMatch, item.itsMatch);
+                if (itsLastIconImage != item.itsIcon) {
+                    itsIcon.setImageResource(item.itsIcon);
+                    itsLastIconImage = item.itsIcon;
+                }
+
+                itsTitle.requestLayout();
+            }
+
+            /** Set text in a field */
+            private static void setText(TextView tv, String text)
+            {
+                tv.setText((text == null) ? "" : text);
+            }
         }
 
         /**
