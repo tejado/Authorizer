@@ -78,7 +78,7 @@ public class PasswdSafeListFragment extends ListFragment
         PasswdSafeListFragment frag = new PasswdSafeListFragment();
         Bundle args = new Bundle();
         args.putString("mode", mode.toString());
-        args.putStringArrayList("groups", location.getGroups());
+        args.putParcelable("location", location);
         args.putBoolean("isContents", isContents);
         frag.setArguments(args);
         return frag;
@@ -95,16 +95,18 @@ public class PasswdSafeListFragment extends ListFragment
         Bundle args = getArguments();
 
         String modestr = null;
-        ArrayList<String> groups = null;
+        PasswdLocation location;
         boolean isContents = false;
         if (args != null) {
             modestr = args.getString("mode");
-            groups = args.getStringArrayList("groups");
+            location = args.getParcelable("location");
             isContents = args.getBoolean("isContents", false);
+        } else {
+            location = new PasswdLocation();
         }
         itsMode = (modestr == null) ?
                 Listener.Mode.GROUPS : Listener.Mode.valueOf(modestr);
-        itsLocation = new PasswdLocation(groups);
+        itsLocation = location;
         itsIsContents = isContents;
     }
 
