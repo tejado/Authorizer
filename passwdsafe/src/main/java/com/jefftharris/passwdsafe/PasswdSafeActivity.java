@@ -39,6 +39,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         implements PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
                    PasswdSafeNavDrawerFragment.Listener,
+                   PasswdSafeRecordBasicFragment.Listener,
                    PasswdSafeRecordFragment.Listener
 {
     // TODO: new files

@@ -10,11 +10,13 @@ package com.jefftharris.passwdsafe;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
@@ -84,37 +86,65 @@ public class PasswdSafeRecordFragment extends Fragment
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record,
                                      container, false);
         itsTitle = (TextView)root.findViewById(R.id.title);
+
+        final ViewPager viewPager = (ViewPager)root.findViewById(R.id.viewpager);
+        viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager())
+        {
+            @Override
+            public Fragment getItem(int position)
+            {
+                switch (position) {
+                case 0:
+                case 1:
+                case 2: {
+                    return PasswdSafeRecordBasicFragment.newInstance(
+                            itsLocation.getRecord());
+                }
+                }
+                return null;
+            }
+
+            @Override
+            public int getCount()
+            {
+                return 3;
+            }
+
+            @Override
+            public CharSequence getPageTitle(int position)
+            {
+                switch (position) {
+                case 0: {
+                    return getString(R.string.basic);
+                }
+                case 1: {
+                    return getString(R.string.password);
+                }
+                case 2: {
+                    return getString(R.string.notes);
+                }
+                }
+                return null;
+            }
+        });
+
+        final TabLayout tabLayout = (TabLayout)root.findViewById(R.id.tabs);
+        tabLayout.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                tabLayout.setupWithViewPager(viewPager);
+            }
+        });
+
         return root;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
-        super.onActivityCreated(savedInstanceState);
-
-        TabHost tabHost = (TabHost)getView();
-        if (tabHost == null) {
-            return;
-        }
-
-        tabHost.setup();
-        tabHost.addTab(tabHost.newTabSpec("basic")
-                              .setIndicator(getString(R.string.basic))
-                              .setContent(R.id.basic_tab));
-        tabHost.addTab(tabHost.newTabSpec("password")
-                              .setIndicator(getString(R.string.password))
-                              .setContent(R.id.password_tab));
-        tabHost.addTab(tabHost.newTabSpec("notes")
-                              .setIndicator(getString(R.string.notes))
-                              .setContent(R.id.notes_tab));
-        tabHost.setCurrentTab(0);
     }
 
     @Override
     public void onResume()
     {
         super.onResume();
-
         itsListener.updateLocationView(itsLocation);
         refresh();
     }
