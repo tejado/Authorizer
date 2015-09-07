@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -312,6 +313,15 @@ public class PasswdSafeActivity extends AppCompatActivity
         PasswdSafeUtil.dbginfo(TAG, "updateLocationView: %s", location);
         itsLocation = location;
         itsFileDataView.setCurrGroups(itsLocation.getGroups());
+
+        String groups = location.getGroupPath();
+        if (!TextUtils.isEmpty(groups)) {
+            itsTitle = PasswdSafeApp.getAppTitle(groups, this);
+        } else {
+            itsTitle = PasswdSafeApp.getAppFileTitle(itsFileData.getUri(),
+                                                     this);
+        }
+        restoreActionBar();
 
         if (itsIsTwoPane) {
             PasswdSafeListFragment.Listener.Mode listMode =
