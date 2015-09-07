@@ -73,6 +73,12 @@ public class PasswdLocation implements Parcelable
         return TextUtils.join(" / ", itsGroups);
     }
 
+    /** Does the location represent a record */
+    public boolean isRecord()
+    {
+        return itsRecord != null;
+    }
+
     /** Get the location's specific record; null for no record */
     public String getRecord()
     {

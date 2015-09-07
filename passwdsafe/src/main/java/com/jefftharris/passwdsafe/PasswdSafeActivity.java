@@ -28,6 +28,8 @@ import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdRecordListData;
 
+import org.pwsafe.lib.file.PwsRecord;
+
 import java.util.List;
 
 /**
@@ -36,7 +38,8 @@ import java.util.List;
 public class PasswdSafeActivity extends AppCompatActivity
         implements PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
-                   PasswdSafeNavDrawerFragment.Listener
+                   PasswdSafeNavDrawerFragment.Listener,
+                   PasswdSafeRecordFragment.Listener
 {
     // TODO: new files
     // TODO: rotation support without having to reopen file
@@ -55,6 +58,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: modern theme
     // TODO: file close/lock timeout
     // TODO: autobackup
+    // TODO: keyboard support
+    // TODO: shortcuts
 
     enum Mode
     {
@@ -65,7 +70,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Initial mode for an open file */
         OPEN_INIT,
         /** An open file */
-        OPEN
+        OPEN,
+        /** A record */
+        RECORD
     }
 
     /** The open password file */
@@ -314,18 +321,29 @@ public class PasswdSafeActivity extends AppCompatActivity
         itsLocation = location;
         itsFileDataView.setCurrGroups(itsLocation.getGroups());
 
-        String groups = location.getGroupPath();
-        if (!TextUtils.isEmpty(groups)) {
-            itsTitle = PasswdSafeApp.getAppTitle(groups, this);
+        if (itsFileData == null) {
+            itsTitle = PasswdSafeApp.getAppTitle(null, this);
         } else {
-            itsTitle = PasswdSafeApp.getAppFileTitle(itsFileData.getUri(),
-                                                     this);
+            if (location.isRecord()) {
+                PwsRecord rec = itsFileData.getRecord(location.getRecord());
+                itsTitle = itsFileData.getTitle(rec);
+            } else {
+                String groups = location.getGroupPath();
+                if (!TextUtils.isEmpty(groups)) {
+                    itsTitle = PasswdSafeApp.getAppTitle(groups, this);
+                } else {
+                    itsTitle = PasswdSafeApp.getAppFileTitle(
+                            itsFileData.getUri(), this);
+                }
+            }
         }
         restoreActionBar();
 
         if (itsIsTwoPane) {
+            // TODO: show selected item in left list with record selected
+
             PasswdSafeListFragment.Listener.Mode listMode =
-                    (itsLocation.getRecord() != null) ?
+                    itsLocation.isRecord() ?
                             PasswdSafeListFragment.Listener.Mode.ALL :
                             PasswdSafeListFragment.Listener.Mode.GROUPS;
             FragmentManager fragMgr = getSupportFragmentManager();
@@ -336,6 +354,15 @@ public class PasswdSafeActivity extends AppCompatActivity
             }
         }
 
+    }
+
+    /**
+     * Get the file data
+     */
+    @Override
+    public PasswdFileData getFileData()
+    {
+        return itsFileData;
     }
 
     /**
@@ -363,13 +390,19 @@ public class PasswdSafeActivity extends AppCompatActivity
      */
     private void setOpenView(PasswdLocation location, boolean initial)
     {
-        PasswdSafeListFragment.Listener.Mode mode =
-                itsIsTwoPane ? PasswdSafeListFragment.Listener.Mode.RECORDS :
-                        PasswdSafeListFragment.Listener.Mode.ALL;
-        Fragment viewFrag = PasswdSafeListFragment.newInstance(
-                mode, location, true);
+        Fragment viewFrag;
+        Mode viewMode;
+        if (location.isRecord()) {
+            viewFrag = PasswdSafeRecordFragment.newInstance(location);
+            viewMode = Mode.RECORD;
+        } else {
+            PasswdSafeListFragment.Listener.Mode mode =
+                    itsIsTwoPane ? PasswdSafeListFragment.Listener.Mode.RECORDS :
+                            PasswdSafeListFragment.Listener.Mode.ALL;
+            viewFrag = PasswdSafeListFragment.newInstance(mode, location, true);
 
-        Mode viewMode = initial ? Mode.OPEN_INIT : Mode.OPEN;
+            viewMode = initial ? Mode.OPEN_INIT : Mode.OPEN;
+        }
         setView(viewMode, viewFrag);
     }
 
@@ -403,7 +436,8 @@ public class PasswdSafeActivity extends AppCompatActivity
             clearBackStack = true;
             break;
         }
-        case OPEN: {
+        case OPEN:
+        case RECORD: {
             fileOpen = true;
             showLeftList = true;
             supportsBack = true;
