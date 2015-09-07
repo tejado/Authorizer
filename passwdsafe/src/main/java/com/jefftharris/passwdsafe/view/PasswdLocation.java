@@ -9,13 +9,28 @@ package com.jefftharris.passwdsafe.view;
 
 import java.util.ArrayList;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 /**
  * The PasswdLocation class encapsulates a location within a password file
  */
-public class PasswdLocation
+public class PasswdLocation implements Parcelable
 {
+    public static final Parcelable.Creator<PasswdLocation> CREATOR =
+            new Parcelable.Creator<PasswdLocation>() {
+                public PasswdLocation createFromParcel(Parcel in)
+                {
+                    return new PasswdLocation(in);
+                }
+
+                public PasswdLocation[] newArray(int size)
+                {
+                    return new PasswdLocation[size];
+                }
+            };
+
     private final ArrayList<String> itsGroups = new ArrayList<>();
     private final String itsRecord;
 
@@ -25,12 +40,6 @@ public class PasswdLocation
         this(null, null);
     }
 
-    /** Constructor with groups */
-    public PasswdLocation(ArrayList<String> groups)
-    {
-        this(groups, null);
-    }
-
     /** Constructor with groups and a specific record */
     public PasswdLocation(ArrayList<String> groups, String record)
     {
@@ -38,6 +47,18 @@ public class PasswdLocation
             itsGroups.addAll(groups);
         }
         itsRecord = record;
+    }
+
+    /** Constructor from a parcel */
+    public PasswdLocation(Parcel parcel)
+    {
+        parcel.readStringList(itsGroups);
+        byte hasRecord = parcel.readByte();
+        if (hasRecord != 0) {
+            itsRecord = parcel.readString();
+        } else {
+            itsRecord = null;
+        }
     }
 
     /** Get the location's groups */
@@ -80,6 +101,22 @@ public class PasswdLocation
             loc.itsGroups.remove(loc.itsGroups.size() - 1);
         }
         return loc;
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags)
+    {
+        parcel.writeStringList(itsGroups);
+        parcel.writeByte((byte)((itsRecord != null) ? 1 : 0));
+        if (itsRecord != null) {
+            parcel.writeString(itsRecord);
+        }
     }
 
     /* (non-Javadoc)
