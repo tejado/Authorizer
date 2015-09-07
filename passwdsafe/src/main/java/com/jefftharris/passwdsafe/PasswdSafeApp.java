@@ -27,6 +27,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
@@ -426,14 +427,22 @@ public class PasswdSafeApp extends Application
 
     public static String getAppFileTitle(PasswdFileUri uri, Context ctx)
     {
-        StringBuilder builder =
-                new StringBuilder(PasswdSafeUtil.getAppTitle(ctx));
-        if (uri != null) {
-            builder.append(" - ");
-            builder.append(uri.getIdentifier(ctx, true));
-        }
-        return builder.toString();
+        return getAppTitle((uri != null) ? uri.getIdentifier(ctx, true) : null,
+                           ctx);
+    }
 
+    /**
+     * Get a title for the application
+     */
+    public static String getAppTitle(String title, Context ctx)
+    {
+        StringBuilder builder = new StringBuilder();
+        if (!TextUtils.isEmpty(title)) {
+            builder.append(title);
+            builder.append(" - ");
+        }
+        builder.append(PasswdSafeUtil.getAppTitle(ctx));
+        return builder.toString();
     }
 
     private synchronized void updateFileCloseTimeoutPref(
