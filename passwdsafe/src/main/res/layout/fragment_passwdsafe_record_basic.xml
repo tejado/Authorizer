@@ -5,10 +5,31 @@
   ~ distributed with this code, or available from
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.jefftharris.passwdsafe.PasswdSafeRecordBasicFragment">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.jefftharris.passwdsafe.PasswdSafeRecordBasicFragment">
 
-</TextView>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="6dp"
+                  android:orientation="vertical">
+
+        <LinearLayout android:id="@+id/user_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/username_header" />
+
+            <View style="@style/Separator"/>
+
+            <TextView android:id="@+id/user"
+                      style="@style/RecordField.Large"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</ScrollView>
