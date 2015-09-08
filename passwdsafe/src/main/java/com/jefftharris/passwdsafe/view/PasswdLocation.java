@@ -8,10 +8,15 @@
 package com.jefftharris.passwdsafe.view;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+
+import org.pwsafe.lib.file.PwsRecord;
 
 /**
  * The PasswdLocation class encapsulates a location within a password file
@@ -37,7 +42,7 @@ public class PasswdLocation implements Parcelable
     /** Default constructor */
     public PasswdLocation()
     {
-        this(null, null);
+        itsRecord = null;
     }
 
     /** Constructor with groups and a specific record */
@@ -47,6 +52,18 @@ public class PasswdLocation implements Parcelable
             itsGroups.addAll(groups);
         }
         itsRecord = record;
+    }
+
+    /** Constructor from a password record */
+    public PasswdLocation(PwsRecord rec, PasswdFileData fileData)
+    {
+        String group = fileData.getGroup(rec);
+        if (!TextUtils.isEmpty(group)) {
+            String[] groups = TextUtils.split(group, "\\.");
+            // TODO: deal with escaped .s?
+            Collections.addAll(itsGroups, groups);
+        }
+        itsRecord = fileData.getUUID(rec);
     }
 
     /** Constructor from a parcel */
