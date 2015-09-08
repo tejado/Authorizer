@@ -20,7 +20,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -29,6 +31,7 @@ import org.pwsafe.lib.file.PwsRecord;
  * Fragment for showing basic fields of a password record
  */
 public class PasswdSafeRecordBasicFragment extends Fragment
+        implements View.OnClickListener
 {
     /**
      * Listener interface for owning activity
@@ -37,9 +40,15 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     {
         /** Get the file data */
         PasswdFileData getFileData();
+
+        /** Change the location in the password file */
+        void changeLocation(PasswdLocation location);
     }
 
     private String itsRecUuid;
+    private View itsBaseRow;
+    private TextView itsBaseLabel;
+    private TextView itsBase;
     private View itsGroupRow;
     private TextView itsGroup;
     private View itsUserRow;
@@ -79,11 +88,16 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record_basic,
                                      container, false);
+        itsBaseRow = root.findViewById(R.id.base_row);
+        itsBaseRow.setOnClickListener(this);
+        itsBaseLabel = (TextView)root.findViewById(R.id.base_label);
+        itsBaseLabel.setOnClickListener(this);
+        itsBase = (TextView)root.findViewById(R.id.base);
+        itsBase.setOnClickListener(this);
         itsGroupRow = root.findViewById(R.id.group_row);
         itsGroup = (TextView)root.findViewById(R.id.group);
         itsUserRow = root.findViewById(R.id.user_row);
         itsUser = (TextView)root.findViewById(R.id.user);
-
         return root;
     }
 
@@ -123,6 +137,18 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         }
     }
 
+    @Override
+    public void onClick(View view)
+    {
+        switch (view.getId()) {
+        case R.id.base_row:
+        case R.id.base_label:
+        case R.id.base: {
+            showRefRec(true, 0);
+        }
+        }
+    }
+
     /**
      * Refresh the view
      */
@@ -142,8 +168,56 @@ public class PasswdSafeRecordBasicFragment extends Fragment
             return;
         }
 
+        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+
+        PwsRecord ref = passwdRec.getRef();
+        switch (passwdRec.getType()) {
+        case NORMAL: {
+            itsBaseRow.setVisibility(View.GONE);
+            break;
+        }
+        case ALIAS: {
+            itsBaseRow.setVisibility(View.VISIBLE);
+            itsBaseLabel.setText(R.string.alias_base_record_header);
+            itsBase.setText(fileData.getId(ref));
+        }
+        case SHORTCUT: {
+            itsBaseRow.setVisibility(View.VISIBLE);
+            itsBaseLabel.setText(R.string.shortcut_base_record_header);
+            itsBase.setText(fileData.getId(ref));
+        }
+        }
+
         setFieldText(itsGroup, itsGroupRow, fileData.getGroup(rec));
         setFieldText(itsUser, itsUserRow, fileData.getUsername(rec));
+    }
+
+    /**
+     * Show a referenced record
+     */
+    private void showRefRec(boolean baseRef, int referencingPos)
+    {
+        PasswdFileData fileData = itsListener.getFileData();
+        if (fileData == null) {
+            return;
+        }
+
+        PwsRecord rec = fileData.getRecord(itsRecUuid);
+        if (rec == null) {
+            return;
+        }
+
+        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+        PwsRecord refRec = null;
+        if (baseRef) {
+            refRec = passwdRec.getRef();
+        }
+        if (refRec == null) {
+            return;
+        }
+
+        PasswdLocation location = new PasswdLocation(refRec, fileData);
+        itsListener.changeLocation(location);
     }
 
     /**

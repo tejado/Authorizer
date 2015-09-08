@@ -14,7 +14,41 @@
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="vertical"
-                  android:padding="6dp">
+                  android:layout_marginTop="6dp">
+
+        <LinearLayout android:id="@+id/base_row"
+                      style="@style/RecordRow">
+
+            <TextView android:id="@+id/base_label"
+                      style="@style/RecordHeader"/>
+
+            <View style="@style/Separator"/>
+
+            <RelativeLayout android:id="@+id/base_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true">
+
+                <Button android:id="@+id/base_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:text="@string/go_to"/>
+
+                <TextView android:id="@+id/base"
+                          style="@style/RecordField.Large"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentStart="true"
+                          android:layout_toLeftOf="@id/base_btn"
+                          android:layout_toStartOf="@id/base_btn"
+                          android:clickable="true"
+                          android:layout_alignParentBottom="false"
+                          android:layout_alignParentTop="false"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
 
         <LinearLayout android:id="@+id/group_row"
                       style="@style/RecordRow">
