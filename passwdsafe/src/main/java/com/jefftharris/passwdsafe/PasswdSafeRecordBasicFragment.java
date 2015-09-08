@@ -40,6 +40,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     }
 
     private String itsRecUuid;
+    private View itsGroupRow;
+    private TextView itsGroup;
     private View itsUserRow;
     private TextView itsUser;
     private Listener itsListener;
@@ -77,6 +79,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record_basic,
                                      container, false);
+        itsGroupRow = root.findViewById(R.id.group_row);
+        itsGroup = (TextView)root.findViewById(R.id.group);
         itsUserRow = root.findViewById(R.id.user_row);
         itsUser = (TextView)root.findViewById(R.id.user);
 
@@ -138,6 +142,7 @@ public class PasswdSafeRecordBasicFragment extends Fragment
             return;
         }
 
+        setFieldText(itsGroup, itsGroupRow, fileData.getGroup(rec));
         setFieldText(itsUser, itsUserRow, fileData.getUsername(rec));
     }
 
