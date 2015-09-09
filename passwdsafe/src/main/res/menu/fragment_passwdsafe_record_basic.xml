@@ -11,4 +11,7 @@
     <item android:id="@+id/menu_copy_user"
           android:title="@string/copy_user"/>
 
+    <item android:id="@+id/menu_toggle_password"
+          android:title="@string/show_password"/>
+
 </menu>

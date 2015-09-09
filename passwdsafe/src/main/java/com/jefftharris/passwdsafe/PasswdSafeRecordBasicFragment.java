@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,11 +18,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -46,6 +49,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     }
 
     private String itsRecUuid;
+    private boolean itsIsPasswordShown = false;
+    private String itsHiddenPasswordStr;
     private View itsBaseRow;
     private TextView itsBaseLabel;
     private TextView itsBase;
@@ -53,6 +58,9 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     private TextView itsGroup;
     private View itsUserRow;
     private TextView itsUser;
+    private View itsPasswordRow;
+    private TextView itsPassword;
+    private SeekBar itsPasswordSeek;
     private Listener itsListener;
 
     public static PasswdSafeRecordBasicFragment newInstance(String recUuid)
@@ -91,13 +99,39 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         itsBaseRow = root.findViewById(R.id.base_row);
         itsBaseRow.setOnClickListener(this);
         itsBaseLabel = (TextView)root.findViewById(R.id.base_label);
-        itsBaseLabel.setOnClickListener(this);
         itsBase = (TextView)root.findViewById(R.id.base);
-        itsBase.setOnClickListener(this);
+        View baseBtn = root.findViewById(R.id.base_btn);
+        baseBtn.setOnClickListener(this);
         itsGroupRow = root.findViewById(R.id.group_row);
         itsGroup = (TextView)root.findViewById(R.id.group);
         itsUserRow = root.findViewById(R.id.user_row);
         itsUser = (TextView)root.findViewById(R.id.user);
+        itsPasswordRow = root.findViewById(R.id.password_row);
+        itsPasswordRow.setOnClickListener(this);
+        itsPassword = (TextView)root.findViewById(R.id.password);
+        itsPasswordSeek = (SeekBar)root.findViewById(R.id.password_seek);
+        itsPasswordSeek.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener()
+                {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress,
+                                                  boolean fromUser)
+                    {
+                        if (fromUser) {
+                            updatePasswordShown(false, progress);
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar)
+                    {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar)
+                    {
+                    }
+                });
         return root;
     }
 
@@ -123,12 +157,27 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem item = menu.findItem(R.id.menu_toggle_password);
+        item.setTitle(itsIsPasswordShown ?
+                              R.string.hide_password : R.string.show_password);
+        item.setEnabled(itsPasswordRow.getVisibility() == View.VISIBLE);
+
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
         case R.id.menu_copy_user: {
             PasswdSafeUtil.copyToClipboard(itsUser.getText().toString(),
                                            getActivity());
+            return true;
+        }
+        case R.id.menu_toggle_password: {
+            updatePasswordShown(true, 0);
             return true;
         }
         default: {
@@ -142,9 +191,13 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     {
         switch (view.getId()) {
         case R.id.base_row:
-        case R.id.base_label:
-        case R.id.base: {
+        case R.id.base_btn: {
             showRefRec(true, 0);
+            break;
+        }
+        case R.id.password_row: {
+            updatePasswordShown(true, 0);
+            break;
         }
         }
     }
@@ -171,6 +224,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
 
         PwsRecord ref = passwdRec.getRef();
+        PwsRecord recForPassword = rec;
+        int hiddenId = R.string.hidden_password_normal;
         switch (passwdRec.getType()) {
         case NORMAL: {
             itsBaseRow.setVisibility(View.GONE);
@@ -180,16 +235,32 @@ public class PasswdSafeRecordBasicFragment extends Fragment
             itsBaseRow.setVisibility(View.VISIBLE);
             itsBaseLabel.setText(R.string.alias_base_record_header);
             itsBase.setText(fileData.getId(ref));
+            hiddenId = R.string.hidden_password_alias;
+            recForPassword = ref;
+            break;
         }
         case SHORTCUT: {
             itsBaseRow.setVisibility(View.VISIBLE);
             itsBaseLabel.setText(R.string.shortcut_base_record_header);
             itsBase.setText(fileData.getId(ref));
+            hiddenId = R.string.hidden_password_shortcut;
+            recForPassword = ref;
+            break;
         }
         }
 
         setFieldText(itsGroup, itsGroupRow, fileData.getGroup(rec));
         setFieldText(itsUser, itsUserRow, fileData.getUsername(rec));
+
+        itsIsPasswordShown = false;
+        itsHiddenPasswordStr = getString(hiddenId);
+        String password = fileData.getPassword(recForPassword);
+        setFieldText(itsPassword, itsPasswordRow,
+                     ((password != null) ? itsHiddenPasswordStr : null));
+        itsPasswordSeek.setMax((password != null) ? password.length() : 0);
+        itsPasswordSeek.setProgress(0);
+
+        GuiUtils.invalidateOptionsMenu(getActivity());
     }
 
     /**
@@ -218,6 +289,67 @@ public class PasswdSafeRecordBasicFragment extends Fragment
 
         PasswdLocation location = new PasswdLocation(refRec, fileData);
         itsListener.changeLocation(location);
+    }
+
+    /**
+     * Update whether the password is shown
+     */
+    private void updatePasswordShown(boolean isToggle, int progress)
+    {
+        String password;
+        if (isToggle) {
+            itsIsPasswordShown = !itsIsPasswordShown;
+            password = itsIsPasswordShown ? getPassword() : itsHiddenPasswordStr;
+            itsPasswordSeek.setProgress(
+                    itsIsPasswordShown ? itsPasswordSeek.getMax() : 0);
+        } else if (progress == 0) {
+            itsIsPasswordShown = false;
+            password = itsHiddenPasswordStr;
+        } else {
+            itsIsPasswordShown = true;
+            password = getPassword();
+            if ((password != null) && (progress < password.length())) {
+                password = password.substring(0, progress) + "…";
+            }
+        }
+        itsPassword.setText(password);
+        itsPassword.setTypeface(
+                itsIsPasswordShown ? Typeface.MONOSPACE : Typeface.DEFAULT);
+        GuiUtils.invalidateOptionsMenu(getActivity());
+    }
+
+    /**
+     * Get the password
+     */
+    private String getPassword()
+    {
+        if (!isAdded() || (itsListener == null)) {
+            return null;
+        }
+
+        PasswdFileData fileData = itsListener.getFileData();
+        if (fileData == null) {
+            return null;
+        }
+
+        // TODO: save off record and filedata?
+        PwsRecord rec = fileData.getRecord(itsRecUuid);
+        if (rec == null) {
+            return null;
+        }
+
+        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+        switch (passwdRec.getType()) {
+        case NORMAL: {
+            return fileData.getPassword(rec);
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            return fileData.getPassword(passwdRec.getRef());
+        }
+        }
+
+        return null;
     }
 
     /**

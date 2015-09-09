@@ -13,38 +13,41 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:orientation="vertical"
-                  android:layout_marginTop="6dp">
+                  android:layout_marginTop="6dp"
+                  android:orientation="vertical">
 
         <LinearLayout android:id="@+id/base_row"
-                      style="@style/RecordRow">
+                      style="@style/RecordRow"
+                      android:clickable="true">
 
             <TextView android:id="@+id/base_label"
-                      style="@style/RecordHeader"/>
+                      style="@style/RecordHeader"
+                      android:clickable="false"/>
 
-            <View style="@style/Separator"/>
+            <View style="@style/Separator"
+                  android:clickable="false"/>
 
             <RelativeLayout android:id="@+id/base_group"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:clickable="true">
+                            android:clickable="false">
 
                 <Button android:id="@+id/base_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
                         android:text="@string/go_to"/>
 
                 <TextView android:id="@+id/base"
                           style="@style/RecordField.Large"
+                          android:layout_alignParentBottom="false"
                           android:layout_alignParentLeft="true"
                           android:layout_alignParentStart="true"
+                          android:layout_alignParentTop="false"
                           android:layout_toLeftOf="@id/base_btn"
                           android:layout_toStartOf="@id/base_btn"
-                          android:clickable="true"
-                          android:layout_alignParentBottom="false"
-                          android:layout_alignParentTop="false"/>
+                          android:clickable="false"/>
 
             </RelativeLayout>
 
@@ -74,6 +77,35 @@
             <TextView android:id="@+id/user"
                       style="@style/RecordField.Large"/>
 
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/password_row"
+                      style="@style/RecordRow"
+                      android:clickable="true">
+
+            <TextView style="@style/RecordHeader"
+                      android:clickable="false"
+                      android:text="@string/password_header" />
+
+            <View style="@style/Separator"
+                  android:clickable="false"/>
+
+            <LinearLayout style="@style/RecordField.Large"
+                          android:clickable="false"
+                          android:orientation="vertical">
+
+                <TextView android:id="@+id/password"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:clickable="false"
+                          android:textAppearance="?android:textAppearanceLarge" />
+
+                <SeekBar android:id="@+id/password_seek"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
