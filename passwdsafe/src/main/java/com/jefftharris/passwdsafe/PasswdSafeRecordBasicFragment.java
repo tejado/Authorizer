@@ -61,6 +61,10 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     private View itsPasswordRow;
     private TextView itsPassword;
     private SeekBar itsPasswordSeek;
+    private View itsUrlRow;
+    private TextView itsUrl;
+    private View itsEmailRow;
+    private TextView itsEmail;
     private Listener itsListener;
 
     public static PasswdSafeRecordBasicFragment newInstance(String recUuid)
@@ -132,6 +136,10 @@ public class PasswdSafeRecordBasicFragment extends Fragment
                     {
                     }
                 });
+        itsUrlRow = root.findViewById(R.id.url_row);
+        itsUrl = (TextView)root.findViewById(R.id.url);
+        itsEmailRow = root.findViewById(R.id.email_row);
+        itsEmail = (TextView)root.findViewById(R.id.email);
         return root;
     }
 
@@ -226,9 +234,13 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         PwsRecord ref = passwdRec.getRef();
         PwsRecord recForPassword = rec;
         int hiddenId = R.string.hidden_password_normal;
+        String url = null;
+        String email = null;
         switch (passwdRec.getType()) {
         case NORMAL: {
             itsBaseRow.setVisibility(View.GONE);
+            url = fileData.getURL(rec);
+            email = fileData.getEmail(rec);
             break;
         }
         case ALIAS: {
@@ -237,6 +249,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
             itsBase.setText(fileData.getId(ref));
             hiddenId = R.string.hidden_password_alias;
             recForPassword = ref;
+            url = fileData.getURL(rec);
+            email = fileData.getEmail(rec);
             break;
         }
         case SHORTCUT: {
@@ -259,6 +273,9 @@ public class PasswdSafeRecordBasicFragment extends Fragment
                      ((password != null) ? itsHiddenPasswordStr : null));
         itsPasswordSeek.setMax((password != null) ? password.length() : 0);
         itsPasswordSeek.setProgress(0);
+
+        setFieldText(itsUrl, itsUrlRow, url);
+        setFieldText(itsEmail, itsEmailRow, email);
 
         GuiUtils.invalidateOptionsMenu(getActivity());
     }

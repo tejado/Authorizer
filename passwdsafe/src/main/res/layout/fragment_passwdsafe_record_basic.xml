@@ -106,6 +106,35 @@
 
 
             </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/url_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/url" />
+
+            <View style="@style/Separator"/>
+
+            <TextView android:id="@+id/url"
+                      style="@style/RecordField"
+                      android:autoLink="web"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/email_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/email_header" />
+
+            <View style="@style/Separator"/>
+
+            <TextView android:id="@+id/email"
+                      style="@style/RecordField"
+                      android:autoLink="email"/>
+
         </LinearLayout>
 
     </LinearLayout>

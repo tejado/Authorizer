@@ -61,6 +61,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: autobackup
     // TODO: keyboard support
     // TODO: shortcuts
+    // TODO: hide app (or certain views) from recent apps list
 
     enum Mode
     {
