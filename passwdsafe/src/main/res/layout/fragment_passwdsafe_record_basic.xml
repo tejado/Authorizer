@@ -172,6 +172,19 @@
 
         </LinearLayout>
 
+        <LinearLayout android:id="@+id/protected_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/protected_record_header" />
+
+            <View style="@style/Separator"/>
+
+            <TextView style="@style/RecordField"
+                      android:text="@string/unprotect_to_modify"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </ScrollView>

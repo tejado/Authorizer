@@ -74,6 +74,7 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     private TextView itsCreationTime;
     private View itsLastModTimeRow;
     private TextView itsLastModTime;
+    private View itsProtectedRow;
 
     public static PasswdSafeRecordBasicFragment newInstance(String recUuid)
     {
@@ -153,6 +154,7 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         itsCreationTime = (TextView)root.findViewById(R.id.creation_time);
         itsLastModTimeRow = root.findViewById(R.id.last_mod_time_row);
         itsLastModTime = (TextView)root.findViewById(R.id.last_mod_time);
+        itsProtectedRow = root.findViewById(R.id.protected_row);
         return root;
     }
 
@@ -175,6 +177,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     {
         inflater.inflate(R.menu.fragment_passwdsafe_record_basic, menu);
         super.onCreateOptionsMenu(menu, inflater);
+
+        // TODO: all menu options
     }
 
     @Override
@@ -302,6 +306,7 @@ public class PasswdSafeRecordBasicFragment extends Fragment
                             (creationTime != null) || (lastModTime != null));
         setFieldDate(itsCreationTime, itsCreationTimeRow, creationTime);
         setFieldDate(itsLastModTime, itsLastModTimeRow, lastModTime);
+        GuiUtils.setVisible(itsProtectedRow, fileData.isProtected(rec));
 
         GuiUtils.invalidateOptionsMenu(getActivity());
     }
