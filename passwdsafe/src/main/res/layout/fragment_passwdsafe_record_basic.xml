@@ -137,6 +137,41 @@
 
         </LinearLayout>
 
+        <LinearLayout android:id="@+id/times_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/times_header" />
+
+            <View style="@style/Separator"/>
+
+            <TableLayout style="@style/RecordField.Small"
+                         android:shrinkColumns="1"
+                         android:stretchColumns="1">
+
+                <TableRow android:id="@+id/creation_time_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                              android:text="@string/created"/>
+
+                    <TextView android:id="@+id/creation_time"
+                              android:layout_width="wrap_content"/>
+
+                </TableRow>
+
+                <TableRow android:id="@+id/last_mod_time_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                              android:text="@string/modified"/>
+
+                    <TextView android:id="@+id/last_mod_time"
+                              android:layout_width="wrap_content"/>
+                </TableRow>
+
+            </TableLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </ScrollView>
