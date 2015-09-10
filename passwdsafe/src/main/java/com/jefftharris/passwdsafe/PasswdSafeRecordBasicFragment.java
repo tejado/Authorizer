@@ -24,10 +24,13 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
+
+import java.util.Date;
 
 
 /**
@@ -51,6 +54,7 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     private String itsRecUuid;
     private boolean itsIsPasswordShown = false;
     private String itsHiddenPasswordStr;
+    private Listener itsListener;
     private View itsBaseRow;
     private TextView itsBaseLabel;
     private TextView itsBase;
@@ -65,7 +69,11 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     private TextView itsUrl;
     private View itsEmailRow;
     private TextView itsEmail;
-    private Listener itsListener;
+    private View itsTimesRow;
+    private View itsCreationTimeRow;
+    private TextView itsCreationTime;
+    private View itsLastModTimeRow;
+    private TextView itsLastModTime;
 
     public static PasswdSafeRecordBasicFragment newInstance(String recUuid)
     {
@@ -140,6 +148,11 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         itsUrl = (TextView)root.findViewById(R.id.url);
         itsEmailRow = root.findViewById(R.id.email_row);
         itsEmail = (TextView)root.findViewById(R.id.email);
+        itsTimesRow = root.findViewById(R.id.times_row);
+        itsCreationTimeRow = root.findViewById(R.id.creation_time_row);
+        itsCreationTime = (TextView)root.findViewById(R.id.creation_time);
+        itsLastModTimeRow = root.findViewById(R.id.last_mod_time_row);
+        itsLastModTime = (TextView)root.findViewById(R.id.last_mod_time);
         return root;
     }
 
@@ -236,11 +249,15 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         int hiddenId = R.string.hidden_password_normal;
         String url = null;
         String email = null;
+        Date creationTime = null;
+        Date lastModTime = null;
         switch (passwdRec.getType()) {
         case NORMAL: {
             itsBaseRow.setVisibility(View.GONE);
             url = fileData.getURL(rec);
             email = fileData.getEmail(rec);
+            creationTime = fileData.getCreationTime(rec);
+            lastModTime = fileData.getLastModTime(rec);
             break;
         }
         case ALIAS: {
@@ -251,6 +268,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
             recForPassword = ref;
             url = fileData.getURL(rec);
             email = fileData.getEmail(rec);
+            creationTime = fileData.getCreationTime(recForPassword);
+            lastModTime = fileData.getLastModTime(recForPassword);
             break;
         }
         case SHORTCUT: {
@@ -259,6 +278,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
             itsBase.setText(fileData.getId(ref));
             hiddenId = R.string.hidden_password_shortcut;
             recForPassword = ref;
+            creationTime = fileData.getCreationTime(recForPassword);
+            lastModTime = fileData.getLastModTime(recForPassword);
             break;
         }
         }
@@ -276,6 +297,11 @@ public class PasswdSafeRecordBasicFragment extends Fragment
 
         setFieldText(itsUrl, itsUrlRow, url);
         setFieldText(itsEmail, itsEmailRow, email);
+
+        GuiUtils.setVisible(itsTimesRow,
+                            (creationTime != null) || (lastModTime != null));
+        setFieldDate(itsCreationTime, itsCreationTimeRow, creationTime);
+        setFieldDate(itsLastModTime, itsLastModTimeRow, lastModTime);
 
         GuiUtils.invalidateOptionsMenu(getActivity());
     }
@@ -378,7 +404,18 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         field.setText(text);
 
         if (fieldRow != null) {
-            fieldRow.setVisibility((text != null) ? View.VISIBLE : View.GONE);
+            GuiUtils.setVisible(fieldRow, (text != null));
         }
+    }
+
+    /**
+     * Set the value of a date field.  The field's row is visible if the date
+     * isn't null
+     */
+    private void setFieldDate(TextView field, View fieldRow, Date date)
+    {
+        String str =
+                (date != null) ? Utils.formatDate(date, getActivity()) : null;
+        setFieldText(field, fieldRow, str);
     }
 }
