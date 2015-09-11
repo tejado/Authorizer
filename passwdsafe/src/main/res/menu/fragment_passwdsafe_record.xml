@@ -19,13 +19,4 @@
           app:showAsAction="ifRoom"
           android:title="@string/delete"/>
 
-    <item android:id="@+id/menu_copy_notes"
-          android:title="@string/copy_notes"/>
-
-    <item android:id="@+id/menu_toggle_monospace"
-          android:title="@string/toggle_monospace"/>
-
-    <item android:id="@+id/menu_toggle_word_wrap"
-          android:title="@string/toggle_word_wrap"/>
-
 </menu>
