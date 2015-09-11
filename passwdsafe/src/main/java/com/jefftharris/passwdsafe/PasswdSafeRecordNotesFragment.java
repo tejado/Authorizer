@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -38,13 +39,28 @@ public class PasswdSafeRecordNotesFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_passwdsafe_record_notes,
                                 container, false);
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // TODO: menu copy notes
+        // TODO: menu toggle monospace
+        // TODO: menu toggle wrap notes
+        switch (item.getItemId()) {
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
+
+    @Override
     protected void doOnCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
+        inflater.inflate(R.menu.fragment_passwdsafe_record_notes, menu);
     }
 
     @Override

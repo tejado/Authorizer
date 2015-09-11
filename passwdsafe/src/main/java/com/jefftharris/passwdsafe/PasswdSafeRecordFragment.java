@@ -183,9 +183,6 @@ public class PasswdSafeRecordFragment extends Fragment
     {
         // TODO: menu edit
         // TODO: menu delete
-        // TODO: menu copy notes
-        // TODO: menu toggle monospace
-        // TODO: menu toggle wrap notes
         switch (item.getItemId()) {
         default: {
             return super.onOptionsItemSelected(item);
