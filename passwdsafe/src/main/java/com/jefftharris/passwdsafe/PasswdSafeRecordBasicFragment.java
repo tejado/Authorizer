@@ -11,6 +11,7 @@ package com.jefftharris.passwdsafe;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -250,68 +251,59 @@ public class PasswdSafeRecordBasicFragment extends Fragment
      */
     private void refresh()
     {
-        if (!isAdded() || (itsListener == null)) {
+        RecordInfo info = getRecordInfo();
+        if (info == null) {
             return;
         }
 
-        PasswdFileData fileData = itsListener.getFileData();
-        if (fileData == null) {
-            return;
-        }
-
-        PwsRecord rec = fileData.getRecord(itsRecUuid);
-        if (rec == null) {
-            return;
-        }
-
-        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-
-        PwsRecord ref = passwdRec.getRef();
-        PwsRecord recForPassword = rec;
+        PwsRecord ref = info.itsPasswdRec.getRef();
+        PwsRecord recForPassword = info.itsRec;
         int hiddenId = R.string.hidden_password_normal;
         String url = null;
         String email = null;
         Date creationTime = null;
         Date lastModTime = null;
-        switch (passwdRec.getType()) {
+        switch (info.itsPasswdRec.getType()) {
         case NORMAL: {
             itsBaseRow.setVisibility(View.GONE);
-            url = fileData.getURL(rec);
-            email = fileData.getEmail(rec);
-            creationTime = fileData.getCreationTime(rec);
-            lastModTime = fileData.getLastModTime(rec);
+            url = info.itsFileData.getURL(info.itsRec);
+            email = info.itsFileData.getEmail(info.itsRec);
+            creationTime = info.itsFileData.getCreationTime(info.itsRec);
+            lastModTime = info.itsFileData.getLastModTime(info.itsRec);
             break;
         }
         case ALIAS: {
             itsBaseRow.setVisibility(View.VISIBLE);
             itsBaseLabel.setText(R.string.alias_base_record_header);
-            itsBase.setText(fileData.getId(ref));
+            itsBase.setText(info.itsFileData.getId(ref));
             hiddenId = R.string.hidden_password_alias;
             recForPassword = ref;
-            url = fileData.getURL(rec);
-            email = fileData.getEmail(rec);
-            creationTime = fileData.getCreationTime(recForPassword);
-            lastModTime = fileData.getLastModTime(recForPassword);
+            url = info.itsFileData.getURL(info.itsRec);
+            email = info.itsFileData.getEmail(info.itsRec);
+            creationTime = info.itsFileData.getCreationTime(recForPassword);
+            lastModTime = info.itsFileData.getLastModTime(recForPassword);
             break;
         }
         case SHORTCUT: {
             itsBaseRow.setVisibility(View.VISIBLE);
             itsBaseLabel.setText(R.string.shortcut_base_record_header);
-            itsBase.setText(fileData.getId(ref));
+            itsBase.setText(info.itsFileData.getId(ref));
             hiddenId = R.string.hidden_password_shortcut;
             recForPassword = ref;
-            creationTime = fileData.getCreationTime(recForPassword);
-            lastModTime = fileData.getLastModTime(recForPassword);
+            creationTime = info.itsFileData.getCreationTime(recForPassword);
+            lastModTime = info.itsFileData.getLastModTime(recForPassword);
             break;
         }
         }
 
-        setFieldText(itsGroup, itsGroupRow, fileData.getGroup(rec));
-        setFieldText(itsUser, itsUserRow, fileData.getUsername(rec));
+        setFieldText(itsGroup, itsGroupRow,
+                     info.itsFileData.getGroup(info.itsRec));
+        setFieldText(itsUser, itsUserRow,
+                     info.itsFileData.getUsername(info.itsRec));
 
         itsIsPasswordShown = false;
         itsHiddenPasswordStr = getString(hiddenId);
-        String password = fileData.getPassword(recForPassword);
+        String password = info.itsFileData.getPassword(recForPassword);
         setFieldText(itsPassword, itsPasswordRow,
                      ((password != null) ? itsHiddenPasswordStr : null));
         itsPasswordSeek.setMax((password != null) ? password.length() : 0);
@@ -324,16 +316,17 @@ public class PasswdSafeRecordBasicFragment extends Fragment
                             (creationTime != null) || (lastModTime != null));
         setFieldDate(itsCreationTime, itsCreationTimeRow, creationTime);
         setFieldDate(itsLastModTime, itsLastModTimeRow, lastModTime);
-        GuiUtils.setVisible(itsProtectedRow, fileData.isProtected(rec));
+        GuiUtils.setVisible(itsProtectedRow,
+                            info.itsFileData.isProtected(info.itsRec));
 
-        List<PwsRecord> references = passwdRec.getRefsToRecord();
+        List<PwsRecord> references = info.itsPasswdRec.getRefsToRecord();
         boolean hasReferences = (references != null) && !references.isEmpty();
         if (hasReferences) {
             ArrayAdapter<String> adapter =
                     new ArrayAdapter<>(getActivity(),
                                        android.R.layout.simple_list_item_1);
             for (PwsRecord refRec: references) {
-                adapter.add(fileData.getId(refRec));
+                adapter.add(info.itsFileData.getId(refRec));
             }
             itsReferences.setAdapter(adapter);
         } else {
@@ -350,22 +343,16 @@ public class PasswdSafeRecordBasicFragment extends Fragment
      */
     private void showRefRec(boolean baseRef, int referencingPos)
     {
-        PasswdFileData fileData = itsListener.getFileData();
-        if (fileData == null) {
+        RecordInfo info = getRecordInfo();
+        if (info == null) {
             return;
         }
 
-        PwsRecord rec = fileData.getRecord(itsRecUuid);
-        if (rec == null) {
-            return;
-        }
-
-        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
         PwsRecord refRec = null;
         if (baseRef) {
-            refRec = passwdRec.getRef();
+            refRec = info.itsPasswdRec.getRef();
         } else {
-            List<PwsRecord> references = passwdRec.getRefsToRecord();
+            List<PwsRecord> references = info.itsPasswdRec.getRefsToRecord();
             if ((referencingPos >= 0) && (referencingPos < references.size())) {
                 refRec = references.get(referencingPos);
             }
@@ -374,7 +361,7 @@ public class PasswdSafeRecordBasicFragment extends Fragment
             return;
         }
 
-        PasswdLocation location = new PasswdLocation(refRec, fileData);
+        PasswdLocation location = new PasswdLocation(refRec, info.itsFileData);
         itsListener.changeLocation(location);
     }
 
@@ -410,32 +397,41 @@ public class PasswdSafeRecordBasicFragment extends Fragment
      */
     private String getPassword()
     {
-        if (!isAdded() || (itsListener == null)) {
+        RecordInfo info = getRecordInfo();
+        if (info == null) {
             return null;
         }
 
-        PasswdFileData fileData = itsListener.getFileData();
-        if (fileData == null) {
-            return null;
-        }
-
-        // TODO: save off record and filedata?
-        PwsRecord rec = fileData.getRecord(itsRecUuid);
-        if (rec == null) {
-            return null;
-        }
-
-        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-        switch (passwdRec.getType()) {
+        switch (info.itsPasswdRec.getType()) {
         case NORMAL: {
-            return fileData.getPassword(rec);
+            return info.itsFileData.getPassword(info.itsRec);
         }
         case ALIAS:
         case SHORTCUT: {
-            return fileData.getPassword(passwdRec.getRef());
+            return info.itsFileData.getPassword(info.itsPasswdRec.getRef());
         }
         }
 
+        return null;
+    }
+
+    /**
+     * Get the record information
+     */
+    private RecordInfo getRecordInfo()
+    {
+        if (isAdded() && (itsListener != null)) {
+            PasswdFileData fileData = itsListener.getFileData();
+            if (fileData != null) {
+                PwsRecord rec = fileData.getRecord(itsRecUuid);
+                if (rec != null) {
+                    PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+                    if (passwdRec != null) {
+                        return new RecordInfo(rec, passwdRec, fileData);
+                    }
+                }
+            }
+        }
         return null;
     }
 
@@ -461,5 +457,27 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         String str =
                 (date != null) ? Utils.formatDate(date, getActivity()) : null;
         setFieldText(field, fieldRow, str);
+    }
+
+    /**
+     * Wrapper class for record information
+     */
+    private static class RecordInfo
+    {
+        public final PwsRecord itsRec;
+        public final PasswdRecord itsPasswdRec;
+        public final PasswdFileData itsFileData;
+
+        /**
+         * Constructor
+         */
+        public RecordInfo(@NonNull PwsRecord rec,
+                          @NonNull PasswdRecord passwdRec,
+                          @NonNull PasswdFileData fileData)
+        {
+            itsRec = rec;
+            itsPasswdRec = passwdRec;
+            itsFileData = fileData;
+        }
     }
 }
