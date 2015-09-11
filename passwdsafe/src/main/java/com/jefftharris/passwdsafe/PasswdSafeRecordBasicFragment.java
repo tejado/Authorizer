@@ -54,6 +54,9 @@ public class PasswdSafeRecordBasicFragment extends Fragment
 
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
+
+        /** Is the navigation drawer open */
+        boolean isNavDrawerOpen();
     }
 
     private String itsRecUuid;
@@ -194,7 +197,9 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        inflater.inflate(R.menu.fragment_passwdsafe_record_basic, menu);
+        if ((itsListener != null) && !itsListener.isNavDrawerOpen()) {
+            inflater.inflate(R.menu.fragment_passwdsafe_record_basic, menu);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -202,9 +207,12 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     public void onPrepareOptionsMenu(Menu menu)
     {
         MenuItem item = menu.findItem(R.id.menu_toggle_password);
-        item.setTitle(itsIsPasswordShown ?
-                              R.string.hide_password : R.string.show_password);
-        item.setEnabled(itsPasswordRow.getVisibility() == View.VISIBLE);
+        if (item != null) {
+            item.setTitle(
+                    itsIsPasswordShown ?
+                            R.string.hide_password : R.string.show_password);
+            item.setEnabled(itsPasswordRow.getVisibility() == View.VISIBLE);
+        }
 
         super.onPrepareOptionsMenu(menu);
     }

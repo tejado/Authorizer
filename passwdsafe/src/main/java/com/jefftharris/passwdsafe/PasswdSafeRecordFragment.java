@@ -43,6 +43,9 @@ public class PasswdSafeRecordFragment extends Fragment
 
         /** Update the view for the location in the password file */
         void updateLocationView(PasswdLocation location);
+
+        /** Is the navigation drawer open */
+        boolean isNavDrawerOpen();
     }
 
     private PasswdLocation itsLocation;
@@ -163,7 +166,9 @@ public class PasswdSafeRecordFragment extends Fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        inflater.inflate(R.menu.fragment_passwdsafe_record, menu);
+        if ((itsListener != null) && !itsListener.isNavDrawerOpen()) {
+            inflater.inflate(R.menu.fragment_passwdsafe_record, menu);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -175,7 +180,6 @@ public class PasswdSafeRecordFragment extends Fragment
         // TODO: menu copy notes
         // TODO: menu toggle monospace
         // TODO: menu toggle wrap notes
-        // TODO: hide items when drawer is open
         switch (item.getItemId()) {
         default: {
             return super.onOptionsItemSelected(item);
