@@ -15,6 +15,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -83,6 +86,7 @@ public class PasswdSafeRecordFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record,
                                      container, false);
         itsTitle = (TextView)root.findViewById(R.id.title);
@@ -154,6 +158,29 @@ public class PasswdSafeRecordFragment extends Fragment
     {
         super.onDetach();
         itsListener = null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_passwdsafe_record, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // TODO: menu edit
+        // TODO: menu delete
+        // TODO: menu copy notes
+        // TODO: menu toggle monospace
+        // TODO: menu toggle wrap notes
+        // TODO: hide items when drawer is open
+        switch (item.getItemId()) {
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
     }
 
     /**

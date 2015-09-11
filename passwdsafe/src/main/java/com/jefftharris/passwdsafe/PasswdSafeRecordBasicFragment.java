@@ -196,8 +196,6 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     {
         inflater.inflate(R.menu.fragment_passwdsafe_record_basic, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        // TODO: all menu options
     }
 
     @Override
