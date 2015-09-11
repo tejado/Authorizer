@@ -358,6 +358,12 @@ public class PasswdSafeActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public boolean isNavDrawerOpen()
+    {
+        return itsNavDrawerFrag.isDrawerOpen();
+    }
+
     /**
      * Get the file data
      */
