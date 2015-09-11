@@ -185,6 +185,20 @@
 
         </LinearLayout>
 
+        <LinearLayout android:id="@+id/references_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/references_label" />
+
+            <View style="@style/Separator"/>
+
+            <ListView android:id="@+id/references"
+                      style="@style/RecordField"
+                      tools:ignore="NestedScrolling"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </ScrollView>

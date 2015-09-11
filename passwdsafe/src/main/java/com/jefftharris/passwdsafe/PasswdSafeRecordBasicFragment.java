@@ -18,6 +18,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -31,6 +34,7 @@ import com.jefftharris.passwdsafe.view.PasswdLocation;
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -75,6 +79,8 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     private View itsLastModTimeRow;
     private TextView itsLastModTime;
     private View itsProtectedRow;
+    private View itsReferencesRow;
+    private ListView itsReferences;
 
     public static PasswdSafeRecordBasicFragment newInstance(String recUuid)
     {
@@ -155,6 +161,18 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         itsLastModTimeRow = root.findViewById(R.id.last_mod_time_row);
         itsLastModTime = (TextView)root.findViewById(R.id.last_mod_time);
         itsProtectedRow = root.findViewById(R.id.protected_row);
+        itsReferencesRow = root.findViewById(R.id.references_row);
+        itsReferences = (ListView)root.findViewById(R.id.references);
+        itsReferences.setOnItemClickListener(
+                new AdapterView.OnItemClickListener()
+                {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,
+                                            int position, long id)
+                    {
+                        showRefRec(false, position);
+                    }
+                });
         return root;
     }
 
@@ -308,6 +326,22 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         setFieldDate(itsLastModTime, itsLastModTimeRow, lastModTime);
         GuiUtils.setVisible(itsProtectedRow, fileData.isProtected(rec));
 
+        List<PwsRecord> references = passwdRec.getRefsToRecord();
+        boolean hasReferences = (references != null) && !references.isEmpty();
+        if (hasReferences) {
+            ArrayAdapter<String> adapter =
+                    new ArrayAdapter<>(getActivity(),
+                                       android.R.layout.simple_list_item_1);
+            for (PwsRecord refRec: references) {
+                adapter.add(fileData.getId(refRec));
+            }
+            itsReferences.setAdapter(adapter);
+        } else {
+            itsReferences.setAdapter(null);
+        }
+        GuiUtils.setListViewHeightBasedOnChildren(itsReferences);
+        GuiUtils.setVisible(itsReferencesRow, hasReferences);
+
         GuiUtils.invalidateOptionsMenu(getActivity());
     }
 
@@ -330,6 +364,11 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         PwsRecord refRec = null;
         if (baseRef) {
             refRec = passwdRec.getRef();
+        } else {
+            List<PwsRecord> references = passwdRec.getRefsToRecord();
+            if ((referencingPos >= 0) && (referencingPos < references.size())) {
+                refRec = references.get(referencingPos);
+            }
         }
         if (refRec == null) {
             return;
