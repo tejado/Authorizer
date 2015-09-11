@@ -8,11 +8,8 @@
 package com.jefftharris.passwdsafe;
 
 
-import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,8 +22,6 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
@@ -41,28 +36,13 @@ import java.util.List;
 /**
  * Fragment for showing basic fields of a password record
  */
-public class PasswdSafeRecordBasicFragment extends Fragment
+public class PasswdSafeRecordBasicFragment
+        extends AbstractPasswdSafeRecordFragment
         implements View.OnClickListener
 {
-    /**
-     * Listener interface for owning activity
-     */
-    public interface Listener
-    {
-        /** Get the file data */
-        PasswdFileData getFileData();
 
-        /** Change the location in the password file */
-        void changeLocation(PasswdLocation location);
-
-        /** Is the navigation drawer open */
-        boolean isNavDrawerOpen();
-    }
-
-    private String itsRecUuid;
     private boolean itsIsPasswordShown = false;
     private String itsHiddenPasswordStr;
-    private Listener itsListener;
     private View itsBaseRow;
     private TextView itsBaseLabel;
     private TextView itsBase;
@@ -91,28 +71,9 @@ public class PasswdSafeRecordBasicFragment extends Fragment
      */
     public static PasswdSafeRecordBasicFragment newInstance(String recUuid)
     {
-        Bundle args = new Bundle();
-        args.putString("recUuid", recUuid);
         PasswdSafeRecordBasicFragment frag = new PasswdSafeRecordBasicFragment();
-        frag.setArguments(args);
+        frag.setArguments(createArgs(recUuid));
         return frag;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-        if (args != null) {
-            itsRecUuid = args.getString("recUuid");
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity)
-    {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
     }
 
     @Override
@@ -184,29 +145,6 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     }
 
     @Override
-    public void onResume()
-    {
-        super.onResume();
-        refresh();
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        itsListener = null;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        if ((itsListener != null) && !itsListener.isNavDrawerOpen()) {
-            inflater.inflate(R.menu.fragment_passwdsafe_record_basic, menu);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
     public void onPrepareOptionsMenu(Menu menu)
     {
         MenuItem item = menu.findItem(R.id.menu_toggle_password);
@@ -255,10 +193,14 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         }
     }
 
-    /**
-     * Refresh the view
-     */
-    private void refresh()
+    @Override
+    protected void doOnCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_passwdsafe_record_basic, menu);
+    }
+
+    @Override
+    protected void doRefresh()
     {
         RecordInfo info = getRecordInfo();
         if (info == null) {
@@ -345,7 +287,6 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         GuiUtils.setVisible(itsReferencesRow, hasReferences);
 
         GuiUtils.invalidateOptionsMenu(getActivity());
-        scrollViewToTop();
     }
 
     /**
@@ -426,26 +367,6 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     }
 
     /**
-     * Get the record information
-     */
-    private RecordInfo getRecordInfo()
-    {
-        if (isAdded() && (itsListener != null)) {
-            PasswdFileData fileData = itsListener.getFileData();
-            if (fileData != null) {
-                PwsRecord rec = fileData.getRecord(itsRecUuid);
-                if (rec != null) {
-                    PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-                    if (passwdRec != null) {
-                        return new RecordInfo(rec, passwdRec, fileData);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
      * Set the value of a text field.  The field's row is visible if the text
      * isn't null.
      */
@@ -467,45 +388,5 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         String str =
                 (date != null) ? Utils.formatDate(date, getActivity()) : null;
         setFieldText(field, fieldRow, str);
-    }
-
-    /**
-     * Try to scroll the view to the top
-     */
-    private void scrollViewToTop()
-    {
-        final View root = getView();
-        if (root != null) {
-            root.post(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    root.scrollTo(0, 0);
-                }
-            });
-        }
-    }
-
-    /**
-     * Wrapper class for record information
-     */
-    private static class RecordInfo
-    {
-        public final PwsRecord itsRec;
-        public final PasswdRecord itsPasswdRec;
-        public final PasswdFileData itsFileData;
-
-        /**
-         * Constructor
-         */
-        public RecordInfo(@NonNull PwsRecord rec,
-                          @NonNull PasswdRecord passwdRec,
-                          @NonNull PasswdFileData fileData)
-        {
-            itsRec = rec;
-            itsPasswdRec = passwdRec;
-            itsFileData = fileData;
-        }
     }
 }

@@ -8,62 +8,30 @@
 package com.jefftharris.passwdsafe;
 
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.jefftharris.passwdsafe.file.PasswdFileData;
 
 
 /**
  * Fragment for showing password-specific fields of a password record
  */
-public class PasswdSafeRecordPasswordFragment extends Fragment
+public class PasswdSafeRecordPasswordFragment
+        extends AbstractPasswdSafeRecordFragment
 {
-    /**
-     * Listener interface for owning activity
-     */
-    public interface Listener
-    {
-        /** Get the file data */
-        PasswdFileData getFileData();
-    }
-
-    private String itsRecUuid;
-    private Listener itsListener;
-
     /**
      * Create a new instance of the fragment
      */
     public static PasswdSafeRecordPasswordFragment newInstance(String recUuid)
     {
-        Bundle args = new Bundle();
-        args.putString("recUuid", recUuid);
         PasswdSafeRecordPasswordFragment frag =
                 new PasswdSafeRecordPasswordFragment();
-        frag.setArguments(args);
+        frag.setArguments(createArgs(recUuid));
         return frag;
 
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-        if (args != null) {
-            itsRecUuid = args.getString("recUuid");
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity)
-    {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
     }
 
     @Override
@@ -75,23 +43,12 @@ public class PasswdSafeRecordPasswordFragment extends Fragment
     }
 
     @Override
-    public void onResume()
+    protected void doOnCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        super.onResume();
-        refresh();
     }
 
     @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        itsListener = null;
-    }
-
-    /**
-     * Refresh the view
-     */
-    private void refresh()
+    protected void doRefresh()
     {
 
     }

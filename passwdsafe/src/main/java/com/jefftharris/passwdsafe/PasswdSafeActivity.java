@@ -36,11 +36,10 @@ import java.util.List;
  * The main PasswdSafe activity for showing a password file
  */
 public class PasswdSafeActivity extends AppCompatActivity
-        implements PasswdSafeListFragment.Listener,
+        implements AbstractPasswdSafeRecordFragment.Listener,
+                   PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
                    PasswdSafeNavDrawerFragment.Listener,
-                   PasswdSafeRecordBasicFragment.Listener,
-                   PasswdSafeRecordPasswordFragment.Listener,
                    PasswdSafeRecordFragment.Listener
 {
     // TODO: new files
