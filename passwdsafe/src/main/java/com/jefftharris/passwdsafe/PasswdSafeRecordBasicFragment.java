@@ -86,6 +86,9 @@ public class PasswdSafeRecordBasicFragment extends Fragment
     private View itsReferencesRow;
     private ListView itsReferences;
 
+    /**
+     * Create a new instance of the fragment
+     */
     public static PasswdSafeRecordBasicFragment newInstance(String recUuid)
     {
         Bundle args = new Bundle();
