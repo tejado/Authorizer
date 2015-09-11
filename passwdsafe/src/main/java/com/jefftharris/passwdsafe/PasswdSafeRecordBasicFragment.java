@@ -336,6 +336,7 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         GuiUtils.setVisible(itsReferencesRow, hasReferences);
 
         GuiUtils.invalidateOptionsMenu(getActivity());
+        scrollViewToTop();
     }
 
     /**
@@ -457,6 +458,24 @@ public class PasswdSafeRecordBasicFragment extends Fragment
         String str =
                 (date != null) ? Utils.formatDate(date, getActivity()) : null;
         setFieldText(field, fieldRow, str);
+    }
+
+    /**
+     * Try to scroll the view to the top
+     */
+    private void scrollViewToTop()
+    {
+        final View root = getView();
+        if (root != null) {
+            root.post(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    root.scrollTo(0, 0);
+                }
+            });
+        }
     }
 
     /**
