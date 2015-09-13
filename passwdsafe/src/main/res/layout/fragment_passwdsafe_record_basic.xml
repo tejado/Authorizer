@@ -40,7 +40,7 @@
                         android:text="@string/go_to"/>
 
                 <TextView android:id="@+id/base"
-                          style="@style/RecordField.Large"
+                          style="@style/RecordField"
                           android:layout_alignParentBottom="false"
                           android:layout_alignParentLeft="true"
                           android:layout_alignParentStart="true"
@@ -50,19 +50,6 @@
                           android:clickable="false"/>
 
             </RelativeLayout>
-
-        </LinearLayout>
-
-        <LinearLayout android:id="@+id/group_row"
-                      style="@style/RecordRow">
-
-            <TextView style="@style/RecordHeader"
-                      android:text="@string/group_header" />
-
-            <View style="@style/Separator"/>
-
-            <TextView android:id="@+id/group"
-                      style="@style/RecordField.Large"/>
 
         </LinearLayout>
 
@@ -134,6 +121,19 @@
             <TextView android:id="@+id/email"
                       style="@style/RecordField"
                       android:autoLink="email"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/group_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/group_header" />
+
+            <View style="@style/Separator"/>
+
+            <TextView android:id="@+id/group"
+                      style="@style/RecordField"/>
 
         </LinearLayout>
 
