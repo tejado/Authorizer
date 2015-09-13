@@ -23,7 +23,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
@@ -364,29 +363,5 @@ public class PasswdSafeRecordBasicFragment
         }
 
         return null;
-    }
-
-    /**
-     * Set the value of a text field.  The field's row is visible if the text
-     * isn't null.
-     */
-    private void setFieldText(TextView field, View fieldRow, String text)
-    {
-        field.setText(text);
-
-        if (fieldRow != null) {
-            GuiUtils.setVisible(fieldRow, (text != null));
-        }
-    }
-
-    /**
-     * Set the value of a date field.  The field's row is visible if the date
-     * isn't null
-     */
-    private void setFieldDate(TextView field, View fieldRow, Date date)
-    {
-        String str =
-                (date != null) ? Utils.formatDate(date, getActivity()) : null;
-        setFieldText(field, fieldRow, str);
     }
 }
