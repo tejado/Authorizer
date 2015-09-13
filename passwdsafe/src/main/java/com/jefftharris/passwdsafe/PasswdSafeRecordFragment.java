@@ -64,6 +64,9 @@ public class PasswdSafeRecordFragment extends Fragment
     private TextView itsTitle;
     private Listener itsListener;
 
+    /** Last selected tab to restore across records */
+    private static int itsLastSelectedTab = 0;
+
     /**
      * Create a new instance
      */
@@ -107,6 +110,15 @@ public class PasswdSafeRecordFragment extends Fragment
         itsTitle = (TextView)root.findViewById(R.id.title);
 
         final ViewPager viewPager = (ViewPager)root.findViewById(R.id.viewpager);
+        viewPager.addOnPageChangeListener(
+                new ViewPager.SimpleOnPageChangeListener()
+                {
+                    @Override
+                    public void onPageSelected(int position)
+                    {
+                        itsLastSelectedTab = position;
+                    }
+                });
         viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager())
         {
             @Override
@@ -152,8 +164,8 @@ public class PasswdSafeRecordFragment extends Fragment
                 return null;
             }
         });
+        viewPager.setCurrentItem(itsLastSelectedTab);
 
-        // TODO: remember tab when changing records
         // TODO: how to distinguish close of file vs. close of record in single pane view
 
         final TabLayout tabLayout = (TabLayout)root.findViewById(R.id.tabs);
