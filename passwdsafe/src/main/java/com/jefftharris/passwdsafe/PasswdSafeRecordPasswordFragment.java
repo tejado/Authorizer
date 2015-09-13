@@ -14,10 +14,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
+import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
@@ -42,6 +45,11 @@ public class PasswdSafeRecordPasswordFragment
     private TextView itsExpirationInterval;
     private View itsPasswordModTimeRow;
     private TextView itsPasswordModTime;
+    private CheckBox itsHistoryEnabledCb;
+    private TextView itsHistoryMaxSizeLabel;
+    private TextView itsHistoryMaxSize;
+    private ListView itsHistory;
+
 
     /**
      * Create a new instance of the fragment
@@ -74,6 +82,13 @@ public class PasswdSafeRecordPasswordFragment
         itsPasswordModTimeRow = root.findViewById(R.id.password_mod_time_row);
         itsPasswordModTime =
                 (TextView)root.findViewById(R.id.password_mod_time);
+        itsHistoryEnabledCb = (CheckBox)root.findViewById(R.id.history_enabled);
+        itsHistoryEnabledCb.setClickable(false);
+        itsHistoryMaxSizeLabel =
+                (TextView)root.findViewById(R.id.history_max_size_label);
+        itsHistoryMaxSize = (TextView)root.findViewById(R.id.history_max_size);
+        itsHistory = (ListView)root.findViewById(R.id.history);
+        itsHistory.setEnabled(false);
         return root;
 
         // TODO: spacing between fields
@@ -96,6 +111,7 @@ public class PasswdSafeRecordPasswordFragment
         String policyLoc = null;
         PasswdExpiration passwdExpiry = null;
         Date lastModTime = null;
+        PasswdHistory history = null;
         switch (info.itsPasswdRec.getType()) {
         case NORMAL: {
             policy = info.itsPasswdRec.getPasswdPolicy();
@@ -120,12 +136,14 @@ public class PasswdSafeRecordPasswordFragment
             }
             passwdExpiry = info.itsFileData.getPasswdExpiry(info.itsRec);
             lastModTime = info.itsFileData.getPasswdLastModTime(info.itsRec);
+            history = info.itsFileData.getPasswdHistory(info.itsRec);
             break;
         }
         case ALIAS: {
             PwsRecord recForPassword = info.itsPasswdRec.getRef();
             passwdExpiry = info.itsFileData.getPasswdExpiry(recForPassword);
             lastModTime = info.itsFileData.getPasswdLastModTime(recForPassword);
+            history = info.itsFileData.getPasswdHistory(recForPassword);
             break;
         }
         case SHORTCUT: {
@@ -158,5 +176,24 @@ public class PasswdSafeRecordPasswordFragment
         GuiUtils.setVisible(itsPasswordTimesRow,
                             (passwdExpiry != null) || (lastModTime != null) ||
                             (expiryIntStr != null));
-    }
+
+        boolean historyExists = (history != null);
+        boolean historyEnabled = false;
+        String historyMaxSize;
+        if (historyExists) {
+            historyEnabled = history.isEnabled();
+            historyMaxSize = Integer.toString(history.getMaxSize());
+            itsHistory.setAdapter(
+                    PasswdHistory.createAdapter(history, getActivity(), true));
+        } else {
+            historyMaxSize = getString(R.string.n_a);
+            itsHistory.setAdapter(null);
+        }
+        GuiUtils.setListViewHeightBasedOnChildren(itsHistory);
+        itsHistoryEnabledCb.setChecked(historyEnabled);
+        itsHistoryEnabledCb.setEnabled(historyExists);
+        itsHistoryMaxSize.setText(historyMaxSize);
+        GuiUtils.setVisible(itsHistoryMaxSize, historyExists);
+        GuiUtils.setVisible(itsHistoryMaxSizeLabel, historyExists);
+     }
 }
