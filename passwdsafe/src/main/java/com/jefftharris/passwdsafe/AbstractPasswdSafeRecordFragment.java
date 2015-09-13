@@ -14,12 +14,17 @@ import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
+
+import java.util.Date;
 
 /**
  * Base class for showing fields of a password record
@@ -123,6 +128,33 @@ public abstract class AbstractPasswdSafeRecordFragment extends Fragment
             }
         }
         return null;
+    }
+
+
+    /**
+     * Set the value of a text field.  The field's row is visible if the text
+     * isn't null.
+     */
+    protected static void setFieldText(TextView field,
+                                       View fieldRow,
+                                       String text)
+    {
+        field.setText(text);
+
+        if (fieldRow != null) {
+            GuiUtils.setVisible(fieldRow, (text != null));
+        }
+    }
+
+    /**
+     * Set the value of a date field.  The field's row is visible if the date
+     * isn't null
+     */
+    protected void setFieldDate(TextView field, View fieldRow, Date date)
+    {
+        String str =
+                (date != null) ? Utils.formatDate(date, getActivity()) : null;
+        setFieldText(field, fieldRow, str);
     }
 
     /**
