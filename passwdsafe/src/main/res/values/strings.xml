@@ -127,6 +127,7 @@
     <string name="location">Location</string>
     <string name="max_size_label">Maximum size:</string>
     <string name="modified">Modified</string>
+    <string name="monospace">Monospace</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -239,8 +240,6 @@
     <string name="sync">Sync</string>
     <string name="times_header">TIMES</string>
     <string name="title">Title</string>
-    <string name="toggle_word_wrap">Toggle Word Wrap</string>
-    <string name="toggle_monospace">Toggle Monospace</string>
     <string name="unknown_sync_file">Unknown sync file</string>
     <string name="unprotect_all">Unprotect All Records</string>
     <string name="unprotect_group">Unprotect Group Records</string>
@@ -253,6 +252,7 @@
     <string name="use_symbols">Use Symbols</string>
     <string name="use_uppercase">Use Uppercase</string>
     <string name="username_header">USER NAME</string>
+    <string name="word_wrap">Word Wrap</string>
     <string name="yes">Yes</string>
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>

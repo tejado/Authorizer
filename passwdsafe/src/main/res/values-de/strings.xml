@@ -127,6 +127,7 @@
     <string name="location">Ort</string>
     <string name="max_size_label">Max. Größe:</string>
     <string name="modified">Geändert</string>
+    <string name="monospace">Monospace-Schrift</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
     <string name="navigation_drawer_open">Öffnen Navigation Schublade</string>
@@ -241,8 +242,6 @@
     <string name="sync">Synchronisieren</string>
     <string name="times_header">ZEITEN</string>
     <string name="title">Titel</string>
-    <string name="toggle_word_wrap">Zeilenumbruch ein/aus</string>
-    <string name="toggle_monospace">Schriftart wechseln</string>
     <string name="unknown_sync_file">Unbekannte Datei</string>
     <string name="unprotect_all">Alle Einträge freigeben</string>
     <string name="unprotect_group">Gruppe freigeben</string>
@@ -255,6 +254,7 @@
     <string name="use_symbols">Symbole</string>
     <string name="use_uppercase">Großbuchstaben</string>
     <string name="username_header">BENUTZERNAME</string>
+    <string name="word_wrap">Zeilenumbruch</string>
     <string name="yes">Ja</string>
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey deaktiviert. Aktivieren NFC zu bedienen.</string>
