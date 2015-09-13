@@ -14,6 +14,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +62,8 @@ public class PasswdSafeRecordFragment extends Fragment
     private PasswdLocation itsLocation;
     private boolean itsCanEdit = false;
     private boolean itsCanDelete = false;
+    private boolean itsHasNotes = false;
+    private TabLayout itsTabs;
     private TextView itsTitle;
     private Listener itsListener;
 
@@ -168,13 +171,14 @@ public class PasswdSafeRecordFragment extends Fragment
 
         // TODO: how to distinguish close of file vs. close of record in single pane view
 
-        final TabLayout tabLayout = (TabLayout)root.findViewById(R.id.tabs);
-        tabLayout.post(new Runnable()
+        itsTabs = (TabLayout)root.findViewById(R.id.tabs);
+        itsTabs.post(new Runnable()
         {
             @Override
             public void run()
             {
-                tabLayout.setupWithViewPager(viewPager);
+                itsTabs.setupWithViewPager(viewPager);
+                updateNotesTab();
             }
         });
 
@@ -275,6 +279,36 @@ public class PasswdSafeRecordFragment extends Fragment
         boolean hasReferences = (references != null) && !references.isEmpty();
         itsCanDelete = itsCanEdit && !hasReferences && !isProtected;
 
+        switch (passwdRec.getType()) {
+        case NORMAL:
+        case ALIAS: {
+            String notes = fileData.getNotes(rec);
+            itsHasNotes = !TextUtils.isEmpty(notes);
+            break;
+        }
+        case SHORTCUT: {
+            itsHasNotes = false;
+            break;
+        }
+        }
+        updateNotesTab();
+
         GuiUtils.invalidateOptionsMenu(getActivity());
+    }
+
+    /**
+     * Update the notes tab
+     */
+    private void updateNotesTab()
+    {
+        TabLayout.Tab tab =
+                (itsTabs.getTabCount() >= 3) ? itsTabs.getTabAt(2) : null;
+        if (tab != null) {
+            if (itsHasNotes) {
+                tab.setIcon(R.drawable.ic_action_file_attachment);
+            } else {
+                tab.setIcon(null);
+            }
+        }
     }
 }
