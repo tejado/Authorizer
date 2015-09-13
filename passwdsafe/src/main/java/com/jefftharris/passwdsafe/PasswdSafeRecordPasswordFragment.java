@@ -90,8 +90,6 @@ public class PasswdSafeRecordPasswordFragment
         itsHistory = (ListView)root.findViewById(R.id.history);
         itsHistory.setEnabled(false);
         return root;
-
-        // TODO: spacing between fields
     }
 
     @Override
