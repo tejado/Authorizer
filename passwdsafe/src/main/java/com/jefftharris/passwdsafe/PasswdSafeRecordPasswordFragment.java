@@ -15,6 +15,11 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.PasswdPolicyView;
+
 
 /**
  * Fragment for showing password-specific fields of a password record
@@ -22,6 +27,9 @@ import android.view.ViewGroup;
 public class PasswdSafeRecordPasswordFragment
         extends AbstractPasswdSafeRecordFragment
 {
+    private View itsPolicyRow;
+    private PasswdPolicyView itsPolicy;
+
     /**
      * Create a new instance of the fragment
      */
@@ -38,8 +46,12 @@ public class PasswdSafeRecordPasswordFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        return inflater.inflate(R.layout.fragment_passwdsafe_record_password,
-                                container, false);
+        View root = inflater.inflate(
+                R.layout.fragment_passwdsafe_record_password, container, false);
+        itsPolicyRow = root.findViewById(R.id.policy_row);
+        itsPolicy = (PasswdPolicyView)root.findViewById(R.id.policy);
+        itsPolicy.setGenerateEnabled(false);
+        return root;
     }
 
     @Override
@@ -50,6 +62,47 @@ public class PasswdSafeRecordPasswordFragment
     @Override
     protected void doRefresh()
     {
+        RecordInfo info = getRecordInfo();
+        if (info == null) {
+            return;
+        }
 
+        PasswdPolicy policy = null;
+        String policyLoc = null;
+        switch (info.itsPasswdRec.getType()) {
+        case NORMAL: {
+            policy = info.itsPasswdRec.getPasswdPolicy();
+            if (policy == null) {
+                PasswdSafeApp app =
+                        (PasswdSafeApp)getActivity().getApplication();
+                policy = app.getDefaultPasswdPolicy();
+                policyLoc = getString(R.string.default_policy);
+            } else if (policy.getLocation() ==
+                       PasswdPolicy.Location.RECORD_NAME) {
+                HeaderPasswdPolicies hdrPolicies =
+                        info.itsFileData.getHdrPasswdPolicies();
+                String policyName = policy.getName();
+                if (hdrPolicies != null) {
+                    policy = hdrPolicies.getPasswdPolicy(policyName);
+                }
+                if (policy != null) {
+                    policyLoc = getString(R.string.database_policy, policyName);
+                }
+            } else {
+                policyLoc = getString(R.string.record);
+            }
+            break;
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            break;
+        }
+        }
+
+        if (policy != null) {
+            itsPolicy.showLocation(policyLoc);
+            itsPolicy.showPolicy(policy, -1);
+        }
+        GuiUtils.setVisible(itsPolicyRow, policy != null);
     }
 }
