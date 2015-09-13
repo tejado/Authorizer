@@ -23,9 +23,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
+
+import java.util.List;
 
 
 /**
@@ -44,11 +48,19 @@ public class PasswdSafeRecordFragment extends Fragment
         /** Update the view for the location in the password file */
         void updateLocationView(PasswdLocation location);
 
+        /** Edit the record */
+        void editRecord(PasswdLocation location);
+
+        /** Delete the record */
+        void deleteRecord(PasswdLocation location);
+
         /** Is the navigation drawer open */
         boolean isNavDrawerOpen();
     }
 
     private PasswdLocation itsLocation;
+    private boolean itsCanEdit = false;
+    private boolean itsCanDelete = false;
     private TextView itsTitle;
     private Listener itsListener;
 
@@ -182,11 +194,37 @@ public class PasswdSafeRecordFragment extends Fragment
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem item = menu.findItem(R.id.menu_edit);
+        if (item != null) {
+            item.setVisible(itsCanEdit);
+        }
+
+        item = menu.findItem(R.id.menu_delete);
+        if (item != null) {
+            item.setVisible(itsCanDelete);
+        }
+
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // TODO: menu edit
-        // TODO: menu delete
         switch (item.getItemId()) {
+        case R.id.menu_edit: {
+            if (itsListener != null) {
+                itsListener.editRecord(itsLocation);
+            }
+            return true;
+        }
+        case R.id.menu_delete: {
+            if (itsListener != null) {
+                itsListener.deleteRecord(itsLocation);
+            }
+            return true;
+        }
         default: {
             return super.onOptionsItemSelected(item);
         }
@@ -212,6 +250,19 @@ public class PasswdSafeRecordFragment extends Fragment
             return;
         }
 
+        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+        if (passwdRec == null) {
+            return;
+        }
+
         itsTitle.setText(fileData.getTitle(rec));
+
+        itsCanEdit = fileData.canEdit();
+        boolean isProtected = fileData.isProtected(rec);
+        List<PwsRecord> references = passwdRec.getRefsToRecord();
+        boolean hasReferences = (references != null) && !references.isEmpty();
+        itsCanDelete = itsCanEdit && !hasReferences && !isProtected;
+
+        GuiUtils.invalidateOptionsMenu(getActivity());
     }
 }

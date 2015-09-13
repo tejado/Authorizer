@@ -359,6 +359,20 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     @Override
+    public void editRecord(PasswdLocation location)
+    {
+        Toast.makeText(this, "editRecord " + location,
+                       Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void deleteRecord(PasswdLocation location)
+    {
+        Toast.makeText(this, "deleteRecord " + location,
+                       Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public boolean isNavDrawerOpen()
     {
         return itsNavDrawerFrag.isDrawerOpen();
