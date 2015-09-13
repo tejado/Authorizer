@@ -286,8 +286,8 @@ public class RecordView extends AbstractRecordTabActivity
         menu.add(0, MENU_COPY_USER, 0, R.string.copy_user);
         menu.add(0, MENU_COPY_PASSWORD, 0, R.string.copy_password);
         menu.add(0, MENU_COPY_NOTES, 0, R.string.copy_notes);
-        menu.add(0, MENU_TOGGLE_MONOSPACE, 0, R.string.toggle_monospace);
-        menu.add(0, MENU_TOGGLE_WRAP_NOTES, 0, R.string.toggle_word_wrap);
+        menu.add(0, MENU_TOGGLE_MONOSPACE, 0, R.string.monospace);
+        menu.add(0, MENU_TOGGLE_WRAP_NOTES, 0, R.string.word_wrap);
         return true;
     }
 

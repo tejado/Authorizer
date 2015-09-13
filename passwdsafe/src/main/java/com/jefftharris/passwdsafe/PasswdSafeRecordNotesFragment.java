@@ -70,14 +70,16 @@ public class PasswdSafeRecordNotesFragment
                                            getActivity());
             return true;
         }
-        case R.id.menu_toggle_monospace: {
+        case R.id.menu_monospace: {
             itsIsMonospace = !itsIsMonospace;
+            item.setChecked(itsIsMonospace);
             saveNotesOptionsPrefs();
             setNotesOptions();
             return true;
         }
-        case R.id.menu_toggle_word_wrap: {
+        case R.id.menu_word_wrap: {
             itsIsWordWrap = !itsIsWordWrap;
+            item.setChecked(itsIsWordWrap);
             saveNotesOptionsPrefs();
             setNotesOptions();
             return true;
@@ -92,6 +94,16 @@ public class PasswdSafeRecordNotesFragment
     protected void doOnCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.fragment_passwdsafe_record_notes, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem item = menu.findItem(R.id.menu_monospace);
+        item.setChecked(itsIsMonospace);
+        item = menu.findItem(R.id.menu_word_wrap);
+        item.setChecked(itsIsWordWrap);
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -119,6 +131,7 @@ public class PasswdSafeRecordNotesFragment
         itsIsWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
         itsIsMonospace = prefs.getBoolean(MONOSPACE_PREF, false);
         setNotesOptions();
+        GuiUtils.invalidateOptionsMenu(getActivity());
     }
 
     /**
