@@ -14,11 +14,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
+import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
+
+import org.pwsafe.lib.file.PwsRecord;
+
+import java.util.Date;
 
 
 /**
@@ -29,6 +35,13 @@ public class PasswdSafeRecordPasswordFragment
 {
     private View itsPolicyRow;
     private PasswdPolicyView itsPolicy;
+    private View itsPasswordTimesRow;
+    private View itsExpirationTimeRow;
+    private TextView itsExpirationTime;
+    private View itsExpirationIntervalRow;
+    private TextView itsExpirationInterval;
+    private View itsPasswordModTimeRow;
+    private TextView itsPasswordModTime;
 
     /**
      * Create a new instance of the fragment
@@ -51,7 +64,19 @@ public class PasswdSafeRecordPasswordFragment
         itsPolicyRow = root.findViewById(R.id.policy_row);
         itsPolicy = (PasswdPolicyView)root.findViewById(R.id.policy);
         itsPolicy.setGenerateEnabled(false);
+        itsPasswordTimesRow = root.findViewById(R.id.password_times_row);
+        itsExpirationTimeRow = root.findViewById(R.id.expiration_time_row);
+        itsExpirationTime = (TextView)root.findViewById(R.id.expiration_time);
+        itsExpirationIntervalRow =
+                root.findViewById(R.id.expiration_interval_row);
+        itsExpirationInterval =
+                (TextView)root.findViewById(R.id.expiration_interval);
+        itsPasswordModTimeRow = root.findViewById(R.id.password_mod_time_row);
+        itsPasswordModTime =
+                (TextView)root.findViewById(R.id.password_mod_time);
         return root;
+
+        // TODO: spacing between fields
     }
 
     @Override
@@ -69,6 +94,8 @@ public class PasswdSafeRecordPasswordFragment
 
         PasswdPolicy policy = null;
         String policyLoc = null;
+        PasswdExpiration passwdExpiry = null;
+        Date lastModTime = null;
         switch (info.itsPasswdRec.getType()) {
         case NORMAL: {
             policy = info.itsPasswdRec.getPasswdPolicy();
@@ -91,12 +118,28 @@ public class PasswdSafeRecordPasswordFragment
             } else {
                 policyLoc = getString(R.string.record);
             }
+            passwdExpiry = info.itsFileData.getPasswdExpiry(info.itsRec);
+            lastModTime = info.itsFileData.getPasswdLastModTime(info.itsRec);
             break;
         }
-        case ALIAS:
+        case ALIAS: {
+            PwsRecord recForPassword = info.itsPasswdRec.getRef();
+            passwdExpiry = info.itsFileData.getPasswdExpiry(recForPassword);
+            lastModTime = info.itsFileData.getPasswdLastModTime(recForPassword);
+            break;
+        }
         case SHORTCUT: {
             break;
         }
+        }
+
+        String expiryIntStr = null;
+        if ((passwdExpiry != null) && passwdExpiry.itsIsRecurring) {
+            int val = passwdExpiry.itsInterval;
+            if (val != 0) {
+                expiryIntStr = getResources().getQuantityString(
+                        R.plurals.interval_days, val, val);
+            }
         }
 
         if (policy != null) {
@@ -104,5 +147,16 @@ public class PasswdSafeRecordPasswordFragment
             itsPolicy.showPolicy(policy, -1);
         }
         GuiUtils.setVisible(itsPolicyRow, policy != null);
+
+        setFieldDate(itsExpirationTime, itsExpirationTimeRow,
+                     (passwdExpiry != null) ?
+                             passwdExpiry.itsExpiration : null);
+        setFieldText(itsExpirationInterval, itsExpirationIntervalRow,
+                     expiryIntStr);
+        setFieldDate(itsPasswordModTime, itsPasswordModTimeRow, lastModTime);
+        //noinspection ConstantConditions
+        GuiUtils.setVisible(itsPasswordTimesRow,
+                            (passwdExpiry != null) || (lastModTime != null) ||
+                            (expiryIntStr != null));
     }
 }
