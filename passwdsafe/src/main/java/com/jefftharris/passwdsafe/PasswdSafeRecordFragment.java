@@ -141,6 +141,9 @@ public class PasswdSafeRecordFragment extends Fragment
             }
         });
 
+        // TODO: remember tab when changing records
+        // TODO: how to distinguish close of file vs. close of record in single pane view
+
         final TabLayout tabLayout = (TabLayout)root.findViewById(R.id.tabs);
         tabLayout.post(new Runnable()
         {
