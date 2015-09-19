@@ -314,48 +314,12 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /**
-     * Update the view for the location in the password file
+     * Get the file data
      */
     @Override
-    public void updateLocationView(PasswdLocation location)
+    public PasswdFileData getFileData()
     {
-        PasswdSafeUtil.dbginfo(TAG, "updateLocationView: %s", location);
-        itsLocation = location;
-        itsFileDataView.setCurrGroups(itsLocation.getGroups());
-
-        if (itsFileData == null) {
-            itsTitle = PasswdSafeApp.getAppTitle(null, this);
-        } else {
-            if (location.isRecord()) {
-                PwsRecord rec = itsFileData.getRecord(location.getRecord());
-                itsTitle = itsFileData.getTitle(rec);
-            } else {
-                String groups = location.getGroupPath();
-                if (!TextUtils.isEmpty(groups)) {
-                    itsTitle = PasswdSafeApp.getAppTitle(groups, this);
-                } else {
-                    itsTitle = PasswdSafeApp.getAppFileTitle(
-                            itsFileData.getUri(), this);
-                }
-            }
-        }
-        restoreActionBar();
-
-        if (itsIsTwoPane) {
-            // TODO: show selected item in left list with record selected
-
-            PasswdSafeListFragment.Listener.Mode listMode =
-                    itsLocation.isRecord() ?
-                            PasswdSafeListFragment.Listener.Mode.ALL :
-                            PasswdSafeListFragment.Listener.Mode.GROUPS;
-            FragmentManager fragMgr = getSupportFragmentManager();
-            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
-            if (listFrag instanceof PasswdSafeListFragment) {
-                ((PasswdSafeListFragment)listFrag).updateLocationView(
-                        itsLocation, listMode);
-            }
-        }
-
+        return itsFileData;
     }
 
     @Override
@@ -372,19 +336,36 @@ public class PasswdSafeActivity extends AppCompatActivity
                        Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Update the view for opening a file
+     */
+    @Override
+    public void updateViewFileOpen()
+    {
+    }
+
+    /**
+     * Update the view for a list of records
+     */
+    @Override
+    public void updateViewList(PasswdLocation location)
+    {
+        doUpdateViewLocation(location);
+    }
+
+    /**
+     * Update the view for a record
+     */
+    @Override
+    public void updateViewRecord(PasswdLocation location)
+    {
+        doUpdateViewLocation(location);
+    }
+
     @Override
     public boolean isNavDrawerOpen()
     {
         return itsNavDrawerFrag.isDrawerOpen();
-    }
-
-    /**
-     * Get the file data
-     */
-    @Override
-    public PasswdFileData getFileData()
-    {
-        return itsFileData;
     }
 
     /**
@@ -490,6 +471,50 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
 
         txn.commit();
+    }
+
+    /**
+     * Update the view for a location in the file
+     */
+    private void doUpdateViewLocation(PasswdLocation location)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "doUpdateViewLocation: %s", location);
+        itsLocation = location;
+        itsFileDataView.setCurrGroups(itsLocation.getGroups());
+
+        if (itsFileData == null) {
+            itsTitle = PasswdSafeApp.getAppTitle(null, this);
+        } else {
+            if (location.isRecord()) {
+                PwsRecord rec = itsFileData.getRecord(location.getRecord());
+                itsTitle = itsFileData.getTitle(rec);
+            } else {
+                String groups = location.getGroupPath();
+                if (!TextUtils.isEmpty(groups)) {
+                    itsTitle = PasswdSafeApp.getAppTitle(groups, this);
+                } else {
+                    itsTitle = PasswdSafeApp.getAppFileTitle(
+                            itsFileData.getUri(), this);
+                }
+            }
+        }
+        restoreActionBar();
+
+        if (itsIsTwoPane) {
+            // TODO: show selected item in left list with record selected
+
+            PasswdSafeListFragment.Listener.Mode listMode =
+                    itsLocation.isRecord() ?
+                            PasswdSafeListFragment.Listener.Mode.ALL :
+                            PasswdSafeListFragment.Listener.Mode.GROUPS;
+            FragmentManager fragMgr = getSupportFragmentManager();
+            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
+            if (listFrag instanceof PasswdSafeListFragment) {
+                ((PasswdSafeListFragment)listFrag).updateLocationView(
+                        itsLocation, listMode);
+            }
+        }
+
     }
 
     /**

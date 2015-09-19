@@ -54,6 +54,9 @@ public class PasswdSafeOpenFileFragment extends Fragment
 
         /** Handle when the file was successfully opened */
         void handleFileOpen(PasswdFileData fileData, String recToOpen);
+
+        /** Update the view for opening a file */
+        void updateViewFileOpen();
     }
 
     private Listener itsListener;
@@ -169,6 +172,13 @@ public class PasswdSafeOpenFileFragment extends Fragment
         super.onStart();
         itsResolveTask = new ResolveTask();
         itsResolveTask.execute();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsListener.updateViewFileOpen();
     }
 
     @Override

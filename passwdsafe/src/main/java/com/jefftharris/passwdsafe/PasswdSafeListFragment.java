@@ -54,8 +54,8 @@ public class PasswdSafeListFragment extends ListFragment
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
 
-        /** Update the view for the location in the password file */
-        void updateLocationView(PasswdLocation location);
+        /** Update the view for a list of records */
+        void updateViewList(PasswdLocation location);
     }
 
 
@@ -162,7 +162,7 @@ public class PasswdSafeListFragment extends ListFragment
         super.onResume();
 
         if (itsIsContents) {
-            itsListener.updateLocationView(itsLocation);
+            itsListener.updateViewList(itsLocation);
         }
         refreshList();
     }

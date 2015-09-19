@@ -46,14 +46,14 @@ public class PasswdSafeRecordFragment extends Fragment
         /** Get the file data */
         PasswdFileData getFileData();
 
-        /** Update the view for the location in the password file */
-        void updateLocationView(PasswdLocation location);
-
         /** Edit the record */
         void editRecord(PasswdLocation location);
 
         /** Delete the record */
         void deleteRecord(PasswdLocation location);
+
+        /** Update the view for a record */
+        void updateViewRecord(PasswdLocation location);
 
         /** Is the navigation drawer open */
         boolean isNavDrawerOpen();
@@ -189,7 +189,7 @@ public class PasswdSafeRecordFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateLocationView(itsLocation);
+        itsListener.updateViewRecord(itsLocation);
         refresh();
     }
 
