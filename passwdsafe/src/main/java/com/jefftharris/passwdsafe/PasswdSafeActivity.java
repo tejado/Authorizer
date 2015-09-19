@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -46,7 +47,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: rotation support without having to reopen file
     // TODO: search
     // TODO: 3rdparty file open
-    // TODO: record view
     // TODO: policies
     // TODO: expired passwords
     // TODO: preferences
@@ -75,6 +75,18 @@ public class PasswdSafeActivity extends AppCompatActivity
         OPEN,
         /** A record */
         RECORD
+    }
+
+    enum ViewMode
+    {
+        /** Initial mode */
+        INIT,
+        /** Opening a file */
+        FILE_OPEN,
+        /** Viewing a list of records */
+        VIEW_LIST,
+        /** Viewing a record */
+        VIEW_RECORD
     }
 
     /** The open password file */
@@ -113,6 +125,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         // Set up the drawer.
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
+        doUpdateView(ViewMode.INIT, new PasswdLocation());
         setInitialView();
 
         Intent intent = getIntent();
@@ -346,7 +359,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void updateViewFileOpen()
     {
-        itsNavDrawerFrag.setMode(PasswdSafeNavDrawerFragment.NavMode.INIT);
+        doUpdateView(ViewMode.FILE_OPEN, new PasswdLocation());
     }
 
     /**
@@ -355,8 +368,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void updateViewList(PasswdLocation location)
     {
-        itsNavDrawerFrag.setMode(PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN);
-        doUpdateViewLocation(location);
+        doUpdateView(ViewMode.VIEW_LIST, location);
     }
 
     /**
@@ -365,11 +377,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void updateViewRecord(PasswdLocation location)
     {
-        itsNavDrawerFrag.setMode(
-                itsIsTwoPane ?
-                        PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
-                        PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD);
-        doUpdateViewLocation(location);
+        doUpdateView(ViewMode.VIEW_RECORD, location);
     }
 
     @Override
@@ -480,13 +488,37 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /**
-     * Update the view for a location in the file
+     * Update the view mode
      */
-    private void doUpdateViewLocation(PasswdLocation location)
+    private void doUpdateView(ViewMode mode, @NonNull PasswdLocation location)
     {
-        PasswdSafeUtil.dbginfo(TAG, "doUpdateViewLocation: %s", location);
+        PasswdSafeUtil.dbginfo(TAG, "doUpdateView: mode: %s, loc: %s",
+                               mode, location);
+
+        PasswdSafeNavDrawerFragment.NavMode drawerMode =
+                PasswdSafeNavDrawerFragment.NavMode.INIT;
+        switch (mode) {
+        case INIT: {
+            break;
+        }
+        case FILE_OPEN: {
+            break;
+        }
+        case VIEW_LIST: {
+            drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
+            break;
+        }
+        case VIEW_RECORD: {
+            drawerMode = itsIsTwoPane ?
+                    PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
+                    PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD;
+            break;
+        }
+        }
+
         itsLocation = location;
         itsFileDataView.setCurrGroups(itsLocation.getGroups());
+        itsNavDrawerFrag.setMode(drawerMode);
 
         if (itsFileData == null) {
             itsTitle = PasswdSafeApp.getAppTitle(null, this);
