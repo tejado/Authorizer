@@ -169,8 +169,6 @@ public class PasswdSafeRecordFragment extends Fragment
         });
         viewPager.setCurrentItem(itsLastSelectedTab);
 
-        // TODO: how to distinguish close of file vs. close of record in single pane view
-
         itsTabs = (TabLayout)root.findViewById(R.id.tabs);
         itsTabs.post(new Runnable()
         {

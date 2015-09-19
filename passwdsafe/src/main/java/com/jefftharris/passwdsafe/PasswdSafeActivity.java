@@ -178,10 +178,14 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
+        case android.R.id.home: {
+            if (itsNavDrawerFrag.isDrawerEnabled()) {
+                return super.onOptionsItemSelected(item);
+            }
+            onBackPressed();
+            return true;
+        }
         case R.id.menu_close: {
             finish();
             return true;
@@ -342,6 +346,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void updateViewFileOpen()
     {
+        itsNavDrawerFrag.setMode(PasswdSafeNavDrawerFragment.NavMode.INIT);
     }
 
     /**
@@ -350,6 +355,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void updateViewList(PasswdLocation location)
     {
+        itsNavDrawerFrag.setMode(PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN);
         doUpdateViewLocation(location);
     }
 
@@ -359,6 +365,10 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void updateViewRecord(PasswdLocation location)
     {
+        itsNavDrawerFrag.setMode(
+                itsIsTwoPane ?
+                        PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
+                        PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD);
         doUpdateViewLocation(location);
     }
 
@@ -418,7 +428,6 @@ public class PasswdSafeActivity extends AppCompatActivity
         //FragmentManager.enableDebugLogging(true);
         FragmentTransaction txn = fragMgr.beginTransaction();
 
-        boolean fileOpen = false;
         boolean showLeftList = false;
         boolean forceLeftListVisibility = false;
         boolean clearBackStack = false;
@@ -434,20 +443,17 @@ public class PasswdSafeActivity extends AppCompatActivity
             break;
         }
         case OPEN_INIT: {
-            fileOpen = true;
             showLeftList = true;
             clearBackStack = true;
             break;
         }
         case OPEN:
         case RECORD: {
-            fileOpen = true;
             showLeftList = true;
             supportsBack = true;
             break;
         }
         }
-        itsNavDrawerFrag.setFileOpen(fileOpen);
         if (clearBackStack) {
             //noinspection StatementWithEmptyBody
             while (fragMgr.popBackStackImmediate()) {
