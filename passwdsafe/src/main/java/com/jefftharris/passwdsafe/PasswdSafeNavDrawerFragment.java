@@ -51,6 +51,16 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         void showAbout();
     }
 
+    public enum NavMode
+    {
+        /** Initial state */
+        INIT,
+        /** File open */
+        FILE_OPEN,
+        /** Record open in a single-pane view */
+        SINGLE_RECORD
+    }
+
     /** Per the design guidelines, you should show the drawer on launch until
      * the user manually expands it. This shared preference tracks this. */
     private static final String PREF_USER_LEARNED_DRAWER =
@@ -113,6 +123,12 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     {
         return itsDrawerLayout != null &&
                itsDrawerLayout.isDrawerOpen(itsFragmentContainerView);
+    }
+
+    /** Is the drawer enabled */
+    public boolean isDrawerEnabled()
+    {
+        return itsDrawerToggle.isDrawerIndicatorEnabled();
     }
 
     /**
@@ -184,13 +200,34 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         }
 
         itsDrawerLayout.setDrawerListener(itsDrawerToggle);
+        setMode(NavMode.INIT);
     }
 
     /** Update drawer for whether a file is open */
-    public void setFileOpen(boolean open)
+    public void setMode(NavMode mode)
     {
+        boolean fileOpen = false;
+        boolean drawerEnabled = false;
+        switch (mode) {
+        case INIT: {
+            drawerEnabled = true;
+            break;
+        }
+        case FILE_OPEN: {
+            fileOpen = true;
+            drawerEnabled = true;
+            break;
+        }
+        case SINGLE_RECORD: {
+            fileOpen = true;
+            break;
+        }
+        }
+
+        itsDrawerToggle.setDrawerIndicatorEnabled(drawerEnabled);
+
         Menu menu = itsNavView.getMenu();
-        menu.setGroupEnabled(R.id.menu_drawer_file_group, open);
+        menu.setGroupEnabled(R.id.menu_drawer_file_group, fileOpen);
     }
 
     /** Call from activity's onPostCreate callback */

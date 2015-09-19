@@ -567,7 +567,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
             View root = getView();
             setVisibility(R.id.yubi_progress_text, false, root);
             setProgressVisible(false, false);
-            // TODO: test yubikey with disabled fields
             setFieldsEnabled(true);
         }
     }
