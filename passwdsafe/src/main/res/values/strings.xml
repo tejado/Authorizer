@@ -81,7 +81,7 @@
     <string name="file_exists">File exists</string>
     <string name="file_label">File:</string>
     <string name="file_label_val">File: %1$s</string>
-    <string name="file_name_label">File Name:</string>
+    <string name="file_name">File Name</string>
     <string name="file_operations">File Operations…</string>
     <string name="file_password_encoding">File password encoding</string>
     <string name="file_settings">File Settings</string>

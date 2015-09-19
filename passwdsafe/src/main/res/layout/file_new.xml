@@ -15,7 +15,7 @@
 
                 <TextView
                     style="@style/TableLabelColumn"
-                    android:text="@string/file_name_label"/>
+                    android:text="@string/file_name"/>
 
                 <EditText android:id="@+id/file_name"
                           android:singleLine="true"
