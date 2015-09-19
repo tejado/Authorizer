@@ -66,8 +66,6 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     private static final String PREF_USER_LEARNED_DRAWER =
             "passwdsafe_navigation_drawer_learned";
 
-    // TODO: test initial state of autoshow drawer.  Does it conflict with file open?
-
     /** Helper component that ties the action bar to the navigation drawer. */
     private ActionBarDrawerToggle itsDrawerToggle;
 
@@ -192,11 +190,6 @@ public class PasswdSafeNavDrawerFragment extends Fragment
             }
         };
 
-        // If the user hasn't 'learned' about the drawer, open it
-        if (!itsUserLearnedDrawer && !itsFromSavedInstanceState) {
-            itsDrawerLayout.openDrawer(itsFragmentContainerView);
-        }
-
         itsDrawerLayout.setDrawerListener(itsDrawerToggle);
         setMode(NavMode.INIT);
     }
@@ -206,6 +199,7 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     {
         boolean fileOpen = false;
         boolean drawerEnabled = false;
+        boolean openDrawer = false;
         switch (mode) {
         case INIT: {
             drawerEnabled = true;
@@ -214,6 +208,8 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         case FILE_OPEN: {
             fileOpen = true;
             drawerEnabled = true;
+            // If the user hasn't 'learned' about the drawer, open it
+            openDrawer = !itsUserLearnedDrawer && !itsFromSavedInstanceState;
             break;
         }
         case SINGLE_RECORD: {
@@ -226,6 +222,10 @@ public class PasswdSafeNavDrawerFragment extends Fragment
 
         Menu menu = itsNavView.getMenu();
         menu.setGroupEnabled(R.id.menu_drawer_file_group, fileOpen);
+
+        if (openDrawer) {
+            itsDrawerLayout.openDrawer(itsFragmentContainerView);
+        }
     }
 
     /** Call from activity's onPostCreate callback */
