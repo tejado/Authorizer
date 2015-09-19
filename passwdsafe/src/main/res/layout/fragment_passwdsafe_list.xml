@@ -36,7 +36,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:drawSelectorOnTop="false"
-        android:fastScrollEnabled="true"/>
+        android:fastScrollEnabled="true"
+        android:choiceMode="singleChoice"/>
 
     <TextView
         android:id="@android:id/empty"
