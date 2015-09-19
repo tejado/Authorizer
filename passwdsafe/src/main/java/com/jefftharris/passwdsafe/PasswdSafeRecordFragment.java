@@ -21,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
@@ -64,7 +63,6 @@ public class PasswdSafeRecordFragment extends Fragment
     private boolean itsCanDelete = false;
     private boolean itsHasNotes = false;
     private TabLayout itsTabs;
-    private TextView itsTitle;
     private Listener itsListener;
 
     /** Last selected tab to restore across records */
@@ -110,7 +108,6 @@ public class PasswdSafeRecordFragment extends Fragment
         setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record,
                                      container, false);
-        itsTitle = (TextView)root.findViewById(R.id.title);
 
         final ViewPager viewPager = (ViewPager)root.findViewById(R.id.viewpager);
         viewPager.addOnPageChangeListener(
@@ -268,8 +265,6 @@ public class PasswdSafeRecordFragment extends Fragment
         if (passwdRec == null) {
             return;
         }
-
-        itsTitle.setText(fileData.getTitle(rec));
 
         itsCanEdit = fileData.canEdit();
         boolean isProtected = fileData.isProtected(rec);
