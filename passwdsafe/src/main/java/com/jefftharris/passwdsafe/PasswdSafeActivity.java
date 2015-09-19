@@ -24,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
@@ -61,7 +62,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: autobackup
     // TODO: keyboard support
     // TODO: shortcuts
-    // TODO: hide app (or certain views) from recent apps list
 
     enum Mode
     {
@@ -115,6 +115,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        ApiCompat.setRecentAppsVisible(getWindow(), false);
         setContentView(R.layout.activity_passwdsafe);
         itsIsTwoPane = (findViewById(R.id.content_list) != null);
 
