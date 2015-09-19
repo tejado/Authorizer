@@ -66,8 +66,6 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     private static final String PREF_USER_LEARNED_DRAWER =
             "passwdsafe_navigation_drawer_learned";
 
-    // TODO: remember selected item? (or init from activity state)
-
     // TODO: test initial state of autoshow drawer.  Does it conflict with file open?
 
     /** Helper component that ties the action bar to the navigation drawer. */
