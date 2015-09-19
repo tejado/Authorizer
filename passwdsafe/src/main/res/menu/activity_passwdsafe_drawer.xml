@@ -11,7 +11,8 @@
            android:enabled="false"
            android:checkableBehavior="single">
         <item android:id="@+id/menu_drawer_records"
-              android:title="@string/records"/>
+              android:title="@string/records"
+              android:checked="true"/>
 
         <item android:id="@+id/menu_drawer_passwd_policies"
               android:title="@string/password_policies"/>

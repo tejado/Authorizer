@@ -54,6 +54,9 @@ public class PasswdSafeOpenFileFragment extends Fragment
 
         /** Handle when the file was successfully opened */
         void handleFileOpen(PasswdFileData fileData, String recToOpen);
+
+        /** Update the view for opening a file */
+        void updateViewFileOpen();
     }
 
     private Listener itsListener;
@@ -169,6 +172,13 @@ public class PasswdSafeOpenFileFragment extends Fragment
         super.onStart();
         itsResolveTask = new ResolveTask();
         itsResolveTask.execute();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsListener.updateViewFileOpen();
     }
 
     @Override
@@ -316,7 +326,9 @@ public class PasswdSafeOpenFileFragment extends Fragment
         itsPasswordEdit.setEnabled(true);
         itsOkBtn.setEnabled(true);
         //noinspection ConstantConditions
-        if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
+        if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
+            (itsFileUri.getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
+            itsReadonlyCb.setChecked(false);
             itsPasswordEdit.setText("test123");
             itsOkBtn.performClick();
         }
@@ -555,7 +567,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
             View root = getView();
             setVisibility(R.id.yubi_progress_text, false, root);
             setProgressVisible(false, false);
-            // TODO: test yubikey with disabled fields
             setFieldsEnabled(true);
         }
     }
