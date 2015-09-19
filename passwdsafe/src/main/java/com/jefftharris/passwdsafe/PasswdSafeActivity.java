@@ -507,8 +507,6 @@ public class PasswdSafeActivity extends AppCompatActivity
         restoreActionBar();
 
         if (itsIsTwoPane) {
-            // TODO: show selected item in left list with record selected
-
             PasswdSafeListFragment.Listener.Mode listMode =
                     itsLocation.isRecord() ?
                             PasswdSafeListFragment.Listener.Mode.ALL :

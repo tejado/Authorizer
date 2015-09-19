@@ -19,11 +19,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdRecordListData;
 
@@ -148,7 +150,8 @@ public class PasswdSafeListFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
-        itsAdapter = new ItemListAdapter(itsIsSortCaseSensitive, getActivity());
+        itsAdapter = new ItemListAdapter(itsIsSortCaseSensitive, itsIsContents,
+                                         getActivity());
         setListAdapter(itsAdapter);
     }
 
@@ -269,7 +272,17 @@ public class PasswdSafeListFragment extends ListFragment
     public void onLoadFinished(Loader<List<PasswdRecordListData>> loader,
                                List<PasswdRecordListData> data)
     {
-        itsAdapter.setData(data);
+        int selPos = itsAdapter.setData(
+                data, itsIsContents ? null : itsLocation.getRecord());
+        if (isResumed()) {
+            ListView list = getListView();
+            if (selPos != -1) {
+                list.setItemChecked(selPos, true);
+                list.smoothScrollToPosition(selPos);
+            } else {
+                list.clearChoices();
+            }
+        }
     }
 
 
@@ -279,7 +292,7 @@ public class PasswdSafeListFragment extends ListFragment
     @Override
     public void onLoaderReset(Loader<List<PasswdRecordListData>> loader)
     {
-        itsAdapter.setData(null);
+        onLoadFinished(loader, null);
     }
 
 
@@ -289,21 +302,27 @@ public class PasswdSafeListFragment extends ListFragment
     {
         private final LayoutInflater itsInflater;
         private final boolean itsIsCaseSensitive;
+        private final boolean itsIsContents;
         private Section[] itsSections;
         // TODO: keep fast scrolling??
 
         /** Constructor */
-        public ItemListAdapter(boolean caseSensitive, Context context)
+        public ItemListAdapter(boolean caseSensitive,
+                               boolean isContents,
+                               Context context)
         {
             super(context, R.layout.passwdsafe_list_item, android.R.id.text1);
             itsInflater = (LayoutInflater)context.getSystemService(
                     Context.LAYOUT_INFLATER_SERVICE);
             itsIsCaseSensitive = caseSensitive;
+            itsIsContents = isContents;
         }
 
         /** Set the list data */
-        public void setData(List<PasswdRecordListData> data)
+        public int setData(List<PasswdRecordListData> data,
+                           String selectedRecord)
         {
+            int selectedPos = -1;
             setNotifyOnChange(false);
             clear();
             ArrayList<Section> sections = new ArrayList<>();
@@ -312,6 +331,10 @@ public class PasswdSafeListFragment extends ListFragment
                 int idx = 0;
                 for (PasswdRecordListData item: data) {
                     add(item);
+                    if ((selectedRecord != null) &&
+                        TextUtils.equals(item.itsUuid, selectedRecord)) {
+                        selectedPos = idx;
+                    }
 
                     char first = TextUtils.isEmpty(item.itsTitle) ?
                             ' ' : item.itsTitle.charAt(0);
@@ -329,6 +352,7 @@ public class PasswdSafeListFragment extends ListFragment
             itsSections = sections.toArray(new Section[sections.size()]);
             setNotifyOnChange(true);
             notifyDataSetChanged();
+            return selectedPos;
         }
 
         /* (non-Javadoc)
@@ -347,7 +371,11 @@ public class PasswdSafeListFragment extends ListFragment
                 itemViews = (ViewHolder)convertView.getTag();
             }
 
-            itemViews.update(getItem(position));
+            PasswdRecordListData item = getItem(position);
+            ListView list = (ListView)parent;
+            boolean isSelected = list.isItemChecked(position);
+            itemViews.update(item, isSelected,
+                             !itsIsContents && (item.itsRecord != null));
             return convertView;
         }
 
@@ -389,6 +417,7 @@ public class PasswdSafeListFragment extends ListFragment
             private final TextView itsUser;
             private final TextView itsMatch;
             private final ImageView itsIcon;
+            private final CheckBox itsSelection;
             private int itsLastIconImage;
 
             /** Constructor */
@@ -398,11 +427,14 @@ public class PasswdSafeListFragment extends ListFragment
                 itsUser = (TextView)view.findViewById(android.R.id.text2);
                 itsMatch = (TextView)view.findViewById(R.id.match);
                 itsIcon = (ImageView)view.findViewById(R.id.icon);
+                itsSelection = (CheckBox)view.findViewById(R.id.selection);
                 itsLastIconImage = -1;
             }
 
             /** Update the fields for a list item */
-            public void update(PasswdRecordListData item)
+            public void update(PasswdRecordListData item,
+                               boolean selected,
+                               boolean isLeftListRecord)
             {
                 setText(itsTitle, item.itsTitle);
                 setText(itsUser, item.itsUser);
@@ -411,6 +443,8 @@ public class PasswdSafeListFragment extends ListFragment
                     itsIcon.setImageResource(item.itsIcon);
                     itsLastIconImage = item.itsIcon;
                 }
+                itsSelection.setChecked(selected);
+                GuiUtils.setVisible(itsSelection, isLeftListRecord);
 
                 itsTitle.requestLayout();
             }
