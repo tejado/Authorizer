@@ -108,7 +108,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Does the UI show two panes */
     private boolean itsIsTwoPane = false;
 
-    /** Logging tag */
+    private static final String STATE_TITLE = "title";
     private static final String TAG = "PasswdSafeActivity";
 
     @Override
@@ -122,26 +122,29 @@ public class PasswdSafeActivity extends AppCompatActivity
         itsNavDrawerFrag = (PasswdSafeNavDrawerFragment)
                 getSupportFragmentManager().findFragmentById(
                         R.id.navigation_drawer);
-        itsTitle = getTitle();
-
-        // Set up the drawer.
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
-        doUpdateView(ViewMode.INIT, new PasswdLocation());
-        changeInitialView();
 
-        Intent intent = getIntent();
-        PasswdSafeUtil.dbginfo(TAG, "onCreate: %s", intent);
-        switch (intent.getAction()) {
-        case PasswdSafeUtil.VIEW_INTENT:
-        case Intent.ACTION_VIEW: {
-            changeFileOpenView(intent);
-            break;
-        }
-        default: {
-            Log.e(TAG, "Unknown action for intent: " + intent);
-            finish();
-            break;
-        }
+        if (savedInstanceState == null) {
+            itsTitle = getTitle();
+            doUpdateView(ViewMode.INIT, new PasswdLocation());
+            changeInitialView();
+
+            Intent intent = getIntent();
+            PasswdSafeUtil.dbginfo(TAG, "onCreate: %s", intent);
+            switch (intent.getAction()) {
+            case PasswdSafeUtil.VIEW_INTENT:
+            case Intent.ACTION_VIEW: {
+                changeFileOpenView(intent);
+                break;
+            }
+            default: {
+                Log.e(TAG, "Unknown action for intent: " + intent);
+                finish();
+                break;
+            }
+            }
+        } else {
+            itsTitle = savedInstanceState.getCharSequence(STATE_TITLE);
         }
     }
 
@@ -162,6 +165,13 @@ public class PasswdSafeActivity extends AppCompatActivity
     {
         itsNavDrawerFrag.onPostCreate();
         super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(STATE_TITLE, itsTitle);
     }
 
     @Override
@@ -437,28 +447,17 @@ public class PasswdSafeActivity extends AppCompatActivity
         //FragmentManager.enableDebugLogging(true);
         FragmentTransaction txn = fragMgr.beginTransaction();
 
-        boolean showLeftList = false;
-        boolean forceLeftListVisibility = false;
         boolean clearBackStack = false;
         boolean supportsBack = false;
         switch (mode) {
-        case INIT: {
-            clearBackStack = true;
-            forceLeftListVisibility = true;
-            break;
-        }
-        case FILE_OPEN: {
-            clearBackStack = true;
-            break;
-        }
+        case INIT:
+        case FILE_OPEN:
         case OPEN_INIT: {
-            showLeftList = true;
             clearBackStack = true;
             break;
         }
         case OPEN:
         case RECORD: {
-            showLeftList = true;
             supportsBack = true;
             break;
         }
@@ -479,7 +478,6 @@ public class PasswdSafeActivity extends AppCompatActivity
                 txn.remove(currFrag);
             }
         }
-        setLeftListVisible(showLeftList, forceLeftListVisibility, txn, fragMgr);
 
         if (supportsBack) {
             txn.addToBackStack(null);
@@ -496,20 +494,21 @@ public class PasswdSafeActivity extends AppCompatActivity
         PasswdSafeUtil.dbginfo(TAG, "doUpdateView: mode: %s, loc: %s",
                                mode, location);
 
+        boolean showLeftList = false;
         PasswdSafeNavDrawerFragment.NavMode drawerMode =
                 PasswdSafeNavDrawerFragment.NavMode.INIT;
         switch (mode) {
-        case INIT: {
-            break;
-        }
+        case INIT:
         case FILE_OPEN: {
             break;
         }
         case VIEW_LIST: {
+            showLeftList = true;
             drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
             break;
         }
         case VIEW_RECORD: {
+            showLeftList = true;
             drawerMode = itsIsTwoPane ?
                     PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
                     PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD;
@@ -550,26 +549,19 @@ public class PasswdSafeActivity extends AppCompatActivity
                 ((PasswdSafeListFragment)listFrag).updateLocationView(
                         itsLocation, listMode);
             }
-        }
 
-    }
-
-    /**
-     *  Set whether the left pane is visible
-     */
-    private void setLeftListVisible(boolean visible,
-                                    boolean force,
-                                    FragmentTransaction txn,
-                                    FragmentManager fragMgr)
-    {
-        if (itsIsTwoPane) {
-            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
             if (listFrag != null) {
-                if (visible && (force || listFrag.isHidden())) {
+                FragmentTransaction txn = fragMgr.beginTransaction();
+                if (showLeftList) {
+                    txn.setTransitionStyle(
+                            FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                     txn.show(listFrag);
-                } else if (!visible && (force || listFrag.isVisible())) {
+                } else {
+                    txn.setTransitionStyle(
+                            FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
                     txn.hide(listFrag);
                 }
+                txn.commit();
             }
         }
     }
