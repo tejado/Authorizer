@@ -93,7 +93,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     PasswdFileData itsFileData;
 
     /** The open password file view */
-    PasswdFileDataView itsFileDataView = new PasswdFileDataView(this);
+    PasswdFileDataView itsFileDataView = new PasswdFileDataView();
 
     /** The location in the password file */
     PasswdLocation itsLocation = new PasswdLocation();
@@ -179,7 +179,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     {
         super.onDestroy();
         if (itsFileData != null) {
-            itsFileDataView.clearFileData();
+            itsFileDataView.clearFileData(this);
             itsFileData.close();
             itsFileData = null;
         }
@@ -286,11 +286,11 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         // TODO: recToOpen
         if (itsFileData != null) {
-            itsFileDataView.clearFileData();
+            itsFileDataView.clearFileData(this);
             itsFileData.close();
         }
         itsFileData = fileData;
-        itsFileDataView.setFileData(itsFileData);
+        itsFileDataView.setFileData(itsFileData, this);
         changeOpenView(itsLocation, true);
     }
 
@@ -322,7 +322,8 @@ public class PasswdSafeActivity extends AppCompatActivity
             break;
         }
         }
-        return itsFileDataView.getRecords(incRecords, incGroups);
+        return itsFileDataView.getRecords(incRecords, incGroups,
+                                          getApplicationContext());
     }
 
     /**

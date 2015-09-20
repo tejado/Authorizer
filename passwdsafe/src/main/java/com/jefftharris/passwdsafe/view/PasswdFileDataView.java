@@ -49,42 +49,40 @@ public class PasswdFileDataView
     private RecordSortOrderPref itsRecordSortOrder =
             RecordSortOrderPref.GROUP_LAST;
 
-    private final Context itsContext;
-
     /**
      * Constructor
      */
-    public PasswdFileDataView(Context ctx)
+    public PasswdFileDataView()
     {
         itsRootNode = new GroupNode();
-        itsContext = ctx;
     }
 
     /**
      * Clear the file data
      */
-    public synchronized void clearFileData()
+    public synchronized void clearFileData(Context ctx)
     {
         itsFileData = null;
         itsCurrGroups.clear();
-        rebuildView();
+        rebuildView(ctx);
     }
 
     /**
      * Set the file data
      */
-    public synchronized void setFileData(PasswdFileData fileData)
+    public synchronized void setFileData(PasswdFileData fileData, Context ctx)
     {
         itsFileData = fileData;
         itsCurrGroups.clear();
-        rebuildView();
+        rebuildView(ctx);
     }
 
     /**
      * Get records
      */
     public synchronized List<PasswdRecordListData> getRecords(boolean incRecords,
-                                                              boolean incGroups)
+                                                              boolean incGroups,
+                                                              Context ctx)
     {
         List<PasswdRecordListData> records = new ArrayList<>();
         if (itsCurrGroupNode == null) {
@@ -97,7 +95,7 @@ public class PasswdFileDataView
                 for (Map.Entry<String, GroupNode> entry:
                         entryGroups.entrySet()) {
                     int items = entry.getValue().getNumRecords();
-                    String str = itsContext.getResources().getQuantityString(
+                    String str = ctx.getResources().getQuantityString(
                             R.plurals.group_items, items, items);
 
                     records.add(new PasswdRecordListData(
@@ -137,7 +135,7 @@ public class PasswdFileDataView
     /**
      * Rebuild the view information
      */
-    private void rebuildView()
+    private void rebuildView(Context ctx)
     {
         // TODO: rebuild in background?
 
@@ -153,7 +151,7 @@ public class PasswdFileDataView
                     new StringComparator() : String.CASE_INSENSITIVE_ORDER;
 
             for (PwsRecord rec: records) {
-                String match = filterRecord(rec);
+                String match = filterRecord(rec, ctx);
                 if (match == null) {
                     continue;
                 }
@@ -176,7 +174,7 @@ public class PasswdFileDataView
              }
         } else {
             for (PwsRecord rec: records) {
-                String match = filterRecord(rec);
+                String match = filterRecord(rec, ctx);
                 if (match != null) {
                     itsRootNode.addRecord(new MatchPwsRecord(rec, match));
                 }
@@ -208,12 +206,12 @@ public class PasswdFileDataView
      * @return A non-null string if the record matches the filter; null if it
      * does not
      */
-    private String filterRecord(PwsRecord rec)
+    private String filterRecord(PwsRecord rec, Context ctx)
     {
         if (itsFilter == null) {
             return PasswdRecordFilter.QUERY_MATCH;
         }
-        return itsFilter.filterRecord(rec, itsFileData, itsContext);
+        return itsFilter.filterRecord(rec, itsFileData, ctx);
     }
 
     /**
