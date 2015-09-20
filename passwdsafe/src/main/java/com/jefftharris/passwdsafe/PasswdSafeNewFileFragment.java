@@ -41,6 +41,9 @@ public class PasswdSafeNewFileFragment extends Fragment
 
         /** Handle when the file was successfully created */
         void handleFileNew(PasswdFileData fileData);
+
+        /** Update the view for creating a new file */
+        void updateViewFileNew();
     }
 
     private Listener itsListener;
@@ -113,6 +116,13 @@ public class PasswdSafeNewFileFragment extends Fragment
         super.onStart();
         itsResolveTask = new ResolveTask();
         itsResolveTask.execute();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsListener.updateViewFileNew();
     }
 
     @Override
