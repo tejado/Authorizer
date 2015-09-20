@@ -89,11 +89,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         VIEW_RECORD
     }
 
-    /** The open password file */
-    private PasswdFileData itsFileData;
-
-    /** The open password file view */
-    private PasswdFileDataView itsFileDataView = new PasswdFileDataView();
+    /** Fragment holding the open file data */
+    private PasswdSafeFileDataFragment itsFileDataFrag;
 
     /** The location in the password file */
     private PasswdLocation itsLocation = new PasswdLocation();
@@ -108,6 +105,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Does the UI show two panes */
     private boolean itsIsTwoPane = false;
 
+    private static final String FRAG_DATA = "data";
     private static final String STATE_TITLE = "title";
     private static final String TAG = "PasswdSafeActivity";
 
@@ -117,14 +115,23 @@ public class PasswdSafeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         ApiCompat.setRecentAppsVisible(getWindow(), false);
         setContentView(R.layout.activity_passwdsafe);
-        itsIsTwoPane = (findViewById(R.id.content_list) != null);
+        itsIsTwoPane = (findViewById(R.id.two_pane) != null);
 
         itsNavDrawerFrag = (PasswdSafeNavDrawerFragment)
                 getSupportFragmentManager().findFragmentById(
                         R.id.navigation_drawer);
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
 
-        if (savedInstanceState == null) {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        itsFileDataFrag = (PasswdSafeFileDataFragment)
+                fragMgr.findFragmentByTag(FRAG_DATA);
+        if (itsFileDataFrag == null) {
+            itsFileDataFrag = new PasswdSafeFileDataFragment();
+            fragMgr.beginTransaction().add(itsFileDataFrag, FRAG_DATA).commit();
+        }
+        boolean newFileDataFrag = itsFileDataFrag.checkNew();
+
+        if (newFileDataFrag || (savedInstanceState == null)) {
             itsTitle = getTitle();
             doUpdateView(ViewMode.INIT, new PasswdLocation());
             changeInitialView();
@@ -172,17 +179,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     {
         super.onSaveInstanceState(outState);
         outState.putCharSequence(STATE_TITLE, itsTitle);
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-        if (itsFileData != null) {
-            itsFileDataView.clearFileData(this);
-            itsFileData.close();
-            itsFileData = null;
-        }
     }
 
     @Override
@@ -285,12 +281,7 @@ public class PasswdSafeActivity extends AppCompatActivity
                                fileData.getUri(), recToOpen);
 
         // TODO: recToOpen
-        if (itsFileData != null) {
-            itsFileDataView.clearFileData(this);
-            itsFileData.close();
-        }
-        itsFileData = fileData;
-        itsFileDataView.setFileData(itsFileData, this);
+        itsFileDataFrag.setFileData(fileData, this);
         changeOpenView(itsLocation, true);
     }
 
@@ -301,7 +292,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     public List<PasswdRecordListData> getBackgroundRecordItems(
             PasswdSafeListFragment.Listener.Mode mode)
     {
-        if (itsFileDataView == null) {
+        PasswdFileDataView dataView = itsFileDataFrag.getFileDataView();
+        if (dataView == null) {
             return null;
         }
 
@@ -322,8 +314,8 @@ public class PasswdSafeActivity extends AppCompatActivity
             break;
         }
         }
-        return itsFileDataView.getRecords(incRecords, incGroups,
-                                          getApplicationContext());
+        return dataView.getRecords(incRecords, incGroups,
+                                   getApplicationContext());
     }
 
     /**
@@ -332,7 +324,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void changeLocation(PasswdLocation location)
     {
-        if (itsFileData == null) {
+        if (itsFileDataFrag.getFileData() == null) {
             return;
         }
 
@@ -348,7 +340,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public PasswdFileData getFileData()
     {
-        return itsFileData;
+        return itsFileDataFrag.getFileData();
     }
 
     @Override
@@ -518,33 +510,43 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
 
         itsLocation = location;
-        itsFileDataView.setCurrGroups(itsLocation.getGroups());
+        itsFileDataFrag.getFileDataView().setCurrGroups(itsLocation.getGroups());
         itsNavDrawerFrag.setMode(drawerMode);
 
-        if (itsFileData == null) {
+        PasswdFileData fileData = itsFileDataFrag.getFileData();
+        if (fileData == null) {
             itsTitle = PasswdSafeApp.getAppTitle(null, this);
         } else {
             if (location.isRecord()) {
-                PwsRecord rec = itsFileData.getRecord(location.getRecord());
-                itsTitle = itsFileData.getTitle(rec);
+                PwsRecord rec = fileData.getRecord(location.getRecord());
+                itsTitle = fileData.getTitle(rec);
             } else {
                 String groups = location.getGroupPath();
                 if (!TextUtils.isEmpty(groups)) {
                     itsTitle = PasswdSafeApp.getAppTitle(groups, this);
                 } else {
                     itsTitle = PasswdSafeApp.getAppFileTitle(
-                            itsFileData.getUri(), this);
+                            fileData.getUri(), this);
                 }
             }
         }
         restoreActionBar();
+
+        FragmentManager fragMgr = getSupportFragmentManager();
+        Fragment contentsFrag = fragMgr.findFragmentById(R.id.content);
+        if (contentsFrag instanceof PasswdSafeListFragment) {
+            PasswdSafeListFragment.Listener.Mode contentsMode =
+                    itsIsTwoPane ? PasswdSafeListFragment.Listener.Mode.RECORDS :
+                            PasswdSafeListFragment.Listener.Mode.ALL;
+            ((PasswdSafeListFragment)contentsFrag).updateLocationView(
+                    itsLocation, contentsMode);
+        }
 
         if (itsIsTwoPane) {
             PasswdSafeListFragment.Listener.Mode listMode =
                     itsLocation.isRecord() ?
                             PasswdSafeListFragment.Listener.Mode.ALL :
                             PasswdSafeListFragment.Listener.Mode.GROUPS;
-            FragmentManager fragMgr = getSupportFragmentManager();
             Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
             if (listFrag instanceof PasswdSafeListFragment) {
                 ((PasswdSafeListFragment)listFrag).updateLocationView(
