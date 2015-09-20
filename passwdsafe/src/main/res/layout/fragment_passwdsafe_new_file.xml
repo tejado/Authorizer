@@ -39,7 +39,9 @@
                 android:hint="@string/file_name"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textAppearance="?android:attr/textAppearanceMedium">
+                android:inputType="textNoSuggestions"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/psafe3_ext">
                 <requestFocus/>
             </EditText>
         </android.support.design.widget.TextInputLayout>

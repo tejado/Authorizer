@@ -12,10 +12,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -48,7 +51,7 @@ public class PasswdSafeNewFileFragment extends Fragment
 
     private Listener itsListener;
     private Uri itsNewFileUri;
-    private TextView itsFileName;
+    private EditText itsFileName;
     private TextView itsPasswordEdit;
     private TextView itsPasswordConfirm;
     private ProgressBar itsProgress;
@@ -85,7 +88,38 @@ public class PasswdSafeNewFileFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_passwdsafe_new_file,
                                          container, false);
 
-        itsFileName = (TextView)rootView.findViewById(R.id.file_name);
+        itsFileName = (EditText)rootView.findViewById(R.id.file_name);
+        itsFileName.setSelection(0);
+        itsFileName.addTextChangedListener(new TextWatcher()
+        {
+            private final String itsSuffix;
+
+            {
+                itsSuffix = getString(R.string.psafe3_ext);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after)
+            {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count)
+            {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                if (!s.toString().endsWith(itsSuffix)) {
+                    s.replace(0, s.length(), itsSuffix);
+                    itsFileName.setSelection(0);
+                }
+            }
+        });
+
         itsPasswordEdit = (TextView)rootView.findViewById(R.id.password);
         itsPasswordConfirm =
                 (TextView)rootView.findViewById(R.id.password_confirm);
