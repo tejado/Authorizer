@@ -76,6 +76,11 @@ public class PasswdSafeOpenFileFragment extends Fragment
     private int itsYubiSlot = 2;
     private int itsNumProgressUsers = 0;
 
+    private static final String ARG_URI = "uri";
+    private static final String ARG_REC_TO_OPEN = "recToOpen";
+    private static final String STATE_SLOT = "slot";
+
+
     /**
      * Create a new instance
      */
@@ -84,8 +89,8 @@ public class PasswdSafeOpenFileFragment extends Fragment
     {
         PasswdSafeOpenFileFragment fragment = new PasswdSafeOpenFileFragment();
         Bundle args = new Bundle();
-        args.putParcelable("uri", fileUri);
-        args.putString("recToOpen", recToOpen);
+        args.putParcelable(ARG_URI, fileUri);
+        args.putString(ARG_REC_TO_OPEN, recToOpen);
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,8 +101,14 @@ public class PasswdSafeOpenFileFragment extends Fragment
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            itsFileUri = args.getParcelable("uri");
-            itsRecToOpen = args.getString("recToOpen");
+            itsFileUri = args.getParcelable(ARG_URI);
+            itsRecToOpen = args.getString(ARG_REC_TO_OPEN);
+        }
+
+        if (savedInstanceState == null) {
+            itsYubiSlot = 2;
+        } else {
+            itsYubiSlot = savedInstanceState.getInt(STATE_SLOT, 2);
         }
     }
 
@@ -182,6 +193,13 @@ public class PasswdSafeOpenFileFragment extends Fragment
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_SLOT, itsYubiSlot);
+    }
+
+    @Override
     public void onPause()
     {
         super.onPause();
@@ -232,9 +250,20 @@ public class PasswdSafeOpenFileFragment extends Fragment
                             startVisible);
         }
 
-        MenuItem item = menu.findItem(R.id.menu_slot_2);
+        MenuItem item;
+        switch (itsYubiSlot) {
+        case 2:
+        default: {
+            item = menu.findItem(R.id.menu_slot_2);
+            itsYubiSlot = 2;
+            break;
+        }
+        case 1: {
+            item = menu.findItem(R.id.menu_slot_1);
+            break;
+        }
+        }
         item.setChecked(true);
-        itsYubiSlot = 2;
 
         super.onCreateOptionsMenu(menu, inflater);
     }
