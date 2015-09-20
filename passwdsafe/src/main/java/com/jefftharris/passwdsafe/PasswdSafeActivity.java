@@ -63,7 +63,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: keyboard support
     // TODO: shortcuts
 
-    enum Mode
+    enum ChangeMode
     {
         /** Initial mode with no file open */
         INIT,
@@ -127,14 +127,14 @@ public class PasswdSafeActivity extends AppCompatActivity
         // Set up the drawer.
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
         doUpdateView(ViewMode.INIT, new PasswdLocation());
-        setInitialView();
+        changeInitialView();
 
         Intent intent = getIntent();
         PasswdSafeUtil.dbginfo(TAG, "onCreate: %s", intent);
         switch (intent.getAction()) {
         case PasswdSafeUtil.VIEW_INTENT:
         case Intent.ACTION_VIEW: {
-            setFileOpenView(intent);
+            changeFileOpenView(intent);
             break;
         }
         default: {
@@ -281,7 +281,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
         itsFileData = fileData;
         itsFileDataView.setFileData(itsFileData);
-        setOpenView(itsLocation, true);
+        changeOpenView(itsLocation, true);
     }
 
     /**
@@ -327,7 +327,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         PasswdSafeUtil.dbginfo(TAG, "changeLocation loc: %s", location);
         if (!itsLocation.equals(location)) {
-            setOpenView(location, false);
+            changeOpenView(location, false);
         }
     }
 
@@ -388,50 +388,50 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /**
-     * Set the initial view
+     * Change the initial view
      */
-    private void setInitialView()
+    private void changeInitialView()
     {
-        setView(Mode.INIT, null);
+        doChangeView(ChangeMode.INIT, null);
     }
 
     /**
-     * Set the view for opening a file
+     * Change the view for opening a file
      */
-    private void setFileOpenView(Intent intent)
+    private void changeFileOpenView(Intent intent)
     {
         Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
         String recToOpen = intent.getData().getQueryParameter("recToOpen");
         Fragment openFrag = PasswdSafeOpenFileFragment.newInstance(openUri,
                                                                    recToOpen);
-        setView(Mode.FILE_OPEN, openFrag);
+        doChangeView(ChangeMode.FILE_OPEN, openFrag);
     }
 
     /**
-     * Set the view for an open file
+     * Change the view for an open file
      */
-    private void setOpenView(PasswdLocation location, boolean initial)
+    private void changeOpenView(PasswdLocation location, boolean initial)
     {
         Fragment viewFrag;
-        Mode viewMode;
+        ChangeMode viewMode;
         if (location.isRecord()) {
             viewFrag = PasswdSafeRecordFragment.newInstance(location);
-            viewMode = Mode.RECORD;
+            viewMode = ChangeMode.RECORD;
         } else {
             PasswdSafeListFragment.Listener.Mode mode =
                     itsIsTwoPane ? PasswdSafeListFragment.Listener.Mode.RECORDS :
                             PasswdSafeListFragment.Listener.Mode.ALL;
             viewFrag = PasswdSafeListFragment.newInstance(mode, location, true);
 
-            viewMode = initial ? Mode.OPEN_INIT : Mode.OPEN;
+            viewMode = initial ? ChangeMode.OPEN_INIT : ChangeMode.OPEN;
         }
-        setView(viewMode, viewFrag);
+        doChangeView(viewMode, viewFrag);
     }
 
     /**
-     * Set the view of the activity
+     * Change the view of the activity
      */
-    private void setView(Mode mode, Fragment contentFrag)
+    private void doChangeView(ChangeMode mode, Fragment contentFrag)
     {
         FragmentManager fragMgr = getSupportFragmentManager();
         //FragmentManager.enableDebugLogging(true);
