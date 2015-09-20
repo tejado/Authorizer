@@ -63,7 +63,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: keyboard support
     // TODO: shortcuts
 
-    enum ChangeMode
+    private enum ChangeMode
     {
         /** Initial mode with no file open */
         INIT,
@@ -77,7 +77,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         RECORD
     }
 
-    enum ViewMode
+    private enum ViewMode
     {
         /** Initial mode */
         INIT,
@@ -90,13 +90,13 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /** The open password file */
-    PasswdFileData itsFileData;
+    private PasswdFileData itsFileData;
 
     /** The open password file view */
-    PasswdFileDataView itsFileDataView = new PasswdFileDataView();
+    private PasswdFileDataView itsFileDataView = new PasswdFileDataView();
 
     /** The location in the password file */
-    PasswdLocation itsLocation = new PasswdLocation();
+    private PasswdLocation itsLocation = new PasswdLocation();
 
     /** Fragment managing the behaviors, interactions and presentation of the
      * navigation drawer. */
