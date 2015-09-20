@@ -86,6 +86,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         INIT,
         /** Opening a file */
         FILE_OPEN,
+        /** Creating a new file */
+        FILE_NEW,
         /** Viewing a list of records */
         VIEW_LIST,
         /** Viewing a record */
@@ -371,6 +373,15 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /**
+     * Update the view for creating a new file
+     */
+    @Override
+    public void updateViewFileNew()
+    {
+        doUpdateView(ViewMode.FILE_NEW, new PasswdLocation());
+    }
+
+    /**
      * Update the view for a list of records
      */
     @Override
@@ -536,10 +547,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         PasswdSafeNavDrawerFragment.NavMode drawerMode =
                 PasswdSafeNavDrawerFragment.NavMode.INIT;
         switch (mode) {
-        case INIT: {
-            break;
-        }
-        case FILE_OPEN: {
+        case INIT:
+        case FILE_OPEN:
+        case FILE_NEW: {
             break;
         }
         case VIEW_LIST: {
