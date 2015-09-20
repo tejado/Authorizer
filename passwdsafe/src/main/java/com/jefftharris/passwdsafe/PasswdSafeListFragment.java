@@ -61,6 +61,7 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
+    // TODO: cleanup mode handling
     private Listener.Mode itsMode = Listener.Mode.GROUPS;
     private PasswdLocation itsLocation;
     private boolean itsIsContents = false;
@@ -71,6 +72,7 @@ public class PasswdSafeListFragment extends ListFragment
     // TODO: sort case pref
     private boolean itsIsSortCaseSensitive = false;
 
+    // TODO: different empty text
 
     /** Create a new instance */
     public static PasswdSafeListFragment newInstance(Listener.Mode mode,
@@ -167,7 +169,6 @@ public class PasswdSafeListFragment extends ListFragment
         if (itsIsContents) {
             itsListener.updateViewList(itsLocation);
         }
-        refreshList();
     }
 
     @Override
