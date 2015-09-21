@@ -26,6 +26,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 
 /**
@@ -123,6 +124,7 @@ public class PasswdSafeNewFileFragment extends Fragment
         itsPasswordEdit = (TextView)rootView.findViewById(R.id.password);
         itsPasswordConfirm =
                 (TextView)rootView.findViewById(R.id.password_confirm);
+        PasswordVisibilityMenuHandler.set(itsPasswordEdit, itsPasswordConfirm);
         itsProgress = (ProgressBar)rootView.findViewById(R.id.progress);
         itsProgress.setVisibility(View.INVISIBLE);
         Button cancelBtn = (Button)rootView.findViewById(R.id.cancel);
