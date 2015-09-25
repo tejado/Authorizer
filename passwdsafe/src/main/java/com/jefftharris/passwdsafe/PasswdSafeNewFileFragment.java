@@ -9,9 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -19,12 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdFileUri;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
@@ -32,8 +27,9 @@ import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 /**
  * Fragment for creating a new file
  */
-public class PasswdSafeNewFileFragment extends Fragment
-    implements View.OnClickListener
+public class PasswdSafeNewFileFragment
+        extends AbstractPasswdSafeOpenNewFileFragment
+        implements View.OnClickListener
 {
     /**
      * Listener interface for owning activity
@@ -51,14 +47,10 @@ public class PasswdSafeNewFileFragment extends Fragment
     }
 
     private Listener itsListener;
-    private Uri itsNewFileUri;
     private EditText itsFileName;
     private TextView itsPasswordEdit;
     private TextView itsPasswordConfirm;
-    private ProgressBar itsProgress;
     private Button itsOkBtn;
-    private PasswdFileUri itsPasswdFileUri;
-    private ResolveTask itsResolveTask;
 
     /**
      * Create a new instance
@@ -78,7 +70,7 @@ public class PasswdSafeNewFileFragment extends Fragment
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            itsNewFileUri = args.getParcelable("uri");
+            setFileUri((Uri)args.getParcelable("uri"));
         }
     }
 
@@ -88,6 +80,7 @@ public class PasswdSafeNewFileFragment extends Fragment
     {
         View rootView = inflater.inflate(R.layout.fragment_passwdsafe_new_file,
                                          container, false);
+        setupView(rootView);
 
         itsFileName = (EditText)rootView.findViewById(R.id.file_name);
         itsFileName.setSelection(0);
@@ -125,8 +118,6 @@ public class PasswdSafeNewFileFragment extends Fragment
         itsPasswordConfirm =
                 (TextView)rootView.findViewById(R.id.password_confirm);
         PasswordVisibilityMenuHandler.set(itsPasswordEdit, itsPasswordConfirm);
-        itsProgress = (ProgressBar)rootView.findViewById(R.id.progress);
-        itsProgress.setVisibility(View.INVISIBLE);
         Button cancelBtn = (Button)rootView.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);
         itsOkBtn = (Button)rootView.findViewById(R.id.ok);
@@ -147,25 +138,10 @@ public class PasswdSafeNewFileFragment extends Fragment
     }
 
     @Override
-    public void onStart()
-    {
-        super.onStart();
-        itsResolveTask = new ResolveTask();
-        itsResolveTask.execute();
-    }
-
-    @Override
     public void onResume()
     {
         super.onResume();
         itsListener.updateViewFileNew();
-    }
-
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        cancelOpen(false);
     }
 
     @Override
@@ -189,97 +165,32 @@ public class PasswdSafeNewFileFragment extends Fragment
     }
 
     /**
-     * Handle when the resolve task is finished
+     * Derived-class handler for when the resolve task is finished
      */
-    private void resolveTaskFinished(PasswdFileUri uri)
+    @Override
+    protected final void doResolveTaskFinished()
     {
-        if (itsResolveTask == null) {
-            return;
-        }
-        itsResolveTask = null;
-        if (uri == null) {
-            cancelOpen(true);
-            return;
-        }
-
-        if (!uri.exists()) {
-            PasswdSafeUtil.showFatalMsg("File does't exist: " + uri,
-                                        getActivity());
-            return;
-        }
-
-        itsPasswdFileUri = uri;
     }
 
     /**
-     * Set whether a background task is running
+     *  Derived-class handler when the fragment is canceled
      */
-    private void setBgTaskRunning(boolean running)
+    @Override
+    protected final void doCancelFragment(boolean userCancel)
     {
-        itsFileName.setEnabled(!running);
-        itsPasswordEdit.setEnabled(!running);
-        itsPasswordConfirm.setEnabled(!running);
-        itsProgress.setVisibility(running ? View.VISIBLE : View.INVISIBLE);
-        itsOkBtn.setEnabled(!running);
-    }
-
-    /**
-     *  Cancel the file open
-     */
-    private void cancelOpen(boolean userCancel)
-    {
-        if (itsResolveTask != null) {
-            ResolveTask task = itsResolveTask;
-            itsResolveTask = null;
-            task.cancel(false);
-        }
-        GuiUtils.setKeyboardVisible(itsFileName, getActivity(), false);
+        GuiUtils.setKeyboardVisible(itsPasswordEdit, getActivity(), false);
         if (userCancel && itsListener != null) {
             itsListener.handleFileNewCanceled();
         }
     }
 
-    /**
-     * Background task for resolving the file URI
-     */
-    private class ResolveTask extends BackgroundTask<PasswdFileUri>
+    /** Enable/disable field controls during background operations */
+    @Override
+    protected final void setFieldsEnabled(boolean enabled)
     {
-        @Override
-        protected PasswdFileUri doInBackground(Void... voids)
-        {
-            return new PasswdFileUri(itsNewFileUri, getActivity());
-        }
-
-        @Override
-        protected void onPostExecute(PasswdFileUri uri)
-        {
-            super.onPostExecute(uri);
-            resolveTaskFinished(uri);
-        }
-    }
-
-    /**
-     * Background task
-     */
-    private abstract class BackgroundTask<ResultT>
-            extends AsyncTask<Void, Void, ResultT>
-    {
-        @Override
-        protected void onCancelled()
-        {
-            onPostExecute(null);
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-            setBgTaskRunning(true);
-        }
-
-        @Override
-        protected void onPostExecute(ResultT data)
-        {
-            setBgTaskRunning(false);
-        }
+        itsFileName.setEnabled(enabled);
+        itsPasswordEdit.setEnabled(enabled);
+        itsPasswordConfirm.setEnabled(enabled);
+        itsOkBtn.setEnabled(enabled);
     }
 }
