@@ -20,6 +20,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
@@ -47,6 +49,7 @@ public class PasswdSafeNewFileFragment
     }
 
     private Listener itsListener;
+    private TextView itsTitle;
     private EditText itsFileName;
     private TextView itsPasswordEdit;
     private TextView itsPasswordConfirm;
@@ -82,6 +85,7 @@ public class PasswdSafeNewFileFragment
                                          container, false);
         setupView(rootView);
 
+        itsTitle = (TextView)rootView.findViewById(R.id.title);
         itsFileName = (EditText)rootView.findViewById(R.id.file_name);
         itsFileName.setSelection(0);
         itsFileName.addTextChangedListener(new TextWatcher()
@@ -170,6 +174,50 @@ public class PasswdSafeNewFileFragment
     @Override
     protected final void doResolveTaskFinished()
     {
+        int titleId = R.string.new_file;
+        PasswdFileUri uri = getPasswdFileUri();
+        PasswdFileUri.Type type =
+                (uri != null) ? uri.getType() : PasswdFileUri.Type.FILE;
+        switch (type) {
+        case FILE: {
+            titleId = R.string.new_local_file;
+            break;
+        }
+        case SYNC_PROVIDER: {
+            if (uri.getSyncType() == null) {
+                PasswdSafeUtil.showFatalMsg("Unknown sync type", getActivity());
+                break;
+            }
+            switch (uri.getSyncType()) {
+            case GDRIVE:
+            case GDRIVE_PLAY: {
+                titleId = R.string.new_drive_file;
+                break;
+            }
+            case DROPBOX: {
+                titleId = R.string.new_dropbox_file;
+                break;
+            }
+            case BOX: {
+                titleId = R.string.new_box_file;
+                break;
+            }
+            case ONEDRIVE: {
+                titleId = R.string.new_onedrive_file;
+                break;
+            }
+            case OWNCLOUD: {
+                titleId = R.string.new_owncloud_file;
+                break;
+            }
+            }
+        }
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            break;
+        }
+        }
+        itsTitle.setText(titleId);
     }
 
     /**
