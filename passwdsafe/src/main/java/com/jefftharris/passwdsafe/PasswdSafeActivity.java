@@ -290,30 +290,14 @@ public class PasswdSafeActivity extends AppCompatActivity
      */
     @Override
     public List<PasswdRecordListData> getBackgroundRecordItems(
-            PasswdSafeListFragment.Listener.Mode mode)
+            boolean incRecords,
+            boolean incGroups)
     {
         PasswdFileDataView dataView = itsFileDataFrag.getFileDataView();
         if (dataView == null) {
             return null;
         }
 
-        boolean incRecords = false;
-        boolean incGroups = false;
-        switch (mode) {
-        case GROUPS: {
-            incGroups = true;
-            break;
-        }
-        case RECORDS: {
-            incRecords = true;
-            break;
-        }
-        case ALL: {
-            incGroups = true;
-            incRecords = true;
-            break;
-        }
-        }
         return dataView.getRecords(incRecords, incGroups,
                                    getApplicationContext());
     }
@@ -421,11 +405,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             viewFrag = PasswdSafeRecordFragment.newInstance(location);
             viewMode = ChangeMode.RECORD;
         } else {
-            PasswdSafeListFragment.Listener.Mode mode =
-                    itsIsTwoPane ? PasswdSafeListFragment.Listener.Mode.RECORDS :
-                            PasswdSafeListFragment.Listener.Mode.ALL;
-            viewFrag = PasswdSafeListFragment.newInstance(mode, location, true);
-
+            viewFrag = PasswdSafeListFragment.newInstance(location, true);
             viewMode = initial ? ChangeMode.OPEN_INIT : ChangeMode.OPEN;
         }
         doChangeView(viewMode, viewFrag);
@@ -535,18 +515,17 @@ public class PasswdSafeActivity extends AppCompatActivity
         FragmentManager fragMgr = getSupportFragmentManager();
         Fragment contentsFrag = fragMgr.findFragmentById(R.id.content);
         if (contentsFrag instanceof PasswdSafeListFragment) {
-            PasswdSafeListFragment.Listener.Mode contentsMode =
-                    itsIsTwoPane ? PasswdSafeListFragment.Listener.Mode.RECORDS :
-                            PasswdSafeListFragment.Listener.Mode.ALL;
+            PasswdSafeListFragment.Mode contentsMode = itsIsTwoPane ?
+                    PasswdSafeListFragment.Mode.RECORDS :
+                    PasswdSafeListFragment.Mode.ALL;
             ((PasswdSafeListFragment)contentsFrag).updateLocationView(
                     itsLocation, contentsMode);
         }
 
         if (itsIsTwoPane) {
-            PasswdSafeListFragment.Listener.Mode listMode =
-                    itsLocation.isRecord() ?
-                            PasswdSafeListFragment.Listener.Mode.ALL :
-                            PasswdSafeListFragment.Listener.Mode.GROUPS;
+            PasswdSafeListFragment.Mode listMode = itsLocation.isRecord() ?
+                    PasswdSafeListFragment.Mode.ALL :
+                    PasswdSafeListFragment.Mode.GROUPS;
             Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
             if (listFrag instanceof PasswdSafeListFragment) {
                 ((PasswdSafeListFragment)listFrag).updateLocationView(
