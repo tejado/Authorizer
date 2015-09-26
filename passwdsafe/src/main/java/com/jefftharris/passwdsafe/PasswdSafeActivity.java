@@ -484,17 +484,33 @@ public class PasswdSafeActivity extends AppCompatActivity
         PasswdSafeUtil.dbginfo(TAG, "doUpdateView: mode: %s, loc: %s",
                                mode, location);
 
+        itsLocation = location;
+        itsFileDataFrag.getFileDataView().setCurrGroups(itsLocation.getGroups());
+
         boolean showLeftList = false;
         PasswdSafeNavDrawerFragment.NavMode drawerMode =
                 PasswdSafeNavDrawerFragment.NavMode.INIT;
         switch (mode) {
         case INIT:
         case FILE_OPEN: {
+            itsTitle = PasswdSafeApp.getAppTitle(null, this);
             break;
         }
         case VIEW_LIST: {
             showLeftList = true;
             drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
+            itsTitle = null;
+            String groups = itsLocation.getGroupPath();
+            if (TextUtils.isEmpty(groups)) {
+                PasswdFileData fileData = itsFileDataFrag.getFileData();
+                if (fileData != null) {
+                    itsTitle = PasswdSafeApp.getAppFileTitle(
+                            fileData.getUri(), this);
+                }
+            }
+            if (itsTitle == null) {
+                itsTitle = PasswdSafeApp.getAppTitle(groups, this);
+            }
             break;
         }
         case VIEW_RECORD:
@@ -503,31 +519,21 @@ public class PasswdSafeActivity extends AppCompatActivity
             drawerMode = itsIsTwoPane ?
                     PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
                     PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD;
+            PasswdFileData fileData = itsFileDataFrag.getFileData();
+            if ((fileData != null) && itsLocation.isRecord()) {
+                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
+                String title = fileData.getTitle(rec);
+                if (mode == ViewMode.VIEW_RECORD) {
+                    itsTitle = title;
+                } else {
+                    itsTitle = getString(R.string.edit_item, title);
+                }
+            }
             break;
         }
         }
 
-        itsLocation = location;
-        itsFileDataFrag.getFileDataView().setCurrGroups(itsLocation.getGroups());
         itsNavDrawerFrag.setMode(drawerMode);
-
-        PasswdFileData fileData = itsFileDataFrag.getFileData();
-        if (fileData == null) {
-            itsTitle = PasswdSafeApp.getAppTitle(null, this);
-        } else {
-            if (itsLocation.isRecord()) {
-                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
-                itsTitle = fileData.getTitle(rec);
-            } else {
-                String groups = itsLocation.getGroupPath();
-                if (!TextUtils.isEmpty(groups)) {
-                    itsTitle = PasswdSafeApp.getAppTitle(groups, this);
-                } else {
-                    itsTitle = PasswdSafeApp.getAppFileTitle(
-                            fileData.getUri(), this);
-                }
-            }
-        }
         restoreActionBar();
 
         FragmentManager fragMgr = getSupportFragmentManager();
