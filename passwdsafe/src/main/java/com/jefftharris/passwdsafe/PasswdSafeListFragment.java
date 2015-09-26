@@ -69,11 +69,10 @@ public class PasswdSafeListFragment extends ListFragment
     private Listener itsListener;
     private View itsGroupPanel;
     private TextView itsGroupLabel;
+    private TextView itsEmptyText;
     private ItemListAdapter itsAdapter;
     // TODO: sort case pref
     private boolean itsIsSortCaseSensitive = false;
-
-    // TODO: different empty text
 
     /** Create a new instance */
     public static PasswdSafeListFragment newInstance(PasswdLocation location,
@@ -135,6 +134,7 @@ public class PasswdSafeListFragment extends ListFragment
         itsGroupPanel = root.findViewById(R.id.current_group_panel);
         itsGroupPanel.setOnClickListener(this);
         itsGroupLabel = (TextView)root.findViewById(R.id.current_group_label);
+        itsEmptyText = (TextView)root.findViewById(android.R.id.empty);
 
         return root;
     }
@@ -275,6 +275,11 @@ public class PasswdSafeListFragment extends ListFragment
                 list.smoothScrollToPosition(selPos);
             } else {
                 list.clearChoices();
+            }
+
+            if (itsEmptyText.getText().length() == 0) {
+                itsEmptyText.setText(itsIsContents ? R.string.no_records :
+                                             R.string.no_groups);
             }
         }
     }
