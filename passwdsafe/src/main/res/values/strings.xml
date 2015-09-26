@@ -152,6 +152,7 @@
         \n\nThe previous file chooser can be enabled by opening the menu and
         selecting Preferences, File Settings, and the legacy file chooser.
     </string>
+    <string name="no_groups">No Groups</string>
     <string name="no_shortcut_chosen">No shortcut chosen</string>
     <string name="no_policies">No Policies</string>
     <string name="no_records">No Records</string>

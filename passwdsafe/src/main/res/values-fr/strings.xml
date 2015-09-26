@@ -154,6 +154,7 @@
         menu et en sélectionnant Préférences, Paramètres du fichier, et le
         fichier de l\'héritage sélecteur.
     </string>
+    <string name="no_groups">Aucune Groupes</string>
     <string name="no_shortcut_chosen">Aucun raccourci choisi</string>
     <string name="no_policies">Aucune stratégie</string>
     <string name="no_records">Aucune entrée</string>

@@ -154,6 +154,7 @@
         Vorgaben, Datei-Einstellungen, und das Erbe Dateiauswahl aktiviert
         werden.
     </string>
+    <string name="no_groups">Keine Gruppen</string>
     <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
     <string name="no_policies">Keine Regel</string>
     <string name="no_records">Keine Einträge</string>
