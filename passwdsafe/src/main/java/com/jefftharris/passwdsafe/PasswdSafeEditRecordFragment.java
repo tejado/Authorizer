@@ -12,6 +12,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,10 +33,15 @@ public class PasswdSafeEditRecordFragment extends Fragment
     {
         /** Update the view for editing a record */
         void updateViewEditRecord(PasswdLocation location);
+
+        /** Is the navigation drawer open */
+        boolean isNavDrawerOpen();
     }
 
     private PasswdLocation itsLocation;
     private Listener itsListener;
+
+    // TODO: if pending changes, warn on navigation
 
     /**
      * Create a new instance
@@ -73,6 +81,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+        setHasOptionsMenu(true);
         View rootView = inflater.inflate(
                 R.layout.fragment_passwdsafe_edit_record, container, false);
 
@@ -94,10 +103,37 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsListener = null;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        if ((itsListener != null) && !itsListener.isNavDrawerOpen()) {
+            inflater.inflate(R.menu.fragment_passwdsafe_edit_record, menu);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+        case R.id.menu_done: {
+            // TODO: save
+            return true;
+        }
+        default: {
+            return super.onOptionsItemSelected(item);
+        }
+        }
+    }
+
     /**
      * Refresh the view
      */
     private void refresh()
     {
+        if (!isAdded() || (itsListener == null)) {
+            return;
+        }
+
     }
 }
