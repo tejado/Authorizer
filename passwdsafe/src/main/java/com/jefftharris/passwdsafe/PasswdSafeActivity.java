@@ -39,13 +39,13 @@ import java.util.List;
  */
 public class PasswdSafeActivity extends AppCompatActivity
         implements AbstractPasswdSafeRecordFragment.Listener,
+                   PasswdSafeEditRecordFragment.Listener,
                    PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
                    PasswdSafeNavDrawerFragment.Listener,
                    PasswdSafeRecordFragment.Listener
 {
     // TODO: new files
-    // TODO: rotation support without having to reopen file
     // TODO: search
     // TODO: 3rdparty file open
     // TODO: policies
@@ -74,7 +74,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** An open file */
         OPEN,
         /** A record */
-        RECORD
+        RECORD,
+        /** Edit a record */
+        EDIT_RECORD
     }
 
     private enum ViewMode
@@ -86,7 +88,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Viewing a list of records */
         VIEW_LIST,
         /** Viewing a record */
-        VIEW_RECORD
+        VIEW_RECORD,
+        /** Editing a record */
+        EDIT_RECORD
     }
 
     /** Fragment holding the open file data */
@@ -330,8 +334,13 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void editRecord(PasswdLocation location)
     {
-        Toast.makeText(this, "editRecord " + location,
-                       Toast.LENGTH_SHORT).show();
+        if (itsFileDataFrag.getFileData() == null) {
+            return;
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "editRecord loc: %s", location);
+        doChangeView(ChangeMode.EDIT_RECORD,
+                     PasswdSafeEditRecordFragment.newInstance(location));
     }
 
     @Override
@@ -366,6 +375,13 @@ public class PasswdSafeActivity extends AppCompatActivity
     public void updateViewRecord(PasswdLocation location)
     {
         doUpdateView(ViewMode.VIEW_RECORD, location);
+    }
+
+    /** Update the view for editing a record */
+    @Override
+    public void updateViewEditRecord(PasswdLocation location)
+    {
+        doUpdateView(ViewMode.EDIT_RECORD, location);
     }
 
     @Override
@@ -430,7 +446,8 @@ public class PasswdSafeActivity extends AppCompatActivity
             break;
         }
         case OPEN:
-        case RECORD: {
+        case RECORD:
+        case EDIT_RECORD: {
             supportsBack = true;
             break;
         }
@@ -480,7 +497,8 @@ public class PasswdSafeActivity extends AppCompatActivity
             drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
             break;
         }
-        case VIEW_RECORD: {
+        case VIEW_RECORD:
+        case EDIT_RECORD: {
             showLeftList = true;
             drawerMode = itsIsTwoPane ?
                     PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
@@ -497,11 +515,11 @@ public class PasswdSafeActivity extends AppCompatActivity
         if (fileData == null) {
             itsTitle = PasswdSafeApp.getAppTitle(null, this);
         } else {
-            if (location.isRecord()) {
-                PwsRecord rec = fileData.getRecord(location.getRecord());
+            if (itsLocation.isRecord()) {
+                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
                 itsTitle = fileData.getTitle(rec);
             } else {
-                String groups = location.getGroupPath();
+                String groups = itsLocation.getGroupPath();
                 if (!TextUtils.isEmpty(groups)) {
                     itsTitle = PasswdSafeApp.getAppTitle(groups, this);
                 } else {
