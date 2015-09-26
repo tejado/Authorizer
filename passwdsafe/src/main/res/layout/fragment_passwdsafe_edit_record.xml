@@ -5,10 +5,72 @@
   ~ distributed with this code, or available from
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.jefftharris.passwdsafe.PasswdSafeEditRecordFragment">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.jefftharris.passwdsafe.PasswdSafeEditRecordFragment">
 
-</FrameLayout>
+    <TextView android:id="@+id/error_msg"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:gravity="end"
+              android:textAppearance="@style/TextAppearance.Design.Error"/>
+
+    <View style="@style/Separator.Light"
+          android:layout_marginBottom="2dip"
+          android:layout_marginTop="2dip"/>
+
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/title"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:hint="@string/title"
+                          android:inputType="textCapSentences|textAutoCorrect"
+                          android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/url"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:hint="@string/url"
+                          android:inputType="textUri"
+                          android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/email"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:hint="@string/email"
+                          android:inputType="textEmailAddress"
+                          android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
