@@ -7,9 +7,9 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.Context;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.app.Activity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
@@ -235,10 +235,10 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     }
 
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context ctx)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        super.onAttach(ctx);
+        itsListener = (Listener)ctx;
     }
 
     @Override
