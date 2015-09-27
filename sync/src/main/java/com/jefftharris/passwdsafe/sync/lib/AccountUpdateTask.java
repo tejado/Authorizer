@@ -13,6 +13,8 @@ import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
+import com.jefftharris.passwdsafe.lib.view.ProgressFragment;
+
 /**
  * Async task to update an account
  */
