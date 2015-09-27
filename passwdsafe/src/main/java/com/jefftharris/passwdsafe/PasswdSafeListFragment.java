@@ -211,7 +211,7 @@ public class PasswdSafeListFragment extends ListFragment
     /** Refresh the list due to file changes */
     private void refreshList()
     {
-        if (!isAdded()) {
+        if (!isResumed()) {
             return;
         }
 

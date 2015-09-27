@@ -487,6 +487,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         itsLocation = location;
         itsFileDataFrag.getFileDataView().setCurrGroups(itsLocation.getGroups());
 
+        FragmentManager fragMgr = getSupportFragmentManager();
         boolean showLeftList = false;
         PasswdSafeNavDrawerFragment.NavMode drawerMode =
                 PasswdSafeNavDrawerFragment.NavMode.INIT;
@@ -510,6 +511,15 @@ public class PasswdSafeActivity extends AppCompatActivity
             }
             if (itsTitle == null) {
                 itsTitle = PasswdSafeApp.getAppTitle(groups, this);
+            }
+
+            Fragment contentsFrag = fragMgr.findFragmentById(R.id.content);
+            if (contentsFrag instanceof PasswdSafeListFragment) {
+                PasswdSafeListFragment.Mode contentsMode = itsIsTwoPane ?
+                        PasswdSafeListFragment.Mode.RECORDS :
+                        PasswdSafeListFragment.Mode.ALL;
+                ((PasswdSafeListFragment)contentsFrag).updateLocationView(
+                        itsLocation, contentsMode);
             }
             break;
         }
@@ -535,16 +545,6 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         itsNavDrawerFrag.setMode(drawerMode);
         restoreActionBar();
-
-        FragmentManager fragMgr = getSupportFragmentManager();
-        Fragment contentsFrag = fragMgr.findFragmentById(R.id.content);
-        if (contentsFrag instanceof PasswdSafeListFragment) {
-            PasswdSafeListFragment.Mode contentsMode = itsIsTwoPane ?
-                    PasswdSafeListFragment.Mode.RECORDS :
-                    PasswdSafeListFragment.Mode.ALL;
-            ((PasswdSafeListFragment)contentsFrag).updateLocationView(
-                    itsLocation, contentsMode);
-        }
 
         if (itsIsTwoPane) {
             PasswdSafeListFragment.Mode listMode = itsLocation.isRecord() ?
