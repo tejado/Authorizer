@@ -11,7 +11,9 @@ package com.jefftharris.passwdsafe;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +24,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
@@ -53,6 +56,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
     private PasswdLocation itsLocation;
     private Listener itsListener;
+    private Validator itsValidator = new Validator();
+    private TextInputLayout itsTitleInput;
     private TextView itsTitle;
 
     // TODO: if pending changes, warn on navigation
@@ -100,10 +105,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(
                 R.layout.fragment_passwdsafe_edit_record, container, false);
+        itsTitleInput =
+                (TextInputLayout)rootView.findViewById(R.id.title_input);
         itsTitle = (TextView)rootView.findViewById(R.id.title);
+        itsValidator.registerTextView(itsTitle);
 
         initialize();
-
         return rootView;
     }
 
@@ -113,6 +120,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         super.onResume();
         itsListener.updateViewEditRecord(itsLocation);
         refresh();
+        itsValidator.validate();
     }
 
     @Override
@@ -129,6 +137,17 @@ public class PasswdSafeEditRecordFragment extends Fragment
             inflater.inflate(R.menu.fragment_passwdsafe_edit_record, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        super.onPrepareOptionsMenu(menu);
+
+        MenuItem item = menu.findItem(R.id.menu_done);
+        boolean valid = itsValidator.isValid();
+        item.setEnabled(valid);
+        item.getIcon().setAlpha(valid ? 255 : 130);
     }
 
     @Override
@@ -250,6 +269,57 @@ public class PasswdSafeEditRecordFragment extends Fragment
             itsRec = rec;
             itsPasswdRec = passwdRec;
             itsFileData = fileData;
+        }
+    }
+
+    /**
+     * Validator
+     */
+    private class Validator extends AbstractTextWatcher
+    {
+        private boolean itsIsValid = false;
+
+        /**
+         * Register a text view with the validator
+         */
+        public final void registerTextView(TextView field)
+        {
+            field.addTextChangedListener(this);
+        }
+
+        /**
+         * Validate
+         */
+        public final void validate()
+        {
+            boolean valid = true;
+            CharSequence title = itsTitle.getText();
+            if (title.length() == 0) {
+                valid = false;
+                itsTitleInput.setError(getString(R.string.empty_title));
+            } else {
+                itsTitleInput.setError(null);
+                itsTitleInput.setErrorEnabled(false);
+            }
+
+            if (valid != itsIsValid) {
+                itsIsValid = valid;
+                GuiUtils.invalidateOptionsMenu(getActivity());
+            }
+        }
+
+        /**
+         * Is valid
+         */
+        public final boolean isValid()
+        {
+            return itsIsValid;
+        }
+
+        @Override
+        public final void afterTextChanged(Editable s)
+        {
+            validate();
         }
     }
 }
