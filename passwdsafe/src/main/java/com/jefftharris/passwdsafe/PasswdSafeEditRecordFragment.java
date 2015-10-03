@@ -130,6 +130,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     @Override
+    public void onPause()
+    {
+        super.onPause();
+        GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
+    }
+
+    @Override
     public void onDetach()
     {
         super.onDetach();
