@@ -59,6 +59,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private Validator itsValidator = new Validator();
     private TextInputLayout itsTitleInput;
     private TextView itsTitle;
+    private TextView itsUser;
     private TextView itsUrl;
     private TextView itsEmail;
 
@@ -111,6 +112,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 (TextInputLayout)rootView.findViewById(R.id.title_input);
         itsTitle = (TextView)rootView.findViewById(R.id.title);
         itsValidator.registerTextView(itsTitle);
+        itsUser = (TextView)rootView.findViewById(R.id.user);
         itsUrl = (TextView)rootView.findViewById(R.id.url);
         itsEmail = (TextView)rootView.findViewById(R.id.email);
 
@@ -179,6 +181,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
 
         itsTitle.setText(info.itsFileData.getTitle(info.itsRec));
+        itsUser.setText(info.itsFileData.getUsername(info.itsRec));
         itsUrl.setText(info.itsFileData.getURL(info.itsRec));
         itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
     }
@@ -213,6 +216,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
                                     itsTitle);
         if (updateStr != null) {
             info.itsFileData.setTitle(updateStr, record);
+        }
+
+        updateStr = getUpdatedField(info.itsFileData.getUsername(record),
+                                    itsUser);
+        if (updateStr != null) {
+            info.itsFileData.setUsername(updateStr, record);
         }
 
         updateStr = getUpdatedField(info.itsFileData.getURL(record), itsUrl);
