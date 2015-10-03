@@ -59,6 +59,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private Validator itsValidator = new Validator();
     private TextInputLayout itsTitleInput;
     private TextView itsTitle;
+    private TextView itsUrl;
 
     // TODO: if pending changes, warn on navigation
     // TODO: v2 support
@@ -109,6 +110,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 (TextInputLayout)rootView.findViewById(R.id.title_input);
         itsTitle = (TextView)rootView.findViewById(R.id.title);
         itsValidator.registerTextView(itsTitle);
+        itsUrl = (TextView)rootView.findViewById(R.id.url);
 
         initialize();
         return rootView;
@@ -175,6 +177,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
 
         itsTitle.setText(info.itsFileData.getTitle(info.itsRec));
+        itsUrl.setText(info.itsFileData.getURL(info.itsRec));
     }
 
     /**
@@ -207,6 +210,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
                                     itsTitle);
         if (updateStr != null) {
             info.itsFileData.setTitle(updateStr, record);
+        }
+
+        updateStr = getUpdatedField(info.itsFileData.getURL(record), itsUrl);
+        if (updateStr != null) {
+            info.itsFileData.setURL(updateStr, record);
         }
 
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
