@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -45,6 +46,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
         /** Is the navigation drawer open */
         boolean isNavDrawerOpen();
+
+        /** Finish editing a record */
+        void finishEditRecord(boolean save);
     }
 
     private PasswdLocation itsLocation;
@@ -132,7 +136,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     {
         switch (item.getItemId()) {
         case R.id.menu_done: {
-            // TODO: save
+            saveRecord();
             return true;
         }
         default: {
@@ -165,6 +169,44 @@ public class PasswdSafeEditRecordFragment extends Fragment
             return;
         }
         */
+    }
+
+    /**
+     * Save the record
+     */
+    private void saveRecord()
+    {
+        RecordInfo info = getRecordInfo();
+        if (info == null) {
+            return;
+        }
+
+        PwsRecord record = info.itsRec;
+
+        String updateStr;
+        updateStr = getUpdatedField(info.itsFileData.getTitle(record),
+                                    itsTitle);
+        if (updateStr != null) {
+            info.itsFileData.setTitle(updateStr, record);
+        }
+
+        GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
+        itsListener.finishEditRecord(record.isModified());
+    }
+
+    /**
+     * Get the updated value from a text field.  Return null if no changes.
+     */
+    private String getUpdatedField(String currVal, TextView field)
+    {
+        if (currVal == null) {
+            currVal = "";
+        }
+        String newVal = field.getText().toString();
+        if (newVal.equals(currVal)) {
+            newVal = null;
+        }
+        return newVal;
     }
 
     /**

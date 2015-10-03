@@ -7,8 +7,10 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,12 +28,14 @@ import android.widget.Toast;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.ProgressFragment;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdRecordListData;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -102,6 +106,9 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Fragment managing the behaviors, interactions and presentation of the
      * navigation drawer. */
     private PasswdSafeNavDrawerFragment itsNavDrawerFrag;
+
+    /** Running task to save a file */
+    private SaveTask itsSaveTask = null;
 
     /** Used to store the last screen title */
     private CharSequence itsTitle;
@@ -183,6 +190,16 @@ public class PasswdSafeActivity extends AppCompatActivity
     {
         super.onSaveInstanceState(outState);
         outState.putCharSequence(STATE_TITLE, itsTitle);
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if (itsSaveTask != null) {
+            itsSaveTask.cancelTask();
+            itsSaveTask = null;
+        }
     }
 
     @Override
@@ -390,6 +407,18 @@ public class PasswdSafeActivity extends AppCompatActivity
         return itsNavDrawerFrag.isDrawerOpen();
     }
 
+    @Override
+    public void finishEditRecord(boolean save)
+    {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        fragMgr.popBackStack();
+
+        if (save) {
+            itsSaveTask = new SaveTask(itsFileDataFrag.getFileData(), this);
+            itsSaveTask.execute();
+        }
+    }
+
     /**
      * Change the initial view
      */
@@ -581,6 +610,96 @@ public class PasswdSafeActivity extends AppCompatActivity
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(itsTitle);
+        }
+    }
+
+    /**
+     * Task to save a file in the background
+     */
+    private class SaveTask
+    {
+        private final PasswdFileData itsFileData;
+        private final Context itsContext;
+        private final ProgressFragment itsProgressFrag;
+        private final AsyncTask<Void, Void, Object> itsTask =
+                new AsyncTask<Void, Void, Object>()
+        {
+            @Override
+            protected void onPreExecute()
+            {
+                itsProgressFrag.show(getSupportFragmentManager(), null);
+            }
+
+            @Override
+            protected void onPostExecute(Object result)
+            {
+                SaveTask.this.onPostExecute(result);
+            }
+
+            @Override
+            protected Object doInBackground(Void... params)
+            {
+                try {
+                    if (itsFileData != null) {
+                        itsFileData.save(itsContext);
+                        PasswdSafeUtil.dbginfo(TAG, "SaveTask finished");
+                    }
+                    return null;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        };
+
+        /**
+         * Constructor
+         */
+        public SaveTask(PasswdFileData fileData, Context ctx)
+        {
+            itsFileData = fileData;
+            itsContext = ctx.getApplicationContext();
+
+            String file = itsFileData.getUri().getIdentifier(itsContext, false);
+            String msg = itsContext.getString(R.string.saving_file, file);
+            itsProgressFrag = ProgressFragment.newInstance(msg);
+        }
+
+        /**
+         * Execute the task
+         */
+        public final void execute()
+        {
+            itsTask.execute();
+        }
+
+        /**
+         * Cancel the save task
+         */
+        public final void cancelTask()
+        {
+            itsTask.cancel(false);
+            onPostExecute(null);
+        }
+
+        /**
+         * Handle the result of executing the task
+         */
+        private void onPostExecute(Object result)
+        {
+            itsProgressFrag.dismiss();
+            itsSaveTask = null;
+
+            if (result instanceof Exception) {
+                Exception e = (Exception)result;
+                String msg = e.toString();
+                if ((e instanceof IOException) &&
+                    (ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT)) {
+                    msg = itsContext.getString(R.string.kitkat_sdcard_warning,
+                                               msg);
+                }
+                PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafeActivity.this,
+                                            true);
+            }
         }
     }
 }
