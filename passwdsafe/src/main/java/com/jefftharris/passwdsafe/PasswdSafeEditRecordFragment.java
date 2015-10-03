@@ -60,6 +60,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private TextInputLayout itsTitleInput;
     private TextView itsTitle;
     private TextView itsUrl;
+    private TextView itsEmail;
 
     // TODO: if pending changes, warn on navigation
     // TODO: v2 support
@@ -111,6 +112,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsTitle = (TextView)rootView.findViewById(R.id.title);
         itsValidator.registerTextView(itsTitle);
         itsUrl = (TextView)rootView.findViewById(R.id.url);
+        itsEmail = (TextView)rootView.findViewById(R.id.email);
 
         initialize();
         return rootView;
@@ -178,6 +180,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
         itsTitle.setText(info.itsFileData.getTitle(info.itsRec));
         itsUrl.setText(info.itsFileData.getURL(info.itsRec));
+        itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
     }
 
     /**
@@ -215,6 +218,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
         updateStr = getUpdatedField(info.itsFileData.getURL(record), itsUrl);
         if (updateStr != null) {
             info.itsFileData.setURL(updateStr, record);
+        }
+
+        updateStr = getUpdatedField(info.itsFileData.getEmail(record),
+                                    itsEmail);
+        if (updateStr != null) {
+            info.itsFileData.setEmail(updateStr, record);
         }
 
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
