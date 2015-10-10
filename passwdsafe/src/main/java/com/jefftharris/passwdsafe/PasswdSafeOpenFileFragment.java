@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -319,6 +320,7 @@ public class PasswdSafeOpenFileFragment
      * Derived-class handler for when the resolve task is finished
      */
     @Override
+    @SuppressLint("SetTextI18n")
     protected final void doResolveTaskFinished()
     {
         setTitle(R.string.open_file);
