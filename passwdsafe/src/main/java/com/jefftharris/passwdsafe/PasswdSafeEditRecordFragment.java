@@ -14,27 +14,38 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.NewGroupDialog;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.TreeSet;
 
 
 /**
  * Fragment for editing a password record
  */
 public class PasswdSafeEditRecordFragment extends Fragment
+        implements NewGroupDialog.Listener
 {
     /**
      * Listener interface for owning activity
@@ -57,8 +68,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private PasswdLocation itsLocation;
     private Listener itsListener;
     private Validator itsValidator = new Validator();
+    private final TreeSet<String> itsGroups =
+            new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    private int itsPrevGroupPos = -1;
     private TextInputLayout itsTitleInput;
     private TextView itsTitle;
+    private Spinner itsGroup;
     private TextView itsUser;
     private TextView itsUrl;
     private TextView itsEmail;
@@ -66,6 +81,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     // TODO: if pending changes, warn on navigation
     // TODO: v2 support
     // TODO: protected flag
+    // TODO: on new record, use current group
 
     /**
      * Create a new instance
@@ -112,6 +128,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 (TextInputLayout)rootView.findViewById(R.id.title_input);
         itsTitle = (TextView)rootView.findViewById(R.id.title);
         itsValidator.registerTextView(itsTitle);
+        itsGroup = (Spinner)rootView.findViewById(R.id.group);
         itsUser = (TextView)rootView.findViewById(R.id.user);
         itsUrl = (TextView)rootView.findViewById(R.id.url);
         itsEmail = (TextView)rootView.findViewById(R.id.email);
@@ -177,6 +194,18 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
     }
 
+    @Override
+    public void handleNewGroup(String newGroup)
+    {
+        if (newGroup != null) {
+            if (!TextUtils.isEmpty(newGroup)) {
+                itsGroups.add(newGroup);
+            }
+            itsPrevGroupPos = updateGroups(newGroup);
+            itsValidator.validate();
+        }
+    }
+
     /**
      * Initialize the view
      */
@@ -191,6 +220,99 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsUser.setText(info.itsFileData.getUsername(info.itsRec));
         itsUrl.setText(info.itsFileData.getURL(info.itsRec));
         itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
+
+        String group = info.itsFileData.getGroup(info.itsRec);
+        initGroup(group, info);
+    }
+
+    /**
+     * Initialize the group in the view
+     */
+    private void initGroup(String initialGroup, RecordInfo info)
+    {
+        for (PwsRecord rec: info.itsFileData.getRecords()) {
+            String group = info.itsFileData.getGroup(rec);
+            if (!TextUtils.isEmpty(group)) {
+                itsGroups.add(group);
+            }
+        }
+
+        itsPrevGroupPos = updateGroups(initialGroup);
+        itsGroup.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener()
+                {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view,
+                                               int position, long id)
+                    {
+                        selectGroup(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> arg0)
+                    {
+                    }
+                });
+
+    }
+
+    /**
+     * Select a new group
+     */
+    private void selectGroup(int position)
+    {
+        if (position == (itsGroup.getCount() - 1)) {
+            // Set to previous group so rotations don't recreate with the new
+            // group item selected
+            itsGroup.setSelection(itsPrevGroupPos);
+            NewGroupDialog groupDlg = NewGroupDialog.newInstance();
+            groupDlg.setTargetFragment(this, 0);
+            groupDlg.show(getFragmentManager(), "NewGroupDialog");
+        } else {
+            itsPrevGroupPos = position;
+            itsValidator.validate();
+        }
+    }
+
+    /**
+     * Update the groups in the spinner
+     * @return The selected position
+     */
+    private int updateGroups(String selGroup)
+    {
+        ArrayList<String> groupList = new ArrayList<>(itsGroups.size() + 2);
+        groupList.add(getString(R.string.none_paren));
+        int pos = 1;
+        int groupPos = 0;
+        for (String grp : itsGroups) {
+            if (grp.equals(selGroup)) {
+                groupPos = pos;
+            }
+            groupList.add(grp);
+            ++pos;
+        }
+
+        groupList.add(getString(R.string.new_group_menu));
+        setSpinnerItems(itsGroup, groupList);
+        if (groupPos != 0) {
+            itsGroup.setSelection(groupPos);
+        }
+        return groupPos;
+    }
+
+    /**
+     * Set the items in a spinner
+     */
+    private void setSpinnerItems(Spinner spinner, List<?> items)
+    {
+        ArrayAdapter<Object> adapter =
+                new ArrayAdapter<>(getContext(),
+                                   android.R.layout.simple_spinner_item,
+                                   Collections.unmodifiableList(items));
+        adapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -225,6 +347,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
             info.itsFileData.setTitle(updateStr, record);
         }
 
+        updateStr = getUpdatedGroup(info.itsFileData.getGroup(record));
+        if (updateStr != null) {
+            info.itsFileData.setGroup(updateStr, record);
+        }
+
         updateStr = getUpdatedField(info.itsFileData.getUsername(record),
                                     itsUser);
         if (updateStr != null) {
@@ -247,6 +374,19 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     /**
+     * Get the updated value of the group.  Return null if no changes
+     */
+    private String getUpdatedGroup(String currVal)
+    {
+        if (currVal == null) {
+            currVal = "";
+        }
+        String newVal = (itsGroup.getSelectedItemPosition() > 0) ?
+                itsGroup.getSelectedItem().toString() : "";
+        return (newVal.equals(currVal)) ? null : newVal;
+    }
+
+    /**
      * Get the updated value from a text field.  Return null if no changes.
      */
     private String getUpdatedField(String currVal, TextView field)
@@ -255,10 +395,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
             currVal = "";
         }
         String newVal = field.getText().toString();
-        if (newVal.equals(currVal)) {
-            newVal = null;
-        }
-        return newVal;
+        return (newVal.equals(currVal)) ? null : newVal;
     }
 
     /**
@@ -334,6 +471,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 itsTitleInput.setError(null);
                 itsTitleInput.setErrorEnabled(false);
             }
+
+            // TODO: title/user/group validation
 
             if (valid != itsIsValid) {
                 itsIsValid = valid;
