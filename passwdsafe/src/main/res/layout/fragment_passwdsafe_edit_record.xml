@@ -12,16 +12,6 @@
               android:orientation="vertical"
               tools:context="com.jefftharris.passwdsafe.PasswdSafeEditRecordFragment">
 
-    <TextView android:id="@+id/error_msg"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:gravity="end"
-              android:textAppearance="@style/TextAppearance.Design.Error"/>
-
-    <View style="@style/Separator.Light"
-          android:layout_marginBottom="2dip"
-          android:layout_marginTop="2dip"/>
-
     <ScrollView android:layout_width="fill_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1">
@@ -50,6 +40,29 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:paddingBottom="2dp">
+
+                <TextView style="@style/TextAppearance.AppCompat.Caption"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:paddingEnd="4dp"
+                          android:paddingLeft="4dp"
+                          android:paddingRight="4dp"
+                          android:paddingStart="4dp"
+                          android:text="@string/group"/>
+
+                <Spinner android:id="@+id/group"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:prompt="@string/choose_group"
+                         android:spinnerMode="dialog"
+                         tools:ignore="UnusedAttribute"/>
+            </LinearLayout>
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -58,7 +71,7 @@
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:hint="@string/username"
-                          android:inputType="text"
+                          android:inputType="textNoSuggestions"
                           android:singleLine="true"/>
 
             </android.support.design.widget.TextInputLayout>
