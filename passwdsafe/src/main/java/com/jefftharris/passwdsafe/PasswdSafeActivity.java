@@ -633,11 +633,18 @@ public class PasswdSafeActivity extends AppCompatActivity
             @Override
             protected void onPostExecute(Object result)
             {
+                // TODO: fix use of file by other threads while saving.
+                // Causing RuntimeCryptoException when view frag is refreshing
+                result = doSave();
                 SaveTask.this.onPostExecute(result);
             }
 
             @Override
             protected Object doInBackground(Void... params)
+            {
+                return null;
+            }
+            private Object doSave()
             {
                 try {
                     if (itsFileData != null) {
