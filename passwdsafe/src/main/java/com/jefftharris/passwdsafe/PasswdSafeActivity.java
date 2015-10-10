@@ -47,6 +47,7 @@ public class PasswdSafeActivity extends AppCompatActivity
                    PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
                    PasswdSafeNavDrawerFragment.Listener,
+                   PasswdSafeNewFileFragment.Listener,
                    PasswdSafeRecordFragment.Listener
 {
     // TODO: new files
@@ -73,6 +74,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         INIT,
         /** Opening a file */
         FILE_OPEN,
+        /** Creating a new file */
+        FILE_NEW,
         /** Initial mode for an open file */
         OPEN_INIT,
         /** An open file */
@@ -89,6 +92,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         INIT,
         /** Opening a file */
         FILE_OPEN,
+        /** Creating a new file */
+        FILE_NEW,
         /** Viewing a list of records */
         VIEW_LIST,
         /** Viewing a record */
@@ -153,6 +158,10 @@ public class PasswdSafeActivity extends AppCompatActivity
             case PasswdSafeUtil.VIEW_INTENT:
             case Intent.ACTION_VIEW: {
                 changeFileOpenView(intent);
+                break;
+            }
+            case PasswdSafeUtil.NEW_INTENT: {
+                changeFileNewView(intent);
                 break;
             }
             default: {
@@ -307,6 +316,25 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /**
+     * Handle when the file new is canceled
+     */
+    @Override
+    public void handleFileNewCanceled()
+    {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileNewCanceled");
+        finish();
+    }
+
+    /**
+     * Handle when the file was successfully created
+     */
+    @Override
+    public void handleFileNew(PasswdFileData fileData)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileNew: %s", fileData.getUri());
+    }
+
+    /**
      * Get the current record items in a background thread
      */
     @Override
@@ -377,6 +405,15 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /**
+     * Update the view for creating a new file
+     */
+    @Override
+    public void updateViewFileNew()
+    {
+        doUpdateView(ViewMode.FILE_NEW, new PasswdLocation());
+    }
+
+    /**
      * Update the view for a list of records
      */
     @Override
@@ -440,6 +477,16 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     /**
+     * Change the view for creating a new file
+     */
+    private void changeFileNewView(Intent intent)
+    {
+        Uri newUri = PasswdSafeApp.getOpenUriFromIntent(intent);
+        Fragment newFrag = PasswdSafeNewFileFragment.newInstance(newUri);
+        doChangeView(ChangeMode.FILE_NEW, newFrag);
+    }
+
+    /**
      * Change the view for an open file
      */
     private void changeOpenView(PasswdLocation location, boolean initial)
@@ -470,6 +517,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         switch (mode) {
         case INIT:
         case FILE_OPEN:
+        case FILE_NEW:
         case OPEN_INIT: {
             clearBackStack = true;
             break;
@@ -522,7 +570,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 PasswdSafeNavDrawerFragment.NavMode.INIT;
         switch (mode) {
         case INIT:
-        case FILE_OPEN: {
+        case FILE_OPEN:
+        case FILE_NEW: {
             itsTitle = PasswdSafeApp.getAppTitle(null, this);
             break;
         }

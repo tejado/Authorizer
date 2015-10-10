@@ -11,9 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,8 +40,9 @@ import java.io.IOException;
 /**
  * Fragment for opening a file
  */
-public class PasswdSafeOpenFileFragment extends Fragment
-    implements View.OnClickListener
+public class PasswdSafeOpenFileFragment
+        extends AbstractPasswdSafeOpenNewFileFragment
+        implements View.OnClickListener
 {
     /**
      * Listener interface for owning activity
@@ -61,21 +60,16 @@ public class PasswdSafeOpenFileFragment extends Fragment
     }
 
     private Listener itsListener;
-    private Uri itsFileUri;
     private String itsRecToOpen;
     private TextView itsTitle;
     private TextView itsPasswordEdit;
     private CheckBox itsReadonlyCb;
-    private ProgressBar itsProgress;
     private Button itsYubiStartBtn;
     private Button itsOkBtn;
-    private PasswdFileUri itsPasswdFileUri;
-    private ResolveTask itsResolveTask;
     private OpenTask itsOpenTask;
     private YubikeyMgr itsYubiMgr;
     private YubikeyMgr.User itsYubiUser;
     private int itsYubiSlot = 2;
-    private int itsNumProgressUsers = 0;
 
     private static final String ARG_URI = "uri";
     private static final String ARG_REC_TO_OPEN = "recToOpen";
@@ -102,7 +96,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            itsFileUri = args.getParcelable(ARG_URI);
+            setFileUri((Uri)args.getParcelable(ARG_URI));
             itsRecToOpen = args.getString(ARG_REC_TO_OPEN);
         }
 
@@ -121,6 +115,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
 
         View rootView = inflater.inflate(R.layout.fragment_passwdsafe_open_file,
                                          container, false);
+        setupView(rootView);
 
         itsTitle = (TextView)rootView.findViewById(R.id.file);
         itsPasswordEdit = (TextView)rootView.findViewById(R.id.passwd_edit);
@@ -128,8 +123,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
         itsPasswordEdit.setEnabled(false);
 
         itsReadonlyCb = (CheckBox)rootView.findViewById(R.id.read_only);
-        itsProgress = (ProgressBar)rootView.findViewById(R.id.progress);
-        itsProgress.setVisibility(View.INVISIBLE);
         Button cancelBtn = (Button)rootView.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);
         itsOkBtn = (Button)rootView.findViewById(R.id.ok);
@@ -179,14 +172,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
     }
 
     @Override
-    public void onStart()
-    {
-        super.onStart();
-        itsResolveTask = new ResolveTask();
-        itsResolveTask.execute();
-    }
-
-    @Override
     public void onResume()
     {
         super.onResume();
@@ -207,7 +192,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
         if (itsYubiMgr != null) {
             itsYubiMgr.onPause();
         }
-        cancelOpen(false);
     }
 
     @Override
@@ -305,7 +289,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
         case R.id.cancel: {
             Activity act = getActivity();
             GuiUtils.setKeyboardVisible(itsPasswordEdit, act, false);
-            cancelOpen(true);
+            cancelFragment(true);
             break;
         }
         case R.id.ok: {
@@ -317,7 +301,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
         }
         case R.id.old: {
             Intent intent = PasswdSafeUtil.createOpenIntent(
-                    itsFileUri, itsRecToOpen, false);
+                    getFileUri(), itsRecToOpen, false);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.addFlags(ApiCompat.INTENT_FLAG_ACTIVITY_CLEAR_TASK);
@@ -332,36 +316,48 @@ public class PasswdSafeOpenFileFragment extends Fragment
     }
 
     /**
-     * Handle when the resolve task is finished
+     * Derived-class handler for when the resolve task is finished
      */
-    private void resolveTaskFinished(PasswdFileUri uri)
+    @Override
+    protected final void doResolveTaskFinished()
     {
-        if (itsResolveTask == null) {
-            return;
-        }
-        itsResolveTask = null;
-        if (uri == null) {
-            cancelOpen(false);
-            return;
-        }
-
-        if (!uri.exists()) {
-            PasswdSafeUtil.showFatalMsg("File does't exist: " + uri,
-                                        getActivity());
-            return;
-        }
-
-        itsPasswdFileUri = uri;
         setTitle(R.string.open_file);
         itsPasswordEdit.setEnabled(true);
         itsOkBtn.setEnabled(true);
         //noinspection ConstantConditions
         if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
-            (itsFileUri.getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
+            (getFileUri().getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
             itsReadonlyCb.setChecked(false);
             itsPasswordEdit.setText("test123");
             itsOkBtn.performClick();
         }
+    }
+
+    /**
+     *  Derived-class handler when the fragment is canceled
+     */
+    @Override
+    protected final void doCancelFragment(boolean userCancel)
+    {
+        if (itsOpenTask != null) {
+            OpenTask task = itsOpenTask;
+            itsOpenTask = null;
+            task.cancel(false);
+        }
+        GuiUtils.setKeyboardVisible(itsPasswordEdit, getActivity(), false);
+        if (userCancel && itsListener != null) {
+            itsListener.handleFileOpenCanceled();
+        }
+    }
+
+    /** Enable/disable field controls during background operations */
+    @Override
+    protected final void setFieldsEnabled(boolean enabled)
+    {
+        itsPasswordEdit.setEnabled(enabled);
+        itsReadonlyCb.setEnabled(enabled);
+        itsYubiStartBtn.setEnabled(enabled);
+        itsOkBtn.setEnabled(enabled);
     }
 
     /**
@@ -379,7 +375,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
         }
 
         if (result == null) {
-            cancelOpen(false);
+            cancelFragment(false);
             return;
         }
 
@@ -402,34 +398,14 @@ public class PasswdSafeOpenFileFragment extends Fragment
     }
 
     /**
-     *  Cancel the file open
-     */
-    private void cancelOpen(boolean userCancel)
-    {
-        if (itsResolveTask != null) {
-            ResolveTask task = itsResolveTask;
-            itsResolveTask = null;
-            task.cancel(false);
-        }
-        if (itsOpenTask != null) {
-            OpenTask task = itsOpenTask;
-            itsOpenTask = null;
-            task.cancel(false);
-        }
-        GuiUtils.setKeyboardVisible(itsPasswordEdit, getActivity(), false);
-        if (userCancel && itsListener != null) {
-            itsListener.handleFileOpenCanceled();
-        }
-    }
-
-    /**
      * Set the title
      */
     private void setTitle(int label)
     {
         String title;
-        if (itsPasswdFileUri != null) {
-            title = itsPasswdFileUri.getIdentifier(getActivity(), true);
+        PasswdFileUri passwdFileUri = getPasswdFileUri();
+        if (passwdFileUri != null) {
+            title = passwdFileUri.getIdentifier(getActivity(), true);
         } else {
             title = "";
         }
@@ -450,25 +426,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
     }
 
     /**
-     * Background task for resolving the file URI
-     */
-    private class ResolveTask extends BackgroundTask<PasswdFileUri>
-    {
-        @Override
-        protected PasswdFileUri doInBackground(Void... voids)
-        {
-            return new PasswdFileUri(itsFileUri, getActivity());
-        }
-
-        @Override
-        protected void onPostExecute(PasswdFileUri uri)
-        {
-            super.onPostExecute(uri);
-            resolveTaskFinished(uri);
-        }
-    }
-
-    /**
      * Background task for opening the file
      */
     private class OpenTask extends BackgroundTask<Object>
@@ -486,7 +443,7 @@ public class PasswdSafeOpenFileFragment extends Fragment
         protected Object doInBackground(Void... voids)
         {
             PasswdFileData fileData =
-                    new PasswdFileData(itsPasswdFileUri);
+                    new PasswdFileData(getPasswdFileUri());
             try {
                 fileData.load(itsItsPassword, itsItsIsReadOnly, getActivity());
                 return fileData;
@@ -507,33 +464,6 @@ public class PasswdSafeOpenFileFragment extends Fragment
         {
             super.onPostExecute(data);
             openTaskFinished(data);
-        }
-    }
-
-    /**
-     * Background task
-     */
-    private abstract class BackgroundTask<ResultT>
-            extends AsyncTask<Void, Void, ResultT>
-    {
-        @Override
-        protected void onCancelled()
-        {
-            onPostExecute(null);
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-            setProgressVisible(true, true);
-            setFieldsEnabled(false);
-        }
-
-        @Override
-        protected void onPostExecute(ResultT data)
-        {
-            setProgressVisible(false, true);
-            setFieldsEnabled(true);
         }
     }
 
@@ -578,8 +508,9 @@ public class PasswdSafeOpenFileFragment extends Fragment
         @Override
         public void timerTick(int totalTime, int remainingTime)
         {
-            itsProgress.setMax(totalTime);
-            itsProgress.setProgress(remainingTime);
+            ProgressBar progress = getProgress();
+            progress.setMax(totalTime);
+            progress.setProgress(remainingTime);
         }
 
         @Override
@@ -599,30 +530,5 @@ public class PasswdSafeOpenFileFragment extends Fragment
             setProgressVisible(false, false);
             setFieldsEnabled(true);
         }
-    }
-
-    /** Show or hide the progress bar */
-    private void setProgressVisible(boolean visible, boolean indeterminate)
-    {
-        if (visible) {
-            if (++itsNumProgressUsers == 1) {
-                itsProgress.setIndeterminate(indeterminate);
-                itsProgress.setVisibility(View.VISIBLE);
-            }
-        } else {
-            if (--itsNumProgressUsers <= 0) {
-                itsNumProgressUsers = 0;
-                itsProgress.setVisibility(View.INVISIBLE);
-            }
-        }
-    }
-
-    /** Enable/disable field controls during background operations */
-    private void setFieldsEnabled(boolean enabled)
-    {
-        itsPasswordEdit.setEnabled(enabled);
-        itsReadonlyCb.setEnabled(enabled);
-        itsYubiStartBtn.setEnabled(enabled);
-        itsOkBtn.setEnabled(enabled);
     }
 }
