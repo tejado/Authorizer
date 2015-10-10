@@ -7,8 +7,10 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -26,12 +28,14 @@ import android.widget.Toast;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.ProgressFragment;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdRecordListData;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -39,6 +43,7 @@ import java.util.List;
  */
 public class PasswdSafeActivity extends AppCompatActivity
         implements AbstractPasswdSafeRecordFragment.Listener,
+                   PasswdSafeEditRecordFragment.Listener,
                    PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
                    PasswdSafeNavDrawerFragment.Listener,
@@ -46,7 +51,6 @@ public class PasswdSafeActivity extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener
 {
     // TODO: new files
-    // TODO: rotation support without having to reopen file
     // TODO: search
     // TODO: 3rdparty file open
     // TODO: policies
@@ -64,7 +68,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: keyboard support
     // TODO: shortcuts
 
-    enum Mode
+    private enum ChangeMode
     {
         /** Initial mode with no file open */
         INIT,
@@ -77,10 +81,12 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** An open file */
         OPEN,
         /** A record */
-        RECORD
+        RECORD,
+        /** Edit a record */
+        EDIT_RECORD
     }
 
-    enum ViewMode
+    private enum ViewMode
     {
         /** Initial mode */
         INIT,
@@ -91,21 +97,23 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Viewing a list of records */
         VIEW_LIST,
         /** Viewing a record */
-        VIEW_RECORD
+        VIEW_RECORD,
+        /** Editing a record */
+        EDIT_RECORD
     }
 
-    /** The open password file */
-    PasswdFileData itsFileData;
-
-    /** The open password file view */
-    PasswdFileDataView itsFileDataView = new PasswdFileDataView(this);
+    /** Fragment holding the open file data */
+    private PasswdSafeFileDataFragment itsFileDataFrag;
 
     /** The location in the password file */
-    PasswdLocation itsLocation = new PasswdLocation();
+    private PasswdLocation itsLocation = new PasswdLocation();
 
     /** Fragment managing the behaviors, interactions and presentation of the
      * navigation drawer. */
     private PasswdSafeNavDrawerFragment itsNavDrawerFrag;
+
+    /** Running task to save a file */
+    private SaveTask itsSaveTask = null;
 
     /** Used to store the last screen title */
     private CharSequence itsTitle;
@@ -113,7 +121,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Does the UI show two panes */
     private boolean itsIsTwoPane = false;
 
-    /** Logging tag */
+    private static final String FRAG_DATA = "data";
+    private static final String STATE_TITLE = "title";
     private static final String TAG = "PasswdSafeActivity";
 
     @Override
@@ -122,35 +131,47 @@ public class PasswdSafeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         ApiCompat.setRecentAppsVisible(getWindow(), false);
         setContentView(R.layout.activity_passwdsafe);
-        itsIsTwoPane = (findViewById(R.id.content_list) != null);
+        itsIsTwoPane = (findViewById(R.id.two_pane) != null);
 
         itsNavDrawerFrag = (PasswdSafeNavDrawerFragment)
                 getSupportFragmentManager().findFragmentById(
                         R.id.navigation_drawer);
-        itsTitle = getTitle();
-
-        // Set up the drawer.
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
-        doUpdateView(ViewMode.INIT, new PasswdLocation());
-        setInitialView();
 
-        Intent intent = getIntent();
-        PasswdSafeUtil.dbginfo(TAG, "onCreate: %s", intent);
-        switch (intent.getAction()) {
-        case PasswdSafeUtil.VIEW_INTENT:
-        case Intent.ACTION_VIEW: {
-            setFileOpenView(intent);
-            break;
+        FragmentManager fragMgr = getSupportFragmentManager();
+        itsFileDataFrag = (PasswdSafeFileDataFragment)
+                fragMgr.findFragmentByTag(FRAG_DATA);
+        if (itsFileDataFrag == null) {
+            itsFileDataFrag = new PasswdSafeFileDataFragment();
+            fragMgr.beginTransaction().add(itsFileDataFrag, FRAG_DATA).commit();
         }
-        case PasswdSafeUtil.NEW_INTENT: {
-            setFileNewView(intent);
-            break;
-        }
-        default: {
-            Log.e(TAG, "Unknown action for intent: " + intent);
-            finish();
-            break;
-        }
+        boolean newFileDataFrag = itsFileDataFrag.checkNew();
+
+        if (newFileDataFrag || (savedInstanceState == null)) {
+            itsTitle = getTitle();
+            doUpdateView(ViewMode.INIT, new PasswdLocation());
+            changeInitialView();
+
+            Intent intent = getIntent();
+            PasswdSafeUtil.dbginfo(TAG, "onCreate: %s", intent);
+            switch (intent.getAction()) {
+            case PasswdSafeUtil.VIEW_INTENT:
+            case Intent.ACTION_VIEW: {
+                changeFileOpenView(intent);
+                break;
+            }
+            case PasswdSafeUtil.NEW_INTENT: {
+                changeFileNewView(intent);
+                break;
+            }
+            default: {
+                Log.e(TAG, "Unknown action for intent: " + intent);
+                finish();
+                break;
+            }
+            }
+        } else {
+            itsTitle = savedInstanceState.getCharSequence(STATE_TITLE);
         }
     }
 
@@ -174,13 +195,19 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy()
+    protected void onSaveInstanceState(Bundle outState)
     {
-        super.onDestroy();
-        if (itsFileData != null) {
-            itsFileDataView.clearFileData();
-            itsFileData.close();
-            itsFileData = null;
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(STATE_TITLE, itsTitle);
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if (itsSaveTask != null) {
+            itsSaveTask.cancelTask();
+            itsSaveTask = null;
         }
     }
 
@@ -284,13 +311,27 @@ public class PasswdSafeActivity extends AppCompatActivity
                                fileData.getUri(), recToOpen);
 
         // TODO: recToOpen
-        if (itsFileData != null) {
-            itsFileDataView.clearFileData();
-            itsFileData.close();
-        }
-        itsFileData = fileData;
-        itsFileDataView.setFileData(itsFileData);
-        setOpenView(itsLocation, true);
+        itsFileDataFrag.setFileData(fileData, this);
+        changeOpenView(itsLocation, true);
+    }
+
+    /**
+     * Handle when the file new is canceled
+     */
+    @Override
+    public void handleFileNewCanceled()
+    {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileNewCanceled");
+        finish();
+    }
+
+    /**
+     * Handle when the file was successfully created
+     */
+    @Override
+    public void handleFileNew(PasswdFileData fileData)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileNew: %s", fileData.getUri());
     }
 
     /**
@@ -298,30 +339,16 @@ public class PasswdSafeActivity extends AppCompatActivity
      */
     @Override
     public List<PasswdRecordListData> getBackgroundRecordItems(
-            PasswdSafeListFragment.Listener.Mode mode)
+            boolean incRecords,
+            boolean incGroups)
     {
-        if (itsFileDataView == null) {
+        PasswdFileDataView dataView = itsFileDataFrag.getFileDataView();
+        if (dataView == null) {
             return null;
         }
 
-        boolean incRecords = false;
-        boolean incGroups = false;
-        switch (mode) {
-        case GROUPS: {
-            incGroups = true;
-            break;
-        }
-        case RECORDS: {
-            incRecords = true;
-            break;
-        }
-        case ALL: {
-            incGroups = true;
-            incRecords = true;
-            break;
-        }
-        }
-        return itsFileDataView.getRecords(incRecords, incGroups);
+        return dataView.getRecords(incRecords, incGroups,
+                                   getApplicationContext());
     }
 
     /**
@@ -330,13 +357,13 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void changeLocation(PasswdLocation location)
     {
-        if (itsFileData == null) {
+        if (itsFileDataFrag.getFileData() == null) {
             return;
         }
 
         PasswdSafeUtil.dbginfo(TAG, "changeLocation loc: %s", location);
         if (!itsLocation.equals(location)) {
-            setOpenView(location, false);
+            changeOpenView(location, false);
         }
     }
 
@@ -346,14 +373,19 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public PasswdFileData getFileData()
     {
-        return itsFileData;
+        return itsFileDataFrag.getFileData();
     }
 
     @Override
     public void editRecord(PasswdLocation location)
     {
-        Toast.makeText(this, "editRecord " + location,
-                       Toast.LENGTH_SHORT).show();
+        if (itsFileDataFrag.getFileData() == null) {
+            return;
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "editRecord loc: %s", location);
+        doChangeView(ChangeMode.EDIT_RECORD,
+                     PasswdSafeEditRecordFragment.newInstance(location));
     }
 
     @Override
@@ -399,114 +431,100 @@ public class PasswdSafeActivity extends AppCompatActivity
         doUpdateView(ViewMode.VIEW_RECORD, location);
     }
 
+    /** Update the view for editing a record */
+    @Override
+    public void updateViewEditRecord(PasswdLocation location)
+    {
+        doUpdateView(ViewMode.EDIT_RECORD, location);
+    }
+
     @Override
     public boolean isNavDrawerOpen()
     {
         return itsNavDrawerFrag.isDrawerOpen();
     }
 
-    /**
-     * Handle when the file new is canceled
-     */
     @Override
-    public void handleFileNewCanceled()
+    public void finishEditRecord(boolean save)
     {
-        PasswdSafeUtil.dbginfo(TAG, "handleFileNewCanceled");
-        finish();
+        FragmentManager fragMgr = getSupportFragmentManager();
+        fragMgr.popBackStack();
+
+        if (save) {
+            itsSaveTask = new SaveTask(itsFileDataFrag.getFileData(), this);
+            itsSaveTask.execute();
+        }
     }
 
     /**
-     * Handle when the file was successfully created
+     * Change the initial view
      */
-    @Override
-    public void handleFileNew(PasswdFileData fileData)
+    private void changeInitialView()
     {
-        PasswdSafeUtil.dbginfo(TAG, "handleFileNew: %s", fileData.getUri());
+        doChangeView(ChangeMode.INIT, null);
     }
 
     /**
-     * Set the initial view
+     * Change the view for opening a file
      */
-    private void setInitialView()
-    {
-        setView(Mode.INIT, null);
-    }
-
-    /**
-     * Set the view for opening a file
-     */
-    private void setFileOpenView(Intent intent)
+    private void changeFileOpenView(Intent intent)
     {
         Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
         String recToOpen = intent.getData().getQueryParameter("recToOpen");
         Fragment openFrag = PasswdSafeOpenFileFragment.newInstance(openUri,
                                                                    recToOpen);
-        setView(Mode.FILE_OPEN, openFrag);
+        doChangeView(ChangeMode.FILE_OPEN, openFrag);
     }
 
     /**
-     * Set the view for creating a new file
+     * Change the view for creating a new file
      */
-    private void setFileNewView(Intent intent)
+    private void changeFileNewView(Intent intent)
     {
         Uri newUri = PasswdSafeApp.getOpenUriFromIntent(intent);
         Fragment newFrag = PasswdSafeNewFileFragment.newInstance(newUri);
-        setView(Mode.FILE_NEW, newFrag);
+        doChangeView(ChangeMode.FILE_NEW, newFrag);
     }
 
     /**
-     * Set the view for an open file
+     * Change the view for an open file
      */
-    private void setOpenView(PasswdLocation location, boolean initial)
+    private void changeOpenView(PasswdLocation location, boolean initial)
     {
         Fragment viewFrag;
-        Mode viewMode;
+        ChangeMode viewMode;
         if (location.isRecord()) {
             viewFrag = PasswdSafeRecordFragment.newInstance(location);
-            viewMode = Mode.RECORD;
+            viewMode = ChangeMode.RECORD;
         } else {
-            PasswdSafeListFragment.Listener.Mode mode =
-                    itsIsTwoPane ? PasswdSafeListFragment.Listener.Mode.RECORDS :
-                            PasswdSafeListFragment.Listener.Mode.ALL;
-            viewFrag = PasswdSafeListFragment.newInstance(mode, location, true);
-
-            viewMode = initial ? Mode.OPEN_INIT : Mode.OPEN;
+            viewFrag = PasswdSafeListFragment.newInstance(location, true);
+            viewMode = initial ? ChangeMode.OPEN_INIT : ChangeMode.OPEN;
         }
-        setView(viewMode, viewFrag);
+        doChangeView(viewMode, viewFrag);
     }
 
     /**
-     * Set the view of the activity
+     * Change the view of the activity
      */
-    private void setView(Mode mode, Fragment contentFrag)
+    private void doChangeView(ChangeMode mode, Fragment contentFrag)
     {
         FragmentManager fragMgr = getSupportFragmentManager();
         //FragmentManager.enableDebugLogging(true);
         FragmentTransaction txn = fragMgr.beginTransaction();
 
-        boolean showLeftList = false;
-        boolean forceLeftListVisibility = false;
         boolean clearBackStack = false;
         boolean supportsBack = false;
         switch (mode) {
-        case INIT: {
-            clearBackStack = true;
-            forceLeftListVisibility = true;
-            break;
-        }
+        case INIT:
         case FILE_OPEN:
-        case FILE_NEW: {
-            clearBackStack = true;
-            break;
-        }
+        case FILE_NEW:
         case OPEN_INIT: {
-            showLeftList = true;
             clearBackStack = true;
             break;
         }
         case OPEN:
-        case RECORD: {
-            showLeftList = true;
+        case RECORD:
+        case EDIT_RECORD: {
             supportsBack = true;
             break;
         }
@@ -527,7 +545,6 @@ public class PasswdSafeActivity extends AppCompatActivity
                 txn.remove(currFrag);
             }
         }
-        setLeftListVisible(showLeftList, forceLeftListVisibility, txn, fragMgr);
 
         if (supportsBack) {
             txn.addToBackStack(null);
@@ -544,79 +561,91 @@ public class PasswdSafeActivity extends AppCompatActivity
         PasswdSafeUtil.dbginfo(TAG, "doUpdateView: mode: %s, loc: %s",
                                mode, location);
 
+        itsLocation = location;
+        itsFileDataFrag.getFileDataView().setCurrGroups(itsLocation.getGroups());
+
+        FragmentManager fragMgr = getSupportFragmentManager();
+        boolean showLeftList = false;
         PasswdSafeNavDrawerFragment.NavMode drawerMode =
                 PasswdSafeNavDrawerFragment.NavMode.INIT;
         switch (mode) {
         case INIT:
         case FILE_OPEN:
         case FILE_NEW: {
+            itsTitle = PasswdSafeApp.getAppTitle(null, this);
             break;
         }
         case VIEW_LIST: {
+            showLeftList = true;
             drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
+            itsTitle = null;
+            String groups = itsLocation.getGroupPath();
+            if (TextUtils.isEmpty(groups)) {
+                PasswdFileData fileData = itsFileDataFrag.getFileData();
+                if (fileData != null) {
+                    itsTitle = PasswdSafeApp.getAppFileTitle(
+                            fileData.getUri(), this);
+                }
+            }
+            if (itsTitle == null) {
+                itsTitle = PasswdSafeApp.getAppTitle(groups, this);
+            }
+
+            Fragment contentsFrag = fragMgr.findFragmentById(R.id.content);
+            if (contentsFrag instanceof PasswdSafeListFragment) {
+                PasswdSafeListFragment.Mode contentsMode = itsIsTwoPane ?
+                        PasswdSafeListFragment.Mode.RECORDS :
+                        PasswdSafeListFragment.Mode.ALL;
+                ((PasswdSafeListFragment)contentsFrag).updateLocationView(
+                        itsLocation, contentsMode);
+            }
             break;
         }
-        case VIEW_RECORD: {
+        case VIEW_RECORD:
+        case EDIT_RECORD: {
+            showLeftList = true;
             drawerMode = itsIsTwoPane ?
                     PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
                     PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD;
+            PasswdFileData fileData = itsFileDataFrag.getFileData();
+            if ((fileData != null) && itsLocation.isRecord()) {
+                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
+                String title = fileData.getTitle(rec);
+                if (mode == ViewMode.VIEW_RECORD) {
+                    itsTitle = title;
+                } else {
+                    itsTitle = getString(R.string.edit_item, title);
+                }
+            }
             break;
         }
         }
 
-        itsLocation = location;
-        itsFileDataView.setCurrGroups(itsLocation.getGroups());
         itsNavDrawerFrag.setMode(drawerMode);
-
-        if (itsFileData == null) {
-            itsTitle = PasswdSafeApp.getAppTitle(null, this);
-        } else {
-            if (location.isRecord()) {
-                PwsRecord rec = itsFileData.getRecord(location.getRecord());
-                itsTitle = itsFileData.getTitle(rec);
-            } else {
-                String groups = location.getGroupPath();
-                if (!TextUtils.isEmpty(groups)) {
-                    itsTitle = PasswdSafeApp.getAppTitle(groups, this);
-                } else {
-                    itsTitle = PasswdSafeApp.getAppFileTitle(
-                            itsFileData.getUri(), this);
-                }
-            }
-        }
         restoreActionBar();
 
         if (itsIsTwoPane) {
-            PasswdSafeListFragment.Listener.Mode listMode =
-                    itsLocation.isRecord() ?
-                            PasswdSafeListFragment.Listener.Mode.ALL :
-                            PasswdSafeListFragment.Listener.Mode.GROUPS;
-            FragmentManager fragMgr = getSupportFragmentManager();
+            PasswdSafeListFragment.Mode listMode = itsLocation.isRecord() ?
+                    PasswdSafeListFragment.Mode.ALL :
+                    PasswdSafeListFragment.Mode.GROUPS;
             Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
             if (listFrag instanceof PasswdSafeListFragment) {
                 ((PasswdSafeListFragment)listFrag).updateLocationView(
                         itsLocation, listMode);
             }
-        }
 
-    }
-
-    /**
-     *  Set whether the left pane is visible
-     */
-    private void setLeftListVisible(boolean visible,
-                                    boolean force,
-                                    FragmentTransaction txn,
-                                    FragmentManager fragMgr)
-    {
-        if (itsIsTwoPane) {
-            Fragment listFrag = fragMgr.findFragmentById(R.id.content_list);
             if (listFrag != null) {
-                if (visible && (force || listFrag.isHidden())) {
+                FragmentTransaction txn = fragMgr.beginTransaction();
+                if (showLeftList) {
+                    txn.setTransitionStyle(
+                            FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                     txn.show(listFrag);
-                } else if (!visible && (force || listFrag.isVisible())) {
+                } else {
+                    txn.setTransitionStyle(
+                            FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
                     txn.hide(listFrag);
                 }
+                txn.commit();
             }
         }
     }
@@ -630,6 +659,96 @@ public class PasswdSafeActivity extends AppCompatActivity
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(itsTitle);
+        }
+    }
+
+    /**
+     * Task to save a file in the background
+     */
+    private class SaveTask
+    {
+        private final PasswdFileData itsFileData;
+        private final Context itsContext;
+        private final ProgressFragment itsProgressFrag;
+        private final AsyncTask<Void, Void, Object> itsTask =
+                new AsyncTask<Void, Void, Object>()
+        {
+            @Override
+            protected void onPreExecute()
+            {
+                itsProgressFrag.show(getSupportFragmentManager(), null);
+            }
+
+            @Override
+            protected void onPostExecute(Object result)
+            {
+                SaveTask.this.onPostExecute(result);
+            }
+
+            @Override
+            protected Object doInBackground(Void... params)
+            {
+                try {
+                    if (itsFileData != null) {
+                        itsFileData.save(itsContext);
+                        PasswdSafeUtil.dbginfo(TAG, "SaveTask finished");
+                    }
+                    return null;
+                } catch (Exception e) {
+                    return e;
+                }
+            }
+        };
+
+        /**
+         * Constructor
+         */
+        public SaveTask(PasswdFileData fileData, Context ctx)
+        {
+            itsFileData = fileData;
+            itsContext = ctx.getApplicationContext();
+
+            String file = itsFileData.getUri().getIdentifier(itsContext, false);
+            String msg = itsContext.getString(R.string.saving_file, file);
+            itsProgressFrag = ProgressFragment.newInstance(msg);
+        }
+
+        /**
+         * Execute the task
+         */
+        public final void execute()
+        {
+            itsTask.execute();
+        }
+
+        /**
+         * Cancel the save task
+         */
+        public final void cancelTask()
+        {
+            itsTask.cancel(false);
+            onPostExecute(null);
+        }
+
+        /**
+         * Handle the result of executing the task
+         */
+        private void onPostExecute(Object result)
+        {
+            itsProgressFrag.dismiss();
+            itsSaveTask = null;
+
+            if (result instanceof Exception) {
+                Exception e = (Exception)result;
+                String msg = e.toString();
+                if ((e instanceof IOException) &&
+                    (ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT)) {
+                    msg = itsContext.getString(R.string.kitkat_sdcard_warning,
+                                               msg);
+                }
+                PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafeActivity.this,
+                                            true);
+            }
         }
     }
 }

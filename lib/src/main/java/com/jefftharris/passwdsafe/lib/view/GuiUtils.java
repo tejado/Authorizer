@@ -330,19 +330,12 @@ public final class GuiUtils
                                         int notifyId,
                                         boolean autoCancel)
     {
-        Notification notif;
-        if (ApiCompat.SDK_VERSION == ApiCompat.SDK_CUPCAKE) {
-            notif = new Notification(iconId, tickerText,
-                                     System.currentTimeMillis());
-            notif.setLatestEventInfo(ctx, title, content, intent);
-        } else {
-            BitmapDrawable b =
-                    (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
-            if (b == null) {
-                return;
-            }
-            NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(ctx)
+        BitmapDrawable b =
+                (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
+        if (b == null) {
+            return;
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setContentIntent(intent)
@@ -350,22 +343,21 @@ public final class GuiUtils
                 .setLargeIcon(b.getBitmap())
                 .setTicker(tickerText)
                 .setAutoCancel(autoCancel);
-            NotificationCompat.InboxStyle style =
+        NotificationCompat.InboxStyle style =
                 new NotificationCompat.InboxStyle(builder)
                 .setBigContentTitle(title)
                 .setSummaryText(content);
 
-            int numLines = Math.min(bigLines.size(), 5);
-            for (int i = 0; i < numLines; ++i) {
-                style.addLine(bigLines.get(i));
-            }
-            if (numLines < bigLines.size()) {
-                style.addLine("…");
-            }
-
-            builder.setStyle(style);
-            notif = builder.build();
+        int numLines = Math.min(bigLines.size(), 5);
+        for (int i = 0; i < numLines; ++i) {
+            style.addLine(bigLines.get(i));
         }
+        if (numLines < bigLines.size()) {
+            style.addLine("…");
+        }
+
+        builder.setStyle(style);
+        Notification notif = builder.build();
         notifyMgr.notify(notifyId, notif);
     }
 
@@ -381,19 +373,12 @@ public final class GuiUtils
                                               int notifyId,
                                               boolean autoCancel)
     {
-        Notification notif;
-        if (ApiCompat.SDK_VERSION == ApiCompat.SDK_CUPCAKE) {
-            notif = new Notification(iconId, title,
-                                     System.currentTimeMillis());
-            notif.setLatestEventInfo(ctx, title, content, intent);
-        } else {
-            BitmapDrawable b =
-                    (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
-            if (b == null) {
-                return;
-            }
-            NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(ctx)
+        BitmapDrawable b =
+                (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
+        if (b == null) {
+            return;
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setContentIntent(intent)
@@ -401,8 +386,7 @@ public final class GuiUtils
                 .setLargeIcon(b.getBitmap())
                 .setTicker(title)
                 .setAutoCancel(autoCancel);
-            notif = builder.build();
-        }
+        Notification notif = builder.build();
         notifyMgr.notify(notifyId, notif);
     }
 }

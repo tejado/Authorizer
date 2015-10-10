@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -39,19 +38,21 @@ public class PasswdSafeListFragment extends ListFragment
         implements LoaderManager.LoaderCallbacks<List<PasswdRecordListData>>,
                    View.OnClickListener
 {
+    /** Mode for which items are shown from the file */
+    public enum Mode
+    {
+        NONE,
+        GROUPS,
+        RECORDS,
+        ALL
+    }
+
     /** Listener interface for owning activity */
     public interface Listener
     {
-        /** Mode for which items are shown from the file */
-        enum Mode
-        {
-            GROUPS,
-            RECORDS,
-            ALL
-        }
-
         /** Get the current record items in a background thread */
-        List<PasswdRecordListData> getBackgroundRecordItems(Mode mode);
+        List<PasswdRecordListData> getBackgroundRecordItems(boolean incRecords,
+                                                            boolean incGroups);
 
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
@@ -61,25 +62,23 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
-    private Listener.Mode itsMode = Listener.Mode.GROUPS;
+    private Mode itsMode = Mode.NONE;
     private PasswdLocation itsLocation;
     private boolean itsIsContents = false;
     private Listener itsListener;
     private View itsGroupPanel;
     private TextView itsGroupLabel;
+    private TextView itsEmptyText;
     private ItemListAdapter itsAdapter;
     // TODO: sort case pref
     private boolean itsIsSortCaseSensitive = false;
 
-
     /** Create a new instance */
-    public static PasswdSafeListFragment newInstance(Listener.Mode mode,
-                                                     PasswdLocation location,
+    public static PasswdSafeListFragment newInstance(PasswdLocation location,
                                                      boolean isContents)
     {
         PasswdSafeListFragment frag = new PasswdSafeListFragment();
         Bundle args = new Bundle();
-        args.putString("mode", mode.toString());
         args.putParcelable("location", location);
         args.putBoolean("isContents", isContents);
         frag.setArguments(args);
@@ -96,31 +95,24 @@ public class PasswdSafeListFragment extends ListFragment
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
 
-        String modestr = null;
         PasswdLocation location;
         boolean isContents = false;
         if (args != null) {
-            modestr = args.getString("mode");
             location = args.getParcelable("location");
             isContents = args.getBoolean("isContents", false);
         } else {
             location = new PasswdLocation();
         }
-        itsMode = (modestr == null) ?
-                Listener.Mode.GROUPS : Listener.Mode.valueOf(modestr);
         itsLocation = location;
         itsIsContents = isContents;
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
-     */
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context ctx)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        super.onAttach(ctx);
+        itsListener = (Listener)ctx;
     }
 
 
@@ -138,6 +130,7 @@ public class PasswdSafeListFragment extends ListFragment
         itsGroupPanel = root.findViewById(R.id.current_group_panel);
         itsGroupPanel.setOnClickListener(this);
         itsGroupLabel = (TextView)root.findViewById(R.id.current_group_label);
+        itsEmptyText = (TextView)root.findViewById(android.R.id.empty);
 
         return root;
     }
@@ -167,7 +160,6 @@ public class PasswdSafeListFragment extends ListFragment
         if (itsIsContents) {
             itsListener.updateViewList(itsLocation);
         }
-        refreshList();
     }
 
     @Override
@@ -208,7 +200,7 @@ public class PasswdSafeListFragment extends ListFragment
 
 
     /** Update the location shown by the list */
-    public void updateLocationView(PasswdLocation location, Listener.Mode mode)
+    public void updateLocationView(PasswdLocation location, Mode mode)
     {
         itsLocation = location;
         itsMode = mode;
@@ -219,7 +211,7 @@ public class PasswdSafeListFragment extends ListFragment
     /** Refresh the list due to file changes */
     private void refreshList()
     {
-        if (!isAdded()) {
+        if (!isResumed()) {
             return;
         }
 
@@ -228,14 +220,12 @@ public class PasswdSafeListFragment extends ListFragment
 
         boolean groupVisible = false;
         switch (itsMode) {
-        case GROUPS: {
-            groupVisible = true;
-            break;
-        }
-        case RECORDS: {
+        case RECORDS:
+        case NONE: {
             groupVisible = false;
             break;
         }
+        case GROUPS:
         case ALL: {
             groupVisible = true;
             break;
@@ -281,6 +271,11 @@ public class PasswdSafeListFragment extends ListFragment
                 list.smoothScrollToPosition(selPos);
             } else {
                 list.clearChoices();
+            }
+
+            if (itsEmptyText.getText().length() == 0) {
+                itsEmptyText.setText(itsIsContents ? R.string.no_records :
+                                             R.string.no_groups);
             }
         }
     }
@@ -484,11 +479,11 @@ public class PasswdSafeListFragment extends ListFragment
     private static class ItemLoader
             extends AsyncTaskLoader<List<PasswdRecordListData>>
     {
-        private final Listener.Mode itsMode;
+        private final Mode itsMode;
         private final Listener itsActListener;
 
         /** Constructor */
-        public ItemLoader(Listener.Mode mode, Listener actListener,
+        public ItemLoader(Mode mode, Listener actListener,
                           Context context)
         {
             super(context);
@@ -525,7 +520,28 @@ public class PasswdSafeListFragment extends ListFragment
         @Override
         public List<PasswdRecordListData> loadInBackground()
         {
-            return itsActListener.getBackgroundRecordItems(itsMode);
+            boolean incRecords = false;
+            boolean incGroups = false;
+            switch (itsMode) {
+            case NONE: {
+                break;
+            }
+            case RECORDS: {
+                incRecords = true;
+                break;
+            }
+            case GROUPS: {
+                incGroups = true;
+                break;
+            }
+            case ALL: {
+                incRecords = true;
+                incGroups = true;
+                break;
+            }
+            }
+            return itsActListener.getBackgroundRecordItems(incRecords,
+                                                           incGroups);
         }
     }
 }
