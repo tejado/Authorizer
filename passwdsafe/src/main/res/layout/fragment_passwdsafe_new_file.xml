@@ -25,8 +25,10 @@
                   android:text="@string/new_file"
                   android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-        <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
-                                                       android:layout_height="wrap_content">
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/file_name_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText android:id="@+id/file_name"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -35,14 +37,15 @@
                       android:inputType="textNoSuggestions"
                       android:scrollHorizontally="true"
                       android:singleLine="true"
-                      android:text="@string/psafe3_ext"
-                      android:textAppearance="?android:attr/textAppearanceMedium">
+                      android:text="@string/psafe3_ext">
                 <requestFocus/>
             </EditText>
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
-                                                       android:layout_height="wrap_content">
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/password_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText android:id="@+id/password"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -50,13 +53,14 @@
                       android:hint="@string/password"
                       android:inputType="textPassword"
                       android:scrollHorizontally="true"
-                      android:singleLine="true"
-                      android:textAppearance="?android:attr/textAppearanceMedium">
+                      android:singleLine="true">
             </EditText>
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
-                                                       android:layout_height="wrap_content">
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/password_confirm_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
             <EditText android:id="@+id/password_confirm"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -65,16 +69,9 @@
                       android:imeOptions="actionGo"
                       android:inputType="textPassword"
                       android:scrollHorizontally="true"
-                      android:singleLine="true"
-                      android:textAppearance="?android:attr/textAppearanceMedium">
+                      android:singleLine="true">
             </EditText>
         </android.support.design.widget.TextInputLayout>
-
-        <View style="@style/Separator.Light"/>
-
-        <TextView android:id="@+id/error_msg"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"/>
 
         <ProgressBar android:id="@+id/progress"
                      style="?android:attr/progressBarStyleHorizontal"

@@ -7,10 +7,13 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.app.Activity;
+import android.content.Context;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
@@ -49,11 +53,18 @@ public class PasswdSafeNewFileFragment
     }
 
     private Listener itsListener;
+    private String itsPsafe3Sfx;
     private TextView itsTitle;
+    private TextInputLayout itsFileNameInput;
     private EditText itsFileName;
-    private TextView itsPasswordEdit;
+    private TextInputLayout itsPasswordInput;
+    private TextView itsPassword;
+    private TextInputLayout itsPasswordConfirmInput;
     private TextView itsPasswordConfirm;
     private Button itsOkBtn;
+    private Validator itsValidator = new Validator();
+
+    private static final String ARG_URI = "uri";
 
     /**
      * Create a new instance
@@ -62,7 +73,7 @@ public class PasswdSafeNewFileFragment
     {
         PasswdSafeNewFileFragment fragment = new PasswdSafeNewFileFragment();
         Bundle args = new Bundle();
-        args.putParcelable("uri", newFileUri);
+        args.putParcelable(ARG_URI, newFileUri);
         fragment.setArguments(args);
         return fragment;
     }
@@ -73,7 +84,7 @@ public class PasswdSafeNewFileFragment
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
-            setFileUri((Uri)args.getParcelable("uri"));
+            setFileUri((Uri)args.getParcelable(ARG_URI));
         }
     }
 
@@ -85,17 +96,14 @@ public class PasswdSafeNewFileFragment
                                          container, false);
         setupView(rootView);
 
+        itsPsafe3Sfx = getString(R.string.psafe3_ext);
         itsTitle = (TextView)rootView.findViewById(R.id.title);
+        itsFileNameInput = (TextInputLayout)
+                rootView.findViewById(R.id.file_name_input);
         itsFileName = (EditText)rootView.findViewById(R.id.file_name);
         itsFileName.setSelection(0);
         itsFileName.addTextChangedListener(new TextWatcher()
         {
-            private final String itsSuffix;
-
-            {
-                itsSuffix = getString(R.string.psafe3_ext);
-            }
-
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,
                                           int after)
@@ -111,34 +119,45 @@ public class PasswdSafeNewFileFragment
             @Override
             public void afterTextChanged(Editable s)
             {
-                if (!s.toString().endsWith(itsSuffix)) {
-                    s.replace(0, s.length(), itsSuffix);
+                if (!s.toString().endsWith(itsPsafe3Sfx)) {
+                    s.replace(0, s.length(), itsPsafe3Sfx);
                     itsFileName.setSelection(0);
                 }
             }
         });
+        itsValidator.registerTextView(itsFileName);
 
-        itsPasswordEdit = (TextView)rootView.findViewById(R.id.password);
-        itsPasswordConfirm =
-                (TextView)rootView.findViewById(R.id.password_confirm);
-        PasswordVisibilityMenuHandler.set(itsPasswordEdit, itsPasswordConfirm);
+        itsPasswordInput = (TextInputLayout)
+                rootView.findViewById(R.id.password_input);
+        itsPassword = (TextView)rootView.findViewById(R.id.password);
+        itsValidator.registerTextView(itsPassword);
+        itsPasswordInput.setTypeface(Typeface.DEFAULT);
+
+        itsPasswordConfirmInput = (TextInputLayout)
+                rootView.findViewById(R.id.password_confirm_input);
+        itsPasswordConfirm = (TextView)
+                rootView.findViewById(R.id.password_confirm);
+        itsValidator.registerTextView(itsPasswordConfirm);
+        itsPasswordConfirmInput.setTypeface(Typeface.DEFAULT);
+        PasswordVisibilityMenuHandler.set(itsPassword, itsPasswordConfirm);
+
         Button cancelBtn = (Button)rootView.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);
         itsOkBtn = (Button)rootView.findViewById(R.id.ok);
         itsOkBtn.setOnClickListener(this);
         itsOkBtn.setEnabled(false);
 
-        GuiUtils.setupFormKeyboard(itsFileName, itsPasswordConfirm,
-                                   itsOkBtn, getActivity());
+        GuiUtils.setupFormKeyboard(itsFileName, itsPasswordConfirm, itsOkBtn,
+                                   getActivity());
 
         return rootView;
     }
 
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context ctx)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        super.onAttach(ctx);
+        itsListener = (Listener)ctx;
     }
 
     @Override
@@ -146,6 +165,7 @@ public class PasswdSafeNewFileFragment
     {
         super.onResume();
         itsListener.updateViewFileNew();
+        itsValidator.validate();
     }
 
     @Override
@@ -226,7 +246,7 @@ public class PasswdSafeNewFileFragment
     @Override
     protected final void doCancelFragment(boolean userCancel)
     {
-        GuiUtils.setKeyboardVisible(itsPasswordEdit, getActivity(), false);
+        GuiUtils.setKeyboardVisible(itsPasswordInput, getActivity(), false);
         if (userCancel && itsListener != null) {
             itsListener.handleFileNewCanceled();
         }
@@ -236,9 +256,122 @@ public class PasswdSafeNewFileFragment
     @Override
     protected final void setFieldsEnabled(boolean enabled)
     {
-        itsFileName.setEnabled(enabled);
-        itsPasswordEdit.setEnabled(enabled);
-        itsPasswordConfirm.setEnabled(enabled);
-        itsOkBtn.setEnabled(enabled);
+        itsFileNameInput.setEnabled(enabled);
+        itsPasswordInput.setEnabled(enabled);
+        itsPasswordConfirmInput.setEnabled(enabled);
+        if (enabled) {
+            itsValidator.validate();
+        } else {
+            itsOkBtn.setEnabled(false);
+        }
+
+    }
+
+    /**
+     * Class to validate fields in the fragment
+     */
+    private class Validator
+    {
+        private final TextWatcher itsTextWatcher = new AbstractTextWatcher()
+        {
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                validate();
+            }
+        };
+
+        /**
+         * Register a text view with the validator to revalidate on text change
+         */
+        public void registerTextView(TextView tv)
+        {
+            tv.addTextChangedListener(itsTextWatcher);
+        }
+
+        /**
+         * Validate the fragment
+         */
+        public final void validate()
+        {
+            boolean isError;
+
+            CharSequence fileName = itsFileName.getText();
+            isError = setInputError(validateFileName(fileName.toString()),
+                                    itsFileNameInput);
+
+            CharSequence passwd = itsPassword.getText();
+            isError |= setInputError(
+                    (passwd.length() == 0) ?
+                            getString(R.string.empty_password) : null,
+                    itsPasswordInput);
+
+            CharSequence confirm = itsPasswordConfirm.getText();
+            isError |= setInputError(
+                    !TextUtils.equals(passwd, confirm) ?
+                            getString(R.string.passwords_do_not_match) : null,
+                    itsPasswordConfirmInput);
+
+            itsOkBtn.setEnabled(!isError);
+        }
+
+        /**
+         * Set the error message on a TextInputLayout
+         * @param errorMsg The error message; null if no error
+         * @param field The input field
+         * @return Whether there was an error
+         */
+        private boolean setInputError(String errorMsg, TextInputLayout field)
+        {
+            boolean isError = (errorMsg != null);
+
+            // Set fields only if error changes to prevent flashing
+            boolean currError = field.isErrorEnabled();
+            CharSequence currErrorMsg = field.getError();
+            if ((currError != isError) ||
+                !TextUtils.equals(errorMsg, currErrorMsg)) {
+                field.setError(errorMsg);
+                // Set enabled last to remove red underline even if null msg
+                field.setErrorEnabled(isError);
+            }
+
+            return isError;
+        }
+
+        /**
+         * Validate the file name
+         * @return error message if invalid; null if valid
+         */
+        private String validateFileName(String fileName)
+        {
+            if (!fileName.endsWith(itsPsafe3Sfx)) {
+                return getString(R.string.invalid_file_name);
+            }
+            
+            String fileNameBase = fileName.substring(
+                    0, fileName.length() - itsPsafe3Sfx.length());
+
+            if (fileNameBase.length() == 0) {
+                return getString(R.string.empty_file_name);
+            } else {
+                for (int i = 0; i < fileNameBase.length(); ++i) {
+                    char c = fileNameBase.charAt(i);
+                    if (!Character.isLetterOrDigit(c)) {
+                        return getString(R.string.invalid_file_name);
+                    }
+                }
+            }
+
+            PasswdFileUri uri = getPasswdFileUri();
+            if (uri != null) {
+                String error = uri.validateNewChild(fileNameBase,
+                                                    getActivity());
+                if (error != null) {
+                    return error;
+                }
+            }
+
+            return null;
+        }
     }
 }
