@@ -63,6 +63,7 @@ public class PasswdSafeNewFileFragment
     private TextView itsPasswordConfirm;
     private Button itsOkBtn;
     private Validator itsValidator = new Validator();
+    private NewTask itsNewTask;
 
     private static final String ARG_URI = "uri";
 
@@ -185,6 +186,13 @@ public class PasswdSafeNewFileFragment
             }
             break;
         }
+        case R.id.ok: {
+            itsNewTask = new NewTask(
+                    itsFileName.getText().toString(),
+                    new StringBuilder(itsPassword.getText()));
+            itsNewTask.execute();
+            break;
+        }
         }
     }
 
@@ -246,6 +254,11 @@ public class PasswdSafeNewFileFragment
     @Override
     protected final void doCancelFragment(boolean userCancel)
     {
+        if (itsNewTask != null) {
+            NewTask task = itsNewTask;
+            itsNewTask = null;
+            task.cancel(false);
+        }
         GuiUtils.setKeyboardVisible(itsPasswordInput, getActivity(), false);
         if (userCancel && itsListener != null) {
             itsListener.handleFileNewCanceled();
@@ -264,7 +277,31 @@ public class PasswdSafeNewFileFragment
         } else {
             itsOkBtn.setEnabled(false);
         }
+    }
 
+    /**
+     * Handle when the new task is finished
+     */
+    private void newTaskFinished(Object result, PasswdFileUri fileUri)
+    {
+        if (itsNewTask == null) {
+            return;
+        }
+        itsNewTask = null;
+
+        if (result == null) {
+            cancelFragment(false);
+            return;
+        }
+
+        if (result instanceof PasswdFileData) {
+            itsListener.handleFileNew((PasswdFileData)result);
+        } else {
+            Exception e = (Exception) result;
+            PasswdSafeUtil.showFatalMsg(
+                    e, getString(R.string.cannot_create_file, fileUri),
+                    getActivity());
+        }
     }
 
     /**
@@ -372,6 +409,46 @@ public class PasswdSafeNewFileFragment
             }
 
             return null;
+        }
+    }
+
+    /**
+     * Background task for creating a new file
+     */
+    private class NewTask extends BackgroundTask<Object>
+    {
+        private final String itsFileName;
+        private final StringBuilder itsPassword;
+        private PasswdFileUri itsFileUri;
+
+        /**
+         * Constructor
+         */
+        public NewTask(String fileName, StringBuilder password)
+        {
+            itsFileName = fileName;
+            itsPassword = password;
+        }
+
+        @Override
+        protected Object doInBackground(Void... voids)
+        {
+            try {
+                Context ctx = getContext();
+                itsFileUri = getPasswdFileUri().createNewChild(itsFileName, ctx);
+                PasswdFileData fileData = new PasswdFileData(itsFileUri);
+                fileData.createNewFile(itsPassword, ctx);
+                return fileData;
+            } catch (Exception e) {
+                return e;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Object data)
+        {
+            super.onPostExecute(data);
+            newTaskFinished(data, itsFileUri);
         }
     }
 }
