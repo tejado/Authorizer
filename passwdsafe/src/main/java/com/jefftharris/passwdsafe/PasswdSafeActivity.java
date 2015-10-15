@@ -67,6 +67,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: autobackup
     // TODO: keyboard support
     // TODO: shortcuts
+    // TODO: storage access framework support
 
     private enum ChangeMode
     {
@@ -332,6 +333,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     public void handleFileNew(PasswdFileData fileData)
     {
         PasswdSafeUtil.dbginfo(TAG, "handleFileNew: %s", fileData.getUri());
+        itsFileDataFrag.setFileData(fileData, this);
+        changeOpenView(itsLocation, true);
     }
 
     /**
