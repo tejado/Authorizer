@@ -49,7 +49,9 @@ import java.util.TreeSet;
  * Fragment for editing a password record
  */
 public class PasswdSafeEditRecordFragment extends Fragment
-        implements NewGroupDialog.Listener, View.OnClickListener
+        implements NewGroupDialog.Listener,
+                   View.OnClickListener,
+                   AdapterView.OnItemSelectedListener
 {
     /**
      * Listener interface for owning activity
@@ -150,6 +152,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         View rootView = inflater.inflate(
                 R.layout.fragment_passwdsafe_edit_record, container, false);
         itsType = (Spinner)rootView.findViewById(R.id.type);
+        itsType.setOnItemSelectedListener(this);
         itsTypeError = (TextView)rootView.findViewById(R.id.type_error);
         itsLinkRef = (TextView)rootView.findViewById(R.id.link_ref);
         itsLinkRef.setOnClickListener(this);
@@ -158,6 +161,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsTitle = (TextView)rootView.findViewById(R.id.title);
         itsValidator.registerTextView(itsTitle);
         itsGroup = (Spinner)rootView.findViewById(R.id.group);
+        itsGroup.setOnItemSelectedListener(this);
         itsUser = (TextView)rootView.findViewById(R.id.user);
         itsValidator.registerTextView(itsUser);
         itsUrlInput = rootView.findViewById(R.id.url_input);
@@ -272,6 +276,51 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     @Override
+    public void onItemSelected(AdapterView<?> spinnerView, View view,
+                               int position, long id)
+    {
+        switch (spinnerView.getId()) {
+        case R.id.type: {
+            PasswdRecord.Type type = PasswdRecord.Type.NORMAL;
+            switch (position) {
+            case TYPE_NORMAL: {
+                type = PasswdRecord.Type.NORMAL;
+                break;
+            }
+            case TYPE_ALIAS: {
+                type = PasswdRecord.Type.ALIAS;
+                break;
+            }
+            case TYPE_SHORTCUT: {
+                type = PasswdRecord.Type.SHORTCUT;
+                break;
+            }
+            }
+            setType(type, false);
+            break;
+        }
+        case R.id.group: {
+            selectGroup(position);
+            break;
+        }
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> spinnerView)
+    {
+        switch (spinnerView.getId()) {
+        case R.id.type: {
+            setType(PasswdRecord.Type.NORMAL, false);
+            break;
+        }
+        case R.id.group: {
+            break;
+        }
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         PasswdSafeUtil.dbginfo(TAG, "onActivityResult data: %s", data);
@@ -329,21 +378,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
 
         itsPrevGroupPos = updateGroups(initialGroup);
-        itsGroup.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener()
-                {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view,
-                                               int position, long id)
-                    {
-                        selectGroup(position);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> arg0)
-                    {
-                    }
-                });
     }
 
     /**
@@ -365,38 +399,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
             break;
         }
         }
-
-        itsType.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener()
-                {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view,
-                                               int position, long id)
-                    {
-                        PasswdRecord.Type type = PasswdRecord.Type.NORMAL;
-                        switch (position) {
-                        case TYPE_NORMAL: {
-                            type = PasswdRecord.Type.NORMAL;
-                            break;
-                        }
-                        case TYPE_ALIAS: {
-                            type = PasswdRecord.Type.ALIAS;
-                            break;
-                        }
-                        case TYPE_SHORTCUT: {
-                            type = PasswdRecord.Type.SHORTCUT;
-                            break;
-                        }
-                        }
-                        setType(type, false);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent)
-                    {
-                        setType(PasswdRecord.Type.NORMAL, false);
-                    }
-                });
 
         setType(itsRecOrigType, true);
         setLinkRef(linkRef, info);
