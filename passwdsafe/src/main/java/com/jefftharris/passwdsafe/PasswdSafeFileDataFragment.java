@@ -80,4 +80,10 @@ public class PasswdSafeFileDataFragment extends Fragment
         itsFileData = fileData;
         itsFileDataView.setFileData(itsFileData, ctx);
     }
+
+    /** Refresh the password file data */
+    public void refreshFileData(Context ctx)
+    {
+        itsFileDataView.setFileData(itsFileData, ctx);
+    }
 }
