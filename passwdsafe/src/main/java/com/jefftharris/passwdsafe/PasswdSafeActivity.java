@@ -410,11 +410,23 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void finishEditRecord(boolean save)
     {
+        boolean resetLoc = false;
+        if (save) {
+            itsFileDataFrag.refreshFileData(this);
+            PasswdFileData fileData = itsFileDataFrag.getFileData();
+            PasswdLocation newLoc = new PasswdLocation(
+                    fileData.getRecord(itsLocation.getRecord()), fileData);
+            if (!newLoc.equals(itsLocation)) {
+                resetLoc = true;
+            }
+        }
+
         FragmentManager fragMgr = getSupportFragmentManager();
-        fragMgr.popBackStack();
+        fragMgr.popBackStackImmediate();
 
         if (save) {
-            itsSaveTask = new SaveTask(itsFileDataFrag.getFileData(), this);
+            itsSaveTask = new SaveTask(itsFileDataFrag.getFileData(),
+                                       resetLoc, this);
             itsSaveTask.execute();
         }
     }
@@ -619,6 +631,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     private class SaveTask
     {
         private final PasswdFileData itsFileData;
+        private final boolean itsIsResetLoc;
         private final Context itsContext;
         private final ProgressFragment itsProgressFrag;
         private final AsyncTask<Void, Void, Object> itsTask =
@@ -661,9 +674,10 @@ public class PasswdSafeActivity extends AppCompatActivity
         /**
          * Constructor
          */
-        public SaveTask(PasswdFileData fileData, Context ctx)
+        public SaveTask(PasswdFileData fileData, boolean resetLoc, Context ctx)
         {
             itsFileData = fileData;
+            itsIsResetLoc = resetLoc;
             itsContext = ctx.getApplicationContext();
 
             String file = itsFileData.getUri().getIdentifier(itsContext, false);
@@ -706,6 +720,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 }
                 PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafeActivity.this,
                                             true);
+            } else if (itsIsResetLoc) {
+                changeOpenView(new PasswdLocation(), true);
             }
         }
     }
