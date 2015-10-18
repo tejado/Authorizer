@@ -19,13 +19,40 @@
         <LinearLayout android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       android:orientation="vertical">
-            <!--
-            <Spinner android:id="@+id/type"
-                     android:layout_width="fill_parent"
-                     android:layout_height="wrap_content"
-                     android:prompt="@string/choose_type"
-                     android:entries="@array/record_type"/>
--->
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:paddingBottom="2dp">
+
+                <TextView style="@style/TextAppearance.AppCompat.Caption"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:paddingEnd="4dp"
+                          android:paddingLeft="4dp"
+                          android:paddingRight="4dp"
+                          android:paddingStart="4dp"
+                          android:text="@string/type"/>
+
+                <Spinner android:id="@+id/type"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:entries="@array/record_type"
+                         android:prompt="@string/choose_type"
+                         android:spinnerMode="dropdown"
+                         tools:ignore="UnusedAttribute"/>
+
+                <TextView android:id="@+id/type_error"
+                          style="@style/TextAppearance.Design.Error"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:paddingEnd="4dp"
+                          android:paddingLeft="4dp"
+                          android:paddingRight="4dp"
+                          android:paddingStart="4dp"/>
+            </LinearLayout>
+
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/title_input"
                 android:layout_width="match_parent"

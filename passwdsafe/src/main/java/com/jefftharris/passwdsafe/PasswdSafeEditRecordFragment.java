@@ -73,6 +73,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
             new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     private int itsPrevGroupPos = -1;
     private final HashSet<RecordKey> itsRecordKeys = new HashSet<>();
+    private PasswdRecord.Type itsRecType = PasswdRecord.Type.NORMAL;
+    private PasswdRecord.Type itsRecOrigType = PasswdRecord.Type.NORMAL;
+    private PwsRecord itsLinkRef = null;
+    private Spinner itsType;
+    private TextView itsTypeError;
     private TextInputLayout itsTitleInput;
     private TextView itsTitle;
     private Spinner itsGroup;
@@ -80,10 +85,19 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private TextView itsUrl;
     private TextView itsEmail;
 
+    // Constants must match record_type strings
+    private static final int TYPE_NORMAL = 0;
+    private static final int TYPE_ALIAS = 1;
+    private static final int TYPE_SHORTCUT = 2;
+
     // TODO: if pending changes, warn on navigation
     // TODO: v2 support
     // TODO: protected flag
     // TODO: on new record, use current group
+
+    // TODO: password link to select record
+    // TODO: type has normal password and details
+    // TODO: save type
 
     /**
      * Create a new instance
@@ -126,6 +140,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(
                 R.layout.fragment_passwdsafe_edit_record, container, false);
+        itsType = (Spinner)rootView.findViewById(R.id.type);
+        itsTypeError = (TextView)rootView.findViewById(R.id.type_error);
         itsTitleInput =
                 (TextInputLayout)rootView.findViewById(R.id.title_input);
         itsTitle = (TextView)rootView.findViewById(R.id.title);
@@ -226,6 +242,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
         String group = info.itsFileData.getGroup(info.itsRec);
         initGroup(group, info);
+        initTypeAndPassword(info);
     }
 
     /**
@@ -263,7 +280,118 @@ public class PasswdSafeEditRecordFragment extends Fragment
                     {
                     }
                 });
+    }
 
+    /**
+     * Initialize the type and password
+     */
+    private void initTypeAndPassword(RecordInfo info)
+    {
+        itsRecOrigType = PasswdRecord.Type.NORMAL;
+        PwsRecord linkRef = null;
+        String password = null;
+        if (info.itsRec != null) {
+            itsRecOrigType = info.itsPasswdRec.getType();
+            switch (itsRecOrigType) {
+            case NORMAL: {
+                password = info.itsFileData.getPassword(info.itsRec);
+                break;
+            }
+            case ALIAS:
+            case SHORTCUT: {
+                linkRef = info.itsPasswdRec.getRef();
+                break;
+            }
+            }
+        }
+
+        itsType.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener()
+                {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view,
+                                               int position, long id)
+                    {
+                        PasswdRecord.Type type = PasswdRecord.Type.NORMAL;
+                        switch (position) {
+                        case TYPE_NORMAL: {
+                            type = PasswdRecord.Type.NORMAL;
+                            break;
+                        }
+                        case TYPE_ALIAS: {
+                            type = PasswdRecord.Type.ALIAS;
+                            break;
+                        }
+                        case TYPE_SHORTCUT: {
+                            type = PasswdRecord.Type.SHORTCUT;
+                            break;
+                        }
+                        }
+                        setType(type, false);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent)
+                    {
+                        setType(PasswdRecord.Type.NORMAL, false);
+                    }
+                });
+
+        setType(itsRecOrigType, true);
+        setLinkRef(linkRef, info);
+    }
+
+    /**
+     * Set the record's type
+     */
+    private void setType(PasswdRecord.Type type, boolean init)
+    {
+        if ((type == itsRecType) && !init) {
+            return;
+        }
+
+        // Prev type needs to be updated before setting spinner to prevent
+        // recursion
+        itsRecType = type;
+        GuiUtils.invalidateOptionsMenu(getActivity());
+
+        if (init) {
+            int pos = TYPE_NORMAL;
+            switch (type) {
+            case NORMAL: {
+                pos = TYPE_NORMAL;
+                break;
+            }
+            case ALIAS: {
+                pos = TYPE_ALIAS;
+                break;
+            }
+            case SHORTCUT: {
+                pos = TYPE_SHORTCUT;
+                break;
+            }
+            }
+            itsType.setSelection(pos);
+        }
+
+        itsValidator.validate();
+
+        if (!init) {
+            // Clear link on type change in case it is no longer valid
+            setLinkRef(null, null);
+        }
+    }
+
+    /**
+     * Set the link to another record
+     */
+    private void setLinkRef(PwsRecord ref, RecordInfo info)
+    {
+        itsLinkRef = ref;
+        String id = (itsLinkRef != null) ?
+                info.itsFileData.getId(itsLinkRef) : "";
+
+        itsValidator.validate();
     }
 
     /**
@@ -482,8 +610,29 @@ public class PasswdSafeEditRecordFragment extends Fragment
          */
         public final void validate()
         {
-            boolean valid;
-            valid = !setInputError(validateTitle(), itsTitleInput);
+            String typeError = null;
+            switch (itsRecType) {
+            case NORMAL: {
+                break;
+            }
+            case ALIAS: {
+                if (itsLinkRef == null) {
+                    typeError = getString(R.string.no_alias_chosen);
+                }
+                break;
+            }
+            case SHORTCUT: {
+                if (itsLinkRef == null) {
+                    typeError = getString(R.string.no_shortcut_chosen);
+                }
+                break;
+            }
+            }
+            GuiUtils.setVisible(itsTypeError, (typeError != null));
+            itsTypeError.setText(typeError);
+
+            boolean valid = (typeError == null);
+            valid &= !setInputError(validateTitle(), itsTitleInput);
 
             if (valid != itsIsValid) {
                 itsIsValid = valid;
