@@ -8,7 +8,9 @@
 package com.jefftharris.passwdsafe;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -28,6 +30,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.NewGroupDialog;
@@ -46,7 +49,7 @@ import java.util.TreeSet;
  * Fragment for editing a password record
  */
 public class PasswdSafeEditRecordFragment extends Fragment
-        implements NewGroupDialog.Listener
+        implements NewGroupDialog.Listener, View.OnClickListener
 {
     /**
      * Listener interface for owning activity
@@ -74,18 +77,27 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private int itsPrevGroupPos = -1;
     private final HashSet<RecordKey> itsRecordKeys = new HashSet<>();
     private PasswdRecord.Type itsRecType = PasswdRecord.Type.NORMAL;
+    private boolean itsTypeHasNormalPassword = true;
+    private boolean itsTypeHasDetails = true;
     private PasswdRecord.Type itsRecOrigType = PasswdRecord.Type.NORMAL;
-    private PwsRecord itsLinkRef = null;
+    private PwsRecord itsReferencedRec = null;
     private Spinner itsType;
     private TextView itsTypeError;
+    private TextView itsLinkRef;
     private TextInputLayout itsTitleInput;
     private TextView itsTitle;
     private Spinner itsGroup;
     private TextView itsUser;
+    private View itsUrlInput;
     private TextView itsUrl;
+    private View itsEmailInput;
     private TextView itsEmail;
 
-    // Constants must match record_type strings
+    private static final String TAG = "PasswdSafeEditRecordFragment";
+
+    private static final int RECORD_SELECTION_REQUEST = 0;
+
+     // Constants must match record_type strings
     private static final int TYPE_NORMAL = 0;
     private static final int TYPE_ALIAS = 1;
     private static final int TYPE_SHORTCUT = 2;
@@ -94,10 +106,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     // TODO: v2 support
     // TODO: protected flag
     // TODO: on new record, use current group
-
-    // TODO: password link to select record
-    // TODO: type has normal password and details
-    // TODO: save type
+    // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut
 
     /**
      * Create a new instance
@@ -142,6 +151,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 R.layout.fragment_passwdsafe_edit_record, container, false);
         itsType = (Spinner)rootView.findViewById(R.id.type);
         itsTypeError = (TextView)rootView.findViewById(R.id.type_error);
+        itsLinkRef = (TextView)rootView.findViewById(R.id.link_ref);
+        itsLinkRef.setOnClickListener(this);
         itsTitleInput =
                 (TextInputLayout)rootView.findViewById(R.id.title_input);
         itsTitle = (TextView)rootView.findViewById(R.id.title);
@@ -149,7 +160,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsGroup = (Spinner)rootView.findViewById(R.id.group);
         itsUser = (TextView)rootView.findViewById(R.id.user);
         itsValidator.registerTextView(itsUser);
+        itsUrlInput = rootView.findViewById(R.id.url_input);
         itsUrl = (TextView)rootView.findViewById(R.id.url);
+        itsEmailInput = rootView.findViewById(R.id.email_input);
         itsEmail = (TextView)rootView.findViewById(R.id.email);
 
         initialize();
@@ -225,6 +238,57 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
     }
 
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.link_ref: {
+            Intent intent = new Intent(PasswdSafeApp.CHOOSE_RECORD_INTENT,
+                                       getActivity().getIntent().getData(),
+                                       getContext(),
+                                       RecordSelectionActivity.class);
+            // Do not allow mixed alias and shortcut references to a
+            // record to work around a bug in Password Safe that does
+            // not allow both
+            switch (itsRecType) {
+            case NORMAL: {
+                break;
+            }
+            case ALIAS: {
+                intent.putExtra(RecordSelectionActivity.FILTER_NO_SHORTCUT,
+                                true);
+                break;
+            }
+            case SHORTCUT: {
+                intent.putExtra(RecordSelectionActivity.FILTER_NO_ALIAS, true);
+                break;
+            }
+            }
+
+            startActivityForResult(intent, RECORD_SELECTION_REQUEST);
+            break;
+        }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "onActivityResult data: %s", data);
+
+        if ((requestCode == RECORD_SELECTION_REQUEST) &&
+            (resultCode == Activity.RESULT_OK)) {
+            String uuid = data.getStringExtra(PasswdSafeApp.RESULT_DATA_UUID);
+            RecordInfo info = getRecordInfo();
+            if (info == null) {
+                return;
+            }
+            setLinkRef(info.itsFileData.getRecord(uuid), info);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     /**
      * Initialize the view
      */
@@ -287,22 +351,19 @@ public class PasswdSafeEditRecordFragment extends Fragment
      */
     private void initTypeAndPassword(RecordInfo info)
     {
-        itsRecOrigType = PasswdRecord.Type.NORMAL;
+        itsRecOrigType = info.itsPasswdRec.getType();
         PwsRecord linkRef = null;
         String password = null;
-        if (info.itsRec != null) {
-            itsRecOrigType = info.itsPasswdRec.getType();
-            switch (itsRecOrigType) {
-            case NORMAL: {
-                password = info.itsFileData.getPassword(info.itsRec);
-                break;
-            }
-            case ALIAS:
-            case SHORTCUT: {
-                linkRef = info.itsPasswdRec.getRef();
-                break;
-            }
-            }
+        switch (itsRecOrigType) {
+        case NORMAL: {
+            password = info.itsFileData.getPassword(info.itsRec);
+            break;
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            linkRef = info.itsPasswdRec.getRef();
+            break;
+        }
         }
 
         itsType.setOnItemSelectedListener(
@@ -374,6 +435,30 @@ public class PasswdSafeEditRecordFragment extends Fragment
             itsType.setSelection(pos);
         }
 
+        itsTypeHasNormalPassword = true;
+        itsTypeHasDetails = true;
+        switch (type) {
+        case NORMAL: {
+            itsTypeHasNormalPassword = true;
+            itsTypeHasDetails = true;
+            break;
+        }
+        case ALIAS: {
+            itsTypeHasNormalPassword = false;
+            itsTypeHasDetails = true;
+            break;
+        }
+        case SHORTCUT: {
+            itsTypeHasNormalPassword = false;
+            itsTypeHasDetails = false;
+            break;
+        }
+        }
+
+        GuiUtils.setVisible(itsLinkRef, !itsTypeHasNormalPassword);
+        GuiUtils.setVisible(itsUrlInput, itsTypeHasDetails);
+        GuiUtils.setVisible(itsEmailInput, itsTypeHasDetails);
+
         itsValidator.validate();
 
         if (!init) {
@@ -387,10 +472,10 @@ public class PasswdSafeEditRecordFragment extends Fragment
      */
     private void setLinkRef(PwsRecord ref, RecordInfo info)
     {
-        itsLinkRef = ref;
-        String id = (itsLinkRef != null) ?
-                info.itsFileData.getId(itsLinkRef) : "";
-
+        itsReferencedRec = ref;
+        String id = (itsReferencedRec != null) ?
+                info.itsFileData.getId(itsReferencedRec) : "";
+        itsLinkRef.setText(id);
         itsValidator.validate();
     }
 
@@ -496,15 +581,56 @@ public class PasswdSafeEditRecordFragment extends Fragment
             info.itsFileData.setUsername(updateStr, record);
         }
 
-        updateStr = getUpdatedField(info.itsFileData.getURL(record), itsUrl);
-        if (updateStr != null) {
-            info.itsFileData.setURL(updateStr, record);
+        String currUrl = info.itsFileData.getURL(record);
+        String currEmail = info.itsFileData.getEmail(record);
+        if (itsTypeHasDetails) {
+            updateStr = getUpdatedField(currUrl, itsUrl);
+            if (updateStr != null) {
+                info.itsFileData.setURL(updateStr, record);
+            }
+
+            updateStr = getUpdatedField(currEmail, itsEmail);
+            if (updateStr != null) {
+                info.itsFileData.setEmail(updateStr, record);
+            }
+        } else {
+            if (currUrl != null) {
+                info.itsFileData.setURL(null, record);
+            }
+            if (currEmail != null) {
+                info.itsFileData.setEmail(null, record);
+            }
         }
 
-        updateStr = getUpdatedField(info.itsFileData.getEmail(record),
-                                    itsEmail);
-        if (updateStr != null) {
-            info.itsFileData.setEmail(updateStr, record);
+        // Update password after history so update is shown in new history
+        String currPasswd = info.itsFileData.getPassword(record);
+        String newPasswd;
+        if (itsTypeHasNormalPassword) {
+            // TODO: fix with real password
+            //newPasswd = getUpdatedField(currPasswd, R.id.password);
+            newPasswd = null;
+            switch (itsRecOrigType) {
+            case NORMAL: {
+                break;
+            }
+            case ALIAS:
+            case SHORTCUT: {
+                currPasswd = null;
+                break;
+            }
+            }
+        } else {
+            newPasswd = PasswdRecord.uuidToPasswd(
+                    info.itsFileData.getUUID(itsReferencedRec), itsRecType);
+            if (newPasswd.equals(currPasswd)) {
+                newPasswd = null;
+            }
+        }
+        if (newPasswd != null) {
+            info.itsFileData.setPassword(currPasswd, newPasswd, record);
+            if (!itsTypeHasNormalPassword) {
+                info.itsFileData.clearPasswdLastModTime(record);
+            }
         }
 
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
@@ -616,13 +742,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 break;
             }
             case ALIAS: {
-                if (itsLinkRef == null) {
+                if (itsReferencedRec == null) {
                     typeError = getString(R.string.no_alias_chosen);
                 }
                 break;
             }
             case SHORTCUT: {
-                if (itsLinkRef == null) {
+                if (itsReferencedRec == null) {
                     typeError = getString(R.string.no_shortcut_chosen);
                 }
                 break;
