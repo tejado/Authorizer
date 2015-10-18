@@ -37,6 +37,7 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -71,6 +72,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private final TreeSet<String> itsGroups =
             new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     private int itsPrevGroupPos = -1;
+    private final HashSet<RecordKey> itsRecordKeys = new HashSet<>();
     private TextInputLayout itsTitleInput;
     private TextView itsTitle;
     private Spinner itsGroup;
@@ -130,6 +132,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsValidator.registerTextView(itsTitle);
         itsGroup = (Spinner)rootView.findViewById(R.id.group);
         itsUser = (TextView)rootView.findViewById(R.id.user);
+        itsValidator.registerTextView(itsUser);
         itsUrl = (TextView)rootView.findViewById(R.id.url);
         itsEmail = (TextView)rootView.findViewById(R.id.email);
 
@@ -234,6 +237,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
             String group = info.itsFileData.getGroup(rec);
             if (!TextUtils.isEmpty(group)) {
                 itsGroups.add(group);
+            }
+
+            if (rec != info.itsRec) {
+                RecordKey key = new RecordKey(
+                        info.itsFileData.getTitle(rec), group,
+                        info.itsFileData.getUsername(rec));
+                itsRecordKeys.add(key);
             }
         }
 
@@ -381,8 +391,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         if (currVal == null) {
             currVal = "";
         }
-        String newVal = (itsGroup.getSelectedItemPosition() > 0) ?
-                itsGroup.getSelectedItem().toString() : "";
+        String newVal = getGroupVal();
         return (newVal.equals(currVal)) ? null : newVal;
     }
 
@@ -396,6 +405,15 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
         String newVal = field.getText().toString();
         return (newVal.equals(currVal)) ? null : newVal;
+    }
+
+    /**
+     * Get the group value
+     */
+    private String getGroupVal()
+    {
+        return (itsGroup.getSelectedItemPosition() > 0) ?
+                itsGroup.getSelectedItem().toString() : "";
     }
 
     /**
@@ -449,6 +467,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
     {
         private boolean itsIsValid = false;
 
+        // TODO: refactor validation to reuse with new file fragment
+
         /**
          * Register a text view with the validator
          */
@@ -462,17 +482,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
          */
         public final void validate()
         {
-            boolean valid = true;
-            CharSequence title = itsTitle.getText();
-            if (title.length() == 0) {
-                valid = false;
-                itsTitleInput.setError(getString(R.string.empty_title));
-            } else {
-                itsTitleInput.setError(null);
-                itsTitleInput.setErrorEnabled(false);
-            }
-
-            // TODO: title/user/group validation
+            boolean valid;
+            valid = !setInputError(validateTitle(), itsTitleInput);
 
             if (valid != itsIsValid) {
                 itsIsValid = valid;
@@ -492,6 +503,86 @@ public class PasswdSafeEditRecordFragment extends Fragment
         public final void afterTextChanged(Editable s)
         {
             validate();
+        }
+
+        /**
+         * Validate the title field
+         * @return error message if invalid; null if valid
+         */
+        private String validateTitle()
+        {
+            CharSequence title = itsTitle.getText();
+            if (title.length() == 0) {
+                return getString(R.string.empty_title);
+            }
+
+            RecordKey key = new RecordKey(title.toString(), getGroupVal(),
+                                          itsUser.getText().toString());
+            if (itsRecordKeys.contains(key)) {
+                return getString(R.string.duplicate_entry);
+            }
+
+            return null;
+        }
+
+        /**
+         * Set the error message on a TextInputLayout
+         * @param errorMsg The error message; null if no error
+         * @param field The input field
+         * @return Whether there was an error
+         */
+        private boolean setInputError(String errorMsg, TextInputLayout field)
+        {
+            boolean isError = (errorMsg != null);
+
+            // Set fields only if error changes to prevent flashing
+            boolean currError = field.isErrorEnabled();
+            CharSequence currErrorMsg = field.getError();
+            if ((currError != isError) ||
+                !TextUtils.equals(errorMsg, currErrorMsg)) {
+                field.setError(errorMsg);
+                // Set enabled last to remove red underline even if null msg
+                field.setErrorEnabled(isError);
+            }
+
+            return isError;
+        }
+   }
+
+    /**
+     * Unique key fields for a record
+     */
+    private static class RecordKey
+    {
+        private final String itsTitle;
+        private final String itsGroup;
+        private final String itsUser;
+
+        public RecordKey(String title, String group, String user)
+        {
+            itsTitle = (title != null) ? title : "";
+            itsGroup = (group != null) ? group : "";
+            itsUser = (user != null) ? user : "";
+        }
+
+        @Override
+        public final boolean equals(Object o)
+        {
+            if (o instanceof RecordKey) {
+                RecordKey key = (RecordKey)o;
+                return itsTitle.equals(key.itsTitle) &&
+                    itsGroup.equals(key.itsGroup) &&
+                    itsUser.equals(key.itsUser);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public final int hashCode()
+        {
+            return itsTitle.hashCode() ^ itsGroup.hashCode() ^
+            itsUser.hashCode();
         }
     }
 }
