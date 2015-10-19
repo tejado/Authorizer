@@ -172,6 +172,9 @@ public class PasswdSafeRecordFragment extends Fragment
             @Override
             public void run()
             {
+                if (!isAdded()) {
+                    return;
+                }
                 itsTabs.setupWithViewPager(viewPager);
                 updateNotesTab();
             }
