@@ -118,7 +118,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut
     // TODO: pause file close timer while editor open
-    // TODO: menu to show/hide password
     // TODO: generate password
 
     /**
@@ -186,6 +185,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsPasswordInput = (TextInputLayout)
                 rootView.findViewById(R.id.password_input);
         itsPassword = (TextView)rootView.findViewById(R.id.password);
+        View passwordVisibility =
+                rootView.findViewById(R.id.password_visibility);
+        passwordVisibility.setOnClickListener(this);
         itsValidator.registerTextView(itsPassword);
         itsPasswordConfirmInput = (TextInputLayout)
                 rootView.findViewById(R.id.password_confirm_input);
@@ -294,6 +296,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
 
             startActivityForResult(intent, RECORD_SELECTION_REQUEST);
+            break;
+        }
+        case R.id.password_visibility: {
+            boolean visible = GuiUtils.isPasswordVisible(itsPassword);
+            setPasswordVisibility(!visible);
             break;
         }
         }
@@ -510,6 +517,16 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 info.itsFileData.getId(itsReferencedRec) : "";
         itsLinkRef.setText(id);
         itsValidator.validate();
+    }
+
+    /**
+     * Set the visibility of the password fields
+     */
+    private void setPasswordVisibility(boolean visible)
+    {
+        GuiUtils.setPasswordVisible(itsPasswordCurrent, visible);
+        GuiUtils.setPasswordVisible(itsPassword, visible);
+        GuiUtils.setPasswordVisible(itsPasswordConfirm, visible);
     }
 
     /**
