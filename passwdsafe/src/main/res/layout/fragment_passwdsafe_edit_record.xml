@@ -1,0 +1,153 @@
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="com.jefftharris.passwdsafe.PasswdSafeEditRecordFragment">
+
+    <ScrollView android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+        <LinearLayout android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:paddingBottom="2dp">
+
+                <TextView style="@style/TextAppearance.AppCompat.Caption"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:paddingEnd="4dp"
+                          android:paddingLeft="4dp"
+                          android:paddingRight="4dp"
+                          android:paddingStart="4dp"
+                          android:text="@string/type"/>
+
+                <LinearLayout style="@style/Widget.AppCompat.Spinner.Underlined"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="horizontal">
+
+                    <Spinner android:id="@+id/type"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_weight="0"
+                             android:entries="@array/record_type"
+                             android:prompt="@string/choose_type"
+                             android:spinnerMode="dropdown"
+                             tools:ignore="UnusedAttribute"/>
+
+                    <TextView android:id="@+id/link_ref"
+                              style="@style/TextViewSpinner"
+                              android:layout_width="0dp"
+                              android:layout_height="wrap_content"
+                              android:layout_weight="1"
+                              android:hint="@string/choose"/>
+
+                </LinearLayout>
+
+                <TextView android:id="@+id/type_error"
+                          style="@style/TextAppearance.Design.Error"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:paddingEnd="4dp"
+                          android:paddingLeft="4dp"
+                          android:paddingRight="4dp"
+                          android:paddingStart="4dp"/>
+
+            </LinearLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/title_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/title"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:hint="@string/title"
+                          android:inputType="textCapSentences|textAutoCorrect"
+                          android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:paddingBottom="2dp">
+
+                <TextView style="@style/TextAppearance.AppCompat.Caption"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:paddingEnd="4dp"
+                          android:paddingLeft="4dp"
+                          android:paddingRight="4dp"
+                          android:paddingStart="4dp"
+                          android:text="@string/group"/>
+
+                <Spinner android:id="@+id/group"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:prompt="@string/choose_group"
+                         android:spinnerMode="dialog"
+                         tools:ignore="UnusedAttribute"/>
+            </LinearLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/user"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:hint="@string/username"
+                          android:inputType="textNoSuggestions"
+                          android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/url_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/url"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:hint="@string/url"
+                          android:inputType="textUri"
+                          android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/email_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/email"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:hint="@string/email"
+                          android:inputType="textEmailAddress"
+                          android:singleLine="true"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

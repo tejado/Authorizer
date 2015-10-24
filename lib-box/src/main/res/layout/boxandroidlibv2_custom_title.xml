@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/customTitle"
+    android:layout_width="fill_parent"
+    android:layout_height="50dp"
+    android:textSize="20sp"
+    android:gravity="center"
+    android:background="@drawable/boxandroidlibv2_box_background_header"
+    android:textColor="#ffffffff" />
