@@ -146,6 +146,69 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <!-- Password fields -->
+            <TextView android:id="@+id/password_label"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="@string/password"
+                      android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <LinearLayout android:id="@+id/password_fields"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:padding="6dp">
+
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="horizontal"
+                              android:layout_marginBottom="6dp">
+
+                    <TextView android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="@string/current"
+                              android:textAppearance="?android:attr/textAppearanceMedium"
+                              android:layout_marginLeft="4dp"
+                              android:layout_marginStart="4dp"/>
+
+                    <TextView android:id="@+id/password_current"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_marginLeft="6dp"
+                              android:layout_marginStart="6dp"
+                              android:inputType="textPassword"
+                              android:textAppearance="?android:attr/textAppearanceMedium"
+                              android:typeface="monospace"
+                              tools:ignore="TextViewEdits"/>
+
+                </LinearLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/password_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText android:id="@+id/password"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="@string/password"
+                              android:inputType="textPassword"
+                              android:singleLine="true"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/password_confirm_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText android:id="@+id/password_confirm"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="@string/confirm"
+                              android:inputType="textPassword"
+                              android:singleLine="true"/>
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </ScrollView>

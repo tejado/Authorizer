@@ -35,6 +35,7 @@ import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.NewGroupDialog;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
+import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -94,6 +95,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private TextView itsUrl;
     private View itsEmailInput;
     private TextView itsEmail;
+    private View itsPasswordLabel;
+    private View itsPasswordFields;
+    private TextView itsPasswordCurrent;
+    private TextInputLayout itsPasswordInput;
+    private TextView itsPassword;
+    private TextInputLayout itsPasswordConfirmInput;
+    private TextView itsPasswordConfirm;
 
     private static final String TAG = "PasswdSafeEditRecordFragment";
 
@@ -109,6 +117,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
     // TODO: protected flag
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut
+    // TODO: pause file close timer while editor open
+    // TODO: menu to show/hide password
+    // TODO: generate password
 
     /**
      * Create a new instance
@@ -168,6 +179,19 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsUrl = (TextView)rootView.findViewById(R.id.url);
         itsEmailInput = rootView.findViewById(R.id.email_input);
         itsEmail = (TextView)rootView.findViewById(R.id.email);
+        itsPasswordLabel = rootView.findViewById(R.id.password_label);
+        itsPasswordFields = rootView.findViewById(R.id.password_fields);
+        itsPasswordCurrent = (TextView)
+                rootView.findViewById(R.id.password_current);
+        itsPasswordInput = (TextInputLayout)
+                rootView.findViewById(R.id.password_input);
+        itsPassword = (TextView)rootView.findViewById(R.id.password);
+        itsValidator.registerTextView(itsPassword);
+        itsPasswordConfirmInput = (TextInputLayout)
+                rootView.findViewById(R.id.password_confirm_input);
+        itsPasswordConfirm = (TextView)
+                rootView.findViewById(R.id.password_confirm);
+        itsValidator.registerTextView(itsPasswordConfirm);
 
         initialize();
         return rootView;
@@ -401,6 +425,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
 
         setType(itsRecOrigType, true);
+        itsPasswordCurrent.setText(password);
+        itsPassword.setText(password);
+        itsPasswordConfirm.setText(password);
+        PasswordVisibilityMenuHandler.set(itsPassword, itsPasswordCurrent,
+                                          itsPasswordConfirm);
         setLinkRef(linkRef, info);
     }
 
@@ -460,6 +489,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
         GuiUtils.setVisible(itsLinkRef, !itsTypeHasNormalPassword);
         GuiUtils.setVisible(itsUrlInput, itsTypeHasDetails);
         GuiUtils.setVisible(itsEmailInput, itsTypeHasDetails);
+        GuiUtils.setVisible(itsPasswordLabel, itsTypeHasNormalPassword);
+        GuiUtils.setVisible(itsPasswordFields, itsTypeHasNormalPassword);
 
         itsValidator.validate();
 
@@ -608,9 +639,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         String currPasswd = info.itsFileData.getPassword(record);
         String newPasswd;
         if (itsTypeHasNormalPassword) {
-            // TODO: fix with real password
-            //newPasswd = getUpdatedField(currPasswd, R.id.password);
-            newPasswd = null;
+            newPasswd = getUpdatedField(currPasswd, itsPassword);
             switch (itsRecOrigType) {
             case NORMAL: {
                 break;
@@ -761,6 +790,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
             boolean valid = (typeError == null);
             valid &= !setInputError(validateTitle(), itsTitleInput);
+            valid &= !setInputError(validatePassword(), itsPasswordInput);
+            valid &= !setInputError(validatePasswordConfirm(),
+                                    itsPasswordConfirmInput);
 
             if (valid != itsIsValid) {
                 itsIsValid = valid;
@@ -799,6 +831,49 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 return getString(R.string.duplicate_entry);
             }
 
+            return null;
+        }
+
+        /**
+         * Validate the password field
+         * @return error message if invalid; null if valid
+         */
+        private String validatePassword()
+        {
+            switch (itsRecType) {
+            case NORMAL: {
+                if (itsPassword.getText().length() == 0) {
+                    return getString(R.string.empty_password);
+                }
+                break;
+            }
+            case ALIAS:
+            case SHORTCUT: {
+                break;
+            }
+            }
+            return null;
+        }
+
+        /**
+         * Validate the password confirm field
+         * @return error message if invalid; null if valid
+         */
+        private String validatePasswordConfirm()
+        {
+            switch (itsRecType) {
+            case NORMAL: {
+                if (!TextUtils.equals(itsPassword.getText(),
+                                      itsPasswordConfirm.getText())) {
+                    return getString(R.string.passwords_do_not_match);
+                }
+                break;
+            }
+            case ALIAS:
+            case SHORTCUT: {
+                break;
+            }
+            }
             return null;
         }
 
