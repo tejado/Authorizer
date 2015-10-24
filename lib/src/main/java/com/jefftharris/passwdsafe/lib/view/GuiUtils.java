@@ -27,6 +27,7 @@ import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -149,10 +150,18 @@ public final class GuiUtils
     }
 
 
+    /**
+     * Set whether the view shows a visible password
+     */
     public static void setPasswordVisible(TextView tv, boolean visible)
     {
+        int pos = tv.getSelectionStart();
         tv.setInputType(visible ? INPUT_TEXT_PASSWORD_VISIBLE :
                                 INPUT_TEXT_PASSWORD);
+        if (tv instanceof EditText) {
+            // Keep selection location after the type change
+            ((EditText)tv).setSelection(pos);
+        }
     }
 
 
