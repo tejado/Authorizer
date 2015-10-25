@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -79,6 +80,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
             new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     private int itsPrevGroupPos = -1;
     private final HashSet<RecordKey> itsRecordKeys = new HashSet<>();
+    private final ArrayList<View> itsProtectViews = new ArrayList<>();
+    private boolean itsIsProtected = false;
     private PasswdRecord.Type itsRecType = PasswdRecord.Type.NORMAL;
     private boolean itsTypeHasNormalPassword = true;
     private boolean itsTypeHasDetails = true;
@@ -195,6 +198,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 rootView.findViewById(R.id.password_confirm);
         itsValidator.registerTextView(itsPasswordConfirm);
 
+        initProtViews(rootView);
         initialize();
         return rootView;
     }
@@ -240,6 +244,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
         boolean valid = itsValidator.isValid();
         item.setEnabled(valid);
         item.getIcon().setAlpha(valid ? 255 : 130);
+
+        item = menu.findItem(R.id.menu_protect);
+        updateProtectedMenu(item);
     }
 
     @Override
@@ -248,6 +255,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
         switch (item.getItemId()) {
         case R.id.menu_done: {
             saveRecord();
+            return true;
+        }
+        case R.id.menu_protect: {
+            itsIsProtected = !itsIsProtected;
+            updateProtectedMenu(item);
+            updateProtected();
             return true;
         }
         default: {
@@ -383,10 +396,14 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsUser.setText(info.itsFileData.getUsername(info.itsRec));
         itsUrl.setText(info.itsFileData.getURL(info.itsRec));
         itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
+        itsIsProtected = info.itsFileData.isProtected(info.itsRec);
 
         String group = info.itsFileData.getGroup(info.itsRec);
         initGroup(group, info);
         initTypeAndPassword(info);
+
+        updateProtected();
+        itsValidator.validate();
     }
 
     /**
@@ -602,6 +619,48 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     /**
+     * Initialize the list of protected views
+     */
+    private void initProtViews(View v)
+    {
+        if ((v instanceof Spinner) || (v instanceof TextInputLayout) ||
+            (v instanceof EditText) ||
+            (v.getId() == R.id.link_ref) ||
+            (v.getId() == R.id.password_current) /*||
+            (v.getId() == R.id.password_visibility)*/) {
+            itsProtectViews.add(v);
+        }
+
+        if (v instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup)v;
+            for (int i = 0; i < group.getChildCount(); ++i) {
+                initProtViews(group.getChildAt(i));
+            }
+        }
+    }
+
+    /**
+     * Update the UI when the protected state changes
+     */
+    private void updateProtected()
+    {
+        for (View v: itsProtectViews) {
+            v.setEnabled(!itsIsProtected);
+        }
+        GuiUtils.invalidateOptionsMenu(getActivity());
+    }
+
+    /**
+     * Update the menu item for protected
+     */
+    private void updateProtectedMenu(MenuItem protItem)
+    {
+        protItem.setChecked(itsIsProtected);
+        protItem.setIcon(itsIsProtected ? R.drawable.ic_action_lock :
+                                 R.drawable.ic_action_lock_open);
+    }
+
+    /**
      * Save the record
      */
     private void saveRecord()
@@ -650,6 +709,10 @@ public class PasswdSafeEditRecordFragment extends Fragment
             if (currEmail != null) {
                 info.itsFileData.setEmail(null, record);
             }
+        }
+
+        if (itsIsProtected != info.itsFileData.isProtected(record)) {
+            info.itsFileData.setProtected(itsIsProtected, record);
         }
 
         // Update password after history so update is shown in new history
