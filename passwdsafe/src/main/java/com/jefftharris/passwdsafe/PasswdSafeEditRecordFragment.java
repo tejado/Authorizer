@@ -230,7 +230,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
     {
         super.onResume();
         itsListener.updateViewEditRecord(itsLocation);
-        refresh();
         itsValidator.validate();
     }
 
@@ -753,19 +752,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-    }
-
-    /**
-     * Refresh the view
-     */
-    private void refresh()
-    {
-        // TODO: refresh needed?
-        /*
-        if (!isAdded() || (itsListener == null)) {
-            return;
-        }
-        */
     }
 
     /**
