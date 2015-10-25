@@ -25,17 +25,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.NewGroupDialog;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
+import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -87,6 +92,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private boolean itsTypeHasDetails = true;
     private PasswdRecord.Type itsRecOrigType = PasswdRecord.Type.NORMAL;
     private PwsRecord itsReferencedRec = null;
+    private List<PasswdPolicy> itsPolicies;
+    private PasswdPolicy itsOrigPolicy;
+    private PasswdPolicy itsCurrPolicy;
     private Spinner itsType;
     private TextView itsTypeError;
     private TextView itsLinkRef;
@@ -105,6 +113,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private TextView itsPassword;
     private TextInputLayout itsPasswordConfirmInput;
     private TextView itsPasswordConfirm;
+    private Spinner itsPolicy;
+    private Button itsPolicyEditBtn;
+    private PasswdPolicyView itsPasswdPolicyView;
 
     private static final String TAG = "PasswdSafeEditRecordFragment";
 
@@ -117,7 +128,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
     // TODO: if pending changes, warn on navigation
     // TODO: v2 support
-    // TODO: protected flag
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut
     // TODO: pause file close timer while editor open
@@ -197,6 +207,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsPasswordConfirm = (TextView)
                 rootView.findViewById(R.id.password_confirm);
         itsValidator.registerTextView(itsPasswordConfirm);
+        itsPolicy = (Spinner)rootView.findViewById(R.id.policy);
+        itsPolicy.setOnItemSelectedListener(this);
+        itsPasswdPolicyView = (PasswdPolicyView)
+                rootView.findViewById(R.id.policy_view);
+        itsPolicyEditBtn = (Button)rootView.findViewById(R.id.policy_edit);
+        itsPolicyEditBtn.setOnClickListener(this);
 
         initProtViews(rootView);
         initialize();
@@ -347,6 +363,10 @@ public class PasswdSafeEditRecordFragment extends Fragment
             selectGroup(position);
             break;
         }
+        case R.id.policy: {
+            selectPolicy((PasswdPolicy)spinnerView.getSelectedItem());
+            break;
+        }
         }
     }
 
@@ -360,6 +380,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
         case R.id.group: {
             break;
+        }
+        case R.id.policy: {
+            selectPolicy(null);
         }
         }
     }
@@ -401,6 +424,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         String group = info.itsFileData.getGroup(info.itsRec);
         initGroup(group, info);
         initTypeAndPassword(info);
+        initPasswdPolicy(info);
 
         updateProtected();
         itsValidator.validate();
@@ -455,6 +479,87 @@ public class PasswdSafeEditRecordFragment extends Fragment
         PasswordVisibilityMenuHandler.set(itsPassword, itsPasswordCurrent,
                                           itsPasswordConfirm);
         setLinkRef(linkRef, info);
+    }
+
+    /**
+     * Initialize the password policy
+     */
+    private void initPasswdPolicy(RecordInfo info)
+    {
+        itsOrigPolicy = info.itsPasswdRec.getPasswdPolicy();
+
+        itsPolicies = new ArrayList<>();
+        PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
+        PasswdPolicy defPolicy = app.getDefaultPasswdPolicy();
+        itsPolicies.add(defPolicy);
+
+        HeaderPasswdPolicies hdrPolicies =
+                info.itsFileData.getHdrPasswdPolicies();
+        if (hdrPolicies != null) {
+            for (HeaderPasswdPolicies.HdrPolicy hdrPolicy:
+                    hdrPolicies.getPolicies()) {
+                itsPolicies.add(hdrPolicy.getPolicy());
+            }
+        }
+
+        PasswdPolicy customPolicy;
+        String customName = getString(R.string.record_policy);
+        if ((itsOrigPolicy != null) &&
+            (itsOrigPolicy.getLocation() == PasswdPolicy.Location.RECORD)) {
+            customPolicy = new PasswdPolicy(customName, itsOrigPolicy);
+        } else {
+            customPolicy = new PasswdPolicy(customName,
+                                            PasswdPolicy.Location.RECORD);
+        }
+        itsPolicies.add(customPolicy);
+
+        itsPasswdPolicyView.setGenerateEnabled(false);
+
+        PasswdPolicy selPolicy;
+        if (itsOrigPolicy != null) {
+            if (itsOrigPolicy.getLocation() ==
+                PasswdPolicy.Location.RECORD_NAME) {
+                if (hdrPolicies != null) {
+                    selPolicy = hdrPolicies.getPasswdPolicy(
+                            itsOrigPolicy.getName());
+                } else {
+                    selPolicy = null;
+                }
+            } else {
+                selPolicy = customPolicy;
+            }
+        } else {
+            selPolicy = defPolicy;
+        }
+
+        updatePasswdPolicies(selPolicy);
+    }
+
+    /**
+     * Update the password policies
+     */
+    private void updatePasswdPolicies(PasswdPolicy selPolicy)
+    {
+        Collections.sort(itsPolicies);
+        setSpinnerItems(itsPolicy, itsPolicies);
+        int selItem = itsPolicies.indexOf(selPolicy);
+        if (selItem < 0) {
+            selItem = 0;
+        }
+        itsPolicy.setSelection(selItem);
+    }
+
+    /**
+     * Select a password policy
+     */
+    private void selectPolicy(PasswdPolicy policy)
+    {
+        itsCurrPolicy = policy;
+        itsPasswdPolicyView.showPolicy(itsCurrPolicy, -1);
+        boolean canEdit =
+                (itsCurrPolicy != null) &&
+                (itsCurrPolicy.getLocation() == PasswdPolicy.Location.RECORD);
+        GuiUtils.setVisible(itsPolicyEditBtn, canEdit);
     }
 
     /**
@@ -624,10 +729,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private void initProtViews(View v)
     {
         if ((v instanceof Spinner) || (v instanceof TextInputLayout) ||
-            (v instanceof EditText) ||
+            (v instanceof EditText) || (v instanceof Button) ||
             (v.getId() == R.id.link_ref) ||
-            (v.getId() == R.id.password_current) /*||
-            (v.getId() == R.id.password_visibility)*/) {
+            (v.getId() == R.id.password_current)) {
             itsProtectViews.add(v);
         }
 
@@ -715,6 +819,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
             info.itsFileData.setProtected(itsIsProtected, record);
         }
 
+        Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
+        if (updatePolicy.first) {
+            info.itsFileData.setPasswdPolicy(updatePolicy.second, record);
+        }
+
         // Update password after history so update is shown in new history
         String currPasswd = info.itsFileData.getPassword(record);
         String newPasswd;
@@ -770,6 +879,74 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
         String newVal = field.getText().toString();
         return (newVal.equals(currVal)) ? null : newVal;
+    }
+
+    /**
+     * Get the password policy that may have been updated
+     */
+    private Pair<Boolean, PasswdPolicy> getUpdatedPolicy()
+    {
+        PasswdPolicy.Location origLoc = PasswdPolicy.Location.DEFAULT;
+        if (itsOrigPolicy != null) {
+            origLoc = itsOrigPolicy.getLocation();
+        }
+
+        PasswdPolicy.Location currLoc = PasswdPolicy.Location.DEFAULT;
+        if (itsCurrPolicy != null) {
+            currLoc = itsCurrPolicy.getLocation();
+        }
+
+        boolean policyChanged = false;
+        switch (origLoc) {
+        case DEFAULT: {
+            if (currLoc != origLoc) {
+                policyChanged = true;
+            }
+            break;
+        }
+        case HEADER:
+        case RECORD_NAME: {
+            switch (currLoc) {
+            case DEFAULT:
+            case RECORD: {
+                policyChanged = true;
+                break;
+            }
+            case HEADER:
+            case RECORD_NAME: {
+                if (!itsOrigPolicy.getName().equals(itsCurrPolicy.getName())) {
+                    policyChanged = true;
+                }
+                break;
+            }
+            }
+            break;
+        }
+        case RECORD: {
+            switch (currLoc) {
+            case DEFAULT:
+            case HEADER:
+            case RECORD_NAME: {
+                policyChanged = true;
+                break;
+            }
+            case RECORD: {
+                if (!itsOrigPolicy.recordPolicyEquals(itsCurrPolicy)) {
+                    policyChanged = true;
+                }
+                break;
+            }
+            }
+            break;
+        }
+        }
+
+        PasswdPolicy updatedPolicy = null;
+        if (policyChanged && (currLoc != PasswdPolicy.Location.DEFAULT)) {
+            updatedPolicy = itsCurrPolicy;
+        }
+
+        return new Pair<>(policyChanged, updatedPolicy);
     }
 
     /**
