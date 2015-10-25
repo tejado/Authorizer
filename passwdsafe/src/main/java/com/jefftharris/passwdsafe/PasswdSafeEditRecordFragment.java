@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
@@ -58,6 +59,7 @@ import java.util.TreeSet;
 public class PasswdSafeEditRecordFragment extends Fragment
         implements NewGroupDialog.Listener,
                    View.OnClickListener,
+                   View.OnLongClickListener,
                    AdapterView.OnItemSelectedListener
 {
     /**
@@ -131,7 +133,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut
     // TODO: pause file close timer while editor open
-    // TODO: generate password
 
     /**
      * Create a new instance
@@ -201,6 +202,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
         View passwordVisibility =
                 rootView.findViewById(R.id.password_visibility);
         passwordVisibility.setOnClickListener(this);
+        passwordVisibility.setOnLongClickListener(this);
+        View passwordGenerate =
+                rootView.findViewById(R.id.password_generate);
+        passwordGenerate.setOnClickListener(this);
+        passwordGenerate.setOnLongClickListener(this);
         itsValidator.registerTextView(itsPassword);
         itsPasswordConfirmInput = (TextInputLayout)
                 rootView.findViewById(R.id.password_confirm_input);
@@ -332,7 +338,36 @@ public class PasswdSafeEditRecordFragment extends Fragment
             setPasswordVisibility(!visible);
             break;
         }
+        case R.id.password_generate: {
+            if (itsCurrPolicy != null) {
+                try {
+                    setPassword(itsCurrPolicy.generate());
+                } catch (Exception e) {
+                    PasswdSafeUtil.showFatalMsg(e, getActivity());
+                }
+            }
+            break;
         }
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.password_visibility: {
+            int msg = GuiUtils.isPasswordVisible(itsPassword) ?
+                    R.string.hide_passwords : R.string.show_passwords;
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        case R.id.password_generate: {
+            Toast.makeText(getContext(), R.string.generate_password,
+                           Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        }
+        return false;
     }
 
     @Override
@@ -652,6 +687,16 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     /**
+     * Set the password
+     */
+    private void setPassword(String password)
+    {
+        itsPassword.setText(password);
+        itsPasswordConfirm.setText(password);
+        setPasswordVisibility(true);
+    }
+
+    /**
      * Select a new group
      */
     private void selectGroup(int position)
@@ -731,7 +776,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
         if ((v instanceof Spinner) || (v instanceof TextInputLayout) ||
             (v instanceof EditText) || (v instanceof Button) ||
             (v.getId() == R.id.link_ref) ||
-            (v.getId() == R.id.password_current)) {
+            (v.getId() == R.id.password_current) ||
+            (v.getId() == R.id.password_generate)) {
             itsProtectViews.add(v);
         }
 
@@ -751,7 +797,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
         for (View v: itsProtectViews) {
             v.setEnabled(!itsIsProtected);
         }
-        GuiUtils.invalidateOptionsMenu(getActivity());
     }
 
     /**

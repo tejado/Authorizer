@@ -191,14 +191,28 @@
                 </android.support.design.widget.TextInputLayout>
 
                 <ImageView android:id="@+id/password_visibility"
+                           style="@style/Widget.AppCompat.ActionButton"
                            android:layout_width="wrap_content"
                            android:layout_height="wrap_content"
                            android:layout_alignParentEnd="true"
                            android:layout_alignParentRight="true"
-                           android:layout_marginTop="12dp"
+                           android:layout_marginTop="10dp"
                            android:clickable="true"
                            android:contentDescription="@string/show_passwords"
+                           android:longClickable="true"
                            android:src="@drawable/ic_action_visibility"/>
+
+                <ImageView android:id="@+id/password_generate"
+                           style="@style/Widget.AppCompat.ActionButton"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_marginTop="10dp"
+                           android:layout_toLeftOf="@id/password_visibility"
+                           android:layout_toStartOf="@id/password_visibility"
+                           android:clickable="true"
+                           android:contentDescription="@string/generate_password"
+                           android:longClickable="true"
+                           android:src="@drawable/ic_action_new_password"/>
             </RelativeLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -215,8 +229,8 @@
 
             <TextView android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:textAppearance="?android:attr/textAppearanceMedium"
-                      android:text="@string/password_policy"/>
+                      android:text="@string/password_policy"
+                      android:textAppearance="?android:attr/textAppearanceMedium"/>
 
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
@@ -226,9 +240,9 @@
                          style="@style/Widget.AppCompat.Spinner.Underlined"
                          android:layout_width="0dp"
                          android:layout_height="wrap_content"
+                         android:layout_gravity="center_vertical"
                          android:layout_weight="1"
-                         android:gravity="fill_vertical"
-                         android:layout_gravity="center_vertical"/>
+                         android:gravity="fill_vertical"/>
 
                 <Button android:id="@+id/policy_edit"
                         android:layout_width="wrap_content"
