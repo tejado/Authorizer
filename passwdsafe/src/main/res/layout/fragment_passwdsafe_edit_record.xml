@@ -161,8 +161,6 @@
 
                 <TextView android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:layout_marginLeft="4dp"
-                          android:layout_marginStart="4dp"
                           android:text="@string/current"
                           android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -214,6 +212,36 @@
                           android:inputType="textPassword"
                           android:singleLine="true"/>
             </android.support.design.widget.TextInputLayout>
+
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:textAppearance="?android:attr/textAppearanceMedium"
+                      android:text="@string/password_policy"/>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+
+                <Spinner android:id="@+id/policy"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="0dp"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="1"
+                         android:gravity="fill_vertical"
+                         android:layout_gravity="center_vertical"/>
+
+                <Button android:id="@+id/policy_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/edit"/>
+
+            </LinearLayout>
+
+            <com.jefftharris.passwdsafe.view.PasswdPolicyView
+                android:id="@+id/policy_view"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"/>
 
         </LinearLayout>
 
