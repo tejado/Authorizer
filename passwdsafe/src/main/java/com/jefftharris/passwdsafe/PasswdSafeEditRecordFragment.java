@@ -1077,11 +1077,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
             itsTypeError.setText(typeError);
 
             boolean valid = (typeError == null);
-            valid &= !setInputError(validateTitle(), itsTitleInput);
-            valid &= !setInputError(validatePassword(), itsPasswordInput);
-            valid &= !setInputError(validatePasswordConfirm(),
-                                    itsPasswordConfirmInput);
-
+            valid &= !GuiUtils.setTextInputError(validateTitle(),
+                                                 itsTitleInput);
+            valid &= !GuiUtils.setTextInputError(validatePassword(),
+                                                 itsPasswordInput);
+            valid &= !GuiUtils.setTextInputError(validatePasswordConfirm(),
+                                                 itsPasswordConfirmInput);
             if (valid != itsIsValid) {
                 itsIsValid = valid;
                 GuiUtils.invalidateOptionsMenu(getActivity());
@@ -1163,29 +1164,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
             }
             return null;
-        }
-
-        /**
-         * Set the error message on a TextInputLayout
-         * @param errorMsg The error message; null if no error
-         * @param field The input field
-         * @return Whether there was an error
-         */
-        private boolean setInputError(String errorMsg, TextInputLayout field)
-        {
-            boolean isError = (errorMsg != null);
-
-            // Set fields only if error changes to prevent flashing
-            boolean currError = field.isErrorEnabled();
-            CharSequence currErrorMsg = field.getError();
-            if ((currError != isError) ||
-                !TextUtils.equals(errorMsg, currErrorMsg)) {
-                field.setError(errorMsg);
-                // Set enabled last to remove red underline even if null msg
-                field.setErrorEnabled(isError);
-            }
-
-            return isError;
         }
    }
 

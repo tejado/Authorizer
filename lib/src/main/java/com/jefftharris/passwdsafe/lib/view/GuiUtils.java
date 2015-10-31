@@ -19,8 +19,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.IBinder;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
@@ -171,6 +175,41 @@ public final class GuiUtils
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    /**
+     * Set the error message on a TextInputLayout
+     * @param errorMsg The error message; null if no error
+     * @param field The input field
+     * @return Whether there was an error
+     */
+    public static boolean setTextInputError(String errorMsg,
+                                            TextInputLayout field)
+    {
+        boolean isError = !TextUtils.isEmpty(errorMsg);
+
+        // Set fields only if error changes to prevent flashing
+        CharSequence currErrorMsg = field.getError();
+        if (!TextUtils.equals(errorMsg, currErrorMsg)) {
+            field.setError(errorMsg);
+            if (!isError && (field.getChildCount() > 1)) {
+                // Assume the TextInputLayout has its error message as the
+                // second child.  Use animation so visibility occurs after
+                // the TextInputLayout's animation that turns it invisible
+                View error = field.getChildAt(1);
+                ViewCompat.animate(error)
+                          .setListener(new ViewPropertyAnimatorListenerAdapter()
+                          {
+                              @Override
+                              public void onAnimationEnd(View view)
+                              {
+                                  view.setVisibility(View.GONE);
+                              }
+                          })
+                          .start();
+            }
+        }
+
+        return isError;
+    }
 
     /**
      * Setup the keyboard on a dialog. The initial field gets focus and shows

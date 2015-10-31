@@ -334,45 +334,22 @@ public class PasswdSafeNewFileFragment
             boolean isError;
 
             CharSequence fileName = itsFileName.getText();
-            isError = setInputError(validateFileName(fileName.toString()),
-                                    itsFileNameInput);
+            isError = GuiUtils.setTextInputError(
+                    validateFileName(fileName.toString()), itsFileNameInput);
 
             CharSequence passwd = itsPassword.getText();
-            isError |= setInputError(
+            isError |= GuiUtils.setTextInputError(
                     (passwd.length() == 0) ?
                             getString(R.string.empty_password) : null,
                     itsPasswordInput);
 
             CharSequence confirm = itsPasswordConfirm.getText();
-            isError |= setInputError(
+            isError |= GuiUtils.setTextInputError(
                     !TextUtils.equals(passwd, confirm) ?
                             getString(R.string.passwords_do_not_match) : null,
                     itsPasswordConfirmInput);
 
             itsOkBtn.setEnabled(!isError);
-        }
-
-        /**
-         * Set the error message on a TextInputLayout
-         * @param errorMsg The error message; null if no error
-         * @param field The input field
-         * @return Whether there was an error
-         */
-        private boolean setInputError(String errorMsg, TextInputLayout field)
-        {
-            boolean isError = (errorMsg != null);
-
-            // Set fields only if error changes to prevent flashing
-            boolean currError = field.isErrorEnabled();
-            CharSequence currErrorMsg = field.getError();
-            if ((currError != isError) ||
-                !TextUtils.equals(errorMsg, currErrorMsg)) {
-                field.setError(errorMsg);
-                // Set enabled last to remove red underline even if null msg
-                field.setErrorEnabled(isError);
-            }
-
-            return isError;
         }
 
         /**
