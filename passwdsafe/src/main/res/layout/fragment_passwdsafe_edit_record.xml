@@ -152,7 +152,10 @@
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:orientation="vertical"
-                      android:padding="6dp">
+                      android:paddingBottom="12dp"
+                      android:paddingLeft="6dp"
+                      android:paddingRight="6dp"
+                      android:paddingTop="6dp">
 
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
@@ -227,6 +230,7 @@
                           android:singleLine="true"/>
             </android.support.design.widget.TextInputLayout>
 
+            <!-- Password policy -->
             <TextView android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:text="@string/password_policy"
@@ -257,6 +261,75 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"/>
 
+            <!-- Pasword expiration -->
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="@string/password_expiration"
+                      android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+            <Spinner android:id="@+id/expire_choice"
+                     style="@style/Widget.AppCompat.Spinner.Underlined"
+                     android:layout_width="fill_parent"
+                     android:layout_height="wrap_content"
+                     android:entries="@array/expire_type"
+                     android:prompt="@string/choose_type"/>
+
+            <LinearLayout android:id="@+id/expire_date_fields"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+
+                <TextView android:id="@+id/expire_date_time"
+                          style="@style/TextViewSpinner"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"/>
+
+                <TextView android:id="@+id/expire_date_date"
+                          style="@style/TextViewSpinner"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <TextView android:id="@+id/expire_date_error"
+                      style="@style/TextAppearance.Design.Error"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingEnd="4dp"
+                      android:paddingLeft="4dp"
+                      android:paddingRight="4dp"
+                      android:paddingStart="4dp"
+                      android:text="@string/password_expiration_in_past"/>
+
+            <RelativeLayout android:id="@+id/expire_interval_fields"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/expire_interval_val_input"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <EditText android:id="@+id/expire_interval_val"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="@string/days"
+                              android:inputType="number"
+                              android:minWidth="48dp"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <CheckBox android:id="@+id/expire_interval_recurring"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignParentEnd="true"
+                          android:layout_alignParentRight="true"
+                          android:layout_centerVertical="true"
+                          android:layout_marginLeft="16dp"
+                          android:layout_marginStart="16dp"
+                          android:layout_toEndOf="@id/expire_interval_val_input"
+                          android:layout_toRightOf="@id/expire_interval_val_input"
+                          android:text="@string/recurring"/>
+
+            </RelativeLayout>
         </LinearLayout>
 
     </LinearLayout>
