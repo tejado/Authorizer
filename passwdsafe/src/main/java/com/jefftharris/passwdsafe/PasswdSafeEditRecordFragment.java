@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,28 +28,35 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
+import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.Pair;
+import com.jefftharris.passwdsafe.view.DatePickerDialogFragment;
 import com.jefftharris.passwdsafe.view.NewGroupDialog;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
+import com.jefftharris.passwdsafe.view.TimePickerDialogFragment;
 
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -60,6 +69,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
         implements NewGroupDialog.Listener,
                    View.OnClickListener,
                    View.OnLongClickListener,
+                   TimePickerDialogFragment.Listener,
+                   DatePickerDialogFragment.Listener,
                    AdapterView.OnItemSelectedListener
 {
     /**
@@ -97,6 +108,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private List<PasswdPolicy> itsPolicies;
     private PasswdPolicy itsOrigPolicy;
     private PasswdPolicy itsCurrPolicy;
+    private PasswdExpiration itsOrigExpiry;
+    private PasswdExpiration.Type itsExpiryType = PasswdExpiration.Type.NEVER;
+    private Calendar itsExpiryDate;
     private Spinner itsType;
     private TextView itsTypeError;
     private TextView itsLinkRef;
@@ -118,6 +132,15 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private Spinner itsPolicy;
     private Button itsPolicyEditBtn;
     private PasswdPolicyView itsPasswdPolicyView;
+    private Spinner itsExpire;
+    private View itsExpireDateFields;
+    private TextView itsExpireDateTime;
+    private TextView itsExpireDateDate;
+    private View itsExpireDateError;
+    private View itsExpireIntervalFields;
+    private TextInputLayout itsExpireIntervalInput;
+    private TextView itsExpireInterval;
+    private CheckBox itsExpireIntervalRecurring;
 
     private static final String TAG = "PasswdSafeEditRecordFragment";
 
@@ -133,6 +156,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut
     // TODO: pause file close timer while editor open
+    // TODO: rotation support
 
     /**
      * Create a new instance
@@ -192,6 +216,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsUrl = (TextView)rootView.findViewById(R.id.url);
         itsEmailInput = rootView.findViewById(R.id.email_input);
         itsEmail = (TextView)rootView.findViewById(R.id.email);
+        // Password
         itsPasswordLabel = rootView.findViewById(R.id.password_label);
         itsPasswordFields = rootView.findViewById(R.id.password_fields);
         itsPasswordCurrent = (TextView)
@@ -213,12 +238,33 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsPasswordConfirm = (TextView)
                 rootView.findViewById(R.id.password_confirm);
         itsValidator.registerTextView(itsPasswordConfirm);
+        // Password policy
         itsPolicy = (Spinner)rootView.findViewById(R.id.policy);
         itsPolicy.setOnItemSelectedListener(this);
         itsPasswdPolicyView = (PasswdPolicyView)
                 rootView.findViewById(R.id.policy_view);
         itsPolicyEditBtn = (Button)rootView.findViewById(R.id.policy_edit);
         itsPolicyEditBtn.setOnClickListener(this);
+        // Password expiration
+        itsExpire = (Spinner)rootView.findViewById(R.id.expire_choice);
+        itsExpire.setOnItemSelectedListener(this);
+        itsExpireDateFields = rootView.findViewById(R.id.expire_date_fields);
+        itsExpireDateTime = (TextView)
+                rootView.findViewById(R.id.expire_date_time);
+        itsExpireDateTime.setOnClickListener(this);
+        itsExpireDateDate = (TextView)
+                rootView.findViewById(R.id.expire_date_date);
+        itsExpireDateDate.setOnClickListener(this);
+        itsExpireDateError = rootView.findViewById(R.id.expire_date_error);
+        itsExpireIntervalFields =
+                rootView.findViewById(R.id.expire_interval_fields);
+        itsExpireIntervalInput = (TextInputLayout)
+                rootView.findViewById(R.id.expire_interval_val_input);
+        itsExpireInterval = (TextView)
+                rootView.findViewById(R.id.expire_interval_val);
+        itsValidator.registerTextView(itsExpireInterval);
+        itsExpireIntervalRecurring = (CheckBox)
+                rootView.findViewById(R.id.expire_interval_recurring);
 
         initProtViews(rootView);
         initialize();
@@ -347,6 +393,25 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
             break;
         }
+        case R.id.expire_date_time: {
+            TimePickerDialogFragment picker =
+                    TimePickerDialogFragment.newInstance(
+                            itsExpiryDate.get(Calendar.HOUR_OF_DAY),
+                            itsExpiryDate.get(Calendar.MINUTE));
+            picker.setTargetFragment(this, 0);
+            picker.show(getFragmentManager(), "timePicker");
+            break;
+        }
+        case R.id.expire_date_date: {
+            DatePickerDialogFragment picker =
+                    DatePickerDialogFragment.newInstance(
+                            itsExpiryDate.get(Calendar.YEAR),
+                            itsExpiryDate.get(Calendar.MONTH),
+                            itsExpiryDate.get(Calendar.DAY_OF_MONTH));
+            picker.setTargetFragment(this, 0);
+            picker.show(getFragmentManager(), "datePicker");
+            break;
+        }
         }
     }
 
@@ -401,6 +466,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
             selectPolicy((PasswdPolicy)spinnerView.getSelectedItem());
             break;
         }
+        case R.id.expire_choice: {
+            updatePasswdExpiryChoice(
+                    PasswdExpiration.Type.fromStrIdx(position));
+            break;
+        }
         }
     }
 
@@ -417,8 +487,31 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
         case R.id.policy: {
             selectPolicy(null);
+            break;
+        }
+        case R.id.expire_choice: {
+            updatePasswdExpiryChoice(PasswdExpiration.Type.NEVER);
+            break;
         }
         }
+    }
+
+    @Override
+    public void handleTimePicked(int hourOfDay, int minute)
+    {
+        itsExpiryDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        itsExpiryDate.set(Calendar.MINUTE, minute);
+        itsExpiryDate.set(Calendar.SECOND, 0);
+        updatePasswdExpiryDate();
+    }
+
+    @Override
+    public void handleDatePicked(int year, int monthOfYear, int dayOfMonth)
+    {
+        itsExpiryDate.set(Calendar.YEAR, year);
+        itsExpiryDate.set(Calendar.MONTH, monthOfYear);
+        itsExpiryDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        updatePasswdExpiryDate();
     }
 
     @Override
@@ -459,6 +552,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         initGroup(group, info);
         initTypeAndPassword(info);
         initPasswdPolicy(info);
+        initPasswdExpiry(info);
 
         updateProtected();
         itsValidator.validate();
@@ -570,6 +664,43 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     /**
+     * Initialize the password expiration
+     */
+    @SuppressLint("SetTextI18n")
+    private void initPasswdExpiry(RecordInfo info)
+    {
+        itsOrigExpiry = info.itsPasswdRec.getPasswdExpiry();
+
+        itsExpiryDate = Calendar.getInstance();
+        int interval;
+        boolean recurring;
+        PasswdExpiration.Type expireType;
+        if (itsOrigExpiry == null) {
+            expireType = PasswdExpiration.Type.NEVER;
+            interval = PasswdExpiration.INTERVAL_DEFAULT;
+            recurring = false;
+        } else {
+            if ((itsOrigExpiry.itsInterval != 0) &&
+                itsOrigExpiry.itsIsRecurring) {
+                expireType = PasswdExpiration.Type.INTERVAL;
+                interval = itsOrigExpiry.itsInterval;
+                recurring = true;
+            } else {
+                expireType = PasswdExpiration.Type.DATE;
+                interval = PasswdExpiration.INTERVAL_DEFAULT;
+                recurring = false;
+            }
+            itsExpiryDate.setTime(itsOrigExpiry.itsExpiration);
+        }
+        updatePasswdExpiryDate();
+
+        itsExpire.setSelection(expireType.itsStrIdx);
+        updatePasswdExpiryChoice(expireType);
+        itsExpireInterval.setText(Integer.toString(interval));
+        itsExpireIntervalRecurring.setChecked(recurring);
+    }
+
+    /**
      * Update the password policies
      */
     private void updatePasswdPolicies(PasswdPolicy selPolicy)
@@ -594,6 +725,33 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 (itsCurrPolicy != null) &&
                 (itsCurrPolicy.getLocation() == PasswdPolicy.Location.RECORD);
         GuiUtils.setVisible(itsPolicyEditBtn, canEdit);
+    }
+
+    /**
+     * Update fields based on the password expiration choice changing
+     */
+    private void updatePasswdExpiryChoice(PasswdExpiration.Type type)
+    {
+        itsExpiryType = type;
+        GuiUtils.setVisible(itsExpireDateFields,
+                            itsExpiryType == PasswdExpiration.Type.DATE);
+        GuiUtils.setVisible(itsExpireIntervalFields,
+                            itsExpiryType == PasswdExpiration.Type.INTERVAL);
+        itsValidator.validate();
+    }
+
+    /**
+     * Update fields after the password expiration date changes
+     */
+    private void updatePasswdExpiryDate()
+    {
+        long expiryDate = itsExpiryDate.getTimeInMillis();
+        Context ctx = getContext();
+        itsExpireDateTime.setText(Utils.formatDate(expiryDate, ctx,
+                                                   true, false, false));
+        itsExpireDateDate.setText(Utils.formatDate(expiryDate, ctx,
+                                                   false, true, false));
+        itsValidator.validate();
     }
 
     /**
@@ -760,11 +918,19 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private void initProtViews(View v)
     {
         if ((v instanceof Spinner) || (v instanceof TextInputLayout) ||
-            (v instanceof EditText) || (v instanceof Button) ||
-            (v.getId() == R.id.link_ref) ||
-            (v.getId() == R.id.password_current) ||
-            (v.getId() == R.id.password_generate)) {
+            (v instanceof EditText) || (v instanceof Button)) {
             itsProtectViews.add(v);
+        } else {
+            switch (v.getId()) {
+            case R.id.expire_date_date:
+            case R.id.expire_date_time:
+            case R.id.link_ref:
+            case R.id.password_current:
+            case R.id.password_generate: {
+                itsProtectViews.add(v);
+                break;
+            }
+            }
         }
 
         if (v instanceof ViewGroup) {
@@ -884,6 +1050,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
         }
 
+        // Update expiration dates after password so changes in expiration
+        // overwrite basic expiration updates when the password changes.
+        Pair<Boolean, PasswdExpiration> updateExpiry = getUpdatedExpiry();
+        if (updateExpiry.first) {
+            info.itsFileData.setPasswdExpiry(updateExpiry.second, record);
+        }
+
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
         itsListener.finishEditRecord(record.isModified());
     }
@@ -981,12 +1154,74 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     /**
+     * Get the password expiration that may have been updated
+     */
+    private Pair<Boolean, PasswdExpiration> getUpdatedExpiry()
+    {
+        // Get the updated expiration
+        PasswdExpiration updatedExpiry = null;
+        switch (itsRecType) {
+        case NORMAL: {
+            switch (itsExpiryType) {
+            case NEVER: {
+                updatedExpiry = null;
+                break;
+            }
+            case DATE: {
+                updatedExpiry = new PasswdExpiration(itsExpiryDate.getTime(),
+                                                     0, false);
+                break;
+            }
+            case INTERVAL: {
+                int interval = getTextFieldInt(
+                        itsExpireInterval, PasswdExpiration.INTERVAL_DEFAULT);
+                long exp = System.currentTimeMillis();
+                exp += (long)interval * DateUtils.DAY_IN_MILLIS;
+                exp -= (exp % DateUtils.MINUTE_IN_MILLIS);
+                Date expiry = new Date(exp);
+
+                if (itsExpireIntervalRecurring.isChecked()) {
+                    updatedExpiry = new PasswdExpiration(expiry, interval,
+                                                         true);
+                } else {
+                    updatedExpiry = new PasswdExpiration(expiry, 0, false);
+                }
+                break;
+            }
+            }
+            break;
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            updatedExpiry = null;
+            break;
+        }
+        }
+
+        return new Pair<>(!PasswdExpiration.isEquals(itsOrigExpiry,
+                                                     updatedExpiry),
+                          updatedExpiry);
+    }
+
+    /**
      * Get the group value
      */
     private String getGroupVal()
     {
         return (itsGroup.getSelectedItemPosition() > 0) ?
                 itsGroup.getSelectedItem().toString() : "";
+    }
+
+    /**
+     * Get the integer value of a field
+     */
+    private static int getTextFieldInt(TextView tv, int defaultValue)
+    {
+        try {
+            return Integer.parseInt(tv.getText().toString());
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
     }
 
     /**
@@ -1083,6 +1318,27 @@ public class PasswdSafeEditRecordFragment extends Fragment
                                                  itsPasswordInput);
             valid &= !GuiUtils.setTextInputError(validatePasswordConfirm(),
                                                  itsPasswordConfirmInput);
+
+            boolean invalidExpiryDate = false;
+            switch (itsExpiryType) {
+            case NEVER: {
+                break;
+            }
+            case DATE: {
+                long now = System.currentTimeMillis();
+                long expiry = itsExpiryDate.getTimeInMillis();
+                invalidExpiryDate = (expiry < now);
+                break;
+            }
+            case INTERVAL: {
+                valid &= !GuiUtils.setTextInputError(validateExpiryInterval(),
+                                                     itsExpireIntervalInput);
+                break;
+            }
+            }
+            GuiUtils.setVisible(itsExpireDateError, invalidExpiryDate);
+            valid &= !invalidExpiryDate;
+
             if (valid != itsIsValid) {
                 itsIsValid = valid;
                 GuiUtils.invalidateOptionsMenu(getActivity());
@@ -1165,7 +1421,20 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
             return null;
         }
-   }
+
+        /**
+         * Validate the password expiration field
+         * @return error message if invalid; null if valid
+         */
+        private String validateExpiryInterval()
+        {
+            int interval = getTextFieldInt(itsExpireInterval, -1);
+            return ((interval < PasswdExpiration.VALID_INTERVAL_MIN) ||
+                    (interval > PasswdExpiration.VALID_INTERVAL_MAX)) ?
+                    getString(R.string.password_expiration_invalid_interval) :
+                    null;
+        }
+    }
 
     /**
      * Unique key fields for a record
