@@ -1004,8 +1004,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
      */
     private void setPassword(String password)
     {
-        itsPassword.setText(password);
-        itsPasswordConfirm.setText(password);
+        try {
+            itsValidator.setPaused(true);
+            itsPassword.setText(password);
+            itsPasswordConfirm.setText(password);
+        } finally {
+            itsValidator.setPaused(false);
+        }
         setPasswordVisibility(true);
     }
 
@@ -1445,6 +1450,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private class Validator extends AbstractTextWatcher
     {
         private boolean itsIsValid = false;
+        private boolean itsIsPaused = false;
 
         // TODO: refactor validation to reuse with new file fragment
 
@@ -1457,10 +1463,26 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
 
         /**
+         * Set whether the validator is paused.  Validation will be performed
+         * if not paused.
+         */
+        public final void setPaused(boolean paused)
+        {
+            itsIsPaused = paused;
+            if (!paused) {
+                validate();
+            }
+        }
+
+        /**
          * Validate
          */
         public final void validate()
         {
+            if (itsIsPaused) {
+                return;
+            }
+
             String typeError = null;
             switch (itsRecType) {
             case NORMAL: {
