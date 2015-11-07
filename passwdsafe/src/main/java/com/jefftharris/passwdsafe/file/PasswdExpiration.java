@@ -64,7 +64,7 @@ public class PasswdExpiration
     /**
      * Are two expirations equal
      */
-    public static boolean isEquals(PasswdExpiration exp1, PasswdExpiration exp2)
+    public static boolean isEqual(PasswdExpiration exp1, PasswdExpiration exp2)
     {
         if (((exp1 == null) && (exp2 != null)) ||
             ((exp1 != null) && (exp2 == null))) {
