@@ -104,7 +104,7 @@
     <string name="home">Home</string>
     <string name="interval">Interval</string>
     <string name="invalid_file_name">Invalid file name</string>
-    <string name="invalid_history_max_size">Invalid history maximum size</string>
+    <string name="invalid_history_max_size">Size must be between %1$d and %2$d</string>
     <string name="invalid_length">Invalid length</string>
     <string name="invalid_option_length">Invalid option length</string>
     <string name="invalid_password">Invalid password</string>
@@ -125,6 +125,7 @@
     <string name="length_max_val">Length must be at most %1$d</string>
     <string name="loading_file">Loading %s…</string>
     <string name="location">Location</string>
+    <string name="max_size">Maximum size</string>
     <string name="max_size_label">Maximum size:</string>
     <string name="modified">Modified</string>
     <string name="monospace">Monospace</string>
@@ -170,7 +171,7 @@
     <string name="password_encoding_label">Password Encoding:</string>
     <string name="password_expiration">Password Expiration</string>
     <string name="password_expiration_in_past">Password expiration is in the past</string>
-    <string name="password_expiration_invalid_interval">Password expiration interval must be in the range 1&#8211;3650</string>
+    <string name="password_expiration_invalid_interval">Interval must be in the range 1&#8211;3650</string>
     <string name="password_expired">Password expired</string>
     <string name="password_expires_before">Password expires before %1$s</string>
     <string name="password_expires_today">Password expires today</string>

@@ -104,7 +104,7 @@
     <string name="home">Startordner</string>
     <string name="interval">Intervall</string>
     <string name="invalid_file_name">Ungültiger Dateiname</string>
-    <string name="invalid_history_max_size">Ungültige Verlaufsgröße</string>
+    <string name="invalid_history_max_size">Größe muss zwischen %1$d und %2$d sein</string>
     <string name="invalid_length">Ungültige Länge</string>
     <string name="invalid_option_length">Ungültige Optionslänge</string>
     <string name="invalid_password">Ungültiges Passwort</string>
@@ -125,6 +125,7 @@
     <string name="length_max_val">Länge max. %1$d</string>
     <string name="loading_file">Lade %s…</string>
     <string name="location">Ort</string>
+    <string name="max_size">Max. Größe</string>
     <string name="max_size_label">Max. Größe:</string>
     <string name="modified">Geändert</string>
     <string name="monospace">Monospace-Schrift</string>
@@ -172,7 +173,7 @@
     <string name="password_encoding_label">Passwortkodierung:</string>
     <string name="password_expiration">Passwortablaufdatum</string>
     <string name="password_expiration_in_past">Ablaufdatum liegt in der Vergangenheit</string>
-    <string name="password_expiration_invalid_interval">Ablaufdatum muss sich im Bereich von 1&#8211;3650 befinden</string>
+    <string name="password_expiration_invalid_interval">Interval muss im Bereich 1&#8211;3650 sein</string>
     <string name="password_expired">Passwort abgelaufen</string>
     <string name="password_expires_before">Passwort läuft vor dem %1$s ab</string>
     <string name="password_expires_today">Password läuft heute ab</string>

@@ -19,6 +19,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +40,7 @@ import android.widget.Toast;
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -111,6 +115,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private PasswdExpiration itsOrigExpiry;
     private PasswdExpiration.Type itsExpiryType = PasswdExpiration.Type.NEVER;
     private Calendar itsExpiryDate;
+    private PasswdHistory itsHistory;
+    // UI fields
     private Spinner itsType;
     private TextView itsTypeError;
     private TextView itsLinkRef;
@@ -141,6 +147,11 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private TextInputLayout itsExpireIntervalInput;
     private TextView itsExpireInterval;
     private CheckBox itsExpireIntervalRecurring;
+    private Button itsHistoryAddRemoveBtn;
+    private CheckBox itsHistoryEnabled;
+    private TextInputLayout itsHistoryMaxSizeInput;
+    private TextView itsHistoryMaxSize;
+    private ListView itsHistoryList;
 
     private static final String TAG = "PasswdSafeEditRecordFragment";
 
@@ -216,6 +227,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsUrl = (TextView)rootView.findViewById(R.id.url);
         itsEmailInput = rootView.findViewById(R.id.email_input);
         itsEmail = (TextView)rootView.findViewById(R.id.email);
+
         // Password
         itsPasswordLabel = rootView.findViewById(R.id.password_label);
         itsPasswordFields = rootView.findViewById(R.id.password_fields);
@@ -238,6 +250,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsPasswordConfirm = (TextView)
                 rootView.findViewById(R.id.password_confirm);
         itsValidator.registerTextView(itsPasswordConfirm);
+
         // Password policy
         itsPolicy = (Spinner)rootView.findViewById(R.id.policy);
         itsPolicy.setOnItemSelectedListener(this);
@@ -245,6 +258,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 rootView.findViewById(R.id.policy_view);
         itsPolicyEditBtn = (Button)rootView.findViewById(R.id.policy_edit);
         itsPolicyEditBtn.setOnClickListener(this);
+
         // Password expiration
         itsExpire = (Spinner)rootView.findViewById(R.id.expire_choice);
         itsExpire.setOnItemSelectedListener(this);
@@ -265,6 +279,29 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsValidator.registerTextView(itsExpireInterval);
         itsExpireIntervalRecurring = (CheckBox)
                 rootView.findViewById(R.id.expire_interval_recurring);
+
+        // Password history
+        itsHistoryAddRemoveBtn = (Button)
+                rootView.findViewById(R.id.history_addremove);
+        itsHistoryAddRemoveBtn.setOnClickListener(this);
+        itsHistoryEnabled = (CheckBox)
+                rootView.findViewById(R.id.history_enabled);
+        itsHistoryEnabled.setOnClickListener(this);
+        itsHistoryMaxSizeInput = (TextInputLayout)
+                rootView.findViewById(R.id.history_max_size_input);
+        itsHistoryMaxSize = (TextView)
+                rootView.findViewById(R.id.history_max_size);
+        itsHistoryMaxSize.addTextChangedListener(
+                new AbstractTextWatcher()
+                {
+                    @Override
+                    public void afterTextChanged(Editable s)
+                    {
+                        historyMaxSizeChanged();
+                    }
+                });
+        itsHistoryList = (ListView)rootView.findViewById(R.id.history);
+        registerForContextMenu(itsHistoryList);
 
         initProtViews(rootView);
         initialize();
@@ -332,6 +369,52 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
         default: {
             return super.onOptionsItemSelected(item);
+        }
+        }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        if ((v == itsHistoryList) && itsHistoryList.isEnabled()) {
+            AdapterView.AdapterContextMenuInfo info =
+                    (AdapterView.AdapterContextMenuInfo)menuInfo;
+            List<PasswdHistory.Entry> passwds = itsHistory.getPasswds();
+            if ((info.position >= 0) && (info.position < passwds.size())) {
+                menu.setHeaderTitle(passwds.get(info.position).getPasswd());
+                getActivity().getMenuInflater().inflate(
+                        R.menu.fragment_passwdsafe_edit_record_history, menu);
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+
+        switch (item.getItemId()) {
+        case R.id.menu_history_remove: {
+            List<PasswdHistory.Entry> passwds = itsHistory.getPasswds();
+            if ((info.position >= 0) && (info.position < passwds.size())) {
+                passwds.remove(info.position);
+                historyChanged(true);
+            }
+            return true;
+        }
+        case R.id.menu_history_set_password: {
+            List<PasswdHistory.Entry> passwds = itsHistory.getPasswds();
+            if ((info.position >= 0) && (info.position < passwds.size())) {
+                setPassword(passwds.get(info.position).getPasswd());
+            }
+            return true;
+        }
+        default: {
+            return super.onContextItemSelected(item);
         }
         }
     }
@@ -410,6 +493,22 @@ public class PasswdSafeEditRecordFragment extends Fragment
                             itsExpiryDate.get(Calendar.DAY_OF_MONTH));
             picker.setTargetFragment(this, 0);
             picker.show(getFragmentManager(), "datePicker");
+            break;
+        }
+        case R.id.history_addremove: {
+            if (itsHistory == null) {
+                itsHistory = new PasswdHistory();
+            } else {
+                itsHistory = null;
+            }
+            historyChanged(true);
+            break;
+        }
+        case R.id.history_enabled: {
+            if (itsHistory != null) {
+                itsHistory.setEnabled(!itsHistory.isEnabled());
+            }
+            historyChanged(true);
             break;
         }
         }
@@ -547,12 +646,14 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsUrl.setText(info.itsFileData.getURL(info.itsRec));
         itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
         itsIsProtected = info.itsFileData.isProtected(info.itsRec);
+        itsHistory = info.itsFileData.getPasswdHistory(info.itsRec);
 
         String group = info.itsFileData.getGroup(info.itsRec);
         initGroup(group, info);
         initTypeAndPassword(info);
         initPasswdPolicy(info);
         initPasswdExpiry(info);
+        historyChanged(true);
 
         updateProtected();
         itsValidator.validate();
@@ -755,6 +856,61 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     /**
+     * Update the view when the history changes
+     */
+    @SuppressLint("SetTextI18n")
+    private void historyChanged(boolean updateMaxSize)
+    {
+        boolean historyExists = (itsHistory != null);
+        itsHistoryAddRemoveBtn.setText(
+                getString(historyExists ? R.string.remove : R.string.add));
+
+        GuiUtils.setVisible(itsHistoryEnabled, historyExists);
+        GuiUtils.setVisible(itsHistoryMaxSize, historyExists);
+        //GuiUtils.setVisible(itsHistoryMaxSizeLabel, historyExists);
+        GuiUtils.setVisible(itsHistoryList, historyExists);
+
+        if (historyExists) {
+            boolean historyEnabled = itsHistory.isEnabled() && !itsIsProtected;
+            itsHistoryEnabled.setChecked(historyEnabled);
+            itsHistoryMaxSize.setEnabled(historyEnabled);
+            //itsHistoryMaxSizeLabel.setEnabled(historyEnabled);
+            if (updateMaxSize) {
+                itsHistoryMaxSize.setText(
+                        Integer.toString(itsHistory.getMaxSize()));
+            }
+
+            ListAdapter histAdapter = PasswdHistory.createAdapter(
+                    itsHistory, getContext(), historyEnabled);
+            itsHistoryList.setAdapter(histAdapter);
+            GuiUtils.setListViewHeightBasedOnChildren(itsHistoryList);
+            itsHistoryList.setEnabled(historyEnabled);
+        }
+
+        itsValidator.validate();
+    }
+
+    /**
+     * Update the view when the history max size changes
+     */
+    private void historyMaxSizeChanged()
+    {
+        if (itsHistory != null) {
+            int maxSize = getHistMaxSize();
+            itsHistory.setMaxSize(maxSize);
+            historyChanged(false);
+        }
+    }
+
+    /**
+     * Get the history max size
+     */
+    private int getHistMaxSize()
+    {
+        return getTextFieldInt(itsHistoryMaxSize, -1);
+    }
+
+    /**
      * Set the record's type
      */
     private void setType(PasswdRecord.Type type, boolean init)
@@ -949,6 +1105,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         for (View v: itsProtectViews) {
             v.setEnabled(!itsIsProtected);
         }
+        historyChanged(true);
     }
 
     /**
@@ -993,6 +1150,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
         String currUrl = info.itsFileData.getURL(record);
         String currEmail = info.itsFileData.getEmail(record);
+        PasswdHistory currHistory = info.itsFileData.getPasswdHistory(record);
         if (itsTypeHasDetails) {
             updateStr = getUpdatedField(currUrl, itsUrl);
             if (updateStr != null) {
@@ -1019,6 +1177,19 @@ public class PasswdSafeEditRecordFragment extends Fragment
         Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
         if (updatePolicy.first) {
             info.itsFileData.setPasswdPolicy(updatePolicy.second, record);
+        }
+
+        if (itsTypeHasNormalPassword) {
+            if (PasswdHistory.isEqual(itsHistory, currHistory)) {
+                if (itsHistory != null) {
+                    itsHistory.adjustEntriesToMaxSize();
+                }
+                info.itsFileData.setPasswdHistory(itsHistory, record, true);
+            }
+        } else {
+            if (currHistory != null) {
+                info.itsFileData.setPasswdHistory(null, record, true);
+            }
         }
 
         // Update password after history so update is shown in new history
@@ -1198,8 +1369,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
         }
 
-        return new Pair<>(!PasswdExpiration.isEquals(itsOrigExpiry,
-                                                     updatedExpiry),
+        return new Pair<>(!PasswdExpiration.isEqual(itsOrigExpiry,
+                                                    updatedExpiry),
                           updatedExpiry);
     }
 
@@ -1338,6 +1509,22 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
             GuiUtils.setVisible(itsExpireDateError, invalidExpiryDate);
             valid &= !invalidExpiryDate;
+
+            boolean invalidHistory = false;
+            if (itsHistory != null) {
+                int histMaxSize = getHistMaxSize();
+                if ((histMaxSize < PasswdHistory.MAX_SIZE_MIN) ||
+                    (histMaxSize > PasswdHistory.MAX_SIZE_MAX)) {
+                    invalidHistory = true;
+                }
+            }
+            //valid &= !invalidHistory;
+            valid &= !GuiUtils.setTextInputError(
+                    invalidHistory ?
+                            getString(R.string.invalid_history_max_size,
+                                      PasswdHistory.MAX_SIZE_MIN,
+                                      PasswdHistory.MAX_SIZE_MAX) : null,
+                    itsHistoryMaxSizeInput);
 
             if (valid != itsIsValid) {
                 itsIsValid = valid;

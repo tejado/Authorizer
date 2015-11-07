@@ -225,6 +225,20 @@ public class PasswdHistory
         }
     }
 
+    /**
+     * Are two histories equal
+     */
+    public static boolean isEqual(PasswdHistory hist1, PasswdHistory hist2)
+    {
+        //noinspection SimplifiableIfStatement
+        if (((hist1 == null) && (hist2 != null)) ||
+            ((hist1 != null) && (hist2 == null))) {
+            return false;
+        }
+
+        return (hist1 == null) || hist1.equals(hist2);
+    }
+
 
     public static ListAdapter createAdapter(PasswdHistory history,
                                             Context context,

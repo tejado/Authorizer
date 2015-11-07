@@ -314,22 +314,80 @@
                               android:layout_height="wrap_content"
                               android:hint="@string/days"
                               android:inputType="number"
-                              android:minWidth="48dp"/>
+                              android:minWidth="64dp"/>
                 </android.support.design.widget.TextInputLayout>
 
                 <CheckBox android:id="@+id/expire_interval_recurring"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:layout_alignParentEnd="true"
-                          android:layout_alignParentRight="true"
-                          android:layout_centerVertical="true"
-                          android:layout_marginLeft="16dp"
-                          android:layout_marginStart="16dp"
+                          android:layout_marginLeft="8dp"
+                          android:layout_marginStart="8dp"
+                          android:layout_marginTop="16dp"
                           android:layout_toEndOf="@id/expire_interval_val_input"
                           android:layout_toRightOf="@id/expire_interval_val_input"
                           android:text="@string/recurring"/>
 
             </RelativeLayout>
+
+            <!-- Password history -->
+            <RelativeLayout android:id="@+id/history_group"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content">
+                <Button android:id="@+id/history_addremove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:text="@string/add"/>
+
+                <TextView android:id="@+id/history_label"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignBaseline="@id/history_addremove"
+                          android:layout_alignBottom="@id/history_addremove"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentStart="true"
+                          android:layout_alignTop="@id/history_addremove"
+                          android:layout_toLeftOf="@id/history_addremove"
+                          android:layout_toStartOf="@id/history_addremove"
+                          android:text="@string/history"
+                          android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <CheckBox android:id="@+id/history_enabled"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentStart="true"
+                          android:layout_below="@+id/history_addremove"
+                          android:layout_marginTop="16dp"
+                          android:text="@string/enabled"/>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/history_max_size_input"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/history_addremove"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/history_enabled"
+                    android:layout_toRightOf="@+id/history_enabled">
+                    <EditText android:id="@+id/history_max_size"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:hint="@string/max_size"
+                              android:inputType="number"
+                              android:minWidth="100dip"
+                              android:singleLine="false"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <ListView android:id="@+id/history"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_below="@+id/history_max_size_input"
+                          tools:ignore="NestedScrolling"/>
+
+            </RelativeLayout>
+
         </LinearLayout>
 
     </LinearLayout>
