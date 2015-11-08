@@ -879,7 +879,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
 
             ListAdapter histAdapter = PasswdHistory.createAdapter(
-                    itsHistory, getContext(), historyEnabled);
+                    itsHistory, historyEnabled, true, getContext());
             itsHistoryList.setAdapter(histAdapter);
             GuiUtils.setListViewHeightBasedOnChildren(itsHistoryList);
             itsHistoryList.setEnabled(historyEnabled);

@@ -75,4 +75,18 @@
 
     <color name="transparent">#00000000</color>
 
+    <style name="ListItem">
+        <item name="android:minHeight">?attr/listPreferredItemHeight</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+
+    <style name="ListItemText">
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+
+    <style name="ListItemSeconday">
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+
 </resources>

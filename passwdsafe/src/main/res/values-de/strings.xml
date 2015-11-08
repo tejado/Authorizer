@@ -127,6 +127,7 @@
     <string name="location">Ort</string>
     <string name="max_size">Max. Größe</string>
     <string name="max_size_label">Max. Größe:</string>
+    <string name="menu">Menü</string>
     <string name="modified">Geändert</string>
     <string name="monospace">Monospace-Schrift</string>
     <string name="n_a">N/A</string>

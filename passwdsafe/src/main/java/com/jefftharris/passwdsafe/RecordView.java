@@ -983,7 +983,7 @@ public class RecordView extends AbstractRecordTabActivity
             historyEnabled = history.isEnabled();
             historyMaxSize = Integer.toString(history.getMaxSize());
             histView.setAdapter(
-                PasswdHistory.createAdapter(history, this, true));
+                PasswdHistory.createAdapter(history, true, false, this));
         } else {
             historyMaxSize = getString(R.string.n_a);
             histView.setAdapter(null);
