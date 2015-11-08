@@ -127,6 +127,7 @@
     <string name="location">Emplacement</string>
     <string name="max_size">Taille maximale</string>
     <string name="max_size_label">Taille maximale:</string>
+    <string name="menu">Menu</string>
     <string name="modified">Modifié</string>
     <string name="monospace">Chasse fixe</string>
     <string name="n_a">N/A</string>

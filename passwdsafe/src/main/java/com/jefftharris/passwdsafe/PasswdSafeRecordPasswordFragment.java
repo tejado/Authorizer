@@ -181,8 +181,9 @@ public class PasswdSafeRecordPasswordFragment
         if (historyExists) {
             historyEnabled = history.isEnabled();
             historyMaxSize = Integer.toString(history.getMaxSize());
-            itsHistory.setAdapter(
-                    PasswdHistory.createAdapter(history, getActivity(), true));
+            itsHistory.setAdapter(PasswdHistory.createAdapter(history, true,
+                                                              false,
+                                                              getActivity()));
         } else {
             historyMaxSize = getString(R.string.n_a);
             itsHistory.setAdapter(null);

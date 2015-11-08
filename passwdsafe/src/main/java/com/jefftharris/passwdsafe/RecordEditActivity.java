@@ -1162,7 +1162,8 @@ public class RecordEditActivity extends AbstractRecordActivity
             }
 
             ListAdapter histAdapter =
-                PasswdHistory.createAdapter(itsHistory, this, historyEnabled);
+                    PasswdHistory.createAdapter(itsHistory, historyEnabled, true,
+                                                this);
             histView.setAdapter(histAdapter);
             GuiUtils.setListViewHeightBasedOnChildren(histView);
             histView.setEnabled(historyEnabled);

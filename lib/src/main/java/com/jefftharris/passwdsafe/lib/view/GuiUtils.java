@@ -8,7 +8,6 @@
 package com.jefftharris.passwdsafe.lib.view;
 
 import java.util.List;
-import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,7 +34,6 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -56,55 +54,6 @@ public final class GuiUtils
         InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
 
 
-    /**
-     * The EnableAdapter class is a SimpleAdapter that can show its items in a
-     * disabled state
-     */
-    @SuppressWarnings("SameParameterValue")
-    public static class EnableAdapter extends SimpleAdapter
-    {
-        private final boolean itsIsEnabled;
-
-        /**
-         * Constructor
-         */
-        public EnableAdapter(Context context,
-                             List<? extends Map<String, ?>> data, int resource,
-                             String[] from, int[] to, boolean enabled)
-        {
-            super(context, data, resource, from, to);
-            itsIsEnabled = enabled;
-        }
-
-        /* (non-Javadoc)
-         * @see android.widget.SimpleAdapter#getView(int, android.view.View, android.view.ViewGroup)
-         */
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
-            View v = super.getView(position, convertView, parent);
-            if (!itsIsEnabled) {
-                setEnabled(v);
-            }
-            return v;
-        }
-
-        /**
-         * Set the enabled state of the view and its children
-         */
-        private void setEnabled(View v)
-        {
-            v.setEnabled(itsIsEnabled);
-            if (v instanceof ViewGroup) {
-                ViewGroup vg = (ViewGroup)v;
-                for (int i = 0; i < vg.getChildCount(); ++i) {
-                    setEnabled(vg.getChildAt(i));
-                }
-            }
-        }
-    }
-
-
     public static String getTextViewStr(Activity act, int viewId)
     {
         TextView tv = (TextView)act.findViewById(viewId);
@@ -118,27 +67,44 @@ public final class GuiUtils
         return (obj == null) ? null : obj.toString();
     }
 
-
-    public static void setListViewHeightBasedOnChildren(ListView listView)
+    /**
+     * Set the height of a ListView based on all of its children
+     */
+    public static void setListViewHeightBasedOnChildren(final ListView listView)
     {
-        ListAdapter listAdapter = listView.getAdapter();
+        final ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
             return;
         }
 
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
+        // Defer measurement so listview is rendered to get its width
+        listView.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                int width = View.MeasureSpec.makeMeasureSpec(
+                        listView.getMeasuredWidth(), View.MeasureSpec.AT_MOST);
+                int height = View.MeasureSpec.makeMeasureSpec(
+                        0, View.MeasureSpec.UNSPECIFIED);
+                int totalHeight = 0;
+                int numItems = listAdapter.getCount();
+                for (int i = 0; i < numItems; i++) {
+                    View listItem = listAdapter.getView(i, null, listView);
+                    listItem.measure(width, height);
+                    totalHeight += listItem.getMeasuredHeight();
+                }
 
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight +
-            (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
+                ViewGroup.LayoutParams params = listView.getLayoutParams();
+                params.height = totalHeight;
+                if (numItems > 0) {
+                    params.height +=
+                            listView.getDividerHeight() * (numItems - 1);
+                }
+                listView.setLayoutParams(params);
+            }
+        });
     }
-
 
     public static boolean isBackKeyDown(int keyCode, KeyEvent event)
     {

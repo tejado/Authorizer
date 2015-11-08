@@ -16,4 +16,11 @@
     <!-- API 14 theme customizations can go here. -->
   </style>
 
+    <style name="ListItemText">
+        <item name="android:textAppearance">?android:attr/textAppearanceListItem</item>
+    </style>
+
+    <style name="ListItemSeconday">
+        <item name="android:textAppearance">?android:attr/textAppearanceListItemSecondary</item>
+    </style>
 </resources>
