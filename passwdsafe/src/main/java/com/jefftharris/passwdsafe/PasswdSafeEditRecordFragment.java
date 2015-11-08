@@ -159,6 +159,10 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
     private static final int RECORD_SELECTION_REQUEST = 0;
 
+    private static final String STATE_EXPIRY_DATE = "expiryDate";
+    private static final String STATE_HISTORY = "history";
+    private static final String STATE_PROTECTED = "protected";
+
      // Constants must match record_type strings
     private static final int TYPE_NORMAL = 0;
     private static final int TYPE_ALIAS = 1;
@@ -167,9 +171,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
     // TODO: if pending changes, warn on navigation
     // TODO: v2 support
     // TODO: on new record, use current group
-    // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut
+    // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut (and rotate support)
     // TODO: pause file close timer while editor open
-    // TODO: rotation support
+    // TODO: record policy editing
 
     /**
      * Create a new instance
@@ -316,11 +320,53 @@ public class PasswdSafeEditRecordFragment extends Fragment
     }
 
     @Override
+    public void onViewStateRestored(Bundle savedInstanceState)
+    {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState == null) {
+            return;
+        }
+
+        if (savedInstanceState.containsKey(STATE_PROTECTED)) {
+            itsIsProtected = savedInstanceState.getBoolean(STATE_PROTECTED,
+                                                           itsIsProtected);
+            updateProtected();
+        }
+
+        if (savedInstanceState.containsKey(STATE_EXPIRY_DATE)) {
+            itsExpiryDate.setTimeInMillis(
+                    savedInstanceState.getLong(
+                            STATE_EXPIRY_DATE,
+                            itsExpiryDate.getTimeInMillis()));
+            updatePasswdExpiryDate();
+        }
+
+        if (savedInstanceState.containsKey(STATE_HISTORY)) {
+            String historyStr = savedInstanceState.getString(STATE_HISTORY);
+            itsHistory = (historyStr != null) ?
+                    new PasswdHistory(historyStr) : null;
+            historyChanged(true);
+        }
+
+        GuiUtils.invalidateOptionsMenu(getActivity());
+    }
+
+    @Override
     public void onResume()
     {
         super.onResume();
         itsListener.updateViewEditRecord(itsLocation);
         itsValidator.validate();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putLong(STATE_EXPIRY_DATE, itsExpiryDate.getTimeInMillis());
+        outState.putString(STATE_HISTORY,
+                           (itsHistory != null) ? itsHistory.toString() : null);
+        outState.putBoolean(STATE_PROTECTED, itsIsProtected);
     }
 
     @Override
@@ -1560,7 +1606,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
                     invalidHistory = true;
                 }
             }
-            //valid &= !invalidHistory;
             valid &= !GuiUtils.setTextInputError(
                     invalidHistory ?
                             getString(R.string.invalid_history_max_size,
