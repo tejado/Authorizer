@@ -308,6 +308,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         // Notes
         itsNotesLabel = rootView.findViewById(R.id.notes_label);
         itsNotes = (TextView)rootView.findViewById(R.id.notes);
+        PasswdSafeRecordNotesFragment.setNotesOptions(itsNotes, getActivity());
 
         initProtViews(rootView);
         initialize();
