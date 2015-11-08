@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -90,6 +91,18 @@ public class PasswdSafeRecordNotesFragment
         }
     }
 
+    /**
+     * Set the current view options on the notes field
+     */
+    public static void setNotesOptions(TextView notes, Activity act)
+    {
+        SharedPreferences prefs =
+                act.getPreferences(Context.MODE_PRIVATE);
+        boolean wordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
+        boolean isMonospace = prefs.getBoolean(MONOSPACE_PREF, false);
+        setNotesOptions(notes, wordWrap, isMonospace);
+    }
+
     @Override
     protected void doOnCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
@@ -152,8 +165,16 @@ public class PasswdSafeRecordNotesFragment
      */
     private void setNotesOptions()
     {
-        itsNotes.setHorizontallyScrolling(!itsIsWordWrap);
-        itsNotes.setTypeface(
-                itsIsMonospace ? Typeface.MONOSPACE : Typeface.DEFAULT);
+        setNotesOptions(itsNotes, itsIsWordWrap, itsIsMonospace);
+    }
+
+    /**
+     * Set options for notes
+     */
+    private static void setNotesOptions(TextView notes, boolean wordWrap,
+                                        boolean monospace)
+    {
+        notes.setHorizontallyScrolling(!wordWrap);
+        notes.setTypeface(monospace ? Typeface.MONOSPACE : Typeface.DEFAULT);
     }
 }
