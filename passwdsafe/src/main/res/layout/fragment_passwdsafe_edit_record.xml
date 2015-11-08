@@ -390,6 +390,17 @@
 
         </LinearLayout>
 
+        <!-- Notes -->
+        <TextView android:id="@+id/notes_label"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="@string/notes"
+                  android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <EditText android:id="@+id/notes"
+                  android:inputType="textCapSentences|textMultiLine|textLongMessage|textAutoCorrect"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"/>
     </LinearLayout>
 
 </ScrollView>

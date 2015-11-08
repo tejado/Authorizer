@@ -152,6 +152,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private TextInputLayout itsHistoryMaxSizeInput;
     private TextView itsHistoryMaxSize;
     private ListView itsHistoryList;
+    private View itsNotesLabel;
+    private TextView itsNotes;
 
     private static final String TAG = "PasswdSafeEditRecordFragment";
 
@@ -302,6 +304,10 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 });
         itsHistoryList = (ListView)rootView.findViewById(R.id.history);
         registerForContextMenu(itsHistoryList);
+
+        // Notes
+        itsNotesLabel = rootView.findViewById(R.id.notes_label);
+        itsNotes = (TextView)rootView.findViewById(R.id.notes);
 
         initProtViews(rootView);
         initialize();
@@ -647,6 +653,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
         itsIsProtected = info.itsFileData.isProtected(info.itsRec);
         itsHistory = info.itsFileData.getPasswdHistory(info.itsRec);
+        itsNotes.setText(info.itsFileData.getNotes(info.itsRec));
 
         String group = info.itsFileData.getGroup(info.itsRec);
         initGroup(group, info);
@@ -966,6 +973,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
         GuiUtils.setVisible(itsEmailInput, itsTypeHasDetails);
         GuiUtils.setVisible(itsPasswordLabel, itsTypeHasNormalPassword);
         GuiUtils.setVisible(itsPasswordFields, itsTypeHasNormalPassword);
+        GuiUtils.setVisible(itsNotesLabel, itsTypeHasDetails);
+        GuiUtils.setVisible(itsNotes, itsTypeHasDetails);
 
         itsValidator.validate();
 
@@ -1149,6 +1158,18 @@ public class PasswdSafeEditRecordFragment extends Fragment
                                     itsUser);
         if (updateStr != null) {
             info.itsFileData.setUsername(updateStr, record);
+        }
+
+        String currNotes = info.itsFileData.getNotes(record);
+        if (itsTypeHasDetails) {
+            updateStr = getUpdatedField(currNotes, itsNotes);
+            if (updateStr != null) {
+                info.itsFileData.setNotes(updateStr, record);
+            }
+        } else {
+            if (currNotes != null) {
+                info.itsFileData.setNotes(null, record);
+            }
         }
 
         String currUrl = info.itsFileData.getURL(record);
