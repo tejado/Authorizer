@@ -867,14 +867,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
         GuiUtils.setVisible(itsHistoryEnabled, historyExists);
         GuiUtils.setVisible(itsHistoryMaxSize, historyExists);
-        //GuiUtils.setVisible(itsHistoryMaxSizeLabel, historyExists);
         GuiUtils.setVisible(itsHistoryList, historyExists);
 
         if (historyExists) {
             boolean historyEnabled = itsHistory.isEnabled() && !itsIsProtected;
             itsHistoryEnabled.setChecked(historyEnabled);
             itsHistoryMaxSize.setEnabled(historyEnabled);
-            //itsHistoryMaxSizeLabel.setEnabled(historyEnabled);
             if (updateMaxSize) {
                 itsHistoryMaxSize.setText(
                         Integer.toString(itsHistory.getMaxSize()));
@@ -1185,7 +1183,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
 
         if (itsTypeHasNormalPassword) {
-            if (PasswdHistory.isEqual(itsHistory, currHistory)) {
+            if (!PasswdHistory.isEqual(itsHistory, currHistory)) {
                 if (itsHistory != null) {
                     itsHistory.adjustEntriesToMaxSize();
                 }
