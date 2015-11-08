@@ -488,6 +488,41 @@ public class PasswdSafeEditRecordFragment extends Fragment
     public void onClick(View v)
     {
         switch (v.getId()) {
+        case R.id.expire_date_date: {
+            DatePickerDialogFragment picker =
+                    DatePickerDialogFragment.newInstance(
+                            itsExpiryDate.get(Calendar.YEAR),
+                            itsExpiryDate.get(Calendar.MONTH),
+                            itsExpiryDate.get(Calendar.DAY_OF_MONTH));
+            picker.setTargetFragment(this, 0);
+            picker.show(getFragmentManager(), "datePicker");
+            break;
+        }
+        case R.id.expire_date_time: {
+            TimePickerDialogFragment picker =
+                    TimePickerDialogFragment.newInstance(
+                            itsExpiryDate.get(Calendar.HOUR_OF_DAY),
+                            itsExpiryDate.get(Calendar.MINUTE));
+            picker.setTargetFragment(this, 0);
+            picker.show(getFragmentManager(), "timePicker");
+            break;
+        }
+        case R.id.history_addremove: {
+            if (itsHistory == null) {
+                itsHistory = new PasswdHistory();
+            } else {
+                itsHistory = null;
+            }
+            historyChanged(true);
+            break;
+        }
+        case R.id.history_enabled: {
+            if (itsHistory != null) {
+                itsHistory.setEnabled(!itsHistory.isEnabled());
+            }
+            historyChanged(true);
+            break;
+        }
         case R.id.link_ref: {
             Intent intent = new Intent(PasswdSafeApp.CHOOSE_RECORD_INTENT,
                                        getActivity().getIntent().getData(),
@@ -514,11 +549,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
             startActivityForResult(intent, RECORD_SELECTION_REQUEST);
             break;
         }
-        case R.id.password_visibility: {
-            boolean visible = GuiUtils.isPasswordVisible(itsPassword);
-            setPasswordVisibility(!visible);
-            break;
-        }
         case R.id.password_generate: {
             if (itsCurrPolicy != null) {
                 try {
@@ -529,39 +559,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
             break;
         }
-        case R.id.expire_date_time: {
-            TimePickerDialogFragment picker =
-                    TimePickerDialogFragment.newInstance(
-                            itsExpiryDate.get(Calendar.HOUR_OF_DAY),
-                            itsExpiryDate.get(Calendar.MINUTE));
-            picker.setTargetFragment(this, 0);
-            picker.show(getFragmentManager(), "timePicker");
-            break;
-        }
-        case R.id.expire_date_date: {
-            DatePickerDialogFragment picker =
-                    DatePickerDialogFragment.newInstance(
-                            itsExpiryDate.get(Calendar.YEAR),
-                            itsExpiryDate.get(Calendar.MONTH),
-                            itsExpiryDate.get(Calendar.DAY_OF_MONTH));
-            picker.setTargetFragment(this, 0);
-            picker.show(getFragmentManager(), "datePicker");
-            break;
-        }
-        case R.id.history_addremove: {
-            if (itsHistory == null) {
-                itsHistory = new PasswdHistory();
-            } else {
-                itsHistory = null;
-            }
-            historyChanged(true);
-            break;
-        }
-        case R.id.history_enabled: {
-            if (itsHistory != null) {
-                itsHistory.setEnabled(!itsHistory.isEnabled());
-            }
-            historyChanged(true);
+        case R.id.password_visibility: {
+            boolean visible = GuiUtils.isPasswordVisible(itsPassword);
+            setPasswordVisibility(!visible);
             break;
         }
         }
