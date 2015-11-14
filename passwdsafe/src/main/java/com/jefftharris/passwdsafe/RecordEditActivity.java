@@ -73,7 +73,7 @@ import android.widget.TimePicker;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 public class RecordEditActivity extends AbstractRecordActivity
-    implements PasswdPolicyEditDialog.Editor
+        //implements PasswdPolicyEditDialog.Editor
 {
     private static final String TAG = "RecordEditActivity";
 
@@ -376,11 +376,13 @@ public class RecordEditActivity extends AbstractRecordActivity
             dialog = alertDialog;
             break;
         }
+        /*
         case DIALOG_EDIT_POLICY: {
             itsPolicyEditDialog = new PasswdPolicyEditDialog(this);
             dialog = itsPolicyEditDialog.create(itsCurrPolicy, this);
             break;
         }
+        */
         case DIALOG_PASSWD_EXPIRY_TIME: {
             dialog = new TimePickerDialog(
                 this,
