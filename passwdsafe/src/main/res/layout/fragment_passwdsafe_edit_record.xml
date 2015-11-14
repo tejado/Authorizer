@@ -15,7 +15,8 @@
                   android:layout_height="wrap_content"
                   android:orientation="vertical">
 
-        <LinearLayout android:layout_width="match_parent"
+        <LinearLayout android:id="@+id/type_group"
+                      android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:orientation="vertical"
                       android:paddingBottom="2dp">
@@ -262,72 +263,78 @@
                 android:layout_margin="4dp"/>
 
             <!-- Pasword expiration -->
-            <TextView android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="@string/password_expiration"
-                      android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-            <Spinner android:id="@+id/expire_choice"
-                     style="@style/Widget.AppCompat.Spinner.Underlined"
-                     android:layout_width="fill_parent"
-                     android:layout_height="wrap_content"
-                     android:entries="@array/expire_type"
-                     android:prompt="@string/choose_type"/>
-
-            <LinearLayout android:id="@+id/expire_date_fields"
+            <LinearLayout android:id="@+id/expire_group"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          android:orientation="horizontal">
+                          android:orientation="vertical">
 
-                <TextView android:id="@+id/expire_date_time"
-                          style="@style/TextViewSpinner"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
+                <TextView android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:text="@string/password_expiration"
+                          android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-                <TextView android:id="@+id/expire_date_date"
-                          style="@style/TextViewSpinner"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"/>
+                <Spinner android:id="@+id/expire_choice"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="fill_parent"
+                         android:layout_height="wrap_content"
+                         android:entries="@array/expire_type"
+                         android:prompt="@string/choose_type"/>
 
-            </LinearLayout>
-
-            <TextView android:id="@+id/expire_date_error"
-                      style="@style/TextAppearance.Design.Error"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:paddingEnd="4dp"
-                      android:paddingLeft="4dp"
-                      android:paddingRight="4dp"
-                      android:paddingStart="4dp"
-                      android:text="@string/password_expiration_in_past"/>
-
-            <RelativeLayout android:id="@+id/expire_interval_fields"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/expire_interval_val_input"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <EditText android:id="@+id/expire_interval_val"
+                <LinearLayout android:id="@+id/expire_date_fields"
                               android:layout_width="match_parent"
                               android:layout_height="wrap_content"
-                              android:hint="@string/days"
-                              android:inputType="number"
-                              android:minWidth="64dp"/>
-                </android.support.design.widget.TextInputLayout>
+                              android:orientation="horizontal">
 
-                <CheckBox android:id="@+id/expire_interval_recurring"
+                    <TextView android:id="@+id/expire_date_time"
+                              style="@style/TextViewSpinner"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+
+                    <TextView android:id="@+id/expire_date_date"
+                              style="@style/TextViewSpinner"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <TextView android:id="@+id/expire_date_error"
+                          style="@style/TextAppearance.Design.Error"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:layout_marginLeft="8dp"
-                          android:layout_marginStart="8dp"
-                          android:layout_marginTop="16dp"
-                          android:layout_toEndOf="@id/expire_interval_val_input"
-                          android:layout_toRightOf="@id/expire_interval_val_input"
-                          android:text="@string/recurring"/>
+                          android:paddingEnd="4dp"
+                          android:paddingLeft="4dp"
+                          android:paddingRight="4dp"
+                          android:paddingStart="4dp"
+                          android:text="@string/password_expiration_in_past"/>
 
-            </RelativeLayout>
+                <RelativeLayout android:id="@+id/expire_interval_fields"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/expire_interval_val_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <EditText android:id="@+id/expire_interval_val"
+                                  android:layout_width="match_parent"
+                                  android:layout_height="wrap_content"
+                                  android:hint="@string/days"
+                                  android:inputType="number"
+                                  android:minWidth="64dp"/>
+                    </android.support.design.widget.TextInputLayout>
+
+                    <CheckBox android:id="@+id/expire_interval_recurring"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_marginLeft="8dp"
+                              android:layout_marginStart="8dp"
+                              android:layout_marginTop="16dp"
+                              android:layout_toEndOf="@id/expire_interval_val_input"
+                              android:layout_toRightOf="@id/expire_interval_val_input"
+                              android:text="@string/recurring"/>
+
+                </RelativeLayout>
+            </LinearLayout>
 
             <!-- Password history -->
             <RelativeLayout android:id="@+id/history_group"
@@ -398,9 +405,9 @@
                   android:textAppearance="?android:attr/textAppearanceLarge"/>
 
         <EditText android:id="@+id/notes"
-                  android:inputType="textCapSentences|textMultiLine|textLongMessage|textAutoCorrect"
                   android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"/>
+                  android:layout_height="wrap_content"
+                  android:inputType="textCapSentences|textMultiLine|textLongMessage|textAutoCorrect"/>
     </LinearLayout>
 
 </ScrollView>

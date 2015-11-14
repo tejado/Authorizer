@@ -118,7 +118,9 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private PasswdExpiration.Type itsExpiryType = PasswdExpiration.Type.NEVER;
     private Calendar itsExpiryDate;
     private PasswdHistory itsHistory;
+    private boolean itsIsV3 = false;
     // UI fields
+    private View itsTypeGroup;
     private Spinner itsType;
     private TextView itsTypeError;
     private TextView itsLinkRef;
@@ -140,6 +142,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private Spinner itsPolicy;
     private Button itsPolicyEditBtn;
     private PasswdPolicyView itsPasswdPolicyView;
+    private View itsExpireGroup;
     private Spinner itsExpire;
     private View itsExpireDateFields;
     private TextView itsExpireDateTime;
@@ -149,6 +152,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private TextInputLayout itsExpireIntervalInput;
     private TextView itsExpireInterval;
     private CheckBox itsExpireIntervalRecurring;
+    private View itsHistoryGroup;
     private Button itsHistoryAddRemoveBtn;
     private CheckBox itsHistoryEnabled;
     private TextInputLayout itsHistoryMaxSizeInput;
@@ -171,7 +175,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private static final int TYPE_SHORTCUT = 2;
 
     // TODO: if pending changes, warn on navigation
-    // TODO: v2 support
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut (and rotate support)
     // TODO: pause file close timer while editor open
@@ -217,6 +220,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(
                 R.layout.fragment_passwdsafe_edit_record, container, false);
+        itsTypeGroup = rootView.findViewById(R.id.type_group);
         itsType = (Spinner)rootView.findViewById(R.id.type);
         itsType.setOnItemSelectedListener(this);
         itsTypeError = (TextView)rootView.findViewById(R.id.type_error);
@@ -267,6 +271,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsPolicyEditBtn.setOnClickListener(this);
 
         // Password expiration
+        itsExpireGroup = rootView.findViewById(R.id.expire_group);
         itsExpire = (Spinner)rootView.findViewById(R.id.expire_choice);
         itsExpire.setOnItemSelectedListener(this);
         itsExpireDateFields = rootView.findViewById(R.id.expire_date_fields);
@@ -288,6 +293,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
                 rootView.findViewById(R.id.expire_interval_recurring);
 
         // Password history
+        itsHistoryGroup = rootView.findViewById(R.id.history_group);
         itsHistoryAddRemoveBtn = (Button)
                 rootView.findViewById(R.id.history_addremove);
         itsHistoryAddRemoveBtn.setOnClickListener(this);
@@ -364,7 +370,10 @@ public class PasswdSafeEditRecordFragment extends Fragment
     public void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-        outState.putLong(STATE_EXPIRY_DATE, itsExpiryDate.getTimeInMillis());
+        if (itsExpiryDate != null) {
+            outState.putLong(STATE_EXPIRY_DATE,
+                             itsExpiryDate.getTimeInMillis());
+        }
         outState.putString(STATE_HISTORY,
                            (itsHistory != null) ? itsHistory.toString() : null);
         outState.putBoolean(STATE_PROTECTED, itsIsProtected);
@@ -720,20 +729,28 @@ public class PasswdSafeEditRecordFragment extends Fragment
             return;
         }
 
+        itsIsV3 = info.itsFileData.isV3();
         itsTitle.setText(info.itsFileData.getTitle(info.itsRec));
         itsUser.setText(info.itsFileData.getUsername(info.itsRec));
-        itsUrl.setText(info.itsFileData.getURL(info.itsRec));
-        itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
-        itsIsProtected = info.itsFileData.isProtected(info.itsRec);
         itsHistory = info.itsFileData.getPasswdHistory(info.itsRec);
         itsNotes.setText(info.itsFileData.getNotes(info.itsRec));
+
+        if (itsIsV3) {
+            itsUrl.setText(info.itsFileData.getURL(info.itsRec));
+            itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
+            itsIsProtected = info.itsFileData.isProtected(info.itsRec);
+            historyChanged(true);
+        } else {
+            GuiUtils.setVisible(itsUrlInput, false);
+            GuiUtils.setVisible(itsEmailInput, false);
+            GuiUtils.setVisible(itsHistoryGroup, false);
+        }
 
         String group = info.itsFileData.getGroup(info.itsRec);
         initGroup(group, info);
         initTypeAndPassword(info);
         initPasswdPolicy(info);
         initPasswdExpiry(info);
-        historyChanged(true);
 
         updateProtected();
         itsValidator.validate();
@@ -787,7 +804,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsPasswordConfirm.setText(password);
         PasswordVisibilityMenuHandler.set(itsPassword, itsPasswordCurrent,
                                           itsPasswordConfirm);
-        setLinkRef(linkRef, info);
+
+        if (itsIsV3) {
+            setLinkRef(linkRef, info);
+        } else {
+            GuiUtils.setVisible(itsTypeGroup, false);
+        }
     }
 
     /**
@@ -811,16 +833,18 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
         }
 
-        PasswdPolicy customPolicy;
-        String customName = getString(R.string.record_policy);
-        if ((itsOrigPolicy != null) &&
-            (itsOrigPolicy.getLocation() == PasswdPolicy.Location.RECORD)) {
-            customPolicy = new PasswdPolicy(customName, itsOrigPolicy);
-        } else {
-            customPolicy = new PasswdPolicy(customName,
-                                            PasswdPolicy.Location.RECORD);
+        PasswdPolicy customPolicy = null;
+        if (itsIsV3) {
+            String customName = getString(R.string.record_policy);
+            if ((itsOrigPolicy != null) &&
+                (itsOrigPolicy.getLocation() == PasswdPolicy.Location.RECORD)) {
+                customPolicy = new PasswdPolicy(customName, itsOrigPolicy);
+            } else {
+                customPolicy = new PasswdPolicy(customName,
+                                                PasswdPolicy.Location.RECORD);
+            }
+            itsPolicies.add(customPolicy);
         }
-        itsPolicies.add(customPolicy);
 
         itsPasswdPolicyView.setGenerateEnabled(false);
 
@@ -850,35 +874,39 @@ public class PasswdSafeEditRecordFragment extends Fragment
     @SuppressLint("SetTextI18n")
     private void initPasswdExpiry(RecordInfo info)
     {
-        itsOrigExpiry = info.itsPasswdRec.getPasswdExpiry();
+        if (itsIsV3) {
+            itsOrigExpiry = info.itsPasswdRec.getPasswdExpiry();
 
-        itsExpiryDate = Calendar.getInstance();
-        int interval;
-        boolean recurring;
-        PasswdExpiration.Type expireType;
-        if (itsOrigExpiry == null) {
-            expireType = PasswdExpiration.Type.NEVER;
-            interval = PasswdExpiration.INTERVAL_DEFAULT;
-            recurring = false;
-        } else {
-            if ((itsOrigExpiry.itsInterval != 0) &&
-                itsOrigExpiry.itsIsRecurring) {
-                expireType = PasswdExpiration.Type.INTERVAL;
-                interval = itsOrigExpiry.itsInterval;
-                recurring = true;
-            } else {
-                expireType = PasswdExpiration.Type.DATE;
+            itsExpiryDate = Calendar.getInstance();
+            int interval;
+            boolean recurring;
+            PasswdExpiration.Type expireType;
+            if (itsOrigExpiry == null) {
+                expireType = PasswdExpiration.Type.NEVER;
                 interval = PasswdExpiration.INTERVAL_DEFAULT;
                 recurring = false;
+            } else {
+                if ((itsOrigExpiry.itsInterval != 0) &&
+                    itsOrigExpiry.itsIsRecurring) {
+                    expireType = PasswdExpiration.Type.INTERVAL;
+                    interval = itsOrigExpiry.itsInterval;
+                    recurring = true;
+                } else {
+                    expireType = PasswdExpiration.Type.DATE;
+                    interval = PasswdExpiration.INTERVAL_DEFAULT;
+                    recurring = false;
+                }
+                itsExpiryDate.setTime(itsOrigExpiry.itsExpiration);
             }
-            itsExpiryDate.setTime(itsOrigExpiry.itsExpiration);
-        }
-        updatePasswdExpiryDate();
+            updatePasswdExpiryDate();
 
-        itsExpire.setSelection(expireType.itsStrIdx);
-        updatePasswdExpiryChoice(expireType);
-        itsExpireInterval.setText(Integer.toString(interval));
-        itsExpireIntervalRecurring.setChecked(recurring);
+            itsExpire.setSelection(expireType.itsStrIdx);
+            updatePasswdExpiryChoice(expireType);
+            itsExpireInterval.setText(Integer.toString(interval));
+            itsExpireIntervalRecurring.setChecked(recurring);
+        } else {
+            GuiUtils.setVisible(itsExpireGroup, false);
+        }
     }
 
     /**
@@ -1042,8 +1070,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
         }
 
         GuiUtils.setVisible(itsLinkRef, !itsTypeHasNormalPassword);
-        GuiUtils.setVisible(itsUrlInput, itsTypeHasDetails);
-        GuiUtils.setVisible(itsEmailInput, itsTypeHasDetails);
+        GuiUtils.setVisible(itsUrlInput, itsIsV3 && itsTypeHasDetails);
+        GuiUtils.setVisible(itsEmailInput, itsIsV3 && itsTypeHasDetails);
         GuiUtils.setVisible(itsPasswordLabel, itsTypeHasNormalPassword);
         GuiUtils.setVisible(itsPasswordFields, itsTypeHasNormalPassword);
         GuiUtils.setVisible(itsNotesLabel, itsTypeHasDetails);
@@ -1198,9 +1226,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
      */
     private void updateProtectedMenu(MenuItem protItem)
     {
-        protItem.setChecked(itsIsProtected);
-        protItem.setIcon(itsIsProtected ? R.drawable.ic_action_lock :
-                                 R.drawable.ic_action_lock_open);
+        if (itsIsV3) {
+            protItem.setChecked(itsIsProtected);
+            protItem.setIcon(itsIsProtected ? R.drawable.ic_action_lock :
+                                     R.drawable.ic_action_lock_open);
+        } else {
+            protItem.setVisible(false);
+        }
     }
 
     /**
@@ -1245,47 +1277,50 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
         }
 
-        String currUrl = info.itsFileData.getURL(record);
-        String currEmail = info.itsFileData.getEmail(record);
-        PasswdHistory currHistory = info.itsFileData.getPasswdHistory(record);
-        if (itsTypeHasDetails) {
-            updateStr = getUpdatedField(currUrl, itsUrl);
-            if (updateStr != null) {
-                info.itsFileData.setURL(updateStr, record);
-            }
-
-            updateStr = getUpdatedField(currEmail, itsEmail);
-            if (updateStr != null) {
-                info.itsFileData.setEmail(updateStr, record);
-            }
-        } else {
-            if (currUrl != null) {
-                info.itsFileData.setURL(null, record);
-            }
-            if (currEmail != null) {
-                info.itsFileData.setEmail(null, record);
-            }
-        }
-
-        if (itsIsProtected != info.itsFileData.isProtected(record)) {
-            info.itsFileData.setProtected(itsIsProtected, record);
-        }
-
-        Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
-        if (updatePolicy.first) {
-            info.itsFileData.setPasswdPolicy(updatePolicy.second, record);
-        }
-
-        if (itsTypeHasNormalPassword) {
-            if (!PasswdHistory.isEqual(itsHistory, currHistory)) {
-                if (itsHistory != null) {
-                    itsHistory.adjustEntriesToMaxSize();
+        if (itsIsV3) {
+            String currUrl = info.itsFileData.getURL(record);
+            String currEmail = info.itsFileData.getEmail(record);
+            PasswdHistory currHistory = info.itsFileData
+                    .getPasswdHistory(record);
+            if (itsTypeHasDetails) {
+                updateStr = getUpdatedField(currUrl, itsUrl);
+                if (updateStr != null) {
+                    info.itsFileData.setURL(updateStr, record);
                 }
-                info.itsFileData.setPasswdHistory(itsHistory, record, true);
+
+                updateStr = getUpdatedField(currEmail, itsEmail);
+                if (updateStr != null) {
+                    info.itsFileData.setEmail(updateStr, record);
+                }
+            } else {
+                if (currUrl != null) {
+                    info.itsFileData.setURL(null, record);
+                }
+                if (currEmail != null) {
+                    info.itsFileData.setEmail(null, record);
+                }
             }
-        } else {
-            if (currHistory != null) {
-                info.itsFileData.setPasswdHistory(null, record, true);
+
+            if (itsIsProtected != info.itsFileData.isProtected(record)) {
+                info.itsFileData.setProtected(itsIsProtected, record);
+            }
+
+            Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
+            if (updatePolicy.first) {
+                info.itsFileData.setPasswdPolicy(updatePolicy.second, record);
+            }
+
+            if (itsTypeHasNormalPassword) {
+                if (!PasswdHistory.isEqual(itsHistory, currHistory)) {
+                    if (itsHistory != null) {
+                        itsHistory.adjustEntriesToMaxSize();
+                    }
+                    info.itsFileData.setPasswdHistory(itsHistory, record, true);
+                }
+            } else {
+                if (currHistory != null) {
+                    info.itsFileData.setPasswdHistory(null, record, true);
+                }
             }
         }
 
@@ -1318,11 +1353,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
             }
         }
 
-        // Update expiration dates after password so changes in expiration
-        // overwrite basic expiration updates when the password changes.
-        Pair<Boolean, PasswdExpiration> updateExpiry = getUpdatedExpiry();
-        if (updateExpiry.first) {
-            info.itsFileData.setPasswdExpiry(updateExpiry.second, record);
+        if (itsIsV3) {
+            // Update expiration dates after password so changes in expiration
+            // overwrite basic expiration updates when the password changes.
+            Pair<Boolean, PasswdExpiration> updateExpiry = getUpdatedExpiry();
+            if (updateExpiry.first) {
+                info.itsFileData.setPasswdExpiry(updateExpiry.second, record);
+            }
         }
 
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
@@ -1604,25 +1641,27 @@ public class PasswdSafeEditRecordFragment extends Fragment
             valid &= !GuiUtils.setTextInputError(validatePasswordConfirm(),
                                                  itsPasswordConfirmInput);
 
-            boolean invalidExpiryDate = false;
-            switch (itsExpiryType) {
-            case NEVER: {
-                break;
+            if (itsIsV3) {
+                boolean invalidExpiryDate = false;
+                switch (itsExpiryType) {
+                case NEVER: {
+                    break;
+                }
+                case DATE: {
+                    long now = System.currentTimeMillis();
+                    long expiry = itsExpiryDate.getTimeInMillis();
+                    invalidExpiryDate = (expiry < now);
+                    break;
+                }
+                case INTERVAL: {
+                    valid &= !GuiUtils.setTextInputError(
+                            validateExpiryInterval(), itsExpireIntervalInput);
+                    break;
+                }
+                }
+                GuiUtils.setVisible(itsExpireDateError, invalidExpiryDate);
+                valid &= !invalidExpiryDate;
             }
-            case DATE: {
-                long now = System.currentTimeMillis();
-                long expiry = itsExpiryDate.getTimeInMillis();
-                invalidExpiryDate = (expiry < now);
-                break;
-            }
-            case INTERVAL: {
-                valid &= !GuiUtils.setTextInputError(validateExpiryInterval(),
-                                                     itsExpireIntervalInput);
-                break;
-            }
-            }
-            GuiUtils.setVisible(itsExpireDateError, invalidExpiryDate);
-            valid &= !invalidExpiryDate;
 
             boolean invalidHistory = false;
             if (itsHistory != null) {
