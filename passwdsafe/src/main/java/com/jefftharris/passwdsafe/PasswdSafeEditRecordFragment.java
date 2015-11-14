@@ -51,6 +51,7 @@ import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.DatePickerDialogFragment;
 import com.jefftharris.passwdsafe.view.NewGroupDialog;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
+import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TimePickerDialogFragment;
@@ -75,6 +76,7 @@ public class PasswdSafeEditRecordFragment extends Fragment
                    View.OnLongClickListener,
                    TimePickerDialogFragment.Listener,
                    DatePickerDialogFragment.Listener,
+                   PasswdPolicyEditDialog.Listener,
                    AdapterView.OnItemSelectedListener
 {
     /**
@@ -173,7 +175,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut (and rotate support)
     // TODO: pause file close timer while editor open
-    // TODO: record policy editing
 
     /**
      * Create a new instance
@@ -564,6 +565,13 @@ public class PasswdSafeEditRecordFragment extends Fragment
             setPasswordVisibility(!visible);
             break;
         }
+        case R.id.policy_edit: {
+            PasswdPolicyEditDialog dlg =
+                    PasswdPolicyEditDialog.newInstance(itsCurrPolicy);
+            dlg.setTargetFragment(this, 0);
+            dlg.show(getFragmentManager(), "PasswdPolicyEditDialog");
+            break;
+        }
         }
     }
 
@@ -664,6 +672,24 @@ public class PasswdSafeEditRecordFragment extends Fragment
         itsExpiryDate.set(Calendar.MONTH, monthOfYear);
         itsExpiryDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
         updatePasswdExpiryDate();
+    }
+
+    @Override
+    public void handlePolicyEditComplete(PasswdPolicy oldPolicy,
+                                         PasswdPolicy newPolicy)
+    {
+        if (oldPolicy != null) {
+            itsPolicies.remove(oldPolicy);
+        }
+        itsPolicies.add(newPolicy);
+        updatePasswdPolicies(newPolicy);
+    }
+
+    @Override
+    public boolean isDuplicatePolicy(String name)
+    {
+        // Shouldn't ever be called as record policy
+        return false;
     }
 
     @Override

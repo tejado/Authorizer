@@ -58,7 +58,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: preferences
     // TODO: about
     // TODO: add record
-    // TODO: edit record
     // TODO: expiry notifications
     // TODO: details
     // TODO: file operations
