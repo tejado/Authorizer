@@ -31,18 +31,18 @@ public abstract class DialogValidator
         /**
          * Constructor with a specific view and password fields
          */
-        public AlertValidator(AlertDialog dlg, View view, Activity act)
+        public AlertValidator(AlertDialog dlg, View view, Context ctx)
         {
-            this(dlg, view, act, true);
+            this(dlg, view, ctx, true);
         }
 
         /**
          * Constructor with a specific view and optional password fields
          */
-        public AlertValidator(AlertDialog dlg, View view, Activity act,
+        public AlertValidator(AlertDialog dlg, View view, Context ctx,
                               boolean hasPasswords)
         {
-            super(view, act, hasPasswords);
+            super(view, ctx, hasPasswords);
             itsDialog = dlg;
         }
 
@@ -92,9 +92,9 @@ public abstract class DialogValidator
     /**
      * Constructor with a specific view and optional password fields
      */
-    protected DialogValidator(View view, Activity act, boolean hasPasswords)
+    protected DialogValidator(View view, Context ctx, boolean hasPasswords)
     {
-        itsContext = act;
+        itsContext = ctx;
         if (hasPasswords) {
             itsPassword = (TextView) view.findViewById(R.id.password);
             registerTextView(itsPassword);
