@@ -36,7 +36,7 @@ import android.widget.ListView;
  * Activity for managing password policies for a file
  */
 public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
-    implements PasswdPolicyEditDialog.Editor
+    //implements PasswdPolicyEditDialog.Editor
 {
     private static final int MENU_ADD =         0;
     private static final int MENU_EDIT =        1;
@@ -225,6 +225,8 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     {
         Dialog dialog;
         switch (id) {
+        // TODO: re-add add/edit support
+        /*
         case DIALOG_ADD: {
             itsEditDialog = new PasswdPolicyEditDialog(this);
             dialog = itsEditDialog.create(null, this);
@@ -235,6 +237,7 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
             dialog = itsEditDialog.create(getSelectedPolicy(), this);
             break;
         }
+        */
         case DIALOG_DELETE: {
             AbstractDialogClickListener dlgClick =
                 new AbstractDialogClickListener()

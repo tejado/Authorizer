@@ -8,12 +8,15 @@
 package com.jefftharris.passwdsafe.view;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,19 +40,24 @@ import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
  * The PasswdPolicyEditDialog class encapsulates the functionality for the
  * dialog to add or edit a policy.
  */
-public class PasswdPolicyEditDialog
+public class PasswdPolicyEditDialog extends DialogFragment
 {
-    public interface Editor
+    // TODO: refactor to normal fragment vs. dialog?
+    // TODO: update look to use TextInputLayout?
+
+    /**
+     * Listener interface for the owning fragment
+     */
+    public interface Listener
     {
         /** Callback when the policy has finished being edited */
-        void onPolicyEditComplete(PasswdPolicy oldPolicy,
-                                  PasswdPolicy newPolicy);
+        void handlePolicyEditComplete(PasswdPolicy oldPolicy,
+                                      PasswdPolicy newPolicy);
 
         /** Check whether the policy name already exists */
         boolean isDuplicatePolicy(String name);
     }
 
-    private final Editor itsEditor;
     private PasswdPolicy itsPolicy;
     private View itsView;
     private DialogValidator itsValidator;
@@ -64,22 +72,36 @@ public class PasswdPolicyEditDialog
     private TextView itsCustomSymbolsEdit;
     private String itsDefaultSymbols;
 
-    /** Constructor */
-    public PasswdPolicyEditDialog(Editor editor)
+    /**
+     * Create a new instance
+     * @param policy The policy to edit; null for an add
+     */
+    public static PasswdPolicyEditDialog newInstance(PasswdPolicy policy)
     {
-        itsEditor = editor;
+        PasswdPolicyEditDialog dlg = new PasswdPolicyEditDialog();
+        Bundle args = new Bundle();
+        args.putParcelable("policy", policy);
+        dlg.setArguments(args);
+        return dlg;
     }
 
-    /** Create a dialog to edit the give policy (null for an add) */
     @SuppressLint("InflateParams")
-    public Dialog create(PasswdPolicy policy, Activity act)
+    public @NonNull
+    Dialog onCreateDialog(Bundle savedInstanceState)
     {
-        itsPolicy = policy;
-        LayoutInflater factory = LayoutInflater.from(act);
+        Bundle args = getArguments();
+        if (args != null) {
+            itsPolicy = args.getParcelable("policy");
+        } else {
+            itsPolicy = null;
+        }
+
+        Context ctx = getContext();
+        LayoutInflater factory = LayoutInflater.from(ctx);
         itsView = factory.inflate(R.layout.passwd_policy_edit, null);
 
         SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(act);
+                PreferenceManager.getDefaultSharedPreferences(ctx);
 
         itsIsNameEditable = true;
         itsNameEdit = (TextView)itsView.findViewById(R.id.name);
@@ -105,8 +127,8 @@ public class PasswdPolicyEditDialog
         int[] optionLens = new int[4];
         String customSymbols;
         PasswdPolicy.Type origType;
-        if (policy != null) {
-            switch (policy.getLocation()) {
+        if (itsPolicy != null) {
+            switch (itsPolicy.getLocation()) {
             case DEFAULT: {
                 itsNameEdit.setEnabled(false);
                 break;
@@ -122,22 +144,22 @@ public class PasswdPolicyEditDialog
             }
 
             titleId = R.string.edit_policy;
-            name = policy.getName();
-            len = policy.getLength();
-            origType = policy.getType();
+            name = itsPolicy.getName();
+            len = itsPolicy.getLength();
+            origType = itsPolicy.getType();
             useOptions[0] =
-                policy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
+                itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
             useOptions[1] =
-                policy.checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE);
+                itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE);
             useOptions[2] =
-                policy.checkFlags(PasswdPolicy.FLAG_USE_DIGITS);
+                itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_DIGITS);
             useOptions[3] =
-                policy.checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS);
-            optionLens[0] = policy.getMinLowercase();
-            optionLens[1] = policy.getMinUppercase();
-            optionLens[2] = policy.getMinDigits();
-            optionLens[3] = policy.getMinSymbols();
-            customSymbols = policy.getSpecialSymbols();
+                itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS);
+            optionLens[0] = itsPolicy.getMinLowercase();
+            optionLens[1] = itsPolicy.getMinUppercase();
+            optionLens[2] = itsPolicy.getMinDigits();
+            optionLens[3] = itsPolicy.getMinSymbols();
+            customSymbols = itsPolicy.getSpecialSymbols();
         } else {
             titleId = R.string.new_policy;
             name = "";
@@ -157,18 +179,20 @@ public class PasswdPolicyEditDialog
                 public void onOkClicked(DialogInterface dialog)
                 {
                     dialog.dismiss();
-                    itsEditor.onPolicyEditComplete(itsPolicy, createPolicy());
+                    Listener listener = (Listener)getTargetFragment();
+                    listener.handlePolicyEditComplete(itsPolicy,
+                                                      createPolicy());
                 }
             };
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(act)
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx)
             .setTitle(titleId)
             .setView(itsView)
             .setPositiveButton(R.string.ok, dlgClick)
             .setNegativeButton(R.string.cancel, dlgClick)
             .setOnCancelListener(dlgClick);
         AlertDialog dialog = alert.create();
-        itsValidator = new Validator(dialog, itsView, act);
+        itsValidator = new Validator(dialog, itsView, ctx);
 
         // Must set text before registering view so validation isn't
         // triggered right away
@@ -509,6 +533,7 @@ public class PasswdPolicyEditDialog
 
 
     /** Set a text view to an integer value */
+    @SuppressLint("SetTextI18n")
     private void setTextView(TextView tv, int value)
     {
         tv.setText(Integer.toString(value));
@@ -528,9 +553,9 @@ public class PasswdPolicyEditDialog
     private final class Validator extends DialogValidator.AlertValidator
     {
         /** Constructor */
-        private Validator(AlertDialog dlg, View view, Activity act)
+        private Validator(AlertDialog dlg, View view, Context ctx)
         {
-            super(dlg, view, act, false);
+            super(dlg, view, ctx, false);
         }
 
         @Override
@@ -545,10 +570,12 @@ public class PasswdPolicyEditDialog
                     return getString(R.string.empty_name);
                 }
 
-                if (((itsPolicy == null) ||
-                     (!itsPolicy.getName().equals(name))) &&
-                    itsEditor.isDuplicatePolicy(name)) {
-                    return getString(R.string.duplicate_name);
+                if ((itsPolicy == null) ||
+                    !itsPolicy.getName().equals(name)) {
+                    Listener listener = (Listener)getTargetFragment();
+                    if (listener.isDuplicatePolicy(name)) {
+                        return getString(R.string.duplicate_name);
+                    }
                 }
             }
 
