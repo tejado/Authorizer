@@ -61,6 +61,40 @@ public abstract class DialogValidator
         }
     }
 
+     /**
+     * DialogValidator for alert compat dialogs
+     */
+    public static class AlertCompatValidator extends DialogValidator
+    {
+        private final android.support.v7.app.AlertDialog itsDialog;
+
+        /**
+         * Constructor with a specific view and optional password fields
+         */
+        public AlertCompatValidator(android.support.v7.app.AlertDialog dlg,
+                                    View view, Context ctx,
+                                    boolean hasPasswords)
+        {
+            super(view, ctx, hasPasswords);
+            itsDialog = dlg;
+        }
+
+        @Override
+        protected final View getDoneButton()
+        {
+            return itsDialog.getButton(
+                    android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+        }
+
+        /**
+         * Get the alert dialog
+         */
+        protected final android.support.v7.app.AlertDialog getDialog()
+        {
+            return itsDialog;
+        }
+    }
+
     private final Context itsContext;
     private TextView itsPassword = null;
     private TextView itsPasswordConfirm = null;

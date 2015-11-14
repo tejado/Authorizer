@@ -8,7 +8,6 @@
 package com.jefftharris.passwdsafe.view;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +16,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -550,7 +550,7 @@ public class PasswdPolicyEditDialog extends DialogFragment
 
 
     /** Dialog validator */
-    private final class Validator extends DialogValidator.AlertValidator
+    private final class Validator extends DialogValidator.AlertCompatValidator
     {
         /** Constructor */
         private Validator(AlertDialog dlg, View view, Context ctx)
