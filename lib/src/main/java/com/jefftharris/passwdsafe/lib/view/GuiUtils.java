@@ -211,6 +211,40 @@ public final class GuiUtils
 
 
     /**
+     * Setup the keyboard on a dialog. The initial field gets focus and shows
+     * the keyboard. The final field clicks the Ok button when enter is pressed.
+     */
+    public static void setupDialogKeyboard(
+            final android.support.v7.app.AlertDialog dialog,
+            TextView initialField,
+            TextView finalField,
+            Context ctx)
+    {
+        setShowKeyboardListener(dialog, initialField, ctx);
+        finalField.setOnKeyListener(new OnKeyListener()
+        {
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER: {
+                        Button btn =
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                        if (btn.isEnabled()) {
+                            btn.performClick();
+                        }
+                        return true;
+                    }
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+
+    /**
      * Setup the keyboard on a form.  The final field clicks the supplied OK
      * button when enter is pressed.
      */

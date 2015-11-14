@@ -8,12 +8,12 @@
 package com.jefftharris.passwdsafe.view;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -29,6 +29,8 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
  */
 public class NewGroupDialog extends DialogFragment
 {
+    // TODO: use textinputlayout?
+
     /**
      * Listener interface for the owning fragment
      */
