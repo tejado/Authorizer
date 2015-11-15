@@ -169,7 +169,7 @@ public class PasswdSafeApp extends Application
 
     public static final String EXPIRATION_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.EXPIRATION_TIMEOUT";
-    private static final String FILE_TIMEOUT_INTENT =
+    public static final String FILE_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
     public static final String CHOOSE_RECORD_INTENT =
         "com.jefftharris.passwdsafe.action.CHOOSE_RECORD_INTENT";
