@@ -278,13 +278,6 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".PasswdSafeApp$FileTimeoutReceiver"
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <action android:name="com.jefftharris.passwdsafe.action.FILE_TIMEOUT"/>
-            </intent-filter>
-        </receiver>
-        <receiver
             android:name=".StartupReceiver"
             tools:ignore="ExportedReceiver">
             <intent-filter>
