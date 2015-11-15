@@ -174,7 +174,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
     private static final int TYPE_ALIAS = 1;
     private static final int TYPE_SHORTCUT = 2;
 
-    // TODO: if pending changes, warn on navigation
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut (and rotate support)
     // TODO: pause file close timer while editor open

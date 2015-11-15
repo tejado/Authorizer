@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
@@ -237,13 +239,33 @@ public class PasswdSafeActivity extends AppCompatActivity
             return true;
         }
         case R.id.menu_close: {
-            finish();
+            checkNavigation(false, new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    finish();
+                }
+            });
             return true;
         }
         default: {
             return super.onOptionsItemSelected(item);
         }
         }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        checkNavigation(false, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                PasswdSafeActivity.super.onBackPressed();
+            }
+        });
     }
 
     /**
@@ -520,51 +542,93 @@ public class PasswdSafeActivity extends AppCompatActivity
     /**
      * Change the view of the activity
      */
-    private void doChangeView(ChangeMode mode, Fragment contentFrag)
+    private void doChangeView(final ChangeMode mode, final Fragment contentFrag)
+    {
+        checkNavigation(true, new Runnable()
+        {
+            public void run()
+            {
+                FragmentManager fragMgr = getSupportFragmentManager();
+                FragmentTransaction txn = fragMgr.beginTransaction();
+
+                boolean clearBackStack = false;
+                boolean supportsBack = false;
+                switch (mode) {
+                case INIT:
+                case FILE_OPEN:
+                case FILE_NEW:
+                case OPEN_INIT: {
+                    clearBackStack = true;
+                    break;
+                }
+                case OPEN:
+                case RECORD:
+                case EDIT_RECORD: {
+                    supportsBack = true;
+                    break;
+                }
+                }
+                if (clearBackStack) {
+                    //noinspection StatementWithEmptyBody
+                    while (fragMgr.popBackStackImmediate()) {
+                        // Clear back stack
+                    }
+                }
+
+                txn.setTransitionStyle(
+                        FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                if (contentFrag != null) {
+                    txn.replace(R.id.content, contentFrag);
+                } else {
+                    Fragment currFrag = fragMgr.findFragmentById(R.id.content);
+                    if (currFrag != null) {
+                        txn.remove(currFrag);
+                    }
+                }
+
+                if (supportsBack) {
+                    txn.addToBackStack(null);
+                }
+
+                txn.commit();
+            }
+        });
+    }
+
+    /**
+     * Check whether to confirm before performing a navigation change
+     */
+    private void checkNavigation(final boolean popOnConfirm,
+                                 final Runnable navRun)
     {
         FragmentManager fragMgr = getSupportFragmentManager();
         //FragmentManager.enableDebugLogging(true);
-        FragmentTransaction txn = fragMgr.beginTransaction();
-
-        boolean clearBackStack = false;
-        boolean supportsBack = false;
-        switch (mode) {
-        case INIT:
-        case FILE_OPEN:
-        case FILE_NEW:
-        case OPEN_INIT: {
-            clearBackStack = true;
-            break;
-        }
-        case OPEN:
-        case RECORD:
-        case EDIT_RECORD: {
-            supportsBack = true;
-            break;
-        }
-        }
-        if (clearBackStack) {
-            //noinspection StatementWithEmptyBody
-            while (fragMgr.popBackStackImmediate()) {
-                // Clear back stack
-            }
-        }
-
-        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        if (contentFrag != null) {
-            txn.replace(R.id.content, contentFrag);
+        Fragment currFrag = fragMgr.findFragmentById(R.id.content);
+        if (currFrag instanceof PasswdSafeEditRecordFragment) {
+            DialogInterface.OnClickListener continueListener =
+                    new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                            if (popOnConfirm) {
+                                FragmentManager fragMgr =
+                                        getSupportFragmentManager();
+                                fragMgr.popBackStackImmediate();
+                            }
+                            navRun.run();
+                        }
+                    };
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.continue_p)
+                    .setMessage(R.string.any_changes_will_be_lost)
+                    .setPositiveButton(R.string.continue_str, continueListener)
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
         } else {
-            Fragment currFrag = fragMgr.findFragmentById(R.id.content);
-            if (currFrag != null) {
-                txn.remove(currFrag);
-            }
+            navRun.run();
         }
-
-        if (supportsBack) {
-            txn.addToBackStack(null);
-        }
-
-        txn.commit();
     }
 
     /**

@@ -5,6 +5,7 @@
     <string name="add_record">Ajouter Entrée</string>
     <string name="alias_base_record_header">ALIAS</string>
     <string name="alias_base_record_label">Alias</string>
+    <string name="any_changes_will_be_lost">Toute modification apportée à l\'entrée seront perdues.</string>
     <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Au moins</string>
@@ -28,6 +29,8 @@
     <string name="confirm_password_label">Confirmer mot de passe:</string>
     <string name="cannot_delete_record">Impossible de supprimer l\'entrée - %1$s"</string>
     <string name="content_file">Contenu du fichier</string>
+    <string name="continue_str">Continuez</string>
+    <string name="continue_p">Continuez?</string>
     <string name="copy_clipboard">Copier dans le Presse-papiers</string>
     <string name="copy_notes">Copier les notes</string>
     <string name="copy_password">Copier le mot de passe</string>

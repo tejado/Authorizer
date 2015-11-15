@@ -5,6 +5,7 @@
     <string name="add_record">Add Record</string>
     <string name="alias_base_record_header">ALIAS</string>
     <string name="alias_base_record_label">Alias</string>
+    <string name="any_changes_will_be_lost">Any changes to the record will be lost.</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">At least</string>
@@ -28,6 +29,8 @@
     <string name="confirm_password_label">Confirm Password:</string>
     <string name="cannot_delete_record">Cannot delete record - %1$s</string>
     <string name="content_file">Content File</string>
+    <string name="continue_str">Continue</string>
+    <string name="continue_p">Continue?</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
