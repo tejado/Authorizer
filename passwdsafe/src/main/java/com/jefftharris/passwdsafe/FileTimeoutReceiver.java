@@ -32,6 +32,7 @@ class FileTimeoutReceiver extends BroadcastReceiver
     private final AlarmManager itsAlarmMgr;
     private final PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout = 0;
+    private boolean itsIsPaused = true;
 
     private static final String TAG = "FileTimeoutReceiver";
 
@@ -69,23 +70,24 @@ class FileTimeoutReceiver extends BroadcastReceiver
     }
 
     /**
-     * Touch the file timeout timer
+     * Update the file timeout
+     * @param paused Whether the timeout is paused
      */
-    public void touch()
+    public void updateTimeout(boolean paused)
     {
-        if (itsFileCloseTimeout != 0) {
-            itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
-                            SystemClock.elapsedRealtime() + itsFileCloseTimeout,
-                            itsCloseIntent);
+        if (paused) {
+            if (!itsIsPaused) {
+                itsIsPaused = true;
+                cancel();
+            }
+        } else {
+            itsIsPaused = false;
+            if (itsFileCloseTimeout != 0) {
+                itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
+                                SystemClock.elapsedRealtime() + itsFileCloseTimeout,
+                                itsCloseIntent);
+            }
         }
-    }
-
-    /**
-     * Cancel the file timeout timer
-     */
-    public void cancel()
-    {
-        itsAlarmMgr.cancel(itsCloseIntent);
     }
 
     @Override
@@ -106,10 +108,18 @@ class FileTimeoutReceiver extends BroadcastReceiver
             if (itsFileCloseTimeout == 0) {
                 cancel();
             } else {
-                touch();
+                updateTimeout(itsIsPaused);
             }
             break;
         }
         }
+    }
+
+    /**
+     * Cancel the file timeout timer
+     */
+    private void cancel()
+    {
+        itsAlarmMgr.cancel(itsCloseIntent);
     }
 }

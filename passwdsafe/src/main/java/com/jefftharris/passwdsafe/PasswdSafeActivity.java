@@ -657,6 +657,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         boolean showLeftList = false;
         PasswdSafeNavDrawerFragment.NavMode drawerMode =
                 PasswdSafeNavDrawerFragment.NavMode.INIT;
+        boolean fileTimeoutPaused = true;
         switch (mode) {
         case INIT:
         case FILE_OPEN:
@@ -667,6 +668,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         case VIEW_LIST: {
             showLeftList = true;
             drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
+            fileTimeoutPaused = false;
             itsTitle = null;
             String groups = itsLocation.getGroupPath();
             if (TextUtils.isEmpty(groups)) {
@@ -696,6 +698,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             drawerMode = itsIsTwoPane ?
                     PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
                     PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD;
+            fileTimeoutPaused = (mode == ViewMode.EDIT_RECORD);
             PasswdFileData fileData = itsFileDataFrag.getFileData();
             if ((fileData != null) && itsLocation.isRecord()) {
                 PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
@@ -712,7 +715,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         itsNavDrawerFrag.setMode(drawerMode);
         restoreActionBar();
-        itsTimeoutReceiver.touch();
+        itsTimeoutReceiver.updateTimeout(fileTimeoutPaused);
 
         if (itsIsTwoPane) {
             PasswdSafeListFragment.Mode listMode = itsLocation.isRecord() ?
