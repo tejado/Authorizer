@@ -216,6 +216,7 @@ public class PasswdSafeListFragment extends ListFragment
         }
 
         LoaderManager lm = getLoaderManager();
+        lm.destroyLoader(0);
         lm.restartLoader(0, null, this);
 
         boolean groupVisible = false;
@@ -491,27 +492,11 @@ public class PasswdSafeListFragment extends ListFragment
             itsActListener = actListener;
         }
 
-
-        /** Handle when the loader is reset */
-        @Override
-        protected void onReset()
-        {
-            super.onReset();
-            onStopLoading();
-        }
-
         /** Handle when the loader is started */
         @Override
         protected void onStartLoading()
         {
             forceLoad();
-        }
-
-        /** Handle when the loader is stopped */
-        @Override
-        protected void onStopLoading()
-        {
-            cancelLoad();
         }
 
         /* (non-Javadoc)
