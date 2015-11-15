@@ -176,7 +176,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
 
     // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut (and rotate support)
-    // TODO: pause file close timer while editor open
 
     /**
      * Create a new instance
