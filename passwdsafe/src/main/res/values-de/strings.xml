@@ -5,6 +5,7 @@
     <string name="add_record">Eintrag hinzufügen</string>
     <string name="alias_base_record_header">ALIAS</string>
     <string name="alias_base_record_label">Alias</string>
+    <string name="any_changes_will_be_lost">Alle Änderungen an der Eintrag wird gelöscht.</string>
     <string name="app_desc">Programm zum Zugriff und Bearbeiten von PasswordSafe-Datenbanken auf Android</string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Mind.</string>
@@ -28,6 +29,8 @@
     <string name="confirm_password_label">Passwort bestätigen:</string>
     <string name="cannot_delete_record">Kann Eintrag nicht löschen - %1$s</string>
     <string name="content_file">Inhaltsdatei</string>
+    <string name="continue_str">Fortsetzen</string>
+    <string name="continue_p">Fortsetzen?</string>
     <string name="copy_clipboard">Kopieren</string>
     <string name="copy_notes">Notiz kopieren</string>
     <string name="copy_password">Passwort kopieren</string>
