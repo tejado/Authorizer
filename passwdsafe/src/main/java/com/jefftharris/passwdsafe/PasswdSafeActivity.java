@@ -64,7 +64,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: details
     // TODO: file operations
     // TODO: modern theme
-    // TODO: file close/lock timeout
+    // TODO: lock timeout
     // TODO: autobackup
     // TODO: keyboard support
     // TODO: shortcuts
@@ -123,6 +123,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Does the UI show two panes */
     private boolean itsIsTwoPane = false;
 
+    private FileTimeoutReceiver itsTimeoutReceiver;
+
     private static final String FRAG_DATA = "data";
     private static final String STATE_TITLE = "title";
     private static final String TAG = "PasswdSafeActivity";
@@ -148,6 +150,8 @@ public class PasswdSafeActivity extends AppCompatActivity
             fragMgr.beginTransaction().add(itsFileDataFrag, FRAG_DATA).commit();
         }
         boolean newFileDataFrag = itsFileDataFrag.checkNew();
+
+        itsTimeoutReceiver = new FileTimeoutReceiver(this);
 
         if (newFileDataFrag || (savedInstanceState == null)) {
             itsTitle = getTitle();
@@ -211,6 +215,13 @@ public class PasswdSafeActivity extends AppCompatActivity
             itsSaveTask.cancelTask();
             itsSaveTask = null;
         }
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        itsTimeoutReceiver.onDestroy();
+        super.onDestroy();
     }
 
     @Override
@@ -701,6 +712,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         itsNavDrawerFrag.setMode(drawerMode);
         restoreActionBar();
+        itsTimeoutReceiver.touch();
 
         if (itsIsTwoPane) {
             PasswdSafeListFragment.Mode listMode = itsLocation.isRecord() ?
