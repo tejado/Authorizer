@@ -23,6 +23,7 @@ import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -54,11 +55,12 @@ public class PasswdSafeRecordPasswordFragment
     /**
      * Create a new instance of the fragment
      */
-    public static PasswdSafeRecordPasswordFragment newInstance(String recUuid)
+    public static PasswdSafeRecordPasswordFragment newInstance(
+            PasswdLocation location)
     {
         PasswdSafeRecordPasswordFragment frag =
                 new PasswdSafeRecordPasswordFragment();
-        frag.setArguments(createArgs(recUuid));
+        frag.setArguments(createArgs(location));
         return frag;
 
     }

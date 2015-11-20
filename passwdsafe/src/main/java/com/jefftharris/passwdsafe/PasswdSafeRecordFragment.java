@@ -127,15 +127,15 @@ public class PasswdSafeRecordFragment extends Fragment
                 switch (position) {
                 case 0: {
                     return PasswdSafeRecordBasicFragment.newInstance(
-                            itsLocation.getRecord());
+                            itsLocation);
                 }
                 case 1: {
                     return PasswdSafeRecordPasswordFragment.newInstance(
-                            itsLocation.getRecord());
+                            itsLocation);
                 }
                 case 2: {
                     return PasswdSafeRecordNotesFragment.newInstance(
-                            itsLocation.getRecord());
+                            itsLocation);
                 }
                 }
                 return null;

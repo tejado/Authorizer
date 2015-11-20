@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -32,26 +31,6 @@ public abstract class AbstractPasswdSafeRecordFragment
     {
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
-    }
-
-    /**
-     * Create arguments for new instance
-     */
-    protected static Bundle createArgs(String recUuid)
-    {
-        Bundle args = new Bundle();
-        args.putString("recUuid", recUuid);
-        return args;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-        if (args != null) {
-            itsRecUuid = args.getString("recUuid");
-        }
     }
 
     @Override

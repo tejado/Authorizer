@@ -68,10 +68,11 @@ public class PasswdSafeRecordBasicFragment
     /**
      * Create a new instance of the fragment
      */
-    public static PasswdSafeRecordBasicFragment newInstance(String recUuid)
+    public static PasswdSafeRecordBasicFragment newInstance(
+            PasswdLocation location)
     {
         PasswdSafeRecordBasicFragment frag = new PasswdSafeRecordBasicFragment();
-        frag.setArguments(createArgs(recUuid));
+        frag.setArguments(createArgs(location));
         return frag;
     }
 
