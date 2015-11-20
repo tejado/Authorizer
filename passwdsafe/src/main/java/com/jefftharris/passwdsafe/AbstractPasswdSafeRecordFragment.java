@@ -7,47 +7,32 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
-
-import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.Date;
 
 /**
  * Base class for showing fields of a password record
  */
-public abstract class AbstractPasswdSafeRecordFragment extends Fragment
+public abstract class AbstractPasswdSafeRecordFragment
+        extends AbstractPasswdSafeFileDataFragment
+                        <AbstractPasswdSafeRecordFragment.Listener>
 {
     /**
      * Listener interface for owning activity
      */
     public interface Listener
+            extends AbstractPasswdSafeFileDataFragment.Listener
     {
-        /** Get the file data */
-        PasswdFileData getFileData();
-
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
-
-        /** Is the navigation drawer open */
-        boolean isNavDrawerOpen();
     }
-
-    protected String itsRecUuid;
-    protected Listener itsListener;
 
     /**
      * Create arguments for new instance
@@ -70,66 +55,16 @@ public abstract class AbstractPasswdSafeRecordFragment extends Fragment
     }
 
     @Override
-    public void onAttach(Context ctx)
-    {
-        super.onAttach(ctx);
-        itsListener = (Listener)ctx;
-    }
-
-    @Override
     public void onResume()
     {
         super.onResume();
         refresh();
     }
 
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        itsListener = null;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        if ((itsListener != null) && !itsListener.isNavDrawerOpen()) {
-            doOnCreateOptionsMenu(menu, inflater);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    /**
-     * Derived-class create options menu
-     */
-    protected abstract void doOnCreateOptionsMenu(Menu menu,
-                                                  MenuInflater inflater);
-
     /**
      * Derived-class refresh
      */
     protected abstract void doRefresh();
-
-    /**
-     * Get the record information
-     */
-    protected RecordInfo getRecordInfo()
-    {
-        if (isAdded() && (itsListener != null)) {
-            PasswdFileData fileData = itsListener.getFileData();
-            if (fileData != null) {
-                PwsRecord rec = fileData.getRecord(itsRecUuid);
-                if (rec != null) {
-                    PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-                    if (passwdRec != null) {
-                        return new RecordInfo(rec, passwdRec, fileData);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
 
     /**
      * Set the value of a text field.  The field's row is visible if the text
@@ -174,28 +109,6 @@ public abstract class AbstractPasswdSafeRecordFragment extends Fragment
                     root.scrollTo(0, 0);
                 }
             });
-        }
-    }
-
-    /**
-     * Wrapper class for record information
-     */
-    protected static class RecordInfo
-    {
-        public final PwsRecord itsRec;
-        public final PasswdRecord itsPasswdRec;
-        public final PasswdFileData itsFileData;
-
-        /**
-         * Constructor
-         */
-        public RecordInfo(@NonNull PwsRecord rec,
-                          @NonNull PasswdRecord passwdRec,
-                          @NonNull PasswdFileData fileData)
-        {
-            itsRec = rec;
-            itsPasswdRec = passwdRec;
-            itsFileData = fileData;
         }
     }
 }
