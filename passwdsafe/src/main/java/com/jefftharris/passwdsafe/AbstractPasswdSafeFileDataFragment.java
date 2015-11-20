@@ -62,7 +62,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
     }
 
     private PasswdLocation itsLocation;
-    protected ListenerT itsListener;
+    private ListenerT itsListener;
 
     /**
      * Create arguments for new instance
@@ -116,6 +116,14 @@ public abstract class AbstractPasswdSafeFileDataFragment
     protected final PasswdLocation getLocation()
     {
         return itsLocation;
+    }
+
+    /**
+     * Get the context listener
+     */
+    protected final ListenerT getListener()
+    {
+        return itsListener;
     }
 
     /**

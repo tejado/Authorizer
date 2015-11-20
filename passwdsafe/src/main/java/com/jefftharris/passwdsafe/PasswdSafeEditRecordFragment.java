@@ -329,7 +329,7 @@ public class PasswdSafeEditRecordFragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewEditRecord(getLocation());
+        getListener().updateViewEditRecord(getLocation());
         itsValidator.validate();
     }
 
@@ -1320,7 +1320,7 @@ public class PasswdSafeEditRecordFragment
         }
 
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
-        itsListener.finishEditRecord(record.isModified());
+        getListener().finishEditRecord(record.isModified());
     }
 
     /**
