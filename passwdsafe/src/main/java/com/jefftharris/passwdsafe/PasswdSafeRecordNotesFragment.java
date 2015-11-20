@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 
 /**
@@ -41,11 +42,12 @@ public class PasswdSafeRecordNotesFragment
     /**
      * Create a new instance of the fragment
      */
-    public static PasswdSafeRecordNotesFragment newInstance(String recUuid)
+    public static PasswdSafeRecordNotesFragment newInstance(
+            PasswdLocation location)
     {
         PasswdSafeRecordNotesFragment frag =
                 new PasswdSafeRecordNotesFragment();
-        frag.setArguments(createArgs(recUuid));
+        frag.setArguments(createArgs(location));
         return frag;
 
     }

@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -59,8 +61,30 @@ public abstract class AbstractPasswdSafeFileDataFragment
         }
     }
 
-    protected String itsRecUuid;
+    protected PasswdLocation itsLocation;
     protected ListenerT itsListener;
+
+    /**
+     * Create arguments for new instance
+     */
+    protected static Bundle createArgs(PasswdLocation location)
+    {
+        Bundle args = new Bundle();
+        args.putParcelable("location", location);
+        return args;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            itsLocation = args.getParcelable("location");
+        } else {
+            itsLocation = new PasswdLocation();
+        }
+    }
 
     @Override
     public void onAttach(Context ctx)
@@ -100,7 +124,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
         if (isAdded() && (itsListener != null)) {
             PasswdFileData fileData = itsListener.getFileData();
             if (fileData != null) {
-                PwsRecord rec = fileData.getRecord(itsRecUuid);
+                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
                 if (rec != null) {
                     PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
                     if (passwdRec != null) {
