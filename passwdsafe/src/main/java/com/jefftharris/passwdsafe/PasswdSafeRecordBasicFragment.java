@@ -313,7 +313,7 @@ public class PasswdSafeRecordBasicFragment
         }
 
         PasswdLocation location = new PasswdLocation(refRec, info.itsFileData);
-        itsListener.changeLocation(location);
+        getListener().changeLocation(location);
     }
 
     /**

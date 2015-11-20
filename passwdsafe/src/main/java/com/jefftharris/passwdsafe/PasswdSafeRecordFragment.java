@@ -156,7 +156,7 @@ public class PasswdSafeRecordFragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewRecord(getLocation());
+        getListener().updateViewRecord(getLocation());
         refresh();
     }
 
@@ -181,14 +181,16 @@ public class PasswdSafeRecordFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_edit: {
-            if (itsListener != null) {
-                itsListener.editRecord(getLocation());
+            Listener listener = getListener();
+            if (listener != null) {
+                listener.editRecord(getLocation());
             }
             return true;
         }
         case R.id.menu_delete: {
-            if (itsListener != null) {
-                itsListener.deleteRecord(getLocation());
+            Listener listener = getListener();
+            if (listener != null) {
+                listener.deleteRecord(getLocation());
             }
             return true;
         }
