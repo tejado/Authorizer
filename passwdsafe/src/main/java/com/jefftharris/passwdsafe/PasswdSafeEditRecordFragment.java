@@ -13,9 +13,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -39,7 +37,6 @@ import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
-import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
@@ -70,7 +67,9 @@ import java.util.TreeSet;
 /**
  * Fragment for editing a password record
  */
-public class PasswdSafeEditRecordFragment extends Fragment
+public class PasswdSafeEditRecordFragment
+        extends AbstractPasswdSafeFileDataFragment
+                        <PasswdSafeEditRecordFragment.Listener>
         implements NewGroupDialog.Listener,
                    View.OnClickListener,
                    View.OnLongClickListener,
@@ -83,22 +82,15 @@ public class PasswdSafeEditRecordFragment extends Fragment
      * Listener interface for owning activity
      */
     public interface Listener
+            extends AbstractPasswdSafeFileDataFragment.Listener
     {
-        /** Get the file data */
-        PasswdFileData getFileData();
-
         /** Update the view for editing a record */
         void updateViewEditRecord(PasswdLocation location);
-
-        /** Is the navigation drawer open */
-        boolean isNavDrawerOpen();
 
         /** Finish editing a record */
         void finishEditRecord(boolean save);
     }
 
-    private PasswdLocation itsLocation;
-    private Listener itsListener;
     private Validator itsValidator = new Validator();
     private final TreeSet<String> itsGroups =
             new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -184,31 +176,8 @@ public class PasswdSafeEditRecordFragment extends Fragment
             PasswdLocation location)
     {
         PasswdSafeEditRecordFragment frag = new PasswdSafeEditRecordFragment();
-        Bundle args = new Bundle();
-        args.putParcelable("location", location);
-        frag.setArguments(args);
+        frag.setArguments(createArgs(location));
         return frag;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-        PasswdLocation location;
-        if (args != null) {
-            location = args.getParcelable("location");
-        } else {
-            location = new PasswdLocation();
-        }
-        itsLocation = location;
-    }
-
-    @Override
-    public void onAttach(Context ctx)
-    {
-        super.onAttach(ctx);
-        itsListener = (Listener)ctx;
     }
 
     @Override
@@ -382,22 +351,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
     {
         super.onPause();
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        itsListener = null;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        if ((itsListener != null) && !itsListener.isNavDrawerOpen()) {
-            inflater.inflate(R.menu.fragment_passwdsafe_edit_record, menu);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -715,6 +668,12 @@ public class PasswdSafeEditRecordFragment extends Fragment
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    protected void doOnCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_passwdsafe_edit_record, menu);
     }
 
     /**
@@ -1524,50 +1483,6 @@ public class PasswdSafeEditRecordFragment extends Fragment
             return Integer.parseInt(tv.getText().toString());
         } catch (NumberFormatException e) {
             return defaultValue;
-        }
-    }
-
-    /**
-     * Get the record information
-     */
-    protected RecordInfo getRecordInfo()
-    {
-        // TODO: pull record info into base class to share with AbstractPasswdSafeRecordFragment
-
-        if (isAdded() && (itsListener != null)) {
-            PasswdFileData fileData = itsListener.getFileData();
-            if (fileData != null) {
-                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
-                if (rec != null) {
-                    PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-                    if (passwdRec != null) {
-                        return new RecordInfo(rec, passwdRec, fileData);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Wrapper class for record information
-     */
-    protected static class RecordInfo
-    {
-        public final PwsRecord itsRec;
-        public final PasswdRecord itsPasswdRec;
-        public final PasswdFileData itsFileData;
-
-        /**
-         * Constructor
-         */
-        public RecordInfo(@NonNull PwsRecord rec,
-                          @NonNull PasswdRecord passwdRec,
-                          @NonNull PasswdFileData fileData)
-        {
-            itsRec = rec;
-            itsPasswdRec = passwdRec;
-            itsFileData = fileData;
         }
     }
 
