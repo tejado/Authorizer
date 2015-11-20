@@ -96,15 +96,15 @@ public class PasswdSafeRecordFragment
                 switch (position) {
                 case 0: {
                     return PasswdSafeRecordBasicFragment.newInstance(
-                            itsLocation);
+                            getLocation());
                 }
                 case 1: {
                     return PasswdSafeRecordPasswordFragment.newInstance(
-                            itsLocation);
+                            getLocation());
                 }
                 case 2: {
                     return PasswdSafeRecordNotesFragment.newInstance(
-                            itsLocation);
+                            getLocation());
                 }
                 }
                 return null;
@@ -156,7 +156,7 @@ public class PasswdSafeRecordFragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewRecord(itsLocation);
+        itsListener.updateViewRecord(getLocation());
         refresh();
     }
 
@@ -182,13 +182,13 @@ public class PasswdSafeRecordFragment
         switch (item.getItemId()) {
         case R.id.menu_edit: {
             if (itsListener != null) {
-                itsListener.editRecord(itsLocation);
+                itsListener.editRecord(getLocation());
             }
             return true;
         }
         case R.id.menu_delete: {
             if (itsListener != null) {
-                itsListener.deleteRecord(itsLocation);
+                itsListener.deleteRecord(getLocation());
             }
             return true;
         }
