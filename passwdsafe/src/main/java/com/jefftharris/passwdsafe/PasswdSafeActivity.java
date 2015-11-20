@@ -122,7 +122,11 @@ public class PasswdSafeActivity extends AppCompatActivity
     /** Does the UI show two panes */
     private boolean itsIsTwoPane = false;
 
+    /** Receiver for file timeout notifications */
     private FileTimeoutReceiver itsTimeoutReceiver;
+
+    /** Current view mode */
+    private ViewMode itsCurrViewMode = ViewMode.INIT;
 
     private static final String FRAG_DATA = "data";
     private static final String STATE_TITLE = "title";
@@ -240,15 +244,26 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        FragmentManager fragMgr = getSupportFragmentManager();
-        //FragmentManager.enableDebugLogging(true);
-        Fragment currFrag = fragMgr.findFragmentById(R.id.content);
-        boolean isEdit = (currFrag instanceof PasswdSafeEditRecordFragment);
+        boolean viewCanAdd = false;
+        switch (itsCurrViewMode) {
+        case VIEW_LIST:
+        case VIEW_RECORD: {
+            viewCanAdd = true;
+            break;
+        }
+        case INIT:
+        case FILE_OPEN:
+        case FILE_NEW:
+        case EDIT_RECORD: {
+            break;
+        }
+        }
 
         MenuItem item = menu.findItem(R.id.menu_add);
         if (item != null) {
             PasswdFileData fileData = itsFileDataFrag.getFileData();
-            item.setVisible((fileData != null) && fileData.canEdit() && !isEdit);
+            item.setVisible(viewCanAdd &&
+                            (fileData != null) && fileData.canEdit());
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -629,10 +644,22 @@ public class PasswdSafeActivity extends AppCompatActivity
     private void checkNavigation(final boolean popOnConfirm,
                                  final Runnable navRun)
     {
-        FragmentManager fragMgr = getSupportFragmentManager();
-        //FragmentManager.enableDebugLogging(true);
-        Fragment currFrag = fragMgr.findFragmentById(R.id.content);
-        if (currFrag instanceof PasswdSafeEditRecordFragment) {
+        boolean doPrompt = false;
+        switch (itsCurrViewMode) {
+        case EDIT_RECORD: {
+            doPrompt = true;
+            break;
+        }
+        case INIT:
+        case FILE_OPEN:
+        case FILE_NEW:
+        case VIEW_LIST:
+        case VIEW_RECORD: {
+            break;
+        }
+        }
+
+        if (doPrompt) {
             DialogInterface.OnClickListener continueListener =
                     new DialogInterface.OnClickListener()
                     {
@@ -669,6 +696,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         itsLocation = location;
         itsFileDataFrag.getFileDataView().setCurrGroups(itsLocation.getGroups());
+        itsCurrViewMode = mode;
 
         FragmentManager fragMgr = getSupportFragmentManager();
         boolean showLeftList = false;
