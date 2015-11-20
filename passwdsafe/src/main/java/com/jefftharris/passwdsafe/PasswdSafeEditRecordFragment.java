@@ -13,6 +13,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -37,6 +39,7 @@ import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
+import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdHistory;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
@@ -53,6 +56,7 @@ import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TimePickerDialogFragment;
 
+import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.ArrayList;
@@ -88,7 +92,7 @@ public class PasswdSafeEditRecordFragment
         void updateViewEditRecord(PasswdLocation location);
 
         /** Finish editing a record */
-        void finishEditRecord(boolean save);
+        void finishEditRecord(boolean save, PasswdLocation newLocation);
     }
 
     private Validator itsValidator = new Validator();
@@ -166,7 +170,6 @@ public class PasswdSafeEditRecordFragment
     private static final int TYPE_ALIAS = 1;
     private static final int TYPE_SHORTCUT = 2;
 
-    // TODO: on new record, use current group
     // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut (and rotate support)
 
     /**
@@ -682,33 +685,42 @@ public class PasswdSafeEditRecordFragment
     private void initialize()
     {
         RecordInfo info = getRecordInfo();
-        if (info == null) {
-            return;
-        }
+        PasswdFileData fileData;
+        PwsRecord record;
+        String group;
+        if (info != null) {
+            fileData = info.itsFileData;
+            record = info.itsRec;
+            itsIsV3 = fileData.isV3();
+            itsTitle.setText(fileData.getTitle(record));
+            group = fileData.getGroup(record);
+            itsUser.setText(fileData.getUsername(record));
+            itsHistory = fileData.getPasswdHistory(record);
+            itsNotes.setText(fileData.getNotes(record));
 
-        itsIsV3 = info.itsFileData.isV3();
-        itsTitle.setText(info.itsFileData.getTitle(info.itsRec));
-        itsUser.setText(info.itsFileData.getUsername(info.itsRec));
-        itsHistory = info.itsFileData.getPasswdHistory(info.itsRec);
-        itsNotes.setText(info.itsFileData.getNotes(info.itsRec));
-
-        if (itsIsV3) {
-            itsUrl.setText(info.itsFileData.getURL(info.itsRec));
-            itsEmail.setText(info.itsFileData.getEmail(info.itsRec));
-            itsIsProtected = info.itsFileData.isProtected(info.itsRec);
-            historyChanged(true);
+            if (itsIsV3) {
+                itsUrl.setText(fileData.getURL(record));
+                itsEmail.setText(fileData.getEmail(record));
+                itsIsProtected = fileData.isProtected(record);
+                historyChanged(true);
+            } else {
+                GuiUtils.setVisible(itsUrlInput, false);
+                GuiUtils.setVisible(itsEmailInput, false);
+                GuiUtils.setVisible(itsHistoryGroup, false);
+            }
         } else {
-            GuiUtils.setVisible(itsUrlInput, false);
-            GuiUtils.setVisible(itsEmailInput, false);
-            GuiUtils.setVisible(itsHistoryGroup, false);
+            fileData = getFileData();
+            if (fileData == null) {
+                return;
+            }
+            record = null;
+            itsIsV3 = fileData.isV3();
+            group = getLocation().getRecordGroup();
         }
-
-        String group = info.itsFileData.getGroup(info.itsRec);
-        initGroup(group, info);
+        initGroup(group, fileData, record);
         initTypeAndPassword(info);
-        initPasswdPolicy(info);
+        initPasswdPolicy(info, fileData);
         initPasswdExpiry(info);
-
         updateProtected();
         itsValidator.validate();
     }
@@ -716,18 +728,19 @@ public class PasswdSafeEditRecordFragment
     /**
      * Initialize the group in the view
      */
-    private void initGroup(String initialGroup, RecordInfo info)
+    private void initGroup(@Nullable String initialGroup, 
+                           @NonNull PasswdFileData fileData,
+                           @Nullable PwsRecord editRec)
     {
-        for (PwsRecord rec: info.itsFileData.getRecords()) {
-            String group = info.itsFileData.getGroup(rec);
+        for (PwsRecord rec: fileData.getRecords()) {
+            String group = fileData.getGroup(rec);
             if (!TextUtils.isEmpty(group)) {
                 itsGroups.add(group);
             }
 
-            if (rec != info.itsRec) {
-                RecordKey key = new RecordKey(
-                        info.itsFileData.getTitle(rec), group,
-                        info.itsFileData.getUsername(rec));
+            if (rec != editRec) {
+                RecordKey key = new RecordKey(fileData.getTitle(rec), group,
+                                              fileData.getUsername(rec));
                 itsRecordKeys.add(key);
             }
         }
@@ -738,21 +751,25 @@ public class PasswdSafeEditRecordFragment
     /**
      * Initialize the type and password
      */
-    private void initTypeAndPassword(RecordInfo info)
+    private void initTypeAndPassword(@Nullable RecordInfo info)
     {
-        itsRecOrigType = info.itsPasswdRec.getType();
-        PwsRecord linkRef = null;
         String password = null;
-        switch (itsRecOrigType) {
-        case NORMAL: {
-            password = info.itsFileData.getPassword(info.itsRec);
-            break;
-        }
-        case ALIAS:
-        case SHORTCUT: {
-            linkRef = info.itsPasswdRec.getRef();
-            break;
-        }
+        PwsRecord linkRef = null;
+        if (info != null) {
+            itsRecOrigType = info.itsPasswdRec.getType();
+            switch (itsRecOrigType) {
+            case NORMAL: {
+                password = info.itsFileData.getPassword(info.itsRec);
+                break;
+            }
+            case ALIAS:
+            case SHORTCUT: {
+                linkRef = info.itsPasswdRec.getRef();
+                break;
+            }
+            }
+        } else {
+            itsRecOrigType = PasswdRecord.Type.NORMAL;
         }
 
         setType(itsRecOrigType, true);
@@ -772,17 +789,20 @@ public class PasswdSafeEditRecordFragment
     /**
      * Initialize the password policy
      */
-    private void initPasswdPolicy(RecordInfo info)
+    private void initPasswdPolicy(@Nullable RecordInfo info,
+                                  @NonNull PasswdFileData fileData)
     {
-        itsOrigPolicy = info.itsPasswdRec.getPasswdPolicy();
+        if (info != null) {
+            itsOrigPolicy = info.itsPasswdRec.getPasswdPolicy();
+        } else {
+            itsOrigPolicy = null;
+        }
 
         itsPolicies = new ArrayList<>();
         PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
         PasswdPolicy defPolicy = app.getDefaultPasswdPolicy();
         itsPolicies.add(defPolicy);
-
-        HeaderPasswdPolicies hdrPolicies =
-                info.itsFileData.getHdrPasswdPolicies();
+        HeaderPasswdPolicies hdrPolicies = fileData.getHdrPasswdPolicies();
         if (hdrPolicies != null) {
             for (HeaderPasswdPolicies.HdrPolicy hdrPolicy:
                     hdrPolicies.getPolicies()) {
@@ -829,10 +849,11 @@ public class PasswdSafeEditRecordFragment
      * Initialize the password expiration
      */
     @SuppressLint("SetTextI18n")
-    private void initPasswdExpiry(RecordInfo info)
+    private void initPasswdExpiry(@Nullable RecordInfo info)
     {
         if (itsIsV3) {
-            itsOrigExpiry = info.itsPasswdRec.getPasswdExpiry();
+            itsOrigExpiry =
+                    (info != null) ? info.itsPasswdRec.getPasswdExpiry() : null;
 
             itsExpiryDate = Calendar.getInstance();
             int interval;
@@ -1198,73 +1219,85 @@ public class PasswdSafeEditRecordFragment
     private void saveRecord()
     {
         RecordInfo info = getRecordInfo();
-        if (info == null) {
+        PasswdFileData fileData;
+        if (info != null) {
+            fileData = info.itsFileData;
+        } else {
+            fileData = getFileData();
+        }
+        if (fileData == null) {
             return;
         }
 
-        PwsRecord record = info.itsRec;
+        PwsRecord record;
+        boolean newRecord;
+        if (info != null) {
+            record = info.itsRec;
+            newRecord = false;
+        } else {
+            record = fileData.createRecord();
+            record.setLoaded();
+            newRecord = true;
+        }
 
         String updateStr;
-        updateStr = getUpdatedField(info.itsFileData.getTitle(record),
-                                    itsTitle);
+        updateStr = getUpdatedField(fileData.getTitle(record), itsTitle);
         if (updateStr != null) {
-            info.itsFileData.setTitle(updateStr, record);
+            fileData.setTitle(updateStr, record);
         }
 
-        updateStr = getUpdatedGroup(info.itsFileData.getGroup(record));
+        updateStr = getUpdatedGroup(fileData.getGroup(record));
         if (updateStr != null) {
-            info.itsFileData.setGroup(updateStr, record);
+            fileData.setGroup(updateStr, record);
         }
 
-        updateStr = getUpdatedField(info.itsFileData.getUsername(record),
-                                    itsUser);
+        updateStr = getUpdatedField(fileData.getUsername(record), itsUser);
         if (updateStr != null) {
-            info.itsFileData.setUsername(updateStr, record);
+            fileData.setUsername(updateStr, record);
         }
 
-        String currNotes = info.itsFileData.getNotes(record);
+        String currNotes = fileData.getNotes(record);
         if (itsTypeHasDetails) {
             updateStr = getUpdatedField(currNotes, itsNotes);
             if (updateStr != null) {
-                info.itsFileData.setNotes(updateStr, record);
+                fileData.setNotes(updateStr, record);
             }
         } else {
             if (currNotes != null) {
-                info.itsFileData.setNotes(null, record);
+                fileData.setNotes(null, record);
             }
         }
 
         if (itsIsV3) {
-            String currUrl = info.itsFileData.getURL(record);
-            String currEmail = info.itsFileData.getEmail(record);
-            PasswdHistory currHistory = info.itsFileData
-                    .getPasswdHistory(record);
+            String currUrl = fileData.getURL(record);
+            String currEmail = fileData.getEmail(record);
+            PasswdHistory currHistory = fileData.getPasswdHistory(record);
             if (itsTypeHasDetails) {
                 updateStr = getUpdatedField(currUrl, itsUrl);
                 if (updateStr != null) {
-                    info.itsFileData.setURL(updateStr, record);
+                    fileData.setURL(updateStr, record);
                 }
 
                 updateStr = getUpdatedField(currEmail, itsEmail);
                 if (updateStr != null) {
-                    info.itsFileData.setEmail(updateStr, record);
+                    fileData.setEmail(updateStr, record);
                 }
             } else {
                 if (currUrl != null) {
-                    info.itsFileData.setURL(null, record);
+                    fileData.setURL(null, record);
                 }
                 if (currEmail != null) {
-                    info.itsFileData.setEmail(null, record);
+                    fileData.setEmail(null, record);
                 }
             }
 
-            if (itsIsProtected != info.itsFileData.isProtected(record)) {
-                info.itsFileData.setProtected(itsIsProtected, record);
+            if (itsIsProtected != fileData.isProtected(record)) {
+                fileData.setProtected(itsIsProtected, record);
             }
 
             Pair<Boolean, PasswdPolicy> updatePolicy = getUpdatedPolicy();
             if (updatePolicy.first) {
-                info.itsFileData.setPasswdPolicy(updatePolicy.second, record);
+                fileData.setPasswdPolicy(updatePolicy.second, record);
             }
 
             if (itsTypeHasNormalPassword) {
@@ -1272,17 +1305,17 @@ public class PasswdSafeEditRecordFragment
                     if (itsHistory != null) {
                         itsHistory.adjustEntriesToMaxSize();
                     }
-                    info.itsFileData.setPasswdHistory(itsHistory, record, true);
+                    fileData.setPasswdHistory(itsHistory, record, true);
                 }
             } else {
                 if (currHistory != null) {
-                    info.itsFileData.setPasswdHistory(null, record, true);
+                    fileData.setPasswdHistory(null, record, true);
                 }
             }
         }
 
         // Update password after history so update is shown in new history
-        String currPasswd = info.itsFileData.getPassword(record);
+        String currPasswd = fileData.getPassword(record);
         String newPasswd;
         if (itsTypeHasNormalPassword) {
             newPasswd = getUpdatedField(currPasswd, itsPassword);
@@ -1298,15 +1331,15 @@ public class PasswdSafeEditRecordFragment
             }
         } else {
             newPasswd = PasswdRecord.uuidToPasswd(
-                    info.itsFileData.getUUID(itsReferencedRec), itsRecType);
+                    fileData.getUUID(itsReferencedRec), itsRecType);
             if (newPasswd.equals(currPasswd)) {
                 newPasswd = null;
             }
         }
         if (newPasswd != null) {
-            info.itsFileData.setPassword(currPasswd, newPasswd, record);
+            fileData.setPassword(currPasswd, newPasswd, record);
             if (!itsTypeHasNormalPassword) {
-                info.itsFileData.clearPasswdLastModTime(record);
+                fileData.clearPasswdLastModTime(record);
             }
         }
 
@@ -1315,12 +1348,25 @@ public class PasswdSafeEditRecordFragment
             // overwrite basic expiration updates when the password changes.
             Pair<Boolean, PasswdExpiration> updateExpiry = getUpdatedExpiry();
             if (updateExpiry.first) {
-                info.itsFileData.setPasswdExpiry(updateExpiry.second, record);
+                fileData.setPasswdExpiry(updateExpiry.second, record);
+            }
+        }
+
+        if (newRecord) {
+            try {
+                fileData.addRecord(record);
+            } catch (PasswordSafeException e) {
+                PasswdSafeUtil.showFatalMsg(e, "Error saving record: " + e,
+                                            getActivity());
+                return;
             }
         }
 
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
-        getListener().finishEditRecord(record.isModified());
+
+        PasswdLocation newLocation = new PasswdLocation(record, fileData);
+        getListener().finishEditRecord(newRecord || record.isModified(),
+                                       newLocation);
     }
 
     /**
@@ -1493,8 +1539,6 @@ public class PasswdSafeEditRecordFragment
     {
         private boolean itsIsValid = false;
         private boolean itsIsPaused = false;
-
-        // TODO: refactor validation to reuse with new file fragment
 
         /**
          * Register a text view with the validator

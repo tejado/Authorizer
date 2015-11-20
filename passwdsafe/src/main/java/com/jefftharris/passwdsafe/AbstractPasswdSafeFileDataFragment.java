@@ -133,19 +133,28 @@ public abstract class AbstractPasswdSafeFileDataFragment
                                                   MenuInflater inflater);
 
     /**
+     * Get the file data
+     */
+    protected final PasswdFileData getFileData()
+    {
+        if (isAdded() && (itsListener != null)) {
+            return itsListener.getFileData();
+        }
+        return null;
+    }
+
+    /**
      * Get the record information
      */
     protected final RecordInfo getRecordInfo()
     {
-        if (isAdded() && (itsListener != null)) {
-            PasswdFileData fileData = itsListener.getFileData();
-            if (fileData != null) {
-                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
-                if (rec != null) {
-                    PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-                    if (passwdRec != null) {
-                        return new RecordInfo(rec, passwdRec, fileData);
-                    }
+        PasswdFileData fileData = getFileData();
+        if (fileData != null) {
+            PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
+            if (rec != null) {
+                PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+                if (passwdRec != null) {
+                    return new RecordInfo(rec, passwdRec, fileData);
                 }
             }
         }
