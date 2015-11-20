@@ -70,7 +70,6 @@
     <string name="empty_password">Empty password</string>
     <string name="empty_title">Empty title</string>
     <string name="enabled">Enabled</string>
-    <string name="enter_net_group">Enter new group:</string>
     <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Expiration Notifications</string>
@@ -142,6 +141,7 @@
     <string name="new_file">New File</string>
     <string name="new_dropbox_file">New Dropbox File</string>
     <string name="new_file_not_supp_uri">New file not supported for URI %1$s</string>
+    <string name="new_group">New group</string>
     <string name="new_group_menu">New group…</string>
     <string name="new_local_file">New Local File</string>
     <string name="new_onedrive_file">New OneDrive File</string>

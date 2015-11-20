@@ -29,8 +29,6 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
  */
 public class NewGroupDialog extends DialogFragment
 {
-    // TODO: use textinputlayout?
-
     /**
      * Listener interface for the owning fragment
      */
@@ -78,7 +76,6 @@ public class NewGroupDialog extends DialogFragment
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
                 .setTitle(PasswdSafeUtil.getAppTitle(getContext()))
-                .setMessage(R.string.enter_net_group)
                 .setView(view)
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)
