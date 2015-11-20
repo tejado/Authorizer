@@ -70,7 +70,6 @@
     <string name="empty_password">Mot de passe vide</string>
     <string name="empty_title">Titre vide</string>
     <string name="enabled">Activé</string>
-    <string name="enter_net_group">Entrer un nouveau groupe:</string>
     <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers logs</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Notifications d\'Expiration</string>
@@ -142,6 +141,7 @@
     <string name="new_file">Nouveau fichier</string>
     <string name="new_dropbox_file">Nouveau fichier de Dropbox</string>
     <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
+    <string name="new_group">Nouveau groupe</string>
     <string name="new_group_menu">Nouveau groupe…</string>
     <string name="new_local_file">Nouveau fichier local</string>
     <string name="new_onedrive_file">Nouveau fichier de OneDrive</string>

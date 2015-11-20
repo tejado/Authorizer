@@ -70,7 +70,6 @@
     <string name="empty_password">Kein Passwort</string>
     <string name="empty_title">Kein Titel</string>
     <string name="enabled">Eingeschaltet</string>
-    <string name="enter_net_group">Neue Gruppe:</string>
     <string name="erase_all_expiration_notifications">Lösche alle Mitteilungen für abgelaufende Passwörter</string>
     <string name="expiration">Ablaufdatum</string>
     <string name="expiration_notifications">Ablaufmitteilungen</string>
@@ -142,6 +141,7 @@
     <string name="new_file">Neue Datei</string>
     <string name="new_dropbox_file">Neue Dropbox-Datei</string>
     <string name="new_file_not_supp_uri">Datei inkompatibel mit URI %1$s</string>
+    <string name="new_group">Neue Gruppe</string>
     <string name="new_group_menu">Neue Gruppe …</string>
     <string name="new_local_file">Neue lokale Datei</string>
     <string name="new_onedrive_file">Neue OneDrive-Datei</string>
