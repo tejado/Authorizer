@@ -8,7 +8,6 @@
 package com.jefftharris.passwdsafe;
 
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -22,8 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
@@ -35,16 +32,16 @@ import java.util.List;
 /**
  * Fragment showing a password record
  */
-public class PasswdSafeRecordFragment extends Fragment
+public class PasswdSafeRecordFragment
+        extends AbstractPasswdSafeFileDataFragment
+                        <PasswdSafeRecordFragment.Listener>
 {
     /**
      * Listener interface for owning activity
      */
     public interface Listener
+            extends AbstractPasswdSafeFileDataFragment.Listener
     {
-        /** Get the file data */
-        PasswdFileData getFileData();
-
         /** Edit the record */
         void editRecord(PasswdLocation location);
 
@@ -53,17 +50,12 @@ public class PasswdSafeRecordFragment extends Fragment
 
         /** Update the view for a record */
         void updateViewRecord(PasswdLocation location);
-
-        /** Is the navigation drawer open */
-        boolean isNavDrawerOpen();
     }
 
-    private PasswdLocation itsLocation;
     private boolean itsCanEdit = false;
     private boolean itsCanDelete = false;
     private boolean itsHasNotes = false;
     private TabLayout itsTabs;
-    private Listener itsListener;
 
     /** Last selected tab to restore across records */
     private static int itsLastSelectedTab = 0;
@@ -74,31 +66,8 @@ public class PasswdSafeRecordFragment extends Fragment
     public static PasswdSafeRecordFragment newInstance(PasswdLocation location)
     {
         PasswdSafeRecordFragment frag = new PasswdSafeRecordFragment();
-        Bundle args = new Bundle();
-        args.putParcelable("location", location);
-        frag.setArguments(args);
+        frag.setArguments(createArgs(location));
         return frag;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        Bundle args = getArguments();
-        PasswdLocation location;
-        if (args != null) {
-            location = args.getParcelable("location");
-        } else {
-            location = new PasswdLocation();
-        }
-        itsLocation = location;
-    }
-
-    @Override
-    public void onAttach(Context ctx)
-    {
-        super.onAttach(ctx);
-        itsListener = (Listener)ctx;
     }
 
     @Override
@@ -192,22 +161,6 @@ public class PasswdSafeRecordFragment extends Fragment
     }
 
     @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        itsListener = null;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        if ((itsListener != null) && !itsListener.isNavDrawerOpen()) {
-            inflater.inflate(R.menu.fragment_passwdsafe_record, menu);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
     public void onPrepareOptionsMenu(Menu menu)
     {
         MenuItem item = menu.findItem(R.id.menu_edit);
@@ -245,40 +198,32 @@ public class PasswdSafeRecordFragment extends Fragment
         }
     }
 
+    @Override
+    protected void doOnCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.fragment_passwdsafe_record, menu);
+    }
+
     /**
      * Refresh the view
      */
-    public void refresh()
+    private void refresh()
     {
-        if (!isAdded() || (itsListener == null)) {
+        RecordInfo info = getRecordInfo();
+        if (info == null) {
             return;
         }
 
-        PasswdFileData fileData = itsListener.getFileData();
-        if (fileData == null) {
-            return;
-        }
-
-        PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
-        if (rec == null) {
-            return;
-        }
-
-        PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-        if (passwdRec == null) {
-            return;
-        }
-
-        itsCanEdit = fileData.canEdit();
-        boolean isProtected = fileData.isProtected(rec);
-        List<PwsRecord> references = passwdRec.getRefsToRecord();
+        itsCanEdit = info.itsFileData.canEdit();
+        boolean isProtected = info.itsFileData.isProtected(info.itsRec);
+        List<PwsRecord> references = info.itsPasswdRec.getRefsToRecord();
         boolean hasReferences = (references != null) && !references.isEmpty();
         itsCanDelete = itsCanEdit && !hasReferences && !isProtected;
 
-        switch (passwdRec.getType()) {
+        switch (info.itsPasswdRec.getType()) {
         case NORMAL:
         case ALIAS: {
-            String notes = fileData.getNotes(rec);
+            String notes = info.itsFileData.getNotes(info.itsRec);
             itsHasNotes = !TextUtils.isEmpty(notes);
             break;
         }
