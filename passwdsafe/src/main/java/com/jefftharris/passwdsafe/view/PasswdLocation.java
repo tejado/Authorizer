@@ -90,6 +90,16 @@ public class PasswdLocation implements Parcelable
         return TextUtils.join(" / ", itsGroups);
     }
 
+    /** Get the path string for the group as stored in a record */
+    public String getRecordGroup()
+    {
+        if (itsGroups.isEmpty()) {
+            return null;
+        }
+        // TODO: deal with escaped .s?
+        return TextUtils.join(".", itsGroups);
+    }
+
     /** Does the location represent a record */
     public boolean isRecord()
     {
@@ -142,6 +152,12 @@ public class PasswdLocation implements Parcelable
         }
     }
 
+    /** Are the locations' groups equal */
+    public boolean equalGroups(PasswdLocation loc)
+    {
+        return itsGroups.equals(loc.itsGroups);
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -152,7 +168,7 @@ public class PasswdLocation implements Parcelable
             return false;
         }
         PasswdLocation location = (PasswdLocation)o;
-        return itsGroups.equals(location.itsGroups) &&
+        return equalGroups(location) &&
                TextUtils.equals(itsRecord, location.itsRecord);
     }
 

@@ -52,18 +52,17 @@ public class PasswdSafeActivity extends AppCompatActivity
                    PasswdSafeNewFileFragment.Listener,
                    PasswdSafeRecordFragment.Listener
 {
-    // TODO: new files
     // TODO: search
     // TODO: 3rdparty file open
     // TODO: policies
     // TODO: expired passwords
     // TODO: preferences
     // TODO: about
-    // TODO: add record
     // TODO: expiry notifications
     // TODO: details
     // TODO: file operations
     // TODO: modern theme
+    // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: lock timeout
     // TODO: autobackup
     // TODO: keyboard support
@@ -239,6 +238,23 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        //FragmentManager.enableDebugLogging(true);
+        Fragment currFrag = fragMgr.findFragmentById(R.id.content);
+        boolean isEdit = (currFrag instanceof PasswdSafeEditRecordFragment);
+
+        MenuItem item = menu.findItem(R.id.menu_add);
+        if (item != null) {
+            PasswdFileData fileData = itsFileDataFrag.getFileData();
+            item.setVisible((fileData != null) && fileData.canEdit() && !isEdit);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
@@ -247,6 +263,10 @@ public class PasswdSafeActivity extends AppCompatActivity
                 return super.onOptionsItemSelected(item);
             }
             onBackPressed();
+            return true;
+        }
+        case R.id.menu_add: {
+            editRecord(itsLocation.selectRecord(null));
             return true;
         }
         case R.id.menu_close: {
@@ -480,15 +500,12 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     @Override
-    public void finishEditRecord(boolean save)
+    public void finishEditRecord(boolean save, PasswdLocation newLocation)
     {
         boolean resetLoc = false;
         if (save) {
             itsFileDataFrag.refreshFileData(this);
-            PasswdFileData fileData = itsFileDataFrag.getFileData();
-            PasswdLocation newLoc = new PasswdLocation(
-                    fileData.getRecord(itsLocation.getRecord()), fileData);
-            if (!newLoc.equals(itsLocation)) {
+            if (!newLocation.equalGroups(itsLocation)) {
                 resetLoc = true;
             }
         }
@@ -708,6 +725,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 } else {
                     itsTitle = getString(R.string.edit_item, title);
                 }
+            } else {
+                itsTitle = getString(R.string.new_entry);
             }
             break;
         }
