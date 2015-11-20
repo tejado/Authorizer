@@ -61,7 +61,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
         }
     }
 
-    protected PasswdLocation itsLocation;
+    private PasswdLocation itsLocation;
     protected ListenerT itsListener;
 
     /**
@@ -111,6 +111,14 @@ public abstract class AbstractPasswdSafeFileDataFragment
     }
 
     /**
+     * Get the password location
+     */
+    protected final PasswdLocation getLocation()
+    {
+        return itsLocation;
+    }
+
+    /**
      * Derived-class create options menu
      */
     protected abstract void doOnCreateOptionsMenu(Menu menu,
@@ -119,7 +127,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
     /**
      * Get the record information
      */
-    protected RecordInfo getRecordInfo()
+    protected final RecordInfo getRecordInfo()
     {
         if (isAdded() && (itsListener != null)) {
             PasswdFileData fileData = itsListener.getFileData();

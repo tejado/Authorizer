@@ -329,7 +329,7 @@ public class PasswdSafeEditRecordFragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewEditRecord(itsLocation);
+        itsListener.updateViewEditRecord(getLocation());
         itsValidator.validate();
     }
 
