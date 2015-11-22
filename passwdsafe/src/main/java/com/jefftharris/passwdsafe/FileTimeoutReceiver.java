@@ -32,6 +32,8 @@ class FileTimeoutReceiver extends BroadcastReceiver
     private final AlarmManager itsAlarmMgr;
     private final PendingIntent itsCloseIntent;
     private int itsFileCloseTimeout = 0;
+    private boolean itsIsCloseScreenOff =
+            Preferences.PREF_FILE_CLOSE_SCREEN_OFF_DEF;
     private boolean itsIsPaused = true;
 
     private static final String TAG = "FileTimeoutReceiver";
@@ -42,19 +44,20 @@ class FileTimeoutReceiver extends BroadcastReceiver
     public FileTimeoutReceiver(Activity act)
     {
         itsActivity = act;
-        itsAlarmMgr =
-                (AlarmManager)itsActivity.getSystemService(Context.ALARM_SERVICE);
+        itsAlarmMgr = (AlarmManager)
+                itsActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(PasswdSafeApp.FILE_TIMEOUT_INTENT);
         intent.setPackage("com.jefftharris.passwdsafe");
-        itsCloseIntent = PendingIntent.getBroadcast(itsActivity,
-                                                    0, intent, 0);
-        itsActivity.registerReceiver(
-                this, new IntentFilter(PasswdSafeApp.FILE_TIMEOUT_INTENT));
+        itsCloseIntent = PendingIntent.getBroadcast(itsActivity, 0, intent, 0);
+        IntentFilter filter =
+                new IntentFilter(PasswdSafeApp.FILE_TIMEOUT_INTENT);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        itsActivity.registerReceiver(this, filter);
 
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(itsActivity);
         prefs.registerOnSharedPreferenceChangeListener(this);
-        onSharedPreferenceChanged(prefs, Preferences.PREF_FILE_CLOSE_TIMEOUT);
+        updatePrefs(prefs);
     }
 
     /**
@@ -83,9 +86,10 @@ class FileTimeoutReceiver extends BroadcastReceiver
         } else {
             itsIsPaused = false;
             if (itsFileCloseTimeout != 0) {
-                itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
-                                SystemClock.elapsedRealtime() + itsFileCloseTimeout,
-                                itsCloseIntent);
+                itsAlarmMgr.set(
+                        AlarmManager.ELAPSED_REALTIME,
+                        SystemClock.elapsedRealtime() + itsFileCloseTimeout,
+                        itsCloseIntent);
             }
         }
     }
@@ -93,25 +97,53 @@ class FileTimeoutReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context ctx, Intent intent)
     {
-        Log.i(TAG, "File timeout");
-        itsActivity.finish();
+        boolean close = false;
+        switch (intent.getAction()) {
+        case PasswdSafeApp.FILE_TIMEOUT_INTENT: {
+            Log.i(TAG, "File timeout");
+            close = true;
+            break;
+        }
+        case Intent.ACTION_SCREEN_OFF: {
+            if (itsIsCloseScreenOff) {
+                Log.i(TAG, "Screen off");
+                close = true;
+            }
+            break;
+        }
+        }
+        if (close) {
+            itsActivity.finish();
+        }
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
     {
         switch (key) {
+        case Preferences.PREF_FILE_CLOSE_SCREEN_OFF:
         case Preferences.PREF_FILE_CLOSE_TIMEOUT: {
-            FileTimeoutPref pref = Preferences.getFileCloseTimeoutPref(prefs);
-            PasswdSafeUtil.dbginfo(TAG, "new file close timeout: %s", pref);
-            itsFileCloseTimeout = pref.getTimeout();
-            if (itsFileCloseTimeout == 0) {
-                cancel();
-            } else {
-                updateTimeout(itsIsPaused);
-            }
+            updatePrefs(prefs);
             break;
         }
+        }
+    }
+
+    /**
+     * Update the preferences
+     */
+    private void updatePrefs(SharedPreferences prefs)
+    {
+        FileTimeoutPref pref = Preferences.getFileCloseTimeoutPref(prefs);
+        itsIsCloseScreenOff = Preferences.getFileCloseScreenOffPref(prefs);
+        PasswdSafeUtil.dbginfo(TAG, "update prefs timeout: %s, screen: %b",
+                               pref, itsIsCloseScreenOff);
+
+        itsFileCloseTimeout = pref.getTimeout();
+        if (itsFileCloseTimeout == 0) {
+            cancel();
+        } else {
+            updateTimeout(itsIsPaused);
         }
     }
 

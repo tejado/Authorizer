@@ -67,11 +67,11 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: protect / unprotect all
     // TODO: modern theme
     // TODO: recheck all icons (remove use of all built-in ones)
-    // TODO: lock timeout
     // TODO: autobackup
     // TODO: keyboard support
     // TODO: shortcuts
     // TODO: storage access framework support
+    // TODO: check manifest errors regarding icons
 
     private enum ChangeMode
     {
