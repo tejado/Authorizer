@@ -115,9 +115,11 @@ public class PasswdSafeRecordNotesFragment
     public void onPrepareOptionsMenu(Menu menu)
     {
         MenuItem item = menu.findItem(R.id.menu_monospace);
-        item.setChecked(itsIsMonospace);
-        item = menu.findItem(R.id.menu_word_wrap);
-        item.setChecked(itsIsWordWrap);
+        if (item != null) {
+            item.setChecked(itsIsMonospace);
+            item = menu.findItem(R.id.menu_word_wrap);
+            item.setChecked(itsIsWordWrap);
+        }
         super.onPrepareOptionsMenu(menu);
     }
 
