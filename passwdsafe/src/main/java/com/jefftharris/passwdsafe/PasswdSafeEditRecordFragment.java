@@ -362,12 +362,16 @@ public class PasswdSafeEditRecordFragment
         super.onPrepareOptionsMenu(menu);
 
         MenuItem item = menu.findItem(R.id.menu_done);
-        boolean valid = itsValidator.isValid();
-        item.setEnabled(valid);
-        item.getIcon().setAlpha(valid ? 255 : 130);
+        if (item != null) {
+            boolean valid = itsValidator.isValid();
+            item.setEnabled(valid);
+            item.getIcon().setAlpha(valid ? 255 : 130);
+        }
 
         item = menu.findItem(R.id.menu_protect);
-        updateProtectedMenu(item);
+        if (item != null) {
+            updateProtectedMenu(item);
+        }
     }
 
     @Override
