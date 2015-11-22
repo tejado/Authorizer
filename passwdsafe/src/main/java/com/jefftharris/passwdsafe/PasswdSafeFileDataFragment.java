@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
@@ -59,7 +60,8 @@ public class PasswdSafeFileDataFragment extends Fragment
     }
 
     /** Get the password file data */
-    public PasswdFileData getFileData()
+    public @Nullable
+    PasswdFileData getFileData()
     {
         return itsFileData;
     }
