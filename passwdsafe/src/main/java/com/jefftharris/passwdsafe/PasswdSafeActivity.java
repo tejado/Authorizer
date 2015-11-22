@@ -31,6 +31,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.ProgressFragment;
+import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdRecordListData;
@@ -45,6 +46,7 @@ import java.util.List;
  */
 public class PasswdSafeActivity extends AppCompatActivity
         implements AbstractPasswdSafeRecordFragment.Listener,
+                   ConfirmPromptDialog.Listener,
                    PasswdSafeEditRecordFragment.Listener,
                    PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
@@ -60,7 +62,9 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: about
     // TODO: expiry notifications
     // TODO: details
-    // TODO: file operations
+    // TODO: delete file
+    // TODO: change password
+    // TODO: protect / unprotect all
     // TODO: modern theme
     // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: lock timeout
@@ -459,10 +463,16 @@ public class PasswdSafeActivity extends AppCompatActivity
     }
 
     @Override
-    public void deleteRecord(PasswdLocation location)
+    public void deleteRecord(PasswdLocation location, String title)
     {
-        Toast.makeText(this, "deleteRecord " + location,
-                       Toast.LENGTH_SHORT).show();
+        PasswdSafeUtil.dbginfo(TAG, "deleteRecord loc: %s", location);
+        Bundle confirmArgs = new Bundle();
+        confirmArgs.putParcelable("location", location);
+        ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
+                getString(R.string.delete_record_msg, title),
+                getString(R.string.delete),
+                confirmArgs);
+        dialog.show(getSupportFragmentManager(), "Delete record");
     }
 
     /**
@@ -532,6 +542,31 @@ public class PasswdSafeActivity extends AppCompatActivity
             itsSaveTask = new SaveTask(itsFileDataFrag.getFileData(),
                                        resetLoc, this);
             itsSaveTask.execute();
+        }
+    }
+
+    @Override
+    public void promptConfirmed(Bundle confirmArgs)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "promptConfirmed: %s", confirmArgs);
+        PasswdLocation location = confirmArgs.getParcelable("location");
+        if (location == null) {
+            return;
+        }
+
+        PasswdFileData fileData = itsFileDataFrag.getFileData();
+        if (fileData == null) {
+            return;
+        }
+
+        PwsRecord rec = fileData.getRecord(location.getRecord());
+        if (rec == null) {
+            return;
+        }
+
+        boolean removed = fileData.removeRecord(rec, this);
+        if (removed) {
+            finishEditRecord(true, location.selectRecord(null));
         }
     }
 
