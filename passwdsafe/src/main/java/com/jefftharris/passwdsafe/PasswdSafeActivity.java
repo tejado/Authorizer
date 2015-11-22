@@ -117,8 +117,8 @@ public class PasswdSafeActivity extends AppCompatActivity
      * navigation drawer. */
     private PasswdSafeNavDrawerFragment itsNavDrawerFrag;
 
-    /** Running task to save a file */
-    private SaveTask itsSaveTask = null;
+    /** Currently running task */
+    private SaveTask itsCurrTask = null;
 
     /** Used to store the last screen title */
     private CharSequence itsTitle;
@@ -218,9 +218,9 @@ public class PasswdSafeActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
-        if (itsSaveTask != null) {
-            itsSaveTask.cancelTask();
-            itsSaveTask = null;
+        if (itsCurrTask != null) {
+            itsCurrTask.cancelTask();
+            itsCurrTask = null;
         }
     }
 
@@ -539,9 +539,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         fragMgr.popBackStackImmediate();
 
         if (save) {
-            itsSaveTask = new SaveTask(itsFileDataFrag.getFileData(),
+            itsCurrTask = new SaveTask(itsFileDataFrag.getFileData(),
                                        resetLoc, this);
-            itsSaveTask.execute();
+            itsCurrTask.execute();
         }
     }
 
@@ -840,60 +840,100 @@ public class PasswdSafeActivity extends AppCompatActivity
     /**
      * Task to save a file in the background
      */
-    private class SaveTask
+    private final class SaveTask extends AbstractTask
     {
         private final PasswdFileData itsFileData;
         private final boolean itsIsResetLoc;
-        private final Context itsContext;
-        private final ProgressFragment itsProgressFrag;
-        private final AsyncTask<Void, Void, Object> itsTask =
-                new AsyncTask<Void, Void, Object>()
-        {
-            @Override
-            protected void onPreExecute()
-            {
-                itsProgressFrag.show(getSupportFragmentManager(), null);
-            }
-
-            @Override
-            protected void onPostExecute(Object result)
-            {
-                // TODO: fix use of file by other threads while saving.
-                // Causing RuntimeCryptoException when view frag is refreshing
-                result = doSave();
-                SaveTask.this.onPostExecute(result);
-            }
-
-            @Override
-            protected Object doInBackground(Void... params)
-            {
-                return null;
-            }
-            private Object doSave()
-            {
-                try {
-                    if (itsFileData != null) {
-                        itsFileData.save(itsContext);
-                        PasswdSafeUtil.dbginfo(TAG, "SaveTask finished");
-                    }
-                    return null;
-                } catch (Exception e) {
-                    return e;
-                }
-            }
-        };
 
         /**
          * Constructor
          */
         public SaveTask(PasswdFileData fileData, boolean resetLoc, Context ctx)
         {
+            super(ctx.getString(R.string.saving_file,
+                                fileData.getUri().getIdentifier(ctx, false)),
+                  ctx);
             itsFileData = fileData;
             itsIsResetLoc = resetLoc;
-            itsContext = ctx.getApplicationContext();
+        }
 
-            String file = itsFileData.getUri().getIdentifier(itsContext, false);
-            String msg = itsContext.getString(R.string.saving_file, file);
+        @Override
+        protected final void handleDoInBackground() throws Exception
+        {
+            if (itsFileData != null) {
+                itsFileData.save(getContext());
+                PasswdSafeUtil.dbginfo(TAG, "SaveTask finished");
+            }
+        }
+
+        @Override
+        protected final void handlePostExecute()
+        {
+            if (itsIsResetLoc) {
+                changeOpenView(new PasswdLocation(), true);
+            }
+        }
+
+        @Override
+        protected final String getExceptionMsg(Exception e)
+        {
+            String msg = super.getExceptionMsg(e);
+            if ((e instanceof IOException) &&
+                (ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT)) {
+                msg = getContext().getString(R.string.kitkat_sdcard_warning,
+                                             msg);
+            }
+            return msg;
+        }
+    }
+
+    /**
+     * Abstract task for background operations
+     */
+    private abstract class AbstractTask
+    {
+        private final Context itsContext;
+        private final ProgressFragment itsProgressFrag;
+        private final AsyncTask<Void, Void, Object> itsTask =
+                new AsyncTask<Void, Void, Object>()
+                {
+                    @Override
+                    protected void onPreExecute()
+                    {
+                        itsProgressFrag.show(getSupportFragmentManager(), null);
+                    }
+
+                    @Override
+                    protected void onPostExecute(Object result)
+                    {
+                        // TODO: fix use of file by other threads while saving.
+                        // Causing RuntimeCryptoException when view frag is refreshing
+                        result = doAction();
+                        handlePostExecute(result);
+                    }
+
+                    @Override
+                    protected Object doInBackground(Void... params)
+                    {
+                        return null;
+                    }
+                    private Object doAction()
+                    {
+                        try {
+                            handleDoInBackground();
+                            return new Object();
+                        } catch (Exception e) {
+                            return e;
+                        }
+                    }
+                };
+
+        /**
+         * Constructor
+         */
+        protected AbstractTask(String msg, Context ctx) 
+        {
+            itsContext = ctx.getApplicationContext();
             itsProgressFrag = ProgressFragment.newInstance(msg);
         }
 
@@ -911,30 +951,52 @@ public class PasswdSafeActivity extends AppCompatActivity
         public final void cancelTask()
         {
             itsTask.cancel(false);
-            onPostExecute(null);
+            handlePostExecute(null);
         }
 
         /**
          * Handle the result of executing the task
          */
-        private void onPostExecute(Object result)
+        private void handlePostExecute(Object result)
         {
             itsProgressFrag.dismiss();
-            itsSaveTask = null;
+            itsCurrTask = null;
 
             if (result instanceof Exception) {
                 Exception e = (Exception)result;
-                String msg = e.toString();
-                if ((e instanceof IOException) &&
-                    (ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT)) {
-                    msg = itsContext.getString(R.string.kitkat_sdcard_warning,
-                                               msg);
-                }
+                String msg = getExceptionMsg(e);
                 PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafeActivity.this,
                                             true);
-            } else if (itsIsResetLoc) {
-                changeOpenView(new PasswdLocation(), true);
+            } else if (result != null) {
+                handlePostExecute();
             }
+        }
+
+        /**
+         * Execute the task in a background thread
+         */
+        protected abstract void handleDoInBackground() throws Exception;
+
+        /**
+         * Execute a task in the main thread after the background operation
+         * completes successfully
+         */
+        protected abstract void handlePostExecute();
+
+        /**
+         * Get a message for the exception
+         */
+        protected String getExceptionMsg(Exception e)
+        {
+            return e.toString();
+        }
+
+        /**
+         * Get a context
+         */
+        protected final Context getContext()
+        {
+            return itsContext;
         }
     }
 }
