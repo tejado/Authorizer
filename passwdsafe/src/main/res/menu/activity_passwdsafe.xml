@@ -22,4 +22,13 @@
           android:orderInCategory="100"
           app:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/menu_file_ops"
+          android:title="@string/file_operations"
+          android:orderInCategory="100">
+        <menu>
+            <item android:id="@+id/menu_file_delete"
+                  android:title="@string/delete_file"/>
+        </menu>
+    </item>
+
 </menu>
