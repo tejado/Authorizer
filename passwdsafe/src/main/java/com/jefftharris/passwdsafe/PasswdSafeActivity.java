@@ -28,8 +28,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.view.ProgressFragment;
 import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
@@ -62,7 +64,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: about
     // TODO: expiry notifications
     // TODO: details
-    // TODO: delete file
     // TODO: change password
     // TODO: protect / unprotect all
     // TODO: modern theme
@@ -70,8 +71,9 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: autobackup
     // TODO: keyboard support
     // TODO: shortcuts
-    // TODO: storage access framework support
     // TODO: check manifest errors regarding icons
+    // TODO: storage access framework support (want to keep support?)
+    // TODO: recent files db (should that be carried forward? only if SAF kept)
 
     private enum ChangeMode
     {
@@ -107,6 +109,15 @@ public class PasswdSafeActivity extends AppCompatActivity
         EDIT_RECORD
     }
 
+    /** Action conformed via ConfirmPromptDialog */
+    private enum ConfirmAction
+    {
+        /** Delete a file */
+        DELETE_FILE,
+        /** Delete a record */
+        DELETE_RECORD
+    }
+
     /** Fragment holding the open file data */
     private PasswdSafeFileDataFragment itsFileDataFrag;
 
@@ -118,7 +129,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     private PasswdSafeNavDrawerFragment itsNavDrawerFrag;
 
     /** Currently running task */
-    private SaveTask itsCurrTask = null;
+    private AbstractTask itsCurrTask = null;
 
     /** Used to store the last screen title */
     private CharSequence itsTitle;
@@ -134,6 +145,10 @@ public class PasswdSafeActivity extends AppCompatActivity
 
     private static final String FRAG_DATA = "data";
     private static final String STATE_TITLE = "title";
+
+    private static final String CONFIRM_ARG_ACTION = "action";
+    private static final String CONFIRM_ARG_LOCATION = "location";
+
     private static final String TAG = "PasswdSafeActivity";
 
     @Override
@@ -248,11 +263,21 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        PasswdFileData fileData = itsFileDataFrag.getFileData();
+        boolean fileEditable = (fileData != null) && fileData.canEdit();
+
         boolean viewCanAdd = false;
+        boolean viewHasFileOps = false;
         switch (itsCurrViewMode) {
-        case VIEW_LIST:
+        case VIEW_LIST: {
+            viewCanAdd = fileEditable;
+            if (itsLocation.getGroups().isEmpty() && fileEditable) {
+                viewHasFileOps = true;
+            }
+            break;
+        }
         case VIEW_RECORD: {
-            viewCanAdd = true;
+            viewCanAdd = fileEditable;
             break;
         }
         case INIT:
@@ -264,11 +289,10 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
 
         MenuItem item = menu.findItem(R.id.menu_add);
-        if (item != null) {
-            PasswdFileData fileData = itsFileDataFrag.getFileData();
-            item.setVisible(viewCanAdd &&
-                            (fileData != null) && fileData.canEdit());
-        }
+        item.setVisible(viewCanAdd);
+
+        item = menu.findItem(R.id.menu_file_ops);
+        item.setVisible(viewHasFileOps);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -297,6 +321,23 @@ public class PasswdSafeActivity extends AppCompatActivity
                     finish();
                 }
             });
+            return true;
+        }
+        case R.id.menu_file_delete: {
+            PasswdFileData fileData = itsFileDataFrag.getFileData();
+            if (fileData == null) {
+                return true;
+            }
+            String uriName = fileData.getUri().getIdentifier(this, true);
+
+            Bundle confirmArgs = new Bundle();
+            confirmArgs.putString(CONFIRM_ARG_ACTION,
+                                  ConfirmAction.DELETE_FILE.name());
+            ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
+                    getString(R.string.delete_file_msg, uriName),
+                    getString(R.string.delete),
+                    confirmArgs);
+            dialog.show(getSupportFragmentManager(), "Delete file");
             return true;
         }
         default: {
@@ -467,7 +508,9 @@ public class PasswdSafeActivity extends AppCompatActivity
     {
         PasswdSafeUtil.dbginfo(TAG, "deleteRecord loc: %s", location);
         Bundle confirmArgs = new Bundle();
-        confirmArgs.putParcelable("location", location);
+        confirmArgs.putString(CONFIRM_ARG_ACTION,
+                              ConfirmAction.DELETE_RECORD.name());
+        confirmArgs.putParcelable(CONFIRM_ARG_LOCATION, location);
         ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
                 getString(R.string.delete_record_msg, title),
                 getString(R.string.delete),
@@ -549,24 +592,43 @@ public class PasswdSafeActivity extends AppCompatActivity
     public void promptConfirmed(Bundle confirmArgs)
     {
         PasswdSafeUtil.dbginfo(TAG, "promptConfirmed: %s", confirmArgs);
-        PasswdLocation location = confirmArgs.getParcelable("location");
-        if (location == null) {
-            return;
-        }
-
         PasswdFileData fileData = itsFileDataFrag.getFileData();
         if (fileData == null) {
             return;
         }
 
-        PwsRecord rec = fileData.getRecord(location.getRecord());
-        if (rec == null) {
+        ConfirmAction action;
+        try {
+            action = ConfirmAction.valueOf(
+                    confirmArgs.getString(CONFIRM_ARG_ACTION));
+        } catch (Exception e) {
             return;
         }
 
-        boolean removed = fileData.removeRecord(rec, this);
-        if (removed) {
-            finishEditRecord(true, location.selectRecord(null));
+        switch (action) {
+        case DELETE_FILE: {
+            itsCurrTask = new DeleteTask(fileData.getUri(), this);
+            itsCurrTask.execute();
+            break;
+        }
+        case DELETE_RECORD: {
+            PasswdLocation location =
+                    confirmArgs.getParcelable(CONFIRM_ARG_LOCATION);
+            if (location == null) {
+                break;
+            }
+
+            PwsRecord rec = fileData.getRecord(location.getRecord());
+            if (rec == null) {
+                break;
+            }
+
+            boolean removed = fileData.removeRecord(rec, this);
+            if (removed) {
+                finishEditRecord(true, location.selectRecord(null));
+            }
+            break;
+        }
         }
     }
 
@@ -795,6 +857,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
         }
 
+        GuiUtils.invalidateOptionsMenu(this);
         itsNavDrawerFrag.setMode(drawerMode);
         restoreActionBar();
         itsTimeoutReceiver.updateTimeout(fileTimeoutPaused);
@@ -884,6 +947,35 @@ public class PasswdSafeActivity extends AppCompatActivity
                                              msg);
             }
             return msg;
+        }
+    }
+
+    /**
+     * Task to delete a file in the background
+     */
+    private final class DeleteTask extends AbstractTask
+    {
+        private final PasswdFileUri itsFileUri;
+
+        /**
+         * Constructor
+         */
+        public DeleteTask(PasswdFileUri uri, Context ctx)
+        {
+            super(ctx.getString(R.string.delete_file), ctx);
+            itsFileUri = uri;
+        }
+
+        @Override
+        protected void handleDoInBackground() throws Exception
+        {
+            itsFileUri.delete(getContext());
+        }
+
+        @Override
+        protected void handlePostExecute()
+        {
+            PasswdSafeActivity.this.finish();
         }
     }
 
