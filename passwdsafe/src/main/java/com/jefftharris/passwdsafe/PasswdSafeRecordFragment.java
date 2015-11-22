@@ -46,7 +46,7 @@ public class PasswdSafeRecordFragment
         void editRecord(PasswdLocation location);
 
         /** Delete the record */
-        void deleteRecord(PasswdLocation location);
+        void deleteRecord(PasswdLocation location, String title);
 
         /** Update the view for a record */
         void updateViewRecord(PasswdLocation location);
@@ -55,6 +55,7 @@ public class PasswdSafeRecordFragment
     private boolean itsCanEdit = false;
     private boolean itsCanDelete = false;
     private boolean itsHasNotes = false;
+    private String itsTitle;
     private TabLayout itsTabs;
 
     /** Last selected tab to restore across records */
@@ -190,7 +191,7 @@ public class PasswdSafeRecordFragment
         case R.id.menu_delete: {
             Listener listener = getListener();
             if (listener != null) {
-                listener.deleteRecord(getLocation());
+                listener.deleteRecord(getLocation(), itsTitle);
             }
             return true;
         }
@@ -217,6 +218,7 @@ public class PasswdSafeRecordFragment
         }
 
         itsCanEdit = info.itsFileData.canEdit();
+        itsTitle = info.itsFileData.getTitle(info.itsRec);
         boolean isProtected = info.itsFileData.isProtected(info.itsRec);
         List<PwsRecord> references = info.itsPasswdRec.getRefsToRecord();
         boolean hasReferences = (references != null) && !references.isEmpty();
