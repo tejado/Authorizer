@@ -273,12 +273,14 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         boolean viewCanAdd = false;
         boolean viewHasFileOps = false;
+        boolean viewHasFileChangePassword = false;
         boolean viewHasClose = true;
         switch (itsCurrViewMode) {
         case VIEW_LIST: {
             viewCanAdd = fileEditable;
             if (itsLocation.getGroups().isEmpty() && fileEditable) {
                 viewHasFileOps = true;
+                viewHasFileChangePassword = !fileData.isYubikey();
             }
             break;
         }
@@ -294,8 +296,6 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
         case CHANGING_PASSWORD: {
             viewHasClose = false;
-
-            // TODO: disable changing if using yubikey
             break;
         }
         }
@@ -313,6 +313,11 @@ public class PasswdSafeActivity extends AppCompatActivity
         item = menu.findItem(R.id.menu_file_ops);
         if (item != null) {
             item.setVisible(viewHasFileOps);
+        }
+
+        item = menu.findItem(R.id.menu_file_change_password);
+        if (item != null) {
+            item.setEnabled(viewHasFileChangePassword);
         }
 
         return super.onPrepareOptionsMenu(menu);

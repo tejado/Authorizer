@@ -71,6 +71,7 @@ public class PasswdFileData
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<>();
     private HeaderPasswdPolicies itsHdrPolicies = new HeaderPasswdPolicies();
     private boolean itsIsOpenReadOnly = false;
+    private boolean itsIsYubikey = false;
 
     private static final List<PasswdFileDataObserver> itsObservers =
             new ArrayList<>();
@@ -237,6 +238,22 @@ public class PasswdFileData
     public final PasswdFileUri getUri()
     {
         return itsUri;
+    }
+
+    /**
+     * Get whether a Yubikey was used to open the file
+     */
+    public final boolean isYubikey()
+    {
+        return itsIsYubikey;
+    }
+
+    /**
+     * Set whether a Yubikey was used to open the file
+     */
+    public final void setYubikey(boolean yubikey)
+    {
+        itsIsYubikey = yubikey;
     }
 
     public final boolean canEdit()
