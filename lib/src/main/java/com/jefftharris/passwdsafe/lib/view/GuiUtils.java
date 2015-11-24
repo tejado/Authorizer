@@ -187,24 +187,15 @@ public final class GuiUtils
                                            Context ctx)
     {
         setShowKeyboardListener(dialog, initialField, ctx);
-        finalField.setOnKeyListener(new OnKeyListener()
+        setupKeyboardEnter(finalField, new Runnable()
         {
-            public boolean onKey(View v, int keyCode, KeyEvent event)
+            @Override
+            public void run()
             {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_CENTER:
-                    case KeyEvent.KEYCODE_ENTER: {
-                        Button btn =
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                        if (btn.isEnabled()) {
-                            btn.performClick();
-                        }
-                        return true;
-                    }
-                    }
+                Button btn = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                if (btn.isEnabled()) {
+                    btn.performClick();
                 }
-                return false;
             }
         });
     }
@@ -221,24 +212,16 @@ public final class GuiUtils
             Context ctx)
     {
         setShowKeyboardListener(dialog, initialField, ctx);
-        finalField.setOnKeyListener(new OnKeyListener()
+        setupKeyboardEnter(finalField, new Runnable()
         {
-            public boolean onKey(View v, int keyCode, KeyEvent event)
+            @Override
+            public void run()
             {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_CENTER:
-                    case KeyEvent.KEYCODE_ENTER: {
-                        Button btn =
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                        if (btn.isEnabled()) {
-                            btn.performClick();
-                        }
-                        return true;
-                    }
-                    }
+                Button btn = dialog.getButton(
+                        android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                if (btn.isEnabled()) {
+                    btn.performClick();
                 }
-                return false;
             }
         });
     }
@@ -253,25 +236,30 @@ public final class GuiUtils
                                          final Button okBtn,
                                          Context ctx)
     {
-        GuiUtilsFroyo.showKeyboard(firstField, ctx);
-        finalField.setOnKeyListener(new OnKeyListener()
+        setupFormKeyboard(firstField, finalField, ctx, new Runnable()
         {
-            public boolean onKey(View v, int keyCode, KeyEvent event)
+            @Override
+            public void run()
             {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_CENTER:
-                    case KeyEvent.KEYCODE_ENTER: {
-                        if (okBtn.isEnabled()) {
-                            okBtn.performClick();
-                        }
-                        return true;
-                    }
-                    }
+                if (okBtn.isEnabled()) {
+                    okBtn.performClick();
                 }
-                return false;
             }
         });
+    }
+
+
+    /**
+     * Setup the keyboard on a form.  The final field performs the supplied
+     * runnable when enter is pressed.
+     */
+    public static void setupFormKeyboard(TextView firstField,
+                                         TextView finalField,
+                                         Context ctx,
+                                         Runnable enterRunnable)
+    {
+        GuiUtilsFroyo.showKeyboard(firstField, ctx);
+        setupKeyboardEnter(finalField, enterRunnable);
     }
 
 
@@ -292,6 +280,31 @@ public final class GuiUtils
         } else {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
+    }
+
+
+    /**
+     * Setup a field to run an action on an enter or dpad center key press
+     */
+    private static void setupKeyboardEnter(TextView field,
+                                           final Runnable enterRunnable)
+    {
+        field.setOnKeyListener(new OnKeyListener()
+        {
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER: {
+                        enterRunnable.run();
+                        return true;
+                    }
+                    }
+                }
+                return false;
+            }
+        });
     }
 
 
