@@ -16,12 +16,6 @@
           android:orderInCategory="100"
           app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/menu_close"
-          android:title="@string/close"
-          android:icon="@drawable/ic_action_close_cancel"
-          android:orderInCategory="100"
-          app:showAsAction="ifRoom"/>
-
     <item android:id="@+id/menu_file_ops"
           android:title="@string/file_operations"
           android:orderInCategory="100">
@@ -33,5 +27,11 @@
                   android:title="@string/delete_file"/>
         </menu>
     </item>
+
+    <item android:id="@+id/menu_close"
+          android:title="@string/close_file"
+          android:icon="@drawable/ic_action_close_cancel"
+          android:orderInCategory="100"
+          app:showAsAction="ifRoom"/>
 
 </menu>
