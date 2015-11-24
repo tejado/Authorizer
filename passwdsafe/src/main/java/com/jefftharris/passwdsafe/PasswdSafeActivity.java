@@ -290,10 +290,10 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
         case INIT:
         case FILE_OPEN:
-        case FILE_NEW:
-        case EDIT_RECORD: {
+        case FILE_NEW: {
             break;
         }
+        case EDIT_RECORD:
         case CHANGING_PASSWORD: {
             viewHasClose = false;
             break;
@@ -881,22 +881,28 @@ public class PasswdSafeActivity extends AppCompatActivity
             }
             break;
         }
-        case VIEW_RECORD:
-        case EDIT_RECORD: {
+        case VIEW_RECORD: {
             showLeftList = true;
             drawerMode = itsIsTwoPane ?
                     PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
                     PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD;
-            fileTimeoutPaused = (mode == ViewMode.EDIT_RECORD);
+            fileTimeoutPaused = false;
             PasswdFileData fileData = itsFileDataFrag.getFileData();
             if ((fileData != null) && itsLocation.isRecord()) {
                 PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
-                String title = fileData.getTitle(rec);
-                if (mode == ViewMode.VIEW_RECORD) {
-                    itsTitle = title;
-                } else {
-                    itsTitle = getString(R.string.edit_item, title);
-                }
+                itsTitle = fileData.getTitle(rec);
+            } else {
+                itsTitle = getString(R.string.new_entry);
+            }
+            break;
+        }
+        case EDIT_RECORD: {
+            drawerMode = PasswdSafeNavDrawerFragment.NavMode.CANCELABLE_ACTION;
+            PasswdFileData fileData = itsFileDataFrag.getFileData();
+            if ((fileData != null) && itsLocation.isRecord()) {
+                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
+                itsTitle = getString(R.string.edit_item,
+                                     fileData.getTitle(rec));
             } else {
                 itsTitle = getString(R.string.new_entry);
             }
