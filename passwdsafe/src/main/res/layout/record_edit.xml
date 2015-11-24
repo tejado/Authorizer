@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:id="@+id/record_edit"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              xmlns:tools="http://schemas.android.com/tools"
+              tools:ignore="NestedScrolling,NestedWeights">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/rec_title"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:textSize="24sp"/>
+
+        <Button
+            android:id="@+id/done_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/done"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/error_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"/>
+
+    <View
+        style="@style/Separator.Light"
+        android:layout_marginBottom="2dip"
+        android:layout_marginTop="2dip"/>
+
+    <ScrollView android:layout_weight="1"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp">
+        <LinearLayout android:orientation="vertical"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content">
+            <TableLayout android:id="@+id/base_group"
+                         android:layout_width="fill_parent"
+                         android:layout_height="wrap_content"
+                         android:stretchColumns="1"
+                         android:shrinkColumns="1">
+                <TableRow android:id="@+id/type_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/type"/>
+
+                    <Spinner android:id="@+id/type"
+                             android:layout_width="fill_parent"
+                             android:layout_height="wrap_content"
+                             android:prompt="@string/choose_type"
+                             android:entries="@array/record_type"/>
+                </TableRow>
+                <TableRow android:id="@+id/title_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/title"/>
+
+                    <EditText android:id="@+id/title"
+                              android:singleLine="true"
+                              android:inputType="textCapSentences|textAutoCorrect"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/group_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/group"/>
+
+                    <Spinner android:id="@+id/group"
+                             android:drawSelectorOnTop="true"
+                             android:prompt="@string/choose_group"
+                             android:layout_width="fill_parent"
+                             android:layout_height="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/url_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/url"/>
+
+                    <EditText android:id="@+id/url"
+                              android:singleLine="true"
+                              android:inputType="textUri"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/email_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/email"/>
+
+                    <EditText android:id="@+id/email"
+                              android:singleLine="true"
+                              android:inputType="textEmailAddress"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/user_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/username"/>
+
+                    <EditText android:id="@+id/user"
+                              android:singleLine="true"
+                              android:inputType="text"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/password_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/password"/>
+
+                    <EditText android:id="@+id/password"
+                              android:singleLine="true"
+                              android:inputType="textPassword"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/password_confirm_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/confirm"/>
+
+                    <EditText android:id="@+id/password_confirm"
+                              android:singleLine="true"
+                              android:inputType="textPassword"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/password_current_row">
+
+                    <TextView
+                        style="@style/TableLabelColumn"
+                        android:text="@string/current"/>
+
+                    <TextView
+                        android:id="@+id/password_current"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/password_link_row"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/password_link_label"
+                        style="@style/TableLabelColumn"/>
+
+                    <TextView
+                        android:id="@+id/password_link"
+                        style="@style/TextViewSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/choose"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/protected_row">
+
+                    <CheckBox
+                        android:id="@+id/protected_record"
+                        style="@style/TableLabelColumn"
+                        android:layout_span="2"
+                        android:text="@string/protected_record"/>
+
+                </TableRow>
+            </TableLayout>
+
+            <View
+                android:id="@+id/policy_sep"
+                style="@style/Separator.Light"
+                android:layout_marginBottom="2dip"
+                android:layout_marginTop="2dip"/>
+
+            <TextView
+                android:id="@+id/policy_label"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/password_policy"
+                android:textSize="24sp"/>
+
+            <LinearLayout
+                android:id="@+id/policy_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/policy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <Button
+                    android:id="@+id/policy_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit"/>
+
+            </LinearLayout>
+
+            <com.jefftharris.passwdsafe.view.PasswdPolicyView
+                android:id="@+id/policy_view"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/expire_sep"
+                style="@style/Separator.Light"
+                android:layout_marginBottom="2dip"
+                android:layout_marginTop="2dip"/>
+
+            <TextView
+                android:id="@+id/expire_label"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/password_expiration"
+                android:textSize="24sp"/>
+
+            <Spinner
+                android:id="@+id/expire_choice"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/expire_type"
+                android:prompt="@string/choose_type"/>
+
+            <LinearLayout
+                android:id="@+id/expire_date_fields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/expire_date_time"
+                    style="@style/TextViewSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/expire_date_date"
+                    style="@style/TextViewSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/expire_interval_fields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/expire_interval_val"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"/>
+
+                <TextView
+                    android:id="@+id/expire_interval_days"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/expire_interval_val"
+                    android:layout_alignBaseline="@id/expire_interval_val"
+                    android:text="@string/days"/>
+
+                <CheckBox
+                    android:id="@+id/expire_interval_recurring"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/expire_interval_val"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@id/expire_interval_days"
+                    android:text="@string/recurring"/>
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/history_group_sep"
+                style="@style/Separator.Light"
+                android:layout_marginBottom="2dip"
+                android:layout_marginTop="2dip"/>
+
+            <RelativeLayout android:id="@+id/history_group"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            >
+                <Button android:id="@+id/history_addremove"
+                        android:text="@string/add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        />
+                <TextView android:id="@+id/history_label"
+                          android:text="@string/history"
+                          android:textSize="24sp"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_toLeftOf="@id/history_addremove"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignTop="@id/history_addremove"
+                          android:layout_alignBaseline="@id/history_addremove"
+                          android:layout_alignBottom="@id/history_addremove"
+                          />
+                <CheckBox android:id="@+id/history_enabled"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="@string/enabled"
+                          android:layout_below="@id/history_label"
+                          android:layout_alignParentLeft="true"
+                          />
+                <EditText android:id="@+id/history_max_size"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:singleLine="true"
+                          android:minWidth="50dip"
+                          android:inputType="number"
+                          android:layout_below="@id/history_label"
+                          android:layout_alignParentRight="true"
+                          />
+                <TextView android:id="@+id/history_max_size_label"
+                          android:text="@string/max_size_label"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_below="@id/history_label"
+                          android:layout_toLeftOf="@+id/history_max_size"
+                          android:layout_toRightOf="@+id/history_enabled"
+                          android:layout_alignBaseline="@+id/history_max_size"
+                          android:gravity="right"
+                          />
+                <ListView android:id="@+id/history"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_below="@id/history_enabled"
+                          />
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/notes_sep"
+                style="@style/Separator.Light"
+                android:layout_marginBottom="2dip"
+                android:layout_marginTop="2dip"/>
+
+            <TextView android:id="@+id/notes_label"
+                      android:text="@string/notes"
+                      android:textSize="24sp"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      />
+            <EditText android:id="@+id/notes"
+                      android:inputType="textCapSentences|textMultiLine|textLongMessage|textAutoCorrect"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
