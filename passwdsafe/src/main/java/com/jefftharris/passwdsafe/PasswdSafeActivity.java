@@ -49,6 +49,7 @@ import java.util.List;
 public class PasswdSafeActivity extends AppCompatActivity
         implements AbstractPasswdSafeRecordFragment.Listener,
                    ConfirmPromptDialog.Listener,
+                   PasswdSafeChangePasswordFragment.Listener,
                    PasswdSafeEditRecordFragment.Listener,
                    PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
@@ -64,7 +65,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: about
     // TODO: expiry notifications
     // TODO: details
-    // TODO: change password
     // TODO: protect / unprotect all
     // TODO: modern theme
     // TODO: recheck all icons (remove use of all built-in ones)
@@ -74,6 +74,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: check manifest errors regarding icons
     // TODO: storage access framework support (want to keep support?)
     // TODO: recent files db (should that be carried forward? only if SAF kept)
+    // TODO: add checked get file data to show fatal error if none
 
     private enum ChangeMode
     {
@@ -90,7 +91,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** A record */
         RECORD,
         /** Edit a record */
-        EDIT_RECORD
+        EDIT_RECORD,
+        /** Change a password */
+        CHANGE_PASSWORD
     }
 
     private enum ViewMode
@@ -106,7 +109,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Viewing a record */
         VIEW_RECORD,
         /** Editing a record */
-        EDIT_RECORD
+        EDIT_RECORD,
+        /** Changing a password */
+        CHANGING_PASSWORD
     }
 
     /** Action conformed via ConfirmPromptDialog */
@@ -268,6 +273,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         boolean viewCanAdd = false;
         boolean viewHasFileOps = false;
+        boolean viewHasClose = true;
         switch (itsCurrViewMode) {
         case VIEW_LIST: {
             viewCanAdd = fileEditable;
@@ -286,13 +292,28 @@ public class PasswdSafeActivity extends AppCompatActivity
         case EDIT_RECORD: {
             break;
         }
+        case CHANGING_PASSWORD: {
+            viewHasClose = false;
+
+            // TODO: disable changing if using yubikey
+            break;
+        }
         }
 
         MenuItem item = menu.findItem(R.id.menu_add);
-        item.setVisible(viewCanAdd);
+        if (item != null) {
+            item.setVisible(viewCanAdd);
+        }
+
+        item = menu.findItem(R.id.menu_close);
+        if (item != null) {
+            item.setVisible(viewHasClose);
+        }
 
         item = menu.findItem(R.id.menu_file_ops);
-        item.setVisible(viewHasFileOps);
+        if (item != null) {
+            item.setVisible(viewHasFileOps);
+        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -321,6 +342,12 @@ public class PasswdSafeActivity extends AppCompatActivity
                     finish();
                 }
             });
+            return true;
+        }
+        case R.id.menu_file_change_password: {
+            PasswdSafeUtil.dbginfo(TAG, "change password");
+            doChangeView(ChangeMode.CHANGE_PASSWORD,
+                         PasswdSafeChangePasswordFragment.newInstance());
             return true;
         }
         case R.id.menu_file_delete: {
@@ -573,7 +600,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         boolean resetLoc = false;
         if (save) {
             itsFileDataFrag.refreshFileData(this);
-            if (!newLocation.equalGroups(itsLocation)) {
+            if ((newLocation != null) &&
+                !newLocation.equalGroups(itsLocation)) {
                 resetLoc = true;
             }
         }
@@ -586,6 +614,18 @@ public class PasswdSafeActivity extends AppCompatActivity
                                        resetLoc, this);
             itsCurrTask.execute();
         }
+    }
+
+    @Override
+    public void finishChangePassword()
+    {
+        finishEditRecord(true, null);
+    }
+
+    @Override
+    public void updateViewChangingPassword()
+    {
+        doUpdateView(ViewMode.CHANGING_PASSWORD, itsLocation);
     }
 
     @Override
@@ -703,7 +743,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 }
                 case OPEN:
                 case RECORD:
-                case EDIT_RECORD: {
+                case EDIT_RECORD:
+                case CHANGE_PASSWORD: {
                     supportsBack = true;
                     break;
                 }
@@ -751,7 +792,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         case FILE_OPEN:
         case FILE_NEW:
         case VIEW_LIST:
-        case VIEW_RECORD: {
+        case VIEW_RECORD:
+        case CHANGING_PASSWORD: {
             break;
         }
         }
@@ -853,6 +895,12 @@ public class PasswdSafeActivity extends AppCompatActivity
             } else {
                 itsTitle = getString(R.string.new_entry);
             }
+            break;
+        }
+        case CHANGING_PASSWORD: {
+            itsTitle = getString(R.string.change_password);
+            drawerMode = PasswdSafeNavDrawerFragment.NavMode.CANCELABLE_ACTION;
+            fileTimeoutPaused = false;
             break;
         }
         }

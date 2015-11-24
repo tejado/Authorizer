@@ -229,6 +229,7 @@
     <string name="regular_expression_summary">Benutze reguläre Ausdrücke statt Teil eines Wortes.</string>
     <string name="remove">Entfernen</string>
     <string name="recurring">Wiederholt</string>
+    <string name="save">Speichern</string>
     <string name="saving_file">Speichere %s …</string>
     <string name="search">Suchen</string>
     <string name="search_hint">In PasswdSafe suchen</string>
