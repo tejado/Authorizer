@@ -33,6 +33,7 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.view.ProgressFragment;
+import com.jefftharris.passwdsafe.util.NoPasswdFileDataException;
 import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
@@ -74,7 +75,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: check manifest errors regarding icons
     // TODO: storage access framework support (want to keep support?)
     // TODO: recent files db (should that be carried forward? only if SAF kept)
-    // TODO: add checked get file data to show fatal error if none
 
     private enum ChangeMode
     {
@@ -452,12 +452,14 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void handleFileOpen(PasswdFileData fileData, String recToOpen)
     {
-        PasswdSafeUtil.dbginfo(TAG, "handleFileOpen: %s, rec: %s",
-                               fileData.getUri(), recToOpen);
 
-        // TODO: recToOpen
-        itsFileDataFrag.setFileData(fileData, this);
-        changeOpenView(itsLocation, true);
+        throw new RuntimeException("FOO");
+//        PasswdSafeUtil.dbginfo(TAG, "handleFileOpen: %s, rec: %s",
+//                               fileData.getUri(), recToOpen);
+//
+//        // TODO: recToOpen
+//        itsFileDataFrag.setFileData(fileData, this);
+//        changeOpenView(itsLocation, true);
     }
 
     /**
@@ -518,9 +520,14 @@ public class PasswdSafeActivity extends AppCompatActivity
      * Get the file data
      */
     @Override
-    public PasswdFileData getFileData()
+    public @NonNull PasswdFileData getFileData()
+            throws NoPasswdFileDataException
     {
-        return itsFileDataFrag.getFileData();
+        PasswdFileData fileData = itsFileDataFrag.getFileData();
+        if (fileData == null) {
+            throw new NoPasswdFileDataException();
+        }
+        return fileData;
     }
 
     @Override

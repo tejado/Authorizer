@@ -712,9 +712,6 @@ public class PasswdSafeEditRecordFragment
             }
         } else {
             fileData = getFileData();
-            if (fileData == null) {
-                return;
-            }
             record = null;
             itsIsV3 = fileData.isV3();
             group = getLocation().getRecordGroup();
@@ -1226,9 +1223,6 @@ public class PasswdSafeEditRecordFragment
             fileData = info.itsFileData;
         } else {
             fileData = getFileData();
-        }
-        if (fileData == null) {
-            return;
         }
 
         PwsRecord record;

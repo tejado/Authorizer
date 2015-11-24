@@ -10,12 +10,14 @@ package com.jefftharris.passwdsafe;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
+import com.jefftharris.passwdsafe.util.NoPasswdFileDataException;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -33,7 +35,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
     public interface Listener
     {
         /** Get the file data */
-        PasswdFileData getFileData();
+        @NonNull PasswdFileData getFileData() throws NoPasswdFileDataException;
 
         /** Is the navigation drawer open */
         boolean isNavDrawerOpen();
@@ -135,21 +137,23 @@ public abstract class AbstractPasswdSafeFileDataFragment
     /**
      * Get the file data
      */
-    protected final PasswdFileData getFileData()
+    protected final @NonNull PasswdFileData getFileData()
+            throws NoPasswdFileDataException
     {
         if (isAdded() && (itsListener != null)) {
             return itsListener.getFileData();
         }
-        return null;
+        throw new NoPasswdFileDataException();
     }
 
     /**
      * Get the record information
      */
-    protected final RecordInfo getRecordInfo()
+    protected final @Nullable
+    RecordInfo getRecordInfo()
     {
-        PasswdFileData fileData = getFileData();
-        if (fileData != null) {
+        try {
+            PasswdFileData fileData = getFileData();
             PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
             if (rec != null) {
                 PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
@@ -157,6 +161,8 @@ public abstract class AbstractPasswdSafeFileDataFragment
                     return new RecordInfo(rec, passwdRec, fileData);
                 }
             }
+        } catch (NoPasswdFileDataException e) {
+            return null;
         }
         return null;
     }
