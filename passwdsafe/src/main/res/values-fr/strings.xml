@@ -229,6 +229,7 @@
     <string name="regular_expression_summary">Utiliser une expression régulière pour la recherche au lieu d\'une sous-chaîne</string>
     <string name="remove">Supprimer</string>
     <string name="recurring">Périodique</string>
+    <string name="save">Enregistrer</string>
     <string name="saving_file">Enregistrement %s…</string>
     <string name="search">Rechercher</string>
     <string name="search_hint">Rechercher PasswdSafe</string>
