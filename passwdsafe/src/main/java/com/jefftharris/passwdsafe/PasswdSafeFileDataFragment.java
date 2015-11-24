@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
@@ -26,7 +27,7 @@ public class PasswdSafeFileDataFragment extends Fragment
     private PasswdFileData itsFileData;
 
     /** The open password file view */
-    private PasswdFileDataView itsFileDataView = new PasswdFileDataView();
+    private final PasswdFileDataView itsFileDataView = new PasswdFileDataView();
 
     /** One-time check for whether the fragment was newly created */
     private boolean itsIsNew = true;
@@ -60,14 +61,13 @@ public class PasswdSafeFileDataFragment extends Fragment
     }
 
     /** Get the password file data */
-    public @Nullable
-    PasswdFileData getFileData()
+    public @Nullable PasswdFileData getFileData()
     {
         return itsFileData;
     }
 
     /** Get the view of the password file data */
-    public PasswdFileDataView getFileDataView()
+    public @NonNull PasswdFileDataView getFileDataView()
     {
         return itsFileDataView;
     }
