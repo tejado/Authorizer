@@ -58,7 +58,9 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         /** File open */
         FILE_OPEN,
         /** Record open in a single-pane view */
-        SINGLE_RECORD
+        SINGLE_RECORD,
+        /** Showing an action that can be canceled */
+        CANCELABLE_ACTION
     }
 
     /** Per the design guidelines, you should show the drawer on launch until
@@ -200,6 +202,7 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         boolean fileOpen = false;
         boolean drawerEnabled = false;
         boolean openDrawer = false;
+        int upIndicator = 0;
         switch (mode) {
         case INIT: {
             drawerEnabled = true;
@@ -216,9 +219,18 @@ public class PasswdSafeNavDrawerFragment extends Fragment
             fileOpen = true;
             break;
         }
+        case CANCELABLE_ACTION: {
+            upIndicator = R.drawable.ic_action_close_cancel;
+            break;
+        }
         }
 
         itsDrawerToggle.setDrawerIndicatorEnabled(drawerEnabled);
+        if (upIndicator == 0) {
+            itsDrawerToggle.setHomeAsUpIndicator(null);
+        } else {
+            itsDrawerToggle.setHomeAsUpIndicator(upIndicator);
+        }
 
         Menu menu = itsNavView.getMenu();
         menu.setGroupEnabled(R.id.menu_drawer_file_group, fileOpen);
