@@ -452,14 +452,12 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void handleFileOpen(PasswdFileData fileData, String recToOpen)
     {
+        PasswdSafeUtil.dbginfo(TAG, "handleFileOpen: %s, rec: %s",
+                               fileData.getUri(), recToOpen);
 
-        throw new RuntimeException("FOO");
-//        PasswdSafeUtil.dbginfo(TAG, "handleFileOpen: %s, rec: %s",
-//                               fileData.getUri(), recToOpen);
-//
-//        // TODO: recToOpen
-//        itsFileDataFrag.setFileData(fileData, this);
-//        changeOpenView(itsLocation, true);
+        // TODO: recToOpen
+        itsFileDataFrag.setFileData(fileData, this);
+        changeOpenView(itsLocation, true);
     }
 
     /**
