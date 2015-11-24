@@ -102,10 +102,7 @@ public class PasswdSafeChangePasswordFragment
         super.onResume();
         Listener listener = getListener();
         PasswdFileData fileData = listener.getFileData();
-        if (fileData != null) {
-            itsTitle.setText(
-                    fileData.getUri().getIdentifier(getContext(), true));
-        }
+        itsTitle.setText(fileData.getUri().getIdentifier(getContext(), true));
         listener.updateViewChangingPassword();
         itsValidator.validate();
     }
@@ -158,10 +155,6 @@ public class PasswdSafeChangePasswordFragment
         }
 
         PasswdFileData fileData = getFileData();
-        if (fileData == null) {
-            return;
-        }
-
         StringBuilder newPasswd = new StringBuilder(itsPassword.getText());
         fileData.changePasswd(newPasswd);
 
