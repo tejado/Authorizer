@@ -9,16 +9,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu_done"
-          android:icon="@drawable/ic_action_done"
-          android:title="@string/done"
-          app:showAsAction="ifRoom"/>
-
     <item android:id="@+id/menu_protect"
           android:checkable="true"
           android:title="@string/protected_record"
           android:icon="@drawable/ic_action_lock_open"
           android:checked="false"
+          app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menu_save"
+          android:title="@string/save"
           app:showAsAction="ifRoom"/>
 
 </menu>
