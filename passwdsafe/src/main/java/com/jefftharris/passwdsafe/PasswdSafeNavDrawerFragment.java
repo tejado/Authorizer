@@ -63,10 +63,22 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         CANCELABLE_ACTION
     }
 
+    /**
+     * A menu item in the file group
+     */
+    private enum FileGroupItem
+    {
+        RECORDS,
+        PASSWORD_POLICIES,
+        EXPIRED_PASSWORDS
+    }
+
     /** Per the design guidelines, you should show the drawer on launch until
      * the user manually expands it. This shared preference tracks this. */
     private static final String PREF_USER_LEARNED_DRAWER =
             "passwdsafe_navigation_drawer_learned";
+
+    private static final String STATE_FILE_ITEM = "fileItem";
 
     /** Helper component that ties the action bar to the navigation drawer. */
     private ActionBarDrawerToggle itsDrawerToggle;
@@ -74,6 +86,7 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     private DrawerLayout itsDrawerLayout;
     private NavigationView itsNavView;
     private View itsFragmentContainerView;
+    private FileGroupItem itsSelFileItem = FileGroupItem.RECORDS;
     private Listener itsListener;
 
     private boolean itsFromSavedInstanceState;
@@ -95,6 +108,14 @@ public class PasswdSafeNavDrawerFragment extends Fragment
 
         if (savedInstanceState != null) {
             itsFromSavedInstanceState = true;
+            try {
+                String fileItem = savedInstanceState.getString(STATE_FILE_ITEM);
+                if (fileItem != null) {
+                    itsSelFileItem = FileGroupItem.valueOf(fileItem);
+                }
+            } catch (IllegalArgumentException e) {
+                itsSelFileItem = FileGroupItem.RECORDS;
+            }
         }
     }
 
@@ -254,6 +275,13 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_FILE_ITEM, itsSelFileItem.name());
+    }
+
+    @Override
     public void onDetach()
     {
         super.onDetach();
@@ -295,18 +323,48 @@ public class PasswdSafeNavDrawerFragment extends Fragment
 
         switch(menuItem.getItemId()) {
         case R.id.menu_drawer_records: {
-            menuItem.setChecked(true);
-            itsListener.showFileRecords();
+            switch (itsSelFileItem) {
+            case RECORDS: {
+                break;
+            }
+            case PASSWORD_POLICIES:
+            case EXPIRED_PASSWORDS: {
+                itsSelFileItem = FileGroupItem.RECORDS;
+                menuItem.setChecked(true);
+                itsListener.showFileRecords();
+                break;
+            }
+            }
             break;
         }
         case R.id.menu_drawer_passwd_policies: {
-            menuItem.setChecked(true);
-            itsListener.showFilePasswordPolicies();
+            switch (itsSelFileItem) {
+            case PASSWORD_POLICIES: {
+                break;
+            }
+            case RECORDS:
+            case EXPIRED_PASSWORDS: {
+                itsSelFileItem = FileGroupItem.PASSWORD_POLICIES;
+                menuItem.setChecked(true);
+                itsListener.showFilePasswordPolicies();
+                break;
+            }
+            }
             break;
         }
         case R.id.menu_drawer_expired_passwords: {
-            menuItem.setChecked(true);
-            itsListener.showFileExpiredPasswords();
+            switch (itsSelFileItem) {
+            case EXPIRED_PASSWORDS: {
+                break;
+            }
+            case RECORDS:
+            case PASSWORD_POLICIES: {
+                itsSelFileItem = FileGroupItem.EXPIRED_PASSWORDS;
+                menuItem.setChecked(true);
+                itsListener.showFileExpiredPasswords();
+                break;
+            }
+            }
             break;
         }
         case R.id.menu_drawer_preferences: {
