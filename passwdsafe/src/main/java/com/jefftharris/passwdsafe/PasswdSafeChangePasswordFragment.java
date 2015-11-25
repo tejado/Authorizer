@@ -24,6 +24,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
+import com.jefftharris.passwdsafe.view.TextInputUtils;
 
 /**
  * Fragment for changing a file's password
@@ -184,13 +185,13 @@ public class PasswdSafeChangePasswordFragment
             boolean valid;
 
             CharSequence passwd = itsPassword.getText();
-            valid = !GuiUtils.setTextInputError(
+            valid = !TextInputUtils.setTextInputError(
                     (passwd.length() == 0) ?
                             getString(R.string.empty_password) : null,
                     itsPasswordInput);
 
             CharSequence confirm = itsPasswordConfirm.getText();
-            valid &= !GuiUtils.setTextInputError(
+            valid &= !TextInputUtils.setTextInputError(
                     !TextUtils.equals(passwd, confirm) ?
                             getString(R.string.passwords_do_not_match) : null,
                     itsPasswordConfirmInput);

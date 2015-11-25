@@ -54,6 +54,7 @@ import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
+import com.jefftharris.passwdsafe.view.TextInputUtils;
 import com.jefftharris.passwdsafe.view.TimePickerDialogFragment;
 
 import org.pwsafe.lib.exception.PasswordSafeException;
@@ -1587,12 +1588,12 @@ public class PasswdSafeEditRecordFragment
             itsTypeError.setText(typeError);
 
             boolean valid = (typeError == null);
-            valid &= !GuiUtils.setTextInputError(validateTitle(),
-                                                 itsTitleInput);
-            valid &= !GuiUtils.setTextInputError(validatePassword(),
-                                                 itsPasswordInput);
-            valid &= !GuiUtils.setTextInputError(validatePasswordConfirm(),
-                                                 itsPasswordConfirmInput);
+            valid &= !TextInputUtils.setTextInputError(validateTitle(),
+                                                       itsTitleInput);
+            valid &= !TextInputUtils.setTextInputError(validatePassword(),
+                                                       itsPasswordInput);
+            valid &= !TextInputUtils.setTextInputError(
+                    validatePasswordConfirm(), itsPasswordConfirmInput);
 
             if (itsIsV3) {
                 boolean invalidExpiryDate = false;
@@ -1607,7 +1608,7 @@ public class PasswdSafeEditRecordFragment
                     break;
                 }
                 case INTERVAL: {
-                    valid &= !GuiUtils.setTextInputError(
+                    valid &= !TextInputUtils.setTextInputError(
                             validateExpiryInterval(), itsExpireIntervalInput);
                     break;
                 }
@@ -1624,7 +1625,7 @@ public class PasswdSafeEditRecordFragment
                     invalidHistory = true;
                 }
             }
-            valid &= !GuiUtils.setTextInputError(
+            valid &= !TextInputUtils.setTextInputError(
                     invalidHistory ?
                             getString(R.string.invalid_history_max_size,
                                       PasswdHistory.MAX_SIZE_MIN,
