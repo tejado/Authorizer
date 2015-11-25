@@ -361,11 +361,9 @@ public class PasswdSafeEditRecordFragment
     {
         super.onPrepareOptionsMenu(menu);
 
-        MenuItem item = menu.findItem(R.id.menu_done);
+        MenuItem item = menu.findItem(R.id.menu_save);
         if (item != null) {
-            boolean valid = itsValidator.isValid();
-            item.setEnabled(valid);
-            item.getIcon().setAlpha(valid ? 255 : 130);
+            item.setEnabled(itsValidator.isValid());
         }
 
         item = menu.findItem(R.id.menu_protect);
@@ -378,7 +376,7 @@ public class PasswdSafeEditRecordFragment
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
-        case R.id.menu_done: {
+        case R.id.menu_save: {
             saveRecord();
             return true;
         }
@@ -714,9 +712,6 @@ public class PasswdSafeEditRecordFragment
             }
         } else {
             fileData = getFileData();
-            if (fileData == null) {
-                return;
-            }
             record = null;
             itsIsV3 = fileData.isV3();
             group = getLocation().getRecordGroup();
@@ -1228,9 +1223,6 @@ public class PasswdSafeEditRecordFragment
             fileData = info.itsFileData;
         } else {
             fileData = getFileData();
-        }
-        if (fileData == null) {
-            return;
         }
 
         PwsRecord record;

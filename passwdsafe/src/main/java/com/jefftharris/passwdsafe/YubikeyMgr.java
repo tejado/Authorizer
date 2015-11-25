@@ -151,7 +151,6 @@ public class YubikeyMgr
      *  false otherwise */
     public boolean onPause()
     {
-        PasswdSafeUtil.dbginfo(TAG, "onPause");
         if (itsUser == null) {
             return false;
         }

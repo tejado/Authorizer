@@ -26,13 +26,16 @@
           android:title="@string/file_operations"
           android:orderInCategory="100">
         <menu>
+            <item android:id="@+id/menu_file_change_password"
+                  android:title="@string/change_password"/>
+
             <item android:id="@+id/menu_file_delete"
                   android:title="@string/delete_file"/>
         </menu>
     </item>
 
     <item android:id="@+id/menu_close"
-          android:title="@string/close"
+          android:title="@string/close_file"
           android:icon="@drawable/ic_action_close_cancel"
           android:orderInCategory="100"
           app:showAsAction="ifRoom"/>
