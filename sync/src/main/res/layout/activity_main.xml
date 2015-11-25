@@ -540,7 +540,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_launcher_passwdsafe"
+            android:drawableLeft="@mipmap/ic_launcher_passwdsafe"
             android:drawablePadding="6dp"
             android:gravity="fill_vertical"
             android:padding="6dp"

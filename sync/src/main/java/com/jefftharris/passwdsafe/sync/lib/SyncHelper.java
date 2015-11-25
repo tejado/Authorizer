@@ -147,7 +147,7 @@ public class SyncHelper
             String title = ctx.getString(R.string.passwdsafe_sync_conflict);
             GuiUtils.showNotification(
                     notifMgr, ctx, R.drawable.ic_stat_app,
-                    title, title, R.drawable.ic_launcher_sync,
+                    title, title, R.mipmap.ic_launcher_sync,
                     provider.getTypeAndDisplayName(ctx),
                     logrec.getConflictFiles(), logsIntent,
                     (int)provider.itsId, true);
