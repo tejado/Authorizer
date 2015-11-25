@@ -54,7 +54,7 @@ public class LauncherRecordShortcuts extends AbstractPasswdSafeActivity
         intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, fileData.getTitle(rec));
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                         Intent.ShortcutIconResource.fromContext(
-                            this, R.drawable.ic_launcher_passwdsafe));
+                            this, R.mipmap.ic_launcher_passwdsafe));
         setResult(RESULT_OK, intent);
         finish();
     }

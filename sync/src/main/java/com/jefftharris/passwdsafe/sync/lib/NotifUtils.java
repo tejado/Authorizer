@@ -75,7 +75,7 @@ public final class NotifUtils
         }
         }
         GuiUtils.showSimpleNotification(notifMgr, ctx, R.drawable.ic_stat_app,
-                                        title, R.drawable.ic_launcher_sync,
+                                        title, R.mipmap.ic_launcher_sync,
                                         content, mainIntent, type.itsNotifId,
                                         true);
     }
