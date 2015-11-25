@@ -31,6 +31,15 @@ import java.util.regex.PatternSyntaxException;
  */
 public class PasswdFileDataView
 {
+    /**
+     * Visitor interface for iterating records
+     */
+    public interface RecordVisitor
+    {
+        /** Visit a record */
+        void visitRecord(PwsRecord record);
+    }
+
     private PasswdFileData itsFileData;
 
     private GroupNode itsRootNode;
@@ -177,6 +186,14 @@ public class PasswdFileDataView
     }
 
     /**
+     * Visit all records under the current group
+     */
+    public synchronized void walkGroupRecords(RecordVisitor visitor)
+    {
+        walkGroupRecords(itsCurrGroupNode, visitor);
+    }
+
+    /**
      * Rebuild the view information
      */
     private synchronized void rebuildView(Context ctx)
@@ -256,6 +273,31 @@ public class PasswdFileDataView
             return PasswdRecordFilter.QUERY_MATCH;
         }
         return itsFilter.filterRecord(rec, itsFileData, ctx);
+    }
+
+    /**
+     * Recursively visit all records under a group.  Must be called while
+     * synchronized.
+     */
+    private void walkGroupRecords(GroupNode node, RecordVisitor visitor)
+    {
+        if (node == null) {
+            return;
+        }
+
+        Map<String, GroupNode> childGroups = node.getGroups();
+        if (childGroups != null) {
+            for (GroupNode child : childGroups.values()) {
+                walkGroupRecords(child, visitor);
+            }
+        }
+
+        List<MatchPwsRecord> childRecords = node.getRecords();
+        if (childRecords != null) {
+            for (MatchPwsRecord matchRec : childRecords) {
+                visitor.visitRecord(matchRec.itsRecord);
+            }
+        }
     }
 
     /**
