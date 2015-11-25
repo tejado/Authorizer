@@ -69,6 +69,7 @@ dependencies {
     debugCompile project(path: ':lib', configuration: 'debug')
     releaseCompile project(path: ':lib', configuration: 'release')
     compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:cardview-v7:23.1.0'
     compile 'com.android.support:design:23.0.1'
     compile 'com.android.support:support-v4:23.0.1'
 }

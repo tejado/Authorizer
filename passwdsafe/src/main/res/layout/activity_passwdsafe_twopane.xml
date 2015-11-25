@@ -9,38 +9,54 @@
 <android.support.v4.widget.DrawerLayout
     android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.jefftharris.passwdsafe.PasswdSafeActivity">
 
-    <LinearLayout android:id="@+id/two_pane"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:layout_marginEnd="16dp"
-                  android:layout_marginLeft="16dp"
-                  android:layout_marginRight="16dp"
-                  android:layout_marginStart="16dp"
-                  android:baselineAligned="false"
-                  android:divider="?android:attr/dividerHorizontal"
-                  android:orientation="horizontal"
-                  android:showDividers="middle"
-                  tools:ignore="UnusedAttribute">
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-        <fragment android:id="@+id/content_list"
-                  android:name="com.jefftharris.passwdsafe.PasswdSafeListFragment"
-                  android:layout_width="0dp"
-                  android:layout_height="match_parent"
-                  android:layout_weight="1"
-                  tools:layout="@android:layout/list_content"/>
+        <include android:id="@+id/query_panel"
+                 layout="@layout/activity_passwdsafe_query_panel"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"/>
 
-        <FrameLayout android:id="@+id/content"
-                     android:layout_width="0dp"
-                     android:layout_height="match_parent"
-                     android:layout_marginLeft="16dp"
-                     android:layout_marginStart="16dp"
-                     android:layout_weight="3"/>
-    </LinearLayout>
+        <LinearLayout android:id="@+id/two_pane"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:layout_above="@id/query_panel"
+                      android:layout_alignParentEnd="true"
+                      android:layout_alignParentLeft="true"
+                      android:layout_alignParentRight="true"
+                      android:layout_alignParentStart="true"
+                      android:layout_alignParentTop="true"
+                      android:layout_marginEnd="16dp"
+                      android:layout_marginLeft="16dp"
+                      android:layout_marginRight="16dp"
+                      android:layout_marginStart="16dp"
+                      android:baselineAligned="false"
+                      android:divider="?android:attr/dividerHorizontal"
+                      android:orientation="horizontal"
+                      android:showDividers="middle"
+                      tools:ignore="UnusedAttribute">
+
+            <fragment android:id="@+id/content_list"
+                      android:name="com.jefftharris.passwdsafe.PasswdSafeListFragment"
+                      android:layout_width="0dp"
+                      android:layout_height="match_parent"
+                      android:layout_weight="1"
+                      tools:layout="@android:layout/list_content"/>
+
+            <FrameLayout android:id="@+id/content"
+                         android:layout_width="0dp"
+                         android:layout_height="match_parent"
+                         android:layout_marginLeft="16dp"
+                         android:layout_marginStart="16dp"
+                         android:layout_weight="3"/>
+        </LinearLayout>
+    </RelativeLayout>
 
     <!-- android:layout_gravity="start" tells DrawerLayout to treat
          this as a sliding drawer on the left side for left-to-right

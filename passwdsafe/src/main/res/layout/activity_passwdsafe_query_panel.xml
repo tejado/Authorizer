@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/query_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true"
+        app:contentPadding="4dp">
+        <RelativeLayout android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="visible">
+            <ImageButton android:id="@+id/query_clear_btn"
+                         style="@style/Widget.AppCompat.ActionButton"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_alignParentEnd="true"
+                         android:layout_alignParentRight="true"
+                         android:layout_centerVertical="true"
+                         android:contentDescription="@string/clear"
+                         android:src="@drawable/ic_action_close_cancel_dark"/>
+
+            <TextView android:id="@+id/query"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_alignParentLeft="true"
+                      android:layout_alignParentStart="true"
+                      android:layout_centerVertical="true"
+                      android:layout_toLeftOf="@id/query_clear_btn"
+                      android:layout_toStartOf="@id/query_clear_btn"
+                      android:gravity="center_vertical"
+                      android:textAppearance="?android:attr/textAppearanceMedium"/>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</merge>
