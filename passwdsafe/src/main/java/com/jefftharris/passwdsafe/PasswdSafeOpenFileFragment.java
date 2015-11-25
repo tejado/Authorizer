@@ -71,6 +71,7 @@ public class PasswdSafeOpenFileFragment
     private YubikeyMgr itsYubiMgr;
     private YubikeyMgr.User itsYubiUser;
     private int itsYubiSlot = 2;
+    private boolean itsIsYubikey = false;
 
     private static final String ARG_URI = "uri";
     private static final String ARG_REC_TO_OPEN = "recToOpen";
@@ -447,6 +448,7 @@ public class PasswdSafeOpenFileFragment
             PasswdFileData fileData =
                     new PasswdFileData(getPasswdFileUri());
             try {
+                fileData.setYubikey(itsIsYubikey);
                 fileData.load(itsItsPassword, itsItsIsReadOnly, getActivity());
                 return fileData;
             } catch (Exception e) {
@@ -489,6 +491,7 @@ public class PasswdSafeOpenFileFragment
         @Override
         public void setHashedPassword(String password)
         {
+            itsIsYubikey = true;
             itsPasswordEdit.setText(password);
             itsOkBtn.performClick();
         }
