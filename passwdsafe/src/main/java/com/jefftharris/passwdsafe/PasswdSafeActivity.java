@@ -73,7 +73,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: expiry notifications
     // TODO: details
     // TODO: protect / unprotect all
-    // TODO: modern theme
     // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: autobackup
     // TODO: keyboard support
