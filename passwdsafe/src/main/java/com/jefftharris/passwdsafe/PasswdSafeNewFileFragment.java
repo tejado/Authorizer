@@ -28,6 +28,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
+import com.jefftharris.passwdsafe.view.TextInputUtils;
 
 
 /**
@@ -334,17 +335,17 @@ public class PasswdSafeNewFileFragment
             boolean isError;
 
             CharSequence fileName = itsFileName.getText();
-            isError = GuiUtils.setTextInputError(
+            isError = TextInputUtils.setTextInputError(
                     validateFileName(fileName.toString()), itsFileNameInput);
 
             CharSequence passwd = itsPassword.getText();
-            isError |= GuiUtils.setTextInputError(
+            isError |= TextInputUtils.setTextInputError(
                     (passwd.length() == 0) ?
                             getString(R.string.empty_password) : null,
                     itsPasswordInput);
 
             CharSequence confirm = itsPasswordConfirm.getText();
-            isError |= GuiUtils.setTextInputError(
+            isError |= TextInputUtils.setTextInputError(
                     !TextUtils.equals(passwd, confirm) ?
                             getString(R.string.passwords_do_not_match) : null,
                     itsPasswordConfirmInput);

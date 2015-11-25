@@ -22,7 +22,6 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
-import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 /**
  * Dialog to select a new group
@@ -82,7 +81,7 @@ public class NewGroupDialog extends DialogFragment
                 .setOnCancelListener(dlgClick);
         AlertDialog alertDialog = builder.create();
         TextView tv = (TextView)view.findViewById(R.id.new_group);
-        GuiUtils.setupDialogKeyboard(alertDialog, tv, tv, getContext());
+        DialogUtils.setupDialogKeyboard(alertDialog, tv, tv, getContext());
         return alertDialog;
     }
 }

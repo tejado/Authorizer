@@ -18,12 +18,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.IBinder;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
@@ -142,42 +138,6 @@ public final class GuiUtils
     }
 
     /**
-     * Set the error message on a TextInputLayout
-     * @param errorMsg The error message; null if no error
-     * @param field The input field
-     * @return Whether there was an error
-     */
-    public static boolean setTextInputError(String errorMsg,
-                                            TextInputLayout field)
-    {
-        boolean isError = !TextUtils.isEmpty(errorMsg);
-
-        // Set fields only if error changes to prevent flashing
-        CharSequence currErrorMsg = field.getError();
-        if (!TextUtils.equals(errorMsg, currErrorMsg)) {
-            field.setError(errorMsg);
-            if (!isError && (field.getChildCount() > 1)) {
-                // Assume the TextInputLayout has its error message as the
-                // second child.  Use animation so visibility occurs after
-                // the TextInputLayout's animation that turns it invisible
-                View error = field.getChildAt(1);
-                ViewCompat.animate(error)
-                          .setListener(new ViewPropertyAnimatorListenerAdapter()
-                          {
-                              @Override
-                              public void onAnimationEnd(View view)
-                              {
-                                  view.setVisibility(View.GONE);
-                              }
-                          })
-                          .start();
-            }
-        }
-
-        return isError;
-    }
-
-    /**
      * Setup the keyboard on a dialog. The initial field gets focus and shows
      * the keyboard. The final field clicks the Ok button when enter is pressed.
      */
@@ -193,32 +153,6 @@ public final class GuiUtils
             public void run()
             {
                 Button btn = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                if (btn.isEnabled()) {
-                    btn.performClick();
-                }
-            }
-        });
-    }
-
-
-    /**
-     * Setup the keyboard on a dialog. The initial field gets focus and shows
-     * the keyboard. The final field clicks the Ok button when enter is pressed.
-     */
-    public static void setupDialogKeyboard(
-            final android.support.v7.app.AlertDialog dialog,
-            TextView initialField,
-            TextView finalField,
-            Context ctx)
-    {
-        setShowKeyboardListener(dialog, initialField, ctx);
-        setupKeyboardEnter(finalField, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Button btn = dialog.getButton(
-                        android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
                 if (btn.isEnabled()) {
                     btn.performClick();
                 }
@@ -286,7 +220,7 @@ public final class GuiUtils
     /**
      * Setup a field to run an action on an enter or dpad center key press
      */
-    private static void setupKeyboardEnter(TextView field,
+    public static void setupKeyboardEnter(TextView field,
                                            final Runnable enterRunnable)
     {
         field.setOnKeyListener(new OnKeyListener()
@@ -312,7 +246,7 @@ public final class GuiUtils
      * Set a listener to show the keyboard when the dialog is shown. Only works
      * on Froyo and higher.
      */
-    private static void setShowKeyboardListener(Dialog dialog, View view,
+    public static void setShowKeyboardListener(Dialog dialog, View view,
                                                 Context ctx)
     {
         if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_FROYO) {

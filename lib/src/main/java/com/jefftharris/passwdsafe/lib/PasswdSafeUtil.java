@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,7 +21,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.support.v7.app.AlertDialog;
 import android.text.ClipboardManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -40,6 +40,8 @@ public class PasswdSafeUtil
     public static final boolean DEBUG = BuildConfig.DEBUG;
 
     private static final String TAG = "PasswdSafeUtil";
+
+    // TODO: Convert to v7 AlertDialog
 
     public static Intent createOpenIntent(Uri uri, String recToOpen)
     {
