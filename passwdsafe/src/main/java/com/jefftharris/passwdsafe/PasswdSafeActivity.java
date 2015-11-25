@@ -72,7 +72,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: about
     // TODO: expiry notifications
     // TODO: details
-    // TODO: protect / unprotect all
     // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: autobackup
     // TODO: keyboard support
@@ -314,15 +313,17 @@ public class PasswdSafeActivity extends AppCompatActivity
         boolean viewCanAdd = false;
         boolean viewHasFileOps = false;
         boolean viewHasFileChangePassword = false;
+        boolean viewProtectAll = true;
         boolean viewHasSearch = false;
         boolean viewHasClose = true;
         switch (itsCurrViewMode) {
         case VIEW_LIST: {
             viewCanAdd = fileEditable;
             viewHasSearch = true;
-            if (itsLocation.getGroups().isEmpty() && fileEditable) {
+            if (fileEditable) {
                 viewHasFileOps = true;
                 viewHasFileChangePassword = !fileData.isYubikey();
+                viewProtectAll = itsLocation.getGroups().isEmpty();
             }
             break;
         }
@@ -360,6 +361,19 @@ public class PasswdSafeActivity extends AppCompatActivity
         item = menu.findItem(R.id.menu_file_change_password);
         if (item != null) {
             item.setEnabled(viewHasFileChangePassword);
+        }
+
+        if (viewHasFileChangePassword) {
+            item = menu.findItem(R.id.menu_file_protect_records);
+            if (item != null) {
+                item.setTitle(viewProtectAll ? R.string.protect_all :
+                                      R.string.protect_group);
+            }
+            item = menu.findItem(R.id.menu_file_unprotect_records);
+            if (item != null) {
+                item.setTitle(viewProtectAll ? R.string.unprotect_all :
+                                      R.string.unprotect_group);
+            }
         }
 
         item = menu.findItem(R.id.menu_search);
@@ -417,6 +431,14 @@ public class PasswdSafeActivity extends AppCompatActivity
                     getString(R.string.delete),
                     confirmArgs);
             dialog.show(getSupportFragmentManager(), "Delete file");
+            return true;
+        }
+        case R.id.menu_file_protect_records: {
+            protectRecords(true);
+            return true;
+        }
+        case R.id.menu_file_unprotect_records: {
+            protectRecords(false);
             return true;
         }
         default: {
@@ -666,29 +688,13 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void finishEditRecord(boolean save, PasswdLocation newLocation)
     {
-        boolean resetLoc = false;
-        if (save) {
-            itsFileDataFrag.refreshFileData(this);
-            if ((newLocation != null) &&
-                !newLocation.equalGroups(itsLocation)) {
-                resetLoc = true;
-            }
-        }
-
-        FragmentManager fragMgr = getSupportFragmentManager();
-        fragMgr.popBackStackImmediate();
-
-        if (save) {
-            itsCurrTask = new SaveTask(itsFileDataFrag.getFileData(),
-                                       resetLoc, this);
-            itsCurrTask.execute();
-        }
+        saveFile(true, save, newLocation);
     }
 
     @Override
     public void finishChangePassword()
     {
-        finishEditRecord(true, null);
+        saveFile(true, true, null);
     }
 
     @Override
@@ -734,7 +740,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
             boolean removed = fileData.removeRecord(rec, this);
             if (removed) {
-                finishEditRecord(true, location.selectRecord(null));
+                saveFile(true, true, location.selectRecord(null));
             }
             break;
         }
@@ -768,6 +774,55 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
 
         changeOpenView(new PasswdLocation(), true);
+    }
+
+    /**
+     * Protect or unprotect all records under the current group
+     */
+    private void protectRecords(final boolean doProtect)
+    {
+        final PasswdFileData fileData = itsFileDataFrag.getFileData();
+        if (fileData == null) {
+            return;
+        }
+
+        itsFileDataFrag.getFileDataView().walkGroupRecords(
+                new PasswdFileDataView.RecordVisitor()
+                {
+                    @Override
+                    public void visitRecord(PwsRecord record)
+                    {
+                        fileData.setProtected(doProtect, record);
+                    }
+                });
+        saveFile(false, true, null);
+    }
+
+    /**
+     * Save the file
+     */
+    private void saveFile(boolean popBack, boolean save,
+                          PasswdLocation newLocation)
+    {
+        boolean resetLoc = false;
+        if (save) {
+            itsFileDataFrag.refreshFileData(this);
+            if ((newLocation != null) &&
+                !newLocation.equalGroups(itsLocation)) {
+                resetLoc = true;
+            }
+        }
+
+        if (popBack) {
+            FragmentManager fragMgr = getSupportFragmentManager();
+            fragMgr.popBackStackImmediate();
+        }
+
+        if (save) {
+            itsCurrTask = new SaveTask(itsFileDataFrag.getFileData(),
+                                       resetLoc, this);
+            itsCurrTask.execute();
+        }
     }
 
     /**

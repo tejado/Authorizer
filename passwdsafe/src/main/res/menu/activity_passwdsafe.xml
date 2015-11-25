@@ -29,6 +29,12 @@
             <item android:id="@+id/menu_file_change_password"
                   android:title="@string/change_password"/>
 
+            <item android:id="@+id/menu_file_protect_records"
+                  android:title="@string/protect_all"/>
+
+            <item android:id="@+id/menu_file_unprotect_records"
+                  android:title="@string/unprotect_all"/>
+
             <item android:id="@+id/menu_file_delete"
                   android:title="@string/delete_file"/>
         </menu>
