@@ -23,6 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * The PasswdFileDataView contains state for viewing a password file
@@ -44,6 +46,9 @@ public class PasswdFileDataView
 
     // TODO: sort case pref
     private boolean itsIsSortCaseSensitive = false;
+
+    // TODO: sort regex pref
+    private boolean itsIsSearchRegex = true;
 
     // TODO: sort order pref
     private RecordSortOrderPref itsRecordSortOrder =
@@ -133,9 +138,48 @@ public class PasswdFileDataView
     }
 
     /**
+     * Get the record filter
+     */
+    public synchronized PasswdRecordFilter getRecordFilter()
+    {
+        return itsFilter;
+    }
+
+    /**
+     * Set the record filter from a query string
+     */
+    public synchronized void setRecordFilter(String query, Context ctx)
+            throws Exception
+    {
+        PasswdRecordFilter filter = null;
+        Pattern queryPattern = null;
+        if (!TextUtils.isEmpty(query)) {
+            try {
+                int flags = 0;
+                if (!itsIsSortCaseSensitive) {
+                    flags |= Pattern.CASE_INSENSITIVE;
+                }
+                if (!itsIsSearchRegex) {
+                    flags |= Pattern.LITERAL;
+                }
+                queryPattern = Pattern.compile(query, flags);
+            } catch(PatternSyntaxException e) {
+                throw new Exception("Invalid query regex", e);
+            }
+        }
+        if (queryPattern != null) {
+            filter = new PasswdRecordFilter(queryPattern,
+                                            PasswdRecordFilter.OPTS_DEFAULT);
+        }
+
+        itsFilter = filter;
+        rebuildView(ctx);
+    }
+
+    /**
      * Rebuild the view information
      */
-    private void rebuildView(Context ctx)
+    private synchronized void rebuildView(Context ctx)
     {
         // TODO: rebuild in background?
 

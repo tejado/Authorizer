@@ -10,15 +10,15 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.jefftharris.passwdsafe.PasswdSafeActivity">
 
+    <item android:id="@+id/menu_search"
+          android:title="@string/search"
+          android:icon="@android:drawable/ic_menu_search"
+          app:showAsAction="ifRoom|collapseActionView"
+          app:actionViewClass="android.support.v7.widget.SearchView" />
+
     <item android:id="@+id/menu_add"
           android:title="@string/add_record"
           android:icon="@drawable/ic_action_add"
-          android:orderInCategory="100"
-          app:showAsAction="ifRoom"/>
-
-    <item android:id="@+id/menu_close"
-          android:title="@string/close"
-          android:icon="@drawable/ic_action_close_cancel"
           android:orderInCategory="100"
           app:showAsAction="ifRoom"/>
 
@@ -30,5 +30,11 @@
                   android:title="@string/delete_file"/>
         </menu>
     </item>
+
+    <item android:id="@+id/menu_close"
+          android:title="@string/close"
+          android:icon="@drawable/ic_action_close_cancel"
+          android:orderInCategory="100"
+          app:showAsAction="ifRoom"/>
 
 </menu>
