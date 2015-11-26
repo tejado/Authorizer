@@ -416,7 +416,7 @@ public class Preferences extends PreferenceActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.layout.preferences);
+        addPreferencesFromResource(R.xml.preferences);
 
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
