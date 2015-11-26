@@ -120,9 +120,4 @@
 
     </PreferenceCategory>
 
-    <com.jefftharris.passwdsafe.lib.view.LongListPreference
-        android:name="fontSize Pref"
-        android:key="fontSizePref"
-        android:title="@string/font_size"/>
-
 </PreferenceScreen>
