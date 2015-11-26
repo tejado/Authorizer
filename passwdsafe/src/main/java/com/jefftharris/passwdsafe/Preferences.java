@@ -184,7 +184,7 @@ public class Preferences extends PreferenceActivity
     {
         SharedPreferences.Editor prefsEdit = prefs.edit();
         prefsEdit.putBoolean(PREF_FILE_OPEN_READ_ONLY, readonly);
-        prefsEdit.commit();
+        prefsEdit.apply();
     }
 
     public static File getFileDirPref(SharedPreferences prefs)
@@ -197,7 +197,7 @@ public class Preferences extends PreferenceActivity
     {
         SharedPreferences.Editor prefsEdit = prefs.edit();
         prefsEdit.putString(Preferences.PREF_FILE_DIR, dir.toString());
-        prefsEdit.commit();
+        prefsEdit.apply();
     }
 
     public static Uri getDefFilePref(SharedPreferences prefs)
@@ -314,7 +314,7 @@ public class Preferences extends PreferenceActivity
 
         PasswdSafeUtil.dbginfo(TAG, "Save new default policy: %s", policyStr);
         prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policyStr);
-        prefsEdit.commit();
+        prefsEdit.apply();
     }
 
     /** Upgrade the default file preference if needed */
@@ -327,7 +327,7 @@ public class Preferences extends PreferenceActivity
             defFileUri = Uri.fromFile(def);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(PREF_DEF_FILE, defFileUri.toString());
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -358,7 +358,7 @@ public class Preferences extends PreferenceActivity
     {
         SharedPreferences.Editor prefsEdit = prefs.edit();
         prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policy.toHdrPolicyString());
-        prefsEdit.commit();
+        prefsEdit.apply();
     }
 
     public static RecordSortOrderPref getRecordSortOrderPref(
