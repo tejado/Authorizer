@@ -1,0 +1,37 @@
+import java.text.SimpleDateFormat
+
+apply plugin: 'com.android.library'
+
+def hgId() {
+    return 'hg id'.execute().text.trim();
+}
+
+def buildTime() {
+    def df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss Z");
+    return df.format(new Date());
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
+    publishNonDefault true
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        buildConfigField 'String', 'BUILD_ID', "\"${hgId()}\""
+        buildConfigField 'String', 'BUILD_DATE', "\"${buildTime()}\""
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.android.support:support-annotations:23.0.1'
+}
