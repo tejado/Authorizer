@@ -46,8 +46,8 @@
         <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="fileLegacyFileChooser Pref"
             android:key="fileLegacyFileChooserPref"
-            android:title="@string/legacy_file_chooser"
-            android:summary="@string/legacy_file_chooser_summary"/>
+            android:summary="@string/legacy_file_chooser_summary"
+            android:title="@string/legacy_file_chooser"/>
 
     </PreferenceCategory>
 
