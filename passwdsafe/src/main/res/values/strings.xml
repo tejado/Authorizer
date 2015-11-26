@@ -380,12 +380,6 @@
         <item>1 hour</item>
     </string-array>
 
-    <!-- Order must match FontSizePref enum values -->
-    <string-array name="font_size_pref">
-        <item>Normal</item>
-        <item>Small</item>
-    </string-array>
-
     <!-- Order must match constants in RecordSortOrderPref -->
     <string-array name="record_sort_order_pref">
         <item>Groups first</item>

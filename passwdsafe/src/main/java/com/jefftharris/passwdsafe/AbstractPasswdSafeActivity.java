@@ -26,7 +26,6 @@ import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
-import com.jefftharris.passwdsafe.pref.FontSizePref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 import com.jefftharris.passwdsafe.pref.RecordSortOrderPref;
 
@@ -89,7 +88,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             Preferences.PREF_RECORD_SORT_ORDER_DEF;
     private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = false;
-    private FontSizePref itsFontSize = Preferences.PREF_FONT_SIZE_DEF;
     protected PasswdExpiryNotifPref itsExpiryNotifPref =
         Preferences.PREF_PASSWD_EXPIRY_NOTIF_DEF;
     protected int itsNumExpired = 0;
@@ -148,7 +146,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         itsIsSearchCaseSensitive =
             Preferences.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
-        itsFontSize = Preferences.getFontSizePref(prefs);
         itsExpiryNotifPref = Preferences.getPasswdExpiryNotifPref(prefs);
     }
 
@@ -343,19 +340,6 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         }
 
         int layout = R.layout.passwdsafe_list_item;
-        switch (itsFontSize) {
-        case NORMAL:
-        {
-            // Default already set
-            break;
-        }
-        case SMALL:
-        {
-            layout = R.layout.passwdsafe_list_item_small;
-            break;
-        }
-        }
-
         String[] from;
         int[] to;
         if (!hasFilterSearchQuery()) {

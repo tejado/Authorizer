@@ -32,7 +32,6 @@ import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
-import com.jefftharris.passwdsafe.pref.FontSizePref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 import com.jefftharris.passwdsafe.pref.RecordSortOrderPref;
 
@@ -124,9 +123,6 @@ public class Preferences extends PreferenceActivity
     private static final String PREF_DEF_PASSWD_POLICY = "defaultPasswdPolicy";
     private static final String PREF_DEF_PASSWD_POLICY_DEF = "";
 
-    private static final String PREF_FONT_SIZE = "fontSizePref";
-    public static final FontSizePref PREF_FONT_SIZE_DEF = FontSizePref.NORMAL;
-
     private static final String INTENT_SCREEN = "screen";
 
     private static final String TAG = "Preferences";
@@ -141,7 +137,6 @@ public class Preferences extends PreferenceActivity
     private ListPreference itsPasswdExpiryNotifPref;
     private EditTextPreference itsPasswdDefaultSymsPref;
     private ListPreference itsRecordSortOrderPref;
-    private ListPreference itsFontSizePref;
 
 
     public static FileTimeoutPref getFileCloseTimeoutPref(SharedPreferences prefs)
@@ -219,16 +214,6 @@ public class Preferences extends PreferenceActivity
     {
         return prefs.getBoolean(PREF_FILE_LEGACY_FILE_CHOOSER,
                                 PREF_FILE_LEGACY_FILE_CHOOSER_DEF);
-    }
-
-    public static FontSizePref getFontSizePref(SharedPreferences prefs)
-    {
-        try {
-            return FontSizePref.valueOf(
-                prefs.getString(PREF_FONT_SIZE, PREF_FONT_SIZE_DEF.toString()));
-        } catch (IllegalArgumentException e) {
-            return PREF_FONT_SIZE_DEF;
-        }
     }
 
     public static boolean getGroupRecordsPref(SharedPreferences prefs)
@@ -509,11 +494,6 @@ public class Preferences extends PreferenceActivity
                 RecordSortOrderPref.getValues());
         onSharedPreferenceChanged(prefs, PREF_RECORD_SORT_ORDER);
 
-        itsFontSizePref = (ListPreference) findPreference(PREF_FONT_SIZE);
-        itsFontSizePref.setEntries(FontSizePref.getDisplayNames(res));
-        itsFontSizePref.setEntryValues(FontSizePref.getValues());
-        onSharedPreferenceChanged(prefs, PREF_FONT_SIZE);
-
         Intent intent = getIntent();
         String screen = intent.getStringExtra(INTENT_SCREEN);
         if (screen != null) {
@@ -588,11 +568,6 @@ public class Preferences extends PreferenceActivity
             itsRecordSortOrderPref.setSummary(
                     getRecordSortOrderPref(prefs)
                             .getDisplayName(getResources()));
-            break;
-        }
-        case PREF_FONT_SIZE: {
-            itsFontSizePref.setSummary(
-                    getFontSizePref(prefs).getDisplayName(getResources()));
             break;
         }
         }
