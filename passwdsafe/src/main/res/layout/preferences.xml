@@ -4,11 +4,11 @@
     android:layout_height="wrap_content"
     android:key="top_prefs">
 
-    <PreferenceScreen
+    <PreferenceCategory
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:key="fileOptions"
-        android:title="@string/file_settings">
+        android:title="@string/files">
 
         <com.jefftharris.passwdsafe.lib.view.LongEditTextPreference
             android:name="FileDir Pref"
@@ -70,13 +70,13 @@
             android:title="@string/legacy_file_chooser"
             android:summary="@string/legacy_file_chooser_summary"/>
 
-        </PreferenceScreen>
+    </PreferenceCategory>
 
-    <PreferenceScreen
+    <PreferenceCategory
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:key="passwordOptions"
-        android:title="@string/password_settings">
+        android:title="@string/passwords">
 
         <com.jefftharris.passwdsafe.lib.view.LongListPreference
             android:name="passwordEncoding Pref"
@@ -112,13 +112,13 @@
             android:summary="@string/password_gen_prefs_moved"
             android:title="@string/password_generation"/>
 
-    </PreferenceScreen>
+    </PreferenceCategory>
 
-    <PreferenceScreen
+    <PreferenceCategory
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:key="recordOptions"
-        android:title="@string/record_settings">
+        android:title="@string/records">
 
         <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="sortCaseSensitive Pref"
@@ -143,13 +143,13 @@
             android:key="recordSortOrderPref"
             android:title="@string/record_sort_order"/>
 
-    </PreferenceScreen>
+    </PreferenceCategory>
 
-    <PreferenceScreen
+    <PreferenceCategory
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:key="searchOptions"
-        android:title="@string/search_settings">
+        android:title="@string/search">
 
         <com.jefftharris.passwdsafe.lib.view.LongCheckBoxPreference
             android:name="searchCaseSensitive Pref"
@@ -168,7 +168,7 @@
             android:summary="@string/regular_expression_summary"
             android:title="@string/regular_expression"/>
 
-    </PreferenceScreen>
+    </PreferenceCategory>
 
     <com.jefftharris.passwdsafe.lib.view.LongListPreference
         android:name="fontSize Pref"
