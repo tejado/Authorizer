@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
+import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 /**
  * File data fragment for retaining information between runtime configuration
@@ -24,7 +25,10 @@ import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 public class PasswdSafeFileDataFragment extends Fragment
 {
     /** The open password file */
-    private PasswdFileData itsFileData;
+    private static PasswdFileData itsFileData;
+
+    /** The last viewed record UUID */
+    private static String itsLastViewedRecord;
 
     /** The open password file view */
     private final PasswdFileDataView itsFileDataView = new PasswdFileDataView();
@@ -80,6 +84,7 @@ public class PasswdSafeFileDataFragment extends Fragment
             itsFileData.close();
         }
         itsFileData = fileData;
+        itsLastViewedRecord = null;
         itsFileDataView.setFileData(itsFileData, ctx);
     }
 
@@ -87,5 +92,26 @@ public class PasswdSafeFileDataFragment extends Fragment
     public void refreshFileData(Context ctx)
     {
         itsFileDataView.setFileData(itsFileData, ctx);
+    }
+
+    /** Set the location in the file */
+    public void setLocation(PasswdLocation location)
+    {
+        itsFileDataView.setCurrGroups(location.getGroups());
+        if (location.isRecord()) {
+            itsLastViewedRecord = location.getRecord();
+        }
+    }
+
+    /** Get the global open password file data */
+    public static @Nullable PasswdFileData getOpenFileData()
+    {
+        return itsFileData;
+    }
+
+    /** Get the last viewed record */
+    public static @Nullable String getLastViewedRecord()
+    {
+        return itsLastViewedRecord;
     }
 }

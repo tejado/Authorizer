@@ -30,7 +30,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
-import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.Pair;
@@ -134,7 +133,7 @@ public class PasswdSafeIME extends InputMethodService
         if (itsEnterKey != null) {
             itsEnterKey.label = (enterText != -1) ? getString(enterText) : null;
             itsEnterKey.icon = (enterIcon != -1) ?
-                    getResources().getDrawable(enterIcon) : null;
+                    GuiUtils.getDrawable(getResources(), enterIcon) : null;
         }
 
         itsIsPasswordField = false;
@@ -202,7 +201,6 @@ public class PasswdSafeIME extends InputMethodService
                     rc.first.getUri().getUri(), uuid);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(ApiCompat.INTENT_FLAG_ACTIVITY_CLEAR_TASK);
         }
         startActivity(intent);
     }
@@ -310,14 +308,13 @@ public class PasswdSafeIME extends InputMethodService
     /** Refresh the fields from the current password data */
     private Pair<PasswdFileData, PwsRecord> refresh()
     {
-        PasswdSafeApp app = getPasswdSafeApp();
-        PasswdFileData fileData = app.accessOpenFileData();
+        PasswdFileData fileData = PasswdSafeFileDataFragment.getOpenFileData();
         PwsRecord rec = null;
         TextView filetv = (TextView)itsView.findViewById(R.id.file);
         if (fileData != null) {
             filetv.setText(fileData.getUri().getIdentifier(this, false));
 
-            String uuid = app.getLastViewedRecord();
+            String uuid = PasswdSafeFileDataFragment.getLastViewedRecord();
             if (uuid != null) {
                 rec = fileData.getRecord(uuid);
             }
@@ -345,12 +342,6 @@ public class PasswdSafeIME extends InputMethodService
     {
         View v = itsView.findViewById(R.id.password_warning);
         v.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    /** Get the PasswdSafeApp */
-    private PasswdSafeApp getPasswdSafeApp()
-    {
-        return (PasswdSafeApp)getApplication();
     }
 
     /** The PasswdSafeKeyboard class is a keyboard for PasswdSafe */
