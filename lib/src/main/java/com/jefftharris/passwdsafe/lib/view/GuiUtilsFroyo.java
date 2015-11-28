@@ -12,6 +12,8 @@ import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 
 /**
@@ -71,5 +73,14 @@ public final class GuiUtilsFroyo
     public static void showKeyboard(View view, Context ctx)
     {
         view.post(new KeyboardViewer(view, ctx));
+    }
+
+    /**
+     * Get a drawable resource
+     */
+    @SuppressWarnings("deprecation")
+    public static Drawable getDrawable(Resources res, int id)
+    {
+        return res.getDrawable(id);
     }
 }
