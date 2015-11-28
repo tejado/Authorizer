@@ -234,15 +234,33 @@ public class PasswdSafeActivity extends AppCompatActivity
         super.onNewIntent(intent);
 
         PasswdSafeUtil.dbginfo(TAG, "onNewIntent: %s", intent);
-
-        if (intent.getAction().equals(Intent.ACTION_SEARCH)) {
+        switch (intent.getAction()) {
+        case PasswdSafeUtil.VIEW_INTENT:
+        case Intent.ACTION_VIEW: {
+            Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
+            PasswdFileData fileData = itsFileDataFrag.getFileData();
+            if ((fileData == null) ||
+                !fileData.getUri().getUri().equals(openUri)) {
+                // Close and reopen the new file
+                itsFileDataFrag.setFileData(null, this);
+                doUpdateView(ViewMode.INIT, new PasswdLocation());
+                changeInitialView();
+                changeFileOpenView(intent);
+            }
+            break;
+        }
+        case Intent.ACTION_SEARCH: {
             setRecordFilter(intent.getStringExtra(SearchManager.QUERY));
-        } else {
+            break;
+        }
+        default: {
             FragmentManager fragMgr = getSupportFragmentManager();
             Fragment frag = fragMgr.findFragmentById(R.id.content);
             if (frag instanceof PasswdSafeOpenFileFragment) {
                 ((PasswdSafeOpenFileFragment)frag).onNewIntent(intent);
             }
+            break;
+        }
         }
     }
 
