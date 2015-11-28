@@ -74,7 +74,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: details
     // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: autobackup
-    // TODO: keyboard support
     // TODO: shortcuts
     // TODO: check manifest errors regarding icons
     // TODO: storage access framework support (want to keep support?)
@@ -1004,10 +1003,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         PasswdSafeUtil.dbginfo(TAG, "doUpdateView: mode: %s, loc: %s",
                                mode, location);
 
-        PasswdFileDataView fileDataView = itsFileDataFrag.getFileDataView();
-
         itsLocation = location;
-        fileDataView.setCurrGroups(itsLocation.getGroups());
+        itsFileDataFrag.setLocation(itsLocation);
         itsCurrViewMode = mode;
 
         FragmentManager fragMgr = getSupportFragmentManager();
@@ -1091,6 +1088,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         restoreActionBar();
         itsTimeoutReceiver.updateTimeout(fileTimeoutPaused);
 
+        PasswdFileDataView fileDataView = itsFileDataFrag.getFileDataView();
         GuiUtils.setVisible(itsQueryPanel,
                             queryVisibleForMode &&
                             (fileDataView.getRecordFilter() != null));
