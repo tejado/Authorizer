@@ -16,7 +16,9 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.text.InputType;
@@ -312,6 +314,19 @@ public final class GuiUtils
     }
 
 
+    /**
+     * Get a drawable resource
+     */
+    public static Drawable getDrawable(Resources res, int id)
+    {
+        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_LOLLIPOP) {
+            return GuiUtilsLollipop.getDrawable(res, id);
+        } else {
+            return GuiUtilsFroyo.getDrawable(res, id);
+        }
+    }
+
+
     /** Show a notification */
     public static void showNotification(NotificationManager notifyMgr,
                                         Context ctx,
@@ -326,7 +341,7 @@ public final class GuiUtils
                                         boolean autoCancel)
     {
         BitmapDrawable b =
-                (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
+                (BitmapDrawable)getDrawable(ctx.getResources(), bigIcon);
         if (b == null) {
             return;
         }
@@ -369,7 +384,7 @@ public final class GuiUtils
                                               boolean autoCancel)
     {
         BitmapDrawable b =
-                (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
+                (BitmapDrawable)getDrawable(ctx.getResources(), bigIcon);
         if (b == null) {
             return;
         }
