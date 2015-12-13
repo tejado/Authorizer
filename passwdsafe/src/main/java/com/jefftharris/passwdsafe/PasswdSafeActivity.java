@@ -61,12 +61,12 @@ public class PasswdSafeActivity extends AppCompatActivity
                    PasswdSafeEditRecordFragment.Listener,
                    PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
+                   PasswdSafePolicyListFragment.Listener,
                    PasswdSafeNavDrawerFragment.Listener,
                    PasswdSafeNewFileFragment.Listener,
                    PasswdSafeRecordFragment.Listener
 {
     // TODO: 3rdparty file open
-    // TODO: policies
     // TODO: expired passwords
     // TODO: preferences
     // TODO: about
@@ -96,7 +96,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Edit a record */
         EDIT_RECORD,
         /** Change a password */
-        CHANGE_PASSWORD
+        CHANGE_PASSWORD,
+        /** View policy list */
+        VIEW_POLICY_LIST
     }
 
     private enum ViewMode
@@ -114,7 +116,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Editing a record */
         EDIT_RECORD,
         /** Changing a password */
-        CHANGING_PASSWORD
+        CHANGING_PASSWORD,
+        /** Viewing a list of policies */
+        VIEW_POLICY_LIST
     }
 
     /** Action conformed via ConfirmPromptDialog */
@@ -350,7 +354,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
         case INIT:
         case FILE_OPEN:
-        case FILE_NEW: {
+        case FILE_NEW:
+        case VIEW_POLICY_LIST: {
             break;
         }
         case EDIT_RECORD:
@@ -499,7 +504,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showFileRecords()
     {
-        Toast.makeText(this, "showFileRecords", Toast.LENGTH_SHORT).show();
+        changeOpenView(itsLocation, false);
     }
 
     /**
@@ -508,7 +513,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showFilePasswordPolicies()
     {
-        Toast.makeText(this, "showFilePasswordPolicies", Toast.LENGTH_SHORT).show();
+        doChangeView(ChangeMode.VIEW_POLICY_LIST,
+                     PasswdSafePolicyListFragment.newInstance());
     }
 
     /**
@@ -705,19 +711,31 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void finishEditRecord(boolean save, PasswdLocation newLocation)
     {
-        saveFile(true, save, newLocation);
+        saveFile(true, save, newLocation, null);
     }
 
     @Override
     public void finishChangePassword()
     {
-        saveFile(true, true, null);
+        saveFile(true, true, null, null);
     }
 
     @Override
     public void updateViewChangingPassword()
     {
         doUpdateView(ViewMode.CHANGING_PASSWORD, itsLocation);
+    }
+
+    @Override
+    public void updateViewPolicyList()
+    {
+        doUpdateView(ViewMode.VIEW_POLICY_LIST, itsLocation);
+    }
+
+    @Override
+    public void finishPolicyEdit(Runnable postSaveRun)
+    {
+        saveFile(false, true, null, postSaveRun);
     }
 
     @Override
@@ -757,7 +775,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
             boolean removed = fileData.removeRecord(rec, this);
             if (removed) {
-                saveFile(true, true, location.selectRecord(null));
+                saveFile(true, true, location.selectRecord(null), null);
             }
             break;
         }
@@ -812,14 +830,14 @@ public class PasswdSafeActivity extends AppCompatActivity
                         fileData.setProtected(doProtect, record);
                     }
                 });
-        saveFile(false, true, null);
+        saveFile(false, true, null, null);
     }
 
     /**
      * Save the file
      */
     private void saveFile(boolean popBack, boolean save,
-                          PasswdLocation newLocation)
+                          PasswdLocation newLocation, Runnable postSaveRun)
     {
         boolean resetLoc = false;
         if (save) {
@@ -837,7 +855,7 @@ public class PasswdSafeActivity extends AppCompatActivity
 
         if (save) {
             itsCurrTask = new SaveTask(itsFileDataFrag.getFileData(),
-                                       resetLoc, this);
+                                       resetLoc, postSaveRun, this);
             itsCurrTask.execute();
         }
     }
@@ -914,7 +932,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 case OPEN:
                 case RECORD:
                 case EDIT_RECORD:
-                case CHANGE_PASSWORD: {
+                case CHANGE_PASSWORD:
+                case VIEW_POLICY_LIST: {
                     supportsBack = true;
                     break;
                 }
@@ -963,7 +982,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         case FILE_NEW:
         case VIEW_LIST:
         case VIEW_RECORD:
-        case CHANGING_PASSWORD: {
+        case CHANGING_PASSWORD:
+        case VIEW_POLICY_LIST: {
             break;
         }
         }
@@ -1081,6 +1101,12 @@ public class PasswdSafeActivity extends AppCompatActivity
             fileTimeoutPaused = false;
             break;
         }
+        case VIEW_POLICY_LIST: {
+            drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
+            itsTitle = PasswdSafeApp.getAppTitle(
+                    getString(R.string.password_policies), this);
+            break;
+        }
         }
 
         GuiUtils.invalidateOptionsMenu(this);
@@ -1138,17 +1164,20 @@ public class PasswdSafeActivity extends AppCompatActivity
     {
         private final PasswdFileData itsFileData;
         private final boolean itsIsResetLoc;
+        private final Runnable itsPostSaveRun;
 
         /**
          * Constructor
          */
-        public SaveTask(PasswdFileData fileData, boolean resetLoc, Context ctx)
+        public SaveTask(PasswdFileData fileData, boolean resetLoc,
+                        Runnable postSaveRun, Context ctx)
         {
             super(ctx.getString(R.string.saving_file,
                                 fileData.getUri().getIdentifier(ctx, false)),
                   ctx);
             itsFileData = fileData;
             itsIsResetLoc = resetLoc;
+            itsPostSaveRun = postSaveRun;
         }
 
         @Override
@@ -1165,6 +1194,10 @@ public class PasswdSafeActivity extends AppCompatActivity
         {
             if (itsIsResetLoc) {
                 changeOpenView(new PasswdLocation(), true);
+            }
+
+            if (itsPostSaveRun != null) {
+                itsPostSaveRun.run();
             }
         }
 
@@ -1238,6 +1271,11 @@ public class PasswdSafeActivity extends AppCompatActivity
                     @Override
                     protected Object doInBackground(Void... params)
                     {
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         return null;
                     }
                     private Object doAction()
