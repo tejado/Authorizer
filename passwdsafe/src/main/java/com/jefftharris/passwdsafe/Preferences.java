@@ -67,8 +67,8 @@ public class Preferences extends PreferenceActivity
         "fileOpenReadOnly";
     private static final boolean PREF_FILE_OPEN_READ_ONLY_DEF = false;
 
-    private static final String PREF_DEF_FILE = "defFilePref";
-    private static final String PREF_DEF_FILE_DEF = "";
+    public static final String PREF_DEF_FILE = "defFilePref";
+    public static final String PREF_DEF_FILE_DEF = "";
 
     private static final String PREF_FILE_LEGACY_FILE_CHOOSER =
             "fileLegacyFileChooserPref";
