@@ -7,23 +7,20 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/menu_drawer_file_group"
-           android:enabled="false"
+    <group android:id="@+id/menu_drawer"
            android:checkableBehavior="single">
         <item android:id="@+id/menu_drawer_records"
-              android:title="@string/records"
-              android:checked="true"/>
+              android:icon="@drawable/ic_action_people_outline"
+              android:title="@string/records"/>
 
         <item android:id="@+id/menu_drawer_passwd_policies"
+              android:icon="@drawable/ic_action_password"
               android:title="@string/password_policies"/>
 
         <item android:id="@+id/menu_drawer_expired_passwords"
+              android:icon="@drawable/ic_action_alarm_dark"
               android:title="@string/expired_passwords"/>
 
-    </group>
-
-    <group android:id="@+id/menu_drawer_common_group"
-           android:checkableBehavior="none">
         <item android:id="@+id/menu_drawer_preferences"
               android:icon="@android:drawable/ic_menu_preferences"
               android:title="@string/preferences"/>

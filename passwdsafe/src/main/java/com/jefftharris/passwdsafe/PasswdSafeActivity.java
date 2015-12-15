@@ -73,6 +73,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: expiry notifications
     // TODO: details
     // TODO: recheck all icons (remove use of all built-in ones)
+    // TODO: use trash can icon for delete and X for close for consistency
     // TODO: autobackup
     // TODO: shortcuts
     // TODO: check manifest errors regarding icons
@@ -1030,8 +1031,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         FragmentManager fragMgr = getSupportFragmentManager();
         boolean showLeftList = false;
         boolean queryVisibleForMode = false;
-        PasswdSafeNavDrawerFragment.NavMode drawerMode =
-                PasswdSafeNavDrawerFragment.NavMode.INIT;
+        PasswdSafeNavDrawerFragment.Mode drawerMode =
+                PasswdSafeNavDrawerFragment.Mode.INIT;
         boolean fileTimeoutPaused = true;
         switch (mode) {
         case INIT:
@@ -1043,7 +1044,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         case VIEW_LIST: {
             showLeftList = true;
             queryVisibleForMode = true;
-            drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.RECORDS_LIST;
             fileTimeoutPaused = false;
             itsTitle = null;
             String groups = itsLocation.getGroupPath();
@@ -1071,8 +1072,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         case VIEW_RECORD: {
             showLeftList = true;
             drawerMode = itsIsTwoPane ?
-                    PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN :
-                    PasswdSafeNavDrawerFragment.NavMode.SINGLE_RECORD;
+                    PasswdSafeNavDrawerFragment.Mode.RECORDS_LIST :
+                    PasswdSafeNavDrawerFragment.Mode.RECORDS_SINGLE;
             fileTimeoutPaused = false;
             PasswdFileData fileData = itsFileDataFrag.getFileData();
             if ((fileData != null) && itsLocation.isRecord()) {
@@ -1084,7 +1085,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             break;
         }
         case EDIT_RECORD: {
-            drawerMode = PasswdSafeNavDrawerFragment.NavMode.CANCELABLE_ACTION;
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.RECORDS_ACTION;
             PasswdFileData fileData = itsFileDataFrag.getFileData();
             if ((fileData != null) && itsLocation.isRecord()) {
                 PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
@@ -1097,12 +1098,12 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
         case CHANGING_PASSWORD: {
             itsTitle = getString(R.string.change_password);
-            drawerMode = PasswdSafeNavDrawerFragment.NavMode.CANCELABLE_ACTION;
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.RECORDS_ACTION;
             fileTimeoutPaused = false;
             break;
         }
         case VIEW_POLICY_LIST: {
-            drawerMode = PasswdSafeNavDrawerFragment.NavMode.FILE_OPEN;
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.POLICIES;
             itsTitle = PasswdSafeApp.getAppTitle(
                     getString(R.string.password_policies), this);
             break;
@@ -1110,7 +1111,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         }
 
         GuiUtils.invalidateOptionsMenu(this);
-        itsNavDrawerFrag.setMode(drawerMode);
+        itsNavDrawerFrag.setMode(drawerMode,
+                                 itsFileDataFrag.getFileData() != null);
         restoreActionBar();
         itsTimeoutReceiver.updateTimeout(fileTimeoutPaused);
 
