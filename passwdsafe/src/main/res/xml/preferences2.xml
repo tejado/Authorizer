@@ -52,6 +52,7 @@
 
         <CheckBoxPreference
             android:name="fileLegacyFileChooser Pref"
+            android:defaultValue="true"
             android:key="fileLegacyFileChooserPref"
             android:summary="@string/legacy_file_chooser_summary"
             android:title="@string/legacy_file_chooser"/>
