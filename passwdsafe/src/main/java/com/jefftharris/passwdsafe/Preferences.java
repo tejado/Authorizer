@@ -12,22 +12,11 @@ import java.io.File;
 import org.pwsafe.lib.file.PwsFile;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Environment;
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
-import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
@@ -36,13 +25,11 @@ import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 import com.jefftharris.passwdsafe.pref.RecordSortOrderPref;
 
 /**
- * The Preferences class defines the activity for managing preferences on the
- * application
+ * The Preferences class manages preferences for the application
  *
  * @author Jeff Harris
  */
-public class Preferences extends PreferenceActivity
-    implements SharedPreferences.OnSharedPreferenceChangeListener
+public class Preferences
 {
     public static final String PREF_FILE_DIR = "fileDirPref";
     public static final String PREF_FILE_DIR_DEF =
@@ -123,20 +110,7 @@ public class Preferences extends PreferenceActivity
     private static final String PREF_DEF_PASSWD_POLICY = "defaultPasswdPolicy";
     private static final String PREF_DEF_PASSWD_POLICY_DEF = "";
 
-    private static final String INTENT_SCREEN = "screen";
-
     private static final String TAG = "Preferences";
-
-    private static final int REQUEST_DEFAULT_FILE = 0;
-
-    private EditTextPreference itsFileDirPref;
-    private Preference itsDefFilePref;
-    private ListPreference itsFileClosePref;
-    private ListPreference itsFileBackupPref;
-    private ListPreference itsPasswdEncPref;
-    private ListPreference itsPasswdExpiryNotifPref;
-    private EditTextPreference itsPasswdDefaultSymsPref;
-    private ListPreference itsRecordSortOrderPref;
 
 
     public static FileTimeoutPref getFileCloseTimeoutPref(SharedPreferences prefs)
@@ -394,239 +368,5 @@ public class Preferences extends PreferenceActivity
     {
         return prefs.getBoolean(PREF_SORT_CASE_SENSITIVE,
                                 PREF_SORT_CASE_SENSITIVE_DEF);
-    }
-
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferences);
-
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.registerOnSharedPreferenceChangeListener(this);
-
-        itsFileDirPref = (EditTextPreference)findPreference(PREF_FILE_DIR);
-        itsFileClosePref = (ListPreference)
-            findPreference(PREF_FILE_CLOSE_TIMEOUT);
-        itsFileBackupPref = (ListPreference)
-            findPreference(PREF_FILE_BACKUP);
-
-        itsFileDirPref.setDefaultValue(PREF_FILE_DIR_DEF);
-        onSharedPreferenceChanged(prefs, PREF_FILE_DIR);
-
-        itsDefFilePref = findPreference(PREF_DEF_FILE);
-        itsDefFilePref.setOnPreferenceClickListener(
-                new Preference.OnPreferenceClickListener()
-                {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference)
-                    {
-                        Intent intent = new Intent(
-                                Intent.ACTION_CREATE_SHORTCUT,
-                                null, Preferences.this,
-                                LauncherFileShortcuts.class);
-                        intent.putExtra(
-                                LauncherFileShortcuts.EXTRA_IS_DEFAULT_FILE,
-                                true);
-                        startActivityForResult(intent, REQUEST_DEFAULT_FILE);
-                        return true;
-                    }
-                });
-        onSharedPreferenceChanged(prefs, PREF_DEF_FILE);
-
-        Resources res = getResources();
-        itsFileClosePref.setEntries(FileTimeoutPref.getDisplayNames(res));
-        itsFileClosePref.setEntryValues(FileTimeoutPref.getValues());
-        onSharedPreferenceChanged(prefs, PREF_FILE_CLOSE_TIMEOUT);
-
-        itsFileBackupPref.setEntries(FileBackupPref.getDisplayNames(res));
-        itsFileBackupPref.setEntryValues(FileBackupPref.getValues());
-        onSharedPreferenceChanged(prefs, PREF_FILE_BACKUP);
-
-        CheckBoxPreference fileChoosePref = (CheckBoxPreference)
-                findPreference(PREF_FILE_LEGACY_FILE_CHOOSER);
-        fileChoosePref.setDefaultValue(PREF_FILE_LEGACY_FILE_CHOOSER_DEF);
-        fileChoosePref.setChecked(PREF_FILE_LEGACY_FILE_CHOOSER_DEF);
-
-        itsPasswdEncPref = (ListPreference)findPreference(PREF_PASSWD_ENC);
-        String[] charsets =  PwsFile.ALL_PASSWORD_CHARSETS.toArray(
-                new String[PwsFile.ALL_PASSWORD_CHARSETS.size()]);
-        itsPasswdEncPref.setEntries(charsets);
-        itsPasswdEncPref.setEntryValues(charsets);
-        itsPasswdEncPref.setDefaultValue(PREF_PASSWD_ENC_DEF);
-        onSharedPreferenceChanged(prefs, PREF_PASSWD_ENC);
-
-        itsPasswdExpiryNotifPref =
-            (ListPreference)findPreference(PREF_PASSWD_EXPIRY_NOTIF);
-        itsPasswdExpiryNotifPref.setEntries(
-                PasswdExpiryNotifPref.getDisplayNames(res));
-        itsPasswdExpiryNotifPref.setEntryValues(
-                PasswdExpiryNotifPref.getValues());
-        onSharedPreferenceChanged(prefs, PREF_PASSWD_EXPIRY_NOTIF);
-
-        itsPasswdDefaultSymsPref =
-                (EditTextPreference)findPreference(PREF_PASSWD_DEFAULT_SYMS);
-        itsPasswdDefaultSymsPref.getEditText().setHint(
-                PasswdPolicy.SYMBOLS_DEFAULT);
-        itsPasswdDefaultSymsPref.setDefaultValue(PasswdPolicy.SYMBOLS_DEFAULT);
-        onSharedPreferenceChanged(prefs, PREF_PASSWD_DEFAULT_SYMS);
-
-        Preference pref = findPreference(PREF_PASSWD_CLEAR_ALL_NOTIFS);
-        pref.setOnPreferenceClickListener(
-                new Preference.OnPreferenceClickListener()
-                {
-                    public boolean onPreferenceClick(Preference preference)
-                    {
-                        PasswdSafeApp app = (PasswdSafeApp) getApplication();
-                        app.getNotifyMgr()
-                           .clearAllNotifications(Preferences.this);
-                        return true;
-                    }
-                });
-
-        itsRecordSortOrderPref = (ListPreference)
-                findPreference(PREF_RECORD_SORT_ORDER);
-        itsRecordSortOrderPref.setEntries(
-                RecordSortOrderPref.getDisplayNames(res));
-        itsRecordSortOrderPref.setEntryValues(
-                RecordSortOrderPref.getValues());
-        onSharedPreferenceChanged(prefs, PREF_RECORD_SORT_ORDER);
-
-        Intent intent = getIntent();
-        String screen = intent.getStringExtra(INTENT_SCREEN);
-        if (screen != null) {
-            Preference scr = findPreference(screen);
-            getPreferenceScreen().onItemClick(null, null, scr.getOrder(), 0);
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see android.preference.PreferenceActivity#onDestroy()
-     */
-    @Override
-    protected void onDestroy()
-    {
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.unregisterOnSharedPreferenceChangeListener(this);
-        super.onDestroy();
-    }
-
-    /* (non-Javadoc)
-     * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
-     */
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
-    {
-        switch (key) {
-        case PREF_FILE_DIR: {
-            File pref = getFileDirPref(prefs);
-            if (pref.toString().length() == 0) {
-                pref = new File(PREF_FILE_DIR_DEF);
-                itsFileDirPref.setText(pref.toString());
-            }
-            // Make sure text editor is in sync with preference value
-            if (!pref.toString().equals(itsFileDirPref.getText())) {
-                itsFileDirPref.setText(pref.toString());
-            }
-            itsFileDirPref.setSummary(pref.toString());
-            break;
-        }
-        case PREF_DEF_FILE: {
-            new DefaultFileResolver().execute(getDefFilePref(prefs));
-            break;
-        }
-        case PREF_FILE_CLOSE_TIMEOUT: {
-            itsFileClosePref.setSummary(
-                    getFileCloseTimeoutPref(prefs).getDisplayName(
-                            getResources()));
-            break;
-        }
-        case PREF_FILE_BACKUP: {
-            itsFileBackupPref.setSummary(
-                    getFileBackupPref(prefs).getDisplayName(getResources()));
-            break;
-        }
-        case PREF_PASSWD_ENC: {
-            itsPasswdEncPref.setSummary(getPasswordEncodingPref(prefs));
-            break;
-        }
-        case PREF_PASSWD_EXPIRY_NOTIF: {
-            itsPasswdExpiryNotifPref.setSummary(
-                    getPasswdExpiryNotifPref(prefs).getDisplayName(
-                            getResources()));
-            break;
-        }
-        case PREF_PASSWD_DEFAULT_SYMS: {
-            String val = getPasswdDefaultSymbolsPref(prefs);
-            itsPasswdDefaultSymsPref.setSummary(
-                    getString(R.string.symbols_used_by_default, val));
-            break;
-        }
-        case PREF_RECORD_SORT_ORDER: {
-            itsRecordSortOrderPref.setSummary(
-                    getRecordSortOrderPref(prefs)
-                            .getDisplayName(getResources()));
-            break;
-        }
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see android.preference.PreferenceActivity#onActivityResult(int, int, android.content.Intent)
-     */
-    @Override
-    protected void onActivityResult(int requestCode,
-                                    int resultCode,
-                                    Intent data)
-    {
-        if (requestCode == REQUEST_DEFAULT_FILE) {
-            if (resultCode == RESULT_OK) {
-                Intent val =
-                        data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
-                SharedPreferences.Editor editor = itsDefFilePref.getEditor();
-                String prefVal =
-                        (val != null) ? val.getData().toString() : null;
-                editor.putString(PREF_DEF_FILE, prefVal);
-                editor.commit();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    /** Background task to resolve the default file URI and set the
-     * preference's summary */
-    private final class DefaultFileResolver
-            extends AsyncTask<Uri, Void, PasswdFileUri>
-    {
-        /* (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected PasswdFileUri doInBackground(Uri... params)
-        {
-            Uri uri = params[0];
-            if (uri == null) {
-                return null;
-            }
-            return new PasswdFileUri(uri, Preferences.this);
-        }
-
-        /* (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(PasswdFileUri result)
-        {
-            String summary;
-            if (result == null) {
-                summary = getString(R.string.none);
-            } else {
-                summary = result.getIdentifier(Preferences.this, false);
-            }
-            itsDefFilePref.setSummary(summary);
-        }
     }
 }
