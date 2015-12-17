@@ -55,7 +55,7 @@ public class Preferences extends PreferenceActivity
                     "fileCloseScreenOffPref";
     public static final boolean PREF_FILE_CLOSE_SCREEN_OFF_DEF = false;
 
-    private static final String PREF_FILE_BACKUP = "fileBackupPref";
+    public static final String PREF_FILE_BACKUP = "fileBackupPref";
     private static final FileBackupPref PREF_FILE_BACKUP_DEF =
         FileBackupPref.BACKUP_1;
 
@@ -78,7 +78,7 @@ public class Preferences extends PreferenceActivity
     private static final boolean PREF_GROUP_RECORDS_DEF = true;
 
     public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
-    private static final String PREF_PASSWD_ENC_DEF =
+    public static final String PREF_PASSWD_ENC_DEF =
         PwsFile.DEFAULT_PASSWORD_CHARSET;
     public static final String PREF_PASSWD_EXPIRY_NOTIF =
         "passwordExpiryNotifyPref";
@@ -86,10 +86,10 @@ public class Preferences extends PreferenceActivity
         PasswdExpiryNotifPref.IN_TWO_WEEKS;
     public static final String PREF_PASSWD_DEFAULT_SYMS =
         "passwordDefaultSymbolsPref";
-    private static final String PREF_PASSWD_CLEAR_ALL_NOTIFS =
+    public static final String PREF_PASSWD_CLEAR_ALL_NOTIFS =
         "passwordClearAllNotifsPref";
 
-    private static final String PREF_RECORD_SORT_ORDER = "recordSortOrderPref";
+    public static final String PREF_RECORD_SORT_ORDER = "recordSortOrderPref";
     public static final RecordSortOrderPref PREF_RECORD_SORT_ORDER_DEF =
             RecordSortOrderPref.GROUP_FIRST;
 

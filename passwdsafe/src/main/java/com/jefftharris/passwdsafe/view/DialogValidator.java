@@ -159,12 +159,14 @@ public abstract class DialogValidator
     {
         String errorMsg = doValidation();
         boolean isError = (errorMsg != null);
-        if (!isError) {
-            itsErrorMsgView.setVisibility(View.GONE);
-        } else {
-            itsErrorMsgView.setVisibility(View.VISIBLE);
-            itsErrorMsgView.setText(
-                Html.fromHtml(String.format(itsErrorFmt, errorMsg)));
+        if (itsErrorMsgView != null) {
+            if (!isError) {
+                itsErrorMsgView.setVisibility(View.GONE);
+            } else {
+                itsErrorMsgView.setVisibility(View.VISIBLE);
+                itsErrorMsgView.setText(
+                        Html.fromHtml(String.format(itsErrorFmt, errorMsg)));
+            }
         }
 
         getDoneButton().setEnabled(!isError);
