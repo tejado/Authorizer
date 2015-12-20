@@ -82,7 +82,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: storage access framework support (want to keep support?)
     // TODO: recent files db (should that be carried forward? only if SAF kept)
 
-    // TODO: disable file timeout on change password
     // TODO: one new file or change password, setting invalid, then valid, then
     // invalid passwords doesn't show the error on second invalid
     // TODO: what of log for "LayoutInflater already has factory installed"
@@ -1213,11 +1212,11 @@ public class PasswdSafeActivity extends AppCompatActivity
         case CHANGING_PASSWORD: {
             itsTitle = getString(R.string.change_password);
             drawerMode = PasswdSafeNavDrawerFragment.Mode.RECORDS_ACTION;
-            fileTimeoutPaused = false;
             break;
         }
         case VIEW_POLICY_LIST: {
             drawerMode = PasswdSafeNavDrawerFragment.Mode.POLICIES;
+            fileTimeoutPaused = false;
             itsTitle = PasswdSafeApp.getAppTitle(
                     getString(R.string.password_policies), this);
             break;
