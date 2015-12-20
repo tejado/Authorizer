@@ -55,9 +55,12 @@ public class PasswdSafeIME extends InputMethodService
     private static final int PASSWDSAFE_KEY = -24;
     private static final int KEYBOARD_CHOOSE_KEY = -25;
 
-    private View itsView;
     private KeyboardView itsKeyboardView;
     private Keyboard.Key itsEnterKey;
+    private TextView itsFile;
+    private View itsRecordLabel;
+    private TextView itsRecord;
+    private View itsPasswordWarning;
     private boolean itsAllowPassword = false;
     private boolean itsIsPasswordField = false;
     private int itsEnterAction = EditorInfo.IME_ACTION_NONE;
@@ -69,16 +72,20 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public View onCreateInputView()
     {
-        itsView = getLayoutInflater().inflate(R.layout.input_method, null);
-        refresh(null);
+        View view = getLayoutInflater().inflate(R.layout.input_method, null);
 
         Keyboard keyboard = new PasswdSafeKeyboard(this, R.xml.keyboard);
-        itsKeyboardView = (KeyboardView)itsView.findViewById(R.id.keyboard);
+        itsKeyboardView = (KeyboardView)view.findViewById(R.id.keyboard);
         itsKeyboardView.setPreviewEnabled(false);
         itsKeyboardView.setKeyboard(keyboard);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
-        View icon = itsView.findViewById(R.id.icon);
+        itsFile = (TextView)view.findViewById(R.id.file);
+        itsRecordLabel = view.findViewById(R.id.record_label);
+        itsRecord = (TextView)view.findViewById(R.id.record);
+        itsPasswordWarning = view.findViewById(R.id.password_warning);
+
+        View icon = view.findViewById(R.id.icon);
         icon.setOnClickListener(new OnClickListener()
         {
             @Override
@@ -88,7 +95,8 @@ public class PasswdSafeIME extends InputMethodService
             }
         });
 
-        return itsView;
+        refresh(null);
+        return view;
     }
 
     /* (non-Javadoc)
@@ -367,18 +375,15 @@ public class PasswdSafeIME extends InputMethodService
             }
         });
 
-        TextView filetv = (TextView)itsView.findViewById(R.id.file);
-        View reclabel = itsView.findViewById(R.id.record_label);
-        TextView rectv = (TextView)itsView.findViewById(R.id.record);
         boolean haveFile = (labels.get() != null);
-        GuiUtils.setVisible(reclabel, haveFile);
-        GuiUtils.setVisible(rectv, haveFile);
+        GuiUtils.setVisible(itsRecordLabel, haveFile);
+        GuiUtils.setVisible(itsRecord, haveFile);
         if (haveFile) {
-            filetv.setText(labels.get().first);
-            rectv.setText(labels.get().second);
+            itsFile.setText(labels.get().first);
+            itsRecord.setText(labels.get().second);
         } else {
-            filetv.setText(R.string.none_selected_open);
-            rectv.setText(null);
+            itsFile.setText(R.string.none_selected_open);
+            itsRecord.setText(null);
             if (user != null) {
                 user.refresh(null, null);
             }
@@ -388,8 +393,7 @@ public class PasswdSafeIME extends InputMethodService
     /** Show the password warning */
     private void showPasswordWarning(boolean show)
     {
-        View v = itsView.findViewById(R.id.password_warning);
-        v.setVisibility(show ? View.VISIBLE : View.GONE);
+        GuiUtils.setVisible(itsPasswordWarning, show);
     }
 
     /**
