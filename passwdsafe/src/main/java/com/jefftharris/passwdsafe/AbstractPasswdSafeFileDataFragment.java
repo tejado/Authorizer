@@ -68,8 +68,6 @@ public abstract class AbstractPasswdSafeFileDataFragment
      */
     protected interface RecordInfoUser
     {
-        // TODO: remove RecordInfo and just pass the three fields
-
         /**
          * Callback to use the file data record
          */

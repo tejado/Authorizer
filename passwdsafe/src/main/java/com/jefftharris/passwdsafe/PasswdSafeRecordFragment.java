@@ -213,7 +213,6 @@ public class PasswdSafeRecordFragment
      */
     private void refresh()
     {
-        // TODO: acquire record info once and refresh this and tab fragment
         useRecordInfo(new RecordInfoUser()
         {
             @Override
