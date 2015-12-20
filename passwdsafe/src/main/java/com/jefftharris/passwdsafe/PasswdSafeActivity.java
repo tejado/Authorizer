@@ -82,8 +82,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: storage access framework support (want to keep support?)
     // TODO: recent files db (should that be carried forward? only if SAF kept)
 
-    // TODO: one new file or change password, setting invalid, then valid, then
-    // invalid passwords doesn't show the error on second invalid
     // TODO: what of log for "LayoutInflater already has factory installed"
 
     private enum ChangeMode

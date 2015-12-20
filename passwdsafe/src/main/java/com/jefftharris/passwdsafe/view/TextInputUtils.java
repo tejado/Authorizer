@@ -8,10 +8,7 @@
 package com.jefftharris.passwdsafe.view;
 
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.text.TextUtils;
-import android.view.View;
 
 /**
  * Utilities for TextInputLayout
@@ -33,22 +30,7 @@ public class TextInputUtils
         CharSequence currErrorMsg = field.getError();
         if (!TextUtils.equals(errorMsg, currErrorMsg)) {
             field.setError(errorMsg);
-            if (!isError && (field.getChildCount() > 1)) {
-                // Assume the TextInputLayout has its error message as the
-                // second child.  Use animation so visibility occurs after
-                // the TextInputLayout's animation that turns it invisible
-                View error = field.getChildAt(1);
-                ViewCompat.animate(error)
-                          .setListener(new ViewPropertyAnimatorListenerAdapter()
-                          {
-                              @Override
-                              public void onAnimationEnd(View view)
-                              {
-                                  view.setVisibility(View.GONE);
-                              }
-                          })
-                          .start();
-            }
+            field.setErrorEnabled(isError);
         }
 
         return isError;
