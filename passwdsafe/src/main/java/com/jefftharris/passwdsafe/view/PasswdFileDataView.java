@@ -94,9 +94,10 @@ public class PasswdFileDataView
     /**
      * Get records
      */
-    public synchronized List<PasswdRecordListData> getRecords(boolean incRecords,
-                                                              boolean incGroups,
-                                                              Context ctx)
+    public synchronized List<PasswdRecordListData> getRecords(
+            boolean incRecords,
+            boolean incGroups,
+            Context ctx)
     {
         List<PasswdRecordListData> records = new ArrayList<>();
         if (itsCurrGroupNode == null) {
@@ -128,8 +129,9 @@ public class PasswdFileDataView
             }
         }
 
-        PasswdRecordListDataComparator comp = new PasswdRecordListDataComparator(
-                itsIsSortCaseSensitive, itsRecordSortOrder);
+        PasswdRecordListDataComparator comp =
+                new PasswdRecordListDataComparator(itsIsSortCaseSensitive,
+                                                   itsRecordSortOrder);
         Collections.sort(records, comp);
         return records;
     }
