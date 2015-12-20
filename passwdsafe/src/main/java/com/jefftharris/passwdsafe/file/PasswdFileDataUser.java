@@ -5,11 +5,17 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.util;
+package com.jefftharris.passwdsafe.file;
+
+import android.support.annotation.NonNull;
 
 /**
- * Exception for no PasswdFileData
+ * Interface for users of password file data
  */
-public class NoPasswdFileDataException extends RuntimeException
+public interface PasswdFileDataUser
 {
+    /**
+     * Callback to use the password file data
+     */
+    void useFileData(@NonNull PasswdFileData fileData);
 }

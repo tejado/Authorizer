@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
@@ -101,10 +103,16 @@ public class PasswdSafeChangePasswordFragment
     public void onResume()
     {
         super.onResume();
-        Listener listener = getListener();
-        PasswdFileData fileData = listener.getFileData();
-        itsTitle.setText(fileData.getUri().getIdentifier(getContext(), true));
-        listener.updateViewChangingPassword();
+        useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                itsTitle.setText(fileData.getUri().getIdentifier(getContext(),
+                                                                 true));
+            }
+        });
+        getListener().updateViewChangingPassword();
         itsValidator.validate();
     }
 
@@ -155,10 +163,16 @@ public class PasswdSafeChangePasswordFragment
             return;
         }
 
-        PasswdFileData fileData = getFileData();
-        StringBuilder newPasswd = new StringBuilder(itsPassword.getText());
-        fileData.changePasswd(newPasswd);
-
+        useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                StringBuilder newPasswd =
+                        new StringBuilder(itsPassword.getText());
+                fileData.changePasswd(newPasswd);
+            }
+        });
         getListener().finishChangePassword();
     }
 

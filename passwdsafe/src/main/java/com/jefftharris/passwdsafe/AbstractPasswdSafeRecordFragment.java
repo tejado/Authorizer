@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
@@ -43,7 +44,7 @@ public abstract class AbstractPasswdSafeRecordFragment
     /**
      * Derived-class refresh
      */
-    protected abstract void doRefresh();
+    protected abstract void doRefresh(@NonNull RecordInfo info);
 
     /**
      * Set the value of a text field.  The field's row is visible if the text
@@ -76,7 +77,14 @@ public abstract class AbstractPasswdSafeRecordFragment
      */
     private void refresh()
     {
-        doRefresh();
+        useRecordInfo(new RecordInfoUser()
+        {
+            @Override
+            public void useRecordInfo(@NonNull RecordInfo info)
+            {
+                doRefresh(info);
+            }
+        });
 
         final View root = getView();
         if (root != null) {

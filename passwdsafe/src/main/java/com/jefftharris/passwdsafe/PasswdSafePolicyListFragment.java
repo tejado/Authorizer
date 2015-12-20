@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ListFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -25,9 +26,11 @@ import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.HeaderPasswdPolicies;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.util.ObjectHolder;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 import com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog;
@@ -221,7 +224,7 @@ public class PasswdSafePolicyListFragment extends ListFragment
      */
     private void savePolicies(String rmPolicy, PasswdPolicy addPolicy)
     {
-        List<PasswdPolicy> newPolicies = new ArrayList<>();
+        final List<PasswdPolicy> newPolicies = new ArrayList<>();
         if (itsHdrPolicies != null) {
             Collection<HeaderPasswdPolicies.HdrPolicy> hdrPolicies =
                     itsHdrPolicies.getPolicies();
@@ -233,14 +236,15 @@ public class PasswdSafePolicyListFragment extends ListFragment
             }
         }
 
-        Pair<String, String> policyRename = null;
+        final ObjectHolder<Pair<String, String>> policyRename =
+                new ObjectHolder<>();
         if (addPolicy != null) {
             newPolicies.add(addPolicy);
 
             if (rmPolicy != null) {
                 String newName = addPolicy.getName();
                 if (!TextUtils.equals(newName, rmPolicy)) {
-                    policyRename = new Pair<>(rmPolicy, newName);
+                    policyRename.set(new Pair<>(rmPolicy, newName));
                 }
             }
         }
@@ -248,9 +252,16 @@ public class PasswdSafePolicyListFragment extends ListFragment
         PasswdSafeUtil.dbginfo(TAG, "savePolicies: %s, rename: %s",
                                newPolicies, policyRename);
 
-        PasswdFileData fileData = itsListener.getFileData();
-        fileData.setHdrPasswdPolicies(newPolicies.isEmpty() ? null: newPolicies,
-                                      policyRename);
+        itsListener.useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                fileData.setHdrPasswdPolicies(
+                        newPolicies.isEmpty() ? null : newPolicies,
+                        policyRename.get());
+            }
+        });
         itsListener.finishPolicyEdit(new Runnable()
         {
             @Override
@@ -270,13 +281,15 @@ public class PasswdSafePolicyListFragment extends ListFragment
 
         itsHdrPolicies = null;
         itsIsFileReadonly = true;
-        try {
-            PasswdFileData fileData = itsListener.getFileData();
-            itsHdrPolicies = fileData.getHdrPasswdPolicies();
-            itsIsFileReadonly = !fileData.isV3() || !fileData.canEdit();
-        } catch (Exception e) {
-            return;
-        }
+        itsListener.useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                itsHdrPolicies = fileData.getHdrPasswdPolicies();
+                itsIsFileReadonly = !fileData.isV3() || !fileData.canEdit();
+            }
+        });
 
         if (itsHdrPolicies != null) {
             for (HeaderPasswdPolicies.HdrPolicy hdrPolicy:
