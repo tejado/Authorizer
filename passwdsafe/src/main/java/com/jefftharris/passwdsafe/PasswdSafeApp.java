@@ -204,8 +204,8 @@ public class PasswdSafeApp extends Application
             SharedPreferences.Editor prefsEdit = prefs.edit();
             fileListEdit.remove(dirPrefName);
             prefsEdit.putString(Preferences.PREF_FILE_DIR, dirPref);
-            fileListEdit.commit();
-            prefsEdit.commit();
+            fileListEdit.apply();
+            prefsEdit.apply();
         }
         Preferences.upgradePasswdPolicy(prefs, this);
         Preferences.upgradeDefaultFilePref(prefs);
