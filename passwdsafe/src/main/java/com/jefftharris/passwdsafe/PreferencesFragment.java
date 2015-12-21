@@ -54,8 +54,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     @Override
     public void onCreatePreferences(Bundle bundle, String s)
     {
-        // TODO: use xml.preferences and update custom preference classes to v7
-        addPreferencesFromResource(R.xml.preferences2);
+        addPreferencesFromResource(R.xml.preferences);
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         prefs.registerOnSharedPreferenceChangeListener(this);
@@ -103,6 +102,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
                 findPreference(Preferences.PREF_PASSWD_DEFAULT_SYMS);
         // TODO: hint for PasswdPolicy.SYMBOLS_DEFAULT. May need specialized
         // EditText preference class t override view binding method
+        itsPasswdDefaultSymsPref.setDialogMessage(PasswdPolicy.SYMBOLS_DEFAULT);
         itsPasswdDefaultSymsPref.setDefaultValue(PasswdPolicy.SYMBOLS_DEFAULT);
         onSharedPreferenceChanged(prefs, Preferences.PREF_PASSWD_DEFAULT_SYMS);
 
