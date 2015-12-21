@@ -46,6 +46,7 @@
     <string name="default_file_to_open">Standarddatei</string>
     <string name="default_policy">Standardregel</string>
     <string name="default_symbols">Standardsymbole</string>
+    <string name="default_symbols_empty_pref">Verwenden Sie eine leere Vorliebe für Standardsymbole: %1$s</string>
     <string name="delete">Löschen</string>
     <string name="delete_file">Datei löschen</string>
     <string name="delete_file_msg">Lösche Datei \"%1$s\"?</string>

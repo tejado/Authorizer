@@ -46,6 +46,7 @@
     <string name="default_file_to_open">Fichier à ouvrir par défaut</string>
     <string name="default_policy">Stratégie par défaut</string>
     <string name="default_symbols">Symboles par défaut</string>
+    <string name="default_symbols_empty_pref">Utilisez une préférence vide symboles par défaut: %1$s</string>
     <string name="delete">Supprimer</string>
     <string name="delete_file">Supprimer base de données</string>
     <string name="delete_file_msg">Supprimer le fichier \"%1$s\"?</string>

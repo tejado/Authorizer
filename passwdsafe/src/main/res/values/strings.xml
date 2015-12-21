@@ -46,6 +46,7 @@
     <string name="default_file_to_open">Default file to open</string>
     <string name="default_policy">Default Policy</string>
     <string name="default_symbols">Default symbols</string>
+    <string name="default_symbols_empty_pref">Use an empty preference for default symbols: %1$s</string>
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
     <string name="delete_file_msg">Delete file \"%1$s\"?</string>
