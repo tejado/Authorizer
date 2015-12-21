@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -124,13 +125,8 @@ public class PasswdSafeRecordNotesFragment
     }
 
     @Override
-    protected void doRefresh()
+    protected void doRefresh(@NonNull RecordInfo info)
     {
-        RecordInfo info = getRecordInfo();
-        if (info == null) {
-            return;
-        }
-
         switch (info.itsPasswdRec.getType()) {
         case NORMAL:
         case ALIAS: {

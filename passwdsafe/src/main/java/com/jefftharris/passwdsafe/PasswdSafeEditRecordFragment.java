@@ -47,6 +47,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.util.ObjectHolder;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.view.DatePickerDialogFragment;
 import com.jefftharris.passwdsafe.view.NewGroupDialog;
@@ -665,12 +666,17 @@ public class PasswdSafeEditRecordFragment
 
         if ((requestCode == RECORD_SELECTION_REQUEST) &&
             (resultCode == Activity.RESULT_OK)) {
-            String uuid = data.getStringExtra(PasswdSafeApp.RESULT_DATA_UUID);
-            RecordInfo info = getRecordInfo();
-            if (info == null) {
-                return;
-            }
-            setLinkRef(info.itsFileData.getRecord(uuid), info);
+            final String uuid =
+                    data.getStringExtra(PasswdSafeApp.RESULT_DATA_UUID);
+
+            useRecordInfo(new RecordInfoUser()
+            {
+                @Override
+                public void useRecordInfo(@NonNull RecordInfo info)
+                {
+                    setLinkRef(info.itsFileData.getRecord(uuid), info);
+                }
+            });
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -687,40 +693,44 @@ public class PasswdSafeEditRecordFragment
      */
     private void initialize()
     {
-        RecordInfo info = getRecordInfo();
-        PasswdFileData fileData;
-        PwsRecord record;
-        String group;
-        if (info != null) {
-            fileData = info.itsFileData;
-            record = info.itsRec;
-            itsIsV3 = fileData.isV3();
-            itsTitle.setText(fileData.getTitle(record));
-            group = fileData.getGroup(record);
-            itsUser.setText(fileData.getUsername(record));
-            itsHistory = fileData.getPasswdHistory(record);
-            itsNotes.setText(fileData.getNotes(record));
+        useRecordFile(new RecordFileUser()
+        {
+            @Override
+            public void useFile(@Nullable RecordInfo info,
+                                @NonNull PasswdFileData fileData)
+            {
+                PwsRecord record;
+                String group;
+                if (info != null) {
+                    record = info.itsRec;
+                    itsIsV3 = fileData.isV3();
+                    itsTitle.setText(fileData.getTitle(record));
+                    group = fileData.getGroup(record);
+                    itsUser.setText(fileData.getUsername(record));
+                    itsHistory = fileData.getPasswdHistory(record);
+                    itsNotes.setText(fileData.getNotes(record));
 
-            if (itsIsV3) {
-                itsUrl.setText(fileData.getURL(record));
-                itsEmail.setText(fileData.getEmail(record));
-                itsIsProtected = fileData.isProtected(record);
-                historyChanged(true);
-            } else {
-                GuiUtils.setVisible(itsUrlInput, false);
-                GuiUtils.setVisible(itsEmailInput, false);
-                GuiUtils.setVisible(itsHistoryGroup, false);
+                    if (itsIsV3) {
+                        itsUrl.setText(fileData.getURL(record));
+                        itsEmail.setText(fileData.getEmail(record));
+                        itsIsProtected = fileData.isProtected(record);
+                        historyChanged(true);
+                    } else {
+                        GuiUtils.setVisible(itsUrlInput, false);
+                        GuiUtils.setVisible(itsEmailInput, false);
+                        GuiUtils.setVisible(itsHistoryGroup, false);
+                    }
+                } else {
+                    record = null;
+                    itsIsV3 = fileData.isV3();
+                    group = getLocation().getRecordGroup();
+                }
+                initGroup(group, fileData, record);
+                initTypeAndPassword(info);
+                initPasswdPolicy(info, fileData);
+                initPasswdExpiry(info);
             }
-        } else {
-            fileData = getFileData();
-            record = null;
-            itsIsV3 = fileData.isV3();
-            group = getLocation().getRecordGroup();
-        }
-        initGroup(group, fileData, record);
-        initTypeAndPassword(info);
-        initPasswdPolicy(info, fileData);
-        initPasswdExpiry(info);
+        });
         updateProtected();
         itsValidator.validate();
     }
@@ -1218,14 +1228,29 @@ public class PasswdSafeEditRecordFragment
      */
     private void saveRecord()
     {
-        RecordInfo info = getRecordInfo();
-        PasswdFileData fileData;
-        if (info != null) {
-            fileData = info.itsFileData;
-        } else {
-            fileData = getFileData();
+        final ObjectHolder<Pair<Boolean, PasswdLocation>> rc =
+                new ObjectHolder<>();
+        useRecordFile(new RecordFileUser()
+        {
+            @Override
+            public void useFile(@Nullable RecordInfo info,
+                                @NonNull PasswdFileData fileData)
+            {
+                rc.set(updateSaveRecord(info, fileData));
+            }
+        });
+        if (rc.get() != null) {
+            getListener().finishEditRecord(rc.get().first, rc.get().second);
         }
+    }
 
+    /**
+     * Save the updated fields in the record
+     */
+    private Pair<Boolean, PasswdLocation>
+    updateSaveRecord(@Nullable RecordInfo info,
+                     @NonNull PasswdFileData fileData)
+    {
         PwsRecord record;
         boolean newRecord;
         if (info != null) {
@@ -1355,15 +1380,14 @@ public class PasswdSafeEditRecordFragment
             } catch (PasswordSafeException e) {
                 PasswdSafeUtil.showFatalMsg(e, "Error saving record: " + e,
                                             getActivity());
-                return;
+                return null;
             }
         }
 
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
 
-        PasswdLocation newLocation = new PasswdLocation(record, fileData);
-        getListener().finishEditRecord(newRecord || record.isModified(),
-                                       newLocation);
+        return new Pair<>(newRecord || record.isModified(),
+                          new PasswdLocation(record, fileData));
     }
 
     /**

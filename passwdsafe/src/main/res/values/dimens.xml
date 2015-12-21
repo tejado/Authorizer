@@ -4,6 +4,9 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="fragment_full_horizontal_margin">0dp</dimen>
+    <dimen name="fragment_full_vertical_margin">0dp</dimen>
+
     <dimen name="keyboard_horizontal_margin">0dp</dimen>
     <dimen name="keyboard_vertical_margin">6dp</dimen>
     <dimen name="keyboard_header_margin">6dp</dimen>

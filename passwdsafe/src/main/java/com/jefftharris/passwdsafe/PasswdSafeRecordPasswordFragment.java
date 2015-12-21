@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -100,13 +101,8 @@ public class PasswdSafeRecordPasswordFragment
     }
 
     @Override
-    protected void doRefresh()
+    protected void doRefresh(@NonNull RecordInfo info)
     {
-        RecordInfo info = getRecordInfo();
-        if (info == null) {
-            return;
-        }
-
         PasswdPolicy policy = null;
         String policyLoc = null;
         PasswdExpiration passwdExpiry = null;
@@ -196,5 +192,5 @@ public class PasswdSafeRecordPasswordFragment
         itsHistoryMaxSize.setText(historyMaxSize);
         GuiUtils.setVisible(itsHistoryMaxSize, historyExists);
         GuiUtils.setVisible(itsHistoryMaxSizeLabel, historyExists);
-     }
+    }
 }

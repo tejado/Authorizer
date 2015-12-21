@@ -51,26 +51,25 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         void showAbout();
     }
 
-    public enum NavMode
+    /** Mode of the navigation drawer */
+    public enum Mode
     {
         /** Initial state */
         INIT,
-        /** File open */
-        FILE_OPEN,
-        /** Record open in a single-pane view */
-        SINGLE_RECORD,
-        /** Showing an action that can be canceled */
-        CANCELABLE_ACTION
-    }
-
-    /**
-     * A menu item in the file group
-     */
-    private enum FileGroupItem
-    {
-        RECORDS,
-        PASSWORD_POLICIES,
-        EXPIRED_PASSWORDS
+        /** List of records */
+        RECORDS_LIST,
+        /** Single record */
+        RECORDS_SINGLE,
+        /** Action on a record */
+        RECORDS_ACTION,
+        /** Password policies */
+        POLICIES,
+        /** Password expirations */
+        EXPIRATIONS,
+        /** Preferences */
+        PREFERENCES,
+        /** About */
+        ABOUT
     }
 
     /** Per the design guidelines, you should show the drawer on launch until
@@ -78,24 +77,17 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     private static final String PREF_USER_LEARNED_DRAWER =
             "passwdsafe_navigation_drawer_learned";
 
-    private static final String STATE_FILE_ITEM = "fileItem";
-
     /** Helper component that ties the action bar to the navigation drawer. */
     private ActionBarDrawerToggle itsDrawerToggle;
 
     private DrawerLayout itsDrawerLayout;
     private NavigationView itsNavView;
     private View itsFragmentContainerView;
-    private FileGroupItem itsSelFileItem = FileGroupItem.RECORDS;
+    private NavMenuItem itsSelNavItem = null;
     private Listener itsListener;
 
     private boolean itsFromSavedInstanceState;
     private boolean itsUserLearnedDrawer;
-
-    /** Constructor */
-    public PasswdSafeNavDrawerFragment()
-    {
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -108,14 +100,6 @@ public class PasswdSafeNavDrawerFragment extends Fragment
 
         if (savedInstanceState != null) {
             itsFromSavedInstanceState = true;
-            try {
-                String fileItem = savedInstanceState.getString(STATE_FILE_ITEM);
-                if (fileItem != null) {
-                    itsSelFileItem = FileGroupItem.valueOf(fileItem);
-                }
-            } catch (IllegalArgumentException e) {
-                itsSelFileItem = FileGroupItem.RECORDS;
-            }
         }
     }
 
@@ -214,34 +198,56 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         };
 
         itsDrawerLayout.setDrawerListener(itsDrawerToggle);
-        setMode(NavMode.INIT);
+        setMode(Mode.INIT, false);
     }
 
-    /** Update drawer for whether a file is open */
-    public void setMode(NavMode mode)
+    /** Update drawer for the fragments displayed in the activity */
+    public void setMode(Mode mode, boolean fileOpen)
     {
-        boolean fileOpen = false;
         boolean drawerEnabled = false;
         boolean openDrawer = false;
         int upIndicator = 0;
+        NavMenuItem selNavItem = null;
+
         switch (mode) {
         case INIT: {
             drawerEnabled = true;
             break;
         }
-        case FILE_OPEN: {
-            fileOpen = true;
+        case RECORDS_LIST: {
             drawerEnabled = true;
             // If the user hasn't 'learned' about the drawer, open it
             openDrawer = !itsUserLearnedDrawer && !itsFromSavedInstanceState;
+            selNavItem = NavMenuItem.RECORDS;
             break;
         }
-        case SINGLE_RECORD: {
-            fileOpen = true;
+        case RECORDS_SINGLE: {
+            selNavItem = NavMenuItem.RECORDS;
             break;
         }
-        case CANCELABLE_ACTION: {
+        case RECORDS_ACTION: {
             upIndicator = R.drawable.ic_action_close_cancel;
+            selNavItem = NavMenuItem.RECORDS;
+            break;
+        }
+        case POLICIES: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.PASSWORD_POLICIES;
+            break;
+        }
+        case EXPIRATIONS: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.EXPIRED_PASSWORDS;
+            break;
+        }
+        case PREFERENCES: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.PREFERENCES;
+            break;
+        }
+        case ABOUT: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.ABOUT;
             break;
         }
         }
@@ -254,7 +260,22 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         }
 
         Menu menu = itsNavView.getMenu();
-        menu.setGroupEnabled(R.id.menu_drawer_file_group, fileOpen);
+        for (int i = 0; i < menu.size(); ++i) {
+            MenuItem item = menu.getItem(i);
+            int itemId = item.getItemId();
+            if (selNavItem == null) {
+                item.setChecked(false);
+            } else if (selNavItem.itsMenuId == itemId) {
+                item.setChecked(true);
+            }
+
+            if ((itemId == NavMenuItem.RECORDS.itsMenuId) ||
+                (itemId == NavMenuItem.PASSWORD_POLICIES.itsMenuId) ||
+                (itemId == NavMenuItem.EXPIRED_PASSWORDS.itsMenuId)) {
+                item.setEnabled(fileOpen);
+            }
+        }
+        itsSelNavItem = selNavItem;
 
         if (openDrawer) {
             itsDrawerLayout.openDrawer(itsFragmentContainerView);
@@ -272,13 +293,6 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     {
         super.onAttach(ctx);
         itsListener = (Listener)ctx;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-        outState.putString(STATE_FILE_ITEM, itsSelFileItem.name());
     }
 
     @Override
@@ -321,60 +335,30 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     {
         itsDrawerLayout.closeDrawers();
 
-        switch(menuItem.getItemId()) {
-        case R.id.menu_drawer_records: {
-            switch (itsSelFileItem) {
+        NavMenuItem navItem = NavMenuItem.fromMenuId(menuItem.getItemId());
+        if ((navItem != null) && (itsSelNavItem != navItem)) {
+            switch (navItem) {
             case RECORDS: {
-                break;
-            }
-            case PASSWORD_POLICIES:
-            case EXPIRED_PASSWORDS: {
-                itsSelFileItem = FileGroupItem.RECORDS;
-                menuItem.setChecked(true);
                 itsListener.showFileRecords();
                 break;
             }
-            }
-            break;
-        }
-        case R.id.menu_drawer_passwd_policies: {
-            switch (itsSelFileItem) {
             case PASSWORD_POLICIES: {
-                break;
-            }
-            case RECORDS:
-            case EXPIRED_PASSWORDS: {
-                itsSelFileItem = FileGroupItem.PASSWORD_POLICIES;
-                menuItem.setChecked(true);
                 itsListener.showFilePasswordPolicies();
                 break;
             }
-            }
-            break;
-        }
-        case R.id.menu_drawer_expired_passwords: {
-            switch (itsSelFileItem) {
             case EXPIRED_PASSWORDS: {
-                break;
-            }
-            case RECORDS:
-            case PASSWORD_POLICIES: {
-                itsSelFileItem = FileGroupItem.EXPIRED_PASSWORDS;
-                menuItem.setChecked(true);
                 itsListener.showFileExpiredPasswords();
                 break;
             }
+            case PREFERENCES: {
+                itsListener.showPreferences();
+                break;
             }
-            break;
-        }
-        case R.id.menu_drawer_preferences: {
-            itsListener.showPreferences();
-            break;
-        }
-        case R.id.menu_drawer_about: {
-            itsListener.showAbout();
-            break;
-        }
+            case ABOUT: {
+                itsListener.showAbout();
+                break;
+            }
+            }
         }
 
         return true;
@@ -384,5 +368,40 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     private ActionBar getActionBar()
     {
         return ((AppCompatActivity) getActivity()).getSupportActionBar();
+    }
+
+    /**
+     * A menu item
+     */
+    private enum NavMenuItem
+    {
+        RECORDS              (R.id.menu_drawer_records),
+        PASSWORD_POLICIES    (R.id.menu_drawer_passwd_policies),
+        EXPIRED_PASSWORDS    (R.id.menu_drawer_expired_passwords),
+        PREFERENCES          (R.id.menu_drawer_preferences),
+        ABOUT                (R.id.menu_drawer_about);
+
+        public final int itsMenuId;
+
+        /**
+         * Constructor
+         */
+        NavMenuItem(int menuId)
+        {
+            itsMenuId = menuId;
+        }
+
+        /**
+         * Get the enum from a menu id
+         */
+        public static NavMenuItem fromMenuId(int menuId)
+        {
+            for (NavMenuItem item: NavMenuItem.values()) {
+                if (item.itsMenuId == menuId) {
+                    return item;
+                }
+            }
+            return null;
+        }
     }
 }

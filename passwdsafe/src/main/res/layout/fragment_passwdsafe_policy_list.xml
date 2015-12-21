@@ -1,0 +1,32 @@
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/fragment_full_vertical_margin"
+              android:paddingLeft="@dimen/fragment_full_horizontal_margin"
+              android:paddingRight="@dimen/fragment_full_horizontal_margin"
+              android:paddingTop="@dimen/fragment_full_vertical_margin"
+              tools:context="com.jefftharris.passwdsafe.PasswdSafePolicyListFragment">
+
+    <ListView android:id="@android:id/list"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_weight="1"
+              android:choiceMode="singleChoice"/>
+
+    <TextView android:id="@android:id/empty"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:text="@string/no_policies"
+              android:layout_weight="1"
+              android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+</LinearLayout>

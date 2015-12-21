@@ -16,8 +16,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.file.PasswdRecord;
-import com.jefftharris.passwdsafe.util.NoPasswdFileDataException;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -34,8 +34,8 @@ public abstract class AbstractPasswdSafeFileDataFragment
      */
     public interface Listener
     {
-        /** Get the file data */
-        @NonNull PasswdFileData getFileData() throws NoPasswdFileDataException;
+        /** Use the file data */
+        void useFileData(PasswdFileDataUser user);
 
         /** Is the navigation drawer open */
         boolean isNavDrawerOpen();
@@ -61,6 +61,29 @@ public abstract class AbstractPasswdSafeFileDataFragment
             itsPasswdRec = passwdRec;
             itsFileData = fileData;
         }
+    }
+
+    /**
+     * Interface for users of a file data record
+     */
+    protected interface RecordInfoUser
+    {
+        /**
+         * Callback to use the file data record
+         */
+        void useRecordInfo(@NonNull RecordInfo info);
+    }
+
+    /**
+     * Interfaces for users of file data with an optional record
+     */
+    protected interface RecordFileUser
+    {
+        /**
+         * Callback to use the file data and record
+         */
+        void useFile(@Nullable RecordInfo info,
+                     @NonNull PasswdFileData fileData);
     }
 
     private PasswdLocation itsLocation;
@@ -135,35 +158,57 @@ public abstract class AbstractPasswdSafeFileDataFragment
                                                   MenuInflater inflater);
 
     /**
-     * Get the file data
+     * Use the file data
      */
-    protected final @NonNull PasswdFileData getFileData()
-            throws NoPasswdFileDataException
+    protected final void useFileData(PasswdFileDataUser user)
     {
-        if (isAdded() && (itsListener != null)) {
-            return itsListener.getFileData();
+        if (isAdded() && itsListener != null) {
+            itsListener.useFileData(user);
         }
-        throw new NoPasswdFileDataException();
     }
 
     /**
-     * Get the record information
+     * Use the file data record at the current location
      */
-    protected final @Nullable
-    RecordInfo getRecordInfo()
+    protected final void useRecordInfo(final RecordInfoUser user)
     {
-        try {
-            PasswdFileData fileData = getFileData();
-            PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
-            if (rec != null) {
-                PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-                if (passwdRec != null) {
-                    return new RecordInfo(rec, passwdRec, fileData);
+        useRecordFile(new RecordFileUser()
+        {
+            @Override
+            public void useFile(@Nullable RecordInfo info,
+                                @NonNull PasswdFileData fileData)
+            {
+                if (info != null) {
+                    user.useRecordInfo(info);
                 }
             }
-        } catch (NoPasswdFileDataException e) {
-            return null;
-        }
-        return null;
+        });
+    }
+
+    /**
+     * Use the file data with an optional record at the current location
+     */
+    protected final void useRecordFile(final RecordFileUser user)
+    {
+        useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
+                if (rec == null) {
+                    user.useFile(null, fileData);
+                    return;
+                }
+                PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+                if (passwdRec == null) {
+                    user.useFile(null, fileData);
+                    return;
+                }
+
+                user.useFile(new RecordInfo(rec, passwdRec, fileData),
+                             fileData);
+            }
+        });
     }
 }

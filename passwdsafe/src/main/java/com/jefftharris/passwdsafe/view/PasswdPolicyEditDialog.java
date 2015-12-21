@@ -15,8 +15,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +40,7 @@ import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
  * The PasswdPolicyEditDialog class encapsulates the functionality for the
  * dialog to add or edit a policy.
  */
-public class PasswdPolicyEditDialog extends DialogFragment
+public class PasswdPolicyEditDialog extends AppCompatDialogFragment
 {
     // TODO: refactor to normal fragment vs. dialog?
     // TODO: update look to use TextInputLayout?
@@ -214,7 +214,6 @@ public class PasswdPolicyEditDialog extends DialogFragment
         itsCustomSymbolsEdit.setText(customSymbols);
         itsValidator.registerTextView(itsCustomSymbolsEdit);
 
-
         Button btn = (Button)itsView.findViewById(R.id.generate);
         btn.setOnClickListener(new OnClickListener()
         {
@@ -227,6 +226,13 @@ public class PasswdPolicyEditDialog extends DialogFragment
         return dialog;
     }
 
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsValidator.reset();
+    }
 
     /** Reset the dialog validation */
     public void reset()
