@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -212,32 +213,33 @@ public class PasswdSafeRecordFragment
      */
     private void refresh()
     {
-        RecordInfo info = getRecordInfo();
-        if (info == null) {
-            return;
-        }
+        useRecordInfo(new RecordInfoUser()
+        {
+            @Override
+            public void useRecordInfo(@NonNull RecordInfo info)
+            {
+                itsCanEdit = info.itsFileData.canEdit();
+                itsTitle = info.itsFileData.getTitle(info.itsRec);
+                boolean isProtected = info.itsFileData.isProtected(info.itsRec);
+                List<PwsRecord> refs = info.itsPasswdRec.getRefsToRecord();
+                boolean hasRefs = (refs != null) && !refs.isEmpty();
+                itsCanDelete = itsCanEdit && !hasRefs && !isProtected;
 
-        itsCanEdit = info.itsFileData.canEdit();
-        itsTitle = info.itsFileData.getTitle(info.itsRec);
-        boolean isProtected = info.itsFileData.isProtected(info.itsRec);
-        List<PwsRecord> references = info.itsPasswdRec.getRefsToRecord();
-        boolean hasReferences = (references != null) && !references.isEmpty();
-        itsCanDelete = itsCanEdit && !hasReferences && !isProtected;
-
-        switch (info.itsPasswdRec.getType()) {
-        case NORMAL:
-        case ALIAS: {
-            String notes = info.itsFileData.getNotes(info.itsRec);
-            itsHasNotes = !TextUtils.isEmpty(notes);
-            break;
-        }
-        case SHORTCUT: {
-            itsHasNotes = false;
-            break;
-        }
-        }
+                switch (info.itsPasswdRec.getType()) {
+                case NORMAL:
+                case ALIAS: {
+                    String notes = info.itsFileData.getNotes(info.itsRec);
+                    itsHasNotes = !TextUtils.isEmpty(notes);
+                    break;
+                }
+                case SHORTCUT: {
+                    itsHasNotes = false;
+                    break;
+                }
+                }
+            }
+        });
         updateNotesTab();
-
         GuiUtils.invalidateOptionsMenu(getActivity());
     }
 

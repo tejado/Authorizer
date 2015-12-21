@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.text.TextUtils;
@@ -91,7 +92,12 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
     public void onAttach(Context ctx)
     {
         super.onAttach(ctx);
-        itsListener = (Listener)ctx;
+        Fragment frag = getTargetFragment();
+        if (frag != null) {
+            itsListener = (Listener)frag;
+        } else {
+            itsListener = (Listener)ctx;
+        }
     }
 
     @Override

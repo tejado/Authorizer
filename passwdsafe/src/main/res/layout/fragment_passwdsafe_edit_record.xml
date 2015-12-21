@@ -9,6 +9,10 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingBottom="@dimen/fragment_full_vertical_margin"
+            android:paddingLeft="@dimen/fragment_full_horizontal_margin"
+            android:paddingRight="@dimen/fragment_full_horizontal_margin"
+            android:paddingTop="@dimen/fragment_full_vertical_margin"
             tools:context="com.jefftharris.passwdsafe.PasswdSafeEditRecordFragment">
 
     <LinearLayout android:layout_width="fill_parent"

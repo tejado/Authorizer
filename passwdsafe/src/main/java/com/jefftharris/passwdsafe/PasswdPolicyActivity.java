@@ -225,7 +225,6 @@ public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     {
         Dialog dialog;
         switch (id) {
-        // TODO: re-add add/edit support
         /*
         case DIALOG_ADD: {
             itsEditDialog = new PasswdPolicyEditDialog(this);

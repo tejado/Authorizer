@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.util.ObjectHolder;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -200,13 +202,8 @@ public class PasswdSafeRecordBasicFragment
     }
 
     @Override
-    protected void doRefresh()
+    protected void doRefresh(@NonNull RecordInfo info)
     {
-        RecordInfo info = getRecordInfo();
-        if (info == null) {
-            return;
-        }
-
         PwsRecord ref = info.itsPasswdRec.getRef();
         PwsRecord recForPassword = info.itsRec;
         int hiddenId = R.string.hidden_password_normal;
@@ -292,28 +289,34 @@ public class PasswdSafeRecordBasicFragment
     /**
      * Show a referenced record
      */
-    private void showRefRec(boolean baseRef, int referencingPos)
+    private void showRefRec(final boolean baseRef, final int referencingPos)
     {
-        RecordInfo info = getRecordInfo();
-        if (info == null) {
-            return;
-        }
+        final ObjectHolder<PasswdLocation> location = new ObjectHolder<>();
+        useRecordInfo(new RecordInfoUser()
+        {
+            @Override
+            public void useRecordInfo(@NonNull RecordInfo info)
+            {
+                PwsRecord refRec = null;
+                if (baseRef) {
+                    refRec = info.itsPasswdRec.getRef();
+                } else {
+                    List<PwsRecord> refs = info.itsPasswdRec.getRefsToRecord();
+                    if ((referencingPos >= 0) &&
+                        (referencingPos < refs.size())) {
+                        refRec = refs.get(referencingPos);
+                    }
+                }
+                if (refRec == null) {
+                    return;
+                }
 
-        PwsRecord refRec = null;
-        if (baseRef) {
-            refRec = info.itsPasswdRec.getRef();
-        } else {
-            List<PwsRecord> references = info.itsPasswdRec.getRefsToRecord();
-            if ((referencingPos >= 0) && (referencingPos < references.size())) {
-                refRec = references.get(referencingPos);
+                location.set(new PasswdLocation(refRec, info.itsFileData));
             }
+        });
+        if (location.get() != null) {
+            getListener().changeLocation(location.get());
         }
-        if (refRec == null) {
-            return;
-        }
-
-        PasswdLocation location = new PasswdLocation(refRec, info.itsFileData);
-        getListener().changeLocation(location);
     }
 
     /**
@@ -348,21 +351,26 @@ public class PasswdSafeRecordBasicFragment
      */
     private String getPassword()
     {
-        RecordInfo info = getRecordInfo();
-        if (info == null) {
-            return null;
-        }
-
-        switch (info.itsPasswdRec.getType()) {
-        case NORMAL: {
-            return info.itsFileData.getPassword(info.itsRec);
-        }
-        case ALIAS:
-        case SHORTCUT: {
-            return info.itsFileData.getPassword(info.itsPasswdRec.getRef());
-        }
-        }
-
-        return null;
+        final ObjectHolder<String> password = new ObjectHolder<>();
+        useRecordInfo(new RecordInfoUser()
+        {
+            @Override
+            public void useRecordInfo(@NonNull RecordInfo info)
+            {
+                switch (info.itsPasswdRec.getType()) {
+                case NORMAL: {
+                    password.set(info.itsFileData.getPassword(info.itsRec));
+                    break;
+                }
+                case ALIAS:
+                case SHORTCUT: {
+                    password.set(info.itsFileData.getPassword(
+                            info.itsPasswdRec.getRef()));
+                    break;
+                }
+                }
+            }
+        });
+        return password.get();
     }
 }
