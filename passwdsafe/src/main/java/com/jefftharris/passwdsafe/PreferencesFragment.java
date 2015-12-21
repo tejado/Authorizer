@@ -100,9 +100,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat
 
         itsPasswdDefaultSymsPref = (EditTextPreference)
                 findPreference(Preferences.PREF_PASSWD_DEFAULT_SYMS);
-        // TODO: hint for PasswdPolicy.SYMBOLS_DEFAULT. May need specialized
-        // EditText preference class t override view binding method
-        itsPasswdDefaultSymsPref.setDialogMessage(PasswdPolicy.SYMBOLS_DEFAULT);
+        itsPasswdDefaultSymsPref.setDialogMessage(
+                getString(R.string.default_symbols_empty_pref,
+                          PasswdPolicy.SYMBOLS_DEFAULT));
         itsPasswdDefaultSymsPref.setDefaultValue(PasswdPolicy.SYMBOLS_DEFAULT);
         onSharedPreferenceChanged(prefs, Preferences.PREF_PASSWD_DEFAULT_SYMS);
 
