@@ -57,6 +57,7 @@ import java.util.List;
  */
 public class PasswdSafeActivity extends AppCompatActivity
         implements AbstractPasswdSafeRecordFragment.Listener,
+                   AboutFragment.Listener,
                    View.OnClickListener,
                    ConfirmPromptDialog.Listener,
                    PasswdSafeChangePasswordFragment.Listener,
@@ -71,7 +72,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: 3rdparty file open
     // TODO: expired passwords
     // TODO: preferences
-    // TODO: about
     // TODO: expiry notifications
     // TODO: details
     // TODO: recheck all icons (remove use of all built-in ones)
@@ -81,8 +81,6 @@ public class PasswdSafeActivity extends AppCompatActivity
     // TODO: check manifest errors regarding icons
     // TODO: storage access framework support (want to keep support?)
     // TODO: recent files db (should that be carried forward? only if SAF kept)
-
-    // TODO: what of log for "LayoutInflater already has factory installed"
 
     private enum ChangeMode
     {
@@ -103,7 +101,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Change a password */
         CHANGE_PASSWORD,
         /** View policy list */
-        VIEW_POLICY_LIST
+        VIEW_POLICY_LIST,
+        /** View about info */
+        VIEW_ABOUT
     }
 
     private enum ViewMode
@@ -123,7 +123,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Changing a password */
         CHANGING_PASSWORD,
         /** Viewing a list of policies */
-        VIEW_POLICY_LIST
+        VIEW_POLICY_LIST,
+        /** Viewing about info */
+        VIEW_ABOUT
     }
 
     /** Action conformed via ConfirmPromptDialog */
@@ -378,7 +380,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 case INIT:
                 case FILE_OPEN:
                 case FILE_NEW:
-                case VIEW_POLICY_LIST: {
+                case VIEW_POLICY_LIST:
+                case VIEW_ABOUT: {
                     break;
                 }
                 case EDIT_RECORD:
@@ -574,7 +577,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showAbout()
     {
-        Toast.makeText(this, "showAbout", Toast.LENGTH_SHORT).show();
+        doChangeView(ChangeMode.VIEW_ABOUT, AboutFragment.newInstance());
     }
 
     /**
@@ -736,6 +739,12 @@ public class PasswdSafeActivity extends AppCompatActivity
     public void finishEditRecord(boolean save, PasswdLocation newLocation)
     {
         saveFile(true, save, newLocation, null);
+    }
+
+    @Override
+    public void updateViewAbout()
+    {
+        doUpdateView(ViewMode.VIEW_ABOUT, itsLocation);
     }
 
     @Override
@@ -1023,7 +1032,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 case RECORD:
                 case EDIT_RECORD:
                 case CHANGE_PASSWORD:
-                case VIEW_POLICY_LIST: {
+                case VIEW_POLICY_LIST:
+                case VIEW_ABOUT: {
                     supportsBack = true;
                     break;
                 }
@@ -1073,7 +1083,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         case VIEW_LIST:
         case VIEW_RECORD:
         case CHANGING_PASSWORD:
-        case VIEW_POLICY_LIST: {
+        case VIEW_POLICY_LIST:
+        case VIEW_ABOUT: {
             break;
         }
         }
@@ -1217,6 +1228,13 @@ public class PasswdSafeActivity extends AppCompatActivity
             fileTimeoutPaused = false;
             itsTitle = PasswdSafeApp.getAppTitle(
                     getString(R.string.password_policies), this);
+            break;
+        }
+        case VIEW_ABOUT: {
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.ABOUT;
+            fileTimeoutPaused = false;
+            itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.about),
+                                                 this);
             break;
         }
         }
