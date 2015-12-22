@@ -46,6 +46,7 @@
     <string name="default_file_to_open">Standarddatei</string>
     <string name="default_policy">Standardregel</string>
     <string name="default_symbols">Standardsymbole</string>
+    <string name="default_symbols_empty_pref">Verwenden Sie eine leere Vorliebe für Standardsymbole: %1$s</string>
     <string name="delete">Löschen</string>
     <string name="delete_file">Datei löschen</string>
     <string name="delete_file_msg">Lösche Datei \"%1$s\"?</string>
@@ -87,7 +88,7 @@
     <string name="file_name">Dateiname</string>
     <string name="file_operations">Datei …</string>
     <string name="file_password_encoding">Passwortkodierung</string>
-    <string name="file_settings">Datei-Einstellungen</string>
+    <string name="files">Dateien</string>
     <string name="font_size">Schriftgröße</string>
     <string name="generate">Erzeugen</string>
     <string name="generate_password">Passwort erzeugen</string>
@@ -191,9 +192,9 @@
     <string name="password_policy">Passwortregel</string>
     <string name="password_policies">Passwortregeln</string>
     <string name="password_record">Passworteintrag</string>
-    <string name="password_settings">Passwort-Einstellungen</string>
     <string name="password_times_header">PASSWORTZEITEN</string>
     <string name="password_with_expiration">Passwort mit Ablaufdatum</string>
+    <string name="passwords">Passwörter</string>
     <string name="passwords_do_not_match">Passwörter stimmen nicht überein</string>
     <string name="permissions_label">Berechtigungen:</string>
     <string name="policy_header">Regel</string>
@@ -219,7 +220,6 @@
     <string name="record_label">Eintrag:</string>
     <string name="record_not_found">Eintrag nicht gefunden</string>
     <string name="record_policy">Eintragsregeln</string>
-    <string name="record_settings">Eintrags-Einstellungen</string>
     <string name="record_sort_order">Eintrag Sortierreihenfolge</string>
     <string name="record_type">Eintragstyp</string>
     <string name="read_only">Nur Lesen</string>
@@ -234,7 +234,6 @@
     <string name="saving_file">Speichere %s …</string>
     <string name="search">Suchen</string>
     <string name="search_hint">In PasswdSafe suchen</string>
-    <string name="search_settings">Such-Einstellungen</string>
     <string name="select_accounts">Konto auswählen</string>
     <string name="select_file_label">Datei auswählen:</string>
     <string name="send">Senden</string>
@@ -381,12 +380,6 @@
         <item>5 Minuten</item>
         <item>15 Minuten</item>
         <item>1 Stunde</item>
-    </string-array>
-
-    <!-- Order must match FontSizePref enum values -->
-    <string-array name="font_size_pref">
-        <item>Normal</item>
-        <item>Klein</item>
     </string-array>
 
     <!-- Order must match constants in RecordSortOrderPref -->

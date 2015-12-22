@@ -67,11 +67,11 @@ public class PasswdSafeActivity extends AppCompatActivity
                    PasswdSafePolicyListFragment.Listener,
                    PasswdSafeNavDrawerFragment.Listener,
                    PasswdSafeNewFileFragment.Listener,
-                   PasswdSafeRecordFragment.Listener
+                   PasswdSafeRecordFragment.Listener,
+                   PreferencesFragment.Listener
 {
     // TODO: 3rdparty file open
     // TODO: expired passwords
-    // TODO: preferences
     // TODO: expiry notifications
     // TODO: details
     // TODO: recheck all icons (remove use of all built-in ones)
@@ -100,10 +100,12 @@ public class PasswdSafeActivity extends AppCompatActivity
         EDIT_RECORD,
         /** Change a password */
         CHANGE_PASSWORD,
+        /** View about info */
+        VIEW_ABOUT,
         /** View policy list */
         VIEW_POLICY_LIST,
-        /** View about info */
-        VIEW_ABOUT
+        /** View preferences */
+        VIEW_PREFERENCES
     }
 
     private enum ViewMode
@@ -122,10 +124,12 @@ public class PasswdSafeActivity extends AppCompatActivity
         EDIT_RECORD,
         /** Changing a password */
         CHANGING_PASSWORD,
+        /** Viewing about info */
+        VIEW_ABOUT,
         /** Viewing a list of policies */
         VIEW_POLICY_LIST,
-        /** Viewing about info */
-        VIEW_ABOUT
+        /** Viewing preferences */
+        VIEW_PREFERENCES
     }
 
     /** Action conformed via ConfirmPromptDialog */
@@ -380,8 +384,9 @@ public class PasswdSafeActivity extends AppCompatActivity
                 case INIT:
                 case FILE_OPEN:
                 case FILE_NEW:
+                case VIEW_ABOUT:
                 case VIEW_POLICY_LIST:
-                case VIEW_ABOUT: {
+                case VIEW_PREFERENCES: {
                     break;
                 }
                 case EDIT_RECORD:
@@ -568,7 +573,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showPreferences()
     {
-        Toast.makeText(this, "showPreferences", Toast.LENGTH_SHORT).show();
+        doChangeView(ChangeMode.VIEW_PREFERENCES,
+                     PreferencesFragment.newInstance());
     }
 
     /**
@@ -769,6 +775,12 @@ public class PasswdSafeActivity extends AppCompatActivity
     public void finishPolicyEdit(Runnable postSaveRun)
     {
         saveFile(false, true, null, postSaveRun);
+    }
+
+    @Override
+    public void updateViewPreferences()
+    {
+        doUpdateView(ViewMode.VIEW_PREFERENCES, itsLocation);
     }
 
     @Override
@@ -1032,8 +1044,9 @@ public class PasswdSafeActivity extends AppCompatActivity
                 case RECORD:
                 case EDIT_RECORD:
                 case CHANGE_PASSWORD:
+                case VIEW_ABOUT:
                 case VIEW_POLICY_LIST:
-                case VIEW_ABOUT: {
+                case VIEW_PREFERENCES: {
                     supportsBack = true;
                     break;
                 }
@@ -1083,8 +1096,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         case VIEW_LIST:
         case VIEW_RECORD:
         case CHANGING_PASSWORD:
+        case VIEW_ABOUT:
         case VIEW_POLICY_LIST:
-        case VIEW_ABOUT: {
+        case VIEW_PREFERENCES: {
             break;
         }
         }
@@ -1223,6 +1237,13 @@ public class PasswdSafeActivity extends AppCompatActivity
             drawerMode = PasswdSafeNavDrawerFragment.Mode.RECORDS_ACTION;
             break;
         }
+        case VIEW_ABOUT: {
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.ABOUT;
+            fileTimeoutPaused = false;
+            itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.about),
+                                                 this);
+            break;
+        }
         case VIEW_POLICY_LIST: {
             drawerMode = PasswdSafeNavDrawerFragment.Mode.POLICIES;
             fileTimeoutPaused = false;
@@ -1230,11 +1251,11 @@ public class PasswdSafeActivity extends AppCompatActivity
                     getString(R.string.password_policies), this);
             break;
         }
-        case VIEW_ABOUT: {
-            drawerMode = PasswdSafeNavDrawerFragment.Mode.ABOUT;
+        case VIEW_PREFERENCES: {
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.PREFERENCES;
             fileTimeoutPaused = false;
-            itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.about),
-                                                 this);
+            itsTitle = PasswdSafeApp.getAppTitle(
+                    getString(R.string.preferences), this);
             break;
         }
         }

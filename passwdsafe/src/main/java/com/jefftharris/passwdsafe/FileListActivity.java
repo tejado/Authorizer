@@ -49,7 +49,7 @@ public class FileListActivity extends AbstractFileListActivity
         getMenuInflater().inflate(R.menu.activity_file_list, menu);
 
         MenuItem item = menu.findItem(R.id.menu_preferences);
-        item.setIntent(new Intent(this, Preferences.class));
+        item.setIntent(new Intent(this, PreferencesActivity.class));
         MenuItemCompat.setShowAsAction(item,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 

@@ -46,6 +46,7 @@
     <string name="default_file_to_open">Fichier à ouvrir par défaut</string>
     <string name="default_policy">Stratégie par défaut</string>
     <string name="default_symbols">Symboles par défaut</string>
+    <string name="default_symbols_empty_pref">Utilisez une préférence vide symboles par défaut: %1$s</string>
     <string name="delete">Supprimer</string>
     <string name="delete_file">Supprimer base de données</string>
     <string name="delete_file_msg">Supprimer le fichier \"%1$s\"?</string>
@@ -87,7 +88,7 @@
     <string name="file_name">Nom du fichier</string>
     <string name="file_operations">Réglage sauvegarde</string>
     <string name="file_password_encoding">Encodage fichier mots de passe</string>
-    <string name="file_settings">Paramètres du fichier</string>
+    <string name="files">Fichiers</string>
     <string name="font_size">Taille de la police</string>
     <string name="generate">Générer</string>
     <string name="generate_password">Générer un mot de passe</string>
@@ -191,9 +192,9 @@
     <string name="password_policy">Mot de passe Stratégie</string>
     <string name="password_policies">Mot de passe Stratégies</string>
     <string name="password_record">Mot de passe entrée</string>
-    <string name="password_settings">Paramètres mots de passe</string>
     <string name="password_times_header">TEMPS MOT DE PASSE</string>
     <string name="password_with_expiration">Mot de passe avec date d\'expiration</string>
+    <string name="passwords">Mots de passe</string>
     <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>
     <string name="permissions_label">Autorisations:</string>
     <string name="policy_header">STRATÉGIE</string>
@@ -219,7 +220,6 @@
     <string name="record_label">Entrée:</string>
     <string name="record_not_found">Entrée introuvable</string>
     <string name="record_policy">Stratégie Entrée</string>
-    <string name="record_settings">Paramètres des entrées</string>
     <string name="record_sort_order">Entrée ordre de tri</string>
     <string name="record_type">Type d\'entrée</string>
     <string name="read_only">Lecture seule</string>
@@ -234,7 +234,6 @@
     <string name="saving_file">Enregistrement %s…</string>
     <string name="search">Rechercher</string>
     <string name="search_hint">Rechercher PasswdSafe</string>
-    <string name="search_settings">Paramètres de recherche</string>
     <string name="select_accounts">Sélectionnez comptes</string>
     <string name="select_file_label">Sélectionnez la sauvegarde à ouvrir:</string>
     <string name="send">Envoyer</string>
@@ -391,12 +390,6 @@
         <item>5 minutes</item>
         <item>15 minutes</item>
         <item>1 heure</item>
-    </string-array>
-
-    <!-- Order must match FontSizePref enum values -->
-    <string-array name="font_size_pref">
-        <item>Normale</item>
-        <item>Petite</item>
     </string-array>
 
     <!-- Order must match constants in RecordSortOrderPref -->
