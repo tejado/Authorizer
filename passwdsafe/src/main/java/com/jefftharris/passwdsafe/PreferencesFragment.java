@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -40,8 +41,16 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener,
                    Preference.OnPreferenceClickListener
 {
+    /** Listener interface for owning activity */
+    public interface Listener
+    {
+        /** Update the view for preferences */
+        void updateViewPreferences();
+    }
+
     private static final int REQUEST_DEFAULT_FILE = 0;
 
+    private Listener itsListener;
     private EditTextPreference itsFileDirPref;
     private Preference itsDefFilePref;
     private ListPreference itsFileClosePref;
@@ -50,6 +59,23 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     private ListPreference itsPasswdExpiryNotifPref;
     private EditTextPreference itsPasswdDefaultSymsPref;
     private ListPreference itsRecordSortOrderPref;
+
+    /**
+     * Create a new instance
+     */
+    public static PreferencesFragment newInstance()
+    {
+        return new PreferencesFragment();
+    }
+
+    @Override
+    public void onAttach(Context ctx)
+    {
+        super.onAttach(ctx);
+        if (ctx instanceof Listener) {
+            itsListener = (Listener)ctx;
+        }
+    }
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s)
@@ -116,6 +142,22 @@ public class PreferencesFragment extends PreferenceFragmentCompat
                 RecordSortOrderPref.getDisplayNames(res));
         itsRecordSortOrderPref.setEntryValues(RecordSortOrderPref.getValues());
         onSharedPreferenceChanged(prefs, Preferences.PREF_RECORD_SORT_ORDER);
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (itsListener != null) {
+            itsListener.updateViewPreferences();
+        }
+    }
+
+    @Override
+    public void onDetach()
+    {
+        super.onDetach();
+        itsListener = null;
     }
 
     @Override

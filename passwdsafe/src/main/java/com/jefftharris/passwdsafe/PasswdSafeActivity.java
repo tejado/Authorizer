@@ -66,11 +66,11 @@ public class PasswdSafeActivity extends AppCompatActivity
                    PasswdSafePolicyListFragment.Listener,
                    PasswdSafeNavDrawerFragment.Listener,
                    PasswdSafeNewFileFragment.Listener,
-                   PasswdSafeRecordFragment.Listener
+                   PasswdSafeRecordFragment.Listener,
+                   PreferencesFragment.Listener
 {
     // TODO: 3rdparty file open
     // TODO: expired passwords
-    // TODO: preferences
     // TODO: about
     // TODO: expiry notifications
     // TODO: details
@@ -103,7 +103,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Change a password */
         CHANGE_PASSWORD,
         /** View policy list */
-        VIEW_POLICY_LIST
+        VIEW_POLICY_LIST,
+        /** View preferences */
+        VIEW_PREFERENCES
     }
 
     private enum ViewMode
@@ -123,7 +125,9 @@ public class PasswdSafeActivity extends AppCompatActivity
         /** Changing a password */
         CHANGING_PASSWORD,
         /** Viewing a list of policies */
-        VIEW_POLICY_LIST
+        VIEW_POLICY_LIST,
+        /** Viewing preferences */
+        VIEW_PREFERENCES
     }
 
     /** Action conformed via ConfirmPromptDialog */
@@ -378,7 +382,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 case INIT:
                 case FILE_OPEN:
                 case FILE_NEW:
-                case VIEW_POLICY_LIST: {
+                case VIEW_POLICY_LIST:
+                case VIEW_PREFERENCES: {
                     break;
                 }
                 case EDIT_RECORD:
@@ -565,7 +570,8 @@ public class PasswdSafeActivity extends AppCompatActivity
     @Override
     public void showPreferences()
     {
-        Toast.makeText(this, "showPreferences", Toast.LENGTH_SHORT).show();
+        doChangeView(ChangeMode.VIEW_PREFERENCES,
+                     PreferencesFragment.newInstance());
     }
 
     /**
@@ -760,6 +766,12 @@ public class PasswdSafeActivity extends AppCompatActivity
     public void finishPolicyEdit(Runnable postSaveRun)
     {
         saveFile(false, true, null, postSaveRun);
+    }
+
+    @Override
+    public void updateViewPreferences()
+    {
+        doUpdateView(ViewMode.VIEW_PREFERENCES, itsLocation);
     }
 
     @Override
@@ -1023,7 +1035,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 case RECORD:
                 case EDIT_RECORD:
                 case CHANGE_PASSWORD:
-                case VIEW_POLICY_LIST: {
+                case VIEW_POLICY_LIST:
+                case VIEW_PREFERENCES: {
                     supportsBack = true;
                     break;
                 }
@@ -1073,7 +1086,8 @@ public class PasswdSafeActivity extends AppCompatActivity
         case VIEW_LIST:
         case VIEW_RECORD:
         case CHANGING_PASSWORD:
-        case VIEW_POLICY_LIST: {
+        case VIEW_POLICY_LIST:
+        case VIEW_PREFERENCES: {
             break;
         }
         }
@@ -1217,6 +1231,13 @@ public class PasswdSafeActivity extends AppCompatActivity
             fileTimeoutPaused = false;
             itsTitle = PasswdSafeApp.getAppTitle(
                     getString(R.string.password_policies), this);
+            break;
+        }
+        case VIEW_PREFERENCES: {
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.PREFERENCES;
+            fileTimeoutPaused = false;
+            itsTitle = PasswdSafeApp.getAppTitle(
+                    getString(R.string.preferences), this);
             break;
         }
         }
