@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Base application theme for API 11+. This theme completely replaces
+        AppBaseTheme from res/values/styles.xml on API 11+ devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Holo">
+        <!-- API 11 theme customizations can go here. -->
+    </style>
+
+    <style name="BorderlessButton">
+        <item name="android:background">@drawable/item_background_holo_dark</item>
+        <item name="android:paddingLeft">4dip</item>
+        <item name="android:paddingRight">4dip</item>
+    </style>
+
+    <style name="InputMethodText">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+    </style>
+
+    <style name="SelectableView">
+        <item name="android:background">@drawable/item_background_holo_dark</item>
+    </style>
+
+</resources>
