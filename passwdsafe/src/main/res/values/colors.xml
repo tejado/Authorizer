@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="accent_material_light" tools:override="true">#304ffe</color>
+    <color name="primary_dark_material_dark" tools:override="true">#ad0000</color>
+    <color name="primary_material_dark" tools:override="true">#b71c1c</color>
+</resources>
