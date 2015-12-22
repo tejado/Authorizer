@@ -7,14 +7,18 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <resources>
-  <!--
+    <!--
       Base application theme for API 14+. This theme completely replaces
       AppBaseTheme from BOTH res/values/styles.xml and
       res/values-v11/styles.xml on API 14+ devices.
-  -->
-  <style name="AppBaseTheme" parent="android:Theme.Holo">
-    <!-- API 14 theme customizations can go here. -->
-  </style>
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Holo">
+        <!-- API 14 theme customizations can go here. -->
+    </style>
+
+    <style name="NewAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
 
     <style name="ListItemText">
         <item name="android:textAppearance">?android:attr/textAppearanceListItem</item>

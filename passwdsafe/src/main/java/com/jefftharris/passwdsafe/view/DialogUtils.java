@@ -74,6 +74,7 @@ public class DialogUtils
     /**
      * Create a dialog used as a prompt to confirm an operation
      */
+    // TODO: fix generic confirm prompt for new dialog
     public static DialogData createConfirmPrompt
     (
         Activity act,
