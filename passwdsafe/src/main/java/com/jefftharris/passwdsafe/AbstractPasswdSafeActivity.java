@@ -51,7 +51,7 @@ import android.widget.TextView;
 public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListActivity
     implements PasswdFileActivity
 {
-    protected static final String TAG = "PasswdSafe";
+    protected static final String TAG = "PasswdSafeOld";
 
     private static final int MENU_PARENT = 1;
     private static final int MENU_SEARCH = 2;

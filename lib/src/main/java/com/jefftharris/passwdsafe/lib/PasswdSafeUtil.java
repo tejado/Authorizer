@@ -60,7 +60,7 @@ public class PasswdSafeUtil
 
         intent.setClassName(PACKAGE,
                             PACKAGE +
-                            (newAct ? ".PasswdSafeActivity" : ".PasswdSafe"));
+                            (newAct ? ".PasswdSafeActivity" : ".PasswdSafeOld"));
 
         return intent;
     }
