@@ -271,7 +271,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             Boolean reopenVal = reopen.get();
             if ((reopenVal != null) && reopenVal) {
                 // Close and reopen the new file
-                itsFileDataFrag.setFileData(null, this);
+                itsFileDataFrag.setFileData(null);
                 doUpdateView(ViewMode.INIT, new PasswdLocation());
                 changeInitialView();
                 changeFileOpenView(intent);
@@ -606,7 +606,7 @@ public class PasswdSafeActivity extends AppCompatActivity
                                fileData.getUri(), recToOpen);
 
         // TODO: recToOpen
-        itsFileDataFrag.setFileData(fileData, this);
+        itsFileDataFrag.setFileData(fileData);
         changeOpenView(itsLocation, true);
     }
 
@@ -627,7 +627,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     public void handleFileNew(PasswdFileData fileData)
     {
         PasswdSafeUtil.dbginfo(TAG, "handleFileNew: %s", fileData.getUri());
-        itsFileDataFrag.setFileData(fileData, this);
+        itsFileDataFrag.setFileData(fileData);
         changeOpenView(itsLocation, true);
     }
 
@@ -640,8 +640,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             boolean incGroups)
     {
         PasswdFileDataView dataView = itsFileDataFrag.getFileDataView();
-        return dataView.getRecords(incRecords, incGroups,
-                                   getApplicationContext());
+        return dataView.getRecords(incRecords, incGroups);
     }
 
     /**
@@ -848,7 +847,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     {
         PasswdFileDataView fileView = itsFileDataFrag.getFileDataView();
         try {
-            fileView.setRecordFilter(query, this);
+            fileView.setRecordFilter(query);
         } catch (Exception e) {
             String msg = e.getMessage();
             Log.e(TAG, msg, e);
@@ -931,7 +930,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             {
                 boolean resetLoc = false;
                 if (save) {
-                    itsFileDataFrag.refreshFileData(PasswdSafeActivity.this);
+                    itsFileDataFrag.refreshFileData();
                     if ((newLocation != null) &&
                         !newLocation.equalGroups(itsLocation)) {
                         resetLoc = true;
