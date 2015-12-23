@@ -55,7 +55,7 @@ import java.util.List;
 /**
  * The main PasswdSafe activity for showing a password file
  */
-public class PasswdSafeActivity extends AppCompatActivity
+public class PasswdSafe extends AppCompatActivity
         implements AbstractPasswdSafeRecordFragment.Listener,
                    AboutFragment.Listener,
                    View.OnClickListener,
@@ -189,7 +189,7 @@ public class PasswdSafeActivity extends AppCompatActivity
     private static int MENU_BIT_HAS_SEARCH = 4;
     private static int MENU_BIT_HAS_CLOSE = 5;
 
-    private static final String TAG = "PasswdSafeActivity";
+    private static final String TAG = "PasswdSafe";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -479,8 +479,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 @Override
                 public void useFileData(@NonNull PasswdFileData fileData)
                 {
-                    uriName.set(fileData.getUri().getIdentifier(
-                            PasswdSafeActivity.this, true));
+                    uriName.set(fileData.getUri().getIdentifier(PasswdSafe.this,
+                                                                true));
                 }
             });
             if (uriName.get() == null) {
@@ -518,7 +518,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                PasswdSafeActivity.super.onBackPressed();
+                PasswdSafe.super.onBackPressed();
             }
         });
     }
@@ -826,9 +826,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 {
                     PwsRecord rec = fileData.getRecord(location.getRecord());
                     if (rec != null) {
-                        removed.set(
-                                fileData.removeRecord(rec,
-                                                      PasswdSafeActivity.this));
+                        removed.set(fileData.removeRecord(rec,
+                                                          PasswdSafe.this));
                     }
                 }
             });
@@ -959,8 +958,8 @@ public class PasswdSafeActivity extends AppCompatActivity
                 @Override
                 public void useFileData(@NonNull PasswdFileData fileData)
                 {
-                    fileId.set(fileData.getUri().getIdentifier(
-                            PasswdSafeActivity.this, false));
+                    fileId.set(fileData.getUri().getIdentifier(PasswdSafe.this,
+                                                               false));
                 }
             });
             itsCurrTask = new SaveTask(fileId.get(), saveRun, this);
@@ -1168,7 +1167,7 @@ public class PasswdSafeActivity extends AppCompatActivity
                     public void useFileData(@NonNull PasswdFileData fileData)
                     {
                         itsTitle = PasswdSafeApp.getAppFileTitle(
-                                fileData.getUri(), PasswdSafeActivity.this);
+                                fileData.getUri(), PasswdSafe.this);
                     }
                 });
             }
@@ -1392,7 +1391,7 @@ public class PasswdSafeActivity extends AppCompatActivity
         @Override
         protected void handlePostExecute()
         {
-            PasswdSafeActivity.this.finish();
+            PasswdSafe.this.finish();
         }
     }
 
@@ -1467,8 +1466,7 @@ public class PasswdSafeActivity extends AppCompatActivity
             if (result instanceof Exception) {
                 Exception e = (Exception)result;
                 String msg = getExceptionMsg(e);
-                PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafeActivity.this,
-                                            true);
+                PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafe.this, true);
             } else if (result != null) {
                 handlePostExecute();
             }
