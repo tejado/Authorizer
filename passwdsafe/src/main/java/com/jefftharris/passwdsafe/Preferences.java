@@ -61,7 +61,7 @@ public class Preferences
             "fileLegacyFileChooserPref";
     private static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = true;
 
-    private static final String PREF_GROUP_RECORDS = "groupRecordsPref";
+    public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     private static final boolean PREF_GROUP_RECORDS_DEF = true;
 
     public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
@@ -80,16 +80,16 @@ public class Preferences
     public static final RecordSortOrderPref PREF_RECORD_SORT_ORDER_DEF =
             RecordSortOrderPref.GROUP_FIRST;
 
-    private static final String PREF_SEARCH_CASE_SENSITIVE =
+    public static final String PREF_SEARCH_CASE_SENSITIVE =
         "searchCaseSensitivePref";
     private static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
-    private static final String PREF_SEARCH_REGEX = "searchRegexPref";
+    public static final String PREF_SEARCH_REGEX = "searchRegexPref";
     private static final boolean PREF_SEARCH_REGEX_DEF = false;
 
     private static final String PREF_SHOW_HIDDEN_FILES = "showBackupFilesPref";
     private static final boolean PREF_SHOW_HIDDEN_FILES_DEF = false;
 
-    private static final String PREF_SORT_CASE_SENSITIVE =
+    public static final String PREF_SORT_CASE_SENSITIVE =
         "sortCaseSensitivePref";
     private static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
 

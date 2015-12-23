@@ -42,6 +42,13 @@ public class PasswdSafeFileDataFragment extends Fragment
     private static final String TAG = "PasswdSafeFileDataFragment";
 
     @Override
+    public void onAttach(Context ctx)
+    {
+        super.onAttach(ctx);
+        itsFileDataView.onAttach(ctx);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -56,7 +63,14 @@ public class PasswdSafeFileDataFragment extends Fragment
 
         // Called when app is being finalized but not when rotated
         PasswdSafeUtil.dbginfo(TAG, "onDestroy");
-        setFileData(null, getContext());
+        setFileData(null);
+    }
+
+    @Override
+    public void onDetach()
+    {
+        itsFileDataView.onDetach();
+        super.onDetach();
     }
 
     /** One-time check for whether the fragment was created new */
@@ -82,28 +96,28 @@ public class PasswdSafeFileDataFragment extends Fragment
     }
 
     /** Set the password file data */
-    public void setFileData(PasswdFileData fileData, Context ctx)
+    public void setFileData(PasswdFileData fileData)
     {
         PasswdFileToken token = acquireFileData();
         try {
             if (itsFileData != null) {
-                itsFileDataView.clearFileData(ctx);
+                itsFileDataView.clearFileData();
                 itsFileData.close();
             }
             itsFileData = fileData;
             itsLastViewedRecord = null;
-            itsFileDataView.setFileData(itsFileData, ctx);
+            itsFileDataView.setFileData(itsFileData);
         } finally {
             token.release();
         }
     }
 
     /** Refresh the password file data */
-    public void refreshFileData(Context ctx)
+    public void refreshFileData()
     {
         PasswdFileToken token = acquireFileData();
         try {
-            itsFileDataView.setFileData(token.getFileData(), ctx);
+            itsFileDataView.setFileData(token.getFileData());
         } finally {
             token.release();
         }
