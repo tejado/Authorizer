@@ -8,11 +8,16 @@
 package com.jefftharris.passwdsafe.view;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.pref.RecordSortOrderPref;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -30,6 +35,7 @@ import java.util.regex.PatternSyntaxException;
  * The PasswdFileDataView contains state for viewing a password file
  */
 public class PasswdFileDataView
+        implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     /**
      * Visitor interface for iterating records
@@ -41,27 +47,19 @@ public class PasswdFileDataView
     }
 
     private PasswdFileData itsFileData;
-
     private GroupNode itsRootNode;
-
     private GroupNode itsCurrGroupNode;
-
     private final ArrayList<String> itsCurrGroups = new ArrayList<>();
-
     private PasswdRecordFilter itsFilter;
-
-    // TODO: group records pref
     private boolean itsIsGroupRecords = true;
-
-    // TODO: sort case pref
     private boolean itsIsSortCaseSensitive = false;
-
-    // TODO: sort regex pref
+    private boolean itsIsSearchCaseSensitive = false;
     private boolean itsIsSearchRegex = true;
-
-    // TODO: sort order pref
     private RecordSortOrderPref itsRecordSortOrder =
             RecordSortOrderPref.GROUP_LAST;
+    private Context itsContext;
+
+    private static final String TAG = "PasswdFileDataView";
 
     /**
      * Constructor
@@ -72,23 +70,100 @@ public class PasswdFileDataView
     }
 
     /**
+     * Handle when the owning fragment is attached to the context
+     */
+    public void onAttach(Context ctx)
+    {
+        itsContext = ctx.getApplicationContext();
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(itsContext);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+        itsIsGroupRecords = Preferences.getGroupRecordsPref(prefs);
+        itsIsSortCaseSensitive = Preferences.getSortCaseSensitivePref(prefs);
+        itsIsSearchCaseSensitive =
+                Preferences.getSearchCaseSensitivePref(prefs);
+        itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
+        itsRecordSortOrder = Preferences.getRecordSortOrderPref(prefs);
+    }
+
+    /**
+     * Handle when the owning fragment is detached from its fragment
+     */
+    public void onDetach()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(itsContext);
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+        itsContext = null;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    {
+        boolean rebuild = false;
+        boolean rebuildSearch = false;
+        switch (key) {
+        case Preferences.PREF_GROUP_RECORDS: {
+            itsIsGroupRecords = Preferences.getGroupRecordsPref(prefs);
+            rebuild = true;
+            break;
+        }
+        case Preferences.PREF_SORT_CASE_SENSITIVE: {
+            itsIsSortCaseSensitive =
+                    Preferences.getSortCaseSensitivePref(prefs);
+            rebuild = true;
+            break;
+        }
+        case Preferences.PREF_SEARCH_CASE_SENSITIVE: {
+            itsIsSearchCaseSensitive =
+                    Preferences.getSearchCaseSensitivePref(prefs);
+            rebuildSearch = true;
+            break;
+        }
+        case Preferences.PREF_SEARCH_REGEX: {
+            itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
+            rebuildSearch = true;
+            break;
+        }
+        case Preferences.PREF_RECORD_SORT_ORDER: {
+            itsRecordSortOrder = Preferences.getRecordSortOrderPref(prefs);
+            rebuild = true;
+            break;
+        }
+        }
+
+        if (rebuildSearch &&
+            (itsFilter != null) && itsFilter.isQueryType()) {
+            try {
+                setRecordFilter(itsFilter.toString(itsContext));
+            } catch (Exception e) {
+                String msg = e.getMessage();
+                Log.e(TAG, msg, e);
+                PasswdSafeUtil.showErrorMsg(msg, itsContext);
+            }
+        } else if (rebuild) {
+            rebuildView();
+        }
+    }
+
+    /**
      * Clear the file data
      */
-    public synchronized void clearFileData(Context ctx)
+    public synchronized void clearFileData()
     {
         itsFileData = null;
         itsCurrGroups.clear();
-        rebuildView(ctx);
+        rebuildView();
     }
 
     /**
      * Set the file data
      */
-    public synchronized void setFileData(PasswdFileData fileData, Context ctx)
+    public synchronized void setFileData(PasswdFileData fileData)
     {
         itsFileData = fileData;
         itsCurrGroups.clear();
-        rebuildView(ctx);
+        rebuildView();
     }
 
     /**
@@ -96,8 +171,7 @@ public class PasswdFileDataView
      */
     public synchronized List<PasswdRecordListData> getRecords(
             boolean incRecords,
-            boolean incGroups,
-            Context ctx)
+            boolean incGroups)
     {
         List<PasswdRecordListData> records = new ArrayList<>();
         if (itsCurrGroupNode == null) {
@@ -110,7 +184,7 @@ public class PasswdFileDataView
                 for (Map.Entry<String, GroupNode> entry:
                         entryGroups.entrySet()) {
                     int items = entry.getValue().getNumRecords();
-                    String str = ctx.getResources().getQuantityString(
+                    String str = itsContext.getResources().getQuantityString(
                             R.plurals.group_items, items, items);
 
                     records.add(new PasswdRecordListData(
@@ -159,7 +233,7 @@ public class PasswdFileDataView
     /**
      * Set the record filter from a query string
      */
-    public synchronized void setRecordFilter(String query, Context ctx)
+    public synchronized void setRecordFilter(String query)
             throws Exception
     {
         PasswdRecordFilter filter = null;
@@ -167,7 +241,7 @@ public class PasswdFileDataView
         if (!TextUtils.isEmpty(query)) {
             try {
                 int flags = 0;
-                if (!itsIsSortCaseSensitive) {
+                if (!itsIsSearchCaseSensitive) {
                     flags |= Pattern.CASE_INSENSITIVE;
                 }
                 if (!itsIsSearchRegex) {
@@ -184,7 +258,7 @@ public class PasswdFileDataView
         }
 
         itsFilter = filter;
-        rebuildView(ctx);
+        rebuildView();
     }
 
     /**
@@ -198,7 +272,7 @@ public class PasswdFileDataView
     /**
      * Rebuild the view information
      */
-    private synchronized void rebuildView(Context ctx)
+    private synchronized void rebuildView()
     {
         // TODO: rebuild in background?
 
@@ -214,7 +288,7 @@ public class PasswdFileDataView
                     new StringComparator() : String.CASE_INSENSITIVE_ORDER;
 
             for (PwsRecord rec: records) {
-                String match = filterRecord(rec, ctx);
+                String match = filterRecord(rec);
                 if (match == null) {
                     continue;
                 }
@@ -237,7 +311,7 @@ public class PasswdFileDataView
              }
         } else {
             for (PwsRecord rec: records) {
-                String match = filterRecord(rec, ctx);
+                String match = filterRecord(rec);
                 if (match != null) {
                     itsRootNode.addRecord(new MatchPwsRecord(rec, match));
                 }
@@ -269,12 +343,12 @@ public class PasswdFileDataView
      * @return A non-null string if the record matches the filter; null if it
      * does not
      */
-    private String filterRecord(PwsRecord rec, Context ctx)
+    private String filterRecord(PwsRecord rec)
     {
         if (itsFilter == null) {
             return PasswdRecordFilter.QUERY_MATCH;
         }
-        return itsFilter.filterRecord(rec, itsFileData, ctx);
+        return itsFilter.filterRecord(rec, itsFileData, itsContext);
     }
 
     /**
