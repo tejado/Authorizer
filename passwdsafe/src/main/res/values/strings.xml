@@ -182,8 +182,6 @@
     <string name="password_expires_before">Password expires before %1$s</string>
     <string name="password_expires_today">Password expires today</string>
     <string name="password_file">Password file</string>
-    <string name="password_generation">Password generation</string>
-    <string name="password_gen_prefs_moved">Password generation options have moved.  Open a file and edit the default policy.</string>
     <string name="password_header">PASSWORD</string>
     <string name="password_label">Password:</string>
     <string name="password_len_short_opt">Password length too short for options</string>
