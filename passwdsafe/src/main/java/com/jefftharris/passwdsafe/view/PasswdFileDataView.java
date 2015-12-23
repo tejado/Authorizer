@@ -51,12 +51,16 @@ public class PasswdFileDataView
     private GroupNode itsCurrGroupNode;
     private final ArrayList<String> itsCurrGroups = new ArrayList<>();
     private PasswdRecordFilter itsFilter;
-    private boolean itsIsGroupRecords = true;
-    private boolean itsIsSortCaseSensitive = false;
-    private boolean itsIsSearchCaseSensitive = false;
-    private boolean itsIsSearchRegex = true;
+    private boolean itsIsGroupRecords =
+            Preferences.PREF_GROUP_RECORDS_DEF;
+    private boolean itsIsSortCaseSensitive =
+            Preferences.PREF_SORT_CASE_SENSITIVE_DEF;
+    private boolean itsIsSearchCaseSensitive =
+            Preferences.PREF_SEARCH_CASE_SENSITIVE_DEF;
+    private boolean itsIsSearchRegex =
+            Preferences.PREF_SEARCH_REGEX_DEF;
     private RecordSortOrderPref itsRecordSortOrder =
-            RecordSortOrderPref.GROUP_LAST;
+            Preferences.PREF_RECORD_SORT_ORDER_DEF;
     private Context itsContext;
 
     private static final String TAG = "PasswdFileDataView";

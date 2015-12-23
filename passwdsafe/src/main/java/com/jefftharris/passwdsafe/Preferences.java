@@ -62,7 +62,7 @@ public class Preferences
     private static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = true;
 
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
-    private static final boolean PREF_GROUP_RECORDS_DEF = true;
+    public static final boolean PREF_GROUP_RECORDS_DEF = true;
 
     public static final String PREF_PASSWD_ENC = "passwordEncodingPref";
     public static final String PREF_PASSWD_ENC_DEF =
@@ -82,16 +82,16 @@ public class Preferences
 
     public static final String PREF_SEARCH_CASE_SENSITIVE =
         "searchCaseSensitivePref";
-    private static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
+    public static final boolean PREF_SEARCH_CASE_SENSITIVE_DEF = false;
     public static final String PREF_SEARCH_REGEX = "searchRegexPref";
-    private static final boolean PREF_SEARCH_REGEX_DEF = false;
+    public static final boolean PREF_SEARCH_REGEX_DEF = false;
 
     private static final String PREF_SHOW_HIDDEN_FILES = "showBackupFilesPref";
     private static final boolean PREF_SHOW_HIDDEN_FILES_DEF = false;
 
     public static final String PREF_SORT_CASE_SENSITIVE =
         "sortCaseSensitivePref";
-    private static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
+    public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
 
     private static final String PREF_GEN_LOWER = "passwdGenLower";
     private static final boolean PREF_GEN_LOWER_DEF = true;
