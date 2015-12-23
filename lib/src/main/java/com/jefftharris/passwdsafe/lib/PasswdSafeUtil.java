@@ -21,7 +21,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.text.ClipboardManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -127,12 +126,13 @@ public class PasswdSafeUtil
         }
     }
 
+    /**
+     * Copy text to the clipboard
+     */
     public static void copyToClipboard(String str, Context ctx)
     {
         try {
-            ClipboardManager clipMgr = (ClipboardManager)
-                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-            clipMgr.setText(str);
+            ApiCompat.copyToClipboard(str, ctx);
         } catch (Throwable e) {
             String err = ctx.getString(R.string.copy_clipboard_error,
                                        getAppTitle(ctx));
