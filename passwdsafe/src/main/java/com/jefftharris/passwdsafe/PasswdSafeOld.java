@@ -56,7 +56,7 @@ import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.PasswdEntryDialog;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
-public class PasswdSafe extends AbstractPasswdSafeActivity
+public class PasswdSafeOld extends AbstractPasswdSafeActivity
 {
     private static final int DIALOG_GET_PASSWD =        MAX_DIALOG + 1;
     private static final int DIALOG_PROGRESS =          MAX_DIALOG + 2;
@@ -640,7 +640,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                     PasswdFileUri uri = getUri();
                     if (uri != null) {
                         String error = uri.validateNewChild(fileName.toString(),
-                                                            PasswdSafe.this);
+                                                            PasswdSafeOld.this);
                         if (error != null) {
                             return error;
                         }
@@ -948,12 +948,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                 PasswdFileUri uri = (PasswdFileUri)(result);
                 if (!uri.exists()) {
                     PasswdSafeUtil.showFatalMsg("File does't exist: " + uri,
-                                                PasswdSafe.this);
+                                                PasswdSafeOld.this);
                     return;
                 }
                 openFile(uri);
                 String title = PasswdSafeApp.getAppFileTitle(getUri(),
-                                                             PasswdSafe.this);
+                                                             PasswdSafeOld.this);
                 //noinspection ConstantConditions
                 if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
                     title += " - AUTOOPEN!!!!!";
@@ -1131,7 +1131,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#getTitle(android.content.Context)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#getTitle(android.content.Context)
          */
         @Override
         public String getTitle(Context ctx)
@@ -1140,7 +1140,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
          */
         @Override
         protected Object handleDoInBackground(PasswdFileUri uri, Context ctx)
@@ -1152,7 +1152,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleOnPostExecute(java.lang.Object)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#handleOnPostExecute(java.lang.Object)
          */
         @Override
         protected void handleOnPostExecute(Object result)
@@ -1178,7 +1178,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#getTitle(android.content.Context)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#getTitle(android.content.Context)
          */
         @Override
         public String getTitle(Context ctx)
@@ -1193,7 +1193,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
          */
         @Override
         protected Object handleDoInBackground(PasswdFileUri uri, Context ctx)
@@ -1211,7 +1211,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleOnPostExecute(java.lang.Object)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#handleOnPostExecute(java.lang.Object)
          */
         @Override
         protected void handleOnPostExecute(Object result)
@@ -1219,12 +1219,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
             PasswdFileData fileData = (PasswdFileData)result;
             openFile(fileData.getUri());
             getPasswdFile().setFileData(fileData);
-            setTitle(PasswdSafeApp.getAppFileTitle(getUri(), PasswdSafe.this));
+            setTitle(PasswdSafeApp.getAppFileTitle(getUri(), PasswdSafeOld.this));
             showFileData(MOD_DATA);
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleGetExceptionMsg(java.lang.Exception)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#handleGetExceptionMsg(java.lang.Exception)
          */
         @Override
         protected String handleGetExceptionMsg(Context ctx)
@@ -1242,7 +1242,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#getTitle(android.content.Context)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#getTitle(android.content.Context)
          */
         @Override
         public String getTitle(Context ctx)
@@ -1251,7 +1251,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#handleDoInBackground(com.jefftharris.passwdsafe.file.PasswdFileUri, android.content.Context)
          */
         @Override
         protected Object handleDoInBackground(PasswdFileUri uri, Context ctx)
@@ -1268,12 +1268,12 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         }
 
         /* (non-Javadoc)
-         * @see com.jefftharris.passwdsafe.PasswdSafe.AbstractTask#handleOnPostExecute(java.lang.Object)
+         * @see com.jefftharris.passwdsafe.PasswdSafeOld.AbstractTask#handleOnPostExecute(java.lang.Object)
          */
         @Override
         protected void handleOnPostExecute(Object result)
         {
-            PasswdSafe.this.finish();
+            PasswdSafeOld.this.finish();
         }
     }
 
@@ -1304,7 +1304,7 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
         protected final Object doInBackground(Void... params)
         {
             PasswdFileUri uri = getUri();
-            Context ctx = PasswdSafe.this;
+            Context ctx = PasswdSafeOld.this;
             try {
                 return handleDoInBackground(uri, ctx);
             } catch (Exception e) {
@@ -1344,14 +1344,14 @@ public class PasswdSafe extends AbstractPasswdSafeActivity
                      TextUtils.equals(e.getMessage(), "Invalid password")) ||
                     (e instanceof InvalidPassphraseException)) {
                     PasswdSafeUtil.showFatalMsg(
-                        getString(R.string.invalid_password), PasswdSafe.this,
+                        getString(R.string.invalid_password), PasswdSafeOld.this,
                         false);
                 } else {
-                    String msg = handleGetExceptionMsg(PasswdSafe.this);
+                    String msg = handleGetExceptionMsg(PasswdSafeOld.this);
                     if (msg == null) {
                         msg = e.toString();
                     }
-                    PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafe.this);
+                    PasswdSafeUtil.showFatalMsg(e, msg, PasswdSafeOld.this);
                 }
             }
         }
