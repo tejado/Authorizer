@@ -70,7 +70,6 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    PreferencesFragment.Listener
 {
-    // TODO: 3rdparty file open
     // TODO: expired passwords
     // TODO: expiry notifications
     // TODO: details

@@ -66,16 +66,13 @@
             <!-- View files -->
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.VIEW"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
-
                 <data android:scheme="file"/>
             </intent-filter>
+
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.VIEW"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
-
                 <data android:scheme="content"/>
                 <data android:mimeType="vnd.android.cursor.item/vnd.com.jefftharris.passwdsafe.sync.provider.files"/>
             </intent-filter>
@@ -97,6 +94,92 @@
             <intent-filter>
                 <action android:name="com.jefftharris.passwdsafe.action.NEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <!-- Dropbox, Astro -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:host="*" android:scheme="file"/>
+                <!-- Handle some number of '.'s in the path -->
+                <data android:pathPattern=".*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak"/>
+                <data android:mimeType="*/*"/>
+                <data android:mimeType="application/octet-stream"/>
+                <data android:mimeType="application/x-ibak"/>
+                <data android:mimeType="application/x-psafe"/>
+                <data android:mimeType="application/x-psafe3"/>
+                <data android:mimeType="application/application/octet-string"/>
+                <data android:mimeType="application/application/x-ibak"/>
+                <data android:mimeType="application/application/x-psafe"/>
+                <data android:mimeType="application/application/x-psafe3"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:host="*" android:scheme="file"/>
+                <!-- Handle some number of '.'s in the path -->
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
+                <data android:mimeType="application/x-ns-proxy-autoconfig"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:host="*" android:scheme="file"/>
+                <!-- Handle some number of '.'s in the path -->
+                <data android:pathPattern=".*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.psafe3"/>
+                <data android:pathPattern=".*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
+                <data android:pathPattern=".*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak"/>
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak"/>
+            </intent-filter>
+
+            <!-- Content providers - e.g. mail app attachments -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:scheme="content"/>
+                <data android:mimeType="application/psafe3"/>
+                <data android:mimeType="application/psafe"/>
+                <data android:mimeType="application/dat"/>
+                <data android:mimeType="application/x-psafe3"/>
+                <data android:mimeType="application/x-psafe"/>
+                <data android:mimeType="application/x-dat"/>
+                <data android:mimeType="application/octet-stream"/>
             </intent-filter>
 
             <!-- Search -->
@@ -127,113 +210,6 @@
                 <data android:scheme="content"/>
                 <data android:mimeType="vnd.android.cursor.item/vnd.com.jefftharris.passwdsafe.sync.provider.files"/>
             </intent-filter>
-
-            <!-- Dropbox, Astro -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="*"
-                    android:scheme="file"/>
-
-                <!-- Handle some number of '.'s in the path -->
-                <data android:pathPattern=".*\\.psafe3"/>
-                <data android:pathPattern=".*\\..*\\.psafe3"/>
-                <data android:pathPattern=".*\\..*\\..*\\.psafe3"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.psafe3"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.psafe3"/>
-                <data android:pathPattern=".*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\.ibak"/>
-                <data android:pathPattern=".*\\..*\\.ibak"/>
-                <data android:pathPattern=".*\\..*\\..*\\.ibak"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak"/>
-                <data android:mimeType="*/*"/>
-                <data android:mimeType="application/octet-stream"/>
-                <data android:mimeType="application/x-ibak"/>
-                <data android:mimeType="application/x-psafe"/>
-                <data android:mimeType="application/x-psafe3"/>
-                <data android:mimeType="application/application/octet-string"/>
-                <data android:mimeType="application/application/x-ibak"/>
-                <data android:mimeType="application/application/x-psafe"/>
-                <data android:mimeType="application/application/x-psafe3"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="*"
-                    android:scheme="file"/>
-                <!-- Handle some number of '.'s in the path -->
-                <data android:pathPattern=".*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
-                <data android:mimeType="application/x-ns-proxy-autoconfig"/>
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="*"
-                    android:scheme="file"/>
-                <!-- Handle some number of '.'s in the path -->
-                <data android:pathPattern=".*\\.psafe3"/>
-                <data android:pathPattern=".*\\..*\\.psafe3"/>
-                <data android:pathPattern=".*\\..*\\..*\\.psafe3"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.psafe3"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.psafe3"/>
-                <data android:pathPattern=".*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.dat"/>
-                <data android:pathPattern=".*\\.ibak"/>
-                <data android:pathPattern=".*\\..*\\.ibak"/>
-                <data android:pathPattern=".*\\..*\\..*\\.ibak"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.ibak"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak"/>
-            </intent-filter>
-
-            <!-- Content providers - e.g. mail app attachments -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-
-                <data android:scheme="content"/>
-                <data android:mimeType="application/psafe3"/>
-                <data android:mimeType="application/psafe"/>
-                <data android:mimeType="application/dat"/>
-                <data android:mimeType="application/x-psafe3"/>
-                <data android:mimeType="application/x-psafe"/>
-                <data android:mimeType="application/x-dat"/>
-                <data android:mimeType="application/octet-stream"/>
-            </intent-filter>
-
-            <!-- Search
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-            </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-                -->
         </activity>
         <activity
             android:name=".PasswdPolicyActivity"
