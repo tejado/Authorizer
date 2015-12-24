@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools">
     <!--
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
@@ -25,6 +26,21 @@
 
     <style name="BorderlessButton">
         <item name="android:background">@android:drawable/list_selector_background</item>
+    </style>
+
+    <style name="GridLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="layout_gravity">fill_horizontal</item>
+        <item name="layout_columnWeight">2</item>
+    </style>
+
+    <style name="GridField">
+        <item name="android:layout_width">0dp</item>
+        <item name="layout_gravity">fill_horizontal</item>
+    </style>
+
+    <style name="GridField.W3">
+        <item name="layout_columnWeight">3</item>
     </style>
 
     <style name="InputMethodText">

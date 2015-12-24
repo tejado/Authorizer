@@ -2,8 +2,8 @@
     <string name="about">Über</string>
     <string name="app_name">PasswdSafe LIBRARY</string>
     <string name="box">Box</string>
-    <string name="build_date">Erstellungsdatum: %s</string>
-    <string name="build_id">Schaffung Kennung: %s</string>
+    <string name="build_date">Erstellungsdatum</string>
+    <string name="build_id">Schaffung Kennung</string>
     <string name="cancel">Abbrechen</string>
     <string name="choose_files">Wählen Dateien</string>
     <string name="close">Schließen</string>
@@ -28,5 +28,5 @@
     <string name="reload">Nachladen</string>
     <string name="type">Typ</string>
     <string name="url">URL</string>
-    <string name="version">Version: %s</string>
+    <string name="version">Version</string>
 </resources>

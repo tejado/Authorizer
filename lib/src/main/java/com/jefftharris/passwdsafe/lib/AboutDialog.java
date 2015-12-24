@@ -26,12 +26,16 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+
 /**
  *  The about dialog
  */
 public class AboutDialog extends DialogFragment
         implements DialogInterface.OnClickListener
 {
+    // TODO: Move passwdsafe about_fragment to lib once sync app able to use extra libs
+
     /** Create a new instance */
     public static AboutDialog newInstance(String extraLicenseInfo)
     {
@@ -58,6 +62,8 @@ public class AboutDialog extends DialogFragment
         LayoutInflater factory = LayoutInflater.from(act);
         View detailsView = factory.inflate(R.layout.fragment_about, null);
 
+        View fileDetails = detailsView.findViewById(R.id.file_details_group);
+        GuiUtils.setVisible(fileDetails, false);
         String name = updateAboutFields(detailsView, extraLicenseInfo, act);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
@@ -96,11 +102,11 @@ public class AboutDialog extends DialogFragment
         }
 
         TextView tv = (TextView)detailsView.findViewById(R.id.version);
-        tv.setText(ctx.getString(R.string.version, version));
+        tv.setText(version);
         tv = (TextView)detailsView.findViewById(R.id.build_id);
-        tv.setText(ctx.getString(R.string.build_id, BuildConfig.BUILD_ID));
+        tv.setText(BuildConfig.BUILD_ID);
         tv = (TextView)detailsView.findViewById(R.id.build_date);
-        tv.setText(ctx.getString(R.string.build_date, BuildConfig.BUILD_DATE));
+        tv.setText(BuildConfig.BUILD_DATE);
         tv = (TextView)detailsView.findViewById(R.id.release_notes);
         tv.setText(
                 Html.fromHtml(tv.getText().toString().replace("\n", "<br>")));
