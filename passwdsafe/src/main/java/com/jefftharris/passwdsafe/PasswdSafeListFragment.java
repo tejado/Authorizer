@@ -337,7 +337,8 @@ public class PasswdSafeListFragment extends ListFragment
                     char compFirst = itsIsCaseSensitive ?
                             first : Character.toUpperCase(first);
                     if (compChar != compFirst) {
-                        Section s = new Section(Character.toString(compFirst), idx);
+                        Section s = new Section(Character.toString(compFirst),
+                                                idx);
                         sections.add(s);
                         compChar = compFirst;
                     }

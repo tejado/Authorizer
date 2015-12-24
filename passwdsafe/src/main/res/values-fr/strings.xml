@@ -179,13 +179,11 @@
     <string name="password_encoding_label">Encodage mot de passe:</string>
     <string name="password_expiration">Expiration mot de passe</string>
     <string name="password_file">Fichier mot de passe</string>
-    <string name="password_generation">Composition des mots de passe</string>
     <string name="password_expiration_in_past">L\'expiration du mot est atteint</string>
     <string name="password_expiration_invalid_interval">Intervalle doit être dans la gamme 1&#8211;3650</string>
     <string name="password_expired">Mot de passe expiré</string>
     <string name="password_expires_before">Mot de passe expire avant %1$s</string>
     <string name="password_expires_today">Mot de passe expire aujourd\'hui</string>
-    <string name="password_gen_prefs_moved">Options de génération de mot de passe déplacées. Ouvrez le fichier et modifiez la stratégie par défaut.</string>
     <string name="password_header">MOT DE PASSE</string>
     <string name="password_label">Mot de passe:</string>
     <string name="password_len_short_opt">Mot de passe trop court pour les options</string>

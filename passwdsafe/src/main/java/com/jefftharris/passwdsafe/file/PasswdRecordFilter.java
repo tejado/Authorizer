@@ -342,6 +342,13 @@ public final class PasswdRecordFilter implements Parcelable
         return true;
     }
 
+    /**
+     * Is the filter's type a query
+     */
+    public final boolean isQueryType()
+    {
+        return (itsType == Type.QUERY);
+    }
 
     /** Convert the filter to a string */
     public final String toString(Context ctx)

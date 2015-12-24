@@ -30,6 +30,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.util.YubiState;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
@@ -333,6 +334,19 @@ public class PasswdSafeOpenFileFragment
             itsReadonlyCb.setChecked(false);
             itsPasswordEdit.setText("test123");
             itsOkBtn.performClick();
+        } else {
+            itsReadonlyCb.setChecked(true);
+            Pair<Boolean, Integer> rc = getPasswdFileUri().isWritable();
+            if (rc.first) {
+                itsReadonlyCb.setEnabled(true);
+            } else {
+                itsReadonlyCb.setEnabled(false);
+                if (rc.second != null) {
+                    itsReadonlyCb.setText(String.format(
+                            "%s - %s", itsReadonlyCb.getText(),
+                            getString(rc.second)));
+                }
+            }
         }
     }
 
