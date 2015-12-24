@@ -13,6 +13,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.ClipboardManager;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -116,5 +117,20 @@ public final class ApiCompat
     {
         return (SDK_VERSION >= SDK_KITKAT) &&
                 ApiCompatKitkat.documentsContractDeleteDocument(cr, uri);
+    }
+
+    /**
+     * Copy text to the clipboard
+     */
+    public static void copyToClipboard(String str, Context ctx)
+    {
+        if (SDK_VERSION >= SDK_HONEYCOMB) {
+            ApiCompatHoneycomb.copyToClipboard(str, ctx);
+        } else {
+            @SuppressWarnings("deprecation")
+            ClipboardManager clipMgr = (ClipboardManager)
+                    ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipMgr.setText(str);
+        }
     }
 }

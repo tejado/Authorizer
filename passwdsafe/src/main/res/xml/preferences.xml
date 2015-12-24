@@ -92,12 +92,6 @@
             android:summary="@string/erase_all_expiration_notifications"
             android:title="@string/clear_password_notifications"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <com.jefftharris.passwdsafe.view.LongPreference
-            android:selectable="false"
-            android:summary="@string/password_gen_prefs_moved"
-            android:title="@string/password_generation"/>
-
     </PreferenceCategory>
 
     <PreferenceCategory android:key="recordOptions"

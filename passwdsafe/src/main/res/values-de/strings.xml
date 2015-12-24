@@ -184,8 +184,6 @@
     <string name="password_expires_before">Passwort läuft vor dem %1$s ab</string>
     <string name="password_expires_today">Password läuft heute ab</string>
     <string name="password_file">Passwortdatei</string>
-    <string name="password_generation">Passworterzeugung</string>
-    <string name="password_gen_prefs_moved">Optionen zur Passworterzeugung befinden sich ab jetzt im Dateimenü.</string>
     <string name="password_header">PASSWORT</string>
     <string name="password_label">Passwort:</string>
     <string name="password_len_short_opt">Passwort ist zu kurz</string>

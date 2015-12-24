@@ -8,7 +8,9 @@
 package com.jefftharris.passwdsafe;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +28,7 @@ import com.jefftharris.passwdsafe.view.PasswdLocation;
  * changes
  */
 public class PasswdSafeFileDataFragment extends Fragment
+        implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     /** The open password file */
     private static PasswdFileData itsFileData;
@@ -39,7 +42,22 @@ public class PasswdSafeFileDataFragment extends Fragment
     /** One-time check for whether the fragment was newly created */
     private boolean itsIsNew = true;
 
+    private boolean itsIsCloseClearClipboard =
+            Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF;
+
     private static final String TAG = "PasswdSafeFileDataFragment";
+
+    @Override
+    public void onAttach(Context ctx)
+    {
+        super.onAttach(ctx);
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(ctx);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+        itsIsCloseClearClipboard =
+                Preferences.getFileCloseClearClipboardPref(prefs);
+        itsFileDataView.onAttach(ctx);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -56,7 +74,29 @@ public class PasswdSafeFileDataFragment extends Fragment
 
         // Called when app is being finalized but not when rotated
         PasswdSafeUtil.dbginfo(TAG, "onDestroy");
-        setFileData(null, getContext());
+        setFileData(null);
+    }
+
+    @Override
+    public void onDetach()
+    {
+        itsFileDataView.onDetach();
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+        super.onDetach();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    {
+        switch (key) {
+        case Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD: {
+            itsIsCloseClearClipboard =
+                    Preferences.getFileCloseClearClipboardPref(prefs);
+            break;
+        }
+        }
     }
 
     /** One-time check for whether the fragment was created new */
@@ -82,28 +122,31 @@ public class PasswdSafeFileDataFragment extends Fragment
     }
 
     /** Set the password file data */
-    public void setFileData(PasswdFileData fileData, Context ctx)
+    public void setFileData(PasswdFileData fileData)
     {
         PasswdFileToken token = acquireFileData();
         try {
             if (itsFileData != null) {
-                itsFileDataView.clearFileData(ctx);
+                itsFileDataView.clearFileData();
                 itsFileData.close();
+                if (itsIsCloseClearClipboard) {
+                    PasswdSafeUtil.copyToClipboard("", getContext());
+                }
             }
             itsFileData = fileData;
             itsLastViewedRecord = null;
-            itsFileDataView.setFileData(itsFileData, ctx);
+            itsFileDataView.setFileData(itsFileData);
         } finally {
             token.release();
         }
     }
 
     /** Refresh the password file data */
-    public void refreshFileData(Context ctx)
+    public void refreshFileData()
     {
         PasswdFileToken token = acquireFileData();
         try {
-            itsFileDataView.setFileData(token.getFileData(), ctx);
+            itsFileDataView.setFileData(token.getFileData());
         } finally {
             token.release();
         }
