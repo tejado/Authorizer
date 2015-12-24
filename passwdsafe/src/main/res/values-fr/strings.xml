@@ -41,7 +41,7 @@
     <string name="custom_symbols">Symboles personnalisés</string>
     <string name="custom_symbol_not_alphanum">Les symboles personnalisés ne doivent pas contenir d\'espaces, ni de caractères alphanumériques</string>
     <string name="database_policy">Base de données stratégie - %s</string>
-    <string name="database_version_label">Version base de données:</string>
+    <string name="database_version">Version base de données</string>
     <string name="days">Journées</string>
     <string name="default_file_to_open">Fichier à ouvrir par défaut</string>
     <string name="default_policy">Stratégie par défaut</string>
@@ -83,6 +83,7 @@
     <string name="file_backups">Fichiers de sauvegarde</string>
     <string name="file_close_timeout">Fermeture automatique de fichier</string>
     <string name="file_exists">Le fichier existe</string>
+    <string name="file">Fichier</string>
     <string name="file_label">Fichier:</string>
     <string name="file_label_val">Fichier: %1$s</string>
     <string name="file_name">Nom du fichier</string>
@@ -118,9 +119,9 @@
         d\'écrire sur des cartes SD amovibles. Si le fichier est situé sur
         une carte, il devra être déplacé vers la mémoire interne.
     </string>
-    <string name="last_save_app_label">Application utilisée:</string>
-    <string name="last_save_by_label">Dernier enregistrement par:</string>
-    <string name="last_save_time_label">Dernier enregistrement le:</string>
+    <string name="last_save_app">Application utilisée</string>
+    <string name="last_save_by">Dernier enregistrement par</string>
+    <string name="last_save_time">Dernier enregistrement le</string>
     <string name="legacy_file_chooser">Héritage de sélection de fichier</string>
     <string name="legacy_file_chooser_summary">Utilisable avec KitKat et plus</string>
     <string name="length">Longueur</string>
@@ -169,14 +170,14 @@
     <string name="none_paren">"(Aucun)"</string>
     <string name="none_selected_open">Aucun sélectionné. Ouvrez PasswdSafe de choisir.</string>
     <string name="notes">Notes</string>
-    <string name="num_records_label">Nombre d\'entrées:</string>
+    <string name="num_records">Nombre d\'entrées</string>
     <string name="ok">OK</string>
     <string name="open_file">Ouvrir %s</string>
     <string name="open_file_title">Ouvrir un fichier</string>
     <string name="option_not_selected">Au moins une option doit être sélectionnée</string>
     <string name="parent_group">Groupe parent</string>
     <string name="password">Mot de passe</string>
-    <string name="password_encoding_label">Encodage mot de passe:</string>
+    <string name="password_encoding">Encodage mot de passe</string>
     <string name="password_expiration">Expiration mot de passe</string>
     <string name="password_file">Fichier mot de passe</string>
     <string name="password_expiration_in_past">L\'expiration du mot est atteint</string>
@@ -194,7 +195,7 @@
     <string name="password_with_expiration">Mot de passe avec date d\'expiration</string>
     <string name="passwords">Mots de passe</string>
     <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>
-    <string name="permissions_label">Autorisations:</string>
+    <string name="permissions">Autorisations</string>
     <string name="policy_header">STRATÉGIE</string>
     <string name="policy_no">Non</string>
     <string name="policy_yes_len">Oui - Au moins %1$d</string>

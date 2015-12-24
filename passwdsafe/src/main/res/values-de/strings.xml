@@ -41,7 +41,7 @@
     <string name="custom_symbols">Eigene Symbole</string>
     <string name="custom_symbol_not_alphanum">Eigene Symbole dürfen keine Buchstaben, Zahlen oder Leerzeichen sein</string>
     <string name="database_policy">Datenbankregel - %s</string>
-    <string name="database_version_label">Datenbankversion:</string>
+    <string name="database_version">Datenbankversion</string>
     <string name="days">Tage</string>
     <string name="default_file_to_open">Standarddatei</string>
     <string name="default_policy">Standardregel</string>
@@ -83,6 +83,7 @@
     <string name="file_backups">Backups</string>
     <string name="file_close_timeout">Dateizeitsperre</string>
     <string name="file_exists">Datei existiert</string>
+    <string name="file">Datei</string>
     <string name="file_label">Datei:</string>
     <string name="file_label_val">Datei: %1$s</string>
     <string name="file_name">Dateiname</string>
@@ -118,9 +119,9 @@
         entfernbaren Sd-Karten verhindert. Wenn die Datei auf einer Karte 
         befindet, wird es zu dem internen Speicher verschoben werden.
     </string>
-    <string name="last_save_app_label">Letzte App:</string>
-    <string name="last_save_by_label">Gespeichert von:</string>
-    <string name="last_save_time_label">Gespeichert am:</string>
+    <string name="last_save_app">Letzte App</string>
+    <string name="last_save_by">Gespeichert von</string>
+    <string name="last_save_time">Gespeichert am</string>
     <string name="legacy_file_chooser">Legacy-Dateiauswahl</string>
     <string name="legacy_file_chooser_summary">Verwendbar mit KitKat und höher</string>
     <string name="length">Länge</string>
@@ -169,14 +170,14 @@
     <string name="none_paren">(Keine)</string>
     <string name="none_selected_open">Nichts zum Öffnen ausgewählt.</string>
     <string name="notes">Notizen</string>
-    <string name="num_records_label">Eintragsanzahl:</string>
+    <string name="num_records">Eintragsanzahl</string>
     <string name="ok">OK</string>
     <string name="open_file">Öffnen %s</string>
     <string name="open_file_title">Datei öffnen</string>
     <string name="option_not_selected">Mindestens 1 Option auswählen</string>
     <string name="parent_group">Übergeordnete Gruppe</string>
     <string name="password">Passwort</string>
-    <string name="password_encoding_label">Passwortkodierung:</string>
+    <string name="password_encoding">Passwortkodierung</string>
     <string name="password_expiration">Passwortablaufdatum</string>
     <string name="password_expiration_in_past">Ablaufdatum liegt in der Vergangenheit</string>
     <string name="password_expiration_invalid_interval">Interval muss im Bereich 1&#8211;3650 sein</string>
@@ -194,7 +195,7 @@
     <string name="password_with_expiration">Passwort mit Ablaufdatum</string>
     <string name="passwords">Passwörter</string>
     <string name="passwords_do_not_match">Passwörter stimmen nicht überein</string>
-    <string name="permissions_label">Berechtigungen:</string>
+    <string name="permissions">Berechtigungen</string>
     <string name="policy_header">Regel</string>
     <string name="policy_no">Nein</string>
     <string name="policy_yes_len">Ja - Mind. %1$d</string>

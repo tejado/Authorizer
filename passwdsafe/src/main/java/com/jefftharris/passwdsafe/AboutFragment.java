@@ -9,11 +9,16 @@ package com.jefftharris.passwdsafe;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
 
 /**
@@ -34,6 +39,14 @@ public class AboutFragment extends Fragment
     }
 
     private Listener itsListener;
+    private TextView itsFile;
+    private TextView itsPermissions;
+    private TextView itsNumRecords;
+    private TextView itsPasswordEnc;
+    private TextView itsDatabaseVer;
+    private TextView itsLastSaveBy;
+    private TextView itsLastSaveApp;
+    private TextView itsLastSaveTime;
 
     /**
      * Create a new instance
@@ -59,6 +72,15 @@ public class AboutFragment extends Fragment
                                          container, false);
 
         AboutDialog.updateAboutFields(rootView, null, getContext());
+        itsFile = (TextView)rootView.findViewById(R.id.file);
+        itsPermissions = (TextView)rootView.findViewById(R.id.permissions);
+        itsNumRecords = (TextView)rootView.findViewById(R.id.num_records);
+        itsPasswordEnc = (TextView)
+                rootView.findViewById(R.id.password_encoding);
+        itsDatabaseVer = (TextView)rootView.findViewById(R.id.database_version);
+        itsLastSaveBy = (TextView)rootView.findViewById(R.id.last_save_by);
+        itsLastSaveApp = (TextView)rootView.findViewById(R.id.last_save_app);
+        itsLastSaveTime = (TextView)rootView.findViewById(R.id.last_save_time);
         return rootView;
     }
 
@@ -67,6 +89,44 @@ public class AboutFragment extends Fragment
     {
         super.onResume();
         itsListener.updateViewAbout();
+
+        itsListener.useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                itsFile.setText(fileData.getUri().toString());
+                itsPermissions.setText(fileData.canEdit() ?
+                                       R.string.read_write : R.string.read_only);
+                itsNumRecords.setText(
+                        String.format("%d", fileData.getRecords().size()));
+                itsPasswordEnc.setText(fileData.getOpenPasswordEncoding());
+                if (fileData.isV3()) {
+                    StringBuilder build = new StringBuilder();
+                    String str = fileData.getHdrLastSaveUser();
+                    if (!TextUtils.isEmpty(str)) {
+                        build.append(str);
+                    }
+                    str = fileData.getHdrLastSaveHost();
+                    if (!TextUtils.isEmpty(str)) {
+                        if (build.length() > 0) {
+                            build.append(" on ");
+                        }
+                        build.append(str);
+                    }
+
+                    itsDatabaseVer.setText(fileData.getHdrVersion());
+                    itsLastSaveBy.setText(build);
+                    itsLastSaveApp.setText(fileData.getHdrLastSaveApp());
+                    itsLastSaveTime.setText(fileData.getHdrLastSaveTime());
+                } else {
+                    itsDatabaseVer.setText(null);
+                    itsLastSaveBy.setText(null);
+                    itsLastSaveApp.setText(null);
+                    itsLastSaveTime.setText(null);
+                }
+            }
+        });
     }
 
     @Override
