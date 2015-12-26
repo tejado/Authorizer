@@ -1,0 +1,560 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/no_accounts_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:text="@string/no_accounts"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+        
+        <RelativeLayout
+            android:id="@+id/gdrive_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <ImageButton
+                android:id="@+id/gdrive_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onGdriveClear"
+                android:padding="12dp"
+                android:src="@drawable/ic_action_delete"/>
+
+            <TextView
+                android:id="@+id/gdrive_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/gdrive_clear"
+                android:drawableLeft="@drawable/google_drive"
+                android:drawablePadding="6dp"
+                android:gravity="fill_vertical"
+                android:padding="6dp"
+                android:text="@string/google_drive"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+    
+            <TextView
+                android:id="@+id/gdrive_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_title"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false"/>
+    
+            <LinearLayout
+                android:id="@+id/gdrive_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_acct"
+                android:divider="@drawable/spacer_medium"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                tools:ignore="UnusedAttribute">
+
+                <ImageButton
+                    android:id="@+id/gdrive_sync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/sync"
+                    android:onClick="onGdriveSync"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_action_sync"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/gdrive_interval_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_interval_label"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    
+                    <Spinner
+                        android:id="@+id/gdrive_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/interval_array"
+                        tools:listitem="@android:layout/simple_spinner_item"/>
+                </LinearLayout>
+                
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/gdrive_sync_warning"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/gdrive_controls"
+                android:drawableLeft="@android:drawable/ic_dialog_alert"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/gdrive_separator"
+            style="@style/Separator"
+            android:layout_margin="6dp"/>
+
+        <RelativeLayout
+            android:id="@+id/dropbox_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <ImageButton
+                android:id="@+id/dropbox_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onDropboxClear"
+                android:padding="12dp"
+                android:src="@drawable/ic_action_delete"/>
+            
+            <TextView
+                android:id="@+id/dropbox_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/dropbox_clear"
+                android:drawableLeft="@drawable/dropbox"
+                android:drawablePadding="6dp"
+                android:gravity="fill_vertical"
+                android:padding="6dp"
+                android:text="@string/dropbox"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <TextView
+                android:id="@+id/dropbox_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/dropbox_title"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false"/>
+    
+            <LinearLayout
+                android:id="@+id/dropbox_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/dropbox_acct"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@drawable/spacer_medium"
+                    android:orientation="horizontal"
+                    android:showDividers="middle"
+                    tools:ignore="UnusedAttribute">
+
+                    <ImageButton
+                        android:id="@+id/dropbox_sync"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/sync"
+                        android:onClick="onDropboxSync"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_action_sync"/>
+
+                    <Button
+                        android:id="@+id/dropbox_choose_files"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:onClick="onDropboxChooseFiles"
+                        android:text="@string/choose_files"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="6dp">
+
+                    <TextView
+                        android:id="@+id/dropbox_interval_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_interval_label"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    
+                    <Spinner
+                        android:id="@+id/dropbox_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/interval_array"
+                        tools:listitem="@android:layout/simple_spinner_item"/>
+                </LinearLayout>
+                
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/dropbox_acct_unlink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/dropbox_controls"
+                android:drawableLeft="@android:drawable/ic_dialog_alert"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:padding="6dp"
+                android:text="@string/dropbox_acct_unlinked"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/dropbox_separator"
+            style="@style/Separator"
+            android:layout_margin="6dp"/>
+
+        <RelativeLayout
+            android:id="@+id/box_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <ImageButton
+                android:id="@+id/box_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onBoxClear"
+                android:padding="12dp"
+                android:src="@drawable/ic_action_delete"/>
+            
+            <TextView
+                android:id="@+id/box_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/box_clear"
+                android:drawableLeft="@drawable/box"
+                android:drawablePadding="6dp"
+                android:gravity="fill_vertical"
+                android:padding="6dp"
+                android:text="@string/box"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <TextView
+                android:id="@+id/box_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/box_title"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false"/>
+    
+            <LinearLayout
+                android:id="@+id/box_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/box_acct"
+                android:divider="@drawable/spacer_medium"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                tools:ignore="UnusedAttribute">
+
+                <ImageButton
+                    android:id="@+id/box_sync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/sync"
+                    android:onClick="onBoxSync"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_action_sync"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/box_interval_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_interval_label"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    
+                    <Spinner
+                        android:id="@+id/box_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/interval_array"
+                        tools:listitem="@android:layout/simple_spinner_item"/>
+                </LinearLayout>
+                
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/box_separator"
+            style="@style/Separator"
+            android:layout_margin="6dp"/>
+
+        <RelativeLayout
+            android:id="@+id/onedrive_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/onedrive_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onOnedriveClear"
+                android:padding="12dp"
+                android:src="@drawable/ic_action_delete"/>
+
+            <TextView
+                android:id="@+id/onedrive_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/onedrive_clear"
+                android:drawableLeft="@drawable/onedrive"
+                android:drawablePadding="6dp"
+                android:gravity="fill_vertical"
+                android:padding="6dp"
+                android:text="@string/onedrive"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <TextView
+                android:id="@+id/onedrive_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/onedrive_title"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false"/>
+
+            <LinearLayout
+                android:id="@+id/onedrive_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/onedrive_acct"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@drawable/spacer_medium"
+                    android:orientation="horizontal"
+                    android:showDividers="middle"
+                    tools:ignore="UnusedAttribute">
+
+                    <ImageButton
+                        android:id="@+id/onedrive_sync"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/sync"
+                        android:onClick="onOnedriveSync"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_action_sync"/>
+
+                    <Button
+                        android:id="@+id/onedrive_choose_files"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:onClick="onOnedriveChooseFiles"
+                        android:text="@string/choose_files"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="6dp">
+
+                    <TextView
+                        android:id="@+id/onedrive_interval_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sync_interval_label"
+                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                    <Spinner
+                        android:id="@+id/onedrive_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/interval_array"
+                        tools:listitem="@android:layout/simple_spinner_item"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/onedrive_auth_required"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/onedrive_controls"
+                android:drawableLeft="@android:drawable/ic_dialog_alert"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:padding="6dp"
+                android:text="@string/onedrive_acct_unlinked"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/onedrive_separator"
+            style="@style/Separator"
+            android:layout_margin="6dp"/>
+
+        <RelativeLayout
+            android:id="@+id/owncloud_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <ImageButton
+                android:id="@+id/owncloud_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/clear"
+                android:onClick="onOwncloudClear"
+                android:padding="12dp"
+                android:src="@drawable/ic_action_delete"/>
+            
+            <TextView
+                android:id="@+id/owncloud_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/owncloud_clear"
+                android:drawableLeft="@drawable/owncloud"
+                android:drawablePadding="6dp"
+                android:gravity="fill_vertical"
+                android:padding="6dp"
+                android:text="@string/owncloud"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <TextView
+                android:id="@+id/owncloud_acct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/owncloud_title"
+                android:padding="6dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textIsSelectable="false"/>
+    
+            <LinearLayout
+                android:id="@+id/owncloud_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/owncloud_acct"
+                android:divider="@drawable/spacer_medium"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                tools:ignore="UnusedAttribute">
+
+                <ImageButton
+                    android:id="@+id/owncloud_sync"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/sync"
+                    android:onClick="onOwncloudSync"
+                    android:src="@drawable/ic_action_sync"/>
+
+                <ImageButton
+                    android:id="@+id/owncloud_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/edit"
+                    android:onClick="onOwncloudEdit"
+                    android:src="@drawable/ic_action_edit"/>
+
+                <Button
+                    android:id="@+id/owncloud_choose_files"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:onClick="onOwncloudChooseFiles"
+                    android:text="@string/choose_files"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/owncloud_auth_required"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/owncloud_controls"
+                android:drawableLeft="@android:drawable/ic_dialog_alert"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:padding="6dp"
+                android:text="@string/owncloud_auth_required"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/owncloud_separator"
+            style="@style/Separator"
+            android:layout_margin="6dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@mipmap/ic_launcher_passwdsafe"
+            android:drawablePadding="6dp"
+            android:gravity="fill_vertical"
+            android:padding="6dp"
+            android:paddingTop="12dp"
+            android:text="@string/passwdsafe"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@android:drawable/ic_media_play"
+            android:drawablePadding="6dp"
+            android:onClick="onLaunchPasswdSafeClick"
+            android:text="@string/open"/>
+    </LinearLayout>
+
+</ScrollView>

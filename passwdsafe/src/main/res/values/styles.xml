@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools">
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <!-- New application theme -->
+    <style name="NewAppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <!-- TODO: use new theme everywhere -->
+    </style>
+
+    <style name="BorderlessButton">
+        <item name="android:background">@android:drawable/list_selector_background</item>
+    </style>
+
+    <style name="GridLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="layout_gravity">fill_horizontal</item>
+        <item name="layout_columnWeight">2</item>
+    </style>
+
+    <style name="GridField">
+        <item name="android:layout_width">0dp</item>
+        <item name="layout_gravity">fill_horizontal</item>
+    </style>
+
+    <style name="GridField.W3">
+        <item name="layout_columnWeight">3</item>
+    </style>
+
+    <style name="InputMethodText">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="Preference_TextAppearanceMaterialBody2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="RecordRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="RecordHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">5dp</item>
+    </style>
+
+    <style name="RecordField">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:minHeight">38dp</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+
+    <style name="RecordField.Small">
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+    </style>
+
+    <style name="RecordField.Large">
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+
+    <style name="SelectableView">
+        <item name="android:background">@android:drawable/list_selector_background</item>
+    </style>
+
+    <style name="Separator.Accent">
+        <item name="android:background">@color/accent</item>
+    </style>
+
+    <style name="TableLabelColumn">
+        <item name="android:paddingRight">3dp</item>
+    </style>
+
+    <style name="TextViewSpinner">
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:background">@drawable/spinner_background_holo_dark</item>
+        <item name="android:gravity">center_vertical|left</item>
+    </style>
+
+    <color name="transparent">#00000000</color>
+
+    <style name="ListItem">
+        <item name="android:minHeight">?attr/listPreferredItemHeight</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+
+    <style name="ListItemText">
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+
+    <style name="ListItemSeconday">
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+
+</resources>

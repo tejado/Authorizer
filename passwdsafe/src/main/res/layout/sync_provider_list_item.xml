@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="2dip"
+    android:paddingBottom="2dip"
+    android:paddingLeft="2dip"
+    android:mode="twoLine"
+    >
+
+    <ImageView android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:scaleType="fitCenter" 
+        android:adjustViewBounds="true"
+        android:layout_weight="0"
+        android:contentDescription="@string/record_type"
+        />
+
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"        
+        android:paddingLeft="6dp"
+        >
+                
+        <TextView android:id="@android:id/text1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:paddingRight="6dip"
+            />
+            
+        <TextView android:id="@android:id/text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@android:id/text1"
+            android:layout_alignLeft="@android:id/text1"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            />
+    
+    </RelativeLayout>
+    
+</LinearLayout>

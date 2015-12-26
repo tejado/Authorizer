@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent">
+    <TableLayout android:layout_width="fill_parent"
+                 android:layout_height="wrap_content"
+                 android:stretchColumns="1"
+                 android:shrinkColumns="1"
+                 android:padding="3dip"
+                 >
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/file_label"/>
+
+            <TextView android:id="@+id/file"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/permissions"/>
+
+            <TextView android:id="@+id/permissions"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/num_records"/>
+
+            <TextView android:id="@+id/num_records"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow>
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/password_encoding"/>
+
+            <TextView android:id="@+id/password_encoding"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow android:id="@+id/database_version_row">
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/database_version"/>
+
+            <TextView android:id="@+id/database_version"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow android:id="@+id/last_save_by_row">
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/last_save_by"/>
+
+            <TextView android:id="@+id/last_save_by"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow android:id="@+id/last_save_app_row">
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/last_save_app"/>
+
+            <TextView android:id="@+id/last_save_app"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+        <TableRow android:id="@+id/last_save_time_row">
+
+            <TextView
+                style="@style/TableLabelColumn"
+                android:text="@string/last_save_time"/>
+
+            <TextView android:id="@+id/last_save_time"
+                      android:layout_width="wrap_content"/>
+        </TableRow>
+    </TableLayout>
+</ScrollView>
