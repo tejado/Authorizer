@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
@@ -79,7 +80,6 @@ public class PasswdSafe extends AppCompatActivity
     // TODO: check manifest errors regarding icons
     // TODO: storage access framework support (want to keep support?)
     // TODO: recent files db (should that be carried forward? only if SAF kept)
-    // TODO: check whether to confirm on last back to exit
 
     private enum ChangeMode
     {
@@ -177,6 +177,9 @@ public class PasswdSafe extends AppCompatActivity
 
     /** Current view mode */
     private ViewMode itsCurrViewMode = ViewMode.INIT;
+
+    /** Whether to confirm a back operation if it will close the file */
+    private boolean itsIsConfirmBackClosed = true;
 
     private static final String FRAG_DATA = "data";
     private static final String STATE_TITLE = "title";
@@ -517,6 +520,33 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        if (fragMgr.getBackStackEntryCount() == 0) {
+            switch (itsCurrViewMode) {
+            case VIEW_LIST: {
+                if (itsIsConfirmBackClosed) {
+                    Toast.makeText(this, R.string.press_again_close_warning,
+                                   Toast.LENGTH_SHORT).show();
+                    itsIsConfirmBackClosed = false;
+                    return;
+                }
+                break;
+            }
+            case INIT:
+            case CHANGING_PASSWORD:
+            case EDIT_RECORD:
+            case FILE_OPEN:
+            case FILE_NEW:
+            case VIEW_RECORD:
+            case VIEW_ABOUT:
+            case VIEW_EXPIRATION:
+            case VIEW_POLICY_LIST:
+            case VIEW_PREFERENCES: {
+                break;
+            }
+            }
+        }
+
         checkNavigation(false, new Runnable()
         {
             @Override
@@ -1104,6 +1134,7 @@ public class PasswdSafe extends AppCompatActivity
                 }
 
                 txn.commit();
+                itsIsConfirmBackClosed = true;
             }
         });
     }
