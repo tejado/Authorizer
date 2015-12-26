@@ -71,6 +71,7 @@
     <string name="empty_name">Empty name</string>
     <string name="empty_password">Empty password</string>
     <string name="empty_title">Empty title</string>
+    <string name="enable_expiration_notifications">Enable expiration notifications</string>
     <string name="enabled">Enabled</string>
     <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
     <string name="expiration">Expiration</string>
@@ -258,6 +259,7 @@
     <string name="use_symbols">Use Symbols</string>
     <string name="use_uppercase">Use Uppercase</string>
     <string name="username_header">USER NAME</string>
+    <string name="view_password_expirations">View password expirations</string>
     <string name="word_wrap">Word Wrap</string>
     <string name="yes">Yes</string>
     <string name="yubikey">YubiKey</string>

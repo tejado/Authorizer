@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
@@ -62,6 +61,7 @@ public class PasswdSafe extends AppCompatActivity
                    ConfirmPromptDialog.Listener,
                    PasswdSafeChangePasswordFragment.Listener,
                    PasswdSafeEditRecordFragment.Listener,
+                   PasswdSafeExpirationsFragment.Listener,
                    PasswdSafeListFragment.Listener,
                    PasswdSafeOpenFileFragment.Listener,
                    PasswdSafePolicyListFragment.Listener,
@@ -100,6 +100,8 @@ public class PasswdSafe extends AppCompatActivity
         CHANGE_PASSWORD,
         /** View about info */
         VIEW_ABOUT,
+        /** View expiration info */
+        VIEW_EXPIRATION,
         /** View policy list */
         VIEW_POLICY_LIST,
         /** View preferences */
@@ -124,6 +126,8 @@ public class PasswdSafe extends AppCompatActivity
         CHANGING_PASSWORD,
         /** Viewing about info */
         VIEW_ABOUT,
+        /** Viewing expiration info */
+        VIEW_EXPIRATION,
         /** Viewing a list of policies */
         VIEW_POLICY_LIST,
         /** Viewing preferences */
@@ -383,6 +387,7 @@ public class PasswdSafe extends AppCompatActivity
                 case FILE_OPEN:
                 case FILE_NEW:
                 case VIEW_ABOUT:
+                case VIEW_EXPIRATION:
                 case VIEW_POLICY_LIST:
                 case VIEW_PREFERENCES: {
                     break;
@@ -562,7 +567,8 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public void showFileExpiredPasswords()
     {
-        Toast.makeText(this, "showFileExpiredPasswords", Toast.LENGTH_SHORT).show();
+        doChangeView(ChangeMode.VIEW_EXPIRATION,
+                     PasswdSafeExpirationsFragment.newInstance());
     }
 
     /**
@@ -760,6 +766,12 @@ public class PasswdSafe extends AppCompatActivity
     public void updateViewChangingPassword()
     {
         doUpdateView(ViewMode.CHANGING_PASSWORD, itsLocation);
+    }
+
+    @Override
+    public void updateViewExpirations()
+    {
+        doUpdateView(ViewMode.VIEW_EXPIRATION, itsLocation);
     }
 
     @Override
@@ -1041,6 +1053,7 @@ public class PasswdSafe extends AppCompatActivity
                 case EDIT_RECORD:
                 case CHANGE_PASSWORD:
                 case VIEW_ABOUT:
+                case VIEW_EXPIRATION:
                 case VIEW_POLICY_LIST:
                 case VIEW_PREFERENCES: {
                     supportsBack = true;
@@ -1093,6 +1106,7 @@ public class PasswdSafe extends AppCompatActivity
         case VIEW_RECORD:
         case CHANGING_PASSWORD:
         case VIEW_ABOUT:
+        case VIEW_EXPIRATION:
         case VIEW_POLICY_LIST:
         case VIEW_PREFERENCES: {
             break;
@@ -1238,6 +1252,13 @@ public class PasswdSafe extends AppCompatActivity
             fileTimeoutPaused = false;
             itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.about),
                                                  this);
+            break;
+        }
+        case VIEW_EXPIRATION: {
+            drawerMode = PasswdSafeNavDrawerFragment.Mode.EXPIRATIONS;
+            fileTimeoutPaused = false;
+            itsTitle = PasswdSafeApp.getAppTitle(
+                    getString(R.string.password_expiration), this);
             break;
         }
         case VIEW_POLICY_LIST: {

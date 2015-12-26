@@ -7,9 +7,10 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="accent_material_light" tools:override="true">#304ffe</color>
+    <color name="accent">#304ffe</color>
+    <color name="accent_material_light" tools:override="true">@color/accent</color>
     <color name="primary_dark_material_dark" tools:override="true">#ad0000</color>
     <color name="primary_material_dark" tools:override="true">#b71c1c</color>
     <!-- this is needed as preference_category_material layout uses this color as the text color -->
-    <color name="preference_fallback_accent_color">@color/accent_material_light</color>
+    <color name="preference_fallback_accent_color">@color/accent</color>
 </resources>

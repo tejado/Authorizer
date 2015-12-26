@@ -87,6 +87,10 @@
         <item name="android:background">@android:drawable/list_selector_background</item>
     </style>
 
+    <style name="Separator.Accent">
+        <item name="android:background">@color/accent</item>
+    </style>
+
     <style name="TableLabelColumn">
         <item name="android:paddingRight">3dp</item>
     </style>

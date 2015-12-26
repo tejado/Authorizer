@@ -71,6 +71,7 @@
     <string name="empty_name">Kein Name</string>
     <string name="empty_password">Kein Passwort</string>
     <string name="empty_title">Kein Titel</string>
+    <string name="enable_expiration_notifications">Aktivieren Sie Ablaufmitteilungen</string>
     <string name="enabled">Eingeschaltet</string>
     <string name="erase_all_expiration_notifications">Lösche alle Mitteilungen für abgelaufende Passwörter</string>
     <string name="expiration">Ablaufdatum</string>
@@ -260,6 +261,7 @@
     <string name="use_symbols">Symbole</string>
     <string name="use_uppercase">Großbuchstaben</string>
     <string name="username_header">BENUTZERNAME</string>
+    <string name="view_password_expirations">Sehen Sie sich die Passwort Abläufe</string>
     <string name="word_wrap">Zeilenumbruch</string>
     <string name="yes">Ja</string>
     <string name="yubikey">YubiKey</string>
