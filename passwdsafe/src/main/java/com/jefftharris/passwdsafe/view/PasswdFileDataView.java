@@ -139,7 +139,9 @@ public class PasswdFileDataView
         if (rebuildSearch &&
             (itsFilter != null) && itsFilter.isQueryType()) {
             try {
-                setRecordFilter(itsFilter.toString(itsContext));
+                PasswdRecordFilter filter =
+                        createRecordFilter(itsFilter.toString(itsContext));
+                setRecordFilter(filter);
             } catch (Exception e) {
                 String msg = e.getMessage();
                 Log.e(TAG, msg, e);
@@ -235,9 +237,9 @@ public class PasswdFileDataView
     }
 
     /**
-     * Set the record filter from a query string
+     * Create a record filter from a query string
      */
-    public synchronized void setRecordFilter(String query)
+    public PasswdRecordFilter createRecordFilter(String query)
             throws Exception
     {
         PasswdRecordFilter filter = null;
@@ -261,6 +263,11 @@ public class PasswdFileDataView
                                             PasswdRecordFilter.OPTS_DEFAULT);
         }
 
+        return filter;
+    }
+
+    public synchronized void setRecordFilter(PasswdRecordFilter filter)
+    {
         itsFilter = filter;
         rebuildView();
     }
