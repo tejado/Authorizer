@@ -49,6 +49,7 @@ import org.pwsafe.lib.file.PwsRecord;
 
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,7 +71,6 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    PreferencesFragment.Listener
 {
-    // TODO: expired passwords
     // TODO: expiry notifications
     // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: use trash can icon for delete and X for close for consistency
@@ -79,6 +79,7 @@ public class PasswdSafe extends AppCompatActivity
     // TODO: check manifest errors regarding icons
     // TODO: storage access framework support (want to keep support?)
     // TODO: recent files db (should that be carried forward? only if SAF kept)
+    // TODO: check whether to confirm on last back to exit
 
     private enum ChangeMode
     {
@@ -281,7 +282,7 @@ public class PasswdSafe extends AppCompatActivity
             break;
         }
         case Intent.ACTION_SEARCH: {
-            setRecordFilter(intent.getStringExtra(SearchManager.QUERY));
+            setRecordQueryFilter(intent.getStringExtra(SearchManager.QUERY));
             break;
         }
         default: {
@@ -536,7 +537,7 @@ public class PasswdSafe extends AppCompatActivity
     {
         switch (v.getId()) {
         case R.id.query_clear_btn: {
-            setRecordFilter(null);
+            setRecordQueryFilter(null);
             break;
         }
         }
@@ -775,6 +776,16 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
+    public void setRecordExpiryFilter(PasswdRecordFilter.ExpiryFilter filter,
+                                      Date customDate)
+    {
+        PasswdRecordFilter recFilter =
+                new PasswdRecordFilter(filter, customDate,
+                                       PasswdRecordFilter.OPTS_DEFAULT);
+        setRecordFilter(recFilter);
+    }
+
+    @Override
     public void updateViewPolicyList()
     {
         doUpdateView(ViewMode.VIEW_POLICY_LIST, itsLocation);
@@ -852,18 +863,28 @@ public class PasswdSafe extends AppCompatActivity
     /**
      * Set the record filter from a query string
      */
-    private void setRecordFilter(String query)
+    private void setRecordQueryFilter(String query)
     {
         PasswdFileDataView fileView = itsFileDataFrag.getFileDataView();
+        PasswdRecordFilter filter;
         try {
-            fileView.setRecordFilter(query);
+            filter = fileView.createRecordFilter(query);
         } catch (Exception e) {
             String msg = e.getMessage();
             Log.e(TAG, msg, e);
             PasswdSafeUtil.showErrorMsg(msg, this);
             return;
         }
-        PasswdRecordFilter filter = fileView.getRecordFilter();
+        setRecordFilter(filter);
+    }
+
+    /**
+     * Set the record filter
+     */
+    private void setRecordFilter(PasswdRecordFilter filter)
+    {
+        PasswdFileDataView fileView = itsFileDataFrag.getFileDataView();
+        fileView.setRecordFilter(filter);
         if (filter != null) {
             itsQuery.setText(getString(R.string.query_label,
                                        filter.toString(this)));
