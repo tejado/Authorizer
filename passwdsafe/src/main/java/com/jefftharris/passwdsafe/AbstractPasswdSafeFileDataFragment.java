@@ -29,6 +29,8 @@ public abstract class AbstractPasswdSafeFileDataFragment
         <ListenerT extends AbstractPasswdSafeFileDataFragment.Listener>
         extends Fragment
 {
+    // TODO: Need abs fragment to use file data but not have a location?
+
     /**
      * Listener interface for owning activity
      */

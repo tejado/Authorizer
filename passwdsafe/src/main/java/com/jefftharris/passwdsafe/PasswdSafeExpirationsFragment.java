@@ -9,15 +9,24 @@ package com.jefftharris.passwdsafe;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 
+import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
+import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.util.ObjectHolder;
+import com.jefftharris.passwdsafe.util.Pair;
+import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 import com.jefftharris.passwdsafe.view.DatePickerDialogFragment;
 
 import java.util.Calendar;
@@ -28,12 +37,15 @@ import java.util.Date;
  */
 public class PasswdSafeExpirationsFragment extends Fragment
         implements AdapterView.OnItemClickListener,
+                   CompoundButton.OnCheckedChangeListener,
+                   ConfirmPromptDialog.Listener,
                    DatePickerDialogFragment.Listener
 {
     /**
      * Listener interface for owning activity
      */
     public interface Listener
+            extends AbstractPasswdSafeFileDataFragment.Listener
     {
         /** Update the view for expiration info */
         void updateViewExpirations();
@@ -46,6 +58,7 @@ public class PasswdSafeExpirationsFragment extends Fragment
     private static final String TAG = "PasswdSafeExpirationsFragment";
 
     private Listener itsListener;
+    private CheckBox itsEnableExpiryNotifs;
 
     /**
      * Create a new instance
@@ -69,6 +82,9 @@ public class PasswdSafeExpirationsFragment extends Fragment
         View root = inflater.inflate(R.layout.fragment_passwdsafe_expirations,
                                      container, false);
 
+        itsEnableExpiryNotifs = (CheckBox)
+                root.findViewById(R.id.enable_expiry_notifs);
+        itsEnableExpiryNotifs.setOnCheckedChangeListener(this);
         ListView expirations = (ListView)root.findViewById(R.id.expirations);
         expirations.setOnItemClickListener(this);
 
@@ -122,6 +138,27 @@ public class PasswdSafeExpirationsFragment extends Fragment
     }
 
     @Override
+    public void onCheckedChanged(CompoundButton button, boolean isChecked)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "onCheckedChanged checked %b", isChecked);
+        switch (button.getId()) {
+        case R.id.enable_expiry_notifs: {
+            if (isChecked) {
+                ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
+                        getString(R.string.expiration_notifications),
+                        getString(R.string.expiration_notifications_warning),
+                        getString(R.string.enable), null);
+                dialog.setTargetFragment(this, 0);
+                dialog.show(getFragmentManager(), "expiry");
+            } else {
+                setExpiryNotif(false);
+            }
+            break;
+        }
+        }
+    }
+
+    @Override
     public void handleDatePicked(int year, int monthOfYear, int dayOfMonth)
     {
         if (itsListener == null) {
@@ -135,10 +172,71 @@ public class PasswdSafeExpirationsFragment extends Fragment
                 PasswdRecordFilter.ExpiryFilter.CUSTOM, date.getTime());
     }
 
+    @Override
+    public void promptConfirmed(Bundle confirmArgs)
+    {
+        setExpiryNotif(true);
+    }
+
+    @Override
+    public void promptCanceled(Bundle confirmArgs)
+    {
+        refresh();
+    }
+
     /**
      * Refresh the view
      */
     private void refresh()
     {
+        final ObjectHolder<Pair<Boolean, Boolean>> rc = new ObjectHolder<>();
+        itsListener.useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                PasswdFileUri uri = fileData.getUri();
+                boolean enabled = NotificationMgr.notifSupported(uri);
+                boolean checked = false;
+                if (enabled) {
+                    NotificationMgr notifyMgr = getNotifyMgr();
+                    checked = notifyMgr.hasPasswdExpiryNotif(uri);
+                }
+                rc.set(new Pair<>(enabled, checked));
+            }
+        });
+        if (rc.get() != null) {
+            // Disable listener to set state
+            itsEnableExpiryNotifs.setOnCheckedChangeListener(null);
+            itsEnableExpiryNotifs.setEnabled(rc.get().first);
+            itsEnableExpiryNotifs.setChecked(rc.get().second);
+            itsEnableExpiryNotifs.setOnCheckedChangeListener(this);
+        }
+    }
+
+    /**
+     * Set whether expiration notifications are enabled
+     */
+    private void setExpiryNotif(final boolean enabled)
+    {
+        itsListener.useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                NotificationMgr notifyMgr = getNotifyMgr();
+                notifyMgr.setPasswdExpiryNotif(fileData, enabled);
+            }
+        });
+        refresh();
+    }
+
+    /**
+     * Get the notification manager
+     */
+    private NotificationMgr getNotifyMgr()
+    {
+        PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
+        return app.getNotifyMgr();
     }
 }

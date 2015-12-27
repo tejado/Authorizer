@@ -19,7 +19,7 @@
 
         <item android:id="@+id/menu_drawer_expired_passwords"
               android:icon="@drawable/ic_action_alarm_dark"
-              android:title="@string/expired_passwords"/>
+              android:title="@string/password_expiration"/>
 
         <item android:id="@+id/menu_drawer_preferences"
               android:icon="@android:drawable/ic_menu_preferences"

@@ -72,7 +72,6 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    PreferencesFragment.Listener
 {
-    // TODO: expiry notifications
     // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: use trash can icon for delete and X for close for consistency
     // TODO: autobackup
