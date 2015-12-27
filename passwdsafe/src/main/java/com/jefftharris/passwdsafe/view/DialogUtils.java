@@ -87,11 +87,9 @@ public class DialogUtils
         @SuppressLint("InflateParams")
         View dlgView = factory.inflate(R.layout.confirm_prompt, null);
 
-//        TextView prompt = (TextView)dlgView.findViewById(R.id.prompt);
-//        prompt.setText(promptStr);
-
         AlertDialog.Builder alert = new AlertDialog.Builder(act)
             .setTitle(titleStr)
+            .setMessage(promptStr)
             .setView(dlgView)
             .setPositiveButton(R.string.ok, dlgClick)
             .setNegativeButton(R.string.cancel, dlgClick)

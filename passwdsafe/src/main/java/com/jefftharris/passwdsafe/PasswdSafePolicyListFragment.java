@@ -179,6 +179,11 @@ public class PasswdSafePolicyListFragment extends ListFragment
         savePolicies(policy.getName(), null);
     }
 
+    @Override
+    public void promptCanceled(Bundle confirmArgs)
+    {
+    }
+
     /**
      * Delete a policy
      */
@@ -188,7 +193,7 @@ public class PasswdSafePolicyListFragment extends ListFragment
         Bundle confirmArgs = new Bundle();
         confirmArgs.putParcelable(CONFIRM_ARG_POLICY, policy);
         ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
-                getString(R.string.delete_policy_msg, policy.getName()),
+                getString(R.string.delete_policy_msg, policy.getName()), null,
                 getString(R.string.delete), confirmArgs);
         dialog.setTargetFragment(this, 0);
         dialog.show(getFragmentManager(), "Delete policy");

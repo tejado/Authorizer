@@ -30,6 +30,7 @@ import com.jefftharris.passwdsafe.R;
  */
 public class ConfirmPromptDialog extends AppCompatDialogFragment
     implements CompoundButton.OnCheckedChangeListener,
+               DialogInterface.OnCancelListener,
                DialogInterface.OnClickListener
 {
     /**
@@ -39,6 +40,9 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
     {
         /** Handle when a prompt was confirmed */
         void promptConfirmed(Bundle confirmArgs);
+
+        /** Handle when a prompt was canceled */
+        void promptCanceled(Bundle confirmArgs);
     }
 
     private CheckBox itsConfirmCb;
@@ -48,12 +52,14 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
     /**
      * Create a new instance
      */
-    public static ConfirmPromptDialog newInstance(String prompt,
+    public static ConfirmPromptDialog newInstance(String title,
+                                                  String prompt,
                                                   String confirm,
                                                   Bundle confirmArgs)
     {
         ConfirmPromptDialog dialog = new ConfirmPromptDialog();
         Bundle args = new Bundle();
+        args.putString("title", title);
         args.putString("prompt", prompt);
         args.putString("confirm", confirm);
         args.putBundle("confirmArgs", confirmArgs);
@@ -65,6 +71,7 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
     public @NonNull Dialog onCreateDialog(Bundle savedInstanceState)
     {
         Bundle args = getArguments();
+        String titleStr = args.getString("title");
         String promptStr = args.getString("prompt");
         String confirmStr = args.getString("confirm");
         if (TextUtils.isEmpty(confirmStr)) {
@@ -79,11 +86,13 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
         itsConfirmCb = (CheckBox)dlgView.findViewById(R.id.confirm);
         itsConfirmCb.setOnCheckedChangeListener(this);
 
+        setCancelable(true);
         AlertDialog.Builder alert = new AlertDialog.Builder(ctx)
-            .setTitle(promptStr)
+            .setTitle(titleStr)
+            .setMessage(promptStr)
             .setView(dlgView)
             .setPositiveButton(confirmStr, this)
-            .setNegativeButton(R.string.cancel, null);
+            .setNegativeButton(R.string.cancel, this);
         itsDialog = alert.create();
         return itsDialog;
     }
@@ -117,9 +126,20 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
     @Override
     public void onClick(DialogInterface dialog, int which)
     {
-        if ((which == AlertDialog.BUTTON_POSITIVE) && (itsListener != null)) {
-            Bundle confirmArgs = getArguments().getBundle("confirmArgs");
+        if (itsListener == null) {
+            return;
+        }
+
+        Bundle confirmArgs = getArguments().getBundle("confirmArgs");
+        switch (which) {
+        case AlertDialog.BUTTON_POSITIVE: {
             itsListener.promptConfirmed(confirmArgs);
+            break;
+        }
+        case AlertDialog.BUTTON_NEGATIVE: {
+            itsListener.promptCanceled(confirmArgs);
+            break;
+        }
         }
     }
 
@@ -127,6 +147,16 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
     {
         validate();
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog)
+    {
+        super.onCancel(dialog);
+        if (itsListener != null) {
+            Bundle confirmArgs = getArguments().getBundle("confirmArgs");
+            itsListener.promptCanceled(confirmArgs);
+        }
     }
 
     /**
