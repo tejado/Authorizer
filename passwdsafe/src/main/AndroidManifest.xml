@@ -25,6 +25,7 @@
     <application
         android:name=".PasswdSafeApp"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_scheme"
         android:description="@string/app_desc"
         android:icon="@mipmap/ic_launcher_passwdsafe"
         android:label="@string/app_name"
