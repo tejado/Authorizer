@@ -72,6 +72,7 @@
     <string name="empty_password">Mot de passe vide</string>
     <string name="empty_title">Titre vide</string>
     <string name="enable_expiration_notifications">Activer les notifications d\'expiration</string>
+    <string name="enable">Activer</string>
     <string name="enabled">Activé</string>
     <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers logs</string>
     <string name="expiration">Expiration</string>

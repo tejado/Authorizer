@@ -72,6 +72,7 @@
     <string name="empty_password">Empty password</string>
     <string name="empty_title">Empty title</string>
     <string name="enable_expiration_notifications">Enable expiration notifications</string>
+    <string name="enable">Enable</string>
     <string name="enabled">Enabled</string>
     <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
     <string name="expiration">Expiration</string>

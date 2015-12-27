@@ -72,6 +72,7 @@
     <string name="empty_password">Kein Passwort</string>
     <string name="empty_title">Kein Titel</string>
     <string name="enable_expiration_notifications">Aktivieren Sie Ablaufmitteilungen</string>
+    <string name="enable">Aktivieren</string>
     <string name="enabled">Eingeschaltet</string>
     <string name="erase_all_expiration_notifications">Lösche alle Mitteilungen für abgelaufende Passwörter</string>
     <string name="expiration">Ablaufdatum</string>
