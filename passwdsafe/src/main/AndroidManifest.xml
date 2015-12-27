@@ -49,10 +49,12 @@
 
             <meta-data
                 android:name="com.sec.minimode.icon.portrait.normal"
-                android:resource="@mipmap/ic_launcher_passwdsafe"/>
+                android:resource="@mipmap/ic_launcher_passwdsafe"
+                tools:ignore="ManifestResource"/>
             <meta-data
                 android:name="com.sec.minimode.icon.landscape.normal"
-                android:resource="@mipmap/ic_launcher_passwdsafe"/>
+                android:resource="@mipmap/ic_launcher_passwdsafe"
+                tools:ignore="ManifestResource"/>
         </activity>
 
         <activity
