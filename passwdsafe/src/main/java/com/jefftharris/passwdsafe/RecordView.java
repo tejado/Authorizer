@@ -274,13 +274,13 @@ public class RecordView extends AbstractRecordTabActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuItem mi = menu.add(0, MENU_EDIT, 0, R.string.edit);
-        mi.setIcon(android.R.drawable.ic_menu_edit);
+        mi.setIcon(R.drawable.ic_action_edit);
 
         mi = menu.add(0, MENU_DELETE, 0, R.string.delete);
-        mi.setIcon(android.R.drawable.ic_menu_delete);
+        mi.setIcon(R.drawable.ic_action_delete);
 
         mi = menu.add(0, MENU_CLOSE, 0, R.string.close);
-        mi.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+        mi.setIcon(R.drawable.ic_action_close_cancel);
 
         menu.add(0, MENU_TOGGLE_PASSWORD, 0, R.string.show_password);
         menu.add(0, MENU_COPY_USER, 0, R.string.copy_user);

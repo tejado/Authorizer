@@ -24,10 +24,6 @@
         <!-- TODO: use new theme everywhere -->
     </style>
 
-    <style name="BorderlessButton">
-        <item name="android:background">@android:drawable/list_selector_background</item>
-    </style>
-
     <style name="GridLabel">
         <item name="android:layout_width">0dp</item>
         <item name="layout_gravity">fill_horizontal</item>
@@ -81,10 +77,6 @@
 
     <style name="RecordField.Large">
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
-    </style>
-
-    <style name="SelectableView">
-        <item name="android:background">@android:drawable/list_selector_background</item>
     </style>
 
     <style name="Separator.Accent">

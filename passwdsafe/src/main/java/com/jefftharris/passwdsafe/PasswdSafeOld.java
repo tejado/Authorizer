@@ -224,7 +224,7 @@ public class PasswdSafeOld extends AbstractPasswdSafeActivity
         addSearchMenuItem(menu);
 
         mi = menu.add(0, MENU_ADD_RECORD, 0, R.string.add_record);
-        mi.setIcon(android.R.drawable.ic_menu_add);
+        mi.setIcon(R.drawable.ic_action_add);
 
         addCloseMenuItem(menu);
 
@@ -241,17 +241,17 @@ public class PasswdSafeOld extends AbstractPasswdSafeActivity
         SubMenu submenu = menu.addSubMenu(R.string.file_operations);
 
         mi = submenu.add(0, MENU_CHANGE_PASSWD, 0, R.string.change_password);
-        mi.setIcon(android.R.drawable.ic_menu_edit);
+        mi.setIcon(R.drawable.ic_action_edit);
 
         mi = submenu.add(0, MENU_DELETE, 0, R.string.delete_file);
-        mi.setIcon(android.R.drawable.ic_menu_delete);
+        mi.setIcon(R.drawable.ic_action_delete);
 
         submenu.add(0, MENU_PROTECT, 0, R.string.protect_all);
         submenu.add(0, MENU_UNPROTECT, 0, R.string.unprotect_all);
         // End file operations submenu
 
         mi = menu.add(0, MENU_DETAILS, 0, R.string.details);
-        mi.setIcon(android.R.drawable.ic_menu_info_details);
+        mi.setIcon(R.drawable.ic_action_info_dark);
 
         addParentMenuItem(menu);
 
