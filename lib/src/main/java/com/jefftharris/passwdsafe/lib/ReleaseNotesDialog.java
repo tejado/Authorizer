@@ -59,7 +59,7 @@ public class ReleaseNotesDialog extends DialogFragment
 
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
             .setTitle(R.string.release_notes_title)
-            .setIcon(android.R.drawable.ic_menu_info_details)
+            .setIcon(R.drawable.ic_action_info_dark)
             .setMessage(Html.fromHtml(notes))
             .setPositiveButton(R.string.close, this);
         return builder.create();

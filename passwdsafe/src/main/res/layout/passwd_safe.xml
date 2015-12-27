@@ -66,14 +66,13 @@
 
         <ImageButton
             android:id="@+id/query_clear_btn"
-            style="@style/BorderlessButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@id/query_sep"
             android:layout_marginTop="2dp"
             android:contentDescription="@string/clear"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+            android:src="@drawable/ic_action_close_cancel"/>
 
         <TextView
             android:id="@+id/query"
@@ -88,7 +87,6 @@
 
     <RelativeLayout
         android:id="@+id/expiry_panel"
-        style="@style/SelectableView"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -100,14 +98,13 @@
 
         <ImageButton
             android:id="@+id/expiry_clear_btn"
-            style="@style/BorderlessButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@id/expiry_sep"
             android:layout_marginTop="2dp"
             android:contentDescription="@string/clear"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
+            android:src="@drawable/ic_action_close_cancel"/>
 
         <TextView
             android:id="@+id/expiry"
@@ -117,7 +114,7 @@
             android:layout_centerVertical="true"
             android:layout_marginTop="4dp"
             android:layout_toLeftOf="@id/expiry_clear_btn"
-            android:drawableLeft="@android:drawable/ic_dialog_alert"
+            android:drawableLeft="@drawable/ic_action_alert_warning_dark"
             android:drawablePadding="4dp"
             android:gravity="center_vertical"
             android:textSize="16sp"/>

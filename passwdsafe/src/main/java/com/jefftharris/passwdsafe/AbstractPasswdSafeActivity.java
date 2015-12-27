@@ -196,7 +196,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected void addSearchMenuItem(Menu menu)
     {
         MenuItem mi = menu.add(0, MENU_SEARCH, 0, R.string.search);
-        mi.setIcon(android.R.drawable.ic_menu_search);
+        mi.setIcon(R.drawable.ic_action_search);
     }
 
 
@@ -210,7 +210,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected void addCloseMenuItem(Menu menu)
     {
         MenuItem mi = menu.add(0, MENU_CLOSE, 0, R.string.close);
-        mi.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+        mi.setIcon(R.drawable.ic_action_close_cancel);
     }
 
 

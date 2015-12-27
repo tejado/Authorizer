@@ -72,11 +72,12 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    PreferencesFragment.Listener
 {
+    // TODO: Show frame for expired entries on file open
     // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: use trash can icon for delete and X for close for consistency
     // TODO: shortcuts
     // TODO: storage access framework support (want to keep support?)
-    // TODO: recent files db (should that be carried forward? only if SAF kept)
+    // TODO: recent files db (should that be carried forward? only if SAF kept??)
 
     private enum ChangeMode
     {

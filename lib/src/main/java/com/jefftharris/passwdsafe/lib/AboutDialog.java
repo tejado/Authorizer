@@ -68,7 +68,7 @@ public class AboutDialog extends DialogFragment
 
         AlertDialog.Builder builder = new AlertDialog.Builder(act)
             .setTitle(name)
-            .setIcon(android.R.drawable.ic_menu_info_details)
+            .setIcon(R.drawable.ic_action_info_dark)
             .setView(detailsView)
             .setPositiveButton(R.string.close, this);
         return builder.create();
