@@ -498,8 +498,7 @@ public class PasswdSafe extends AppCompatActivity
                                   ConfirmAction.DELETE_FILE.name());
             ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
                     getString(R.string.delete_file_msg, uriName.get()),
-                    getString(R.string.delete),
-                    confirmArgs);
+                    null, getString(R.string.delete), confirmArgs);
             dialog.show(getSupportFragmentManager(), "Delete file");
             return true;
         }
@@ -720,9 +719,8 @@ public class PasswdSafe extends AppCompatActivity
                               ConfirmAction.DELETE_RECORD.name());
         confirmArgs.putParcelable(CONFIRM_ARG_LOCATION, location);
         ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
-                getString(R.string.delete_record_msg, title),
-                getString(R.string.delete),
-                confirmArgs);
+                getString(R.string.delete_record_msg, title), null,
+                getString(R.string.delete), confirmArgs);
         dialog.show(getSupportFragmentManager(), "Delete record");
     }
 
@@ -888,6 +886,11 @@ public class PasswdSafe extends AppCompatActivity
             break;
         }
         }
+    }
+
+    @Override
+    public void promptCanceled(Bundle confirmArgs)
+    {
     }
 
     /**
