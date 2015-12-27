@@ -73,7 +73,6 @@ public class PasswdSafe extends AppCompatActivity
     // TODO: expired passwords
     // TODO: expiry notifications
     // TODO: recheck all icons (remove use of all built-in ones)
-    // TODO: use trash can icon for delete and X for close for consistency
     // TODO: autobackup
     // TODO: shortcuts
     // TODO: check manifest errors regarding icons
