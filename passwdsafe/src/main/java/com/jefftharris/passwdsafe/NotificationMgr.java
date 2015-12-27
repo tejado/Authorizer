@@ -51,6 +51,7 @@ import com.jefftharris.passwdsafe.view.DialogUtils;
 /**
  * The NotificationMgr class encapsulates the notifications provided by the app
  */
+@SuppressWarnings("TryFinallyCanBeTryWithResources")
 public class NotificationMgr implements PasswdFileDataObserver
 {
     private static final String TAG = "NotificationMgr";
