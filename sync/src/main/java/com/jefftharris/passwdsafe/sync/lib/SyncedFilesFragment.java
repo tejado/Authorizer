@@ -312,7 +312,7 @@ public class SyncedFilesFragment extends ListFragment
             if (file.isFolder()) {
                 views.itsSelected.setVisibility(View.GONE);
                 views.itsModDate.setVisibility(View.GONE);
-                views.itsIcon.setImageResource(R.drawable.folder_rev);
+                views.itsIcon.setImageResource(R.drawable.ic_folder);
             } else {
                 views.itsSelected.setVisibility(View.VISIBLE);
                 views.itsSelected.setChecked(item.itsIsSelected);
