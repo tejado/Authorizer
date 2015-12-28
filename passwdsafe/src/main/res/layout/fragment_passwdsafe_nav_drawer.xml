@@ -14,6 +14,6 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_gravity="start"
+    app:headerLayout="@layout/passwdsafe_nav_drawer_header"
     app:menu="@menu/activity_passwdsafe_drawer"/>
 
-<!-- TODO: add app:headerLayout layout for header -->

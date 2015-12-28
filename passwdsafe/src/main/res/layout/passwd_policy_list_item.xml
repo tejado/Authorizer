@@ -36,7 +36,7 @@
                          android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
                          android:contentDescription="@string/delete"
-                         android:src="@drawable/ic_action_close_cancel"/>
+                         android:src="@drawable/ic_action_delete"/>
 
         </LinearLayout>
 

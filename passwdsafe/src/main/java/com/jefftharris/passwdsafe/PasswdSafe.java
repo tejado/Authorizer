@@ -74,7 +74,6 @@ public class PasswdSafe extends AppCompatActivity
 {
     // TODO: Show frame for expired entries on file open
     // TODO: recheck all icons (remove use of all built-in ones)
-    // TODO: use trash can icon for delete and X for close for consistency
     // TODO: shortcuts
     // TODO: storage access framework support (want to keep support?)
     // TODO: recent files db (should that be carried forward? only if SAF kept??)
@@ -1211,11 +1210,13 @@ public class PasswdSafe extends AppCompatActivity
         PasswdSafeNavDrawerFragment.Mode drawerMode =
                 PasswdSafeNavDrawerFragment.Mode.INIT;
         boolean fileTimeoutPaused = true;
+        String fileNameUpdate = null;
         switch (mode) {
         case INIT:
         case FILE_OPEN:
         case FILE_NEW: {
             itsTitle = PasswdSafeApp.getAppTitle(null, this);
+            fileNameUpdate = "";
             break;
         }
         case VIEW_LIST: {
@@ -1226,15 +1227,20 @@ public class PasswdSafe extends AppCompatActivity
             itsTitle = null;
             String groups = itsLocation.getGroupPath();
             if (TextUtils.isEmpty(groups)) {
+                final ObjectHolder<String> fileNameVal = new ObjectHolder<>();
                 itsFileDataFrag.useFileData(new PasswdFileDataUser()
                 {
                     @Override
                     public void useFileData(@NonNull PasswdFileData fileData)
                     {
+                        PasswdFileUri uri = fileData.getUri();
                         itsTitle = PasswdSafeApp.getAppFileTitle(
-                                fileData.getUri(), PasswdSafe.this);
+                                uri, PasswdSafe.this);
+                        fileNameVal.set(uri.getIdentifier(PasswdSafe.this,
+                                                          true));
                     }
                 });
+                fileNameUpdate = fileNameVal.get();
             }
             if (itsTitle == null) {
                 itsTitle = PasswdSafeApp.getAppTitle(groups, this);
@@ -1331,7 +1337,7 @@ public class PasswdSafe extends AppCompatActivity
         }
 
         GuiUtils.invalidateOptionsMenu(this);
-        itsNavDrawerFrag.setMode(drawerMode, isFileOpen());
+        itsNavDrawerFrag.updateView(drawerMode, fileNameUpdate, isFileOpen());
         restoreActionBar();
         itsTimeoutReceiver.updateTimeout(fileTimeoutPaused);
 
