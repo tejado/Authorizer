@@ -336,6 +336,14 @@ public class PasswdFileDataView
     }
 
     /**
+     * Get the filter for expired records
+     */
+    public PasswdRecordFilter.ExpiryFilter getExpiredRecordsFilter()
+    {
+        return itsExpiryNotifPref.getFilter();
+    }
+
+    /**
      * Rebuild the view information
      */
     private synchronized void rebuildView()

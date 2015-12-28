@@ -72,7 +72,6 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    PreferencesFragment.Listener
 {
-    // TODO: Show frame for expired entries on file open
     // TODO: recheck all icons (remove use of all built-in ones)
     // TODO: shortcuts
     // TODO: storage access framework support (want to keep support?)
@@ -586,6 +585,12 @@ public class PasswdSafe extends AppCompatActivity
             break;
         }
         case R.id.expiry_panel: {
+            PasswdRecordFilter.ExpiryFilter filter =
+                    itsFileDataFrag.getFileDataView().getExpiredRecordsFilter();
+            if (filter != null) {
+                setRecordExpiryFilter(filter, null);
+            }
+            GuiUtils.setVisible(itsExpiryPanel, false);
             break;
         }
         case R.id.expiry_clear_btn: {
