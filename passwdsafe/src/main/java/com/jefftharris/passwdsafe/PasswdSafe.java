@@ -1143,11 +1143,13 @@ public class PasswdSafe extends AppCompatActivity
         PasswdSafeNavDrawerFragment.Mode drawerMode =
                 PasswdSafeNavDrawerFragment.Mode.INIT;
         boolean fileTimeoutPaused = true;
+        String fileNameUpdate = null;
         switch (mode) {
         case INIT:
         case FILE_OPEN:
         case FILE_NEW: {
             itsTitle = PasswdSafeApp.getAppTitle(null, this);
+            fileNameUpdate = "";
             break;
         }
         case VIEW_LIST: {
@@ -1158,15 +1160,20 @@ public class PasswdSafe extends AppCompatActivity
             itsTitle = null;
             String groups = itsLocation.getGroupPath();
             if (TextUtils.isEmpty(groups)) {
+                final ObjectHolder<String> fileNameVal = new ObjectHolder<>();
                 itsFileDataFrag.useFileData(new PasswdFileDataUser()
                 {
                     @Override
                     public void useFileData(@NonNull PasswdFileData fileData)
                     {
+                        PasswdFileUri uri = fileData.getUri();
                         itsTitle = PasswdSafeApp.getAppFileTitle(
-                                fileData.getUri(), PasswdSafe.this);
+                                uri, PasswdSafe.this);
+                        fileNameVal.set(uri.getIdentifier(PasswdSafe.this,
+                                                          true));
                     }
                 });
+                fileNameUpdate = fileNameVal.get();
             }
             if (itsTitle == null) {
                 itsTitle = PasswdSafeApp.getAppTitle(groups, this);
@@ -1256,7 +1263,7 @@ public class PasswdSafe extends AppCompatActivity
         }
 
         GuiUtils.invalidateOptionsMenu(this);
-        itsNavDrawerFrag.setMode(drawerMode, isFileOpen());
+        itsNavDrawerFrag.updateView(drawerMode, fileNameUpdate, isFileOpen());
         restoreActionBar();
         itsTimeoutReceiver.updateTimeout(fileTimeoutPaused);
 

@@ -19,12 +19,16 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 /**
  * Fragment for the navigation drawer of the PasswdSafe activity
@@ -83,6 +87,7 @@ public class PasswdSafeNavDrawerFragment extends Fragment
     private DrawerLayout itsDrawerLayout;
     private NavigationView itsNavView;
     private View itsFragmentContainerView;
+    private TextView itsFileName;
     private NavMenuItem itsSelNavItem = null;
     private Listener itsListener;
 
@@ -118,6 +123,8 @@ public class PasswdSafeNavDrawerFragment extends Fragment
                 R.layout.fragment_passwdsafe_nav_drawer, container, false);
         itsNavView = (NavigationView)fragView;
         itsNavView.setNavigationItemSelectedListener(this);
+        View header = itsNavView.getHeaderView(0);
+        itsFileName = (TextView)header.findViewById(R.id.file_name);
         return fragView;
     }
 
@@ -198,11 +205,14 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         };
 
         itsDrawerLayout.setDrawerListener(itsDrawerToggle);
-        setMode(Mode.INIT, false);
+        updateView(Mode.INIT, "", false);
     }
 
-    /** Update drawer for the fragments displayed in the activity */
-    public void setMode(Mode mode, boolean fileOpen)
+    /**
+     * Update drawer for the fragments displayed in the activity
+     * @param fileNameUpdate If non-null, the file name to set in the view
+     */
+    public void updateView(Mode mode, String fileNameUpdate, boolean fileOpen)
     {
         boolean drawerEnabled = false;
         boolean openDrawer = false;
@@ -276,6 +286,12 @@ public class PasswdSafeNavDrawerFragment extends Fragment
             }
         }
         itsSelNavItem = selNavItem;
+
+        if (fileNameUpdate != null) {
+            GuiUtils.setVisible(itsFileName,
+                                !TextUtils.isEmpty(fileNameUpdate));
+            itsFileName.setText(fileNameUpdate);
+        }
 
         if (openDrawer) {
             itsDrawerLayout.openDrawer(itsFragmentContainerView);
