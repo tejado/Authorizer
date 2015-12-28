@@ -1,4 +1,5 @@
 Notice for the following files:
+sym_keyboard_delete.png
 passwdsafe/src/main/res/drawable-hdpi/list_focused_holo.9.png
 passwdsafe/src/main/res/drawable-hdpi/list_longpressed_holo.9.png
 passwdsafe/src/main/res/drawable-hdpi/list_pressed_holo_dark.9.png
@@ -7,13 +8,8 @@ passwdsafe/src/main/res/drawable-hdpi/spinner_default_holo_dark.9.png
 passwdsafe/src/main/res/drawable-hdpi/spinner_disabled_holo_dark.9.png
 passwdsafe/src/main/res/drawable-hdpi/spinner_focused_holo_dark.9.png
 passwdsafe/src/main/res/drawable-hdpi/spinner_pressed_holo_dark.9.png
-passwdsafe/src/main/res/drawable-hdpi/sym_keyboard_choose.png
-passwdsafe/src/main/res/drawable-hdpi/sym_keyboard_delete.png
-passwdsafe/src/main/res/drawable-hdpi/sym_keyboard_return.png
 passwdsafe/src/main/res/drawable-hdpi/sym_keyboard_search.png
 passwdsafe/src/main/res/drawable-hdpi/sym_keyboard_space.png
-passwdsafe/src/main/res/drawable-ldpi/sym_keyboard_delete.png
-passwdsafe/src/main/res/drawable-ldpi/sym_keyboard_return.png
 passwdsafe/src/main/res/drawable-ldpi/sym_keyboard_search.png
 passwdsafe/src/main/res/drawable-ldpi/sym_keyboard_space.png
 passwdsafe/src/main/res/drawable-mdpi/list_focused_holo.9.png
@@ -24,9 +20,6 @@ passwdsafe/src/main/res/drawable-mdpi/spinner_default_holo_dark.9.png
 passwdsafe/src/main/res/drawable-mdpi/spinner_disabled_holo_dark.9.png
 passwdsafe/src/main/res/drawable-mdpi/spinner_focused_holo_dark.9.png
 passwdsafe/src/main/res/drawable-mdpi/spinner_pressed_holo_dark.9.png
-passwdsafe/src/main/res/drawable-mdpi/sym_keyboard_choose.png
-passwdsafe/src/main/res/drawable-mdpi/sym_keyboard_delete.png
-passwdsafe/src/main/res/drawable-mdpi/sym_keyboard_return.png
 passwdsafe/src/main/res/drawable-mdpi/sym_keyboard_search.png
 passwdsafe/src/main/res/drawable-mdpi/sym_keyboard_space.png
 passwdsafe/src/main/res/drawable-xhdpi/list_focused_holo.9.png
@@ -37,9 +30,6 @@ passwdsafe/src/main/res/drawable-xhdpi/spinner_default_holo_dark.9.png
 passwdsafe/src/main/res/drawable-xhdpi/spinner_disabled_holo_dark.9.png
 passwdsafe/src/main/res/drawable-xhdpi/spinner_focused_holo_dark.9.png
 passwdsafe/src/main/res/drawable-xhdpi/spinner_pressed_holo_dark.9.png
-passwdsafe/src/main/res/drawable-xhdpi/sym_keyboard_choose.png
-passwdsafe/src/main/res/drawable-xhdpi/sym_keyboard_delete.png
-passwdsafe/src/main/res/drawable-xhdpi/sym_keyboard_return.png
 passwdsafe/src/main/res/drawable-xhdpi/sym_keyboard_search.png
 passwdsafe/src/main/res/drawable-xhdpi/sym_keyboard_space.png
 passwdsafe/src/main/res/drawable/item_background_holo_dark.xml
