@@ -15,9 +15,12 @@ import android.util.Log;
 
 import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.file.PasswdExpiration;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 import com.jefftharris.passwdsafe.pref.RecordSortOrderPref;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -51,6 +54,8 @@ public class PasswdFileDataView
     private GroupNode itsCurrGroupNode;
     private final ArrayList<String> itsCurrGroups = new ArrayList<>();
     private PasswdRecordFilter itsFilter;
+    private int itsNumExpired = 0;
+    private boolean itsIsExpiryChanged = true;
     private boolean itsIsGroupRecords =
             Preferences.PREF_GROUP_RECORDS_DEF;
     private boolean itsIsSortCaseSensitive =
@@ -61,6 +66,8 @@ public class PasswdFileDataView
             Preferences.PREF_SEARCH_REGEX_DEF;
     private RecordSortOrderPref itsRecordSortOrder =
             Preferences.PREF_RECORD_SORT_ORDER_DEF;
+    private PasswdExpiryNotifPref itsExpiryNotifPref =
+            Preferences.PREF_PASSWD_EXPIRY_NOTIF_DEF;
     private Context itsContext;
 
     private static final String TAG = "PasswdFileDataView";
@@ -88,6 +95,7 @@ public class PasswdFileDataView
                 Preferences.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
         itsRecordSortOrder = Preferences.getRecordSortOrderPref(prefs);
+        itsExpiryNotifPref = Preferences.getPasswdExpiryNotifPref(prefs);
     }
 
     /**
@@ -134,6 +142,12 @@ public class PasswdFileDataView
             rebuild = true;
             break;
         }
+        case Preferences.PREF_PASSWD_EXPIRY_NOTIF: {
+            itsExpiryNotifPref = Preferences.getPasswdExpiryNotifPref(prefs);
+            rebuild = true;
+            itsIsExpiryChanged = true;
+            break;
+        }
         }
 
         if (rebuildSearch &&
@@ -159,6 +173,7 @@ public class PasswdFileDataView
     {
         itsFileData = null;
         itsCurrGroups.clear();
+        itsIsExpiryChanged = true;
         rebuildView();
     }
 
@@ -169,6 +184,7 @@ public class PasswdFileDataView
     {
         itsFileData = fileData;
         itsCurrGroups.clear();
+        itsIsExpiryChanged = true;
         rebuildView();
     }
 
@@ -281,6 +297,45 @@ public class PasswdFileDataView
     }
 
     /**
+     * Check whether the expiration options have changed
+     */
+    public boolean checkExpiryChanged()
+    {
+        boolean changed = itsIsExpiryChanged;
+        itsIsExpiryChanged = false;
+        return changed;
+    }
+
+    /**
+     * Reset whether the expiration options have changed
+     */
+    public void resetExpiryChanged()
+    {
+        itsIsExpiryChanged = true;
+    }
+
+    /**
+     * Get whether there are expired records
+     */
+    public boolean hasExpiredRecords()
+    {
+        return itsNumExpired > 0;
+    }
+
+    /**
+     * Get the description of the expired records
+     */
+    public String getExpiredRecordsStr(Context ctx)
+    {
+        String str = null;
+        PasswdRecordFilter.ExpiryFilter filter = itsExpiryNotifPref.getFilter();
+        if (filter != null) {
+            str = filter.getRecordsExpireStr(itsNumExpired, ctx.getResources());
+        }
+        return str;
+    }
+
+    /**
      * Rebuild the view information
      */
     private synchronized void rebuildView()
@@ -288,6 +343,7 @@ public class PasswdFileDataView
         // TODO: rebuild in background?
 
         itsRootNode = new GroupNode();
+        itsNumExpired = 0;
         if (itsFileData == null) {
             updateCurrentGroup();
             return;
@@ -329,6 +385,18 @@ public class PasswdFileDataView
             }
         }
         updateCurrentGroup();
+
+        PasswdRecordFilter.ExpiryFilter filter = itsExpiryNotifPref.getFilter();
+        if (filter != null) {
+            long expiration = filter.getExpiryFromNow(null);
+            for (PasswdRecord rec : itsFileData.getPasswdRecords()) {
+                PasswdExpiration expiry = rec.getPasswdExpiry();
+                if ((expiry != null) &&
+                    (expiry.itsExpiration.getTime() <= expiration)) {
+                    ++itsNumExpired;
+                }
+            }
+        }
     }
 
     /** Update the current group */
