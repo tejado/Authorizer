@@ -18,15 +18,15 @@
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-        <include android:id="@+id/query_panel"
-                 layout="@layout/activity_passwdsafe_query_panel"
+        <include android:id="@+id/bottom_panels"
+                 layout="@layout/activity_passwdsafe_bottom_panels"
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"/>
 
         <LinearLayout android:id="@+id/two_pane"
                       android:layout_width="match_parent"
                       android:layout_height="match_parent"
-                      android:layout_above="@id/query_panel"
+                      android:layout_above="@id/bottom_panels"
                       android:layout_alignParentEnd="true"
                       android:layout_alignParentLeft="true"
                       android:layout_alignParentRight="true"
