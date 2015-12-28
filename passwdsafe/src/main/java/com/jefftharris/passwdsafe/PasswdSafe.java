@@ -153,6 +153,12 @@ public class PasswdSafe extends AppCompatActivity
     /** The query label */
     private TextView itsQuery;
 
+    /** Panel for displaying expired entries */
+    private View itsExpiryPanel;
+
+    /** The expired entries label */
+    private TextView itsExpiry;
+
     /** The search menu item */
     private MenuItem itsSearchItem = null;
 
@@ -181,6 +187,7 @@ public class PasswdSafe extends AppCompatActivity
     private static final String FRAG_DATA = "data";
     private static final String STATE_TITLE = "title";
     private static final String STATE_QUERY = "query";
+    private static final String STATE_EXPIRY_VISIBLE = "expiryVisible";
 
     private static final String CONFIRM_ARG_ACTION = "action";
     private static final String CONFIRM_ARG_LOCATION = "location";
@@ -211,6 +218,13 @@ public class PasswdSafe extends AppCompatActivity
         View queryClearBtn = findViewById(R.id.query_clear_btn);
         queryClearBtn.setOnClickListener(this);
         itsQuery = (TextView)findViewById(R.id.query);
+
+        itsExpiryPanel = findViewById(R.id.expiry_panel);
+        itsExpiryPanel.setOnClickListener(this);
+        GuiUtils.setVisible(itsExpiryPanel, false);
+        View expiryClearBtn = findViewById(R.id.expiry_clear_btn);
+        expiryClearBtn.setOnClickListener(this);
+        itsExpiry = (TextView)findViewById(R.id.expiry);
 
         FragmentManager fragMgr = getSupportFragmentManager();
         itsFileDataFrag = (PasswdSafeFileDataFragment)
@@ -249,6 +263,9 @@ public class PasswdSafe extends AppCompatActivity
         } else {
             itsTitle = savedInstanceState.getCharSequence(STATE_TITLE);
             itsQuery.setText(savedInstanceState.getCharSequence(STATE_QUERY));
+            if (savedInstanceState.getBoolean(STATE_EXPIRY_VISIBLE, false)) {
+                itsFileDataFrag.getFileDataView().resetExpiryChanged();
+            }
         }
     }
 
@@ -309,6 +326,8 @@ public class PasswdSafe extends AppCompatActivity
         super.onSaveInstanceState(outState);
         outState.putCharSequence(STATE_TITLE, itsTitle);
         outState.putCharSequence(STATE_QUERY, itsQuery.getText());
+        outState.putBoolean(STATE_EXPIRY_VISIBLE,
+                            itsExpiryPanel.getVisibility() == View.VISIBLE);
     }
 
     @Override
@@ -564,6 +583,13 @@ public class PasswdSafe extends AppCompatActivity
         switch (v.getId()) {
         case R.id.query_clear_btn: {
             setRecordQueryFilter(null);
+            break;
+        }
+        case R.id.expiry_panel: {
+            break;
+        }
+        case R.id.expiry_clear_btn: {
+            GuiUtils.setVisible(itsExpiryPanel, false);
             break;
         }
         }
@@ -1337,7 +1363,8 @@ public class PasswdSafe extends AppCompatActivity
         }
 
         GuiUtils.invalidateOptionsMenu(this);
-        itsNavDrawerFrag.updateView(drawerMode, fileNameUpdate, isFileOpen());
+        boolean fileOpen = isFileOpen();
+        itsNavDrawerFrag.updateView(drawerMode, fileNameUpdate, fileOpen);
         restoreActionBar();
         itsTimeoutReceiver.updateTimeout(fileTimeoutPaused);
 
@@ -1345,6 +1372,16 @@ public class PasswdSafe extends AppCompatActivity
         GuiUtils.setVisible(itsQueryPanel,
                             queryVisibleForMode &&
                             (fileDataView.getRecordFilter() != null));
+
+        if (fileOpen) {
+            if (fileDataView.checkExpiryChanged()) {
+                GuiUtils.setVisible(itsExpiryPanel,
+                                    fileDataView.hasExpiredRecords());
+                itsExpiry.setText(fileDataView.getExpiredRecordsStr(this));
+            }
+        } else {
+            GuiUtils.setVisible(itsExpiryPanel, false);
+        }
 
         if (itsIsTwoPane) {
             PasswdSafeListFragment.Mode listMode = itsLocation.isRecord() ?
