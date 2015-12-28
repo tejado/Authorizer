@@ -211,7 +211,7 @@ public class PasswdFileDataView
 
                     records.add(new PasswdRecordListData(
                             entry.getKey(), str, null,
-                            null, R.drawable.folder_rev, null));
+                            null, R.drawable.ic_folder, null));
                 }
             }
         }

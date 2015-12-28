@@ -420,7 +420,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
             for(Map.Entry<String, GroupNode> entry : entryGroups.entrySet()) {
                 HashMap<String, Object> recInfo = new HashMap<>();
                 recInfo.put(TITLE, entry.getKey());
-                recInfo.put(ICON,R.drawable.folder_rev);
+                recInfo.put(ICON,R.drawable.ic_folder);
 
                 int items = entry.getValue().getNumRecords();
                 String str =
