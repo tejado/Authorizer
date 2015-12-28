@@ -90,7 +90,7 @@
                     android:layout_centerVertical="true"
                     android:layout_toLeftOf="@+id/yubi_help"
                     android:layout_toRightOf="@+id/yubi_start"
-                    android:entries="@+array/yubikey_slots"
+                    android:entries="@array/yubikey_slots"
                     tools:listitem="@android:layout/simple_spinner_dropdown_item" />
             </RelativeLayout>
 
