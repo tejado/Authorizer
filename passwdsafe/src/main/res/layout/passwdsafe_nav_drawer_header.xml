@@ -40,7 +40,7 @@
               android:textSize="14sp"
               android:textStyle="bold"/>
 
-    <View style="@style/Separator"
+    <View style="@style/Separator.Accent"
           android:layout_alignParentEnd="true"
           android:layout_alignParentLeft="true"
           android:layout_alignParentRight="true"
@@ -48,7 +48,6 @@
           android:layout_below="@+id/file_name"
           android:layout_marginBottom="8dp"
           android:layout_marginLeft="16dp"
-          android:layout_marginRight="16dp"
-          android:background="@color/accent_material_light"/>
+          android:layout_marginRight="16dp"/>
 
 </RelativeLayout>
