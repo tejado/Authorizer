@@ -1161,7 +1161,7 @@ public class RecordEditActivity extends AbstractRecordActivity
             maxSize.setEnabled(historyEnabled);
             maxSizeLabel.setEnabled(historyEnabled);
             if (updateMaxSize) {
-                maxSize.setText(Integer.toString(itsHistory.getMaxSize()));
+                maxSize.setText(String.format("%d", itsHistory.getMaxSize()));
             }
 
             ListAdapter histAdapter =
