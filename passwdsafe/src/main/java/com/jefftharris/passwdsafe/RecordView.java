@@ -625,7 +625,7 @@ public class RecordView extends AbstractRecordTabActivity
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(WORD_WRAP_PREF, isWordWrap);
         editor.putBoolean(MONOSPACE_PREF, itsIsMonospace);
-        editor.commit();
+        editor.apply();
     }
 
     private void setNotesOptions()
