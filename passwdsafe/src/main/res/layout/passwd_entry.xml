@@ -68,8 +68,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:drawableLeft="@drawable/yubikey"
+                    android:drawableStart="@drawable/yubikey"
                     android:drawablePadding="6dp"
                     android:text="@string/yubikey" />
 
@@ -77,6 +79,7 @@
                     android:id="@+id/yubi_help"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:contentDescription="@string/help"
@@ -87,8 +90,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:layout_toEndOf="@+id/yubi_start"
                     android:layout_toLeftOf="@+id/yubi_help"
                     android:layout_toRightOf="@+id/yubi_start"
+                    android:layout_toStartOf="@+id/yubi_help"
                     android:entries="@array/yubikey_slots"
                     tools:listitem="@android:layout/simple_spinner_dropdown_item" />
             </RelativeLayout>

@@ -132,6 +132,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="32dip"
+                android:layout_marginStart="32dip"
                 android:orientation="vertical">
 
                 <CheckBox
@@ -144,13 +145,15 @@
                     android:id="@+id/symbols_default"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="32dip"/>
+                    android:layout_marginLeft="32dip"
+                    android:layout_marginStart="32dip"/>
 
                 <EditText
                     android:id="@+id/symbols_custom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="32dip"
+                    android:layout_marginStart="32dip"
                     android:inputType="text"/>
 
             </LinearLayout>
