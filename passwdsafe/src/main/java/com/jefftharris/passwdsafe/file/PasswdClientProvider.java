@@ -17,6 +17,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.support.annotation.NonNull;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 
@@ -66,7 +67,7 @@ public class PasswdClientProvider extends ContentProvider
      * @see android.content.ContentProvider#openFile(android.net.Uri, java.lang.String)
      */
     @Override
-    public ParcelFileDescriptor openFile(Uri uri, String mode)
+    public ParcelFileDescriptor openFile(@NonNull Uri uri, @NonNull String mode)
             throws FileNotFoundException
     {
         if (!mode.equals("r")) {
@@ -95,7 +96,7 @@ public class PasswdClientProvider extends ContentProvider
      * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
      */
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs)
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs)
     {
         return 0;
     }
@@ -104,7 +105,7 @@ public class PasswdClientProvider extends ContentProvider
      * @see android.content.ContentProvider#getType(android.net.Uri)
      */
     @Override
-    public String getType(Uri uri)
+    public String getType(@NonNull Uri uri)
     {
         return null;
     }
@@ -113,7 +114,7 @@ public class PasswdClientProvider extends ContentProvider
      * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
      */
     @Override
-    public Uri insert(Uri uri, ContentValues values)
+    public Uri insert(@NonNull Uri uri, ContentValues values)
     {
         return null;
     }
@@ -132,7 +133,7 @@ public class PasswdClientProvider extends ContentProvider
      * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
      */
     @Override
-    public Cursor query(Uri uri,
+    public Cursor query(@NonNull Uri uri,
                         String[] projection,
                         String selection,
                         String[] selectionArgs,
@@ -145,7 +146,7 @@ public class PasswdClientProvider extends ContentProvider
      * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
      */
     @Override
-    public int update(Uri uri,
+    public int update(@NonNull Uri uri,
                       ContentValues values,
                       String selection,
                       String[] selectionArgs)

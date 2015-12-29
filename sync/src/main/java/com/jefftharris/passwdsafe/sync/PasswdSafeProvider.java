@@ -32,6 +32,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
@@ -121,7 +122,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
      */
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs)
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs)
     {
         if (selection != null) {
             throw new IllegalArgumentException("selection not supported");
@@ -195,7 +196,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#getType(android.net.Uri)
      */
     @Override
-    public String getType(Uri uri)
+    public String getType(@NonNull Uri uri)
     {
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDERS: {
@@ -233,7 +234,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
      */
     @Override
-    public Uri insert(Uri uri, ContentValues values)
+    public Uri insert(@NonNull Uri uri, ContentValues values)
     {
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDERS: {
@@ -347,7 +348,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
      */
     @Override
-    public Cursor query(Uri uri,
+    public Cursor query(@NonNull Uri uri,
                         String[] projection,
                         String selection,
                         String[] selectionArgs,
@@ -491,7 +492,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
      */
     @Override
-    public int update(Uri uri,
+    public int update(@NonNull Uri uri,
                       ContentValues values,
                       String selection,
                       String[] selectionArgs)
@@ -596,7 +597,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#openFile(android.net.Uri, java.lang.String)
      */
     @Override
-    public ParcelFileDescriptor openFile(Uri uri, String mode)
+    public ParcelFileDescriptor openFile(@NonNull Uri uri, @NonNull String mode)
             throws FileNotFoundException
     {
         if (!mode.equals("r")) {
