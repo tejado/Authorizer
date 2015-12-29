@@ -111,7 +111,7 @@
     <string name="home">Home</string>
     <string name="interval">Interval</string>
     <string name="invalid_file_name">Invalid file name</string>
-    <string name="invalid_history_max_size">Size must be between %1$d and %2$d</string>
+    <string name="invalid_history_max_size" tools:ignore="PluralsCandidate">Size must be between %1$d and %2$d</string>
     <string name="invalid_length">Invalid length</string>
     <string name="invalid_option_length">Invalid option length</string>
     <string name="invalid_password">Invalid password</string>
@@ -199,9 +199,9 @@
     <string name="policy_header">POLICY</string>
     <string name="policy_no">No</string>
     <string name="policy_yes_len">Yes - At least %1$d</string>
-    <string name="policy_yes_sym_default">Yes - At least %1$d from default symbols: %2$s</string>
-    <string name="policy_yes_sym_easy">Yes - At least %1$d from easy symbols: %2$s</string>
-    <string name="policy_yes_sym_policy">Yes - At least %1$d from policy symbols: %2$s</string>
+    <string name="policy_yes_sym_default" tools:ignore="PluralsCandidate">Yes - At least %1$d from default symbols: %2$s</string>
+    <string name="policy_yes_sym_easy" tools:ignore="PluralsCandidate">Yes - At least %1$d from easy symbols: %2$s</string>
+    <string name="policy_yes_sym_policy" tools:ignore="PluralsCandidate">Yes - At least %1$d from policy symbols: %2$s</string>
     <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Yes - Symbols: %2$s</string>
     <string name="preferences">Preferences</string>
     <string name="press_again_close_warning">Press again to close the file</string>
