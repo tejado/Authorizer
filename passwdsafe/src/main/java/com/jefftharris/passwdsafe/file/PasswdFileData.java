@@ -243,9 +243,9 @@ public class PasswdFileData
     /**
      * Get whether a Yubikey was used to open the file
      */
-    public final boolean isYubikey()
+    public final boolean isNotYubikey()
     {
-        return itsIsYubikey;
+        return !itsIsYubikey;
     }
 
     /**
