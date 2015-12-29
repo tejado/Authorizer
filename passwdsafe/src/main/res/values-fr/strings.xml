@@ -92,7 +92,6 @@
     <string name="file_operations">Réglage sauvegarde</string>
     <string name="file_password_encoding">Encodage fichier mots de passe</string>
     <string name="files">Fichiers</string>
-    <string name="font_size">Taille de la police</string>
     <string name="generate">Générer</string>
     <string name="generate_password">Générer un mot de passe</string>
     <string name="go">OK</string>
