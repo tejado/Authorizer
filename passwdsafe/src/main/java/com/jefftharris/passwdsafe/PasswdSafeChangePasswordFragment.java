@@ -53,7 +53,7 @@ public class PasswdSafeChangePasswordFragment
     private TextView itsPassword;
     private TextInputLayout itsPasswordConfirmInput;
     private TextView itsPasswordConfirm;
-    private Validator itsValidator = new Validator();
+    private final Validator itsValidator = new Validator();
 
     /**
      * Create a new instance

@@ -191,12 +191,12 @@ public class PasswdSafe extends AppCompatActivity
     private static final String CONFIRM_ARG_ACTION = "action";
     private static final String CONFIRM_ARG_LOCATION = "location";
 
-    private static int MENU_BIT_CAN_ADD = 0;
-    private static int MENU_BIT_HAS_FILE_OPS = 1;
-    private static int MENU_BIT_HAS_FILE_CHANGE_PASSWORD = 2;
-    private static int MENU_BIT_PROTECT_ALL = 3;
-    private static int MENU_BIT_HAS_SEARCH = 4;
-    private static int MENU_BIT_HAS_CLOSE = 5;
+    private static final int MENU_BIT_CAN_ADD = 0;
+    private static final int MENU_BIT_HAS_FILE_OPS = 1;
+    private static final int MENU_BIT_HAS_FILE_CHANGE_PASSWORD = 2;
+    private static final int MENU_BIT_PROTECT_ALL = 3;
+    private static final int MENU_BIT_HAS_SEARCH = 4;
+    private static final int MENU_BIT_HAS_CLOSE = 5;
 
     private static final String TAG = "PasswdSafe";
 
