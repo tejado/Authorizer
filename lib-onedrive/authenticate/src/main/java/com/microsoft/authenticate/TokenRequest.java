@@ -24,6 +24,7 @@ import java.util.List;
  * Abstract class that represents an OAuth token request.
  * Known subclasses include AccessTokenRequest and RefreshAccessTokenRequest
  */
+@SuppressWarnings("deprecation")
 abstract class TokenRequest {
 
     /**

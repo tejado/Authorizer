@@ -44,13 +44,10 @@ public final class ApiCompat
     /** Request a manual sync of a content provider */
     public static void requestManualSync(Account acct,
                                          Uri uri,
-                                         Context ctx,
                                          Bundle extras)
     {
         if (SDK_VERSION >= SDK_ECLAIR) {
             ApiCompatEclair.requestManualSync(acct, uri.getAuthority(), extras);
-        } else {
-            ApiCompatCupcake.requestManualSync(uri, ctx);
         }
     }
 
@@ -131,6 +128,21 @@ public final class ApiCompat
             ClipboardManager clipMgr = (ClipboardManager)
                     ctx.getSystemService(Context.CLIPBOARD_SERVICE);
             clipMgr.setText(str);
+        }
+    }
+
+    /**
+     * Does the clipboard have text
+     */
+    public static boolean clipboardHasText(Context ctx)
+    {
+        if (SDK_VERSION >= SDK_HONEYCOMB) {
+            return ApiCompatHoneycomb.clipboardHasText(ctx);
+        } else {
+            @SuppressWarnings("deprecation")
+            ClipboardManager clipMgr = (ClipboardManager)
+                    ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            return clipMgr.hasText();
         }
     }
 }

@@ -56,6 +56,7 @@ import com.jefftharris.passwdsafe.view.DialogValidator;
 import com.jefftharris.passwdsafe.view.PasswdEntryDialog;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 
+@SuppressWarnings("deprecation")
 public class PasswdSafeOld extends AbstractPasswdSafeActivity
 {
     private static final int DIALOG_GET_PASSWD =        MAX_DIALOG + 1;

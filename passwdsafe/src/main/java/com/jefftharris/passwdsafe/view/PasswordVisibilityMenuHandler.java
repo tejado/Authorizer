@@ -8,10 +8,9 @@
 package com.jefftharris.passwdsafe.view;
 
 import com.jefftharris.passwdsafe.R;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
-import android.content.Context;
-import android.text.ClipboardManager;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -52,9 +51,7 @@ public class PasswordVisibilityMenuHandler
             MenuItem mi;
             mi = menu.findItem(android.R.id.paste);
             if (mi == null) {
-                ClipboardManager clipMgr = (ClipboardManager)
-                    v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                if (clipMgr.hasText()) {
+                if (ApiCompat.clipboardHasText(v.getContext())) {
                     mi = menu.add(0, android.R.id.paste, 0,
                                   android.R.string.paste);
                     mi.setOnMenuItemClickListener(this);

@@ -17,6 +17,7 @@ import android.app.ListActivity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractPasswdFileListActivity extends ListActivity
     implements PasswdFileActivity
 {

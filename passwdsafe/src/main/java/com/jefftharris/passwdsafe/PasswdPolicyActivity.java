@@ -35,6 +35,7 @@ import android.widget.ListView;
 /**
  * Activity for managing password policies for a file
  */
+@SuppressWarnings("deprecation")
 public class PasswdPolicyActivity extends AbstractPasswdFileListActivity
     //implements PasswdPolicyEditDialog.Editor
 {

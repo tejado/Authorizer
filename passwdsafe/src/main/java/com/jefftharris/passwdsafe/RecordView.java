@@ -58,6 +58,7 @@ import android.widget.TabWidget;
 import android.widget.TextView;
 
 
+@SuppressWarnings("deprecation")
 public class RecordView extends AbstractRecordTabActivity
 {
     private static final String TAG = "RecordView";
@@ -87,6 +88,7 @@ public class RecordView extends AbstractRecordTabActivity
     private static final int NOTES_ICON_LEVEL_BASE = 0;
     private static final int NOTES_ICON_LEVEL_NOTES = 1;
 
+    @SuppressWarnings("deprecation")
     private class NotesTabDrawable extends StateListDrawable
     {
         public NotesTabDrawable(Resources res)
