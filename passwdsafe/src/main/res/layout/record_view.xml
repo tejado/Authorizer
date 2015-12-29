@@ -77,7 +77,6 @@
                         style="@style/RecordRow">
 
                         <TextView
-                            android:id="@+id/group_label"
                             style="@style/RecordHeader"
                             android:text="@string/group_header"/>
 
@@ -147,7 +146,6 @@
                         style="@style/RecordRow">
 
                         <TextView
-                            android:id="@+id/url_label"
                             style="@style/RecordHeader"
                             android:text="@string/url" />
 
@@ -165,7 +163,6 @@
                         style="@style/RecordRow">
 
                         <TextView
-                            android:id="@+id/email_label"
                             style="@style/RecordHeader"
                             android:text="@string/email_header" />
 
@@ -183,14 +180,12 @@
                         style="@style/RecordRow">
 
                         <TextView
-                            android:id="@+id/times_label"
                             style="@style/RecordHeader"
                             android:text="@string/times_header" />
 
                         <View style="@style/Separator"/>
 
                         <TableLayout
-                            android:id="@+id/times"
                             style="@style/RecordField.Small"
                             android:shrinkColumns="1"
                             android:stretchColumns="1">
@@ -275,14 +270,12 @@
                         style="@style/RecordRow">
 
                         <TextView
-                            android:id="@+id/password_times_label"
                             style="@style/RecordHeader"
                             android:text="@string/password_times_header" />
 
                         <View style="@style/Separator"/>
 
                         <TableLayout
-                            android:id="@+id/password_times"
                             style="@style/RecordField.Small"
                             android:shrinkColumns="1"
                             android:stretchColumns="1">

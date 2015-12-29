@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
-              android:id="@+id/record_edit"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
               xmlns:tools="http://schemas.android.com/tools"
@@ -63,7 +62,7 @@
                              android:prompt="@string/choose_type"
                              android:entries="@array/record_type"/>
                 </TableRow>
-                <TableRow android:id="@+id/title_row">
+                <TableRow>
 
                     <TextView
                         style="@style/TableLabelColumn"
@@ -154,7 +153,7 @@
                               android:layout_height="wrap_content"/>
                 </TableRow>
 
-                <TableRow android:id="@+id/password_current_row">
+                <TableRow>
 
                     <TextView
                         style="@style/TableLabelColumn"

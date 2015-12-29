@@ -45,7 +45,6 @@
             android:text="@string/read_only"/>
 
         <LinearLayout
-            android:id="@+id/yubi_fields"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >

@@ -7,8 +7,7 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/menu_drawer"
-           android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item android:id="@+id/menu_drawer_records"
               android:icon="@drawable/ic_action_people_outline"
               android:title="@string/records"/>
