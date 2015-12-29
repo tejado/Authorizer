@@ -766,7 +766,7 @@ public class PasswdSafeOld extends AbstractPasswdSafeActivity
                        R.string.read_write : R.string.read_only);
 
             tv = (TextView)dialog.findViewById(R.id.num_records);
-            tv.setText(Integer.toString(fileData.getRecords().size()));
+            tv.setText(String.format("%d", fileData.getRecords().size()));
 
             tv = (TextView)dialog.findViewById(R.id.password_encoding);
             tv.setText(fileData.getOpenPasswordEncoding());
