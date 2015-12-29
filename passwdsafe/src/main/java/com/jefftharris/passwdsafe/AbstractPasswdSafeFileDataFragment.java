@@ -39,8 +39,8 @@ public abstract class AbstractPasswdSafeFileDataFragment
         /** Use the file data */
         void useFileData(PasswdFileDataUser user);
 
-        /** Is the navigation drawer open */
-        boolean isNavDrawerOpen();
+        /** Is the navigation drawer closed */
+        boolean isNavDrawerClosed();
     }
 
     /**
@@ -131,7 +131,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        if ((itsListener != null) && !itsListener.isNavDrawerOpen()) {
+        if ((itsListener != null) && itsListener.isNavDrawerClosed()) {
             doOnCreateOptionsMenu(menu, inflater);
         }
         super.onCreateOptionsMenu(menu, inflater);
