@@ -7,6 +7,7 @@ import com.microsoft.authenticate.OAuthConfig;
 /**
  * OAuth configuration for the OneDrive service
  */
+@SuppressWarnings("CanBeFinal")
 public class OneDriveOAuthConfig implements OAuthConfig {
 
     /**

@@ -63,7 +63,7 @@ public class PasswdSafeNewFileFragment
     private TextInputLayout itsPasswordConfirmInput;
     private TextView itsPasswordConfirm;
     private Button itsOkBtn;
-    private Validator itsValidator = new Validator();
+    private final Validator itsValidator = new Validator();
     private NewTask itsNewTask;
 
     private static final String ARG_URI = "uri";
