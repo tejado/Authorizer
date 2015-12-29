@@ -582,7 +582,7 @@ public final class FileListFragment extends ListFragment
             } else if (file.itsFile.isDirectory()) {
                 icon = R.drawable.ic_folder;
             } else {
-                icon = R.drawable.login_rev;
+                icon = R.drawable.ic_passwdsafe_dark;
                 item.put(MOD_DATE, Utils.formatDate(file.itsFile.lastModified(),
                                                     getContext()));
             }

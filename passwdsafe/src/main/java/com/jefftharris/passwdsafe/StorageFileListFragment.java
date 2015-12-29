@@ -129,7 +129,7 @@ public final class StorageFileListFragment extends ListFragment
                         }
                         case R.id.icon: {
                             ImageView iv = (ImageView)view;
-                            iv.setImageResource(R.drawable.login_rev);
+                            iv.setImageResource(R.drawable.ic_passwdsafe_dark);
                             return true;
                         }
                         case R.id.mod_date: {
