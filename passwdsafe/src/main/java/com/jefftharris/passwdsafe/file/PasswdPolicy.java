@@ -419,6 +419,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     }
 
     /** Are the policies equal for the fields used by a record policy */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean recordPolicyEquals(PasswdPolicy policy)
     {
         return ((itsFlags == policy.itsFlags) &&
