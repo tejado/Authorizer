@@ -319,7 +319,7 @@ public class SyncedFilesFragment extends ListFragment
                 views.itsModDate.setVisibility(View.VISIBLE);
                 views.itsModDate.setText(Utils.formatDate(file.getModTime(),
                                                           getContext()));
-                views.itsIcon.setImageResource(R.drawable.login_rev);
+                views.itsIcon.setImageResource(R.drawable.ic_passwdsafe_dark);
             }
 
             return convertView;
