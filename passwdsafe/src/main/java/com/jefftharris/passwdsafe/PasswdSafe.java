@@ -796,9 +796,9 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
-    public boolean isNavDrawerOpen()
+    public boolean isNavDrawerClosed()
     {
-        return itsNavDrawerFrag.isDrawerOpen();
+        return !itsNavDrawerFrag.isDrawerOpen();
     }
 
     @Override
