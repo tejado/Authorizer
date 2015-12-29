@@ -22,6 +22,7 @@
             android:id="@+id/home"
             android:layout_width="36dp"
             android:layout_height="36dp"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:contentDescription="@string/home"
             android:src="@drawable/button_home"/>
@@ -33,8 +34,10 @@
             android:layout_alignBottom="@id/up_icon"
             android:layout_alignTop="@id/up_icon"
             android:layout_marginBottom="2dp"
+            android:layout_toEndOf="@id/up_icon"
             android:layout_toLeftOf="@id/home"
             android:layout_toRightOf="@id/up_icon"
+            android:layout_toStartOf="@id/home"
             android:gravity="center_vertical"
             android:text="@string/group"/>
 
