@@ -72,6 +72,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.AdapterView.OnItemSelectedListener;
 
+@SuppressWarnings("deprecation")
 public class RecordEditActivity extends AbstractRecordActivity
         //implements PasswdPolicyEditDialog.Editor
 {

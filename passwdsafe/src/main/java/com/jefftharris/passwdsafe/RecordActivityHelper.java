@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 
+@SuppressWarnings("deprecation")
 public class RecordActivityHelper implements PasswdFileActivity
 {
     private static final String TAG = "RecordActivityHelper";

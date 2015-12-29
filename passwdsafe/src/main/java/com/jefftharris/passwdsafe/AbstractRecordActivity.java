@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 
+@SuppressWarnings("deprecation")
 public abstract class AbstractRecordActivity extends Activity
     implements PasswdFileActivity
 {

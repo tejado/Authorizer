@@ -25,6 +25,7 @@ import android.webkit.CookieSyncManager;
  * AuthClient is a class responsible for retrieving an {@link AuthSession}, which
  * can be given to a service in order to make authenticated requests.
  */
+@SuppressWarnings("deprecation")
 public class AuthClient {
 
     /**

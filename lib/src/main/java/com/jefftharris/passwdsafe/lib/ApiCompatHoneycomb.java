@@ -29,4 +29,14 @@ public final class ApiCompatHoneycomb
         ClipData clip = ClipData.newPlainText(null, str);
         clipMgr.setPrimaryClip(clip);
     }
+
+    /**
+     * Does the clipboard have text
+     */
+    public static boolean clipboardHasText(Context ctx)
+    {
+        ClipboardManager clipMgr = (ClipboardManager)
+                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+        return clipMgr.hasPrimaryClip();
+    }
 }
