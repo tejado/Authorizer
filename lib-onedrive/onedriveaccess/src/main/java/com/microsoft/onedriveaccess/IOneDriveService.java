@@ -24,6 +24,7 @@ import retrofit.mime.TypedFile;
 /**
  * Service interface that will connect to OneDrive
  */
+@SuppressWarnings("UnusedReturnValue")
 public interface IOneDriveService {
 
     /**
