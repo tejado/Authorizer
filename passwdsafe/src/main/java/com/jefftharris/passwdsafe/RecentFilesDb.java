@@ -25,7 +25,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 /**
  * Database helper class to manage the recent files list
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "TryFinallyCanBeTryWithResources"})
 public final class RecentFilesDb extends SQLiteOpenHelper
 {
     public static final String DB_TABLE_FILES = "files";
