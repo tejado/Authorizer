@@ -19,6 +19,7 @@ final class OAuthSuccessfulResponse implements OAuthResponse {
      * Builder is a utility class that is used to build a new OAuthSuccessfulResponse.
      * It must be constructed with the required fields, and can add on the optional ones.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public static class Builder {
         /**
          * The access token
