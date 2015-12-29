@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe.file;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.pwsafe.lib.file.PwsStreamStorage;
@@ -45,6 +46,9 @@ public class PasswdFileGenProviderStorage extends PwsStreamStorage
                 Context ctx = helper.getContext();
 
                 pfd = ctx.getContentResolver().openFileDescriptor(itsUri, "w");
+                if (pfd == null) {
+                    throw new IOException(itsUri.toString());
+                }
                 fos = new FileOutputStream(pfd.getFileDescriptor());
                 fos.write(data);
 

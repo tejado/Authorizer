@@ -48,7 +48,10 @@ public class DbProvider
     /** Get the type and display name */
     public String getTypeAndDisplayName(Context ctx)
     {
-        StringBuilder str = new StringBuilder(itsType.getName(ctx));
+        StringBuilder str = new StringBuilder();
+        if (itsType != null) {
+            str.append(itsType.getName(ctx));
+        }
         str.append(" - ");
         if (!TextUtils.isEmpty(itsDisplayName)) {
             str.append(itsDisplayName);

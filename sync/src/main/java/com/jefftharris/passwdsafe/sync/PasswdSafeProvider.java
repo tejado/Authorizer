@@ -478,8 +478,9 @@ public class PasswdSafeProvider extends ContentProvider
             SQLiteDatabase db = syncDb.getDb();
             Cursor c = qb.query(db, projection, selection, selectionArgs,
                                 null, null, sortOrder);
-            if (c != null) {
-                c.setNotificationUri(getContext().getContentResolver(),
+            Context ctx = getContext();
+            if ((c != null) && (ctx != null)) {
+                c.setNotificationUri(ctx.getContentResolver(),
                                      PasswdSafeContract.CONTENT_URI);
             }
             return c;
@@ -541,6 +542,9 @@ public class PasswdSafeProvider extends ContentProvider
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 Context ctx = getContext();
+                if (ctx == null) {
+                    throw new NullPointerException("ctx");
+                }
 
                 DbFile file = SyncDb.getFile(id, db);
                 if (file == null) {
@@ -616,10 +620,12 @@ public class PasswdSafeProvider extends ContentProvider
             } finally {
                 syncDb.endTransactionAndRelease();
             }
-            if ((file == null) || (file.itsLocalFile == null)) {
+            Context ctx = getContext();
+            if ((file == null) || (file.itsLocalFile == null) ||
+                (ctx == null)) {
                 throw new FileNotFoundException(uri.toString());
             }
-            File localFile = getContext().getFileStreamPath(file.itsLocalFile);
+            File localFile = ctx.getFileStreamPath(file.itsLocalFile);
             PasswdSafeUtil.dbginfo(TAG, "openFile uri %s, file %s",
                                    uri, localFile);
             return ParcelFileDescriptor.open(
@@ -712,7 +718,11 @@ public class PasswdSafeProvider extends ContentProvider
     /** Notify both files and remote files listeners for changes */
     private void notifyFileChanges(long providerId, long fileId)
     {
-        ContentResolver cr = getContext().getContentResolver();
+        Context ctx = getContext();
+        if (ctx == null) {
+            return;
+        }
+        ContentResolver cr = ctx.getContentResolver();
 
         Uri providerUri = ContentUris.withAppendedId(
                 PasswdSafeContract.Providers.CONTENT_URI, providerId);
