@@ -111,7 +111,7 @@
     <string name="home">Accueil</string>
     <string name="interval">Intervalle</string>
     <string name="invalid_file_name">Nom de fichier invalide</string>
-    <string name="invalid_history_max_size">Taille doit être comprise entre %1$s et %2$s</string>
+    <string name="invalid_history_max_size">Taille doit être comprise entre %1$d et %2$d</string>
     <string name="invalid_length">Longueur invalide</string>
     <string name="invalid_option_length">Longueur d\'option invalide</string>
     <string name="invalid_password">"Mot de passe incorrect"</string>
