@@ -18,7 +18,7 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:contentDescription="@string/up"
-            android:src="@drawable/folder_up_rev"/>
+            android:src="@drawable/ic_folder_up"/>
 
         <TextView
             android:id="@+id/current_group_label"

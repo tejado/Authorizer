@@ -13,15 +13,21 @@
 
         <ImageView
             android:id="@+id/up_icon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:scaleType="center"
             android:contentDescription="@string/up"
-            android:src="@drawable/folder_up_rev"/>
+            android:src="@drawable/ic_folder_up"/>
 
         <ImageView
             android:id="@+id/home"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:scaleType="center"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:contentDescription="@string/home"
