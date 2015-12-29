@@ -392,7 +392,7 @@ public class PasswdSafe extends AppCompatActivity
                     if (fileEditable) {
                         options.set(MENU_BIT_HAS_FILE_OPS, true);
                         options.set(MENU_BIT_HAS_FILE_CHANGE_PASSWORD,
-                                    !fileData.isYubikey());
+                                    fileData.isNotYubikey());
                         options.set(MENU_BIT_PROTECT_ALL,
                                     itsLocation.getGroups().isEmpty());
                     }
