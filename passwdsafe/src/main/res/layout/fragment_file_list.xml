@@ -28,7 +28,7 @@
                    android:layout_alignParentEnd="true"
                    android:layout_alignParentRight="true"
                    android:contentDescription="@string/home"
-                   android:src="@drawable/button_home"/>
+                   android:src="@drawable/ic_action_home_dark"/>
 
         <TextView android:id="@+id/current_group_label"
                   android:layout_width="fill_parent"
