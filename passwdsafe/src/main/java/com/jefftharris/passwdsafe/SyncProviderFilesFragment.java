@@ -48,6 +48,9 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         /** Open a file */
         void openFile(Uri uri, String fileName);
+
+        /** Update the view for a list of sync files */
+        void updateViewSyncFiles();
     }
 
     private static final String TAG = "SyncProviderFilesFrag";
@@ -229,6 +232,12 @@ public class SyncProviderFilesFragment extends ListFragment
             });
     }
 
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsListener.updateViewSyncFiles();
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)

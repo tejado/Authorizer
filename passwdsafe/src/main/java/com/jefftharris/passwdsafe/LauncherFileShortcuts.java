@@ -92,4 +92,14 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
     {
         return itsIsDefaultFile;
     }
+
+    @Override
+    public void updateViewFiles()
+    {
+    }
+
+    @Override
+    public void updateViewSyncFiles()
+    {
+    }
 }

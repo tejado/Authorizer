@@ -23,9 +23,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 
 /**
@@ -33,8 +35,10 @@ import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
  * top-level options
  */
 public class FileListActivity extends AppCompatActivity
-        implements FileListFragment.Listener,
+        implements AboutFragment.Listener,
+                   FileListFragment.Listener,
                    FileListNavDrawerFragment.Listener,
+                   PreferencesFragment.Listener,
                    StorageFileListFragment.Listener,
                    SyncProviderFragment.Listener,
                    SyncProviderFilesFragment.Listener
@@ -44,6 +48,30 @@ public class FileListActivity extends AppCompatActivity
     private static final String STATE_TITLE = "title";
 
     private static final String TAG = "FileListActivity";
+
+    private enum ChangeMode
+    {
+        /** View about info */
+        VIEW_ABOUT,
+        /** View files */
+        VIEW_FILES,
+        /** Initial view of files */
+        VIEW_FILES_INIT,
+        /** View preferences */
+        VIEW_PREFERENCES
+    }
+
+    private enum ViewMode
+    {
+        /** Viewing about info */
+        VIEW_ABOUT,
+        /** Viewing files */
+        VIEW_FILES,
+        /** Viewing preferences */
+        VIEW_PREFERENCES
+    }
+
+    // TODO: handle pref changes
 
     private FileListNavDrawerFragment itsNavDrawerFrag;
     private boolean itsIsCloseOnOpen = false;
@@ -65,13 +93,8 @@ public class FileListActivity extends AppCompatActivity
         itsIsCloseOnOpen = intent.getBooleanExtra(INTENT_EXTRA_CLOSE_ON_OPEN,
                                                   false);
 
-        FragmentManager fragMgr = getSupportFragmentManager();
-        FragmentTransaction txn = fragMgr.beginTransaction();
-        txn.replace(R.id.sync, new SyncProviderFragment());
-        txn.commit();
-
         if (savedInstanceState == null) {
-            setFileChooseFrag();
+            showFiles(true);
         } else {
             itsTitle = savedInstanceState.getCharSequence(STATE_TITLE);
         }
@@ -192,10 +215,65 @@ public class FileListActivity extends AppCompatActivity
         return false;
     }
 
+    @Override
+    public void updateViewFiles()
+    {
+        doUpdateView(ViewMode.VIEW_FILES);
+    }
+
+    @Override
+    public void updateViewSyncFiles()
+    {
+        doUpdateView(ViewMode.VIEW_FILES);
+    }
+
+    @Override
+    public boolean isNavDrawerClosed()
+    {
+        return !itsNavDrawerFrag.isDrawerOpen();
+    }
+
+    @Override
+    public void useFileData(PasswdFileDataUser user)
+    {
+        // No file data for about fragment
+    }
+
+    @Override
+    public void updateViewAbout()
+    {
+        doUpdateView(ViewMode.VIEW_ABOUT);
+    }
+
+    @Override
+    public void updateViewPreferences()
+    {
+        doUpdateView(ViewMode.VIEW_PREFERENCES);
+    }
+
+    @Override
+    public void showAbout()
+    {
+        doChangeView(ChangeMode.VIEW_ABOUT, AboutFragment.newInstance(), null);
+    }
+
+    @Override
+    public void showFiles()
+    {
+        showFiles(false);
+    }
+
+    @Override
+    public void showPreferences()
+    {
+        doChangeView(ChangeMode.VIEW_PREFERENCES,
+                     PreferencesFragment.newInstance(), null);
+    }
+
     /**
-     * Set the file chooser fragment
+     * View files
      */
-    private void setFileChooseFrag()
+    private void showFiles(boolean initial)
     {
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(this);
@@ -205,18 +283,111 @@ public class FileListActivity extends AppCompatActivity
         if ((itsIsStorageFrag == null) || (itsIsStorageFrag != storageFrag)) {
             PasswdSafeUtil.dbginfo(TAG, "setFileChooseFrag storage %b",
                                    storageFrag);
-            Fragment frag;
-            if (storageFrag) {
-                frag = new StorageFileListFragment();
-            } else {
-                frag = new FileListFragment();
-            }
-            FragmentManager fragMgr = getSupportFragmentManager();
-            FragmentTransaction txn = fragMgr.beginTransaction();
-            txn.replace(R.id.files, frag);
-            txn.commit();
             itsIsStorageFrag = storageFrag;
         }
+
+        Fragment filesFrag;
+        if (itsIsStorageFrag) {
+            filesFrag = new StorageFileListFragment();
+        } else {
+            filesFrag = new FileListFragment();
+        }
+
+        doChangeView(initial ?
+                     ChangeMode.VIEW_FILES_INIT : ChangeMode.VIEW_FILES,
+                     filesFrag, new SyncProviderFragment());
+    }
+
+    /**
+     * Change the view of the activity
+     */
+    private void doChangeView(ChangeMode mode,
+                              Fragment filesFrag,
+                              Fragment syncFrag)
+    {
+        boolean clearBackStack = false;
+        boolean supportsBack = false;
+        switch (mode) {
+        case VIEW_FILES_INIT: {
+            clearBackStack = true;
+            break;
+        }
+        case VIEW_ABOUT:
+        case VIEW_FILES:
+        case VIEW_PREFERENCES: {
+            supportsBack = true;
+            break;
+        }
+        }
+
+        FragmentManager fragMgr = getSupportFragmentManager();
+        FragmentTransaction txn = fragMgr.beginTransaction();
+        txn.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+        if (clearBackStack) {
+            //noinspection StatementWithEmptyBody
+            while (fragMgr.popBackStackImmediate()) {
+                // Clear back stack
+            }
+        }
+
+        if (filesFrag != null) {
+            txn.replace(R.id.files, filesFrag);
+        } else {
+            Fragment currFrag = fragMgr.findFragmentById(R.id.files);
+            if ((currFrag != null) && currFrag.isAdded()) {
+                txn.remove(currFrag);
+            }
+        }
+
+        if (syncFrag != null) {
+            txn.replace(R.id.sync, syncFrag);
+        } else {
+            Fragment currFrag = fragMgr.findFragmentById(R.id.sync);
+            if ((currFrag != null) && currFrag.isAdded()) {
+                txn.remove(currFrag);
+            }
+        }
+
+        if (supportsBack) {
+            txn.addToBackStack(null);
+        }
+
+        txn.commit();
+    }
+
+    /**
+     * Update the view mode
+     */
+    private void doUpdateView(ViewMode mode)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "doUpdateView mode: %s", mode);
+
+        FileListNavDrawerFragment.Mode drawerMode =
+                FileListNavDrawerFragment.Mode.INIT;
+        switch (mode) {
+        case VIEW_ABOUT: {
+            drawerMode = FileListNavDrawerFragment.Mode.ABOUT;
+            itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.about),
+                                                 this);
+            break;
+        }
+        case VIEW_FILES: {
+            drawerMode = FileListNavDrawerFragment.Mode.FILES;
+            itsTitle = getString(R.string.app_name);
+            break;
+        }
+        case VIEW_PREFERENCES: {
+            drawerMode = FileListNavDrawerFragment.Mode.PREFERENCES;
+            itsTitle = PasswdSafeApp.getAppTitle(
+                    getString(R.string.preferences), this);
+            break;
+        }
+        }
+
+        GuiUtils.invalidateOptionsMenu(this);
+        itsNavDrawerFrag.updateView(drawerMode);
+        restoreActionBar();
     }
 
     /**
