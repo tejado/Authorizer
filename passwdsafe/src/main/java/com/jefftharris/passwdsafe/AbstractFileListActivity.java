@@ -8,7 +8,6 @@
 package com.jefftharris.passwdsafe;
 
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
@@ -17,7 +16,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
@@ -33,12 +31,8 @@ public abstract class AbstractFileListActivity extends AppCompatActivity
                    SyncProviderFilesFragment.Listener
 
 {
-    public static final String INTENT_EXTRA_CLOSE_ON_OPEN = "closeOnOpen";
-
     private static final String TAG = "AbstractFileListActivity";
 
-    protected boolean itsIsCloseOnOpen = false;
-    protected FileListNavDrawerFragment itsNavDrawerFrag;
     private Boolean itsIsStorageFrag = null;
 
 
@@ -49,16 +43,7 @@ public abstract class AbstractFileListActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_file_list);
-
-        itsNavDrawerFrag = (FileListNavDrawerFragment)
-                getSupportFragmentManager().findFragmentById(
-                        R.id.navigation_drawer);
-        itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
-
-        Intent intent = getIntent();
-        itsIsCloseOnOpen = intent.getBooleanExtra(INTENT_EXTRA_CLOSE_ON_OPEN,
-                                                  false);
+        setContentView(R.layout.activity_launcher_file_shortcuts);
 
         FragmentManager fragMgr = getSupportFragmentManager();
         FragmentTransaction txn = fragMgr.beginTransaction();
@@ -68,13 +53,6 @@ public abstract class AbstractFileListActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             setFileChooseFrag();
         }
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState)
-    {
-        itsNavDrawerFrag.onPostCreate();
-        super.onPostCreate(savedInstanceState);
     }
 
     /* (non-Javadoc)
