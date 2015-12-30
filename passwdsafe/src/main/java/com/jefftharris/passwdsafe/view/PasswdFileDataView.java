@@ -479,7 +479,8 @@ public class PasswdFileDataView
         String uuid = itsFileData.getUUID(rec.itsRecord);
 
         return new PasswdRecordListData(title, user, uuid, rec.itsMatch,
-                                        R.drawable.contact_rev, rec.itsRecord);
+                                        R.drawable.ic_action_person_outline,
+                                        rec.itsRecord);
     }
 
 
