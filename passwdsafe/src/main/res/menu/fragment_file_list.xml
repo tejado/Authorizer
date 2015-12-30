@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/menu_parent"
-        android:icon="@drawable/arrow_up"
+        android:icon="@drawable/ic_action_up"
         android:title="@string/parent_directory"/>
 
 </menu>
