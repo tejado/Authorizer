@@ -20,6 +20,8 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.util.ObjectHolder;
 
 /**
  * Fragment for showing app 'about' information
@@ -39,6 +41,7 @@ public class AboutFragment extends Fragment
     }
 
     private Listener itsListener;
+    private View itsFileDetailsGroup;
     private TextView itsFile;
     private TextView itsPermissions;
     private TextView itsNumRecords;
@@ -72,6 +75,7 @@ public class AboutFragment extends Fragment
                                          container, false);
 
         AboutDialog.updateAboutFields(rootView, null, getContext());
+        itsFileDetailsGroup = rootView.findViewById(R.id.file_details_group);
         itsFile = (TextView)rootView.findViewById(R.id.file);
         itsPermissions = (TextView)rootView.findViewById(R.id.permissions);
         itsNumRecords = (TextView)rootView.findViewById(R.id.num_records);
@@ -90,11 +94,13 @@ public class AboutFragment extends Fragment
         super.onResume();
         itsListener.updateViewAbout();
 
+        final ObjectHolder<Boolean> called = new ObjectHolder<>(false);
         itsListener.useFileData(new PasswdFileDataUser()
         {
             @Override
             public void useFileData(@NonNull PasswdFileData fileData)
             {
+                called.set(true);
                 itsFile.setText(fileData.getUri().toString());
                 itsPermissions.setText(fileData.canEdit() ?
                                        R.string.read_write : R.string.read_only);
@@ -127,6 +133,7 @@ public class AboutFragment extends Fragment
                 }
             }
         });
+        GuiUtils.setVisible(itsFileDetailsGroup, called.get());
     }
 
     @Override
