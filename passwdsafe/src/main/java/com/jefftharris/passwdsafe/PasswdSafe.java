@@ -348,27 +348,28 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        if (!itsNavDrawerFrag.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.activity_passwdsafe, menu);
-            restoreActionBar();
-
-            // Get the SearchView and set the searchable configuration
-            SearchManager searchManager =
-                    (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-            itsSearchItem = menu.findItem(R.id.menu_search);
-            MenuItemCompat.collapseActionView(itsSearchItem);
-            SearchView searchView = (SearchView)
-                    MenuItemCompat.getActionView(itsSearchItem);
-            searchView.setSearchableInfo(
-                    searchManager.getSearchableInfo(getComponentName()));
-            searchView.setIconifiedByDefault(true);
-
-            return true;
+        if (itsNavDrawerFrag.isDrawerOpen()) {
+            return super.onCreateOptionsMenu(menu);
         }
-        return super.onCreateOptionsMenu(menu);
+
+        // Only show items in the action bar relevant to this screen
+        // if the drawer is not showing. Otherwise, let the drawer
+        // decide what to show in the action bar.
+        getMenuInflater().inflate(R.menu.activity_passwdsafe, menu);
+        restoreActionBar();
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager =
+                (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        itsSearchItem = menu.findItem(R.id.menu_search);
+        MenuItemCompat.collapseActionView(itsSearchItem);
+        SearchView searchView = (SearchView)
+                MenuItemCompat.getActionView(itsSearchItem);
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true);
+
+        return true;
     }
 
     @Override
