@@ -10,7 +10,9 @@ package com.jefftharris.passwdsafe;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +29,23 @@ import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
  */
 public class FileListActivity extends AbstractFileListActivity
 {
+    private static final String STATE_TITLE = "title";
+
     private static final String TAG = "FileListActivity";
+
+    private CharSequence itsTitle;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            itsTitle = savedInstanceState.getCharSequence(STATE_TITLE);
+        }
+        if (itsTitle == null) {
+            itsTitle = getTitle();
+        }
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
@@ -39,6 +57,12 @@ public class FileListActivity extends AbstractFileListActivity
         ReleaseNotesDialog.checkNotes(this);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(STATE_TITLE, itsTitle);
+    }
 
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
@@ -46,8 +70,16 @@ public class FileListActivity extends AbstractFileListActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        if (itsNavDrawerFrag.isDrawerOpen()) {
+            return super.onCreateOptionsMenu(menu);
+        }
+
+        // Only show items in the action bar relevant to this screen
+        // if the drawer is not showing. Otherwise, let the drawer
+        // decide what to show in the action bar.
         getMenuInflater().inflate(R.menu.activity_file_list, menu);
 
+        // TODO: set ifRoom in menu
         MenuItem item = menu.findItem(R.id.menu_preferences);
         item.setIntent(new Intent(this, PreferencesActivity.class));
         MenuItemCompat.setShowAsAction(item,
@@ -57,7 +89,8 @@ public class FileListActivity extends AbstractFileListActivity
         MenuItemCompat.setShowAsAction(item,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        return super.onCreateOptionsMenu(menu);
+        restoreActionBar();
+        return true;
     }
 
     /* (non-Javadoc)
@@ -67,6 +100,13 @@ public class FileListActivity extends AbstractFileListActivity
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
+        case android.R.id.home: {
+            if (itsNavDrawerFrag.isDrawerEnabled()) {
+                return super.onOptionsItemSelected(item);
+            }
+            onBackPressed();
+            return true;
+        }
         case R.id.menu_about: {
             AboutDialog dlg = AboutDialog.newInstance(null);
             dlg.show(getSupportFragmentManager(), "AboutDialog");
@@ -117,5 +157,17 @@ public class FileListActivity extends AbstractFileListActivity
     public boolean activityHasNoneItem()
     {
         return false;
+    }
+
+    /**
+     * Restore the action bar from the nav drawer
+     */
+    private void restoreActionBar()
+    {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setTitle(itsTitle);
+        }
     }
 }
