@@ -11,13 +11,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
@@ -79,16 +77,6 @@ public class FileListActivity extends AbstractFileListActivity
         // decide what to show in the action bar.
         getMenuInflater().inflate(R.menu.activity_file_list, menu);
 
-        // TODO: set ifRoom in menu
-        MenuItem item = menu.findItem(R.id.menu_preferences);
-        item.setIntent(new Intent(this, PreferencesActivity.class));
-        MenuItemCompat.setShowAsAction(item,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
-        item = menu.findItem(R.id.menu_about);
-        MenuItemCompat.setShowAsAction(item,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
         restoreActionBar();
         return true;
     }
@@ -105,11 +93,6 @@ public class FileListActivity extends AbstractFileListActivity
                 return super.onOptionsItemSelected(item);
             }
             onBackPressed();
-            return true;
-        }
-        case R.id.menu_about: {
-            AboutDialog dlg = AboutDialog.newInstance(null);
-            dlg.show(getSupportFragmentManager(), "AboutDialog");
             return true;
         }
         default: {
