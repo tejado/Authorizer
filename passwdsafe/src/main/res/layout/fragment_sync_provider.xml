@@ -4,8 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <View
-        style="@style/Separator.Light"/>
+    <View style="@style/Separator.Accent"
+          android:layout_marginBottom="8dp"
+          android:layout_marginTop="8dp"/>
 
     <ListView
         android:id="@android:id/list"
