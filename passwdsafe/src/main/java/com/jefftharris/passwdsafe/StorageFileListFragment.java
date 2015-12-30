@@ -150,18 +150,6 @@ public final class StorageFileListFragment extends ListFragment
         lm.initLoader(LOADER_FILES, null, this);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onResume()
-     */
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
-        app.closeOpenFile();
-    }
-
-
     @Override
     public void onDestroy()
     {
