@@ -1155,7 +1155,7 @@ public class PasswdSafe extends AppCompatActivity
                     txn.replace(R.id.content, contentFrag);
                 } else {
                     Fragment currFrag = fragMgr.findFragmentById(R.id.content);
-                    if (currFrag != null) {
+                    if ((currFrag != null) && currFrag.isAdded()) {
                         txn.remove(currFrag);
                     }
                 }
