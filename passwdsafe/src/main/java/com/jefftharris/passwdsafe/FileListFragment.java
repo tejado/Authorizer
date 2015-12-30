@@ -39,6 +39,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
@@ -50,7 +51,8 @@ import com.jefftharris.passwdsafe.util.FileComparator;
  */
 public final class FileListFragment extends ListFragment
         implements LoaderCallbacks<List<Map<String, Object>>>,
-                   View.OnClickListener
+                   View.OnClickListener,
+                   View.OnLongClickListener
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -134,8 +136,10 @@ public final class FileListFragment extends ListFragment
 
         View v = view.findViewById(R.id.current_group_panel);
         v.setOnClickListener(this);
+        v.setOnLongClickListener(this);
         v = view.findViewById(R.id.home);
         v.setOnClickListener(this);
+        v.setOnLongClickListener(this);
 
         return view;
     }
@@ -268,6 +272,24 @@ public final class FileListFragment extends ListFragment
             break;
         }
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.current_group_panel: {
+            Toast.makeText(getContext(), R.string.parent_directory,
+                           Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        case R.id.home: {
+            Toast.makeText(getContext(), R.string.home,
+                           Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        }
+        return false;
     }
 
     /** Create a loader for files */

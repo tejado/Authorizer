@@ -17,20 +17,22 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
-                    android:focusable="true">
+                    android:focusable="true"
+                    android:longClickable="true">
 
         <ImageButton android:id="@+id/home"
-                   style="@style/Widget.AppCompat.ActionButton"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:layout_alignParentEnd="true"
-                   android:layout_alignParentRight="true"
-                   android:layout_centerVertical="true"
-                   android:contentDescription="@string/home"
-                   android:minHeight="48dp"
-                   android:minWidth="48dp"
-                   android:scaleType="center"
-                   android:src="@drawable/ic_action_home_dark"/>
+                     style="@style/Widget.AppCompat.ActionButton"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_alignParentEnd="true"
+                     android:layout_alignParentRight="true"
+                     android:layout_centerVertical="true"
+                     android:contentDescription="@string/home"
+                     android:longClickable="true"
+                     android:minHeight="48dp"
+                     android:minWidth="48dp"
+                     android:scaleType="center"
+                     android:src="@drawable/ic_action_home_dark"/>
 
         <TextView android:id="@+id/current_group_label"
                   android:layout_width="fill_parent"
