@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
@@ -26,6 +27,7 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 public abstract class AbstractFileListActivity extends AppCompatActivity
         implements FileListFragment.Listener,
+                   FileListNavDrawerFragment.Listener,
                    StorageFileListFragment.Listener,
                    SyncProviderFragment.Listener,
                    SyncProviderFilesFragment.Listener
@@ -36,6 +38,7 @@ public abstract class AbstractFileListActivity extends AppCompatActivity
     private static final String TAG = "AbstractFileListActivity";
 
     protected boolean itsIsCloseOnOpen = false;
+    protected FileListNavDrawerFragment itsNavDrawerFrag;
     private Boolean itsIsStorageFrag = null;
 
 
@@ -47,6 +50,11 @@ public abstract class AbstractFileListActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_list);
+
+        itsNavDrawerFrag = (FileListNavDrawerFragment)
+                getSupportFragmentManager().findFragmentById(
+                        R.id.navigation_drawer);
+        itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
 
         Intent intent = getIntent();
         itsIsCloseOnOpen = intent.getBooleanExtra(INTENT_EXTRA_CLOSE_ON_OPEN,
@@ -62,6 +70,12 @@ public abstract class AbstractFileListActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState)
+    {
+        itsNavDrawerFrag.onPostCreate();
+        super.onPostCreate(savedInstanceState);
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onResume()
@@ -94,6 +108,7 @@ public abstract class AbstractFileListActivity extends AppCompatActivity
     }
 
 
+    // TODO: need old back support?
     /* (non-Javadoc)
      * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
      */
