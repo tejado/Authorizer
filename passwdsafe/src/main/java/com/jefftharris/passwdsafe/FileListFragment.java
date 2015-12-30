@@ -49,7 +49,8 @@ import com.jefftharris.passwdsafe.util.FileComparator;
  * The FileListFragment allows the user to choose which file to open
  */
 public final class FileListFragment extends ListFragment
-        implements LoaderCallbacks<List<Map<String, Object>>>
+        implements LoaderCallbacks<List<Map<String, Object>>>,
+                   View.OnClickListener
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -131,26 +132,10 @@ public final class FileListFragment extends ListFragment
         View view = inflater.inflate(R.layout.fragment_file_list,
                                      container, false);
 
-        View.OnClickListener parentListener = new View.OnClickListener()
-        {
-            public final void onClick(View v)
-            {
-                doParentPressed();
-            }
-        };
-        View v = view.findViewById(R.id.up_icon);
-        v.setOnClickListener(parentListener);
-        v = view.findViewById(R.id.current_group_label);
-        v.setOnClickListener(parentListener);
-
+        View v = view.findViewById(R.id.current_group_panel);
+        v.setOnClickListener(this);
         v = view.findViewById(R.id.home);
-        v.setOnClickListener(new View.OnClickListener()
-        {
-            public final void onClick(View v)
-            {
-                doHomePressed();
-            }
-        });
+        v.setOnClickListener(this);
 
         return view;
     }
@@ -195,6 +180,7 @@ public final class FileListFragment extends ListFragment
         inflater.inflate(R.menu.fragment_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
+        // TODO: update menus for ifRoom
         MenuItem mi = menu.findItem(R.id.menu_file_new);
         MenuItemCompat.setShowAsAction(mi,
                                        MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
@@ -266,6 +252,21 @@ public final class FileListFragment extends ListFragment
         } else {
             PasswdSafeUtil.dbginfo(TAG, "Open file: %s", file.itsFile);
             openFile(file.itsFile);
+        }
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.current_group_panel: {
+            doParentPressed();
+            break;
+        }
+        case R.id.home: {
+            doHomePressed();
+            break;
+        }
         }
     }
 
@@ -416,13 +417,6 @@ public final class FileListFragment extends ListFragment
             groupPanel.setVisibility(View.VISIBLE);
             groupLabel.setText(itsDir.toString());
             emptyLabel.setText(R.string.no_files);
-        }
-
-        View selectFileLabel = rootView.findViewById(R.id.select_file_label);
-        if ((adapter != null) && !adapter.isEmpty()) {
-            selectFileLabel.setVisibility(View.VISIBLE);
-        } else {
-            selectFileLabel.setVisibility(View.GONE);
         }
 
         setListAdapter(adapter);
