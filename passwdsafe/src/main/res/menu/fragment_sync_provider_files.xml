@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/menu_sync_files"
-        android:icon="@drawable/ic_menu_refresh"
+        android:icon="@drawable/ic_action_sync"
         android:title="@string/sync"/>
 
     <item

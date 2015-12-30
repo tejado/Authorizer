@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/menu_sync"
-        android:icon="@drawable/ic_menu_refresh"
+        android:icon="@drawable/ic_action_sync"
         android:orderInCategory="50"
         android:title="@string/sync"/>
 
