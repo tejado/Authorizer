@@ -25,7 +25,6 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 public abstract class AbstractFileListActivity extends AppCompatActivity
         implements FileListFragment.Listener,
-                   FileListNavDrawerFragment.Listener,
                    StorageFileListFragment.Listener,
                    SyncProviderFragment.Listener,
                    SyncProviderFilesFragment.Listener
