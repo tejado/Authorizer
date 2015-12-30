@@ -62,6 +62,9 @@ public final class FileListFragment extends ListFragment
 
         /** Does the activity have a 'none' item */
         boolean activityHasNoneItem();
+
+        /** Update the view for a list of files */
+        void updateViewFiles();
     }
 
     /** File data information for the list */
@@ -181,6 +184,7 @@ public final class FileListFragment extends ListFragment
         app.closeOpenFile();
         itsDirHistory.clear();
         showFiles();
+        itsListener.updateViewFiles();
     }
 
 
