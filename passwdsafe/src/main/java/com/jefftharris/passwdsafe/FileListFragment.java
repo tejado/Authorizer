@@ -180,8 +180,6 @@ public final class FileListFragment extends ListFragment
     public void onResume()
     {
         super.onResume();
-        PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
-        app.closeOpenFile();
         itsDirHistory.clear();
         showFiles();
         itsListener.updateViewFiles();

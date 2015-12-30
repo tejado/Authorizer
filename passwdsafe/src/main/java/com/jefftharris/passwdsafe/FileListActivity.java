@@ -71,8 +71,6 @@ public class FileListActivity extends AppCompatActivity
         VIEW_PREFERENCES
     }
 
-    // TODO: handle pref changes
-
     private FileListNavDrawerFragment itsNavDrawerFrag;
     private boolean itsIsCloseOnOpen = false;
     private CharSequence itsTitle;
