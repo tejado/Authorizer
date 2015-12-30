@@ -528,7 +528,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
         recInfo.put(RECORD, rec.itsRecord);
         recInfo.put(MATCH, rec.itsMatch);
         recInfo.put(USERNAME, user);
-        recInfo.put(ICON, R.drawable.contact_rev);
+        recInfo.put(ICON, R.drawable.ic_action_person_outline);
         return recInfo;
     }
 
