@@ -203,7 +203,7 @@ public abstract class AbstractPasswdSafeActivity extends AbstractPasswdFileListA
     protected void addParentMenuItem(Menu menu)
     {
         MenuItem mi = menu.add(0, MENU_PARENT, 0, R.string.parent_group);
-        mi.setIcon(R.drawable.arrow_up);
+        mi.setIcon(R.drawable.ic_action_up);
     }
 
 
