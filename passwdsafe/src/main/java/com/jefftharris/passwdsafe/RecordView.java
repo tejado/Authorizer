@@ -33,10 +33,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -85,42 +82,6 @@ public class RecordView extends AbstractRecordTabActivity
     //private static final int TAB_PASSWORD = 1;
     private static final int TAB_NOTES = 2;
 
-    private static final int NOTES_ICON_LEVEL_BASE = 0;
-    private static final int NOTES_ICON_LEVEL_NOTES = 1;
-
-    @SuppressWarnings("deprecation")
-    private class NotesTabDrawable extends StateListDrawable
-    {
-        public NotesTabDrawable(Resources res)
-        {
-            addState(new int[] { android.R.attr.state_selected },
-                     res.getDrawable(R.drawable.ic_tab_attachment_selected));
-            addState(new int[] { },
-                     res.getDrawable(R.drawable.ic_tab_attachment_normal));
-        }
-
-        @Override
-        protected boolean onStateChange(int[] stateSet)
-        {
-            boolean rc = super.onStateChange(stateSet);
-
-            Drawable draw = getCurrent();
-            if (draw != null) {
-                draw.setLevel(itsHasNotes ? NOTES_ICON_LEVEL_NOTES :
-                                            NOTES_ICON_LEVEL_BASE);
-                rc = true;
-            }
-
-            return rc;
-        }
-
-        @Override
-        public boolean isStateful()
-        {
-            return true;
-        }
-    }
-
     private boolean isPasswordShown = false;
     private TextView itsPasswordView;
     private String itsHiddenPasswordStr;
@@ -129,7 +90,6 @@ public class RecordView extends AbstractRecordTabActivity
     private boolean itsHasNotes = false;
     private boolean itsHasReferences = false;
     private boolean itsIsProtected = false;
-    private Drawable itsNotesTabDrawable;
     private DialogValidator itsDeleteValidator;
 
 
@@ -159,25 +119,21 @@ public class RecordView extends AbstractRecordTabActivity
 
         setContentView(R.layout.record_view);
 
-        Resources res = getResources();
         TabHost tabHost = getTabHost();
         TabHost.TabSpec spec;
 
         spec = tabHost.newTabSpec("basic")
-            .setIndicator(getString(R.string.basic),
-                          res.getDrawable(R.drawable.ic_tab_contact))
+            .setIndicator(getString(R.string.basic))
             .setContent(R.id.basic_tab);
         tabHost.addTab(spec);
 
         spec = tabHost.newTabSpec("password")
-            .setIndicator(getString(R.string.password),
-                          res.getDrawable(R.drawable.ic_tab_account_list))
+            .setIndicator(getString(R.string.password))
             .setContent(R.id.password_tab);
         tabHost.addTab(spec);
 
-        itsNotesTabDrawable = new NotesTabDrawable(res);
         spec = tabHost.newTabSpec("notes")
-            .setIndicator(getString(R.string.notes), itsNotesTabDrawable)
+            .setIndicator(getString(R.string.notes))
             .setContent(R.id.notes_tab);
         tabHost.addTab(spec);
 
@@ -900,9 +856,6 @@ public class RecordView extends AbstractRecordTabActivity
         }
         }
 
-        int[] currState = itsNotesTabDrawable.getState();
-        itsNotesTabDrawable.setState(new int[currState.length + 1]);
-        itsNotesTabDrawable.setState(currState);
         View notesTab = tabs.getChildAt(TAB_NOTES);
         View notesTitle = notesTab.findViewById(android.R.id.title);
         notesTab.setEnabled(itsHasNotes);
