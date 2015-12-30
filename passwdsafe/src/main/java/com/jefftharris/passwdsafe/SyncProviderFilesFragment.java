@@ -18,7 +18,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.TextUtils;
 import android.util.Log;
@@ -246,15 +245,6 @@ public class SyncProviderFilesFragment extends ListFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.fragment_sync_provider_files, menu);
-
-        MenuItem mi = menu.findItem(R.id.menu_sync_files);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
-        mi = menu.findItem(R.id.menu_file_new);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
         super.onCreateOptionsMenu(menu, inflater);
     }
 
