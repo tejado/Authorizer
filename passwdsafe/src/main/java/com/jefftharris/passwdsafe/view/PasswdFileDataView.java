@@ -348,8 +348,6 @@ public class PasswdFileDataView
      */
     private synchronized void rebuildView()
     {
-        // TODO: rebuild in background?
-
         itsRootNode = new GroupNode();
         itsNumExpired = 0;
         if (itsFileData == null) {

@@ -74,7 +74,7 @@ import java.util.TreeSet;
  * Fragment for editing a password record
  */
 public class PasswdSafeEditRecordFragment
-        extends AbstractPasswdSafeFileDataFragment
+        extends AbstractPasswdSafeLocationFragment
                         <PasswdSafeEditRecordFragment.Listener>
         implements NewGroupDialog.Listener,
                    View.OnClickListener,
