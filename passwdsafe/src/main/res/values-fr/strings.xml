@@ -242,7 +242,7 @@
     <string name="shortcut_base_record_header">RACCOURCI</string>
     <string name="shortcut_base_record_label">Raccourci</string>
     <string name="shortcut_file">Fichier de raccourci</string>
-    <string name="shortcut_choose_record">Choisir l\'entrée de mot de passe</string>
+    <string name="shortcut_record">Entrée raccourci</string>
     <string name="show_backup_files">Afficher les sauvegardes</string>
     <string name="show_password">Afficher mot de passe</string>
     <string name="show_passwords">Afficher mots de passe</string>
