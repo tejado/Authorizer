@@ -666,9 +666,19 @@ public class PasswdSafe extends AppCompatActivity
         PasswdSafeUtil.dbginfo(TAG, "handleFileOpen: %s, rec: %s",
                                fileData.getUri(), recToOpen);
 
-        // TODO: recToOpen
         itsFileDataFrag.setFileData(fileData);
         changeOpenView(itsLocation, true);
+
+        // Jump to record to open if given
+        if (!TextUtils.isEmpty(recToOpen)) {
+            PwsRecord rec = fileData.getRecord(recToOpen);
+            if (rec != null) {
+                changeLocation(new PasswdLocation(rec, fileData));
+            } else {
+                Toast.makeText(this, R.string.record_not_found,
+                               Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     /**
