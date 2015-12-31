@@ -5,6 +5,7 @@
     <string name="add_record">Add Record</string>
     <string name="alias_base_record_header">ALIAS</string>
     <string name="alias_base_record_label">Alias</string>
+    <string name="alias_to_same_record">Alias to the same record</string>
     <string name="any_changes_will_be_lost">Any changes to the record will be lost.</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">PasswdSafe</string>
@@ -241,6 +242,7 @@
     <string name="shortcut_base_record_label">Shortcut</string>
     <string name="shortcut_file">Shortcut file</string>
     <string name="shortcut_record">Shortcut record</string>
+    <string name="shortcut_to_same_record">Shortcut to the same record</string>
     <string name="show_backup_files">Show backup files</string>
     <string name="show_password">Show Password</string>
     <string name="show_passwords">Show Passwords</string>

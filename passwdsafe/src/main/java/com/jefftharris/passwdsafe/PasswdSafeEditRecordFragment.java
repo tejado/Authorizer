@@ -103,12 +103,13 @@ public class PasswdSafeEditRecordFragment
     private int itsPrevGroupPos = -1;
     private final HashSet<RecordKey> itsRecordKeys = new HashSet<>();
     private final ArrayList<View> itsProtectViews = new ArrayList<>();
+    private String itsUuid;
     private boolean itsIsProtected = false;
     private PasswdRecord.Type itsRecType = PasswdRecord.Type.NORMAL;
     private boolean itsTypeHasNormalPassword = true;
     private boolean itsTypeHasDetails = true;
     private PasswdRecord.Type itsRecOrigType = PasswdRecord.Type.NORMAL;
-    private PwsRecord itsReferencedRec = null;
+    private String itsReferencedRecUuid = null;
     private List<PasswdPolicy> itsPolicies;
     private PasswdPolicy itsOrigPolicy;
     private PasswdPolicy itsCurrPolicy;
@@ -668,8 +669,6 @@ public class PasswdSafeEditRecordFragment
             (resultCode == Activity.RESULT_OK)) {
             final String uuid =
                     data.getStringExtra(PasswdSafeApp.RESULT_DATA_UUID);
-
-            // TODO: can't have alias/shortcut to self
             useRecordFile(new RecordFileUser()
             {
                 @Override
@@ -705,6 +704,7 @@ public class PasswdSafeEditRecordFragment
                 String group;
                 if (info != null) {
                     record = info.itsRec;
+                    itsUuid = fileData.getUUID(record);
                     itsIsV3 = fileData.isV3();
                     itsTitle.setText(fileData.getTitle(record));
                     group = fileData.getGroup(record);
@@ -724,6 +724,7 @@ public class PasswdSafeEditRecordFragment
                     }
                 } else {
                     record = null;
+                    itsUuid = null;
                     itsIsV3 = fileData.isV3();
                     group = getLocation().getRecordGroup();
                 }
@@ -1080,9 +1081,14 @@ public class PasswdSafeEditRecordFragment
      */
     private void setLinkRef(PwsRecord ref, PasswdFileData fileData)
     {
-        itsReferencedRec = ref;
-        String id = (itsReferencedRec != null) ?
-                    fileData.getId(itsReferencedRec) : "";
+        String id;
+        if (ref != null) {
+            itsReferencedRecUuid = fileData.getUUID(ref);
+            id = fileData.getId(ref);
+        } else {
+            itsReferencedRecUuid = null;
+            id = "";
+        }
         itsLinkRef.setText(id);
         itsValidator.validate();
     }
@@ -1354,8 +1360,8 @@ public class PasswdSafeEditRecordFragment
             }
             }
         } else {
-            newPasswd = PasswdRecord.uuidToPasswd(
-                    fileData.getUUID(itsReferencedRec), itsRecType);
+            newPasswd = PasswdRecord.uuidToPasswd(itsReferencedRecUuid,
+                                                  itsRecType);
             if (newPasswd.equals(currPasswd)) {
                 newPasswd = null;
             }
@@ -1598,14 +1604,22 @@ public class PasswdSafeEditRecordFragment
                 break;
             }
             case ALIAS: {
-                if (itsReferencedRec == null) {
+                if (itsReferencedRecUuid == null) {
                     typeError = getString(R.string.no_alias_chosen);
+                    break;
+                }
+                if (TextUtils.equals(itsReferencedRecUuid, itsUuid)) {
+                    typeError = getString(R.string.alias_to_same_record);
                 }
                 break;
             }
             case SHORTCUT: {
-                if (itsReferencedRec == null) {
+                if (itsReferencedRecUuid == null) {
                     typeError = getString(R.string.no_shortcut_chosen);
+                    break;
+                }
+                if (TextUtils.equals(itsReferencedRecUuid, itsUuid)) {
+                    typeError = getString(R.string.shortcut_to_same_record);
                 }
                 break;
             }
