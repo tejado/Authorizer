@@ -14,14 +14,4 @@
           android:title="@string/new_local_file"
           app:showAsAction="ifRoom"/>
 
-    <item
-        android:id="@+id/menu_home"
-        android:icon="@drawable/ic_action_home"
-        android:title="@string/home"/>
-
-    <item
-        android:id="@+id/menu_parent"
-        android:icon="@drawable/ic_action_up"
-        android:title="@string/parent_directory"/>
-
 </menu>
