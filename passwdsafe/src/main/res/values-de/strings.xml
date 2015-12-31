@@ -5,6 +5,7 @@
     <string name="add_record">Eintrag hinzufügen</string>
     <string name="alias_base_record_header">ALIAS</string>
     <string name="alias_base_record_label">Alias</string>
+    <string name="alias_to_same_record">Alias auf den gleichen Eintrag</string>
     <string name="any_changes_will_be_lost">Alle Änderungen an der Eintrag wird gelöscht.</string>
     <string name="app_desc">Programm zum Zugriff und Bearbeiten von PasswordSafe-Datenbanken auf Android</string>
     <string name="app_name">PasswdSafe</string>
@@ -243,6 +244,7 @@
     <string name="shortcut_base_record_label">Verknüpfung</string>
     <string name="shortcut_file">Verknüpfungsdatei</string>
     <string name="shortcut_record">Verknüpfung Eintrag</string>
+    <string name="shortcut_to_same_record">Verknüpfung zu dem gleichen Eintrag</string>
     <string name="show_backup_files">Backups anzeigen</string>
     <string name="show_password">Passwort anzeigen</string>
     <string name="show_passwords">Passwörter anzeigen</string>
