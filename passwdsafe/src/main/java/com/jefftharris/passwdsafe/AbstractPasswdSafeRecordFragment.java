@@ -21,7 +21,7 @@ import java.util.Date;
  * Base class for showing fields of a password record
  */
 public abstract class AbstractPasswdSafeRecordFragment
-        extends AbstractPasswdSafeFileDataFragment
+        extends AbstractPasswdSafeLocationFragment
                         <AbstractPasswdSafeRecordFragment.Listener>
 {
     /**

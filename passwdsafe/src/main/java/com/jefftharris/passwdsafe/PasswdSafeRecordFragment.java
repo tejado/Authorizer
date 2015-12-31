@@ -34,7 +34,7 @@ import java.util.List;
  * Fragment showing a password record
  */
 public class PasswdSafeRecordFragment
-        extends AbstractPasswdSafeFileDataFragment
+        extends AbstractPasswdSafeLocationFragment
                         <PasswdSafeRecordFragment.Listener>
 {
     /**

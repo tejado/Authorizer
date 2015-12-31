@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -35,7 +37,9 @@ import java.util.Date;
 /**
  * Fragment for password expiration information
  */
-public class PasswdSafeExpirationsFragment extends Fragment
+public class PasswdSafeExpirationsFragment
+        extends AbstractPasswdSafeFileDataFragment
+                        <PasswdSafeExpirationsFragment.Listener>
         implements AdapterView.OnItemClickListener,
                    CompoundButton.OnCheckedChangeListener,
                    ConfirmPromptDialog.Listener,
@@ -57,7 +61,6 @@ public class PasswdSafeExpirationsFragment extends Fragment
 
     private static final String TAG = "PasswdSafeExpirationsFragment";
 
-    private Listener itsListener;
     private CheckBox itsEnableExpiryNotifs;
 
     /**
@@ -66,13 +69,6 @@ public class PasswdSafeExpirationsFragment extends Fragment
     public static PasswdSafeExpirationsFragment newInstance()
     {
         return new PasswdSafeExpirationsFragment();
-    }
-
-    @Override
-    public void onAttach(Context ctx)
-    {
-        super.onAttach(ctx);
-        itsListener = (Listener)ctx;
     }
 
     @Override
@@ -95,15 +91,8 @@ public class PasswdSafeExpirationsFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewExpirations();
+        getListener().updateViewExpirations();
         refresh();
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        itsListener = null;
     }
 
     @Override
@@ -120,7 +109,7 @@ public class PasswdSafeExpirationsFragment extends Fragment
         case IN_A_MONTH:
         case IN_A_YEAR:
         case ANY: {
-            itsListener.setRecordExpiryFilter(filter, null);
+            getListener().setRecordExpiryFilter(filter, null);
             break;
         }
         case CUSTOM: {
@@ -161,14 +150,15 @@ public class PasswdSafeExpirationsFragment extends Fragment
     @Override
     public void handleDatePicked(int year, int monthOfYear, int dayOfMonth)
     {
-        if (itsListener == null) {
+        Listener listener = getListener();
+        if (listener == null) {
             return;
         }
         Calendar date = Calendar.getInstance();
         date.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
         date.set(Calendar.MILLISECOND, 0);
         date.add(Calendar.DAY_OF_MONTH, 1);
-        itsListener.setRecordExpiryFilter(
+        listener.setRecordExpiryFilter(
                 PasswdRecordFilter.ExpiryFilter.CUSTOM, date.getTime());
     }
 
@@ -184,13 +174,18 @@ public class PasswdSafeExpirationsFragment extends Fragment
         refresh();
     }
 
+    @Override
+    protected void doOnCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+    }
+
     /**
      * Refresh the view
      */
     private void refresh()
     {
         final ObjectHolder<Pair<Boolean, Boolean>> rc = new ObjectHolder<>();
-        itsListener.useFileData(new PasswdFileDataUser()
+        getListener().useFileData(new PasswdFileDataUser()
         {
             @Override
             public void useFileData(@NonNull PasswdFileData fileData)
@@ -219,7 +214,7 @@ public class PasswdSafeExpirationsFragment extends Fragment
      */
     private void setExpiryNotif(final boolean enabled)
     {
-        itsListener.useFileData(new PasswdFileDataUser()
+        getListener().useFileData(new PasswdFileDataUser()
         {
             @Override
             public void useFileData(@NonNull PasswdFileData fileData)
