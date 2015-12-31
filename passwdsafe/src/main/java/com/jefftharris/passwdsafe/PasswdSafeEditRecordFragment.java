@@ -495,7 +495,7 @@ public class PasswdSafeEditRecordFragment
             Intent intent = new Intent(PasswdSafeApp.CHOOSE_RECORD_INTENT,
                                        getActivity().getIntent().getData(),
                                        getContext(),
-                                       RecordSelectionActivity.class);
+                                       LauncherRecordShortcuts.class);
             // Do not allow mixed alias and shortcut references to a
             // record to work around a bug in Password Safe that does
             // not allow both
@@ -504,12 +504,12 @@ public class PasswdSafeEditRecordFragment
                 break;
             }
             case ALIAS: {
-                intent.putExtra(RecordSelectionActivity.FILTER_NO_SHORTCUT,
+                intent.putExtra(LauncherRecordShortcuts.FILTER_NO_SHORTCUT,
                                 true);
                 break;
             }
             case SHORTCUT: {
-                intent.putExtra(RecordSelectionActivity.FILTER_NO_ALIAS, true);
+                intent.putExtra(LauncherRecordShortcuts.FILTER_NO_ALIAS, true);
                 break;
             }
             }
@@ -669,12 +669,14 @@ public class PasswdSafeEditRecordFragment
             final String uuid =
                     data.getStringExtra(PasswdSafeApp.RESULT_DATA_UUID);
 
-            useRecordInfo(new RecordInfoUser()
+            // TODO: can't have alias/shortcut to self
+            useRecordFile(new RecordFileUser()
             {
                 @Override
-                public void useRecordInfo(@NonNull RecordInfo info)
+                public void useFile(@Nullable RecordInfo info,
+                                    @NonNull PasswdFileData fileData)
                 {
-                    setLinkRef(info.itsFileData.getRecord(uuid), info);
+                    setLinkRef(fileData.getRecord(uuid), fileData);
                 }
             });
         } else {
@@ -790,7 +792,7 @@ public class PasswdSafeEditRecordFragment
                                           itsPasswordConfirm);
 
         if (itsIsV3) {
-            setLinkRef(linkRef, info);
+            setLinkRef(linkRef, (info != null) ? info.itsFileData : null);
         } else {
             GuiUtils.setVisible(itsTypeGroup, false);
         }
@@ -1076,11 +1078,11 @@ public class PasswdSafeEditRecordFragment
     /**
      * Set the link to another record
      */
-    private void setLinkRef(PwsRecord ref, RecordInfo info)
+    private void setLinkRef(PwsRecord ref, PasswdFileData fileData)
     {
         itsReferencedRec = ref;
         String id = (itsReferencedRec != null) ?
-                info.itsFileData.getId(itsReferencedRec) : "";
+                    fileData.getId(itsReferencedRec) : "";
         itsLinkRef.setText(id);
         itsValidator.validate();
     }
