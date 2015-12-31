@@ -186,19 +186,6 @@ public final class FileListFragment extends ListFragment
 
 
     /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onPrepareOptionsMenu(android.view.Menu)
-     */
-    @Override
-    public void onPrepareOptionsMenu(Menu menu)
-    {
-        MenuItem mi = menu.findItem(R.id.menu_parent);
-        if (mi != null) {
-            mi.setEnabled((itsDir != null) && (itsDir.getParentFile() != null));
-        }
-    }
-
-
-    /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem)
      */
     @Override
@@ -210,14 +197,6 @@ public final class FileListFragment extends ListFragment
                 startActivity(new Intent(PasswdSafeUtil.NEW_INTENT,
                                          Uri.fromFile(itsDir)));
             }
-            return true;
-        }
-        case R.id.menu_home: {
-            doHomePressed();
-            return true;
-        }
-        case R.id.menu_parent: {
-            doParentPressed();
             return true;
         }
         default: {
