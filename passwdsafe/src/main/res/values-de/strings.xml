@@ -242,7 +242,7 @@
     <string name="shortcut_base_record_header">VERKNÜPFUNG</string>
     <string name="shortcut_base_record_label">Verknüpfung</string>
     <string name="shortcut_file">Verknüpfungsdatei</string>
-    <string name="shortcut_choose_record">Passworteintrag für Verknüpfung auswählen</string>
+    <string name="shortcut_record">Verknüpfung Eintrag</string>
     <string name="show_backup_files">Backups anzeigen</string>
     <string name="show_password">Passwort anzeigen</string>
     <string name="show_passwords">Passwörter anzeigen</string>

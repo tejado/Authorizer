@@ -240,7 +240,7 @@
     <string name="shortcut_base_record_header">SHORTCUT</string>
     <string name="shortcut_base_record_label">Shortcut</string>
     <string name="shortcut_file">Shortcut file</string>
-    <string name="shortcut_choose_record">Choose shortcut password record</string>
+    <string name="shortcut_record">Shortcut record</string>
     <string name="show_backup_files">Show backup files</string>
     <string name="show_password">Show Password</string>
     <string name="show_passwords">Show Passwords</string>

@@ -49,6 +49,7 @@ public class PasswdFileDataView
         void visitRecord(PwsRecord record);
     }
 
+    // TODO: file data view shouldn't hold the file data
     private PasswdFileData itsFileData;
     private GroupNode itsRootNode;
     private GroupNode itsCurrGroupNode;
