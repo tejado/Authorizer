@@ -167,13 +167,12 @@ public class PasswdSafeEditRecordFragment
     private static final String STATE_EXPIRY_DATE = "expiryDate";
     private static final String STATE_HISTORY = "history";
     private static final String STATE_PROTECTED = "protected";
+    private static final String STATE_REFERENCED_RECORD = "referencedRecord";
 
      // Constants must match record_type strings
     private static final int TYPE_NORMAL = 0;
     private static final int TYPE_ALIAS = 1;
     private static final int TYPE_SHORTCUT = 2;
-
-    // TODO: fix RecordSelectionActivity for use in choosing alias/shortcut (and rotate support)
 
     /**
      * Create a new instance
@@ -328,6 +327,24 @@ public class PasswdSafeEditRecordFragment
             historyChanged(true);
         }
 
+        if (savedInstanceState.containsKey(STATE_REFERENCED_RECORD)) {
+            final String ref =
+                    savedInstanceState.getString(STATE_REFERENCED_RECORD);
+            // Delay setting the link reference to allow type selection change
+            // to occur which clears the reference
+            View root = getView();
+            if (root != null) {
+                root.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        setLinkRefUuid(ref);
+                    }
+                });
+            }
+        }
+
         GuiUtils.invalidateOptionsMenu(getActivity());
     }
 
@@ -350,6 +367,7 @@ public class PasswdSafeEditRecordFragment
         outState.putString(STATE_HISTORY,
                            (itsHistory != null) ? itsHistory.toString() : null);
         outState.putBoolean(STATE_PROTECTED, itsIsProtected);
+        outState.putString(STATE_REFERENCED_RECORD, itsReferencedRecUuid);
     }
 
     @Override
@@ -667,17 +685,7 @@ public class PasswdSafeEditRecordFragment
 
         if ((requestCode == RECORD_SELECTION_REQUEST) &&
             (resultCode == Activity.RESULT_OK)) {
-            final String uuid =
-                    data.getStringExtra(PasswdSafeApp.RESULT_DATA_UUID);
-            useRecordFile(new RecordFileUser()
-            {
-                @Override
-                public void useFile(@Nullable RecordInfo info,
-                                    @NonNull PasswdFileData fileData)
-                {
-                    setLinkRef(fileData.getRecord(uuid), fileData);
-                }
-            });
+            setLinkRefUuid(data.getStringExtra(PasswdSafeApp.RESULT_DATA_UUID));
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -1091,6 +1099,22 @@ public class PasswdSafeEditRecordFragment
         }
         itsLinkRef.setText(id);
         itsValidator.validate();
+    }
+
+    /**
+     * Set the link to another record by UUID
+     */
+    private void setLinkRefUuid(final String refUuid)
+    {
+        useRecordFile(new RecordFileUser()
+        {
+            @Override
+            public void useFile(@Nullable RecordInfo info,
+                                @NonNull PasswdFileData fileData)
+            {
+                setLinkRef(fileData.getRecord(refUuid), fileData);
+            }
+        });
     }
 
     /**
