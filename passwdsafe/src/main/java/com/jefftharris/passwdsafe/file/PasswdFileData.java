@@ -349,11 +349,6 @@ public class PasswdFileData
         return getField(rec, PwsRecordV3.PASSWORD);
     }
 
-    public final boolean hasPassword(PwsRecord rec)
-    {
-        return hasField(rec, PwsRecordV3.PASSWORD);
-    }
-
     public final void setPassword(String oldPasswd, String newPasswd,
                                   PwsRecord rec)
     {
@@ -717,11 +712,6 @@ public class PasswdFileData
             date = (Date)field.getValue();
         }
         return date;
-    }
-
-    private boolean hasField(PwsRecord rec, int fieldId)
-    {
-        return doGetRecField(rec, fieldId) != null;
     }
 
     private int getVersionFieldId(int fieldId)
