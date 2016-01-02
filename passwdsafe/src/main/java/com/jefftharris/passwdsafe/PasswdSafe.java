@@ -814,7 +814,7 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public void finishEditRecord(boolean save, PasswdLocation newLocation)
     {
-        saveFile(true, save, newLocation, null);
+        finishEdit(save, true, null, newLocation, null);
     }
 
     @Override
@@ -826,7 +826,7 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public void finishChangePassword()
     {
-        saveFile(true, true, null, null);
+        finishEdit(true, true, null, null, null);
     }
 
     @Override
@@ -860,7 +860,7 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public void finishPolicyEdit(Runnable postSaveRun)
     {
-        saveFile(false, true, null, postSaveRun);
+        finishEdit(true, false, null, null, postSaveRun);
     }
 
     @Override
@@ -919,8 +919,8 @@ public class PasswdSafe extends AppCompatActivity
                 }
             });
             if (removed.get()) {
-                saveFile(true, true, location.getRecord(),
-                         location.selectRecord(null), null);
+                finishEdit(true, true, location.getRecord(),
+                           location.selectRecord(null), null);
             }
             break;
         }
@@ -1014,26 +1014,17 @@ public class PasswdSafe extends AppCompatActivity
         });
 
         if (doSave.get()) {
-            saveFile(false, true, null, null);
+            finishEdit(true, false, null, null, null);
         }
     }
 
     /**
-     * Save the file
+     * Finish editing the file
      */
-    private void saveFile(boolean popBack, boolean save,
-                          PasswdLocation newLocation, Runnable postSaveRun)
-    {
-        saveFile(popBack, save, null, newLocation, postSaveRun);
-    }
-
-    /**
-     * Save the file
-     */
-    private void saveFile(final boolean popBack, final boolean save,
-                          final String popTag,
-                          final PasswdLocation newLocation,
-                          final Runnable postSaveRun)
+    private void finishEdit(final boolean save,
+                            final boolean popBack, final String popTag,
+                            final PasswdLocation newLocation,
+                            final Runnable postSaveRun)
     {
         Runnable saveRun = new Runnable()
         {
