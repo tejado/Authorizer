@@ -26,15 +26,12 @@
     <string name="close_file">Fermer le fichier</string>
     <string name="close_file_screen_off">Fermer le fichier à l\'extinction de l\'écran</string>
     <string name="confirm">Confirmer</string>
-    <string name="confirm_label">Confirmer:</string>
-    <string name="confirm_password_label">Confirmer mot de passe:</string>
     <string name="cannot_delete_record">Impossible de supprimer l\'entrée - %1$s"</string>
     <string name="content_file">Contenu du fichier</string>
     <string name="continue_str">Continuez</string>
     <string name="continue_p">Continuez?</string>
     <string name="copy_clipboard">Copier dans le Presse-papiers</string>
     <string name="copy_notes">Copier les notes</string>
-    <string name="copy_password">Copier le mot de passe</string>
     <string name="copy_user">Copier le nom d\'utilisateur</string>
     <string name="created">Créé</string>
     <string name="current">Actuel</string>
@@ -50,11 +47,9 @@
     <string name="delete">Supprimer</string>
     <string name="delete_file">Supprimer base de données</string>
     <string name="delete_file_msg">Supprimer le fichier \"%1$s\"?</string>
-    <string name="delete_file_title">Confirmer la suppression du fichier</string>
     <string name="delete_policy">Supprimer la stratégie</string>
     <string name="delete_policy_msg">Supprimer la stratégie \"%1$s\"?</string>
     <string name="delete_record_msg">Supprimer l\'entrée \"%1$s\"?</string>
-    <string name="details">Détails</string>
     <string name="directory_for_files">Répertoire des les fichiers</string>
     <string name="done">Valider</string>
     <string name="duplicate_entry">Dupliquer l\'entrée</string>
@@ -76,7 +71,6 @@
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Notifications d\'Expiration</string>
     <string name="expiration_notifications_warning">L\'activation des notifications d\'expiration implique que PasswdSafe stocke les informations d\'expiration dans un fichier (titre de l\'entrée, le groupe et la date d\'expiration). Ces informations sont stockées en clair sur l\'appareil, mais aucun mot de passe n\'y est stockés.</string>
-    <string name="expired_passwords">Mots de passe Expirés</string>
     <string name="expired_password_notification">Notification mot de passe expiré</string>
     <string name="expiring_password">Expiration mot de passe</string>
     <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
@@ -148,7 +142,6 @@
     <string name="new_local_file">Nouveau fichier local</string>
     <string name="new_onedrive_file">Nouveau fichier de OneDrive</string>
     <string name="new_owncloud_file">Nouveau fichier de ownCloud</string>
-    <string name="new_password_label">Nouveau mot de passe:</string>
     <string name="new_policy">Nouvelle stratégie</string>
     <string name="next">Suivant</string>
     <string name="no_alias_chosen">Aucun alias choisi</string>

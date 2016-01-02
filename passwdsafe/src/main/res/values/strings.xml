@@ -26,15 +26,12 @@
     <string name="close_file">Close File</string>
     <string name="close_file_screen_off">Close file on screen off</string>
     <string name="confirm">Confirm</string>
-    <string name="confirm_label">Confirm:</string>
-    <string name="confirm_password_label">Confirm Password:</string>
     <string name="cannot_delete_record">Cannot delete record - %1$s</string>
     <string name="content_file">Content File</string>
     <string name="continue_str">Continue</string>
     <string name="continue_p">Continue?</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
     <string name="copy_notes">Copy Notes</string>
-    <string name="copy_password">Copy Password</string>
     <string name="copy_user">Copy User Name</string>
     <string name="created">Created</string>
     <string name="current">Current</string>
@@ -50,11 +47,9 @@
     <string name="delete">Delete</string>
     <string name="delete_file">Delete File</string>
     <string name="delete_file_msg">Delete file \"%1$s\"?</string>
-    <string name="delete_file_title">Confirm File Deletion</string>
     <string name="delete_policy">Delete Policy</string>
     <string name="delete_policy_msg">Delete policy \"%1$s\"?</string>
     <string name="delete_record_msg">Delete record \"%1$s\"?</string>
-    <string name="details">Details</string>
     <string name="directory_for_files">Directory for files</string>
     <string name="done">Done</string>
     <string name="duplicate_entry">Duplicate entry</string>
@@ -76,7 +71,6 @@
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Expiration Notifications</string>
     <string name="expiration_notifications_warning">Enabling expiration notifications requires PasswdSafe to store expiration information for the file (record title, group, and expiration date).  This information is stored unencrypted on the device.  No passwords are stored.</string>
-    <string name="expired_passwords">Expired Passwords</string>
     <string name="expired_password_notification">Expired password notification</string>
     <string name="expiring_password">Expiring password</string>
     <string name="ext_storage_not_mounted">External storage not mounted.  Please mount the storage to view files.</string>
@@ -148,7 +142,6 @@
     <string name="new_local_file">New Local File</string>
     <string name="new_onedrive_file">New OneDrive File</string>
     <string name="new_owncloud_file">New ownCloud File</string>
-    <string name="new_password_label">New Password:</string>
     <string name="new_policy">New Policy</string>
     <string name="next">Next</string>
     <string name="no_alias_chosen">No alias chosen</string>
