@@ -121,8 +121,9 @@ public class FileListActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
-        // TODO: Check release notes dialog
-        ReleaseNotesDialog.checkNotes(this);
+        if (ReleaseNotesDialog.checkShowNotes(this)) {
+            showAbout();
+        }
     }
 
     @Override
