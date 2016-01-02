@@ -165,7 +165,6 @@
     <string name="open_file">Open %s</string>
     <string name="open_file_title">Open File</string>
     <string name="option_not_selected">At least one option must be selected</string>
-    <string name="parent_group">Parent Group</string>
     <string name="password">Password</string>
     <string name="password_encoding">Password encoding</string>
     <string name="password_expiration">Password Expiration</string>
@@ -243,7 +242,6 @@
     <string name="unprotect_all">Unprotect All Records</string>
     <string name="unprotect_group">Unprotect Group Records</string>
     <string name="unprotect_to_modify">Unprotect to modify</string>
-    <string name="up">Up</string>
     <string name="username">User Name</string>
     <string name="use_count">Use Count</string>
     <string name="use_digits">Use Digits</string>

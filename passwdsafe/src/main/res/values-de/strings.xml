@@ -167,7 +167,6 @@
     <string name="open_file">Öffnen %s</string>
     <string name="open_file_title">Datei öffnen</string>
     <string name="option_not_selected">Mindestens 1 Option auswählen</string>
-    <string name="parent_group">Übergeordnete Gruppe</string>
     <string name="password">Passwort</string>
     <string name="password_encoding">Passwortkodierung</string>
     <string name="password_expiration">Passwortablaufdatum</string>
@@ -245,7 +244,6 @@
     <string name="unprotect_all">Alle Einträge freigeben</string>
     <string name="unprotect_group">Gruppe freigeben</string>
     <string name="unprotect_to_modify">Zum Freigeben Eintrag bearbeiten</string>
-    <string name="up">Oben</string>
     <string name="username">Benutzername</string>
     <string name="use_count">Anzahl</string>
     <string name="use_digits">Ziffern</string>
