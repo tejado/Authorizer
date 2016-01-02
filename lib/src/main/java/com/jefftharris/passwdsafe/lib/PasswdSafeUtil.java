@@ -42,26 +42,15 @@ public class PasswdSafeUtil
 
     // TODO: Convert to v7 AlertDialog
 
-    public static Intent createOpenIntent(Uri uri, String recToOpen)
-    {
-        // TODO: remove old activity support
-        return createOpenIntent(uri, recToOpen, true);
-    }
-
     /** Create an intent to open a URI */
-    public static Intent createOpenIntent(Uri uri, String recToOpen,
-                                          boolean newAct)
+    public static Intent createOpenIntent(Uri uri, String recToOpen)
     {
         Uri.Builder builder = uri.buildUpon();
         if (recToOpen != null) {
             builder.appendQueryParameter("recToOpen", recToOpen);
         }
         Intent intent = new Intent(VIEW_INTENT, builder.build());
-
-        intent.setClassName(PACKAGE,
-                            PACKAGE +
-                            (newAct ? ".PasswdSafe" : ".PasswdSafeOld"));
-
+        intent.setClassName(PACKAGE, PACKAGE + ".PasswdSafe");
         return intent;
     }
 

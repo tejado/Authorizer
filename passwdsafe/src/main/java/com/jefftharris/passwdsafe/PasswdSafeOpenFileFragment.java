@@ -27,7 +27,6 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
-import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.Pair;
@@ -131,8 +130,6 @@ public class PasswdSafeOpenFileFragment
         itsOkBtn = (Button)rootView.findViewById(R.id.ok);
         itsOkBtn.setOnClickListener(this);
         itsOkBtn.setEnabled(false);
-        Button oldBtn = (Button)rootView.findViewById(R.id.old);
-        oldBtn.setOnClickListener(this);
 
         itsYubiMgr = new YubikeyMgr();
         itsYubiUser = new YubikeyUser();
@@ -300,15 +297,6 @@ public class PasswdSafeOpenFileFragment
             itsOpenTask = new OpenTask(
                     new StringBuilder(itsPasswordEdit.getText()), readonly);
             itsOpenTask.execute();
-            break;
-        }
-        case R.id.old: {
-            Intent intent = PasswdSafeUtil.createOpenIntent(
-                    getFileUri(), itsRecToOpen, false);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(ApiCompat.INTENT_FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
             break;
         }
         case R.id.yubi_start: {
