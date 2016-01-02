@@ -192,9 +192,11 @@ public class PasswdSafe extends AppCompatActivity
     private static final int MENU_BIT_CAN_ADD = 0;
     private static final int MENU_BIT_HAS_FILE_OPS = 1;
     private static final int MENU_BIT_HAS_FILE_CHANGE_PASSWORD = 2;
-    private static final int MENU_BIT_PROTECT_ALL = 3;
-    private static final int MENU_BIT_HAS_SEARCH = 4;
-    private static final int MENU_BIT_HAS_CLOSE = 5;
+    private static final int MENU_BIT_HAS_FILE_PROTECT = 3;
+    private static final int MENU_BIT_HAS_FILE_DELETE = 4;
+    private static final int MENU_BIT_PROTECT_ALL = 5;
+    private static final int MENU_BIT_HAS_SEARCH = 6;
+    private static final int MENU_BIT_HAS_CLOSE = 7;
 
     private static final String TAG = "PasswdSafe";
 
@@ -392,8 +394,13 @@ public class PasswdSafe extends AppCompatActivity
                         options.set(MENU_BIT_HAS_FILE_OPS, true);
                         options.set(MENU_BIT_HAS_FILE_CHANGE_PASSWORD,
                                     fileData.isNotYubikey());
+                        options.set(MENU_BIT_HAS_FILE_PROTECT, true);
                         options.set(MENU_BIT_PROTECT_ALL,
                                     itsLocation.getGroups().isEmpty());
+                    }
+                    if (fileData.canDelete()) {
+                        options.set(MENU_BIT_HAS_FILE_OPS, true);
+                        options.set(MENU_BIT_HAS_FILE_DELETE, true);
                     }
                     break;
                 }
@@ -440,16 +447,24 @@ public class PasswdSafe extends AppCompatActivity
         }
 
         if (options.get(MENU_BIT_HAS_FILE_OPS)) {
+            boolean hasProtect = options.get(MENU_BIT_HAS_FILE_PROTECT);
             boolean viewProtectAll = options.get(MENU_BIT_PROTECT_ALL);
             item = menu.findItem(R.id.menu_file_protect_records);
             if (item != null) {
+                item.setEnabled(hasProtect);
                 item.setTitle(viewProtectAll ? R.string.protect_all :
                                       R.string.protect_group);
             }
             item = menu.findItem(R.id.menu_file_unprotect_records);
             if (item != null) {
+                item.setEnabled(hasProtect);
                 item.setTitle(viewProtectAll ? R.string.unprotect_all :
                                       R.string.unprotect_group);
+            }
+
+            item = menu.findItem(R.id.menu_file_delete);
+            if (item != null) {
+                item.setEnabled(options.get(MENU_BIT_HAS_FILE_DELETE));
             }
         }
 
