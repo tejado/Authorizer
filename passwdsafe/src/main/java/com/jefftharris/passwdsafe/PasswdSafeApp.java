@@ -7,9 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -48,17 +45,13 @@ public class PasswdSafeApp extends Application
     public static final String CHOOSE_RECORD_INTENT =
         "com.jefftharris.passwdsafe.action.CHOOSE_RECORD_INTENT";
 
-    public static final int RESULT_MODIFIED = Activity.RESULT_FIRST_USER;
     public static final String RESULT_DATA_UUID = "uuid";
 
     private PasswdFileData itsFileData = null;
-    private String itsLastViewedRecord = null;
     private final WeakHashMap<Activity, Object> itsFileDataActivities =
             new WeakHashMap<>();
     private PasswdPolicy itsDefaultPasswdPolicy = null;
     private NotificationMgr itsNotifyMgr;
-    private boolean itsIsFileCloseScreenOff =
-            Preferences.PREF_FILE_CLOSE_SCREEN_OFF_DEF;
     private boolean itsIsFileCloseClearClipboard =
         Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF;
     private boolean itsIsOpenDefault = true;
@@ -111,7 +104,6 @@ public class PasswdSafeApp extends Application
         Preferences.upgradePasswdPolicy(prefs, this);
         Preferences.upgradeDefaultFilePref(prefs);
 
-        updateFileCloseScreenOffPref(prefs);
         setPasswordEncodingPref(prefs);
         setPasswordDefaultSymsPref(prefs);
         setFileCloseClearClipboardPref(prefs);
@@ -139,10 +131,6 @@ public class PasswdSafeApp extends Application
                                key, prefs.getAll().get(key));
 
         switch (key) {
-        case Preferences.PREF_FILE_CLOSE_SCREEN_OFF: {
-            updateFileCloseScreenOffPref(prefs);
-            break;
-        }
         case Preferences.PREF_PASSWD_ENC: {
             setPasswordEncodingPref(prefs);
             break;
@@ -173,16 +161,6 @@ public class PasswdSafeApp extends Application
     }
 
     /**
-     * Sanitize an intent URI for the open file URI. Removes fragments and query
-     * parameters
-     */
-    public static PasswdFileUri getFileUriFromIntent(Intent intent,
-                                                     Context ctx)
-    {
-        return new PasswdFileUri(getOpenUriFromIntent(intent), ctx);
-    }
-
-    /**
      * Sanitize an intent URI for a file to open. Removes fragments and query
      * params
      */
@@ -195,28 +173,6 @@ public class PasswdSafeApp extends Application
         return builder.build();
     }
 
-
-    /** Access an open password file. The data returned should only be used for
-     * short durations. */
-    public synchronized PasswdFileData accessOpenFileData()
-    {
-        PasswdSafeUtil.dbgverb(TAG, "access open file data: %s", itsFileData);
-        return itsFileData;
-    }
-
-    /** Close an open file */
-    public synchronized void closeOpenFile()
-    {
-        PasswdSafeUtil.dbgverb(TAG, "close file");
-        checkScreenOffReceiver();
-        closeFileData();
-    }
-
-    /** Get the UUID of the last viewed record */
-    public synchronized String getLastViewedRecord()
-    {
-        return itsLastViewedRecord;
-    }
 
     /** Get the default password policy */
     public synchronized PasswdPolicy getDefaultPasswdPolicy()
@@ -262,12 +218,6 @@ public class PasswdSafeApp extends Application
         return builder.toString();
     }
 
-    private void updateFileCloseScreenOffPref(SharedPreferences prefs)
-    {
-        itsIsFileCloseScreenOff =
-                        Preferences.getFileCloseScreenOffPref(prefs);
-    }
-
     private static void setPasswordEncodingPref(SharedPreferences prefs)
     {
         PwsFile.setPasswordEncoding(Preferences.getPasswordEncodingPref(prefs));
@@ -294,38 +244,6 @@ public class PasswdSafeApp extends Application
         return Preferences.getPasswdExpiryNotifPref(prefs).getFilter();
     }
 
-    private synchronized void touchFileData(Activity activity)
-    {
-        PasswdSafeUtil.dbgverb(TAG, "touch activity: %s, data: %s",
-                               activity, itsFileData);
-        if (itsFileData != null) {
-            itsFileDataActivities.put(activity, null);
-            checkScreenOffReceiver();
-        }
-    }
-
-    private synchronized void releaseFileData(Activity activity)
-    {
-        PasswdSafeUtil.dbgverb(TAG, "release activity: %s", activity);
-        itsFileDataActivities.remove(activity);
-        checkScreenOffReceiver();
-    }
-
-    private synchronized void setFileData(PasswdFileData fileData,
-                                          Activity activity)
-    {
-        closeFileData();
-        itsFileData = fileData;
-        touchFileData(activity);
-    }
-
-    /** Set the UUID of the last viewed record */
-    private synchronized void setLastViewedRecord(String uuid)
-    {
-        PasswdSafeUtil.dbginfo(TAG, "setViewedRecord: %s", uuid);
-        itsLastViewedRecord = uuid;
-    }
-
     private synchronized void closeFileData()
     {
         PasswdSafeUtil.dbginfo(TAG, "closeFileData data: %s", itsFileData);
@@ -337,7 +255,6 @@ public class PasswdSafeApp extends Application
                 PasswdSafeUtil.copyToClipboard("", this);
             }
         }
-        itsLastViewedRecord = null;
 
         for (Map.Entry<Activity, Object> entry :
             itsFileDataActivities.entrySet()) {
