@@ -79,7 +79,6 @@
     <string name="file_exists">Le fichier existe</string>
     <string name="file">Fichier</string>
     <string name="file_label">Fichier:</string>
-    <string name="file_label_val">Fichier: %1$s</string>
     <string name="file_name">Nom du fichier</string>
     <string name="file_operations">Réglage sauvegarde</string>
     <string name="file_password_encoding">Encodage fichier mots de passe</string>
@@ -177,7 +176,6 @@
     <string name="password_expires_before">Mot de passe expire avant %1$s</string>
     <string name="password_expires_today">Mot de passe expire aujourd\'hui</string>
     <string name="password_header">MOT DE PASSE</string>
-    <string name="password_label">Mot de passe:</string>
     <string name="password_len_short_opt">Mot de passe trop court pour les options</string>
     <string name="password_policy">Mot de passe Stratégie</string>
     <string name="password_policies">Mot de passe Stratégies</string>
@@ -453,10 +451,5 @@
         <item>Facile-à-lire</item>
         <item>Prononçable</item>
         <item>Hexadécimal</item>
-    </string-array>
-    
-    <string-array name="yubikey_slots">
-        <item>Rainure 1</item>
-        <item>Rainure 2</item>
     </string-array>
 </resources>
