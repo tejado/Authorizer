@@ -54,7 +54,6 @@
     <string name="delete_policy">Supprimer la stratégie</string>
     <string name="delete_policy_msg">Supprimer la stratégie \"%1$s\"?</string>
     <string name="delete_record_msg">Supprimer l\'entrée \"%1$s\"?</string>
-    <string name="delete_record_title">Confirmer la suppression de l\'entrée</string>
     <string name="details">Détails</string>
     <string name="directory_for_files">Répertoire des les fichiers</string>
     <string name="done">Valider</string>

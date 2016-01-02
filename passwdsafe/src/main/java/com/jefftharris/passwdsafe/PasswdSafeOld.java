@@ -1105,8 +1105,8 @@ public class PasswdSafeOld extends AbstractPasswdSafeActivity
 
     private void openRecord(String uuid)
     {
-        RecordView.startActivityForResult(getUri(), uuid, RECORD_VIEW_REQUEST,
-                                          this);
+//        RecordView.startActivityForResult(getUri(), uuid, RECORD_VIEW_REQUEST,
+//                                          this);
     }
 
     /** Remove and cleanup a dialog */

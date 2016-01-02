@@ -27,8 +27,7 @@
             <View style="@style/Separator"
                   android:clickable="false"/>
 
-            <RelativeLayout android:id="@+id/base_group"
-                            android:layout_width="wrap_content"
+            <RelativeLayout android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:clickable="false">
 

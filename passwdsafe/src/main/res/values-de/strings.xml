@@ -54,7 +54,6 @@
     <string name="delete_policy">Regel löschen</string>
     <string name="delete_policy_msg">Lösche Regel \"%1$s\"?</string>
     <string name="delete_record_msg">Lösche Eintrag \"%1$s\"?</string>
-    <string name="delete_record_title">Bestätige Löschen</string>
     <string name="details">Details</string>
     <string name="directory_for_files">Standardordner</string>
     <string name="done">Fertig</string>

@@ -216,9 +216,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RecordView"
-            android:label="@string/app_name"/>
-        <activity
             android:name=".RecordSelectionActivity"
             android:label="@string/password_record"
             android:theme="@style/Theme.AppCompat.Light.Dialog"/>

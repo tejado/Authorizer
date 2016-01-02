@@ -355,8 +355,7 @@
                         android:layout_alignParentRight="true"
                         android:text="@string/add"/>
 
-                <TextView android:id="@+id/history_label"
-                          android:layout_width="wrap_content"
+                <TextView android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:layout_alignBaseline="@id/history_addremove"
                           android:layout_alignBottom="@id/history_addremove"
