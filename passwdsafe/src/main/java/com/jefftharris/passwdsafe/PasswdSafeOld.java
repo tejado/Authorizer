@@ -369,10 +369,10 @@ public class PasswdSafeOld extends AbstractPasswdSafeActivity
             break;
         }
         case MENU_PASSWD_POLICIES: {
-            startActivityForResult(new Intent(Intent.ACTION_VIEW,
-                                              getUri().getUri(),
-                                              this, PasswdPolicyActivity.class),
-                                   POLICY_VIEW_REQUEST);
+//            startActivityForResult(new Intent(Intent.ACTION_VIEW,
+//                                              getUri().getUri(),
+//                                              this, PasswdPolicyActivity.class),
+//                                   POLICY_VIEW_REQUEST);
             break;
         }
         case MENU_PASSWD_EXPIRYS: {

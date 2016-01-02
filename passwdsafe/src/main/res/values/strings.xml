@@ -54,7 +54,6 @@
     <string name="delete_file_title">Confirm File Deletion</string>
     <string name="delete_policy">Delete Policy</string>
     <string name="delete_policy_msg">Delete policy \"%1$s\"?</string>
-    <string name="delete_policy_title">Confirm Policy Deletion</string>
     <string name="delete_record_msg">Delete record \"%1$s\"?</string>
     <string name="delete_record_title">Confirm Record Deletion</string>
     <string name="details">Details</string>

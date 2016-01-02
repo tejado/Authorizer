@@ -215,9 +215,6 @@
                 <data android:mimeType="vnd.android.cursor.item/vnd.com.jefftharris.passwdsafe.sync.provider.files"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".PasswdPolicyActivity"
-            android:label="@string/app_name"/>
         <activity android:name=".PreferencesActivity"
                   android:theme="@style/NewAppTheme"/>
         <activity
