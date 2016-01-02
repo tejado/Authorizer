@@ -197,10 +197,6 @@
         </activity>
 
         <activity
-            android:name=".RecordSelectionActivity"
-            android:label="@string/password_record"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"/>
-        <activity
             android:name=".LauncherFileShortcuts"
             android:label="@string/password_file"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
