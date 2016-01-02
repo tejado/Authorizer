@@ -555,7 +555,7 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         /** Constructor */
         private Validator(AlertDialog dlg, View view, Context ctx)
         {
-            super(dlg, view, ctx, false);
+            super(dlg, view, ctx);
         }
 
         @Override
