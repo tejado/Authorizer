@@ -333,7 +333,15 @@ public final class PasswdRecordFilter implements Parcelable
      */
     public final boolean isQueryType()
     {
-        return (itsType == Type.QUERY);
+        switch (itsType) {
+        case QUERY: {
+            return true;
+        }
+        case EXPIRATION: {
+            return false;
+        }
+        }
+        return false;
     }
 
     /** Convert the filter to a string */
