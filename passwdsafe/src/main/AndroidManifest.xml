@@ -216,9 +216,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RecordEditActivity"
-            android:label="@string/app_name"/>
-        <activity
             android:name=".RecordView"
             android:label="@string/app_name"/>
         <activity

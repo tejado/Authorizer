@@ -327,10 +327,10 @@ public class RecordView extends AbstractRecordTabActivity
         switch (item.getItemId()) {
         case MENU_EDIT:
         {
-            startActivityForResult(
-                new Intent(Intent.ACTION_EDIT, getIntent().getData(),
-                           this, RecordEditActivity.class),
-                RECORD_EDIT_REQUEST);
+//            startActivityForResult(
+//                new Intent(Intent.ACTION_EDIT, getIntent().getData(),
+//                           this, RecordEditActivity.class),
+//                RECORD_EDIT_REQUEST);
             break;
         }
         case MENU_DELETE:

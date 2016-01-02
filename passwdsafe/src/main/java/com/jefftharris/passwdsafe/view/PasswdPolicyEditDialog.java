@@ -234,12 +234,6 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         itsValidator.reset();
     }
 
-    /** Reset the dialog validation */
-    public void reset()
-    {
-        itsValidator.reset();
-    }
-
 
     /**
      * Create a policy from the dialog fields. It is assumed that the fields
