@@ -134,12 +134,6 @@
                 android:layout_weight="1"
                 android:text="@android:string/ok"/>
 
-            <Button
-                android:id="@+id/old"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Old"/>
         </LinearLayout>
 
     </LinearLayout>
