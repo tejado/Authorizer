@@ -684,6 +684,9 @@ public class PasswdSafe extends AppCompatActivity
         itsFileDataFrag.setFileData(fileData);
         changeOpenView(itsLocation, true);
 
+        PasswdSafeApp app = (PasswdSafeApp)getApplication();
+        app.getNotifyMgr().cancelNotification(fileData.getUri());
+
         // Jump to record to open if given
         if (!TextUtils.isEmpty(recToOpen)) {
             PwsRecord rec = fileData.getRecord(recToOpen);
