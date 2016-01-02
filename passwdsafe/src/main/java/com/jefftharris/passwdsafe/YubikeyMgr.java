@@ -147,19 +147,18 @@ public class YubikeyMgr
         itsUser.starting();
     }
 
-    /** Handle a pause of the activity.  Return true if the manager is active;
-     *  false otherwise */
-    public boolean onPause()
+    /** Handle a pause of the activity */
+    public void onPause()
     {
         if (itsUser == null) {
-            return false;
+            return;
         }
         Activity act = itsUser.getActivity();
 
         if (itsIsRegistered) {
             NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
             if ((adapter == null) || !adapter.isEnabled()) {
-                return true;
+                return;
             }
 
             adapter.disableForegroundDispatch(act);
@@ -170,8 +169,6 @@ public class YubikeyMgr
             itsTagIntent.cancel();
             itsTagIntent = null;
         }
-
-        return true;
     }
 
     /// Stop the interaction with the key
