@@ -87,8 +87,6 @@
         <item name="android:paddingRight">3dp</item>
     </style>
 
-    <color name="transparent">#00000000</color>
-
     <style name="ListItem">
         <item name="android:minHeight">?attr/listPreferredItemHeight</item>
         <item name="android:paddingLeft">16dp</item>
