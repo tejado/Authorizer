@@ -29,12 +29,6 @@ public enum RecordSortOrderPref
         itsValue = value;
     }
 
-    /** Get the value of the preference */
-    public final String getValue()
-    {
-        return itsValue;
-    }
-
     /** Get the display name of the preference */
     public final String getDisplayName(Resources res)
     {
@@ -47,7 +41,7 @@ public enum RecordSortOrderPref
         RecordSortOrderPref[] prefs = values();
         String[] strs = new String[prefs.length];
         for (int i = 0; i < prefs.length; ++i) {
-            strs[i] = prefs[i].getValue();
+            strs[i] = prefs[i].itsValue;
         }
         return strs;
     }

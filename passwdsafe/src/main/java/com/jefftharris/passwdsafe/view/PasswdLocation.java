@@ -46,7 +46,7 @@ public class PasswdLocation implements Parcelable
     }
 
     /** Constructor with groups and a specific record */
-    public PasswdLocation(ArrayList<String> groups, String record)
+    private PasswdLocation(ArrayList<String> groups, String record)
     {
         if (groups != null) {
             itsGroups.addAll(groups);
@@ -67,7 +67,7 @@ public class PasswdLocation implements Parcelable
     }
 
     /** Constructor from a parcel */
-    public PasswdLocation(Parcel parcel)
+    private PasswdLocation(Parcel parcel)
     {
         parcel.readStringList(itsGroups);
         byte hasRecord = parcel.readByte();
