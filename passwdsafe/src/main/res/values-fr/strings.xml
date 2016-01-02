@@ -4,7 +4,6 @@
     <string name="add_policy">Ajouter Stratégie</string>
     <string name="add_record">Ajouter Entrée</string>
     <string name="alias_base_record_header">ALIAS</string>
-    <string name="alias_base_record_label">Alias</string>
     <string name="alias_to_same_record">Alias pour la même entrée</string>
     <string name="any_changes_will_be_lost">Toute modification apportée à l\'entrée seront perdues.</string>
     <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
@@ -240,7 +239,6 @@
     <string name="send">Envoyer</string>
     <string name="set_password">Définir le mot de passe</string>
     <string name="shortcut_base_record_header">RACCOURCI</string>
-    <string name="shortcut_base_record_label">Raccourci</string>
     <string name="shortcut_file">Fichier de raccourci</string>
     <string name="shortcut_record">Entrée raccourci</string>
     <string name="shortcut_to_same_record">Raccourci pour la même entrée</string>
@@ -402,7 +400,7 @@
         <item>Groupes dernière</item>
     </string-array>
 
-    <!-- Order must match constants in RecordEditActivity -->
+    <!-- Order must match constants in PasswdSafeEditRecordFragment -->
     <string-array name="record_type">
         <item>Normal</item>
         <item>Alias</item>

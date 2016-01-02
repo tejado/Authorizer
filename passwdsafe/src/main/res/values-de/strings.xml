@@ -4,7 +4,6 @@
     <string name="add_policy">Regel hinzufügen</string>
     <string name="add_record">Eintrag hinzufügen</string>
     <string name="alias_base_record_header">ALIAS</string>
-    <string name="alias_base_record_label">Alias</string>
     <string name="alias_to_same_record">Alias auf den gleichen Eintrag</string>
     <string name="any_changes_will_be_lost">Alle Änderungen an der Eintrag wird gelöscht.</string>
     <string name="app_desc">Programm zum Zugriff und Bearbeiten von PasswordSafe-Datenbanken auf Android</string>
@@ -240,7 +239,6 @@
     <string name="send">Senden</string>
     <string name="set_password">Passwort einstellen</string>
     <string name="shortcut_base_record_header">VERKNÜPFUNG</string>
-    <string name="shortcut_base_record_label">Verknüpfung</string>
     <string name="shortcut_file">Verknüpfungsdatei</string>
     <string name="shortcut_record">Verknüpfung Eintrag</string>
     <string name="shortcut_to_same_record">Verknüpfung zu dem gleichen Eintrag</string>
@@ -392,7 +390,7 @@
         <item>Gruppen letzten</item>
     </string-array>
 
-    <!-- Order must match constants in RecordEditActivity -->
+    <!-- Order must match constants in PasswdSafeEditRecordFragment -->
     <string-array name="record_type">
         <item>Normal</item>
         <item>Alias</item>

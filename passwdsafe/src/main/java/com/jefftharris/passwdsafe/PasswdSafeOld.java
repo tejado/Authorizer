@@ -335,12 +335,12 @@ public class PasswdSafeOld extends AbstractPasswdSafeActivity
         switch (item.getItemId()) {
         case MENU_ADD_RECORD:
         {
-            Intent addIntent =
-                new Intent(Intent.ACTION_INSERT, getUri().getUri(),
-                           this, RecordEditActivity.class);
-            addIntent.putExtra(RecordEditActivity.INSERT_INTENT_EXTRA_GROUP,
-                               getCurrGroupStr());
-            startActivityForResult(addIntent, RECORD_ADD_REQUEST);
+//            Intent addIntent =
+//                new Intent(Intent.ACTION_INSERT, getUri().getUri(),
+//                           this, RecordEditActivity.class);
+//            addIntent.putExtra(RecordEditActivity.INSERT_INTENT_EXTRA_GROUP,
+//                               getCurrGroupStr());
+//            startActivityForResult(addIntent, RECORD_ADD_REQUEST);
             break;
         }
         case MENU_DETAILS:

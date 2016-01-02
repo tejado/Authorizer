@@ -4,7 +4,6 @@
     <string name="add_policy">Add Policy</string>
     <string name="add_record">Add Record</string>
     <string name="alias_base_record_header">ALIAS</string>
-    <string name="alias_base_record_label">Alias</string>
     <string name="alias_to_same_record">Alias to the same record</string>
     <string name="any_changes_will_be_lost">Any changes to the record will be lost.</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
@@ -238,7 +237,6 @@
     <string name="send">Send</string>
     <string name="set_password">Set Password</string>
     <string name="shortcut_base_record_header">SHORTCUT</string>
-    <string name="shortcut_base_record_label">Shortcut</string>
     <string name="shortcut_file">Shortcut file</string>
     <string name="shortcut_record">Shortcut record</string>
     <string name="shortcut_to_same_record">Shortcut to the same record</string>
@@ -391,7 +389,7 @@
         <item>Groups last</item>
     </string-array>
 
-    <!-- Order must match constants in RecordEditActivity -->
+    <!-- Order must match constants in PasswdSafeEditRecordFragment -->
     <string-array name="record_type">
         <item>Normal</item>
         <item>Alias</item>
