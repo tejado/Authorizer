@@ -72,7 +72,7 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    PreferencesFragment.Listener
 {
-    // TODO: recent files db (should that be carried forward? only if SAF kept??)
+    // TODO: create new file with SAF
 
     private enum ChangeMode
     {
