@@ -57,9 +57,9 @@ public class Preferences
     public static final String PREF_DEF_FILE = "defFilePref";
     private static final String PREF_DEF_FILE_DEF = "";
 
-    private static final String PREF_FILE_LEGACY_FILE_CHOOSER =
+    public static final String PREF_FILE_LEGACY_FILE_CHOOSER =
             "fileLegacyFileChooserPref";
-    private static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = true;
+    public static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = true;
 
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     public static final boolean PREF_GROUP_RECORDS_DEF = true;

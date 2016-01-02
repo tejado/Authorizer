@@ -39,6 +39,7 @@ public class FileListActivity extends AppCompatActivity
                    FileListFragment.Listener,
                    FileListNavDrawerFragment.Listener,
                    PreferencesFragment.Listener,
+                   SharedPreferences.OnSharedPreferenceChangeListener,
                    StorageFileListFragment.Listener,
                    SyncProviderFragment.Listener,
                    SyncProviderFilesFragment.Listener
@@ -74,7 +75,9 @@ public class FileListActivity extends AppCompatActivity
     private FileListNavDrawerFragment itsNavDrawerFrag;
     private boolean itsIsCloseOnOpen = false;
     private CharSequence itsTitle;
-    private Boolean itsIsStorageFrag = null;
+    private boolean itsIsLegacyChooser =
+            Preferences.PREF_FILE_LEGACY_FILE_CHOOSER_DEF;
+    private boolean itsIsLegacyChooserChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -90,6 +93,12 @@ public class FileListActivity extends AppCompatActivity
         Intent intent = getIntent();
         itsIsCloseOnOpen = intent.getBooleanExtra(INTENT_EXTRA_CLOSE_ON_OPEN,
                                                   false);
+
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+        onSharedPreferenceChanged(prefs,
+                                  Preferences.PREF_FILE_LEGACY_FILE_CHOOSER);
 
         if (savedInstanceState == null) {
             showFiles(true);
@@ -112,6 +121,7 @@ public class FileListActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
+        // TODO: Check release notes dialog
         ReleaseNotesDialog.checkNotes(this);
     }
 
@@ -120,6 +130,15 @@ public class FileListActivity extends AppCompatActivity
     {
         super.onSaveInstanceState(outState);
         outState.putCharSequence(STATE_TITLE, itsTitle);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+        super.onDestroy();
     }
 
     @Override
@@ -156,6 +175,25 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    {
+        switch (key) {
+        case Preferences.PREF_FILE_LEGACY_FILE_CHOOSER: {
+            boolean legacy =
+                    ((ApiCompat.SDK_VERSION < ApiCompat.SDK_KITKAT) ||
+                     Preferences.getFileLegacyFileChooserPref(prefs));
+            if (legacy != itsIsLegacyChooser) {
+                itsIsLegacyChooser = legacy;
+                itsIsLegacyChooserChanged = true;
+            }
+            PasswdSafeUtil.dbginfo(TAG, "onSharedPreferenceChanged legacy %b",
+                                   itsIsLegacyChooser);
+            break;
+        }
+        }
+    }
+
+    @Override
     public void onBackPressed()
     {
         FragmentManager mgr = getSupportFragmentManager();
@@ -165,7 +203,11 @@ public class FileListActivity extends AppCompatActivity
                           ((FileListFragment) frag).doBackPressed();
 
         if (!handled) {
-            super.onBackPressed();
+            if (itsIsLegacyChooserChanged) {
+                showFiles(true);
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
@@ -258,7 +300,7 @@ public class FileListActivity extends AppCompatActivity
     @Override
     public void showFiles()
     {
-        showFiles(false);
+        showFiles(itsIsLegacyChooserChanged);
     }
 
     @Override
@@ -273,23 +315,13 @@ public class FileListActivity extends AppCompatActivity
      */
     private void showFiles(boolean initial)
     {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        boolean storageFrag =
-                ((ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT) &&
-                 !Preferences.getFileLegacyFileChooserPref(prefs));
-        if ((itsIsStorageFrag == null) || (itsIsStorageFrag != storageFrag)) {
-            PasswdSafeUtil.dbginfo(TAG, "setFileChooseFrag storage %b",
-                                   storageFrag);
-            itsIsStorageFrag = storageFrag;
-        }
-
         Fragment filesFrag;
-        if (itsIsStorageFrag) {
-            filesFrag = new StorageFileListFragment();
-        } else {
+        if (itsIsLegacyChooser) {
             filesFrag = new FileListFragment();
+        } else {
+            filesFrag = new StorageFileListFragment();
         }
+        itsIsLegacyChooserChanged = false;
 
         doChangeView(initial ?
                      ChangeMode.VIEW_FILES_INIT : ChangeMode.VIEW_FILES,

@@ -149,9 +149,8 @@
         fichier
         \n\nSi les fichiers ne sont pas affichés dans l\'écran des documents,
         utiliser le menu pour montrer le stockage interne ou sur la carte SD.
-        \n\nLe sélecteur de fichier précédent peut être activée en ouvrant le
-        menu et en sélectionnant Préférences, Paramètres du fichier, et le
-        fichier de l\'héritage sélecteur.
+        \n\nLe sélecteur de fichier précédent est activé dans les Préférences
+        que le fichier héritage sélecteur.
     </string>
     <string name="no_groups">Aucune Groupes</string>
     <string name="no_shortcut_chosen">Aucun raccourci choisi</string>

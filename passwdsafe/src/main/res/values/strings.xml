@@ -148,8 +148,8 @@
         No Files - Select action to open or create a new file
         \n\nIf files are not showing in the documents screen, use the menu to
         show internal storage or the SD card.
-        \n\nThe previous file chooser can be enabled by opening the menu and
-        selecting Preferences, File Settings, and the legacy file chooser.
+        \n\nThe previous file chooser is enabled in the Preferences as the
+        legacy file chooser.
     </string>
     <string name="no_groups">No Groups</string>
     <string name="no_shortcut_chosen">No shortcut chosen</string>
