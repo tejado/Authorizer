@@ -149,9 +149,8 @@
         Datei
         \n\nWenn Dateien nicht in der Dokumenten-Bildschirm zeigt, verwenden Sie
         das Menü im internen Speicher oder der SD-Karte zu zeigen.
-        \n\nDie vorherige Dateiauswahl kann durch das Menü öffnen und wählen Sie
-        Vorgaben, Datei-Einstellungen, und das Erbe Dateiauswahl aktiviert
-        werden.
+        \n\nDie vorherige Dateiauswahl wird in den Einstellungen wie das Erbe
+        Dateiauswahl aktiviert.
     </string>
     <string name="no_groups">Keine Gruppen</string>
     <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>

@@ -59,6 +59,9 @@ public final class StorageFileListFragment extends ListFragment
 
         /** Does the activity have a menu */
         boolean activityHasMenu();
+
+        /** Update the view for a list of files */
+        void updateViewFiles();
     }
 
     private static final String TAG = "StorageFileListFragment";
@@ -148,6 +151,13 @@ public final class StorageFileListFragment extends ListFragment
 
         LoaderManager lm = getLoaderManager();
         lm.initLoader(LOADER_FILES, null, this);
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsListener.updateViewFiles();
     }
 
     @Override
