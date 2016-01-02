@@ -167,7 +167,6 @@
     <string name="open_file">Ouvrir %s</string>
     <string name="open_file_title">Ouvrir un fichier</string>
     <string name="option_not_selected">Au moins une option doit être sélectionnée</string>
-    <string name="parent_group">Groupe parent</string>
     <string name="password">Mot de passe</string>
     <string name="password_encoding">Encodage mot de passe</string>
     <string name="password_expiration">Expiration mot de passe</string>
@@ -245,7 +244,6 @@
     <string name="unprotect_all">Déprotéger les entrées</string>
     <string name="unprotect_group">Déprotéger les groupes</string>
     <string name="unprotect_to_modify">Déprotéger les modifications</string>
-    <string name="up">Haut</string>
     <string name="username">Nom utilisateur</string>
     <string name="use_count">Utiliser compteur</string>
     <string name="use_digits">Utiliser chiffres</string>
