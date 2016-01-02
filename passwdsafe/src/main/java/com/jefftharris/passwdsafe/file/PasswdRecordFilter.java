@@ -328,20 +328,6 @@ public final class PasswdRecordFilter implements Parcelable
     }
 
 
-    /** Does the record filter have a search query */
-    public final boolean hasSearchQuery()
-    {
-        switch (itsType) {
-        case QUERY: {
-            return itsSearchQuery != null;
-        }
-        case EXPIRATION: {
-            return true;
-        }
-        }
-        return true;
-    }
-
     /**
      * Is the filter's type a query
      */
