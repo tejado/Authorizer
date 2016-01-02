@@ -70,8 +70,9 @@ public class PasswdSafeListFragment extends ListFragment
     private ItemListAdapter itsAdapter;
 
     /** Create a new instance */
-    public static PasswdSafeListFragment newInstance(PasswdLocation location,
-                                                     boolean isContents)
+    public static PasswdSafeListFragment newInstance(
+            PasswdLocation location,
+            @SuppressWarnings("SameParameterValue") boolean isContents)
     {
         PasswdSafeListFragment frag = new PasswdSafeListFragment();
         Bundle args = new Bundle();
