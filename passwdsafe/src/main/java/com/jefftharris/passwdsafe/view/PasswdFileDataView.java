@@ -573,7 +573,7 @@ public class PasswdFileDataView
     /**
      * Case-sensitive string comparator
      */
-    public static final class StringComparator implements Comparator<String>
+    private static final class StringComparator implements Comparator<String>
     {
         /** Compare the strings */
         public final int compare(String arg0, String arg1)

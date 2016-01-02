@@ -217,7 +217,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     /**
      * Constructor from a parcel
      */
-    public PasswdPolicy(Parcel source)
+    private PasswdPolicy(Parcel source)
     {
         itsName = source.readString();
         itsLocation = Location.valueOf(source.readString());

@@ -115,7 +115,7 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
      *
      * @param drawerLayout The DrawerLayout containing this fragment's UI.
      */
-    public void setUp(DrawerLayout drawerLayout)
+    protected void setUp(DrawerLayout drawerLayout)
     {
         itsFragmentContainerView =
                 getActivity().findViewById(R.id.navigation_drawer);
@@ -262,7 +262,7 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     }
 
     /** Get the action bar */
-    protected ActionBar getActionBar()
+    private ActionBar getActionBar()
     {
         return ((AppCompatActivity) getActivity()).getSupportActionBar();
     }

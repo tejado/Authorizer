@@ -36,7 +36,7 @@ public class Preferences
         Environment.getExternalStorageDirectory().toString();
 
     public static final String PREF_FILE_CLOSE_TIMEOUT = "fileCloseTimeoutPref";
-    public static final FileTimeoutPref PREF_FILE_CLOSE_TIMEOUT_DEF =
+    private static final FileTimeoutPref PREF_FILE_CLOSE_TIMEOUT_DEF =
         FileTimeoutPref.TO_5_MIN;
     public static final String PREF_FILE_CLOSE_SCREEN_OFF =
                     "fileCloseScreenOffPref";
@@ -55,7 +55,7 @@ public class Preferences
     private static final boolean PREF_FILE_OPEN_READ_ONLY_DEF = false;
 
     public static final String PREF_DEF_FILE = "defFilePref";
-    public static final String PREF_DEF_FILE_DEF = "";
+    private static final String PREF_DEF_FILE_DEF = "";
 
     private static final String PREF_FILE_LEGACY_FILE_CHOOSER =
             "fileLegacyFileChooserPref";
