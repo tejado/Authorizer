@@ -743,7 +743,8 @@ public class PasswdSafe extends AppCompatActivity
         if (isFileOpen()) {
             PasswdSafeUtil.dbginfo(TAG, "editRecord loc: %s", location);
             doChangeView(ChangeMode.EDIT_RECORD,
-                         PasswdSafeEditRecordFragment.newInstance(location));
+                         PasswdSafeEditRecordFragment.newInstance(location),
+                         (location != null) ? location.getRecord() : null);
         }
     }
 
@@ -918,7 +919,8 @@ public class PasswdSafe extends AppCompatActivity
                 }
             });
             if (removed.get()) {
-                saveFile(true, true, location.selectRecord(null), null);
+                saveFile(true, true, location.getRecord(),
+                         location.selectRecord(null), null);
             }
             break;
         }
@@ -1019,7 +1021,17 @@ public class PasswdSafe extends AppCompatActivity
     /**
      * Save the file
      */
+    private void saveFile(boolean popBack, boolean save,
+                          PasswdLocation newLocation, Runnable postSaveRun)
+    {
+        saveFile(popBack, save, null, newLocation, postSaveRun);
+    }
+
+    /**
+     * Save the file
+     */
     private void saveFile(final boolean popBack, final boolean save,
+                          final String popTag,
                           final PasswdLocation newLocation,
                           final Runnable postSaveRun)
     {
@@ -1040,6 +1052,16 @@ public class PasswdSafe extends AppCompatActivity
                 if (popBack) {
                     FragmentManager fragMgr = getSupportFragmentManager();
                     fragMgr.popBackStackImmediate();
+
+                    if (popTag != null) {
+                        //noinspection StatementWithEmptyBody
+                        while(fragMgr.popBackStackImmediate(
+                                popTag,
+                                FragmentManager.POP_BACK_STACK_INCLUSIVE)) {
+                            // Pop all fragments up to the first use of the
+                            // given tag
+                        }
+                    }
                 }
 
                 if (resetLoc) {
@@ -1114,13 +1136,24 @@ public class PasswdSafe extends AppCompatActivity
             viewFrag = PasswdSafeListFragment.newInstance(location, true);
             viewMode = initial ? ChangeMode.OPEN_INIT : ChangeMode.OPEN;
         }
-        doChangeView(viewMode, viewFrag);
+        doChangeView(viewMode, viewFrag, location.getRecord());
     }
 
     /**
      * Change the view of the activity
      */
-    private void doChangeView(final ChangeMode mode, final Fragment contentFrag)
+    private void doChangeView(ChangeMode mode, Fragment contentFrag)
+    {
+        doChangeView(mode, contentFrag,  null);
+    }
+
+    /**
+     * Change the view of the activity with an optional identifying tag for the
+     * transition
+     */
+    private void doChangeView(final ChangeMode mode,
+                              final Fragment contentFrag,
+                              final String transTag)
     {
         checkNavigation(true, new Runnable()
         {
@@ -1170,7 +1203,7 @@ public class PasswdSafe extends AppCompatActivity
                 }
 
                 if (supportsBack) {
-                    txn.addToBackStack(null);
+                    txn.addToBackStack(transTag);
                 }
 
                 txn.commit();
