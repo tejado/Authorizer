@@ -41,17 +41,6 @@ public enum RecordSortOrderPref
         return getDisplayNamesArray(res)[ordinal()];
     }
 
-    /** Get the preference from its value */
-    public static RecordSortOrderPref prefValueOf(String str)
-    {
-        for (RecordSortOrderPref pref : values()) {
-            if (pref.getValue().equals(str)) {
-                return pref;
-            }
-        }
-        throw new IllegalArgumentException(str);
-    }
-
     /** Get all of the preference values */
     public static String[] getValues()
     {
