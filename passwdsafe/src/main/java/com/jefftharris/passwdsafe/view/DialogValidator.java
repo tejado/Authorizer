@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe.view;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.text.Editable;
@@ -29,20 +28,11 @@ public abstract class DialogValidator
         private final AlertDialog itsDialog;
 
         /**
-         * Constructor with a specific view and password fields
+         * Constructor with a specific view and optional password fields
          */
         public AlertValidator(AlertDialog dlg, View view, Context ctx)
         {
-            this(dlg, view, ctx, true);
-        }
-
-        /**
-         * Constructor with a specific view and optional password fields
-         */
-        public AlertValidator(AlertDialog dlg, View view, Context ctx,
-                              boolean hasPasswords)
-        {
-            super(view, ctx, hasPasswords);
+            super(view, ctx);
             itsDialog = dlg;
         }
 
@@ -72,10 +62,9 @@ public abstract class DialogValidator
          * Constructor with a specific view and optional password fields
          */
         public AlertCompatValidator(android.support.v7.app.AlertDialog dlg,
-                                    View view, Context ctx,
-                                    boolean hasPasswords)
+                                    View view, Context ctx)
         {
-            super(view, ctx, hasPasswords);
+            super(view, ctx);
             itsDialog = dlg;
         }
 
@@ -86,19 +75,9 @@ public abstract class DialogValidator
                     android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
         }
 
-        /**
-         * Get the alert dialog
-         */
-        protected final android.support.v7.app.AlertDialog getDialog()
-        {
-            return itsDialog;
-        }
     }
 
     private final Context itsContext;
-    private TextView itsPassword = null;
-    private TextView itsPasswordConfirm = null;
-    private boolean itsAllowEmptyPassword = false;
     private final TextView itsErrorMsgView;
     private final String itsErrorFmt;
     private final TextWatcher itsTextWatcher = new AbstractTextWatcher()
@@ -110,32 +89,11 @@ public abstract class DialogValidator
     };
 
     /**
-     * Constructor with the activity as the view and password fields
-     */
-    public DialogValidator(Activity act)
-    {
-        itsContext = act;
-        itsPassword = (TextView) act.findViewById(R.id.password);
-        registerTextView(itsPassword);
-        itsPasswordConfirm = (TextView)act.findViewById(R.id.password_confirm);
-        registerTextView(itsPasswordConfirm);
-        itsErrorMsgView = (TextView)act.findViewById(R.id.error_msg);
-        itsErrorFmt = act.getResources().getString(R.string.error_msg);
-    }
-
-    /**
      * Constructor with a specific view and optional password fields
      */
-    protected DialogValidator(View view, Context ctx, boolean hasPasswords)
+    protected DialogValidator(View view, Context ctx)
     {
         itsContext = ctx;
-        if (hasPasswords) {
-            itsPassword = (TextView) view.findViewById(R.id.password);
-            registerTextView(itsPassword);
-            itsPasswordConfirm =
-                (TextView)view.findViewById(R.id.password_confirm);
-            registerTextView(itsPasswordConfirm);
-        }
         itsErrorMsgView = (TextView)view.findViewById(R.id.error_msg);
         itsErrorFmt = view.getResources().getString(R.string.error_msg);
     }
@@ -148,10 +106,6 @@ public abstract class DialogValidator
 
     public void reset()
     {
-        if (itsPassword != null) {
-            itsPassword.setText("");
-            itsPasswordConfirm.setText("");
-        }
         validate();
     }
 
@@ -176,15 +130,6 @@ public abstract class DialogValidator
 
     protected String doValidation()
     {
-        if (itsPassword != null) {
-            String passwd = itsPassword.getText().toString();
-            if (!itsAllowEmptyPassword && (passwd.length() == 0)) {
-                return getString(R.string.empty_password);
-            }
-            if (!passwd.equals(itsPasswordConfirm.getText().toString())) {
-                return getString(R.string.passwords_do_not_match);
-            }
-        }
         return null;
     }
 
@@ -198,8 +143,4 @@ public abstract class DialogValidator
         return itsContext.getString(id, args);
     }
 
-    protected final void setAllowEmptyPassword(boolean allow)
-    {
-        itsAllowEmptyPassword = allow;
-    }
 }

@@ -97,7 +97,7 @@ public class DialogUtils
         AlertDialog alertDialog = alert.create();
 
         final DialogValidator validator =
-            new DialogValidator.AlertValidator(alertDialog, dlgView, act, false)
+            new DialogValidator.AlertValidator(alertDialog, dlgView, act)
         {
             @Override
             public final void reset()
