@@ -242,19 +242,6 @@ public class PasswdSafeApp extends Application
     }
 
 
-    public static String getAppFileTitle(ActivityPasswdFile actFile,
-                                         Context ctx)
-    {
-        PasswdFileUri uri = null;
-        if (actFile != null) {
-            PasswdFileData fileData = actFile.getFileData();
-            if (fileData != null) {
-                uri = fileData.getUri();
-            }
-        }
-        return getAppFileTitle(uri, ctx);
-    }
-
     public static String getAppFileTitle(PasswdFileUri uri, Context ctx)
     {
         return getAppTitle((uri != null) ? uri.getIdentifier(ctx, true) : null,
