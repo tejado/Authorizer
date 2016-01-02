@@ -139,53 +139,6 @@ public class NotificationMgr implements PasswdFileDataObserver
     }
 
 
-    /** Toggle whether notifications are enabled for a password file */
-    public void togglePasswdExpiryNotif(final PasswdFileData fileData,
-                                        Activity act)
-    {
-        if (fileData == null) {
-            return;
-        }
-        boolean checkAddNotif = true;
-        try {
-            SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-            try {
-                db.beginTransaction();
-                Long uriId = getDbUriId(fileData.getUri(), db);
-                if (uriId != null) {
-                    checkAddNotif = false;
-                    removeUri(uriId, db);
-                    loadEntries(db);
-                }
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
-        } catch (SQLException e) {
-            Log.e(TAG, "Database error", e);
-            return;
-        }
-
-        if (checkAddNotif) {
-            DialogUtils.DialogData dlgData =
-                    DialogUtils.createConfirmPrompt(
-                        act,
-                        new AbstractDialogClickListener()
-                        {
-                            @Override
-                            public void onOkClicked(DialogInterface dialog)
-                            {
-                                enablePasswdExpiryNotif(fileData);
-                            }
-                        },
-                        act.getString(R.string.expiration_notifications),
-                        act.getString(R.string.expiration_notifications_warning));
-            dlgData.itsDialog.show();
-            dlgData.itsValidator.validate();
-        }
-    }
-
-
     /* (non-Javadoc)
      * @see com.jefftharris.passwdsafe.file.PasswdFileDataObserver#passwdFileDataChanged(com.jefftharris.passwdsafe.file.PasswdFileData)
      */
@@ -300,24 +253,6 @@ public class NotificationMgr implements PasswdFileDataObserver
         }
         }
         return false;
-    }
-
-
-    /** Enable notifications for the password file */
-    private void enablePasswdExpiryNotif(@NonNull PasswdFileData fileData)
-    {
-        try {
-            SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-            try {
-                db.beginTransaction();
-                enablePasswdExpiryNotif(fileData, db);
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
-        } catch (SQLException e) {
-            Log.e(TAG, "Database error", e);
-        }
     }
 
 
