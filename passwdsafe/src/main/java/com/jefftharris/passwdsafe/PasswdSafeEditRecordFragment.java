@@ -97,7 +97,7 @@ public class PasswdSafeEditRecordFragment
         void finishEditRecord(boolean save, PasswdLocation newLocation);
     }
 
-    private Validator itsValidator = new Validator();
+    private final Validator itsValidator = new Validator();
     private final TreeSet<String> itsGroups =
             new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     private int itsPrevGroupPos = -1;
