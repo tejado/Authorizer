@@ -286,21 +286,6 @@ public final class GuiUtils
         }
     }
 
-    /** Ensure the selected item in a ListView is visible */
-    public static void ensureListViewSelectionVisible(final ListView lv,
-                                                      final int pos)
-    {
-        lv.post(new Runnable() {
-            public void run()
-            {
-                if ((pos <= lv.getFirstVisiblePosition()) ||
-                    (pos >= lv.getLastVisiblePosition())) {
-                    lv.setSelection(pos);
-                }
-            }
-        });
-    }
-
 
     /** Remove the layout_centerVertical flag if it is not supported */
     public static void removeUnsupportedCenterVertical(View v)
