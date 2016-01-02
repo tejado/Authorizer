@@ -26,15 +26,12 @@
     <string name="close_file">Datei Schließen</string>
     <string name="close_file_screen_off">Datei schließen, wenn Bildschirm abschaltet</string>
     <string name="confirm">Bestätigen</string>
-    <string name="confirm_label">Bestätigen:</string>
-    <string name="confirm_password_label">Passwort bestätigen:</string>
     <string name="cannot_delete_record">Kann Eintrag nicht löschen - %1$s</string>
     <string name="content_file">Inhaltsdatei</string>
     <string name="continue_str">Fortsetzen</string>
     <string name="continue_p">Fortsetzen?</string>
     <string name="copy_clipboard">Kopieren</string>
     <string name="copy_notes">Notiz kopieren</string>
-    <string name="copy_password">Passwort kopieren</string>
     <string name="copy_user">Benutzername kopieren</string>
     <string name="created">Erstellt</string>
     <string name="current">Aktuell</string>
@@ -50,11 +47,9 @@
     <string name="delete">Löschen</string>
     <string name="delete_file">Datei löschen</string>
     <string name="delete_file_msg">Lösche Datei \"%1$s\"?</string>
-    <string name="delete_file_title">Bestätige Löschen</string>
     <string name="delete_policy">Regel löschen</string>
     <string name="delete_policy_msg">Lösche Regel \"%1$s\"?</string>
     <string name="delete_record_msg">Lösche Eintrag \"%1$s\"?</string>
-    <string name="details">Details</string>
     <string name="directory_for_files">Standardordner</string>
     <string name="done">Fertig</string>
     <string name="duplicate_entry">Eintrag schon vorhanden</string>
@@ -76,7 +71,6 @@
     <string name="expiration">Ablaufdatum</string>
     <string name="expiration_notifications">Ablaufmitteilungen</string>
     <string name="expiration_notifications_warning">Mitteilungen über das Ablaufdatum von Passwörtern erfordert, dass PasswdSafe Informationen (Eintragstitel, Gruppe und Ablaufdatum) auf dem Gerät unverschlüsselt speichert. Passwörter werden nicht gespeichert.</string>
-    <string name="expired_passwords">Abgelaufene Passwörter</string>
     <string name="expired_password_notification">Mitteilungen über abgelaufene Passwörter</string>
     <string name="expiring_password">Passwort abgelaufen</string>
     <string name="ext_storage_not_mounted">Externer Speicher muss eingehängt sein, um Dateien zu sehen.</string>
@@ -148,7 +142,6 @@
     <string name="new_local_file">Neue lokale Datei</string>
     <string name="new_onedrive_file">Neue OneDrive-Datei</string>
     <string name="new_owncloud_file">Neue ownCloud-Datei</string>
-    <string name="new_password_label">Neues Passwort:</string>
     <string name="new_policy">Neue Regel</string>
     <string name="next">Nächtes</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
