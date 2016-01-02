@@ -7,24 +7,17 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import org.pwsafe.lib.file.PwsFile;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
-import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
@@ -47,15 +40,9 @@ public class PasswdSafeApp extends Application
 
     public static final String RESULT_DATA_UUID = "uuid";
 
-    private PasswdFileData itsFileData = null;
-    private final WeakHashMap<Activity, Object> itsFileDataActivities =
-            new WeakHashMap<>();
     private PasswdPolicy itsDefaultPasswdPolicy = null;
     private NotificationMgr itsNotifyMgr;
-    private boolean itsIsFileCloseClearClipboard =
-        Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF;
     private boolean itsIsOpenDefault = true;
-    private BroadcastReceiver itsScreenOffReceiver = null;
 
     private static final String TAG = "PasswdSafeApp";
 
@@ -106,20 +93,8 @@ public class PasswdSafeApp extends Application
 
         setPasswordEncodingPref(prefs);
         setPasswordDefaultSymsPref(prefs);
-        setFileCloseClearClipboardPref(prefs);
         itsDefaultPasswdPolicy = Preferences.getDefPasswdPolicyPref(prefs,
                                                                     this);
-    }
-
-    /* (non-Javadoc)
-     * @see android.app.Application#onTerminate()
-     */
-    @Override
-    public void onTerminate()
-    {
-        PasswdSafeUtil.dbginfo(TAG, "onTerminate");
-        closeFileData();
-        super.onTerminate();
     }
 
     /* (non-Javadoc)
@@ -137,10 +112,6 @@ public class PasswdSafeApp extends Application
         }
         case Preferences.PREF_PASSWD_DEFAULT_SYMS: {
             setPasswordDefaultSymsPref(prefs);
-            break;
-        }
-        case Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD: {
-            setFileCloseClearClipboardPref(prefs);
             break;
         }
         case Preferences.PREF_PASSWD_EXPIRY_NOTIF: {
@@ -230,55 +201,11 @@ public class PasswdSafeApp extends Application
                 Preferences.getPasswdDefaultSymbolsPref(prefs));
     }
 
-    private void setFileCloseClearClipboardPref(SharedPreferences prefs)
-    {
-        itsIsFileCloseClearClipboard =
-            Preferences.getFileCloseClearClipboardPref(prefs);
-    }
-
     /** Get the password expiration filter for notifications from a
      * preference */
     private static PasswdRecordFilter.ExpiryFilter
         getPasswdExpiryNotifPref(SharedPreferences prefs)
     {
         return Preferences.getPasswdExpiryNotifPref(prefs).getFilter();
-    }
-
-    private synchronized void closeFileData()
-    {
-        PasswdSafeUtil.dbginfo(TAG, "closeFileData data: %s", itsFileData);
-        if (itsFileData != null) {
-            itsFileData.close();
-            itsFileData = null;
-
-            if (itsIsFileCloseClearClipboard) {
-                PasswdSafeUtil.copyToClipboard("", this);
-            }
-        }
-
-        for (Map.Entry<Activity, Object> entry :
-            itsFileDataActivities.entrySet()) {
-            PasswdSafeUtil.dbgverb(TAG, "closeFileData activity: %s",
-                                   entry.getKey());
-            entry.getKey().finish();
-        }
-        itsFileDataActivities.clear();
-        checkScreenOffReceiver();
-    }
-
-    /** Check whether the screen off receiver should be added or removed */
-    private synchronized void checkScreenOffReceiver()
-    {
-        boolean haveActivities = !itsFileDataActivities.isEmpty();
-        if ((itsScreenOffReceiver == null) && haveActivities) {
-            PasswdSafeUtil.dbginfo(TAG, "add screen off receiver");
-            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-            //itsScreenOffReceiver = new FileTimeoutReceiver();
-            registerReceiver(itsScreenOffReceiver, filter);
-        } else if ((itsScreenOffReceiver != null) && !haveActivities) {
-            PasswdSafeUtil.dbginfo(TAG, "remove screen off receiver");
-            unregisterReceiver(itsScreenOffReceiver);
-            itsScreenOffReceiver = null;
-        }
     }
 }
