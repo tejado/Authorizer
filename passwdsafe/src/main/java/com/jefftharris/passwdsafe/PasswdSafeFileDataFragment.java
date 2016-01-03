@@ -56,7 +56,7 @@ public class PasswdSafeFileDataFragment extends Fragment
         prefs.registerOnSharedPreferenceChangeListener(this);
         itsIsCloseClearClipboard =
                 Preferences.getFileCloseClearClipboardPref(prefs);
-        itsFileDataView.onAttach(ctx);
+        itsFileDataView.onAttach(ctx, prefs);
     }
 
     @Override
@@ -96,6 +96,9 @@ public class PasswdSafeFileDataFragment extends Fragment
                     Preferences.getFileCloseClearClipboardPref(prefs);
             break;
         }
+        }
+        if (itsFileDataView.handleSharedPreferenceChanged(prefs, key)) {
+            refreshFileData();
         }
     }
 
@@ -146,7 +149,7 @@ public class PasswdSafeFileDataFragment extends Fragment
     {
         PasswdFileToken token = acquireFileData();
         try {
-            itsFileDataView.setFileData(token.getFileData());
+            itsFileDataView.refreshFileData(token.getFileData());
         } finally {
             token.release();
         }

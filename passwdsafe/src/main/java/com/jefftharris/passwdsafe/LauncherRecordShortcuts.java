@@ -8,8 +8,10 @@
 package com.jefftharris.passwdsafe;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,7 +35,8 @@ import org.pwsafe.lib.file.PwsRecord;
 import java.util.List;
 
 public class LauncherRecordShortcuts extends AppCompatActivity
-        implements PasswdSafeListFragment.Listener
+        implements PasswdSafeListFragment.Listener,
+                   SharedPreferences.OnSharedPreferenceChangeListener
 {
     /**
      * Intent flag to apply a filter to show records that have no aliases
@@ -65,8 +68,12 @@ public class LauncherRecordShortcuts extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher_record_shortcuts);
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
         itsFile = (TextView)findViewById(R.id.file);
-        itsFileDataView.onAttach(this);
+        itsFileDataView.onAttach(this, prefs);
 
         Intent intent = getIntent();
         switch (intent.getAction()) {
@@ -146,8 +153,26 @@ public class LauncherRecordShortcuts extends AppCompatActivity
     @Override
     public void onDestroy()
     {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
         itsFileDataView.onDetach();
         super.onDestroy();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    {
+        if (itsFileDataView.handleSharedPreferenceChanged(prefs, key)) {
+            PasswdSafeFileDataFragment.useOpenFileData(new PasswdFileDataUser()
+            {
+                @Override
+                public void useFileData(@NonNull PasswdFileData fileData)
+                {
+                    itsFileDataView.refreshFileData(fileData);
+                }
+            });
+        }
     }
 
     @Override

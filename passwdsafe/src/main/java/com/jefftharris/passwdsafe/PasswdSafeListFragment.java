@@ -172,7 +172,7 @@ public class PasswdSafeListFragment extends ListFragment
     public void onListItemClick(ListView l, View v, int position, long id)
     {
         PasswdRecordListData item = itsAdapter.getItem(position);
-        if (item.itsRecord != null) {
+        if (item.itsIsRecord) {
             itsListener.changeLocation(itsLocation.selectRecord(item.itsUuid));
         } else {
             itsListener.changeLocation(itsLocation.selectGroup(item.itsTitle));
@@ -348,7 +348,7 @@ public class PasswdSafeListFragment extends ListFragment
             ListView list = (ListView)parent;
             boolean isSelected = list.isItemChecked(position);
             itemViews.update(item, isSelected,
-                             !itsIsContents && (item.itsRecord != null));
+                             !itsIsContents && item.itsIsRecord);
             return convertView;
         }
 
