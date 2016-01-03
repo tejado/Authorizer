@@ -258,6 +258,7 @@ public class SyncProviderFilesFragment extends ListFragment
         switch (item.getItemId()) {
         case R.id.menu_sync_files: {
             try {
+                // TODO: do sync in background to prevent ANR
                 ContentResolver cr = getActivity().getContentResolver();
                 cr.query(PasswdSafeContract.Methods.CONTENT_URI,
                          null, null,
