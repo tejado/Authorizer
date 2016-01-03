@@ -246,6 +246,29 @@ public class PasswdFileDataView
     }
 
     /**
+     * Does the data view show the given group
+     */
+    public boolean hasGroup(String group)
+    {
+        if (TextUtils.isEmpty(group)) {
+            return true;
+        }
+
+        ArrayList<String> groups = new ArrayList<>();
+        PasswdFileData.splitGroup(group, groups);
+
+        GroupNode node = itsRootNode;
+        for (String checkGroup: groups) {
+            GroupNode childNode = node.getGroup(checkGroup);
+            if (childNode == null) {
+                return false;
+            }
+            node = childNode;
+        }
+        return true;
+    }
+
+    /**
      * Get the record filter
      */
     public synchronized PasswdRecordFilter getRecordFilter()
