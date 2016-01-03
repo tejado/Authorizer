@@ -88,7 +88,7 @@
     <string name="go">Gehen</string>
     <string name="go_to">Gehe zu</string>
     <string name="group">Gruppe</string>
-    <string name="group_cannot_start_with_dot">Gruppe kann nicht mit einem '.' beginnen</string>
+    <string name="group_cannot_start_with_dot">Gruppe kann nicht mit einem \'.\' beginnen</string>
     <string name="group_header">GRUPPE</string>
     <string name="group_records">Gruppeneintrag</string>
     <string name="help">Hilfe</string>
