@@ -105,6 +105,16 @@
                      android:prompt="@string/choose_group"
                      android:spinnerMode="dialog"
                      tools:ignore="UnusedAttribute"/>
+
+            <TextView android:id="@+id/group_error"
+                      style="@style/TextAppearance.Design.Error"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingEnd="4dp"
+                      android:paddingLeft="4dp"
+                      android:paddingRight="4dp"
+                      android:paddingStart="4dp"/>
+
         </LinearLayout>
 
         <android.support.design.widget.TextInputLayout

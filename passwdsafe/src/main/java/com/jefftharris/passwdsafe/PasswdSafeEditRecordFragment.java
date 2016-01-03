@@ -126,6 +126,7 @@ public class PasswdSafeEditRecordFragment
     private TextInputLayout itsTitleInput;
     private TextView itsTitle;
     private Spinner itsGroup;
+    private TextView itsGroupError;
     private TextView itsUser;
     private View itsUrlInput;
     private TextView itsUrl;
@@ -204,6 +205,7 @@ public class PasswdSafeEditRecordFragment
         itsValidator.registerTextView(itsTitle);
         itsGroup = (Spinner)rootView.findViewById(R.id.group);
         itsGroup.setOnItemSelectedListener(this);
+        itsGroupError = (TextView)rootView.findViewById(R.id.group_error);
         itsUser = (TextView)rootView.findViewById(R.id.user);
         itsValidator.registerTextView(itsUser);
         itsUrlInput = rootView.findViewById(R.id.url_input);
@@ -1654,6 +1656,16 @@ public class PasswdSafeEditRecordFragment
             boolean valid = (typeError == null);
             valid &= !TextInputUtils.setTextInputError(validateTitle(),
                                                        itsTitleInput);
+
+            String group = getGroupVal();
+            String groupError = null;
+            if (!TextUtils.isEmpty(group) && (group.charAt(0) == '.')) {
+                groupError = getString(R.string.group_cannot_start_with_dot);
+            }
+            GuiUtils.setVisible(itsGroupError, (groupError != null));
+            itsGroupError.setText(groupError);
+            valid &= (groupError == null);
+
             valid &= !TextInputUtils.setTextInputError(validatePassword(),
                                                        itsPasswordInput);
             valid &= !TextInputUtils.setTextInputError(
