@@ -7,8 +7,6 @@
  */
 package com.jefftharris.passwdsafe.view;
 
-import org.pwsafe.lib.file.PwsRecord;
-
 /**
  * Holder class for password record data in a list view
  */
