@@ -339,7 +339,7 @@ public class MainActivity extends FragmentActivity
             extras.putBoolean(SyncAdapter.SYNC_EXTRAS_FULL, true);
             ApiCompat.requestManualSync(itsGdriveAccount,
                                         PasswdSafeContract.CONTENT_URI,
-                                        this, extras);
+                                        extras);
         }
     }
 

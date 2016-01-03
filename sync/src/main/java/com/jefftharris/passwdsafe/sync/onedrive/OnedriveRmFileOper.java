@@ -37,7 +37,7 @@ public class OnedriveRmFileOper
         try {
             providerClient.deleteItemByPath(itsFile.itsRemoteId);
         } catch (RetrofitError e) {
-            if (!OnedriveSyncer.is404Error(e)) {
+            if (OnedriveSyncer.isNot404Error(e)) {
                 throw e;
             }
         }

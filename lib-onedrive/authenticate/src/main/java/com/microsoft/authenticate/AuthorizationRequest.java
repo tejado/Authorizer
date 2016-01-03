@@ -38,6 +38,7 @@ import android.widget.LinearLayout;
  * displays the login and consent page and then, on a successful login and consent, performs an
  * async AccessToken request.
  */
+@SuppressWarnings("deprecation")
 class AuthorizationRequest implements ObservableOAuthRequest, OAuthRequestObserver {
 
     /**

@@ -32,6 +32,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
@@ -121,7 +122,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
      */
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs)
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs)
     {
         if (selection != null) {
             throw new IllegalArgumentException("selection not supported");
@@ -195,7 +196,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#getType(android.net.Uri)
      */
     @Override
-    public String getType(Uri uri)
+    public String getType(@NonNull Uri uri)
     {
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDERS: {
@@ -233,7 +234,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
      */
     @Override
-    public Uri insert(Uri uri, ContentValues values)
+    public Uri insert(@NonNull Uri uri, ContentValues values)
     {
         switch (PasswdSafeContract.MATCHER.match(uri)) {
         case PasswdSafeContract.MATCH_PROVIDERS: {
@@ -347,7 +348,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)
      */
     @Override
-    public Cursor query(Uri uri,
+    public Cursor query(@NonNull Uri uri,
                         String[] projection,
                         String selection,
                         String[] selectionArgs,
@@ -477,8 +478,9 @@ public class PasswdSafeProvider extends ContentProvider
             SQLiteDatabase db = syncDb.getDb();
             Cursor c = qb.query(db, projection, selection, selectionArgs,
                                 null, null, sortOrder);
-            if (c != null) {
-                c.setNotificationUri(getContext().getContentResolver(),
+            Context ctx = getContext();
+            if ((c != null) && (ctx != null)) {
+                c.setNotificationUri(ctx.getContentResolver(),
                                      PasswdSafeContract.CONTENT_URI);
             }
             return c;
@@ -491,7 +493,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])
      */
     @Override
-    public int update(Uri uri,
+    public int update(@NonNull Uri uri,
                       ContentValues values,
                       String selection,
                       String[] selectionArgs)
@@ -540,6 +542,9 @@ public class PasswdSafeProvider extends ContentProvider
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
                 Context ctx = getContext();
+                if (ctx == null) {
+                    throw new NullPointerException("ctx");
+                }
 
                 DbFile file = SyncDb.getFile(id, db);
                 if (file == null) {
@@ -596,7 +601,7 @@ public class PasswdSafeProvider extends ContentProvider
      * @see android.content.ContentProvider#openFile(android.net.Uri, java.lang.String)
      */
     @Override
-    public ParcelFileDescriptor openFile(Uri uri, String mode)
+    public ParcelFileDescriptor openFile(@NonNull Uri uri, @NonNull String mode)
             throws FileNotFoundException
     {
         if (!mode.equals("r")) {
@@ -615,10 +620,12 @@ public class PasswdSafeProvider extends ContentProvider
             } finally {
                 syncDb.endTransactionAndRelease();
             }
-            if ((file == null) || (file.itsLocalFile == null)) {
+            Context ctx = getContext();
+            if ((file == null) || (file.itsLocalFile == null) ||
+                (ctx == null)) {
                 throw new FileNotFoundException(uri.toString());
             }
-            File localFile = getContext().getFileStreamPath(file.itsLocalFile);
+            File localFile = ctx.getFileStreamPath(file.itsLocalFile);
             PasswdSafeUtil.dbginfo(TAG, "openFile uri %s, file %s",
                                    uri, localFile);
             return ParcelFileDescriptor.open(
@@ -693,7 +700,7 @@ public class PasswdSafeProvider extends ContentProvider
                     Uri uri = ContentUris.withAppendedId(
                             PasswdSafeContract.Providers.CONTENT_URI,
                             provider.itsId);
-                    ApiCompat.requestManualSync(acct, uri, getContext(), null);
+                    ApiCompat.requestManualSync(acct, uri, null);
                     break;
                 }
                 case GDRIVE_PLAY: {
@@ -711,7 +718,11 @@ public class PasswdSafeProvider extends ContentProvider
     /** Notify both files and remote files listeners for changes */
     private void notifyFileChanges(long providerId, long fileId)
     {
-        ContentResolver cr = getContext().getContentResolver();
+        Context ctx = getContext();
+        if (ctx == null) {
+            return;
+        }
+        ContentResolver cr = ctx.getContentResolver();
 
         Uri providerUri = ContentUris.withAppendedId(
                 PasswdSafeContract.Providers.CONTENT_URI, providerId);

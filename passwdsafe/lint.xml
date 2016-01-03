@@ -23,4 +23,5 @@
     <issue id="TextViewEdits">
         <ignore path="res/layout/record_edit.xml" />
     </issue>
+    <issue id="ManifestResource" severity="ignore" />
 </lint>

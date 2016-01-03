@@ -51,6 +51,7 @@ import com.jefftharris.passwdsafe.view.DialogUtils;
 /**
  * The NotificationMgr class encapsulates the notifications provided by the app
  */
+@SuppressWarnings("TryFinallyCanBeTryWithResources")
 public class NotificationMgr implements PasswdFileDataObserver
 {
     private static final String TAG = "NotificationMgr";
@@ -107,24 +108,26 @@ public class NotificationMgr implements PasswdFileDataObserver
         return itsNotifUris.contains(uri.getUri());
     }
 
-
-    /** Toggle whether notifications are enabled for a password file */
-    public void togglePasswdExpiryNotif(final PasswdFileData fileData,
-                                        Activity act)
+    /**
+     * Set whether notifications are enabled for a password file
+     */
+    public void setPasswdExpiryNotif(@NonNull PasswdFileData fileData,
+                                     boolean enabled)
     {
-        if (fileData == null) {
-            return;
-        }
-        boolean checkAddNotif = true;
         try {
             SQLiteDatabase db = itsDbHelper.getWritableDatabase();
             try {
                 db.beginTransaction();
                 Long uriId = getDbUriId(fileData.getUri(), db);
-                if (uriId != null) {
-                    checkAddNotif = false;
-                    removeUri(uriId, db);
-                    loadEntries(db);
+                if (enabled) {
+                    if (uriId == null) {
+                        enablePasswdExpiryNotif(fileData, db);
+                    }
+                } else {
+                    if (uriId != null) {
+                        removeUri(uriId, db);
+                        loadEntries(db);
+                    }
                 }
                 db.setTransactionSuccessful();
             } finally {
@@ -132,25 +135,6 @@ public class NotificationMgr implements PasswdFileDataObserver
             }
         } catch (SQLException e) {
             Log.e(TAG, "Database error", e);
-            return;
-        }
-
-        if (checkAddNotif) {
-            DialogUtils.DialogData dlgData =
-                    DialogUtils.createConfirmPrompt(
-                        act,
-                        new AbstractDialogClickListener()
-                        {
-                            @Override
-                            public void onOkClicked(DialogInterface dialog)
-                            {
-                                enablePasswdExpiryNotif(fileData);
-                            }
-                        },
-                        act.getString(R.string.expiration_notifications),
-                        act.getString(R.string.expiration_notifications_warning));
-            dlgData.itsDialog.show();
-            dlgData.itsValidator.validate();
         }
     }
 
@@ -273,23 +257,14 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
     /** Enable notifications for the password file */
-    private void enablePasswdExpiryNotif(PasswdFileData fileData)
+    private void enablePasswdExpiryNotif(@NonNull PasswdFileData fileData,
+                                         SQLiteDatabase db)
+            throws SQLException
     {
-        try {
-            SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-            try {
-                db.beginTransaction();
-                ContentValues values = new ContentValues(1);
-                values.put(DB_COL_URIS_URI, fileData.getUri().toString());
-                long id = db.insertOrThrow(DB_TABLE_URIS, null, values);
-                doUpdatePasswdFileData(id, fileData, db);
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
-        } catch (SQLException e) {
-            Log.e(TAG, "Database error", e);
-        }
+        ContentValues values = new ContentValues(1);
+        values.put(DB_COL_URIS_URI, fileData.getUri().toString());
+        long id = db.insertOrThrow(DB_TABLE_URIS, null, values);
+        doUpdatePasswdFileData(id, fileData, db);
     }
 
 
@@ -509,7 +484,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         GuiUtils.showNotification(
             itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
             itsCtx.getString(R.string.expiring_password),
-            title, R.drawable.ic_launcher_passwdsafe,
+            title, R.mipmap.ic_launcher_passwdsafe,
             passwdUri.getIdentifier(itsCtx, false),
             strs, intent, info.getNotifId(), false);
         return true;

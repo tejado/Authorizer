@@ -10,16 +10,21 @@ package com.jefftharris.passwdsafe.file;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 
+import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.Utils;
-import com.jefftharris.passwdsafe.lib.view.GuiUtils.EnableAdapter;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 public class PasswdHistory
 {
@@ -59,9 +64,6 @@ public class PasswdHistory
 
     public static final int MAX_SIZE_MIN = 0;
     public static final int MAX_SIZE_MAX = 255;
-
-    private static final String PASSWD = "passwd";
-    private static final String DATE = "date";
 
     private boolean itsIsEnabled;
     private int itsMaxSize;
@@ -225,24 +227,122 @@ public class PasswdHistory
         }
     }
 
-
-    public static ListAdapter createAdapter(PasswdHistory history,
-                                            Context context,
-                                            boolean enabled)
+    /**
+     * Are two histories equal
+     */
+    public static boolean isEqual(PasswdHistory hist1, PasswdHistory hist2)
     {
-        ArrayList<HashMap<String, Object>> histData = new ArrayList<>();
-        for (PasswdHistory.Entry entry : history.getPasswds()) {
-            HashMap<String, Object> entryData = new HashMap<>();
-            entryData.put(PASSWD, entry.getPasswd());
-            entryData.put(DATE, Utils.formatDate(entry.getDate(), context));
-            histData.add(entryData);
+        //noinspection SimplifiableIfStatement
+        if (((hist1 == null) && (hist2 != null)) ||
+            ((hist1 != null) && (hist2 == null))) {
+            return false;
         }
 
-        return new EnableAdapter(context, histData,
-                                 android.R.layout.simple_list_item_2,
-                                 new String[] { PASSWD, DATE },
-                                 new int[] { android.R.id.text1,
-                                             android.R.id.text2 },
-                                 enabled);
+        return (hist1 == null) || hist1.equals(hist2);
+    }
+
+    /**
+     * Create a list adapter to show a history
+     */
+    public static ListAdapter createAdapter(PasswdHistory history,
+                                            boolean enabled,
+                                            boolean hasContextMenu,
+                                            Context ctx)
+    {
+        ArrayList<PasswdHistory.Entry> entries =
+                new ArrayList<>(history.getPasswds());
+        return new HistoryAdapter(entries, enabled, hasContextMenu, ctx);
+    }
+
+
+    /**
+     * List adapter to show history entries
+     */
+    private static class HistoryAdapter extends ArrayAdapter<Entry>
+    {
+        private final boolean itsIsEnabled;
+        private final boolean itsHasContextMenu;
+        private final LayoutInflater itsInflater;
+
+        /**
+         * Constructor
+         */
+        public HistoryAdapter(ArrayList<Entry> entries,
+                              boolean enabled,
+                              boolean hasContextMenu,
+                              Context ctx)
+        {
+            super(ctx, R.layout.passwd_history_list_item, entries);
+            itsIsEnabled = enabled;
+            itsHasContextMenu = hasContextMenu;
+            itsInflater = (LayoutInflater)ctx.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            ViewHolder itemViews;
+            if (convertView == null) {
+                convertView = itsInflater.inflate(
+                        R.layout.passwd_history_list_item, parent, false);
+                itemViews = new ViewHolder(convertView, itsIsEnabled,
+                                           itsHasContextMenu);
+                convertView.setTag(itemViews);
+            } else {
+                itemViews = (ViewHolder)convertView.getTag();
+            }
+
+            Entry entry = getItem(position);
+            itemViews.update(entry, getContext());
+            return convertView;
+        }
+
+        /**
+         * View holder class for fields in each entry's layout
+         */
+        private static class ViewHolder implements View.OnClickListener
+        {
+            private final TextView itsPassword;
+            private final TextView itsDate;
+
+            /**
+             * Constructor
+             */
+            public ViewHolder(View view,
+                              boolean enabled,
+                              boolean hasContextMenu)
+            {
+                itsPassword = (TextView)view.findViewById(R.id.password);
+                itsDate = (TextView)view.findViewById(R.id.date);
+
+                view.setEnabled(enabled);
+                itsPassword.setEnabled(enabled);
+                itsDate.setEnabled(enabled);
+
+                View menuBtn = view.findViewById(R.id.item_menu);
+                if (hasContextMenu) {
+                    menuBtn.setEnabled(enabled);
+                    menuBtn.setOnClickListener(this);
+                } else {
+                    GuiUtils.setVisible(menuBtn, false);
+                }
+            }
+
+            /**
+             * Update the layout fields with values from the entry
+             */
+            public void update(Entry entry, Context ctx)
+            {
+                itsPassword.setText(entry.getPasswd());
+                itsDate.setText(Utils.formatDate(entry.getDate(), ctx));
+            }
+
+            @Override
+            public void onClick(View v)
+            {
+                v.showContextMenu();
+            }
+        }
     }
 }

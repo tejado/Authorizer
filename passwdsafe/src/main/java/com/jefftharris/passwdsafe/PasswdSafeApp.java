@@ -7,160 +7,25 @@
  */
 package com.jefftharris.passwdsafe;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ConcurrentModificationException;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import org.pwsafe.lib.file.PwsFile;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.text.TextUtils;
 
-import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 
 public class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
-    public class AppActivityPasswdFile extends ActivityPasswdFile
-    {
-        /// The file data
-        PasswdFileData itsFileData;
-
-        public AppActivityPasswdFile(PasswdFileData fileData,
-                                     PasswdFileActivity activity)
-        {
-            super(activity);
-            itsFileData = fileData;
-
-            touch();
-        }
-
-        /**
-         * @return the fileData
-         */
-        @Override
-        public final PasswdFileData getFileData()
-        {
-            synchronized (PasswdSafeApp.this) {
-                touch();
-                return itsFileData;
-            }
-        }
-
-        @Override
-        public final boolean isOpen()
-        {
-            synchronized (PasswdSafeApp.this) {
-                return (itsFileData != null);
-            }
-        }
-
-        @Override
-        public final void setFileData(PasswdFileData fileData)
-        {
-            synchronized (PasswdSafeApp.this) {
-                PasswdSafeApp.this.setFileData(fileData, getActivity());
-                itsFileData = fileData;
-            }
-        }
-
-        /** Set the UUID of the last viewed record */
-        @Override
-        public final void setLastViewedRecord(String uuid)
-        {
-            PasswdSafeApp.this.setLastViewedRecord(uuid);
-        }
-
-        /**
-         * Save the file.  Will likely be called in a background thread.
-         * @throws IOException
-         * @throws ConcurrentModificationException
-         * @throws NoSuchAlgorithmException
-         */
-        @Override
-        protected final void doSave()
-            throws NoSuchAlgorithmException, ConcurrentModificationException,
-                   IOException
-        {
-            synchronized (PasswdSafeApp.this) {
-                if (itsFileData != null) {
-                    cancelFileDataTimer();
-                    try {
-                        itsFileData.save(PasswdSafeApp.this);
-                    } finally {
-                        touchFileDataTimer();
-                    }
-                }
-            }
-        }
-
-        @Override
-        public final void touch()
-        {
-            touchFileData(getActivity());
-        }
-
-        @Override
-        public final void release()
-        {
-            releaseFileData(getActivity());
-        }
-
-        @Override
-        public final void close()
-        {
-            synchronized (PasswdSafeApp.this) {
-                PasswdSafeApp.this.setFileData(null, getActivity());
-                itsFileData = null;
-            }
-        }
-
-        @Override
-        public final void pauseFileTimer()
-        {
-            PasswdSafeApp.this.pauseFileTimer();
-        }
-
-        @Override
-        public final void resumeFileTimer()
-        {
-            PasswdSafeApp.this.resumeFileTimer();
-        }
-    }
-
-    public static class FileTimeoutReceiver extends BroadcastReceiver
-    {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean closeFile = true;
-            PasswdSafeApp app = (PasswdSafeApp)context.getApplicationContext();
-            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-                closeFile = app.itsIsFileCloseScreenOff;
-            }
-            if (closeFile) {
-                Log.i(TAG, "File timeout: " + intent);
-                app.closeFileData(true);
-            }
-        }
-    }
 
     public static final String DEBUG_AUTO_FILE =
         null;
@@ -168,34 +33,17 @@ public class PasswdSafeApp extends Application
 
     public static final String EXPIRATION_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.EXPIRATION_TIMEOUT";
-    private static final String FILE_TIMEOUT_INTENT =
+    public static final String FILE_TIMEOUT_INTENT =
         "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
     public static final String CHOOSE_RECORD_INTENT =
         "com.jefftharris.passwdsafe.action.CHOOSE_RECORD_INTENT";
 
-    public static final int RESULT_MODIFIED = Activity.RESULT_FIRST_USER;
     public static final String RESULT_DATA_UUID = "uuid";
 
-    private PasswdFileData itsFileData = null;
-    private String itsLastViewedRecord = null;
-    private final WeakHashMap<Activity, Object> itsFileDataActivities =
-            new WeakHashMap<>();
     private PasswdPolicy itsDefaultPasswdPolicy = null;
-    private AlarmManager itsAlarmMgr;
     private NotificationMgr itsNotifyMgr;
-    private PendingIntent itsCloseIntent;
-    private int itsFileCloseTimeout =
-        Preferences.PREF_FILE_CLOSE_TIMEOUT_DEF.getTimeout();
-    private boolean itsIsFileCloseScreenOff =
-                    Preferences.PREF_FILE_CLOSE_SCREEN_OFF_DEF;
-    private boolean itsIsFileCloseClearClipboard =
-        Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF;
     private boolean itsIsOpenDefault = true;
-    private boolean itsFileTimerPaused = false;
-    private BroadcastReceiver itsScreenOffReceiver = null;
 
-    private static final Intent FILE_TIMEOUT_INTENT_OBJ =
-        new Intent(FILE_TIMEOUT_INTENT);
     private static final String TAG = "PasswdSafeApp";
 
     static {
@@ -216,9 +64,10 @@ public class PasswdSafeApp extends Application
         SharedPreferences prefs =
             PreferenceManager.getDefaultSharedPreferences(this);
 
-        itsAlarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmMgr =
+                (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         itsNotifyMgr = new NotificationMgr(this,
-                                           itsAlarmMgr,
+                                           alarmMgr,
                                            getPasswdExpiryNotifPref(prefs));
 
         prefs.registerOnSharedPreferenceChangeListener(this);
@@ -236,30 +85,16 @@ public class PasswdSafeApp extends Application
             SharedPreferences.Editor prefsEdit = prefs.edit();
             fileListEdit.remove(dirPrefName);
             prefsEdit.putString(Preferences.PREF_FILE_DIR, dirPref);
-            fileListEdit.commit();
-            prefsEdit.commit();
+            fileListEdit.apply();
+            prefsEdit.apply();
         }
         Preferences.upgradePasswdPolicy(prefs, this);
         Preferences.upgradeDefaultFilePref(prefs);
 
-        updateFileCloseTimeoutPref(prefs);
-        updateFileCloseScreenOffPref(prefs);
         setPasswordEncodingPref(prefs);
         setPasswordDefaultSymsPref(prefs);
-        setFileCloseClearClipboardPref(prefs);
         itsDefaultPasswdPolicy = Preferences.getDefPasswdPolicyPref(prefs,
                                                                     this);
-    }
-
-    /* (non-Javadoc)
-     * @see android.app.Application#onTerminate()
-     */
-    @Override
-    public void onTerminate()
-    {
-        PasswdSafeUtil.dbginfo(TAG, "onTerminate");
-        closeFileData(false);
-        super.onTerminate();
     }
 
     /* (non-Javadoc)
@@ -271,24 +106,12 @@ public class PasswdSafeApp extends Application
                                key, prefs.getAll().get(key));
 
         switch (key) {
-        case Preferences.PREF_FILE_CLOSE_TIMEOUT: {
-            updateFileCloseTimeoutPref(prefs);
-            break;
-        }
-        case Preferences.PREF_FILE_CLOSE_SCREEN_OFF: {
-            updateFileCloseScreenOffPref(prefs);
-            break;
-        }
         case Preferences.PREF_PASSWD_ENC: {
             setPasswordEncodingPref(prefs);
             break;
         }
         case Preferences.PREF_PASSWD_DEFAULT_SYMS: {
             setPasswordDefaultSymsPref(prefs);
-            break;
-        }
-        case Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD: {
-            setFileCloseClearClipboardPref(prefs);
             break;
         }
         case Preferences.PREF_PASSWD_EXPIRY_NOTIF: {
@@ -309,74 +132,21 @@ public class PasswdSafeApp extends Application
     }
 
     /**
-     * Sanitize an intent URI for the open file URI. Removes fragments and query
-     * parameters
+     * Sanitize an intent URI for a file to open. Removes fragments and query
+     * params
      */
-    public static PasswdFileUri getFileUriFromIntent(Intent intent,
-                                                     Context ctx)
+    public static Uri getOpenUriFromIntent(Intent intent)
     {
         Uri uri = intent.getData();
+        if (uri == null) {
+            return null;
+        }
         Uri.Builder builder = uri.buildUpon();
         builder.fragment("");
         builder.query("");
-        return new PasswdFileUri(builder.build(), ctx);
+        return builder.build();
     }
 
-    public synchronized ActivityPasswdFile accessPasswdFile
-    (
-         PasswdFileUri uri,
-         PasswdFileActivity activity
-    )
-    {
-        if ((itsFileData == null) || (itsFileData.getUri() == null) ||
-            (!itsFileData.getUri().equals(uri))) {
-            itsFileDataActivities.remove(activity.getActivity());
-            checkScreenOffReceiver();
-            closeFileData(false);
-        }
-
-        PasswdSafeUtil.dbgverb(TAG, "access uri: %s, data: %s",
-                               uri, itsFileData);
-        return new AppActivityPasswdFile(itsFileData, activity);
-    }
-
-    public synchronized ActivityPasswdFile accessOpenFile
-    (
-        PasswdFileActivity activity
-    )
-    {
-        PasswdSafeUtil.dbgverb(TAG, "access open file data: %s", itsFileData);
-        if (itsFileData == null) {
-            return null;
-        }
-        return new AppActivityPasswdFile(itsFileData, activity);
-    }
-
-
-    /** Access an open password file. The data returned should only be used for
-     * short durations. */
-    public synchronized PasswdFileData accessOpenFileData()
-    {
-        PasswdSafeUtil.dbgverb(TAG, "access open file data: %s", itsFileData);
-        if (itsFileData != null) {
-            touchFileDataTimer();
-        }
-        return itsFileData;
-    }
-
-    /** Close an open file */
-    public synchronized void closeOpenFile()
-    {
-        PasswdSafeUtil.dbgverb(TAG, "close file");
-        checkScreenOffReceiver();
-        closeFileData(false);
-    }
-
-    /** Get the UUID of the last viewed record */
-    public synchronized String getLastViewedRecord()
-    {
-        return itsLastViewedRecord;
-    }
 
     /** Get the default password policy */
     public synchronized PasswdPolicy getDefaultPasswdPolicy()
@@ -402,48 +172,24 @@ public class PasswdSafeApp extends Application
     }
 
 
-    public static String getAppFileTitle(ActivityPasswdFile actFile,
-                                         Context ctx)
-    {
-        PasswdFileUri uri = null;
-        if (actFile != null) {
-            PasswdFileData fileData = actFile.getFileData();
-            if (fileData != null) {
-                uri = fileData.getUri();
-            }
-        }
-        return getAppFileTitle(uri, ctx);
-    }
-
     public static String getAppFileTitle(PasswdFileUri uri, Context ctx)
     {
-        StringBuilder builder =
-                new StringBuilder(PasswdSafeUtil.getAppTitle(ctx));
-        if (uri != null) {
+        return getAppTitle((uri != null) ? uri.getIdentifier(ctx, true) : null,
+                           ctx);
+    }
+
+    /**
+     * Get a title for the application
+     */
+    public static String getAppTitle(String title, Context ctx)
+    {
+        StringBuilder builder = new StringBuilder();
+        if (!TextUtils.isEmpty(title)) {
+            builder.append(title);
             builder.append(" - ");
-            builder.append(uri.getIdentifier(ctx, true));
         }
+        builder.append(PasswdSafeUtil.getAppTitle(ctx));
         return builder.toString();
-
-    }
-
-    private synchronized void updateFileCloseTimeoutPref(
-            SharedPreferences prefs)
-    {
-        FileTimeoutPref pref = Preferences.getFileCloseTimeoutPref(prefs);
-        PasswdSafeUtil.dbginfo(TAG, "new file close timeout: %s", pref);
-        itsFileCloseTimeout = pref.getTimeout();
-        if (itsFileCloseTimeout == 0) {
-            cancelFileDataTimer();
-        } else {
-            touchFileDataTimer();
-        }
-    }
-
-    private void updateFileCloseScreenOffPref(SharedPreferences prefs)
-    {
-        itsIsFileCloseScreenOff =
-                        Preferences.getFileCloseScreenOffPref(prefs);
     }
 
     private static void setPasswordEncodingPref(SharedPreferences prefs)
@@ -458,133 +204,11 @@ public class PasswdSafeApp extends Application
                 Preferences.getPasswdDefaultSymbolsPref(prefs));
     }
 
-    private void setFileCloseClearClipboardPref(SharedPreferences prefs)
-    {
-        itsIsFileCloseClearClipboard =
-            Preferences.getFileCloseClearClipboardPref(prefs);
-    }
-
     /** Get the password expiration filter for notifications from a
      * preference */
     private static PasswdRecordFilter.ExpiryFilter
         getPasswdExpiryNotifPref(SharedPreferences prefs)
     {
         return Preferences.getPasswdExpiryNotifPref(prefs).getFilter();
-    }
-
-    private synchronized void pauseFileTimer()
-    {
-        cancelFileDataTimer();
-        itsFileTimerPaused = true;
-    }
-
-    private synchronized void resumeFileTimer()
-    {
-        itsFileTimerPaused = false;
-        touchFileDataTimer();
-    }
-
-    private synchronized void cancelFileDataTimer()
-    {
-        if (itsCloseIntent != null) {
-            itsAlarmMgr.cancel(itsCloseIntent);
-            itsCloseIntent = null;
-        }
-    }
-
-    private synchronized void touchFileDataTimer()
-    {
-        PasswdSafeUtil.dbgverb(TAG, "touch timer timeout: %d",
-                               itsFileCloseTimeout);
-        if ((itsFileData != null) && (itsFileCloseTimeout != 0) &&
-            !itsFileTimerPaused) {
-            if (itsCloseIntent == null) {
-                itsCloseIntent =
-                    PendingIntent.getBroadcast(this, 0,
-                                               FILE_TIMEOUT_INTENT_OBJ, 0);
-            }
-            PasswdSafeUtil.dbgverb(TAG, "register adding timer");
-            itsAlarmMgr.set(AlarmManager.ELAPSED_REALTIME,
-                            SystemClock.elapsedRealtime() + itsFileCloseTimeout,
-                            itsCloseIntent);
-        }
-    }
-
-    private synchronized void touchFileData(Activity activity)
-    {
-        PasswdSafeUtil.dbgverb(TAG, "touch activity: %s, data: %s",
-                               activity, itsFileData);
-        if (itsFileData != null) {
-            itsFileDataActivities.put(activity, null);
-            checkScreenOffReceiver();
-            touchFileDataTimer();
-        }
-    }
-
-    private synchronized void releaseFileData(Activity activity)
-    {
-        PasswdSafeUtil.dbgverb(TAG, "release activity: %s", activity);
-        itsFileDataActivities.remove(activity);
-        checkScreenOffReceiver();
-    }
-
-    private synchronized void setFileData(PasswdFileData fileData,
-                                          Activity activity)
-    {
-        closeFileData(false);
-        itsFileData = fileData;
-        touchFileData(activity);
-    }
-
-    /** Set the UUID of the last viewed record */
-    private synchronized void setLastViewedRecord(String uuid)
-    {
-        PasswdSafeUtil.dbginfo(TAG, "setViewedRecord: %s", uuid);
-        itsLastViewedRecord = uuid;
-    }
-
-    private synchronized void closeFileData(boolean isTimeout)
-    {
-        PasswdSafeUtil.dbginfo(TAG, "closeFileData data: %s", itsFileData);
-        if (itsFileData != null) {
-            itsFileData.close();
-            itsFileData = null;
-
-            if (isTimeout) {
-                itsIsOpenDefault = true;
-            }
-
-            if (itsIsFileCloseClearClipboard) {
-                PasswdSafeUtil.copyToClipboard("", this);
-            }
-        }
-        itsLastViewedRecord = null;
-
-        cancelFileDataTimer();
-
-        for (Map.Entry<Activity, Object> entry :
-            itsFileDataActivities.entrySet()) {
-            PasswdSafeUtil.dbgverb(TAG, "closeFileData activity: %s",
-                                   entry.getKey());
-            entry.getKey().finish();
-        }
-        itsFileDataActivities.clear();
-        checkScreenOffReceiver();
-    }
-
-    /** Check whether the screen off receiver should be added or removed */
-    private synchronized void checkScreenOffReceiver()
-    {
-        boolean haveActivities = !itsFileDataActivities.isEmpty();
-        if ((itsScreenOffReceiver == null) && haveActivities) {
-            PasswdSafeUtil.dbginfo(TAG, "add screen off receiver");
-            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-            itsScreenOffReceiver = new FileTimeoutReceiver();
-            registerReceiver(itsScreenOffReceiver, filter);
-        } else if ((itsScreenOffReceiver != null) && !haveActivities) {
-            PasswdSafeUtil.dbginfo(TAG, "remove screen off receiver");
-            unregisterReceiver(itsScreenOffReceiver);
-            itsScreenOffReceiver = null;
-        }
     }
 }

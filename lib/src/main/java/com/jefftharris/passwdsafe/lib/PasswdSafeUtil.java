@@ -15,14 +15,12 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.text.ClipboardManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,6 +39,8 @@ public class PasswdSafeUtil
     public static final boolean DEBUG = BuildConfig.DEBUG;
 
     private static final String TAG = "PasswdSafeUtil";
+
+    // TODO: Convert to v7 AlertDialog
 
     /** Create an intent to open a URI */
     public static Intent createOpenIntent(Uri uri, String recToOpen)
@@ -115,12 +115,13 @@ public class PasswdSafeUtil
         }
     }
 
+    /**
+     * Copy text to the clipboard
+     */
     public static void copyToClipboard(String str, Context ctx)
     {
         try {
-            ClipboardManager clipMgr = (ClipboardManager)
-                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-            clipMgr.setText(str);
+            ApiCompat.copyToClipboard(str, ctx);
         } catch (Throwable e) {
             String err = ctx.getString(R.string.copy_clipboard_error,
                                        getAppTitle(ctx));
@@ -182,31 +183,25 @@ public class PasswdSafeUtil
         };
 
         AlertDialog.Builder dlg = new AlertDialog.Builder(activity)
-        .setTitle(getAppTitle(activity) + " - " +
-                  activity.getString(R.string.error))
-        .setMessage(msg)
-        .setCancelable(false)
-        .setPositiveButton(
-             copyTrace ? R.string.copy_trace_and_close : R.string.close,
-             dlgClick)
-        .setOnCancelListener(dlgClick);
+                .setTitle(getAppTitle(activity) + " - " +
+                          activity.getString(R.string.error))
+                .setMessage(msg)
+                .setCancelable(false)
+                .setPositiveButton(
+                        copyTrace ? R.string.copy_trace_and_close : R.string.close,
+                        dlgClick)
+                .setOnCancelListener(dlgClick);
         dlg.show();
     }
 
     public static void showErrorMsg(String msg, Context context)
     {
         AlertDialog.Builder dlg = new AlertDialog.Builder(context)
-        .setTitle(PasswdSafeUtil.getAppTitle(context) + " - " +
-                  context.getString(R.string.error))
-        .setMessage(msg)
-        .setCancelable(true)
-        .setNeutralButton(R.string.close, new OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int which)
-            {
-                dialog.dismiss();
-            }
-        });
+                .setTitle(PasswdSafeUtil.getAppTitle(context) + " - " +
+                          context.getString(R.string.error))
+                .setMessage(msg)
+                .setCancelable(true)
+                .setPositiveButton(R.string.close, null);
         dlg.show();
     }
 

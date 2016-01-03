@@ -3,4 +3,4 @@
 <!-- for the Search Manager. -->
 
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
-    android:icon="@drawable/ic_launcher_passwdsafe"/>
+    android:icon="@mipmap/ic_launcher_passwdsafe"/>

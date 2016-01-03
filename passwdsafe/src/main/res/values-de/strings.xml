@@ -4,7 +4,8 @@
     <string name="add_policy">Regel hinzufügen</string>
     <string name="add_record">Eintrag hinzufügen</string>
     <string name="alias_base_record_header">ALIAS</string>
-    <string name="alias_base_record_label">Alias</string>
+    <string name="alias_to_same_record">Alias auf den gleichen Eintrag</string>
+    <string name="any_changes_will_be_lost">Alle Änderungen an der Eintrag wird gelöscht.</string>
     <string name="app_desc">Programm zum Zugriff und Bearbeiten von PasswordSafe-Datenbanken auf Android</string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Mind.</string>
@@ -22,36 +23,33 @@
     <string name="clear_clipboard_on_close">Zwischenablage beim Schließen leeren</string>
     <string name="clear_password_notifications">Mitteilung beim Leeren der Zwischenablage</string>
     <string name="clear_recent">Klar Letzte</string>
+    <string name="close_file">Datei Schließen</string>
     <string name="close_file_screen_off">Datei schließen, wenn Bildschirm abschaltet</string>
     <string name="confirm">Bestätigen</string>
-    <string name="confirm_label">Bestätigen:</string>
-    <string name="confirm_password_label">Passwort bestätigen:</string>
     <string name="cannot_delete_record">Kann Eintrag nicht löschen - %1$s</string>
     <string name="content_file">Inhaltsdatei</string>
+    <string name="continue_str">Fortsetzen</string>
+    <string name="continue_p">Fortsetzen?</string>
     <string name="copy_clipboard">Kopieren</string>
     <string name="copy_notes">Notiz kopieren</string>
-    <string name="copy_password">Passwort kopieren</string>
     <string name="copy_user">Benutzername kopieren</string>
     <string name="created">Erstellt</string>
     <string name="current">Aktuell</string>
     <string name="custom_symbols">Eigene Symbole</string>
     <string name="custom_symbol_not_alphanum">Eigene Symbole dürfen keine Buchstaben, Zahlen oder Leerzeichen sein</string>
     <string name="database_policy">Datenbankregel - %s</string>
-    <string name="database_version_label">Datenbankversion:</string>
+    <string name="database_version">Datenbankversion</string>
     <string name="days">Tage</string>
     <string name="default_file_to_open">Standarddatei</string>
     <string name="default_policy">Standardregel</string>
     <string name="default_symbols">Standardsymbole</string>
+    <string name="default_symbols_empty_pref">Verwenden Sie eine leere Vorliebe für Standardsymbole: %1$s</string>
     <string name="delete">Löschen</string>
     <string name="delete_file">Datei löschen</string>
     <string name="delete_file_msg">Lösche Datei \"%1$s\"?</string>
-    <string name="delete_file_title">Bestätige Löschen</string>
     <string name="delete_policy">Regel löschen</string>
     <string name="delete_policy_msg">Lösche Regel \"%1$s\"?</string>
-    <string name="delete_policy_title">Bestätige Löschen</string>
     <string name="delete_record_msg">Lösche Eintrag \"%1$s\"?</string>
-    <string name="delete_record_title">Bestätige Löschen</string>
-    <string name="details">Details</string>
     <string name="directory_for_files">Standardordner</string>
     <string name="done">Fertig</string>
     <string name="duplicate_entry">Eintrag schon vorhanden</string>
@@ -66,31 +64,31 @@
     <string name="empty_name">Kein Name</string>
     <string name="empty_password">Kein Passwort</string>
     <string name="empty_title">Kein Titel</string>
+    <string name="enable_expiration_notifications">Aktivieren Sie Ablaufmitteilungen</string>
+    <string name="enable">Aktivieren</string>
     <string name="enabled">Eingeschaltet</string>
-    <string name="enter_net_group">Neue Gruppe:</string>
     <string name="erase_all_expiration_notifications">Lösche alle Mitteilungen für abgelaufende Passwörter</string>
     <string name="expiration">Ablaufdatum</string>
     <string name="expiration_notifications">Ablaufmitteilungen</string>
     <string name="expiration_notifications_warning">Mitteilungen über das Ablaufdatum von Passwörtern erfordert, dass PasswdSafe Informationen (Eintragstitel, Gruppe und Ablaufdatum) auf dem Gerät unverschlüsselt speichert. Passwörter werden nicht gespeichert.</string>
-    <string name="expired_passwords">Abgelaufene Passwörter</string>
     <string name="expired_password_notification">Mitteilungen über abgelaufene Passwörter</string>
     <string name="expiring_password">Passwort abgelaufen</string>
     <string name="ext_storage_not_mounted">Externer Speicher muss eingehängt sein, um Dateien zu sehen.</string>
     <string name="file_backups">Backups</string>
     <string name="file_close_timeout">Dateizeitsperre</string>
     <string name="file_exists">Datei existiert</string>
+    <string name="file">Datei</string>
     <string name="file_label">Datei:</string>
-    <string name="file_label_val">Datei: %1$s</string>
-    <string name="file_name_label">Dateiname:</string>
+    <string name="file_name">Dateiname</string>
     <string name="file_operations">Datei …</string>
     <string name="file_password_encoding">Passwortkodierung</string>
-    <string name="file_settings">Datei-Einstellungen</string>
-    <string name="font_size">Schriftgröße</string>
+    <string name="files">Dateien</string>
     <string name="generate">Erzeugen</string>
     <string name="generate_password">Passwort erzeugen</string>
     <string name="go">Gehen</string>
     <string name="go_to">Gehe zu</string>
     <string name="group">Gruppe</string>
+    <string name="group_cannot_start_with_dot">Gruppe kann nicht mit einem \'.\' beginnen</string>
     <string name="group_header">GRUPPE</string>
     <string name="group_records">Gruppeneintrag</string>
     <string name="help">Hilfe</string>
@@ -104,7 +102,7 @@
     <string name="home">Startordner</string>
     <string name="interval">Intervall</string>
     <string name="invalid_file_name">Ungültiger Dateiname</string>
-    <string name="invalid_history_max_size">Ungültige Verlaufsgröße</string>
+    <string name="invalid_history_max_size">Größe muss zwischen %1$d und %2$d sein</string>
     <string name="invalid_length">Ungültige Länge</string>
     <string name="invalid_option_length">Ungültige Optionslänge</string>
     <string name="invalid_password">Ungültiges Passwort</string>
@@ -114,9 +112,9 @@
         entfernbaren Sd-Karten verhindert. Wenn die Datei auf einer Karte 
         befindet, wird es zu dem internen Speicher verschoben werden.
     </string>
-    <string name="last_save_app_label">Letzte App:</string>
-    <string name="last_save_by_label">Gespeichert von:</string>
-    <string name="last_save_time_label">Gespeichert am:</string>
+    <string name="last_save_app">Letzte App</string>
+    <string name="last_save_by">Gespeichert von</string>
+    <string name="last_save_time">Gespeichert am</string>
     <string name="legacy_file_chooser">Legacy-Dateiauswahl</string>
     <string name="legacy_file_chooser_summary">Verwendbar mit KitKat und höher</string>
     <string name="length">Länge</string>
@@ -125,8 +123,11 @@
     <string name="length_max_val">Länge max. %1$d</string>
     <string name="loading_file">Lade %s…</string>
     <string name="location">Ort</string>
+    <string name="max_size">Max. Größe</string>
     <string name="max_size_label">Max. Größe:</string>
+    <string name="menu">Menü</string>
     <string name="modified">Geändert</string>
+    <string name="monospace">Monospace-Schrift</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
     <string name="navigation_drawer_open">Öffnen Navigation Schublade</string>
@@ -136,11 +137,11 @@
     <string name="new_file">Neue Datei</string>
     <string name="new_dropbox_file">Neue Dropbox-Datei</string>
     <string name="new_file_not_supp_uri">Datei inkompatibel mit URI %1$s</string>
+    <string name="new_group">Neue Gruppe</string>
     <string name="new_group_menu">Neue Gruppe …</string>
     <string name="new_local_file">Neue lokale Datei</string>
     <string name="new_onedrive_file">Neue OneDrive-Datei</string>
     <string name="new_owncloud_file">Neue ownCloud-Datei</string>
-    <string name="new_password_label">Neues Passwort:</string>
     <string name="new_policy">Neue Regel</string>
     <string name="next">Nächtes</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
@@ -149,10 +150,10 @@
         Datei
         \n\nWenn Dateien nicht in der Dokumenten-Bildschirm zeigt, verwenden Sie
         das Menü im internen Speicher oder der SD-Karte zu zeigen.
-        \n\nDie vorherige Dateiauswahl kann durch das Menü öffnen und wählen Sie
-        Vorgaben, Datei-Einstellungen, und das Erbe Dateiauswahl aktiviert
-        werden.
+        \n\nDie vorherige Dateiauswahl wird in den Einstellungen wie das Erbe
+        Dateiauswahl aktiviert.
     </string>
+    <string name="no_groups">Keine Gruppen</string>
     <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
     <string name="no_policies">Keine Regel</string>
     <string name="no_records">Keine Einträge</string>
@@ -160,33 +161,30 @@
     <string name="none_paren">(Keine)</string>
     <string name="none_selected_open">Nichts zum Öffnen ausgewählt.</string>
     <string name="notes">Notizen</string>
-    <string name="num_records_label">Eintragsanzahl:</string>
+    <string name="num_records">Eintragsanzahl</string>
     <string name="ok">OK</string>
+    <string name="open_file">Öffnen %s</string>
     <string name="open_file_title">Datei öffnen</string>
     <string name="option_not_selected">Mindestens 1 Option auswählen</string>
-    <string name="parent_group">Übergeordnete Gruppe</string>
     <string name="password">Passwort</string>
-    <string name="password_encoding_label">Passwortkodierung:</string>
+    <string name="password_encoding">Passwortkodierung</string>
     <string name="password_expiration">Passwortablaufdatum</string>
     <string name="password_expiration_in_past">Ablaufdatum liegt in der Vergangenheit</string>
-    <string name="password_expiration_invalid_interval">Ablaufdatum muss sich im Bereich von 1&#8211;3650 befinden</string>
+    <string name="password_expiration_invalid_interval">Interval muss im Bereich 1&#8211;3650 sein</string>
     <string name="password_expired">Passwort abgelaufen</string>
     <string name="password_expires_before">Passwort läuft vor dem %1$s ab</string>
     <string name="password_expires_today">Password läuft heute ab</string>
     <string name="password_file">Passwortdatei</string>
-    <string name="password_generation">Passworterzeugung</string>
-    <string name="password_gen_prefs_moved">Optionen zur Passworterzeugung befinden sich ab jetzt im Dateimenü.</string>
     <string name="password_header">PASSWORT</string>
-    <string name="password_label">Passwort:</string>
     <string name="password_len_short_opt">Passwort ist zu kurz</string>
     <string name="password_policy">Passwortregel</string>
     <string name="password_policies">Passwortregeln</string>
     <string name="password_record">Passworteintrag</string>
-    <string name="password_settings">Passwort-Einstellungen</string>
     <string name="password_times_header">PASSWORTZEITEN</string>
     <string name="password_with_expiration">Passwort mit Ablaufdatum</string>
+    <string name="passwords">Passwörter</string>
     <string name="passwords_do_not_match">Passwörter stimmen nicht überein</string>
-    <string name="permissions_label">Berechtigungen:</string>
+    <string name="permissions">Berechtigungen</string>
     <string name="policy_header">Regel</string>
     <string name="policy_no">Nein</string>
     <string name="policy_yes_len">Ja - Mind. %1$d</string>
@@ -195,6 +193,7 @@
     <string name="policy_yes_sym_policy">Ja - Mind. %1$d aus Regelsymbolen: %2$s</string>
     <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Ja - Symbole: %2$s</string>
     <string name="preferences">Einstellungen</string>
+    <string name="press_again_close_warning">Erneut drücken, um die Datei zu schließen</string>
     <string name="press_password_warning">Passwort erneut berühren, um es in ein sichtbares Feld zu kopieren</string>
     <string name="press_yubikey">Drücken Sie die YubiKey</string>
     <string name="protect_all">Alle Einträge schützen</string>
@@ -210,7 +209,6 @@
     <string name="record_label">Eintrag:</string>
     <string name="record_not_found">Eintrag nicht gefunden</string>
     <string name="record_policy">Eintragsregeln</string>
-    <string name="record_settings">Eintrags-Einstellungen</string>
     <string name="record_sort_order">Eintrag Sortierreihenfolge</string>
     <string name="record_type">Eintragstyp</string>
     <string name="read_only">Nur Lesen</string>
@@ -221,18 +219,18 @@
     <string name="regular_expression_summary">Benutze reguläre Ausdrücke statt Teil eines Wortes.</string>
     <string name="remove">Entfernen</string>
     <string name="recurring">Wiederholt</string>
+    <string name="save">Speichern</string>
     <string name="saving_file">Speichere %s …</string>
     <string name="search">Suchen</string>
     <string name="search_hint">In PasswdSafe suchen</string>
-    <string name="search_settings">Such-Einstellungen</string>
     <string name="select_accounts">Konto auswählen</string>
     <string name="select_file_label">Datei auswählen:</string>
     <string name="send">Senden</string>
     <string name="set_password">Passwort einstellen</string>
     <string name="shortcut_base_record_header">VERKNÜPFUNG</string>
-    <string name="shortcut_base_record_label">Verknüpfung</string>
-    <string name="shortcut_choose_file">Verknüpfung für Datei auswählen</string>
-    <string name="shortcut_choose_record">Passworteintrag für Verknüpfung auswählen</string>
+    <string name="shortcut_file">Verknüpfungsdatei</string>
+    <string name="shortcut_record">Verknüpfung Eintrag</string>
+    <string name="shortcut_to_same_record">Verknüpfung zu dem gleichen Eintrag</string>
     <string name="show_backup_files">Backups anzeigen</string>
     <string name="show_password">Passwort anzeigen</string>
     <string name="show_passwords">Passwörter anzeigen</string>
@@ -240,13 +238,10 @@
     <string name="sync">Synchronisieren</string>
     <string name="times_header">ZEITEN</string>
     <string name="title">Titel</string>
-    <string name="toggle_word_wrap">Zeilenumbruch ein/aus</string>
-    <string name="toggle_monospace">Schriftart wechseln</string>
     <string name="unknown_sync_file">Unbekannte Datei</string>
     <string name="unprotect_all">Alle Einträge freigeben</string>
     <string name="unprotect_group">Gruppe freigeben</string>
     <string name="unprotect_to_modify">Zum Freigeben Eintrag bearbeiten</string>
-    <string name="up">Oben</string>
     <string name="username">Benutzername</string>
     <string name="use_count">Anzahl</string>
     <string name="use_digits">Ziffern</string>
@@ -254,6 +249,8 @@
     <string name="use_symbols">Symbole</string>
     <string name="use_uppercase">Großbuchstaben</string>
     <string name="username_header">BENUTZERNAME</string>
+    <string name="view_password_expirations">Sehen Sie sich die Passwort Abläufe</string>
+    <string name="word_wrap">Zeilenumbruch</string>
     <string name="yes">Ja</string>
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey deaktiviert. Aktivieren NFC zu bedienen.</string>
@@ -271,8 +268,13 @@
         - Jetzt kann der YubiKey zum automatischen öffnen der Passwortdatei
         benutzt werden.
     </string>
-    
+    <string name="yubikey_slot_1">YubiKey Slot 1</string>
+    <string name="yubikey_slot_2">YubiKey Slot 2</string>
+
     <string name="release_notes">
+        &lt;b&gt;6.0.0&lt;/b&gt; - Aktualisieren Sie die Benutzerschnittstelle
+        für Material-Design und Tablet-Unterstützung
+        \n\n
         &lt;b&gt;5.4.0&lt;/b&gt;\n
         - Fügen Sie Microsoft OneDrive Unterstützung. Nach der Authentifizierung
         ein Konto, wählen Sie die Dateien, die synchronisiert werden.\n
@@ -372,12 +374,6 @@
         <item>1 Stunde</item>
     </string-array>
 
-    <!-- Order must match FontSizePref enum values -->
-    <string-array name="font_size_pref">
-        <item>Normal</item>
-        <item>Klein</item>
-    </string-array>
-
     <!-- Order must match constants in RecordSortOrderPref -->
     <string-array name="record_sort_order_pref">
         <item>Gruppen ersten</item>
@@ -385,7 +381,7 @@
         <item>Gruppen letzten</item>
     </string-array>
 
-    <!-- Order must match constants in RecordEditActivity -->
+    <!-- Order must match constants in PasswdSafeEditRecordFragment -->
     <string-array name="record_type">
         <item>Normal</item>
         <item>Alias</item>
@@ -448,10 +444,5 @@
         <item>Einfach zu lesen</item>
         <item>Aussprechbar</item>
         <item>Hexadezimal</item>
-    </string-array>
-    
-    <string-array name="yubikey_slots">
-        <item>Slot 1</item>
-        <item>Slot 2</item>
     </string-array>
 </resources>

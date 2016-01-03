@@ -7,9 +7,9 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,7 +18,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,6 +47,9 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         /** Open a file */
         void openFile(Uri uri, String fileName);
+
+        /** Update the view for a list of sync files */
+        void updateViewSyncFiles();
     }
 
     private static final String TAG = "SyncProviderFilesFrag";
@@ -71,14 +73,11 @@ public class SyncProviderFilesFragment extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
-     */
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context ctx)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        super.onAttach(ctx);
+        itsListener = (Listener)ctx;
     }
 
 
@@ -232,6 +231,12 @@ public class SyncProviderFilesFragment extends ListFragment
             });
     }
 
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsListener.updateViewSyncFiles();
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
@@ -240,15 +245,6 @@ public class SyncProviderFilesFragment extends ListFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.fragment_sync_provider_files, menu);
-
-        MenuItem mi = menu.findItem(R.id.menu_sync_files);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
-        mi = menu.findItem(R.id.menu_file_new);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -262,6 +258,7 @@ public class SyncProviderFilesFragment extends ListFragment
         switch (item.getItemId()) {
         case R.id.menu_sync_files: {
             try {
+                // TODO: do sync in background to prevent ANR
                 ContentResolver cr = getActivity().getContentResolver();
                 cr.query(PasswdSafeContract.Methods.CONTENT_URI,
                          null, null,

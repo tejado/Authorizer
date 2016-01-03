@@ -8,7 +8,6 @@
 package com.jefftharris.passwdsafe.lib.view;
 
 import java.util.List;
-import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,7 +16,9 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.text.InputType;
@@ -27,10 +28,10 @@ import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -51,55 +52,6 @@ public final class GuiUtils
         InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
 
 
-    /**
-     * The EnableAdapter class is a SimpleAdapter that can show its items in a
-     * disabled state
-     */
-    @SuppressWarnings("SameParameterValue")
-    public static class EnableAdapter extends SimpleAdapter
-    {
-        private final boolean itsIsEnabled;
-
-        /**
-         * Constructor
-         */
-        public EnableAdapter(Context context,
-                             List<? extends Map<String, ?>> data, int resource,
-                             String[] from, int[] to, boolean enabled)
-        {
-            super(context, data, resource, from, to);
-            itsIsEnabled = enabled;
-        }
-
-        /* (non-Javadoc)
-         * @see android.widget.SimpleAdapter#getView(int, android.view.View, android.view.ViewGroup)
-         */
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
-            View v = super.getView(position, convertView, parent);
-            if (!itsIsEnabled) {
-                setEnabled(v);
-            }
-            return v;
-        }
-
-        /**
-         * Set the enabled state of the view and its children
-         */
-        private void setEnabled(View v)
-        {
-            v.setEnabled(itsIsEnabled);
-            if (v instanceof ViewGroup) {
-                ViewGroup vg = (ViewGroup)v;
-                for (int i = 0; i < vg.getChildCount(); ++i) {
-                    setEnabled(vg.getChildAt(i));
-                }
-            }
-        }
-    }
-
-
     public static String getTextViewStr(Activity act, int viewId)
     {
         TextView tv = (TextView)act.findViewById(viewId);
@@ -113,27 +65,44 @@ public final class GuiUtils
         return (obj == null) ? null : obj.toString();
     }
 
-
-    public static void setListViewHeightBasedOnChildren(ListView listView)
+    /**
+     * Set the height of a ListView based on all of its children
+     */
+    public static void setListViewHeightBasedOnChildren(final ListView listView)
     {
-        ListAdapter listAdapter = listView.getAdapter();
+        final ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
             return;
         }
 
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
+        // Defer measurement so listview is rendered to get its width
+        listView.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                int width = View.MeasureSpec.makeMeasureSpec(
+                        listView.getMeasuredWidth(), View.MeasureSpec.AT_MOST);
+                int height = View.MeasureSpec.makeMeasureSpec(
+                        0, View.MeasureSpec.UNSPECIFIED);
+                int totalHeight = 0;
+                int numItems = listAdapter.getCount();
+                for (int i = 0; i < numItems; i++) {
+                    View listItem = listAdapter.getView(i, null, listView);
+                    listItem.measure(width, height);
+                    totalHeight += listItem.getMeasuredHeight();
+                }
 
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight +
-            (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
+                ViewGroup.LayoutParams params = listView.getLayoutParams();
+                params.height = totalHeight;
+                if (numItems > 0) {
+                    params.height +=
+                            listView.getDividerHeight() * (numItems - 1);
+                }
+                listView.setLayoutParams(params);
+            }
+        });
     }
-
 
     public static boolean isBackKeyDown(int keyCode, KeyEvent event)
     {
@@ -149,10 +118,18 @@ public final class GuiUtils
     }
 
 
+    /**
+     * Set whether the view shows a visible password
+     */
     public static void setPasswordVisible(TextView tv, boolean visible)
     {
+        int pos = tv.getSelectionStart();
         tv.setInputType(visible ? INPUT_TEXT_PASSWORD_VISIBLE :
-                        INPUT_TEXT_PASSWORD);
+                                INPUT_TEXT_PASSWORD);
+        if (tv instanceof EditText) {
+            // Keep selection location after the type change
+            ((EditText)tv).setSelection(pos);
+        }
     }
 
 
@@ -161,7 +138,6 @@ public final class GuiUtils
     {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
-
 
     /**
      * Setup the keyboard on a dialog. The initial field gets focus and shows
@@ -173,26 +149,53 @@ public final class GuiUtils
                                            Context ctx)
     {
         setShowKeyboardListener(dialog, initialField, ctx);
-        finalField.setOnKeyListener(new OnKeyListener()
+        setupKeyboardEnter(finalField, new Runnable()
         {
-            public boolean onKey(View v, int keyCode, KeyEvent event)
+            @Override
+            public void run()
             {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_CENTER:
-                    case KeyEvent.KEYCODE_ENTER: {
-                        Button btn =
-                            dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                        if (btn.isEnabled()) {
-                            btn.performClick();
-                        }
-                        return true;
-                    }
-                    }
+                Button btn = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                if (btn.isEnabled()) {
+                    btn.performClick();
                 }
-                return false;
             }
         });
+    }
+
+
+    /**
+     * Setup the keyboard on a form.  The final field clicks the supplied OK
+     * button when enter is pressed.
+     */
+    public static void setupFormKeyboard(TextView firstField,
+                                         TextView finalField,
+                                         final Button okBtn,
+                                         Context ctx)
+    {
+        setupFormKeyboard(firstField, finalField, ctx, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (okBtn.isEnabled()) {
+                    okBtn.performClick();
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Setup the keyboard on a form.  The final field performs the supplied
+     * runnable when enter is pressed.
+     */
+    public static void setupFormKeyboard(TextView firstField,
+                                         TextView finalField,
+                                         Context ctx,
+                                         Runnable enterRunnable)
+    {
+        GuiUtilsFroyo.showKeyboard(firstField, ctx);
+        setupKeyboardEnter(finalField, enterRunnable);
     }
 
 
@@ -204,7 +207,12 @@ public final class GuiUtils
         InputMethodManager imm = (InputMethodManager)
             ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (visible) {
-            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+            if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
+                imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+            } else {
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                                    InputMethodManager.HIDE_IMPLICIT_ONLY);
+            }
         } else {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
@@ -212,10 +220,35 @@ public final class GuiUtils
 
 
     /**
+     * Setup a field to run an action on an enter or dpad center key press
+     */
+    public static void setupKeyboardEnter(TextView field,
+                                           final Runnable enterRunnable)
+    {
+        field.setOnKeyListener(new OnKeyListener()
+        {
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER: {
+                        enterRunnable.run();
+                        return true;
+                    }
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+
+    /**
      * Set a listener to show the keyboard when the dialog is shown. Only works
      * on Froyo and higher.
      */
-    private static void setShowKeyboardListener(Dialog dialog, View view,
+    public static void setShowKeyboardListener(Dialog dialog, View view,
                                                 Context ctx)
     {
         if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_FROYO) {
@@ -253,21 +286,6 @@ public final class GuiUtils
         }
     }
 
-    /** Ensure the selected item in a ListView is visible */
-    public static void ensureListViewSelectionVisible(final ListView lv,
-                                                      final int pos)
-    {
-        lv.post(new Runnable() {
-            public void run()
-            {
-                if ((pos <= lv.getFirstVisiblePosition()) ||
-                    (pos >= lv.getLastVisiblePosition())) {
-                    lv.setSelection(pos);
-                }
-            }
-        });
-    }
-
 
     /** Remove the layout_centerVertical flag if it is not supported */
     public static void removeUnsupportedCenterVertical(View v)
@@ -277,6 +295,19 @@ public final class GuiUtils
                 (RelativeLayout.LayoutParams)v.getLayoutParams();
             params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
             v.setLayoutParams(params);
+        }
+    }
+
+
+    /**
+     * Get a drawable resource
+     */
+    public static Drawable getDrawable(Resources res, int id)
+    {
+        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_LOLLIPOP) {
+            return GuiUtilsLollipop.getDrawable(res, id);
+        } else {
+            return GuiUtilsFroyo.getDrawable(res, id);
         }
     }
 
@@ -294,19 +325,12 @@ public final class GuiUtils
                                         int notifyId,
                                         boolean autoCancel)
     {
-        Notification notif;
-        if (ApiCompat.SDK_VERSION == ApiCompat.SDK_CUPCAKE) {
-            notif = new Notification(iconId, tickerText,
-                                     System.currentTimeMillis());
-            notif.setLatestEventInfo(ctx, title, content, intent);
-        } else {
-            BitmapDrawable b =
-                    (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
-            if (b == null) {
-                return;
-            }
-            NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(ctx)
+        BitmapDrawable b =
+                (BitmapDrawable)getDrawable(ctx.getResources(), bigIcon);
+        if (b == null) {
+            return;
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setContentIntent(intent)
@@ -314,22 +338,21 @@ public final class GuiUtils
                 .setLargeIcon(b.getBitmap())
                 .setTicker(tickerText)
                 .setAutoCancel(autoCancel);
-            NotificationCompat.InboxStyle style =
+        NotificationCompat.InboxStyle style =
                 new NotificationCompat.InboxStyle(builder)
                 .setBigContentTitle(title)
                 .setSummaryText(content);
 
-            int numLines = Math.min(bigLines.size(), 5);
-            for (int i = 0; i < numLines; ++i) {
-                style.addLine(bigLines.get(i));
-            }
-            if (numLines < bigLines.size()) {
-                style.addLine("…");
-            }
-
-            builder.setStyle(style);
-            notif = builder.build();
+        int numLines = Math.min(bigLines.size(), 5);
+        for (int i = 0; i < numLines; ++i) {
+            style.addLine(bigLines.get(i));
         }
+        if (numLines < bigLines.size()) {
+            style.addLine("…");
+        }
+
+        builder.setStyle(style);
+        Notification notif = builder.build();
         notifyMgr.notify(notifyId, notif);
     }
 
@@ -345,19 +368,12 @@ public final class GuiUtils
                                               int notifyId,
                                               boolean autoCancel)
     {
-        Notification notif;
-        if (ApiCompat.SDK_VERSION == ApiCompat.SDK_CUPCAKE) {
-            notif = new Notification(iconId, title,
-                                     System.currentTimeMillis());
-            notif.setLatestEventInfo(ctx, title, content, intent);
-        } else {
-            BitmapDrawable b =
-                    (BitmapDrawable)ctx.getResources().getDrawable(bigIcon);
-            if (b == null) {
-                return;
-            }
-            NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(ctx)
+        BitmapDrawable b =
+                (BitmapDrawable)getDrawable(ctx.getResources(), bigIcon);
+        if (b == null) {
+            return;
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setContentIntent(intent)
@@ -365,8 +381,7 @@ public final class GuiUtils
                 .setLargeIcon(b.getBitmap())
                 .setTicker(title)
                 .setAutoCancel(autoCancel);
-            notif = builder.build();
-        }
+        Notification notif = builder.build();
         notifyMgr.notify(notifyId, notif);
     }
 }

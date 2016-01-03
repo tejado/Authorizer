@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.os.OperationCanceledException;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
@@ -43,6 +44,12 @@ public class PasswdCursorLoader extends CursorLoader
         try {
             return super.loadInBackground();
         } catch (Exception e) {
+            // Rethrow canceled exceptions (API 16+)
+            if ((e instanceof OperationCanceledException) ||
+                "OperationCanceledException".equals(
+                        e.getClass().getSimpleName())) {
+                throw e;
+            }
             itsLoadException = e;
             return null;
         }

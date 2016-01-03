@@ -7,30 +7,23 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.support.design.widget.NavigationView;
-import android.support.v7.app.AppCompatActivity;
-import android.app.Activity;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 /**
  * Fragment for the navigation drawer of the PasswdSafe activity
  */
-public class PasswdSafeNavDrawerFragment extends Fragment
-    implements NavigationView.OnNavigationItemSelectedListener
+public class PasswdSafeNavDrawerFragment
+        extends AbstractNavDrawerFragment<PasswdSafeNavDrawerFragment.Listener>
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -51,65 +44,39 @@ public class PasswdSafeNavDrawerFragment extends Fragment
         void showAbout();
     }
 
-    /** Per the design guidelines, you should show the drawer on launch until
-     * the user manually expands it. This shared preference tracks this. */
-    private static final String PREF_USER_LEARNED_DRAWER =
-            "passwdsafe_navigation_drawer_learned";
-
-    // TODO: remember selected item? (or init from activity state)
-
-    /** Helper component that ties the action bar to the navigation drawer. */
-    private ActionBarDrawerToggle itsDrawerToggle;
-
-    private DrawerLayout itsDrawerLayout;
-    private View itsFragmentContainerView;
-    private Listener itsListener;
-
-    private boolean itsFromSavedInstanceState;
-    private boolean itsUserLearnedDrawer;
-
-    /** Constructor */
-    public PasswdSafeNavDrawerFragment()
+    /** Mode of the navigation drawer */
+    public enum Mode
     {
+        /** Initial state */
+        INIT,
+        /** List of records */
+        RECORDS_LIST,
+        /** Single record */
+        RECORDS_SINGLE,
+        /** Action on a record */
+        RECORDS_ACTION,
+        /** Password policies */
+        POLICIES,
+        /** Password expirations */
+        EXPIRATIONS,
+        /** Preferences */
+        PREFERENCES,
+        /** About */
+        ABOUT
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-
-        SharedPreferences sp =
-                PreferenceManager.getDefaultSharedPreferences(getActivity());
-        itsUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
-
-        if (savedInstanceState != null) {
-            itsFromSavedInstanceState = true;
-        }
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
-        super.onActivityCreated(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
+    private TextView itsFileName;
+    private NavMenuItem itsSelNavItem = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        View fragView = inflater.inflate(
-                R.layout.fragment_passwd_safe_nav_drawer, container, false);
-        NavigationView navView = (NavigationView)fragView;
-        navView.setNavigationItemSelectedListener(this);
+        View fragView = doCreateView(inflater, container,
+                                     R.layout.fragment_passwdsafe_nav_drawer);
+        View header = getNavView().getHeaderView(0);
+        itsFileName = (TextView)header.findViewById(R.id.file_name);
         return fragView;
-    }
-
-    /** Is the drawer open */
-    public boolean isDrawerOpen()
-    {
-        return itsDrawerLayout != null &&
-               itsDrawerLayout.isDrawerOpen(itsFragmentContainerView);
     }
 
     /**
@@ -120,154 +87,160 @@ public class PasswdSafeNavDrawerFragment extends Fragment
      */
     public void setUp(DrawerLayout drawerLayout)
     {
-        itsFragmentContainerView =
-                getActivity().findViewById(R.id.navigation_drawer);
-        itsDrawerLayout = drawerLayout;
+        super.setUp(drawerLayout);
+        updateView(Mode.INIT, "", false);
+    }
 
-        // set a custom shadow that overlays the main content when the drawer
-        // opens
-        itsDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
-                                        GravityCompat.START);
+    /**
+     * Update drawer for the fragments displayed in the activity
+     * @param fileNameUpdate If non-null, the file name to set in the view
+     */
+    public void updateView(Mode mode, String fileNameUpdate, boolean fileOpen)
+    {
+        boolean drawerEnabled = false;
+        boolean openDrawer = false;
+        int upIndicator = 0;
+        NavMenuItem selNavItem = null;
 
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
-
-        // ActionBarDrawerToggle ties together the the proper interactions
-        // between the navigation drawer and the action bar app icon.
-        itsDrawerToggle = new ActionBarDrawerToggle(
-                getActivity(), itsDrawerLayout,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close)
-        {
-            @Override
-            public void onDrawerClosed(View drawerView)
-            {
-                super.onDrawerClosed(drawerView);
-                if (!isAdded()) {
-                    return;
-                }
-
-                getActivity().supportInvalidateOptionsMenu();
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView)
-            {
-                super.onDrawerOpened(drawerView);
-                if (!isAdded()) {
-                    return;
-                }
-
-                if (!itsUserLearnedDrawer) {
-                    // The user manually opened the drawer; store this flag to
-                    // prevent auto-showing the navigation drawer automatically
-                    // in the future.
-                    itsUserLearnedDrawer = true;
-                    SharedPreferences sp =
-                            PreferenceManager.getDefaultSharedPreferences(
-                                    getActivity());
-                    sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true)
-                      .apply();
-                }
-
-                getActivity().supportInvalidateOptionsMenu();
-            }
-        };
-
-        // If the user hasn't 'learned' about the drawer, open it
-        if (!itsUserLearnedDrawer && !itsFromSavedInstanceState) {
-            itsDrawerLayout.openDrawer(itsFragmentContainerView);
+        switch (mode) {
+        case INIT: {
+            drawerEnabled = true;
+            break;
+        }
+        case RECORDS_LIST: {
+            drawerEnabled = true;
+            // If the user hasn't 'learned' about the drawer, open it
+            openDrawer = shouldOpenDrawer();
+            selNavItem = NavMenuItem.RECORDS;
+            break;
+        }
+        case RECORDS_SINGLE: {
+            selNavItem = NavMenuItem.RECORDS;
+            break;
+        }
+        case RECORDS_ACTION: {
+            upIndicator = R.drawable.ic_action_close_cancel;
+            selNavItem = NavMenuItem.RECORDS;
+            break;
+        }
+        case POLICIES: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.PASSWORD_POLICIES;
+            break;
+        }
+        case EXPIRATIONS: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.EXPIRED_PASSWORDS;
+            break;
+        }
+        case PREFERENCES: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.PREFERENCES;
+            break;
+        }
+        case ABOUT: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.ABOUT;
+            break;
+        }
         }
 
-        itsDrawerLayout.setDrawerListener(itsDrawerToggle);
-    }
+        updateDrawerToggle(drawerEnabled, upIndicator);
 
-    /** Call from activity's onPostCreate callback */
-    public void onPostCreate()
-    {
-        itsDrawerToggle.syncState();
-    }
+        Menu menu = getNavView().getMenu();
+        for (int i = 0; i < menu.size(); ++i) {
+            MenuItem item = menu.getItem(i);
+            int itemId = item.getItemId();
+            if (selNavItem == null) {
+                item.setChecked(false);
+            } else if (selNavItem.itsMenuId == itemId) {
+                item.setChecked(true);
+            }
 
-    @Override
-    public void onAttach(Activity activity)
-    {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
-    }
-
-    @Override
-    public void onDetach()
-    {
-        super.onDetach();
-        itsListener = null;
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
-        super.onConfigurationChanged(newConfig);
-        // Forward the new configuration the drawer toggle component.
-        itsDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        // If the drawer is open, show the global app actions in the action bar
-        if (itsDrawerLayout != null && isDrawerOpen()) {
-            inflater.inflate(R.menu.global, menu);
-            ActionBar actionBar = getActionBar();
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(R.string.app_name);
+            if ((itemId == NavMenuItem.RECORDS.itsMenuId) ||
+                (itemId == NavMenuItem.PASSWORD_POLICIES.itsMenuId) ||
+                (itemId == NavMenuItem.EXPIRED_PASSWORDS.itsMenuId)) {
+                item.setEnabled(fileOpen);
+            }
         }
-        super.onCreateOptionsMenu(menu, inflater);
-    }
+        itsSelNavItem = selNavItem;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        return itsDrawerToggle.onOptionsItemSelected(item) ||
-               super.onOptionsItemSelected(item);
+        if (fileNameUpdate != null) {
+            GuiUtils.setVisible(itsFileName,
+                                !TextUtils.isEmpty(fileNameUpdate));
+            itsFileName.setText(fileNameUpdate);
+        }
+
+        openDrawer(openDrawer);
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem)
     {
-        itsDrawerLayout.closeDrawers();
+        closeDrawer();
 
-        switch(menuItem.getItemId()) {
-        case R.id.menu_drawer_records: {
-            menuItem.setChecked(true);
-            itsListener.showFileRecords();
-            break;
-        }
-        case R.id.menu_drawer_passwd_policies: {
-            menuItem.setChecked(true);
-            itsListener.showFilePasswordPolicies();
-            break;
-        }
-        case R.id.menu_drawer_expired_passwords: {
-            menuItem.setChecked(true);
-            itsListener.showFileExpiredPasswords();
-            break;
-        }
-        case R.id.menu_drawer_preferences: {
-            itsListener.showPreferences();
-            break;
-        }
-        case R.id.menu_drawer_about: {
-            itsListener.showAbout();
-            break;
-        }
+        Listener listener = getListener();
+        NavMenuItem navItem = NavMenuItem.fromMenuId(menuItem.getItemId());
+        if ((navItem != null) && (itsSelNavItem != navItem)) {
+            switch (navItem) {
+            case RECORDS: {
+                listener.showFileRecords();
+                break;
+            }
+            case PASSWORD_POLICIES: {
+                listener.showFilePasswordPolicies();
+                break;
+            }
+            case EXPIRED_PASSWORDS: {
+                listener.showFileExpiredPasswords();
+                break;
+            }
+            case PREFERENCES: {
+                listener.showPreferences();
+                break;
+            }
+            case ABOUT: {
+                listener.showAbout();
+                break;
+            }
+            }
         }
 
         return true;
     }
 
-    /** Get the action bar */
-    private ActionBar getActionBar()
+    /**
+     * A menu item
+     */
+    private enum NavMenuItem
     {
-        return ((AppCompatActivity) getActivity()).getSupportActionBar();
+        RECORDS              (R.id.menu_drawer_records),
+        PASSWORD_POLICIES    (R.id.menu_drawer_passwd_policies),
+        EXPIRED_PASSWORDS    (R.id.menu_drawer_expired_passwords),
+        PREFERENCES          (R.id.menu_drawer_preferences),
+        ABOUT                (R.id.menu_drawer_about);
+
+        public final int itsMenuId;
+
+        /**
+         * Constructor
+         */
+        NavMenuItem(int menuId)
+        {
+            itsMenuId = menuId;
+        }
+
+        /**
+         * Get the enum from a menu id
+         */
+        public static NavMenuItem fromMenuId(int menuId)
+        {
+            for (NavMenuItem item: NavMenuItem.values()) {
+                if (item.itsMenuId == menuId) {
+                    return item;
+                }
+            }
+            return null;
+        }
     }
 }

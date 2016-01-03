@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
@@ -25,12 +26,16 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+
 /**
  *  The about dialog
  */
 public class AboutDialog extends DialogFragment
         implements DialogInterface.OnClickListener
 {
+    // TODO: Move passwdsafe about_fragment to lib once sync app able to use extra libs
+
     /** Create a new instance */
     public static AboutDialog newInstance(String extraLicenseInfo)
     {
@@ -55,14 +60,38 @@ public class AboutDialog extends DialogFragment
 
         Activity act = getActivity();
         LayoutInflater factory = LayoutInflater.from(act);
-        View detailsView = factory.inflate(R.layout.fragment_about_dialog,
-                                           null);
+        View detailsView = factory.inflate(R.layout.fragment_about, null);
 
+        View fileDetails = detailsView.findViewById(R.id.file_details_group);
+        GuiUtils.setVisible(fileDetails, false);
+        String name = updateAboutFields(detailsView, extraLicenseInfo, act);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(act)
+            .setTitle(name)
+            .setIcon(R.drawable.ic_action_info_dark)
+            .setView(detailsView)
+            .setPositiveButton(R.string.close, this);
+        return builder.create();
+    }
+
+    /** Handle a click on the dialog button */
+    public void onClick(DialogInterface dialog, int which)
+    {
+        dialog.dismiss();
+    }
+
+    /**
+     * Update the fields of the about fragment
+     */
+    public static String updateAboutFields(View detailsView,
+                                           final String extraLicenseInfo,
+                                           Context ctx)
+    {
         String name;
         StringBuilder version = new StringBuilder();
-        PackageInfo pkgInfo = PasswdSafeUtil.getAppPackageInfo(act);
+        PackageInfo pkgInfo = PasswdSafeUtil.getAppPackageInfo(ctx);
         if (pkgInfo != null) {
-            name = getString(pkgInfo.applicationInfo.labelRes);
+            name = ctx.getString(pkgInfo.applicationInfo.labelRes);
             version.append(pkgInfo.versionName);
         } else {
             name = null;
@@ -73,11 +102,11 @@ public class AboutDialog extends DialogFragment
         }
 
         TextView tv = (TextView)detailsView.findViewById(R.id.version);
-        tv.setText(act.getString(R.string.version, version));
+        tv.setText(version);
         tv = (TextView)detailsView.findViewById(R.id.build_id);
-        tv.setText(act.getString(R.string.build_id, BuildConfig.BUILD_ID));
+        tv.setText(BuildConfig.BUILD_ID);
         tv = (TextView)detailsView.findViewById(R.id.build_date);
-        tv.setText(act.getString(R.string.build_date, BuildConfig.BUILD_DATE));
+        tv.setText(BuildConfig.BUILD_DATE);
         tv = (TextView)detailsView.findViewById(R.id.release_notes);
         tv.setText(
                 Html.fromHtml(tv.getText().toString().replace("\n", "<br>")));
@@ -99,17 +128,6 @@ public class AboutDialog extends DialogFragment
         btn.setVisibility(
                 (extraLicenseInfo != null) ? View.VISIBLE : View.GONE);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(act)
-            .setTitle(name)
-            .setIcon(android.R.drawable.ic_menu_info_details)
-            .setView(detailsView)
-            .setPositiveButton(R.string.close, this);
-        return builder.create();
-    }
-
-    /** Handle a click on the dialog button */
-    public void onClick(DialogInterface dialog, int which)
-    {
-        dialog.dismiss();
+        return name;
     }
 }

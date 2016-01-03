@@ -51,11 +51,11 @@ public class OnedriveSyncer
 
 
     /** Is the error a 404 not-found error */
-    public static boolean is404Error(RetrofitError e)
+    public static boolean isNot404Error(RetrofitError e)
     {
-        return (!e.isNetworkError() &&
-                (e.getResponse() != null) &&
-                (e.getResponse().getStatus() == 404));
+        return (e.isNetworkError() ||
+                (e.getResponse() == null) ||
+                (e.getResponse().getStatus() != 404));
     }
 
 
@@ -149,7 +149,7 @@ public class OnedriveSyncer
                         files.put(remfile.getRemoteId(), remfile);
                     }
                 } catch (RetrofitError e) {
-                    if (!is404Error(e)) {
+                    if (isNot404Error(e)) {
                         throw e;
                     }
                 }

@@ -18,13 +18,15 @@ import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.util.Pair;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 /**
  * The PasswdPolicy class represents a password policy for a file or record
  */
-public class PasswdPolicy implements Comparable<PasswdPolicy>
+public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
 {
     public static final int FLAG_USE_LOWERCASE          = 0x8000;
     public static final int FLAG_USE_UPPERCASE          = 0x4000;
@@ -51,6 +53,25 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     public static final String EASY_LOWER_CHARS = "abcdefghijkmnopqrstuvwxyz";
     public static final String EASY_UPPER_CHARS = "ABCDEFGHJKLMNPQRTUVWXY";
     public static final String EASY_DIGITS = "346789";
+
+    /**
+     * Parcelable CREATOR instance
+     */
+    public static final Parcelable.Creator<PasswdPolicy> CREATOR =
+            new Parcelable.Creator<PasswdPolicy>()
+            {
+                @Override
+                public PasswdPolicy createFromParcel(Parcel source)
+                {
+                    return new PasswdPolicy(source);
+                }
+
+                @Override
+                public PasswdPolicy[] newArray(int size)
+                {
+                    return new PasswdPolicy[size];
+                }
+            };
 
     /** The location of the policy */
     public enum Location
@@ -191,6 +212,22 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
         this(name, copy.itsLocation, copy.itsFlags, copy.itsLength,
              copy.itsMinLowercase, copy.itsMinUppercase,
              copy.itsMinDigits, copy.itsMinSymbols, copy.itsSpecialSymbols);
+    }
+
+    /**
+     * Constructor from a parcel
+     */
+    private PasswdPolicy(Parcel source)
+    {
+        itsName = source.readString();
+        itsLocation = Location.valueOf(source.readString());
+        itsFlags = source.readInt();
+        itsLength = source.readInt();
+        itsMinLowercase = source.readInt();
+        itsMinUppercase = source.readInt();
+        itsMinDigits = source.readInt();
+        itsMinSymbols = source.readInt();
+        itsSpecialSymbols = source.readString();
     }
 
     /** Create a default policy */
@@ -382,6 +419,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
     }
 
     /** Are the policies equal for the fields used by a record policy */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean recordPolicyEquals(PasswdPolicy policy)
     {
         return ((itsFlags == policy.itsFlags) &&
@@ -407,6 +445,26 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>
             str.append(itsSpecialSymbols);
         }
         return str.toString();
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(itsName);
+        dest.writeString(itsLocation.name());
+        dest.writeInt(itsFlags);
+        dest.writeInt(itsLength);
+        dest.writeInt(itsMinLowercase);
+        dest.writeInt(itsMinUppercase);
+        dest.writeInt(itsMinDigits);
+        dest.writeInt(itsMinSymbols);
+        dest.writeString(itsSpecialSymbols);
     }
 
     /** Parse a header policy from a string */

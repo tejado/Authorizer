@@ -1,38 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="10sp">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:paddingEnd="?attr/dialogPreferredPadding"
+              android:paddingLeft="?attr/dialogPreferredPadding"
+              android:paddingRight="?attr/dialogPreferredPadding"
+              android:paddingStart="?attr/dialogPreferredPadding">
 
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/prompt"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-            <CheckBox
-                android:id="@+id/confirm"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/confirm"
-                android:textAppearance="?android:attr/textAppearanceMedium"/>
-        </LinearLayout>
-    </ScrollView>
-
-    <TextView
-        android:id="@+id/error_msg"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+    <CheckBox android:id="@+id/confirm"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:text="@string/confirm"/>
 
 </LinearLayout>

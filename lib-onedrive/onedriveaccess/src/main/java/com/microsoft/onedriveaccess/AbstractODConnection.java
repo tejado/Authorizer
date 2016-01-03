@@ -7,6 +7,7 @@ import retrofit.converter.Converter;
 /**
  * Abstract type defining configurable aspects of the ODConnection
  */
+@SuppressWarnings("SameReturnValue")
 public abstract class AbstractODConnection {
 
     /**

@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Represents an authentication session.
  */
-@SuppressWarnings("UnusedDeclaration")
+@SuppressWarnings({"UnusedDeclaration", "UnusedReturnValue"})
 public class AuthSession {
 
     /**

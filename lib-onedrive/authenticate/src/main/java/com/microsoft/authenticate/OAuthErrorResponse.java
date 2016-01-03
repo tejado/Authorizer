@@ -17,6 +17,7 @@ final class OAuthErrorResponse implements OAuthResponse {
      * An OAuthResponse must contain an error, but an error_description and
      * error_uri are optional
      */
+    @SuppressWarnings("UnusedReturnValue")
     public static class Builder {
         /**
          * The error

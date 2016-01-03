@@ -60,4 +60,29 @@ public class PasswdExpiration
         itsInterval = interval;
         itsIsRecurring = recurring;
     }
+
+    /**
+     * Are two expirations equal
+     */
+    public static boolean isEqual(PasswdExpiration exp1, PasswdExpiration exp2)
+    {
+        if (((exp1 == null) && (exp2 != null)) ||
+            ((exp1 != null) && (exp2 == null))) {
+            return false;
+        }
+
+        if (exp1 == null) {
+            return true;
+        }
+
+        //noinspection SimplifiableIfStatement
+        if ((exp1.itsExpiration == null) || (exp2.itsExpiration == null)) {
+            return false;
+        }
+
+        return exp1.itsExpiration.equals(exp2.itsExpiration) &&
+               (exp1.itsInterval == exp2.itsInterval) &&
+               (exp1.itsIsRecurring == exp2.itsIsRecurring);
+
+    }
 }
