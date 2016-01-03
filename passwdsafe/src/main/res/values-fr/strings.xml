@@ -88,6 +88,7 @@
     <string name="go">OK</string>
     <string name="go_to">Aller à</string>
     <string name="group">Groupe</string>
+    <string name="group_cannot_start_with_dot">Groupe ne peut pas commencer par un '.'</string>
     <string name="group_header">GROUPE</string>
     <string name="group_records">Groupe d\'entrées</string>
     <string name="help">Assistance</string>
