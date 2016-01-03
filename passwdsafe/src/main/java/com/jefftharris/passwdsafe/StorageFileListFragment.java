@@ -364,8 +364,10 @@ public final class StorageFileListFragment extends ListFragment
         int flags = openIntent.getFlags() &
                     (Intent.FLAG_GRANT_READ_URI_PERMISSION |
                      Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        String title = RecentFilesDb.updateOpenedSafFile(uri, flags,
-                                                         getActivity());
+
+        Context ctx = getContext();
+        String title = RecentFilesDb.getSafDisplayName(uri, ctx);
+        RecentFilesDb.updateOpenedSafFile(uri, flags, ctx);
         if (title != null) {
             openUri(uri, title);
         }

@@ -26,13 +26,15 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     private PasswdFileUri itsPasswdFileUri;
     private ResolveTask itsResolveTask;
     private int itsNumProgressUsers = 0;
+    private boolean itsDoResolveOnStart = true;
 
     @Override
     public void onStart()
     {
         super.onStart();
-        itsResolveTask = new ResolveTask();
-        itsResolveTask.execute();
+        if (itsDoResolveOnStart) {
+            startResolve();
+        }
     }
 
     @Override
@@ -59,6 +61,14 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     }
 
     /**
+     * Set whether to do a resolve on start
+     */
+    protected final void setDoResolveOnStart(boolean doResolveOnStart)
+    {
+        itsDoResolveOnStart = doResolveOnStart;
+    }
+
+    /**
      * Get the password file URI
      */
     protected final PasswdFileUri getPasswdFileUri()
@@ -81,6 +91,15 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     {
         itsProgress = (ProgressBar)rootView.findViewById(R.id.progress);
         itsProgress.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * Start the resolve task
+     */
+    protected void startResolve()
+    {
+        itsResolveTask = new ResolveTask();
+        itsResolveTask.execute();
     }
 
     /**
