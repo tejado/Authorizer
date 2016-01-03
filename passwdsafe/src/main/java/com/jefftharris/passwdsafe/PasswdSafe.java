@@ -72,8 +72,6 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    PreferencesFragment.Listener
 {
-    // TODO: create new file with SAF
-
     private enum ChangeMode
     {
         /** Initial mode with no file open */
@@ -1568,7 +1566,15 @@ public class PasswdSafe extends AppCompatActivity
         @Override
         protected void handleDoInBackground() throws Exception
         {
-            itsFileUri.delete(getContext());
+            Context ctx = getContext();
+            RecentFilesDb recentFilesDb = new RecentFilesDb(ctx);
+            try {
+                recentFilesDb.removeUri(itsFileUri.getUri());
+            } finally {
+                recentFilesDb.close();
+            }
+
+            itsFileUri.delete(ctx);
         }
 
         @Override
