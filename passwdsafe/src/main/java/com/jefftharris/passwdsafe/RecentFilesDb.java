@@ -25,7 +25,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 /**
  * Database helper class to manage the recent files list
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "TryFinallyCanBeTryWithResources"})
 public final class RecentFilesDb extends SQLiteOpenHelper
 {
     public static final String DB_TABLE_FILES = "files";
@@ -153,10 +153,16 @@ public final class RecentFilesDb extends SQLiteOpenHelper
 
 
     /** Update an opened storage access file */
-    public static String updateOpenedSafFile(Uri uri, int flags, Context ctx)
+    public static void updateOpenedSafFile(Uri uri, int flags, Context ctx)
     {
         ContentResolver cr = ctx.getContentResolver();
         ApiCompat.takePersistableUriPermission(cr, uri, flags);
+    }
+
+    /** Get the display name of a storage access file */
+    public static String getSafDisplayName(Uri uri, Context ctx)
+    {
+        ContentResolver cr = ctx.getContentResolver();
         Cursor cursor = cr.query(uri, null, null, null, null);
         try {
             if ((cursor != null) && (cursor.moveToFirst())) {
@@ -170,7 +176,6 @@ public final class RecentFilesDb extends SQLiteOpenHelper
         }
         return null;
     }
-
 
     @Override
     public void onCreate(SQLiteDatabase db)

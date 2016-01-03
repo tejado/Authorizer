@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
@@ -84,14 +85,11 @@ public class SyncedFilesFragment extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
-     */
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context ctx)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        super.onAttach(ctx);
+        itsListener = (Listener)ctx;
     }
 
 
@@ -314,14 +312,14 @@ public class SyncedFilesFragment extends ListFragment
             if (file.isFolder()) {
                 views.itsSelected.setVisibility(View.GONE);
                 views.itsModDate.setVisibility(View.GONE);
-                views.itsIcon.setImageResource(R.drawable.folder_rev);
+                views.itsIcon.setImageResource(R.drawable.ic_folder);
             } else {
                 views.itsSelected.setVisibility(View.VISIBLE);
                 views.itsSelected.setChecked(item.itsIsSelected);
                 views.itsModDate.setVisibility(View.VISIBLE);
                 views.itsModDate.setText(Utils.formatDate(file.getModTime(),
                                                           getContext()));
-                views.itsIcon.setImageResource(R.drawable.login_rev);
+                views.itsIcon.setImageResource(R.drawable.ic_passwdsafe_dark);
             }
 
             return convertView;

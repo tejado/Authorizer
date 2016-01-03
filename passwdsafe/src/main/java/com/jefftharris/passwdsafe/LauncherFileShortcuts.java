@@ -8,25 +8,45 @@
 package com.jefftharris.passwdsafe;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
+import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
-public class LauncherFileShortcuts extends AbstractFileListActivity
+public class LauncherFileShortcuts extends AppCompatActivity
+        implements FileListFragment.Listener,
+                   StorageFileListFragment.Listener,
+                   SyncProviderFragment.Listener,
+                   SyncProviderFilesFragment.Listener
 {
     public static final String EXTRA_IS_DEFAULT_FILE = "isDefFile";
 
+    private static final String TAG = "LauncherFileShortcuts";
+
+    private Boolean itsIsStorageFrag = null;
     private boolean itsIsDefaultFile = false;
 
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_launcher_file_shortcuts);
+
+        FragmentManager fragMgr = getSupportFragmentManager();
+        FragmentTransaction txn = fragMgr.beginTransaction();
+        txn.replace(R.id.sync, new SyncProviderFragment());
+        txn.commit();
+
+        if (savedInstanceState == null) {
+            setFileChooseFrag();
+        }
 
         Intent intent = getIntent();
         if (!Intent.ACTION_CREATE_SHORTCUT.equals(intent.getAction())) {
@@ -38,20 +58,31 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
         if (itsIsDefaultFile) {
             setTitle(R.string.default_file_to_open);
         } else {
-            setTitle(R.string.shortcut_choose_file);
+            setTitle(R.string.shortcut_file);
         }
-
-        // Remove the extra padding for tablets when used as a dialog style
-        View root = findViewById(R.id.content);
-        int pad = root.getPaddingTop();
-        root.setPadding(pad, pad, pad, pad);
     }
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        setFileChooseFrag();
+    }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#openFile(android.net.Uri)
-     * @see com.jefftharris.passwdsafe.SyncProviderFilesFragment.Listener#openFile(android.net.Uri)
-     */
+    @Override
+    public void onBackPressed()
+    {
+        FragmentManager mgr = getSupportFragmentManager();
+        Fragment frag = mgr.findFragmentById(R.id.files);
+        boolean handled = (frag instanceof FileListFragment) &&
+                          frag.isVisible() &&
+                          ((FileListFragment) frag).doBackPressed();
+
+        if (!handled) {
+            super.onBackPressed();
+        }
+    }
+
     @Override
     public void openFile(Uri uri, String fileName)
     {
@@ -66,30 +97,75 @@ public class LauncherFileShortcuts extends AbstractFileListActivity
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, fileName);
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(
-                                this, R.drawable.ic_launcher_passwdsafe));
+                                this, R.mipmap.ic_launcher_passwdsafe));
             setResult(RESULT_OK, intent);
         }
 
         finish();
     }
 
+    @Override
+    public void showSyncProviderFiles(Uri uri)
+    {
+        FragmentManager fragMgr = getSupportFragmentManager();
+        Fragment syncFrag = fragMgr.findFragmentById(R.id.sync);
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#activityHasMenu()
-     */
+        SyncProviderFilesFragment syncFilesFrag =
+                SyncProviderFilesFragment.newInstance(uri);
+
+        FragmentTransaction txn = fragMgr.beginTransaction();
+        txn.remove(syncFrag);
+        txn.replace(R.id.files, syncFilesFrag);
+        txn.addToBackStack(null);
+        txn.commit();
+    }
+
     @Override
     public boolean activityHasMenu()
     {
         return false;
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.FileListFragment.Listener#activityHasNoneItem()
-     */
     @Override
     public boolean activityHasNoneItem()
     {
         return itsIsDefaultFile;
+    }
+
+    @Override
+    public void updateViewFiles()
+    {
+    }
+
+    @Override
+    public void updateViewSyncFiles()
+    {
+    }
+
+    /**
+     * Set the file chooser fragment
+     */
+    private void setFileChooseFrag()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        boolean storageFrag =
+                ((ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT) &&
+                 !Preferences.getFileLegacyFileChooserPref(prefs));
+        if ((itsIsStorageFrag == null) || (itsIsStorageFrag != storageFrag)) {
+            PasswdSafeUtil.dbginfo(TAG, "setFileChooseFrag storage %b",
+                                   storageFrag);
+            Fragment frag;
+            if (storageFrag) {
+                frag = new StorageFileListFragment();
+            } else {
+                frag = new FileListFragment();
+            }
+            FragmentManager fragMgr = getSupportFragmentManager();
+            FragmentTransaction txn = fragMgr.beginTransaction();
+            txn.replace(R.id.files, frag);
+            txn.commit();
+            itsIsStorageFrag = storageFrag;
+        }
     }
 }

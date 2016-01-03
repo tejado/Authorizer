@@ -71,6 +71,7 @@ public class PasswdFileData
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<>();
     private HeaderPasswdPolicies itsHdrPolicies = new HeaderPasswdPolicies();
     private boolean itsIsOpenReadOnly = false;
+    private boolean itsIsYubikey = false;
 
     private static final List<PasswdFileDataObserver> itsObservers =
             new ArrayList<>();
@@ -239,6 +240,22 @@ public class PasswdFileData
         return itsUri;
     }
 
+    /**
+     * Get whether a Yubikey was used to open the file
+     */
+    public final boolean isNotYubikey()
+    {
+        return !itsIsYubikey;
+    }
+
+    /**
+     * Set whether a Yubikey was used to open the file
+     */
+    public final void setYubikey(boolean yubikey)
+    {
+        itsIsYubikey = yubikey;
+    }
+
     public final boolean canEdit()
     {
         return !itsIsOpenReadOnly &&
@@ -304,6 +321,26 @@ public class PasswdFileData
         setField(str, rec, PwsRecordV3.GROUP);
     }
 
+    /**
+     * Split the group into the given list
+     */
+    public static void splitGroup(String group, ArrayList<String> groups)
+    {
+        groups.clear();
+        String[] splitGroups = TextUtils.split(group, "\\.");
+        for (String splitGroup: splitGroups) {
+            if (TextUtils.isEmpty(splitGroup)) {
+                if (!groups.isEmpty()) {
+                    int pos = groups.size() - 1;
+                    String last = groups.get(pos);
+                    groups.set(pos, last + ".");
+                }
+            } else {
+                groups.add(splitGroup);
+            }
+        }
+    }
+
     /** Get the time the record was last modified */
     public final Date getLastModTime(PwsRecord rec)
     {
@@ -330,11 +367,6 @@ public class PasswdFileData
     public final String getPassword(PwsRecord rec)
     {
         return getField(rec, PwsRecordV3.PASSWORD);
-    }
-
-    public final boolean hasPassword(PwsRecord rec)
-    {
-        return hasField(rec, PwsRecordV3.PASSWORD);
     }
 
     public final void setPassword(String oldPasswd, String newPasswd,
@@ -700,11 +732,6 @@ public class PasswdFileData
             date = (Date)field.getValue();
         }
         return date;
-    }
-
-    private boolean hasField(PwsRecord rec, int fieldId)
-    {
-        return doGetRecField(rec, fieldId) != null;
     }
 
     private int getVersionFieldId(int fieldId)

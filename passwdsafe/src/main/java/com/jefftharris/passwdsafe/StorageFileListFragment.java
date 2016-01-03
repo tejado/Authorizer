@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,7 +20,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,6 +58,9 @@ public final class StorageFileListFragment extends ListFragment
 
         /** Does the activity have a menu */
         boolean activityHasMenu();
+
+        /** Update the view for a list of files */
+        void updateViewFiles();
     }
 
     private static final String TAG = "StorageFileListFragment";
@@ -71,14 +74,11 @@ public final class StorageFileListFragment extends ListFragment
     private SimpleCursorAdapter itsFilesAdapter;
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
-     */
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context ctx)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        super.onAttach(ctx);
+        itsListener = (Listener)ctx;
     }
 
     @Override
@@ -131,7 +131,7 @@ public final class StorageFileListFragment extends ListFragment
                         }
                         case R.id.icon: {
                             ImageView iv = (ImageView)view;
-                            iv.setImageResource(R.drawable.login_rev);
+                            iv.setImageResource(R.drawable.ic_passwdsafe_dark);
                             return true;
                         }
                         case R.id.mod_date: {
@@ -152,17 +152,12 @@ public final class StorageFileListFragment extends ListFragment
         lm.initLoader(LOADER_FILES, null, this);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onResume()
-     */
     @Override
     public void onResume()
     {
         super.onResume();
-        PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
-        app.closeOpenFile();
+        itsListener.updateViewFiles();
     }
-
 
     @Override
     public void onDestroy()
@@ -210,13 +205,6 @@ public final class StorageFileListFragment extends ListFragment
     {
         inflater.inflate(R.menu.fragment_storage_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem mi = menu.findItem(R.id.menu_file_open);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        mi = menu.findItem(R.id.menu_file_new);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
 
     @Override
@@ -376,8 +364,10 @@ public final class StorageFileListFragment extends ListFragment
         int flags = openIntent.getFlags() &
                     (Intent.FLAG_GRANT_READ_URI_PERMISSION |
                      Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        String title = RecentFilesDb.updateOpenedSafFile(uri, flags,
-                                                         getActivity());
+
+        Context ctx = getContext();
+        String title = RecentFilesDb.getSafDisplayName(uri, ctx);
+        RecentFilesDb.updateOpenedSafFile(uri, flags, ctx);
         if (title != null) {
             openUri(uri, title);
         }

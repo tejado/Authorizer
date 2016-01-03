@@ -147,20 +147,18 @@ public class YubikeyMgr
         itsUser.starting();
     }
 
-    /** Handle a pause of the activity.  Return true if the manager is active;
-     *  false otherwise */
-    public boolean onPause()
+    /** Handle a pause of the activity */
+    public void onPause()
     {
-        PasswdSafeUtil.dbginfo(TAG, "onPause");
         if (itsUser == null) {
-            return false;
+            return;
         }
         Activity act = itsUser.getActivity();
 
         if (itsIsRegistered) {
             NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
             if ((adapter == null) || !adapter.isEnabled()) {
-                return true;
+                return;
             }
 
             adapter.disableForegroundDispatch(act);
@@ -171,22 +169,15 @@ public class YubikeyMgr
             itsTagIntent.cancel();
             itsTagIntent = null;
         }
-
-        return true;
     }
 
     /// Stop the interaction with the key
     public void stop()
     {
         onPause();
-        if (itsTimer != null) {
-            itsTimer.cancel();
-            itsTimer = null;
-        }
-        if (itsUser != null) {
-            itsUser.stopped();
-            itsUser = null;
-        }
+        stopUser();
+        itsTimer = null;
+        itsUser = null;
     }
 
     /// Handle the intent for when the key is discovered
@@ -263,12 +254,14 @@ public class YubikeyMgr
                 // Prune response bytes and convert
                 String pwstr = Util.bytesToHex(resp, 0, resp.length - 2);
 //                PasswdSafeUtil.dbginfo(TAG, "Pw: " + pwstr);
+                stopUser();
                 itsUser.setHashedPassword(pwstr);
             } finally {
                 isotag.close();
             }
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo(TAG, e, "handleKeyIntent");
+            stopUser();
             itsUser.handleHashException(e);
         }
 
@@ -285,5 +278,18 @@ public class YubikeyMgr
 
         throw new Exception("Invalid response: " +
                             Util.bytesToHex(resp));
+    }
+
+    /**
+     * Stop interaction with the user
+     */
+    private void stopUser()
+    {
+        if (itsTimer != null) {
+            itsTimer.cancel();
+        }
+        if (itsUser != null) {
+            itsUser.stopped();
+        }
     }
 }

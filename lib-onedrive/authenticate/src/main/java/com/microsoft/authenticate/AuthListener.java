@@ -5,6 +5,7 @@ package com.microsoft.authenticate;
  * Returns the * status of the operation when onAuthComplete is called. If there was an error
  * during the operation, onAuthError is called with the exception that was thrown.
  */
+@SuppressWarnings("UnusedParameters")
 public interface AuthListener {
     /**
      * Invoked when the operation completes successfully.

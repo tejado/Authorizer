@@ -7,16 +7,15 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,14 +56,11 @@ public class SyncProviderFragment extends ListFragment
     private boolean itsHasProvider = true;
     private Listener itsListener;
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
-     */
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context ctx)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        super.onAttach(ctx);
+        itsListener = (Listener)ctx;
     }
 
 
@@ -176,10 +172,6 @@ public class SyncProviderFragment extends ListFragment
     {
         inflater.inflate(R.menu.fragment_sync_provider, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem mi = menu.findItem(R.id.menu_sync);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
     }
 
 

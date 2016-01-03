@@ -4,8 +4,8 @@
     <string name="about">A propos</string>
     <string name="app_name">PasswdSafe LIBRARY</string>
     <string name="box">Box</string>
-    <string name="build_date">Date de création: %s</string>
-    <string name="build_id">Identificateur de création: %s</string>
+    <string name="build_date">Date de création</string>
+    <string name="build_id">Identificateur de création</string>
     <string name="cancel">Annuler</string>
     <string name="choose_files">Choisissez Fichiers</string>
     <string name="close">Fermer</string>

@@ -11,7 +11,9 @@ import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.ClipboardManager;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -32,32 +34,20 @@ public final class ApiCompat
         android.os.Build.VERSION_CODES.FROYO;
     public static final int SDK_HONEYCOMB = 11;
     public static final int SDK_KITKAT = 19;
+    public static final int SDK_LOLLIPOP = 21;
 
     /** Copy of Intent.FLAG_ACTIVITY_CLEAR_TASK available on API 11 */
     public static final int INTENT_FLAG_ACTIVITY_CLEAR_TASK = 0x00008000;
 
-    public static final int SDK_VERSION;
-    static {
-        int sdk;
-        try {
-            sdk = Integer.parseInt(android.os.Build.VERSION.SDK);
-        } catch (NumberFormatException e) {
-            // Default back to android 1.5
-            sdk = SDK_CUPCAKE;
-        }
-        SDK_VERSION = sdk;
-    }
+    public static final int SDK_VERSION = Build.VERSION.SDK_INT;
 
     /** Request a manual sync of a content provider */
     public static void requestManualSync(Account acct,
                                          Uri uri,
-                                         Context ctx,
                                          Bundle extras)
     {
         if (SDK_VERSION >= SDK_ECLAIR) {
             ApiCompatEclair.requestManualSync(acct, uri.getAuthority(), extras);
-        } else {
-            ApiCompatCupcake.requestManualSync(uri, ctx);
         }
     }
 
@@ -124,5 +114,35 @@ public final class ApiCompat
     {
         return (SDK_VERSION >= SDK_KITKAT) &&
                 ApiCompatKitkat.documentsContractDeleteDocument(cr, uri);
+    }
+
+    /**
+     * Copy text to the clipboard
+     */
+    public static void copyToClipboard(String str, Context ctx)
+    {
+        if (SDK_VERSION >= SDK_HONEYCOMB) {
+            ApiCompatHoneycomb.copyToClipboard(str, ctx);
+        } else {
+            @SuppressWarnings("deprecation")
+            ClipboardManager clipMgr = (ClipboardManager)
+                    ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipMgr.setText(str);
+        }
+    }
+
+    /**
+     * Does the clipboard have text
+     */
+    public static boolean clipboardHasText(Context ctx)
+    {
+        if (SDK_VERSION >= SDK_HONEYCOMB) {
+            return ApiCompatHoneycomb.clipboardHasText(ctx);
+        } else {
+            @SuppressWarnings("deprecation")
+            ClipboardManager clipMgr = (ClipboardManager)
+                    ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+            return clipMgr.hasText();
+        }
     }
 }

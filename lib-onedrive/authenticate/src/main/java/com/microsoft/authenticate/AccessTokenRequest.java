@@ -15,6 +15,7 @@ import java.util.Locale;
  * This class adds the proper parameters for the access token request via the
  * constructBody() hook.
  */
+@SuppressWarnings("deprecation")
 class AccessTokenRequest extends TokenRequest {
 
     /**

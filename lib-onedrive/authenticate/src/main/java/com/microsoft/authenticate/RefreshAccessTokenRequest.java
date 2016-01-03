@@ -13,6 +13,7 @@ import com.microsoft.authenticate.OAuth.GrantType;
  * is done by the parent class, TokenRequest. This class adds in the required body parameters via
  * TokenRequest's hook method, constructBody().
  */
+@SuppressWarnings("deprecation")
 class RefreshAccessTokenRequest extends TokenRequest {
 
     /** REQUIRED. Value MUST be set to "refresh_token". */

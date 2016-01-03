@@ -10,6 +10,7 @@ import java.util.Date;
 /**
  * Helper class for handling ISO 8601 strings of the following format: "2008-03-01T13:00:00".
  */
+@SuppressWarnings("RedundantThrows")
 final class ISO8601 {
 
     /**

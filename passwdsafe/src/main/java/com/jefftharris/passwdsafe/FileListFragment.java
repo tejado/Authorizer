@@ -29,7 +29,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +38,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
@@ -49,7 +49,9 @@ import com.jefftharris.passwdsafe.util.FileComparator;
  * The FileListFragment allows the user to choose which file to open
  */
 public final class FileListFragment extends ListFragment
-        implements LoaderCallbacks<List<Map<String, Object>>>
+        implements LoaderCallbacks<List<Map<String, Object>>>,
+                   View.OnClickListener,
+                   View.OnLongClickListener
 {
     /** Listener interface for the owning activity */
     public interface Listener
@@ -62,6 +64,9 @@ public final class FileListFragment extends ListFragment
 
         /** Does the activity have a 'none' item */
         boolean activityHasNoneItem();
+
+        /** Update the view for a list of files */
+        void updateViewFiles();
     }
 
     /** File data information for the list */
@@ -106,14 +111,11 @@ public final class FileListFragment extends ListFragment
     private final LinkedList<File> itsDirHistory = new LinkedList<>();
     private Listener itsListener;
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onAttach(android.app.Activity)
-     */
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context ctx)
     {
-        super.onAttach(activity);
-        itsListener = (Listener)activity;
+        super.onAttach(ctx);
+        itsListener = (Listener)ctx;
     }
 
 
@@ -131,26 +133,12 @@ public final class FileListFragment extends ListFragment
         View view = inflater.inflate(R.layout.fragment_file_list,
                                      container, false);
 
-        View.OnClickListener parentListener = new View.OnClickListener()
-        {
-            public final void onClick(View v)
-            {
-                doParentPressed();
-            }
-        };
-        View v = view.findViewById(R.id.up_icon);
-        v.setOnClickListener(parentListener);
-        v = view.findViewById(R.id.current_group_label);
-        v.setOnClickListener(parentListener);
-
+        View v = view.findViewById(R.id.current_group_panel);
+        v.setOnClickListener(this);
+        v.setOnLongClickListener(this);
         v = view.findViewById(R.id.home);
-        v.setOnClickListener(new View.OnClickListener()
-        {
-            public final void onClick(View v)
-            {
-                doHomePressed();
-            }
-        });
+        v.setOnClickListener(this);
+        v.setOnLongClickListener(this);
 
         return view;
     }
@@ -180,10 +168,9 @@ public final class FileListFragment extends ListFragment
     public void onResume()
     {
         super.onResume();
-        PasswdSafeApp app = (PasswdSafeApp)getActivity().getApplication();
-        app.closeOpenFile();
         itsDirHistory.clear();
         showFiles();
+        itsListener.updateViewFiles();
     }
 
 
@@ -195,23 +182,6 @@ public final class FileListFragment extends ListFragment
     {
         inflater.inflate(R.menu.fragment_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
-        MenuItem mi = menu.findItem(R.id.menu_file_new);
-        MenuItemCompat.setShowAsAction(mi,
-                                       MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-    }
-
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onPrepareOptionsMenu(android.view.Menu)
-     */
-    @Override
-    public void onPrepareOptionsMenu(Menu menu)
-    {
-        MenuItem mi = menu.findItem(R.id.menu_parent);
-        if (mi != null) {
-            mi.setEnabled((itsDir != null) && (itsDir.getParentFile() != null));
-        }
     }
 
 
@@ -227,14 +197,6 @@ public final class FileListFragment extends ListFragment
                 startActivity(new Intent(PasswdSafeUtil.NEW_INTENT,
                                          Uri.fromFile(itsDir)));
             }
-            return true;
-        }
-        case R.id.menu_home: {
-            doHomePressed();
-            return true;
-        }
-        case R.id.menu_parent: {
-            doParentPressed();
             return true;
         }
         default: {
@@ -268,6 +230,39 @@ public final class FileListFragment extends ListFragment
             PasswdSafeUtil.dbginfo(TAG, "Open file: %s", file.itsFile);
             openFile(file.itsFile);
         }
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.current_group_panel: {
+            doParentPressed();
+            break;
+        }
+        case R.id.home: {
+            doHomePressed();
+            break;
+        }
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.current_group_panel: {
+            Toast.makeText(getContext(), R.string.parent_directory,
+                           Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        case R.id.home: {
+            Toast.makeText(getContext(), R.string.home,
+                           Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        }
+        return false;
     }
 
     /** Create a loader for files */
@@ -417,13 +412,6 @@ public final class FileListFragment extends ListFragment
             groupPanel.setVisibility(View.VISIBLE);
             groupLabel.setText(itsDir.toString());
             emptyLabel.setText(R.string.no_files);
-        }
-
-        View selectFileLabel = rootView.findViewById(R.id.select_file_label);
-        if ((adapter != null) && !adapter.isEmpty()) {
-            selectFileLabel.setVisibility(View.VISIBLE);
-        } else {
-            selectFileLabel.setVisibility(View.GONE);
         }
 
         setListAdapter(adapter);
@@ -583,9 +571,9 @@ public final class FileListFragment extends ListFragment
             if (file.itsFile == null) {
                 icon = 0;
             } else if (file.itsFile.isDirectory()) {
-                icon = R.drawable.folder_rev;
+                icon = R.drawable.ic_folder;
             } else {
-                icon = R.drawable.login_rev;
+                icon = R.drawable.ic_passwdsafe_dark;
                 item.put(MOD_DATE, Utils.formatDate(file.itsFile.lastModified(),
                                                     getContext()));
             }

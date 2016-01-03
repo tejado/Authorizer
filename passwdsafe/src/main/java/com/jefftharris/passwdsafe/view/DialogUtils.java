@@ -9,13 +9,16 @@ package com.jefftharris.passwdsafe.view;
 
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -26,6 +29,31 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
  */
 public class DialogUtils
 {
+    /**
+     * Setup the keyboard on a dialog. The initial field gets focus and shows
+     * the keyboard. The final field clicks the Ok button when enter is pressed.
+     */
+    public static void setupDialogKeyboard(
+            final android.support.v7.app.AlertDialog dialog,
+            TextView initialField,
+            TextView finalField,
+            Context ctx)
+    {
+        GuiUtils.setShowKeyboardListener(dialog, initialField, ctx);
+        GuiUtils.setupKeyboardEnter(finalField, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Button btn = dialog.getButton(
+                        android.support.v7.app.AlertDialog.BUTTON_POSITIVE);
+                if (btn.isEnabled()) {
+                    btn.performClick();
+                }
+            }
+        });
+    }
+
     /**
      * The DialogData class encapsulates the data returned from a dialog
      * creation method
@@ -46,6 +74,7 @@ public class DialogUtils
     /**
      * Create a dialog used as a prompt to confirm an operation
      */
+    // TODO: fix generic confirm prompt for new dialog
     public static DialogData createConfirmPrompt
     (
         Activity act,
@@ -58,11 +87,9 @@ public class DialogUtils
         @SuppressLint("InflateParams")
         View dlgView = factory.inflate(R.layout.confirm_prompt, null);
 
-        TextView prompt = (TextView)dlgView.findViewById(R.id.prompt);
-        prompt.setText(promptStr);
-
         AlertDialog.Builder alert = new AlertDialog.Builder(act)
             .setTitle(titleStr)
+            .setMessage(promptStr)
             .setView(dlgView)
             .setPositiveButton(R.string.ok, dlgClick)
             .setNegativeButton(R.string.cancel, dlgClick)
@@ -70,7 +97,7 @@ public class DialogUtils
         AlertDialog alertDialog = alert.create();
 
         final DialogValidator validator =
-            new DialogValidator.AlertValidator(alertDialog, dlgView, act, false)
+            new DialogValidator.AlertValidator(alertDialog, dlgView, act)
         {
             @Override
             public final void reset()
