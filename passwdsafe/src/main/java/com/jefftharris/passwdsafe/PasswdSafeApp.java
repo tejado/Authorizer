@@ -138,6 +138,9 @@ public class PasswdSafeApp extends Application
     public static Uri getOpenUriFromIntent(Intent intent)
     {
         Uri uri = intent.getData();
+        if (uri == null) {
+            return null;
+        }
         Uri.Builder builder = uri.buildUpon();
         builder.fragment("");
         builder.query("");
