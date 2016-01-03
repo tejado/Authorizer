@@ -8,7 +8,6 @@
 package com.jefftharris.passwdsafe.view;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -59,9 +58,7 @@ public class PasswdLocation implements Parcelable
     {
         String group = fileData.getGroup(rec);
         if (!TextUtils.isEmpty(group)) {
-            String[] groups = TextUtils.split(group, "\\.");
-            // TODO: deal with escaped .s?
-            Collections.addAll(itsGroups, groups);
+            PasswdFileData.splitGroup(group, itsGroups);
         }
         itsRecord = fileData.getUUID(rec);
     }
@@ -96,7 +93,6 @@ public class PasswdLocation implements Parcelable
         if (itsGroups.isEmpty()) {
             return null;
         }
-        // TODO: deal with escaped .s?
         return TextUtils.join(".", itsGroups);
     }
 

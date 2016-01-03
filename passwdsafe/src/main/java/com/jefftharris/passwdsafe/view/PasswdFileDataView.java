@@ -371,7 +371,8 @@ public class PasswdFileDataView
                 if (group == null) {
                     group = "";
                 }
-                String[] groups = TextUtils.split(group, "\\.");
+                ArrayList<String> groups = new ArrayList<>();
+                PasswdFileData.splitGroup(group, groups);
                 GroupNode node = itsRootNode;
                 for (String g : groups) {
                     GroupNode groupNode = node.getGroup(g);
