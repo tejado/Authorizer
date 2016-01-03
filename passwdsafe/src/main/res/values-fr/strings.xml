@@ -275,6 +275,9 @@
     <string name="yubikey_slot_2">YubiKey Rainure 2</string>
 
     <string name="release_notes">
+        &lt;b&gt;6.0.0&lt;/b&gt; - Mettre à jour l\'interface utilisateur pour
+        le design material et le soutien de la tablette
+        \n\n
         &lt;b&gt;5.4.0&lt;/b&gt;\n
         - Ajout du support OneDrive. Après avoir authentifié un compte, choisir
         les fichiers à synchroniser.\n
