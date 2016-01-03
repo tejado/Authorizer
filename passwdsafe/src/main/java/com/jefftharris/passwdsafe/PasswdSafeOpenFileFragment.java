@@ -11,8 +11,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -294,6 +296,10 @@ public class PasswdSafeOpenFileFragment
         }
         case R.id.ok: {
             boolean readonly = itsReadonlyCb.isChecked();
+            SharedPreferences prefs =
+                    PreferenceManager.getDefaultSharedPreferences(getContext());
+            Preferences.setFileOpenReadOnlyPref(readonly, prefs);
+
             itsOpenTask = new OpenTask(
                     new StringBuilder(itsPasswordEdit.getText()), readonly);
             itsOpenTask.execute();
@@ -323,11 +329,15 @@ public class PasswdSafeOpenFileFragment
             itsPasswordEdit.setText("test123");
             itsOkBtn.performClick();
         } else {
-            itsReadonlyCb.setChecked(true);
             Pair<Boolean, Integer> rc = getPasswdFileUri().isWritable();
             if (rc.first) {
-                itsReadonlyCb.setEnabled(true);
+                SharedPreferences prefs =
+                        PreferenceManager.getDefaultSharedPreferences(
+                                getContext());
+                itsReadonlyCb.setChecked(
+                        Preferences.getFileOpenReadOnlyPref(prefs));
             } else {
+                itsReadonlyCb.setChecked(true);
                 itsReadonlyCb.setEnabled(false);
                 if (rc.second != null) {
                     itsReadonlyCb.setText(String.format(
