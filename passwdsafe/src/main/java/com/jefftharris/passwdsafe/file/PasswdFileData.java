@@ -321,6 +321,26 @@ public class PasswdFileData
         setField(str, rec, PwsRecordV3.GROUP);
     }
 
+    /**
+     * Split the group into the given list
+     */
+    public static void splitGroup(String group, ArrayList<String> groups)
+    {
+        groups.clear();
+        String[] splitGroups = TextUtils.split(group, "\\.");
+        for (String splitGroup: splitGroups) {
+            if (TextUtils.isEmpty(splitGroup)) {
+                if (!groups.isEmpty()) {
+                    int pos = groups.size() - 1;
+                    String last = groups.get(pos);
+                    groups.set(pos, last + ".");
+                }
+            } else {
+                groups.add(splitGroup);
+            }
+        }
+    }
+
     /** Get the time the record was last modified */
     public final Date getLastModTime(PwsRecord rec)
     {
