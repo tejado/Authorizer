@@ -972,6 +972,7 @@ public class PasswdSafe extends AppCompatActivity
     {
         PasswdFileDataView fileView = itsFileDataFrag.getFileDataView();
         fileView.setRecordFilter(filter);
+        itsFileDataFrag.refreshFileData();
         if (filter != null) {
             itsQuery.setText(getString(R.string.query_label,
                                        filter.toString(this)));
@@ -1020,9 +1021,12 @@ public class PasswdSafe extends AppCompatActivity
                         new PasswdFileDataView.RecordVisitor()
                         {
                             @Override
-                            public void visitRecord(PwsRecord record)
+                            public void visitRecord(String recordUuid)
                             {
-                                fileData.setProtected(doProtect, record);
+                                PwsRecord rec = fileData.getRecord(recordUuid);
+                                if (rec != null) {
+                                    fileData.setProtected(doProtect, rec);
+                                }
                             }
                         });
             }

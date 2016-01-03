@@ -89,11 +89,9 @@ public final class PasswdRecordListDataComparator
     private int compareIsGroup(PasswdRecordListData arg0,
                                PasswdRecordListData arg1)
     {
-        Object rec0 = arg0.itsRecord;
-        Object rec1 = arg1.itsRecord;
-        if ((rec0 == null) && (rec1 != null)) {
+        if (!arg0.itsIsRecord && arg1.itsIsRecord) {
             return -1;
-        } else if ((rec0 != null) && (rec1 == null)) {
+        } else if (arg0.itsIsRecord && !arg1.itsIsRecord) {
             return 1;
         }
         return 0;

@@ -24,17 +24,17 @@ public class PasswdRecordListData
 
     public final int itsIcon;
 
-    public final PwsRecord itsRecord;
+    public final boolean itsIsRecord;
 
     /** Constructor */
     public PasswdRecordListData(String title, String user, String uuid,
-                                String match, int icon, PwsRecord record)
+                                String match, int icon, boolean isRecord)
     {
         itsTitle = title;
         itsUser = user;
         itsUuid = uuid;
         itsMatch = match;
         itsIcon = icon;
-        itsRecord = record;
+        itsIsRecord = isRecord;
     }
 }

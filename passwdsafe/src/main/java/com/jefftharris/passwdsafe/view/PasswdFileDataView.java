@@ -9,7 +9,6 @@ package com.jefftharris.passwdsafe.view;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -38,7 +37,6 @@ import java.util.regex.PatternSyntaxException;
  * The PasswdFileDataView contains state for viewing a password file
  */
 public class PasswdFileDataView
-        implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     /**
      * Visitor interface for iterating records
@@ -46,11 +44,9 @@ public class PasswdFileDataView
     public interface RecordVisitor
     {
         /** Visit a record */
-        void visitRecord(PwsRecord record);
+        void visitRecord(String recordUuid);
     }
 
-    // TODO: file data view shouldn't hold the file data
-    private PasswdFileData itsFileData;
     private GroupNode itsRootNode;
     private GroupNode itsCurrGroupNode;
     private final ArrayList<String> itsCurrGroups = new ArrayList<>();
@@ -84,12 +80,9 @@ public class PasswdFileDataView
     /**
      * Handle when the owning fragment is attached to the context
      */
-    public void onAttach(Context ctx)
+    public void onAttach(Context ctx, SharedPreferences prefs)
     {
         itsContext = ctx.getApplicationContext();
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(itsContext);
-        prefs.registerOnSharedPreferenceChangeListener(this);
         itsIsGroupRecords = Preferences.getGroupRecordsPref(prefs);
         itsIsSortCaseSensitive = Preferences.getSortCaseSensitivePref(prefs);
         itsIsSearchCaseSensitive =
@@ -104,14 +97,15 @@ public class PasswdFileDataView
      */
     public void onDetach()
     {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(itsContext);
-        prefs.unregisterOnSharedPreferenceChangeListener(this);
         itsContext = null;
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    /**
+     * Handle a shared preference change
+     * @return Whether the file data should be refreshed
+     */
+    public boolean handleSharedPreferenceChanged(SharedPreferences prefs,
+                                                 String key)
     {
         boolean rebuild = false;
         boolean rebuildSearch = false;
@@ -162,9 +156,9 @@ public class PasswdFileDataView
                 Log.e(TAG, msg, e);
                 PasswdSafeUtil.showErrorMsg(msg, itsContext);
             }
-        } else if (rebuild) {
-            rebuildView();
         }
+
+        return rebuild || rebuildSearch;
     }
 
     /**
@@ -172,10 +166,9 @@ public class PasswdFileDataView
      */
     public synchronized void clearFileData()
     {
-        itsFileData = null;
         itsCurrGroups.clear();
         itsIsExpiryChanged = true;
-        rebuildView();
+        rebuildView(null);
     }
 
     /**
@@ -183,10 +176,18 @@ public class PasswdFileDataView
      */
     public synchronized void setFileData(PasswdFileData fileData)
     {
-        itsFileData = fileData;
         itsCurrGroups.clear();
         itsIsExpiryChanged = true;
-        rebuildView();
+        rebuildView(fileData);
+    }
+
+    /**
+     * Refresh the file data
+     */
+    public synchronized void refreshFileData(PasswdFileData fileData)
+    {
+        itsCurrGroups.clear();
+        rebuildView(fileData);
     }
 
     /**
@@ -212,7 +213,7 @@ public class PasswdFileDataView
 
                     records.add(new PasswdRecordListData(
                             entry.getKey(), str, null,
-                            null, R.drawable.ic_folder, null));
+                            null, R.drawable.ic_folder, false));
                 }
             }
         }
@@ -309,7 +310,6 @@ public class PasswdFileDataView
     public synchronized void setRecordFilter(PasswdRecordFilter filter)
     {
         itsFilter = filter;
-        rebuildView();
     }
 
     /**
@@ -370,27 +370,27 @@ public class PasswdFileDataView
     /**
      * Rebuild the view information
      */
-    private synchronized void rebuildView()
+    private synchronized void rebuildView(PasswdFileData fileData)
     {
         itsRootNode = new GroupNode();
         itsNumExpired = 0;
-        if (itsFileData == null) {
+        if (fileData == null) {
             updateCurrentGroup();
             return;
         }
 
-        List<PwsRecord> records = itsFileData.getRecords();
+        List<PwsRecord> records = fileData.getRecords();
         if (itsIsGroupRecords) {
             Comparator<String> groupComp = itsIsSortCaseSensitive ?
                     new StringComparator() : String.CASE_INSENSITIVE_ORDER;
 
             for (PwsRecord rec: records) {
-                String match = filterRecord(rec);
+                String match = filterRecord(rec, fileData);
                 if (match == null) {
                     continue;
                 }
 
-                String group = itsFileData.getGroup(rec);
+                String group = fileData.getGroup(rec);
                 if (group == null) {
                     group = "";
                 }
@@ -405,13 +405,14 @@ public class PasswdFileDataView
                     }
                     node = groupNode;
                 }
-                node.addRecord(new MatchPwsRecord(rec, match));
+                node.addRecord(new MatchPwsRecord(rec, fileData, match));
              }
         } else {
             for (PwsRecord rec: records) {
-                String match = filterRecord(rec);
+                String match = filterRecord(rec, fileData);
                 if (match != null) {
-                    itsRootNode.addRecord(new MatchPwsRecord(rec, match));
+                    itsRootNode.addRecord(
+                            new MatchPwsRecord(rec, fileData, match));
                 }
             }
         }
@@ -420,7 +421,7 @@ public class PasswdFileDataView
         PasswdRecordFilter.ExpiryFilter filter = itsExpiryNotifPref.getFilter();
         if (filter != null) {
             long expiration = filter.getExpiryFromNow(null);
-            for (PasswdRecord rec : itsFileData.getPasswdRecords()) {
+            for (PasswdRecord rec : fileData.getPasswdRecords()) {
                 PasswdExpiration expiry = rec.getPasswdExpiry();
                 if ((expiry != null) &&
                     (expiry.itsExpiration.getTime() <= expiration)) {
@@ -453,12 +454,12 @@ public class PasswdFileDataView
      * @return A non-null string if the record matches the filter; null if it
      * does not
      */
-    private String filterRecord(PwsRecord rec)
+    private String filterRecord(PwsRecord rec, PasswdFileData fileData)
     {
         if (itsFilter == null) {
             return PasswdRecordFilter.QUERY_MATCH;
         }
-        return itsFilter.filterRecord(rec, itsFileData, itsContext);
+        return itsFilter.filterRecord(rec, fileData, itsContext);
     }
 
     /**
@@ -481,7 +482,7 @@ public class PasswdFileDataView
         List<MatchPwsRecord> childRecords = node.getRecords();
         if (childRecords != null) {
             for (MatchPwsRecord matchRec : childRecords) {
-                visitor.visitRecord(matchRec.itsRecord);
+                visitor.visitRecord(matchRec.itsUuid);
             }
         }
     }
@@ -491,19 +492,18 @@ public class PasswdFileDataView
      */
     private PasswdRecordListData createListData(MatchPwsRecord rec)
     {
-        String title = itsFileData.getTitle(rec.itsRecord);
+        String title = rec.itsTitle;
         if (title == null) {
             title = "Untitled";
         }
-        String user = itsFileData.getUsername(rec.itsRecord);
+        String user = rec.itsUsername;
         if (!TextUtils.isEmpty(user)) {
             user = "[" + user + "]";
         }
-        String uuid = itsFileData.getUUID(rec.itsRecord);
 
-        return new PasswdRecordListData(title, user, uuid, rec.itsMatch,
+        return new PasswdRecordListData(title, user, rec.itsUuid, rec.itsMatch,
                                         R.drawable.ic_action_person_outline,
-                                        rec.itsRecord);
+                                        true);
     }
 
 
@@ -583,12 +583,18 @@ public class PasswdFileDataView
      */
     public static final class MatchPwsRecord
     {
-        public final PwsRecord itsRecord;
+        public final String itsTitle;
+        public final String itsUsername;
+        public final String itsUuid;
         public final String itsMatch;
 
-        public MatchPwsRecord(PwsRecord rec, String match)
+        public MatchPwsRecord(PwsRecord rec,
+                              PasswdFileData fileData,
+                              String match)
         {
-            itsRecord = rec;
+            itsTitle = fileData.getTitle(rec);
+            itsUsername = fileData.getUsername(rec);
+            itsUuid = fileData.getUUID(rec);
             itsMatch = match;
         }
     }
