@@ -1048,14 +1048,10 @@ public class PasswdSafe extends AppCompatActivity
             @Override
             public void run()
             {
-                boolean resetLoc = false;
                 if (save) {
                     itsFileDataFrag.refreshFileData();
-                    if ((newLocation != null) &&
-                        !newLocation.equalGroups(itsLocation)) {
-                        resetLoc = true;
-                    }
                 }
+                boolean resetLoc = shouldResetLoc();
 
                 if (popBack) {
                     FragmentManager fragMgr = getSupportFragmentManager();
@@ -1079,6 +1075,23 @@ public class PasswdSafe extends AppCompatActivity
                 if (postSaveRun != null) {
                     postSaveRun.run();
                 }
+            }
+
+            /**
+             * Should the location be reset
+             */
+            private boolean shouldResetLoc()
+            {
+                if (!save || (newLocation == null)) {
+                    return false;
+                }
+
+                if (!newLocation.equalGroups(itsLocation)) {
+                    return true;
+                }
+
+                PasswdFileDataView dataView = itsFileDataFrag.getFileDataView();
+                return !dataView.hasGroup(newLocation.getRecordGroup());
             }
         };
 
