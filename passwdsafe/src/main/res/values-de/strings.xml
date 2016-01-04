@@ -32,6 +32,13 @@
     <string name="continue_p">Fortsetzen?</string>
     <string name="copy_clipboard">Kopieren</string>
     <string name="copy_notes">Notiz kopieren</string>
+    <string name="copy_password">Passwort kopieren</string>
+    <string name="copy_password_warning">
+        Warnung: Alle Apps können den Inhalt der Zwischenablage zu lesen, und
+        die Zwischenablage nicht zuverlässig gelöscht werden. Die PasswdSafe
+        alternative Tastatur ist eine sicherere Methode für die Eingabe von
+        Kennwörtern in andere Apps.
+    </string>
     <string name="copy_user">Benutzername kopieren</string>
     <string name="created">Erstellt</string>
     <string name="current">Aktuell</string>

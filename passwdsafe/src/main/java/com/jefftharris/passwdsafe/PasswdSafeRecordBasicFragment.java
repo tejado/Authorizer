@@ -8,6 +8,8 @@
 package com.jefftharris.passwdsafe;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.ObjectHolder;
+import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -39,8 +42,11 @@ import java.util.List;
  */
 public class PasswdSafeRecordBasicFragment
         extends AbstractPasswdSafeRecordFragment
-        implements View.OnClickListener
+        implements ConfirmPromptDialog.Listener,
+                   View.OnClickListener
 {
+    private static final String PREF_COPY_PASSWORD_CONFIRM =
+            "copyPasswordConfirm";
 
     private boolean itsIsPasswordShown = false;
     private String itsHiddenPasswordStr;
@@ -166,7 +172,23 @@ public class PasswdSafeRecordBasicFragment
         switch (item.getItemId()) {
         case R.id.menu_copy_user: {
             PasswdSafeUtil.copyToClipboard(itsUser.getText().toString(),
-                                           getActivity());
+                                           getContext());
+            return true;
+        }
+        case R.id.menu_copy_password: {
+            SharedPreferences prefs =
+                    getActivity().getPreferences(Context.MODE_PRIVATE);
+            if (prefs.getBoolean(PREF_COPY_PASSWORD_CONFIRM, false)) {
+                PasswdSafeUtil.copyToClipboard(getPassword(), getContext());
+            } else {
+                Bundle confirmArgs = new Bundle();
+                ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
+                        getString(R.string.copy_password),
+                        getString(R.string.copy_password_warning),
+                        getString(android.R.string.copy), confirmArgs);
+                dialog.show(getFragmentManager(), "Copy password");
+                dialog.setTargetFragment(this, 0);
+            }
             return true;
         }
         case R.id.menu_toggle_password: {
@@ -193,6 +215,20 @@ public class PasswdSafeRecordBasicFragment
             break;
         }
         }
+    }
+
+    @Override
+    public void promptCanceled(Bundle confirmArgs)
+    {
+    }
+
+    @Override
+    public void promptConfirmed(Bundle confirmArgs)
+    {
+        SharedPreferences prefs =
+                getActivity().getPreferences(Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(PREF_COPY_PASSWORD_CONFIRM, true).apply();
+        PasswdSafeUtil.copyToClipboard(getPassword(), getContext());
     }
 
     @Override
