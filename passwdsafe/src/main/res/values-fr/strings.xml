@@ -32,6 +32,13 @@
     <string name="continue_p">Continuez?</string>
     <string name="copy_clipboard">Copier dans le Presse-papiers</string>
     <string name="copy_notes">Copier les notes</string>
+    <string name="copy_password">Copier le mot de passe</string>
+    <string name="copy_password_warning">
+        Attention: Toutes les applications peuvent lire le contenu du
+        presse-papiers, et le presse-papiers ne peuvent pas être effacé de
+        manière fiable. Le PasswdSafe clavier secondaire est une méthode plus
+        sûre pour entrer des mots de passe dans d\'autres applications.
+    </string>
     <string name="copy_user">Copier le nom d\'utilisateur</string>
     <string name="created">Créé</string>
     <string name="current">Actuel</string>
