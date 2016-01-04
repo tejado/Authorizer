@@ -279,6 +279,9 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
+        &lt;b&gt;6.0.1&lt;/b&gt; - Fügen Sie eine Menüoption, um das Passwort in
+        die Zwischenablage mit einem Warn kopieren
+        \n\n
         &lt;b&gt;6.0.0&lt;/b&gt; - Aktualisieren Sie die Benutzerschnittstelle
         für Material-Design und Tablet-Unterstützung
         \n\n
