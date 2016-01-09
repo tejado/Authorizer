@@ -102,8 +102,9 @@ public class AboutFragment extends Fragment
             {
                 called.set(true);
                 itsFile.setText(fileData.getUri().toString());
-                itsPermissions.setText(fileData.canEdit() ?
-                                       R.string.read_write : R.string.read_only);
+                itsPermissions.setText(
+                        fileData.canEdit() ?
+                        R.string.read_write : R.string.read_only_about);
                 itsNumRecords.setText(
                         String.format("%d", fileData.getRecords().size()));
                 itsPasswordEnc.setText(fileData.getOpenPasswordEncoding());

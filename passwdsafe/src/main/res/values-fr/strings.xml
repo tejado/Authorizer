@@ -93,7 +93,7 @@
     <string name="generate">Générer</string>
     <string name="generate_password">Générer un mot de passe</string>
     <string name="go">OK</string>
-    <string name="go_to">Aller à</string>
+    <string name="go_to_shortcut">Aller à</string>
     <string name="group">Groupe</string>
     <string name="group_cannot_start_with_dot">Groupe ne peut pas commencer par un \'.\'</string>
     <string name="group_header">GROUPE</string>
@@ -218,7 +218,8 @@
     <string name="record_policy">Stratégie Entrée</string>
     <string name="record_sort_order">Entrée ordre de tri</string>
     <string name="record_type">Type d\'entrée</string>
-    <string name="read_only">Lecture seule</string>
+    <string name="read_only_about">Lecture seule</string>
+    <string name="read_only_file">Lecture seule</string>
     <string name="read_only_media">Le fichier se trouve sur support en lecture seule. Cette situation peut se produire avec Kitkat et plus sur des cartes SD amovibles.</string>
     <string name="read_write">Lecture-écriture</string>
     <string name="references_label">RÉFÉRENCES</string>
