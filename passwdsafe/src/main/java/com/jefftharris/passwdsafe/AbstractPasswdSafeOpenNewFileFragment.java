@@ -178,17 +178,62 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
      */
     protected class ResolveTask extends BackgroundTask<PasswdFileUri>
     {
+        private PasswdFileUri itsResolvedUri;
+        private Throwable itsResolveEx;
+
         @Override
-        protected PasswdFileUri doInBackground(Void... voids)
+        protected final void onPreExecute()
         {
-            return new PasswdFileUri(itsFileUri, getActivity());
+            super.onPreExecute();
+            switch (PasswdFileUri.getUriType(itsFileUri)) {
+            case GENERIC_PROVIDER: {
+                itsResolvedUri = resolve();
+            }
+            case FILE:
+            case SYNC_PROVIDER:
+            case EMAIL: {
+                break;
+            }
+            }
         }
 
         @Override
-        protected void onPostExecute(PasswdFileUri uri)
+        protected final PasswdFileUri doInBackground(Void... voids)
+        {
+            if ((itsResolvedUri != null) || (itsResolveEx != null)) {
+                return itsResolvedUri;
+            }
+            return resolve();
+        }
+
+        @Override
+        protected final void onPostExecute(PasswdFileUri uri)
         {
             super.onPostExecute(uri);
-            resolveTaskFinished(uri);
+            if (itsResolveEx != null) {
+                PasswdSafeUtil.showFatalMsg(
+                        itsResolveEx,
+                        "Error resolving file URI.  Please email the developer " +
+                        "from the app's Play store listing with information " +
+                        "about the file being opened.  Recreating the issue " +
+                        "has been unsuccessful, preventing a fix.",
+                        getActivity());
+            } else {
+                resolveTaskFinished(uri);
+            }
+        }
+
+        /**
+         * Resolve the file URI, trapping any exceptions
+         */
+        private PasswdFileUri resolve()
+        {
+            try {
+                return new PasswdFileUri(itsFileUri, getActivity());
+            } catch (Throwable e) {
+                itsResolveEx = e;
+                return null;
+            }
         }
     }
 
@@ -199,7 +244,7 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
             extends AsyncTask<Void, Void, ResultT>
     {
         @Override
-        protected void onCancelled()
+        protected final void onCancelled()
         {
             onPostExecute(null);
         }
