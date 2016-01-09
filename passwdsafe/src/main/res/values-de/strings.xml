@@ -5,30 +5,30 @@
     <string name="add_record">Eintrag hinzufügen</string>
     <string name="alias_base_record_header">ALIAS</string>
     <string name="alias_to_same_record">Alias auf den gleichen Eintrag</string>
-    <string name="any_changes_will_be_lost">Alle Änderungen am Eintrag werden verworfen.</string>
-    <string name="app_desc">Programm zum Zugriff und Bearbeiten von PasswordSafe-Datenbanken auf Android</string>
+    <string name="any_changes_will_be_lost">Alle Änderungen am Eintrag gehen verloren.</string>
+    <string name="app_desc">Programm zum Zugriff und Bearbeiten von PasswordSafe-Datenbanken für Android</string>
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">Mind.</string>
     <string name="basic">Allgemein</string>
     <string name="cannot_create_file">Datei kann nicht erstellt werden: %1$s</string>
     <string name="case_sensitive">Groß- und Kleinschreibung</string>
-    <string name="case_sensitive_sorting">Nach Groß- und Kleinschreibung sortieren</string>
+    <string name="case_sensitive_sorting">Sortiere nach Groß- und Kleinschreibung</string>
     <string name="change_password">Passwort ändern</string>
     <string name="check_box_to_confirm">Häkchen setzen zum Bestätigen</string>
     <string name="choose">Auswählen</string>
-    <string name="choose_group">Gruppe wählen</string>
-    <string name="choose_record">Eintrag wählen</string>
-    <string name="choose_type">Typ wählen</string>
+    <string name="choose_group">Gruppe auswählen</string>
+    <string name="choose_record">Eintrag auswählen</string>
+    <string name="choose_type">Typ auswählen</string>
     <string name="clear">Leeren</string>
-    <string name="clear_clipboard_on_close">Zwischenablage beim Schließen leeren</string>
+    <string name="clear_clipboard_on_close">Leere Zwischenablage beim Schließen</string>
     <string name="clear_password_notifications">Mitteilung beim Leeren der Zwischenablage</string>
-    <string name="clear_recent">Liste zuletzt benutzter Dateien leeren</string>
+    <string name="clear_recent">Letzte leeren</string>
     <string name="close_file">Datei schließen</string>
-    <string name="close_file_screen_off">Datei schließen, wenn Bildschirm abschaltet</string>
+    <string name="close_file_screen_off">Schließe Datei, wenn Bildschirm abschaltet</string>
     <string name="confirm">Bestätigen</string>
     <string name="cannot_delete_record">Eintrag kann nicht gelöscht werden - %1$s</string>
     <string name="content_file">Inhaltsdatei</string>
-    <string name="continue_str">Fortsetzen</string>
+    <string name="continue_str">Weiter</string>
     <string name="continue_p">Fortsetzen?</string>
     <string name="copy_clipboard">In die Zwischenablage kopieren</string>
     <string name="copy_notes">Notizen kopieren</string>
@@ -61,7 +61,7 @@
     <string name="done">Fertig</string>
     <string name="duplicate_entry">Eintrag schon vorhanden</string>
     <string name="duplicate_name">Name schon vergeben</string>
-    <string name="edit_item">Bearbeite %s</string>
+    <string name="edit_item">%s bearbeiten</string>
     <string name="edit_policy">Regel bearbeiten</string>
     <string name="email">E-Mail</string>
     <string name="email_attachment">E-Mail-Anlage</string>
@@ -71,13 +71,13 @@
     <string name="empty_name">Kein Name</string>
     <string name="empty_password">Kein Passwort</string>
     <string name="empty_title">Kein Titel</string>
-    <string name="enable_expiration_notifications">Ablaufmitteilungen aktivieren</string>
+    <string name="enable_expiration_notifications">Aktiviere Laufzeitmitteilungen</string>
     <string name="enable">Aktivieren</string>
-    <string name="enabled">Aktiviert</string>
+    <string name="enabled">Aktiv</string>
     <string name="erase_all_expiration_notifications">Alle Mitteilungen über abgelaufende Passwörter sowie beobachtete Dateien löschen</string>
-    <string name="expiration">Ablaufdatum</string>
-    <string name="expiration_notifications">Ablaufmitteilungen</string>
-    <string name="expiration_notifications_warning">Mitteilungen über das Ablaufen von Passwörtern erfordern, dass PasswdSafe gewisse Informationen (Name des Eintrags, Gruppe und Ablaufdatum) auf dem Gerät unverschlüsselt speichert. Passwörter werden nicht gespeichert.</string>
+    <string name="expiration">Laufzeit</string>
+    <string name="expiration_notifications">Laufzeitmitteilungen</string>
+    <string name="expiration_notifications_warning">Mitteilungen über die Laufzeit von Passwörtern erfordert, dass PasswdSafe Informationen (Eintragstitel, Gruppe und Laufzeit) auf dem Gerät unverschlüsselt speichert. Passwörter werden nicht gespeichert.</string>
     <string name="expired_password_notification">Mitteilung über abgelaufenes Passwort</string>
     <string name="expiring_password">Passwort läuft ab</string>
     <string name="ext_storage_not_mounted">Externer Speicher muss eingehängt sein, um Dateien zu sehen.</string>
@@ -93,11 +93,11 @@
     <string name="generate">Erzeugen</string>
     <string name="generate_password">Passwort erzeugen</string>
     <string name="go">Los</string>
-    <string name="go_to">Ansehen</string><!-- Translation 'Ansehen' only works for shortcuts, other places might need 'Gehe zu' in the future -->
+    <string name="go_to_shortcut">Ansehen</string>
     <string name="group">Gruppe</string>
     <string name="group_cannot_start_with_dot">Gruppe kann nicht mit einem \'.\' anfangen</string>
     <string name="group_header">GRUPPE</string>
-    <string name="group_records">Einträge gruppieren</string>
+    <string name="group_records">Gruppiere Einträge</string>
     <string name="help">Hilfe</string>
     <string name="hidden_password_alias">**** (vom Alias, zum Anzeigen berühren)</string>
     <string name="hidden_password_normal">**** (zum Anzeigen berühren)</string>
@@ -109,36 +109,36 @@
     <string name="home">Startordner</string>
     <string name="interval">Zeitraum</string>
     <string name="invalid_file_name">Ungültiger Dateiname</string>
-    <string name="invalid_history_max_size">Größe muss zwischen %1$d und %2$d sein</string>
+    <string name="invalid_history_max_size">Verlauf nur von %1$d bis %2$d möglich.</string>
     <string name="invalid_length">Ungültige Länge</string>
     <string name="invalid_option_length">Ungültige Optionslänge</string>
     <string name="invalid_password">Ungültiges Passwort</string>
     <string name="kitkat_sdcard_warning">
         %1$s
-        \n\nAuf Android KitKat und höher werden Anwendungen am Schreiben auf 
-        entnehmbare SD-Karten gehindert. Wenn sich die Datei auf einer Karte 
-        befindet, wird sie in den internen Speicher verschoben.
+        \n\nAuf Android KitKat und höher können Apps nicht auf 
+        SD-Karten schreiben. Wenn sich die Datei dort befindet,
+        wird sie in den internen Speicher kopiert.
     </string>
     <string name="last_save_app">Letzte App</string>
     <string name="last_save_by">Gespeichert von</string>
     <string name="last_save_time">Gespeichert am</string>
     <string name="legacy_file_chooser">Alte Dateiauswahl</string>
-    <string name="legacy_file_chooser_summary">Verwendbar mit KitKat und höher</string>
+    <string name="legacy_file_chooser_summary">Für Android KitKat und höher</string>
     <string name="length">Länge</string>
     <string name="length_even_hex">Bei Hexadezimal muss die Länge gerade sein.</string>
     <string name="length_min_val">Länge min. %1$d</string>
     <string name="length_max_val">Länge max. %1$d</string>
-    <string name="loading_file">Lade %s…</string>
+    <string name="loading_file">Lade %s …</string>
     <string name="location">Ort</string>
-    <string name="max_size">Max. Größe</string>
-    <string name="max_size_label">Max. Größe:</string>
+    <string name="max_size">Anzahl</string>
+    <string name="max_size_label">Anzahl:</string>
     <string name="menu">Menü</string>
-    <string name="modified">Bearbeitet</string>
-    <string name="monospace">Festbreitenschrift</string>
+    <string name="modified">Geändert</string>
+    <string name="monospace">Monospace-Schrift</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
-    <string name="navigation_drawer_open">Navigationsbereich öffnen</string>
-    <string name="navigation_drawer_close">Navigationsbereich schließen</string>
+    <string name="navigation_drawer_open">Navigation öffnen</string>
+    <string name="navigation_drawer_close">Navigation schließen</string>
     <string name="new_box_file">Neue Box-Datei</string>
     <string name="new_entry">Neuer Eintrag</string>
     <string name="new_file">Neue Datei</string>
@@ -153,11 +153,10 @@
     <string name="next">Weiter</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
     <string name="no_files_select_to_open">
-        Keine Dateien - Aktion wählen um eine Datei zu öffnen oder neu zu erstellen
-        \n\nWenn in der Dokumenten-Verwaltung keine Dateien angezeigt werden, kann
-        das Menü verwendet werden, um den internen Speicher oder die SD-Karte anzuzeigen.
-        \n\nDie vorherige Dateiauswahl kann unter Einstellungen als \"alte Dateiauswahl\"
-        aktiviert werden.
+        Keine Dateien - Öffnen Sie eine Datei oder erstellen Sie eine Neue.
+        \n\nWenn Ihre Dateien beim öffnen nicht angezeigt werden, können Sie
+        im Menü den internen Speicher und/oder die SD-Karte einblenden.
+        \n\nDie alte Dateiauswahl können Sie in den Einstellungen aktivieren.
     </string>
     <string name="no_groups">Keine Gruppen</string>
     <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
@@ -169,14 +168,14 @@
     <string name="notes">Notizen</string>
     <string name="num_records">Anzahl Einträge</string>
     <string name="ok">OK</string>
-    <string name="open_file">Öffne %s</string>
+    <string name="open_file">%s öffnen</string>
     <string name="open_file_title">Datei öffnen</string>
     <string name="option_not_selected">Mindestens eine Option auswählen</string>
     <string name="password">Passwort</string>
     <string name="password_encoding">Passwortkodierung</string>
-    <string name="password_expiration">Passwortablaufdatum</string>
+    <string name="password_expiration">Passwortlaufzeit</string>
     <string name="password_expiration_in_past">Ablaufdatum liegt in der Vergangenheit</string>
-    <string name="password_expiration_invalid_interval">Zeitraum muss im Bereich von 1&#8211;3650 Tagen liegen</string>
+    <string name="password_expiration_invalid_interval">Nur 1 bis 3650 Tage</string>
     <string name="password_expired">Passwort abgelaufen</string>
     <string name="password_expires_before">Passwort läuft vor dem %1$s ab</string>
     <string name="password_expires_today">Password läuft heute ab</string>
@@ -201,43 +200,44 @@
     <string name="preferences">Einstellungen</string>
     <string name="press_again_close_warning">Erneut drücken, um die Datei zu schließen</string>
     <string name="press_password_warning">Passwort erneut berühren, um es in ein sichtbares Feld zu kopieren</string>
-    <string name="press_yubikey">YubiKey anhalten</string>
+    <string name="press_yubikey">Drücken Sie die YubiKey</string>
     <string name="protect_all">Alle Einträge schützen</string>
     <string name="protect_group">Gruppe schützen</string>
     <string name="protected_record">Geschützt</string>
     <string name="protected_record_header">EINTRAG GESCHÜTZT</string>
     <string name="psafe3_ext">.psafe3</string>
     <string name="query_label">Suche: %1$s</string>
-    <string name="recent_files">Letzte Dateien</string>
+    <string name="recent_files">Letzte</string>
     <string name="record">Eintrag</string>
     <string name="records">Einträge</string>
     <string name="record_has_references">Eintrag mit Verweisen</string>
     <string name="record_label">Eintrag:</string>
     <string name="record_not_found">Eintrag nicht gefunden</string>
     <string name="record_policy">Eintragsregeln</string>
-    <string name="record_sort_order">Eintrag Sortierreihenfolge</string>
+    <string name="record_sort_order">Sortierreihenfolge für Einträge</string>
     <string name="record_type">Eintragstyp</string>
-    <string name="read_only">Schreibgeschützt</string><!-- Open File dialog should use 'Schreibgeschützt', About screen should use 'Nur Lesen' -->
+    <string name="read_only_about">Nur Lesen</string>
+    <string name="read_only_file">Schreibgeschützt</string><!-- Open File dialog should use 'Schreibgeschützt', About screen should use 'Nur Lesen' -->
     <string name="read_only_media">Datei befindet sich auf einem schreibgeschützten Medium. Dies kann auf KitKat und höher bei entnehmbaren SD-Karten passieren.</string>
     <string name="read_write">Lesen und Schreiben</string>
     <string name="references_label">VERWEISE</string>
     <string name="regular_expression">Reguläre Ausdrücke</string>
     <string name="regular_expression_summary">Suche mit regulären Ausdrücken statt Wortteilen.</string>
     <string name="remove">Entfernen</string>
-    <string name="recurring">Wiederholt</string>
+    <string name="recurring">Wiederkehrend</string>
     <string name="save">Speichern</string>
     <string name="saving_file">Speichere %s …</string>
     <string name="search">Suchen</string>
-    <string name="search_hint">PasswdSafe durchsuchen</string>
-    <string name="select_accounts">Kontos auswählen</string>
+    <string name="search_hint">In PasswdSafe suchen</string>
+    <string name="select_accounts">Konto auswählen</string>
     <string name="select_file_label">Datei auswählen:</string>
     <string name="send">Senden</string>
-    <string name="set_password">Passwort einstellen</string>
+    <string name="set_password">Passwort wieder verwenden</string>
     <string name="shortcut_base_record_header">VERKNÜPFUNG</string>
     <string name="shortcut_file">Verknüpfungsdatei</string>
     <string name="shortcut_record">Verknüpfungseintrag</string>
     <string name="shortcut_to_same_record">Verknüpfung zum selben Eintrag</string>
-    <string name="show_backup_files">Sicherungen anzeigen</string>
+    <string name="show_backup_files">Zeige Sicherungen an</string>
     <string name="show_password">Passwort anzeigen</string>
     <string name="show_passwords">Passwörter anzeigen</string>
     <string name="symbols_used_by_default">Standardsymbole in der Passwortregel: %1$s</string>
@@ -255,25 +255,24 @@
     <string name="use_symbols">Symbole</string>
     <string name="use_uppercase">Großbuchstaben</string>
     <string name="username_header">BENUTZERNAME</string>
-    <string name="view_password_expirations">Passwortablaufdaten anzeigen</string>
+    <string name="view_password_expirations">Passwortlaufzeiten anzeigen</string>
     <string name="word_wrap">Zeilenumbruch</string>
     <string name="yes">Ja</string>
     <string name="yubikey">YubiKey</string>
-    <string name="yubikey_disabled">YubiKey deaktiviert. Zum Verwenden NFC einschalten.</string>
+    <string name="yubikey_disabled">YubiKey deaktiviert. NFC einschalten, um es benutzen zu können.</string>
     <string name="yubikey_error">Fehler bei der Kommunikation mit dem YubiKey</string>
     <string name="yubikey_help">
-        Um einen YubiKey NEO mit PasswdSafe zu benutzen sind folgende Schritte nötig:\n
-        - NFC-Unterstützung in den Geräte-Einstellungen aktivieren\n
-        - Passwort für die Datei eingeben\n
-        - Schlüssel-Slot auf dem YubiKey auswählen. Meistens ist das Slot 2.\n
-        - Die YubiKey-Taste drücken\n
-        - Den YubiKey innerhalb von 30 Sekunden an den Rücken dieses Geräts 
-        halten. Beim Lesen des YubiKeys ertönt ein Signal. Probieren Sie den
-        YubiKey ein bisschen hin und her zu bewegen, falls das Gerät nicht reagiert.
-        Die richtige Stelle zu finden erfordert etwas Gedult. Der Knopf am YubiKey
-        muss nicht gedrückt werden.\n
-        - Sobald der YubiKey gefunden wurde, wird er zusammen mit Ihrem Passwort zur
-        Authentifizierung genutzt. Die Datei wird dann automatisch geöffnet.
+        Um YubiKey mit PasswdSafe zu benutzen, befolgen bitte Sie 
+        folgende Schritte:\n
+        - NFC-Unterstützung in den Einstellungen einschalten\n
+        - Passwort für die Passwortdatei eingeben\n
+        - Schlüssel-Slot auf dem YubiKey auswählen (Dies ist meist Slot 2)\n
+        - Die YubiKey-Taste einmal drücken\n
+        - Innerhalb von 30 Sekunden, den YubiKey an den Rücken dieses Geräts 
+        halten. Dies ist erfolgreich abgeschlossen, wenn Sie eine akustische 
+        Rückmeldung erhalten.\n
+        - Jetzt kann der YubiKey zum automatischen öffnen der Passwortdatei
+        benutzt werden.
     </string>
     <string name="yubikey_slot_1">YubiKey Slot 1</string>
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
@@ -282,41 +281,41 @@
         &lt;b&gt;6.0.1&lt;/b&gt; - Menüoption und Warnung um Passwörter in
         die Zwischenablage zu kopieren hinzugefügt.
         \n\n
-        &lt;b&gt;6.0.0&lt;/b&gt; - Aktualisierung der grafischen Benutzeroberfläche
-        auf \"Material Design\" mit Tablet-Unterstützung
+        &lt;b&gt;6.0.0&lt;/b&gt; - Neue Benutzungführung gemäß Material-Design
+        und Tablet-Unterstützung
         \n\n
         &lt;b&gt;5.4.0&lt;/b&gt;\n
-        - Unterstützung für Microsofts OneDrive hinzugefügt. Nach der Authentifizierung
-        eines Konto wählen Sie die Dateien, die synchronisiert werden sollen.\n
-        - Einträge ohne Gruppe können vor, nach oder mit Gruppennamen sortiert werden
+        - Unterstützung für OneDrive\n
+        - Neue Sortiermöglichkeiten, Ordner zuerst, Ordner mittendrin, Order 
+        zuletzt\n
+        \n
+        &lt;b&gt;5.3.2&lt;/b&gt; - Die alte Dateiauswahl standardmäßig verwenden
         \n\n
-        &lt;b&gt;5.3.2&lt;/b&gt; - Standardmäßig wird die alte Dateiauswahl verwendet
+        &lt;b&gt;5.3.1&lt;/b&gt; - Hilfe für die Nutzung des intenen Speichers
+        und der alten Dateiauswahl hinzugefügt 
         \n\n
-        &lt;b&gt;5.3.1&lt;/b&gt; - Hilfe zur Benutzung des internal Speichers für die neue
-        Dateiauswahl oder das Einschalten der alten Dateiauswahl hinzugefügt.
-        \n\n
-        &lt;b&gt;5.3.0&lt;/b&gt; - Schieberegler um Teile von Passwörtern anzuzeigen hinzugefügt.
-        Auf Kitkat und höher wird die eingebaute Dokumenten-Verwaltung zum Öffnen oder Erstellen von
-        Dateien benutzt.
+        &lt;b&gt;5.3.0&lt;/b&gt; - Schieberegler hinzugefügt, um Teile eines
+        Passwort anzuzeigen. Auf Kitkat und höher, Unterstützung für den 
+        integrierten Dokumentenmanager.
         \n\n
         &lt;b&gt;5.2.0&lt;/b&gt; - Unterstützung für ownCloud hinzugefügt. Nachdem der Zugriff
         autorisiert ist, kann die Passwortdatei zur Synchronisation ausgewählt werden.
         \n\n
-        &lt;b&gt;5.1.0&lt;/b&gt; - Mehrfenster-Unterstützung auf Samsung-Geräten hinzugefügt.
-        Notiz-Texte können nun ausgewählt werden.
+        &lt;b&gt;5.1.0&lt;/b&gt; -  Multiwindow-Unterstützung für 
+        Samsung-Geräte. Auswahl von Notizen.
         \n\n
         &lt;b&gt;5.0.0&lt;/b&gt; - Unterstützung für YubiKey NEO auf Geräten mit NFC
         \n\n
-        &lt;b&gt;4.7.3&lt;/b&gt; - Geöffnete Datei wird beibehalten, wenn die App vom
-        Home-Bildschirm aus gestartet wird
+        &lt;b&gt;4.7.3&lt;/b&gt; - Bearbeiten Sie eine offene Datei, wenn die App 
+        vom Startbildschirm aus gestartet wird.
         \n\n
-        &lt;b&gt;4.7.2&lt;/b&gt; - Verbesserte Leistung wenn eine Datei mit vielen Passwort-Iterationen
-        geöffnet wird.
+        &lt;b&gt;4.7.2&lt;/b&gt; - Performance-Verbesserung beim Öffnen von 
+        Dateien mit vielen Passwörtern
         \n\n
-        &lt;b&gt;4.7.1&lt;/b&gt; - Absturz in den Einstellungen behoben
+        &lt;b&gt;4.7.1&lt;/b&gt; - Absturz bei Einstellungen behoben
         \n\n
         &lt;b&gt;4.7.0&lt;/b&gt; - Deutsche Übersetzung hinzugefügt
-        \n\n        
+        \n\n
         &lt;b&gt;4.6.0&lt;/b&gt;\n
         - Versuche schreibgeschützte Dateien auf SD-Karten mit Kitkat zu erkennen. Lasst mich wissen,
         ob das Erkennen klappt.\n
@@ -334,7 +333,7 @@
         \n\n
         &lt;b&gt;4.3.0&lt;/b&gt; - Ordner von Dateien wird angezeigt
         \n\n
-        &lt;b&gt;4.2.0&lt;/b&gt; - Eine Eingabemethode, die die Felder des zuletzt ausgewählten Passwort-Eintrages
+        &lt;b&gt;4.2.0&lt;/b&gt; - Eine Eingabemethode, die Felder des zuletzt ausgewählten Passwort-Eintrages
         einfügen kann, ist jetzt verfügbar. Die Eingabemethode muss in den System-Einstellungen eingeschaltet werden,
         bevor sie benutzt werden kann.
         \n\nBenutzung:\n
@@ -347,12 +346,12 @@
 
     <plurals name="expiring_passwords">
         <item quantity="one">1 abgelaufenes Passwort</item>
-        <item quantity="other">%1$d abgelaufene Passwörter</item>
+        <item quantity="other">%1$d abgelaufende Passwörter</item>
     </plurals>
 
     <plurals name="group_items">
-        <item quantity="one">[1 Element]</item>
-        <item quantity="other">[%d Elemente]</item>
+        <item quantity="one">[1 Eintrag]</item>
+        <item quantity="other">[%d Einträge]</item>
     </plurals>
 
     <plurals name="interval_days">
@@ -383,7 +382,7 @@
     <!-- Order must match constants in RecordSortOrderPref -->
     <string-array name="record_sort_order_pref">
         <item>Gruppen zuerst</item>
-        <item>Gruppen dazwischen</item>
+        <item>Gruppen mittendrin</item>
         <item>Gruppen zuletzt</item>
     </string-array>
 
@@ -418,12 +417,12 @@
 
     <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
     <string-array name="expire_filter_records">
-        <item>%1$s Passwörter sind abgelaufen</item>
-        <item>%1$s Passwörter laufen heute ab</item>
-        <item>%1$s Passwörter laufen innerhalb von 1 Woche ab</item>
-        <item>%1$s Passwörter laufen innerhalb von 2 Wochen ab</item>
-        <item>%1$s Passwörter laufen innerhalb 1 Monat ab</item>
-        <item>%1$s Passwörter laufen innerhalb 1 Jahr ab</item>
+        <item>%1$s Passwörter ist abgelaufen</item>
+        <item>%1$s Passwörter läuft heute ab</item>
+        <item>%1$s Passwörter läuft innerhalb 1 Woche ab</item>
+        <item>%1$s Passwörter innerhalb von 2 Wochen ab</item>
+        <item>%1$s Passwörter innerhalb 1 Monat ab</item>
+        <item>%1$s Passwörter innerhalb 1 Jahr ab</item>
     </string-array>
 
     <!-- Order must match PasswdExpiryNotifPref enum values -->
@@ -439,7 +438,7 @@
 
     <!-- Order must match constants in PasswdExpiration.Type -->
     <string-array name="expire_type">
-        <item>Nie</item>
+        <item>Keine</item>
         <item>Datum</item>
         <item>Zeitraum</item>
     </string-array>
