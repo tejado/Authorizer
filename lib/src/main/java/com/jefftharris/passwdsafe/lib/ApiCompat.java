@@ -8,8 +8,10 @@
 package com.jefftharris.passwdsafe.lib;
 
 import android.accounts.Account;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -64,6 +66,21 @@ public final class ApiCompat
             } else {
                 w.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
             }
+        }
+    }
+
+
+    /**
+     * Recreate the activity
+     */
+    public static void recreateActivity(Activity act)
+    {
+        if (SDK_VERSION >= SDK_HONEYCOMB) {
+            ApiCompatHoneycomb.recreateActivity(act);
+        } else {
+            Intent startIntent = act.getIntent();
+            act.finish();
+            act.startActivity(startIntent);
         }
     }
 

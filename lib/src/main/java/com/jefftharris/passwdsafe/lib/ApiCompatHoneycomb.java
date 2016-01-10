@@ -8,6 +8,7 @@
 package com.jefftharris.passwdsafe.lib;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -19,6 +20,15 @@ import android.content.Context;
 @TargetApi(11)
 public final class ApiCompatHoneycomb
 {
+    /**
+     * Recreate the activity
+     */
+    public static void recreateActivity(Activity act)
+    {
+        act.recreate();
+    }
+
+
     /**
      * Copy text to the clipboard
      */
