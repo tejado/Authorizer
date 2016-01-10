@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:app="http://schemas.android.com/apk/res-auto"
            xmlns:tools="http://schemas.android.com/tools">
     <!--
         Base application themes, dependent on API level. This theme is replaced
@@ -13,13 +14,25 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
-    <!-- Application themes -->
+    <!-- Light application theme -->
     <style name="AppTheme" parent="AppBaseTheme">
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="navViewStyle">@style/AppTheme.NavView</item>
     </style>
 
+    <style name="AppTheme.NavView">
+        <!-- Nothing to override -->
+    </style>
+
+    <!-- Dark application theme -->
     <style name="AppThemeDark" parent="AppBaseThemeDark">
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="navViewStyle">@style/AppThemeDark.NavView</item>
+    </style>
+
+    <style name="AppThemeDark.NavView">
+        <item name="itemTextColor">?android:attr/textColorPrimary</item>
+        <item name="itemIconTint">?android:attr/textColorPrimary</item>
     </style>
 
     <!-- Other styles -->
