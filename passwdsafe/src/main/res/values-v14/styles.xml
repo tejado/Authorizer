@@ -8,10 +8,14 @@
   -->
 <resources>
     <!--
-      Base application theme for API 14+. This theme completely replaces
-      AppBaseTheme from res/values/styles.xml on API 14+ devices.
+      Base application themes for API 14+. These themes completely replace
+      AppBase themes from res/values/styles.xml on API 14+ devices.
     -->
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="AppBaseThemeDark" parent="Theme.AppCompat">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
