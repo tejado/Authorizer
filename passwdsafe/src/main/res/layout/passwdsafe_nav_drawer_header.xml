@@ -36,7 +36,7 @@
               android:layout_marginLeft="16dp"
               android:layout_marginRight="16dp"
               android:textAppearance="?android:attr/textAppearanceSmall"
-              android:textColor="@android:color/black"
+              android:textColor="?android:colorForeground"
               android:textSize="14sp"
               android:textStyle="bold"/>
 
