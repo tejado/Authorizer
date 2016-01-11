@@ -22,6 +22,7 @@
                   android:orientation="vertical">
 
         <android.support.v7.widget.CardView
+            style="?attr/cardViewStyle"
             android:id="@+id/query_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,6 +56,7 @@
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            style="?attr/cardViewStyle"
             android:id="@+id/expiry_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

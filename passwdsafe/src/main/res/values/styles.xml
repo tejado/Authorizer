@@ -17,6 +17,7 @@
     <!-- Light application theme -->
     <style name="AppTheme" parent="AppBaseTheme">
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="cardViewStyle">@style/CardView.Light</item>
         <item name="navViewStyle">@style/AppTheme.NavView</item>
     </style>
 
@@ -27,6 +28,7 @@
     <!-- Dark application theme -->
     <style name="AppThemeDark" parent="AppBaseThemeDark">
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="cardViewStyle">@style/CardView.Dark</item>
         <item name="navViewStyle">@style/AppThemeDark.NavView</item>
     </style>
 
