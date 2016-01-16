@@ -82,6 +82,7 @@ public class FileListActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        PasswdSafeApp.setupTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_list);
 
@@ -187,8 +188,6 @@ public class FileListActivity extends AppCompatActivity
                 itsIsLegacyChooser = legacy;
                 itsIsLegacyChooserChanged = true;
             }
-            PasswdSafeUtil.dbginfo(TAG, "onSharedPreferenceChanged legacy %b",
-                                   itsIsLegacyChooser);
             break;
         }
         }

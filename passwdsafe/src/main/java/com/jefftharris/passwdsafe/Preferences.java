@@ -93,6 +93,9 @@ public class Preferences
         "sortCaseSensitivePref";
     public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
 
+    public static final String PREF_DISPLAY_THEME_LIGHT = "displayThemeLightPref";
+    private static final boolean PREF_DISPLAY_THEME_LIGHT_DEF = true;
+
     private static final String PREF_GEN_LOWER = "passwdGenLower";
     private static final boolean PREF_GEN_LOWER_DEF = true;
     private static final String PREF_GEN_UPPER = "passwdGenUpper";
@@ -368,5 +371,14 @@ public class Preferences
     {
         return prefs.getBoolean(PREF_SORT_CASE_SENSITIVE,
                                 PREF_SORT_CASE_SENSITIVE_DEF);
+    }
+
+    /**
+     * Get whether to use the light theme
+     */
+    public static boolean getDisplayThemeLight(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_DISPLAY_THEME_LIGHT,
+                                PREF_DISPLAY_THEME_LIGHT_DEF);
     }
 }

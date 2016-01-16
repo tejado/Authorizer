@@ -58,6 +58,7 @@
     <string name="delete_policy_msg">Regel \"%1$s\" löschen?</string>
     <string name="delete_record_msg">Eintrag \"%1$s\" löschen?</string>
     <string name="directory_for_files">Standardordner</string>
+    <string name="display">Display</string>
     <string name="done">Fertig</string>
     <string name="duplicate_entry">Eintrag schon vorhanden</string>
     <string name="duplicate_name">Name schon vergeben</string>
@@ -251,6 +252,7 @@
     <string name="username">Benutzername</string>
     <string name="use_count">Verwendungen</string>
     <string name="use_digits">Ziffern</string>
+    <string name="use_light_theme">Benutze helles Design</string>
     <string name="use_lowercase">Kleinbuchstaben</string>
     <string name="use_symbols">Symbole</string>
     <string name="use_uppercase">Großbuchstaben</string>

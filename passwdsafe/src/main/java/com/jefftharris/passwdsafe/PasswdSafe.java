@@ -200,6 +200,7 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        PasswdSafeApp.setupTheme(this);
         super.onCreate(savedInstanceState);
         ApiCompat.setRecentAppsVisible(getWindow(), false);
         setContentView(R.layout.activity_passwdsafe);

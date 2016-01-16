@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 import org.pwsafe.lib.file.PwsFile;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.content.Context;
@@ -26,7 +27,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 public class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
-
     public static final String DEBUG_AUTO_FILE =
         null;
         //Preferences.PREF_FILE_DIR_DEF + "/test.psafe3";
@@ -172,6 +172,20 @@ public class PasswdSafeApp extends Application
     }
 
 
+    /**
+     * Setup the theme on an activity
+     */
+    public static void setupTheme(Activity act)
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(act);
+        act.setTheme(Preferences.getDisplayThemeLight(prefs) ?
+                     R.style.AppTheme : R.style.AppThemeDark);
+    }
+
+    /**
+     * Get a title for a URI
+     */
     public static String getAppFileTitle(PasswdFileUri uri, Context ctx)
     {
         return getAppTitle((uri != null) ? uri.getIdentifier(ctx, true) : null,
