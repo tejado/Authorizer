@@ -184,6 +184,17 @@ public class PasswdSafeApp extends Application
     }
 
     /**
+     * Setup the theme on a dialog activity
+     */
+    public static void setupDialogTheme(Activity act)
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(act);
+        act.setTheme(Preferences.getDisplayThemeLight(prefs) ?
+                     R.style.AppTheme_Dialog : R.style.AppThemeDark_Dialog);
+    }
+
+    /**
      * Get a title for a URI
      */
     public static String getAppFileTitle(PasswdFileUri uri, Context ctx)

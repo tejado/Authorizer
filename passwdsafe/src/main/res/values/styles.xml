@@ -10,12 +10,26 @@
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
+    <style name="AppBaseTheme_Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
     <style name="AppBaseThemeDark" parent="Theme.AppCompat">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="AppBaseThemeDark_Dialog" parent="Theme.AppCompat.Dialog">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <!-- Light application theme -->
     <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="cardViewStyle">@style/CardView.Light</item>
+        <item name="navViewStyle">@style/AppTheme_NavView</item>
+    </style>
+
+    <style name="AppTheme_Dialog" parent="AppBaseTheme_Dialog">
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
         <item name="cardViewStyle">@style/CardView.Light</item>
         <item name="navViewStyle">@style/AppTheme_NavView</item>
@@ -27,6 +41,12 @@
 
     <!-- Dark application theme -->
     <style name="AppThemeDark" parent="AppBaseThemeDark">
+        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="cardViewStyle">@style/CardView.Dark</item>
+        <item name="navViewStyle">@style/AppThemeDark_NavView</item>
+    </style>
+
+    <style name="AppThemeDark_Dialog" parent="AppBaseThemeDark_Dialog">
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
         <item name="cardViewStyle">@style/CardView.Dark</item>
         <item name="navViewStyle">@style/AppThemeDark_NavView</item>

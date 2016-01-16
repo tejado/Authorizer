@@ -66,6 +66,7 @@ public class LauncherRecordShortcuts extends AppCompatActivity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+        PasswdSafeApp.setupDialogTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher_record_shortcuts);
         SharedPreferences prefs =
