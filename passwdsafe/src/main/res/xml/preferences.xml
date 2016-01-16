@@ -139,4 +139,16 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory android:key="displayOptions"
+                        android:title="@string/display">
+
+        <!--suppress AndroidElementNotAllowed -->
+        <com.jefftharris.passwdsafe.view.LongCheckBoxPreference
+            android:name="displayTheme Pref"
+            android:defaultValue="true"
+            android:key="displayThemeLightPref"
+            android:title="@string/use_light_theme"/>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

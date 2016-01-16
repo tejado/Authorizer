@@ -25,6 +25,7 @@ import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.pref.FileBackupPref;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
@@ -223,6 +224,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat
                     Preferences.getRecordSortOrderPref(prefs);
             Resources res = getResources();
             itsRecordSortOrderPref.setSummary(pref.getDisplayName(res));
+            break;
+        }
+        case Preferences.PREF_DISPLAY_THEME_LIGHT: {
+            ApiCompat.recreateActivity(getActivity());
             break;
         }
         }

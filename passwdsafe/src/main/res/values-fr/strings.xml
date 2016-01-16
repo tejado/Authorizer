@@ -58,6 +58,7 @@
     <string name="delete_policy_msg">Supprimer la stratégie \"%1$s\"?</string>
     <string name="delete_record_msg">Supprimer l\'entrée \"%1$s\"?</string>
     <string name="directory_for_files">Répertoire des fichiers</string>
+    <string name="display">Affichage</string>
     <string name="done">Valider</string>
     <string name="duplicate_entry">Dupliquer l\'entrée</string>
     <string name="duplicate_name">Dupliquer le nom</string>
@@ -125,7 +126,7 @@
     <string name="legacy_file_chooser">Ancienne méthode de sélection de fichier</string>
     <string name="legacy_file_chooser_summary">Utilisable avec KitKat et plus</string>
     <string name="length">Longueur</string>
-    <string name="length_even_hex">La longueur doit être paire pour l'hexadécimal</string>
+    <string name="length_even_hex">La longueur doit être paire pour l\'hexadécimal</string>
     <string name="length_min_val">La longueur doit être au moins %1$d</string>
     <string name="length_max_val">La longueur doit être au plus %1$d</string>
     <string name="loading_file">Chargement %s…</string>
@@ -158,7 +159,7 @@
         \n\nSi les fichiers ne sont pas affichés dans l\'écran des documents,
         utiliser le menu pour montrer le stockage interne ou sur la carte SD.
         \n\nLe sélecteur de fichier précédent est activé dans les préférences
-        comme étant l'ancienne méthode de selection.
+        comme étant l\'ancienne méthode de selection.
     </string>
     <string name="no_groups">Aucun Groupes</string>
     <string name="no_shortcut_chosen">Aucun raccourci choisi</string>
@@ -253,6 +254,7 @@
     <string name="username">Nom utilisateur</string>
     <string name="use_count">Utiliser compteur</string>
     <string name="use_digits">Utiliser chiffres</string>
+    <string name="use_light_theme">Utiliser thème clair</string>
     <string name="use_lowercase">Utiliser minuscules</string>
     <string name="use_symbols">Utiliser symboles</string>
     <string name="use_uppercase">Utiliser majuscules</string>
