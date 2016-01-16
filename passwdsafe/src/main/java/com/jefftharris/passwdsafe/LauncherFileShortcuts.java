@@ -36,6 +36,7 @@ public class LauncherFileShortcuts extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        PasswdSafeApp.setupDialogTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher_file_shortcuts);
 

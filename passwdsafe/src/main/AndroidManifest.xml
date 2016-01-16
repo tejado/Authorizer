@@ -197,17 +197,18 @@
         <activity
             android:name=".LauncherFileShortcuts"
             android:label="@string/password_file"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:theme="@style/AppTheme_Dialog"
             tools:ignore="ExportedActivity">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".LauncherRecordShortcuts"
             android:label="@string/password_record"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:theme="@style/AppTheme_Dialog"
             tools:ignore="ExportedActivity">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT"/>
