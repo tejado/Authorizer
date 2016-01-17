@@ -12,6 +12,7 @@
 
     <attr name="drawableCloseCancel" format="reference"/>
     <attr name="drawableFolder" format="reference"/>
+    <attr name="drawableFolderUp" format="reference"/>
     <attr name="drawablePasswdsafe" format="reference"/>
     <attr name="drawablePersonOutline" format="reference"/>
 </resources>
