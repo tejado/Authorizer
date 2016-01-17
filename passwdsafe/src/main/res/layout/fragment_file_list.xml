@@ -41,9 +41,9 @@
                   android:layout_centerVertical="true"
                   android:layout_toLeftOf="@id/home"
                   android:layout_toStartOf="@id/home"
-                  android:drawableLeft="@drawable/ic_folder_up"
+                  android:drawableLeft="?attr/drawableFolderUp"
                   android:drawablePadding="8dp"
-                  android:drawableStart="@drawable/ic_folder_up"
+                  android:drawableStart="?attr/drawableFolderUp"
                   android:gravity="center_vertical"
                   android:text="@string/group"/>
 

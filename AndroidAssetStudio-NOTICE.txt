@@ -24,6 +24,8 @@ ic_action_up.png
 ic_action_visibility.png
 ic_folder.png
 ic_folder_light.png
+ic_folder_up.png
+ic_folder_up_light.png
 sym_keyboard_choose.png
 sym_keyboard_return.png
 

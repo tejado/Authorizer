@@ -29,6 +29,7 @@
         <item name="navViewStyle">@style/AppTheme_NavView</item>
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
         <item name="drawableFolder">@drawable/ic_folder</item>
+        <item name="drawableFolderUp">@drawable/ic_folder_up</item>
         <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
     </style>
@@ -39,6 +40,7 @@
         <item name="navViewStyle">@style/AppTheme_NavView</item>
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
         <item name="drawableFolder">@drawable/ic_folder</item>
+        <item name="drawableFolderUp">@drawable/ic_folder_up</item>
         <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
     </style>
@@ -54,6 +56,7 @@
         <item name="navViewStyle">@style/AppThemeDark_NavView</item>
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
         <item name="drawableFolder">@drawable/ic_folder_light</item>
+        <item name="drawableFolderUp">@drawable/ic_folder_up_light</item>
         <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
     </style>
@@ -64,6 +67,7 @@
         <item name="navViewStyle">@style/AppThemeDark_NavView</item>
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
         <item name="drawableFolder">@drawable/ic_folder_light</item>
+        <item name="drawableFolderUp">@drawable/ic_folder_up_light</item>
         <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
     </style>
