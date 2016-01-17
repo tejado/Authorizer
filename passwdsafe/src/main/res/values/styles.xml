@@ -28,6 +28,7 @@
         <item name="cardViewStyle">@style/CardView.Light</item>
         <item name="navViewStyle">@style/AppTheme_NavView</item>
         <item name="drawableActionHome">@drawable/ic_action_home_dark</item>
+        <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_dark</item>
         <item name="drawableActionNewPassword">@drawable/ic_action_new_password</item>
         <item name="drawableActionVisibility">@drawable/ic_action_visibility</item>
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
@@ -42,6 +43,7 @@
         <item name="cardViewStyle">@style/CardView.Light</item>
         <item name="navViewStyle">@style/AppTheme_NavView</item>
         <item name="drawableActionHome">@drawable/ic_action_home_dark</item>
+        <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_dark</item>
         <item name="drawableActionNewPassword">@drawable/ic_action_new_password</item>
         <item name="drawableActionVisibility">@drawable/ic_action_visibility</item>
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
@@ -61,6 +63,7 @@
         <item name="cardViewStyle">@style/CardView.Dark</item>
         <item name="navViewStyle">@style/AppThemeDark_NavView</item>
         <item name="drawableActionHome">@drawable/ic_action_home_light</item>
+        <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_light</item>
         <item name="drawableActionNewPassword">@drawable/ic_action_new_password_light</item>
         <item name="drawableActionVisibility">@drawable/ic_action_visibility_light</item>
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
@@ -75,6 +78,7 @@
         <item name="cardViewStyle">@style/CardView.Dark</item>
         <item name="navViewStyle">@style/AppThemeDark_NavView</item>
         <item name="drawableActionHome">@drawable/ic_action_home_light</item>
+        <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_light</item>
         <item name="drawableActionNewPassword">@drawable/ic_action_new_password_light</item>
         <item name="drawableActionVisibility">@drawable/ic_action_visibility_light</item>
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
