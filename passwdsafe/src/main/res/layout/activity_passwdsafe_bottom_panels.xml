@@ -40,7 +40,7 @@
                              android:layout_alignParentRight="true"
                              android:layout_centerVertical="true"
                              android:contentDescription="@string/clear"
-                             android:src="@drawable/ic_action_close_cancel_dark"/>
+                             android:src="?attr/drawableCloseCancel"/>
 
                 <TextView android:id="@+id/query"
                           android:layout_width="wrap_content"
@@ -76,7 +76,7 @@
                              android:layout_alignParentRight="true"
                              android:layout_centerVertical="true"
                              android:contentDescription="@string/clear"
-                             android:src="@drawable/ic_action_close_cancel_dark"/>
+                             android:src="?attr/drawableCloseCancel"/>
 
                 <TextView android:id="@+id/expiry"
                           android:layout_width="wrap_content"
