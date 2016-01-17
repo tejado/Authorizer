@@ -50,7 +50,7 @@
             android:keyWidth="28%p"/>
         <Key
             android:codes="-24"
-            android:keyIcon="@drawable/ic_action_passwdsafe"
+            android:keyIcon="@drawable/ic_passwdsafe_light"
             android:keyWidth="15%p"/>
         <Key
             android:codes="-25"
