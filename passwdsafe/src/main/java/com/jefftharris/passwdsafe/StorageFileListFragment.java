@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,13 +74,18 @@ public final class StorageFileListFragment extends ListFragment
     private Listener itsListener;
     private RecentFilesDb itsRecentFilesDb;
     private SimpleCursorAdapter itsFilesAdapter;
-
+    private int itsFileIcon;
 
     @Override
     public void onAttach(Context ctx)
     {
         super.onAttach(ctx);
         itsListener = (Listener)ctx;
+
+        Resources.Theme theme = ctx.getTheme();
+        TypedValue attr = new TypedValue();
+        theme.resolveAttribute(R.attr.drawablePasswdsafe, attr, true);
+        itsFileIcon = attr.resourceId;
     }
 
     @Override
@@ -131,7 +138,7 @@ public final class StorageFileListFragment extends ListFragment
                         }
                         case R.id.icon: {
                             ImageView iv = (ImageView)view;
-                            iv.setImageResource(R.drawable.ic_passwdsafe_dark);
+                            iv.setImageResource(itsFileIcon);
                             return true;
                         }
                         case R.id.mod_date: {

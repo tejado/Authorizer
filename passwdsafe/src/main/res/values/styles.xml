@@ -27,12 +27,18 @@
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
         <item name="cardViewStyle">@style/CardView.Light</item>
         <item name="navViewStyle">@style/AppTheme_NavView</item>
+        <item name="drawableFolder">@drawable/ic_folder</item>
+        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
+        <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
     </style>
 
     <style name="AppTheme_Dialog" parent="AppBaseTheme_Dialog">
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
         <item name="cardViewStyle">@style/CardView.Light</item>
         <item name="navViewStyle">@style/AppTheme_NavView</item>
+        <item name="drawableFolder">@drawable/ic_folder</item>
+        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
+        <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
     </style>
 
     <style name="AppTheme_NavView">
@@ -44,12 +50,18 @@
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
         <item name="cardViewStyle">@style/CardView.Dark</item>
         <item name="navViewStyle">@style/AppThemeDark_NavView</item>
+        <item name="drawableFolder">@drawable/ic_folder_light</item>
+        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
+        <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
     </style>
 
     <style name="AppThemeDark_Dialog" parent="AppBaseThemeDark_Dialog">
         <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
         <item name="cardViewStyle">@style/CardView.Dark</item>
         <item name="navViewStyle">@style/AppThemeDark_NavView</item>
+        <item name="drawableFolder">@drawable/ic_folder_light</item>
+        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
+        <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
     </style>
 
     <style name="AppThemeDark_NavView">

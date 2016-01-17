@@ -9,4 +9,8 @@
 <resources>
     <attr name="cardViewStyle" format="reference"/>
     <attr name="navViewStyle" format="reference"/>
+
+    <attr name="drawableFolder" format="reference"/>
+    <attr name="drawablePasswdsafe" format="reference"/>
+    <attr name="drawablePersonOutline" format="reference"/>
 </resources>

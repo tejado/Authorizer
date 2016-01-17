@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -29,6 +30,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -509,6 +511,8 @@ public final class FileListFragment extends ListFragment
     {
         private final File itsDir;
         private final boolean itsIncludeNone;
+        private final int itsFolderIcon;
+        private final int itsFileIcon;
 
         /** Constructor */
         public FileLoader(File dir, boolean includeNone, Context context)
@@ -516,6 +520,13 @@ public final class FileListFragment extends ListFragment
             super(context);
             itsDir = dir;
             itsIncludeNone = includeNone;
+
+            Resources.Theme theme = context.getTheme();
+            TypedValue attr = new TypedValue();
+            theme.resolveAttribute(R.attr.drawableFolder, attr, true);
+            itsFolderIcon = attr.resourceId;
+            theme.resolveAttribute(R.attr.drawablePasswdsafe, attr, true);
+            itsFileIcon = attr.resourceId;
         }
 
         /** Handle when the loader is reset */
@@ -571,9 +582,9 @@ public final class FileListFragment extends ListFragment
             if (file.itsFile == null) {
                 icon = 0;
             } else if (file.itsFile.isDirectory()) {
-                icon = R.drawable.ic_folder;
+                icon = itsFolderIcon;
             } else {
-                icon = R.drawable.ic_passwdsafe_dark;
+                icon = itsFileIcon;
                 item.put(MOD_DATE, Utils.formatDate(file.itsFile.lastModified(),
                                                     getContext()));
             }

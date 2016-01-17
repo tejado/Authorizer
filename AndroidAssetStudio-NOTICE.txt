@@ -14,12 +14,16 @@ ic_action_lock.png
 ic_action_lock_open.png
 ic_action_navigation_more_vert_dark.png
 ic_action_people_outline.png
+ic_action_person_outline.png
+ic_action_person_outline_light.png
 ic_action_plan.png
 ic_action_search.png
 ic_action_settings_dark.png
 ic_action_sync.png
 ic_action_up.png
 ic_action_visibility.png
+ic_folder.png
+ic_folder_light.png
 sym_keyboard_choose.png
 sym_keyboard_return.png
 

@@ -12,7 +12,7 @@
                android:layout_height="fill_parent"
                android:layout_weight="0"
                android:adjustViewBounds="false"
-               android:src="@drawable/ic_folder"
+               android:src="?attr/drawableFolder"
                android:contentDescription="@string/record_type"
                android:scaleType="center"
                android:minWidth="48dp"/>
