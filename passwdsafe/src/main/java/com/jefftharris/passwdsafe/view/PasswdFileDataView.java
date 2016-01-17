@@ -9,8 +9,10 @@ package com.jefftharris.passwdsafe.view;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 
 import com.jefftharris.passwdsafe.Preferences;
 import com.jefftharris.passwdsafe.R;
@@ -66,6 +68,8 @@ public class PasswdFileDataView
     private PasswdExpiryNotifPref itsExpiryNotifPref =
             Preferences.PREF_PASSWD_EXPIRY_NOTIF_DEF;
     private Context itsContext;
+    private int itsFolderIcon;
+    private int itsRecordIcon;
 
     private static final String TAG = "PasswdFileDataView";
 
@@ -90,6 +94,13 @@ public class PasswdFileDataView
         itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
         itsRecordSortOrder = Preferences.getRecordSortOrderPref(prefs);
         itsExpiryNotifPref = Preferences.getPasswdExpiryNotifPref(prefs);
+
+        Resources.Theme theme = ctx.getTheme();
+        TypedValue attr = new TypedValue();
+        theme.resolveAttribute(R.attr.drawableFolder, attr, true);
+        itsFolderIcon = attr.resourceId;
+        theme.resolveAttribute(R.attr.drawablePersonOutline, attr, true);
+        itsRecordIcon = attr.resourceId;
     }
 
     /**
@@ -213,7 +224,7 @@ public class PasswdFileDataView
 
                     records.add(new PasswdRecordListData(
                             entry.getKey(), str, null,
-                            null, R.drawable.ic_folder, false));
+                            null, itsFolderIcon, false));
                 }
             }
         }
@@ -502,8 +513,7 @@ public class PasswdFileDataView
         }
 
         return new PasswdRecordListData(title, user, rec.itsUuid, rec.itsMatch,
-                                        R.drawable.ic_action_person_outline,
-                                        true);
+                                        itsRecordIcon, true);
     }
 
 
