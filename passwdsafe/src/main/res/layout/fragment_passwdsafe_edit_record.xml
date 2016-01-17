@@ -220,7 +220,7 @@
                            android:clickable="true"
                            android:contentDescription="@string/show_passwords"
                            android:longClickable="true"
-                           android:src="@drawable/ic_action_visibility"/>
+                           android:src="?attr/drawableActionVisibility"/>
 
                 <ImageView android:id="@+id/password_generate"
                            style="@style/Widget.AppCompat.ActionButton"
