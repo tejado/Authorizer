@@ -31,7 +31,7 @@
                      android:minHeight="48dp"
                      android:minWidth="48dp"
                      android:scaleType="center"
-                     android:src="@drawable/ic_action_home_dark"/>
+                     android:src="?attr/drawableActionHome"/>
 
         <TextView android:id="@+id/current_group_label"
                   android:layout_width="fill_parent"

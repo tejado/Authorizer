@@ -10,6 +10,7 @@
     <attr name="cardViewStyle" format="reference"/>
     <attr name="navViewStyle" format="reference"/>
 
+    <attr name="drawableActionHome" format="reference"/>
     <attr name="drawableActionNewPassword" format="reference"/>
     <attr name="drawableActionVisibility" format="reference"/>
     <attr name="drawableCloseCancel" format="reference"/>
