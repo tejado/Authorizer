@@ -232,7 +232,7 @@
                            android:clickable="true"
                            android:contentDescription="@string/generate_password"
                            android:longClickable="true"
-                           android:src="@drawable/ic_action_new_password"/>
+                           android:src="?attr/drawableActionNewPassword"/>
             </RelativeLayout>
 
             <android.support.design.widget.TextInputLayout
