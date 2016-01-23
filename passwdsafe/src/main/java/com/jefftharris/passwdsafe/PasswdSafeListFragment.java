@@ -14,9 +14,12 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -24,6 +27,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.CopyField;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdRecordListData;
 
@@ -51,6 +55,12 @@ public class PasswdSafeListFragment extends ListFragment
         /** Get the current record items in a background thread */
         List<PasswdRecordListData> getBackgroundRecordItems(boolean incRecords,
                                                             boolean incGroups);
+
+        /** Is copying supported */
+        boolean isCopySupported();
+
+        /** Copy a field */
+        void copyField(CopyField field, String recUuid);
 
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
@@ -140,6 +150,10 @@ public class PasswdSafeListFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        if (itsListener.isCopySupported()) {
+            registerForContextMenu(getListView());
+        }
         itsAdapter = new ItemListAdapter(itsIsContents, getActivity());
         setListAdapter(itsAdapter);
     }
@@ -163,6 +177,53 @@ public class PasswdSafeListFragment extends ListFragment
     {
         super.onDetach();
         itsListener = null;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo)menuInfo;
+        PasswdRecordListData listItem = itsAdapter.getItem(info.position);
+        if (listItem.itsIsRecord) {
+            menu.setHeaderTitle(listItem.itsTitle);
+
+            int group = itsIsContents ? PasswdSafe.CONTEXT_GROUP_LIST_CONTENTS :
+                        PasswdSafe.CONTEXT_GROUP_LIST;
+            menu.add(group, R.id.menu_copy_user, 0, R.string.copy_user);
+            menu.add(group, R.id.menu_copy_password, 0, R.string.copy_password);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        int group = itsIsContents ? PasswdSafe.CONTEXT_GROUP_LIST_CONTENTS :
+                    PasswdSafe.CONTEXT_GROUP_LIST;
+        if (item.getGroupId() != group) {
+            return super.onContextItemSelected(item);
+        }
+
+        switch (item.getItemId()) {
+        case R.id.menu_copy_password:
+        case R.id.menu_copy_user: {
+                AdapterView.AdapterContextMenuInfo info =
+                    (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+            final PasswdRecordListData listItem =
+                    itsAdapter.getItem(info.position);
+            if (!listItem.itsIsRecord) {
+                itsListener.copyField(
+                        (item.getItemId() == R.id.menu_copy_password) ?
+                        CopyField.PASSWORD : CopyField.USER_NAME,
+                        listItem.itsUuid);
+            }
+
+            return true;
+        }
+        }
+        return super.onContextItemSelected(item);
     }
 
     /* (non-Javadoc)

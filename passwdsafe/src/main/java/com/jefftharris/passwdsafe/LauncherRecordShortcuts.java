@@ -26,6 +26,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.ObjectHolder;
 import com.jefftharris.passwdsafe.util.Pair;
+import com.jefftharris.passwdsafe.view.CopyField;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdRecordListData;
@@ -174,6 +175,18 @@ public class LauncherRecordShortcuts extends AppCompatActivity
                 }
             });
         }
+    }
+
+    @Override
+    public void copyField(CopyField field, String recUuid)
+    {
+        // Not supported
+    }
+
+    @Override
+    public boolean isCopySupported()
+    {
+        return false;
     }
 
     @Override

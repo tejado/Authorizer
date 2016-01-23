@@ -96,6 +96,10 @@ public class Preferences
     public static final String PREF_DISPLAY_THEME_LIGHT = "displayThemeLightPref";
     private static final boolean PREF_DISPLAY_THEME_LIGHT_DEF = true;
 
+    private static final String PREF_COPY_PASSWORD_CONFIRM =
+            "copyPasswordConfirm";
+    private static final boolean PREF_COPY_PASSWORD_CONFIRM_DEF = false;
+
     private static final String PREF_GEN_LOWER = "passwdGenLower";
     private static final boolean PREF_GEN_LOWER_DEF = true;
     private static final String PREF_GEN_UPPER = "passwdGenUpper";
@@ -380,5 +384,23 @@ public class Preferences
     {
         return prefs.getBoolean(PREF_DISPLAY_THEME_LIGHT,
                                 PREF_DISPLAY_THEME_LIGHT_DEF);
+    }
+
+    /**
+     * Get whether the user has confirmed the copy password operation
+     */
+    public static boolean isCopyPasswordConfirm(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_COPY_PASSWORD_CONFIRM,
+                                PREF_COPY_PASSWORD_CONFIRM_DEF);
+    }
+
+    /**
+     * Set whether the user has confirmed the copy password operation
+     */
+    public static void setCopyPasswordConfirm(boolean confirm,
+                                              SharedPreferences prefs)
+    {
+        prefs.edit().putBoolean(PREF_COPY_PASSWORD_CONFIRM, confirm).apply();
     }
 }

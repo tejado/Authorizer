@@ -13,6 +13,7 @@ import java.util.Locale;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 
@@ -105,6 +106,23 @@ public class PasswdRecord
         }
         itsType = type;
         itsRef = ref;
+    }
+
+    /**
+     * Get the password for the record
+     */
+    public String getPassword(@NonNull PasswdFileData fileData)
+    {
+        switch (itsType) {
+        case NORMAL: {
+            return fileData.getPassword(itsRecord);
+        }
+        case ALIAS:
+        case SHORTCUT: {
+            return fileData.getPassword(itsRef);
+        }
+        }
+        return null;
     }
 
     /** Notification that the password policy has changed */

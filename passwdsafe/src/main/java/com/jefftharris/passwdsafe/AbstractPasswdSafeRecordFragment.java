@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.view.CopyField;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import java.util.Date;
@@ -30,6 +31,12 @@ public abstract class AbstractPasswdSafeRecordFragment
     public interface Listener
             extends AbstractPasswdSafeFileDataFragment.Listener
     {
+        /** Is copying supported */
+        boolean isCopySupported();
+
+        /** Copy a field */
+        void copyField(CopyField field, String recUuid);
+
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
     }

@@ -8,11 +8,10 @@
 package com.jefftharris.passwdsafe;
 
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,10 +24,9 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.ObjectHolder;
-import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
+import com.jefftharris.passwdsafe.view.CopyField;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;
@@ -42,14 +40,11 @@ import java.util.List;
  */
 public class PasswdSafeRecordBasicFragment
         extends AbstractPasswdSafeRecordFragment
-        implements ConfirmPromptDialog.Listener,
-                   View.OnClickListener
+        implements View.OnClickListener
 {
-    private static final String PREF_COPY_PASSWORD_CONFIRM =
-            "copyPasswordConfirm";
-
     private boolean itsIsPasswordShown = false;
     private String itsHiddenPasswordStr;
+    private String itsTitle;
     private View itsBaseRow;
     private TextView itsBaseLabel;
     private TextView itsBase;
@@ -149,6 +144,12 @@ public class PasswdSafeRecordBasicFragment
                         showRefRec(false, position);
                     }
                 });
+
+        if (getListener().isCopySupported()) {
+            registerForContextMenu(itsUserRow);
+            registerForContextMenu(itsPasswordRow);
+        }
+
         return root;
     }
 
@@ -171,24 +172,11 @@ public class PasswdSafeRecordBasicFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_copy_user: {
-            PasswdSafeUtil.copyToClipboard(itsUser.getText().toString(),
-                                           getContext());
+            copyUser();
             return true;
         }
         case R.id.menu_copy_password: {
-            SharedPreferences prefs =
-                    getActivity().getPreferences(Context.MODE_PRIVATE);
-            if (prefs.getBoolean(PREF_COPY_PASSWORD_CONFIRM, false)) {
-                PasswdSafeUtil.copyToClipboard(getPassword(), getContext());
-            } else {
-                Bundle confirmArgs = new Bundle();
-                ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
-                        getString(R.string.copy_password),
-                        getString(R.string.copy_password_warning),
-                        getString(android.R.string.copy), confirmArgs);
-                dialog.show(getFragmentManager(), "Copy password");
-                dialog.setTargetFragment(this, 0);
-            }
+            copyPassword();
             return true;
         }
         case R.id.menu_toggle_password: {
@@ -199,6 +187,46 @@ public class PasswdSafeRecordBasicFragment
             return super.onOptionsItemSelected(item);
         }
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view,
+                                    ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        menu.setHeaderTitle(itsTitle);
+        switch (view.getId()) {
+        case R.id.user_row: {
+            menu.add(PasswdSafe.CONTEXT_GROUP_RECORD_BASIC,
+                     R.id.menu_copy_user, 0, R.string.copy_user);
+            break;
+        }
+        case R.id.password_row: {
+            menu.add(PasswdSafe.CONTEXT_GROUP_RECORD_BASIC,
+                     R.id.menu_copy_password, 0, R.string.copy_password);
+            break;
+        }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        if (item.getGroupId() != PasswdSafe.CONTEXT_GROUP_RECORD_BASIC) {
+            return super.onContextItemSelected(item);
+        }
+
+        switch (item.getItemId()) {
+        case R.id.menu_copy_password: {
+            copyPassword();
+            return true;
+        }
+        case R.id.menu_copy_user: {
+            copyUser();
+            return true;
+        }
+        }
+        return super.onContextItemSelected(item);
     }
 
     @Override
@@ -215,20 +243,6 @@ public class PasswdSafeRecordBasicFragment
             break;
         }
         }
-    }
-
-    @Override
-    public void promptCanceled(Bundle confirmArgs)
-    {
-    }
-
-    @Override
-    public void promptConfirmed(Bundle confirmArgs)
-    {
-        SharedPreferences prefs =
-                getActivity().getPreferences(Context.MODE_PRIVATE);
-        prefs.edit().putBoolean(PREF_COPY_PASSWORD_CONFIRM, true).apply();
-        PasswdSafeUtil.copyToClipboard(getPassword(), getContext());
     }
 
     @Override
@@ -280,6 +294,7 @@ public class PasswdSafeRecordBasicFragment
         }
         }
 
+        itsTitle = info.itsFileData.getTitle(info.itsRec);
         setFieldText(itsGroup, itsGroupRow,
                      info.itsFileData.getGroup(info.itsRec));
         setFieldText(itsUser, itsUserRow,
@@ -383,6 +398,22 @@ public class PasswdSafeRecordBasicFragment
     }
 
     /**
+     * Copy the user name to the clipboard
+     */
+    private void copyUser()
+    {
+        getListener().copyField(CopyField.USER_NAME, getLocation().getRecord());
+    }
+
+    /**
+     * Copy the password to the clipboard
+     */
+    private void copyPassword()
+    {
+        getListener().copyField(CopyField.PASSWORD, getLocation().getRecord());
+    }
+
+    /**
      * Get the password
      */
     private String getPassword()
@@ -393,18 +424,7 @@ public class PasswdSafeRecordBasicFragment
             @Override
             public void useRecordInfo(@NonNull RecordInfo info)
             {
-                switch (info.itsPasswdRec.getType()) {
-                case NORMAL: {
-                    password.set(info.itsFileData.getPassword(info.itsRec));
-                    break;
-                }
-                case ALIAS:
-                case SHORTCUT: {
-                    password.set(info.itsFileData.getPassword(
-                            info.itsPasswdRec.getRef()));
-                    break;
-                }
-                }
+                password.set(info.itsPasswdRec.getPassword(info.itsFileData));
             }
         });
         return password.get();
