@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -58,8 +57,7 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences sp =
-                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sp = Preferences.getSharedPrefs(getContext());
         itsUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
         if (savedInstanceState != null) {
@@ -162,8 +160,7 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
                     // in the future.
                     itsUserLearnedDrawer = true;
                     SharedPreferences sp =
-                            PreferenceManager.getDefaultSharedPreferences(
-                                    getActivity());
+                            Preferences.getSharedPrefs(getContext());
                     sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true)
                       .apply();
                 }

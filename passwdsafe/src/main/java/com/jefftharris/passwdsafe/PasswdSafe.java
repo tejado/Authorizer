@@ -23,7 +23,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -752,8 +751,7 @@ public class PasswdSafe extends AppCompatActivity
     {
         switch (field) {
         case PASSWORD: {
-            SharedPreferences prefs =
-                    PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences prefs = Preferences.getSharedPrefs(this);
             if (Preferences.isCopyPasswordConfirm(prefs)) {
                 break;
             }
@@ -975,8 +973,7 @@ public class PasswdSafe extends AppCompatActivity
 
         switch (action) {
         case COPY_PASSWORD: {
-            SharedPreferences prefs =
-                    PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences prefs = Preferences.getSharedPrefs(this);
             Preferences.setCopyPasswordConfirm(true, prefs);
             copyField(CopyField.PASSWORD,
                       confirmArgs.getString(CONFIRM_ARG_RECORD));

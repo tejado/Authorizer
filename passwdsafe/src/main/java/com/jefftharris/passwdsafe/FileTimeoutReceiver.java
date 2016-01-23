@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -54,8 +53,7 @@ class FileTimeoutReceiver extends BroadcastReceiver
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         itsActivity.registerReceiver(this, filter);
 
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(itsActivity);
+        SharedPreferences prefs = Preferences.getSharedPrefs(itsActivity);
         prefs.registerOnSharedPreferenceChangeListener(this);
         updatePrefs(prefs);
     }
@@ -66,8 +64,7 @@ class FileTimeoutReceiver extends BroadcastReceiver
     public void onDestroy()
     {
         cancel();
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(itsActivity);
+        SharedPreferences prefs = Preferences.getSharedPrefs(itsActivity);
         prefs.unregisterOnSharedPreferenceChangeListener(this);
         itsActivity.unregisterReceiver(this);
     }

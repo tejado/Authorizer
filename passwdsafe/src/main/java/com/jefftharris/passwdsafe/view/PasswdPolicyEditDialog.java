@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
@@ -100,8 +99,7 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         LayoutInflater factory = LayoutInflater.from(ctx);
         itsView = factory.inflate(R.layout.passwd_policy_edit, null);
 
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences prefs = Preferences.getSharedPrefs(ctx);
 
         itsIsNameEditable = true;
         itsNameEdit = (TextView)itsView.findViewById(R.id.name);

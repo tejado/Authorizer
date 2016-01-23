@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -95,8 +94,7 @@ public class FileListActivity extends AppCompatActivity
         itsIsCloseOnOpen = intent.getBooleanExtra(INTENT_EXTRA_CLOSE_ON_OPEN,
                                                   false);
 
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
         onSharedPreferenceChanged(prefs,
                                   Preferences.PREF_FILE_LEGACY_FILE_CHOOSER);
@@ -137,8 +135,7 @@ public class FileListActivity extends AppCompatActivity
     @Override
     protected void onDestroy()
     {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
         prefs.unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
     }

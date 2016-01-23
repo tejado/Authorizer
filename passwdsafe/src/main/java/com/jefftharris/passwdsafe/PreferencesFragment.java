@@ -16,7 +16,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
@@ -82,8 +81,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     public void onCreatePreferences(Bundle bundle, String s)
     {
         addPreferencesFromResource(R.xml.preferences);
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
         prefs.registerOnSharedPreferenceChangeListener(this);
         Resources res = getResources();
 
@@ -165,8 +163,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     public void onDestroy()
     {
         super.onDestroy();
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
         prefs.unregisterOnSharedPreferenceChangeListener(this);
     }
 

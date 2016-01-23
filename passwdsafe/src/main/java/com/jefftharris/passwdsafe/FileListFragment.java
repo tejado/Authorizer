@@ -24,7 +24,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -423,8 +422,7 @@ public final class FileListFragment extends ListFragment
             Activity act = getActivity();
             PasswdSafeApp app = (PasswdSafeApp)act.getApplication();
             if (app.checkOpenDefault()) {
-                SharedPreferences prefs =
-                    PreferenceManager.getDefaultSharedPreferences(act);
+                SharedPreferences prefs = Preferences.getSharedPrefs(act);
                 Uri defFile = Preferences.getDefFilePref(prefs);
                 if (defFile != null) {
                     itsListener.openFile(defFile, null);
@@ -468,8 +466,7 @@ public final class FileListFragment extends ListFragment
     /** Get the files in the given directory */
     private static FileData[] getFiles(File dir, Context ctx)
     {
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences prefs = Preferences.getSharedPrefs(ctx);
         boolean showHiddenFiles =
             Preferences.getShowHiddenFilesPref(prefs);
         return getFiles(dir, showHiddenFiles, true);
@@ -491,8 +488,7 @@ public final class FileListFragment extends ListFragment
     /** Get the directory for listing files */
     private File getFileDir()
     {
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
         return Preferences.getFileDirPref(prefs);
     }
 
@@ -500,8 +496,7 @@ public final class FileListFragment extends ListFragment
     /** Set the directory for listing files */
     private void setFileDir(File dir)
     {
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
         Preferences.setFileDirPref(dir, prefs);
     }
 
