@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -70,8 +69,7 @@ public class LauncherRecordShortcuts extends AppCompatActivity
         PasswdSafeApp.setupDialogTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher_record_shortcuts);
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         itsFile = (TextView)findViewById(R.id.file);
@@ -155,8 +153,7 @@ public class LauncherRecordShortcuts extends AppCompatActivity
     @Override
     public void onDestroy()
     {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
         prefs.unregisterOnSharedPreferenceChangeListener(this);
         itsFileDataView.onDetach();
         super.onDestroy();

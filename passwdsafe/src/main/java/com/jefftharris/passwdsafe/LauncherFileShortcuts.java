@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -148,8 +147,7 @@ public class LauncherFileShortcuts extends AppCompatActivity
      */
     private void setFileChooseFrag()
     {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
         boolean storageFrag =
                 ((ApiCompat.SDK_VERSION >= ApiCompat.SDK_KITKAT) &&
                  !Preferences.getFileLegacyFileChooserPref(prefs));

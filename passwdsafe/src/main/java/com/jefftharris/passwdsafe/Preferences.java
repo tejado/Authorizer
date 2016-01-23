@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -119,6 +120,14 @@ public class Preferences
 
     private static final String TAG = "Preferences";
 
+
+    /**
+     * Get the default shared preferences
+     */
+    public static SharedPreferences getSharedPrefs(Context ctx)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(ctx);
+    }
 
     public static FileTimeoutPref getFileCloseTimeoutPref(SharedPreferences prefs)
     {

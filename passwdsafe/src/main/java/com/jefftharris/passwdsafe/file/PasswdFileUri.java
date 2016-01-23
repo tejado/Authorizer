@@ -38,7 +38,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.preference.PreferenceManager;
 import android.provider.OpenableColumns;
 import android.support.v4.os.EnvironmentCompat;
 import android.util.Log;
@@ -656,8 +655,7 @@ public class PasswdFileUri implements Parcelable
         public void createBackupFile(File fromFile, File toFile)
                 throws IOException
         {
-            SharedPreferences prefs =
-                    PreferenceManager.getDefaultSharedPreferences(itsContext);
+            SharedPreferences prefs = Preferences.getSharedPrefs(itsContext);
             FileBackupPref backupPref = Preferences.getFileBackupPref(prefs);
 
             File dir = toFile.getParentFile();

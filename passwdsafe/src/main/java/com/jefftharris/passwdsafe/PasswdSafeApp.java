@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
@@ -61,8 +60,7 @@ public class PasswdSafeApp extends Application
     public void onCreate()
     {
         super.onCreate();
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
 
         AlarmManager alarmMgr =
                 (AlarmManager)getSystemService(Context.ALARM_SERVICE);
@@ -159,8 +157,7 @@ public class PasswdSafeApp extends Application
     public synchronized void setDefaultPasswdPolicy(PasswdPolicy policy)
     {
         itsDefaultPasswdPolicy = policy;
-        SharedPreferences prefs =
-            PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
         Preferences.setDefPasswdPolicyPref(policy, prefs);
     }
 
@@ -177,8 +174,7 @@ public class PasswdSafeApp extends Application
      */
     public static void setupTheme(Activity act)
     {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(act);
+        SharedPreferences prefs = Preferences.getSharedPrefs(act);
         act.setTheme(Preferences.getDisplayThemeLight(prefs) ?
                      R.style.AppTheme : R.style.AppThemeDark);
     }
@@ -188,8 +184,7 @@ public class PasswdSafeApp extends Application
      */
     public static void setupDialogTheme(Activity act)
     {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(act);
+        SharedPreferences prefs = Preferences.getSharedPrefs(act);
         act.setTheme(Preferences.getDisplayThemeLight(prefs) ?
                      R.style.AppTheme_Dialog : R.style.AppThemeDark_Dialog);
     }

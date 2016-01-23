@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,8 +50,7 @@ public class PasswdSafeFileDataFragment extends Fragment
     public void onAttach(Context ctx)
     {
         super.onAttach(ctx);
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(ctx);
+        SharedPreferences prefs = Preferences.getSharedPrefs(ctx);
         prefs.registerOnSharedPreferenceChangeListener(this);
         itsIsCloseClearClipboard =
                 Preferences.getFileCloseClearClipboardPref(prefs);
@@ -81,8 +79,7 @@ public class PasswdSafeFileDataFragment extends Fragment
     public void onDetach()
     {
         itsFileDataView.onDetach();
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
         prefs.unregisterOnSharedPreferenceChangeListener(this);
         super.onDetach();
     }
