@@ -254,7 +254,7 @@
     <string name="username">Nom utilisateur</string>
     <string name="use_count">Utiliser compteur</string>
     <string name="use_digits">Utiliser chiffres</string>
-    <string name="use_light_theme">Utiliser thème clair</string>
+    <string name="use_light_theme">Utilise le thème clair</string>
     <string name="use_lowercase">Utiliser minuscules</string>
     <string name="use_symbols">Utiliser symboles</string>
     <string name="use_uppercase">Utiliser majuscules</string>
@@ -285,6 +285,10 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
+        &lt;b&gt;6.1.0&lt;/b&gt; - Ajout option pour thème foncé dans les
+        préférences.  Amélioration traduction française.  Ajout option copie
+        dans presse papier sur appui long.
+        \n\n
         &lt;b&gt;6.0.2&lt;/b&gt; - Améliorer traduction allemande. Tenter un
         correctif pour l\'erreur la permission de refus lors de l\'ouverture
         des fichiers.
