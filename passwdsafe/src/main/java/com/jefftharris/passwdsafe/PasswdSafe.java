@@ -11,6 +11,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -22,6 +23,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,6 +37,7 @@ import android.widget.Toast;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
+import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -42,6 +45,7 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.view.ProgressFragment;
 import com.jefftharris.passwdsafe.util.ObjectHolder;
 import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
+import com.jefftharris.passwdsafe.view.CopyField;
 import com.jefftharris.passwdsafe.view.PasswdFileDataView;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.view.PasswdRecordListData;
@@ -72,6 +76,10 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    PreferencesFragment.Listener
 {
+    public static final int CONTEXT_GROUP_RECORD_BASIC = 1;
+    public static final int CONTEXT_GROUP_LIST = 2;
+    public static final int CONTEXT_GROUP_LIST_CONTENTS = 3;
+
     private enum ChangeMode
     {
         /** Initial mode with no file open */
@@ -129,6 +137,8 @@ public class PasswdSafe extends AppCompatActivity
     /** Action conformed via ConfirmPromptDialog */
     private enum ConfirmAction
     {
+        /** Copy a password */
+        COPY_PASSWORD,
         /** Delete a file */
         DELETE_FILE,
         /** Delete a record */
@@ -185,6 +195,7 @@ public class PasswdSafe extends AppCompatActivity
 
     private static final String CONFIRM_ARG_ACTION = "action";
     private static final String CONFIRM_ARG_LOCATION = "location";
+    private static final String CONFIRM_ARG_RECORD = "record";
 
     private static final int MENU_BIT_CAN_ADD = 0;
     private static final int MENU_BIT_HAS_FILE_OPS = 1;
@@ -730,6 +741,71 @@ public class PasswdSafe extends AppCompatActivity
         return dataView.getRecords(incRecords, incGroups);
     }
 
+    @Override
+    public boolean isCopySupported()
+    {
+        return true;
+    }
+
+    @Override
+    public void copyField(final CopyField field, final String recUuid)
+    {
+        switch (field) {
+        case PASSWORD: {
+            SharedPreferences prefs =
+                    PreferenceManager.getDefaultSharedPreferences(this);
+            if (Preferences.isCopyPasswordConfirm(prefs)) {
+                break;
+            }
+
+            // Need to prompt
+            Bundle confirmArgs = new Bundle();
+            confirmArgs.putString(CONFIRM_ARG_ACTION,
+                                  ConfirmAction.COPY_PASSWORD.name());
+            confirmArgs.putString(CONFIRM_ARG_RECORD, recUuid);
+            ConfirmPromptDialog dialog = ConfirmPromptDialog.newInstance(
+                    getString(R.string.copy_password),
+                    getString(R.string.copy_password_warning),
+                    getString(android.R.string.copy), confirmArgs);
+            dialog.show(getSupportFragmentManager(), "Copy password");
+            return;
+        }
+        case USER_NAME: {
+            break;
+        }
+        }
+
+        final ObjectHolder<String> copyStr = new ObjectHolder<>();
+        itsFileDataFrag.useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                PwsRecord rec = fileData.getRecord(recUuid);
+                if (rec == null) {
+                    return;
+                }
+
+                switch (field) {
+                case PASSWORD: {
+                    PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+                    if (passwdRec != null) {
+                        copyStr.set(passwdRec.getPassword(fileData));
+                    }
+                    break;
+                }
+                case USER_NAME: {
+                    copyStr.set(fileData.getUsername(rec));
+                    break;
+                }
+                }
+            }
+        });
+        if (copyStr.get() != null) {
+            PasswdSafeUtil.copyToClipboard(copyStr.get(), PasswdSafe.this);
+        }
+    }
+
     /**
      * Change the location in the password file
      */
@@ -898,6 +974,14 @@ public class PasswdSafe extends AppCompatActivity
         }
 
         switch (action) {
+        case COPY_PASSWORD: {
+            SharedPreferences prefs =
+                    PreferenceManager.getDefaultSharedPreferences(this);
+            Preferences.setCopyPasswordConfirm(true, prefs);
+            copyField(CopyField.PASSWORD,
+                      confirmArgs.getString(CONFIRM_ARG_RECORD));
+            break;
+        }
         case DELETE_FILE: {
             final ObjectHolder<PasswdFileUri> uri = new ObjectHolder<>();
             itsFileDataFrag.useFileData(new PasswdFileDataUser()
