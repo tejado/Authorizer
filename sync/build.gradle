@@ -16,8 +16,17 @@ android {
         }
     }
     buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled true
+            //noinspection GroovyAssignabilityCheck
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+            proguardFiles += 'proguard-rules.pro'
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
+            //noinspection GroovyAssignabilityCheck
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
             proguardFiles += 'proguard-rules.pro'
         }
     }
