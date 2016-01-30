@@ -4,4 +4,5 @@
     <issue id="UnusedAttribute">
         <ignore path="AndroidManifest.xml" />
     </issue>
+    <issue id="ManifestResource" severity="ignore" />
 </lint>
