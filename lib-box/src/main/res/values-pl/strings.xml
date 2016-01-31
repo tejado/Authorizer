@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="boxsdk_alert_dialog_cancel" description="">Anuluj</string>
+    <string name="boxsdk_alert_dialog_ok" description="">Prześlij</string>
+    <string name="boxsdk_alert_dialog_password" description="">Hasło</string>
+    <string name="boxsdk_alert_dialog_text_entry" description="">Ta witryna lub aplikacja żąda uwierzytelnienia.</string>
+    <string name="boxsdk_alert_dialog_username" description="">Nazwa użytkownika</string>
+    <string name="boxsdk_title_activity_oauth">OAuthActivity</string>
+    <string name="boxsdk_Select">Wybierz</string>
+    <string name="boxsdk_Cancel">Anuluj</string>
+    <string name="boxsdk_Please_wait">Czekaj...</string>
+    <string name="boxsdk_Create_folder">Utwórz folder</string>
+    <string name="boxsdk_Authenticating">Uwierzytelnianie</string>
+    <string name="boxsdk_Authentication_fail">Uwierzytelnianie nie powiodło się</string>
+    <string name="boxsdk_Authentication_cancelled">Uwierzytelnianie anulowane</string>
+    <string name="boxsdk_Authentication_fail_url_mismatch">Adres URL przekierowania jest nieprawidłowy</string>
+    <string name="boxsdk_details">Szczegóły</string>
+
+    <string name="boxsdk_ssl_error_warning_DATE_INVALID">Niepoprawna data certyfikatu.</string>
+    <string name="boxsdk_ssl_error_warning_EXPIRED">Certyfikat wygasł.</string>
+    <string name="boxsdk_ssl_error_warning_ID_MISMATCH">Niezgodność nazwy hosta.</string>
+    <string name="boxsdk_ssl_error_warning_INVALID">Wystąpił ogólny błąd.</string>
+    <string name="boxsdk_ssl_error_warning_NOT_YET_VALID">Certyfikat nie jest jeszcze ważny.</string>
+    <string name="boxsdk_ssl_error_warning_UNTRUSTED">Urząd certyfikacji nie jest zaufany.</string>
+    <string name="boxsdk_ssl_should_not_proceed">Nie należy kontynuować, zwłaszcza jeśli ostrzeżenie to zostało wyświetlone po raz pierwszy dla tej witryny.</string>
+    
+    <string name="boxsdk_Security_Warning">Ostrzeżenie bezpieczeństwa</string>
+    <string name="boxsdk_There_are_problems_with_the_security_certificate_for_this_site">Napotkano problemy z certyfikatem bezpieczeństwa dla tej witryny.</string>
+    
+    <string name="boxsdk_Continue">Kontynuuj</string>
+    <string name="boxsdk_Go_back">Wróć</string>
+
+    <string name="boxsdk_Select_an_account_to_use">Wybierz konto do użycia</string>
+    <string name="boxsdk_Use_a_different_account">Użyj innego konta</string>
+
+</resources>

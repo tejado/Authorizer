@@ -1,28 +1,38 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '23.0.1'
+    compileSdkVersion 21
+    buildToolsVersion '22.0.1'
+
     defaultConfig {
-        minSdkVersion 10
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion 14
+        targetSdkVersion 21
+        versionCode 30003
+        versionName "3.0.3-SNAPSHOT"
+        version "3.0.3-SNAPSHOT"
+        group "com.box"
     }
+
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles += 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    productFlavors {
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_6
+        targetCompatibility JavaVersion.VERSION_1_7
     }
-    packagingOptions {
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE.txt'
+
+    lintOptions {
+        abortOnError false
     }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.eclipsesource.minimal-json:minimal-json:0.9.1'
 }
+
+apply from: '../maven_push.gradle'
