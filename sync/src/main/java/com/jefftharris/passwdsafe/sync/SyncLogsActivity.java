@@ -8,27 +8,25 @@
 package com.jefftharris.passwdsafe.sync;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  *  Activity to show the sync logs fragment
  */
-public class SyncLogsActivity extends FragmentActivity
+public class SyncLogsActivity extends AppCompatActivity
 {
-    /* (non-Javadoc)
-     * @see android.support.v4.app.FragmentActivity#onCreate(android.os.Bundle)
-     */
     @Override
     protected void onCreate(Bundle args)
     {
         super.onCreate(args);
+        setContentView(R.layout.activity_sync_logs);
 
         if (args == null) {
             SyncLogsFragment logs = new SyncLogsFragment();
             logs.setArguments(getIntent().getExtras());
             FragmentManager mgr = getSupportFragmentManager();
-            mgr.beginTransaction().add(android.R.id.content,logs).commit();
+            mgr.beginTransaction().replace(R.id.contents, logs).commit();
         }
     }
 }

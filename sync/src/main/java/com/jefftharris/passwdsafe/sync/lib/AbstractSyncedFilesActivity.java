@@ -14,13 +14,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -44,7 +44,7 @@ import java.util.List;
 /**
  *  Activity for managing files synced from providers
  */
-public abstract class AbstractSyncedFilesActivity extends FragmentActivity
+public abstract class AbstractSyncedFilesActivity extends AppCompatActivity
         implements SyncedFilesFragment.Listener
 {
     public static final String INTENT_PROVIDER_URI = "provider_uri";

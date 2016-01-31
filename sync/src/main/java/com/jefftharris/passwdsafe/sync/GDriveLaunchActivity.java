@@ -14,7 +14,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 
@@ -29,7 +29,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncDb;
  * The GDriveLaunchActivity is used to open files from within the Google Drive
  * app
  */
-public class GDriveLaunchActivity extends FragmentActivity
+public class GDriveLaunchActivity extends AppCompatActivity
 {
     private static final String TAG = "GDriveLaunchActivity";
 

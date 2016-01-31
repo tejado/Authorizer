@@ -121,13 +121,6 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="Preference_TextAppearanceMaterialBody2">
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif-medium</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-    </style>
-
     <style name="RecordRow">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -155,10 +148,6 @@
 
     <style name="RecordField.Large">
         <item name="android:textAppearance">?android:textAppearanceLarge</item>
-    </style>
-
-    <style name="Separator.Accent">
-        <item name="android:background">?colorAccent</item>
     </style>
 
     <style name="TableLabelColumn">

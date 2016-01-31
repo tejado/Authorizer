@@ -23,7 +23,7 @@
     </LinearLayout>
 
     <View
-        style="@style/Separator.Light"/>
+        style="@style/Separator.Accent"/>
 
     <ListView
         android:id="@android:id/list"

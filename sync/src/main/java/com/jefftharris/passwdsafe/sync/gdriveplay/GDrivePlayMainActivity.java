@@ -23,9 +23,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -55,7 +55,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 /**
  *  Activity for accessing Google Drive
  */
-public class GDrivePlayMainActivity extends FragmentActivity
+public class GDrivePlayMainActivity extends AppCompatActivity
     implements FilesFragment.Listener,
     GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener

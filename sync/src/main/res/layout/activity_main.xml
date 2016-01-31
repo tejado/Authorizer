@@ -117,7 +117,7 @@
 
         <View
             android:id="@+id/gdrive_separator"
-            style="@style/Separator"
+            style="@style/Separator.Accent"
             android:layout_margin="6dp"/>
 
         <RelativeLayout
@@ -235,7 +235,7 @@
 
         <View
             android:id="@+id/dropbox_separator"
-            style="@style/Separator"
+            style="@style/Separator.Accent"
             android:layout_margin="6dp"/>
 
         <RelativeLayout
@@ -322,7 +322,7 @@
 
         <View
             android:id="@+id/box_separator"
-            style="@style/Separator"
+            style="@style/Separator.Accent"
             android:layout_margin="6dp"/>
 
         <RelativeLayout
@@ -439,7 +439,7 @@
 
         <View
             android:id="@+id/onedrive_separator"
-            style="@style/Separator"
+            style="@style/Separator.Accent"
             android:layout_margin="6dp"/>
 
         <RelativeLayout
@@ -534,7 +534,7 @@
 
         <View
             android:id="@+id/owncloud_separator"
-            style="@style/Separator"
+            style="@style/Separator.Accent"
             android:layout_margin="6dp"/>
 
         <TextView
