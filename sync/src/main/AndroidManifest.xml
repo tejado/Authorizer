@@ -116,7 +116,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.box.boxandroidlibv2.activities.OAuthActivity" />
+       <activity
+            android:name="com.box.androidsdk.content.auth.OAuthActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="true" />
 
         <provider
             android:name=".PasswdSafeProvider"

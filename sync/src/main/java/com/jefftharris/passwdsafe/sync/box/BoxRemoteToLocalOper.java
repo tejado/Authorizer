@@ -8,15 +8,14 @@ package com.jefftharris.passwdsafe.sync.box;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.box.boxjavalibv2.BoxClient;
-import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
-import com.box.boxjavalibv2.resourcemanagers.BoxFilesManager;
+import com.box.androidsdk.content.BoxApiFile;
+import com.box.androidsdk.content.listeners.ProgressListener;
+import com.box.androidsdk.content.models.BoxSession;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
@@ -27,7 +26,7 @@ import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
  * A Box sync operation to sync a remote file to a local one
  */
 public class BoxRemoteToLocalOper
-        extends AbstractRemoteToLocalSyncOper<BoxClient>
+        extends AbstractRemoteToLocalSyncOper<BoxSession>
 {
     private static final String TAG = "BoxRemoteToLocalOper";
 
@@ -37,29 +36,34 @@ public class BoxRemoteToLocalOper
         super(file);
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper#doOper(java.lang.Object, android.content.Context)
-     */
     @Override
-    public void doOper(BoxClient providerClient, Context ctx)
+    public void doOper(BoxSession providerClient, Context ctx)
             throws IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "syncRemoteToLocal %s", itsFile);
         setLocalFileName(SyncHelper.getLocalFileName(itsFile.itsId));
 
         try {
-            InputStream is = null;
             OutputStream os = null;
             try {
-                BoxDefaultRequestObject req = new BoxDefaultRequestObject();
-                BoxFilesManager fileMgr = providerClient.getFilesManager();
-                is = fileMgr.downloadFile(itsFile.itsRemoteId, req);
+                BoxApiFile fileApi = new BoxApiFile(providerClient);
                 os = new BufferedOutputStream(
                         ctx.openFileOutput(getLocalFileName(),
                                            Context.MODE_PRIVATE));
-                Utils.copyStream(is, os);
+                fileApi.getDownloadRequest(os, itsFile.itsRemoteId)
+                        .setProgressListener(new ProgressListener()
+                        {
+                            @Override
+                            public void onProgressChanged(long numBytes,
+                                                          long totalBytes)
+                            {
+                                PasswdSafeUtil.dbginfo(TAG, "progress %d/%d",
+                                                       numBytes, totalBytes);
+                            }
+                        })
+                        .send();
             } finally {
-                Utils.closeStreams(is, os);
+                Utils.closeStreams(null, os);
             }
 
             java.io.File localFile = ctx.getFileStreamPath(getLocalFileName());

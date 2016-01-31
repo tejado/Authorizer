@@ -8,16 +8,15 @@ package com.jefftharris.passwdsafe.sync.box;
 
 import android.content.Context;
 
-import com.box.boxjavalibv2.BoxClient;
-import com.box.boxjavalibv2.requests.requestobjects.BoxFileRequestObject;
-import com.box.boxjavalibv2.resourcemanagers.BoxFilesManager;
+import com.box.androidsdk.content.BoxApiFile;
+import com.box.androidsdk.content.models.BoxSession;
 import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 
 /**
  * A Box sync operation to remove a file
  */
-public class BoxRmFileOper extends AbstractRmSyncOper<BoxClient>
+public class BoxRmFileOper extends AbstractRmSyncOper<BoxSession>
 {
     private static final String TAG = "BoxRmFileOper";
 
@@ -26,16 +25,12 @@ public class BoxRmFileOper extends AbstractRmSyncOper<BoxClient>
         super(dbfile, TAG);
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper#doRemoteRemove(java.lang.Object, android.content.Context)
-     */
     @Override
-    protected void doRemoteRemove(BoxClient providerClient, Context ctx)
+    protected void doRemoteRemove(BoxSession providerClient, Context ctx)
             throws Exception
     {
-        BoxFileRequestObject req =
-                BoxFileRequestObject.deleteFileRequestObject();
-        BoxFilesManager fileMgr = providerClient.getFilesManager();
-        fileMgr.deleteFile(itsFile.itsRemoteId, req);
+        BoxApiFile fileApi = new BoxApiFile(providerClient);
+        fileApi.getDeleteRequest(itsFile.itsRemoteId)
+                .send();
     }
 }
