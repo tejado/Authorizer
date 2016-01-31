@@ -20,6 +20,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.IBinder;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.text.InputType;
 import android.view.KeyEvent;
@@ -262,7 +263,9 @@ public final class GuiUtils
      */
     public static void invalidateOptionsMenu(Activity act)
     {
-        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
+        if (act instanceof FragmentActivity) {
+            ((FragmentActivity)act).supportInvalidateOptionsMenu();
+        } else if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
             GuiUtilsHoneycomb.invalidateOptionsMenu(act);
         }
     }
