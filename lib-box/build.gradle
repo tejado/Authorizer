@@ -1,12 +1,13 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '22.0.1'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
+    useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 21
+        minSdkVersion 10
+        targetSdkVersion 23
         versionCode 30003
         versionName "3.0.3-SNAPSHOT"
         version "3.0.3-SNAPSHOT"
@@ -21,7 +22,7 @@ android {
     }
     
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
@@ -35,4 +36,3 @@ dependencies {
     compile 'com.eclipsesource.minimal-json:minimal-json:0.9.1'
 }
 
-apply from: '../maven_push.gradle'
