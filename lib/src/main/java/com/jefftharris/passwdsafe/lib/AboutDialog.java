@@ -17,7 +17,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +31,7 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 /**
  *  The about dialog
  */
-public class AboutDialog extends DialogFragment
+public class AboutDialog extends AppCompatDialogFragment
         implements DialogInterface.OnClickListener
 {
     // TODO: Move passwdsafe about_fragment to lib once sync app able to use extra libs

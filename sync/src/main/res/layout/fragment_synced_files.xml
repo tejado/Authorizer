@@ -14,7 +14,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <View
-        style="@style/Separator.Light"/>
+        style="@style/Separator.Accent"/>
 
     <ProgressBar
         android:id="@+id/progress"

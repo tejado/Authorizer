@@ -46,7 +46,9 @@
                 android:value="id=704216087822" />
         </activity>
 
-        <activity android:name=".SyncLogsActivity"/>
+        <activity android:name=".SyncLogsActivity"
+                  android:label="@string/logs"
+                  android:parentActivityName=".MainActivity"/>
         
         <activity
             android:name=".gdriveplay.GDrivePlayMainActivity"

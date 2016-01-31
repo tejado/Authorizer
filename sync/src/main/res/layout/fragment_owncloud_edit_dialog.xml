@@ -41,7 +41,7 @@
         android:entries="@array/interval_array"
         tools:listitem="@android:layout/simple_spinner_item"/>
 
-    <View style="@style/Separator.Light"/>
+    <View style="@style/Separator.Accent"/>
 
     <TextView
         android:id="@+id/error_msg"
