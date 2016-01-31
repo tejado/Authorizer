@@ -6,7 +6,7 @@
  */
 package com.jefftharris.passwdsafe.sync.box;
 
-import com.box.boxjavalibv2.dao.BoxFile;
+import com.box.androidsdk.content.models.BoxFile;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 
 /**
@@ -50,7 +50,7 @@ class BoxProviderFile implements ProviderRemoteFile
     @Override
     public long getModTime()
     {
-        return itsFile.dateModifiedAt().getTime();
+        return itsFile.getModifiedAt().getTime();
     }
 
     @Override

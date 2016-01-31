@@ -13,10 +13,11 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.box.boxjavalibv2.BoxClient;
-import com.box.boxjavalibv2.dao.BoxFile;
-import com.box.boxjavalibv2.requests.requestobjects.BoxFileUploadRequestObject;
-import com.box.boxjavalibv2.resourcemanagers.BoxFilesManager;
+import com.box.androidsdk.content.BoxApiFile;
+import com.box.androidsdk.content.BoxConstants;
+import com.box.androidsdk.content.listeners.ProgressListener;
+import com.box.androidsdk.content.models.BoxFile;
+import com.box.androidsdk.content.models.BoxSession;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
@@ -25,7 +26,7 @@ import com.jefftharris.passwdsafe.sync.lib.DbFile;
  * A Box sync operation to sync a local file to a remote one
  */
 public class BoxLocalToRemoteOper
-        extends AbstractLocalToRemoteSyncOper<BoxClient>
+        extends AbstractLocalToRemoteSyncOper<BoxSession>
 {
     private static final String TAG = "BoxLocalToRemoteOper";
 
@@ -37,50 +38,56 @@ public class BoxLocalToRemoteOper
         super(file, false);
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper#doOper(java.lang.Object, android.content.Context)
-     */
     @Override
-    public void doOper(BoxClient providerClient, Context ctx) throws Exception
+    public void doOper(BoxSession providerClient, Context ctx) throws Exception
     {
         PasswdSafeUtil.dbginfo(TAG, "syncLocalToRemote %s", itsFile);
 
-        BoxFilesManager fileMgr = providerClient.getFilesManager();
+        BoxApiFile fileApi = new BoxApiFile(providerClient);
+        ProgressListener uploadProgress = new ProgressListener()
+        {
+            @Override
+            public void onProgressChanged(long numBytes, long totalBytes)
+            {
+                PasswdSafeUtil.dbginfo(TAG, "progress %d/%d",
+                                       numBytes, totalBytes);
+            }
+        };
+
         if (itsFile.itsLocalFile != null) {
             setLocalFile(ctx.getFileStreamPath(itsFile.itsLocalFile));
             if (isInsert()) {
-                BoxFileUploadRequestObject req =
-                    BoxFileUploadRequestObject.uploadFileRequestObject(
-                        BoxSyncer.ROOT_FOLDER, itsFile.itsLocalTitle,
-                        getLocalFile(), providerClient.getJSONParser());
-                itsUpdatedFile = fileMgr.uploadFile(req);
+                itsUpdatedFile = fileApi
+                        .getUploadRequest(getLocalFile(),
+                                          BoxConstants.ROOT_FOLDER_ID)
+                        .setFileName(itsFile.itsLocalTitle)
+                        .setProgressListener(uploadProgress)
+                        .send();
             } else {
-                BoxFileUploadRequestObject req =
-                    BoxFileUploadRequestObject.uploadNewVersionRequestObject(
-                        itsFile.itsLocalTitle, getLocalFile());
-                itsUpdatedFile =
-                        fileMgr.uploadNewVersion(itsFile.itsRemoteId, req);
+                itsUpdatedFile = fileApi
+                        .getUploadNewVersionRequest(getLocalFile(),
+                                                    itsFile.itsRemoteId)
+                        .setProgressListener(uploadProgress)
+                        .send();
             }
         } else {
             ByteArrayInputStream is = new ByteArrayInputStream(new byte[0]);
-            BoxFileUploadRequestObject req =
-                    BoxFileUploadRequestObject.uploadFileRequestObject(
-                        BoxSyncer.ROOT_FOLDER, itsFile.itsLocalTitle, is);
+            //noinspection TryFinallyCanBeTryWithResources
             try {
-                itsUpdatedFile = fileMgr.uploadFile(req);
+                itsUpdatedFile = fileApi
+                        .getUploadRequest(is, itsFile.itsLocalTitle,
+                                          BoxConstants.ROOT_FOLDER_ID)
+                        .setProgressListener(uploadProgress)
+                        .send();
             } finally {
                 is.close();
             }
         }
 
         PasswdSafeUtil.dbginfo(TAG, "syncLocalToRemote updated %s",
-                               BoxProvider.boxToString(itsUpdatedFile,
-                                                       providerClient));
+                               BoxProvider.boxToString(itsUpdatedFile));
     }
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.SyncOper#doPostOperUpdate(android.database.sqlite.SQLiteDatabase, android.content.Context)
-     */
     @Override
     public void doPostOperUpdate(SQLiteDatabase db, Context ctx)
             throws IOException, SQLException
@@ -88,7 +95,7 @@ public class BoxLocalToRemoteOper
         doPostOperFileUpdates(itsUpdatedFile.getId(),
                               itsUpdatedFile.getName(),
                               BoxSyncer.getFileFolder(itsUpdatedFile),
-                              itsUpdatedFile.dateModifiedAt().getTime(),
+                              itsUpdatedFile.getModifiedAt().getTime(),
                               itsUpdatedFile.getSha1(),
                               db);
     }
