@@ -8,7 +8,9 @@ ic_action_alert_warning_dark.png
 ic_action_delete.png
 ic_action_edit.png
 ic_action_help.png
+ic_action_history
 ic_action_home.png
+ic_action_info.png
 ic_action_info_dark.png
 ic_action_lock.png
 ic_action_lock_open.png
@@ -17,6 +19,7 @@ ic_action_people_outline.png
 ic_action_person_outline.png
 ic_action_person_outline_light.png
 ic_action_plan.png
+ic_action_play.png
 ic_action_search.png
 ic_action_settings_dark.png
 ic_action_sync.png
