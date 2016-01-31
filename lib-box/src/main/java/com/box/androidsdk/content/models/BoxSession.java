@@ -392,13 +392,19 @@ public class BoxSession extends BoxObject implements BoxAuthentication.AuthListe
     public BoxFutureTask<BoxSession> refresh() {
 
         final BoxFutureTask<BoxSession> task = (new BoxSessionRefreshRequest(this)).toTask();
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                task.run();
-                return null;
-            }
-        }.execute();
+        if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+            new AsyncTask<Void, Void, Void>()
+            {
+                @Override
+                protected Void doInBackground(Void... params)
+                {
+                    task.run();
+                    return null;
+                }
+            }.execute();
+        } else {
+            task.run();
+        }
         return task;
     }
 
