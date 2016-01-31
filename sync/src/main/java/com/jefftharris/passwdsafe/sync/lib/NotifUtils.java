@@ -24,7 +24,8 @@ public final class NotifUtils
     public enum Type
     {
         OWNCLOUD_CERT_TRUSTED(0),
-        DROPBOX_MIGRATED(1);
+        DROPBOX_MIGRATED(1),
+        BOX_MIGRATGED(2);
 
         public final int itsNotifId;
 
@@ -44,7 +45,8 @@ public final class NotifUtils
         case OWNCLOUD_CERT_TRUSTED: {
             break;
         }
-        case DROPBOX_MIGRATED: {
+        case DROPBOX_MIGRATED:
+        case BOX_MIGRATGED: {
             content = ctx.getString(R.string.open_app_reauthorize);
             break;
         }
@@ -71,6 +73,10 @@ public final class NotifUtils
         }
         case DROPBOX_MIGRATED: {
             title = ctx.getString(R.string.dropbox_service_updated);
+            break;
+        }
+        case BOX_MIGRATGED: {
+            title = ctx.getString(R.string.box_service_updated);
             break;
         }
         }

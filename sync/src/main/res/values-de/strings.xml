@@ -8,6 +8,7 @@
     <string name="app_desc">Synchronisiert PasswordSafe-Datenbanken von Cloudspeichern</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="automatic">Automatisch</string>
+    <string name="box_service_updated">Box-Dienstes aktualisiert</string>
     <string name="cant_launch_drive_file">Kann Google-Drive-Datei nicht öffnen. Die Datei wurde möglichweise nicht synchronisiert.</string>
     <string name="choose_account">Konto wählen</string>
     <string name="choose_sync_files_from_dir">Wählen Sie Dateien von %1$s</string>
