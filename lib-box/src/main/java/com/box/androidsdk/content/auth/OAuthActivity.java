@@ -1,9 +1,6 @@
 package com.box.androidsdk.content.auth;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +12,9 @@ import android.content.pm.Signature;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * BoxAndroidClient into the activity result. In the case of failure, the activity result will be {@link android.app.Activity#RESULT_CANCELED} together will a error message in
  * the intent extra.
  */
-public class OAuthActivity extends Activity implements ChooseAuthenticationFragment.OnAuthenticationChosen, OAuthWebViewClient.WebEventListener, OAuthWebView.OnPageFinishedListener {
+public class OAuthActivity extends FragmentActivity implements ChooseAuthenticationFragment.OnAuthenticationChosen, OAuthWebViewClient.WebEventListener, OAuthWebView.OnPageFinishedListener {
     public static final int REQUEST_BOX_APP_FOR_AUTH_CODE = 1;
     public static final String AUTH_CODE = "authcode";
     public static final String USER_ID = "userId";
@@ -203,10 +203,10 @@ public class OAuthActivity extends Activity implements ChooseAuthenticationFragm
 
     protected void startOAuth() {
         // Use already logged in accounts if not disabled in this activity and not already showing this fragment.
-        if (authType != AUTH_TYPE_APP && !getIntent().getBooleanExtra(EXTRA_DISABLE_ACCOUNT_CHOOSING, false) && getFragmentManager().findFragmentByTag(CHOOSE_AUTH_TAG) == null){
+        if (authType != AUTH_TYPE_APP && !getIntent().getBooleanExtra(EXTRA_DISABLE_ACCOUNT_CHOOSING, false) && getSupportFragmentManager().findFragmentByTag(CHOOSE_AUTH_TAG) == null){
             Map<String, BoxAuthenticationInfo> map = BoxAuthentication.getInstance().getStoredAuthInfo(this);
             if (SdkUtils.isEmptyString(getIntent().getStringExtra(EXTRA_USER_ID_RESTRICTION)) && map != null && map.size() > 0) {
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.oauth_container,ChooseAuthenticationFragment.createAuthenticationActivity(this), CHOOSE_AUTH_TAG);
                 transaction.addToBackStack(CHOOSE_AUTH_TAG);
                 transaction.commit();
@@ -278,7 +278,7 @@ public class OAuthActivity extends Activity implements ChooseAuthenticationFragm
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().findFragmentByTag(CHOOSE_AUTH_TAG) != null){
+        if (getSupportFragmentManager().findFragmentByTag(CHOOSE_AUTH_TAG) != null){
             finish();
             return;
         }
@@ -296,9 +296,9 @@ public class OAuthActivity extends Activity implements ChooseAuthenticationFragm
 
     @Override
     public void onDifferentAuthenticationChosen() {
-        Fragment fragment = getFragmentManager().findFragmentByTag(CHOOSE_AUTH_TAG);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(CHOOSE_AUTH_TAG);
         if (fragment != null){
-            getFragmentManager().popBackStack();
+            getSupportFragmentManager().popBackStack();
         }
     }
 
@@ -365,7 +365,7 @@ public class OAuthActivity extends Activity implements ChooseAuthenticationFragm
                 dismissSpinner();
                 Intent intent = new Intent();
                 intent.putExtra(AUTH_INFO, auth);
-                setResult(Activity.RESULT_OK, intent);
+                setResult(FragmentActivity.RESULT_OK, intent);
                 mAuthWasSuccessful = true;
                 finish();
             }
@@ -380,7 +380,7 @@ public class OAuthActivity extends Activity implements ChooseAuthenticationFragm
             public void run() {
                 dismissSpinner();
                 Toast.makeText(OAuthActivity.this, error, Toast.LENGTH_LONG).show();
-                setResult(Activity.RESULT_CANCELED);
+                setResult(FragmentActivity.RESULT_CANCELED);
                 finish();
             }
 

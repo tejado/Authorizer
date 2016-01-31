@@ -1,8 +1,8 @@
 package com.box.androidsdk.content.auth;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +18,8 @@ import java.util.Map;
  * This class will show a scrollable list of accounts a user can choose to log in to, and at the end
  * an option to login as a new account. Activities using this fragment should implement OnAuthenticationChosen.
  */
-public class ChooseAuthenticationFragment extends Fragment {
+public class ChooseAuthenticationFragment extends Fragment
+{
 
     private ListView mListView;
     private static final String EXTRA_BOX_AUTHENTICATION_INFOS = "boxAuthenticationInfos";
@@ -29,7 +30,7 @@ public class ChooseAuthenticationFragment extends Fragment {
         View view = inflater.inflate(R.layout.boxsdk_choose_auth_activity, null);
         mListView = (ListView)view.findViewById(R.id.boxsdk_accounts_list);
         if (infos == null){
-            getActivity().getFragmentManager().beginTransaction().remove(this).commit();
+            getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
         } else {
             mListView.setAdapter(new AuthenticatedAccountsAdapter(getActivity(), R.layout.boxsdk_list_item_account, infos));
             mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
