@@ -1,5 +1,0 @@
-<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:exitFadeDuration="@android:integer/config_mediumAnimTime" tools:ignore="UnusedAttribute">
-
-    <item android:drawable="@drawable/boxandroidlibv2_list_selected_state" android:state_pressed="true"/>
-    
-</selector>
