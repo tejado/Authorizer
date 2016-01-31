@@ -5,7 +5,7 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-package com.jefftharris.passwdsafe.util;
+package com.jefftharris.passwdsafe.lib;
 
 /**
  * The ObjectHolder class is used to encapsulate a variable passed out of an
