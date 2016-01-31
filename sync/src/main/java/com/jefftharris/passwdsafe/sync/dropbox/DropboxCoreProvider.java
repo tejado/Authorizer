@@ -326,15 +326,18 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
 
             try {
                 Context appctx = getContext().getApplicationContext();
-                JSONArray jsonAccounts = new JSONArray(
+                String accts =
                         appctx.getSharedPreferences("dropbox-credentials",
                                                     Context.MODE_PRIVATE)
-                              .getString("accounts", null));
-                if (jsonAccounts.length() > 0) {
-                    JSONObject acct = jsonAccounts.getJSONObject(0);
-                    String userId = acct.getString("userId");
-                    PasswdSafeUtil.dbginfo(TAG, "migrate user: %s", userId);
-                    editor.putString(PREF_USER_ID, userId);
+                              .getString("accounts", null);
+                if (accts != null) {
+                    JSONArray jsonAccounts = new JSONArray(accts);
+                    if (jsonAccounts.length() > 0) {
+                        JSONObject acct = jsonAccounts.getJSONObject(0);
+                        String userId = acct.getString("userId");
+                        PasswdSafeUtil.dbginfo(TAG, "migrate user: %s", userId);
+                        editor.putString(PREF_USER_ID, userId);
+                    }
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error migrating token", e);
