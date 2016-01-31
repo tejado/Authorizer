@@ -14,8 +14,10 @@ import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -29,6 +31,7 @@ import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
+import com.jefftharris.passwdsafe.sync.lib.NotifUtils;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
@@ -43,6 +46,10 @@ public class BoxProvider extends AbstractSyncTimerProvider
     private static final String BOX_CLIENT_SECRET =
             "nuHnpyoGIEYceudysLyBvcBsWSHJdXUy";
 
+    private static final String PREF_AUTH_ACCESS_TOKEN = "boxAccessToken";
+    private static final String PREF_AUTH_EXPIRES_IN = "boxExpiresIn";
+    private static final String PREF_AUTH_REFRESH_TOKEN = "boxRefreshToken";
+    private static final String PREF_AUTH_TOKEN_TYPE = "boxTokenType";
     private static final String PREF_AUTH_USER_ID = "boxUserId";
 
     private static final String TAG = "BoxProvider";
@@ -51,9 +58,6 @@ public class BoxProvider extends AbstractSyncTimerProvider
     private PendingIntent itsAcctLinkIntent = null;
 
     // TODO: handle app disauthentication
-    // TODO: cleanup user handling
-    // TODO: upgrade
-    // TODO: login failures
 
     /** Constructor */
     public BoxProvider(Context ctx)
@@ -71,11 +75,30 @@ public class BoxProvider extends AbstractSyncTimerProvider
         itsClient = new BoxSession(getContext());
         itsClient.setSessionAuthListener(this);
         updateBoxAcct();
+
+        // Check for migration
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (prefs.contains(PREF_AUTH_USER_ID)) {
+            NotifUtils.showNotif(NotifUtils.Type.BOX_MIGRATGED, getContext());
+        }
     }
 
     @Override
     public void startAccountLink(FragmentActivity activity, int requestCode)
     {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (prefs.contains(PREF_AUTH_USER_ID)) {
+            SharedPreferences.Editor edit = prefs.edit();
+            edit.remove(PREF_AUTH_USER_ID);
+            edit.remove(PREF_AUTH_ACCESS_TOKEN);
+            edit.remove(PREF_AUTH_EXPIRES_IN);
+            edit.remove(PREF_AUTH_REFRESH_TOKEN);
+            edit.remove(PREF_AUTH_TOKEN_TYPE);
+            edit.apply();
+        }
+
         if (isAccountAuthorized()) {
             unlinkAccount();
         }

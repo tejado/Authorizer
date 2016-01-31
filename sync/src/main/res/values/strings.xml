@@ -8,6 +8,7 @@
     <string name="app_desc">Sync PasswordSafe databases from cloud services</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="automatic">Automatic</string>
+    <string name="box_service_updated">Box service updated</string>
     <string name="cant_launch_drive_file">Can\'t launch Google Drive file.  Typically the file has not been synced locally.</string>
     <string name="choose_account">Choose Account</string>
     <string name="choose_sync_files_from_dir">Choose files from %1$s</string>
