@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -61,6 +62,9 @@ public class AboutDialog extends AppCompatDialogFragment
         Activity act = getActivity();
         LayoutInflater factory = LayoutInflater.from(act);
         View detailsView = factory.inflate(R.layout.fragment_about, null);
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        int pad = (int)(dm.density * 6);
+        detailsView.setPadding(pad, pad, pad, pad);
 
         View fileDetails = detailsView.findViewById(R.id.file_details_group);
         GuiUtils.setVisible(fileDetails, false);
