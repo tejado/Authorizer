@@ -63,6 +63,8 @@
     <string name="updating_account">Updating account&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;3.0.1&lt;/b&gt; - Bugfix for Box account detection
+        \n\n
         &lt;b&gt;3.0.0&lt;/b&gt; - User interface rewrite for material design.
         Update Box library.  Manually sync the account to re-authorize.
         \n\n
