@@ -79,8 +79,11 @@ public class BoxProvider extends AbstractSyncTimerProvider
         // Check for migration
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (prefs.contains(PREF_AUTH_USER_ID)) {
+        if (prefs.contains(PREF_AUTH_REFRESH_TOKEN)) {
             NotifUtils.showNotif(NotifUtils.Type.BOX_MIGRATGED, getContext());
+        }
+        if (prefs.contains(PREF_AUTH_USER_ID)) {
+            prefs.edit().remove(PREF_AUTH_USER_ID).apply();
         }
     }
 
@@ -89,7 +92,8 @@ public class BoxProvider extends AbstractSyncTimerProvider
     {
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (prefs.contains(PREF_AUTH_USER_ID)) {
+        if (prefs.contains(PREF_AUTH_USER_ID) ||
+            prefs.contains(PREF_AUTH_REFRESH_TOKEN)) {
             SharedPreferences.Editor edit = prefs.edit();
             edit.remove(PREF_AUTH_USER_ID);
             edit.remove(PREF_AUTH_ACCESS_TOKEN);
