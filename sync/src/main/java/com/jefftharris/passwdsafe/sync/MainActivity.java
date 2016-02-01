@@ -432,7 +432,12 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings({"UnusedParameters", "unused"})
     public void onBoxSync(View view)
     {
-        getBoxProvider().requestSync(true);
+        Provider boxProvider = getBoxProvider();
+        if (boxProvider.isAccountAuthorized()) {
+            boxProvider.requestSync(true);
+        } else {
+            onBoxChoose();
+        }
     }
 
 
@@ -824,8 +829,8 @@ public class MainActivity extends AppCompatActivity
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
 
-            View syncBtn = findViewById(R.id.box_sync);
-            syncBtn.setEnabled(authorized);
+            GuiUtils.setVisible(findViewById(R.id.box_acct_unlink),
+                                !authorized);
         } else {
             itsBoxUri = null;
         }
