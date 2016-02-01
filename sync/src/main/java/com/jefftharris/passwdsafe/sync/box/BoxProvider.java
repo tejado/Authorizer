@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.box.androidsdk.content.BoxConfig;
+import com.box.androidsdk.content.BoxException;
 import com.box.androidsdk.content.auth.BoxAuthentication;
 import com.box.androidsdk.content.models.BoxJsonObject;
 import com.box.androidsdk.content.models.BoxSession;
@@ -56,8 +57,7 @@ public class BoxProvider extends AbstractSyncTimerProvider
 
     private BoxSession itsClient;
     private PendingIntent itsAcctLinkIntent = null;
-
-    // TODO: handle app disauthentication
+    private boolean itsIsPendingAdd = false;
 
     /** Constructor */
     public BoxProvider(Context ctx)
@@ -126,8 +126,13 @@ public class BoxProvider extends AbstractSyncTimerProvider
             @Override
             protected void doAccountUpdate(ContentResolver cr)
             {
-                itsNewAcct = itsClient.getUserId();
-                super.doAccountUpdate(cr);
+                itsIsPendingAdd = true;
+                try {
+                    itsNewAcct = itsClient.getUserId();
+                    super.doAccountUpdate(cr);
+                } finally {
+                    itsIsPendingAdd = false;
+                }
             }
         };
     }
@@ -173,7 +178,9 @@ public class BoxProvider extends AbstractSyncTimerProvider
     @Override
     public void cleanupOnDelete(String acctName)
     {
-        unlinkAccount();
+        if (!itsIsPendingAdd) {
+            unlinkAccount();
+        }
     }
 
     @Override
@@ -199,10 +206,22 @@ public class BoxProvider extends AbstractSyncTimerProvider
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {
-        boolean authorized = isAccountAuthorized();
-        PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
-        if (authorized) {
-            new BoxSyncer(itsClient, provider, db, logrec, getContext()).sync();
+        try {
+            boolean authorized = isAccountAuthorized();
+            PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
+            if (authorized) {
+                new BoxSyncer(itsClient, provider, db,
+                              logrec, getContext()).sync();
+            }
+        } catch (Exception e) {
+            Throwable t = e.getCause();
+            if (t instanceof BoxException.RefreshFailure) {
+                if (((BoxException.RefreshFailure)t).isErrorFatal()) {
+                    Log.e(TAG, "sync: fatal refresh", t);
+                    unlinkAccount();
+                }
+            }
+            throw e;
         }
     }
 

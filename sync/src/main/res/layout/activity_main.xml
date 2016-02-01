@@ -318,6 +318,19 @@
                 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/box_acct_unlink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/box_controls"
+                android:drawableLeft="@drawable/ic_action_alert_warning_dark"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:padding="6dp"
+                android:text="@string/box_acct_unlinked"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
+
         </RelativeLayout>
 
         <View

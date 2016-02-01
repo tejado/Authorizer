@@ -8,6 +8,7 @@
     <string name="app_desc">Synchroniser les données PasswordSafe de services de cloud computing</string>
     <string name="app_name">PasswdSafe Sync</string>
     <string name="automatic">Automatique</string>
+    <string name="box_acct_unlinked">App dissociée de compte Box. Synchronisez à nouveau pour permettre l\'accès Box pour PasswdSafe Sync.</string>
     <string name="box_service_updated">Service de Box est mis à jour</string>
     <string name="cant_launch_drive_file">Impossible de lancer le fichier de Google Drive. Typiquement, le fichier n\'a pas été synchronisés localement</string>
     <string name="choose_account">Choisir compte</string>
