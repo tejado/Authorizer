@@ -8,8 +8,8 @@ android {
         minSdkVersion 10
         resConfigs "de", "fr"
         targetSdkVersion 23
-        versionCode 30000
-        versionName "3.0.0"
+        versionCode 30001
+        versionName "3.0.1"
 
         ndk {
             moduleName "DropboxSync"
