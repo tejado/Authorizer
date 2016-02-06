@@ -213,7 +213,7 @@ public class PasswdSafeListFragment extends ListFragment
                     (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
             final PasswdRecordListData listItem =
                     itsAdapter.getItem(info.position);
-            if (!listItem.itsIsRecord) {
+            if (listItem.itsIsRecord) {
                 itsListener.copyField(
                         (item.getItemId() == R.id.menu_copy_password) ?
                         CopyField.PASSWORD : CopyField.USER_NAME,
