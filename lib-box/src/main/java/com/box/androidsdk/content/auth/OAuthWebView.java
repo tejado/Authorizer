@@ -295,22 +295,9 @@ public class OAuthWebView extends WebView {
                         @Override
                         public void onClick(final DialogInterface dialog, final int whichButton) {
                             sslErrorDialogContinueButtonClicked = true;
-                            handler.cancel();
                             mWebEventListener.onAuthFailure(new AuthFailure(AuthFailure.TYPE_USER_INTERACTION, null));
                         }
                     });
-
-            // Only allow user to continue if explicitly granted in config
-            if (BoxConfig.ALLOW_SSL_ERROR) {
-                alertBuilder.setNeutralButton(R.string.boxsdk_ssl_error_details, null);
-                alertBuilder.setPositiveButton(R.string.boxsdk_Continue, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, final int whichButton) {
-                        sslErrorDialogContinueButtonClicked = true;
-                        handler.proceed();
-                    }
-                });
-            }
 
             final AlertDialog loginAlert = alertBuilder.create();
             loginAlert.setOnDismissListener(new OnDismissListener() {
@@ -323,18 +310,7 @@ public class OAuthWebView extends WebView {
                 }
             });
             loginAlert.show();
-            if (BoxConfig.ALLOW_SSL_ERROR) {
-                // this is to show more information on the exception.
-                Button neutralButton = loginAlert.getButton(AlertDialog.BUTTON_NEUTRAL);
-                if (neutralButton != null) {
-                    neutralButton.setOnClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showCertDialog(view.getContext(), error);
-                        }
-                    });
-                }
-            }
+            super.onReceivedSslError(view, handler, error);
         }
 
         protected void showCertDialog(final Context context, final SslError error){
