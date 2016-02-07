@@ -8,6 +8,7 @@
     <string name="any_changes_will_be_lost">Toutes modifications apportées à l\'entrée seront perdues.</string>
     <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
     <string name="app_name">PasswdSafe</string>
+    <string name="app_settings">Préférences</string>
     <string name="at_least">Au moins</string>
     <string name="basic">"Général"</string>
     <string name="cannot_create_file">Impossible de créer le fichier: %1$s</string>
@@ -153,6 +154,12 @@
     <string name="new_policy">Nouvelle stratégie</string>
     <string name="next">Suivant</string>
     <string name="no_alias_chosen">Aucun alias choisi</string>
+    <string name="no_file_permission">
+        PasswdSafe a besoin des droits sur le fichier.
+        \n\nAppuyer sur rafraîchir pour une autre demande. Si la demande n\'est
+        pas visible, allez dans les préférences de l\'application et activez les
+        permissions de stockage.
+    </string>
     <string name="no_files_select_to_open">
         Aucun fichier - Sélectionnez l\'action pour ouvrir ou créer un nouveau
         fichier

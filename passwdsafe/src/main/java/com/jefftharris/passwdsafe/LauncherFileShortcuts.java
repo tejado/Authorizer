@@ -133,6 +133,12 @@ public class LauncherFileShortcuts extends AppCompatActivity
     }
 
     @Override
+    public boolean appHasFilePermission()
+    {
+        return false;
+    }
+
+    @Override
     public void updateViewFiles()
     {
     }

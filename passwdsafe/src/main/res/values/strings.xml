@@ -8,6 +8,7 @@
     <string name="any_changes_will_be_lost">Any changes to the record will be lost.</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">PasswdSafe</string>
+    <string name="app_settings">App Settings</string>
     <string name="at_least">At least</string>
     <string name="basic">Basic</string>
     <string name="cannot_create_file">Cannot create file: %1$s</string>
@@ -152,6 +153,11 @@
     <string name="new_policy">New Policy</string>
     <string name="next">Next</string>
     <string name="no_alias_chosen">No alias chosen</string>
+    <string name="no_file_permission">
+        PasswdSafe requires file permissions.
+        \n\nPress reload for another prompt.  If no prompt is shown, press app
+        settings and enable storage permissions.
+    </string>
     <string name="no_files_select_to_open">
         No Files - Select action to open or create a new file
         \n\nIf files are not showing in the documents screen, use the menu to
