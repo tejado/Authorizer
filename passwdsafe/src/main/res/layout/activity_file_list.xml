@@ -34,6 +34,27 @@
                      android:layout_width="match_parent"
                      android:layout_height="wrap_content"/>
 
+        <LinearLayout android:id="@+id/no_permission_group"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="@string/no_file_permission"/>
+
+            <Button android:id="@+id/reload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reload"/>
+
+            <Button android:id="@+id/app_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_settings"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <!-- The drawer is given a fixed width in dp and extends the full height of

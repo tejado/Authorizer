@@ -66,6 +66,9 @@ public final class FileListFragment extends ListFragment
         /** Does the activity have a 'none' item */
         boolean activityHasNoneItem();
 
+        /** Does the app have file permission */
+        boolean appHasFilePermission();
+
         /** Update the view for a list of files */
         void updateViewFiles();
     }
@@ -185,6 +188,13 @@ public final class FileListFragment extends ListFragment
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem item = menu.findItem(R.id.menu_file_new);
+        item.setEnabled(itsListener.appHasFilePermission());
+        super.onPrepareOptionsMenu(menu);
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onOptionsItemSelected(android.view.MenuItem)

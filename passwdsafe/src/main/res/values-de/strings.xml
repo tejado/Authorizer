@@ -8,6 +8,7 @@
     <string name="any_changes_will_be_lost">Alle Änderungen am Eintrag gehen verloren.</string>
     <string name="app_desc">Programm zum Zugriff und Bearbeiten von PasswordSafe-Datenbanken für Android</string>
     <string name="app_name">PasswdSafe</string>
+    <string name="app_settings">App-Einstellungen</string>
     <string name="at_least">Mind.</string>
     <string name="basic">Allgemein</string>
     <string name="cannot_create_file">Datei kann nicht erstellt werden: %1$s</string>
@@ -153,6 +154,11 @@
     <string name="new_policy">Neue Regel</string>
     <string name="next">Weiter</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
+    <string name="no_file_permission">
+        PasswdSafe benötigt Speicherberechtigung
+        \n\nDrücke Neu Laden um diese neu zu gewähren, wenn dies nicht geht,
+        können Sie die Speicherberechtigung in den App-Einstellungen aktivieren.
+    </string>
     <string name="no_files_select_to_open">
         Keine Dateien - Öffnen Sie eine Datei oder erstellen Sie eine Neue.
         \n\nWenn Ihre Dateien beim öffnen nicht angezeigt werden, können Sie
