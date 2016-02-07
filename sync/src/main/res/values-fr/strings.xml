@@ -65,6 +65,8 @@
     <string name="updating_account">Mise à jour compte&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;3.0.2&lt;/b&gt; - Mettre à jour la librairie Box
+        \n\n
         &lt;b&gt;3.0.1&lt;/b&gt; - Correction pour la détection d\'un compte Box
         \n\n
         &lt;b&gt;3.0.0&lt;/b&gt; - Mettre à jour l\'interface utilisateur pour
