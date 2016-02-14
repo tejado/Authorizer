@@ -142,7 +142,9 @@ public class MainActivity extends AppCompatActivity
                 Manifest.permission.GET_ACCOUNTS, this,
                 PERMISSIONS_RC, APP_SETTINGS_RC,
                 "com.jefftharris.passwdsafe.sync",
-                R.id.no_permission_group, R.id.reload, R.id.app_settings);
+                R.id.reload, R.id.app_settings);
+        View noPermGroup = findViewById(R.id.no_permission_group);
+        GuiUtils.setVisible(noPermGroup, !itsPermissionMgr.checkPerms());
 
         // Check the state of Google Play services
         int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
