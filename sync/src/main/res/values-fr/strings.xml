@@ -31,6 +31,12 @@
     <string name="no_account">Aucun compte</string>
     <string name="no_accounts">Aucun compte à synchroniser. Utilisez le menu pour ajouter un compte.</string>
     <string name="no_logs">Pas de archives</string>
+    <string name="no_permissions">
+        PasswdSafe Sync a besoin des droits sur le contact.
+        \n\nAppuyer sur rafraîchir pour une autre demande. Si la demande n\'est
+        pas visible, allez dans les préférences de l\'application et activez les
+        permissions de contact.
+    </string>
     <string name="no_owncloud_accts">
         Aucune ownCloud comptes disponibles. Ajouter un compte dans 
         l\'application ownCloud premier. Ensuite, il peut être sélectionné 

@@ -31,6 +31,11 @@
     <string name="no_account">Keine Konto</string>
     <string name="no_accounts">Keine Sync-Konten. Verwenden Sie das Menü, um ein Konto hinzufügen.</string>
     <string name="no_logs">Keine Logs</string>
+    <string name="no_permissions">
+        PasswdSafe Sync benötigt kontactberechtigung
+        \n\nDrücke Neu Laden um diese neu zu gewähren, wenn dies nicht geht,
+        können Sie die Kontactberechtigung in den App-Einstellungen aktivieren.
+    </string>
     <string name="no_owncloud_accts">
         Kein ownCloud Konten zur Verfügung. Fügen Sie ein Konto in der ownCloud
         App zuerst. Dann kann es für PasswdSafe Sync ausgewählt werden.
