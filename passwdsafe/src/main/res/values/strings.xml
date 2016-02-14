@@ -8,7 +8,6 @@
     <string name="any_changes_will_be_lost">Any changes to the record will be lost.</string>
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">PasswdSafe</string>
-    <string name="app_settings">App Settings</string>
     <string name="at_least">At least</string>
     <string name="basic">Basic</string>
     <string name="cannot_create_file">Cannot create file: %1$s</string>

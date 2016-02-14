@@ -1,6 +1,7 @@
 <resources>
     <string name="about">Über</string>
     <string name="app_name">PasswdSafe LIBRARY</string>
+    <string name="app_settings">App-Einstellungen</string>
     <string name="box">Box</string>
     <string name="build_date">Erstellungsdatum</string>
     <string name="build_id">Erstellungs-ID</string>
