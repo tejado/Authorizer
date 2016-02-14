@@ -11,16 +11,12 @@ import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +27,7 @@ import android.view.View;
 
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.DynamicPermissionMgr;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
@@ -44,7 +41,6 @@ public class FileListActivity extends AppCompatActivity
         implements AboutFragment.Listener,
                    FileListFragment.Listener,
                    FileListNavDrawerFragment.Listener,
-                   View.OnClickListener,
                    PreferencesFragment.Listener,
                    SharedPreferences.OnSharedPreferenceChangeListener,
                    StorageFileListFragment.Listener,
@@ -83,6 +79,7 @@ public class FileListActivity extends AppCompatActivity
     }
 
     private FileListNavDrawerFragment itsNavDrawerFrag;
+    private DynamicPermissionMgr itsPermissionMgr;
     private View itsFiles;
     private View itsSync;
     private View itsNoPermGroup;
@@ -106,10 +103,6 @@ public class FileListActivity extends AppCompatActivity
         itsFiles = findViewById(R.id.files);
         itsSync = findViewById(R.id.sync);
         itsNoPermGroup = findViewById(R.id.no_permission_group);
-        View reloadBtn = findViewById(R.id.reload);
-        reloadBtn.setOnClickListener(this);
-        View appSettingsBtn = findViewById(R.id.app_settings);
-        appSettingsBtn.setOnClickListener(this);
 
         Intent intent = getIntent();
         itsIsCloseOnOpen = intent.getBooleanExtra(INTENT_EXTRA_CLOSE_ON_OPEN,
@@ -120,6 +113,11 @@ public class FileListActivity extends AppCompatActivity
         onSharedPreferenceChanged(prefs,
                                   Preferences.PREF_FILE_LEGACY_FILE_CHOOSER);
 
+        itsPermissionMgr = new DynamicPermissionMgr(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE, this,
+                REQUEST_STORAGE_PERM, REQUEST_APP_SETTINGS,
+                "com.jefftharris.passwdsafe",
+                R.id.reload, R.id.app_settings);
         showFiles(true, savedInstanceState);
         if (itsTitle == null) {
             itsTitle = getTitle();
@@ -191,38 +189,11 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClick(View v)
-    {
-        switch (v.getId()) {
-        case R.id.reload: {
-            showFiles(true, null);
-            break;
-        }
-        case R.id.app_settings: {
-            Intent intent = new Intent(
-                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            intent.setData(Uri.parse("package:com.jefftharris.passwdsafe"));
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(intent, REQUEST_APP_SETTINGS);
-            }
-            break;
-        }
-        }
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data)
     {
-        switch (requestCode) {
-        case REQUEST_APP_SETTINGS: {
-            ApiCompat.recreateActivity(this);
-            System.exit(0);
-            break;
-        }
-        default: {
+        if (!itsPermissionMgr.handleActivityResult(requestCode)) {
             super.onActivityResult(requestCode, resultCode, data);
-        }
         }
     }
 
@@ -231,20 +202,10 @@ public class FileListActivity extends AppCompatActivity
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults)
     {
-        switch (requestCode) {
-        case REQUEST_STORAGE_PERM: {
-            if ((grantResults.length > 0) &&
-                (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                ApiCompat.recreateActivity(this);
-                System.exit(0);
-            }
-            break;
-        }
-        default: {
+        if (!itsPermissionMgr.handlePermissionsResult(requestCode,
+                                                      grantResults)) {
             super.onRequestPermissionsResult(requestCode, permissions,
                                              grantResults);
-            break;
-        }
         }
     }
 
@@ -330,9 +291,7 @@ public class FileListActivity extends AppCompatActivity
     @Override
     public boolean appHasFilePermission()
     {
-        return (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED);
+        return itsPermissionMgr.hasPerms();
     }
 
     @Override
@@ -411,12 +370,7 @@ public class FileListActivity extends AppCompatActivity
             itsTitle = savedState.getCharSequence(STATE_TITLE);
         }
 
-        if (!appHasFilePermission()) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                    REQUEST_STORAGE_PERM);
-        }
+        itsPermissionMgr.checkPerms();
     }
 
     /**
@@ -497,7 +451,7 @@ public class FileListActivity extends AppCompatActivity
         case VIEW_FILES: {
             drawerMode = FileListNavDrawerFragment.Mode.FILES;
             itsTitle = getString(R.string.app_name);
-            hasPermission = appHasFilePermission();
+            hasPermission = itsPermissionMgr.hasPerms();
             break;
         }
         case VIEW_PREFERENCES: {

@@ -17,8 +17,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
-import com.jefftharris.passwdsafe.lib.view.GuiUtils;
-
 /**
  *  The DynamicPermissionMgr class manages dynamic permissions
  */
@@ -29,7 +27,6 @@ public class DynamicPermissionMgr implements View.OnClickListener
     private final int itsPermsRequestCode;
     private final int itsAppSettingsRequestCode;
     private final String itsPackageName;
-    private final View itsNoPermGroup;
     private final View itsReloadBtn;
     private final View itsAppSettingsBtn;
 
@@ -41,7 +38,6 @@ public class DynamicPermissionMgr implements View.OnClickListener
                                 int permsRequestCode,
                                 int appSettingsRequestCode,
                                 String packageName,
-                                int noPermGroupId,
                                 int reloadId,
                                 int appSettingsId)
     {
@@ -51,13 +47,10 @@ public class DynamicPermissionMgr implements View.OnClickListener
         itsAppSettingsRequestCode = appSettingsRequestCode;
         itsPackageName = packageName;
 
-        itsNoPermGroup = act.findViewById(noPermGroupId);
         itsReloadBtn = act.findViewById(reloadId);
         itsReloadBtn.setOnClickListener(this);
         itsAppSettingsBtn = act.findViewById(appSettingsId);
         itsAppSettingsBtn.setOnClickListener(this);
-
-        checkPerms();
     }
 
     /**
@@ -67,6 +60,19 @@ public class DynamicPermissionMgr implements View.OnClickListener
     {
         return ContextCompat.checkSelfPermission(itsActivity, itsPerm) ==
                PackageManager.PERMISSION_GRANTED;
+    }
+
+    /**
+     * Check whether permissions are granted
+     */
+    public boolean checkPerms()
+    {
+        boolean perms = hasPerms();
+        if (!perms) {
+            ActivityCompat.requestPermissions(
+                    itsActivity, new String[] { itsPerm }, itsPermsRequestCode);
+        }
+        return perms;
     }
 
     /**
@@ -112,19 +118,6 @@ public class DynamicPermissionMgr implements View.OnClickListener
                 itsActivity.startActivityForResult(intent,
                                                    itsAppSettingsRequestCode);
             }
-        }
-    }
-
-    /**
-     * Check whether permissions are granted
-     */
-    private void checkPerms()
-    {
-        boolean perms = hasPerms();
-        GuiUtils.setVisible(itsNoPermGroup, !perms);
-        if (!perms) {
-            ActivityCompat.requestPermissions(
-                    itsActivity, new String[] { itsPerm }, itsPermsRequestCode);
         }
     }
 
