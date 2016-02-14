@@ -8,7 +8,6 @@
     <string name="any_changes_will_be_lost">Toutes modifications apportées à l\'entrée seront perdues.</string>
     <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
     <string name="app_name">PasswdSafe</string>
-    <string name="app_settings">Préférences</string>
     <string name="at_least">Au moins</string>
     <string name="basic">"Général"</string>
     <string name="cannot_create_file">Impossible de créer le fichier: %1$s</string>
