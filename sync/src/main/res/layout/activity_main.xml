@@ -13,6 +13,27 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <LinearLayout android:id="@+id/no_permission_group"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical">
+
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="@string/no_permissions"/>
+
+            <Button android:id="@+id/reload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reload"/>
+
+            <Button android:id="@+id/app_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_settings"/>
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/no_accounts_msg"
             android:layout_width="match_parent"

@@ -6,6 +6,7 @@
  */
 package com.jefftharris.passwdsafe.sync;
 
+import android.Manifest;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -42,6 +43,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.DynamicPermissionMgr;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -72,9 +74,12 @@ public class MainActivity extends AppCompatActivity
     private static final int BOX_AUTH_RC = 2;
     private static final int ONEDRIVE_LINK_RC = 3;
     private static final int OWNCLOUD_LINK_RC = 4;
+    private static final int PERMISSIONS_RC = 5;
+    private static final int APP_SETTINGS_RC = 6;
 
     private static final int LOADER_PROVIDERS = 0;
 
+    private DynamicPermissionMgr itsPermissionMgr;
     private Account itsGdriveAccount = null;
     private Uri itsGdriveUri = null;
     private Uri itsDropboxUri = null;
@@ -132,6 +137,12 @@ public class MainActivity extends AppCompatActivity
             Spinner freqSpin = (Spinner)findViewById(id);
             freqSpin.setOnItemSelectedListener(freqSelListener);
         }
+
+        itsPermissionMgr = new DynamicPermissionMgr(
+                Manifest.permission.GET_ACCOUNTS, this,
+                PERMISSIONS_RC, APP_SETTINGS_RC,
+                "com.jefftharris.passwdsafe.sync",
+                R.id.no_permission_group, R.id.reload, R.id.app_settings);
 
         // Check the state of Google Play services
         int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -229,9 +240,23 @@ public class MainActivity extends AppCompatActivity
             break;
         }
         default: {
-            super.onActivityResult(requestCode, resultCode, data);
+            if (!itsPermissionMgr.handleActivityResult(requestCode)) {
+                super.onActivityResult(requestCode, resultCode, data);
+            }
             break;
         }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults)
+    {
+        if (!itsPermissionMgr.handlePermissionsResult(requestCode,
+                                                      grantResults)) {
+            super.onRequestPermissionsResult(requestCode, permissions,
+                                             grantResults);
         }
     }
 
@@ -253,6 +278,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
+        MenuItem item = menu.findItem(R.id.menu_add);
+        item.setEnabled(itsPermissionMgr.hasPerms());
+
         setProviderMenuEnabled(menu, R.id.menu_add_box, itsBoxUri);
         setProviderMenuEnabled(menu, R.id.menu_add_dropbox, itsDropboxUri);
         setProviderMenuEnabled(menu, R.id.menu_add_google_drive, itsGdriveUri);
