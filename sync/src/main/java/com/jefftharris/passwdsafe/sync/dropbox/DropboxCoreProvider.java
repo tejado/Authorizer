@@ -323,6 +323,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         if (migrate) {
             PasswdSafeUtil.dbginfo(TAG, "doMigration");
             SharedPreferences.Editor editor = prefs.edit();
+            boolean didMigrate = false;
 
             try {
                 Context appctx = getContext().getApplicationContext();
@@ -337,6 +338,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
                         String userId = acct.getString("userId");
                         PasswdSafeUtil.dbginfo(TAG, "migrate user: %s", userId);
                         editor.putString(PREF_USER_ID, userId);
+                        didMigrate = true;
                     }
                 }
             } catch (Exception e) {
@@ -354,6 +356,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
                         continue;
                     }
 
+                    didMigrate = true;
                     String dirpfx = "/Apps/PasswdSafe Sync";
                     for (DbFile dbfile: SyncDb.getFiles(provider.itsId, db)) {
                         SyncDb.updateRemoteFile(
@@ -371,8 +374,10 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
                 syncDb.release();
             }
 
-            NotifUtils.showNotif(NotifUtils.Type.DROPBOX_MIGRATED,
-                                 getContext());
+            if (didMigrate) {
+                NotifUtils.showNotif(NotifUtils.Type.DROPBOX_MIGRATED,
+                                     getContext());
+            }
         }
     }
 }
