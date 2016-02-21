@@ -9,20 +9,30 @@ package com.jefftharris.passwdsafe.sync.gdriveplay;
 import java.io.File;
 
 import android.accounts.Account;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.util.Pair;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableNotifiedException;
-import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.sync.SyncAdapter;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
@@ -33,12 +43,19 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
  * The GDrivePlayProvider class encapsulates a sync provider for Google Drive
  * using the Google Play service.
  */
-public class GDrivePlayProvider implements Provider
+public class GDrivePlayProvider
+        implements Provider,
+                   GoogleApiClient.ConnectionCallbacks,
+                   GoogleApiClient.OnConnectionFailedListener
 {
     private static final String TAG = "GDrivePlayProvider";
 
+    private static final String PREF_ACCOUNT_NAME = "gdrivePlayAccountName";
+
     private final Context itsContext;
     private AccountLinker itsAcctLinker;
+    private GoogleApiClient itsClient;
+    private boolean itsIsPendingAdd = false;
 
     /** Constructor */
     public GDrivePlayProvider(Context ctx)
@@ -53,6 +70,7 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void init()
     {
+        updateAcct();
     }
 
     /* (non-Javadoc)
@@ -61,6 +79,9 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void fini()
     {
+        if ((itsClient != null) && itsClient.isConnected()) {
+            itsClient.disconnect();
+        }
     }
 
     /* (non-Javadoc)
@@ -87,13 +108,40 @@ public class GDrivePlayProvider implements Provider
         if (itsAcctLinker == null) {
             return null;
         }
-        Pair<Boolean, NewAccountTask> rc = itsAcctLinker.handleActivityResult(
-                activityResult, activityData, providerAcctUri);
+        Pair<Boolean, String> rc = itsAcctLinker.handleActivityResult(
+                activityResult, activityData);
         if (rc.first) {
             itsAcctLinker.disconnect();
             itsAcctLinker = null;
+
+            setAcctName(rc.second);
+            updateAcct();
+
+            if (rc.second == null) {
+                return null;
+            }
+
+            // TODO play: use updated play services and acct id for unique value
+            // with name as display name
+            return new NewAccountTask(providerAcctUri, rc.second,
+                                      ProviderType.GDRIVE_PLAY,
+                                      false, itsContext)
+            {
+                @Override
+                protected void doAccountUpdate(ContentResolver cr)
+                {
+                    itsIsPendingAdd = true;
+                    try {
+                        super.doAccountUpdate(cr);
+                    } finally {
+                        itsIsPendingAdd = false;
+                    }
+
+                }
+            };
+        } else {
+            return null;
         }
-        return rc.second;
     }
 
     /* (non-Javadoc)
@@ -110,7 +158,7 @@ public class GDrivePlayProvider implements Provider
     @Override
     public boolean isAccountAuthorized()
     {
-        return false;
+        return (itsClient != null) && itsClient.isConnected();
     }
 
     /* (non-Javadoc)
@@ -136,20 +184,25 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void cleanupOnDelete(String acctName) throws Exception
     {
-        // TODO play: cleanup unlinkAccount vs. cleanupOnDelete
-        String scope = "oauth2:" + Scopes.DRIVE_FILE;
+        if (itsIsPendingAdd) {
+            return;
+        }
+
+        Account acct = getAccount(acctName);
+        setAcctName(null);
+        updateAcct();
+
+        String scope = "oauth2:" + Drive.SCOPE_FILE;
         try {
             String token = GoogleAuthUtil.getTokenWithNotification(
-                    itsContext, acctName, scope, null);
+                    itsContext, acct, scope, null);
             PasswdSafeUtil.dbginfo(TAG, "Remove token for %s, scope: %s",
                                    acctName, scope);
             if (token != null) {
-                GoogleAuthUtil.invalidateToken(itsContext, token);
+                GoogleAuthUtil.clearToken(itsContext, token);
             }
-
-            // TODO play: plus.Account.revokeAccessAndDisconnect(client)
         } catch (UserRecoverableNotifiedException e) {
-            throw e;
+            Log.e(TAG, "Recoverable error", e);
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s, scope: %s",
                                    acctName, scope);
@@ -162,7 +215,22 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void updateSyncFreq(Account acct, int freq)
     {
-        // TODO play: implement updateSyncFreq
+        PasswdSafeUtil.dbginfo(TAG, "updateSyncFreq acct %s, freq %d",
+                               acct, freq);
+        if (acct != null) {
+            ContentResolver.removePeriodicSync(acct,
+                                               PasswdSafeContract.AUTHORITY,
+                                               new Bundle());
+            ContentResolver.setSyncAutomatically(
+                    acct, PasswdSafeContract.AUTHORITY, false);
+            if (freq > 0) {
+                ContentResolver.setSyncAutomatically(
+                        acct, PasswdSafeContract.AUTHORITY, true);
+                ContentResolver.addPeriodicSync(acct,
+                                                PasswdSafeContract.AUTHORITY,
+                                                new Bundle(), freq);
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -171,7 +239,12 @@ public class GDrivePlayProvider implements Provider
     @Override
     public void requestSync(boolean manual)
     {
-        // TODO play: implement requestSync
+        PasswdSafeUtil.dbginfo(TAG, "requestSync manual %b", manual);
+        Account acct = getAccount(getAcctName());
+        Bundle extras = new Bundle();
+        extras.putBoolean(SyncAdapter.SYNC_EXTRAS_FULL, true);
+        ApiCompat.requestManualSync(acct, PasswdSafeContract.CONTENT_URI,
+                                    extras);
     }
 
     /* (non-Javadoc)
@@ -184,6 +257,7 @@ public class GDrivePlayProvider implements Provider
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {
+        PasswdSafeUtil.dbginfo(TAG, "sync");
         // TODO play: implement sync
     }
 
@@ -226,13 +300,72 @@ public class GDrivePlayProvider implements Provider
             GoogleApiClient.ConnectionCallbacks connCbs,
             GoogleApiClient.OnConnectionFailedListener connFailedListener)
     {
-        GoogleApiClient.Builder builder =
-                new GoogleApiClient.Builder(ctx)
+        GoogleApiClient.Builder builder = new GoogleApiClient.Builder(ctx)
                 .addApi(Drive.API)
                 .addScope(Drive.SCOPE_FILE)
                 .setAccountName(acctName)
                 .addConnectionCallbacks(connCbs)
                 .addOnConnectionFailedListener(connFailedListener);
         return builder.build();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "onConnected: %s", bundle);
+        notifyProviderChange();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "onConnectionSuspended %d", i);
+        notifyProviderChange();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "onConnectionFailed %s", connectionResult);
+        notifyProviderChange();
+    }
+
+    private void notifyProviderChange()
+    {
+        ContentResolver cr = itsContext.getContentResolver();
+        cr.notifyChange(PasswdSafeContract.Providers.CONTENT_URI, null);
+    }
+
+    private synchronized String getAcctName()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(itsContext);
+        return prefs.getString(PREF_ACCOUNT_NAME, null);
+    }
+
+    private synchronized void setAcctName(String acctName)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "setAcctName %s", acctName);
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(itsContext);
+        prefs.edit().putString(PREF_ACCOUNT_NAME, acctName).apply();
+    }
+
+    private synchronized void updateAcct()
+    {
+        String acctName = getAcctName();
+        if (acctName != null) {
+            if ((itsClient == null) ||
+                (!itsClient.isConnected() && !itsClient.isConnecting())) {
+                itsClient = createClient(itsContext, acctName, this, this);
+                itsClient.connect();
+            }
+        } else {
+            if ((itsClient != null) &&
+                (itsClient.isConnected() || itsClient.isConnecting())) {
+                itsClient.disconnect();
+                itsClient = null;
+            }
+        }
     }
 }
