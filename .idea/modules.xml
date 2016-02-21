@@ -8,7 +8,6 @@
       <module fileurl="file://$PROJECT_DIR$/lib-box/lib-box.iml" filepath="$PROJECT_DIR$/lib-box/lib-box.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib-onedrive/lib-onedrive.iml" filepath="$PROJECT_DIR$/lib-onedrive/lib-onedrive.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib-owncloud/lib-owncloud.iml" filepath="$PROJECT_DIR$/lib-owncloud/lib-owncloud.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lib-play/lib-play.iml" filepath="$PROJECT_DIR$/lib-play/lib-play.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib-onedrive/onedriveaccess/onedriveaccess.iml" filepath="$PROJECT_DIR$/lib-onedrive/onedriveaccess/onedriveaccess.iml" />
       <module fileurl="file://$PROJECT_DIR$/passwdsafe/passwdsafe.iml" filepath="$PROJECT_DIR$/passwdsafe/passwdsafe.iml" />
       <module fileurl="file://$PROJECT_DIR$/sync/sync.iml" filepath="$PROJECT_DIR$/sync/sync.iml" />

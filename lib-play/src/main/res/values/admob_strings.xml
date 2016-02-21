@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="store_picture_title" tools:ignore="MissingTranslation">Save image</string>
-    <string name="store_picture_message" tools:ignore="MissingTranslation">"Allow Ad to store image in Picture gallery?"</string>
-    <string name="accept" tools:ignore="MissingTranslation">Accept</string>
-    <string name="decline" tools:ignore="MissingTranslation">Decline</string>
-    <string name="create_calendar_title" tools:ignore="MissingTranslation">Create calendar event</string>
-    <string name="create_calendar_message" tools:ignore="MissingTranslation">Allow Ad to create a calendar event?</string>
-</resources>
