@@ -48,7 +48,7 @@ public class SyncHelper
             ProviderType providerType;
             switch (acct.type) {
             case SyncDb.GDRIVE_ACCOUNT_TYPE: {
-                providerType = ProviderType.GDRIVE;
+                providerType = ProviderType.GDRIVE_PLAY;
                 break;
             }
             case SyncDb.DROPBOX_ACCOUNT_TYPE: {
