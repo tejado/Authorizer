@@ -35,8 +35,6 @@ import android.os.ParcelFileDescriptor;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
-import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -685,6 +683,7 @@ public class PasswdSafeProvider extends ContentProvider
                 switch (provider.itsType) {
                 case DROPBOX:
                 case BOX:
+                case GDRIVE_PLAY:
                 case ONEDRIVE:
                 case OWNCLOUD: {
                     Provider providerImpl =
@@ -694,17 +693,6 @@ public class PasswdSafeProvider extends ContentProvider
                     break;
                 }
                 case GDRIVE: {
-                    GoogleAccountManager acctMgr =
-                            new GoogleAccountManager(getContext());
-                    Account acct = acctMgr.getAccountByName(provider.itsAcct);
-                    Uri uri = ContentUris.withAppendedId(
-                            PasswdSafeContract.Providers.CONTENT_URI,
-                            provider.itsId);
-                    ApiCompat.requestManualSync(acct, uri, null);
-                    break;
-                }
-                case GDRIVE_PLAY: {
-                    // TODO play: handle manual sync
                     break;
                 }
                 }

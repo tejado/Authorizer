@@ -7,11 +7,9 @@
 package com.jefftharris.passwdsafe.sync;
 
 import android.Manifest;
-import android.accounts.Account;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -37,12 +35,9 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
-import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.DynamicPermissionMgr;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -53,7 +48,6 @@ import com.jefftharris.passwdsafe.sync.dropbox.DropboxFilesActivity;
 import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
-import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.onedrive.OnedriveFilesActivity;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudEditDialog;
 import com.jefftharris.passwdsafe.sync.owncloud.OwncloudFilesActivity;
@@ -69,19 +63,19 @@ public class MainActivity extends AppCompatActivity
 {
     private static final String TAG = "MainActivity";
 
-    private static final int CHOOSE_ACCOUNT_RC = 0;
     private static final int DROPBOX_LINK_RC = 1;
     private static final int BOX_AUTH_RC = 2;
     private static final int ONEDRIVE_LINK_RC = 3;
     private static final int OWNCLOUD_LINK_RC = 4;
     private static final int PERMISSIONS_RC = 5;
     private static final int APP_SETTINGS_RC = 6;
+    private static final int GDRIVE_PLAY_LINK_RC = 7;
+    private static final int GDRIVE_PLAY_SERVICES_ERROR_RC = 8;
 
     private static final int LOADER_PROVIDERS = 0;
 
     private DynamicPermissionMgr itsPermissionMgr;
-    private Account itsGdriveAccount = null;
-    private Uri itsGdriveUri = null;
+    private Uri itsGDrivePlayUri = null;
     private Uri itsDropboxUri = null;
     private boolean itsDropboxPendingAcctLink = false;
     private Uri itsBoxUri = null;
@@ -147,10 +141,11 @@ public class MainActivity extends AppCompatActivity
         GuiUtils.setVisible(noPermGroup, !itsPermissionMgr.checkPerms());
 
         // Check the state of Google Play services
-        int rc = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        GoogleApiAvailability googleApi = GoogleApiAvailability.getInstance();
+        int rc = googleApi.isGooglePlayServicesAvailable(this);
         if (rc != ConnectionResult.SUCCESS) {
-            Dialog dlg = GooglePlayServicesUtil.getErrorDialog(rc, this, 0);
-            dlg.show();
+            googleApi.showErrorDialogFragment(this, rc,
+                                              GDRIVE_PLAY_SERVICES_ERROR_RC);
         }
 
         updateGdriveAccount(null);
@@ -225,11 +220,6 @@ public class MainActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         switch (requestCode) {
-        case CHOOSE_ACCOUNT_RC:
-            itsNewAccountTask =
-                    getGdriveProvider().finishAccountLink(resultCode, data,
-                                                          itsGdriveUri);
-            break;
         case BOX_AUTH_RC: {
             itsNewAccountTask =
                     getBoxProvider().finishAccountLink(resultCode, data,
@@ -239,6 +229,14 @@ public class MainActivity extends AppCompatActivity
         case OWNCLOUD_LINK_RC: {
             itsNewAccountTask = getOwncloudProvider().finishAccountLink(
                     resultCode, data, itsOwncloudUri);
+            break;
+        }
+        case GDRIVE_PLAY_LINK_RC: {
+            itsNewAccountTask = getGDrivePlayProvider().finishAccountLink(
+                    resultCode, data, itsGDrivePlayUri);
+            break;
+        }
+        case GDRIVE_PLAY_SERVICES_ERROR_RC: {
             break;
         }
         default: {
@@ -285,7 +283,8 @@ public class MainActivity extends AppCompatActivity
 
         setProviderMenuEnabled(menu, R.id.menu_add_box, itsBoxUri);
         setProviderMenuEnabled(menu, R.id.menu_add_dropbox, itsDropboxUri);
-        setProviderMenuEnabled(menu, R.id.menu_add_google_drive, itsGdriveUri);
+        setProviderMenuEnabled(menu, R.id.menu_add_google_drive,
+                               itsGDrivePlayUri);
         setProviderMenuEnabled(menu, R.id.menu_add_onedrive, itsOnedriveUri);
         setProviderMenuEnabled(menu, R.id.menu_add_owncloud, itsOwncloudUri);
         return super.onPrepareOptionsMenu(menu);
@@ -296,8 +295,9 @@ public class MainActivity extends AppCompatActivity
     {
         switch (item.getItemId()) {
         case R.id.menu_about: {
-            String extraLicenses =
-                GooglePlayServicesUtil.getOpenSourceSoftwareLicenseInfo(this);
+            String extraLicenses = GoogleApiAvailability
+                    .getInstance()
+                    .getOpenSourceSoftwareLicenseInfo(this);
             AboutDialog dlg = AboutDialog.newInstance(extraLicenses);
             dlg.show(getSupportFragmentManager(), "AboutDialog");
             return true;
@@ -343,51 +343,46 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    /** Handler to choose a GDrive account */
+    /** Handler to choose a Google Drive account */
     private void onGdriveChoose()
     {
-        Intent intent = AccountPicker.newChooseAccountIntent(
-                itsGdriveAccount, null,
-                new String[]{SyncDb.GDRIVE_ACCOUNT_TYPE},
-                true, null, null, null, null);
+        Provider driveProvider = getGDrivePlayProvider();
         try {
-            startActivityForResult(intent, CHOOSE_ACCOUNT_RC);
-        } catch (ActivityNotFoundException e) {
-            String msg = getString(R.string.google_acct_not_available);
-            Log.e(TAG, msg, e);
-            PasswdSafeUtil.showErrorMsg(msg, this);
+            driveProvider.startAccountLink(this, GDRIVE_PLAY_LINK_RC);
+        } catch (Exception e) {
+            Log.e(TAG, "onGDrivePlayChoose failed", e);
+            driveProvider.unlinkAccount();
         }
     }
 
 
-    /** Button onClick handler to sync a GDrive account */
+    /** Button onClick handler to sync a Google Drive account */
     @SuppressWarnings({"UnusedParameters", "unused"})
     public void onGdriveSync(View view)
     {
-        if (itsGdriveAccount != null) {
-            Bundle extras = new Bundle();
-            extras.putBoolean(SyncAdapter.SYNC_EXTRAS_FULL, true);
-            ApiCompat.requestManualSync(itsGdriveAccount,
-                                        PasswdSafeContract.CONTENT_URI,
-                                        extras);
+        Provider driveProvider = getGDrivePlayProvider();
+        if (driveProvider.isAccountAuthorized()) {
+            driveProvider.requestSync(true);
+        } else {
+            onGdriveChoose();
         }
     }
 
 
-    /** Button onClick handler to clear a GDrive account */
+    /** Button onClick handler to clear a Google Drive account */
     @SuppressWarnings({"UnusedParameters", "unused"})
     public void onGdriveClear(View view)
     {
-        DialogFragment prompt = ClearPromptDlg.newInstance(itsGdriveUri);
+        DialogFragment prompt = ClearPromptDlg.newInstance(itsGDrivePlayUri);
         prompt.show(getSupportFragmentManager(), null);
     }
 
 
-    /** GDrive sync frequency spinner changed */
+    /** Google Drive sync frequency spinner changed */
     private void onGdriveFreqChanged(int pos)
     {
         ProviderSyncFreqPref freq = ProviderSyncFreqPref.displayValueOf(pos);
-        updateSyncFreq(freq, itsGdriveUri);
+        updateSyncFreq(freq, itsGDrivePlayUri);
     }
 
     /** Handler to choose a Dropbox account */
@@ -610,9 +605,6 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
-     */
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args)
     {
@@ -621,9 +613,6 @@ public class MainActivity extends AppCompatActivity
                                 null, null, null);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoadFinished(android.support.v4.content.Loader, java.lang.Object)
-     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor)
     {
@@ -639,9 +628,7 @@ public class MainActivity extends AppCompatActivity
             try {
                 ProviderType type = ProviderType.valueOf(typeStr);
                 switch (type) {
-                case GDRIVE_PLAY: {
-                    break;
-                }
+                case GDRIVE_PLAY:
                 case GDRIVE: {
                     hasGdrive = true;
                     updateGdriveAccount(cursor);
@@ -695,9 +682,6 @@ public class MainActivity extends AppCompatActivity
         GuiUtils.invalidateOptionsMenu(this);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoaderReset(android.support.v4.content.Loader)
-     */
     @Override
     public void onLoaderReset(Loader<Cursor> loader)
     {
@@ -710,10 +694,6 @@ public class MainActivity extends AppCompatActivity
         GuiUtils.invalidateOptionsMenu(this);
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.SyncApp.SyncUpdateHandler#updateGDriveState(com.jefftharris.passwdsafe.sync.SyncApp.SyncUpdateHandler.GDriveState)
-     */
     @Override
     public void updateGDriveState(GDriveState state)
     {
@@ -754,7 +734,7 @@ public class MainActivity extends AppCompatActivity
         itsUpdateTasks.remove(task);
     }
 
-    /** Update the UI when the GDrive account is changed */
+    /** Update the UI when the Google Drive account is changed */
     private void updateGdriveAccount(Cursor cursor)
     {
         boolean haveCursor = (cursor != null);
@@ -768,31 +748,21 @@ public class MainActivity extends AppCompatActivity
                     PasswdSafeContract.Providers.PROJECTION_IDX_SYNC_FREQ);
             ProviderSyncFreqPref freq =
                     ProviderSyncFreqPref.freqValueOf(freqVal);
-            GoogleAccountManager acctMgr = new GoogleAccountManager(this);
-            itsGdriveAccount = acctMgr.getAccountByName(acct);
-            itsGdriveUri = ContentUris.withAppendedId(
+            itsGDrivePlayUri = ContentUris.withAppendedId(
                     PasswdSafeContract.Providers.CONTENT_URI, id);
+
+            TextView acctView = (TextView)findViewById(R.id.gdrive_acct);
+            acctView.setText(acct);
 
             View freqSpinLabel = findViewById(R.id.gdrive_interval_label);
             Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
             freqSpin.setSelection(freq.getDisplayIdx());
-            View syncBtn = findViewById(R.id.gdrive_sync);
+            freqSpin.setEnabled(true);
+            freqSpinLabel.setEnabled(true);
 
-            TextView acctView = (TextView)findViewById(R.id.gdrive_acct);
-            boolean haveAccount = (itsGdriveAccount != null);
-            if (haveAccount) {
-                acctView.setText(itsGdriveAccount.name);
-            } else {
-                acctView.setText(getString(R.string.account_not_exists_label,
-                                           acct));
-            }
-
-            freqSpin.setEnabled(haveAccount);
-            freqSpinLabel.setEnabled(haveAccount);
-            syncBtn.setEnabled(haveAccount);
+            // TODO play: update account warning
         } else {
-            itsGdriveAccount = null;
-            itsGdriveUri = null;
+            itsGDrivePlayUri = null;
         }
     }
 
@@ -963,9 +933,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     /** Get the Google Drive provider */
-    private Provider getGdriveProvider()
+    private Provider getGDrivePlayProvider()
     {
-        return ProviderFactory.getProvider(ProviderType.GDRIVE, this);
+        return ProviderFactory.getProvider(ProviderType.GDRIVE_PLAY, this);
     }
 
     /** Get the Dropbox provider */
