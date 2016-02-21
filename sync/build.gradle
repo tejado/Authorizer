@@ -50,9 +50,9 @@ dependencies {
     releaseCompile project(path: ':lib', configuration: 'release')
     compile project(':lib-box')
     compile project(':lib-owncloud')
-    compile project(':lib-play')
     compile project(':lib-onedrive:authenticate')
     compile project(':lib-onedrive:onedriveaccess')
     compile project(':lib-onedrive')
-    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.google.android.gms:play-services-auth:8.4.0'
+    compile 'com.google.android.gms:play-services-drive:8.4.0'
 }
