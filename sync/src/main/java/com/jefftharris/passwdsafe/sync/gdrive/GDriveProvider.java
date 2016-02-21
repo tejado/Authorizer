@@ -19,8 +19,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+//import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
+//import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -122,8 +122,9 @@ public class GDriveProvider extends AbstractProvider
     @Override
     public Account getAccount(String acctName)
     {
-        GoogleAccountManager acctMgr = new GoogleAccountManager(itsContext);
-        return acctMgr.getAccountByName(acctName);
+//        GoogleAccountManager acctMgr = new GoogleAccountManager(itsContext);
+//        return acctMgr.getAccountByName(acctName);
+        return null;
     }
 
 
@@ -139,19 +140,19 @@ public class GDriveProvider extends AbstractProvider
     @Override
     public void cleanupOnDelete(String acctName)
     {
-        GDriveSyncer.reset();
-        try {
-            GoogleAccountCredential credential =
-                    GDriveSyncer.getAcctCredential(itsContext);
-            String token = GoogleAuthUtil.getToken(itsContext, acctName,
-                                                   credential.getScope());
-            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s", acctName);
-            if (token != null) {
-                GoogleAuthUtil.invalidateToken(itsContext, token);
-            }
-        } catch (Exception e) {
-            PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s", acctName);
-        }
+//        GDriveSyncer.reset();
+//        try {
+//            GoogleAccountCredential credential =
+//                    GDriveSyncer.getAcctCredential(itsContext);
+//            String token = GoogleAuthUtil.getToken(itsContext, acctName,
+//                                                   credential.getScope());
+//            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s", acctName);
+//            if (token != null) {
+//                GoogleAuthUtil.invalidateToken(itsContext, token);
+//            }
+//        } catch (Exception e) {
+//            PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s", acctName);
+//        }
     }
 
 
@@ -191,14 +192,14 @@ public class GDriveProvider extends AbstractProvider
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {
-        GDriveSyncer sync = new GDriveSyncer(acct, provider, db,
-                                             full, logrec, itsContext);
-        SyncUpdateHandler.GDriveState syncState =
-                SyncUpdateHandler.GDriveState.OK;
-        try {
-            syncState = sync.sync();
-        } finally {
-            SyncApp.get(itsContext).updateGDriveSyncState(syncState);
-        }
+//        GDriveSyncer sync = new GDriveSyncer(acct, provider, db,
+//                                             full, logrec, itsContext);
+//        SyncUpdateHandler.GDriveState syncState =
+//                SyncUpdateHandler.GDriveState.OK;
+//        try {
+//            syncState = sync.sync();
+//        } finally {
+//            SyncApp.get(itsContext).updateGDriveSyncState(syncState);
+//        }
     }
 }
