@@ -680,22 +680,9 @@ public class PasswdSafeProvider extends ContentProvider
             }
 
             for (DbProvider provider: providers) {
-                switch (provider.itsType) {
-                case DROPBOX:
-                case BOX:
-                case GDRIVE_PLAY:
-                case ONEDRIVE:
-                case OWNCLOUD: {
-                    Provider providerImpl =
-                            ProviderFactory.getProvider(provider.itsType,
-                                                        getContext());
-                    providerImpl.requestSync(true);
-                    break;
-                }
-                case GDRIVE: {
-                    break;
-                }
-                }
+                Provider providerImpl = ProviderFactory.getProvider(
+                        provider.itsType, getContext());
+                providerImpl.requestSync(true);
             }
         } else {
             throw new IllegalArgumentException("Unknown method: " + name);
