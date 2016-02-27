@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="com.jefftharris.passwdsafe.client.provider.permission.ACCESS"/>
     <uses-permission android:name="com.jefftharris.passwdsafe.sync.provider.permission.ACCESS"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <application
         android:name=".SyncApp"
@@ -27,6 +28,10 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:ignore="UnusedAttribute">
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
 
         <activity
             android:name=".MainActivity"

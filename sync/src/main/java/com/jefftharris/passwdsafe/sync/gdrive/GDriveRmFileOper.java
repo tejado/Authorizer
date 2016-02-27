@@ -10,30 +10,32 @@ import java.io.IOException;
 
 import android.content.Context;
 
-//import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 
 /**
  * A Google Drive sync operation to remove a file
  */
-public class GDriveRmFileOper //extends AbstractRmSyncOper<Drive>
+public class GDriveRmFileOper extends AbstractRmSyncOper<Drive>
 {
-//    private static final String TAG = "GDriveRmFileOper";
-//
-//    /** Constructor */
-//    public GDriveRmFileOper(DbFile file)
-//    {
-//        super(file, TAG);
-//    }
-//
-//    /* (non-Javadoc)
-//     * @see com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper#doRemoteRemove(java.lang.Object, android.content.Context)
-//     */
-//    @Override
-//    protected void doRemoteRemove(Drive providerClient, Context ctx)
-//            throws IOException
-//    {
-//        providerClient.files().trash(itsFile.itsRemoteId).execute();
-//    }
+    private static final String TAG = "GDriveRmFileOper";
+
+    /** Constructor */
+    public GDriveRmFileOper(DbFile file)
+    {
+        super(file, TAG);
+    }
+
+    @Override
+    protected void doRemoteRemove(Drive providerClient, Context ctx)
+            throws IOException
+    {
+        File updatedFile = new File();
+        updatedFile.setTrashed(true);
+        providerClient.files()
+                      .update(itsFile.itsRemoteId, updatedFile)
+                      .execute();
+    }
 }
