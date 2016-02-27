@@ -187,8 +187,7 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
             throws SQLException, IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "Perform full sync");
-        About about = itsDrive.about().get()
-                .setFields(GDriveProvider.ABOUT_FIELDS).execute();
+        syncDisplayName();
         long largestChangeId = -1;//= about.getLargestChangeId();
 
         HashMap<String, File> allRemFiles = new HashMap<>();
@@ -223,6 +222,24 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
         return new Pair<>(largestChangeId, opers);
     }
 
+    /**
+     * Sync account display name
+     */
+    private void syncDisplayName() throws IOException
+    {
+        About about = itsDrive.about().get()
+                              .setFields(GDriveProvider.ABOUT_FIELDS)
+                              .execute();
+        String displayName = null;
+        if (about.getUser() != null) {
+            displayName = about.getUser().getDisplayName();
+        }
+        PasswdSafeUtil.dbginfo(TAG, "user %s", displayName);
+        if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
+            SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
+                                             itsDb);
+        }
+    }
 
     /** Perform a sync of files since the given change id */
     private Pair<Long, List<AbstractSyncOper<Drive>>>
