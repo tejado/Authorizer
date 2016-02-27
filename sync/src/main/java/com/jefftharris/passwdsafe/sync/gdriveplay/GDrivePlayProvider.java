@@ -27,7 +27,12 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableNotifiedException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveFolder;
+import com.google.android.gms.drive.Metadata;
+import com.google.android.gms.drive.MetadataBuffer;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -258,6 +263,9 @@ public class GDrivePlayProvider
                      SyncLogRecord logrec) throws Exception
     {
         PasswdSafeUtil.dbginfo(TAG, "sync");
+        GDrivePlaySyncer sync = new GDrivePlaySyncer(acct.name, provider, db,
+                                                     logrec, itsContext);
+        sync.sync();
         // TODO play: implement sync
     }
 
@@ -303,9 +311,13 @@ public class GDrivePlayProvider
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(ctx)
                 .addApi(Drive.API)
                 .addScope(Drive.SCOPE_FILE)
-                .setAccountName(acctName)
-                .addConnectionCallbacks(connCbs)
-                .addOnConnectionFailedListener(connFailedListener);
+                .setAccountName(acctName);
+        if (connCbs != null) {
+            builder.addConnectionCallbacks(connCbs);
+        }
+        if (connFailedListener != null) {
+            builder.addOnConnectionFailedListener(connFailedListener);
+        }
         return builder.build();
     }
 
@@ -314,6 +326,33 @@ public class GDrivePlayProvider
     {
         PasswdSafeUtil.dbginfo(TAG, "onConnected: %s", bundle);
         notifyProviderChange();
+
+        DriveFolder root = Drive.DriveApi.getRootFolder(itsClient);
+        root.listChildren(itsClient).setResultCallback(
+                new ResultCallback<DriveApi.MetadataBufferResult>()
+                {
+                    @Override
+                    public void onResult(
+                            @NonNull DriveApi.MetadataBufferResult result)
+                    {
+                        try {
+                            MetadataBuffer buf = result.getMetadataBuffer();
+                            if (buf != null) {
+                                try {
+                                    PasswdSafeUtil.dbginfo(TAG, "root count: %d",
+                                                           buf.getCount());
+                                    for (Metadata meta: buf) {
+                                        PasswdSafeUtil.dbginfo(TAG, "root item: %s", meta);
+                                    }
+                                } finally {
+                                    buf.release();
+                                }
+                            }
+                        } finally {
+                            result.release();
+                        }
+                    }
+                });
     }
 
     @Override
