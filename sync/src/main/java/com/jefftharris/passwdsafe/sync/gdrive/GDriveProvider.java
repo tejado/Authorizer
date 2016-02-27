@@ -8,22 +8,29 @@ package com.jefftharris.passwdsafe.sync.gdrive;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
-//import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
-//import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.android.gms.common.AccountPicker;
+import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
+import com.jefftharris.passwdsafe.sync.R;
+import com.jefftharris.passwdsafe.sync.SyncAdapter;
 import com.jefftharris.passwdsafe.sync.SyncApp;
 import com.jefftharris.passwdsafe.sync.SyncUpdateHandler;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProvider;
@@ -36,16 +43,19 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
  */
 public class GDriveProvider extends AbstractProvider
 {
-    public static final String ABOUT_FIELDS = "largestChangeId";
+    public static final String ABOUT_FIELDS = "user";
     public static final String FILE_FIELDS =
-            "id,title,mimeType,labels(trashed),fileExtension,modifiedDate," +
-            "downloadUrl,md5Checksum,parents(id,isRoot)";
+            "id,name,mimeType,trashed,fileExtension,modifiedTime," +
+            "md5Checksum,parents";
     public static final String FOLDER_MIME =
             "application/vnd.google-apps.folder";
+
+    private static final String PREF_ACCOUNT_NAME = "gdriveAccountName";
 
     private static final String TAG = "GDriveProvider";
 
     private final Context itsContext;
+    private String itsAccountName;
 
 
     /** Constructor */
@@ -55,17 +65,14 @@ public class GDriveProvider extends AbstractProvider
     }
 
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#init()
-     */
+    @Override
     public void init()
     {
+        updateAcct();
     }
 
 
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#fini()
-     */
+    @Override
     public void fini()
     {
     }
@@ -76,6 +83,18 @@ public class GDriveProvider extends AbstractProvider
      */
     public void startAccountLink(FragmentActivity activity, int requestCode)
     {
+        Intent intent = AccountPicker.newChooseAccountIntent(
+                null, null,
+                new String[] { GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE },
+                true, null, null, null, null);
+        try {
+            activity.startActivityForResult(intent, requestCode);
+        } catch (ActivityNotFoundException e) {
+            String msg = itsContext.getString(
+                    R.string.google_acct_not_available);
+            Log.e(TAG, msg, e);
+            PasswdSafeUtil.showErrorMsg(msg, activity);
+        }
     }
 
 
@@ -96,6 +115,9 @@ public class GDriveProvider extends AbstractProvider
         if (TextUtils.isEmpty(accountName)) {
             return null;
         }
+
+        setAcctName(accountName);
+        updateAcct();
         return new NewAccountTask(acctProviderUri, accountName,
                                   ProviderType.GDRIVE, false, itsContext);
     }
@@ -114,7 +136,7 @@ public class GDriveProvider extends AbstractProvider
      */
     public boolean isAccountAuthorized()
     {
-        return false;
+        return !TextUtils.isEmpty(itsAccountName);
     }
 
 
@@ -122,9 +144,8 @@ public class GDriveProvider extends AbstractProvider
     @Override
     public Account getAccount(String acctName)
     {
-//        GoogleAccountManager acctMgr = new GoogleAccountManager(itsContext);
-//        return acctMgr.getAccountByName(acctName);
-        return null;
+        GoogleAccountManager acctMgr = new GoogleAccountManager(itsContext);
+        return acctMgr.getAccountByName(acctName);
     }
 
 
@@ -140,19 +161,22 @@ public class GDriveProvider extends AbstractProvider
     @Override
     public void cleanupOnDelete(String acctName)
     {
-//        GDriveSyncer.reset();
-//        try {
-//            GoogleAccountCredential credential =
-//                    GDriveSyncer.getAcctCredential(itsContext);
-//            String token = GoogleAuthUtil.getToken(itsContext, acctName,
-//                                                   credential.getScope());
-//            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s", acctName);
-//            if (token != null) {
-//                GoogleAuthUtil.invalidateToken(itsContext, token);
-//            }
-//        } catch (Exception e) {
-//            PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s", acctName);
-//        }
+        Account acct = getAccount(acctName);
+        setAcctName(null);
+        updateAcct();
+        GDriveSyncer.reset();
+        try {
+            GoogleAccountCredential credential =
+                    GDriveSyncer.getAcctCredential(itsContext);
+            String token = GoogleAuthUtil.getTokenWithNotification(
+                    itsContext, acct, credential.getScope(), null);
+            PasswdSafeUtil.dbginfo(TAG, "Remove token for %s", acctName);
+            if (token != null) {
+                GoogleAuthUtil.clearToken(itsContext, token);
+            }
+        } catch (Exception e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "No auth token for %s", acctName);
+        }
     }
 
 
@@ -182,6 +206,14 @@ public class GDriveProvider extends AbstractProvider
      */
     public void requestSync(boolean manual)
     {
+        PasswdSafeUtil.dbginfo(TAG, "requestSync manual %b", manual);
+        if (isAccountAuthorized()) {
+            Account acct = getAccount(itsAccountName);
+            Bundle extras = new Bundle();
+            extras.putBoolean(SyncAdapter.SYNC_EXTRAS_FULL, true);
+            ApiCompat.requestManualSync(acct, PasswdSafeContract.CONTENT_URI,
+                                        extras);
+        }
     }
 
 
@@ -192,14 +224,29 @@ public class GDriveProvider extends AbstractProvider
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {
-//        GDriveSyncer sync = new GDriveSyncer(acct, provider, db,
-//                                             full, logrec, itsContext);
-//        SyncUpdateHandler.GDriveState syncState =
-//                SyncUpdateHandler.GDriveState.OK;
-//        try {
-//            syncState = sync.sync();
-//        } finally {
-//            SyncApp.get(itsContext).updateGDriveSyncState(syncState);
-//        }
+        GDriveSyncer sync = new GDriveSyncer(acct, provider, db,
+                                             full, logrec, itsContext);
+        SyncUpdateHandler.GDriveState syncState =
+                SyncUpdateHandler.GDriveState.OK;
+        try {
+            syncState = sync.sync();
+        } finally {
+            SyncApp.get(itsContext).updateGDriveSyncState(syncState);
+        }
+    }
+
+    private synchronized void setAcctName(String acctName)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "setAcctName %s", acctName);
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(itsContext);
+        prefs.edit().putString(PREF_ACCOUNT_NAME, acctName).apply();
+    }
+
+    private synchronized void updateAcct()
+    {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(itsContext);
+        itsAccountName = prefs.getString(PREF_ACCOUNT_NAME, null);
     }
 }
