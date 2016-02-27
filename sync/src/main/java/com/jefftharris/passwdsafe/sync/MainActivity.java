@@ -759,8 +759,6 @@ public class MainActivity extends AppCompatActivity
             freqSpin.setSelection(freq.getDisplayIdx());
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
-
-            // TODO play: update account warning
         } else {
             itsGDrivePlayUri = null;
         }
@@ -935,7 +933,9 @@ public class MainActivity extends AppCompatActivity
     /** Get the Google Drive provider */
     private Provider getGDrivePlayProvider()
     {
-        return ProviderFactory.getProvider(ProviderType.GDRIVE_PLAY, this);
+        if (SyncApp.GDRIVEPLAY)
+            return ProviderFactory.getProvider(ProviderType.GDRIVE_PLAY, this);
+        return ProviderFactory.getProvider(ProviderType.GDRIVE, this);
     }
 
     /** Get the Dropbox provider */
