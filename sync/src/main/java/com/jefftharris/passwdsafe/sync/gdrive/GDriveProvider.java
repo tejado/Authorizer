@@ -62,6 +62,7 @@ public class GDriveProvider extends AbstractProvider
     private final Context itsContext;
     private String itsAccountName;
 
+    // TODO: remove notion of full sync
 
     /** Constructor */
     public GDriveProvider(Context ctx)
@@ -207,7 +208,7 @@ public class GDriveProvider extends AbstractProvider
                      SyncLogRecord logrec) throws Exception
     {
         GDriveSyncer sync = new GDriveSyncer(acct, provider, db,
-                                             full, logrec, itsContext);
+                                             logrec, itsContext);
         SyncUpdateHandler.GDriveState syncState =
                 SyncUpdateHandler.GDriveState.OK;
         try {
