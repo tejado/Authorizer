@@ -28,22 +28,13 @@ public class GDriveLocalToRemoteOper
 {
     private static final String TAG = "GDriveLocalToRemoteOper";
 
-    // TODO: no need to get existing file, just capture the updated file like, say, box
-    private File itsDriveFile;
+    private File itsUpdatedFile;
     private String itsUpdateFolders;
 
     /** Constructor */
-    public GDriveLocalToRemoteOper(DbFile file,
-                                   HashMap<String, File> cache,
-                                   boolean forceInsert)
+    public GDriveLocalToRemoteOper(DbFile file, boolean forceInsert)
     {
         super(file, forceInsert);
-        if (isInsert()) {
-            itsDriveFile = new File();
-            itsDriveFile.setDescription("Password Safe file");
-        } else {
-            itsDriveFile = cache.get(itsFile.itsRemoteId);
-        }
     }
 
     @Override
@@ -51,52 +42,50 @@ public class GDriveLocalToRemoteOper
     {
         PasswdSafeUtil.dbginfo(TAG, "syncLocalToRemote %s", itsFile);
 
-        if (!isInsert() && (itsDriveFile == null)) {
-            itsDriveFile = GDriveSyncer.getFile(itsFile.itsRemoteId, drive);
-        }
-
-        File updatedFile = new File();
-        updatedFile.setName(itsFile.itsLocalTitle);
-        updatedFile.setMimeType("application/psafe3");
+        File fileUpdates = new File();
+        fileUpdates.setName(itsFile.itsLocalTitle);
+        fileUpdates.setMimeType("application/psafe3");
         if (isInsert()) {
-            updatedFile.setDescription("Password Safe file");
+            fileUpdates.setDescription("Password Safe file");
         }
 
         Drive.Files files = drive.files();
         if (itsFile.itsLocalFile != null) {
             setLocalFile(ctx.getFileStreamPath(itsFile.itsLocalFile));
-            FileContent fileMedia = new FileContent(itsDriveFile.getMimeType(),
+            FileContent fileMedia = new FileContent(fileUpdates.getMimeType(),
                                                     getLocalFile());
             if (isInsert()) {
-                itsDriveFile = files.create(updatedFile, fileMedia)
-                                    .setFields(GDriveProvider.FILE_FIELDS)
-                                    .execute();
+                itsUpdatedFile = files.create(fileUpdates, fileMedia)
+                                      .setFields(GDriveProvider.FILE_FIELDS)
+                                      .execute();
             } else {
-                itsDriveFile = files.update(itsFile.itsRemoteId, updatedFile,
-                                            fileMedia)
-                                    .setFields(GDriveProvider.FILE_FIELDS)
-                                    .execute();
+                itsUpdatedFile = files.update(itsFile.itsRemoteId, fileUpdates,
+                                              fileMedia)
+                                      .setFields(GDriveProvider.FILE_FIELDS)
+                                      .execute();
             }
         } else {
-            itsDriveFile = files.create(updatedFile)
-                                .setFields(GDriveProvider.FILE_FIELDS)
-                                .execute();
+            itsUpdatedFile = files.create(fileUpdates)
+                                  .setFields(GDriveProvider.FILE_FIELDS)
+                                  .execute();
         }
 
         FileFolders fileFolders = new FileFolders(drive);
-        itsUpdateFolders = fileFolders.computeFileFolders(itsDriveFile);
+        itsUpdateFolders = fileFolders.computeFileFolders(itsUpdatedFile);
+        if (itsUpdateFolders == null) {
+            itsUpdateFolders = itsFile.itsLocalFolder;
+        }
     }
 
     @Override
     public void doPostOperUpdate(SQLiteDatabase db, Context ctx)
             throws IOException, SQLException
     {
-        doPostOperFileUpdates(itsDriveFile.getId(),
-                              itsDriveFile.getName(),
-                              (itsUpdateFolders != null) ?
-                                      itsUpdateFolders : itsFile.itsLocalFolder,
-                              itsDriveFile.getModifiedTime().getValue(),
-                              itsDriveFile.getMd5Checksum(),
+        doPostOperFileUpdates(itsUpdatedFile.getId(),
+                              itsUpdatedFile.getName(),
+                              itsUpdateFolders,
+                              itsUpdatedFile.getModifiedTime().getValue(),
+                              itsUpdatedFile.getMd5Checksum(),
                               db);
     }
 }

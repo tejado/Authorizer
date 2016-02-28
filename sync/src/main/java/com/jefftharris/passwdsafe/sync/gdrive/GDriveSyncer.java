@@ -95,7 +95,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
     protected AbstractLocalToRemoteSyncOper<Drive> createLocalToRemoteOper(
             DbFile dbfile)
     {
-        return new GDriveLocalToRemoteOper(dbfile, itsFileCache, false);
+        return new GDriveLocalToRemoteOper(dbfile, false);
     }
 
     @Override
@@ -196,8 +196,9 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
             return "{null}";
         }
         return String.format(Locale.US,
-                             "{id:%s, name:%s, mime:%s, md5:%s}",
+                             "{id:%s, name:%s, mime:%s, md5:%s, mod:%d}",
                              file.getId(), file.getName(),
-                             file.getMimeType(), file.getMd5Checksum());
+                             file.getMimeType(), file.getMd5Checksum(),
+                             file.getModifiedTime().getValue());
     }
 }
