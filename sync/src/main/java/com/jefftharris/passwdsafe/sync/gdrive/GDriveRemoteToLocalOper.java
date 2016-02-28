@@ -29,6 +29,7 @@ public class GDriveRemoteToLocalOper
 {
     private static final String TAG = "GDriveRemoteToLocalOper";
 
+    // TODO: remove local file and use the dbfile's remote mod time like, say, box
     private File itsDriveFile;
 
     /** Constructor */
