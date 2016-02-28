@@ -38,7 +38,6 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
  */
 public class GDriveSyncer extends AbstractProviderSyncer<Drive>
 {
-    private final HashMap<String, File> itsFileCache = new HashMap<>();
     private final FileFolders itsFileFolders;
     private SyncUpdateHandler.GDriveState itsSyncState =
             SyncUpdateHandler.GDriveState.OK;
@@ -58,22 +57,13 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
                         Context ctx)
     {
         super(drive, provider, db, logrec, ctx, TAG);
-        itsFileFolders = new FileFolders(itsProviderClient, itsFileCache,
-                                         new HashMap<String, FolderRefs>());
+        itsFileFolders = new FileFolders(itsProviderClient);
     }
 
     /** Get the sync state */
     public SyncUpdateHandler.GDriveState getSyncState()
     {
         return itsSyncState;
-    }
-
-    /** Get a file's metadata */
-    public static File getFile(String id, Drive drive)
-            throws IOException
-    {
-        return drive.files().get(id)
-                .setFields(GDriveProvider.FILE_FIELDS).execute();
     }
 
     @Override
@@ -102,7 +92,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
     protected AbstractRemoteToLocalSyncOper<Drive> createRemoteToLocalOper(
             DbFile dbfile)
     {
-        return new GDriveRemoteToLocalOper(dbfile, itsFileCache);
+        return new GDriveRemoteToLocalOper(dbfile);
     }
 
     @Override
