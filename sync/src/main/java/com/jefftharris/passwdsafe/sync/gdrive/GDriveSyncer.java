@@ -58,13 +58,8 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
     private final HashMap<String, File> itsFileCache = new HashMap<>();
     private final FileFolders itsFileFolders;
 
-    private static final HashMap<String, FolderRefs> itsFolderRefs =
-            new HashMap<>();
-    private static boolean itsFolderRefsInit = false;
-
     private static final String TAG = "GDriveSyncer";
 
-    // TODO: remove sync file cache?
     // TODO: remove largest change or convert to string
 
 
@@ -80,7 +75,8 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
         itsDrive = itsProviderClient.first;
         itsDriveToken = itsProviderClient.second;
         itsIsFull = full;
-        itsFileFolders = new FileFolders(itsDrive, itsFileCache, itsFolderRefs);
+        itsFileFolders = new FileFolders(itsDrive, itsFileCache,
+                                         new HashMap<String, FolderRefs>());
     }
 
 
@@ -102,8 +98,7 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
                 Pair<Long, List<AbstractSyncOper<Drive>>> syncrc;
                 boolean noSyncChange = itsIsFull || (changeId == -1);
                 itsLogrec.setFullSync(noSyncChange);
-                if (!itsFolderRefsInit || noSyncChange) {
-                    itsFolderRefsInit = true;
+                if (noSyncChange) {
                     syncrc = performFullSync();
                 } else {
                     syncrc = performSyncSince(changeId);
@@ -148,20 +143,9 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
             Log.e(TAG, "Google auth error", e);
             GoogleAuthUtil.clearToken(itsContext, itsDriveToken);
             throw e;
-        } catch (Exception e) {
-            reset();
-            throw e;
         }
 
         return syncState;
-    }
-
-
-    /** Reset the syncer's cached information */
-    public static void reset()
-    {
-        itsFolderRefs.clear();
-        itsFolderRefsInit = false;
     }
 
 
@@ -544,7 +528,7 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
             return "{null}";
         }
         return String.format(Locale.US,
-                             "{id:%s, title:%s, mime:%s, md5:%s",
+                             "{id:%s, name:%s, mime:%s, md5:%s}",
                              file.getId(), file.getName(),
                              file.getMimeType(), file.getMd5Checksum());
     }
