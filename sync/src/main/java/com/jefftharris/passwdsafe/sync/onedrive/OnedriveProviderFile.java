@@ -54,7 +54,7 @@ public class OnedriveProviderFile implements ProviderRemoteFile
      * Get the file's path for display
      */
     @Override
-    public String getPath()
+    public String getDisplayPath()
     {
         return itsPath;
     }

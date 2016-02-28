@@ -30,7 +30,7 @@ class BoxProviderFile implements ProviderRemoteFile
     }
 
     @Override
-    public String getPath()
+    public String getDisplayPath()
     {
         return getFolder() + PATH_SEPARATOR + getTitle();
     }

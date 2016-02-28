@@ -39,7 +39,7 @@ public class OwncloudProviderFile implements ProviderRemoteFile
     }
 
     @Override
-    public String getPath()
+    public String getDisplayPath()
     {
         return getRemoteId();
     }

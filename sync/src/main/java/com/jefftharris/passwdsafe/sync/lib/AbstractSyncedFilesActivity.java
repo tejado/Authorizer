@@ -184,10 +184,10 @@ public abstract class AbstractSyncedFilesActivity extends AppCompatActivity
      * @see com.jefftharris.passwdsafe.sync.lib.SyncedFilesFragment.Listener#changeDir(java.lang.String)
      */
     @Override
-    public void changeDir(String pathName, String pathId)
+    public void changeDir(String pathDisplay, String pathId)
     {
-        PasswdSafeUtil.dbginfo(TAG, "changeDir: %s", pathName);
-        Fragment files = SyncedFilesFragment.newInstance(pathName, pathId);
+        PasswdSafeUtil.dbginfo(TAG, "changeDir: %s", pathDisplay);
+        Fragment files = SyncedFilesFragment.newInstance(pathDisplay, pathId);
         FragmentManager fragmgr = getSupportFragmentManager();
         FragmentTransaction txn = fragmgr.beginTransaction();
         txn.replace(R.id.content, files);
