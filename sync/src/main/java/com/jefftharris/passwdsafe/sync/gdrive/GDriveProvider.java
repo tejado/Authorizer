@@ -77,10 +77,7 @@ public class GDriveProvider extends AbstractProvider
     {
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#startAccountLink(android.app.Activity, int)
-     */
+    @Override
     public void startAccountLink(FragmentActivity activity, int requestCode)
     {
         Intent intent = AccountPicker.newChooseAccountIntent(
@@ -97,10 +94,7 @@ public class GDriveProvider extends AbstractProvider
         }
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#finishAccountLink()
-     */
+    @Override
     public NewAccountTask finishAccountLink(int activityResult,
                                             Intent activityData,
                                             Uri acctProviderUri)
@@ -122,25 +116,18 @@ public class GDriveProvider extends AbstractProvider
                                   ProviderType.GDRIVE, false, itsContext);
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#unlinkAccount()
-     */
+    @Override
     public void unlinkAccount()
     {
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#isAccountAuthorized()
-     */
+    @Override
     public boolean isAccountAuthorized()
     {
         return !TextUtils.isEmpty(itsAccountName);
     }
 
 
-    /** Get the account for the named provider */
     @Override
     public Account getAccount(String acctName)
     {
@@ -148,16 +135,12 @@ public class GDriveProvider extends AbstractProvider
         return acctMgr.getAccountByName(acctName);
     }
 
-
-    /** Check whether a provider can be added */
     @Override
     public void checkProviderAdd(SQLiteDatabase db)
             throws Exception
     {
     }
 
-
-    /** Cleanup a provider when deleted */
     @Override
     public void cleanupOnDelete(String acctName)
     {
@@ -179,8 +162,6 @@ public class GDriveProvider extends AbstractProvider
         }
     }
 
-
-    /** Update a provider's sync frequency */
     @Override
     public void updateSyncFreq(Account acct, int freq)
     {
@@ -200,10 +181,7 @@ public class GDriveProvider extends AbstractProvider
         }
     }
 
-
-    /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.sync.lib.Provider#requestSync(boolean)
-     */
+    @Override
     public void requestSync(boolean manual)
     {
         PasswdSafeUtil.dbginfo(TAG, "requestSync manual %b", manual);
@@ -216,8 +194,6 @@ public class GDriveProvider extends AbstractProvider
         }
     }
 
-
-    /** Sync a provider */
     @Override
     public void sync(Account acct, DbProvider provider,
                      SQLiteDatabase db,
@@ -235,6 +211,9 @@ public class GDriveProvider extends AbstractProvider
         }
     }
 
+    /**
+     * Set the account name
+     */
     private synchronized void setAcctName(String acctName)
     {
         PasswdSafeUtil.dbginfo(TAG, "setAcctName %s", acctName);
@@ -243,6 +222,9 @@ public class GDriveProvider extends AbstractProvider
         prefs.edit().putString(PREF_ACCOUNT_NAME, acctName).apply();
     }
 
+    /**
+     * Update the account from saved authentication information
+     */
     private synchronized void updateAcct()
     {
         SharedPreferences prefs =
