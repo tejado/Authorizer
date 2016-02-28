@@ -54,27 +54,21 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
 {
     private final Drive itsDrive;
     private final String itsDriveToken;
-    private final boolean itsIsFull;
     private final HashMap<String, File> itsFileCache = new HashMap<>();
     private final FileFolders itsFileFolders;
 
     private static final String TAG = "GDriveSyncer";
 
-    // TODO: remove largest change or convert to string
-
-
     /** Constructor */
     public GDriveSyncer(Account acct,
                         DbProvider provider,
                         SQLiteDatabase db,
-                        boolean full,
                         SyncLogRecord logrec,
                         Context ctx)
     {
         super(getDriveService(acct, ctx), provider, db, logrec, ctx, TAG);
         itsDrive = itsProviderClient.first;
         itsDriveToken = itsProviderClient.second;
-        itsIsFull = full;
         itsFileFolders = new FileFolders(itsDrive, itsFileCache,
                                          new HashMap<String, FolderRefs>());
     }
@@ -93,22 +87,8 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
             List<AbstractSyncOper<Drive>> opers = null;
             try {
                 itsDb.beginTransaction();
-                long changeId = itsProvider.itsSyncChange;
-                PasswdSafeUtil.dbginfo(TAG, "largest change %d", changeId);
-                Pair<Long, List<AbstractSyncOper<Drive>>> syncrc;
-                boolean noSyncChange = itsIsFull || (changeId == -1);
-                itsLogrec.setFullSync(noSyncChange);
-                if (noSyncChange) {
-                    syncrc = performFullSync();
-                } else {
-                    syncrc = performSyncSince(changeId);
-                }
-                long newChangeId = syncrc.first;
-                opers = syncrc.second;
-                if (changeId != newChangeId) {
-                    SyncDb.updateProviderSyncChange(itsProvider,
-                                                    newChangeId, itsDb);
-                }
+                itsLogrec.setFullSync(true);
+                opers = performFullSync();
                 itsDb.setTransactionSuccessful();
             } finally {
                 itsDb.endTransaction();
@@ -167,12 +147,11 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
 
 
     /** Perform a full sync of the files */
-    private Pair<Long, List<AbstractSyncOper<Drive>>> performFullSync()
+    private List<AbstractSyncOper<Drive>> performFullSync()
             throws SQLException, IOException
     {
-        PasswdSafeUtil.dbginfo(TAG, "Perform full sync");
+        PasswdSafeUtil.dbginfo(TAG, "Perform sync");
         syncDisplayName();
-        long largestChangeId = -1;//= about.getLargestChangeId();
 
         HashMap<String, File> allRemFiles = new HashMap<>();
         String query =
@@ -202,8 +181,7 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
         } while((request.getPageToken() != null) &&
                 (request.getPageToken().length() > 0));
 
-        List<AbstractSyncOper<Drive>> opers = performSync(allRemFiles, true);
-        return new Pair<>(largestChangeId, opers);
+        return performSync(allRemFiles, true);
     }
 
     /**
@@ -224,49 +202,6 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
                                              itsDb);
         }
     }
-
-    /** Perform a sync of files since the given change id */
-    private Pair<Long, List<AbstractSyncOper<Drive>>>
-    performSyncSince(long changeId)
-            throws SQLException, IOException
-    {
-        PasswdSafeUtil.dbginfo(TAG, "performSyncSince %d", changeId);
-        HashMap<String, File> changedFiles = new HashMap<>();
-//        Drive.Changes.List request =
-//            itsDrive.changes().list().setStartChangeId(changeId + 1)
-//            .setFields("largestChangeId,nextPageToken," +
-//                    "items(deleted,fileId,file("+GDriveProvider.FILE_FIELDS+"))");
-//        do {
-//            ChangeList changes = request.execute();
-//            long changesLargestId = changes.getLargestChangeId();
-//
-//            for (Change change: changes.getItems()) {
-//                File file = change.getFile();
-//                if (change.getDeleted()) {
-//                    file = null;
-//                } else if (isFolderFile(file)) {
-//                    PasswdSafeUtil.dbginfo(TAG, "isdir %s", file);
-//                    itsFileFolders.checkFolderFiles(file, changedFiles);
-//                    file = null;
-//                } else if (!isSyncFile(file)) {
-//                    file = null;
-//                }
-//                changedFiles.put(change.getFileId(), file);
-//                PasswdSafeUtil.dbginfo(TAG, "performSyncSince changed %s: %s",
-//                                       change.getFileId(), fileToString(file));
-//            }
-//
-//            if (changesLargestId > changeId) {
-//                changeId = changesLargestId;
-//            }
-//            request.setPageToken(changes.getNextPageToken());
-//        } while((request.getPageToken() != null) &&
-//                (request.getPageToken().length() > 0));
-
-        List<AbstractSyncOper<Drive>> opers = performSync(changedFiles, false);
-        return new Pair<>(changeId, opers);
-    }
-
 
     /** Perform a sync of the files */
     private List<AbstractSyncOper<Drive>>
