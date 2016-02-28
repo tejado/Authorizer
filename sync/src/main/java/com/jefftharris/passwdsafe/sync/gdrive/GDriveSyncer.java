@@ -44,9 +44,6 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
 
     private static final String TAG = "GDriveSyncer";
 
-    // TODO: test file in multiple dirs
-    // TODO: optimize FileFolders for single file at a time?
-    // TODO: remove concerns about file renames and purging empty folders from FileFolders
     // TODO: local to remote force insert used? needed?
 
     /** Constructor */
@@ -85,7 +82,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
     protected AbstractLocalToRemoteSyncOper<Drive> createLocalToRemoteOper(
             DbFile dbfile)
     {
-        return new GDriveLocalToRemoteOper(dbfile, false);
+        return new GDriveLocalToRemoteOper(dbfile, itsFileFolders, false);
     }
 
     @Override

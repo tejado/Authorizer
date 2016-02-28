@@ -7,7 +7,6 @@
 package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import android.content.Context;
 import android.database.SQLException;
@@ -28,13 +27,17 @@ public class GDriveLocalToRemoteOper
 {
     private static final String TAG = "GDriveLocalToRemoteOper";
 
+    private final FileFolders itsFileFolders;
     private File itsUpdatedFile;
     private String itsUpdateFolders;
 
     /** Constructor */
-    public GDriveLocalToRemoteOper(DbFile file, boolean forceInsert)
+    public GDriveLocalToRemoteOper(DbFile file,
+                                   FileFolders fileFolders,
+                                   boolean forceInsert)
     {
         super(file, forceInsert);
+        itsFileFolders = fileFolders;
     }
 
     @Override
@@ -70,8 +73,7 @@ public class GDriveLocalToRemoteOper
                                   .execute();
         }
 
-        FileFolders fileFolders = new FileFolders(drive);
-        itsUpdateFolders = fileFolders.computeFileFolders(itsUpdatedFile);
+        itsUpdateFolders = itsFileFolders.computeFileFolders(itsUpdatedFile);
         if (itsUpdateFolders == null) {
             itsUpdateFolders = itsFile.itsLocalFolder;
         }
