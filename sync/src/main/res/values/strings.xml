@@ -20,7 +20,7 @@
     <string name="dropbox_synced_files">Dropbox Synced Files</string>
     <string name="full_sync">Full sync</string>
     <string name="gdrive_state_auth_required">Google account authentication required.  Sync again to begin the authentication process.</string>
-    <string name="gdrive_state_pending_auth">Google account authentication is pending.  Select the sign-in request notification.</string>
+    <string name="gdrive_state_pending_auth">Google account authentication is pending.  Select the sign-in request notification and sync again.</string>
     <string name="google_acct_not_available">Google account not available</string>
     <string name="incremental_sync">Incremental sync</string>
     <string name="interval">Interval</string>
