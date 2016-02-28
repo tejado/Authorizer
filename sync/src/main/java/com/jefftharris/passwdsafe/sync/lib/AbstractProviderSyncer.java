@@ -186,7 +186,7 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
             return;
         }
 
-        PasswdSafeUtil.dbginfo(itsTag, "updateDbFiles update remote %s",
+        PasswdSafeUtil.dbginfo(itsTag, "checkRemoteFileChange update remote %s",
                                dbfile);
         SyncDb.updateRemoteFile(dbfile.itsId, dbfile.itsRemoteId,
                                 remTitle, remFolder, remModDate, remHash,
