@@ -154,7 +154,6 @@ public class GDriveProvider extends AbstractProvider
         Account acct = getAccount(acctName);
         setAcctName(null);
         updateAcct();
-        GDriveSyncer.reset();
         try {
             GoogleAccountCredential credential =
                     GDriveSyncer.getAcctCredential(itsContext);
