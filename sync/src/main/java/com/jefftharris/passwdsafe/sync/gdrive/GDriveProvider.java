@@ -21,11 +21,21 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableNotifiedException;
 import com.google.android.gms.common.AccountPicker;
+import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.accounts.GoogleAccountManager;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -39,6 +49,9 @@ import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+
+import java.io.IOException;
+import java.util.Collections;
 
 /**
  * The GDriveProvider class encapsulates Google Drive
@@ -156,8 +169,7 @@ public class GDriveProvider extends AbstractProvider
         setAcctName(null);
         updateAcct();
         try {
-            GoogleAccountCredential credential =
-                    GDriveSyncer.getAcctCredential(itsContext);
+            GoogleAccountCredential credential = getAcctCredential(itsContext);
             String token = GoogleAuthUtil.getTokenWithNotification(
                     itsContext, acct, credential.getScope(), null);
             PasswdSafeUtil.dbginfo(TAG, "Remove token for %s", acctName);
@@ -207,12 +219,23 @@ public class GDriveProvider extends AbstractProvider
                      boolean full,
                      SyncLogRecord logrec) throws Exception
     {
-        GDriveSyncer sync = new GDriveSyncer(acct, provider, db,
+        Pair<Drive, String> driveService = getDriveService(acct, itsContext);
+        
+        GDriveSyncer sync = new GDriveSyncer(driveService.first, provider, db,
                                              logrec, itsContext);
         SyncUpdateHandler.GDriveState syncState =
                 SyncUpdateHandler.GDriveState.OK;
         try {
-            syncState = sync.sync();
+            sync.sync();
+            syncState = sync.getSyncState();
+        } catch (UserRecoverableAuthIOException e) {
+            PasswdSafeUtil.dbginfo(TAG, e, "Recoverable google auth error");
+            GoogleAuthUtil.clearToken(itsContext, driveService.second);
+            syncState = SyncUpdateHandler.GDriveState.AUTH_REQUIRED;
+        } catch (GoogleAuthIOException e) {
+            Log.e(TAG, "Google auth error", e);
+            GoogleAuthUtil.clearToken(itsContext, driveService.second);
+            throw e;
         } finally {
             SyncApp.get(itsContext).updateGDriveSyncState(syncState);
         }
@@ -269,5 +292,60 @@ public class GDriveProvider extends AbstractProvider
 
             prefs.edit().putInt(PREF_MIGRATION, MIGRATION_V3API).apply();
         }
+    }
+
+    /** Get the Google account credential */
+    private static GoogleAccountCredential getAcctCredential(Context ctx)
+    {
+        return GoogleAccountCredential.usingOAuth2(
+                ctx, Collections.singletonList(DriveScopes.DRIVE));
+    }
+
+    /**
+     * Retrieve a authorized service object to send requests to the Google
+     * Drive API. On failure to retrieve an access token, a notification is
+     * sent to the user requesting that authorization be granted for the
+     * {@code https://www.googleapis.com/auth/drive} scope.
+     *
+     * @return An authorized service object and its auth token.
+     */
+    private static Pair<Drive, String> getDriveService(Account acct,
+                                                       Context ctx)
+    {
+        Drive drive = null;
+        String token = null;
+        try {
+            GoogleAccountCredential credential = getAcctCredential(ctx);
+            credential.setBackOff(new ExponentialBackOff());
+            credential.setSelectedAccountName(acct.name);
+
+            token = GoogleAuthUtil.getTokenWithNotification(
+                    ctx, acct, credential.getScope(),
+                    null, PasswdSafeContract.AUTHORITY, null);
+
+            Drive.Builder builder = new Drive.Builder(
+                    AndroidHttp.newCompatibleTransport(),
+                    JacksonFactory.getDefaultInstance(), credential);
+            builder.setApplicationName(ctx.getString(R.string.app_name));
+            drive = builder.build();
+        } catch (UserRecoverableNotifiedException e) {
+            // User notified
+            PasswdSafeUtil.dbginfo(TAG, e, "User notified auth exception");
+            try {
+                GoogleAuthUtil.clearToken(ctx, null);
+            } catch(Exception ioe) {
+                Log.e(TAG, "getDriveService clear failure", e);
+            }
+        } catch (GoogleAuthException e) {
+            // Unrecoverable
+            Log.e(TAG, "Unrecoverable auth exception", e);
+        }
+        catch (IOException e) {
+            // Transient
+            PasswdSafeUtil.dbginfo(TAG, e, "Transient error");
+        } catch (Exception e) {
+            Log.e(TAG, "Token exception", e);
+        }
+        return new Pair<>(drive, token);
     }
 }

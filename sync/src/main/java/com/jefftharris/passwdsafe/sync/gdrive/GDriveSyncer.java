@@ -8,31 +8,18 @@ package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import android.accounts.Account;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Pair;
 
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableNotifiedException;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAuthIOException;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -50,90 +37,75 @@ import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 /**
  * The Syncer class encapsulates a sync operation
  */
-public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
+public class GDriveSyncer extends ProviderSyncer<Drive>
 {
     private final Drive itsDrive;
-    private final String itsDriveToken;
     private final HashMap<String, File> itsFileCache = new HashMap<>();
     private final FileFolders itsFileFolders;
+    private SyncUpdateHandler.GDriveState itsSyncState =
+            SyncUpdateHandler.GDriveState.OK;
 
     private static final String TAG = "GDriveSyncer";
 
     /** Constructor */
-    public GDriveSyncer(Account acct,
+    public GDriveSyncer(Drive drive,
                         DbProvider provider,
                         SQLiteDatabase db,
                         SyncLogRecord logrec,
                         Context ctx)
     {
-        super(getDriveService(acct, ctx), provider, db, logrec, ctx, TAG);
-        itsDrive = itsProviderClient.first;
-        itsDriveToken = itsProviderClient.second;
+        super(drive, provider, db, logrec, ctx, TAG);
+        itsDrive = drive;
         itsFileFolders = new FileFolders(itsDrive, itsFileCache,
                                          new HashMap<String, FolderRefs>());
     }
 
 
     /** Sync the provider */
-    public SyncUpdateHandler.GDriveState sync() throws Exception
+    public void sync() throws Exception
     {
         if (itsDrive == null) {
-            return SyncUpdateHandler.GDriveState.PENDING_AUTH;
+            itsSyncState = SyncUpdateHandler.GDriveState.PENDING_AUTH;
+            return;
         }
 
-        SyncUpdateHandler.GDriveState syncState =
-                SyncUpdateHandler.GDriveState.OK;
+        List<AbstractSyncOper<Drive>> opers = null;
         try {
-            List<AbstractSyncOper<Drive>> opers = null;
-            try {
-                itsDb.beginTransaction();
-                itsLogrec.setFullSync(true);
-                opers = performFullSync();
-                itsDb.setTransactionSuccessful();
-            } finally {
-                itsDb.endTransaction();
-            }
+            itsDb.beginTransaction();
+            itsLogrec.setFullSync(true);
+            opers = performFullSync();
+            itsDb.setTransactionSuccessful();
+        } finally {
+            itsDb.endTransaction();
+        }
 
-            if (opers != null) {
-                for (AbstractSyncOper<Drive> oper: opers) {
+        if (opers != null) {
+            for (AbstractSyncOper<Drive> oper: opers) {
+                try {
+                    itsLogrec.addEntry(oper.getDescription(itsContext));
+                    oper.doOper(itsDrive, itsContext);
                     try {
-                        itsLogrec.addEntry(oper.getDescription(itsContext));
-                        oper.doOper(itsDrive, itsContext);
-                        try {
-                            itsDb.beginTransaction();
-                            oper.doPostOperUpdate(itsDb, itsContext);
-                            itsDb.setTransactionSuccessful();
-                        } finally {
-                            itsDb.endTransaction();
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "Sync error for file " + oper.getFile(), e);
-                        itsLogrec.addFailure(e);
+                        itsDb.beginTransaction();
+                        oper.doPostOperUpdate(itsDb, itsContext);
+                        itsDb.setTransactionSuccessful();
+                    } finally {
+                        itsDb.endTransaction();
                     }
+                } catch (Exception e) {
+                    Log.e(TAG, "Sync error for file " + oper.getFile(), e);
+                    itsLogrec.addFailure(e);
                 }
             }
-
-            itsContext.getContentResolver().notifyChange(
-                     PasswdSafeContract.CONTENT_URI, null, false);
-        } catch (UserRecoverableAuthIOException e) {
-            PasswdSafeUtil.dbginfo(TAG, e, "Recoverable google auth error");
-            GoogleAuthUtil.clearToken(itsContext, itsDriveToken);
-            syncState = SyncUpdateHandler.GDriveState.AUTH_REQUIRED;
-        } catch (GoogleAuthIOException e) {
-            Log.e(TAG, "Google auth error", e);
-            GoogleAuthUtil.clearToken(itsContext, itsDriveToken);
-            throw e;
         }
 
-        return syncState;
+        itsContext.getContentResolver().notifyChange(
+                PasswdSafeContract.CONTENT_URI, null, false);
     }
 
-
-    /** Get the Google account credential */
-    public static GoogleAccountCredential getAcctCredential(Context ctx)
+    /** Get the sync state */
+    public SyncUpdateHandler.GDriveState getSyncState()
     {
-        return GoogleAccountCredential.usingOAuth2(
-                ctx, Collections.singletonList(DriveScopes.DRIVE));
+        return itsSyncState;
     }
 
 
@@ -466,53 +438,5 @@ public class GDriveSyncer extends ProviderSyncer<Pair<Drive, String>>
                              "{id:%s, name:%s, mime:%s, md5:%s}",
                              file.getId(), file.getName(),
                              file.getMimeType(), file.getMd5Checksum());
-    }
-
-    /**
-     * Retrieve a authorized service object to send requests to the Google
-     * Drive API. On failure to retrieve an access token, a notification is
-     * sent to the user requesting that authorization be granted for the
-     * {@code https://www.googleapis.com/auth/drive} scope.
-     *
-     * @return An authorized service object and its auth token.
-     */
-    private static Pair<Drive, String> getDriveService(Account acct,
-                                                       Context ctx)
-    {
-        Drive drive = null;
-        String token = null;
-        try {
-            GoogleAccountCredential credential = getAcctCredential(ctx);
-            credential.setBackOff(new ExponentialBackOff());
-            credential.setSelectedAccountName(acct.name);
-
-            token = GoogleAuthUtil.getTokenWithNotification(
-                    ctx, acct, credential.getScope(),
-                    null, PasswdSafeContract.AUTHORITY, null);
-
-            Drive.Builder builder = new Drive.Builder(
-                    AndroidHttp.newCompatibleTransport(),
-                    JacksonFactory.getDefaultInstance(), credential);
-            builder.setApplicationName(ctx.getString(R.string.app_name));
-            drive = builder.build();
-        } catch (UserRecoverableNotifiedException e) {
-            // User notified
-            PasswdSafeUtil.dbginfo(TAG, e, "User notified auth exception");
-            try {
-                GoogleAuthUtil.clearToken(ctx, null);
-            } catch(Exception ioe) {
-                Log.e(TAG, "getDriveService clear failure", e);
-            }
-        } catch (GoogleAuthException e) {
-            // Unrecoverable
-            Log.e(TAG, "Unrecoverable auth exception", e);
-        }
-        catch (IOException e) {
-            // Transient
-            PasswdSafeUtil.dbginfo(TAG, e, "Transient error");
-        } catch (Exception e) {
-            Log.e(TAG, "Token exception", e);
-        }
-        return new Pair<>(drive, token);
     }
 }
