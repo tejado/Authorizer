@@ -28,6 +28,7 @@ public class GDriveLocalToRemoteOper
 {
     private static final String TAG = "GDriveLocalToRemoteOper";
 
+    // TODO: no need to get existing file, just capture the updated file like, say, box
     private File itsDriveFile;
     private String itsUpdateFolders;
 

@@ -7,45 +7,48 @@
 package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.About;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.sync.R;
 import com.jefftharris.passwdsafe.sync.SyncUpdateHandler;
+import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
+import com.jefftharris.passwdsafe.sync.lib.AbstractProviderSyncer;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
+import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
-import com.jefftharris.passwdsafe.sync.lib.ProviderSyncer;
+import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
 /**
  * The Syncer class encapsulates a sync operation
  */
-public class GDriveSyncer extends ProviderSyncer<Drive>
+public class GDriveSyncer extends AbstractProviderSyncer<Drive>
 {
-    private final Drive itsDrive;
     private final HashMap<String, File> itsFileCache = new HashMap<>();
     private final FileFolders itsFileFolders;
     private SyncUpdateHandler.GDriveState itsSyncState =
             SyncUpdateHandler.GDriveState.OK;
 
     private static final String TAG = "GDriveSyncer";
+
+    // TODO: test file in multiple dirs
+    // TODO: optimize FileFolders for single file at a time?
+    // TODO: remove concerns about file renames and purging empty folders from FileFolders
+    // TODO: local to remote force insert used? needed?
 
     /** Constructor */
     public GDriveSyncer(Drive drive,
@@ -55,51 +58,8 @@ public class GDriveSyncer extends ProviderSyncer<Drive>
                         Context ctx)
     {
         super(drive, provider, db, logrec, ctx, TAG);
-        itsDrive = drive;
-        itsFileFolders = new FileFolders(itsDrive, itsFileCache,
+        itsFileFolders = new FileFolders(itsProviderClient, itsFileCache,
                                          new HashMap<String, FolderRefs>());
-    }
-
-
-    /** Sync the provider */
-    public void sync() throws Exception
-    {
-        if (itsDrive == null) {
-            itsSyncState = SyncUpdateHandler.GDriveState.PENDING_AUTH;
-            return;
-        }
-
-        List<AbstractSyncOper<Drive>> opers = null;
-        try {
-            itsDb.beginTransaction();
-            itsLogrec.setFullSync(true);
-            opers = performFullSync();
-            itsDb.setTransactionSuccessful();
-        } finally {
-            itsDb.endTransaction();
-        }
-
-        if (opers != null) {
-            for (AbstractSyncOper<Drive> oper: opers) {
-                try {
-                    itsLogrec.addEntry(oper.getDescription(itsContext));
-                    oper.doOper(itsDrive, itsContext);
-                    try {
-                        itsDb.beginTransaction();
-                        oper.doPostOperUpdate(itsDb, itsContext);
-                        itsDb.setTransactionSuccessful();
-                    } finally {
-                        itsDb.endTransaction();
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Sync error for file " + oper.getFile(), e);
-                    itsLogrec.addFailure(e);
-                }
-            }
-        }
-
-        itsContext.getContentResolver().notifyChange(
-                PasswdSafeContract.CONTENT_URI, null, false);
     }
 
     /** Get the sync state */
@@ -107,7 +67,6 @@ public class GDriveSyncer extends ProviderSyncer<Drive>
     {
         return itsSyncState;
     }
-
 
     /** Get a file's metadata */
     public static File getFile(String id, Drive drive)
@@ -117,24 +76,58 @@ public class GDriveSyncer extends ProviderSyncer<Drive>
                 .setFields(GDriveProvider.FILE_FIELDS).execute();
     }
 
-
-    /** Perform a full sync of the files */
-    private List<AbstractSyncOper<Drive>> performFullSync()
-            throws SQLException, IOException
+    @Override
+    protected List<AbstractSyncOper<Drive>> performSync()
+            throws IOException, SQLException
     {
-        PasswdSafeUtil.dbginfo(TAG, "Perform sync");
-        syncDisplayName();
+        if (itsProviderClient == null) {
+            itsSyncState = SyncUpdateHandler.GDriveState.PENDING_AUTH;
+            return null;
+        }
 
-        HashMap<String, File> allRemFiles = new HashMap<>();
+        syncDisplayName();
+        HashMap<String, ProviderRemoteFile> driveFiles = getDriveFiles();
+        updateDbFiles(driveFiles);
+        return resolveSyncOpers();
+    }
+
+    @Override
+    protected AbstractLocalToRemoteSyncOper<Drive> createLocalToRemoteOper(
+            DbFile dbfile)
+    {
+        return new GDriveLocalToRemoteOper(dbfile, itsFileCache, false);
+    }
+
+    @Override
+    protected AbstractRemoteToLocalSyncOper<Drive> createRemoteToLocalOper(
+            DbFile dbfile)
+    {
+        return new GDriveRemoteToLocalOper(dbfile, itsFileCache);
+    }
+
+    @Override
+    protected AbstractRmSyncOper<Drive> createRmFileOper(DbFile dbfile)
+    {
+        return new GDriveRmFileOper(dbfile);
+    }
+
+    /** Get the Google Drive files */
+    private HashMap<String, ProviderRemoteFile> getDriveFiles()
+            throws IOException
+    {
+        HashMap<String, ProviderRemoteFile> driveFiles = new HashMap<>();
+
         String query =
                 "not trashed" +
                 " and ( mimeType = 'application/octet-stream' or " +
                 "       mimeType = 'binary/octet-stream' or " +
                 "       mimeType = 'application/psafe3' )" +
                 " and fullText contains '.psafe3'";
-        Drive.Files.List request = itsDrive.files().list()
-                .setQ(query)
-                .setFields("nextPageToken,files("+GDriveProvider.FILE_FIELDS+")");
+        Drive.Files.List request =
+                itsProviderClient.files().list()
+                                 .setQ(query)
+                                 .setFields("nextPageToken,files(" +
+                                            GDriveProvider.FILE_FIELDS + ")");
         do {
             FileList files = request.execute();
             PasswdSafeUtil.dbginfo(TAG, "num files: %d",
@@ -147,13 +140,14 @@ public class GDriveSyncer extends ProviderSyncer<Drive>
                     continue;
                 }
                 PasswdSafeUtil.dbginfo(TAG, "File %s", fileToString(file));
-                allRemFiles.put(file.getId(), file);
+                GDriveProviderFile driveFile = new GDriveProviderFile(
+                        file, itsFileFolders.computeFileFolders(file));
+                driveFiles.put(driveFile.getRemoteId(), driveFile);
             }
             request.setPageToken(files.getNextPageToken());
-        } while((request.getPageToken() != null) &&
-                (request.getPageToken().length() > 0));
+        } while(!TextUtils.isEmpty(request.getPageToken()));
 
-        return performSync(allRemFiles, true);
+        return driveFiles;
     }
 
     /**
@@ -161,9 +155,9 @@ public class GDriveSyncer extends ProviderSyncer<Drive>
      */
     private void syncDisplayName() throws IOException
     {
-        About about = itsDrive.about().get()
-                              .setFields(GDriveProvider.ABOUT_FIELDS)
-                              .execute();
+        About about = itsProviderClient.about().get()
+                                       .setFields(GDriveProvider.ABOUT_FIELDS)
+                                       .execute();
         String displayName = null;
         if (about.getUser() != null) {
             displayName = about.getUser().getDisplayName();
@@ -174,239 +168,6 @@ public class GDriveSyncer extends ProviderSyncer<Drive>
                                              itsDb);
         }
     }
-
-    /** Perform a sync of the files */
-    private List<AbstractSyncOper<Drive>>
-    performSync(HashMap<String, File> remfiles, boolean isAllRemoteFiles)
-            throws SQLException, IOException
-    {
-        itsFileCache.putAll(remfiles);
-        Map<String, String> fileFolders =
-                itsFileFolders.computeFilesFolders(remfiles);
-
-        List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
-        for (DbFile dbfile: dbfiles) {
-            if (remfiles.containsKey(dbfile.itsRemoteId)) {
-                File remfile = remfiles.get(dbfile.itsRemoteId);
-                if (remfile != null) {
-                    checkRemoteFileChange(dbfile, remfile, fileFolders);
-                } else {
-                    PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
-                                           dbfile);
-                    SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
-                }
-                remfiles.remove(dbfile.itsRemoteId);
-            } else if (isAllRemoteFiles &&
-                    (dbfile.itsLocalChange != DbFile.FileChange.ADDED)) {
-                PasswdSafeUtil.dbginfo(TAG, "performSync remove remote %s",
-                                       dbfile);
-                SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
-            }
-        }
-
-        for (File remfile: remfiles.values()) {
-            if (remfile == null) {
-                continue;
-            }
-            String fileId = remfile.getId();
-            PasswdSafeUtil.dbginfo(TAG, "performSync add remote %s", fileId);
-            SyncDb.addRemoteFile(itsProvider.itsId, fileId,
-                                 remfile.getName(),
-                                 fileFolders.get(fileId),
-                                 remfile.getModifiedTime().getValue(),
-                                 remfile.getMd5Checksum(), itsDb);
-        }
-
-        List<AbstractSyncOper<Drive>> opers = new ArrayList<>();
-        dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
-        for (DbFile dbfile: dbfiles) {
-            resolveSyncOper(dbfile, opers);
-        }
-
-        return opers;
-    }
-
-
-    /** Check for a remote file change and update */
-    private void checkRemoteFileChange(DbFile dbfile,
-                                       File remfile,
-                                       Map<String, String> fileFolders)
-    {
-        boolean changed = true;
-        do {
-            String remTitle = remfile.getName();
-            String remFolder = fileFolders.get(dbfile.itsRemoteId);
-            long remModDate = remfile.getModifiedTime().getValue();
-            String remHash = remfile.getMd5Checksum();
-            if (!TextUtils.equals(dbfile.itsRemoteTitle, remTitle) ||
-                    !TextUtils.equals(dbfile.itsRemoteFolder, remFolder) ||
-                    (dbfile.itsRemoteModDate != remModDate) ||
-                    !TextUtils.equals(dbfile.itsRemoteHash, remHash) ||
-                    TextUtils.isEmpty(dbfile.itsLocalFile)) {
-                break;
-            }
-
-            java.io.File localFile =
-                    itsContext.getFileStreamPath(dbfile.itsLocalFile);
-            if (!localFile.exists()) {
-                break;
-            }
-
-            changed = false;
-        } while(false);
-
-        if (!changed) {
-            return;
-        }
-
-        PasswdSafeUtil.dbginfo(TAG, "performSync update remote %s", dbfile);
-        SyncDb.updateRemoteFile(dbfile.itsId, dbfile.itsRemoteId,
-                                remfile.getName(),
-                                fileFolders.get(dbfile.itsRemoteId),
-                                remfile.getModifiedTime().getValue(),
-                                remfile.getMd5Checksum(), itsDb);
-        switch (dbfile.itsRemoteChange) {
-        case NO_CHANGE:
-        case REMOVED: {
-            SyncDb.updateRemoteFileChange(dbfile.itsId,
-                                          DbFile.FileChange.MODIFIED, itsDb);
-            break;
-        }
-        case ADDED:
-        case MODIFIED: {
-            break;
-        }
-        }
-    }
-
-
-    /** Resolve the sync operations for a file */
-    private void resolveSyncOper(DbFile dbfile,
-                                 List<AbstractSyncOper<Drive>> opers)
-            throws SQLException
-    {
-        if ((dbfile.itsLocalChange != DbFile.FileChange.NO_CHANGE) ||
-                (dbfile.itsRemoteChange != DbFile.FileChange.NO_CHANGE)) {
-            PasswdSafeUtil.dbginfo(TAG, "resolveSyncOper %s", dbfile);
-        }
-
-        switch (dbfile.itsLocalChange) {
-        case ADDED: {
-            switch (dbfile.itsRemoteChange) {
-            case ADDED:
-            case MODIFIED: {
-                logConflictFile(dbfile, true);
-                splitConflictedFile(dbfile, opers);
-                break;
-            }
-            case NO_CHANGE: {
-                opers.add(new GDriveLocalToRemoteOper(dbfile, itsFileCache,
-                                                      false));
-                break;
-            }
-            case REMOVED: {
-                logConflictFile(dbfile, true);
-                recreateRemoteRemovedFile(dbfile, opers);
-                break;
-            }
-            }
-            break;
-        }
-        case MODIFIED: {
-            switch (dbfile.itsRemoteChange) {
-            case ADDED:
-            case MODIFIED: {
-                logConflictFile(dbfile, true);
-                splitConflictedFile(dbfile, opers);
-                break;
-            }
-            case NO_CHANGE: {
-                opers.add(new GDriveLocalToRemoteOper(dbfile, itsFileCache,
-                                                      false));
-                break;
-            }
-            case REMOVED: {
-                logConflictFile(dbfile, true);
-                recreateRemoteRemovedFile(dbfile, opers);
-                break;
-            }
-            }
-            break;
-        }
-        case NO_CHANGE: {
-            switch (dbfile.itsRemoteChange) {
-            case ADDED:
-            case MODIFIED: {
-                opers.add(new GDriveRemoteToLocalOper(dbfile, itsFileCache));
-                break;
-            }
-            case NO_CHANGE: {
-                // Nothing
-                break;
-            }
-            case REMOVED: {
-                opers.add(new GDriveRmFileOper(dbfile));
-                break;
-            }
-            }
-            break;
-        }
-        case REMOVED: {
-            switch (dbfile.itsRemoteChange) {
-            case ADDED:
-            case MODIFIED: {
-                logConflictFile(dbfile, false);
-                DbFile newRemfile = splitRemoteToNewFile(dbfile);
-                DbFile updatedLocalFile = SyncDb.getFile(dbfile.itsId, itsDb);
-
-                opers.add(new GDriveRemoteToLocalOper(newRemfile,
-                                                      itsFileCache));
-                opers.add(new GDriveRmFileOper(updatedLocalFile));
-                break;
-            }
-            case NO_CHANGE:
-            case REMOVED: {
-                opers.add(new GDriveRmFileOper(dbfile));
-                break;
-            }
-            }
-            break;
-        }
-        }
-    }
-
-
-    /** Split the file.  A new added remote file is created with the remote id,
-     * and the file is updated to resemble a new local file with the same id but
-     * a different name indicating a conflict
-     */
-    private void splitConflictedFile(DbFile dbfile,
-                                     List<AbstractSyncOper<Drive>> opers)
-            throws SQLException
-    {
-        DbFile newRemfile = splitRemoteToNewFile(dbfile);
-        DbFile updatedLocalFile = updateFileAsLocallyAdded(
-                dbfile, itsContext.getString(R.string.conflicted_local_copy));
-
-        opers.add(new GDriveRemoteToLocalOper(newRemfile,
-                                              itsFileCache));
-        opers.add(new GDriveLocalToRemoteOper(updatedLocalFile,
-                                              itsFileCache, true));
-    }
-
-
-    /** Recreate a remotely deleted file from local updates */
-    private void recreateRemoteRemovedFile(DbFile dbfile,
-                                           List<AbstractSyncOper<Drive>> opers)
-            throws SQLException
-    {
-        resetRemoteFields(dbfile);
-        DbFile updatedLocalFile = updateFileAsLocallyAdded(
-                dbfile, itsContext.getString(R.string.recreated_local_copy));
-        opers.add(new GDriveLocalToRemoteOper(updatedLocalFile,
-                itsFileCache, true));
-    }
-
 
     /** Should the file be synced */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -421,7 +182,7 @@ public class GDriveSyncer extends ProviderSyncer<Drive>
 
 
     /** Is the file a folder */
-    private static boolean isFolderFile(File file)
+    public static boolean isFolderFile(File file)
     {
         return !file.getTrashed() &&
                 GDriveProvider.FOLDER_MIME.equals(file.getMimeType());
@@ -429,7 +190,7 @@ public class GDriveSyncer extends ProviderSyncer<Drive>
 
 
     /** Get a string form for a remote file */
-    private static String fileToString(File file)
+    public static String fileToString(File file)
     {
         if (file == null) {
             return "{null}";
