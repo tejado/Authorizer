@@ -51,7 +51,7 @@ public class SyncedFilesFragment extends ListFragment
         void listFiles(String path, ListFilesCb cb);
 
         /** Change directory to the given path */
-        void changeDir(String pathName, String pathId);
+        void changeDir(String pathDisplay, String pathId);
 
         /** Change directory to the parent path */
         void changeParentDir();
@@ -65,7 +65,7 @@ public class SyncedFilesFragment extends ListFragment
 
     private static final String TAG = "SyncedFilesFragment";
 
-    private String itsPathName;
+    private String itsPathDisplay;
     private String itsPathId;
     private Listener itsListener;
     private ArrayAdapter<ListItem> itsFilesAdapter;
@@ -78,7 +78,7 @@ public class SyncedFilesFragment extends ListFragment
     {
         SyncedFilesFragment frag = new SyncedFilesFragment();
         Bundle args = new Bundle();
-        args.putString("pathName", pathName);
+        args.putString("pathDisplay", pathName);
         args.putString("pathId", pathId);
         frag.setArguments(args);
         return frag;
@@ -100,7 +100,7 @@ public class SyncedFilesFragment extends ListFragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        itsPathName = getArguments().getString("pathName");
+        itsPathDisplay = getArguments().getString("pathDisplay");
         itsPathId = getArguments().getString("pathId");
     }
 
@@ -119,7 +119,7 @@ public class SyncedFilesFragment extends ListFragment
 
         TextView path = (TextView)rootView.findViewById(R.id.path);
         path.setText(getString(R.string.choose_sync_files_from_dir,
-                               itsPathName));
+                               itsPathDisplay));
 
         itsProgressBar = (ProgressBar)rootView.findViewById(R.id.progress);
         itsProgressBar.setVisibility(View.GONE);
@@ -199,7 +199,7 @@ public class SyncedFilesFragment extends ListFragment
 
         ProviderRemoteFile file = item.itsFile;
         if (file.isFolder()) {
-            itsListener.changeDir(file.getPath(), file.getRemoteId());
+            itsListener.changeDir(file.getDisplayPath(), file.getRemoteId());
         } else {
             boolean newSelected = !item.itsIsSelected;
             PasswdSafeUtil.dbginfo(TAG, "item selected %b: %s",
