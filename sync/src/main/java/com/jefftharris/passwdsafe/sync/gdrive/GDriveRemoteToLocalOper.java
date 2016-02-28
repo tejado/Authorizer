@@ -9,14 +9,13 @@ package com.jefftharris.passwdsafe.sync.gdrive;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
 
 import android.content.Context;
 import android.util.Log;
 
 import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.sync.lib.AbstractRemoteToLocalSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
@@ -29,34 +28,18 @@ public class GDriveRemoteToLocalOper
 {
     private static final String TAG = "GDriveRemoteToLocalOper";
 
-    // TODO: remove local file and use the dbfile's remote mod time like, say, box
-    private File itsDriveFile;
-
     /** Constructor */
-    public GDriveRemoteToLocalOper(DbFile file,
-                                   HashMap<String, File> cache)
+    public GDriveRemoteToLocalOper(DbFile file)
     {
         super(file);
-        itsDriveFile = cache.get(itsFile.itsRemoteId);
     }
-
 
     @Override
     public void doOper(Drive drive, Context ctx) throws IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "syncRemoteToLocal %s", itsFile);
-        if (itsDriveFile == null) {
-            itsDriveFile = GDriveSyncer.getFile(itsFile.itsRemoteId, drive);
-        }
         setLocalFileName(SyncHelper.getLocalFileName(itsFile.itsId));
-        setDownloaded(downloadFile(drive, ctx));
-    }
 
-
-    /** Download a file */
-    private boolean downloadFile(Drive drive, Context ctx)
-    {
-        PasswdSafeUtil.dbginfo(TAG, "downloadFile %s", itsDriveFile.getId());
         try {
             OutputStream os = null;
             try {
@@ -67,21 +50,18 @@ public class GDriveRemoteToLocalOper
                 drive.files().get(itsFile.itsRemoteId)
                      .executeMediaAndDownloadTo(os);
             } finally {
-                if (os != null) {
-                    os.close();
-                }
+                Utils.closeStreams(null, os);
             }
 
             java.io.File localFile = ctx.getFileStreamPath(getLocalFileName());
-            if (!localFile.setLastModified(
-                    itsDriveFile.getModifiedTime().getValue())) {
+            if (!localFile.setLastModified(itsFile.itsRemoteModDate)) {
                 Log.e(TAG, "Can't set mod time on " + itsFile);
             }
+            setDownloaded(true);
         } catch (IOException e) {
             ctx.deleteFile(getLocalFileName());
-            Log.e(TAG, "Sync failed to download " + itsDriveFile.getName(), e);
-            return false;
+            setDownloaded(false);
+            Log.e(TAG, "Sync failed to download " + itsFile, e);
         }
-        return true;
     }
 }
