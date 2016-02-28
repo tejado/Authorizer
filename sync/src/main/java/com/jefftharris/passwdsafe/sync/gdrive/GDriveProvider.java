@@ -69,6 +69,7 @@ public class GDriveProvider extends AbstractProvider
     public void init()
     {
         updateAcct();
+        requestSync(false);
     }
 
 
