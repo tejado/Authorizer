@@ -50,22 +50,6 @@ public class FileFolders
     }
 
 
-    /** Check if any files are contained in the given folder */
-    public void checkFolderFiles(File folder,
-                                 HashMap<String, File> folderFiles)
-            throws IOException
-    {
-        FolderRefs folderRefs = itsFolderRefs.get(folder.getId());
-        if (folderRefs != null) {
-            for (String fileId: folderRefs.itsFileRefs) {
-                File refFile = getCachedFile(fileId);
-                folderFiles.put(fileId, refFile);
-            }
-        }
-
-    }
-
-
     /** Compute the folders for the given file */
     public String computeFileFolders(File file)
             throws IOException
