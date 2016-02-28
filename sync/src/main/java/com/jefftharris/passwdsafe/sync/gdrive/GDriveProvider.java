@@ -143,7 +143,7 @@ public class GDriveProvider extends AbstractProvider
     }
 
     @Override
-    public boolean isAccountAuthorized()
+    public synchronized boolean isAccountAuthorized()
     {
         return !TextUtils.isEmpty(itsAccountName);
     }
@@ -201,7 +201,7 @@ public class GDriveProvider extends AbstractProvider
     }
 
     @Override
-    public void requestSync(boolean manual)
+    public synchronized void requestSync(boolean manual)
     {
         PasswdSafeUtil.dbginfo(TAG, "requestSync manual %b", manual);
         if (isAccountAuthorized()) {
