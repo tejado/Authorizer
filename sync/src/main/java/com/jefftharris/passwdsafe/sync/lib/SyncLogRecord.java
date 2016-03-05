@@ -24,7 +24,6 @@ public class SyncLogRecord
     private final long itsStartTime;
     private final List<Exception> itsFailures = new ArrayList<>();
     private long itsEndTime = -1;
-    private boolean itsIsFullSync = false;
     private final boolean itsIsManualSync;
     private boolean itsIsNotConnected = false;
     private final List<String> itsEntries = new ArrayList<>();
@@ -68,22 +67,10 @@ public class SyncLogRecord
         itsEndTime = System.currentTimeMillis();
     }
 
-    /** Get whether the sync is full or incremental */
-    public boolean isFullSync()
-    {
-        return itsIsFullSync;
-    }
-
     /** Get whether the sync was started manually */
     public boolean isManualSync()
     {
         return itsIsManualSync;
-    }
-
-    /** Set whether the sync is full or incremental */
-    public void setFullSync(boolean full)
-    {
-        itsIsFullSync = full;
     }
 
     /** Get whether the network was not connected */
@@ -142,9 +129,6 @@ public class SyncLogRecord
     {
         return ctx.getString(
                 R.string.sync_log_record, itsAccount,
-                ctx.getString(itsIsFullSync ?
-                                      R.string.full_sync :
-                                      R.string.incremental_sync),
                 ctx.getString(itsIsManualSync ?
                                       R.string.manual :
                                       R.string.automatic),

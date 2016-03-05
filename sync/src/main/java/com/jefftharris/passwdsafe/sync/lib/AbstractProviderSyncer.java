@@ -40,7 +40,6 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
     public final void sync()
             throws Exception
     {
-        itsLogrec.setFullSync(true);
         List<AbstractSyncOper<ProviderClientT>> opers = null;
 
         try {

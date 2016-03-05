@@ -103,14 +103,6 @@ public class SyncLogsFragment extends ListFragment
 
                     StringBuilder str = new StringBuilder();
                     if ((flags &
-                            PasswdSafeContract.SyncLogs.FLAGS_IS_FULL) != 0) {
-                        str.append(getString(R.string.full_sync));
-                    } else {
-                        str.append(getString(R.string.incremental_sync));
-                    }
-
-                    str.append(", ");
-                    if ((flags &
                             PasswdSafeContract.SyncLogs.FLAGS_IS_MANUAL) != 0) {
                         str.append(getString(R.string.manual));
                     } else {

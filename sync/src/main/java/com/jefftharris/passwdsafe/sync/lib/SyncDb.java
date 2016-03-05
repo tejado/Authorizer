@@ -201,19 +201,6 @@ public class SyncDb
         updateProviderFields(id, values, db);
     }
 
-    /** Update a provider sync change */
-    public static void updateProviderSyncChange(DbProvider provider,
-                                                long change,
-                                                SQLiteDatabase db)
-           throws SQLException
-    {
-        PasswdSafeUtil.dbginfo(TAG, "Set provider sync change %s: %d",
-                               provider.itsAcct, change);
-        ContentValues values = new ContentValues();
-        values.put(DB_COL_PROVIDERS_SYNC_CHANGE, change);
-        updateProviderFields(provider.itsId, values, db);
-    }
-
     /** Get a provider by id */
     public static DbProvider getProvider(long id, SQLiteDatabase db)
             throws SQLException
@@ -461,9 +448,6 @@ public class SyncDb
         values.put(DB_COL_SYNC_LOGS_LOG, logrec.getActions());
 
         int flags = 0;
-        if (logrec.isFullSync()) {
-            flags |= PasswdSafeContract.SyncLogs.FLAGS_IS_FULL;
-        }
         if (logrec.isManualSync()) {
             flags |= PasswdSafeContract.SyncLogs.FLAGS_IS_MANUAL;
         }

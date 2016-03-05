@@ -18,11 +18,9 @@
     <string name="dropbox_acct_unlinked">App unlinked from Dropbox account.  Sync again to allow Dropbox access for PasswdSafe Sync.</string>
     <string name="dropbox_service_updated">Dropbox service updated</string>
     <string name="dropbox_synced_files">Dropbox Synced Files</string>
-    <string name="full_sync">Full sync</string>
     <string name="gdrive_state_auth_required">Google account authentication required.  Sync again to begin the authentication process.</string>
     <string name="gdrive_state_pending_auth">Google account authentication is pending.  Select the sign-in request notification and sync again.</string>
     <string name="google_acct_not_available">Google account not available</string>
-    <string name="incremental_sync">Incremental sync</string>
     <string name="interval">Interval</string>
     <string name="logs">Logs</string>
     <string name="manual">Manual</string>
@@ -59,7 +57,7 @@
     <string name="sync">Sync</string>
     <string name="sync_conflict_log">Sync conflict with file %1$s which was locally %2$s and remotely %3$s</string>
     <string name="sync_interval_label">Interval:</string>
-    <string name="sync_log_record">Sync %1$s, %2$s, %3$s, %4$s, start: %5$tc, end: %6$tc</string>
+    <string name="sync_log_record">Sync %1$s, %2$s, %3$s, start: %4$tc, end: %5$tc</string>
     <string name="sync_oper_local_to_remote">Upload file: %1$s</string>
     <string name="sync_oper_remote_to_local">Download file: %1$s</string>
     <string name="sync_oper_rmfile">Remove file: %1$s</string>
