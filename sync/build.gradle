@@ -22,12 +22,14 @@ android {
             //noinspection GroovyAssignabilityCheck
             proguardFiles getDefaultProguardFile('proguard-android.txt')
             proguardFiles += 'proguard-rules.pro'
+            proguardFiles += 'proguard-google-api-client.pro'
         }
         release {
             minifyEnabled true
             //noinspection GroovyAssignabilityCheck
             proguardFiles getDefaultProguardFile('proguard-android.txt')
             proguardFiles += 'proguard-rules.pro'
+            proguardFiles += 'proguard-google-api-client.pro'
         }
     }
     packagingOptions {
