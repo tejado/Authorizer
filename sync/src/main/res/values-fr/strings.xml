@@ -18,11 +18,9 @@
     <string name="dropbox_acct_unlinked">App dissociée de compte Dropbox. Synchronisez à nouveau pour permettre l\'accès Dropbox pour PasswdSafe Sync.</string>
     <string name="dropbox_service_updated">Service de Dropbox est mis à jour</string>
     <string name="dropbox_synced_files">Dropbox Fichiers Synchronisé</string>
-    <string name="full_sync">Synchronisation complète</string>
     <string name="gdrive_state_auth_required">Compte Google authentification requise. Synchronisez à nouveau pour commencer le processus d\'authentification.</string>
     <string name="gdrive_state_pending_auth">Authentification de compte Google est en cours. Sélectionnez la notification de la demande de session.</string>
     <string name="google_acct_not_available">Compte Google n\'est pas disponible</string>
-    <string name="incremental_sync">Synchronisation incrémental</string>
     <string name="interval">Intervalle</string>
     <string name="logs">Archives</string>
     <string name="manual">Manuel</string>
@@ -62,7 +60,7 @@
     <string name="sync">Synchroniser</string>
     <string name="sync_conflict_log">Conflit de synchronisation avec le fichier %1$s qui a été %2$s sur place et %3$s à distance</string>
     <string name="sync_interval_label">Intervalle:</string>
-    <string name="sync_log_record">Synchroniser %1$s, %2$s, %3$s, %4$s, début: %5$tc, fin: %6$tc</string>
+    <string name="sync_log_record">Synchroniser %1$s, %2$s, %3$s, début: %4$tc, fin: %5$tc</string>
     <string name="sync_oper_local_to_remote">Uploader le fichier: %1$s</string>
     <string name="sync_oper_remote_to_local">Télécharger le fichier: %1$s</string>
     <string name="sync_oper_rmfile">Supprimer le fichier: %1$s</string>
