@@ -22,7 +22,6 @@ public class DbProvider
     public final long itsId;
     public final ProviderType itsType;
     public final String itsAcct;
-    public final long itsSyncChange;
     public final int itsSyncFreq;
     public final String itsDisplayName;
 
@@ -30,7 +29,6 @@ public class DbProvider
         SyncDb.DB_COL_PROVIDERS_ID,
         SyncDb.DB_COL_PROVIDERS_TYPE,
         SyncDb.DB_COL_PROVIDERS_ACCT,
-        SyncDb.DB_COL_PROVIDERS_SYNC_CHANGE,
         SyncDb.DB_COL_PROVIDERS_SYNC_FREQ,
         SyncDb.DB_COL_PROVIDERS_DISPLAY_NAME };
 
@@ -40,9 +38,8 @@ public class DbProvider
         itsId = cursor.getLong(0);
         itsType = ProviderType.fromString(cursor.getString(1));
         itsAcct = cursor.getString(2);
-        itsSyncChange = cursor.getLong(3);
-        itsSyncFreq = cursor.getInt(4);
-        itsDisplayName = cursor.getString(5);
+        itsSyncFreq = cursor.getInt(3);
+        itsDisplayName = cursor.getString(4);
     }
 
     /** Get the type and display name */
@@ -66,9 +63,7 @@ public class DbProvider
     {
         return String.format(
                 Locale.US,
-                "{id:%d, type: %s, acct:%s, syncChange:%d, " +
-                "syncFreq:%d, dispName:%s}",
-                itsId, itsType, itsAcct, itsSyncChange, itsSyncFreq,
-                itsDisplayName);
+                "{id:%d, type: %s, acct:%s, syncFreq:%d, dispName:%s}",
+                itsId, itsType, itsAcct, itsSyncFreq, itsDisplayName);
     }
 }

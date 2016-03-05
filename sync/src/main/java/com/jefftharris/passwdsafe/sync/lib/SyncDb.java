@@ -42,7 +42,6 @@ public class SyncDb
     public static final String DB_COL_PROVIDERS_ID = BaseColumns._ID;
     public static final String DB_COL_PROVIDERS_TYPE = "type";
     public static final String DB_COL_PROVIDERS_ACCT = "acct";
-    public static final String DB_COL_PROVIDERS_SYNC_CHANGE = "sync_change";
     public static final String DB_COL_PROVIDERS_SYNC_FREQ = "sync_freq";
     public static final String DB_COL_PROVIDERS_DISPLAY_NAME = "display_name";
     public static final String DB_MATCH_PROVIDERS_ID =
@@ -167,7 +166,6 @@ public class SyncDb
         ContentValues values = new ContentValues();
         values.put(DB_COL_PROVIDERS_TYPE, type.toString());
         values.put(DB_COL_PROVIDERS_ACCT, name);
-        values.put(DB_COL_PROVIDERS_SYNC_CHANGE, -1);
         values.put(DB_COL_PROVIDERS_SYNC_FREQ, freq);
         return db.insertOrThrow(DB_TABLE_PROVIDERS, null, values);
     }
@@ -544,7 +542,8 @@ public class SyncDb
                        DB_COL_PROVIDERS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                        DB_COL_PROVIDERS_TYPE + " TEXT NOT NULL," +
                        DB_COL_PROVIDERS_ACCT + " TEXT NOT NULL," +
-                       DB_COL_PROVIDERS_SYNC_CHANGE + " INTEGER NOT NULL," +
+                       // sync_change is deprecated
+                       "sync_change INTEGER NOT NULL," +
                        DB_COL_PROVIDERS_SYNC_FREQ + " INTEGER NOT NULL" +
                        ");");
             db.execSQL("CREATE TABLE " + DB_TABLE_FILES + " (" +
