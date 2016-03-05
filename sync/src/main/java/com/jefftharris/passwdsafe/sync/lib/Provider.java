@@ -67,7 +67,6 @@ public interface Provider
     void sync(Account acct,
               DbProvider provider,
               SQLiteDatabase db,
-              boolean full,
               SyncLogRecord logrec)
             throws Exception;
 

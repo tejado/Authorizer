@@ -195,7 +195,6 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     public void sync(Account acct,
                      DbProvider provider,
                      SQLiteDatabase db,
-                     boolean full,
                      SyncLogRecord logrec) throws Exception
     {
         try {

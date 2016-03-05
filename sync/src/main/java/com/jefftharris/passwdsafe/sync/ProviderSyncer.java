@@ -128,7 +128,7 @@ public class ProviderSyncer
     }
 
     /** Perform synchronization */
-    public void performSync(boolean manual, boolean full)
+    public void performSync(boolean manual)
     {
         SyncDb syncDb = SyncDb.acquire();
         SQLiteDatabase db = syncDb.getDb();
@@ -140,7 +140,7 @@ public class ProviderSyncer
                         ProviderFactory.getProvider(provider.itsType,
                                                     itsContext);
                 SyncHelper.performSync(itsAccount, provider, providerImpl,
-                                       manual, full, db, itsContext);
+                                       manual, db, itsContext);
             }
         } finally {
             syncDb.release();

@@ -21,9 +21,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter
 {
-    public static final String SYNC_EXTRAS_FULL =
-            "SyncAdapter.SYNC_EXTRAS_FULL";
-
     private Context itsContext = null;
     private static final String TAG = "SyncAdapter";
 
@@ -49,9 +46,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
     {
         boolean manual = (extras != null) &&
                 extras.getBoolean(ContentResolver.SYNC_EXTRAS_MANUAL);
-        boolean full = (extras != null) &&
-                extras.getBoolean(SYNC_EXTRAS_FULL, false);
         ProviderSyncer syncer = new ProviderSyncer(itsContext, account);
-        syncer.performSync(manual, full);
+        syncer.performSync(manual);
     }
 }

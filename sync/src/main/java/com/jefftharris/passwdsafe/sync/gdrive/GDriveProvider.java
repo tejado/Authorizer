@@ -41,7 +41,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.R;
-import com.jefftharris.passwdsafe.sync.SyncAdapter;
 import com.jefftharris.passwdsafe.sync.SyncApp;
 import com.jefftharris.passwdsafe.sync.SyncUpdateHandler;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProvider;
@@ -74,8 +73,6 @@ public class GDriveProvider extends AbstractProvider
 
     private final Context itsContext;
     private String itsAccountName;
-
-    // TODO: remove notion of full sync
 
     /** Constructor */
     public GDriveProvider(Context ctx)
@@ -207,7 +204,6 @@ public class GDriveProvider extends AbstractProvider
         if (isAccountAuthorized()) {
             Account acct = getAccount(itsAccountName);
             Bundle extras = new Bundle();
-            extras.putBoolean(SyncAdapter.SYNC_EXTRAS_FULL, true);
             ApiCompat.requestManualSync(acct, PasswdSafeContract.CONTENT_URI,
                                         extras);
         }
@@ -216,7 +212,6 @@ public class GDriveProvider extends AbstractProvider
     @Override
     public void sync(Account acct, DbProvider provider,
                      SQLiteDatabase db,
-                     boolean full,
                      SyncLogRecord logrec) throws Exception
     {
         Pair<Drive, String> driveService = getDriveService(acct, itsContext);
