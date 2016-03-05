@@ -38,7 +38,7 @@ public class OnedriveLocalToRemoteOper
     /** Constructor */
     public OnedriveLocalToRemoteOper(DbFile dbfile)
     {
-        super(dbfile, false);
+        super(dbfile);
     }
 
     /** Perform the sync operation */

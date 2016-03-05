@@ -44,8 +44,6 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
 
     private static final String TAG = "GDriveSyncer";
 
-    // TODO: local to remote force insert used? needed?
-
     /** Constructor */
     public GDriveSyncer(Drive drive,
                         DbProvider provider,
@@ -82,7 +80,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
     protected AbstractLocalToRemoteSyncOper<Drive> createLocalToRemoteOper(
             DbFile dbfile)
     {
-        return new GDriveLocalToRemoteOper(dbfile, itsFileFolders, false);
+        return new GDriveLocalToRemoteOper(dbfile, itsFileFolders);
     }
 
     @Override

@@ -32,11 +32,9 @@ public class GDriveLocalToRemoteOper
     private String itsUpdateFolders;
 
     /** Constructor */
-    public GDriveLocalToRemoteOper(DbFile file,
-                                   FileFolders fileFolders,
-                                   boolean forceInsert)
+    public GDriveLocalToRemoteOper(DbFile file, FileFolders fileFolders)
     {
-        super(file, forceInsert);
+        super(file);
         itsFileFolders = fileFolders;
     }
 

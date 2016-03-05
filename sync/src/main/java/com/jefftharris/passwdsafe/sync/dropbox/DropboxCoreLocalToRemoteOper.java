@@ -38,7 +38,7 @@ public class DropboxCoreLocalToRemoteOper
     /** Constructor */
     public DropboxCoreLocalToRemoteOper(DbFile dbfile)
     {
-        super(dbfile, false);
+        super(dbfile);
     }
 
     /** Perform the sync operation */

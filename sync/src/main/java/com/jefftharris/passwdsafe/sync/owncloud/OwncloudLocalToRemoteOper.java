@@ -37,7 +37,7 @@ public class OwncloudLocalToRemoteOper extends
     /** Constructor */
     public OwncloudLocalToRemoteOper(DbFile file)
     {
-        super(file, false);
+        super(file);
     }
 
     /* (non-Javadoc)
