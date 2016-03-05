@@ -22,7 +22,6 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.sync.R;
-import com.jefftharris.passwdsafe.sync.SyncApp;
 import com.jefftharris.passwdsafe.sync.SyncLogsActivity;
 
 /**
@@ -49,8 +48,7 @@ public class SyncHelper
             ProviderType providerType;
             switch (acct.type) {
             case SyncDb.GDRIVE_ACCOUNT_TYPE: {
-                providerType = SyncApp.GDRIVEPLAY ? ProviderType.GDRIVE_PLAY :
-                               ProviderType.GDRIVE;
+                providerType = ProviderType.GDRIVE;
                 break;
             }
             case SyncDb.DROPBOX_ACCOUNT_TYPE: {

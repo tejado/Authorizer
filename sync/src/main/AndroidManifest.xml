@@ -49,16 +49,7 @@
         <activity android:name=".SyncLogsActivity"
                   android:label="@string/logs"
                   android:parentActivityName=".MainActivity"/>
-        
-        <activity
-            android:name=".gdriveplay.GDrivePlayMainActivity"
-            android:label="@string/google_drive"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.jefftharris.passwdsafe.sync.MainActivity"/>
-        </activity>
-        
+
         <activity
             android:name=".dropbox.DropboxFilesActivity"
             android:label="@string/dropbox_synced_files"

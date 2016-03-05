@@ -628,7 +628,6 @@ public class MainActivity extends AppCompatActivity
             try {
                 ProviderType type = ProviderType.valueOf(typeStr);
                 switch (type) {
-                case GDRIVE_PLAY:
                 case GDRIVE: {
                     hasGdrive = true;
                     updateGdriveAccount(cursor);
@@ -933,8 +932,6 @@ public class MainActivity extends AppCompatActivity
     /** Get the Google Drive provider */
     private Provider getGDrivePlayProvider()
     {
-        if (SyncApp.GDRIVEPLAY)
-            return ProviderFactory.getProvider(ProviderType.GDRIVE_PLAY, this);
         return ProviderFactory.getProvider(ProviderType.GDRIVE, this);
     }
 

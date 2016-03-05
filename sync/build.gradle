@@ -54,7 +54,6 @@ dependencies {
     compile project(':lib-onedrive:onedriveaccess')
     compile project(':lib-onedrive')
     compile 'com.google.android.gms:play-services-auth:8.4.0'
-    compile 'com.google.android.gms:play-services-drive:8.4.0'
     compile('com.google.api-client:google-api-client-android:1.21.0') {
         exclude group: 'org.apache.httpcomponents'
         exclude group: 'com.google.api-client', module: 'google-api-client'
