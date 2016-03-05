@@ -92,7 +92,6 @@ public class SyncHelper
                                    DbProvider provider,
                                    Provider providerImpl,
                                    boolean manual,
-                                   boolean full,
                                    SQLiteDatabase db,
                                    Context ctx)
     {
@@ -102,8 +101,8 @@ public class SyncHelper
         boolean online = (netInfo != null) && netInfo.isConnected();
 
         PasswdSafeUtil.dbginfo(
-                TAG, "Performing sync %s (%s), manual %b, full %b, online %b",
-                acct.name, acct.type, manual, full, online);
+                TAG, "Performing sync %s (%s), manual %b, online %b",
+                acct.name, acct.type, manual, online);
 
         String displayName = TextUtils.isEmpty(provider.itsDisplayName) ?
                 provider.itsAcct : provider.itsDisplayName;
@@ -113,7 +112,7 @@ public class SyncHelper
         try {
             logrec.setNotConnected(!online);
             if (online) {
-                providerImpl.sync(acct, provider, db, full, logrec);
+                providerImpl.sync(acct, provider, db, logrec);
             }
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);

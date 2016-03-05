@@ -244,7 +244,6 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     public void sync(Account acct,
                      DbProvider provider,
                      SQLiteDatabase db,
-                     boolean full,
                      SyncLogRecord logrec) throws Exception
     {
         boolean authorized = isAccountAuthorized();

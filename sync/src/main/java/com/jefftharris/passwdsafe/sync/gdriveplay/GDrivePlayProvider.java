@@ -37,7 +37,6 @@ import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
-import com.jefftharris.passwdsafe.sync.SyncAdapter;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
@@ -247,7 +246,6 @@ public class GDrivePlayProvider
         PasswdSafeUtil.dbginfo(TAG, "requestSync manual %b", manual);
         Account acct = getAccount(getAcctName());
         Bundle extras = new Bundle();
-        extras.putBoolean(SyncAdapter.SYNC_EXTRAS_FULL, true);
         ApiCompat.requestManualSync(acct, PasswdSafeContract.CONTENT_URI,
                                     extras);
     }
@@ -259,7 +257,6 @@ public class GDrivePlayProvider
     public void sync(Account acct,
                      DbProvider provider,
                      SQLiteDatabase db,
-                     boolean full,
                      SyncLogRecord logrec) throws Exception
     {
         PasswdSafeUtil.dbginfo(TAG, "sync");
