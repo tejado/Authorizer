@@ -303,8 +303,7 @@ public class PasswdSafeNewFileFragment
                     break;
                 }
                 switch (uri.getSyncType()) {
-                case GDRIVE:
-                case GDRIVE_PLAY: {
+                case GDRIVE: {
                     titleId = R.string.new_drive_file;
                     break;
                 }

@@ -20,9 +20,6 @@ import com.jefftharris.passwdsafe.sync.lib.SyncDb;
  */
 public class SyncApp extends Application
 {
-    // TODO: remove
-    public static final boolean GDRIVEPLAY = false;
-
     private static final String TAG = "SyncApp";
 
     private Handler itsHandler = null;

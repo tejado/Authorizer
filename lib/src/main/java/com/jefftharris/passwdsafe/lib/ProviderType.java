@@ -16,7 +16,6 @@ import android.widget.TextView;
 public enum ProviderType
 {
     GDRIVE,
-    GDRIVE_PLAY,
     DROPBOX,
     BOX,
     ONEDRIVE,
@@ -26,8 +25,7 @@ public enum ProviderType
     public void setIcon(ImageView iv)
     {
         switch (this) {
-        case GDRIVE:
-        case GDRIVE_PLAY: {
+        case GDRIVE: {
             iv.setImageResource(R.drawable.google_drive);
             break;
         }
@@ -60,8 +58,7 @@ public enum ProviderType
     public String getName(Context context)
     {
         switch (this) {
-        case GDRIVE:
-        case GDRIVE_PLAY: {
+        case GDRIVE: {
             return context.getString(R.string.google_drive);
         }
         case DROPBOX: {
