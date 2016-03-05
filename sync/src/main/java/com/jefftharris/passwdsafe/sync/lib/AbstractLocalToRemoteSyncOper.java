@@ -25,10 +25,10 @@ public abstract class AbstractLocalToRemoteSyncOper<ProviderClientT> extends
     private File itsLocalFile;
 
     /** Constructor */
-    protected AbstractLocalToRemoteSyncOper(DbFile file, boolean forceInsert)
+    protected AbstractLocalToRemoteSyncOper(DbFile file)
     {
         super(file);
-        itsIsInsert = forceInsert || TextUtils.isEmpty(itsFile.itsRemoteId);
+        itsIsInsert = TextUtils.isEmpty(itsFile.itsRemoteId);
     }
 
 

@@ -35,7 +35,7 @@ public class BoxLocalToRemoteOper
     /** Constructor */
     public BoxLocalToRemoteOper(DbFile file)
     {
-        super(file, false);
+        super(file);
     }
 
     @Override
