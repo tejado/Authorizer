@@ -129,8 +129,7 @@ class AuthorizationRequest implements ObservableOAuthRequest, OAuthRequestObserv
             @Override
             public void onReceivedSslError(final WebView view, final SslErrorHandler handler,
                                            final SslError error) {
-                // Android does not like the SSL certificate we use, because it has '*' in it. Proceed with the errors.
-                handler.proceed();
+                handler.cancel();
             }
 
             /**
