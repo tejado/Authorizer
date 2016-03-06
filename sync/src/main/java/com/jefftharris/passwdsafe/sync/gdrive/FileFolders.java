@@ -11,13 +11,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 
 /**
- * The FileFolders class encapsulates handling of folders for GDrive files
+ * The FileFolders class encapsulates handling of files and folders for
+ * GDrive files
  */
 public class FileFolders
 {
@@ -37,12 +40,33 @@ public class FileFolders
             throws IOException
     {
         String fileId = file.getId();
+        itsFileCache.put(fileId, file);
         ArrayList<String> folders = new ArrayList<>();
         for (String parentId: file.getParents()) {
             traceParentRefs(parentId, "", folders, fileId);
         }
         Collections.sort(folders);
         return TextUtils.join(", ", folders);
+    }
+
+
+    /** Get a cached file */
+    public @Nullable File getCachedFile(String id)
+            throws IOException
+    {
+        File file = itsFileCache.get(id);
+        if (file == null) {
+            try {
+                file = itsDrive.files().get(id)
+                               .setFields(GDriveProvider.FILE_FIELDS).execute();
+            } catch (GoogleJsonResponseException e) {
+                if (e.getStatusCode() != 404) {
+                    throw e;
+                }
+            }
+            itsFileCache.put(id, file);
+        }
+        return file;
     }
 
 
@@ -55,6 +79,9 @@ public class FileFolders
             throws IOException
     {
         File parentFile = getCachedFile(parentId);
+        if (parentFile == null) {
+            return;
+        }
         if (parentFile.getParents() == null) {
             suffix = parentFile.getName() + suffix;
             folders.add(suffix);
@@ -70,19 +97,5 @@ public class FileFolders
                 traceParentRefs(parentParentId, suffix, folders, fileId);
             }
         }
-    }
-
-
-    /** Get a cached file */
-    private File getCachedFile(String id)
-            throws IOException
-    {
-        File file = itsFileCache.get(id);
-        if (file == null) {
-            file = itsDrive.files().get(id)
-                           .setFields(GDriveProvider.FILE_FIELDS).execute();
-            itsFileCache.put(id, file);
-        }
-        return file;
     }
 }
