@@ -7,6 +7,7 @@
 package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -14,6 +15,7 @@ import java.util.Locale;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.google.api.services.drive.Drive;
@@ -108,29 +110,76 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
                 "       mimeType = 'binary/octet-stream' or " +
                 "       mimeType = 'application/psafe3' )" +
                 " and fullText contains '.psafe3'";
-        Drive.Files.List request =
-                itsProviderClient.files().list()
-                                 .setQ(query)
-                                 .setFields("nextPageToken,files(" +
-                                            GDriveProvider.FILE_FIELDS + ")");
-        do {
-            FileList files = request.execute();
-            PasswdSafeUtil.dbginfo(TAG, "num files: %d",
-                                   files.getFiles().size());
-            for (File file: files.getFiles()) {
-                if (!isSyncFile(file)) {
-                    if (isFolderFile(file)) {
-                        PasswdSafeUtil.dbginfo(TAG, "isdir %s", file);
-                    }
-                    continue;
+        for (File file: listFiles(query)) {
+            if (!isSyncFile(file)) {
+                if (isFolderFile(file)) {
+                    PasswdSafeUtil.dbginfo(TAG, "isdir %s", file);
                 }
-                PasswdSafeUtil.dbginfo(TAG, "File %s", fileToString(file));
-                GDriveProviderFile driveFile = new GDriveProviderFile(
-                        file, itsFileFolders.computeFileFolders(file));
-                driveFiles.put(driveFile.getRemoteId(), driveFile);
+                continue;
             }
-            request.setPageToken(files.getNextPageToken());
-        } while(!TextUtils.isEmpty(request.getPageToken()));
+            PasswdSafeUtil.dbginfo(TAG, "File %s", fileToString(file));
+            GDriveProviderFile driveFile = new GDriveProviderFile(
+                    file, itsFileFolders.computeFileFolders(file));
+            driveFiles.put(driveFile.getRemoteId(), driveFile);
+        }
+
+        // Check whether any files were renamed/deleted and replaced with a
+        // different file in the same location with the same name
+        for (DbFile dbfile: SyncDb.getFiles(itsProvider.itsId, itsDb)) {
+            if (dbfile.itsRemoteId == null) {
+                continue;
+            }
+
+            switch (dbfile.itsRemoteChange) {
+            case NO_CHANGE: {
+                File dbremfile =
+                        itsFileFolders.getCachedFile(dbfile.itsRemoteId);
+                if (dbremfile == null) {
+                    break;
+                } else if (isSyncFile(dbremfile)) {
+                    ProviderRemoteFile remfile =
+                            driveFiles.get(dbfile.itsRemoteId);
+                    if (remfile == null) {
+                        break;
+                    }
+                    if (TextUtils.equals(dbfile.itsRemoteTitle,
+                                         remfile.getTitle()) &&
+                        TextUtils.equals(dbfile.itsRemoteFolder,
+                                         remfile.getFolder())) {
+                        break;
+                    }
+                }
+
+                PasswdSafeUtil.dbginfo(TAG, "check replace %s", dbremfile);
+                parentsloop:
+                for (String parent: dbremfile.getParents()) {
+                    for (File replacedFile: listFiles(
+                            String.format("'%s' in parents and name='%s'",
+                                          parent, dbfile.itsRemoteTitle))) {
+                        if (!driveFiles.containsKey(replacedFile.getId())) {
+                            continue;
+                        }
+
+                        PasswdSafeUtil.dbginfo(TAG, "File %s replaced with %s",
+                                               fileToString(dbremfile),
+                                               fileToString(replacedFile));
+                        SyncDb.updateRemoteFile(
+                                dbfile.itsId, replacedFile.getId(),
+                                dbfile.itsRemoteTitle, dbfile.itsRemoteFolder,
+                                dbfile.itsRemoteModDate, dbfile.itsRemoteHash,
+                                itsDb);
+                        break parentsloop;
+                    }
+                }
+                break;
+            }
+            case ADDED:
+            case MODIFIED:
+            case REMOVED: {
+                break;
+            }
+            }
+        }
 
         return driveFiles;
     }
@@ -154,9 +203,29 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
         }
     }
 
+    /** List files */
+    private List<File> listFiles(String query) throws IOException
+    {
+        ArrayList<File> retfiles = new ArrayList<>();
+
+        Drive.Files.List request = itsProviderClient
+                .files().list().setQ(query)
+                .setFields("nextPageToken,files(" +
+                           GDriveProvider.FILE_FIELDS + ")");
+        do {
+            FileList files = request.execute();
+            PasswdSafeUtil.dbginfo(TAG, "num files: %d",
+                                   files.getFiles().size());
+            retfiles.addAll(files.getFiles());
+            request.setPageToken(files.getNextPageToken());
+        } while(!TextUtils.isEmpty(request.getPageToken()));
+
+        return retfiles;
+    }
+
     /** Should the file be synced */
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean isSyncFile(File file)
+    private static boolean isSyncFile(@NonNull File file)
     {
         if (isFolderFile(file) || file.getTrashed()) {
             return false;
@@ -167,7 +236,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
 
 
     /** Is the file a folder */
-    public static boolean isFolderFile(File file)
+    public static boolean isFolderFile(@NonNull File file)
     {
         return !file.getTrashed() &&
                 GDriveProvider.FOLDER_MIME.equals(file.getMimeType());
