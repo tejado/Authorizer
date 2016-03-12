@@ -69,6 +69,9 @@
     <string name="updating_account">Mise à jour compte&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;3.1.0&lt;/b&gt; - Correction synchronisation Google Drive sur
+        les fichiers remplacés et renommés. Mise à jour librairie Google Drive.
+        \n\n
         &lt;b&gt;3.0.2&lt;/b&gt; - Demander les permissions si demandés.
         Mettre à jour la librairie Box.
         \n\n
