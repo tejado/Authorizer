@@ -177,7 +177,7 @@ public class SyncProviderFilesFragment extends ListFragment
                     }
                     String str;
                     ImageView icon = (ImageView)view.findViewById(R.id.icon);
-                    if (cursor.moveToFirst()) {
+                    if ((cursor != null) && cursor.moveToFirst()) {
                         str = PasswdSafeContract.Providers.getDisplayName(cursor);
                         String typeStr = cursor.getString(
                             PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
