@@ -87,6 +87,7 @@
     <string name="file">File</string>
     <string name="file_label">File:</string>
     <string name="file_name">File Name</string>
+    <string name="file_not_found_perm_denied">File not found or permission denied</string>
     <string name="file_operations">File Operations…</string>
     <string name="file_password_encoding">File password encoding</string>
     <string name="files">Files</string>

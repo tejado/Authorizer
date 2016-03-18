@@ -100,9 +100,77 @@ public class PasswdFileUri implements Parcelable
                 }
             };
 
+    /**
+     * Creator for a PasswdFileUri that can work with an AsyncTask
+     */
+    public static class Creator
+    {
+        private final Uri itsFileUri;
+        private final Context itsContext;
+        private PasswdFileUri itsResolvedUri;
+        private Throwable itsResolveEx;
+
+        /**
+         * Constructor
+         */
+        public Creator(Uri fileUri, Context ctx)
+        {
+            itsFileUri = fileUri;
+            itsContext = ctx;
+        }
+
+        /**
+         * Handle a pre-execute call in the main thread
+         */
+        public void onPreExecute()
+        {
+            switch (PasswdFileUri.getUriType(itsFileUri)) {
+            case GENERIC_PROVIDER: {
+                create();
+                break;
+            }
+            case FILE:
+            case SYNC_PROVIDER:
+            case EMAIL: {
+                break;
+            }
+            }
+        }
+
+        /**
+         * Finish creating the PasswdFileUri, typically in a background thread
+         */
+        public PasswdFileUri finishCreate()
+        {
+            if ((itsResolvedUri == null) && (itsResolveEx == null)) {
+                create();
+            }
+            return itsResolvedUri;
+        }
+
+        /**
+         * Get an exception that occurred during the creation
+         */
+        public Throwable getResolveEx()
+        {
+            return itsResolveEx;
+        }
+
+        /**
+         * Create the PasswdFileUri
+         */
+        private void create()
+        {
+            try {
+                itsResolvedUri = new PasswdFileUri(itsFileUri, itsContext);
+            } catch (Throwable e) {
+                itsResolveEx = e;
+            }
+        }
+    }
 
     /** Constructor */
-    public PasswdFileUri(Uri uri, Context ctx)
+    private PasswdFileUri(Uri uri, Context ctx)
     {
         itsUri = uri;
         itsType = getUriType(uri);
