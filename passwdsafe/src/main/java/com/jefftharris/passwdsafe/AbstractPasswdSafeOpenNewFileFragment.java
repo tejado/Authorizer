@@ -178,61 +178,33 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
      */
     protected class ResolveTask extends BackgroundTask<PasswdFileUri>
     {
-        private PasswdFileUri itsResolvedUri;
-        private Throwable itsResolveEx;
+        private PasswdFileUri.Creator itsUriCreator =
+                new PasswdFileUri.Creator(itsFileUri, getActivity());
 
         @Override
         protected final void onPreExecute()
         {
             super.onPreExecute();
-            switch (PasswdFileUri.getUriType(itsFileUri)) {
-            case GENERIC_PROVIDER: {
-                itsResolvedUri = resolve();
-            }
-            case FILE:
-            case SYNC_PROVIDER:
-            case EMAIL: {
-                break;
-            }
-            }
+            itsUriCreator.onPreExecute();
         }
 
         @Override
         protected final PasswdFileUri doInBackground(Void... voids)
         {
-            if ((itsResolvedUri != null) || (itsResolveEx != null)) {
-                return itsResolvedUri;
-            }
-            return resolve();
+            return itsUriCreator.finishCreate();
         }
 
         @Override
         protected final void onPostExecute(PasswdFileUri uri)
         {
             super.onPostExecute(uri);
-            if (itsResolveEx != null) {
+            Throwable resolveEx = itsUriCreator.getResolveEx();
+            if (resolveEx != null) {
                 PasswdSafeUtil.showFatalMsg(
-                        itsResolveEx,
-                        "Error resolving file URI.  Please email the developer " +
-                        "from the app's Play store listing with information " +
-                        "about the file being opened.  Recreating the issue " +
-                        "has been unsuccessful, preventing a fix.",
+                        getString(R.string.file_not_found_perm_denied),
                         getActivity());
             } else {
                 resolveTaskFinished(uri);
-            }
-        }
-
-        /**
-         * Resolve the file URI, trapping any exceptions
-         */
-        private PasswdFileUri resolve()
-        {
-            try {
-                return new PasswdFileUri(itsFileUri, getActivity());
-            } catch (Throwable e) {
-                itsResolveEx = e;
-                return null;
             }
         }
     }

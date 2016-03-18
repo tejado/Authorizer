@@ -432,8 +432,9 @@ public class NotificationMgr implements PasswdFileDataObserver
                             final SQLiteDatabase db)
         throws SQLException
     {
-        PasswdFileUri passwdUri = new PasswdFileUri(uri, itsCtx);
-        if (!passwdUri.exists()) {
+        PasswdFileUri.Creator creator = new PasswdFileUri.Creator(uri, itsCtx);
+        PasswdFileUri passwdUri = creator.finishCreate();
+        if ((passwdUri == null) || !passwdUri.exists()) {
             PasswdSafeUtil.dbginfo(TAG, "Notif file doesn't exist: %s", uri);
             return false;
         }

@@ -21,6 +21,7 @@ import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
@@ -49,6 +50,8 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     }
 
     private static final int REQUEST_DEFAULT_FILE = 0;
+
+    private static final String TAG = "PreferencesFragment";
 
     private Listener itsListener;
     private EditTextPreference itsFileDirPref;
@@ -184,8 +187,8 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             break;
         }
         case Preferences.PREF_DEF_FILE: {
-            new DefaultFileResolver().execute(
-                    Preferences.getDefFilePref(prefs));
+            new DefaultFileResolver(
+                    Preferences.getDefFilePref(prefs)).execute();
             break;
         }
         case Preferences.PREF_FILE_CLOSE_TIMEOUT: {
@@ -261,11 +264,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
                 break;
             }
             Intent val = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
-            String prefVal = (val != null) ? val.getData().toString() : null;
-            SharedPreferences.Editor editor =
-                    itsDefFilePref.getSharedPreferences().edit();
-            editor.putString(Preferences.PREF_DEF_FILE, prefVal);
-            editor.apply();
+            setDefFilePref((val != null) ? val.getData().toString() : null);
             break;
         }
         default: {
@@ -276,28 +275,70 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     }
 
     /**
+     * Set the default file preference
+     */
+    private void setDefFilePref(String prefVal)
+    {
+        SharedPreferences.Editor editor =
+                itsDefFilePref.getSharedPreferences().edit();
+        editor.putString(Preferences.PREF_DEF_FILE, prefVal);
+        editor.apply();
+    }
+
+    /**
      * Background task to resolve the default file URI and set the preference's
      * summary
      */
     private final class DefaultFileResolver
-            extends AsyncTask<Uri, Void, PasswdFileUri>
+            extends AsyncTask<Void, Void, PasswdFileUri>
     {
-        @Override
-        protected PasswdFileUri doInBackground(Uri... params)
+        private PasswdFileUri.Creator itsUriCreator;
+
+        /**
+         * Constructor
+         */
+        public DefaultFileResolver(Uri fileUri)
         {
-            Uri uri = params[0];
-            if (uri == null) {
-                return null;
+            if (fileUri != null) {
+                itsUriCreator = new PasswdFileUri.Creator(fileUri,
+                                                          getContext());
             }
-            return new PasswdFileUri(uri, getContext());
+        }
+
+        @Override
+        protected final void onPreExecute()
+        {
+            super.onPreExecute();
+            if (itsUriCreator != null) {
+                itsUriCreator.onPreExecute();
+            }
+        }
+
+        @Override
+        protected PasswdFileUri doInBackground(Void... params)
+        {
+            return (itsUriCreator != null) ?
+                   itsUriCreator.finishCreate() : null;
         }
 
         @Override
         protected void onPostExecute(PasswdFileUri result)
         {
+            if (!isResumed()) {
+                return;
+            }
             String summary;
             if (result == null) {
                 summary = getString(R.string.none);
+                if (itsUriCreator != null) {
+                    Throwable resolveEx = itsUriCreator.getResolveEx();
+                    if (resolveEx != null) {
+                        Log.e(TAG, "Error resolving default file", resolveEx);
+                        summary =
+                                getString(R.string.file_not_found_perm_denied);
+                        setDefFilePref(null);
+                    }
+                }
             } else {
                 summary = result.getIdentifier(getContext(), false);
             }

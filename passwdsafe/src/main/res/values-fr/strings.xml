@@ -88,6 +88,7 @@
     <string name="file">Fichier</string>
     <string name="file_label">Fichier:</string>
     <string name="file_name">Nom du fichier</string>
+    <string name="file_not_found_perm_denied">Fichier introuvable ou accès interdit</string>
     <string name="file_operations">Réglage sauvegarde</string>
     <string name="file_password_encoding">Encodage fichier mots de passe</string>
     <string name="files">Fichiers</string>
