@@ -11,7 +11,6 @@ package com.jefftharris.passwdsafe;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -25,6 +24,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 
 
 /**
@@ -103,7 +103,7 @@ public class PasswdSafeRecordNotesFragment
                 act.getPreferences(Context.MODE_PRIVATE);
         boolean wordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
         boolean isMonospace = prefs.getBoolean(MONOSPACE_PREF, false);
-        setNotesOptions(notes, wordWrap, isMonospace);
+        setNotesOptions(notes, wordWrap, isMonospace, act);
     }
 
     @Override
@@ -165,16 +165,16 @@ public class PasswdSafeRecordNotesFragment
      */
     private void setNotesOptions()
     {
-        setNotesOptions(itsNotes, itsIsWordWrap, itsIsMonospace);
+        setNotesOptions(itsNotes, itsIsWordWrap, itsIsMonospace, getContext());
     }
 
     /**
      * Set options for notes
      */
     private static void setNotesOptions(TextView notes, boolean wordWrap,
-                                        boolean monospace)
+                                        boolean monospace, Context ctx)
     {
         notes.setHorizontallyScrolling(!wordWrap);
-        notes.setTypeface(monospace ? Typeface.MONOSPACE : Typeface.DEFAULT);
+        TypefaceUtils.enableMonospace(notes, monospace, ctx);
     }
 }

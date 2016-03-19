@@ -57,6 +57,7 @@ import com.jefftharris.passwdsafe.view.PasswdPolicyView;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 import com.jefftharris.passwdsafe.view.TimePickerDialogFragment;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 
 import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.file.PwsRecord;
@@ -191,6 +192,7 @@ public class PasswdSafeEditRecordFragment
                              Bundle savedInstanceState)
     {
         setHasOptionsMenu(true);
+        Context ctx = getContext();
         View rootView = inflater.inflate(
                 R.layout.fragment_passwdsafe_edit_record, container, false);
         itsTypeGroup = rootView.findViewById(R.id.type_group);
@@ -218,9 +220,11 @@ public class PasswdSafeEditRecordFragment
         itsPasswordFields = rootView.findViewById(R.id.password_fields);
         itsPasswordCurrent = (TextView)
                 rootView.findViewById(R.id.password_current);
+        TypefaceUtils.setMonospace(itsPasswordCurrent, ctx);
         itsPasswordInput = (TextInputLayout)
                 rootView.findViewById(R.id.password_input);
         itsPassword = (TextView)rootView.findViewById(R.id.password);
+        TypefaceUtils.setMonospace(itsPassword, ctx);
         View passwordVisibility =
                 rootView.findViewById(R.id.password_visibility);
         passwordVisibility.setOnClickListener(this);
@@ -234,6 +238,7 @@ public class PasswdSafeEditRecordFragment
                 rootView.findViewById(R.id.password_confirm_input);
         itsPasswordConfirm = (TextView)
                 rootView.findViewById(R.id.password_confirm);
+        TypefaceUtils.setMonospace(itsPasswordConfirm, ctx);
         itsValidator.registerTextView(itsPasswordConfirm);
 
         // Password policy
@@ -799,7 +804,8 @@ public class PasswdSafeEditRecordFragment
         itsPasswordCurrent.setText(password);
         itsPassword.setText(password);
         itsPasswordConfirm.setText(password);
-        PasswordVisibilityMenuHandler.set(itsPassword, itsPasswordCurrent,
+        PasswordVisibilityMenuHandler.set(getContext(), itsPassword,
+                                          itsPasswordCurrent,
                                           itsPasswordConfirm);
 
         if (itsIsV3) {
@@ -1124,9 +1130,10 @@ public class PasswdSafeEditRecordFragment
      */
     private void setPasswordVisibility(boolean visible)
     {
-        GuiUtils.setPasswordVisible(itsPasswordCurrent, visible);
-        GuiUtils.setPasswordVisible(itsPassword, visible);
-        GuiUtils.setPasswordVisible(itsPasswordConfirm, visible);
+        Context ctx = getContext();
+        GuiUtils.setPasswordVisible(itsPasswordCurrent, visible, ctx);
+        GuiUtils.setPasswordVisible(itsPassword, visible, ctx);
+        GuiUtils.setPasswordVisible(itsPasswordConfirm, visible, ctx);
     }
 
     /**

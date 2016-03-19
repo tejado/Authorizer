@@ -11,6 +11,7 @@ import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
+import android.content.Context;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
@@ -21,10 +22,10 @@ import android.widget.TextView;
 
 public class PasswordVisibilityMenuHandler
 {
-    public static void set(TextView... views)
+    public static void set(Context ctx, TextView... views)
     {
         for (TextView tv : views) {
-            tv.setOnCreateContextMenuListener(new MenuListener(tv, views));
+            tv.setOnCreateContextMenuListener(new MenuListener(ctx, tv, views));
         }
     }
 
@@ -33,11 +34,13 @@ public class PasswordVisibilityMenuHandler
     {
         private static final int MENU_TOGGLE_PASSWORD = 0;
 
+        private final Context itsContext;
         private final TextView[] itsViews;
         private final TextView itsView;
 
-        public MenuListener(TextView view, TextView[] views)
+        public MenuListener(Context ctx, TextView view, TextView[] views)
         {
+            itsContext = ctx;
             itsViews = views;
             itsView = view;
         }
@@ -78,7 +81,7 @@ public class PasswordVisibilityMenuHandler
             case MENU_TOGGLE_PASSWORD: {
                 boolean visible = GuiUtils.isPasswordVisible(itsView);
                 for (TextView tv : itsViews) {
-                    GuiUtils.setPasswordVisible(tv, !visible);
+                    GuiUtils.setPasswordVisible(tv, !visible, itsContext);
                 }
                 break;
             }

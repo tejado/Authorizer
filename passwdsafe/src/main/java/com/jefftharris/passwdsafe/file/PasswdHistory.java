@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 
 public class PasswdHistory
 {
@@ -283,18 +284,19 @@ public class PasswdHistory
         public View getView(int position, View convertView, ViewGroup parent)
         {
             ViewHolder itemViews;
+            Context ctx = getContext();
             if (convertView == null) {
                 convertView = itsInflater.inflate(
                         R.layout.passwd_history_list_item, parent, false);
                 itemViews = new ViewHolder(convertView, itsIsEnabled,
-                                           itsHasContextMenu);
+                                           itsHasContextMenu, ctx);
                 convertView.setTag(itemViews);
             } else {
                 itemViews = (ViewHolder)convertView.getTag();
             }
 
             Entry entry = getItem(position);
-            itemViews.update(entry, getContext());
+            itemViews.update(entry, ctx);
             return convertView;
         }
 
@@ -311,9 +313,11 @@ public class PasswdHistory
              */
             public ViewHolder(View view,
                               boolean enabled,
-                              boolean hasContextMenu)
+                              boolean hasContextMenu,
+                              Context ctx)
             {
                 itsPassword = (TextView)view.findViewById(R.id.password);
+                TypefaceUtils.setMonospace(itsPassword, ctx);
                 itsDate = (TextView)view.findViewById(R.id.date);
 
                 view.setEnabled(enabled);

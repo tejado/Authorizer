@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 
 /**
  *  Custom view for showing a password policy
@@ -160,6 +161,7 @@ public class PasswdPolicyView extends LinearLayout
         itsGeneratedPasswd =
             (TextView)findViewById(R.id.policy_view_generated_passwd);
         itsGeneratedPasswd.setOnCreateContextMenuListener(this);
+        TypefaceUtils.setMonospace(itsGeneratedPasswd, context);
     }
 
     /** Generate a password from the current policy */
