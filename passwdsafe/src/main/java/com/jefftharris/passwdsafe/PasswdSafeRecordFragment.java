@@ -251,8 +251,6 @@ public class PasswdSafeRecordFragment
         TabLayout.Tab tab =
                 (itsTabs.getTabCount() >= 3) ? itsTabs.getTabAt(2) : null;
         if (tab != null) {
-            // TODO: bring back attachment icon?? don't want to be on top as
-            // the only icon, however
             String title = getString(R.string.notes);
             if (itsHasNotes) {
                 title += " *";
