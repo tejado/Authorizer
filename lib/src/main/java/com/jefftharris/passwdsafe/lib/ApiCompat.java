@@ -28,8 +28,6 @@ import java.util.List;
  */
 public final class ApiCompat
 {
-    public static final int SDK_CUPCAKE =
-        android.os.Build.VERSION_CODES.CUPCAKE;
     private static final int SDK_ECLAIR =
             android.os.Build.VERSION_CODES.ECLAIR;
     public static final int SDK_FROYO =
