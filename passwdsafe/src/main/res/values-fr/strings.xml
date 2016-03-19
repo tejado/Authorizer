@@ -292,6 +292,9 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
+        &lt;b&gt;6.1.2&lt;/b&gt; - Réparation plantage lors de l\'ouverture des
+        préférences.  Correction de bugs.
+        \n\n
         &lt;b&gt;6.1.1&lt;/b&gt; - Demander les permissions du stockage si
         demandés.  Correction du bug copier-coller.
         \n\n
