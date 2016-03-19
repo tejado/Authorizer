@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +35,7 @@ import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.util.YubiState;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
+import com.jefftharris.passwdsafe.view.TextInputUtils;
 
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 
@@ -65,6 +67,7 @@ public class PasswdSafeOpenFileFragment
     private Listener itsListener;
     private String itsRecToOpen;
     private TextView itsTitle;
+    private TextInputLayout itsPasswordInput;
     private TextView itsPasswordEdit;
     private CheckBox itsReadonlyCb;
     private Button itsYubiStartBtn;
@@ -74,6 +77,7 @@ public class PasswdSafeOpenFileFragment
     private YubikeyMgr.User itsYubiUser;
     private int itsYubiSlot = 2;
     private boolean itsIsYubikey = false;
+    private int itsRetries = 0;
 
     private static final String ARG_URI = "uri";
     private static final String ARG_REC_TO_OPEN = "recToOpen";
@@ -123,6 +127,8 @@ public class PasswdSafeOpenFileFragment
         Context ctx = getContext();
 
         itsTitle = (TextView)rootView.findViewById(R.id.file);
+        itsPasswordInput =
+                (TextInputLayout)rootView.findViewById(R.id.passwd_input);
         itsPasswordEdit = (TextView)rootView.findViewById(R.id.passwd_edit);
         TypefaceUtils.setMonospace(itsPasswordEdit, ctx);
         PasswordVisibilityMenuHandler.set(ctx, itsPasswordEdit);
@@ -297,6 +303,8 @@ public class PasswdSafeOpenFileFragment
             break;
         }
         case R.id.ok: {
+            TextInputUtils.setTextInputError(null, itsPasswordInput);
+
             boolean readonly = itsReadonlyCb.isChecked();
             SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
             Preferences.setFileOpenReadOnlyPref(readonly, prefs);
@@ -402,9 +410,15 @@ public class PasswdSafeOpenFileFragment
             if (((e instanceof IOException) &&
                  TextUtils.equals(e.getMessage(), "Invalid password")) ||
                 (e instanceof InvalidPassphraseException)) {
-                PasswdSafeUtil.showFatalMsg(
-                        getString(R.string.invalid_password), getActivity(),
-                        false);
+                if (itsRetries++ < 5) {
+                    TextInputUtils.setTextInputError(
+                            getString(R.string.invalid_password),
+                            itsPasswordInput);
+                } else {
+                    PasswdSafeUtil.showFatalMsg(
+                            getString(R.string.invalid_password), getActivity(),
+                            false);
+                }
             } else {
                 String msg = e.toString();
                 PasswdSafeUtil.showFatalMsg(e, msg, getActivity());
