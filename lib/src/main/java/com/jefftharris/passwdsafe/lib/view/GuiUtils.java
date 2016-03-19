@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe.lib.view;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -32,8 +31,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
@@ -52,19 +49,6 @@ public final class GuiUtils
         InputType.TYPE_CLASS_TEXT |
         InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
 
-
-    public static String getTextViewStr(Activity act, int viewId)
-    {
-        TextView tv = (TextView)act.findViewById(viewId);
-        return tv.getText().toString();
-    }
-
-    public static String getSpinnerStr(Activity act, int viewId)
-    {
-        Spinner s = (Spinner)act.findViewById(viewId);
-        Object obj = s.getSelectedItem();
-        return (obj == null) ? null : obj.toString();
-    }
 
     /**
      * Set the height of a ListView based on all of its children
@@ -105,13 +89,6 @@ public final class GuiUtils
         });
     }
 
-    public static boolean isBackKeyDown(int keyCode, KeyEvent event)
-    {
-        return (ApiCompat.SDK_VERSION < android.os.Build.VERSION_CODES.ECLAIR)
-            && (keyCode == KeyEvent.KEYCODE_BACK)
-            && (event.getRepeatCount() == 0);
-    }
-
 
     public static boolean isPasswordVisible(TextView tv)
     {
@@ -143,29 +120,6 @@ public final class GuiUtils
     public static void setVisible(View view, boolean visible)
     {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
-    /**
-     * Setup the keyboard on a dialog. The initial field gets focus and shows
-     * the keyboard. The final field clicks the Ok button when enter is pressed.
-     */
-    public static void setupDialogKeyboard(final AlertDialog dialog,
-                                           TextView initialField,
-                                           TextView finalField,
-                                           Context ctx)
-    {
-        setShowKeyboardListener(dialog, initialField, ctx);
-        setupKeyboardEnter(finalField, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Button btn = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                if (btn.isEnabled()) {
-                    btn.performClick();
-                }
-            }
-        });
     }
 
 
@@ -291,18 +245,6 @@ public final class GuiUtils
     {
         if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
             GuiUtilsHoneycomb.setTextSelectable(tv);
-        }
-    }
-
-
-    /** Remove the layout_centerVertical flag if it is not supported */
-    public static void removeUnsupportedCenterVertical(View v)
-    {
-        if (ApiCompat.SDK_VERSION <= ApiCompat.SDK_CUPCAKE) {
-            RelativeLayout.LayoutParams params =
-                (RelativeLayout.LayoutParams)v.getLayoutParams();
-            params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
-            v.setLayoutParams(params);
         }
     }
 
