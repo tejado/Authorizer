@@ -44,6 +44,7 @@ public final class ApiCompat
     public static final int SDK_VERSION = Build.VERSION.SDK_INT;
 
     /** Request a manual sync of a content provider */
+    @SuppressWarnings("SameParameterValue")
     public static void requestManualSync(Account acct,
                                          Uri uri,
                                          Bundle extras)

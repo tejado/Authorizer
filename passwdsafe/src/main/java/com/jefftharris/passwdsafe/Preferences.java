@@ -407,6 +407,7 @@ public class Preferences
     /**
      * Set whether the user has confirmed the copy password operation
      */
+    @SuppressWarnings("SameParameterValue")
     public static void setCopyPasswordConfirm(boolean confirm,
                                               SharedPreferences prefs)
     {

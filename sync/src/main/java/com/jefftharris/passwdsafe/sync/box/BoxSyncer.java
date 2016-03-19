@@ -177,6 +177,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxSession>
     }
 
     /** Retrieve the files in the given folder */
+    @SuppressWarnings("SameParameterValue")
     private void retrieveBoxFolderFiles(
             String folderId,
             String[] fileFields,
