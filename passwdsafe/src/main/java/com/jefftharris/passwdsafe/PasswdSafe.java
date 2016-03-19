@@ -768,7 +768,9 @@ public class PasswdSafe extends AppCompatActivity
             dialog.show(getSupportFragmentManager(), "Copy password");
             return;
         }
-        case USER_NAME: {
+        case USER_NAME:
+        case URL:
+        case EMAIL: {
             break;
         }
         }
@@ -794,6 +796,20 @@ public class PasswdSafe extends AppCompatActivity
                 }
                 case USER_NAME: {
                     copyStr.set(fileData.getUsername(rec));
+                    break;
+                }
+                case URL: {
+                    String url = fileData.getURL(rec);
+                    if (!TextUtils.isEmpty(url)) {
+                        copyStr.set(url);
+                    }
+                    break;
+                }
+                case EMAIL: {
+                    String email = fileData.getEmail(rec);
+                    if (!TextUtils.isEmpty(email)) {
+                        copyStr.set(email);
+                    }
                     break;
                 }
                 }

@@ -31,6 +31,7 @@
     <string name="continue_str">Weiter</string>
     <string name="continue_p">Fortsetzen?</string>
     <string name="copy_clipboard">In die Zwischenablage kopieren</string>
+    <string name="copy_email">E-Mail kopieren</string>
     <string name="copy_notes">Notizen kopieren</string>
     <string name="copy_password">Passwort kopieren</string>
     <string name="copy_password_warning">
@@ -39,6 +40,7 @@
         Tastatur von PasswdSafe ist eine sicherere Möglichkeit um Kennwörter
         in andere Apps einzufügen.
     </string>
+    <string name="copy_url">URL kopieren</string>
     <string name="copy_user">Benutzername kopieren</string>
     <string name="created">Erstellt</string>
     <string name="current">Aktuell</string>

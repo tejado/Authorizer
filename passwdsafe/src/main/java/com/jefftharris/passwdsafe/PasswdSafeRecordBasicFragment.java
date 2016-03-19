@@ -165,6 +165,16 @@ public class PasswdSafeRecordBasicFragment
             item.setEnabled(itsPasswordRow.getVisibility() == View.VISIBLE);
         }
 
+        item = menu.findItem(R.id.menu_copy_url);
+        if (item != null) {
+            item.setVisible(itsUrlRow.getVisibility() == View.VISIBLE);
+        }
+
+        item = menu.findItem(R.id.menu_copy_email);
+        if (item != null) {
+            item.setVisible(itsEmailRow.getVisibility() == View.VISIBLE);
+        }
+
         super.onPrepareOptionsMenu(menu);
     }
 
@@ -178,6 +188,14 @@ public class PasswdSafeRecordBasicFragment
         }
         case R.id.menu_copy_password: {
             copyPassword();
+            return true;
+        }
+        case R.id.menu_copy_url: {
+            copyUrl();
+            return true;
+        }
+        case R.id.menu_copy_email: {
+            copyEmail();
             return true;
         }
         case R.id.menu_toggle_password: {
@@ -412,6 +430,22 @@ public class PasswdSafeRecordBasicFragment
     private void copyPassword()
     {
         getListener().copyField(CopyField.PASSWORD, getLocation().getRecord());
+    }
+
+    /**
+     * Copy the URL to the clipboard
+     */
+    private void copyUrl()
+    {
+        getListener().copyField(CopyField.URL, getLocation().getRecord());
+    }
+
+    /**
+     * Copy the email to the clipboard
+     */
+    private void copyEmail()
+    {
+        getListener().copyField(CopyField.EMAIL, getLocation().getRecord());
     }
 
     /**
