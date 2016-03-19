@@ -14,7 +14,7 @@ import java.util.Set;
  */
 class FolderRefs
 {
-    public final Set<String> itsFileRefs = new HashSet<>();
+    private final Set<String> itsFileRefs = new HashSet<>();
 
     public FolderRefs()
     {

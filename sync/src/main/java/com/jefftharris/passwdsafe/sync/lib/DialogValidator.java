@@ -76,7 +76,7 @@ public abstract class DialogValidator
         validate();
     }
 
-    public final void validate()
+    private void validate()
     {
         String errorMsg = doValidation();
         boolean isError = (errorMsg != null);
