@@ -49,8 +49,8 @@ public class FileListActivity extends AppCompatActivity
 {
     public static final String INTENT_EXTRA_CLOSE_ON_OPEN = "closeOnOpen";
 
-    public static final int REQUEST_STORAGE_PERM = 1;
-    public static final int REQUEST_APP_SETTINGS = 2;
+    private static final int REQUEST_STORAGE_PERM = 1;
+    private static final int REQUEST_APP_SETTINGS = 2;
 
     private static final String STATE_TITLE = "title";
 

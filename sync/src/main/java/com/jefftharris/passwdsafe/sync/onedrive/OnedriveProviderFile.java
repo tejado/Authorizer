@@ -17,7 +17,7 @@ import com.microsoft.onedriveaccess.model.Item;
  */
 public class OnedriveProviderFile implements ProviderRemoteFile
 {
-    public static final String DRIVE_ROOT_PATH = "/drive/root:";
+    private static final String DRIVE_ROOT_PATH = "/drive/root:";
 
     private final Item itsItem;
     private final String itsRemoteId;

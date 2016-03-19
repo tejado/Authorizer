@@ -515,7 +515,7 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Get the URI type */
-    public static Type getUriType(Uri uri)
+    private static Type getUriType(Uri uri)
     {
         if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
             return Type.FILE;
