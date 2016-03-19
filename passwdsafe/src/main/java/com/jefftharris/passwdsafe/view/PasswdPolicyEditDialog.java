@@ -34,6 +34,7 @@ import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 
 /**
  * The PasswdPolicyEditDialog class encapsulates the functionality for the
@@ -69,6 +70,7 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
     private final TextView[] itsOptionLens = new TextView[4];
     private CheckBox itsUseCustomSymbols;
     private TextView itsCustomSymbolsEdit;
+    private TextView itsGeneratedPasswd;
     private String itsDefaultSymbols;
 
     /**
@@ -116,6 +118,10 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
             (CheckBox)itsView.findViewById(R.id.use_custom_symbols);
         itsCustomSymbolsEdit =
             (TextView)itsView.findViewById(R.id.symbols_custom);
+        TypefaceUtils.setMonospace(itsCustomSymbolsEdit, ctx);
+        itsGeneratedPasswd =
+                (TextView)itsView.findViewById(R.id.generated_passwd);
+        TypefaceUtils.setMonospace(itsGeneratedPasswd, ctx);
         itsDefaultSymbols = Preferences.getPasswdDefaultSymbolsPref(prefs);
 
         int titleId;
@@ -327,8 +333,7 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
                                             itsView.getContext());
             }
         }
-        TextView tv = (TextView)itsView.findViewById(R.id.generated_passwd);
-        tv.setText(passwd);
+        itsGeneratedPasswd.setText(passwd);
     }
 
     /** Set the type of policy and update the UI */

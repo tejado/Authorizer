@@ -30,6 +30,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.util.YubiState;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
@@ -119,10 +120,12 @@ public class PasswdSafeOpenFileFragment
         View rootView = inflater.inflate(R.layout.fragment_passwdsafe_open_file,
                                          container, false);
         setupView(rootView);
+        Context ctx = getContext();
 
         itsTitle = (TextView)rootView.findViewById(R.id.file);
         itsPasswordEdit = (TextView)rootView.findViewById(R.id.passwd_edit);
-        PasswordVisibilityMenuHandler.set(itsPasswordEdit);
+        TypefaceUtils.setMonospace(itsPasswordEdit, ctx);
+        PasswordVisibilityMenuHandler.set(ctx, itsPasswordEdit);
         itsPasswordEdit.setEnabled(false);
 
         itsReadonlyCb = (CheckBox)rootView.findViewById(R.id.read_only);

@@ -7,6 +7,7 @@
  */
 package com.jefftharris.passwdsafe;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,6 +26,7 @@ import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
@@ -70,11 +72,13 @@ public class PasswdSafeChangePasswordFragment
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(
                 R.layout.fragment_passwdsafe_change_password, container, false);
+        Context ctx = getContext();
 
         itsTitle = (TextView)rootView.findViewById(R.id.title);
         itsPasswordInput = (TextInputLayout)
                 rootView.findViewById(R.id.password_input);
         itsPassword = (TextView)rootView.findViewById(R.id.password);
+        TypefaceUtils.setMonospace(itsPassword, ctx);
         itsValidator.registerTextView(itsPassword);
         itsPasswordInput.setTypeface(Typeface.DEFAULT);
 
@@ -82,9 +86,10 @@ public class PasswdSafeChangePasswordFragment
                 rootView.findViewById(R.id.password_confirm_input);
         itsPasswordConfirm = (TextView)
                 rootView.findViewById(R.id.password_confirm);
+        TypefaceUtils.setMonospace(itsPasswordConfirm, ctx);
         itsValidator.registerTextView(itsPasswordConfirm);
         itsPasswordConfirmInput.setTypeface(Typeface.DEFAULT);
-        PasswordVisibilityMenuHandler.set(itsPassword, itsPasswordConfirm);
+        PasswordVisibilityMenuHandler.set(ctx, itsPassword, itsPasswordConfirm);
 
         GuiUtils.setupFormKeyboard(itsPassword, itsPasswordConfirm,
                                    getContext(), new Runnable()

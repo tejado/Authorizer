@@ -122,11 +122,16 @@ public final class GuiUtils
     /**
      * Set whether the view shows a visible password
      */
-    public static void setPasswordVisible(TextView tv, boolean visible)
+    public static void setPasswordVisible(TextView tv,
+                                          boolean visible,
+                                          Context ctx)
     {
         int pos = tv.getSelectionStart();
         tv.setInputType(visible ? INPUT_TEXT_PASSWORD_VISIBLE :
                                 INPUT_TEXT_PASSWORD);
+        // Reset monospace as the input type change resets to default monospace
+        // font
+        TypefaceUtils.setMonospace(tv, ctx);
         if (tv instanceof EditText) {
             // Keep selection location after the type change
             ((EditText)tv).setSelection(pos);

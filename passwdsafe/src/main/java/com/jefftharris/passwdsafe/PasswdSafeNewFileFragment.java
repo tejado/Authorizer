@@ -32,6 +32,7 @@ import com.jefftharris.passwdsafe.lib.DocumentsContractCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
@@ -143,9 +144,11 @@ public class PasswdSafeNewFileFragment
         });
         itsValidator.registerTextView(itsFileName);
 
+        Context ctx = getContext();
         itsPasswordInput = (TextInputLayout)
                 rootView.findViewById(R.id.password_input);
         itsPassword = (TextView)rootView.findViewById(R.id.password);
+        TypefaceUtils.setMonospace(itsPassword, ctx);
         itsValidator.registerTextView(itsPassword);
         itsPasswordInput.setTypeface(Typeface.DEFAULT);
 
@@ -153,9 +156,10 @@ public class PasswdSafeNewFileFragment
                 rootView.findViewById(R.id.password_confirm_input);
         itsPasswordConfirm = (TextView)
                 rootView.findViewById(R.id.password_confirm);
+        TypefaceUtils.setMonospace(itsPasswordConfirm, ctx);
         itsValidator.registerTextView(itsPasswordConfirm);
         itsPasswordConfirmInput.setTypeface(Typeface.DEFAULT);
-        PasswordVisibilityMenuHandler.set(itsPassword, itsPasswordConfirm);
+        PasswordVisibilityMenuHandler.set(ctx, itsPassword, itsPasswordConfirm);
 
         Button cancelBtn = (Button)rootView.findViewById(R.id.cancel);
         cancelBtn.setOnClickListener(this);

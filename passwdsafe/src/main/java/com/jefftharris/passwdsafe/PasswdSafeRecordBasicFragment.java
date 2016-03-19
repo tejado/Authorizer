@@ -8,7 +8,7 @@
 package com.jefftharris.passwdsafe;
 
 
-import android.graphics.Typeface;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.ContextMenu;
@@ -28,6 +28,7 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.ObjectHolder;
 import com.jefftharris.passwdsafe.view.CopyField;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
+import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -392,9 +393,9 @@ public class PasswdSafeRecordBasicFragment
             }
         }
         itsPassword.setText(password);
-        itsPassword.setTypeface(
-                itsIsPasswordShown ? Typeface.MONOSPACE : Typeface.DEFAULT);
-        GuiUtils.invalidateOptionsMenu(getActivity());
+        Activity act = getActivity();
+        TypefaceUtils.enableMonospace(itsPassword, itsIsPasswordShown, act);
+        GuiUtils.invalidateOptionsMenu(act);
     }
 
     /**
