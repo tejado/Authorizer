@@ -178,7 +178,7 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
      */
     protected class ResolveTask extends BackgroundTask<PasswdFileUri>
     {
-        private PasswdFileUri.Creator itsUriCreator =
+        private final PasswdFileUri.Creator itsUriCreator =
                 new PasswdFileUri.Creator(itsFileUri, getActivity());
 
         @Override
