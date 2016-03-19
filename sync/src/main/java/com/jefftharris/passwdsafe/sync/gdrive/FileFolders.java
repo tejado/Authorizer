@@ -26,7 +26,6 @@ public class FileFolders
 {
     private final Drive itsDrive;
     private final HashMap<String, File> itsFileCache = new HashMap<>();
-    private final HashMap<String, FolderRefs> itsFolderRefs = new HashMap<>();
 
     /** Constructor with internal helper collections */
     public FileFolders(Drive drive)
@@ -43,7 +42,7 @@ public class FileFolders
         itsFileCache.put(fileId, file);
         ArrayList<String> folders = new ArrayList<>();
         for (String parentId: file.getParents()) {
-            traceParentRefs(parentId, "", folders, fileId);
+            traceParentRefs(parentId, "", folders);
         }
         Collections.sort(folders);
         return TextUtils.join(", ", folders);
@@ -74,8 +73,7 @@ public class FileFolders
      *  its folders */
     private void traceParentRefs(String parentId,
                                  String suffix,
-                                 ArrayList<String> folders,
-                                 String fileId)
+                                 ArrayList<String> folders)
             throws IOException
     {
         File parentFile = getCachedFile(parentId);
@@ -86,15 +84,9 @@ public class FileFolders
             suffix = parentFile.getName() + suffix;
             folders.add(suffix);
         } else {
-            FolderRefs refs = itsFolderRefs.get(parentId);
-            if (refs == null) {
-                refs = new FolderRefs();
-                itsFolderRefs.put(parentId, refs);
-            }
-            refs.addRef(fileId);
             suffix = "/" + parentFile.getName() + suffix;
             for (String parentParentId: parentFile.getParents()) {
-                traceParentRefs(parentParentId, suffix, folders, fileId);
+                traceParentRefs(parentParentId, suffix, folders);
             }
         }
     }
