@@ -31,6 +31,7 @@
     <string name="continue_str">Continuer</string>
     <string name="continue_p">Continuer?</string>
     <string name="copy_clipboard">Copier dans le Presse-papiers</string>
+    <string name="copy_email">Copier Email</string>
     <string name="copy_notes">Copier les notes</string>
     <string name="copy_password">Copier le mot de passe</string>
     <string name="copy_password_warning">
@@ -39,6 +40,7 @@
         manière fiable. Le clavier alternatif Passwdsafe est une méthode plus
         sûre pour entrer des mots de passe dans d\'autres applications.
     </string>
+    <string name="copy_url">Copier le URL</string>
     <string name="copy_user">Copier le nom d\'utilisateur</string>
     <string name="created">Créé</string>
     <string name="current">Actuel</string>

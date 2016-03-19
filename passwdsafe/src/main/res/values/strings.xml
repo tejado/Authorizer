@@ -31,6 +31,7 @@
     <string name="continue_str">Continue</string>
     <string name="continue_p">Continue?</string>
     <string name="copy_clipboard">Copy to Clipboard</string>
+    <string name="copy_email">Copy Email</string>
     <string name="copy_notes">Copy Notes</string>
     <string name="copy_password">Copy Password</string>
     <string name="copy_password_warning">
@@ -38,6 +39,7 @@
         cannot be reliably cleared.  The PasswdSafe alternate keyboard is a
         more secure method for entering passwords into other apps.
     </string>
+    <string name="copy_url">Copy URL</string>
     <string name="copy_user">Copy User Name</string>
     <string name="created">Created</string>
     <string name="current">Current</string>

@@ -12,6 +12,8 @@ package com.jefftharris.passwdsafe.view;
  */
 public enum CopyField
 {
+    EMAIL,
     PASSWORD,
+    URL,
     USER_NAME
 }
