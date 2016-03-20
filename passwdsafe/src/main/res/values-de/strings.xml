@@ -288,6 +288,11 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
+        &lt;b&gt;6.2.0&lt;/b&gt; - Erlaube beim Öffnen einer Datei mehrere
+        Versuche bei der Passworteingabe.  Menüeinträge zum kopiere von URL und
+        E-Mail-Adresse hinzugefügt.  Für Passwörter wird eine Schriftart mit
+        Schrägstrich in der Null benutzt.
+        \n\n
         &lt;b&gt;6.1.2&lt;/b&gt; - Absturz beim öffnen der Einstellungen
         behoben.  Fehlerbehebungen.
         \n\n
