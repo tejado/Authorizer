@@ -24,7 +24,6 @@ import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -84,16 +83,6 @@ public class PasswdSafeIME extends InputMethodService
         itsRecordLabel = view.findViewById(R.id.record_label);
         itsRecord = (TextView)view.findViewById(R.id.record);
         itsPasswordWarning = view.findViewById(R.id.password_warning);
-
-        View icon = view.findViewById(R.id.icon);
-        icon.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                onKeyPress(PASSWDSAFE_KEY);
-            }
-        });
 
         refresh(null);
         return view;
