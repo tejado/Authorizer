@@ -7,45 +7,56 @@
     <Row>
         <Key android:codes="-1"
              android:keyEdgeFlags="left"
-             android:keyLabel="@string/username"/>
+             android:keyLabel="@string/username"
+             android:keyWidth="50%p"/>
+        <Key android:codes="-11"
+             android:keyEdgeFlags="right"
+             android:keyLabel="@string/password"
+             android:keyWidth="50%p"/>
+    </Row>
+    <Row>
         <Key android:codes="-2"
-             android:keyLabel="@string/url"/>
+             android:keyEdgeFlags="left"
+             android:keyLabel="@string/url"
+             android:keyWidth="50%p"/>
+        <Key android:codes="-12"
+             android:keyEdgeFlags="right"
+             android:keyLabel="@string/email"
+             android:keyWidth="50%p"/>
+    </Row>
+    <Row>
+        <Key android:codes="-24"
+             android:keyEdgeFlags="left"
+             android:keyIcon="@drawable/ic_passwdsafe_light"
+             android:keyWidth="15%p"/>
+        <Key android:codes="-21"
+             android:keyLabel="@string/title"
+             android:keyWidth="35%p"/>
+        <Key android:codes="-22"
+             android:keyLabel="@string/notes"
+             android:keyWidth="35%p"/>
         <Key android:codes="-3"
              android:isRepeatable="true"
              android:keyEdgeFlags="right"
              android:keyIcon="@drawable/sym_keyboard_delete"
-             android:keyWidth="30%p"/>
+             android:keyWidth="15%p"/>
     </Row>
     <Row>
-        <Key android:codes="-11"
+        <Key android:codes="-26"
              android:keyEdgeFlags="left"
-             android:keyLabel="@string/password"/>
-        <Key android:codes="-12"
-             android:keyLabel="@string/email"/>
-        <Key android:codes="-13"
-             android:keyEdgeFlags="right"
-             android:keyLabel="Enter"
-             android:keyWidth="30%p"/>
-    </Row>
-    <Row>
-        <Key android:codes="-21"
-             android:keyEdgeFlags="left"
-             android:keyLabel="@string/title"
-             android:keyWidth="28%p"/>
+             android:keyLabel="ABC"
+             android:keyWidth="15%p"/>
         <Key android:codes="32"
              android:isRepeatable="true"
              android:keyIcon="@drawable/sym_keyboard_space"
-             android:keyWidth="14%p"/>
-        <Key android:codes="-22"
-             android:keyLabel="@string/notes"
-             android:keyWidth="28%p"/>
-        <Key android:codes="-24"
-             android:keyIcon="@drawable/ic_passwdsafe_light"
-             android:keyWidth="15%p"/>
+             android:keyWidth="50%p"/>
         <Key android:codes="-25"
-             android:keyEdgeFlags="right"
              android:keyIcon="@drawable/sym_keyboard_choose"
              android:keyWidth="15%p"/>
+        <Key android:codes="-13"
+             android:keyEdgeFlags="right"
+             android:keyLabel="Enter"
+             android:keyWidth="20%p"/>
     </Row>
 
 </Keyboard>
