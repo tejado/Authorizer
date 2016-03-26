@@ -62,9 +62,6 @@ public class PasswdSafeIME extends InputMethodService
     private boolean itsAllowPassword = false;
     private boolean itsIsPasswordField = false;
 
-    /* (non-Javadoc)
-     * @see android.inputmethodservice.InputMethodService#onCreateInputView()
-     */
     @SuppressLint("InflateParams")
     @Override
     public View onCreateInputView()
@@ -86,9 +83,6 @@ public class PasswdSafeIME extends InputMethodService
         return view;
     }
 
-    /* (non-Javadoc)
-     * @see android.inputmethodservice.InputMethodService#onStartInputView(android.view.inputmethod.EditorInfo, boolean)
-     */
     @Override
     public void onStartInputView(EditorInfo info, boolean restarting)
     {
@@ -125,9 +119,6 @@ public class PasswdSafeIME extends InputMethodService
         itsKeyboardView.invalidateAllKeys();
     }
 
-    /* (non-Javadoc)
-     * @see android.inputmethodservice.InputMethodService#onEvaluateFullscreenMode()
-     */
     @Override
     public boolean onEvaluateFullscreenMode()
     {
@@ -135,7 +126,9 @@ public class PasswdSafeIME extends InputMethodService
         return false;
     }
 
-    /** Open PasswdSafe */
+    /**
+     * Open PasswdSafe
+     */
     private void openPasswdSafe()
     {
         final ObjectHolder<Pair<Intent, Boolean>> rc = new ObjectHolder<>();
@@ -179,7 +172,9 @@ public class PasswdSafeIME extends InputMethodService
         }
     }
 
-    /** Handle a press of a keyboard key */
+    /**
+     * Handle a press of a keyboard key
+     */
     private void onKeyPress(final int keycode)
     {
         InputConnection conn = getCurrentInputConnection();
@@ -331,7 +326,9 @@ public class PasswdSafeIME extends InputMethodService
         }
     }
 
-    /** Show the password warning */
+    /**
+     * Show the password warning
+     */
     private void showPasswordWarning(boolean show)
     {
         GuiUtils.setVisible(itsPasswordWarning, show);
@@ -349,12 +346,16 @@ public class PasswdSafeIME extends InputMethodService
                      @Nullable PwsRecord rec);
     }
 
-    /** The PasswdSafeKeyboard class is a keyboard for PasswdSafe */
+    /**
+     * The PasswdSafeKeyboard class is a keyboard for PasswdSafe
+     */
     private static final class PasswdSafeKeyboard extends Keyboard
     {
         private Keyboard.Key itsEnterKey;
 
-        /** Constructor */
+        /**
+         * Constructor
+         */
         public PasswdSafeKeyboard(
                 Context context,
                 @SuppressWarnings("SameParameterValue") int xmlLayoutResId)
@@ -423,69 +424,47 @@ public class PasswdSafeIME extends InputMethodService
         }
     }
 
-    /** The listener for keyboard events */
+    /**
+     * The listener for keyboard events
+     */
     private final class KeyboardListener implements OnKeyboardActionListener
     {
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.KeyboardView.OnKeyboardActionListener#onKey(int, int[])
-         */
         @Override
         public void onKey(int primaryCode, int[] keyCodes)
         {
             onKeyPress(primaryCode);
         }
 
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.KeyboardView.OnKeyboardActionListener#onPress(int)
-         */
         @Override
         public void onPress(int primaryCode)
         {
         }
 
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.KeyboardView.OnKeyboardActionListener#onRelease(int)
-         */
         @Override
         public void onRelease(int primaryCode)
         {
         }
 
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.KeyboardView.OnKeyboardActionListener#onText(java.lang.CharSequence)
-         */
         @Override
         public void onText(CharSequence text)
         {
         }
 
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.KeyboardView.OnKeyboardActionListener#swipeDown()
-         */
         @Override
         public void swipeDown()
         {
         }
 
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.KeyboardView.OnKeyboardActionListener#swipeLeft()
-         */
         @Override
         public void swipeLeft()
         {
         }
 
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.KeyboardView.OnKeyboardActionListener#swipeRight()
-         */
         @Override
         public void swipeRight()
         {
         }
 
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.KeyboardView.OnKeyboardActionListener#swipeUp()
-         */
         @Override
         public void swipeUp()
         {
