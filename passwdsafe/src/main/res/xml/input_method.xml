@@ -5,5 +5,5 @@
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:icon="@mipmap/ic_launcher_passwdsafe"
-              android:supportsSwitchingToNextInputMethod="false"
+              android:supportsSwitchingToNextInputMethod="true"
               tools:ignore="UnusedAttribute"/>
