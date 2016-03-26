@@ -54,7 +54,8 @@ public class PasswdSafeIME extends InputMethodService
     private static final int TITLE_KEY = -21;
     private static final int NOTES_KEY = -22;
     private static final int PASSWDSAFE_KEY = -24;
-    private static final int KEYBOARD_CHOOSE_KEY = -25;
+    public static final int KEYBOARD_NEXT_KEY = -25;
+    public static final int KEYBOARD_CHOOSE_KEY = -26;
 
     private KeyboardView itsKeyboardView;
     private PasswdSafeKeyboard itsCurrKeyboard;
@@ -263,7 +264,7 @@ public class PasswdSafeIME extends InputMethodService
             openPasswdSafe();
             break;
         }
-        case KEYBOARD_CHOOSE_KEY: {
+        case KEYBOARD_NEXT_KEY: {
             InputMethodManager inputMgr =
                     (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
             IBinder token = getToken();
@@ -272,6 +273,12 @@ public class PasswdSafeIME extends InputMethodService
                 !ApiCompat.switchToNextInputMethod(inputMgr, token, false)) {
                 inputMgr.showInputMethodPicker();
             }
+            break;
+        }
+        case KEYBOARD_CHOOSE_KEY: {
+            InputMethodManager inputMgr =
+                    (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            inputMgr.showInputMethodPicker();
             break;
         }
         default: {
