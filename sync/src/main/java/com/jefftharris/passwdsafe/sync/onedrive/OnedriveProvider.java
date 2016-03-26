@@ -279,7 +279,7 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
         }
 
         ODConnection conn = new ODConnection(itsAuthClient);
-        conn.setVerboseLogcatOutput(PasswdSafeUtil.DEBUG);
+        conn.setVerboseLogcatOutput(false);
         return conn.getService();
     }
 
