@@ -81,7 +81,7 @@
 
     </RelativeLayout>
 
-    <android.inputmethodservice.KeyboardView
+    <com.jefftharris.passwdsafe.PasswdSafeIMEKeyboardView
         android:id="@+id/keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
