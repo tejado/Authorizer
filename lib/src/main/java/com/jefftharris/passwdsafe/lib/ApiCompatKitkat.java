@@ -15,6 +15,8 @@ import java.util.List;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.net.Uri;
+import android.os.IBinder;
+import android.view.inputmethod.InputMethodManager;
 
 /**
  *  The ApiCompatKitkat class contains helper compatibility methods for Kitkat
@@ -123,5 +125,28 @@ public final class ApiCompatKitkat
             e.printStackTrace();
             return Collections.emptyList();
         }
+    }
+
+
+    /**
+     * API compatible call for
+     * InputMethodManager.shouldOfferSwitchingToNextInputMethod
+     */
+    public static boolean shouldOfferSwitchingToNextInputMethod(
+            InputMethodManager imm,
+            IBinder imeToken)
+    {
+        return imm.shouldOfferSwitchingToNextInputMethod(imeToken);
+    }
+
+    /**
+     * API compatible call for
+     * InputMethodManager.switchToNextInputMethod
+     */
+    public static boolean switchToNextInputMethod(InputMethodManager imm,
+                                                  IBinder imeToken,
+                                                  boolean onlyCurrentIme)
+    {
+        return imm.switchToNextInputMethod(imeToken, onlyCurrentIme);
     }
 }

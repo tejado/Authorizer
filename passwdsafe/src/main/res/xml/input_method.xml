@@ -3,4 +3,7 @@
 <!-- for the Search Manager. -->
 
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
-    android:icon="@mipmap/ic_launcher_passwdsafe"/>
+              xmlns:tools="http://schemas.android.com/tools"
+              android:icon="@mipmap/ic_launcher_passwdsafe"
+              android:supportsSwitchingToNextInputMethod="false"
+              tools:ignore="UnusedAttribute"/>

@@ -15,9 +15,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.text.ClipboardManager;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -160,5 +162,31 @@ public final class ApiCompat
                     ctx.getSystemService(Context.CLIPBOARD_SERVICE);
             return clipMgr.hasText();
         }
+    }
+
+    /**
+     * API compatible call for
+     * InputMethodManager.shouldOfferSwitchingToNextInputMethod
+     */
+    public static boolean shouldOfferSwitchingToNextInputMethod(
+            InputMethodManager imm,
+            IBinder imeToken)
+    {
+        return (SDK_VERSION >= SDK_KITKAT) &&
+               ApiCompatKitkat.shouldOfferSwitchingToNextInputMethod(imm,
+                                                                     imeToken);
+    }
+
+    /**
+     * API compatible call for
+     * InputMethodManager.switchToNextInputMethod
+     */
+    public static boolean switchToNextInputMethod(InputMethodManager imm,
+                                                  IBinder imeToken,
+                                                  boolean onlyCurrentIme)
+    {
+        return (SDK_VERSION >= SDK_KITKAT) &&
+               ApiCompatKitkat.switchToNextInputMethod(imm, imeToken,
+                                                       onlyCurrentIme);
     }
 }

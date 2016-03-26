@@ -10,6 +10,7 @@ package com.jefftharris.passwdsafe;
 import org.pwsafe.lib.file.PwsRecord;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -23,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -30,6 +32,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
+import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.ObjectHolder;
@@ -164,9 +167,7 @@ public class PasswdSafeIME extends InputMethodService
             if (!rc.get().second) {
                 InputMethodManager inputMgr = (InputMethodManager)
                         getSystemService(INPUT_METHOD_SERVICE);
-                IBinder token =
-                        this.getWindow().getWindow().getAttributes().token;
-                GuiUtils.switchToLastInputMethod(inputMgr, token);
+                GuiUtils.switchToLastInputMethod(inputMgr, getToken());
             }
             startActivity(rc.get().first);
         }
@@ -265,7 +266,12 @@ public class PasswdSafeIME extends InputMethodService
         case KEYBOARD_CHOOSE_KEY: {
             InputMethodManager inputMgr =
                     (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-            inputMgr.showInputMethodPicker();
+            IBinder token = getToken();
+            if (!ApiCompat.shouldOfferSwitchingToNextInputMethod(inputMgr,
+                                                                 token) ||
+                !ApiCompat.switchToNextInputMethod(inputMgr, token, false)) {
+                inputMgr.showInputMethodPicker();
+            }
             break;
         }
         default: {
@@ -332,6 +338,22 @@ public class PasswdSafeIME extends InputMethodService
     private void showPasswordWarning(boolean show)
     {
         GuiUtils.setVisible(itsPasswordWarning, show);
+    }
+
+    /**
+     * Get the IME token
+     */
+    private IBinder getToken()
+    {
+        final Dialog dialog = getWindow();
+        if (dialog == null) {
+            return null;
+        }
+        final Window window = dialog.getWindow();
+        if (window == null) {
+            return null;
+        }
+        return window.getAttributes().token;
     }
 
     /**
