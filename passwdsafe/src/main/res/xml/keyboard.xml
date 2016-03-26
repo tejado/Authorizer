@@ -46,13 +46,12 @@
              android:keyEdgeFlags="left"
              android:keyLabel="ABC"
              android:keyWidth="15%p"/>
-        <Key android:codes="32"
-             android:isRepeatable="true"
-             android:keyIcon="@drawable/sym_keyboard_space"
-             android:keyWidth="50%p"/>
         <Key android:codes="-25"
              android:keyIcon="@drawable/sym_keyboard_choose"
-             android:keyWidth="15%p"/>
+             android:keyWidth="10%p"/>
+        <Key android:codes="32"
+             android:keyIcon="@drawable/sym_keyboard_space"
+             android:keyWidth="55%p"/>
         <Key android:codes="-13"
              android:keyEdgeFlags="right"
              android:keyLabel="Enter"
