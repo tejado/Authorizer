@@ -22,7 +22,6 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -55,14 +54,13 @@ public class PasswdSafeIME extends InputMethodService
     private static final int KEYBOARD_CHOOSE_KEY = -25;
 
     private KeyboardView itsKeyboardView;
-    private Keyboard.Key itsEnterKey;
+    private PasswdSafeKeyboard itsCurrKeyboard;
     private TextView itsFile;
     private View itsRecordLabel;
     private TextView itsRecord;
     private View itsPasswordWarning;
     private boolean itsAllowPassword = false;
     private boolean itsIsPasswordField = false;
-    private int itsEnterAction = EditorInfo.IME_ACTION_NONE;
 
     /* (non-Javadoc)
      * @see android.inputmethodservice.InputMethodService#onCreateInputView()
@@ -73,10 +71,10 @@ public class PasswdSafeIME extends InputMethodService
     {
         View view = getLayoutInflater().inflate(R.layout.input_method, null);
 
-        Keyboard keyboard = new PasswdSafeKeyboard(this, R.xml.keyboard);
+        itsCurrKeyboard = new PasswdSafeKeyboard(this, R.xml.keyboard);
         itsKeyboardView = (KeyboardView)view.findViewById(R.id.keyboard);
         itsKeyboardView.setPreviewEnabled(false);
-        itsKeyboardView.setKeyboard(keyboard);
+        itsKeyboardView.setKeyboard(itsCurrKeyboard);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
         itsFile = (TextView)view.findViewById(R.id.file);
@@ -97,45 +95,7 @@ public class PasswdSafeIME extends InputMethodService
         super.onStartInputView(info, restarting);
         refresh(null);
 
-        int enterText = -1;
-        int enterIcon = -1;
-        itsEnterAction =
-                info.imeOptions & (EditorInfo.IME_MASK_ACTION |
-                                   EditorInfo.IME_FLAG_NO_ENTER_ACTION);
-        switch (itsEnterAction) {
-        case EditorInfo.IME_ACTION_DONE: {
-            enterText = R.string.done;
-            break;
-        }
-        case EditorInfo.IME_ACTION_GO: {
-            enterText = R.string.go;
-            break;
-        }
-        case EditorInfo.IME_ACTION_NEXT: {
-            enterText = R.string.next;
-            break;
-        }
-        case EditorInfo.IME_ACTION_SEARCH: {
-            enterIcon = R.drawable.ic_action_search;
-            break;
-        }
-        case EditorInfo.IME_ACTION_SEND: {
-            enterText = R.string.send;
-            break;
-        }
-        default: {
-            enterIcon = R.drawable.sym_keyboard_return;
-            itsEnterAction = EditorInfo.IME_ACTION_NONE;
-            break;
-        }
-        }
-
-        if (itsEnterKey != null) {
-            itsEnterKey.label = (enterText != -1) ? getString(enterText) : null;
-            itsEnterKey.icon = (enterIcon != -1) ?
-                    GuiUtils.getDrawable(getResources(), enterIcon) : null;
-        }
-
+        itsCurrKeyboard.startInputView(info, getResources());
         itsIsPasswordField = false;
         switch (info.inputType & InputType.TYPE_MASK_CLASS) {
         case InputType.TYPE_CLASS_NUMBER: {
@@ -238,7 +198,6 @@ public class PasswdSafeIME extends InputMethodService
         }
         }
 
-        String str = null;
         switch (keycode) {
         case USER_KEY:
         case PASSWORD_KEY:
@@ -290,7 +249,10 @@ public class PasswdSafeIME extends InputMethodService
                     }
                 }
             });
-            str = keyStr.get();
+            String str = keyStr.get();
+            if (str != null) {
+                conn.commitText(str, 1);
+            }
             break;
         }
         case BACK_KEY: {
@@ -298,14 +260,7 @@ public class PasswdSafeIME extends InputMethodService
             break;
         }
         case ENTER_KEY: {
-            if (itsEnterAction == EditorInfo.IME_ACTION_NONE) {
-                conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,
-                                               KeyEvent.KEYCODE_ENTER));
-                conn.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP,
-                                               KeyEvent.KEYCODE_ENTER));
-            } else {
-                conn.performEditorAction(itsEnterAction);
-            }
+            sendKeyChar('\n');
             break;
         }
         case PASSWDSAFE_KEY: {
@@ -318,13 +273,10 @@ public class PasswdSafeIME extends InputMethodService
             inputMgr.showInputMethodPicker();
             break;
         }
-        case 32: {
-            str = " ";
+        default: {
+            sendKeyChar((char)keycode);
             break;
         }
-        }
-        if (str != null) {
-            conn.commitText(str, 1);
         }
     }
 
@@ -398,8 +350,10 @@ public class PasswdSafeIME extends InputMethodService
     }
 
     /** The PasswdSafeKeyboard class is a keyboard for PasswdSafe */
-    private final class PasswdSafeKeyboard extends Keyboard
+    private static final class PasswdSafeKeyboard extends Keyboard
     {
+        private Keyboard.Key itsEnterKey;
+
         /** Constructor */
         public PasswdSafeKeyboard(
                 Context context,
@@ -408,9 +362,54 @@ public class PasswdSafeIME extends InputMethodService
             super(context, xmlLayoutResId);
         }
 
-        /* (non-Javadoc)
-         * @see android.inputmethodservice.Keyboard#createKeyFromXml(android.content.res.Resources, android.inputmethodservice.Keyboard.Row, int, int, android.content.res.XmlResourceParser)
+        /**
+         * Start input on the view
          */
+        public void startInputView(EditorInfo info, Resources res)
+        {
+            if (itsEnterKey == null) {
+                return;
+            }
+
+            int enterText = -1;
+            int enterIcon = -1;
+            int enterAction =
+                    info.imeOptions & (EditorInfo.IME_MASK_ACTION |
+                                       EditorInfo.IME_FLAG_NO_ENTER_ACTION);
+            switch (enterAction) {
+            case EditorInfo.IME_ACTION_DONE: {
+                enterText = R.string.done;
+                break;
+            }
+            case EditorInfo.IME_ACTION_GO: {
+                enterText = R.string.go;
+                break;
+            }
+            case EditorInfo.IME_ACTION_NEXT: {
+                enterText = R.string.next;
+                break;
+            }
+            case EditorInfo.IME_ACTION_SEARCH: {
+                enterIcon = R.drawable.ic_action_search;
+                break;
+            }
+            case EditorInfo.IME_ACTION_SEND: {
+                enterText = R.string.send;
+                break;
+            }
+            default: {
+                enterIcon = R.drawable.sym_keyboard_return;
+                break;
+            }
+            }
+
+            itsEnterKey.label =
+                    (enterText != -1) ? res.getString(enterText) : null;
+            itsEnterKey.icon =
+                    (enterIcon != -1) ?
+                    GuiUtils.getDrawable(res, enterIcon) : null;
+        }
+
         @Override
         protected Key createKeyFromXml(@NonNull Resources res,
                                        @NonNull Row parent,
