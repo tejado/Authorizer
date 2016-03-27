@@ -55,6 +55,7 @@ public class PasswdSafeIME extends InputMethodService
     private static final int PASSWDSAFE_KEY = -24;
 
     private KeyboardView itsKeyboardView;
+    private PasswdSafeIMEKeyboard itsPasswdKeyboard;
     private PasswdSafeIMEKeyboard itsCurrKeyboard;
     private TextView itsFile;
     private View itsRecordLabel;
@@ -66,16 +67,23 @@ public class PasswdSafeIME extends InputMethodService
     // TODO: when launching passwdsafe to get file/record, close passwdsafe once
     // one is chosen to get back to previous activity
 
+    @Override
+    public void onInitializeInterface()
+    {
+        PasswdSafeUtil.dbginfo("foo", "onInitializeInterface");
+        itsPasswdKeyboard = new PasswdSafeIMEKeyboard(this, R.xml.keyboard);
+    }
+
     @SuppressLint("InflateParams")
     @Override
     public View onCreateInputView()
     {
+        PasswdSafeUtil.dbginfo("foo", "onCreateInputView");
         View view = getLayoutInflater().inflate(R.layout.input_method, null);
 
-        itsCurrKeyboard = new PasswdSafeIMEKeyboard(this, R.xml.keyboard);
         itsKeyboardView = (KeyboardView)view.findViewById(R.id.keyboard);
         itsKeyboardView.setPreviewEnabled(false);
-        itsKeyboardView.setKeyboard(itsCurrKeyboard);
+        itsKeyboardView.setKeyboard(itsPasswdKeyboard);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
         itsFile = (TextView)view.findViewById(R.id.file);
@@ -83,17 +91,27 @@ public class PasswdSafeIME extends InputMethodService
         itsRecord = (TextView)view.findViewById(R.id.record);
         itsPasswordWarning = view.findViewById(R.id.password_warning);
 
-        refresh(null);
         return view;
+    }
+
+    @Override
+    public void onStartInput(EditorInfo info, boolean restarting)
+    {
+        PasswdSafeUtil.dbginfo("foo", "onStartInput");
+        super.onStartInput(info, restarting);
+
+        // TODO: choose right starting keyboard...
+        itsCurrKeyboard = itsPasswdKeyboard;
+        itsCurrKeyboard.setOptions(info, getResources());
     }
 
     @Override
     public void onStartInputView(EditorInfo info, boolean restarting)
     {
+        PasswdSafeUtil.dbginfo("foo", "onStartInputView");
         super.onStartInputView(info, restarting);
         refresh(null);
 
-        itsCurrKeyboard.startInputView(info, getResources());
         itsIsPasswordField = false;
         switch (info.inputType & InputType.TYPE_MASK_CLASS) {
         case InputType.TYPE_CLASS_NUMBER: {
@@ -120,7 +138,21 @@ public class PasswdSafeIME extends InputMethodService
         showPasswordWarning(false);
 
         // Reset keyboard to reflect key changes
+        itsKeyboardView.setKeyboard(itsCurrKeyboard);
+        itsKeyboardView.closing();
         itsKeyboardView.invalidateAllKeys();
+    }
+
+    @Override
+    public void onFinishInput()
+    {
+        PasswdSafeUtil.dbginfo("foo", "onFinishInput");
+        super.onFinishInput();
+
+        itsCurrKeyboard = itsPasswdKeyboard;
+        if (itsKeyboardView != null) {
+            itsKeyboardView.closing();
+        }
     }
 
     @Override
