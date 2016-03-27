@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.inputmethodservice.InputMethodService;
+import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
 import android.os.IBinder;
@@ -41,18 +42,19 @@ import com.jefftharris.passwdsafe.util.Pair;
  */
 public class PasswdSafeIME extends InputMethodService
 {
-    public static final int ENTER_KEY = -13;
-    public static final int KEYBOARD_NEXT_KEY = -25;
-    public static final int KEYBOARD_CHOOSE_KEY = -26;
+    // Password fields
+    private static final int USER_KEY = -100;
+    private static final int PASSWORD_KEY = -101;
+    private static final int URL_KEY = -102;
+    private static final int EMAIL_KEY = -103;
+    private static final int TITLE_KEY = -104;
+    private static final int NOTES_KEY = -105;
 
-    private static final int USER_KEY = -1;
-    private static final int URL_KEY = -2;
-    private static final int BACK_KEY = -3;
-    private static final int PASSWORD_KEY = -11;
-    private static final int EMAIL_KEY = -12;
-    private static final int TITLE_KEY = -21;
-    private static final int NOTES_KEY = -22;
-    private static final int PASSWDSAFE_KEY = -24;
+    // Control keys
+    public static final int ENTER_KEY = -200;
+    private static final int PASSWDSAFE_KEY = -201;
+    public static final int KEYBOARD_NEXT_KEY = -202;
+    public static final int KEYBOARD_CHOOSE_KEY = -203;
 
     private KeyboardView itsKeyboardView;
     private PasswdSafeIMEKeyboard itsPasswdSafeKeyboard;
@@ -285,7 +287,7 @@ public class PasswdSafeIME extends InputMethodService
             }
             break;
         }
-        case BACK_KEY: {
+        case Keyboard.KEYCODE_DELETE: {
             conn.deleteSurroundingText(1, 0);
             break;
         }
