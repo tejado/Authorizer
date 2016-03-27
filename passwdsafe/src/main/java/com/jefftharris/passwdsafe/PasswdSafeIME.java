@@ -12,6 +12,7 @@ import org.pwsafe.lib.file.PwsRecord;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -58,6 +59,7 @@ public class PasswdSafeIME extends InputMethodService
 
     private KeyboardView itsKeyboardView;
     private PasswdSafeIMEKeyboard itsPasswdSafeKeyboard;
+    private PasswdSafeIMEKeyboard itsQwertyKeyboard;
     private PasswdSafeIMEKeyboard itsCurrKeyboard;
     private TextView itsFile;
     private View itsRecordLabel;
@@ -68,6 +70,7 @@ public class PasswdSafeIME extends InputMethodService
 
     // TODO: when launching passwdsafe to get file/record, close passwdsafe once
     // one is chosen to get back to previous activity
+    // TODO: cleanup logs
 
     @Override
     public void onInitializeInterface()
@@ -75,6 +78,8 @@ public class PasswdSafeIME extends InputMethodService
         PasswdSafeUtil.dbginfo("foo", "onInitializeInterface");
         itsPasswdSafeKeyboard =
                 new PasswdSafeIMEKeyboard(this, R.xml.keyboard_passwdsafe);
+        itsQwertyKeyboard =
+                new PasswdSafeIMEKeyboard(this, R.xml.keyboard_qwerty);
     }
 
     @SuppressLint("InflateParams")
@@ -104,8 +109,10 @@ public class PasswdSafeIME extends InputMethodService
         super.onStartInput(info, restarting);
 
         // TODO: choose right starting keyboard...
+        Resources res = getResources();
+        itsPasswdSafeKeyboard.setOptions(info, res);
+        itsQwertyKeyboard.setOptions(info, res);
         itsCurrKeyboard = itsPasswdSafeKeyboard;
-        itsCurrKeyboard.setOptions(info, getResources());
     }
 
     @Override
@@ -314,6 +321,15 @@ public class PasswdSafeIME extends InputMethodService
             InputMethodManager inputMgr =
                     (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
             inputMgr.showInputMethodPicker();
+            break;
+        }
+        case Keyboard.KEYCODE_MODE_CHANGE: {
+            Keyboard current = itsKeyboardView.getKeyboard();
+            if (current == itsPasswdSafeKeyboard) {
+                itsKeyboardView.setKeyboard(itsQwertyKeyboard);
+            } else if (current == itsQwertyKeyboard) {
+                itsKeyboardView.setKeyboard(itsPasswdSafeKeyboard);
+            }
             break;
         }
         default: {
