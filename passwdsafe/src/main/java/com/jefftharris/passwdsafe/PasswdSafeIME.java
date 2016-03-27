@@ -60,6 +60,8 @@ public class PasswdSafeIME extends InputMethodService
     private KeyboardView itsKeyboardView;
     private PasswdSafeIMEKeyboard itsPasswdSafeKeyboard;
     private PasswdSafeIMEKeyboard itsQwertyKeyboard;
+    private PasswdSafeIMEKeyboard itsSymbolsKeyboard;
+    private PasswdSafeIMEKeyboard itsSymbolsShiftKeyboard;
     private PasswdSafeIMEKeyboard itsCurrKeyboard;
     private TextView itsFile;
     private View itsRecordLabel;
@@ -82,6 +84,10 @@ public class PasswdSafeIME extends InputMethodService
                 new PasswdSafeIMEKeyboard(this, R.xml.keyboard_passwdsafe);
         itsQwertyKeyboard =
                 new PasswdSafeIMEKeyboard(this, R.xml.keyboard_qwerty);
+        itsSymbolsKeyboard =
+                new PasswdSafeIMEKeyboard(this, R.xml.keyboard_symbols);
+        itsSymbolsShiftKeyboard =
+                new PasswdSafeIMEKeyboard(this, R.xml.keyboard_symbols_shift);
     }
 
     @SuppressLint("InflateParams")
@@ -114,6 +120,8 @@ public class PasswdSafeIME extends InputMethodService
         Resources res = getResources();
         itsPasswdSafeKeyboard.setOptions(info, res);
         itsQwertyKeyboard.setOptions(info, res);
+        itsSymbolsKeyboard.setOptions(info, res);
+        itsSymbolsShiftKeyboard.setOptions(info, res);
         itsCurrKeyboard = itsPasswdSafeKeyboard;
         updateShiftKeyState(info);
     }
@@ -333,12 +341,17 @@ public class PasswdSafeIME extends InputMethodService
                 itsKeyboardView.setKeyboard(itsQwertyKeyboard);
                 updateShiftKeyState(getCurrentInputEditorInfo());
             } else if (current == itsQwertyKeyboard) {
+                itsKeyboardView.setKeyboard(itsSymbolsKeyboard);
+                itsSymbolsKeyboard.setShifted(false);
+            } else if ((current == itsSymbolsKeyboard) ||
+                       (current == itsSymbolsShiftKeyboard)) {
                 itsKeyboardView.setKeyboard(itsPasswdSafeKeyboard);
             }
             break;
         }
         case Keyboard.KEYCODE_SHIFT: {
-            if (itsKeyboardView.getKeyboard() == itsQwertyKeyboard) {
+            Keyboard current = itsKeyboardView.getKeyboard();
+            if (current == itsQwertyKeyboard) {
                 long now = System.currentTimeMillis();
                 if (now < (itsLastShiftTime + 750)) {
                     itsCapsLock = !itsCapsLock;
@@ -348,6 +361,14 @@ public class PasswdSafeIME extends InputMethodService
                 }
                 itsKeyboardView.setShifted(itsCapsLock ||
                                            !itsKeyboardView.isShifted());
+            } else if (current == itsSymbolsKeyboard) {
+                itsSymbolsKeyboard.setShifted(true);
+                itsKeyboardView.setKeyboard(itsSymbolsShiftKeyboard);
+                itsSymbolsShiftKeyboard.setShifted(true);
+            } else if (current == itsSymbolsShiftKeyboard) {
+                itsSymbolsShiftKeyboard.setShifted(false);
+                itsKeyboardView.setKeyboard(itsSymbolsKeyboard);
+                itsSymbolsKeyboard.setShifted(false);
             }
             break;
         }
@@ -357,7 +378,7 @@ public class PasswdSafeIME extends InputMethodService
                 code = Character.toUpperCase(code);
             }
             sendKeyChar((char)code);
-            if (Character.isLetter(code)) {
+            if (Character.isLetter(code) || Character.isWhitespace(code)) {
                 updateShiftKeyState(getCurrentInputEditorInfo());
             }
             break;

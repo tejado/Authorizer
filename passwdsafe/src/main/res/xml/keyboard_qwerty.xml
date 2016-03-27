@@ -86,10 +86,10 @@
              android:keyIcon="@drawable/sym_keyboard_delete"
              android:keyWidth="15%p"/>
     </Row>
-    <Row>
+    <Row android:rowEdgeFlags="bottom">
         <Key android:codes="-2"
              android:keyEdgeFlags="left"
-             android:keyIcon="@drawable/ic_passwdsafe_light"
+             android:keyLabel="\?123"
              android:keyWidth="15%p"/>
         <Key android:codes="44"
              android:keyLabel=","/>

@@ -40,7 +40,7 @@
              android:keyIcon="@drawable/sym_keyboard_delete"
              android:keyWidth="15%p"/>
     </Row>
-    <Row>
+    <Row android:rowEdgeFlags="bottom">
         <Key android:codes="-2"
              android:keyEdgeFlags="left"
              android:keyLabel="ABC"
