@@ -34,9 +34,9 @@ final class PasswdSafeIMEKeyboard extends Keyboard
     }
 
     /**
-     * Start input on the view
+     * Set options on the keyboard
      */
-    public void startInputView(EditorInfo info, Resources res)
+    public void setOptions(EditorInfo info, Resources res)
     {
         if (itsEnterKey == null) {
             return;
