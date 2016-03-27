@@ -53,6 +53,16 @@
               <option name="INSERT_LINE_BREAK_BEFORE_FIRST_ATTRIBUTE" value="false" />
             </value>
           </option>
+          <option name="MANIFEST_SETTINGS">
+            <value>
+              <option name="INSERT_LINE_BREAK_BEFORE_FIRST_ATTRIBUTE" value="false" />
+            </value>
+          </option>
+          <option name="OTHER_SETTINGS">
+            <value>
+              <option name="INSERT_LINE_BREAK_BEFORE_FIRST_ATTRIBUTE" value="false" />
+            </value>
+          </option>
         </AndroidXmlCodeStyleSettings>
         <Objective-C-extensions>
           <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
