@@ -55,7 +55,7 @@ public class PasswdSafeIME extends InputMethodService
     private static final int PASSWDSAFE_KEY = -24;
 
     private KeyboardView itsKeyboardView;
-    private PasswdSafeIMEKeyboard itsPasswdKeyboard;
+    private PasswdSafeIMEKeyboard itsPasswdSafeKeyboard;
     private PasswdSafeIMEKeyboard itsCurrKeyboard;
     private TextView itsFile;
     private View itsRecordLabel;
@@ -71,7 +71,8 @@ public class PasswdSafeIME extends InputMethodService
     public void onInitializeInterface()
     {
         PasswdSafeUtil.dbginfo("foo", "onInitializeInterface");
-        itsPasswdKeyboard = new PasswdSafeIMEKeyboard(this, R.xml.keyboard);
+        itsPasswdSafeKeyboard =
+                new PasswdSafeIMEKeyboard(this, R.xml.keyboard_passwdsafe);
     }
 
     @SuppressLint("InflateParams")
@@ -83,7 +84,7 @@ public class PasswdSafeIME extends InputMethodService
 
         itsKeyboardView = (KeyboardView)view.findViewById(R.id.keyboard);
         itsKeyboardView.setPreviewEnabled(false);
-        itsKeyboardView.setKeyboard(itsPasswdKeyboard);
+        itsKeyboardView.setKeyboard(itsPasswdSafeKeyboard);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
         itsFile = (TextView)view.findViewById(R.id.file);
@@ -101,7 +102,7 @@ public class PasswdSafeIME extends InputMethodService
         super.onStartInput(info, restarting);
 
         // TODO: choose right starting keyboard...
-        itsCurrKeyboard = itsPasswdKeyboard;
+        itsCurrKeyboard = itsPasswdSafeKeyboard;
         itsCurrKeyboard.setOptions(info, getResources());
     }
 
@@ -149,7 +150,7 @@ public class PasswdSafeIME extends InputMethodService
         PasswdSafeUtil.dbginfo("foo", "onFinishInput");
         super.onFinishInput();
 
-        itsCurrKeyboard = itsPasswdKeyboard;
+        itsCurrKeyboard = itsPasswdSafeKeyboard;
         if (itsKeyboardView != null) {
             itsKeyboardView.closing();
         }
