@@ -67,6 +67,8 @@ public class PasswdSafeIME extends InputMethodService
     private View itsPasswordWarning;
     private boolean itsAllowPassword = false;
     private boolean itsIsPasswordField = false;
+    private long itsLastShiftTime = 0;
+    private boolean itsCapsLock = false;
 
     // TODO: when launching passwdsafe to get file/record, close passwdsafe once
     // one is chosen to get back to previous activity
@@ -113,6 +115,7 @@ public class PasswdSafeIME extends InputMethodService
         itsPasswdSafeKeyboard.setOptions(info, res);
         itsQwertyKeyboard.setOptions(info, res);
         itsCurrKeyboard = itsPasswdSafeKeyboard;
+        updateShiftKeyState(info);
     }
 
     @Override
@@ -296,6 +299,7 @@ public class PasswdSafeIME extends InputMethodService
         }
         case Keyboard.KEYCODE_DELETE: {
             conn.deleteSurroundingText(1, 0);
+            updateShiftKeyState(getCurrentInputEditorInfo());
             break;
         }
         case ENTER_KEY: {
@@ -327,15 +331,55 @@ public class PasswdSafeIME extends InputMethodService
             Keyboard current = itsKeyboardView.getKeyboard();
             if (current == itsPasswdSafeKeyboard) {
                 itsKeyboardView.setKeyboard(itsQwertyKeyboard);
+                updateShiftKeyState(getCurrentInputEditorInfo());
             } else if (current == itsQwertyKeyboard) {
                 itsKeyboardView.setKeyboard(itsPasswdSafeKeyboard);
             }
             break;
         }
-        default: {
-            sendKeyChar((char)keycode);
+        case Keyboard.KEYCODE_SHIFT: {
+            if (itsKeyboardView.getKeyboard() == itsQwertyKeyboard) {
+                long now = System.currentTimeMillis();
+                if (now < (itsLastShiftTime + 750)) {
+                    itsCapsLock = !itsCapsLock;
+                    itsLastShiftTime = 0;
+                } else {
+                    itsLastShiftTime = now;
+                }
+                itsKeyboardView.setShifted(itsCapsLock ||
+                                           !itsKeyboardView.isShifted());
+            }
             break;
         }
+        default: {
+            int code = keycode;
+            if (isInputViewShown() && itsKeyboardView.isShifted()) {
+                code = Character.toUpperCase(code);
+            }
+            sendKeyChar((char)code);
+            if (Character.isLetter(code)) {
+                updateShiftKeyState(getCurrentInputEditorInfo());
+            }
+            break;
+        }
+        }
+    }
+
+    /**
+     * Helper to update the shift state of our keyboard based on the initial
+     * editor state.
+     */
+    private void updateShiftKeyState(EditorInfo attr) {
+        if ((attr != null) &&
+            (itsKeyboardView != null) &&
+            (itsKeyboardView.getKeyboard() == itsQwertyKeyboard)) {
+            int caps = 0;
+            EditorInfo ei = getCurrentInputEditorInfo();
+            if ((ei != null) && (ei.inputType != InputType.TYPE_NULL)) {
+                caps = getCurrentInputConnection().getCursorCapsMode(
+                        attr.inputType);
+            }
+            itsKeyboardView.setShifted(itsCapsLock || (caps != 0));
         }
     }
 

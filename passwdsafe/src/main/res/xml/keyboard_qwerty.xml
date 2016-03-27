@@ -64,7 +64,7 @@
              android:isModifier="true"
              android:isSticky="true"
              android:keyEdgeFlags="left"
-             android:keyLabel="SHIFT!!"
+             android:keyIcon="@drawable/sym_keyboard_shift"
              android:keyWidth="15%p"/>
         <Key android:codes="122"
              android:keyLabel="z"/>
