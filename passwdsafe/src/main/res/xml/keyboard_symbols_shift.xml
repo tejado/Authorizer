@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+          android:horizontalGap="0px"
+          android:keyHeight="50dp"
+          android:keyWidth="10%p"
+          android:verticalGap="0px">
+
+    <Row>
+        <Key android:codes="126"
+             android:keyEdgeFlags="left"
+             android:keyLabel="~"/>
+        <Key android:codes="177"
+             android:keyLabel="±"/>
+        <Key android:codes="215"
+             android:keyLabel="×"/>
+        <Key android:codes="247"
+             android:keyLabel="÷"/>
+        <Key android:codes="8226"
+             android:keyLabel="•"/>
+        <Key android:codes="176"
+             android:keyLabel="°"/>
+        <Key android:codes="96"
+             android:keyLabel="`"/>
+        <Key android:codes="180"
+             android:keyLabel="´"/>
+        <Key android:codes="123"
+             android:keyLabel="{"/>
+        <Key android:codes="125"
+             android:keyEdgeFlags="right"
+             android:keyLabel="}"/>
+    </Row>
+    <Row>
+        <Key android:codes="169"
+             android:keyEdgeFlags="left"
+             android:keyLabel="©"/>
+        <Key android:codes="163"
+             android:keyLabel="£"/>
+        <Key android:codes="8364"
+             android:keyLabel="€"/>
+        <Key android:codes="94"
+             android:keyLabel="^"/>
+        <Key android:codes="174"
+             android:keyLabel="®"/>
+        <Key android:codes="165"
+             android:keyLabel="¥"/>
+        <Key android:codes="95"
+             android:keyLabel="_"/>
+        <Key android:codes="43"
+             android:keyLabel="+"/>
+        <Key android:codes="91"
+             android:keyLabel="["/>
+        <Key android:codes="93"
+             android:keyEdgeFlags="right"
+             android:keyLabel="]"/>
+    </Row>
+    <Row>
+        <Key android:codes="-1"
+             android:isModifier="true"
+             android:isSticky="true"
+             android:keyEdgeFlags="left"
+             android:keyLabel="\?123"
+             android:keyWidth="15%p"/>
+        <Key android:codes="161"
+             android:keyLabel="¡"/>
+        <Key android:codes="60"
+             android:keyLabel="&lt;"/>
+        <Key android:codes="62"
+             android:keyLabel="&gt;"/>
+        <Key android:codes="162"
+             android:keyLabel="¢"/>
+        <Key android:codes="124"
+             android:keyLabel="|"/>
+        <Key android:codes="92"
+             android:keyLabel="\\"/>
+        <Key android:codes="191"
+             android:keyLabel="¿"/>
+        <Key android:codes="-5"
+             android:isRepeatable="true"
+             android:keyEdgeFlags="right"
+             android:keyIcon="@drawable/sym_keyboard_delete"
+             android:keyWidth="15%p"/>
+    </Row>
+    <Row android:rowEdgeFlags="bottom">
+        <Key android:codes="-2"
+             android:keyEdgeFlags="left"
+             android:keyIcon="@drawable/ic_passwdsafe_light"
+             android:keyWidth="15%p"/>
+        <Key android:codes="44"
+             android:keyLabel=","/>
+        <Key android:codes="-202"
+             android:keyIcon="@drawable/sym_keyboard_choose"/>
+        <Key android:codes="32"
+             android:keyIcon="@drawable/sym_keyboard_space"
+             android:keyWidth="35%p"/>
+        <Key android:codes="46"
+             android:keyLabel="."/>
+        <Key android:codes="-200"
+             android:keyEdgeFlags="right"
+             android:keyLabel="Enter"
+             android:keyWidth="20%p"/>
+    </Row>
+
+</Keyboard>
