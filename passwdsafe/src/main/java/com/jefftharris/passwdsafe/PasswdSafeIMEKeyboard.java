@@ -26,9 +26,7 @@ final class PasswdSafeIMEKeyboard extends Keyboard
     /**
      * Constructor
      */
-    public PasswdSafeIMEKeyboard(
-            Context context,
-            @SuppressWarnings("SameParameterValue") int xmlLayoutResId)
+    public PasswdSafeIMEKeyboard(Context context, int xmlLayoutResId)
     {
         super(context, xmlLayoutResId);
     }
