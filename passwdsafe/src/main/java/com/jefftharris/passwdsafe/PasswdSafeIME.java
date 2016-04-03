@@ -99,7 +99,6 @@ public class PasswdSafeIME extends InputMethodService
 
         itsKeyboardView = (KeyboardView)view.findViewById(R.id.keyboard);
         itsKeyboardView.setPreviewEnabled(false);
-        itsKeyboardView.setKeyboard(itsPasswdSafeKeyboard);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
         itsFile = (TextView)view.findViewById(R.id.file);
@@ -113,17 +112,16 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public void onStartInput(EditorInfo info, boolean restarting)
     {
-        PasswdSafeUtil.dbginfo("foo", "onStartInput");
+        PasswdSafeUtil.dbginfo("foo", "onStartInput, curr %s, pw %s, qw %s",
+                               itsCurrKeyboard, itsPasswdSafeKeyboard,
+                               itsQwertyKeyboard);
         super.onStartInput(info, restarting);
 
-        // TODO: choose right starting keyboard...
         Resources res = getResources();
         itsPasswdSafeKeyboard.setOptions(info, res);
         itsQwertyKeyboard.setOptions(info, res);
         itsSymbolsKeyboard.setOptions(info, res);
         itsSymbolsShiftKeyboard.setOptions(info, res);
-        itsCurrKeyboard = itsPasswdSafeKeyboard;
-        updateShiftKeyState(info);
     }
 
     @Override
@@ -158,8 +156,26 @@ public class PasswdSafeIME extends InputMethodService
         itsAllowPassword = itsIsPasswordField;
         showPasswordWarning(false);
 
+        PasswdSafeIMEKeyboard keyboard = itsCurrKeyboard;
+        if (keyboard == null) {
+            keyboard = itsPasswdSafeKeyboard;
+        } else if (keyboard != itsPasswdSafeKeyboard) {
+            switch (info.inputType & InputType.TYPE_MASK_CLASS) {
+            case InputType.TYPE_CLASS_NUMBER:
+            case InputType.TYPE_CLASS_DATETIME:
+            case InputType.TYPE_CLASS_PHONE: {
+                keyboard = itsSymbolsKeyboard;
+                break;
+            }
+            default: {
+                keyboard = itsQwertyKeyboard;
+                break;
+            }
+            }
+        }
+
         // Reset keyboard to reflect key changes
-        itsKeyboardView.setKeyboard(itsCurrKeyboard);
+        setKeyboard(keyboard);
         itsKeyboardView.closing();
         itsKeyboardView.invalidateAllKeys();
     }
@@ -170,9 +186,10 @@ public class PasswdSafeIME extends InputMethodService
         PasswdSafeUtil.dbginfo("foo", "onFinishInput");
         super.onFinishInput();
 
-        itsCurrKeyboard = itsPasswdSafeKeyboard;
+        //itsCurrKeyboard = itsPasswdSafeKeyboard;
         if (itsKeyboardView != null) {
             itsKeyboardView.closing();
+            //itsCurrKeyboard = (PasswdSafeIMEKeyboard)itsKeyboardView.getKeyboard();
         }
     }
 
@@ -307,7 +324,7 @@ public class PasswdSafeIME extends InputMethodService
         }
         case Keyboard.KEYCODE_DELETE: {
             conn.deleteSurroundingText(1, 0);
-            updateShiftKeyState(getCurrentInputEditorInfo());
+            updateShiftKeyState();
             break;
         }
         case ENTER_KEY: {
@@ -338,14 +355,13 @@ public class PasswdSafeIME extends InputMethodService
         case Keyboard.KEYCODE_MODE_CHANGE: {
             Keyboard current = itsKeyboardView.getKeyboard();
             if (current == itsPasswdSafeKeyboard) {
-                itsKeyboardView.setKeyboard(itsQwertyKeyboard);
-                updateShiftKeyState(getCurrentInputEditorInfo());
+                setKeyboard(itsQwertyKeyboard);
             } else if (current == itsQwertyKeyboard) {
-                itsKeyboardView.setKeyboard(itsSymbolsKeyboard);
+                setKeyboard(itsSymbolsKeyboard);
                 itsSymbolsKeyboard.setShifted(false);
             } else if ((current == itsSymbolsKeyboard) ||
                        (current == itsSymbolsShiftKeyboard)) {
-                itsKeyboardView.setKeyboard(itsPasswdSafeKeyboard);
+                setKeyboard(itsPasswdSafeKeyboard);
             }
             break;
         }
@@ -363,11 +379,11 @@ public class PasswdSafeIME extends InputMethodService
                                            !itsKeyboardView.isShifted());
             } else if (current == itsSymbolsKeyboard) {
                 itsSymbolsKeyboard.setShifted(true);
-                itsKeyboardView.setKeyboard(itsSymbolsShiftKeyboard);
+                setKeyboard(itsSymbolsShiftKeyboard);
                 itsSymbolsShiftKeyboard.setShifted(true);
             } else if (current == itsSymbolsShiftKeyboard) {
                 itsSymbolsShiftKeyboard.setShifted(false);
-                itsKeyboardView.setKeyboard(itsSymbolsKeyboard);
+                setKeyboard(itsSymbolsKeyboard);
                 itsSymbolsKeyboard.setShifted(false);
             }
             break;
@@ -379,7 +395,7 @@ public class PasswdSafeIME extends InputMethodService
             }
             sendKeyChar((char)code);
             if (Character.isLetter(code) || Character.isWhitespace(code)) {
-                updateShiftKeyState(getCurrentInputEditorInfo());
+                updateShiftKeyState();
             }
             break;
         }
@@ -387,18 +403,26 @@ public class PasswdSafeIME extends InputMethodService
     }
 
     /**
-     * Helper to update the shift state of our keyboard based on the initial
-     * editor state.
+     * Set the current keyboard
      */
-    private void updateShiftKeyState(EditorInfo attr) {
-        if ((attr != null) &&
-            (itsKeyboardView != null) &&
-            (itsKeyboardView.getKeyboard() == itsQwertyKeyboard)) {
+    private void setKeyboard(PasswdSafeIMEKeyboard keyboard)
+    {
+        itsCurrKeyboard = keyboard;
+        itsKeyboardView.setKeyboard(itsCurrKeyboard);
+        updateShiftKeyState();
+    }
+
+    /**
+     * Helper to update the shift state of our keyboard based on the editor
+     * state
+     */
+    private void updateShiftKeyState() {
+        if (itsCurrKeyboard == itsQwertyKeyboard) {
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
             if ((ei != null) && (ei.inputType != InputType.TYPE_NULL)) {
                 caps = getCurrentInputConnection().getCursorCapsMode(
-                        attr.inputType);
+                        ei.inputType);
             }
             itsKeyboardView.setShifted(itsCapsLock || (caps != 0));
         }
