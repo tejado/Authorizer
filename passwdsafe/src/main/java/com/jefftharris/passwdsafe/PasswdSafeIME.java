@@ -43,6 +43,7 @@ import com.jefftharris.passwdsafe.util.Pair;
  *  @author Jeff Harris
  */
 public class PasswdSafeIME extends InputMethodService
+        implements View.OnClickListener
 {
     public static final String PASSWDSAFE_OPEN =
             "com.jefftharris.passwdsafe.Open";
@@ -67,8 +68,6 @@ public class PasswdSafeIME extends InputMethodService
     private PasswdSafeIMEKeyboard itsSymbolsKeyboard;
     private PasswdSafeIMEKeyboard itsSymbolsShiftKeyboard;
     private PasswdSafeIMEKeyboard itsCurrKeyboard;
-    private TextView itsFile;
-    private View itsRecordLabel;
     private TextView itsRecord;
     private View itsPasswordWarning;
     private boolean itsAllowPassword = false;
@@ -104,9 +103,8 @@ public class PasswdSafeIME extends InputMethodService
         itsKeyboardView.setPreviewEnabled(false);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
-        itsFile = (TextView)view.findViewById(R.id.file);
-        itsRecordLabel = view.findViewById(R.id.record_label);
         itsRecord = (TextView)view.findViewById(R.id.record);
+        itsRecord.setOnClickListener(this);
         itsPasswordWarning = view.findViewById(R.id.password_warning);
 
         return view;
@@ -210,6 +208,17 @@ public class PasswdSafeIME extends InputMethodService
         return false;
     }
 
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.record: {
+            openPasswdSafe();
+            break;
+        }
+        }
+    }
+
     /**
      * Open PasswdSafe
      */
@@ -245,7 +254,9 @@ public class PasswdSafeIME extends InputMethodService
             }
         });
         if (rc.get() != null) {
-            if (!rc.get().second) {
+            if (rc.get().second) {
+                setKeyboard(itsPasswdSafeKeyboard);
+            } else {
                 setKeyboard(itsQwertyKeyboard);
             }
             startActivity(rc.get().first);
@@ -450,7 +461,7 @@ public class PasswdSafeIME extends InputMethodService
             public void useFileData(@NonNull PasswdFileData fileData)
             {
                 String fileLabel = fileData.getUri().getIdentifier(
-                        PasswdSafeIME.this, false);
+                        PasswdSafeIME.this, true);
 
                 PwsRecord rec = null;
                 String uuid = PasswdSafeFileDataFragment.getLastViewedRecord();
@@ -472,19 +483,20 @@ public class PasswdSafeIME extends InputMethodService
             }
         });
 
-        boolean haveFile = (labels.get() != null);
-        GuiUtils.setVisible(itsRecordLabel, haveFile);
-        GuiUtils.setVisible(itsRecord, haveFile);
-        if (haveFile) {
-            itsFile.setText(labels.get().first);
-            itsRecord.setText(labels.get().second);
+        StringBuilder label = new StringBuilder();
+        if (labels.get() != null) {
+            label.append(getString(R.string.record)).append(": ");
+            label.append(labels.get().first);
+            label.append(" - ");
+            label.append(labels.get().second);
         } else {
-            itsFile.setText(R.string.none_selected_open);
-            itsRecord.setText(null);
+            label.append(getString(R.string.file)).append(": ")
+                    .append(getString(R.string.none_selected_open));
             if (user != null) {
                 user.refresh(null, null);
             }
         }
+        itsRecord.setText(label.toString());
     }
 
     /**
