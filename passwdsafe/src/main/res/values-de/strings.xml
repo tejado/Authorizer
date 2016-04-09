@@ -88,7 +88,6 @@
     <string name="file_close_timeout">Dateizeitsperre</string>
     <string name="file_exists">Datei existiert bereits</string>
     <string name="file">Datei</string>
-    <string name="file_label">Datei:</string>
     <string name="file_name">Dateiname</string>
     <string name="file_not_found_perm_denied">Datei nicht gefunden oder keine Berechtigung</string>
     <string name="file_operations">Datei …</string>
@@ -220,7 +219,6 @@
     <string name="record">Eintrag</string>
     <string name="records">Einträge</string>
     <string name="record_has_references">Eintrag mit Verweisen</string>
-    <string name="record_label">Eintrag:</string>
     <string name="record_not_found">Eintrag nicht gefunden</string>
     <string name="record_policy">Eintragsregeln</string>
     <string name="record_sort_order">Sortierreihenfolge für Einträge</string>
