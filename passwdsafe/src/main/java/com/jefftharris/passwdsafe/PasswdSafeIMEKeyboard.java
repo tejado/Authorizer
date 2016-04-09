@@ -84,10 +84,51 @@ final class PasswdSafeIMEKeyboard extends Keyboard
                                    @NonNull Row parent,
                                    int x, int y, XmlResourceParser parser)
     {
-        Key key = super.createKeyFromXml(res, parent, x, y, parser);
+        Key key = new PasswdSafeKey(res, parent, x, y, parser);
         if (key.codes[0] == PasswdSafeIME.ENTER_KEY) {
             itsEnterKey = key;
         }
         return key;
+    }
+
+    /**
+     * Key class to use a custom drawable state
+     */
+    private static final class PasswdSafeKey extends Key
+    {
+        private static final int[] ACTION_KEY_NORMAL = {
+                android.R.attr.state_single };
+        private static final int[] ACTION_KEY_PRESSED = {
+                android.R.attr.state_single, android.R.attr.state_pressed };
+
+        /**
+         * Constructor
+         */
+        public PasswdSafeKey(Resources res, Row parent, int x, int y,
+                             XmlResourceParser parser)
+        {
+            super(res, parent, x, y, parser);
+        }
+
+        @Override
+        public int[] getCurrentDrawableState()
+        {
+            switch (codes[0]) {
+            case Keyboard.KEYCODE_DELETE:
+            case Keyboard.KEYCODE_MODE_CHANGE:
+            case PasswdSafeIME.ENTER_KEY:
+            case PasswdSafeIME.KEYBOARD_CHOOSE_KEY:
+            case PasswdSafeIME.KEYBOARD_NEXT_KEY:
+            case PasswdSafeIME.PASSWDSAFE_KEY: {
+                if (pressed) {
+                    return ACTION_KEY_PRESSED;
+                }
+                return ACTION_KEY_NORMAL;
+            }
+            default: {
+                return super.getCurrentDrawableState();
+            }
+            }
+        }
     }
 }
