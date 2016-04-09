@@ -11,8 +11,6 @@ import java.lang.reflect.Method;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.IBinder;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -27,16 +25,12 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 public final class GuiUtilsHoneycomb
 {
     private static Method itsInvalidateOptionsMenuMeth;
-    private static Method itsSwitchLastIMMeth;
     private static Method itsSetTextIsSelectableMeth;
 
     static {
         try {
             itsInvalidateOptionsMenuMeth =
                 Activity.class.getMethod("invalidateOptionsMenu");
-            itsSwitchLastIMMeth =
-                InputMethodManager.class.getMethod("switchToLastInputMethod",
-                                                   IBinder.class);
             itsSetTextIsSelectableMeth =
                 TextView.class.getMethod("setTextIsSelectable", boolean.class);
         } catch (NoSuchMethodException e) {
@@ -54,17 +48,6 @@ public final class GuiUtilsHoneycomb
         }
         catch (Exception e) {
             PasswdSafeUtil.showFatalMsg(e, act);
-        }
-    }
-
-    /** Try to switch to the previous input method */
-    public static void switchToLastInputMethod(InputMethodManager mgr,
-                                               IBinder token)
-    {
-        try {
-            itsSwitchLastIMMeth.invoke(mgr, token);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
