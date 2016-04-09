@@ -21,6 +21,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
@@ -43,6 +44,9 @@ import com.jefftharris.passwdsafe.util.Pair;
  */
 public class PasswdSafeIME extends InputMethodService
 {
+    public static final String PASSWDSAFE_OPEN =
+            "com.jefftharris.passwdsafe.Open";
+
     // Password fields
     private static final int USER_KEY = -100;
     private static final int PASSWORD_KEY = -101;
@@ -71,9 +75,8 @@ public class PasswdSafeIME extends InputMethodService
     private boolean itsIsPasswordField = false;
     private long itsLastShiftTime = 0;
     private boolean itsCapsLock = false;
+    private boolean itsIsPasswdSafeOpen = false;
 
-    // TODO: when launching passwdsafe to get file/record, close passwdsafe once
-    // one is chosen to get back to previous activity
     // TODO: cleanup logs
 
     @Override
@@ -174,6 +177,9 @@ public class PasswdSafeIME extends InputMethodService
             }
         }
 
+        itsIsPasswdSafeOpen = TextUtils.equals(PASSWDSAFE_OPEN,
+                                               info.privateImeOptions);
+
         // Reset keyboard to reflect key changes
         setKeyboard(keyboard);
         itsKeyboardView.closing();
@@ -186,10 +192,14 @@ public class PasswdSafeIME extends InputMethodService
         PasswdSafeUtil.dbginfo("foo", "onFinishInput");
         super.onFinishInput();
 
-        //itsCurrKeyboard = itsPasswdSafeKeyboard;
         if (itsKeyboardView != null) {
             itsKeyboardView.closing();
-            //itsCurrKeyboard = (PasswdSafeIMEKeyboard)itsKeyboardView.getKeyboard();
+        }
+
+        // Finishing on the password file open screen, so clear the current
+        // keyboard to get back to the record chooser
+        if (itsIsPasswdSafeOpen) {
+            itsCurrKeyboard = null;
         }
     }
 
@@ -236,9 +246,7 @@ public class PasswdSafeIME extends InputMethodService
         });
         if (rc.get() != null) {
             if (!rc.get().second) {
-                InputMethodManager inputMgr = (InputMethodManager)
-                        getSystemService(INPUT_METHOD_SERVICE);
-                GuiUtils.switchToLastInputMethod(inputMgr, getToken());
+                setKeyboard(itsQwertyKeyboard);
             }
             startActivity(rc.get().first);
         }

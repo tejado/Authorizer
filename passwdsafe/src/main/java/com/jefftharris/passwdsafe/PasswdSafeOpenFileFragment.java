@@ -171,6 +171,7 @@ public class PasswdSafeOpenFileFragment
 
         GuiUtils.setupFormKeyboard(itsPasswordEdit, itsPasswordEdit, itsOkBtn,
                                    getActivity());
+        itsPasswordEdit.setPrivateImeOptions(PasswdSafeIME.PASSWDSAFE_OPEN);
         return rootView;
     }
 
