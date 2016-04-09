@@ -76,12 +76,10 @@ public class PasswdSafeIME extends InputMethodService
     private boolean itsCapsLock = false;
     private boolean itsIsPasswdSafeOpen = false;
 
-    // TODO: cleanup logs
 
     @Override
     public void onInitializeInterface()
     {
-        PasswdSafeUtil.dbginfo("foo", "onInitializeInterface");
         itsPasswdSafeKeyboard =
                 new PasswdSafeIMEKeyboard(this, R.xml.keyboard_passwdsafe);
         itsQwertyKeyboard =
@@ -96,7 +94,6 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public View onCreateInputView()
     {
-        PasswdSafeUtil.dbginfo("foo", "onCreateInputView");
         View view = getLayoutInflater().inflate(R.layout.input_method, null);
 
         itsKeyboardView = (KeyboardView)view.findViewById(R.id.keyboard);
@@ -113,9 +110,6 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public void onStartInput(EditorInfo info, boolean restarting)
     {
-        PasswdSafeUtil.dbginfo("foo", "onStartInput, curr %s, pw %s, qw %s",
-                               itsCurrKeyboard, itsPasswdSafeKeyboard,
-                               itsQwertyKeyboard);
         super.onStartInput(info, restarting);
 
         Resources res = getResources();
@@ -128,7 +122,6 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public void onStartInputView(EditorInfo info, boolean restarting)
     {
-        PasswdSafeUtil.dbginfo("foo", "onStartInputView");
         super.onStartInputView(info, restarting);
         refresh(null);
 
@@ -187,7 +180,6 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public void onFinishInput()
     {
-        PasswdSafeUtil.dbginfo("foo", "onFinishInput");
         super.onFinishInput();
 
         if (itsKeyboardView != null) {
