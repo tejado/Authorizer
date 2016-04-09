@@ -19,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,12 +127,10 @@ public class AboutDialog extends AppCompatDialogFragment
                                          boolean isChecked)
             {
                 licenseView.setText(extraLicenseInfo);
-                licenseView.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+                GuiUtils.setVisible(licenseView, isChecked);
             }
         });
-        btn.setVisibility(
-                (extraLicenseInfo != null) ? View.VISIBLE : View.GONE);
-
+        GuiUtils.setVisible(btn, !TextUtils.isEmpty(extraLicenseInfo));
         return name;
     }
 }
