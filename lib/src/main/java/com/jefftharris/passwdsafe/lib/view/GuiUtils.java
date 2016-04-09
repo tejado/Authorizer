@@ -18,7 +18,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.text.InputType;
@@ -226,16 +225,6 @@ public final class GuiUtils
             ((FragmentActivity)act).supportInvalidateOptionsMenu();
         } else if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
             GuiUtilsHoneycomb.invalidateOptionsMenu(act);
-        }
-    }
-
-
-    /** Try to switch to the previous input method */
-    public static void switchToLastInputMethod(InputMethodManager mgr,
-                                               IBinder token)
-    {
-        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
-            GuiUtilsHoneycomb.switchToLastInputMethod(mgr, token);
         }
     }
 
