@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="account_not_exists_label">Compte %1$s n\'existe pas</string>
     <string name="add_account">Ajouter un compte</string>
     <string name="adding_account">Ajout de compte&#8230;</string>
     <string name="adding_account_notification">Ajout de compte&#8230;  Sélectionnez notification dans 60s pour autoriser l\'accès.</string>
