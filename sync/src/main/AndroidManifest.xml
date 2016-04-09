@@ -22,6 +22,7 @@
     <application
         android:name=".SyncApp"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_scheme"
         android:description="@string/app_desc"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher_sync"
