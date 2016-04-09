@@ -1,0 +1,67 @@
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PasswdSafe">
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+        <include android:id="@+id/bottom_panels"
+                 layout="@layout/activity_passwdsafe_bottom_panels"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"/>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:layout_above="@id/bottom_panels"
+                      android:layout_alignParentEnd="true"
+                      android:layout_alignParentLeft="true"
+                      android:layout_alignParentRight="true"
+                      android:layout_alignParentStart="true"
+                      android:layout_alignParentTop="true"
+                      android:layout_marginEnd="16dp"
+                      android:layout_marginLeft="16dp"
+                      android:layout_marginRight="16dp"
+                      android:layout_marginStart="16dp"
+                      android:orientation="vertical">
+
+            <FrameLayout android:id="@+id/content"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"/>
+
+            <!-- Need an invisible content list in single view so that fragments
+                 can resume without error when rotating between single and double
+                 panes -->
+            <fragment android:id="@+id/content_list"
+                      android:name="com.jefftharris.passwdsafe.PasswdSafeListFragment"
+                      android:layout_width="0dp"
+                      android:layout_height="0dp"
+                      android:visibility="gone"
+                      tools:layout="@android:layout/list_content"/>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- The drawer is given a fixed width in dp and extends the full height of
+         the container. -->
+    <fragment android:id="@+id/navigation_drawer"
+              android:name="com.jefftharris.passwdsafe.PasswdSafeNavDrawerFragment"
+              android:layout_width="@dimen/navigation_drawer_width"
+              android:layout_height="match_parent"
+              android:layout_gravity="left|start"
+              tools:layout="@layout/fragment_passwdsafe_nav_drawer"
+              tools:ignore="RtlHardcoded"/>
+
+</android.support.v4.widget.DrawerLayout>

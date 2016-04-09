@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="boxsdk_alert_dialog_cancel" description="">Annulla</string>
+    <string name="boxsdk_alert_dialog_ok" description="">Invia</string>
+    <string name="boxsdk_alert_dialog_password" description="">Password</string>
+    <string name="boxsdk_alert_dialog_text_entry" description="">Il sito Web o l\'applicazione richiede l\'autenticazione.</string>
+    <string name="boxsdk_alert_dialog_username" description="">Nome utente</string>
+    <string name="boxsdk_title_activity_oauth">OAuthActivity</string>
+    <string name="boxsdk_Select">Seleziona</string>
+    <string name="boxsdk_Cancel">Annulla</string>
+    <string name="boxsdk_Please_wait">Attendi…</string>
+    <string name="boxsdk_Create_folder">Crea cartella</string>
+    <string name="boxsdk_Authenticating">Autenticazione</string>
+    <string name="boxsdk_Authentication_fail">Autenticazione non riuscita</string>
+    <string name="boxsdk_Authentication_cancelled">Autenticazione annullata</string>
+    <string name="boxsdk_Authentication_fail_url_mismatch">URL di reindirizzamento non valido</string>
+    <string name="boxsdk_details">Dettagli</string>
+
+    <string name="boxsdk_ssl_error_warning_DATE_INVALID">Data del certificato non valida.</string>
+    <string name="boxsdk_ssl_error_warning_EXPIRED">Certificato scaduto.</string>
+    <string name="boxsdk_ssl_error_warning_ID_MISMATCH">Nome host non corrispondente.</string>
+    <string name="boxsdk_ssl_error_warning_INVALID">Si è verificato un errore generico.</string>
+    <string name="boxsdk_ssl_error_warning_NOT_YET_VALID">Il certificato non è ancora valido.</string>
+    <string name="boxsdk_ssl_error_warning_UNTRUSTED">L\'autorità di certificazione non è affidabile.</string>
+    <string name="boxsdk_ssl_should_not_proceed">Non dovresti procedere, soprattutto se non hai mai visualizzato questo avviso prima d\'ora.</string>
+    
+    <string name="boxsdk_Security_Warning">Avviso di protezione</string>
+    <string name="boxsdk_There_are_problems_with_the_security_certificate_for_this_site">Si sono verificati problemi con il certificato di protezione per questo sito.</string>
+    
+    <string name="boxsdk_Continue">Continua</string>
+    <string name="boxsdk_Go_back">Torna indietro</string>
+
+    <string name="boxsdk_Select_an_account_to_use">Seleziona un account da utilizzare</string>
+    <string name="boxsdk_Use_a_different_account">Usa un altro account</string>
+
+</resources>
