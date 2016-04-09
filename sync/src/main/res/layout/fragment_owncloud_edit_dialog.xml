@@ -11,7 +11,7 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              tools:context=".owncloud.OwncloudEditDlg">
+              tools:context=".owncloud.OwncloudEditDialog">
 
     <TextView android:layout_width="match_parent"
               android:layout_height="wrap_content"
