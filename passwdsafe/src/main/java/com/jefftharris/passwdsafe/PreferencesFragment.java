@@ -176,6 +176,11 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         switch (key) {
         case Preferences.PREF_FILE_DIR: {
             File pref = Preferences.getFileDirPref(prefs);
+            if (pref == null) {
+                itsFileDirPref.setText(null);
+                itsFileDirPref.setSummary(null);
+                break;
+            }
             if (TextUtils.isEmpty(pref.toString())) {
                 pref = new File(Preferences.PREF_FILE_DIR_DEF);
                 itsFileDirPref.setText(pref.toString());
