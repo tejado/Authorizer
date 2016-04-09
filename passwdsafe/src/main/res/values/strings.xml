@@ -87,7 +87,6 @@
     <string name="file_close_timeout">File close timeout</string>
     <string name="file_exists">File exists</string>
     <string name="file">File</string>
-    <string name="file_label">File:</string>
     <string name="file_name">File Name</string>
     <string name="file_not_found_perm_denied">File not found or permission denied</string>
     <string name="file_operations">File Operations…</string>
@@ -220,7 +219,6 @@
     <string name="record">Record</string>
     <string name="records">Records</string>
     <string name="record_has_references">Record has references</string>
-    <string name="record_label">Record:</string>
     <string name="record_not_found">Record not found</string>
     <string name="record_policy">Record Policy</string>
     <string name="record_sort_order">Record sort order</string>

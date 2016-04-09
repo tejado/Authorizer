@@ -88,7 +88,6 @@
     <string name="file_close_timeout">Fermeture automatique de fichier</string>
     <string name="file_exists">Le fichier existe</string>
     <string name="file">Fichier</string>
-    <string name="file_label">Fichier:</string>
     <string name="file_name">Nom du fichier</string>
     <string name="file_not_found_perm_denied">Fichier introuvable ou accès interdit</string>
     <string name="file_operations">Réglage sauvegarde</string>
@@ -223,7 +222,6 @@
     <string name="record">Entrée</string>
     <string name="records">Entrées</string>
     <string name="record_has_references">L\'entrée contient des références</string>
-    <string name="record_label">Entrée:</string>
     <string name="record_not_found">Entrée introuvable</string>
     <string name="record_policy">Stratégie Entrée</string>
     <string name="record_sort_order">Ordre de tri des entrées</string>
