@@ -181,6 +181,7 @@ public final class ApiCompat
      * API compatible call for
      * InputMethodManager.switchToNextInputMethod
      */
+    @SuppressWarnings("SameParameterValue")
     public static boolean switchToNextInputMethod(InputMethodManager imm,
                                                   IBinder imeToken,
                                                   boolean onlyCurrentIme)
