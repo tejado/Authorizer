@@ -51,9 +51,9 @@
              android:keyWidth="10%p"/>
         <Key android:codes="32"
              android:keyIcon="@drawable/sym_keyboard_space"
-             android:keyWidth="35%p"/>
+             android:keyWidth="30%p"/>
         <Key android:codes="-200"
-             android:horizontalGap="10%p"
+             android:horizontalGap="15%p"
              android:keyEdgeFlags="right"
              android:keyLabel="Enter"
              android:keyWidth="20%p"/>
