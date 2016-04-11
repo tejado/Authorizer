@@ -10,8 +10,8 @@ android {
         minSdkVersion 10
         resConfigs "de", "fr"
         targetSdkVersion 23
-        versionCode 60200
-        versionName "6.2.0"
+        versionCode 60300
+        versionName "6.3.0"
 
         ndk {
             moduleName "PasswdSafe"
