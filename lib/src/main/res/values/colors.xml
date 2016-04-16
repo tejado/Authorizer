@@ -18,4 +18,8 @@
 
     <!-- this is needed as preference_category_material layout uses this color as the text color -->
     <color name="preference_fallback_accent_color">@color/accent</color>
+
+    <!-- Copied from design compat library -->
+    <color name="textinput_error_color_light">#FFD50000</color>
+    <color name="textinput_error_color_dark">#FFFF6E6E</color>
 </resources>
