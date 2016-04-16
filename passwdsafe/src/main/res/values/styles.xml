@@ -36,6 +36,7 @@
         <item name="drawableFolderUp">@drawable/ic_folder_up</item>
         <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
+        <item name="textColorError">@color/textinput_error_color_light</item>
     </style>
 
     <style name="AppTheme_Dialog" parent="AppBaseTheme_Dialog">
@@ -51,6 +52,7 @@
         <item name="drawableFolderUp">@drawable/ic_folder_up</item>
         <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
+        <item name="textColorError">@color/textinput_error_color_dark</item>
     </style>
 
     <style name="AppTheme_NavView">
