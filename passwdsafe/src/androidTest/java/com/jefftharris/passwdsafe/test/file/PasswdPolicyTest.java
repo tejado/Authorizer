@@ -11,18 +11,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import android.annotation.SuppressLint;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 
 import com.jefftharris.passwdsafe.file.PasswdPolicy;
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+//import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 /**
  * Tests for the PasswdPolicy class
  */
 public class PasswdPolicyTest extends AndroidTestCase
 {
-    private static final String TAG = "PasswdPolicyTest";
+    //private static final String TAG = "PasswdPolicyTest";
 
     /** Constructor */
     public PasswdPolicyTest()
@@ -234,6 +235,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test max valid header policies */
+    @SuppressLint("DefaultLocale")
     public void testHdrMaxValid()
     {
         StringBuilder policiesStr = new StringBuilder("ff");
@@ -707,10 +709,10 @@ public class PasswdPolicyTest extends AndroidTestCase
                                 symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
                                 symbolIdx += LEN_STEP) {
                                 /*
-                                 */
                             PasswdSafeUtil.dbginfo(TAG, "Iter %x %d %d %d %d",
                                                   flags, lowerIdx, upperIdx,
                                                   digitIdx, symbolIdx);
+                                 */
                                 policy = new PasswdPolicy(
                                     "", PasswdPolicy.Location.DEFAULT,
                                     flags, MAX_LEN + minLen, lowerIdx,
