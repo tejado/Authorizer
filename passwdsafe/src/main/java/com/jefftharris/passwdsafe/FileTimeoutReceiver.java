@@ -24,7 +24,7 @@ import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 /**
  * The FileTimeoutReceiver class manages a timeout for file activity
  */
-class FileTimeoutReceiver extends BroadcastReceiver
+public class FileTimeoutReceiver extends BroadcastReceiver
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     private final Activity itsActivity;

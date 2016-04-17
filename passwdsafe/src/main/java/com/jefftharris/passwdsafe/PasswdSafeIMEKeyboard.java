@@ -19,7 +19,7 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 /**
  * The PasswdSafeIMEKeyboard class is a keyboard for PasswdSafe
  */
-final class PasswdSafeIMEKeyboard extends Keyboard
+public final class PasswdSafeIMEKeyboard extends Keyboard
 {
     private Key itsEnterKey;
 
