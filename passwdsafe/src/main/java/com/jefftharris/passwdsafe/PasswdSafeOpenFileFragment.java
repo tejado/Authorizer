@@ -15,7 +15,9 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,6 +80,7 @@ public class PasswdSafeOpenFileFragment
     private int itsYubiSlot = 2;
     private boolean itsIsYubikey = false;
     private int itsRetries = 0;
+    private TextWatcher itsErrorClearingWatcher;
 
     private static final String ARG_URI = "uri";
     private static final String ARG_REC_TO_OPEN = "recToOpen";
@@ -415,6 +418,12 @@ public class PasswdSafeOpenFileFragment
                     TextInputUtils.setTextInputError(
                             getString(R.string.invalid_password),
                             itsPasswordInput);
+
+                    if (itsErrorClearingWatcher == null) {
+                        itsErrorClearingWatcher = new ErrorClearingWatcher();
+                        itsPasswordEdit.addTextChangedListener(
+                                itsErrorClearingWatcher);
+                    }
                 } else {
                     PasswdSafeUtil.showFatalMsg(
                             getString(R.string.invalid_password), getActivity(),
@@ -561,6 +570,32 @@ public class PasswdSafeOpenFileFragment
             setVisibility(R.id.yubi_progress_text, false, root);
             setProgressVisible(false, false);
             setFieldsEnabled(true);
+        }
+    }
+
+    /**
+     * Text watcher to clear the invalid password message
+     */
+    private final class ErrorClearingWatcher implements TextWatcher
+    {
+        @Override
+        public void afterTextChanged(Editable s)
+        {
+            TextInputUtils.setTextInputError(null, itsPasswordInput);
+            itsPasswordEdit.removeTextChangedListener(itsErrorClearingWatcher);
+            itsErrorClearingWatcher = null;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count,
+                                      int after)
+        {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before,
+                                  int count)
+        {
         }
     }
 }
