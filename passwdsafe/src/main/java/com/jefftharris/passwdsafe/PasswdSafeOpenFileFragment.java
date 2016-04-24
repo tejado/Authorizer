@@ -72,11 +72,12 @@ public class PasswdSafeOpenFileFragment
     private TextInputLayout itsPasswordInput;
     private TextView itsPasswordEdit;
     private CheckBox itsReadonlyCb;
-    private Button itsYubiStartBtn;
+    private CheckBox itsYubikeyCb;
     private Button itsOkBtn;
     private OpenTask itsOpenTask;
     private YubikeyMgr itsYubiMgr;
     private YubikeyMgr.User itsYubiUser;
+    private YubiState itsYubiState = YubiState.UNAVAILABLE;
     private int itsYubiSlot = 2;
     private boolean itsIsYubikey = false;
     private int itsRetries = 0;
@@ -146,30 +147,23 @@ public class PasswdSafeOpenFileFragment
 
         itsYubiMgr = new YubikeyMgr();
         itsYubiUser = new YubikeyUser();
-        itsYubiStartBtn = (Button)rootView.findViewById(R.id.yubi_start);
-        itsYubiStartBtn.setOnClickListener(this);
+        itsYubikeyCb = (CheckBox)rootView.findViewById(R.id.yubikey);
         setVisibility(R.id.yubi_help_text, false, rootView);
-        YubiState state = YubiState.UNAVAILABLE;
-        if (itsYubiMgr != null) {
-            state = itsYubiMgr.getState(getActivity());
-        }
-        boolean showDisabled = false;
-        boolean showStart = false;
-        switch (state) {
+        itsYubiState = itsYubiMgr.getState(getActivity());
+        switch (itsYubiState) {
         case UNAVAILABLE: {
+            GuiUtils.setVisible(itsYubikeyCb, false);
             break;
         }
         case DISABLED: {
-            showDisabled = true;
+            itsYubikeyCb.setEnabled(false);
+            itsYubikeyCb.setText(R.string.yubikey_disabled);
             break;
         }
         case ENABLED: {
-            showStart = true;
             break;
         }
         }
-        setVisibility(R.id.yubi_disabled, showDisabled, rootView);
-        setVisibility(R.id.yubi_start, showStart, rootView);
         setVisibility(R.id.yubi_progress_text, false, rootView);
 
         GuiUtils.setupFormKeyboard(itsPasswordEdit, itsPasswordEdit, itsOkBtn,
@@ -237,16 +231,17 @@ public class PasswdSafeOpenFileFragment
     {
         inflater.inflate(R.menu.fragment_passwdsafe_open_file, menu);
 
-        View root = getView();
-        if (root != null) {
-            View yubiStart = root.findViewById(R.id.yubi_start);
-            boolean startVisible = (yubiStart.getVisibility() == View.VISIBLE);
-            menu.setGroupVisible(R.id.menu_group_slots, startVisible);
-
-            View yubiDisabled = root.findViewById(R.id.yubi_disabled);
+        switch (itsYubiState) {
+        case ENABLED:
+        case DISABLED: {
+            break;
+        }
+        case UNAVAILABLE: {
+            menu.setGroupVisible(R.id.menu_group_slots, false);
             MenuItem item = menu.findItem(R.id.menu_yubi_help);
-            item.setVisible((yubiDisabled.getVisibility() == View.VISIBLE) ||
-                            startVisible);
+            item.setVisible(false);
+            break;
+        }
         }
 
         MenuItem item;
@@ -307,19 +302,11 @@ public class PasswdSafeOpenFileFragment
             break;
         }
         case R.id.ok: {
-            TextInputUtils.setTextInputError(null, itsPasswordInput);
-
-            boolean readonly = itsReadonlyCb.isChecked();
-            SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
-            Preferences.setFileOpenReadOnlyPref(readonly, prefs);
-
-            itsOpenTask = new OpenTask(
-                    new StringBuilder(itsPasswordEdit.getText()), readonly);
-            itsOpenTask.execute();
-            break;
-        }
-        case R.id.yubi_start: {
-            itsYubiMgr.start(itsYubiUser);
+            if (itsYubikeyCb.isChecked()) {
+                itsYubiMgr.start(itsYubiUser);
+            } else {
+                startFileOpen();
+            }
             break;
         }
         }
@@ -342,10 +329,9 @@ public class PasswdSafeOpenFileFragment
             itsPasswordEdit.setText("test123");
             itsOkBtn.performClick();
         } else {
+            SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
             Pair<Boolean, Integer> rc = getPasswdFileUri().isWritable();
             if (rc.first) {
-                SharedPreferences prefs =
-                        Preferences.getSharedPrefs(getContext());
                 itsReadonlyCb.setChecked(
                         Preferences.getFileOpenReadOnlyPref(prefs));
             } else {
@@ -357,6 +343,7 @@ public class PasswdSafeOpenFileFragment
                             getString(rc.second)));
                 }
             }
+            itsYubikeyCb.setChecked(Preferences.getFileOpenYubikeyPref(prefs));
         }
     }
 
@@ -383,8 +370,37 @@ public class PasswdSafeOpenFileFragment
     {
         itsPasswordEdit.setEnabled(enabled);
         itsReadonlyCb.setEnabled(enabled);
-        itsYubiStartBtn.setEnabled(enabled);
+        switch (itsYubiState) {
+        case ENABLED: {
+            itsYubikeyCb.setEnabled(enabled);
+            break;
+        }
+        case DISABLED: {
+            itsYubikeyCb.setEnabled(false);
+            break;
+        }
+        case UNAVAILABLE: {
+            break;
+        }
+        }
         itsOkBtn.setEnabled(enabled);
+    }
+
+    /**
+     * Start the task for opening the file
+     */
+    private void startFileOpen()
+    {
+        TextInputUtils.setTextInputError(null, itsPasswordInput);
+
+        boolean readonly = itsReadonlyCb.isChecked();
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+        Preferences.setFileOpenReadOnlyPref(readonly, prefs);
+        Preferences.setFileOpenYubikeyPref(itsYubikeyCb.isChecked(), prefs);
+
+        itsOpenTask = new OpenTask(
+                new StringBuilder(itsPasswordEdit.getText()), readonly);
+        itsOpenTask.execute();
     }
 
     /**
@@ -529,7 +545,7 @@ public class PasswdSafeOpenFileFragment
         {
             itsIsYubikey = true;
             itsPasswordEdit.setText(password);
-            itsOkBtn.performClick();
+            startFileOpen();
         }
 
         @Override

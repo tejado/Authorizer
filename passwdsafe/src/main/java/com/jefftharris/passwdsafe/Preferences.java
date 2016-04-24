@@ -55,6 +55,9 @@ public class Preferences
         "fileOpenReadOnly";
     private static final boolean PREF_FILE_OPEN_READ_ONLY_DEF = false;
 
+    private static final String PREF_FILE_OPEN_YUBIKEY = "fileOpenYubikey";
+    private static final boolean PREF_FILE_OPEN_YUBIKEY_DEF = false;
+
     public static final String PREF_DEF_FILE = "defFilePref";
     private static final String PREF_DEF_FILE_DEF = "";
 
@@ -175,6 +178,24 @@ public class Preferences
         SharedPreferences.Editor prefsEdit = prefs.edit();
         prefsEdit.putBoolean(PREF_FILE_OPEN_READ_ONLY, readonly);
         prefsEdit.apply();
+    }
+
+    /**
+     * Get the preference to use YubiKey
+     */
+    public static boolean getFileOpenYubikeyPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_OPEN_YUBIKEY,
+                                PREF_FILE_OPEN_YUBIKEY_DEF);
+    }
+
+    /**
+     * Set the preference to use YubiKey
+     */
+    public static void setFileOpenYubikeyPref(boolean yubikey,
+                                              SharedPreferences prefs)
+    {
+        prefs.edit().putBoolean(PREF_FILE_OPEN_YUBIKEY, yubikey).apply();
     }
 
     public static File getFileDirPref(SharedPreferences prefs)
