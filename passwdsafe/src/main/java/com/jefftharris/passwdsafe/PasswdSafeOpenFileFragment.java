@@ -43,10 +43,10 @@ import com.jefftharris.passwdsafe.util.YubiState;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
-import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -107,6 +107,7 @@ public class PasswdSafeOpenFileFragment
     private YubiState itsYubiState = YubiState.UNAVAILABLE;
     private int itsYubiSlot = 2;
     private boolean itsIsYubikey = false;
+    private String itsUserPassword;
     private int itsRetries = 0;
     private TextWatcher itsErrorClearingWatcher;
 
@@ -350,6 +351,7 @@ public class PasswdSafeOpenFileFragment
         }
         case R.id.ok: {
             GuiUtils.setVisible(itsSavedPasswordMsg, false);
+            itsUserPassword = itsPasswordEdit.getText().toString();
             if (itsYubikeyCb.isChecked()) {
                 itsYubiMgr.start(itsYubiUser);
             } else {
@@ -514,7 +516,7 @@ public class PasswdSafeOpenFileFragment
                 break;
             }
             case REMOVE: {
-                itsSavedPasswordsMgr.removeUri(getFileUri());
+                itsSavedPasswordsMgr.removeSavedPassword(getFileUri());
                 itsListener.handleFileOpen(result.itsFileData, itsRecToOpen);
                 break;
             }
@@ -674,7 +676,7 @@ public class PasswdSafeOpenFileFragment
         @Override
         public String getUserPassword()
         {
-            return itsPasswordEdit.getText().toString();
+            return itsUserPassword;
         }
 
         @Override
@@ -791,11 +793,11 @@ public class PasswdSafeOpenFileFragment
             PasswdSafeUtil.dbginfo(TAG, "success");
             Cipher cipher = result.getCryptoObject().getCipher();
             try {
-                // TODO: encrypt and store password
-                byte[] enc = cipher.doFinal("Hello".getBytes());
-                PasswdSafeUtil.dbginfo(TAG, "enc: %s", Util.bytesToHex(enc));
+                itsSavedPasswordsMgr.addSavedPassword(getFileUri(),
+                                                      itsUserPassword, cipher);
                 finish(true, getString(R.string.password_saved));
-            } catch (IllegalBlockSizeException | BadPaddingException e) {
+            } catch (IllegalBlockSizeException | BadPaddingException |
+                    UnsupportedEncodingException e) {
                 String msg = "Error using cipher: " + e.getLocalizedMessage();
                 Log.e(TAG, msg, e);
                 onAuthenticationError(0, msg);
