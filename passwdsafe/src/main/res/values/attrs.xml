@@ -19,4 +19,6 @@
     <attr name="drawableFolderUp" format="reference"/>
     <attr name="drawablePasswdsafe" format="reference"/>
     <attr name="drawablePersonOutline" format="reference"/>
+
+    <attr name="textColorGreen" format="reference"/>
 </resources>

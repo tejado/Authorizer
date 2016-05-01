@@ -1,6 +1,7 @@
 Notice for the following files:
 sym_keyboard_delete.png
 sym_keyboard_space.png
+ic_fingerprint.png
 
 ------------------------------------------------------------
 

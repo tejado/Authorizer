@@ -14,10 +14,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,9 +43,17 @@ import com.jefftharris.passwdsafe.util.YubiState;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
+import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 
 
 /**
@@ -66,15 +78,30 @@ public class PasswdSafeOpenFileFragment
         void updateViewFileOpen();
     }
 
+    /**
+     * Type of change in the saved password
+     */
+    private enum SavePasswordChange
+    {
+        ADD,
+        REMOVE,
+        NONE
+    }
+
     private Listener itsListener;
     private String itsRecToOpen;
     private TextView itsTitle;
     private TextInputLayout itsPasswordInput;
     private TextView itsPasswordEdit;
+    private TextView itsSavedPasswordMsg;
     private CheckBox itsReadonlyCb;
+    private CheckBox itsSavePasswdCb;
     private CheckBox itsYubikeyCb;
     private Button itsOkBtn;
     private OpenTask itsOpenTask;
+    private SavedPasswordsMgr itsSavedPasswordsMgr;
+    private SavePasswordChange itsSaveChange = SavePasswordChange.NONE;
+    private AddSavedPasswordUser itsAddSavedPasswordUser;
     private YubikeyMgr itsYubiMgr;
     private YubikeyMgr.User itsYubiUser;
     private YubiState itsYubiState = YubiState.UNAVAILABLE;
@@ -87,6 +114,11 @@ public class PasswdSafeOpenFileFragment
     private static final String ARG_REC_TO_OPEN = "recToOpen";
     private static final String STATE_SLOT = "slot";
 
+    // TODO: Use TextInputEditText everywhere a TextInputLayout is used
+    // TODO: translations
+    // TODO: Check URI type to see whether save should be enabled
+    // TODO: Add warning about no fingerprints available before generating key
+    // TODO: Help for saved passwords
 
     /**
      * Create a new instance
@@ -145,6 +177,13 @@ public class PasswdSafeOpenFileFragment
         itsOkBtn.setOnClickListener(this);
         itsOkBtn.setEnabled(false);
 
+        itsSavedPasswordMsg =
+                (TextView)rootView.findViewById(R.id.saved_password);
+        itsSavePasswdCb = (CheckBox)rootView.findViewById(R.id.save_password);
+        boolean saveAvailable = itsSavedPasswordsMgr.isAvailable();
+        GuiUtils.setVisible(itsSavePasswdCb, saveAvailable);
+        GuiUtils.setVisible(itsSavedPasswordMsg, false);
+
         itsYubiMgr = new YubikeyMgr();
         itsYubiUser = new YubikeyUser();
         itsYubikeyCb = (CheckBox)rootView.findViewById(R.id.yubikey);
@@ -166,6 +205,8 @@ public class PasswdSafeOpenFileFragment
         }
         setVisibility(R.id.yubi_progress_text, false, rootView);
 
+        // TODO: if saved password, don't show keyboard but keep ok button
+        // behavior
         GuiUtils.setupFormKeyboard(itsPasswordEdit, itsPasswordEdit, itsOkBtn,
                                    getActivity());
         itsPasswordEdit.setPrivateImeOptions(PasswdSafeIME.PASSWDSAFE_OPEN);
@@ -177,6 +218,7 @@ public class PasswdSafeOpenFileFragment
     {
         super.onAttach(ctx);
         itsListener = (Listener)ctx;
+        itsSavedPasswordsMgr = new SavedPasswordsMgr(ctx);
     }
 
     @Override
@@ -200,6 +242,10 @@ public class PasswdSafeOpenFileFragment
         if (itsYubiMgr != null) {
             itsYubiMgr.onPause();
         }
+        if (itsAddSavedPasswordUser != null) {
+            itsAddSavedPasswordUser.cancel();
+            itsAddSavedPasswordUser = null;
+        }
     }
 
     @Override
@@ -216,6 +262,7 @@ public class PasswdSafeOpenFileFragment
     {
         super.onDetach();
         itsListener = null;
+        itsSavedPasswordsMgr = null;
     }
 
     /** Handle a new intent */
@@ -302,6 +349,7 @@ public class PasswdSafeOpenFileFragment
             break;
         }
         case R.id.ok: {
+            GuiUtils.setVisible(itsSavedPasswordMsg, false);
             if (itsYubikeyCb.isChecked()) {
                 itsYubiMgr.start(itsYubiUser);
             } else {
@@ -326,6 +374,7 @@ public class PasswdSafeOpenFileFragment
         if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
             (getFileUri().getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
             itsReadonlyCb.setChecked(false);
+            itsYubikeyCb.setChecked(false);
             itsPasswordEdit.setText("test123");
             itsOkBtn.performClick();
         } else {
@@ -344,6 +393,17 @@ public class PasswdSafeOpenFileFragment
                 }
             }
             itsYubikeyCb.setChecked(Preferences.getFileOpenYubikeyPref(prefs));
+
+            boolean isSaved = itsSavedPasswordsMgr.isAvailable() &&
+                              itsSavedPasswordsMgr.isSaved(getFileUri());
+            GuiUtils.setVisible(itsSavedPasswordMsg, isSaved);
+            if (isSaved) {
+                // TODO: i18n
+                // TODO: start mgr for load
+                itsSavedPasswordMsg.setText("Touch sensor to load saved " +
+                                            "password");
+            }
+            itsSavePasswdCb.setChecked(isSaved);
         }
     }
 
@@ -370,6 +430,7 @@ public class PasswdSafeOpenFileFragment
     {
         itsPasswordEdit.setEnabled(enabled);
         itsReadonlyCb.setEnabled(enabled);
+        itsSavePasswdCb.setEnabled(enabled);
         switch (itsYubiState) {
         case ENABLED: {
             itsYubikeyCb.setEnabled(enabled);
@@ -398,6 +459,17 @@ public class PasswdSafeOpenFileFragment
         Preferences.setFileOpenReadOnlyPref(readonly, prefs);
         Preferences.setFileOpenYubikeyPref(itsYubikeyCb.isChecked(), prefs);
 
+        // TODO: show warning about saving first time
+        boolean isSaved = itsSavedPasswordsMgr.isSaved(getFileUri());
+        boolean doSave = itsSavePasswdCb.isChecked();
+        if (isSaved && !doSave) {
+            itsSaveChange = SavePasswordChange.REMOVE;
+        } else if (!isSaved && doSave) {
+            itsSaveChange = SavePasswordChange.ADD;
+        } else {
+            itsSaveChange = SavePasswordChange.NONE;
+        }
+
         itsOpenTask = new OpenTask(
                 new StringBuilder(itsPasswordEdit.getText()), readonly);
         itsOpenTask.execute();
@@ -406,7 +478,7 @@ public class PasswdSafeOpenFileFragment
     /**
      * Handle when the open task is finished
      */
-    private void openTaskFinished(Object result)
+    private void openTaskFinished(OpenResult result)
     {
         if (itsOpenTask == null) {
             return;
@@ -422,11 +494,37 @@ public class PasswdSafeOpenFileFragment
             return;
         }
 
-        if (result instanceof PasswdFileData) {
-            PasswdFileData fileData = (PasswdFileData)result;
-            itsListener.handleFileOpen(fileData, itsRecToOpen);
+        if (result.itsFileData != null) {
+            switch (itsSaveChange) {
+            case ADD: {
+                if (result.itsKeygenError != null) {
+                    String msg = getString(
+                            R.string.password_save_canceled_key_error,
+                            result.itsKeygenError.getLocalizedMessage());
+                    PasswdSafeUtil.showErrorMsg(msg, getContext());
+                    break;
+                }
+
+                if (itsAddSavedPasswordUser != null) {
+                    itsAddSavedPasswordUser.cancel();
+                }
+                itsAddSavedPasswordUser = new AddSavedPasswordUser(result);
+                itsSavedPasswordsMgr.startPasswordAccess(
+                        getFileUri(), itsAddSavedPasswordUser);
+                break;
+            }
+            case REMOVE: {
+                itsSavedPasswordsMgr.removeUri(getFileUri());
+                itsListener.handleFileOpen(result.itsFileData, itsRecToOpen);
+                break;
+            }
+            case NONE: {
+                itsListener.handleFileOpen(result.itsFileData, itsRecToOpen);
+                break;
+            }
+            }
         } else {
-            Exception e = (Exception)result;
+            Exception e = result.itsError;
             if (((e instanceof IOException) &&
                  TextUtils.equals(e.getMessage(), "Invalid password")) ||
                 (e instanceof InvalidPassphraseException)) {
@@ -481,9 +579,30 @@ public class PasswdSafeOpenFileFragment
     }
 
     /**
+     * Result of opening a file
+     */
+    private static class OpenResult
+    {
+        public final PasswdFileData itsFileData;
+        public final Exception itsKeygenError;
+        public final Exception itsError;
+
+        /**
+         * Constructor
+         */
+        public OpenResult(PasswdFileData fileData, Exception keygenError,
+                          Exception error)
+        {
+            itsFileData = fileData;
+            itsKeygenError = keygenError;
+            itsError = error;
+        }
+    }
+
+    /**
      * Background task for opening the file
      */
-    private class OpenTask extends BackgroundTask<Object>
+    private class OpenTask extends BackgroundTask<OpenResult>
     {
         private final StringBuilder itsItsPassword;
         private final boolean itsItsIsReadOnly;
@@ -495,17 +614,35 @@ public class PasswdSafeOpenFileFragment
         }
 
         @Override
-        protected Object doInBackground(Void... voids)
+        protected OpenResult doInBackground(Void... voids)
         {
             PasswdFileData fileData =
                     new PasswdFileData(getPasswdFileUri());
             try {
                 fileData.setYubikey(itsIsYubikey);
                 fileData.load(itsItsPassword, itsItsIsReadOnly, getActivity());
-                return fileData;
             } catch (Exception e) {
-                return e;
+                return new OpenResult(null, null, e);
             }
+
+            Exception keygenError = null;
+            switch (itsSaveChange) {
+            case ADD: {
+                try {
+                    itsSavedPasswordsMgr.generateKey(getFileUri());
+                } catch (InvalidAlgorithmParameterException |
+                        NoSuchAlgorithmException | NoSuchProviderException e) {
+                    keygenError = e;
+                }
+                break;
+            }
+            case REMOVE:
+            case NONE: {
+                break;
+            }
+            }
+
+            return new OpenResult(fileData, keygenError, null);
         }
 
         @Override
@@ -516,7 +653,7 @@ public class PasswdSafeOpenFileFragment
         }
 
         @Override
-        protected void onPostExecute(Object data)
+        protected void onPostExecute(OpenResult data)
         {
             super.onPostExecute(data);
             openTaskFinished(data);
@@ -586,6 +723,188 @@ public class PasswdSafeOpenFileFragment
             setVisibility(R.id.yubi_progress_text, false, root);
             setProgressVisible(false, false);
             setFieldsEnabled(true);
+        }
+    }
+
+    /**
+     * User for adding a saved password
+     */
+    private final class AddSavedPasswordUser extends SavedPasswordsMgr.User
+    {
+        private final OpenResult itsOpenResult;
+        private final int itsTextColor;
+        private final CountDownTimer itsCancelTimer;
+        private Runnable itsPendingAction;
+
+        private static final String TAG = "AddSavedPasswordUser";
+
+        /**
+         * Constructor
+         */
+        public AddSavedPasswordUser(OpenResult result)
+        {
+            itsOpenResult = result;
+            itsTextColor = itsSavedPasswordMsg.getCurrentHintTextColor();
+            itsCancelTimer = new CountDownTimer(30 * 1000, 1 * 1000)
+            {
+                @Override
+                public void onTick(long millisUntilFinished)
+                {
+                    ProgressBar progress = getProgress();
+                    progress.setMax(30);
+                    progress.setProgress((int)millisUntilFinished / 1000);
+                }
+
+                @Override
+                public void onFinish()
+                {
+                    AddSavedPasswordUser.this.cancel();
+                }
+            };
+        }
+
+        @Override
+        public void onAuthenticationError(int errMsgId, CharSequence errString)
+        {
+            PasswdSafeUtil.dbginfo(TAG, "error: %s", errString);
+            finish(false, errString);
+        }
+
+        @Override
+        public void onAuthenticationFailed()
+        {
+            PasswdSafeUtil.dbginfo(TAG, "failed");
+            setNotificationMsg(getString(R.string.fingerprint_not_recognized));
+        }
+
+        @Override
+        public void onAuthenticationHelp(int helpMsgId, CharSequence helpString)
+        {
+            PasswdSafeUtil.dbginfo(TAG, "help: %s", helpString);
+            setNotificationMsg(helpString);
+        }
+
+        @Override
+        public void onAuthenticationSucceeded(
+                FingerprintManagerCompat.AuthenticationResult result)
+        {
+            PasswdSafeUtil.dbginfo(TAG, "success");
+            Cipher cipher = result.getCryptoObject().getCipher();
+            try {
+                // TODO: encrypt and store password
+                byte[] enc = cipher.doFinal("Hello".getBytes());
+                PasswdSafeUtil.dbginfo(TAG, "enc: %s", Util.bytesToHex(enc));
+                finish(true, getString(R.string.password_saved));
+            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                String msg = "Error using cipher: " + e.getLocalizedMessage();
+                Log.e(TAG, msg, e);
+                onAuthenticationError(0, msg);
+            }
+        }
+
+        @Override
+        protected boolean isEncrypt()
+        {
+            return true;
+        }
+
+        @Override
+        protected void onStart()
+        {
+            PasswdSafeUtil.dbginfo(TAG, "onStart");
+            itsCancelTimer.start();
+            itsSavedPasswordMsg.setTextColor(itsTextColor);
+            itsSavedPasswordMsg.setText(
+                    R.string.touch_sensor_to_save_the_password);
+            GuiUtils.setVisible(itsSavedPasswordMsg, true);
+            setFieldsEnabled(false);
+            setProgressVisible(true, false);
+        }
+
+        @Override
+        public void onCancel()
+        {
+            PasswdSafeUtil.dbginfo(TAG, "onCancel");
+            finish(false, getString(R.string.canceled));
+        }
+
+        /**
+         * Temporarily set a notification message for the user
+         */
+        private void setNotificationMsg(CharSequence msg)
+        {
+            itsSavedPasswordMsg.setText(msg);
+            doDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    itsSavedPasswordMsg.setText(
+                            R.string.touch_sensor_to_save_the_password);
+                }
+            });
+        }
+
+        /**
+         * Finish use of the saved password manager
+         */
+        private void finish(boolean success, CharSequence msg)
+        {
+            cancelPendingAction();
+            setProgressVisible(false, false);
+            itsCancelTimer.cancel();
+            itsAddSavedPasswordUser = null;
+
+            int textColor;
+            if (success) {
+                doDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        itsListener.handleFileOpen(itsOpenResult.itsFileData,
+                                                   itsRecToOpen);
+                    }
+                });
+                textColor = R.attr.textColorGreen;
+            } else {
+                setFieldsEnabled(true);
+                textColor = R.attr.textColorError;
+            }
+
+            TypedValue value = new TypedValue();
+            getContext().getTheme().resolveAttribute(textColor, value, true);
+            itsSavedPasswordMsg.setTextColor(value.data);
+            itsSavedPasswordMsg.setText(msg);
+        }
+
+        /**
+         * Cancel a pending action
+         */
+        private void cancelPendingAction()
+        {
+            if (itsPendingAction != null) {
+                itsSavedPasswordMsg.removeCallbacks(itsPendingAction);
+            }
+            itsPendingAction = null;
+        }
+
+        /**
+         * Perform a delayed action
+         */
+        private void doDelayed(final Runnable action)
+        {
+            cancelPendingAction();
+            itsPendingAction = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    action.run();
+                    itsPendingAction = null;
+                }
+            };
+            itsSavedPasswordMsg.postDelayed(itsPendingAction, 2000);
         }
     }
 
