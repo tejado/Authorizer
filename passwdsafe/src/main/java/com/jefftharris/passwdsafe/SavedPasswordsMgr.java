@@ -15,11 +15,13 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
+import android.util.Base64;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -30,7 +32,9 @@ import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 
@@ -146,7 +150,7 @@ public final class SavedPasswordsMgr
         } catch (NoSuchAlgorithmException | NoSuchProviderException |
                 InvalidAlgorithmParameterException e) {
             Log.e(TAG, "generateKey failure", e);
-            removeUri(fileUri);
+            removeSavedPassword(fileUri);
             throw e;
         }
     }
@@ -198,92 +202,40 @@ public final class SavedPasswordsMgr
         return ciph;
     }
 
-    /*
-    @TargetApi(23)
-    public void addUri(Uri fileUri)
+    /**
+     * Add a saved password for a file
+     */
+    public void addSavedPassword(Uri fileUri, String password, Cipher cipher)
+            throws UnsupportedEncodingException, BadPaddingException,
+            IllegalBlockSizeException
     {
-        PasswdSafeUtil.dbginfo(TAG, "addUri: %s", fileUri);
-        if (!itsFingerprintMgr.hasEnrolledFingerprints()) {
-            PasswdSafeUtil.showErrorMsg("No fingerprints enrolled", itsContext);
-            return;
-        }
+        byte[] enc = cipher.doFinal(password.getBytes("UTF-8"));
+        String encStr = Base64.encodeToString(enc, Base64.NO_WRAP);
+        String ivStr = Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP);
 
-        if (isSaved(fileUri)) {
-            removeUri(fileUri);
-        }
-
-        try {
-            String keyName = getPrefsKey(fileUri);
-
-            KeyGenerator keyGen = KeyGenerator.getInstance(
-                    KeyProperties.KEY_ALGORITHM_AES, KEYSTORE);
-            keyGen.init(
-                    new KeyGenParameterSpec.Builder(
-                            keyName,
-                            KeyProperties.PURPOSE_ENCRYPT |
-                            KeyProperties.PURPOSE_DECRYPT)
-                    .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                    .setUserAuthenticationRequired(false)
-                    .setEncryptionPaddings(
-                            KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                    .build());
-            SecretKey key = keyGen.generateKey();
-            PasswdSafeUtil.dbginfo(TAG, "key: %d", key.hashCode());
-
-            Cipher ciph = Cipher.getInstance(
-                    KeyProperties.KEY_ALGORITHM_AES + "/" +
-                    KeyProperties.BLOCK_MODE_CBC + "/" +
-                    KeyProperties.ENCRYPTION_PADDING_PKCS7);
-            ciph.init(Cipher.ENCRYPT_MODE, key);
-            byte[] enc = ciph.doFinal("Hello".getBytes());
-            PasswdSafeUtil.dbginfo(TAG, "enc: %s", Util.bytesToHex(enc));
-
-            SecretKeyFactory fac = SecretKeyFactory.getInstance(
-                    key.getAlgorithm(), "AndroidKeyStore");
-            KeyInfo info = (KeyInfo)fac.getKeySpec(key, KeyInfo.class);
-
-            KeyStore keyStore = getKeystore();
-            for (String alias: Collections.list(keyStore.aliases())) {
-                PasswdSafeUtil.dbginfo(TAG, "alias: %s", alias);
-            }
-
-            getPrefs().edit().putString(getPrefsKey(fileUri), "").apply();
-
-        } catch (KeyStoreException | CertificateException |
-                NoSuchProviderException | NoSuchAlgorithmException |
-                InvalidAlgorithmParameterException |
-                IOException e) {
-            Log.e(TAG, "Error adding Uri", e);
-            PasswdSafeUtil.showErrorMsg(
-                    "Unable to add password: " + e.getMessage(), itsContext);
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
+        String keyName = getPrefsKey(fileUri);
+        SharedPreferences prefs = getPrefs();
+        prefs.edit()
+             .putString(keyName, encStr)
+             .putString("iv_" + keyName, ivStr)
+             .apply();
     }
-    */
 
     /**
      * Removed the saved password and key for a file
      */
-    public synchronized void removeUri(Uri fileUri)
+    public synchronized void removeSavedPassword(Uri fileUri)
     {
-        PasswdSafeUtil.dbginfo(TAG, "removeUri: %s", fileUri);
+        PasswdSafeUtil.dbginfo(TAG, "removeSavedPassword: %s", fileUri);
+        String keyName = getPrefsKey(fileUri);
         try {
             KeyStore keyStore = getKeystore();
-            keyStore.deleteEntry(getPrefsKey(fileUri));
+            keyStore.deleteEntry(keyName);
         } catch (KeyStoreException | CertificateException |
                 IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        getPrefs().edit().remove(getPrefsKey(fileUri)).apply();
+        getPrefs().edit().remove(keyName).remove("iv_" + keyName).apply();
     }
 
     /**
