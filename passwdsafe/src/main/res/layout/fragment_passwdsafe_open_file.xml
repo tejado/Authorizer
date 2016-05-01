@@ -44,11 +44,24 @@
             </EditText>
         </android.support.design.widget.TextInputLayout>
 
-        <CheckBox android:id="@+id/read_only"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:checked="true"
-                  android:text="@string/read_only_file"/>
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal">
+
+            <CheckBox android:id="@+id/read_only"
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:checked="true"
+                      android:text="@string/read_only_file"/>
+
+            <CheckBox android:id="@+id/save_password"
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:checked="false"
+                      android:text="@string/save_password"/>
+        </LinearLayout>
 
         <CheckBox android:id="@+id/yubikey"
                   android:layout_width="match_parent"
@@ -57,6 +70,14 @@
                   android:drawablePadding="6dp"
                   android:drawableStart="@drawable/yubikey"
                   android:text="@string/yubikey"/>
+
+        <TextView android:id="@+id/saved_password"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:drawableLeft="@drawable/ic_fingerprint"
+                  android:drawablePadding="6dp"
+                  android:drawableStart="@drawable/ic_fingerprint"
+                  android:gravity="center_vertical"/>
 
         <TextView android:id="@+id/yubi_help_text"
                   android:layout_width="match_parent"

@@ -10,6 +10,7 @@
     <string name="app_name">PasswdSafe</string>
     <string name="at_least">At least</string>
     <string name="basic">Basic</string>
+    <string name="canceled">Canceled</string>
     <string name="cannot_create_file">Cannot create file: %1$s</string>
     <string name="case_sensitive">Case sensitive</string>
     <string name="case_sensitive_sorting">Case-sensitive sorting</string>
@@ -92,6 +93,7 @@
     <string name="file_operations">File Operations…</string>
     <string name="file_password_encoding">File password encoding</string>
     <string name="files">Files</string>
+    <string name="fingerprint_not_recognized">Fingerprint not recognized</string>
     <string name="generate">Generate</string>
     <string name="generate_password">Generate Password</string>
     <string name="go">Go</string>
@@ -193,6 +195,8 @@
     <string name="password_policy">Password Policy</string>
     <string name="password_policies">Password Policies</string>
     <string name="password_record">Password record</string>
+    <string name="password_save_canceled_key_error">Password save canceled.  Failed to create an encryption key: %s</string>
+    <string name="password_saved">Password saved</string>
     <string name="password_times_header">PASSWORD TIMES</string>
     <string name="password_with_expiration">Password with expiration date</string>
     <string name="passwords">Passwords</string>
@@ -233,6 +237,7 @@
     <string name="remove">Remove</string>
     <string name="recurring">Recurring</string>
     <string name="save">Save</string>
+    <string name="save_password">Save password</string>
     <string name="saving_file">Saving %s…</string>
     <string name="search">Search</string>
     <string name="search_hint">Search PasswdSafe</string>
@@ -251,6 +256,7 @@
     <string name="sync">Sync</string>
     <string name="times_header">TIMES</string>
     <string name="title">Title</string>
+    <string name="touch_sensor_to_save_the_password">Touch sensor to save the password</string>
     <string name="unknown_sync_file">Unknown sync file</string>
     <string name="unprotect_all">Unprotect All Records</string>
     <string name="unprotect_group">Unprotect Group Records</string>
@@ -289,7 +295,9 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
-        <!-- TODO: yubikey_help translation -->
+        <!-- TODO: yubikey_help, save_password translation,
+        password_save_canceled_key_error, fingerprint_not_recognized,
+         password_saved, touch_sensor_to_save_the_password, canceled -->
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n

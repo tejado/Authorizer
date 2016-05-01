@@ -22,4 +22,7 @@
     <!-- Copied from design compat library -->
     <color name="textinput_error_color_light">#FFD50000</color>
     <color name="textinput_error_color_dark">#FFFF6E6E</color>
+
+    <color name="text_color_green_light">#FF99CC00</color>
+    <color name="text_color_green_dark">#FF669900</color>
 </resources>
