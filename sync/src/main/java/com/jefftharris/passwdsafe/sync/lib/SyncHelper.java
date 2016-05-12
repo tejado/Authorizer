@@ -106,7 +106,9 @@ public class SyncHelper
                 provider.itsAcct : provider.itsDisplayName;
         SyncLogRecord logrec =
                 new SyncLogRecord(displayName,
-                                  provider.itsType.getName(ctx), manual);
+                                  (provider.itsType != null)
+                                  ? provider.itsType.getName(ctx) : null,
+                                  manual);
         try {
             logrec.setNotConnected(!online);
             if (online) {

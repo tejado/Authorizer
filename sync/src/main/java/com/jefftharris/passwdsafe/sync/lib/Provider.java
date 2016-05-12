@@ -54,6 +54,7 @@ public interface Provider
             throws Exception;
 
     /** Cleanup a provider when deleted */
+    @SuppressWarnings("RedundantThrows")
     void cleanupOnDelete(String acctName)
             throws Exception;
 

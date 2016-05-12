@@ -64,21 +64,12 @@ public class YubikeyMgr
         /// Get the slot number to use on the key
         int getSlotNum();
 
-        /// Set the password computed by the key
-        void setHashedPassword(String password);
-
-        /// Handle an error while computing the hash
-        void handleHashException(Exception e);
+        /// Finish interaction with the key
+        void finish(String password, Exception e);
 
         /// Handle an update on the timer until the start times out
         void timerTick(@SuppressWarnings("SameParameterValue") int totalTime,
                        int remainingTime);
-
-        /// Notification that the interaction is starting
-        void starting();
-
-        /// Notification that the interaction has stopped
-        void stopped();
     }
 
     /** Get the state of support for the Yubikey */
@@ -143,8 +134,6 @@ public class YubikeyMgr
             }
         };
         itsTimer.start();
-
-        itsUser.starting();
     }
 
     /** Handle a pause of the activity */
@@ -175,7 +164,7 @@ public class YubikeyMgr
     public void stop()
     {
         onPause();
-        stopUser();
+        stopUser(null, null);
         itsTimer = null;
         itsUser = null;
     }
@@ -254,15 +243,13 @@ public class YubikeyMgr
                 // Prune response bytes and convert
                 String pwstr = Util.bytesToHex(resp, 0, resp.length - 2);
 //                PasswdSafeUtil.dbginfo(TAG, "Pw: " + pwstr);
-                stopUser();
-                itsUser.setHashedPassword(pwstr);
+                stopUser(pwstr, null);
             } finally {
                 isotag.close();
             }
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo(TAG, e, "handleKeyIntent");
-            stopUser();
-            itsUser.handleHashException(e);
+            stopUser(null, e);
         }
 
     }
@@ -283,13 +270,13 @@ public class YubikeyMgr
     /**
      * Stop interaction with the user
      */
-    private void stopUser()
+    private void stopUser(String password, Exception e)
     {
         if (itsTimer != null) {
             itsTimer.cancel();
         }
         if (itsUser != null) {
-            itsUser.stopped();
+            itsUser.finish(password, e);
         }
     }
 }

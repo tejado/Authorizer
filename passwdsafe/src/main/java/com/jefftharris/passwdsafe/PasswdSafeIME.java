@@ -21,6 +21,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
@@ -42,7 +43,11 @@ import com.jefftharris.passwdsafe.util.Pair;
  *  @author Jeff Harris
  */
 public class PasswdSafeIME extends InputMethodService
+        implements View.OnClickListener
 {
+    public static final String PASSWDSAFE_OPEN =
+            "com.jefftharris.passwdsafe.Open";
+
     // Password fields
     private static final int USER_KEY = -100;
     private static final int PASSWORD_KEY = -101;
@@ -53,7 +58,7 @@ public class PasswdSafeIME extends InputMethodService
 
     // Control keys
     public static final int ENTER_KEY = -200;
-    private static final int PASSWDSAFE_KEY = -201;
+    public static final int PASSWDSAFE_KEY = -201;
     public static final int KEYBOARD_NEXT_KEY = -202;
     public static final int KEYBOARD_CHOOSE_KEY = -203;
 
@@ -63,23 +68,18 @@ public class PasswdSafeIME extends InputMethodService
     private PasswdSafeIMEKeyboard itsSymbolsKeyboard;
     private PasswdSafeIMEKeyboard itsSymbolsShiftKeyboard;
     private PasswdSafeIMEKeyboard itsCurrKeyboard;
-    private TextView itsFile;
-    private View itsRecordLabel;
     private TextView itsRecord;
     private View itsPasswordWarning;
     private boolean itsAllowPassword = false;
     private boolean itsIsPasswordField = false;
     private long itsLastShiftTime = 0;
     private boolean itsCapsLock = false;
+    private boolean itsIsPasswdSafeOpen = false;
 
-    // TODO: when launching passwdsafe to get file/record, close passwdsafe once
-    // one is chosen to get back to previous activity
-    // TODO: cleanup logs
 
     @Override
     public void onInitializeInterface()
     {
-        PasswdSafeUtil.dbginfo("foo", "onInitializeInterface");
         itsPasswdSafeKeyboard =
                 new PasswdSafeIMEKeyboard(this, R.xml.keyboard_passwdsafe);
         itsQwertyKeyboard =
@@ -94,17 +94,14 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public View onCreateInputView()
     {
-        PasswdSafeUtil.dbginfo("foo", "onCreateInputView");
         View view = getLayoutInflater().inflate(R.layout.input_method, null);
 
         itsKeyboardView = (KeyboardView)view.findViewById(R.id.keyboard);
         itsKeyboardView.setPreviewEnabled(false);
-        itsKeyboardView.setKeyboard(itsPasswdSafeKeyboard);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
-        itsFile = (TextView)view.findViewById(R.id.file);
-        itsRecordLabel = view.findViewById(R.id.record_label);
         itsRecord = (TextView)view.findViewById(R.id.record);
+        itsRecord.setOnClickListener(this);
         itsPasswordWarning = view.findViewById(R.id.password_warning);
 
         return view;
@@ -113,23 +110,18 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public void onStartInput(EditorInfo info, boolean restarting)
     {
-        PasswdSafeUtil.dbginfo("foo", "onStartInput");
         super.onStartInput(info, restarting);
 
-        // TODO: choose right starting keyboard...
         Resources res = getResources();
         itsPasswdSafeKeyboard.setOptions(info, res);
         itsQwertyKeyboard.setOptions(info, res);
         itsSymbolsKeyboard.setOptions(info, res);
         itsSymbolsShiftKeyboard.setOptions(info, res);
-        itsCurrKeyboard = itsPasswdSafeKeyboard;
-        updateShiftKeyState(info);
     }
 
     @Override
     public void onStartInputView(EditorInfo info, boolean restarting)
     {
-        PasswdSafeUtil.dbginfo("foo", "onStartInputView");
         super.onStartInputView(info, restarting);
         refresh(null);
 
@@ -158,8 +150,29 @@ public class PasswdSafeIME extends InputMethodService
         itsAllowPassword = itsIsPasswordField;
         showPasswordWarning(false);
 
+        PasswdSafeIMEKeyboard keyboard = itsCurrKeyboard;
+        if (keyboard == null) {
+            keyboard = itsPasswdSafeKeyboard;
+        } else if (keyboard != itsPasswdSafeKeyboard) {
+            switch (info.inputType & InputType.TYPE_MASK_CLASS) {
+            case InputType.TYPE_CLASS_NUMBER:
+            case InputType.TYPE_CLASS_DATETIME:
+            case InputType.TYPE_CLASS_PHONE: {
+                keyboard = itsSymbolsKeyboard;
+                break;
+            }
+            default: {
+                keyboard = itsQwertyKeyboard;
+                break;
+            }
+            }
+        }
+
+        itsIsPasswdSafeOpen = TextUtils.equals(PASSWDSAFE_OPEN,
+                                               info.privateImeOptions);
+
         // Reset keyboard to reflect key changes
-        itsKeyboardView.setKeyboard(itsCurrKeyboard);
+        setKeyboard(keyboard);
         itsKeyboardView.closing();
         itsKeyboardView.invalidateAllKeys();
     }
@@ -167,12 +180,16 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public void onFinishInput()
     {
-        PasswdSafeUtil.dbginfo("foo", "onFinishInput");
         super.onFinishInput();
 
-        itsCurrKeyboard = itsPasswdSafeKeyboard;
         if (itsKeyboardView != null) {
             itsKeyboardView.closing();
+        }
+
+        // Finishing on the password file open screen, so clear the current
+        // keyboard to get back to the record chooser
+        if (itsIsPasswdSafeOpen) {
+            itsCurrKeyboard = null;
         }
     }
 
@@ -181,6 +198,17 @@ public class PasswdSafeIME extends InputMethodService
     {
         // Don't want to enter full-screen mode as not a real keyboard
         return false;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
+        case R.id.record: {
+            openPasswdSafe();
+            break;
+        }
+        }
     }
 
     /**
@@ -218,10 +246,10 @@ public class PasswdSafeIME extends InputMethodService
             }
         });
         if (rc.get() != null) {
-            if (!rc.get().second) {
-                InputMethodManager inputMgr = (InputMethodManager)
-                        getSystemService(INPUT_METHOD_SERVICE);
-                GuiUtils.switchToLastInputMethod(inputMgr, getToken());
+            if (rc.get().second) {
+                setKeyboard(itsPasswdSafeKeyboard);
+            } else {
+                setKeyboard(itsQwertyKeyboard);
             }
             startActivity(rc.get().first);
         }
@@ -307,7 +335,7 @@ public class PasswdSafeIME extends InputMethodService
         }
         case Keyboard.KEYCODE_DELETE: {
             conn.deleteSurroundingText(1, 0);
-            updateShiftKeyState(getCurrentInputEditorInfo());
+            updateShiftKeyState();
             break;
         }
         case ENTER_KEY: {
@@ -338,14 +366,13 @@ public class PasswdSafeIME extends InputMethodService
         case Keyboard.KEYCODE_MODE_CHANGE: {
             Keyboard current = itsKeyboardView.getKeyboard();
             if (current == itsPasswdSafeKeyboard) {
-                itsKeyboardView.setKeyboard(itsQwertyKeyboard);
-                updateShiftKeyState(getCurrentInputEditorInfo());
+                setKeyboard(itsQwertyKeyboard);
             } else if (current == itsQwertyKeyboard) {
-                itsKeyboardView.setKeyboard(itsSymbolsKeyboard);
+                setKeyboard(itsSymbolsKeyboard);
                 itsSymbolsKeyboard.setShifted(false);
             } else if ((current == itsSymbolsKeyboard) ||
                        (current == itsSymbolsShiftKeyboard)) {
-                itsKeyboardView.setKeyboard(itsPasswdSafeKeyboard);
+                setKeyboard(itsPasswdSafeKeyboard);
             }
             break;
         }
@@ -363,11 +390,11 @@ public class PasswdSafeIME extends InputMethodService
                                            !itsKeyboardView.isShifted());
             } else if (current == itsSymbolsKeyboard) {
                 itsSymbolsKeyboard.setShifted(true);
-                itsKeyboardView.setKeyboard(itsSymbolsShiftKeyboard);
+                setKeyboard(itsSymbolsShiftKeyboard);
                 itsSymbolsShiftKeyboard.setShifted(true);
             } else if (current == itsSymbolsShiftKeyboard) {
                 itsSymbolsShiftKeyboard.setShifted(false);
-                itsKeyboardView.setKeyboard(itsSymbolsKeyboard);
+                setKeyboard(itsSymbolsKeyboard);
                 itsSymbolsKeyboard.setShifted(false);
             }
             break;
@@ -379,7 +406,7 @@ public class PasswdSafeIME extends InputMethodService
             }
             sendKeyChar((char)code);
             if (Character.isLetter(code) || Character.isWhitespace(code)) {
-                updateShiftKeyState(getCurrentInputEditorInfo());
+                updateShiftKeyState();
             }
             break;
         }
@@ -387,18 +414,26 @@ public class PasswdSafeIME extends InputMethodService
     }
 
     /**
-     * Helper to update the shift state of our keyboard based on the initial
-     * editor state.
+     * Set the current keyboard
      */
-    private void updateShiftKeyState(EditorInfo attr) {
-        if ((attr != null) &&
-            (itsKeyboardView != null) &&
-            (itsKeyboardView.getKeyboard() == itsQwertyKeyboard)) {
+    private void setKeyboard(PasswdSafeIMEKeyboard keyboard)
+    {
+        itsCurrKeyboard = keyboard;
+        itsKeyboardView.setKeyboard(itsCurrKeyboard);
+        updateShiftKeyState();
+    }
+
+    /**
+     * Helper to update the shift state of our keyboard based on the editor
+     * state
+     */
+    private void updateShiftKeyState() {
+        if (itsCurrKeyboard == itsQwertyKeyboard) {
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
             if ((ei != null) && (ei.inputType != InputType.TYPE_NULL)) {
                 caps = getCurrentInputConnection().getCursorCapsMode(
-                        attr.inputType);
+                        ei.inputType);
             }
             itsKeyboardView.setShifted(itsCapsLock || (caps != 0));
         }
@@ -418,7 +453,7 @@ public class PasswdSafeIME extends InputMethodService
             public void useFileData(@NonNull PasswdFileData fileData)
             {
                 String fileLabel = fileData.getUri().getIdentifier(
-                        PasswdSafeIME.this, false);
+                        PasswdSafeIME.this, true);
 
                 PwsRecord rec = null;
                 String uuid = PasswdSafeFileDataFragment.getLastViewedRecord();
@@ -440,19 +475,20 @@ public class PasswdSafeIME extends InputMethodService
             }
         });
 
-        boolean haveFile = (labels.get() != null);
-        GuiUtils.setVisible(itsRecordLabel, haveFile);
-        GuiUtils.setVisible(itsRecord, haveFile);
-        if (haveFile) {
-            itsFile.setText(labels.get().first);
-            itsRecord.setText(labels.get().second);
+        StringBuilder label = new StringBuilder();
+        if (labels.get() != null) {
+            label.append(getString(R.string.record)).append(": ");
+            label.append(labels.get().first);
+            label.append(" - ");
+            label.append(labels.get().second);
         } else {
-            itsFile.setText(R.string.none_selected_open);
-            itsRecord.setText(null);
+            label.append(getString(R.string.file)).append(": ")
+                    .append(getString(R.string.none_selected_open));
             if (user != null) {
                 user.refresh(null, null);
             }
         }
+        itsRecord.setText(label.toString());
     }
 
     /**

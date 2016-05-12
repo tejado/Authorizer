@@ -260,6 +260,7 @@ public class PasswdFileDataView
     /**
      * Does the data view show the given group
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean hasGroup(String group)
     {
         if (TextUtils.isEmpty(group)) {

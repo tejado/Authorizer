@@ -235,11 +235,4 @@ public class PasswdSafeUtil
             Log.i(tag, String.format(fmt, args), t);
         }
     }
-
-    /** Log a debug message at verbose level */
-    public static void dbgverb(String tag, String fmt, Object... args)
-    {
-        if (DEBUG)
-            Log.v(tag, String.format(fmt, args));
-    }
 }

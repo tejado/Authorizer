@@ -78,6 +78,7 @@ public class DynamicPermissionMgr implements View.OnClickListener
     /**
      * Handle an activity result
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean handleActivityResult(int requestCode)
     {
         if (requestCode == itsAppSettingsRequestCode) {
@@ -90,6 +91,7 @@ public class DynamicPermissionMgr implements View.OnClickListener
     /**
      * Handle a permissions result
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean handlePermissionsResult(int requestCode,
                                            @NonNull int[] grantResults)
     {
