@@ -134,6 +134,7 @@
                   android:layout_marginLeft="4dp"
                   android:layout_marginRight="4dp"
                   android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:textSize="12sp"
                   android:visibility="gone"/>
 
     </LinearLayout>

@@ -8,10 +8,12 @@
 package com.jefftharris.passwdsafe;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +22,14 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.lib.AboutDialog;
+import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.ObjectHolder;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Locale;
 
 /**
  * Fragment for showing app 'about' information
@@ -39,6 +47,8 @@ public class AboutFragment extends Fragment
          */
         void updateViewAbout();
     }
+
+    private static final String TAG = "AboutFragment";
 
     private Listener itsListener;
     private View itsFileDetailsGroup;
@@ -74,7 +84,12 @@ public class AboutFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_about,
                                          container, false);
 
-        AboutDialog.updateAboutFields(rootView, null, getContext());
+        String licenses = getLicenses("license-PasswdSafe.txt",
+                                      "license-android.txt",
+                                      "license-AndroidAssetStudio.txt",
+                                      "license-RobotoMono.txt");
+
+        AboutDialog.updateAboutFields(rootView, licenses, getContext());
         itsFileDetailsGroup = rootView.findViewById(R.id.file_details_group);
         itsFile = (TextView)rootView.findViewById(R.id.file);
         itsPermissions = (TextView)rootView.findViewById(R.id.permissions);
@@ -105,8 +120,9 @@ public class AboutFragment extends Fragment
                 itsPermissions.setText(
                         fileData.canEdit() ?
                         R.string.read_write : R.string.read_only_about);
-                itsNumRecords.setText(
-                        String.format("%d", fileData.getRecords().size()));
+                itsNumRecords.setText(String.format(
+                        Locale.getDefault(), "%d",
+                        fileData.getRecords().size()));
                 itsPasswordEnc.setText(fileData.getOpenPasswordEncoding());
                 if (fileData.isV3()) {
                     StringBuilder build = new StringBuilder();
@@ -142,5 +158,35 @@ public class AboutFragment extends Fragment
     {
         super.onDetach();
         itsListener = null;
+    }
+
+    /**
+     * Get the licenses
+     */
+    private String getLicenses(String... assets)
+    {
+        StringBuilder licenses = new StringBuilder();
+        AssetManager assetMgr = getResources().getAssets();
+        for (String asset: assets) {
+            licenses.append(asset).append(":\n");
+            try {
+                InputStream is = null;
+                try {
+                    is = assetMgr.open(asset);
+                    BufferedReader r =
+                            new BufferedReader(new InputStreamReader(is));
+                    String line;
+                    while ((line = r.readLine()) != null) {
+                        licenses.append(line).append("\n");
+                    }
+                } finally {
+                    Utils.closeStreams(is, null);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Can't load asset: " + asset, e);
+            }
+            licenses.append("\n\n\n");
+        }
+        return licenses.toString();
     }
 }
