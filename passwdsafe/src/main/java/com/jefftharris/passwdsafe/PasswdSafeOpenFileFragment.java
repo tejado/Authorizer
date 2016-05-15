@@ -225,10 +225,6 @@ public class PasswdSafeOpenFileFragment
         }
         setVisibility(R.id.yubi_progress_text, false, rootView);
 
-        // TODO: if saved password, don't show keyboard but keep ok button
-        // behavior
-        GuiUtils.setupFormKeyboard(itsPasswordEdit, itsPasswordEdit, itsOkBtn,
-                                   getActivity());
         itsPasswordEdit.setPrivateImeOptions(PasswdSafeIME.PASSWDSAFE_OPEN);
         return rootView;
     }
@@ -551,6 +547,8 @@ public class PasswdSafeOpenFileFragment
     {
         boolean isSaved = itsSavedPasswordsMgr.isAvailable() &&
                           itsSavedPasswordsMgr.isSaved(getFileUri());
+        GuiUtils.setupFormKeyboard(isSaved ? null : itsPasswordEdit,
+                                   itsPasswordEdit, itsOkBtn, getContext());
         GuiUtils.setVisible(itsSavedPasswordMsg, isSaved);
         if (isSaved) {
             cancelSavedPasswordUsers();
@@ -558,6 +556,8 @@ public class PasswdSafeOpenFileFragment
             itsLoadSavedPasswordUser = new LoadSavedPasswordUser();
             itsSavedPasswordsMgr.startPasswordAccess(
                     getFileUri(), itsLoadSavedPasswordUser);
+        } else {
+            itsPasswordEdit.requestFocus();
         }
         itsSavePasswdCb.setChecked(isSaved);
     }
