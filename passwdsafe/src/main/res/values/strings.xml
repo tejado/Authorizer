@@ -124,6 +124,7 @@
     <string name="invalid_length">Invalid length</string>
     <string name="invalid_option_length">Invalid option length</string>
     <string name="invalid_password">Invalid password</string>
+    <string name="key_not_found">Key not found for $1%s</string>
     <string name="kitkat_sdcard_warning">
         %1$s
         \n\nOn Android KitKat and higher, apps are prevented from writing to 
@@ -200,6 +201,7 @@
     <string name="password_header">PASSWORD</string>
     <string name="password_len_short_opt">Password length too short for options</string>
     <string name="password_loaded">Password loaded</string>
+    <string name="password_not_found">Password not found for %1$s</string>
     <string name="password_policy">Password Policy</string>
     <string name="password_policies">Password Policies</string>
     <string name="password_record">Password record</string>
@@ -307,7 +309,8 @@
         <!-- TODO: yubikey_help, save_password translation,
         password_save_canceled_key_error, fingerprint_not_recognized,
          password_saved, touch_sensor_to_save_the_password, canceled,
-          touch_sensor_to_load_saved_password, password_loaded -->
+          touch_sensor_to_load_saved_password, password_loaded, key_not_found
+          password_not_found -->
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n

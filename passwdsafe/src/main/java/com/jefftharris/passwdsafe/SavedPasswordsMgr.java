@@ -11,6 +11,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
@@ -125,8 +126,7 @@ public final class SavedPasswordsMgr
     /**
      * Generate a saved password key for a file
      */
-    // TODO: target api testing
-    @TargetApi(23)
+    @TargetApi(Build.VERSION_CODES.M)
     public synchronized void generateKey(Uri fileUri)
             throws InvalidAlgorithmParameterException, NoSuchAlgorithmException,
             NoSuchProviderException
@@ -190,8 +190,8 @@ public final class SavedPasswordsMgr
         SharedPreferences prefs = getPrefs();
         String encStr = prefs.getString(keyName, null);
         if (TextUtils.isEmpty(encStr)) {
-            // TODO i18n
-            throw new IOException("Password not found for " + keyName);
+            throw new IOException(
+                    itsContext.getString(R.string.password_not_found, fileUri));
         }
 
         byte[] enc = Base64.decode(encStr, Base64.NO_WRAP);
@@ -238,6 +238,7 @@ public final class SavedPasswordsMgr
     /**
      * Get the cipher for the key protecting the saved password for a file
      */
+    @TargetApi(Build.VERSION_CODES.M)
     private Cipher getKeyCipher(Uri fileUri, boolean encrypt)
             throws CertificateException, NoSuchAlgorithmException,
                    KeyStoreException, IOException, UnrecoverableKeyException,
@@ -248,8 +249,8 @@ public final class SavedPasswordsMgr
         KeyStore keystore = getKeystore();
         Key key = keystore.getKey(keyName, null);
         if (key == null) {
-            // TODO i18n
-            throw new IOException("Key not found for " + keyName);
+            throw new IOException(itsContext.getString(R.string.key_not_found,
+                                                       fileUri));
         }
 
         Cipher ciph = Cipher.getInstance(
@@ -262,7 +263,7 @@ public final class SavedPasswordsMgr
             SharedPreferences prefs = getPrefs();
             String ivStr = prefs.getString("iv_" + keyName, null);
             if (TextUtils.isEmpty(ivStr)) {
-                throw new IOException("Key IV not found for " + keyName);
+                throw new IOException("Key IV not found for " + fileUri);
             }
             byte[] iv = Base64.decode(ivStr, Base64.NO_WRAP);
             ciph.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
