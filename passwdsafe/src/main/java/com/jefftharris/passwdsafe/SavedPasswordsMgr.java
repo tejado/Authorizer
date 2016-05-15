@@ -15,6 +15,7 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.support.v4.os.CancellationSignal;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
@@ -37,6 +38,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 
 /**
  * The SavedPasswordsMgr class encapsulates functionality for saving
@@ -162,44 +164,39 @@ public final class SavedPasswordsMgr
     {
         try {
             Cipher cipher = getKeyCipher(fileUri, user.isEncrypt());
-            FingerprintManagerCompat.CryptoObject cryptoObj = new
-                    FingerprintManagerCompat.CryptoObject(cipher);
+            FingerprintManagerCompat.CryptoObject cryptoObj =
+                    new FingerprintManagerCompat.CryptoObject(cipher);
             itsFingerprintMgr.authenticate(cryptoObj, 0, user.getCancelSignal(),
                                            user, null);
             user.onStart();
         } catch (CertificateException | NoSuchAlgorithmException |
                 KeyStoreException | UnrecoverableKeyException |
-                NoSuchPaddingException | InvalidKeyException | IOException e) {
-            String msg = "Error retrieving key cipher " + e
-                    .getLocalizedMessage();
-            // TODO: i18n
+                NoSuchPaddingException | InvalidKeyException |
+                InvalidAlgorithmParameterException | IOException e) {
+            String msg = "Error retrieving key cipher " +
+                         e.getLocalizedMessage();
             Log.e(TAG, msg, e);
             user.onAuthenticationError(0, msg);
         }
     }
 
     /**
-     * Get the cipher for the key protecting the saved password for a file
+     * Load a saved password for a file
      */
-    private Cipher getKeyCipher(Uri fileUri, boolean encrypt)
-            throws CertificateException, NoSuchAlgorithmException,
-            KeyStoreException, IOException, UnrecoverableKeyException,
-            NoSuchPaddingException, InvalidKeyException
+    public String loadSavedPassword(Uri fileUri, Cipher cipher)
+            throws IOException, BadPaddingException, IllegalBlockSizeException
     {
         String keyName = getPrefsKey(fileUri);
-        KeyStore keystore = getKeystore();
-        Key key = keystore.getKey(keyName, null);
-        if (key == null) {
+        SharedPreferences prefs = getPrefs();
+        String encStr = prefs.getString(keyName, null);
+        if (TextUtils.isEmpty(encStr)) {
             // TODO i18n
-            throw new IOException("Key not found for " + keyName);
+            throw new IOException("Password not found for " + keyName);
         }
 
-        Cipher ciph = Cipher.getInstance(
-                    KeyProperties.KEY_ALGORITHM_AES + "/" +
-                    KeyProperties.BLOCK_MODE_CBC + "/" +
-                    KeyProperties.ENCRYPTION_PADDING_PKCS7);
-        ciph.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, key);
-        return ciph;
+        byte[] enc = Base64.decode(encStr, Base64.NO_WRAP);
+        byte[] decPassword = cipher.doFinal(enc);
+        return new String(decPassword, "UTF-8");
     }
 
     /**
@@ -236,6 +233,41 @@ public final class SavedPasswordsMgr
             e.printStackTrace();
         }
         getPrefs().edit().remove(keyName).remove("iv_" + keyName).apply();
+    }
+
+    /**
+     * Get the cipher for the key protecting the saved password for a file
+     */
+    private Cipher getKeyCipher(Uri fileUri, boolean encrypt)
+            throws CertificateException, NoSuchAlgorithmException,
+                   KeyStoreException, IOException, UnrecoverableKeyException,
+                   NoSuchPaddingException, InvalidKeyException,
+                   InvalidAlgorithmParameterException
+    {
+        String keyName = getPrefsKey(fileUri);
+        KeyStore keystore = getKeystore();
+        Key key = keystore.getKey(keyName, null);
+        if (key == null) {
+            // TODO i18n
+            throw new IOException("Key not found for " + keyName);
+        }
+
+        Cipher ciph = Cipher.getInstance(
+                KeyProperties.KEY_ALGORITHM_AES + "/" +
+                KeyProperties.BLOCK_MODE_CBC + "/" +
+                KeyProperties.ENCRYPTION_PADDING_PKCS7);
+        if (encrypt) {
+            ciph.init(Cipher.ENCRYPT_MODE, key);
+        } else {
+            SharedPreferences prefs = getPrefs();
+            String ivStr = prefs.getString("iv_" + keyName, null);
+            if (TextUtils.isEmpty(ivStr)) {
+                throw new IOException("Key IV not found for " + keyName);
+            }
+            byte[] iv = Base64.decode(ivStr, Base64.NO_WRAP);
+            ciph.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
+        }
+        return ciph;
     }
 
     /**

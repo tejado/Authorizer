@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="add">Add</string>
     <string name="add_policy">Add Policy</string>
@@ -192,6 +199,7 @@
     <string name="password_file">Password file</string>
     <string name="password_header">PASSWORD</string>
     <string name="password_len_short_opt">Password length too short for options</string>
+    <string name="password_loaded">Password loaded</string>
     <string name="password_policy">Password Policy</string>
     <string name="password_policies">Password Policies</string>
     <string name="password_record">Password record</string>
@@ -257,6 +265,7 @@
     <string name="times_header">TIMES</string>
     <string name="title">Title</string>
     <string name="touch_sensor_to_save_the_password">Touch sensor to save the password</string>
+    <string name="touch_sensor_to_load_saved_password">Touch sensor to load saved password</string>
     <string name="unknown_sync_file">Unknown sync file</string>
     <string name="unprotect_all">Unprotect All Records</string>
     <string name="unprotect_group">Unprotect Group Records</string>
@@ -297,7 +306,8 @@
     <string name="release_notes">
         <!-- TODO: yubikey_help, save_password translation,
         password_save_canceled_key_error, fingerprint_not_recognized,
-         password_saved, touch_sensor_to_save_the_password, canceled -->
+         password_saved, touch_sensor_to_save_the_password, canceled,
+          touch_sensor_to_load_saved_password, password_loaded -->
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n
