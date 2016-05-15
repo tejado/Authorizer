@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2009-2013, 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -57,6 +57,10 @@ public class Preferences
 
     private static final String PREF_FILE_OPEN_YUBIKEY = "fileOpenYubikey";
     private static final boolean PREF_FILE_OPEN_YUBIKEY_DEF = false;
+
+    private static final String PREF_FILE_SAVED_PASSWORD_CONFIRM =
+            "fileSavedPasswordConfirm";
+    private static final boolean PREF_FILE_SAVED_PASSWORD_CONFIRM_DEF = false;
 
     public static final String PREF_DEF_FILE = "defFilePref";
     private static final String PREF_DEF_FILE_DEF = "";
@@ -196,6 +200,27 @@ public class Preferences
                                               SharedPreferences prefs)
     {
         prefs.edit().putBoolean(PREF_FILE_OPEN_YUBIKEY, yubikey).apply();
+    }
+
+    /**
+     * Get the preference for whether the user has confirmed the saved
+     * password warning
+     */
+    public static boolean isFileSavedPasswordConfirm(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_SAVED_PASSWORD_CONFIRM,
+                                PREF_FILE_SAVED_PASSWORD_CONFIRM_DEF);
+    }
+
+    /**
+     * Set the preference for whether the user has confirmed the saved
+     * password warning
+     */
+    public static void setFileSavedPasswordConfirm(boolean confirm,
+                                                   SharedPreferences prefs)
+    {
+        prefs.edit().putBoolean(PREF_FILE_SAVED_PASSWORD_CONFIRM, confirm)
+             .apply();
     }
 
     public static File getFileDirPref(SharedPreferences prefs)

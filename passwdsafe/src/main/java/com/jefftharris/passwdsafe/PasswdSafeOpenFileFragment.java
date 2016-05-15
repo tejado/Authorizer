@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -40,6 +41,7 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.util.YubiState;
+import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
@@ -61,7 +63,8 @@ import javax.crypto.IllegalBlockSizeException;
  */
 public class PasswdSafeOpenFileFragment
         extends AbstractPasswdSafeOpenNewFileFragment
-        implements View.OnClickListener
+        implements ConfirmPromptDialog.Listener,
+                   View.OnClickListener, CompoundButton.OnCheckedChangeListener
 {
     /**
      * Listener interface for owning activity
@@ -201,6 +204,7 @@ public class PasswdSafeOpenFileFragment
                 (TextView)rootView.findViewById(R.id.saved_password);
         itsSavedPasswordTextColor = itsSavedPasswordMsg.getCurrentTextColor();
         itsSavePasswdCb = (CheckBox)rootView.findViewById(R.id.save_password);
+        itsSavePasswdCb.setOnCheckedChangeListener(this);
         boolean saveAvailable = itsSavedPasswordsMgr.isAvailable();
         GuiUtils.setVisible(itsSavePasswdCb, saveAvailable);
         GuiUtils.setVisible(itsSavedPasswordMsg, false);
@@ -378,6 +382,41 @@ public class PasswdSafeOpenFileFragment
             break;
         }
         }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton button, boolean isChecked)
+    {
+        switch (button.getId()) {
+        case R.id.save_password: {
+            if (itsSavePasswdCb.isChecked()) {
+                Context ctx = getContext();
+                SharedPreferences prefs = Preferences.getSharedPrefs(ctx);
+                if (!Preferences.isFileSavedPasswordConfirm(prefs)) {
+                    ConfirmPromptDialog dlg = ConfirmPromptDialog.newInstance(
+                            getString(R.string.save_password_p),
+                            getString(R.string.save_password_warning),
+                            getString(R.string.save), null);
+                    dlg.setTargetFragment(this, 0);
+                    dlg.show(getFragmentManager(), "saveConfirm");
+                }
+            }
+            break;
+        }
+        }
+    }
+
+    @Override
+    public void promptCanceled(Bundle confirmArgs)
+    {
+        itsSavePasswdCb.setChecked(false);
+    }
+
+    @Override
+    public void promptConfirmed(Bundle confirmArgs)
+    {
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+        Preferences.setFileSavedPasswordConfirm(true, prefs);
     }
 
     @Override
@@ -575,7 +614,6 @@ public class PasswdSafeOpenFileFragment
         Preferences.setFileOpenReadOnlyPref(readonly, prefs);
         Preferences.setFileOpenYubikeyPref(itsYubikeyCb.isChecked(), prefs);
 
-        // TODO: show warning about saving first time
         boolean isSaved = itsSavedPasswordsMgr.isSaved(getFileUri());
         boolean doSave = itsSavePasswdCb.isChecked();
         if (isSaved && !doSave) {
