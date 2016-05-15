@@ -138,6 +138,7 @@ public class PasswdSafeOpenFileFragment
     // TODO: Check URI type to see whether save should be enabled
     // TODO: Add warning about no fingerprints available before generating key
     // TODO: Help for saved passwords
+    // TODO: Use pattern/password if no fingerprint available?
 
     /**
      * Create a new instance
@@ -833,6 +834,21 @@ public class PasswdSafeOpenFileFragment
     }
 
     /**
+     * How a saved password access is finished
+     */
+    private enum SavedPasswordFinish
+    {
+        /** Success */
+        SUCCESS,
+        /** Fragment canceled, no delayed operations should be added */
+        FRAGMENT_CANCEL,
+        /** Timeout */
+        TIMEOUT,
+        /** Error */
+        ERROR
+    }
+
+    /**
      * Base user for accessing a saved password
      */
     private abstract class AbstractSavedPasswordUser
@@ -842,6 +858,8 @@ public class PasswdSafeOpenFileFragment
         private final int itsStartMsgId;
         private final CountDownTimer itsCancelTimer;
         private Runnable itsPendingAction;
+        private boolean itsIsCancelTimeout = false;
+        private boolean itsIsFinished = false;
 
         /**
          * Constructor
@@ -864,6 +882,7 @@ public class PasswdSafeOpenFileFragment
                 public void onFinish()
                 {
                     getProgress().setProgress(0);
+                    itsIsCancelTimeout = true;
                     AbstractSavedPasswordUser.this.cancel();
                 }
             };
@@ -874,7 +893,7 @@ public class PasswdSafeOpenFileFragment
                                                 CharSequence errString)
         {
             PasswdSafeUtil.dbginfo(itsTag, "error: %s", errString);
-            finish(false, false, errString);
+            finish(SavedPasswordFinish.ERROR, errString);
         }
 
         @Override
@@ -907,39 +926,70 @@ public class PasswdSafeOpenFileFragment
         public final void onCancel()
         {
             PasswdSafeUtil.dbginfo(itsTag, "onCancel");
-            finish(false, true, getString(R.string.canceled));
+            finish(itsIsCancelTimeout ? SavedPasswordFinish.TIMEOUT :
+                                        SavedPasswordFinish.FRAGMENT_CANCEL,
+                   getString(R.string.canceled));
         }
 
         /**
          * Finish access to the saved passwords
          */
-        protected final void finish(boolean success, boolean cancel,
+        protected final void finish(SavedPasswordFinish finishMode,
                                     CharSequence msg)
         {
+            if (itsIsFinished) {
+                return;
+            }
+            itsIsFinished = true;
             itsCancelTimer.cancel();
             cancelPendingAction();
 
             itsSavedPasswordMsg.setText(msg);
-            int textColor;
-            if (success) {
+            int textColor = itsSavedPasswordTextColor;
+            boolean resolve = false;
+            switch (finishMode) {
+            case SUCCESS: {
                 textColor = R.attr.textColorGreen;
-            } else if (!cancel){
+                resolve = true;
+                break;
+            }
+            case ERROR: {
                 textColor = R.attr.textColorError;
-            } else {
-                itsSavedPasswordMsg.setTextColor(itsSavedPasswordTextColor);
-                return;
+                resolve = true;
+                break;
+            }
+            case FRAGMENT_CANCEL:
+            case TIMEOUT: {
+                break;
+            }
             }
 
-            TypedValue value = new TypedValue();
-            getContext().getTheme().resolveAttribute(textColor, value, true);
-            itsSavedPasswordMsg.setTextColor(value.data);
-            handleFinish(success, cancel);
+            if (resolve) {
+                TypedValue value = new TypedValue();
+                getContext().getTheme().resolveAttribute(textColor, value,
+                                                         true);
+                textColor = value.data;
+            }
+            itsSavedPasswordMsg.setTextColor(textColor);
+            handleFinish(finishMode);
+
+            switch (finishMode) {
+            case FRAGMENT_CANCEL: {
+                cancelPendingAction();
+                break;
+            }
+            case SUCCESS:
+            case ERROR:
+            case TIMEOUT: {
+                break;
+            }
+            }
         }
 
         /**
          * Derived-class callback for finishing access to the saved passwords
          */
-        protected abstract void handleFinish(boolean success, boolean cancel);
+        protected abstract void handleFinish(SavedPasswordFinish finishMode);
 
         /**
          * Perform a delayed action
@@ -1012,7 +1062,8 @@ public class PasswdSafeOpenFileFragment
                 String password = itsSavedPasswordsMgr.loadSavedPassword(
                         getFileUri(), cipher);
                 itsPasswordEdit.setText(password);
-                finish(true, false, getString(R.string.password_loaded));
+                finish(SavedPasswordFinish.SUCCESS,
+                       getString(R.string.password_loaded));
             } catch (IllegalBlockSizeException | BadPaddingException |
                     IOException e) {
                 String msg = "Error using cipher: " + e.getLocalizedMessage();
@@ -1028,9 +1079,10 @@ public class PasswdSafeOpenFileFragment
         }
 
         @Override
-        protected void handleFinish(boolean success, boolean cancel)
+        protected void handleFinish(SavedPasswordFinish finishMode)
         {
-            if (success) {
+            switch (finishMode) {
+            case SUCCESS: {
                 doDelayed(new Runnable()
                 {
                     @Override
@@ -1044,9 +1096,15 @@ public class PasswdSafeOpenFileFragment
                         }
                     }
                 });
-            } else {
+                break;
+            }
+            case ERROR:
+            case FRAGMENT_CANCEL:
+            case TIMEOUT: {
                 itsLoadSavedPasswordUser = null;
                 setProgressVisible(false, false);
+                break;
+            }
             }
         }
     }
@@ -1077,7 +1135,8 @@ public class PasswdSafeOpenFileFragment
             try {
                 itsSavedPasswordsMgr.addSavedPassword(getFileUri(),
                                                       itsUserPassword, cipher);
-                finish(true, false, getString(R.string.password_saved));
+                finish(SavedPasswordFinish.SUCCESS,
+                       getString(R.string.password_saved));
             } catch (IllegalBlockSizeException | BadPaddingException |
                     UnsupportedEncodingException e) {
                 String msg = "Error using cipher: " + e.getLocalizedMessage();
@@ -1093,9 +1152,10 @@ public class PasswdSafeOpenFileFragment
         }
 
         @Override
-        protected void handleFinish(boolean success, boolean cancel)
+        protected void handleFinish(SavedPasswordFinish finishMode)
         {
-            if (success) {
+            switch (finishMode) {
+            case SUCCESS: {
                 doDelayed(new Runnable()
                 {
                     @Override
@@ -1107,7 +1167,10 @@ public class PasswdSafeOpenFileFragment
                                                    itsRecToOpen);
                     }
                 });
-            } else if (!cancel) {
+                break;
+            }
+            case ERROR:
+            case TIMEOUT: {
                 doDelayed(new Runnable()
                 {
                     @Override
@@ -1117,8 +1180,12 @@ public class PasswdSafeOpenFileFragment
                         setPhase(Phase.WAITING_PASSWORD);
                     }
                 });
-            } else {
+                break;
+            }
+            case FRAGMENT_CANCEL: {
                 itsAddSavedPasswordUser = null;
+                break;
+            }
             }
         }
     }
