@@ -248,6 +248,13 @@
     <string name="recurring">Recurring</string>
     <string name="save">Save</string>
     <string name="save_password">Save password</string>
+    <string name="save_password_p">Save password?</string>
+    <string name="save_password_warning">
+        After the file is opened, the entered password will be saved locally.
+        The password is encrypted with an AES-256 key that is protected by a
+        fingerprint scan.  The fingerprint scan may not be as secure as the file
+        password itself.
+    </string>
     <string name="saving_file">Saving %s…</string>
     <string name="search">Search</string>
     <string name="search_hint">Search PasswdSafe</string>
@@ -310,7 +317,7 @@
         password_save_canceled_key_error, fingerprint_not_recognized,
          password_saved, touch_sensor_to_save_the_password, canceled,
           touch_sensor_to_load_saved_password, password_loaded, key_not_found
-          password_not_found -->
+          password_not_found, save_password_p, save_password_warning -->
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n
@@ -490,7 +497,7 @@
         <item>In Two Weeks</item>
         <item>In a Month</item>
         <item>In a Year</item>
-     </string-array>
+    </string-array>
 
     <!-- Order must match constants in PasswdExpiration.Type -->
     <string-array name="expire_type">
