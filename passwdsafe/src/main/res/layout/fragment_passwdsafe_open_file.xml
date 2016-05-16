@@ -80,11 +80,13 @@
                   android:drawableStart="@drawable/ic_fingerprint"
                   android:gravity="center_vertical"/>
 
-        <TextView android:id="@+id/yubi_help_text"
+        <TextView android:id="@+id/file_open_help_text"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:text="@string/yubikey_help"
-                  android:textAppearance="?android:attr/textAppearanceMedium"/>
+                  android:text="@string/file_open_help"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textColor="?android:attr/textColorPrimaryNoDisable"
+                  android:textSize="16sp"/>
 
         <LinearLayout android:layout_width="fill_parent"
                       android:layout_height="wrap_content"

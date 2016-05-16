@@ -97,6 +97,41 @@
     <string name="file">File</string>
     <string name="file_name">File Name</string>
     <string name="file_not_found_perm_denied">File not found or permission denied</string>
+    <string name="file_open_help">
+        File passwords can be saved on devices with a fingerprint scanner and
+        Android 6.0 or higher.  The passwords are encrypted using AES-256
+        keys that are protected by a fingerprint scan.
+        \n
+        - To save a password, first ensure a fingerprint is registered
+        with the device in the security settings.  Then, check the save option,
+        enter the password, and click OK. After the password is verified,
+        scan a fingerprint when prompted. The password will be encrypted and
+        saved, and the file will open.
+        \n
+        - To use a saved password, scan a fingerprint instead of entering a
+        password.  If the scan is successful, the password is decrypted and
+        used to open the file.  If a YubiKey is used, the key will be read
+        after the fingerprint is scanned.
+        \n
+        - To remove a saved password, uncheck the save option and open the file.
+        The saved password will be erased from the device.  All saved
+        passwords can be removed from the password preferences.
+        \n
+        \nTo use a YubiKey NEO, follow these steps:\n
+        - Enable NFC support in the device settings\n
+        - Enter the user password to the file\n
+        - Choose which slot on the YubiKey has the challenge-response key.
+        Usually slot 2 is used for Password Safe.\n
+        - Check the YubiKey option\n
+        - Click OK\n
+        - Within 30 seconds, press the YubiKey to the back of the phone or
+        tablet.  There will be sounds as the key is being read.  If the device
+        doesn\'t respond with a rising tone, try moving the key around.  A bit
+        of trial-and-error is needed to find the correct location.  The button
+        on the YubiKey itself does not need to be pressed.\n
+        - Once the key is found, it will be used to authenticate with your
+        password.  The file will open automatically.
+    </string>
     <string name="file_operations">File Operations…</string>
     <string name="file_password_encoding">File password encoding</string>
     <string name="files">Files</string>
@@ -127,7 +162,7 @@
     <string name="key_not_found">Key not found for $1%s</string>
     <string name="kitkat_sdcard_warning">
         %1$s
-        \n\nOn Android KitKat and higher, apps are prevented from writing to 
+        \n\nOn Android KitKat and higher, apps are prevented from writing to
         removable SD cards.  If the file is located on a card, it will have to
         be moved to the internal storage.
     </string>
@@ -293,22 +328,6 @@
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
     <string name="yubikey_error">Error communicating with the YubiKey</string>
-    <string name="yubikey_help">
-        To use a YubiKey NEO, follow these steps:\n
-        - Enable NFC support in the device settings\n
-        - Enter the user password to the file\n
-        - Choose which slot on the YubiKey has the challenge-response key.
-        Usually slot 2 is used for Password Safe.\n
-        - Check the YubiKey option\n
-        - Click OK\n
-        - Within 30 seconds, press the YubiKey to the back of the phone or
-        tablet.  There will be sounds as the key is being read.  If the device
-        doesn\'t respond with a rising tone, try moving the key around.  A bit
-        of trial-and-error is needed to find the correct location.  The button
-        on the YubiKey itself does not need to be pressed.\n
-        - Once the key is found, it will be used to authenticate with your
-        password.  The file will open automatically.
-    </string>
     <string name="yubikey_slot_1">YubiKey Slot 1</string>
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
@@ -317,7 +336,8 @@
         password_save_canceled_key_error, fingerprint_not_recognized,
          password_saved, touch_sensor_to_save_the_password, canceled,
           touch_sensor_to_load_saved_password, password_loaded, key_not_found
-          password_not_found, save_password_p, save_password_warning -->
+          password_not_found, save_password_p, save_password_warning,
+           file_open_help -->
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n
