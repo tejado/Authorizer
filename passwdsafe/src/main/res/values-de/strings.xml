@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="add">Hinzufügen</string>
     <string name="add_policy">Regel hinzufügen</string>
@@ -90,6 +97,19 @@
     <string name="file">Datei</string>
     <string name="file_name">Dateiname</string>
     <string name="file_not_found_perm_denied">Datei nicht gefunden oder keine Berechtigung</string>
+    <string name="file_open_help">
+        Um YubiKey mit PasswdSafe zu benutzen, befolgen bitte Sie
+        folgende Schritte:\n
+        - NFC-Unterstützung in den Einstellungen einschalten\n
+        - Passwort für die Passwortdatei eingeben\n
+        - Schlüssel-Slot auf dem YubiKey auswählen (Dies ist meist Slot 2)\n
+        - Die YubiKey-Taste einmal drücken\n
+        - Innerhalb von 30 Sekunden, den YubiKey an den Rücken dieses Geräts
+        halten. Dies ist erfolgreich abgeschlossen, wenn Sie eine akustische
+        Rückmeldung erhalten.\n
+        - Jetzt kann der YubiKey zum automatischen öffnen der Passwortdatei
+        benutzt werden.
+    </string>
     <string name="file_operations">Datei …</string>
     <string name="file_password_encoding">Passwortkodierung</string>
     <string name="files">Dateien</string>
@@ -269,19 +289,6 @@
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey deaktiviert. NFC einschalten, um es benutzen zu können.</string>
     <string name="yubikey_error">Fehler bei der Kommunikation mit dem YubiKey</string>
-    <string name="yubikey_help">
-        Um YubiKey mit PasswdSafe zu benutzen, befolgen bitte Sie 
-        folgende Schritte:\n
-        - NFC-Unterstützung in den Einstellungen einschalten\n
-        - Passwort für die Passwortdatei eingeben\n
-        - Schlüssel-Slot auf dem YubiKey auswählen (Dies ist meist Slot 2)\n
-        - Die YubiKey-Taste einmal drücken\n
-        - Innerhalb von 30 Sekunden, den YubiKey an den Rücken dieses Geräts 
-        halten. Dies ist erfolgreich abgeschlossen, wenn Sie eine akustische 
-        Rückmeldung erhalten.\n
-        - Jetzt kann der YubiKey zum automatischen öffnen der Passwortdatei
-        benutzt werden.
-    </string>
     <string name="yubikey_slot_1">YubiKey Slot 1</string>
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 

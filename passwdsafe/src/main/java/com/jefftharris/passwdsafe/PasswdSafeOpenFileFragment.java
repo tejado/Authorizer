@@ -79,6 +79,9 @@ public class PasswdSafeOpenFileFragment
 
         /** Update the view for opening a file */
         void updateViewFileOpen();
+
+        /** Is the navigation drawer closed */
+        boolean isNavDrawerClosed();
     }
 
     /**
@@ -140,8 +143,8 @@ public class PasswdSafeOpenFileFragment
     // TODO: translations
     // TODO: Check URI type to see whether save should be enabled
     // TODO: Add warning about no fingerprints available before generating key
-    // TODO: Help for saved passwords
     // TODO: Use pattern/password if no fingerprint available?
+    // TODO: password preferences clear all
 
     /**
      * Create a new instance
@@ -211,7 +214,7 @@ public class PasswdSafeOpenFileFragment
 
         itsYubiMgr = new YubikeyMgr();
         itsYubikeyCb = (CheckBox)rootView.findViewById(R.id.yubikey);
-        setVisibility(R.id.yubi_help_text, false, rootView);
+        setVisibility(R.id.file_open_help_text, false, rootView);
         itsYubiState = itsYubiMgr.getState(getActivity());
         switch (itsYubiState) {
         case UNAVAILABLE: {
@@ -301,35 +304,35 @@ public class PasswdSafeOpenFileFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        inflater.inflate(R.menu.fragment_passwdsafe_open_file, menu);
+        if ((itsListener != null) && itsListener.isNavDrawerClosed()) {
+            inflater.inflate(R.menu.fragment_passwdsafe_open_file, menu);
 
-        switch (itsYubiState) {
-        case ENABLED:
-        case DISABLED: {
-            break;
-        }
-        case UNAVAILABLE: {
-            menu.setGroupVisible(R.id.menu_group_slots, false);
-            MenuItem item = menu.findItem(R.id.menu_yubi_help);
-            item.setVisible(false);
-            break;
-        }
-        }
+            switch (itsYubiState) {
+            case ENABLED:
+            case DISABLED: {
+                break;
+            }
+            case UNAVAILABLE: {
+                menu.setGroupVisible(R.id.menu_group_slots, false);
+                break;
+            }
+            }
 
-        MenuItem item;
-        switch (itsYubiSlot) {
-        case 2:
-        default: {
-            item = menu.findItem(R.id.menu_slot_2);
-            itsYubiSlot = 2;
-            break;
+            MenuItem item;
+            switch (itsYubiSlot) {
+            case 2:
+            default: {
+                item = menu.findItem(R.id.menu_slot_2);
+                itsYubiSlot = 2;
+                break;
+            }
+            case 1: {
+                item = menu.findItem(R.id.menu_slot_1);
+                break;
+            }
+            }
+            item.setChecked(true);
         }
-        case 1: {
-            item = menu.findItem(R.id.menu_slot_1);
-            break;
-        }
-        }
-        item.setChecked(true);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -338,12 +341,14 @@ public class PasswdSafeOpenFileFragment
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
-        case R.id.menu_yubi_help: {
+        case R.id.menu_file_open_help: {
             View root = getView();
             if (root != null) {
-                View help = root.findViewById(R.id.yubi_help_text);
+                View help = root.findViewById(R.id.file_open_help_text);
                 help.setVisibility((help.getVisibility() == View.VISIBLE) ?
                                            View.GONE : View.VISIBLE);
+                GuiUtils.setKeyboardVisible(itsPasswordEdit, getContext(),
+                                            false);
             }
             return true;
         }

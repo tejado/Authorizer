@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <resources>
     <string name="add">Ajouter</string>
     <string name="add_policy">Ajouter Stratégie</string>
@@ -90,6 +97,22 @@
     <string name="file">Fichier</string>
     <string name="file_name">Nom du fichier</string>
     <string name="file_not_found_perm_denied">Fichier introuvable ou accès interdit</string>
+    <string name="file_open_help">
+        Pour utiliser un YubiKey NEO, procédez comme suit:\n
+        - Activer le support NFC dans les paramètres de l\'appareil\n
+        - Entrez le mot de passe de l\'utilisateur dans le fichier\n
+        - Choisissez quel emplacement sur ​​le YubiKey a la clé de défi-réponse.
+        Habituellement fente 2 est utilisé pour Password Safe.\n
+        - Appuyez sur le bouton YubiKey\n
+        - Dans les 30 secondes, appuyez la YubiKey à l\'arrière du téléphone ou
+        de la tablette. Il y aura des sons confirmant que la clé est lu. Si
+        l\'appareil ne répond pas avec un ton montant, essayez de déplacer la
+        clé autour. Quelques essais peuvent être nécessaire pour
+        déterminer l\'emplacement exact. Le bouton de YubiKey lui-même n\'a pas
+        besoin d\'être pressé.\n
+        - Une fois que la clé est trouvée, elle sera utilisée pour authentifier
+        avec votre mot de passe. Le fichier s\'ouvrira automatiquement.
+    </string>
     <string name="file_operations">Réglage sauvegarde</string>
     <string name="file_password_encoding">Encodage fichier mots de passe</string>
     <string name="files">Fichiers</string>
@@ -272,22 +295,6 @@
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey désactivée. Activer NFC pour utiliser.</string>
     <string name="yubikey_error">Erreur de communication avec le YubiKey</string>
-    <string name="yubikey_help">
-        Pour utiliser un YubiKey NEO, procédez comme suit:\n
-        - Activer le support NFC dans les paramètres de l\'appareil\n
-        - Entrez le mot de passe de l\'utilisateur dans le fichier\n
-        - Choisissez quel emplacement sur ​​le YubiKey a la clé de défi-réponse.
-        Habituellement fente 2 est utilisé pour Password Safe.\n
-        - Appuyez sur le bouton YubiKey\n
-        - Dans les 30 secondes, appuyez la YubiKey à l\'arrière du téléphone ou 
-        de la tablette. Il y aura des sons confirmant que la clé est lu. Si 
-        l\'appareil ne répond pas avec un ton montant, essayez de déplacer la 
-        clé autour. Quelques essais peuvent être nécessaire pour 
-        déterminer l\'emplacement exact. Le bouton de YubiKey lui-même n\'a pas 
-        besoin d\'être pressé.\n
-        - Une fois que la clé est trouvée, elle sera utilisée pour authentifier
-        avec votre mot de passe. Le fichier s\'ouvrira automatiquement.
-    </string>
     <string name="yubikey_slot_1">YubiKey Slot 1</string>
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
