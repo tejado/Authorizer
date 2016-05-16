@@ -141,7 +141,6 @@ public class PasswdSafeOpenFileFragment
 
     // TODO: Use TextInputEditText everywhere a TextInputLayout is used
     // TODO: translations
-    // TODO: Check URI type to see whether save should be enabled
     // TODO: Add warning about no fingerprints available before generating key
     // TODO: Use pattern/password if no fingerprint available?
     // TODO: password preferences clear all
@@ -427,6 +426,8 @@ public class PasswdSafeOpenFileFragment
     @Override
     protected final void doResolveTaskFinished()
     {
+        // Set fields enabled now that file URI has been set
+        setFieldsEnabled(true);
         setPhase(Phase.WAITING_PASSWORD);
     }
 
@@ -452,16 +453,29 @@ public class PasswdSafeOpenFileFragment
     protected final void setFieldsEnabled(boolean enabled)
     {
         itsPasswordEdit.setEnabled(enabled);
-        itsSavePasswdCb.setEnabled(enabled);
         itsOkBtn.setEnabled(enabled);
 
         boolean readonlyEnabled = enabled;
+        boolean savePasswdEnabled = enabled;
         PasswdFileUri passwdFileUri = getPasswdFileUri();
-        if (readonlyEnabled && (passwdFileUri != null)) {
+        if (enabled && (passwdFileUri != null)) {
             Pair<Boolean, Integer> rc = getPasswdFileUri().isWritable();
             readonlyEnabled = rc.first;
+
+            switch (passwdFileUri.getType()) {
+            case EMAIL:
+            case GENERIC_PROVIDER: {
+                savePasswdEnabled = false;
+                break;
+            }
+            case FILE:
+            case SYNC_PROVIDER: {
+                break;
+            }
+            }
         }
         itsReadonlyCb.setEnabled(readonlyEnabled);
+        itsSavePasswdCb.setEnabled(savePasswdEnabled);
 
         switch (itsYubiState) {
         case ENABLED: {
@@ -591,8 +605,19 @@ public class PasswdSafeOpenFileFragment
      */
     private void enterWaitingPasswordPhase()
     {
-        boolean isSaved = itsSavedPasswordsMgr.isAvailable() &&
-                          itsSavedPasswordsMgr.isSaved(getFileUri());
+        boolean isSaved = false;
+        switch (getPasswdFileUri().getType()) {
+        case FILE:
+        case SYNC_PROVIDER: {
+            isSaved = itsSavedPasswordsMgr.isAvailable() &&
+                      itsSavedPasswordsMgr.isSaved(getFileUri());
+        }
+        case EMAIL:
+        case GENERIC_PROVIDER: {
+            break;
+        }
+        }
+
         GuiUtils.setupFormKeyboard(isSaved ? null : itsPasswordEdit,
                                    itsPasswordEdit, itsOkBtn, getContext());
         GuiUtils.setVisible(itsSavedPasswordMsg, isSaved);
