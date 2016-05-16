@@ -559,6 +559,8 @@ public class PasswdSafeOpenFileFragment
     @SuppressLint("SetTextI18n")
     private void exitResolvingPhase()
     {
+        setTitle(R.string.open_file);
+
         //noinspection ConstantConditions
         if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
             (getFileUri().getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
