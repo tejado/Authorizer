@@ -173,8 +173,8 @@ public final class SavedPasswordsMgr
                 KeyStoreException | UnrecoverableKeyException |
                 NoSuchPaddingException | InvalidKeyException |
                 InvalidAlgorithmParameterException | IOException e) {
-            String msg = "Error retrieving key cipher " +
-                         e.getLocalizedMessage();
+            String msg = itsContext.getString(R.string.key_error, fileUri,
+                                              e.getLocalizedMessage());
             Log.e(TAG, msg, e);
             user.onAuthenticationError(0, msg);
         }

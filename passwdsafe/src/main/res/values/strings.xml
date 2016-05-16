@@ -159,6 +159,7 @@
     <string name="invalid_length">Invalid length</string>
     <string name="invalid_option_length">Invalid option length</string>
     <string name="invalid_password">Invalid password</string>
+    <string name="key_error">Key error for %1$s: %2$s</string>
     <string name="key_not_found">Key not found for $1%s</string>
     <string name="kitkat_sdcard_warning">
         %1$s
@@ -337,7 +338,7 @@
          password_saved, touch_sensor_to_save_the_password, canceled,
           touch_sensor_to_load_saved_password, password_loaded, key_not_found
           password_not_found, save_password_p, save_password_warning,
-           file_open_help -->
+           file_open_help, key_error -->
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n
