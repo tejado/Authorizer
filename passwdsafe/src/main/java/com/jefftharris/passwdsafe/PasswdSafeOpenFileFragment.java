@@ -141,7 +141,6 @@ public class PasswdSafeOpenFileFragment
 
     // TODO: Use TextInputEditText everywhere a TextInputLayout is used
     // TODO: translations
-    // TODO: Add warning about no fingerprints available before generating key
     // TODO: Use pattern/password if no fingerprint available?
 
     /**
@@ -830,7 +829,8 @@ public class PasswdSafeOpenFileFragment
                 try {
                     itsSavedPasswordsMgr.generateKey(getFileUri());
                 } catch (InvalidAlgorithmParameterException |
-                        NoSuchAlgorithmException | NoSuchProviderException e) {
+                        NoSuchAlgorithmException | NoSuchProviderException |
+                        IOException e) {
                     keygenError = e;
                 }
                 break;
@@ -1013,6 +1013,7 @@ public class PasswdSafeOpenFileFragment
             itsCancelTimer.cancel();
             cancelPendingAction();
 
+            GuiUtils.setVisible(itsSavedPasswordMsg, true);
             itsSavedPasswordMsg.setText(msg);
             int textColor = itsSavedPasswordTextColor;
             boolean resolve = false;
