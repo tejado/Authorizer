@@ -229,16 +229,18 @@ public final class SavedPasswordsMgr
      */
     public synchronized void removeSavedPassword(Uri fileUri)
     {
-        PasswdSafeUtil.dbginfo(TAG, "removeSavedPassword: %s", fileUri);
         String keyName = getPrefsKey(fileUri);
-        try {
-            KeyStore keyStore = getKeystore();
-            keyStore.deleteEntry(keyName);
-        } catch (KeyStoreException | CertificateException |
-                IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
         getPrefs().edit().remove(keyName).remove("iv_" + keyName).apply();
+        if (isAvailable()) {
+            PasswdSafeUtil.dbginfo(TAG, "removeSavedPassword: %s", fileUri);
+            try {
+                KeyStore keyStore = getKeystore();
+                keyStore.deleteEntry(keyName);
+            } catch (KeyStoreException | CertificateException |
+                    IOException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -247,16 +249,18 @@ public final class SavedPasswordsMgr
     public synchronized void removeAllSavedPasswords()
     {
         getPrefs().edit().clear().apply();
-        try {
-            KeyStore keyStore = getKeystore();
-            for (String key: Collections.list(keyStore.aliases())) {
-                PasswdSafeUtil.dbginfo(TAG, "removeAllSavedPasswords key: %s",
-                                       key);
-                keyStore.deleteEntry(key);
+        if (isAvailable()) {
+            try {
+                KeyStore keyStore = getKeystore();
+                for (String key: Collections.list(keyStore.aliases())) {
+                    PasswdSafeUtil.dbginfo(
+                            TAG, "removeAllSavedPasswords key: %s", key);
+                    keyStore.deleteEntry(key);
+                }
+            } catch (CertificateException | NoSuchAlgorithmException |
+                    IOException | KeyStoreException e) {
+                e.printStackTrace();
             }
-        } catch (CertificateException | NoSuchAlgorithmException |
-                IOException | KeyStoreException e) {
-            e.printStackTrace();
         }
     }
 
