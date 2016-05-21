@@ -214,6 +214,7 @@
         \n\nThe previous file chooser is enabled in the Preferences as the
         legacy file chooser.
     </string>
+    <string name="no_fingerprints_registered">No fingerprints are registered</string>
     <string name="no_groups">No Groups</string>
     <string name="no_shortcut_chosen">No shortcut chosen</string>
     <string name="no_policies">No Policies</string>
@@ -341,7 +342,7 @@
           touch_sensor_to_load_saved_password, password_loaded, key_not_found
           password_not_found, save_password_p, save_password_warning,
            file_open_help, key_error, clear_all_saved_passwords,
-           erase_all_saved_passwords -->
+           erase_all_saved_passwords, no_fingerprints_registered -->
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n

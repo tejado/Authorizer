@@ -130,9 +130,14 @@ public final class SavedPasswordsMgr
     @TargetApi(Build.VERSION_CODES.M)
     public synchronized void generateKey(Uri fileUri)
             throws InvalidAlgorithmParameterException, NoSuchAlgorithmException,
-            NoSuchProviderException
+            NoSuchProviderException, IOException
     {
         PasswdSafeUtil.dbginfo(TAG, "generateKey: %s", fileUri);
+
+        if (!itsFingerprintMgr.hasEnrolledFingerprints()) {
+            throw new IOException(
+                    itsContext.getString(R.string.no_fingerprints_registered));
+        }
 
         String keyName = getPrefsKey(fileUri);
         try {
