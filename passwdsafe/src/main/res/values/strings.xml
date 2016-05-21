@@ -28,6 +28,7 @@
     <string name="choose_record">Choose Record</string>
     <string name="choose_type">Choose Type</string>
     <string name="clear">Clear</string>
+    <string name="clear_all_saved_passwords">Clear all saved passwords</string>
     <string name="clear_clipboard_on_close">Clear clipboard on close</string>
     <string name="clear_password_notifications">Clear password notifications</string>
     <string name="clear_recent">Clear Recent</string>
@@ -85,6 +86,7 @@
     <string name="enable">Enable</string>
     <string name="enabled">Enabled</string>
     <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
+    <string name="erase_all_saved_passwords">Erase all saved passwords and keys</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Expiration Notifications</string>
     <string name="expiration_notifications_warning">Enabling expiration notifications requires PasswdSafe to store expiration information for the file (record title, group, and expiration date).  This information is stored unencrypted on the device.  No passwords are stored.</string>
@@ -338,7 +340,8 @@
          password_saved, touch_sensor_to_save_the_password, canceled,
           touch_sensor_to_load_saved_password, password_loaded, key_not_found
           password_not_found, save_password_p, save_password_warning,
-           file_open_help, key_error -->
+           file_open_help, key_error, clear_all_saved_passwords,
+           erase_all_saved_passwords -->
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n

@@ -33,6 +33,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Collections;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -233,6 +234,25 @@ public final class SavedPasswordsMgr
             e.printStackTrace();
         }
         getPrefs().edit().remove(keyName).remove("iv_" + keyName).apply();
+    }
+
+    /**
+     * Remove all saved passwords and keys
+     */
+    public synchronized void removeAllSavedPasswords()
+    {
+        getPrefs().edit().clear().apply();
+        try {
+            KeyStore keyStore = getKeystore();
+            for (String key: Collections.list(keyStore.aliases())) {
+                PasswdSafeUtil.dbginfo(TAG, "removeAllSavedPasswords key: %s",
+                                       key);
+                keyStore.deleteEntry(key);
+            }
+        } catch (CertificateException | NoSuchAlgorithmException |
+                IOException | KeyStoreException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

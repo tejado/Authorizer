@@ -143,7 +143,6 @@ public class PasswdSafeOpenFileFragment
     // TODO: translations
     // TODO: Add warning about no fingerprints available before generating key
     // TODO: Use pattern/password if no fingerprint available?
-    // TODO: password preferences clear all
 
     /**
      * Create a new instance

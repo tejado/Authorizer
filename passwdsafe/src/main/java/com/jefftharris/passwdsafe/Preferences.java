@@ -83,6 +83,8 @@ public class Preferences
         "passwordDefaultSymbolsPref";
     public static final String PREF_PASSWD_CLEAR_ALL_NOTIFS =
         "passwordClearAllNotifsPref";
+    public static final String PREF_PASSWD_CLEAR_ALL_SAVED =
+        "passwordClearAllSavedPref";
 
     public static final String PREF_RECORD_SORT_ORDER = "recordSortOrderPref";
     public static final RecordSortOrderPref PREF_RECORD_SORT_ORDER_DEF =
