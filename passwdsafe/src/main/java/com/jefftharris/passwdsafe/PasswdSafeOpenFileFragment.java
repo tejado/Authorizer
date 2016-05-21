@@ -141,7 +141,6 @@ public class PasswdSafeOpenFileFragment
 
     // TODO: translations
     // TODO: Use pattern/password if no fingerprint available?
-    // TODO: change password support
 
     /**
      * Create a new instance
