@@ -32,17 +32,17 @@
             android:id="@+id/passwd_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText android:id="@+id/passwd_edit"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:gravity="fill_horizontal"
-                      android:hint="@string/password"
-                      android:imeOptions="actionGo"
-                      android:inputType="textPassword"
-                      android:scrollHorizontally="true"
-                      android:singleLine="true"
-                      android:textAppearance="?android:attr/textAppearanceMedium">
-            </EditText>
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/passwd_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="fill_horizontal"
+                android:hint="@string/password"
+                android:imeOptions="actionGo"
+                android:inputType="textPassword"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout android:layout_width="match_parent"

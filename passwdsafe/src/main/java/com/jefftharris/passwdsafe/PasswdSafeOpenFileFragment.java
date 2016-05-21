@@ -139,9 +139,9 @@ public class PasswdSafeOpenFileFragment
     private static final String STATE_SLOT = "slot";
     private static final String TAG = "PasswdSafeOpenFileFragment";
 
-    // TODO: Use TextInputEditText everywhere a TextInputLayout is used
     // TODO: translations
     // TODO: Use pattern/password if no fingerprint available?
+    // TODO: change password support
 
     /**
      * Create a new instance
