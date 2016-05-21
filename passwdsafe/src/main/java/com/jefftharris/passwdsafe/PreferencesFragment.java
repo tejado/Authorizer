@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -30,6 +30,7 @@ import com.jefftharris.passwdsafe.pref.FileBackupPref;
 import com.jefftharris.passwdsafe.pref.FileTimeoutPref;
 import com.jefftharris.passwdsafe.pref.PasswdExpiryNotifPref;
 import com.jefftharris.passwdsafe.pref.RecordSortOrderPref;
+import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 
 import org.pwsafe.lib.file.PwsFile;
 
@@ -39,7 +40,8 @@ import java.io.File;
  * Fragment for PasswdSafe preferences
  */
 public class PreferencesFragment extends PreferenceFragmentCompat
-        implements SharedPreferences.OnSharedPreferenceChangeListener,
+        implements ConfirmPromptDialog.Listener,
+                   SharedPreferences.OnSharedPreferenceChangeListener,
                    Preference.OnPreferenceClickListener
 {
     /** Listener interface for owning activity */
@@ -137,6 +139,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         Preference clearNotifsPref =
                 findPreference(Preferences.PREF_PASSWD_CLEAR_ALL_NOTIFS);
         clearNotifsPref.setOnPreferenceClickListener(this);
+        Preference clearAllSavedPref =
+                findPreference(Preferences.PREF_PASSWD_CLEAR_ALL_SAVED);
+        clearAllSavedPref.setOnPreferenceClickListener(this);
 
         itsRecordSortOrderPref = (ListPreference)
                 findPreference(Preferences.PREF_RECORD_SORT_ORDER);
@@ -256,6 +261,15 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             app.getNotifyMgr().clearAllNotifications(act);
             return true;
         }
+        case Preferences.PREF_PASSWD_CLEAR_ALL_SAVED: {
+            ConfirmPromptDialog dlg = ConfirmPromptDialog.newInstance(
+                    getString(R.string.clear_all_saved_passwords),
+                    getString(R.string.erase_all_saved_passwords),
+                    getString(R.string.clear), null);
+            dlg.setTargetFragment(this, 0);
+            dlg.show(getFragmentManager(), "clearSavedConfirm");
+            return true;
+        }
         }
         return false;
     }
@@ -277,6 +291,18 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             break;
         }
         }
+    }
+
+    @Override
+    public void promptCanceled(Bundle confirmArgs)
+    {
+    }
+
+    @Override
+    public void promptConfirmed(Bundle confirmArgs)
+    {
+        SavedPasswordsMgr passwdMgr = new SavedPasswordsMgr(getContext());
+        passwdMgr.removeAllSavedPasswords();
     }
 
     /**
