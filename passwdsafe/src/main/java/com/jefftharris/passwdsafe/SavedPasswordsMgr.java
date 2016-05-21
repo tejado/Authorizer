@@ -220,7 +220,7 @@ public final class SavedPasswordsMgr
         SharedPreferences prefs = getPrefs();
         prefs.edit()
              .putString(keyName, encStr)
-             .putString("iv_" + keyName, ivStr)
+             .putString(getIvPrefsKey(keyName), ivStr)
              .apply();
     }
 
@@ -230,7 +230,8 @@ public final class SavedPasswordsMgr
     public synchronized void removeSavedPassword(Uri fileUri)
     {
         String keyName = getPrefsKey(fileUri);
-        getPrefs().edit().remove(keyName).remove("iv_" + keyName).apply();
+        getPrefs().edit()
+                  .remove(keyName).remove(getIvPrefsKey(keyName)).apply();
         if (isAvailable()) {
             PasswdSafeUtil.dbginfo(TAG, "removeSavedPassword: %s", fileUri);
             try {
@@ -290,7 +291,7 @@ public final class SavedPasswordsMgr
             ciph.init(Cipher.ENCRYPT_MODE, key);
         } else {
             SharedPreferences prefs = getPrefs();
-            String ivStr = prefs.getString("iv_" + keyName, null);
+            String ivStr = prefs.getString(getIvPrefsKey(keyName), null);
             if (TextUtils.isEmpty(ivStr)) {
                 throw new IOException("Key IV not found for " + fileUri);
             }
@@ -325,6 +326,15 @@ public final class SavedPasswordsMgr
      */
     private String getPrefsKey(Uri uri)
     {
-        return "SavedPasswordsMgr_" + uri.toString();
+        return "key_" + uri.toString();
     }
+
+    /**
+     * Get the preferences key for the IV of an encryption key
+     */
+    private String getIvPrefsKey(String filePrefsKey)
+    {
+        return "iv_" + filePrefsKey;
+    }
+
 }
