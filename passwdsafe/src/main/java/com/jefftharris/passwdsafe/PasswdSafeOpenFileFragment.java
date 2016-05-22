@@ -439,7 +439,10 @@ public class PasswdSafeOpenFileFragment
             itsOpenTask = null;
             task.cancel(false);
         }
-        GuiUtils.setKeyboardVisible(itsPasswordEdit, getActivity(), false);
+        Context ctx = getContext();
+        if (ctx != null) {
+            GuiUtils.setKeyboardVisible(itsPasswordEdit, ctx, false);
+        }
         if (userCancel && itsListener != null) {
             itsListener.handleFileOpenCanceled();
         }
