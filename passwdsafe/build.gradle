@@ -1,3 +1,10 @@
+/*
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
+ */
 import org.apache.tools.ant.taskdefs.condition.Os
 
 apply plugin: 'com.android.application'
@@ -10,8 +17,8 @@ android {
         minSdkVersion 10
         resConfigs "de", "fr"
         targetSdkVersion 23
-        versionCode 60300
-        versionName "6.3.0"
+        versionCode 60400
+        versionName "6.4.0"
 
         ndk {
             moduleName "PasswdSafe"
