@@ -581,16 +581,19 @@ public class PasswdSafeOpenFileFragment
             itsOkBtn.performClick();
         } else {
             SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
-            Pair<Boolean, Integer> rc = getPasswdFileUri().isWritable();
-            if (rc.first) {
-                itsReadonlyCb.setChecked(
-                        Preferences.getFileOpenReadOnlyPref(prefs));
-            } else {
-                itsReadonlyCb.setChecked(true);
-                if (rc.second != null) {
-                    itsReadonlyCb.setText(String.format(
-                            "%s - %s", itsReadonlyCb.getText(),
-                            getString(rc.second)));
+            PasswdFileUri uri = getPasswdFileUri();
+            if (uri != null) {
+                Pair<Boolean, Integer> rc = uri.isWritable();
+                if (rc.first) {
+                    itsReadonlyCb.setChecked(
+                            Preferences.getFileOpenReadOnlyPref(prefs));
+                } else {
+                    itsReadonlyCb.setChecked(true);
+                    if (rc.second != null) {
+                        itsReadonlyCb.setText(String.format(
+                                "%s - %s", itsReadonlyCb.getText(),
+                                getString(rc.second)));
+                    }
                 }
             }
             itsYubikeyCb.setChecked(Preferences.getFileOpenYubikeyPref(prefs));
