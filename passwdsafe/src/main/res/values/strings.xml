@@ -343,6 +343,9 @@
           password_not_found, save_password_p, save_password_warning,
            file_open_help, key_error, clear_all_saved_passwords,
            erase_all_saved_passwords, no_fingerprints_registered -->
+        &lt;b&gt;6.4.0&lt;/b&gt; - Add option to save file passwords
+        protected by a fingerprint scan on Android 6.0 and higher.
+        \n\n
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n
