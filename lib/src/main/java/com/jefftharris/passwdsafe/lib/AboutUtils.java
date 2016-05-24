@@ -9,8 +9,10 @@ package com.jefftharris.passwdsafe.lib;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.content.res.AssetManager;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -18,11 +20,17 @@ import android.widget.ToggleButton;
 
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 /**
  * Utilities for about dialogs
  */
 public class AboutUtils
 {
+    private static final String TAG = "AboutUtils";
+
     /**
      * Update the fields of the about fragment
      */
@@ -70,5 +78,35 @@ public class AboutUtils
         });
         GuiUtils.setVisible(btn, !TextUtils.isEmpty(extraLicenseInfo));
         return name;
+    }
+
+    /**
+     * Get the licenses
+     */
+    public static String getLicenses(Context ctx, String... assets)
+    {
+        StringBuilder licenses = new StringBuilder();
+        AssetManager assetMgr = ctx.getResources().getAssets();
+        for (String asset: assets) {
+            licenses.append(asset).append(":\n");
+            try {
+                InputStream is = null;
+                try {
+                    is = assetMgr.open(asset);
+                    BufferedReader r =
+                            new BufferedReader(new InputStreamReader(is));
+                    String line;
+                    while ((line = r.readLine()) != null) {
+                        licenses.append(line).append("\n");
+                    }
+                } finally {
+                    Utils.closeStreams(is, null);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Can't load asset: " + asset, e);
+            }
+            licenses.append("\n\n\n");
+        }
+        return licenses.toString();
     }
 }
