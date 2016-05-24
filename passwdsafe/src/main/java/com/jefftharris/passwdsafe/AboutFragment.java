@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
-import com.jefftharris.passwdsafe.lib.AboutDialog;
+import com.jefftharris.passwdsafe.lib.AboutUtils;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.ObjectHolder;
@@ -89,7 +89,7 @@ public class AboutFragment extends Fragment
                                       "license-AndroidAssetStudio.txt",
                                       "license-RobotoMono.txt");
 
-        AboutDialog.updateAboutFields(rootView, licenses, getContext());
+        AboutUtils.updateAboutFields(rootView, licenses, getContext());
         itsFileDetailsGroup = rootView.findViewById(R.id.file_details_group);
         itsFile = (TextView)rootView.findViewById(R.id.file);
         itsPermissions = (TextView)rootView.findViewById(R.id.permissions);
