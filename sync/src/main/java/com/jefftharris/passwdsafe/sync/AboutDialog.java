@@ -56,7 +56,10 @@ public class AboutDialog extends AppCompatDialogFragment
         String licenses =
                 AboutUtils.getLicenses(getContext(), "license-PasswdSafe.txt",
                                        "license-android.txt",
-                                       "license-AndroidAssetStudio.txt") +
+                                       "license-AndroidAssetStudio.txt",
+                                       "license-box.txt",
+                                       "license-onedrive.txt",
+                                       "license-owncloud.txt") +
                 "\n\n" +
                 extraLicenseInfo;
         String name = AboutUtils.updateAboutFields(detailsView, licenses, act);
