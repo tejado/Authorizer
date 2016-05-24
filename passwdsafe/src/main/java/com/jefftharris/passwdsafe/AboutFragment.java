@@ -8,12 +8,10 @@
 package com.jefftharris.passwdsafe;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +20,9 @@ import android.widget.TextView;
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
 import com.jefftharris.passwdsafe.lib.AboutUtils;
-import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.ObjectHolder;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Locale;
 
 /**
@@ -47,8 +41,6 @@ public class AboutFragment extends Fragment
          */
         void updateViewAbout();
     }
-
-    private static final String TAG = "AboutFragment";
 
     private Listener itsListener;
     private View itsFileDetailsGroup;
@@ -84,10 +76,10 @@ public class AboutFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_about,
                                          container, false);
 
-        String licenses = getLicenses("license-PasswdSafe.txt",
-                                      "license-android.txt",
-                                      "license-AndroidAssetStudio.txt",
-                                      "license-RobotoMono.txt");
+        String licenses = AboutUtils.getLicenses(
+                getContext(), "license-PasswdSafe.txt",
+                "license-android.txt", "license-AndroidAssetStudio.txt",
+                "license-RobotoMono.txt");
 
         AboutUtils.updateAboutFields(rootView, licenses, getContext());
         itsFileDetailsGroup = rootView.findViewById(R.id.file_details_group);
@@ -160,33 +152,4 @@ public class AboutFragment extends Fragment
         itsListener = null;
     }
 
-    /**
-     * Get the licenses
-     */
-    private String getLicenses(String... assets)
-    {
-        StringBuilder licenses = new StringBuilder();
-        AssetManager assetMgr = getResources().getAssets();
-        for (String asset: assets) {
-            licenses.append(asset).append(":\n");
-            try {
-                InputStream is = null;
-                try {
-                    is = assetMgr.open(asset);
-                    BufferedReader r =
-                            new BufferedReader(new InputStreamReader(is));
-                    String line;
-                    while ((line = r.readLine()) != null) {
-                        licenses.append(line).append("\n");
-                    }
-                } finally {
-                    Utils.closeStreams(is, null);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Can't load asset: " + asset, e);
-            }
-            licenses.append("\n\n\n");
-        }
-        return licenses.toString();
-    }
 }
