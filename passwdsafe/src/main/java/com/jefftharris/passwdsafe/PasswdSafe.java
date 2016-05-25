@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -932,6 +932,18 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public void finishChangePassword()
     {
+        itsFileDataFrag.useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                Uri fileUri = fileData.getUri().getUri();
+                SavedPasswordsMgr savedMgr =
+                        new SavedPasswordsMgr(PasswdSafe.this);
+                savedMgr.removeSavedPassword(fileUri);
+            }
+        });
+
         finishEdit(true, true, null, null, null);
     }
 

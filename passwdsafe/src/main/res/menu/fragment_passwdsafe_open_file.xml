@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
   ~ All rights reserved. Use of the code is allowed under the
   ~ Artistic License 2.0 terms, as specified in the LICENSE file
   ~ distributed with this code, or available from
@@ -20,9 +20,9 @@
               android:title="@string/yubikey_slot_2"/>
     </group>
 
-    <item android:id="@+id/menu_yubi_help"
+    <item android:id="@+id/menu_file_open_help"
           android:title="@string/help"
           android:icon="@drawable/ic_action_help"
-          app:showAsAction="never"/>
+          app:showAsAction="ifRoom"/>
 
 </menu>
