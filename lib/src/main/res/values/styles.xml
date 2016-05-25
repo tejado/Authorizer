@@ -4,13 +4,13 @@
 
     <style name="GridLabel">
         <item name="android:layout_width">0dp</item>
-        <item name="layout_gravity">fill_horizontal</item>
+        <item name="android:layout_gravity">fill_horizontal</item>
         <item name="layout_columnWeight">2</item>
     </style>
 
     <style name="GridField">
         <item name="android:layout_width">0dp</item>
-        <item name="layout_gravity">fill_horizontal</item>
+        <item name="android:layout_gravity">fill_horizontal</item>
     </style>
 
     <style name="GridField.W3">
