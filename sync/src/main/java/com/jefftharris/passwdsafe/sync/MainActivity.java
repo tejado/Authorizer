@@ -37,11 +37,11 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.jefftharris.passwdsafe.lib.AboutUtils;
 import com.jefftharris.passwdsafe.lib.DynamicPermissionMgr;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
-import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.sync.dropbox.DropboxFilesActivity;
 import com.jefftharris.passwdsafe.sync.lib.AccountUpdateTask;
@@ -176,7 +176,9 @@ public class MainActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
-        ReleaseNotesDialog.checkNotes(this);
+        if (AboutUtils.checkShowNotes(this)) {
+            showAbout();
+        }
     }
 
     /* (non-Javadoc)
@@ -294,11 +296,7 @@ public class MainActivity extends AppCompatActivity
     {
         switch (item.getItemId()) {
         case R.id.menu_about: {
-            String extraLicenses = GoogleApiAvailability
-                    .getInstance()
-                    .getOpenSourceSoftwareLicenseInfo(this);
-            AboutDialog dlg = AboutDialog.newInstance(extraLicenses);
-            dlg.show(getSupportFragmentManager(), "AboutDialog");
+            showAbout();
             return true;
         }
         case R.id.menu_logs: {
@@ -964,6 +962,18 @@ public class MainActivity extends AppCompatActivity
     {
         MenuItem item = menu.findItem(id);
         item.setEnabled(providerUri == null);
+    }
+
+    /**
+     * Show the about dialog
+     */
+    private void showAbout()
+    {
+        String extraLicenses = GoogleApiAvailability
+                .getInstance()
+                .getOpenSourceSoftwareLicenseInfo(this);
+        AboutDialog dlg = AboutDialog.newInstance(extraLicenses);
+        dlg.show(getSupportFragmentManager(), "AboutDialog");
     }
 
     /** Dialog to prompt when an account is cleared */
