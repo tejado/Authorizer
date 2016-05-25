@@ -26,10 +26,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
+import com.jefftharris.passwdsafe.lib.AboutUtils;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
 import com.jefftharris.passwdsafe.lib.DynamicPermissionMgr;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.lib.ReleaseNotesDialog;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 
@@ -135,7 +135,7 @@ public class FileListActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
-        if (ReleaseNotesDialog.checkShowNotes(this)) {
+        if (AboutUtils.checkShowNotes(this)) {
             showAbout();
         }
     }
