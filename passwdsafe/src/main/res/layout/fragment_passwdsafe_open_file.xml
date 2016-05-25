@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
   ~ All rights reserved. Use of the code is allowed under the
   ~ Artistic License 2.0 terms, as specified in the LICENSE file
   ~ distributed with this code, or available from
@@ -17,6 +17,8 @@
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
+                  android:focusable="true"
+                  android:focusableInTouchMode="true"
                   android:orientation="vertical">
 
         <TextView android:id="@+id/file"
@@ -30,18 +32,17 @@
             android:id="@+id/passwd_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText android:id="@+id/passwd_edit"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:gravity="fill_horizontal"
-                      android:hint="@string/password"
-                      android:imeOptions="actionGo"
-                      android:inputType="textPassword"
-                      android:scrollHorizontally="true"
-                      android:singleLine="true"
-                      android:textAppearance="?android:attr/textAppearanceMedium">
-                <requestFocus/>
-            </EditText>
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/passwd_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="fill_horizontal"
+                android:hint="@string/password"
+                android:imeOptions="actionGo"
+                android:inputType="textPassword"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:textAppearance="?android:attr/textAppearanceMedium"/>
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout android:layout_width="match_parent"
@@ -51,6 +52,7 @@
             <CheckBox android:id="@+id/read_only"
                       android:layout_width="0dp"
                       android:layout_height="wrap_content"
+                      android:layout_gravity="center_vertical"
                       android:layout_weight="1"
                       android:checked="true"
                       android:text="@string/read_only_file"/>
@@ -58,6 +60,7 @@
             <CheckBox android:id="@+id/save_password"
                       android:layout_width="0dp"
                       android:layout_height="wrap_content"
+                      android:layout_gravity="center_vertical"
                       android:layout_weight="1"
                       android:checked="false"
                       android:text="@string/save_password"/>
@@ -79,11 +82,13 @@
                   android:drawableStart="@drawable/ic_fingerprint"
                   android:gravity="center_vertical"/>
 
-        <TextView android:id="@+id/yubi_help_text"
+        <TextView android:id="@+id/file_open_help_text"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:text="@string/yubikey_help"
-                  android:textAppearance="?android:attr/textAppearanceMedium"/>
+                  android:text="@string/file_open_help"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textColor="?android:attr/textColorPrimaryNoDisable"
+                  android:textSize="16sp"/>
 
         <LinearLayout android:layout_width="fill_parent"
                       android:layout_height="wrap_content"

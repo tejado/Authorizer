@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="add">Add</string>
     <string name="add_policy">Add Policy</string>
@@ -21,6 +28,7 @@
     <string name="choose_record">Choose Record</string>
     <string name="choose_type">Choose Type</string>
     <string name="clear">Clear</string>
+    <string name="clear_all_saved_passwords">Clear all saved passwords</string>
     <string name="clear_clipboard_on_close">Clear clipboard on close</string>
     <string name="clear_password_notifications">Clear password notifications</string>
     <string name="clear_recent">Clear Recent</string>
@@ -78,6 +86,7 @@
     <string name="enable">Enable</string>
     <string name="enabled">Enabled</string>
     <string name="erase_all_expiration_notifications">Erase all password expiration notifications and tracked files</string>
+    <string name="erase_all_saved_passwords">Erase all saved passwords and keys</string>
     <string name="expiration">Expiration</string>
     <string name="expiration_notifications">Expiration Notifications</string>
     <string name="expiration_notifications_warning">Enabling expiration notifications requires PasswdSafe to store expiration information for the file (record title, group, and expiration date).  This information is stored unencrypted on the device.  No passwords are stored.</string>
@@ -90,6 +99,41 @@
     <string name="file">File</string>
     <string name="file_name">File Name</string>
     <string name="file_not_found_perm_denied">File not found or permission denied</string>
+    <string name="file_open_help">
+        File passwords can be saved on devices with a fingerprint scanner and
+        Android 6.0 or higher.  The passwords are encrypted using AES-256
+        keys that are protected by a fingerprint scan.
+        \n
+        - To save a password, first ensure a fingerprint is registered
+        with the device in the security settings.  Then, check the save option,
+        enter the password, and click OK. After the password is verified,
+        scan a fingerprint when prompted. The password will be encrypted and
+        saved, and the file will open.
+        \n
+        - To use a saved password, scan a fingerprint instead of entering a
+        password.  If the scan is successful, the password is decrypted and
+        used to open the file.  If a YubiKey is used, the key will be read
+        after the fingerprint is scanned.
+        \n
+        - To remove a saved password, uncheck the save option and open the file.
+        The saved password will be erased from the device.  All saved
+        passwords can be removed from the password preferences.
+        \n
+        \nTo use a YubiKey NEO, follow these steps:\n
+        - Enable NFC support in the device settings\n
+        - Enter the user password to the file\n
+        - Choose which slot on the YubiKey has the challenge-response key.
+        Usually slot 2 is used for Password Safe.\n
+        - Check the YubiKey option\n
+        - Click OK\n
+        - Within 30 seconds, press the YubiKey to the back of the phone or
+        tablet.  There will be sounds as the key is being read.  If the device
+        doesn\'t respond with a rising tone, try moving the key around.  A bit
+        of trial-and-error is needed to find the correct location.  The button
+        on the YubiKey itself does not need to be pressed.\n
+        - Once the key is found, it will be used to authenticate with your
+        password.  The file will open automatically.
+    </string>
     <string name="file_operations">File Operations…</string>
     <string name="file_password_encoding">File password encoding</string>
     <string name="files">Files</string>
@@ -117,9 +161,11 @@
     <string name="invalid_length">Invalid length</string>
     <string name="invalid_option_length">Invalid option length</string>
     <string name="invalid_password">Invalid password</string>
+    <string name="key_error">Key error for %1$s: %2$s</string>
+    <string name="key_not_found">Key not found for $1%s</string>
     <string name="kitkat_sdcard_warning">
         %1$s
-        \n\nOn Android KitKat and higher, apps are prevented from writing to 
+        \n\nOn Android KitKat and higher, apps are prevented from writing to
         removable SD cards.  If the file is located on a card, it will have to
         be moved to the internal storage.
     </string>
@@ -168,6 +214,7 @@
         \n\nThe previous file chooser is enabled in the Preferences as the
         legacy file chooser.
     </string>
+    <string name="no_fingerprints_registered">No fingerprints are registered</string>
     <string name="no_groups">No Groups</string>
     <string name="no_shortcut_chosen">No shortcut chosen</string>
     <string name="no_policies">No Policies</string>
@@ -192,6 +239,8 @@
     <string name="password_file">Password file</string>
     <string name="password_header">PASSWORD</string>
     <string name="password_len_short_opt">Password length too short for options</string>
+    <string name="password_loaded">Password loaded</string>
+    <string name="password_not_found">Password not found for %1$s</string>
     <string name="password_policy">Password Policy</string>
     <string name="password_policies">Password Policies</string>
     <string name="password_record">Password record</string>
@@ -238,6 +287,13 @@
     <string name="recurring">Recurring</string>
     <string name="save">Save</string>
     <string name="save_password">Save password</string>
+    <string name="save_password_p">Save password?</string>
+    <string name="save_password_warning">
+        After the file is opened, the entered password will be saved locally.
+        The password is encrypted with an AES-256 key that is protected by a
+        fingerprint scan.  The fingerprint scan may not be as secure as the file
+        password itself.
+    </string>
     <string name="saving_file">Saving %s…</string>
     <string name="search">Search</string>
     <string name="search_hint">Search PasswdSafe</string>
@@ -257,6 +313,7 @@
     <string name="times_header">TIMES</string>
     <string name="title">Title</string>
     <string name="touch_sensor_to_save_the_password">Touch sensor to save the password</string>
+    <string name="touch_sensor_to_load_saved_password">Touch sensor to load saved password</string>
     <string name="unknown_sync_file">Unknown sync file</string>
     <string name="unprotect_all">Unprotect All Records</string>
     <string name="unprotect_group">Unprotect Group Records</string>
@@ -275,29 +332,20 @@
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
     <string name="yubikey_error">Error communicating with the YubiKey</string>
-    <string name="yubikey_help">
-        To use a YubiKey NEO, follow these steps:\n
-        - Enable NFC support in the device settings\n
-        - Enter the user password to the file\n
-        - Choose which slot on the YubiKey has the challenge-response key.
-        Usually slot 2 is used for Password Safe.\n
-        - Check the YubiKey option\n
-        - Click OK\n
-        - Within 30 seconds, press the YubiKey to the back of the phone or
-        tablet.  There will be sounds as the key is being read.  If the device
-        doesn\'t respond with a rising tone, try moving the key around.  A bit
-        of trial-and-error is needed to find the correct location.  The button
-        on the YubiKey itself does not need to be pressed.\n
-        - Once the key is found, it will be used to authenticate with your
-        password.  The file will open automatically.
-    </string>
     <string name="yubikey_slot_1">YubiKey Slot 1</string>
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
         <!-- TODO: yubikey_help, save_password translation,
         password_save_canceled_key_error, fingerprint_not_recognized,
-         password_saved, touch_sensor_to_save_the_password, canceled -->
+         password_saved, touch_sensor_to_save_the_password, canceled,
+          touch_sensor_to_load_saved_password, password_loaded, key_not_found
+          password_not_found, save_password_p, save_password_warning,
+           file_open_help, key_error, clear_all_saved_passwords,
+           erase_all_saved_passwords, no_fingerprints_registered -->
+        &lt;b&gt;6.4.0&lt;/b&gt; - Add option to save file passwords
+        protected by a fingerprint scan on Android 6.0 and higher.
+        \n\n
         &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
         keyboard keys for password entry.  Support cycling between keyboards.
         \n\n
@@ -477,7 +525,7 @@
         <item>In Two Weeks</item>
         <item>In a Month</item>
         <item>In a Year</item>
-     </string-array>
+    </string-array>
 
     <!-- Order must match constants in PasswdExpiration.Type -->
     <string-array name="expire_type">

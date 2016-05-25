@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2014 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -69,6 +69,7 @@ public class PasswdSafeListFragment extends ListFragment
         void updateViewList(PasswdLocation location);
     }
 
+    private static final String STATE_SELECTED_RECORD = "selectedRecord";
 
     private Mode itsMode = Mode.NONE;
     private PasswdLocation itsLocation;
@@ -78,6 +79,7 @@ public class PasswdSafeListFragment extends ListFragment
     private TextView itsGroupLabel;
     private TextView itsEmptyText;
     private ItemListAdapter itsAdapter;
+    private String itsSelectedRecord;
 
     /** Create a new instance */
     public static PasswdSafeListFragment newInstance(
@@ -112,6 +114,11 @@ public class PasswdSafeListFragment extends ListFragment
         }
         itsLocation = location;
         itsIsContents = isContents;
+
+        if (savedInstanceState != null) {
+            itsSelectedRecord =
+                    savedInstanceState.getString(STATE_SELECTED_RECORD);
+        }
     }
 
 
@@ -173,6 +180,13 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_SELECTED_RECORD, itsSelectedRecord);
+    }
+
+    @Override
     public void onDetach()
     {
         super.onDetach();
@@ -214,6 +228,7 @@ public class PasswdSafeListFragment extends ListFragment
             final PasswdRecordListData listItem =
                     itsAdapter.getItem(info.position);
             if (listItem.itsIsRecord) {
+                itsSelectedRecord = listItem.itsUuid;
                 itsListener.copyField(
                         (item.getItemId() == R.id.menu_copy_password) ?
                         CopyField.PASSWORD : CopyField.USER_NAME,
@@ -234,6 +249,7 @@ public class PasswdSafeListFragment extends ListFragment
     {
         PasswdRecordListData item = itsAdapter.getItem(position);
         if (item.itsIsRecord) {
+            itsSelectedRecord = item.itsUuid;
             itsListener.changeLocation(itsLocation.selectRecord(item.itsUuid));
         } else {
             itsListener.changeLocation(itsLocation.selectGroup(item.itsTitle));
@@ -321,7 +337,8 @@ public class PasswdSafeListFragment extends ListFragment
                                List<PasswdRecordListData> data)
     {
         int selPos = itsAdapter.setData(
-                data, itsIsContents ? null : itsLocation.getRecord());
+                data,
+                itsIsContents ? itsSelectedRecord : itsLocation.getRecord());
         if (isResumed()) {
             ListView list = getListView();
             if (selPos != -1) {

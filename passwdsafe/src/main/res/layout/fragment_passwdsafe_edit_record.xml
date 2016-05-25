@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
   ~ All rights reserved. Use of the code is allowed under the
   ~ Artistic License 2.0 terms, as specified in the LICENSE file
   ~ distributed with this code, or available from
@@ -74,14 +74,15 @@
             android:id="@+id/title_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <EditText android:id="@+id/title"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:hint="@string/title"
-                      android:inputType="textCapSentences|textAutoCorrect"
-                      android:singleLine="true"/>
-
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/title"
+                android:inputType="textCapSentences|textAutoCorrect"
+                android:singleLine="true">
+                <requestFocus/>
+            </android.support.design.widget.TextInputEditText>
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout android:layout_width="match_parent"
@@ -120,42 +121,39 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <EditText android:id="@+id/user"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:hint="@string/username"
-                      android:inputType="textNoSuggestions"
-                      android:singleLine="true"/>
-
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/user"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/username"
+                android:inputType="textNoSuggestions"
+                android:singleLine="true"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/url_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <EditText android:id="@+id/url"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:hint="@string/url"
-                      android:inputType="textUri"
-                      android:singleLine="true"/>
-
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/url"
+                android:inputType="textUri"
+                android:singleLine="true"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/email_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <EditText android:id="@+id/email"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:hint="@string/email"
-                      android:inputType="textEmailAddress"
-                      android:singleLine="true"/>
-
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:singleLine="true"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password fields -->
@@ -202,12 +200,13 @@
                     android:id="@+id/password_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <EditText android:id="@+id/password"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:hint="@string/password"
-                              android:inputType="textPassword"
-                              android:singleLine="true"/>
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/password"
+                        android:inputType="textPassword"
+                        android:singleLine="true"/>
                 </android.support.design.widget.TextInputLayout>
 
                 <ImageView android:id="@+id/password_visibility"
@@ -239,12 +238,13 @@
                 android:id="@+id/password_confirm_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <EditText android:id="@+id/password_confirm"
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:hint="@string/confirm"
-                          android:inputType="textPassword"
-                          android:singleLine="true"/>
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/password_confirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/confirm"
+                    android:inputType="textPassword"
+                    android:singleLine="true"/>
             </android.support.design.widget.TextInputLayout>
 
             <!-- Password policy -->
@@ -333,12 +333,13 @@
                         android:id="@+id/expire_interval_val_input"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
-                        <EditText android:id="@+id/expire_interval_val"
-                                  android:layout_width="match_parent"
-                                  android:layout_height="wrap_content"
-                                  android:hint="@string/days"
-                                  android:inputType="number"
-                                  android:minWidth="64dp"/>
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/expire_interval_val"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/days"
+                            android:inputType="number"
+                            android:minWidth="64dp"/>
                     </android.support.design.widget.TextInputLayout>
 
                     <CheckBox android:id="@+id/expire_interval_recurring"
@@ -395,13 +396,14 @@
                     android:layout_marginStart="8dp"
                     android:layout_toEndOf="@+id/history_enabled"
                     android:layout_toRightOf="@+id/history_enabled">
-                    <EditText android:id="@+id/history_max_size"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:hint="@string/max_size"
-                              android:inputType="number"
-                              android:minWidth="100dip"
-                              android:singleLine="false"/>
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/history_max_size"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/max_size"
+                        android:inputType="number"
+                        android:minWidth="100dip"
+                        android:singleLine="false"/>
                 </android.support.design.widget.TextInputLayout>
 
                 <ListView android:id="@+id/history"

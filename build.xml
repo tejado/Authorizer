@@ -2,7 +2,7 @@
 
 <project name="PasswdSafe" basedir=".">
     <target name="hg-push">
-        <do-hg-push dest=""/>
+        <do-hg-push dest="default"/>
         <do-hg-push dest="win"/>
         <do-hg-push dest="sf"/>
         <do-hg-push dest="bb"/>
