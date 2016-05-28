@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="boxsdk_alert_dialog_cancel" description="">Abbrechen</string>
+    <string name="boxsdk_alert_dialog_ok" description="">Senden</string>
+    <string name="boxsdk_alert_dialog_password" description="">Kennwort</string>
+    <string name="boxsdk_alert_dialog_text_entry" description="">Diese Website oder Anwendung erfordert eine Authentifizierung.</string>
+    <string name="boxsdk_alert_dialog_username" description="">Benutzername</string>
+    <string name="boxsdk_title_activity_oauth">OAuthActivity</string>
+    <string name="boxsdk_Select">Auswählen</string>
+    <string name="boxsdk_Cancel">Abbrechen</string>
+    <string name="boxsdk_Please_wait">Bitte warten …</string>
+    <string name="boxsdk_Create_folder">Ordner erstellen</string>
+    <string name="boxsdk_Authenticating">Authentifizierung läuft</string>
+    <string name="boxsdk_Authentication_fail">Authentifizierung fehlgeschlagen</string>
+    <string name="boxsdk_Authentication_cancelled">Authentifizierung abgebrochen</string>
+    <string name="boxsdk_Authentication_fail_url_mismatch">Die Umleitungs-URL ist ungültig.</string>
+    <string name="boxsdk_details">Details</string>
+
+    <string name="boxsdk_ssl_error_warning_DATE_INVALID">Das Datum des Zertifikats ist ungültig.</string>
+    <string name="boxsdk_ssl_error_warning_EXPIRED">Das Zertifikat ist abgelaufen.</string>
+    <string name="boxsdk_ssl_error_warning_ID_MISMATCH">Hostname stimmt nicht überein.</string>
+    <string name="boxsdk_ssl_error_warning_INVALID">Ein allgemeiner Fehler ist aufgetreten.</string>
+    <string name="boxsdk_ssl_error_warning_NOT_YET_VALID">Das Zertifikat ist noch nicht gültig.</string>
+    <string name="boxsdk_ssl_error_warning_UNTRUSTED">Der Aussteller des Zertifikats ist nicht vertrauenswürdig.</string>
+    <string name="boxsdk_ssl_should_not_proceed">Sie sollten nicht fortfahren, vor allem nicht, wenn Sie diese Warnung für diese Website zum allerersten Mal sehen.</string>
+    
+    <string name="boxsdk_Security_Warning">Sicherheitswarnung</string>
+    <string name="boxsdk_There_are_problems_with_the_security_certificate_for_this_site">Es gibt Probleme mit dem Sicherheitszertifikat für diese Website.</string>
+    
+    <string name="boxsdk_Continue">Weiter</string>
+    <string name="boxsdk_Go_back">Zurück</string>
+
+    <string name="boxsdk_Select_an_account_to_use">Zu verwendendes Konto auswählen</string>
+    <string name="boxsdk_Use_a_different_account">Anderes Konto verwenden</string>
+
+</resources>

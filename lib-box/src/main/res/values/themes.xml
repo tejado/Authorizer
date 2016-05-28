@@ -1,0 +1,31 @@
+<resources>
+   
+    <style name="Theme.BoxSdk.DialogNoTitle"  parent="android:style/Theme.Dialog">
+           <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.BoxSdk" parent="android:TextAppearance">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textColorHint">?android:textColorHint</item>
+        <item name="android:textColorHighlight">?android:textColorHighlight</item>
+        <item name="android:textColorLink">?android:textColorLink</item>
+        <item name="android:textSize">@dimen/box_body_material</item>
+    </style>
+
+    <style name="Theme.BoxSdk.Title" parent="Theme.BoxSdk">
+        <item name="android:textSize">@dimen/box_text_size_title_material</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+    </style>
+
+    <style name="Theme.BoxSdk.Subhead"  parent="Theme.BoxSdk">
+        <item name="android:textSize">@dimen/box_text_size_subhead_material</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+
+    </style>
+
+    <style name="Theme.BoxSdk.Body" parent="Theme.BoxSdk">
+        <item name="android:textSize">@dimen/box_body_material</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+    </style>
+
+</resources>

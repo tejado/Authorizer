@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources>
+    <attr name="cardViewStyle" format="reference"/>
+    <attr name="navViewStyle" format="reference"/>
+
+    <attr name="drawableActionHome" format="reference"/>
+    <attr name="drawableActionNavigationMoreVert" format="reference"/>
+    <attr name="drawableActionNewPassword" format="reference"/>
+    <attr name="drawableActionVisibility" format="reference"/>
+    <attr name="drawableCloseCancel" format="reference"/>
+    <attr name="drawableFolder" format="reference"/>
+    <attr name="drawableFolderUp" format="reference"/>
+    <attr name="drawablePasswdsafe" format="reference"/>
+    <attr name="drawablePersonOutline" format="reference"/>
+
+    <attr name="textColorGreen" format="reference"/>
+</resources>
