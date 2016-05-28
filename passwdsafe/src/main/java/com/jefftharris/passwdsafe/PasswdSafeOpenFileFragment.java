@@ -139,9 +139,6 @@ public class PasswdSafeOpenFileFragment
     private static final String STATE_SLOT = "slot";
     private static final String TAG = "PasswdSafeOpenFileFragment";
 
-    // TODO: translations
-    // TODO: Use pattern/password if no fingerprint available?
-
     /**
      * Create a new instance
      */
