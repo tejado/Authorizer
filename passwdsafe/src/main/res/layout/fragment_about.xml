@@ -81,60 +81,7 @@
 
         </android.support.v7.widget.GridLayout>
 
-        <android.support.v7.widget.GridLayout android:layout_width="match_parent"
-                                              android:layout_height="wrap_content"
-                                              app:columnCount="2"
-                                              app:useDefaultMargins="true">
-
-            <TextView android:text="@string/version"
-                      android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-            <TextView android:id="@+id/version"
-                      style="@style/GridField"
-                      android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-            <TextView android:text="@string/build_id"/>
-
-            <TextView android:id="@+id/build_id"
-                      style="@style/GridField"/>
-
-            <TextView android:text="@string/build_date"/>
-
-            <TextView android:id="@+id/build_date"
-                      style="@style/GridField"/>
-
-        </android.support.v7.widget.GridLayout>
-
-        <TextView android:id="@+id/release_notes_title"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_marginLeft="4dp"
-                  android:layout_marginRight="4dp"
-                  android:layout_marginTop="4dp"
-                  android:text="@string/release_notes_title"
-                  android:textAppearance="?android:attr/textAppearanceLarge"/>
-
-        <TextView android:id="@+id/release_notes"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_marginLeft="4dp"
-                  android:layout_marginRight="4dp"
-                  android:text="@string/release_notes"
-                  android:textAppearance="?android:attr/textAppearanceSmall"/>
-
-        <ToggleButton android:id="@+id/toggle_license"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textOff="@string/licenses"
-                      android:textOn="@string/licenses"/>
-        
-        <TextView android:id="@+id/license"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_marginLeft="4dp"
-                  android:layout_marginRight="4dp"
-                  android:textAppearance="?android:attr/textAppearanceSmall"
-                  android:visibility="gone"/>
+        <include layout="@layout/fragment_about_common"/>
 
     </LinearLayout>
 
