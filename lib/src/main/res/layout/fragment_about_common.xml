@@ -14,19 +14,22 @@
                                           app:columnCount="2"
                                           app:useDefaultMargins="true">
 
-        <TextView android:text="@string/version"
+        <TextView style="@style/GridLabelFixed"
+                  android:text="@string/version"
                   android:textAppearance="?android:attr/textAppearanceLarge"/>
 
         <TextView android:id="@+id/version"
                   style="@style/GridField"
                   android:textAppearance="?android:attr/textAppearanceMedium"/>
 
-        <TextView android:text="@string/build_id"/>
+        <TextView style="@style/GridLabelFixed"
+                  android:text="@string/build_id"/>
 
         <TextView android:id="@+id/build_id"
                   style="@style/GridField"/>
 
-        <TextView android:text="@string/build_date"/>
+        <TextView style="@style/GridLabelFixed"
+                  android:text="@string/build_date"/>
 
         <TextView android:id="@+id/build_date"
                   style="@style/GridField"/>
