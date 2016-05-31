@@ -276,8 +276,7 @@ public class PasswdHistory
             super(ctx, R.layout.passwd_history_list_item, entries);
             itsIsEnabled = enabled;
             itsHasContextMenu = hasContextMenu;
-            itsInflater = (LayoutInflater)ctx.getSystemService(
-                    Context.LAYOUT_INFLATER_SERVICE);
+            itsInflater = LayoutInflater.from(ctx);
         }
 
         @Override
