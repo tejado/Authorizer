@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="boxsdk_alert_dialog_cancel" description="">İptal Et</string>
+    <string name="boxsdk_alert_dialog_ok" description="">Gönder</string>
+    <string name="boxsdk_alert_dialog_password" description="">Parola</string>
+    <string name="boxsdk_alert_dialog_text_entry" description="">Bu web sitesi veya uygulama, doğrulama bekliyor.</string>
+    <string name="boxsdk_alert_dialog_username" description="">Kullanıcı Adı</string>
+    <string name="boxsdk_title_activity_oauth">OAuthActivity</string>
+    <string name="boxsdk_Select">Seç</string>
+    <string name="boxsdk_Cancel">İptal Et</string>
+    <string name="boxsdk_Please_wait">Lütfen bekleyin...</string>
+    <string name="boxsdk_Create_folder">Klasör oluştur</string>
+    <string name="boxsdk_Authenticating">Doğrulanıyor</string>
+    <string name="boxsdk_Authentication_fail">Doğrulama Başarısız</string>
+    <string name="boxsdk_Authentication_cancelled">Doğrulama İptal Edildi</string>
+    <string name="boxsdk_Authentication_fail_url_mismatch">Yeniden yönlendirme url\'si geçerli değil</string>
+    <string name="boxsdk_details">Ayrıntılar</string>
+
+    <string name="boxsdk_ssl_error_warning_DATE_INVALID">Sertifikanın tarihi geçersiz.</string>
+    <string name="boxsdk_ssl_error_warning_EXPIRED">Sertifika sona erdi.</string>
+    <string name="boxsdk_ssl_error_warning_ID_MISMATCH">Ana bilgisayar adı eşleşmiyor.</string>
+    <string name="boxsdk_ssl_error_warning_INVALID">Kümesel hata oluştu.</string>
+    <string name="boxsdk_ssl_error_warning_NOT_YET_VALID">Sertifika henüz geçerli değil.</string>
+    <string name="boxsdk_ssl_error_warning_UNTRUSTED">Sertifika yetkilisine güvenilmiyor.</string>
+    <string name="boxsdk_ssl_should_not_proceed">Özellikle, bu sitede bu uyarıyı daha önce görmediyseniz devam etmemelisiniz.</string>
+    
+    <string name="boxsdk_Security_Warning">Güvenlik Uyarısı</string>
+    <string name="boxsdk_There_are_problems_with_the_security_certificate_for_this_site">Bu sitenin güvenlik sertifikasında sorunlar var.</string>
+    
+    <string name="boxsdk_Continue">Devam et</string>
+    <string name="boxsdk_Go_back">Geri dön</string>
+
+    <string name="boxsdk_Select_an_account_to_use">Kullanılacak hesabı seç</string>
+    <string name="boxsdk_Use_a_different_account">Farklı bir hesap seç</string>
+
+</resources>

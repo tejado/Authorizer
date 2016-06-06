@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="boxsdk_alert_dialog_cancel" description="">取消</string>
+    <string name="boxsdk_alert_dialog_ok" description="">送出</string>
+    <string name="boxsdk_alert_dialog_password" description="">密碼</string>
+    <string name="boxsdk_alert_dialog_text_entry" description="">此網站或應用程式需要驗證。</string>
+    <string name="boxsdk_alert_dialog_username" description="">使用者名稱</string>
+    <string name="boxsdk_title_activity_oauth">OAuthActivity</string>
+    <string name="boxsdk_Select">選擇</string>
+    <string name="boxsdk_Cancel">取消</string>
+    <string name="boxsdk_Please_wait">請稍候…</string>
+    <string name="boxsdk_Create_folder">建立資料夾</string>
+    <string name="boxsdk_Authenticating">驗證中</string>
+    <string name="boxsdk_Authentication_fail">驗證失敗</string>
+    <string name="boxsdk_Authentication_cancelled">驗證取消</string>
+    <string name="boxsdk_Authentication_fail_url_mismatch">重新導向 URL 無效</string>
+    <string name="boxsdk_details">詳細資訊</string>
+
+    <string name="boxsdk_ssl_error_warning_DATE_INVALID">憑證日期無效。</string>
+    <string name="boxsdk_ssl_error_warning_EXPIRED">憑證已到期。</string>
+    <string name="boxsdk_ssl_error_warning_ID_MISMATCH">主機名稱不符。</string>
+    <string name="boxsdk_ssl_error_warning_INVALID">發生一般性錯誤。</string>
+    <string name="boxsdk_ssl_error_warning_NOT_YET_VALID">憑證尚未生效。</string>
+    <string name="boxsdk_ssl_error_warning_UNTRUSTED">憑證發行者不是受信任的來源。</string>
+    <string name="boxsdk_ssl_should_not_proceed">請勿繼續執行，尤其是當您從未在此網站上看過此警告時。</string>
+    
+    <string name="boxsdk_Security_Warning">安全警告</string>
+    <string name="boxsdk_There_are_problems_with_the_security_certificate_for_this_site">此網站的安全憑證發生問題。</string>
+    
+    <string name="boxsdk_Continue">繼續</string>
+    <string name="boxsdk_Go_back">返回</string>
+
+    <string name="boxsdk_Select_an_account_to_use">選擇要使用的帳戶</string>
+    <string name="boxsdk_Use_a_different_account">選擇其他帳戶</string>
+
+</resources>
