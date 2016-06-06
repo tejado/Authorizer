@@ -102,24 +102,25 @@
     <string name="file_not_found_perm_denied">Datei nicht gefunden oder keine Berechtigung</string>
     <string name="file_open_help">
         Dateipasswörter können auf dem Gerät gespeichert werden, wenn ein
-        Fingerabdrucksensor und Android 6.0 oder besser vorhanden ist. Die
-        Passwörter werden mit AES-256 verschlüsselt und per Fingerabdruck
-        gesichert.
+        Fingerabdrucksensor und Android 6.0 oder höher vorhanden sind. Die
+        Passwörter werden mittels AES-256-Schlüssel verschlüsselt, welcher
+        per Fingerabdruck gesichert wird.
         \n
-        - Um ein Passwort zu speichern, muss ein Fingerabdruck auf dem Gerät
-        registriert sein. Dann kann die Speicheroption aktiviert werden, das
-        Passwort wird abgefragt und bei Bestätigung verschlüsselt auf dem
-        Gerät gespeichert.
+        - Um ein Passwort zu speichern, muss ein Fingerabdruck in den Sicherheits-
+        Einstellungen auf dem Gerät registriert sein. Setze danach das Häkchen bei
+        \"Passwort speichern\", gib das Passwort ein und bestätige mit OK. Nachdem
+        das Passwort überprüft wurde, wird nach dem Fingerabdruck gefragt.
+        Das Passwort wird verschlüsselt gespeichert und die Datei wird geöffnet.
         \n
         - Um ein gespeichertes Passwort zu nutzen, einfach beim Öffnen einer
-        Passwortdatei den Fingerabdruckssensor berühren statt das Passwort
-        eingeben. Wenn ein YubiKey zum Einsatz kommt, wird dieser nach dem
+        Passwortdatei den Fingerabdrucksensor berühren anstatt das Passwort
+        einzugeben. Wenn ein YubiKey zum Einsatz kommt, wird dieser nach dem
         Fingerabdruck gelesen.
         \n
-        - Um ein gespeichertes Passwort zu entfernen, die entsprechende
-        Option in den Einstellungen ändern und die Datei öffnen. Das Passwort
-        wird auf dem Gerät gelöscht. Alle gespeicherten Passwörter können in
-        den Einstellungen entfernt werden.
+        - Um ein gespeichertes Passwort zu löschen, das Häkchen bei \"Passwort
+        speichern\" entfernen und die Datei wie gewohnt mit Eingabe des Passworts
+        öffnen. Das Passwort wird auf dem Gerät gelöscht. In den Einstellungen
+        können zusätzlich alle gespeicherten Passwörter auf einmal entfernt werden.
         \n
         \nUm YubiKey mit PasswdSafe zu benutzen, befolgen bitte Sie
         folgende Schritte:\n
@@ -212,7 +213,7 @@
         im Menü den internen Speicher und/oder die SD-Karte einblenden.
         \n\nDie alte Dateiauswahl können Sie in den Einstellungen aktivieren.
     </string>
-    <string name="no_fingerprints_registered">Kein Fingerabdruck registriert</string>
+    <string name="no_fingerprints_registered">Keine Fingerabdrücke registriert</string>
     <string name="no_groups">Keine Gruppen</string>
     <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
     <string name="no_policies">Keine Regeln</string>
@@ -242,7 +243,7 @@
     <string name="password_policy">Passwortregel</string>
     <string name="password_policies">Passwortregeln</string>
     <string name="password_record">Passworteintrag</string>
-    <string name="password_save_canceled_key_error">Passwortspeicherung abgebrochen. Konnte kein Verschlüsselungsschlüssel erstellen: %1$s</string>
+    <string name="password_save_canceled_key_error">Speichern des Passworts abgebrochen. Verschlüsselungsschlüssel konnte nicht erstellt werden: %1$s</string>
     <string name="password_saved">Passwort gespeichert</string>
     <string name="password_times_header">PASSWORTZEITEN</string>
     <string name="password_with_expiration">Passwort mit Ablaufdatum</string>
@@ -284,13 +285,14 @@
     <string name="remove">Entfernen</string>
     <string name="recurring">Wiederkehrend</string>
     <string name="save">Speichern</string>
-    <string name="save_password">Speichere Passwort</string>
+    <string name="save_password">Passwort speichern</string>
     <string name="save_password_p">Passwort speichern?</string>
     <string name="save_password_warning">
-        Nach dem die Datei geöffnet wurde, wird das Passwort lokal
+        Nachdem die Datei geöffnet wurde, wird das Passwort lokal
         gespeichert und mit einem AES-256-Schlüssel verschlüsselt. Dieser ist
-        mit dem Fingerabdruck geschützt. Dies kann unsicherer als das
-        Dateipasswort sein.
+        mit dem Fingerabdruck geschützt. Das Benutzen des Fingerabdrucksensors
+        kann unter Umständen unsicherer als das Verwenden des Dateipassworts
+        selbst sein.
     </string>
     <string name="saving_file">Speichere %s …</string>
     <string name="search">Suchen</string>
@@ -310,8 +312,8 @@
     <string name="sync">Synchronisieren</string>
     <string name="times_header">ZEITEN</string>
     <string name="title">Titel</string>
-    <string name="touch_sensor_to_save_the_password">Berühre Sensor um das Passwort zu speichern</string>
-    <string name="touch_sensor_to_load_saved_password">Berühre Sensor um das Passwort zu laden</string>
+    <string name="touch_sensor_to_save_the_password">Sensor berühren um das Passwort zu speichern</string>
+    <string name="touch_sensor_to_load_saved_password">Sensor berühren um das Passwort zu laden</string>
     <string name="unknown_sync_file">Unbekannte Synchronisations-Datei</string>
     <string name="unprotect_all">Alle Einträge freigeben</string>
     <string name="unprotect_group">Gruppe freigeben</string>
@@ -335,7 +337,7 @@
 
     <string name="release_notes">
         &lt;b&gt;6.4.0&lt;/b&gt; - Option für das Speichern von
-        fingerabdruckgeschützten Passwörter und Android 6.0 oder besser
+        fingerabdruckgeschützten Passwörtern auf Android 6.0 oder höher
         hinzugefügt.
         \n\n
         &lt;b&gt;6.3.0&lt;/b&gt; - Benutzbarkeit der Tastatur verbessert.
