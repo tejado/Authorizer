@@ -117,21 +117,6 @@
         <item name="android:layout_marginBottom">16dp</item>
     </style>
 
-    <style name="GridLabel">
-        <item name="android:layout_width">0dp</item>
-        <item name="layout_gravity">fill_horizontal</item>
-        <item name="layout_columnWeight">2</item>
-    </style>
-
-    <style name="GridField">
-        <item name="android:layout_width">0dp</item>
-        <item name="layout_gravity">fill_horizontal</item>
-    </style>
-
-    <style name="GridField.W3">
-        <item name="layout_columnWeight">3</item>
-    </style>
-
     <style name="InputMethodText">
         <!-- Should match the keyboard view's keyTextColor -->
         <item name="android:textColor">#FFFFFFFF</item>
