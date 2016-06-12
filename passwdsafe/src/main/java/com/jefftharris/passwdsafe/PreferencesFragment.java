@@ -16,6 +16,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
@@ -51,7 +52,18 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         void updateViewPreferences();
     }
 
+    /** Action confirmed via ConfirmPromptDialog */
+    private enum ConfirmAction
+    {
+        CLEAR_ALL_NOTIFS,
+        CLEAR_ALL_SAVED
+    }
+
     private static final int REQUEST_DEFAULT_FILE = 0;
+    private static final int REQUEST_CLEAR_ALL_NOTIFS = 1;
+    private static final int REQUEST_CLEAR_ALL_SAVED = 2;
+
+    private static final String CONFIRM_ARG_ACTION = "action";
 
     private static final String TAG = "PreferencesFragment";
 
@@ -258,15 +270,24 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         case Preferences.PREF_PASSWD_CLEAR_ALL_NOTIFS: {
             Activity act = getActivity();
             PasswdSafeApp app = (PasswdSafeApp)act.getApplication();
-            app.getNotifyMgr().clearAllNotifications(act);
+            Bundle confirmArgs = new Bundle();
+            confirmArgs.putString(CONFIRM_ARG_ACTION,
+                                  ConfirmAction.CLEAR_ALL_NOTIFS.name());
+            DialogFragment dlg = app.getNotifyMgr().createClearAllPrompt(
+                    act, confirmArgs);
+            dlg.setTargetFragment(this, REQUEST_CLEAR_ALL_NOTIFS);
+            dlg.show(getFragmentManager(), "clearNotifsConfirm");
             return true;
         }
         case Preferences.PREF_PASSWD_CLEAR_ALL_SAVED: {
+            Bundle confirmArgs = new Bundle();
+            confirmArgs.putString(CONFIRM_ARG_ACTION,
+                                  ConfirmAction.CLEAR_ALL_SAVED.name());
             ConfirmPromptDialog dlg = ConfirmPromptDialog.newInstance(
                     getString(R.string.clear_all_saved_passwords),
                     getString(R.string.erase_all_saved_passwords),
-                    getString(R.string.clear), null);
-            dlg.setTargetFragment(this, 0);
+                    getString(R.string.clear), confirmArgs);
+            dlg.setTargetFragment(this, REQUEST_CLEAR_ALL_SAVED);
             dlg.show(getFragmentManager(), "clearSavedConfirm");
             return true;
         }
@@ -301,8 +322,27 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     @Override
     public void promptConfirmed(Bundle confirmArgs)
     {
-        SavedPasswordsMgr passwdMgr = new SavedPasswordsMgr(getContext());
-        passwdMgr.removeAllSavedPasswords();
+        ConfirmAction action;
+        try {
+            action = ConfirmAction.valueOf(
+                    confirmArgs.getString(CONFIRM_ARG_ACTION));
+        } catch (Exception e) {
+            return;
+        }
+
+        switch (action) {
+        case CLEAR_ALL_NOTIFS: {
+            Activity act = getActivity();
+            PasswdSafeApp app = (PasswdSafeApp)act.getApplication();
+            app.getNotifyMgr().handleClearAllConfirmed();
+            break;
+        }
+        case CLEAR_ALL_SAVED: {
+            SavedPasswordsMgr passwdMgr = new SavedPasswordsMgr(getContext());
+            passwdMgr.removeAllSavedPasswords();
+            break;
+        }
+        }
     }
 
     /**

@@ -18,21 +18,21 @@ import java.util.TreeSet;
 
 import org.pwsafe.lib.file.PwsRecord;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.file.PasswdExpiration;
@@ -43,10 +43,9 @@ import com.jefftharris.passwdsafe.file.PasswdRecord;
 import com.jefftharris.passwdsafe.file.PasswdRecordFilter;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.Utils;
-import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.util.LongReference;
-import com.jefftharris.passwdsafe.view.DialogUtils;
+import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
 
 /**
  * The NotificationMgr class encapsulates the notifications provided by the app
@@ -161,39 +160,36 @@ public class NotificationMgr implements PasswdFileDataObserver
         }
     }
 
-
-    /** Clear all notifications in the database */
-    public void clearAllNotifications(Activity act)
+    /**
+     * Create a confirm prompt for clearing all notifications
+     */
+    public DialogFragment createClearAllPrompt(Context ctx, Bundle args)
     {
-        AbstractDialogClickListener listener =
-            new AbstractDialogClickListener()
-            {
-                @Override
-                public void onOkClicked(DialogInterface dialog)
-                {
-                    try {
-                        SQLiteDatabase db = itsDbHelper.getWritableDatabase();
-                        try {
-                            db.beginTransaction();
-                            db.delete(DB_TABLE_EXPIRYS, null, null);
-                            db.delete(DB_TABLE_URIS, null, null);
-                            loadEntries(db);
-                            db.setTransactionSuccessful();
-                        } finally {
-                            db.endTransaction();
-                        }
-                    } catch (SQLException e) {
-                        Log.e(TAG, "Database error", e);
-                    }
-                }
-            };
+        return ConfirmPromptDialog.newInstance(
+                ctx.getString(R.string.clear_password_notifications),
+                ctx.getString(R.string.erase_all_expiration_notifications),
+                ctx.getString(R.string.clear), args);
+    }
 
-        DialogUtils.DialogData dlgData = DialogUtils.createConfirmPrompt(
-            act, listener,
-            act.getString(R.string.clear_password_notifications),
-            act.getString(R.string.erase_all_expiration_notifications));
-        dlgData.itsDialog.show();
-        dlgData.itsValidator.validate();
+    /**
+     * Clear all notifications after being confirmed
+     */
+    public void handleClearAllConfirmed()
+    {
+        try {
+            SQLiteDatabase db = itsDbHelper.getWritableDatabase();
+            try {
+                db.beginTransaction();
+                db.delete(DB_TABLE_EXPIRYS, null, null);
+                db.delete(DB_TABLE_URIS, null, null);
+                loadEntries(db);
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        } catch (SQLException e) {
+            Log.e(TAG, "Database error", e);
+        }
     }
 
 
