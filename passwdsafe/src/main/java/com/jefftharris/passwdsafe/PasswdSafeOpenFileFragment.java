@@ -567,37 +567,27 @@ public class PasswdSafeOpenFileFragment
     /**
      * Exit the resolving phase
      */
-    @SuppressLint("SetTextI18n")
     private void exitResolvingPhase()
     {
         setTitle(R.string.open_file);
 
-        //noinspection ConstantConditions
-        if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
-            (getFileUri().getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
-            itsReadonlyCb.setChecked(false);
-            itsYubikeyCb.setChecked(false);
-            itsPasswordEdit.setText("test123");
-            itsOkBtn.performClick();
-        } else {
-            SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
-            PasswdFileUri uri = getPasswdFileUri();
-            if (uri != null) {
-                Pair<Boolean, Integer> rc = uri.isWritable();
-                if (rc.first) {
-                    itsReadonlyCb.setChecked(
-                            Preferences.getFileOpenReadOnlyPref(prefs));
-                } else {
-                    itsReadonlyCb.setChecked(true);
-                    if (rc.second != null) {
-                        itsReadonlyCb.setText(String.format(
-                                "%s - %s", itsReadonlyCb.getText(),
-                                getString(rc.second)));
-                    }
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+        PasswdFileUri uri = getPasswdFileUri();
+        if (uri != null) {
+            Pair<Boolean, Integer> rc = uri.isWritable();
+            if (rc.first) {
+                itsReadonlyCb.setChecked(
+                        Preferences.getFileOpenReadOnlyPref(prefs));
+            } else {
+                itsReadonlyCb.setChecked(true);
+                if (rc.second != null) {
+                    itsReadonlyCb.setText(String.format(
+                            "%s - %s", itsReadonlyCb.getText(),
+                            getString(rc.second)));
                 }
             }
-            itsYubikeyCb.setChecked(Preferences.getFileOpenYubikeyPref(prefs));
         }
+        itsYubikeyCb.setChecked(Preferences.getFileOpenYubikeyPref(prefs));
     }
 
     /**
@@ -629,6 +619,7 @@ public class PasswdSafeOpenFileFragment
                     getFileUri(), itsLoadSavedPasswordUser);
         } else {
             itsPasswordEdit.requestFocus();
+            checkOpenDefaultFile();
         }
         itsSavePasswdCb.setChecked(isSaved);
     }
@@ -766,6 +757,22 @@ public class PasswdSafeOpenFileFragment
         if (itsAddSavedPasswordUser != null) {
             itsAddSavedPasswordUser.cancel();
             itsAddSavedPasswordUser = null;
+        }
+    }
+
+    /**
+     * Check for opening default file
+     */
+    @SuppressLint("SetTextI18n")
+    private void checkOpenDefaultFile()
+    {
+        //noinspection ConstantConditions
+        if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
+            (getFileUri().getPath().equals(PasswdSafeApp.DEBUG_AUTO_FILE))) {
+            itsReadonlyCb.setChecked(false);
+            itsYubikeyCb.setChecked(false);
+            itsPasswordEdit.setText("test123");
+            itsOkBtn.performClick();
         }
     }
 

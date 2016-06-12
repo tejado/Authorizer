@@ -126,6 +126,7 @@
         </codeStyleSettings>
         <codeStyleSettings language="XML">
           <option name="FORCE_REARRANGE_MODE" value="1" />
+          <option name="WRAP_ON_TYPING" value="0" />
           <indentOptions>
             <option name="CONTINUATION_INDENT_SIZE" value="4" />
           </indentOptions>

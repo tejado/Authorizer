@@ -19,9 +19,11 @@ import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.file.PasswdFileData;
 import com.jefftharris.passwdsafe.file.PasswdFileDataUser;
-import com.jefftharris.passwdsafe.lib.AboutDialog;
+import com.jefftharris.passwdsafe.lib.AboutUtils;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.ObjectHolder;
+
+import java.util.Locale;
 
 /**
  * Fragment for showing app 'about' information
@@ -74,7 +76,12 @@ public class AboutFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_about,
                                          container, false);
 
-        AboutDialog.updateAboutFields(rootView, null, getContext());
+        String licenses = AboutUtils.getLicenses(
+                getContext(), "license-PasswdSafe.txt",
+                "license-android.txt", "license-AndroidAssetStudio.txt",
+                "license-RobotoMono.txt");
+
+        AboutUtils.updateAboutFields(rootView, licenses, getContext());
         itsFileDetailsGroup = rootView.findViewById(R.id.file_details_group);
         itsFile = (TextView)rootView.findViewById(R.id.file);
         itsPermissions = (TextView)rootView.findViewById(R.id.permissions);
@@ -105,8 +112,9 @@ public class AboutFragment extends Fragment
                 itsPermissions.setText(
                         fileData.canEdit() ?
                         R.string.read_write : R.string.read_only_about);
-                itsNumRecords.setText(
-                        String.format("%d", fileData.getRecords().size()));
+                itsNumRecords.setText(String.format(
+                        Locale.getDefault(), "%d",
+                        fileData.getRecords().size()));
                 itsPasswordEnc.setText(fileData.getOpenPasswordEncoding());
                 if (fileData.isV3()) {
                     StringBuilder build = new StringBuilder();
@@ -143,4 +151,5 @@ public class AboutFragment extends Fragment
         super.onDetach();
         itsListener = null;
     }
+
 }
