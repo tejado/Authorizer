@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="add_account">Ajouter un compte</string>
+    <string name="adding_account">Ajout de compte&#8230;</string>
+    <string name="adding_account_notification">Ajout de compte&#8230;  Sélectionnez notification dans 60s pour autoriser l\'accès.</string>
+    <string name="app_desc">Synchroniser les données PasswordSafe de services de cloud computing</string>
+    <string name="app_name">PasswdSafe Sync</string>
+    <string name="automatic">Automatique</string>
+    <string name="box_acct_unlinked">App dissociée de compte Box. Synchronisez à nouveau pour permettre l\'accès Box pour PasswdSafe Sync.</string>
+    <string name="box_service_updated">Service de Box est mis à jour</string>
+    <string name="cant_launch_drive_file">Impossible de lancer le fichier de Google Drive. Typiquement, le fichier n\'a pas été synchronisés localement</string>
+    <string name="choose_account">Choisir compte</string>
+    <string name="choose_sync_files_from_dir">Choisir les fichiers à partir de %1$s</string>
+    <string name="clear">Effacer</string>
+    <string name="conflicted_local_copy">Copie locale conflit</string>
+    <string name="dropbox_acct_unlinked">App dissociée de compte Dropbox. Synchronisez à nouveau pour permettre l\'accès Dropbox pour PasswdSafe Sync.</string>
+    <string name="dropbox_service_updated">Service de Dropbox est mis à jour</string>
+    <string name="dropbox_synced_files">Dropbox Fichiers Synchronisé</string>
+    <string name="gdrive_state_auth_required">Compte Google authentification requise. Synchronisez à nouveau pour commencer le processus d\'authentification.</string>
+    <string name="gdrive_state_pending_auth">Authentification de compte Google est en cours. Sélectionnez la notification de la demande de session.</string>
+    <string name="google_acct_not_available">Compte Google n\'est pas disponible</string>
+    <string name="interval">Intervalle</string>
+    <string name="logs">Archives</string>
+    <string name="manual">Manuel</string>
+    <string name="network_connected">Réseau connecté</string>
+    <string name="network_not_connected">Le réseau n\'est pas connecté</string>
+    <string name="no_account">Aucun compte</string>
+    <string name="no_accounts">Aucun compte à synchroniser. Utilisez le menu pour ajouter un compte.</string>
+    <string name="no_logs">Pas de archives</string>
+    <string name="no_permissions">
+        PasswdSafe Sync a besoin des droits sur le contact.
+        \n\nAppuyer sur rafraîchir pour une autre demande. Si la demande n\'est
+        pas visible, allez dans les préférences de l\'application et activez les
+        permissions de contact.
+    </string>
+    <string name="no_owncloud_accts">
+        Aucune ownCloud comptes disponibles. Ajouter un compte dans 
+        l\'application ownCloud premier. Ensuite, il peut être sélectionné 
+        pour PasswdSafe Sync.
+    </string>
+    <string name="onedrive_acct_unlinked">App dissociée de compte OneDrive. Synchronisez à nouveau pour permettre l\'accès OneDrive pour PasswdSafe Sync.</string>
+    <string name="onedrive_synced_files">OneDrive Fichiers Synchronisé</string>
+    <string name="open_app_reauthorize">Ouvrir l\'application d\'autoriser à nouveau</string>
+    <string name="owncloud_auth_required">
+        Autorisation requise pour accéder au compte ownCloud. Sélectionnez la 
+        notification est en attente pour permettre l\'accès, puis synchroniser 
+        le compte.
+    </string>
+    <string name="owncloud_cert_trusted">Certificat est approuvé pour le compte ownCloud</string>
+    <string name="owncloud_synced_files">ownCloud Fichiers Synchronisé</string>
+    <string name="passwdsafe">PasswdSafe</string>
+    <string name="passwdsafe_sync_conflict">Conflit de synchronisation PasswdSafe</string>
+    <string name="passwdsafe_synced_file">PasswdSafe fichier synchronisé</string>
+    <string name="recreated_local_copy">Copie locale recréé</string>
+    <string name="remove_account">Supprimer un compte?</string>
+    <string name="removing_account">Retrait de compte&#8230;</string>
+    <string name="show_all">Afficher Tout</string>
+    <string name="sync">Synchroniser</string>
+    <string name="sync_conflict_log">Conflit de synchronisation avec le fichier %1$s qui a été %2$s sur place et %3$s à distance</string>
+    <string name="sync_interval_label">Intervalle:</string>
+    <string name="sync_log_record">Synchroniser %1$s, %2$s, %3$s, début: %4$tc, fin: %5$tc</string>
+    <string name="sync_oper_local_to_remote">Uploader le fichier: %1$s</string>
+    <string name="sync_oper_remote_to_local">Télécharger le fichier: %1$s</string>
+    <string name="sync_oper_rmfile">Supprimer le fichier: %1$s</string>
+    <string name="sync_oper_rmfile_local">Supprimer le fichier local: %1$s</string>
+    <string name="sync_oper_rmfile_remote">Supprimer le fichier distant: %1$s</string>
+    <string name="updating_account">Mise à jour compte&#8230;</string>
+
+    <string name="release_notes">
+        &lt;b&gt;3.1.0&lt;/b&gt; - Correction synchronisation Google Drive sur
+        les fichiers remplacés et renommés. Mise à jour librairie Google Drive.
+        \n\n
+        &lt;b&gt;3.0.2&lt;/b&gt; - Demander les permissions si demandés.
+        Mettre à jour la librairie Box.
+        \n\n
+        &lt;b&gt;3.0.1&lt;/b&gt; - Correction pour la détection d\'un compte Box
+        \n\n
+        &lt;b&gt;3.0.0&lt;/b&gt; - Mettre à jour l\'interface utilisateur pour
+        le design material.  Mettre à jour la librairie Box. Veuillez
+        synchroniser manuellement pour ré-autoriser.
+        \n\n
+        &lt;b&gt;2.3.2&lt;/b&gt; - Ajouter la configuration de l\'URL de
+        ownCloud
+        \n\n
+        &lt;b&gt;2.3.1&lt;/b&gt; - Fixer synchronisation OneDrive des fichiers
+        et des dossiers avec des espaces
+        \n\n
+        &lt;b&gt;2.3.0&lt;/b&gt; - Ajout du support OneDrive. Après avoir
+        authentifié un compte, choisir les fichiers à synchroniser.
+        \n\n
+        &lt;b&gt;2.2.0&lt;/b&gt; - Mise à jour pour utiliser l\'API de core
+        Dropbox. Les fichiers peuvent être synchronisés partir d\'un dossier.
+        Le dossier Apps ne sont plus nécessaires. L\'application doit être
+        autorisé à accéder.
+        \n\n
+        &lt;b&gt;2.1.0&lt;/b&gt; - Ajout du support ownCloud.  Les comptes sont
+        choisis parmi la liste dans l\'application ownCloud.  Une fois l\'accès 
+        est autorisé, les fichiers de mot de passe peuvent être choisis à 
+        synchroniser.
+        \n\n
+        &lt;b&gt;2.0.0&lt;/b&gt; - Améliorer la synchronisation Google Drive:\n
+        - Amélioration de la détection des conflits et la résolution\n
+        - Afficher une notification de conflit de synchronisation\n
+        - Inclure fichier checksum dans la détection de modification à 
+        distance\n
+        - Amélioration de la détection de suppression de fichier lors d\'une 
+        synchronisation complète\n
+        - Ajouter un type MIME pour les fichiers supplémentaires
+        \n\n 
+        &lt;b&gt;1.6.2&lt;/b&gt; - Mettre à jour la version Dropbox
+        \n\n
+        &lt;b&gt;1.6.1&lt;/b&gt; - Améliorer les performances des requêtes 
+        Google Drive lors d\'une synchronisation complète. Mettre à jour la 
+        version Dropbox.
+        &lt;b&gt;1.6.0&lt;/b&gt; - Ajouter une traduction en allemand
+        \n\n
+        &lt;b&gt;1.5.0&lt;/b&gt; - Ajout du support de Box. Fichiers par mot de 
+        passe (.psafe3) sont synchronisés dans le dossier haut et un dossier 
+        taggés avec \'passwdsafe\'.
+        \n\n
+        &lt;b&gt;1.4.0&lt;/b&gt; - Synchronisez le nom du dossier d\'un fichier.
+        Mettre à jour les clients de Dropbox et Google pour leurs dernières
+        versions. Ajouter des messages d\'avertissement pour aider les
+        utilisateurs avec l\'authentification de compte Google.
+        \n\n
+        &lt;b&gt;1.3.1&lt;/b&gt; - Correction d\'un crash lorsque l\'application
+        est déconnecté de son compte Dropbox de l\'utilisateur.
+    </string>
+
+    <string-array name="interval_array">
+        <item>Jamais</item>
+        <item>15 Minutes</item>
+        <item>30 Minutes</item>
+        <item>1 Heure</item>
+        <item>1 Jour</item>
+    </string-array>
+
+</resources>

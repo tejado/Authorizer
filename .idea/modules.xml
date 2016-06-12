@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/PasswdSafe.iml" filepath="$PROJECT_DIR$/PasswdSafe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib-onedrive/authenticate/authenticate.iml" filepath="$PROJECT_DIR$/lib-onedrive/authenticate/authenticate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib-box/lib-box.iml" filepath="$PROJECT_DIR$/lib-box/lib-box.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib-onedrive/lib-onedrive.iml" filepath="$PROJECT_DIR$/lib-onedrive/lib-onedrive.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib-owncloud/lib-owncloud.iml" filepath="$PROJECT_DIR$/lib-owncloud/lib-owncloud.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lib-onedrive/onedriveaccess/onedriveaccess.iml" filepath="$PROJECT_DIR$/lib-onedrive/onedriveaccess/onedriveaccess.iml" />
+      <module fileurl="file://$PROJECT_DIR$/passwdsafe/passwdsafe.iml" filepath="$PROJECT_DIR$/passwdsafe/passwdsafe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sync/sync.iml" filepath="$PROJECT_DIR$/sync/sync.iml" />
+    </modules>
+  </component>
+</project>
