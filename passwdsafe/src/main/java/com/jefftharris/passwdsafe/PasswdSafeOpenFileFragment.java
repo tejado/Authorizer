@@ -1015,12 +1015,12 @@ public class PasswdSafeOpenFileFragment
         protected final void finish(SavedPasswordFinish finishMode,
                                     CharSequence msg)
         {
+            cancelPendingAction();
             if (itsIsFinished) {
                 return;
             }
             itsIsFinished = true;
             itsCancelTimer.cancel();
-            cancelPendingAction();
 
             GuiUtils.setVisible(itsSavedPasswordMsg, true);
             itsSavedPasswordMsg.setText(msg);
