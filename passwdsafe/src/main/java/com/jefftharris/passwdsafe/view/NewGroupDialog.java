@@ -16,12 +16,14 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractDialogClickListener;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 
 /**
  * Dialog to select a new group
@@ -79,9 +81,19 @@ public class NewGroupDialog extends DialogFragment
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
-        AlertDialog alertDialog = builder.create();
+        final AlertDialog alertDialog = builder.create();
         TextView tv = (TextView)view.findViewById(R.id.new_group);
-        DialogUtils.setupDialogKeyboard(alertDialog, tv, tv, getContext());
+        GuiUtils.setupFormKeyboard(tv, tv, getContext(), new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Button btn = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                if (btn.isEnabled()) {
+                    btn.performClick();
+                }
+            }
+        });
         return alertDialog;
     }
 }
