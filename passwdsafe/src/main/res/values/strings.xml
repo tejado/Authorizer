@@ -336,6 +336,10 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
+        &lt;b&gt;6.4.1&lt;/b&gt; - Fix crash when opening file with saved
+        password.  Fix dark text in keyboard.  Improve German translation.
+        Show licenses in About screen.
+        \n\n
         &lt;b&gt;6.4.0&lt;/b&gt; - Add option to save file passwords
         protected by a fingerprint scan on Android 6.0 and higher
         \n\n
