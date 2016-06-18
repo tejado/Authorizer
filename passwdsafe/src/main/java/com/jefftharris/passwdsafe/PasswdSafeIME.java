@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -72,7 +72,7 @@ public class PasswdSafeIME extends InputMethodService
     private View itsPasswordWarning;
     private boolean itsAllowPassword = false;
     private boolean itsIsPasswordField = false;
-    private long itsLastShiftTime = 0;
+    private long itsLastShiftTime = Long.MIN_VALUE;
     private boolean itsCapsLock = false;
     private boolean itsIsPasswdSafeOpen = false;
 
@@ -380,14 +380,17 @@ public class PasswdSafeIME extends InputMethodService
             Keyboard current = itsKeyboardView.getKeyboard();
             if (current == itsQwertyKeyboard) {
                 long now = System.currentTimeMillis();
-                if (now < (itsLastShiftTime + 750)) {
-                    itsCapsLock = !itsCapsLock;
-                    itsLastShiftTime = 0;
-                } else {
+
+                boolean isShifted = itsKeyboardView.isShifted();
+                if (itsCapsLock) {
+                    itsCapsLock = false;
+                } else if (!isShifted) {
                     itsLastShiftTime = now;
+                } else if (now < (itsLastShiftTime + 500)) {
+                    itsCapsLock = true;
+                    itsLastShiftTime = Long.MIN_VALUE;
                 }
-                itsKeyboardView.setShifted(itsCapsLock ||
-                                           !itsKeyboardView.isShifted());
+                itsKeyboardView.setShifted(itsCapsLock || !isShifted);
             } else if (current == itsSymbolsKeyboard) {
                 itsSymbolsKeyboard.setShifted(true);
                 setKeyboard(itsSymbolsShiftKeyboard);
