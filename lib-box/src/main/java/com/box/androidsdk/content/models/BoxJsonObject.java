@@ -1,3 +1,10 @@
+/*
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
+ */
 package com.box.androidsdk.content.models;
 
 import com.box.androidsdk.content.utils.BoxDateFormat;
@@ -88,7 +95,7 @@ public abstract class BoxJsonObject extends BoxObject implements Serializable {
         JsonValue value = member.getValue();
         // TODO: remove this check once we are confident are SDK is handling all fields. BoxEntity is an exception since we are using it for preprocessing.
         if (! (this instanceof BoxEntity)) {
-            System.out.println("unhandled json member '" + memberName + "' xxx  " + value + " current object " + this.getClass());
+//            System.out.println("unhandled json member '" + memberName + "' xxx  " + value + " current object " + this.getClass());
       //      throw new RuntimeException("unhandled json member '" + memberName + "' xxx  " + value + " current object " + this.getClass());
         }
         try{
