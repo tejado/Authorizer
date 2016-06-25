@@ -225,7 +225,6 @@ public class PasswdSafeOpenFileFragment
         }
         setVisibility(R.id.yubi_progress_text, false, rootView);
 
-        itsPasswordEdit.setPrivateImeOptions(PasswdSafeIME.PASSWDSAFE_OPEN);
         return rootView;
     }
 
@@ -556,9 +555,12 @@ public class PasswdSafeOpenFileFragment
             setProgressVisible(true, false);
             break;
         }
-        case INITIAL:
-        case RESOLVING:
         case FINISHED: {
+            PasswdSafeIME.resetKeyboard();
+            break;
+        }
+        case INITIAL:
+        case RESOLVING: {
             break;
         }
         }
@@ -687,13 +689,11 @@ public class PasswdSafeOpenFileFragment
             }
             case REMOVE: {
                 itsSavedPasswordsMgr.removeSavedPassword(getFileUri());
-                setPhase(Phase.FINISHED);
-                itsListener.handleFileOpen(result.itsFileData, itsRecToOpen);
+                finishFileOpen(result.itsFileData);
                 break;
             }
             case NONE: {
-                setPhase(Phase.FINISHED);
-                itsListener.handleFileOpen(result.itsFileData, itsRecToOpen);
+                finishFileOpen(result.itsFileData);
                 break;
             }
             }
@@ -723,6 +723,15 @@ public class PasswdSafeOpenFileFragment
             }
             setPhase(Phase.WAITING_PASSWORD);
         }
+    }
+
+    /**
+     *  Finish the file open fragment
+     */
+    private void finishFileOpen(PasswdFileData fileData)
+    {
+        setPhase(Phase.FINISHED);
+        itsListener.handleFileOpen(fileData, itsRecToOpen);
     }
 
     /**
@@ -1241,9 +1250,7 @@ public class PasswdSafeOpenFileFragment
                     public void run()
                     {
                         itsAddSavedPasswordUser = null;
-                        setPhase(Phase.FINISHED);
-                        itsListener.handleFileOpen(itsOpenResult.itsFileData,
-                                                   itsRecToOpen);
+                        finishFileOpen(itsOpenResult.itsFileData);
                     }
                 });
                 break;

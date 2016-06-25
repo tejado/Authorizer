@@ -21,7 +21,6 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
@@ -45,9 +44,6 @@ import com.jefftharris.passwdsafe.util.Pair;
 public class PasswdSafeIME extends InputMethodService
         implements View.OnClickListener
 {
-    public static final String PASSWDSAFE_OPEN =
-            "com.jefftharris.passwdsafe.Open";
-
     // Password fields
     private static final int USER_KEY = -100;
     private static final int PASSWORD_KEY = -101;
@@ -62,6 +58,8 @@ public class PasswdSafeIME extends InputMethodService
     public static final int KEYBOARD_NEXT_KEY = -202;
     public static final int KEYBOARD_CHOOSE_KEY = -203;
 
+    private static boolean itsResetKeyboard = false;
+
     private KeyboardView itsKeyboardView;
     private PasswdSafeIMEKeyboard itsPasswdSafeKeyboard;
     private PasswdSafeIMEKeyboard itsQwertyKeyboard;
@@ -74,8 +72,14 @@ public class PasswdSafeIME extends InputMethodService
     private boolean itsIsPasswordField = false;
     private long itsLastShiftTime = Long.MIN_VALUE;
     private boolean itsCapsLock = false;
-    private boolean itsIsPasswdSafeOpen = false;
 
+    /**
+     * Reset the keyboard shown when next visible
+     */
+    public static void resetKeyboard()
+    {
+        itsResetKeyboard = true;
+    }
 
     @Override
     public void onInitializeInterface()
@@ -150,6 +154,11 @@ public class PasswdSafeIME extends InputMethodService
         itsAllowPassword = itsIsPasswordField;
         showPasswordWarning(false);
 
+        if (itsResetKeyboard) {
+            itsResetKeyboard = false;
+            itsCurrKeyboard = null;
+        }
+
         PasswdSafeIMEKeyboard keyboard = itsCurrKeyboard;
         if (keyboard == null) {
             keyboard = itsPasswdSafeKeyboard;
@@ -168,9 +177,6 @@ public class PasswdSafeIME extends InputMethodService
             }
         }
 
-        itsIsPasswdSafeOpen = TextUtils.equals(PASSWDSAFE_OPEN,
-                                               info.privateImeOptions);
-
         // Reset keyboard to reflect key changes
         setKeyboard(keyboard);
         itsKeyboardView.closing();
@@ -184,12 +190,6 @@ public class PasswdSafeIME extends InputMethodService
 
         if (itsKeyboardView != null) {
             itsKeyboardView.closing();
-        }
-
-        // Finishing on the password file open screen, so clear the current
-        // keyboard to get back to the record chooser
-        if (itsIsPasswdSafeOpen) {
-            itsCurrKeyboard = null;
         }
     }
 
