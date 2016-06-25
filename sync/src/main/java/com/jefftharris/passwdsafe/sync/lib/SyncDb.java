@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.lib;
@@ -90,13 +91,15 @@ public class SyncDb
     private final ReentrantLock itsMutex = new ReentrantLock();
 
     /** Initialize the single SyncDb instance */
-    public static void initializeDb(Context ctx)
+    public static synchronized void initializeDb(Context ctx)
     {
-        itsDb = new SyncDb(ctx);
+        if (itsDb == null) {
+            itsDb = new SyncDb(ctx);
+        }
     }
 
     /** Finalize the single SyncDb instance */
-    public static void finalizeDb()
+    public static synchronized void finalizeDb()
     {
         itsDb.close();
         itsDb = null;
@@ -105,8 +108,12 @@ public class SyncDb
     /** Acquire the single SyncDb instance */
     public static SyncDb acquire()
     {
-        itsDb.doAcquire();
-        return itsDb;
+        SyncDb db;
+        synchronized (SyncDb.class) {
+            db = itsDb;
+        }
+        db.doAcquire();
+        return db;
     }
 
     /** Constructor */
