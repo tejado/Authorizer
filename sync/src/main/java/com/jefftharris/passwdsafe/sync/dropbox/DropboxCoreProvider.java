@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -19,14 +19,15 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.exception.DropboxException;
-import com.dropbox.client2.exception.DropboxServerException;
-import com.dropbox.client2.exception.DropboxUnlinkedException;
-import com.dropbox.client2.session.AbstractSession;
-import com.dropbox.client2.session.AccessTokenPair;
-import com.dropbox.client2.session.AppKeyPair;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.InvalidAccessTokenException;
+import com.dropbox.core.android.Auth;
+import com.dropbox.core.android.AuthActivity;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.ListFolderResult;
+import com.dropbox.core.v2.files.Metadata;
+import com.dropbox.core.v2.users.FullAccount;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
@@ -50,7 +51,6 @@ import java.util.List;
 public class DropboxCoreProvider extends AbstractSyncTimerProvider
 {
     private static final String DROPBOX_SYNC_APP_KEY = "jaafb7iju45c60f";
-    private static final String DROPBOX_SYNC_APP_SECRET = "gabkj5758t39urh";
     private static final String PREF_MIGRATE_TOKEN = "dropboxMigrateToken";
     private static final String PREF_OAUTH2_TOKEN = "dropboxOAuth2Token";
     private static final String PREF_OATH_KEY = "dropboxOAuthKey";
@@ -59,8 +59,9 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
 
     private static final String TAG = "DropboxCoreProvider";
 
-    private DropboxAPI<AndroidAuthSession> itsApi;
+    private DbxClientV2 itsClient;
     private String itsUserId = null;
+    private boolean itsIsPendingAdd = false;
 
     /** Constructor */
     public DropboxCoreProvider(Context ctx)
@@ -74,8 +75,6 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     {
         super.init();
         doMigration();
-        itsApi = new DropboxAPI<>(new AndroidAuthSession(
-                new AppKeyPair(DROPBOX_SYNC_APP_KEY, DROPBOX_SYNC_APP_SECRET)));
         updateDropboxAcct();
     }
 
@@ -93,7 +92,8 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         if (isAccountAuthorized()) {
             unlinkAccount();
         }
-        itsApi.getSession().startOAuth2Authentication(activity);
+        AuthActivity.result = null;
+        Auth.startOAuth2Authentication(activity, DROPBOX_SYNC_APP_KEY);
     }
 
 
@@ -102,45 +102,53 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
                                             Intent activityData,
                                             Uri providerAcctUri)
     {
-        AndroidAuthSession session = itsApi.getSession();
-        if (!session.authenticationSuccessful()) {
+        String authToken = Auth.getOAuth2Token();
+        if (authToken == null) {
             PasswdSafeUtil.dbginfo(TAG, "finishAccountLink auth failed");
             return null;
         }
+        saveAuthData(authToken);
+        updateDropboxAcct();
 
-        try {
-            session.finishAuthentication();
-            saveAuthData(session.getOAuth2AccessToken());
-            updateDropboxAcct();
-            if (itsUserId != null) {
-                return null;
-            }
-            return new NewAccountTask(providerAcctUri, null,
-                                      ProviderType.DROPBOX, false, getContext())
-            {
-                @Override
-                protected void doAccountUpdate(ContentResolver cr)
-                {
-                    try {
-                        DropboxAPI.Account acct = itsApi.accountInfo();
-                        itsNewAcct = Long.toString(acct.uid);
-                        setUserId(itsNewAcct);
-                        super.doAccountUpdate(cr);
-                    } catch (DropboxException e) {
-                        Log.e(TAG, "Error retrieving account", e);
-                    }
-                }
-            };
-        } catch (Exception e) {
-            Log.e(TAG, "Error authenticating", e);
+        // If user already exists, this is a re-authorization so don't trigger
+        // a new account task
+        if (itsUserId != null) {
             return null;
         }
+
+        return new NewAccountTask(providerAcctUri, null, ProviderType.DROPBOX,
+                                  false, getContext())
+        {
+            @Override
+            protected void doAccountUpdate(ContentResolver cr)
+            {
+                itsIsPendingAdd = true;
+                try {
+                    FullAccount acct = itsClient.users().getCurrentAccount();
+                    itsNewAcct = acct.getAccountId();
+                    setUserId(itsNewAcct);
+                    super.doAccountUpdate(cr);
+                } catch (DbxException e) {
+                    Log.e(TAG, "Error retrieving account", e);
+                } finally {
+                    itsIsPendingAdd = false;
+                }
+            }
+        };
     }
 
 
     @Override
     public void unlinkAccount()
     {
+        // TODO: unlink in background?
+        if (itsClient != null) {
+            try {
+                itsClient.auth().tokenRevoke();
+            } catch (DbxException e) {
+                Log.e(TAG, "Error revoking auth token", e);
+            }
+        }
         saveAuthData(null);
         setUserId(null);
         updateDropboxAcct();
@@ -150,7 +158,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     @Override
     public boolean isAccountAuthorized()
     {
-        return itsApi.getSession().isLinked();
+        return (itsClient != null);
     }
 
 
@@ -176,7 +184,9 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     @Override
     public void cleanupOnDelete(String acctName) throws Exception
     {
-        unlinkAccount();
+        if (!itsIsPendingAdd) {
+            unlinkAccount();
+        }
     }
 
 
@@ -201,36 +211,38 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
             boolean authorized = isAccountAuthorized();
             PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
             if (authorized) {
-                new DropboxCoreSyncer(itsApi, provider, db,
+                new DropboxCoreSyncer(itsClient, provider, db,
                                       logrec, getContext()).sync();
             }
-        } catch (DropboxUnlinkedException e) {
+        } catch (InvalidAccessTokenException e) {
             Log.e(TAG, "unlinked error", e);
             saveAuthData(null);
             updateDropboxAcct();
             throw e;
-        } catch (DropboxServerException e) {
-            if (e.error == DropboxServerException._401_UNAUTHORIZED) {
-                Log.e(TAG, "unauthorized error", e);
-                saveAuthData(null);
-                updateDropboxAcct();
-            }
-            throw e;
+
+            // TODO: notification when providers fail to sync with auth error?
         }
     }
 
 
     /** List files */
     public List<ProviderRemoteFile> listFiles(String path)
-            throws DropboxException
+            throws DbxException
     {
+        List<ProviderRemoteFile> files = new ArrayList<>();
+        ListFolderResult result = itsClient.files().listFolder(path);
+        do {
+            for (Metadata child: result.getEntries()) {
+                files.add(new DropboxCoreProviderFile(child));
+            }
 
-        DropboxAPI.Entry pathEntry = itsApi.metadata(path, 0, null, true, null);
-        List<ProviderRemoteFile> files =
-                new ArrayList<>(pathEntry.contents.size());
-        for (DropboxAPI.Entry child: pathEntry.contents) {
-            files.add(new DropboxCoreProviderFile(child));
-        }
+            if (result.getHasMore()) {
+                result = itsClient.files()
+                                  .listFolderContinue(result.getCursor());
+            } else {
+                result = null;
+            }
+        } while(result != null);
 
         return files;
     }
@@ -243,22 +255,13 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         SharedPreferences prefs =
                 PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        AbstractSession session = itsApi.getSession();
         boolean haveAuth = false;
         String authToken = prefs.getString(PREF_OAUTH2_TOKEN, null);
         if (authToken != null) {
-            session.setOAuth2AccessToken(authToken);
+            // TODO: use standard HTTP requestor or OkHttp version?
+            itsClient = new DbxClientV2(new DbxRequestConfig("PasswdSafe"),
+                                        authToken);
             haveAuth = true;
-        } else {
-            String authKey = prefs.getString(PREF_OATH_KEY, null);
-            String authSecret = prefs.getString(PREF_OATH_SECRET, null);
-            if ((authKey != null) && (authSecret != null)) {
-                session.setAccessTokenPair(new AccessTokenPair(authKey,
-                                                               authSecret));
-                haveAuth = true;
-            } else {
-                session.unlink();
-            }
         }
 
         if (haveAuth) {
@@ -274,6 +277,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         } else {
             itsUserId = null;
             updateSyncFreq(null, 0);
+            itsClient = null;
         }
 
         PasswdSafeUtil.dbginfo(TAG, "init auth %b", isAccountAuthorized());
