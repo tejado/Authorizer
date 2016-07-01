@@ -1,3 +1,10 @@
+/*
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
+ */
 apply plugin: 'com.android.application'
 
 android {
@@ -74,4 +81,5 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
     }
     compile 'com.google.guava:guava-jdk5:17.0'
+    compile 'com.dropbox.core:dropbox-core-sdk:2.0.6'
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -9,17 +9,15 @@ package com.jefftharris.passwdsafe.sync.dropbox;
 
 import android.content.Context;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.v2.DbxClientV2;
 import com.jefftharris.passwdsafe.sync.lib.AbstractRmSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 
 /**
  * A Dropbox sync operation to remove a file
  */
-public class DropboxCoreRmFileOper
-        extends AbstractRmSyncOper<DropboxAPI<AndroidAuthSession>>
+public class DropboxCoreRmFileOper extends AbstractRmSyncOper<DbxClientV2>
 {
     private static final String TAG = "DropboxCoreRmFileOper";
 
@@ -31,9 +29,9 @@ public class DropboxCoreRmFileOper
 
     /** Remove the remote file */
     @Override
-    protected void doRemoteRemove(DropboxAPI<AndroidAuthSession> providerClient,
-                                  Context ctx) throws DropboxException
+    protected void doRemoteRemove(DbxClientV2 providerClient,
+                                  Context ctx) throws DbxException
     {
-        providerClient.delete(itsFile.itsRemoteId);
+        providerClient.files().delete(itsFile.itsRemoteId);
     }
 }
