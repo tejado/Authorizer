@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -62,6 +63,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     private DbxClientV2 itsClient;
     private String itsUserId = null;
     private boolean itsIsPendingAdd = false;
+    private ArrayList<TokenRevokeTask> itsRevokeTasks = new ArrayList<>();
 
     /** Constructor */
     public DropboxCoreProvider(Context ctx)
@@ -78,6 +80,15 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         updateDropboxAcct();
     }
 
+    @Override
+    public void fini()
+    {
+        super.fini();
+        for (TokenRevokeTask task: itsRevokeTasks) {
+            task.cancel(true);
+        }
+        itsRevokeTasks.clear();
+    }
 
     @Override
     protected String getAccountUserId()
@@ -141,13 +152,10 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     @Override
     public void unlinkAccount()
     {
-        // TODO: unlink in background?
         if (itsClient != null) {
-            try {
-                itsClient.auth().tokenRevoke();
-            } catch (DbxException e) {
-                Log.e(TAG, "Error revoking auth token", e);
-            }
+            TokenRevokeTask task = new TokenRevokeTask();
+            task.execute(itsClient);
+            itsRevokeTasks.add(task);
         }
         saveAuthData(null);
         setUserId(null);
@@ -258,7 +266,6 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         boolean haveAuth = false;
         String authToken = prefs.getString(PREF_OAUTH2_TOKEN, null);
         if (authToken != null) {
-            // TODO: use standard HTTP requestor or OkHttp version?
             itsClient = new DbxClientV2(new DbxRequestConfig("PasswdSafe"),
                                         authToken);
             haveAuth = true;
@@ -381,6 +388,33 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
                 NotifUtils.showNotif(NotifUtils.Type.DROPBOX_MIGRATED,
                                      getContext());
             }
+        }
+    }
+
+    /**
+     * Background task to revoke a token
+     */
+    private class TokenRevokeTask extends AsyncTask<DbxClientV2, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(DbxClientV2... clients)
+        {
+            PasswdSafeUtil.dbginfo(TAG, "revoking auth tokens");
+            for (DbxClientV2 client: clients) {
+                try {
+                    client.auth().tokenRevoke();
+                } catch (DbxException e) {
+                    Log.e(TAG, "Error revoking auth token", e);
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid)
+        {
+            itsRevokeTasks.remove(this);
         }
     }
 }
