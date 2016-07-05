@@ -58,8 +58,8 @@ public class DropboxCoreLocalToRemoteOper
                 uploadFile = ctx.getFileStreamPath(itsFile.itsLocalFile);
                 setLocalFile(uploadFile);
                 if (isInsert()) {
-                    remotePath = ProviderRemoteFile.PATH_SEPARATOR +
-                                 itsFile.itsLocalTitle;
+                    remotePath =
+                            DropboxCoreSyncer.createRemoteIdFromLocal(itsFile);
                 } else {
                     remotePath = itsFile.itsRemoteId;
                 }
@@ -67,8 +67,7 @@ public class DropboxCoreLocalToRemoteOper
                 tmpFile = File.createTempFile("passwd", ".psafe3");
                 tmpFile.deleteOnExit();
                 uploadFile = tmpFile;
-                remotePath = ProviderRemoteFile.PATH_SEPARATOR +
-                             itsFile.itsLocalTitle;
+                remotePath = DropboxCoreSyncer.createRemoteIdFromLocal(itsFile);
             }
 
             fis = new FileInputStream(uploadFile);
