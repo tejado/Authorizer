@@ -126,12 +126,14 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
                 ProviderRemoteFile remfile =
                         remoteFiles.getRemoteFileForNew(dbfile.itsId);
                 if (remfile != null) {
+                    String remoteId = remfile.getRemoteId();
                     SyncDb.updateRemoteFile(
-                            dbfile.itsId, remfile.getRemoteId(),
-                            remfile.getTitle(), remfile.getFolder(),
-                            remfile.getModTime(), remfile.getHash(), itsDb);
+                            dbfile.itsId, remoteId, remfile.getTitle(),
+                            remfile.getFolder(), remfile.getModTime(),
+                            remfile.getHash(), itsDb);
                     SyncDb.updateRemoteFileChange(
                             dbfile.itsId, DbFile.FileChange.ADDED, itsDb);
+                    processedRemoteFiles.add(remoteId);
                 }
             } else {
                 ProviderRemoteFile remfile =
