@@ -1,14 +1,14 @@
 /*
- * Copyright (©) 2014-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.gdrive;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,6 +34,7 @@ import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+import com.jefftharris.passwdsafe.sync.lib.SyncRemoteFiles;
 
 /**
  * The Syncer class encapsulates a sync operation
@@ -73,8 +74,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
         }
 
         syncDisplayName();
-        HashMap<String, ProviderRemoteFile> driveFiles = getDriveFiles();
-        updateDbFiles(driveFiles);
+        updateDbFiles(getDriveFiles());
         return resolveSyncOpers();
     }
 
@@ -99,10 +99,10 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
     }
 
     /** Get the Google Drive files */
-    private HashMap<String, ProviderRemoteFile> getDriveFiles()
+    private SyncRemoteFiles getDriveFiles()
             throws IOException
     {
-        HashMap<String, ProviderRemoteFile> driveFiles = new HashMap<>();
+        SyncRemoteFiles driveFiles = new SyncRemoteFiles();
 
         String query =
                 "not trashed" +
@@ -118,70 +118,100 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
                 continue;
             }
             PasswdSafeUtil.dbginfo(TAG, "File %s", fileToString(file));
-            GDriveProviderFile driveFile = new GDriveProviderFile(
-                    file, itsFileFolders.computeFileFolders(file));
-            driveFiles.put(driveFile.getRemoteId(), driveFile);
+            driveFiles.addRemoteFile(new GDriveProviderFile(
+                    file, itsFileFolders.computeFileFolders(file)));
         }
 
-        // Check whether any files were renamed/deleted and replaced with a
-        // different file in the same location with the same name
         for (DbFile dbfile: SyncDb.getFiles(itsProvider.itsId, itsDb)) {
-            if (dbfile.itsRemoteId == null) {
-                continue;
+            if (dbfile.itsRemoteId != null) {
+                checkRenamedOrDeletedAndReplaced(dbfile, driveFiles);
+            } else {
+                checkRemoteFileForNew(dbfile, driveFiles);
             }
 
-            switch (dbfile.itsRemoteChange) {
-            case NO_CHANGE: {
-                File dbremfile =
-                        itsFileFolders.getCachedFile(dbfile.itsRemoteId);
-                if (dbremfile == null) {
-                    break;
-                } else if (isSyncFile(dbremfile)) {
-                    ProviderRemoteFile remfile =
-                            driveFiles.get(dbfile.itsRemoteId);
-                    if (remfile == null) {
-                        break;
-                    }
-                    if (TextUtils.equals(dbfile.itsRemoteTitle,
-                                         remfile.getTitle()) &&
-                        TextUtils.equals(dbfile.itsRemoteFolder,
-                                         remfile.getFolder())) {
-                        break;
-                    }
-                }
-
-                PasswdSafeUtil.dbginfo(TAG, "check replace %s", dbremfile);
-                parentsloop:
-                for (String parent: dbremfile.getParents()) {
-                    for (File replacedFile: listFiles(
-                            String.format("'%s' in parents and name='%s'",
-                                          parent, dbfile.itsRemoteTitle))) {
-                        if (!driveFiles.containsKey(replacedFile.getId())) {
-                            continue;
-                        }
-
-                        PasswdSafeUtil.dbginfo(TAG, "File %s replaced with %s",
-                                               fileToString(dbremfile),
-                                               fileToString(replacedFile));
-                        SyncDb.updateRemoteFile(
-                                dbfile.itsId, replacedFile.getId(),
-                                dbfile.itsRemoteTitle, dbfile.itsRemoteFolder,
-                                dbfile.itsRemoteModDate, dbfile.itsRemoteHash,
-                                itsDb);
-                        break parentsloop;
-                    }
-                }
-                break;
-            }
-            case ADDED:
-            case MODIFIED:
-            case REMOVED: {
-                break;
-            }
-            }
         }
 
         return driveFiles;
+    }
+
+    /**
+     * Check whether any files were renamed/deleted and replaced with a
+     * different file in the same location with the same name
+     */
+    private void checkRenamedOrDeletedAndReplaced(DbFile dbfile,
+                                                  SyncRemoteFiles driveFiles)
+            throws IOException
+    {
+        switch (dbfile.itsRemoteChange) {
+        case NO_CHANGE: {
+            File dbremfile =
+                    itsFileFolders.getCachedFile(dbfile.itsRemoteId);
+            if (dbremfile == null) {
+                break;
+            } else if (isSyncFile(dbremfile)) {
+                ProviderRemoteFile remfile =
+                        driveFiles.getRemoteFile(dbfile.itsRemoteId);
+                if (remfile == null) {
+                    break;
+                }
+                if (TextUtils.equals(dbfile.itsRemoteTitle,
+                                     remfile.getTitle()) &&
+                    TextUtils.equals(dbfile.itsRemoteFolder,
+                                     remfile.getFolder())) {
+                    break;
+                }
+            }
+
+            PasswdSafeUtil.dbginfo(TAG, "check replace %s", dbremfile);
+            parentsloop:
+            for (String parent: dbremfile.getParents()) {
+                for (File replacedFile: listFiles(
+                        String.format("'%s' in parents and name='%s'",
+                                      parent, dbfile.itsRemoteTitle))) {
+                    if (driveFiles.getRemoteFile(replacedFile.getId()) ==
+                        null) {
+                        continue;
+                    }
+
+                    PasswdSafeUtil.dbginfo(TAG, "File %s replaced with %s",
+                                           fileToString(dbremfile),
+                                           fileToString(replacedFile));
+                    SyncDb.updateRemoteFile(
+                            dbfile.itsId, replacedFile.getId(),
+                            dbfile.itsRemoteTitle, dbfile.itsRemoteFolder,
+                            dbfile.itsRemoteModDate, dbfile.itsRemoteHash,
+                            itsDb);
+                    break parentsloop;
+                }
+            }
+            break;
+        }
+        case ADDED:
+        case MODIFIED:
+        case REMOVED: {
+            break;
+        }
+        }
+    }
+
+    /**
+     * Check whether there is a remote file for a new local file
+     */
+    private void checkRemoteFileForNew(DbFile dbfile,
+                                       SyncRemoteFiles driveFiles)
+            throws IOException
+    {
+        List<File> fileList =
+                listFiles(String.format("'root' in parents and name='%s'",
+                                        dbfile.itsLocalTitle));
+        if (!fileList.isEmpty()) {
+            File remfile = fileList.get(0);
+            driveFiles.addRemoteFileForNew(
+                    dbfile.itsId,
+                    new GDriveProviderFile(
+                            remfile,
+                            itsFileFolders.computeFileFolders(remfile)));
+        }
     }
 
     /**
