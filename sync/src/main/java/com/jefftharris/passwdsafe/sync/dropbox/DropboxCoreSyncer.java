@@ -46,6 +46,12 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
         super(client, provider, db, logrec, ctx, TAG);
     }
 
+    /** Create a remote identifier from the local name of a file */
+    public static String createRemoteIdFromLocal(DbFile dbfile)
+    {
+        return ProviderRemoteFile.PATH_SEPARATOR +
+               dbfile.itsLocalTitle.toLowerCase();
+    }
 
     /** Perform a sync of the files */
     @Override
@@ -102,9 +108,7 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
         SyncRemoteFiles files = new SyncRemoteFiles();
         for (DbFile dbfile: SyncDb.getFiles(itsProvider.itsId, itsDb)) {
             if (dbfile.itsRemoteId == null) {
-                Metadata entry = getRemoteFile(
-                        ProviderRemoteFile.PATH_SEPARATOR +
-                        dbfile.itsLocalTitle);
+                Metadata entry = getRemoteFile(createRemoteIdFromLocal(dbfile));
                 if (entry instanceof FileMetadata) {
                     PasswdSafeUtil.dbginfo(
                             TAG, "dbx file for local: %s",
