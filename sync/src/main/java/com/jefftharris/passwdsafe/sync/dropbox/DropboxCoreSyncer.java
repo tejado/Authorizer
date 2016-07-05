@@ -27,10 +27,9 @@ import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+import com.jefftharris.passwdsafe.sync.lib.SyncRemoteFiles;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The DropboxCoreSyncer class encapsulates a Dropbox sync operation
@@ -97,42 +96,54 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
 
 
     /** Get the remote Dropbox files to sync */
-    private Map<String, ProviderRemoteFile> getDropboxFiles()
+    private SyncRemoteFiles getDropboxFiles()
             throws DbxException
     {
-        Map<String, ProviderRemoteFile> files = new HashMap<>();
-
+        SyncRemoteFiles files = new SyncRemoteFiles();
         for (DbFile dbfile: SyncDb.getFiles(itsProvider.itsId, itsDb)) {
-            // TODO: check add of file that already exists
             if (dbfile.itsRemoteId == null) {
-                continue;
-            }
-
-            switch (dbfile.itsRemoteChange) {
-            case NO_CHANGE:
-            case ADDED:
-            case MODIFIED: {
-                Metadata entry =
-                        itsProviderClient.files().getMetadataBuilder(
-                                dbfile.itsRemoteId)
-                        .withIncludeDeleted(true)
-                        .start();
+                Metadata entry = getRemoteFile(
+                        ProviderRemoteFile.PATH_SEPARATOR +
+                        dbfile.itsLocalTitle);
                 if (entry instanceof FileMetadata) {
                     PasswdSafeUtil.dbginfo(
-                            TAG, "dbx file: %s",
+                            TAG, "dbx file for local: %s",
                             DropboxCoreProviderFile.entryToString(entry));
-                    DropboxCoreProviderFile remfile =
-                            new DropboxCoreProviderFile(entry);
-                    files.put(remfile.getRemoteId(), remfile);
+                    files.addRemoteFileForNew(
+                            dbfile.itsId, new DropboxCoreProviderFile(entry));
                 }
-                break;
-            }
-            case REMOVED: {
-                break;
-            }
+            } else {
+                switch (dbfile.itsRemoteChange) {
+                case NO_CHANGE:
+                case ADDED:
+                case MODIFIED: {
+                    Metadata entry = getRemoteFile(dbfile.itsRemoteId);
+                    if (entry instanceof FileMetadata) {
+                        PasswdSafeUtil.dbginfo(
+                                TAG, "dbx file: %s",
+                                DropboxCoreProviderFile.entryToString(entry));
+                        files.addRemoteFile(new DropboxCoreProviderFile(entry));
+                    }
+                    break;
+                }
+                case REMOVED: {
+                    break;
+                }
+                }
             }
         }
-
         return files;
+    }
+
+    /**
+     * Get a remote file's metadata from Dropbox
+     */
+    private Metadata getRemoteFile(String remoteId)
+            throws DbxException
+    {
+        return itsProviderClient.files()
+                                .getMetadataBuilder(remoteId)
+                                .withIncludeDeleted(true)
+                                .start();
     }
 }
