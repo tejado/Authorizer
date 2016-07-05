@@ -1,14 +1,17 @@
 /*
- * Copyright (©) 2014-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.lib;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import android.content.Context;
 import android.database.SQLException;
@@ -106,29 +109,54 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
     /** Update database files from the remote files */
     protected void updateDbFiles(Map<String, ProviderRemoteFile> remfiles)
     {
+        // TODO: remove
+        updateDbFiles(new SyncRemoteFiles(remfiles));
+    }
+
+
+    /** Update database files from the remote files */
+    protected void updateDbFiles(SyncRemoteFiles remoteFiles)
+    {
         List<DbFile> dbfiles = SyncDb.getFiles(itsProvider.itsId, itsDb);
+        Set<String> processedRemoteFiles = new HashSet<>();
         for (DbFile dbfile: dbfiles) {
             if ((dbfile.itsRemoteId == null) ||
                     (dbfile.itsLocalChange == DbFile.FileChange.ADDED)) {
-                continue;
-            }
-            ProviderRemoteFile remfile = remfiles.get(dbfile.itsRemoteId);
-            if (remfile != null) {
-                checkRemoteFileChange(dbfile, remfile);
-                remfiles.remove(dbfile.itsRemoteId);
+
+                ProviderRemoteFile remfile =
+                        remoteFiles.getRemoteFileForNew(dbfile.itsId);
+                if (remfile != null) {
+                    SyncDb.updateRemoteFile(
+                            dbfile.itsId, remfile.getRemoteId(),
+                            remfile.getTitle(), remfile.getFolder(),
+                            remfile.getModTime(), remfile.getHash(), itsDb);
+                    SyncDb.updateRemoteFileChange(
+                            dbfile.itsId, DbFile.FileChange.ADDED, itsDb);
+                }
             } else {
-                PasswdSafeUtil.dbginfo(itsTag, "updateDbFiles remove remote %s",
-                                       dbfile.itsRemoteId);
-                SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
+                ProviderRemoteFile remfile =
+                        remoteFiles.getRemoteFile(dbfile.itsRemoteId);
+                if (remfile != null) {
+                    checkRemoteFileChange(dbfile, remfile);
+                    processedRemoteFiles.add(dbfile.itsRemoteId);
+                } else {
+                    PasswdSafeUtil.dbginfo(itsTag,
+                                           "updateDbFiles remove remote %s",
+                                           dbfile.itsRemoteId);
+                    SyncDb.updateRemoteFileDeleted(dbfile.itsId, itsDb);
+                }
             }
         }
 
-        for (Map.Entry<String, ProviderRemoteFile> entry: remfiles.entrySet()) {
-            String fileId = entry.getKey();
-            ProviderRemoteFile remfile = entry.getValue();
+        for (ProviderRemoteFile remfile: remoteFiles.getRemoteFiles()) {
+            String remoteId = remfile.getRemoteId();
+            if (processedRemoteFiles.contains(remoteId)) {
+                continue;
+            }
+
             PasswdSafeUtil.dbginfo(itsTag, "updateDbFiles add remote %s",
-                                   fileId);
-            SyncDb.addRemoteFile(itsProvider.itsId, fileId,
+                                   remoteId);
+            SyncDb.addRemoteFile(itsProvider.itsId, remoteId,
                                  remfile.getTitle(), remfile.getFolder(),
                                  remfile.getModTime(), remfile.getHash(),
                                  itsDb);
