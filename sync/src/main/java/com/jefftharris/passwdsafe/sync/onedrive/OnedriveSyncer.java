@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.sync.onedrive;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
@@ -21,13 +22,12 @@ import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+import com.jefftharris.passwdsafe.sync.lib.SyncRemoteFiles;
 import com.microsoft.onedriveaccess.IOneDriveService;
 import com.microsoft.onedriveaccess.model.Drive;
 import com.microsoft.onedriveaccess.model.Item;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit.RetrofitError;
 
@@ -56,6 +56,14 @@ public class OnedriveSyncer
         return (e.isNetworkError() ||
                 (e.getResponse() == null) ||
                 (e.getResponse().getStatus() != 404));
+    }
+
+
+    /** Create a remote identifier from the local name of a file */
+    public static String createRemoteIdFromLocal(DbFile dbfile)
+    {
+        return ProviderRemoteFile.PATH_SEPARATOR +
+               Uri.encode(dbfile.itsLocalTitle);
     }
 
 
@@ -127,40 +135,54 @@ public class OnedriveSyncer
     /**
      * Get the remote OneDrive files to sync
      */
-    private Map<String, ProviderRemoteFile> getOnedriveFiles()
+    private SyncRemoteFiles getOnedriveFiles()
     {
-        Map<String, ProviderRemoteFile> files = new HashMap<>();
-
+        SyncRemoteFiles files = new SyncRemoteFiles();
         for (DbFile dbfile: SyncDb.getFiles(itsProvider.itsId, itsDb)) {
             if (dbfile.itsRemoteId == null) {
-                continue;
-            }
-
-            switch (dbfile.itsRemoteChange) {
-            case NO_CHANGE:
-            case ADDED:
-            case MODIFIED: {
-                try {
-                    Item item = itsProviderClient.getItemByPath(
-                            dbfile.itsRemoteId, null);
-                    if (item.Deleted == null) {
-                        OnedriveProviderFile remfile =
-                                new OnedriveProviderFile(item);
-                        files.put(remfile.getRemoteId(), remfile);
-                    }
-                } catch (RetrofitError e) {
-                    if (isNot404Error(e)) {
-                        throw e;
-                    }
+                Item item = getRemoteFile(createRemoteIdFromLocal(dbfile));
+                if (item != null) {
+                    files.addRemoteFileForNew(dbfile.itsId,
+                                              new OnedriveProviderFile(item));
                 }
-                break;
+            } else {
+                switch (dbfile.itsRemoteChange) {
+                case NO_CHANGE:
+                case ADDED:
+                case MODIFIED: {
+                    Item item = getRemoteFile(dbfile.itsRemoteId);
+                    if (item != null) {
+                        files.addRemoteFile(new OnedriveProviderFile(item));
+                    }
+                    break;
+                }
+                case REMOVED: {
+                    break;
+                }
+                }
             }
-            case REMOVED: {
-                break;
-            }
-            }
-         }
-
+        }
         return files;
+    }
+
+
+    /**
+     * Get a remote file's entry from OneDrive
+     * @return The file's entry if found; null if not found or deleted
+     */
+    private Item getRemoteFile(String remoteId) throws RetrofitError
+    {
+        try {
+            Item item = itsProviderClient.getItemByPath(remoteId, null);
+            if (item.Deleted != null) {
+                return null;
+            }
+            return item;
+        } catch (RetrofitError e) {
+            if (isNot404Error(e)) {
+                throw e;
+            }
+            return null;
+        }
     }
 }
