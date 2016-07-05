@@ -14,6 +14,8 @@ import android.text.TextUtils;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.GetMetadataError;
+import com.dropbox.core.v2.files.GetMetadataErrorException;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.users.FullAccount;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -141,13 +143,23 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
 
     /**
      * Get a remote file's metadata from Dropbox
+     * @return The file's FileMetadata if found; null or DeletedMetadata if
+     * not found
      */
     private Metadata getRemoteFile(String remoteId)
             throws DbxException
     {
-        return itsProviderClient.files()
-                                .getMetadataBuilder(remoteId)
-                                .withIncludeDeleted(true)
-                                .start();
+        try {
+            return itsProviderClient.files()
+                                    .getMetadataBuilder(remoteId)
+                                    .withIncludeDeleted(true)
+                                    .start();
+        } catch (GetMetadataErrorException e) {
+            GetMetadataError error = e.errorValue;
+            if (error.getPathValue().isNotFound()) {
+                return null;
+            }
+            throw e;
+        }
     }
 }
