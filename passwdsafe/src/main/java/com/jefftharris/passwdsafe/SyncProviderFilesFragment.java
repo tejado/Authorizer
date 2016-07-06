@@ -7,7 +7,6 @@
  */
 package com.jefftharris.passwdsafe;
 
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +35,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.Utils;
 import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
+import com.jefftharris.passwdsafe.util.ProviderSyncTask;
 
 /**
  * The SyncProviderFilesFragment shows the list of files for a provider
@@ -60,6 +60,7 @@ public class SyncProviderFilesFragment extends ListFragment
     private Uri itsFilesUri;
     private SimpleCursorAdapter itsProviderAdapter;
     private Listener itsListener;
+    private final ProviderSyncTask itsSyncTask = new ProviderSyncTask();
 
 
     /** Create a new instance of the fragment */
@@ -238,6 +239,13 @@ public class SyncProviderFilesFragment extends ListFragment
         itsListener.updateViewSyncFiles();
     }
 
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        itsSyncTask.cancel();
+    }
+
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
      */
@@ -257,17 +265,7 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_sync_files: {
-            try {
-                // TODO: do sync in background to prevent ANR
-                ContentResolver cr = getActivity().getContentResolver();
-                cr.query(PasswdSafeContract.Methods.CONTENT_URI,
-                         null, null,
-                         new String[] { PasswdSafeContract.Methods.METHOD_SYNC,
-                                        itsProviderUri.toString() },
-                         null);
-            } catch (Exception e) {
-                Log.e(TAG, "Error syncing", e);
-            }
+            itsSyncTask.start(itsProviderUri, getContext());
             return true;
         }
         case R.id.menu_file_new: {

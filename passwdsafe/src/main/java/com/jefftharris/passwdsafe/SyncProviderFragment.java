@@ -17,7 +17,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +32,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
+import com.jefftharris.passwdsafe.util.ProviderSyncTask;
 
 /**
  * The SyncProviderFragment allows the user to choose a sync provider
@@ -50,11 +50,10 @@ public class SyncProviderFragment extends ListFragment
         boolean activityHasMenu();
     }
 
-    private static final String TAG = "SyncProviderFilesFrag";
-
     private SimpleCursorAdapter itsProviderAdapter;
     private boolean itsHasProvider = true;
     private Listener itsListener;
+    private final ProviderSyncTask itsSyncTask = new ProviderSyncTask();
 
     @Override
     public void onAttach(Context ctx)
@@ -163,6 +162,12 @@ public class SyncProviderFragment extends ListFragment
         itsListener = null;
     }
 
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        itsSyncTask.cancel();
+    }
 
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
@@ -183,15 +188,7 @@ public class SyncProviderFragment extends ListFragment
     {
         switch (item.getItemId()) {
         case R.id.menu_sync: {
-            try {
-                ContentResolver cr = getActivity().getContentResolver();
-                cr.query(PasswdSafeContract.Methods.CONTENT_URI,
-                         null, null,
-                         new String[] { PasswdSafeContract.Methods.METHOD_SYNC },
-                         null);
-            } catch (Exception e) {
-                Log.e(TAG, "Error syncing", e);
-            }
+            itsSyncTask.start(null, getContext());
             return true;
         }
         default: {
