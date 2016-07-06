@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              tools:context=".owncloud.OwncloudEditDialog">
+
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/url"
+              android:layout_marginLeft="6dp"
+              android:textAppearance="?android:textAppearanceLarge"/>
+
+    <EditText android:id="@+id/url"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:inputType="textUri"/>
+
+    <View style="@style/Separator"/>
+
+    <TextView
+        android:id="@+id/owncloud_interval_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/interval"
+        android:layout_marginLeft="6dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <Spinner
+        android:id="@+id/owncloud_interval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/interval_array"
+        tools:listitem="@android:layout/simple_spinner_item"/>
+
+    <View style="@style/Separator.Accent"/>
+
+    <TextView
+        android:id="@+id/error_msg"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

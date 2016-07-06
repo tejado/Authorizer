@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources>
+    <string name="add">Ajouter</string>
+    <string name="add_policy">Ajouter Stratégie</string>
+    <string name="add_record">Ajouter Entrée</string>
+    <string name="alias_base_record_header">ALIAS</string>
+    <string name="alias_to_same_record">Alias pour la même entrée</string>
+    <string name="any_changes_will_be_lost">Toutes modifications apportées à l\'entrée seront perdues.</string>
+    <string name="app_desc">Accès bases de données PasswordSafe sur Android </string>
+    <string name="app_name">PasswdSafe</string>
+    <string name="at_least">Au moins</string>
+    <string name="basic">"Général"</string>
+    <string name="canceled">Annulé</string>
+    <string name="cannot_create_file">Impossible de créer le fichier: %1$s</string>
+    <string name="case_sensitive">Sensible à la casse</string>
+    <string name="case_sensitive_sorting">Tri sensible à la casse</string>
+    <string name="change_password">Changer mot de passe</string>
+    <string name="check_box_to_confirm">Cocher la case pour confirmer</string>
+    <string name="choose">Choisir</string>
+    <string name="choose_group">Choisir un groupe</string>
+    <string name="choose_record">Choisir une entrée</string>
+    <string name="choose_type">Choisir un type</string>
+    <string name="clear">Effacer</string>
+    <string name="clear_all_saved_passwords">Effacer tous les mots de passe enregistrés</string>
+    <string name="clear_clipboard_on_close">Vider le presse-papiers en quittant</string>
+    <string name="clear_password_notifications">Effacer les notifications de mot de passe</string>
+    <string name="clear_recent">Effacer récente</string>
+    <string name="close_file">Fermer le fichier</string>
+    <string name="close_file_screen_off">Fermer le fichier à l\'extinction de l\'écran</string>
+    <string name="confirm">Confirmer</string>
+    <string name="cannot_delete_record">Impossible de supprimer l\'entrée - %1$s"</string>
+    <string name="content_file">Contenu du fichier</string>
+    <string name="continue_str">Continuer</string>
+    <string name="continue_p">Continuer?</string>
+    <string name="copy_clipboard">Copier dans le Presse-papiers</string>
+    <string name="copy_email">Copier Email</string>
+    <string name="copy_notes">Copier les notes</string>
+    <string name="copy_password">Copier le mot de passe</string>
+    <string name="copy_password_warning">
+        Attention: Toutes les applications peuvent lire le contenu du
+        presse-papiers, et le presse-papiers ne peut pas être effacé de
+        manière fiable. Le clavier alternatif Passwdsafe est une méthode plus
+        sûre pour entrer des mots de passe dans d\'autres applications.
+    </string>
+    <string name="copy_url">Copier le URL</string>
+    <string name="copy_user">Copier le nom d\'utilisateur</string>
+    <string name="created">Créé</string>
+    <string name="current">Actuel</string>
+    <string name="custom_symbols">Symboles personnalisés</string>
+    <string name="custom_symbol_not_alphanum">Les symboles personnalisés ne doivent pas contenir d\'espaces, ni de caractères alphanumériques</string>
+    <string name="database_policy">Stratégie Base de données - %s</string>
+    <string name="database_version">Version base de données</string>
+    <string name="days">Journées</string>
+    <string name="default_file_to_open">Fichier à ouvrir par défaut</string>
+    <string name="default_policy">Stratégie par défaut</string>
+    <string name="default_symbols">Symboles par défaut</string>
+    <string name="default_symbols_empty_pref">Utilisez une préférence vide pour les symboles par défaut: %1$s</string>
+    <string name="delete">Supprimer</string>
+    <string name="delete_file">Supprimer base de données</string>
+    <string name="delete_file_msg">Supprimer le fichier \"%1$s\"?</string>
+    <string name="delete_policy">Supprimer la stratégie</string>
+    <string name="delete_policy_msg">Supprimer la stratégie \"%1$s\"?</string>
+    <string name="delete_record_msg">Supprimer l\'entrée \"%1$s\"?</string>
+    <string name="directory_for_files">Répertoire des fichiers</string>
+    <string name="display">Affichage</string>
+    <string name="done">Valider</string>
+    <string name="duplicate_entry">Dupliquer l\'entrée</string>
+    <string name="duplicate_name">Dupliquer le nom</string>
+    <string name="edit_item">Modifier %s</string>
+    <string name="edit_policy">Modifier la stratégie</string>
+    <string name="email">Email</string>
+    <string name="email_attachment">fichier joint à l\'email</string>
+    <string name="email_header">EMAIL</string>
+    <string name="empty_custom_symbols">Symboles personnalisés vides</string>
+    <string name="empty_file_name">Nom de fichier vide</string>
+    <string name="empty_name">Nom vide</string>
+    <string name="empty_password">Mot de passe vide</string>
+    <string name="empty_title">Titre vide</string>
+    <string name="enable_expiration_notifications">Activer les notifications d\'expiration</string>
+    <string name="enable">Activer</string>
+    <string name="enabled">Activé</string>
+    <string name="erase_all_expiration_notifications">Effacer toutes les notifications d\'expiration de mot de passe et les fichiers suivi</string>
+    <string name="erase_all_saved_passwords">Supprimer tous les mots de passe enregistrés et clés</string>
+    <string name="expiration">Expiration</string>
+    <string name="expiration_notifications">Notifications d\'Expiration</string>
+    <string name="expiration_notifications_warning">L\'activation des notifications d\'expiration implique que PasswdSafe stocke les informations d\'expiration dans un fichier (titre de l\'entrée, le groupe et la date d\'expiration). Ces informations sont stockées en clair sur l\'appareil, mais aucun mot de passe n\'y est stockés.</string>
+    <string name="expired_password_notification">Notification mot de passe expiré</string>
+    <string name="expiring_password">Expiration mot de passe</string>
+    <string name="ext_storage_not_mounted">La carte mémoire externe est indisponible. Veuillez l\'installer pour afficher son contenu.</string>
+    <string name="file_backups">Fichiers de sauvegarde</string>
+    <string name="file_close_timeout">Fermeture automatique de fichier</string>
+    <string name="file_exists">Le fichier existe</string>
+    <string name="file">Fichier</string>
+    <string name="file_name">Nom du fichier</string>
+    <string name="file_not_found_perm_denied">Fichier introuvable ou accès interdit</string>
+    <string name="file_open_help">
+        Le fichier des mots de passe peut être enregistré sur les appareils
+        muni d\'un lecteur d\'empreinte digitale et Android 6 et plus. Les
+        mots de passe sont encrypés en utilisant une clé AES-256 protégée par
+        le lecteur d\'empreinte.
+        \n
+        - Pour enregistrer un mot de passe, assurez-vous d\'abord qu\'un
+        lecteur d\'empreintes est activé dans les réglages de sécurité. Après
+        cela, vérifiez l\'option d\'enregistrement, entrez le mot de passe et
+        cliquez ok. Après que le mot de passe ai été vérifié, faites une
+        lecture d\'empreinte digitale lorsque c\'est demandé. Le mot de passe
+        sera encrypté et enregistré, et le fichier s\'ouvrira.
+        \n
+        - Pour utiliser un mot de passe enregistré, faite une lecture
+        d\'empreinte digitale au lieu d\'entrer un mot de passe. Si la
+        lecture d\'empreinte est OK, le mot de passe est déchiffré et utilisé
+        pour ouvrir le fichier. Si un YubiKey est utilisé, la clé sera lue
+        après la lecture d\'empreinte.
+        \n
+        - Pour supprimer un mot de passe enregistré, deselectionner l\'option
+        d\'enregistrement et ouvrez le fichier. Le mot de passe sera supprimé
+        de l\'appareil. Tous les mots de passe enregistrés peuvent être
+        supprimés depuis les préférences mot de passe.
+        \n
+        \nPour utiliser un YubiKey NEO, procédez comme suit:\n
+        - Activer le support NFC dans les paramètres de l\'appareil\n
+        - Entrez le mot de passe de l\'utilisateur dans le fichier\n
+        - Choisissez quel emplacement sur ​​le YubiKey a la clé de défi-réponse.
+        Habituellement fente 2 est utilisé pour Password Safe.\n
+        - Appuyez sur le bouton YubiKey\n
+        - Dans les 30 secondes, appuyez la YubiKey à l\'arrière du téléphone ou
+        de la tablette. Il y aura des sons confirmant que la clé est lu. Si
+        l\'appareil ne répond pas avec un ton montant, essayez de déplacer la
+        clé autour. Quelques essais peuvent être nécessaire pour
+        déterminer l\'emplacement exact. Le bouton de YubiKey lui-même n\'a pas
+        besoin d\'être pressé.\n
+        - Une fois que la clé est trouvée, elle sera utilisée pour authentifier
+        avec votre mot de passe. Le fichier s\'ouvrira automatiquement.
+    </string>
+    <string name="file_operations">Réglage sauvegarde</string>
+    <string name="file_password_encoding">Encodage fichier mots de passe</string>
+    <string name="files">Fichiers</string>
+    <string name="fingerprint_not_recognized">Empreinte digitale non reconnue</string>
+    <string name="generate">Générer</string>
+    <string name="generate_password">Générer un mot de passe</string>
+    <string name="go">OK</string>
+    <string name="go_to_shortcut">Aller à</string>
+    <string name="group">Groupe</string>
+    <string name="group_cannot_start_with_dot">Groupe ne peut pas commencer par un \'.\'</string>
+    <string name="group_header">GROUPE</string>
+    <string name="group_records">Groupe d\'entrées</string>
+    <string name="help">Assistance</string>
+    <string name="hidden_password_alias">***** (de alias, taper pour visualiser)</string>
+    <string name="hidden_password_normal">***** (taper pour visualiser)</string>
+    <string name="hidden_password_shortcut">***** (de raccourci, taper pour visualiser)</string>
+    <string name="hide_password">Masquer le mot de passe</string>
+    <string name="hide_passwords">Masquer les mots de passe</string>
+    <string name="history">Historique</string>
+    <string name="history_header">HISTORIQUE</string>
+    <string name="home">Accueil</string>
+    <string name="interval">Intervalle</string>
+    <string name="invalid_file_name">Nom de fichier invalide</string>
+    <string name="invalid_history_max_size">Taille doit être comprise entre %1$d et %2$d</string>
+    <string name="invalid_length">Longueur invalide</string>
+    <string name="invalid_option_length">Longueur d\'option invalide</string>
+    <string name="invalid_password">"Mot de passe incorrect"</string>
+    <string name="key_error">Erreur clé pour %1$s: %2$s</string>
+    <string name="key_not_found">Clé non trouvée pour $1%s</string>
+    <string name="kitkat_sdcard_warning">
+        %1$s
+        \n\nSur Android KitKat et plus, les applications sont empêchés 
+        d\'écrire sur des cartes SD amovibles. Si le fichier est situé sur
+        une carte, il devra être déplacé vers la mémoire interne.
+    </string>
+    <string name="last_save_app">Application utilisée</string>
+    <string name="last_save_by">Dernier enregistrement par</string>
+    <string name="last_save_time">Dernier enregistrement le</string>
+    <string name="legacy_file_chooser">Ancienne méthode de sélection de fichier</string>
+    <string name="legacy_file_chooser_summary">Utilisable avec KitKat et plus</string>
+    <string name="length">Longueur</string>
+    <string name="length_even_hex">La longueur doit être paire pour l\'hexadécimal</string>
+    <string name="length_min_val">La longueur doit être au moins %1$d</string>
+    <string name="length_max_val">La longueur doit être au plus %1$d</string>
+    <string name="loading_file">Chargement %s…</string>
+    <string name="location">Emplacement</string>
+    <string name="max_size">Taille maximale</string>
+    <string name="max_size_label">Taille maximale:</string>
+    <string name="menu">Menu</string>
+    <string name="modified">Modifié</string>
+    <string name="monospace">Chasse fixe</string>
+    <string name="n_a">N/A</string>
+    <string name="name">Nom</string>
+    <string name="navigation_drawer_open">Ouvrir le tiroir de navigation</string>
+    <string name="navigation_drawer_close">Fermer le tiroir de navigation</string>
+    <string name="new_box_file">Nouveau fichier Box</string>
+    <string name="new_entry">Nouvelle entrée</string>
+    <string name="new_file">Nouveau fichier</string>
+    <string name="new_dropbox_file">Nouveau fichier Dropbox</string>
+    <string name="new_file_not_supp_uri">Nouveau fichier non pris en charge pour l\'URI %1$s</string>
+    <string name="new_group">Nouveau groupe</string>
+    <string name="new_group_menu">Nouveau groupe…</string>
+    <string name="new_local_file">Nouveau fichier local</string>
+    <string name="new_onedrive_file">Nouveau fichier OneDrive</string>
+    <string name="new_owncloud_file">Nouveau fichier ownCloud</string>
+    <string name="new_policy">Nouvelle stratégie</string>
+    <string name="next">Suivant</string>
+    <string name="no_alias_chosen">Aucun alias choisi</string>
+    <string name="no_file_permission">
+        PasswdSafe a besoin des droits sur le fichier.
+        \n\nAppuyer sur rafraîchir pour une autre demande. Si la demande n\'est
+        pas visible, allez dans les préférences de l\'application et activez les
+        permissions de stockage.
+    </string>
+    <string name="no_files_select_to_open">
+        Aucun fichier - Sélectionnez l\'action pour ouvrir ou créer un nouveau
+        fichier
+        \n\nSi les fichiers ne sont pas affichés dans l\'écran des documents,
+        utiliser le menu pour montrer le stockage interne ou sur la carte SD.
+        \n\nLe sélecteur de fichier précédent est activé dans les préférences
+        comme étant l\'ancienne méthode de selection.
+    </string>
+    <string name="no_fingerprints_registered">Pas de lecteur d\'empreinte digitale activé</string>
+    <string name="no_groups">Aucun Groupes</string>
+    <string name="no_shortcut_chosen">Aucun raccourci choisi</string>
+    <string name="no_policies">Aucune stratégie</string>
+    <string name="no_records">Aucune entrée</string>
+    <string name="no_records_open_file">Aucune entrée. Ouvrez un premier fichier, puis réessayez.</string>
+    <string name="none_paren">"(Aucun)"</string>
+    <string name="none_selected_open">Aucun sélectionné. Ouvrez PasswdSafe pour choisir.</string>
+    <string name="notes">Notes</string>
+    <string name="num_records">Nombre d\'entrées</string>
+    <string name="ok">OK</string>
+    <string name="open_file">Ouvrir %s</string>
+    <string name="open_file_title">Ouvrir un fichier</string>
+    <string name="option_not_selected">Au moins une option doit être sélectionnée</string>
+    <string name="password">Mot de passe</string>
+    <string name="password_encoding">Encodage mot de passe</string>
+    <string name="password_expiration">Expiration mot de passe</string>
+    <string name="password_file">Fichier mot de passe</string>
+    <string name="password_expiration_in_past">L\'expiration du mot est dans le passé</string>
+    <string name="password_expiration_invalid_interval">Intervalle doit être entre 1&#8211;3650</string>
+    <string name="password_expired">Mot de passe expiré</string>
+    <string name="password_expires_before">Mot de passe expire avant %1$s</string>
+    <string name="password_expires_today">Mot de passe expire aujourd\'hui</string>
+    <string name="password_header">MOT DE PASSE</string>
+    <string name="password_len_short_opt">Mot de passe trop court pour les options</string>
+    <string name="password_loaded">Mot de passe chargé</string>
+    <string name="password_not_found">Mot de passe non trouvé pour %1$s</string>
+    <string name="password_policy">Stratégie mot de passe </string>
+    <string name="password_policies">Stratégies mot de passe </string>
+    <string name="password_record">Entrée mot de passe </string>
+    <string name="password_save_canceled_key_error">Enregistrement du mot de
+        passe annulé. Échec de la création de la clé d\'encryption:%1$s</string>
+    <string name="password_saved">Mot de passe enregistré</string>
+    <string name="password_times_header">TEMPS MOT DE PASSE</string>
+    <string name="password_with_expiration">Mot de passe avec date d\'expiration</string>
+    <string name="passwords">Mots de passe</string>
+    <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>
+    <string name="permissions">Autorisations</string>
+    <string name="policy_header">STRATÉGIE</string>
+    <string name="policy_no">Non</string>
+    <string name="policy_yes_len">Oui - Au moins %1$d</string>
+    <string name="policy_yes_sym_default">Oui - Au moins %1$d des symboles par défaut: %2$s</string>
+    <string name="policy_yes_sym_easy">Oui - Au moins %1$d des symboles simples: %2$s</string>
+    <string name="policy_yes_sym_policy">Oui - Au moins %1$d des symboles de stratégie: %2$s</string>
+    <string name="policy_yes_sym_pronounce">Oui - Au moins %1$d des symboles prononçables: %2$s</string>
+    <string name="preferences">Préférences</string>
+    <string name="press_again_close_warning">Appuyez à nouveau pour fermer le fichier</string>
+    <string name="press_password_warning">Appuyez de nouveau Mot de passe pour coller dans le champ visible</string>
+    <string name="press_yubikey">Appyuez sur la YubiKey</string>
+    <string name="protect_all">Protéger toutes les entrées</string>
+    <string name="protect_group">Protéger un groupe d\'entrées</string>
+    <string name="protected_record">Protégé</string>
+    <string name="protected_record_header">ENTRÉE PROTEGÉE</string>
+    <string name="psafe3_ext">.psafe3</string>
+    <string name="query_label">Recherche: %1$s</string>
+    <string name="recent_files">Fichiers Récents</string>
+    <string name="record">Entrée</string>
+    <string name="records">Entrées</string>
+    <string name="record_has_references">L\'entrée contient des références</string>
+    <string name="record_not_found">Entrée introuvable</string>
+    <string name="record_policy">Stratégie Entrée</string>
+    <string name="record_sort_order">Ordre de tri des entrées</string>
+    <string name="record_type">Type d\'entrée</string>
+    <string name="read_only_about">Lecture seule</string>
+    <string name="read_only_file">Lecture seule</string>
+    <string name="read_only_media">Le fichier se trouve sur support en lecture seule. Cette situation peut se produire avec Kitkat et plus sur des cartes SD amovibles.</string>
+    <string name="read_write">Lecture-écriture</string>
+    <string name="references_label">RÉFÉRENCES</string>
+    <string name="regular_expression">Expression régulière</string>
+    <string name="regular_expression_summary">Utiliser une expression régulière pour la recherche au lieu d\'une sous-chaîne</string>
+    <string name="remove">Supprimer</string>
+    <string name="recurring">Périodique</string>
+    <string name="save">Enregistrer</string>
+    <string name="save_password">Enregistrer mot de passe</string>
+    <string name="save_password_p">Enregistrer mot de passe?</string>
+    <string name="save_password_warning">
+        Après l\'ouverture du fichier, le mot de passe entré sera enregistré
+        localement. Il est encrypté en utilisant une clé AES-256 protégée par
+        le lecteur d\'empreinte. Le lecteur d\'empreinte peut ne pas être
+        aussi sécurisé que le fichier de mot de passe.
+    </string>
+    <string name="saving_file">Enregistrement %s…</string>
+    <string name="search">Rechercher</string>
+    <string name="search_hint">Rechercher PasswdSafe</string>
+    <string name="select_accounts">Sélectionnez comptes</string>
+    <string name="select_file_label">Sélectionnez le fichier passwdsafe:</string>
+    <string name="send">Envoyer</string>
+    <string name="set_password">Définir le mot de passe</string>
+    <string name="shortcut_base_record_header">RACCOURCI</string>
+    <string name="shortcut_file">Raccourci Fichier</string>
+    <string name="shortcut_record">Raccourci Entrée </string>
+    <string name="shortcut_to_same_record">Raccourci pour la même entrée</string>
+    <string name="show_backup_files">Afficher les sauvegardes</string>
+    <string name="show_password">Afficher mot de passe</string>
+    <string name="show_passwords">Afficher mots de passe</string>
+    <string name="symbols_used_by_default">Les symboles utilisés par défaut dans de mot de passe stratégie: %1$s</string>
+    <string name="sync">Synchroniser</string>
+    <string name="times_header">TEMPS</string>
+    <string name="title">Titre</string>
+    <string name="touch_sensor_to_save_the_password">Toucher le lecteur
+        d\'empreinte digitale pour enregistrer le mot de passe</string>
+    <string name="touch_sensor_to_load_saved_password">Toucher le lecteur
+        d\'empreinte digitale pour charger le mot de passe enregistré</string>
+    <string name="unknown_sync_file">Fichier synchronisé inconnu</string>
+    <string name="unprotect_all">Déprotéger toutes les entrées</string>
+    <string name="unprotect_group">Déprotéger les groupes</string>
+    <string name="unprotect_to_modify">Déprotéger les modifications</string>
+    <string name="username">Nom utilisateur</string>
+    <string name="use_count">Utiliser compteur</string>
+    <string name="use_digits">Utiliser chiffres</string>
+    <string name="use_light_theme">Utilise le thème clair</string>
+    <string name="use_lowercase">Utiliser minuscules</string>
+    <string name="use_symbols">Utiliser symboles</string>
+    <string name="use_uppercase">Utiliser majuscules</string>
+    <string name="username_header">NOM UTILISATEUR</string>
+    <string name="view_password_expirations">Voir les expirations de mot de passe</string>
+    <string name="word_wrap">Adapter les retours-chariot</string>
+    <string name="yes">Oui</string>
+    <string name="yubikey">YubiKey</string>
+    <string name="yubikey_disabled">YubiKey désactivée. Activer NFC pour utiliser.</string>
+    <string name="yubikey_error">Erreur de communication avec le YubiKey</string>
+    <string name="yubikey_slot_1">YubiKey Slot 1</string>
+    <string name="yubikey_slot_2">YubiKey Slot 2</string>
+
+    <string name="release_notes">
+        &lt;b&gt;6.4.1&lt;/b&gt; - Correction plantage lors de l\'ouverture
+        fichier protégé par mot de passe.  Correction texte sombre sur le
+        clavier.  Amélioration traduction allemande.  Affichage licenses dans
+        l\'écran à propos.
+        \n\n
+        &lt;b&gt;6.4.0&lt;/b&gt; - Ajout option enregistrement mots de passe
+        protégé par empreinte digitale pour Android 6 et supérieur
+        \n\n
+        &lt;b&gt;6.3.0&lt;/b&gt; - Amélioration de l\'usage du clavier. Ajout
+        touches basiques sur le clavier pour la saisie du mot de passe.
+        Support changement des claviers.
+        \n\n
+        &lt;b&gt;6.2.0&lt;/b&gt; - Autorise quelques essais de mots de passe
+        invalides lors de l\'ouverture du fichier.  Ajout entrée menu pour
+        copier l\'URL et champs e-mail.  Utilise une police avec un zéro barré
+        pour les mots de passe.
+        \n\n
+        &lt;b&gt;6.1.2&lt;/b&gt; - Réparation plantage lors de l\'ouverture des
+        préférences.  Correction de bugs.
+        \n\n
+        &lt;b&gt;6.1.1&lt;/b&gt; - Demander les permissions du stockage si
+        demandés.  Correction du bug copier-coller.
+        \n\n
+        &lt;b&gt;6.1.0&lt;/b&gt; - Ajout option pour thème foncé dans les
+        préférences.  Amélioration traduction française.  Ajout option copie
+        dans presse papier sur appui long.
+        \n\n
+        &lt;b&gt;6.0.2&lt;/b&gt; - Améliorer traduction allemande. Tenter un
+        correctif pour l\'erreur la permission de refus lors de l\'ouverture
+        des fichiers.
+        \n\n
+        &lt;b&gt;6.0.1&lt;/b&gt; - Ajouter une option de menu pour copier le mot
+        de passe pour le presse-papiers avec un avertissement
+        \n\n
+        &lt;b&gt;6.0.0&lt;/b&gt; - Mettre à jour l\'interface utilisateur pour
+        le design material et le soutien de la tablette
+        \n\n
+        &lt;b&gt;5.4.0&lt;/b&gt;\n
+        - Ajout du support OneDrive. Après avoir authentifié un compte, choisir
+        les fichiers à synchroniser.\n
+        - Ajouter préférence record pour trier les groupes avant, après, ou
+        mélangé avec des enregistrements
+        \n\n
+        &lt;b&gt;5.3.2&lt;/b&gt; - Utilisez le sélecteur de fichier précédent
+        par défaut
+        \n\n
+        &lt;b&gt;5.3.1&lt;/b&gt; - Ajouter aide pour permettre le stockage
+        interne pour le nouveau sélecteur ou permettant le sélecteur de legs.
+        \n\n
+        &lt;b&gt;5.3.0&lt;/b&gt; - Ajouter curseur pour révéler des parties
+        d\'un mot de passe. Sur Kitkat et plus, utiliser le gestionnaire de
+        documents intégrée à ouvrir ou créer des fichiers.
+        \n\n
+        &lt;b&gt;5.2.0&lt;/b&gt; - Ajout du support ownCloud.  Les comptes sont
+        choisis parmi la liste dans l\'application ownCloud.   Une fois l\'accès 
+        est autorisé, les fichiers de mot de passe peuvent être choisis à 
+        synchroniser.
+        \n\n
+        &lt;b&gt;5.1.0&lt;/b&gt; -  Ajout du support pour les appareils Samsung
+        multifenêtré. Permettre la sélection de texte des notes.
+        \n\n
+        &lt;b&gt;5.0.0&lt;/b&gt; - Soutenir YubiKey NEO pour les appareils avec
+        la technologie NFC
+        \n\n
+        &lt;b&gt;4.7.3&lt;/b&gt; - Maintenir un fichier ouvert lorsque 
+        l\'application est lancée à partir de l\'écran d\'accueil
+        \n\n
+        &lt;b&gt;4.7.2&lt;/b&gt; - Amélioration des performances lors de 
+        l\'ouverture d\'un fichier avec beaucoup d\'itérations de mot de passe
+        \n\n
+        &lt;b&gt;4.7.1&lt;/b&gt; - Correction d\'un crash avec des préférences
+        \n\n
+        &lt;b&gt;4.7.0&lt;/b&gt; - Ajouter une traduction en allemand
+        \n\n
+        &lt;b&gt;4.6.0&lt;/b&gt;\n
+        - Tenter de détecter fichiers en lecture seule sur des cartes SD avec 
+        Kitkat. S\'il vous plaît envoyer vos commentaires si la détection est 
+        ou ne fonctionne pas.\n
+        - Afficher le mot de passe actuel lors de l\'édition de référence\n
+        - Afficher la date de modification des fichiers locaux dans la liste 
+        des fichiers
+        \n\n
+        &lt;b&gt;4.5.0&lt;/b&gt; - Ajout du support de Box avec PasswdSafe Sync.
+        Fichiers par mot de passe (.psafe3) sont synchronisés dans le dossier
+        haut et un dossier taggés avec \'passwdsafe\'.
+        \n\n
+        &lt;b&gt;4.4.0&lt;/b&gt;\n
+        - Ajouter une préférence de mot de passe pour l\'ensemble de symboles
+        à utiliser par défaut dans les stratégies de mot de passe\n
+        - Le groupe actuel est défini comme la valeur par défaut pour les
+        nouvelles entrées\n
+        - Fichiers synchronisés peuvent être définies comme un fichier par
+        défaut
+        \n\n
+        &lt;b&gt;4.3.0&lt;/b&gt; - Afficher le dossier d\'un fichier
+        \n\n
+        &lt;b&gt;4.2.0&lt;/b&gt; - Une méthode de saisie est disponible qui peut
+        coller domaines de la dernière passe enregistrement sélectionné. La
+        méthode de saisie doit être activée dans les paramètres du système
+        avant qu\'il puisse être utilisé.
+        \n\nPour utiliser:\n
+        - Sélectionnez un enregistrement dans PasswdSafe\n
+        - Ouvrez l\'application qui va utiliser les champs de l\'enregistrement\n
+        - Mettre à la méthode de saisie PasswdSafe\n
+        - Sélectionnez les champs à coller des valeurs dans l\'application\n
+        - Sélectionnez l\'icône PasswdSafe de choisir un dossier différent si nécessaire\n
+    </string>
+
+    <plurals name="expiring_passwords">
+        <item quantity="one">%1$d mot de passe expire</item>
+        <item quantity="other">%1$d mots de passe expirent</item>
+    </plurals>
+
+    <plurals name="group_items">
+        <item quantity="one">[%d entrée]</item>
+        <item quantity="other">[%d entrées]</item>
+    </plurals>
+
+    <plurals name="interval_days">
+        <item quantity="one">%d jour</item>
+        <item quantity="other">%d jours</item>
+    </plurals>
+
+    <!-- Order must match FileBackupPref enum values -->
+    <string-array name="file_backup_pref">
+        <item>Aucune</item>
+        <item>1 sauvegarde</item>
+        <item>2 sauvegardes</item>
+        <item>5 sauvegardes</item>
+        <item>10 sauvegardes</item>
+        <item>Toutes</item>
+    </string-array>
+
+    <!-- Order must match FileTimeoutPref enum values -->
+    <string-array name="file_timeout_pref">
+        <item>Jamais</item>
+        <item>30 secondes</item>
+        <item>2 minutes</item>
+        <item>5 minutes</item>
+        <item>15 minutes</item>
+        <item>1 heure</item>
+    </string-array>
+
+    <!-- Order must match constants in RecordSortOrderPref -->
+    <string-array name="record_sort_order_pref">
+        <item>Groupes en premiers</item>
+        <item>Groupes mélangé</item>
+        <item>Groupes en fin</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdSafeEditRecordFragment -->
+    <string-array name="record_type">
+        <item>Normal</item>
+        <item>Alias</item>
+        <item>Raccourci</item>
+    </string-array>
+
+    <!-- Order must match values of PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filters">
+        <item>Expiré</item>
+        <item>Aujourd\'hui</item>
+        <item>Dans une Semaine</item>
+        <item>Dans deux Semaines</item>
+        <item>Dans un Mois</item>
+        <item>Dans un An</item>
+        <item>Tout</item>
+        <item>Personnalisée</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_record">
+        <item>Un mot de passe a expiré</item>
+        <item>Un mot de passe expire aujourd\'hui</item>
+        <item>Un mot de passe expire dans une semaine</item>
+        <item>Un mot de passe expire dans les deux semaines</item>
+        <item>Un mot de passe expire dans un mois</item>
+        <item>Un mot de passe expire dans un an</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_records">
+        <item>%1$s mots de passe ont expiré</item>
+        <item>%1$s mots de passe expirent aujourd\'hui</item>
+        <item>%1$s mots de passe expirent dans une semaine</item>
+        <item>%1$s mots de passe expirent dans les deux semaines</item>
+        <item>%1$s mots de passe expirent dans un mois</item>
+        <item>%1$s mots de passe expirent dans un an</item>
+    </string-array>
+
+    <!-- Order must match PasswdExpiryNotifPref enum values -->
+    <string-array name="passwd_expiry_notif_pref">
+        <item>Aucune</item>
+        <item>Expiré</item>
+        <item>Aujourd\'hui</item>
+        <item>Dans une Semaine</item>
+        <item>Dans deux Semaines</item>
+        <item>Dans un Mois</item>
+        <item>Dans un An</item>
+     </string-array>
+
+    <!-- Order must match constants in PasswdExpiration.Type -->
+    <string-array name="expire_type">
+        <item>Jamais</item>
+        <item>Date</item>
+        <item>Intervalle</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdPolicy.Type -->
+    <string-array name="policy_type">
+        <item>Normal</item>
+        <item>Facile-à-lire</item>
+        <item>Prononçable</item>
+        <item>Hexadécimal</item>
+    </string-array>
+</resources>

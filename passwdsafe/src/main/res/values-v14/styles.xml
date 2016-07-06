@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources>
+    <!--
+      Base application themes for API 14+. These themes completely replace
+      AppBase themes from res/values/styles.xml on API 14+ devices.
+    -->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="AppBaseTheme_Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="AppBaseThemeDark" parent="Theme.AppCompat">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="AppBaseThemeDark_Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="ListItemText">
+        <item name="android:textAppearance">?android:attr/textAppearanceListItem</item>
+    </style>
+
+</resources>

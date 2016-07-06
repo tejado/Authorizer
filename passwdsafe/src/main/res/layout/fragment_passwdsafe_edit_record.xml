@@ -1,0 +1,432 @@
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/fragment_full_vertical_margin"
+            android:paddingLeft="@dimen/fragment_full_horizontal_margin"
+            android:paddingRight="@dimen/fragment_full_horizontal_margin"
+            android:paddingTop="@dimen/fragment_full_vertical_margin"
+            tools:context="com.jefftharris.passwdsafe.PasswdSafeEditRecordFragment">
+
+    <LinearLayout android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical">
+
+        <LinearLayout android:id="@+id/type_group"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:paddingBottom="2dp">
+
+            <TextView style="@style/TextAppearance.AppCompat.Caption"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingEnd="4dp"
+                      android:paddingLeft="4dp"
+                      android:paddingRight="4dp"
+                      android:paddingStart="4dp"
+                      android:text="@string/type"/>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+
+                <Spinner android:id="@+id/type"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="0"
+                         android:entries="@array/record_type"
+                         android:prompt="@string/choose_type"
+                         android:spinnerMode="dropdown"
+                         tools:ignore="UnusedAttribute"/>
+
+                <TextView android:id="@+id/link_ref"
+                          style="@style/Widget.AppCompat.Spinner.Underlined"
+                          android:layout_width="0dp"
+                          android:layout_height="wrap_content"
+                          android:layout_weight="1"
+                          android:layout_marginLeft="8dp"
+                          android:layout_marginStart="8dp"
+                          android:hint="@string/choose"/>
+
+            </LinearLayout>
+
+            <TextView android:id="@+id/type_error"
+                      style="@style/TextAppearance.Design.Error"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingEnd="4dp"
+                      android:paddingLeft="4dp"
+                      android:paddingRight="4dp"
+                      android:paddingStart="4dp"/>
+
+        </LinearLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/title_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/title"
+                android:inputType="textCapSentences|textAutoCorrect"
+                android:singleLine="true">
+                <requestFocus/>
+            </android.support.design.widget.TextInputEditText>
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:paddingBottom="2dp">
+
+            <TextView style="@style/TextAppearance.AppCompat.Caption"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingEnd="4dp"
+                      android:paddingLeft="4dp"
+                      android:paddingRight="4dp"
+                      android:paddingStart="4dp"
+                      android:text="@string/group"/>
+
+            <Spinner android:id="@+id/group"
+                     style="@style/Widget.AppCompat.Spinner.Underlined"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:prompt="@string/choose_group"
+                     android:spinnerMode="dialog"
+                     tools:ignore="UnusedAttribute"/>
+
+            <TextView android:id="@+id/group_error"
+                      style="@style/TextAppearance.Design.Error"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingEnd="4dp"
+                      android:paddingLeft="4dp"
+                      android:paddingRight="4dp"
+                      android:paddingStart="4dp"/>
+
+        </LinearLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/user"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/username"
+                android:inputType="textNoSuggestions"
+                android:singleLine="true"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/url_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/url"
+                android:inputType="textUri"
+                android:singleLine="true"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/email_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:singleLine="true"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <!-- Password fields -->
+        <TextView android:id="@+id/password_label"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="@string/password"
+                  android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <LinearLayout android:id="@+id/password_fields"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="vertical"
+                      android:paddingBottom="12dp"
+                      android:paddingLeft="6dp"
+                      android:paddingRight="6dp"
+                      android:paddingTop="6dp">
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_marginBottom="6dp"
+                          android:orientation="horizontal">
+
+                <TextView android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:text="@string/current"
+                          android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <TextView android:id="@+id/password_current"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_marginLeft="6dp"
+                          android:layout_marginStart="6dp"
+                          android:inputType="textPassword"
+                          android:textAppearance="?android:attr/textAppearanceMedium"
+                          android:typeface="monospace"
+                          tools:ignore="TextViewEdits"/>
+
+            </LinearLayout>
+
+            <RelativeLayout android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/password_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/password"
+                        android:inputType="textPassword"
+                        android:singleLine="true"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageView android:id="@+id/password_visibility"
+                           style="@style/Widget.AppCompat.ActionButton"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_alignParentEnd="true"
+                           android:layout_alignParentRight="true"
+                           android:layout_marginTop="10dp"
+                           android:clickable="true"
+                           android:contentDescription="@string/show_passwords"
+                           android:longClickable="true"
+                           android:src="?attr/drawableActionVisibility"/>
+
+                <ImageView android:id="@+id/password_generate"
+                           style="@style/Widget.AppCompat.ActionButton"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_marginTop="10dp"
+                           android:layout_toLeftOf="@id/password_visibility"
+                           android:layout_toStartOf="@id/password_visibility"
+                           android:clickable="true"
+                           android:contentDescription="@string/generate_password"
+                           android:longClickable="true"
+                           android:src="?attr/drawableActionNewPassword"/>
+            </RelativeLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/password_confirm_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/password_confirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/confirm"
+                    android:inputType="textPassword"
+                    android:singleLine="true"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <!-- Password policy -->
+            <TextView android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:text="@string/password_policy"
+                      android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+
+                <Spinner android:id="@+id/policy"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="0dp"
+                         android:layout_height="wrap_content"
+                         android:layout_gravity="center_vertical"
+                         android:layout_weight="1"
+                         android:gravity="fill_vertical"/>
+
+                <Button android:id="@+id/policy_edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/edit"/>
+
+            </LinearLayout>
+
+            <com.jefftharris.passwdsafe.view.PasswdPolicyView
+                android:id="@+id/policy_view"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"/>
+
+            <!-- Pasword expiration -->
+            <LinearLayout android:id="@+id/expire_group"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical">
+
+                <TextView android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:text="@string/password_expiration"
+                          android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <Spinner android:id="@+id/expire_choice"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="fill_parent"
+                         android:layout_height="wrap_content"
+                         android:entries="@array/expire_type"
+                         android:prompt="@string/choose_type"/>
+
+                <LinearLayout android:id="@+id/expire_date_fields"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:orientation="horizontal">
+
+                    <TextView android:id="@+id/expire_date_time"
+                              style="@style/Widget.AppCompat.Spinner.Underlined"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"/>
+
+                    <TextView android:id="@+id/expire_date_date"
+                              style="@style/Widget.AppCompat.Spinner.Underlined"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_marginLeft="8dp"
+                              android:layout_marginStart="8dp"/>
+
+                </LinearLayout>
+
+                <TextView android:id="@+id/expire_date_error"
+                          style="@style/TextAppearance.Design.Error"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:paddingEnd="4dp"
+                          android:paddingLeft="4dp"
+                          android:paddingRight="4dp"
+                          android:paddingStart="4dp"
+                          android:text="@string/password_expiration_in_past"/>
+
+                <RelativeLayout android:id="@+id/expire_interval_fields"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/expire_interval_val_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/expire_interval_val"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/days"
+                            android:inputType="number"
+                            android:minWidth="64dp"/>
+                    </android.support.design.widget.TextInputLayout>
+
+                    <CheckBox android:id="@+id/expire_interval_recurring"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_marginLeft="8dp"
+                              android:layout_marginStart="8dp"
+                              android:layout_marginTop="16dp"
+                              android:layout_toEndOf="@id/expire_interval_val_input"
+                              android:layout_toRightOf="@id/expire_interval_val_input"
+                              android:text="@string/recurring"/>
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- Password history -->
+            <RelativeLayout android:id="@+id/history_group"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content">
+                <Button android:id="@+id/history_addremove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:text="@string/add"/>
+
+                <TextView android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignBaseline="@id/history_addremove"
+                          android:layout_alignBottom="@id/history_addremove"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentStart="true"
+                          android:layout_alignTop="@id/history_addremove"
+                          android:layout_toLeftOf="@id/history_addremove"
+                          android:layout_toStartOf="@id/history_addremove"
+                          android:text="@string/history"
+                          android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+                <CheckBox android:id="@+id/history_enabled"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentStart="true"
+                          android:layout_below="@+id/history_addremove"
+                          android:layout_marginTop="16dp"
+                          android:text="@string/enabled"/>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/history_max_size_input"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/history_addremove"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_toEndOf="@+id/history_enabled"
+                    android:layout_toRightOf="@+id/history_enabled">
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/history_max_size"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/max_size"
+                        android:inputType="number"
+                        android:minWidth="100dip"
+                        android:singleLine="false"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <ListView android:id="@+id/history"
+                          android:layout_width="fill_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_below="@+id/history_max_size_input"
+                          tools:ignore="NestedScrolling"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <!-- Notes -->
+        <TextView android:id="@+id/notes_label"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="@string/notes"
+                  android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <EditText android:id="@+id/notes"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:inputType="textCapSentences|textMultiLine|textLongMessage|textAutoCorrect"/>
+    </LinearLayout>
+
+</ScrollView>
