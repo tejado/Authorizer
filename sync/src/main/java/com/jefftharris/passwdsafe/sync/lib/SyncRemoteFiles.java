@@ -26,16 +26,7 @@ public class SyncRemoteFiles
      */
     public SyncRemoteFiles()
     {
-        this(new HashMap<String, ProviderRemoteFile>());
-    }
-
-    /**
-     * Constructor
-     */
-    public SyncRemoteFiles(Map<String, ProviderRemoteFile> remoteFiles)
-    {
-        // TODO: remove
-        itsRemoteFiles = remoteFiles;
+        itsRemoteFiles = new HashMap<>();
         itsRemoteFilesForNew = new HashMap<>();
     }
 
