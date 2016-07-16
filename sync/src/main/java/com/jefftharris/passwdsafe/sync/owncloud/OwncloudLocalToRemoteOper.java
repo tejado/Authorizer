@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.owncloud;
@@ -19,7 +20,6 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractLocalToRemoteSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
-import com.owncloud.android.lib.resources.files.FileUtils;
 import com.owncloud.android.lib.resources.files.ReadRemoteFileOperation;
 import com.owncloud.android.lib.resources.files.RemoteFile;
 import com.owncloud.android.lib.resources.files.UploadRemoteFileOperation;
@@ -58,7 +58,7 @@ public class OwncloudLocalToRemoteOper extends
                 setLocalFile(uploadFile);
                 if (isInsert()) {
                     remotePath =
-                            FileUtils.PATH_SEPARATOR + itsFile.itsLocalTitle;
+                            OwncloudSyncer.createRemoteIdFromLocal(itsFile);
                 } else {
                     remotePath = itsFile.itsRemoteId;
                 }
@@ -66,7 +66,7 @@ public class OwncloudLocalToRemoteOper extends
                 tmpFile = File.createTempFile("passwd", ".psafe3");
                 tmpFile.deleteOnExit();
                 uploadFile = tmpFile;
-                remotePath = FileUtils.PATH_SEPARATOR + itsFile.itsLocalTitle;
+                remotePath = OwncloudSyncer.createRemoteIdFromLocal(itsFile);
             }
 
             UploadRemoteFileOperation oper = new UploadRemoteFileOperation(
