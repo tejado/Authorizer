@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe.sync.lib;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import android.content.Context;
@@ -104,14 +103,6 @@ public abstract class AbstractProviderSyncer<ProviderClientT>
     /** Create an operation to remove a file */
     protected abstract AbstractRmSyncOper<ProviderClientT>
     createRmFileOper(DbFile dbfile);
-
-
-    /** Update database files from the remote files */
-    protected void updateDbFiles(Map<String, ProviderRemoteFile> remfiles)
-    {
-        // TODO: remove
-        updateDbFiles(new SyncRemoteFiles(remfiles));
-    }
 
 
     /** Update database files from the remote files */
