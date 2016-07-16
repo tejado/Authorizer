@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/listPreferredItemHeight"
+                android:paddingEnd="@dimen/listPreferredItemPaddingEnd"
+                android:paddingLeft="@dimen/listPreferredItemPaddingStart"
+                android:paddingRight="@dimen/listPreferredItemPaddingEnd"
+                android:paddingStart="@dimen/listPreferredItemPaddingStart">
+
+    <TextView android:id="@+id/title"
+              style="@style/TextAppearance.AppCompat.Subhead"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="8dp"/>
+
+    <TextView android:id="@+id/log"
+              style="@style/TextAppearance.AppCompat.Body1"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignLeft="@id/title"
+              android:layout_alignStart="@id/title"
+              android:layout_below="@id/title"/>
+
+    <TextView android:id="@+id/stack"
+              style="@style/TextAppearance.AppCompat.Body2"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_alignLeft="@id/title"
+              android:layout_alignStart="@id/title"
+              android:layout_below="@id/log"
+              android:textSize="10sp"
+              tools:ignore="SmallSp"/>
+
+</RelativeLayout>
