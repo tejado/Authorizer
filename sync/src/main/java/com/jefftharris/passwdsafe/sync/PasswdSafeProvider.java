@@ -114,6 +114,8 @@ public class PasswdSafeProvider extends ContentProvider
                           SyncDb.DB_COL_SYNC_LOGS_FLAGS);
         SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_LOG,
                           SyncDb.DB_COL_SYNC_LOGS_LOG);
+        SYNC_LOGS_MAP.put(PasswdSafeContract.SyncLogs.COL_STACK,
+                          SyncDb.DB_COL_SYNC_LOGS_STACK);
     }
 
 

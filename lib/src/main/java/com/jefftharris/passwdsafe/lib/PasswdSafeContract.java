@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.lib;
@@ -222,6 +223,7 @@ public final class PasswdSafeContract
         public static final String COL_END = "end";
         public static final String COL_FLAGS = "flags";
         public static final String COL_LOG = "log";
+        public static final String COL_STACK = "stack";
 
         public static final String START_SORT_ORDER = COL_START + " DESC";
         public static final String DEFAULT_SELECTION = COL_LOG + " != ''";
@@ -232,7 +234,8 @@ public final class PasswdSafeContract
             SyncLogs.COL_START,
             SyncLogs.COL_END,
             SyncLogs.COL_FLAGS,
-            SyncLogs.COL_LOG
+            SyncLogs.COL_LOG,
+            SyncLogs.COL_STACK
         };
 
         //public static final int PROJECTION_IDX_ID = 0;
@@ -241,6 +244,7 @@ public final class PasswdSafeContract
         public static final int PROJECTION_IDX_END = 3;
         public static final int PROJECTION_IDX_FLAGS = 4;
         public static final int PROJECTION_IDX_LOG = 5;
+        public static final int PROJECTION_IDX_STACK = 6;
 
         //public static final int FLAGS_IS_FULL =                 1 << 0;
         public static final int FLAGS_IS_MANUAL =               1 << 1;
