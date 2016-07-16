@@ -128,7 +128,6 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
             } else {
                 checkRemoteFileForNew(dbfile, driveFiles);
             }
-
         }
 
         return driveFiles;
