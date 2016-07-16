@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.lib;
@@ -117,11 +118,29 @@ public class SyncLogRecord
             if (actions.length() != 0) {
                 actions.append("\n");
             }
-            StringWriter writer = new StringWriter();
-            e.printStackTrace(new PrintWriter(writer));
-            actions.append("FAILURE: ").append(writer.toString());
+            actions.append("FAILURE: ").append(e.toString());
         }
         return actions.toString();
+    }
+
+    /**
+     * Get the stack trace in the record
+     */
+    public String getStacktrace()
+    {
+        StringWriter strwriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(strwriter);
+        boolean first = true;
+        for (Exception e: itsFailures) {
+            if (first) {
+                first = false;
+            } else {
+                writer.println();
+                writer.println();
+            }
+            e.printStackTrace(writer);
+        }
+        return strwriter.toString();
     }
 
     /** Get a string representation of the record */
