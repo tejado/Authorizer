@@ -151,12 +151,28 @@ public final class GuiUtils
     public static void setupFormKeyboard(TextView firstField,
                                          TextView finalField,
                                          Context ctx,
-                                         Runnable enterRunnable)
+                                         final Runnable enterRunnable)
     {
         if (firstField != null) {
             GuiUtilsFroyo.showKeyboard(firstField, ctx);
         }
-        setupKeyboardEnter(finalField, enterRunnable);
+
+        finalField.setOnKeyListener(new OnKeyListener()
+        {
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_CENTER:
+                    case KeyEvent.KEYCODE_ENTER: {
+                        enterRunnable.run();
+                        return true;
+                    }
+                    }
+                }
+                return false;
+            }
+        });
     }
 
 
@@ -177,31 +193,6 @@ public final class GuiUtils
         } else {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
-    }
-
-
-    /**
-     * Setup a field to run an action on an enter or dpad center key press
-     */
-    public static void setupKeyboardEnter(TextView field,
-                                           final Runnable enterRunnable)
-    {
-        field.setOnKeyListener(new OnKeyListener()
-        {
-            public boolean onKey(View v, int keyCode, KeyEvent event)
-            {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_CENTER:
-                    case KeyEvent.KEYCODE_ENTER: {
-                        enterRunnable.run();
-                        return true;
-                    }
-                    }
-                }
-                return false;
-            }
-        });
     }
 
 
