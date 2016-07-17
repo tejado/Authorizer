@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe.lib.view;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -192,19 +191,6 @@ public final class GuiUtils
             }
         } else {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-        }
-    }
-
-
-    /**
-     * Set a listener to show the keyboard when the dialog is shown. Only works
-     * on Froyo and higher.
-     */
-    public static void setShowKeyboardListener(Dialog dialog, View view,
-                                                Context ctx)
-    {
-        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_FROYO) {
-            GuiUtilsFroyo.setShowKeyboardListener(dialog, view, ctx);
         }
     }
 
