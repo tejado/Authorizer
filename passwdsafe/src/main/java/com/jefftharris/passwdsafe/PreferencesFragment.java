@@ -315,7 +315,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     }
 
     @Override
-    public void promptCanceled(Bundle confirmArgs)
+    public void promptCanceled()
     {
     }
 

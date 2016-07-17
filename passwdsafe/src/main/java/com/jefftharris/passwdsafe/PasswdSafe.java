@@ -1053,7 +1053,7 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
-    public void promptCanceled(Bundle confirmArgs)
+    public void promptCanceled()
     {
     }
 
