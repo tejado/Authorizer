@@ -63,7 +63,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     private DbxClientV2 itsClient;
     private String itsUserId = null;
     private boolean itsIsPendingAdd = false;
-    private ArrayList<TokenRevokeTask> itsRevokeTasks = new ArrayList<>();
+    private final ArrayList<TokenRevokeTask> itsRevokeTasks = new ArrayList<>();
 
     /** Constructor */
     public DropboxCoreProvider(Context ctx)
