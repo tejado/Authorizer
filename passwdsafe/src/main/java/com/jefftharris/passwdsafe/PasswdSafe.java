@@ -223,13 +223,16 @@ public class PasswdSafe extends AppCompatActivity
 
         itsQueryPanel = findViewById(R.id.query_panel);
         View queryClearBtn = findViewById(R.id.query_clear_btn);
+        assert queryClearBtn != null;
         queryClearBtn.setOnClickListener(this);
         itsQuery = (TextView)findViewById(R.id.query);
 
         itsExpiryPanel = findViewById(R.id.expiry_panel);
+        assert itsExpiryPanel != null;
         itsExpiryPanel.setOnClickListener(this);
         GuiUtils.setVisible(itsExpiryPanel, false);
         View expiryClearBtn = findViewById(R.id.expiry_clear_btn);
+        assert expiryClearBtn != null;
         expiryClearBtn.setOnClickListener(this);
         itsExpiry = (TextView)findViewById(R.id.expiry);
 
