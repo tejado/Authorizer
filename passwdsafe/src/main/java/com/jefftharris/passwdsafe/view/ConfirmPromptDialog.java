@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -42,7 +42,7 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
         void promptConfirmed(Bundle confirmArgs);
 
         /** Handle when a prompt was canceled */
-        void promptCanceled(Bundle confirmArgs);
+        void promptCanceled();
     }
 
     private CheckBox itsConfirmCb;
@@ -137,7 +137,7 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
             break;
         }
         case AlertDialog.BUTTON_NEGATIVE: {
-            itsListener.promptCanceled(confirmArgs);
+            itsListener.promptCanceled();
             break;
         }
         }
@@ -154,8 +154,7 @@ public class ConfirmPromptDialog extends AppCompatDialogFragment
     {
         super.onCancel(dialog);
         if (itsListener != null) {
-            Bundle confirmArgs = getArguments().getBundle("confirmArgs");
-            itsListener.promptCanceled(confirmArgs);
+            itsListener.promptCanceled();
         }
     }
 
