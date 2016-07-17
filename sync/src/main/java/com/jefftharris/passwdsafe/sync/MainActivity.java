@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2013-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync;
@@ -128,6 +129,7 @@ public class MainActivity extends AppCompatActivity
         for (int id: new int[]{R.id.box_interval, R.id.dropbox_interval,
                                R.id.gdrive_interval, R.id.onedrive_interval}) {
             Spinner freqSpin = (Spinner)findViewById(id);
+            assert freqSpin != null;
             freqSpin.setOnItemSelectedListener(freqSelListener);
         }
 
@@ -694,6 +696,7 @@ public class MainActivity extends AppCompatActivity
     public void updateGDriveState(GDriveState state)
     {
         TextView warning = (TextView)findViewById(R.id.gdrive_sync_warning);
+        assert warning != null;
         switch (state) {
         case OK: {
             warning.setVisibility(View.GONE);
@@ -748,10 +751,13 @@ public class MainActivity extends AppCompatActivity
                     PasswdSafeContract.Providers.CONTENT_URI, id);
 
             TextView acctView = (TextView)findViewById(R.id.gdrive_acct);
+            assert acctView != null;
             acctView.setText(acct);
 
             View freqSpinLabel = findViewById(R.id.gdrive_interval_label);
+            assert freqSpinLabel != null;
             Spinner freqSpin = (Spinner)findViewById(R.id.gdrive_interval);
+            assert freqSpin != null;
             freqSpin.setSelection(freq.getDisplayIdx());
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
@@ -779,12 +785,16 @@ public class MainActivity extends AppCompatActivity
             boolean authorized = getDbxProvider().isAccountAuthorized();
 
             TextView acctView = (TextView)findViewById(R.id.dropbox_acct);
+            assert acctView != null;
             acctView.setText(acct);
             View chooseFilesBtn = findViewById(R.id.dropbox_choose_files);
+            assert chooseFilesBtn != null;
             chooseFilesBtn.setEnabled(authorized);
 
             View freqSpinLabel = findViewById(R.id.dropbox_interval_label);
+            assert freqSpinLabel != null;
             Spinner freqSpin = (Spinner)findViewById(R.id.dropbox_interval);
+            assert freqSpin != null;
             freqSpin.setSelection(freq.getDisplayIdx());
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
@@ -815,10 +825,13 @@ public class MainActivity extends AppCompatActivity
             boolean authorized = getBoxProvider().isAccountAuthorized();
 
             TextView acctView = (TextView)findViewById(R.id.box_acct);
+            assert acctView != null;
             acctView.setText(acct);
 
             View freqSpinLabel = findViewById(R.id.box_interval_label);
+            assert freqSpinLabel != null;
             Spinner freqSpin = (Spinner) findViewById(R.id.box_interval);
+            assert freqSpin != null;
             freqSpin.setSelection(freq.getDisplayIdx());
             freqSpin.setEnabled(true);
             freqSpinLabel.setEnabled(true);
@@ -851,13 +864,16 @@ public class MainActivity extends AppCompatActivity
             boolean authorized = provider.isAccountAuthorized();
 
             TextView acctView = (TextView)findViewById(R.id.onedrive_acct);
+            assert acctView != null;
             acctView.setText(acct);
 
             GuiUtils.setVisible(findViewById(R.id.onedrive_auth_required),
                                 !authorized);
 
             View freqSpinLabel = findViewById(R.id.onedrive_interval_label);
+            assert freqSpinLabel != null;
             Spinner freqSpin = (Spinner) findViewById(R.id.onedrive_interval);
+            assert freqSpin != null;
             freqSpin.setSelection(freq.getDisplayIdx());
 
             freqSpin.setEnabled(true);
@@ -886,6 +902,7 @@ public class MainActivity extends AppCompatActivity
             boolean authorized = provider.isAccountAuthorized();
 
             TextView acctView = (TextView)findViewById(R.id.owncloud_acct);
+            assert acctView != null;
             acctView.setText(acct);
 
             GuiUtils.setVisible(findViewById(R.id.owncloud_auth_required),
