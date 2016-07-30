@@ -319,12 +319,12 @@
     <string name="unprotect_group">Unprotect Group Records</string>
     <string name="unprotect_to_modify">Unprotect to modify</string>
     <string name="username">User Name</string>
-    <string name="use_count">Use Count</string>
-    <string name="use_digits">Use Digits</string>
+    <string name="use_count">Uses</string>
+    <string name="use_digits">Digits</string>
     <string name="use_light_theme">Use light theme</string>
-    <string name="use_lowercase">Use Lowercase</string>
-    <string name="use_symbols">Use Symbols</string>
-    <string name="use_uppercase">Use Uppercase</string>
+    <string name="use_lowercase">Lowercase</string>
+    <string name="use_symbols">Symbols</string>
+    <string name="use_uppercase">Uppercase</string>
     <string name="username_header">USER NAME</string>
     <string name="view_password_expirations">View password expirations</string>
     <string name="word_wrap">Word Wrap</string>
