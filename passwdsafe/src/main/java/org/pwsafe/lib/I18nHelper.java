@@ -19,11 +19,6 @@ package org.pwsafe.lib;
  */
 public class I18nHelper extends I18nHelperBase
 {
-	/**
-	 * Log4j logger
-	 */
-	private static final Log		LOG			= Log.getInstance(I18nHelper.class.getPackage().getName());
-
 	private static final I18nHelper	TheInstance	= new I18nHelper();
 
 	/**
