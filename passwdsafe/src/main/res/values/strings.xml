@@ -22,7 +22,6 @@
     <string name="case_sensitive">Case sensitive</string>
     <string name="case_sensitive_sorting">Case-sensitive sorting</string>
     <string name="change_password">Change Password</string>
-    <string name="check_box_to_confirm">Check box to confirm</string>
     <string name="choose">Choose</string>
     <string name="choose_group">Choose Group</string>
     <string name="choose_record">Choose Record</string>
@@ -336,6 +335,8 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
+        &lt;b&gt;6.4.2&lt;/b&gt; - Bug fixes.
+        \n\n
         &lt;b&gt;6.4.1&lt;/b&gt; - Fix crash when opening file with saved
         password.  Fix dark text in keyboard.  Improve German translation.
         Show licenses in About screen.

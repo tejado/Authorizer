@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,8 +7,9 @@
  */
 package com.jefftharris.passwdsafe.sync.dropbox;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.RESTUtility;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.FolderMetadata;
+import com.dropbox.core.v2.files.Metadata;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 
 /**
@@ -16,14 +17,17 @@ import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
  */
 public class DropboxCoreProviderFile implements ProviderRemoteFile
 {
-    private final DropboxAPI.Entry itsFile;
+    private final Metadata itsFile;
     private final String itsRemoteId;
+    private final String itsFolder;
 
     /** Constructor */
-    public DropboxCoreProviderFile(DropboxAPI.Entry file)
+    public DropboxCoreProviderFile(Metadata file)
     {
         itsFile = file;
-        itsRemoteId = itsFile.path.toLowerCase();
+        itsRemoteId = itsFile.getPathLower();
+        int lastSlash = itsRemoteId.lastIndexOf('/');
+        itsFolder = (lastSlash >= 0) ? itsRemoteId.substring(0, lastSlash) : "";
     }
 
     /**
@@ -41,7 +45,7 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
     @Override
     public String getDisplayPath()
     {
-        return itsFile.path;
+        return itsFile.getPathDisplay();
     }
 
     /**
@@ -50,7 +54,7 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
     @Override
     public String getTitle()
     {
-        return itsFile.fileName();
+        return itsFile.getName();
     }
 
     /**
@@ -59,7 +63,7 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
     @Override
     public String getFolder()
     {
-        return itsFile.parentPath();
+        return itsFolder;
     }
 
     /**
@@ -68,7 +72,8 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
     @Override
     public long getModTime()
     {
-        return RESTUtility.parseDate(itsFile.modified).getTime();
+        return isFolder() ?
+               0 : ((FileMetadata)itsFile).getServerModified().getTime();
     }
 
     /**
@@ -77,7 +82,7 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
     @Override
     public String getHash()
     {
-        return isFolder() ? itsFile.hash : itsFile.rev;
+        return isFolder() ? "0" : ((FileMetadata)itsFile).getRev();
     }
 
     /**
@@ -86,7 +91,7 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
     @Override
     public boolean isFolder()
     {
-        return itsFile.isDir;
+        return itsFile instanceof FolderMetadata;
     }
 
     /**
@@ -99,15 +104,40 @@ public class DropboxCoreProviderFile implements ProviderRemoteFile
     }
 
     /** Create a string form of a file entry */
-    public static String entryToString(DropboxAPI.Entry entry)
+    public static String entryToString(Metadata entry)
     {
         if (entry == null) {
             return "{null}";
         }
+        boolean isDir;
+        boolean deleted;
+        String rev;
+        String modified;
+        String clientModified;
+        if (entry instanceof FileMetadata) {
+            FileMetadata file = (FileMetadata)entry;
+            isDir = false;
+            deleted = false;
+            rev = file.getRev();
+            modified = file.getServerModified().toString();
+            clientModified = file.getClientModified().toString();
+        } else if (entry instanceof FolderMetadata) {
+            isDir = true;
+            deleted = false;
+            rev = null;
+            modified = null;
+            clientModified = null;
+        } else {
+            isDir = false;
+            deleted = true;
+            rev = null;
+            modified = null;
+            clientModified = null;
+        }
         return String.format(
-                "{path: %s, hash: %s, rev: %s, dir: %b, modified: %s, " +
-                "mime: %s, deleted: %b}",
-                entry.path, entry.hash, entry.rev, entry.isDir, entry.modified,
-                entry.mimeType, entry.isDeleted);
+                "{path: %s, rev: %s, dir: %b, modified: %s, client mod: %s, " +
+                "deleted: %b}",
+                entry.getPathLower(), rev, isDir, modified, clientModified,
+                deleted);
     }
 }

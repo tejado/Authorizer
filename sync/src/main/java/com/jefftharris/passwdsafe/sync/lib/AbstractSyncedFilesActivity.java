@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -56,6 +56,7 @@ public abstract class AbstractSyncedFilesActivity extends AppCompatActivity
 
     private Uri itsProviderUri;
     private Uri itsFilesUri;
+    private final String itsRootId;
     private final ProviderType itsProviderType;
     private final HashMap<String, Long> itsSyncedFiles = new HashMap<>();
     private LoaderCallbacks<Cursor> itsProviderLoaderCb;
@@ -66,7 +67,16 @@ public abstract class AbstractSyncedFilesActivity extends AppCompatActivity
     /** Constructor */
     protected AbstractSyncedFilesActivity(ProviderType providerType)
     {
+        this(providerType, ProviderRemoteFile.PATH_SEPARATOR);
+    }
+
+
+    /** Constructor */
+    protected AbstractSyncedFilesActivity(ProviderType providerType,
+                                          String rootId)
+    {
         itsProviderType = providerType;
+        itsRootId = rootId;
     }
 
 
@@ -89,8 +99,7 @@ public abstract class AbstractSyncedFilesActivity extends AppCompatActivity
                 PasswdSafeContract.RemoteFiles.TABLE).build();
 
         if (args == null) {
-            changeDir(ProviderRemoteFile.PATH_SEPARATOR,
-                      ProviderRemoteFile.PATH_SEPARATOR);
+            changeDir(ProviderRemoteFile.PATH_SEPARATOR, itsRootId);
         }
 
         itsProviderLoaderCb = new ProviderLoaderCb();
@@ -191,7 +200,7 @@ public abstract class AbstractSyncedFilesActivity extends AppCompatActivity
         FragmentManager fragmgr = getSupportFragmentManager();
         FragmentTransaction txn = fragmgr.beginTransaction();
         txn.replace(R.id.content, files);
-        if (!TextUtils.equals(pathId, ProviderRemoteFile.PATH_SEPARATOR)) {
+        if (!TextUtils.equals(pathId, itsRootId)) {
             txn.addToBackStack(null);
         }
         txn.commit();
@@ -335,6 +344,7 @@ public abstract class AbstractSyncedFilesActivity extends AppCompatActivity
             }
             PasswdSafeUtil.dbginfo(TAG, "provider: %s", name);
             TextView title = (TextView)findViewById(R.id.title);
+            assert title != null;
             title.setText(name);
         }
     }
@@ -429,7 +439,7 @@ public abstract class AbstractSyncedFilesActivity extends AppCompatActivity
                 Toast.makeText(
                         itsContext,
                         "Error listing files: " + result.second.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_LONG).show();
             }
             itsCb.handleFiles(result.first, this);
         }

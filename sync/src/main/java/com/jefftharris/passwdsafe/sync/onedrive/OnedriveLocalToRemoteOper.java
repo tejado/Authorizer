@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe.sync.onedrive;
 import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -56,8 +55,8 @@ public class OnedriveLocalToRemoteOper
                 uploadFile = ctx.getFileStreamPath(itsFile.itsLocalFile);
                 setLocalFile(uploadFile);
                 if (isInsert()) {
-                    remotePath = ProviderRemoteFile.PATH_SEPARATOR +
-                                 Uri.encode(itsFile.itsLocalTitle);
+                    remotePath =
+                            OnedriveSyncer.createRemoteIdFromLocal(itsFile);
                 } else {
                     remotePath = itsFile.itsRemoteId;
                 }
@@ -65,8 +64,7 @@ public class OnedriveLocalToRemoteOper
                 tmpFile = File.createTempFile("passwd", ".psafe3");
                 tmpFile.deleteOnExit();
                 uploadFile = tmpFile;
-                remotePath = ProviderRemoteFile.PATH_SEPARATOR +
-                             Uri.encode(itsFile.itsLocalTitle);
+                remotePath = OnedriveSyncer.createRemoteIdFromLocal(itsFile);
             }
 
             Item updatedItem = providerClient.uploadItemByPath(

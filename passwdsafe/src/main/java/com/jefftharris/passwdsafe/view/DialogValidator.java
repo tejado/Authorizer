@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2010-2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe.view;
 import com.jefftharris.passwdsafe.R;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.text.Editable;
 import android.text.Html;
@@ -21,37 +20,6 @@ import android.widget.TextView;
 public abstract class DialogValidator
 {
     /**
-     * DialogValidator for alert dialogs
-     */
-    public static class AlertValidator extends DialogValidator
-    {
-        private final AlertDialog itsDialog;
-
-        /**
-         * Constructor with a specific view and optional password fields
-         */
-        public AlertValidator(AlertDialog dlg, View view, Context ctx)
-        {
-            super(view, ctx);
-            itsDialog = dlg;
-        }
-
-        @Override
-        protected final View getDoneButton()
-        {
-            return itsDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        }
-
-        /**
-         * Get the alert dialog
-         */
-        protected final AlertDialog getDialog()
-        {
-            return itsDialog;
-        }
-    }
-
-     /**
      * DialogValidator for alert compat dialogs
      */
     public static class AlertCompatValidator extends DialogValidator

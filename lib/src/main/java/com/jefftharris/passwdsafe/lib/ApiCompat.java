@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -32,8 +32,6 @@ public final class ApiCompat
 {
     private static final int SDK_ECLAIR =
             android.os.Build.VERSION_CODES.ECLAIR;
-    public static final int SDK_FROYO =
-        android.os.Build.VERSION_CODES.FROYO;
     public static final int SDK_HONEYCOMB = 11;
     public static final int SDK_KITKAT = 19;
     public static final int SDK_LOLLIPOP = 21;

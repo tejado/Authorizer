@@ -404,7 +404,7 @@ public class PasswdSafeOpenFileFragment
     }
 
     @Override
-    public void promptCanceled(Bundle confirmArgs)
+    public void promptCanceled()
     {
         itsSavePasswdCb.setChecked(false);
     }

@@ -133,3 +133,8 @@
 # Slf4j
 -dontwarn org.slf4j.**
 
+# Dropbox unused dependencies
+-dontwarn okhttp3.**
+-dontwarn com.squareup.okhttp.**
+-dontwarn com.google.appengine.**
+-dontwarn javax.servlet.**
