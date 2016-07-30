@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
-              android:padding="3dp">
+              android:padding="3dp"
+              tools:context="com.jefftharris.passwdsafe.view.PasswdPolicyEditDialog">
 
     <ScrollView android:layout_width="fill_parent"
                 android:layout_height="0dp"
@@ -13,39 +16,48 @@
                       android:layout_height="wrap_content"
                       android:orientation="vertical">
 
-            <TableLayout android:layout_width="match_parent"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/name_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/name"
+                    android:inputType="textCapSentences"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:orientation="horizontal">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/length"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:hint="@string/length"
+                        android:inputType="number"
+                        android:text="12"
+                        tools:ignore="HardcodedText"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <Spinner android:id="@+id/type"
+                         style="@style/Widget.AppCompat.Spinner.Underlined"
+                         android:layout_width="0dp"
                          android:layout_height="wrap_content"
-                         android:shrinkColumns="1"
-                         android:stretchColumns="1">
+                         android:layout_weight="1"
+                         android:entries="@array/policy_type"
+                         android:prompt="@string/choose_type"
+                         android:spinnerMode="dropdown"
+                         tools:ignore="UnusedAttribute"
+                         android:layout_gravity="bottom"/>
 
-                <TableRow android:id="@+id/name_row">
-
-                    <TextView style="@style/TableLabelColumn"
-                              android:text="@string/name"/>
-
-                    <EditText android:id="@+id/name"
-                              android:inputType="textCapSentences"/>
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView style="@style/TableLabelColumn"
-                              android:text="@string/length"/>
-
-                    <EditText android:id="@+id/length"
-                              android:inputType="number"/>
-                </TableRow>
-
-                <TableRow>
-
-                    <TextView style="@style/TableLabelColumn"
-                              android:text="@string/type"/>
-
-                    <Spinner android:id="@+id/type"
-                             android:entries="@array/policy_type"/>
-                </TableRow>
-
-            </TableLayout>
+            </LinearLayout>
 
             <TableLayout android:layout_width="match_parent"
                          android:layout_height="wrap_content"

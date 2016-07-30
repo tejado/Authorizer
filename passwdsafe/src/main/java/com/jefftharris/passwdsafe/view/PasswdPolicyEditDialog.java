@@ -42,9 +42,6 @@ import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
  */
 public class PasswdPolicyEditDialog extends AppCompatDialogFragment
 {
-    // TODO: refactor to normal fragment vs. dialog?
-    // TODO: update look to use TextInputLayout?
-
     /**
      * Listener interface for the owning fragment
      */
