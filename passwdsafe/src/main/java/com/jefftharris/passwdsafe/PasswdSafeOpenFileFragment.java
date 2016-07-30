@@ -413,7 +413,7 @@ public class PasswdSafeOpenFileFragment
     public void promptConfirmed(Bundle confirmArgs)
     {
         SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
-        Preferences.setFileSavedPasswordConfirm(true, prefs);
+        Preferences.setFileSavedPasswordConfirmed(prefs);
     }
 
     @Override

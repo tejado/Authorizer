@@ -215,14 +215,11 @@ public class Preferences
     }
 
     /**
-     * Set the preference for whether the user has confirmed the saved
-     * password warning
+     * Set the preference that user has confirmed the saved password warning
      */
-    public static void setFileSavedPasswordConfirm(boolean confirm,
-                                                   SharedPreferences prefs)
+    public static void setFileSavedPasswordConfirmed(SharedPreferences prefs)
     {
-        prefs.edit().putBoolean(PREF_FILE_SAVED_PASSWORD_CONFIRM, confirm)
-             .apply();
+        prefs.edit().putBoolean(PREF_FILE_SAVED_PASSWORD_CONFIRM, true).apply();
     }
 
     public static File getFileDirPref(SharedPreferences prefs)
