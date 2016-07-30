@@ -146,10 +146,8 @@ public class PasswdSafeRecordBasicFragment
                     }
                 });
 
-        if (getListener().isCopySupported()) {
-            registerForContextMenu(itsUserRow);
-            registerForContextMenu(itsPasswordRow);
-        }
+        registerForContextMenu(itsUserRow);
+        registerForContextMenu(itsPasswordRow);
 
         return root;
     }
