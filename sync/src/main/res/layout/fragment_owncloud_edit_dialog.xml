@@ -27,7 +27,6 @@
     <View style="@style/Separator"/>
 
     <TextView
-        android:id="@+id/owncloud_interval_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/interval"
