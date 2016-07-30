@@ -80,16 +80,6 @@ public class Log
 	}
 
 	/**
-	 * Writes a message at info level
-	 *
-	 * @param msg the message to issue.
-	 */
-	public final void info( String msg )
-	{
-	    android.util.Log.i( itsTag, msg );
-	}
-
-	/**
 	 * Logs a message at the warning level.
 	 *
 	 * @param msg the message to issue.
