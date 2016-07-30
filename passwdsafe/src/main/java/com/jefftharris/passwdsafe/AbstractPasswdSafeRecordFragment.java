@@ -31,9 +31,6 @@ public abstract class AbstractPasswdSafeRecordFragment
     public interface Listener
             extends AbstractPasswdSafeFileDataFragment.Listener
     {
-        /** Is copying supported */
-        boolean isCopySupported();
-
         /** Copy a field */
         void copyField(CopyField field, String recUuid);
 
