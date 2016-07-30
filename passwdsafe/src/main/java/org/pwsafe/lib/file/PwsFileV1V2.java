@@ -18,7 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
-import org.pwsafe.lib.I18nHelper;
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.crypto.BlowfishPws;
@@ -177,7 +176,7 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	{
 		if ( (buff.length == 0) || ((buff.length % getBlockSize()) != 0) )
 		{
-			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00001") );
+			throw new IllegalArgumentException("buff length");
 		}
 		readBytes( buff );
 		try {
@@ -269,7 +268,7 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	{
 		if ( (buff.length == 0) || ((buff.length % getBlockSize()) != 0) )
 		{
-			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00001") );
+			throw new IllegalArgumentException("buff length");
 		}
 
 		byte [] temp = Util.cloneByteArray( buff );
