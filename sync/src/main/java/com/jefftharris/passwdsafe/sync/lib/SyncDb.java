@@ -82,6 +82,7 @@ public class SyncDb
     public static final String DB_COL_SYNC_LOGS_END = "end";
     public static final String DB_COL_SYNC_LOGS_FLAGS = "flags";
     public static final String DB_COL_SYNC_LOGS_LOG = "log";
+    public static final String DB_COL_SYNC_LOGS_STACK = "stack";
     private static final String DB_MATCH_SYNC_LOGS_START_BEFORE =
             DB_COL_SYNC_LOGS_START + " < ?";
 
@@ -453,6 +454,7 @@ public class SyncDb
         values.put(DB_COL_SYNC_LOGS_START, logrec.getStartTime());
         values.put(DB_COL_SYNC_LOGS_END, logrec.getEndTime());
         values.put(DB_COL_SYNC_LOGS_LOG, logrec.getActions());
+        values.put(DB_COL_SYNC_LOGS_STACK, logrec.getStacktrace());
 
         int flags = 0;
         if (logrec.isManualSync()) {
@@ -528,7 +530,7 @@ public class SyncDb
     private static final class DbHelper extends SQLiteOpenHelper
     {
         private static final String DB_NAME = "sync.db";
-        private static final int DB_VERSION = 4;
+        private static final int DB_VERSION = 5;
 
         private final Context itsContext;
 
@@ -622,6 +624,13 @@ public class SyncDb
                         onUpgradeV4File(file, db);
                     }
                 }
+            }
+
+            if (oldVersion < 5) {
+                PasswdSafeUtil.dbginfo(TAG, "Upgrade to v5");
+                db.execSQL("ALTER TABLE " + DB_TABLE_SYNC_LOGS +
+                           " ADD COLUMN " + DB_COL_SYNC_LOGS_STACK +
+                           " TEXT;");
             }
         }
 

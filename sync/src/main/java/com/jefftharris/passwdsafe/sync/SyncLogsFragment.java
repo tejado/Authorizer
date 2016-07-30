@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -16,16 +16,19 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.Utils;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.view.PasswdCursorLoader;
 
 /**
@@ -39,6 +42,7 @@ public class SyncLogsFragment extends ListFragment
     private boolean itsIsShowAll = false;
     private SimpleCursorAdapter itsLogsAdapter;
     private LoaderCallbacks<Cursor> itsLogsCbs;
+    private int itsSelItemPos = -1;
 
 
     /* (non-Javadoc)
@@ -67,10 +71,11 @@ public class SyncLogsFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
 
         itsLogsAdapter = new SimpleCursorAdapter(
-               getActivity(), android.R.layout.simple_list_item_2, null,
-               new String[] { PasswdSafeContract.SyncLogs.COL_START,
-                              PasswdSafeContract.SyncLogs.COL_LOG },
-               new int[] { android.R.id.text1, android.R.id.text2 }, 0);
+                getActivity(), R.layout.listview_sync_log_item, null,
+                new String[] { PasswdSafeContract.SyncLogs.COL_START,
+                               PasswdSafeContract.SyncLogs.COL_LOG,
+                               PasswdSafeContract.SyncLogs.COL_STACK},
+                new int[] { R.id.title, R.id.log, R.id.stack }, 0);
 
         itsLogsAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder()
         {
@@ -125,6 +130,22 @@ public class SyncLogsFragment extends ListFragment
                     tv.setText(str.toString());
                     return true;
                 }
+                case PasswdSafeContract.SyncLogs.PROJECTION_IDX_STACK: {
+                    boolean checked =
+                            getListView().isItemChecked(cursor.getPosition());
+                    String stack;
+                    if (checked) {
+                        stack = cursor.getString(
+                                PasswdSafeContract.SyncLogs.PROJECTION_IDX_STACK);
+                    } else {
+                        stack = null;
+                    }
+
+                    GuiUtils.setVisible(view,
+                                        checked && !TextUtils.isEmpty(stack));
+                    ((TextView)view).setText(stack);
+                    return true;
+                }
                 }
                 return false;
             }
@@ -132,6 +153,7 @@ public class SyncLogsFragment extends ListFragment
 
         setListAdapter(itsLogsAdapter);
         setEmptyText(getString(R.string.no_logs));
+        getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
         itsLogsCbs = new LoaderCallbacks<Cursor>()
         {
@@ -212,5 +234,19 @@ public class SyncLogsFragment extends ListFragment
             return super.onOptionsItemSelected(item);
         }
         }
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int pos, long id)
+    {
+        if (l.isItemChecked(pos)) {
+            if (pos == itsSelItemPos) {
+                l.setItemChecked(pos, false);
+                itsSelItemPos = -1;
+            } else {
+                itsSelItemPos = pos;
+            }
+        }
+        l.invalidateViews();
     }
 }

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <resources>
 
     <string name="add_account">Add account</string>
@@ -65,6 +72,9 @@
     <string name="updating_account">Updating account&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;3.2.0&lt;/b&gt; - Update Dropbox to v2 API. Trigger a sync
+        conflict if adding a file that already exists.
+        \n\n
         &lt;b&gt;3.1.0&lt;/b&gt; - Fix Google Drive syncing of renamed and
         replaced files.  Update Google Drive library.
         \n\n

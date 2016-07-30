@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe.lib.view;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -151,42 +150,13 @@ public final class GuiUtils
     public static void setupFormKeyboard(TextView firstField,
                                          TextView finalField,
                                          Context ctx,
-                                         Runnable enterRunnable)
+                                         final Runnable enterRunnable)
     {
         if (firstField != null) {
             GuiUtilsFroyo.showKeyboard(firstField, ctx);
         }
-        setupKeyboardEnter(finalField, enterRunnable);
-    }
 
-
-    /**
-     * Set the keyboard visibility on a view
-     */
-    public static void setKeyboardVisible(View v, Context ctx, boolean visible)
-    {
-        InputMethodManager imm = (InputMethodManager)
-            ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (visible) {
-            if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
-                imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
-            } else {
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
-                                    InputMethodManager.HIDE_IMPLICIT_ONLY);
-            }
-        } else {
-            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-        }
-    }
-
-
-    /**
-     * Setup a field to run an action on an enter or dpad center key press
-     */
-    public static void setupKeyboardEnter(TextView field,
-                                           final Runnable enterRunnable)
-    {
-        field.setOnKeyListener(new OnKeyListener()
+        finalField.setOnKeyListener(new OnKeyListener()
         {
             public boolean onKey(View v, int keyCode, KeyEvent event)
             {
@@ -206,14 +176,21 @@ public final class GuiUtils
 
 
     /**
-     * Set a listener to show the keyboard when the dialog is shown. Only works
-     * on Froyo and higher.
+     * Set the keyboard visibility on a view
      */
-    public static void setShowKeyboardListener(Dialog dialog, View view,
-                                                Context ctx)
+    public static void setKeyboardVisible(View v, Context ctx, boolean visible)
     {
-        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_FROYO) {
-            GuiUtilsFroyo.setShowKeyboardListener(dialog, view, ctx);
+        InputMethodManager imm = (InputMethodManager)
+            ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (visible) {
+            if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
+                imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+            } else {
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                                    InputMethodManager.HIDE_IMPLICIT_ONLY);
+            }
+        } else {
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
 

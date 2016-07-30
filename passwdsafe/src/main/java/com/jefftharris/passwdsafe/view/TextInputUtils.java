@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -29,8 +29,14 @@ public class TextInputUtils
         // Set fields only if error changes to prevent flashing
         CharSequence currErrorMsg = field.getError();
         if (!TextUtils.equals(errorMsg, currErrorMsg)) {
-            field.setError(errorMsg);
-            field.setErrorEnabled(isError);
+            if (TextUtils.isEmpty(errorMsg)) {
+                field.setErrorEnabled(false);
+            } else {
+                // Ensure the error message changes
+                field.setError(null);
+                field.setError(errorMsg);
+                field.setErrorEnabled(true);
+            }
         }
 
         return isError;

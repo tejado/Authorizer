@@ -1,12 +1,12 @@
 /*
- * Copyright (©) 2014-2015 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.box;
 
-import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
@@ -38,6 +38,7 @@ import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
+import com.jefftharris.passwdsafe.sync.lib.SyncRemoteFiles;
 
 /**
  * The BoxSyncer class encapsulates a Box sync operation
@@ -78,8 +79,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxSession>
             throws Exception
     {
         syncDisplayName();
-        HashMap<String, ProviderRemoteFile> boxFiles = getBoxFiles();
-        updateDbFiles(boxFiles);
+        updateDbFiles(getBoxFiles());
         return resolveSyncOpers();
     }
 
@@ -140,15 +140,28 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxSession>
     }
 
     /** Get the files from Box */
-    private HashMap<String, ProviderRemoteFile> getBoxFiles()
+    private SyncRemoteFiles getBoxFiles()
             throws BoxException
     {
         BoxApiFolder folderApi = new BoxApiFolder(itsProviderClient);
-        HashMap<String, ProviderRemoteFile> boxfiles = new HashMap<>();
+        SyncRemoteFiles boxfiles = new SyncRemoteFiles();
 
         // Get root files
         retrieveBoxFolderFiles(BoxConstants.ROOT_FOLDER_ID, FILE_FIELDS,
                                folderApi, boxfiles);
+
+        for (DbFile dbfile: SyncDb.getFiles(itsProvider.itsId, itsDb)) {
+            if (dbfile.itsRemoteId != null) {
+                continue;
+            }
+
+            for (ProviderRemoteFile remfile: boxfiles.getRemoteFiles()) {
+                if (TextUtils.equals(dbfile.itsLocalTitle,
+                                     remfile.getTitle())) {
+                    boxfiles.addRemoteFileForNew(dbfile.itsId, remfile);
+                }
+            }
+        }
 
         // Get files in folders matching 'passwdsafe' search
         BoxApiSearch searchApi = new BoxApiSearch(itsProviderClient);
@@ -182,7 +195,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxSession>
             String folderId,
             String[] fileFields,
             BoxApiFolder folderApi,
-            HashMap<String, ProviderRemoteFile> boxfiles)
+            SyncRemoteFiles boxfiles)
             throws BoxException
     {
         BoxRequestsFolder.GetFolderItems req =
@@ -200,8 +213,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxSession>
                 if (item instanceof BoxFile) {
                     BoxFile file = (BoxFile)item;
                     if (file.getName().endsWith(".psafe3")) {
-                        BoxProviderFile provFile = new BoxProviderFile(file);
-                        boxfiles.put(provFile.getRemoteId(), provFile);
+                        boxfiles.addRemoteFile(new BoxProviderFile(file));
                     }
                 }
             }

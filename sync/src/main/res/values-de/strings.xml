@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <resources>
 
     <string name="add_account">Konto hinzufügen</string>
@@ -66,6 +73,10 @@
     <string name="updating_account">Aktualisiere Konto &#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;3.2.0&lt;/b&gt; - Dropbox auf API v2 aktualisiert.  Löse eine
+        Synchronisationskonflikt aus, wenn eine bereits vorhandene Datei
+        hinzugefügt wird.
+        \n\n
         &lt;b&gt;3.1.0&lt;/b&gt; - Fehler beim Synchronisieren von umbenannten
         und ersetzten Datei auf Google Drive behoben. Aktualisiere deinen
         Google-Drive-Zugang.
