@@ -258,8 +258,6 @@ public abstract class PwsFile
 			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00004") );
 		}
 		result = ( length == 0 ) ? BLOCK_LENGTH : ( (length + (BLOCK_LENGTH - 1)) / BLOCK_LENGTH ) * BLOCK_LENGTH;
-
-		LOG.debug1( "Length = " + length + ", BlockLength = " + result );
 		return result;
 	}
 
@@ -532,7 +530,6 @@ public abstract class PwsFile
 
 		if ( count == -1 )
 		{
-			LOG.debug1( "END OF FILE" );
 			throw new EndOfFileException();
 		}
 		else if ( count < bytes.length )
@@ -667,7 +664,6 @@ public abstract class PwsFile
 	throws IOException
 	{
 		outStream.write( buffer );
-		LOG.debug1( "Wrote " + buffer.length + " bytes" );
 	}
 
 	/**

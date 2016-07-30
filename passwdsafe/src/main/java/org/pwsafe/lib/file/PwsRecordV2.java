@@ -233,7 +233,6 @@ public class PwsRecordV2 extends PwsRecord
 	{
 		if ( ((PwsStringField) getField( TITLE )).equals(PwsFileV2.ID_STRING) )
 		{
-			LOG.debug1( "Ignoring record " + this.toString() );
 			return false;
 		}
 		return true;
@@ -301,7 +300,6 @@ public class PwsRecordV2 extends PwsRecord
 				default :
 					throw new UnimplementedConversionException();
 			}
-			//if ( LOG.isDebug2Enabled() ) LOG.debug2( "type=" + item.getType() + " (" + ((Object[])VALID_TYPES[item.getType()])[1] + "), value=\"" + itemVal.toString() + "\"" );
 			setField( itemVal );
 		}
 	}
@@ -319,7 +317,6 @@ public class PwsRecordV2 extends PwsRecord
 	protected void saveRecord(PwsFile file)
 	throws IOException
 	{
-		LOG.debug2( "----- START OF RECORD -----" );
 		for ( Iterator<?> iter = getFields(); iter.hasNext(); )
 		{
 			int			type;
@@ -328,12 +325,9 @@ public class PwsRecordV2 extends PwsRecord
 			type	= ((Integer) iter.next()).intValue();
 			value	= getField( type );
 
-			if ( LOG.isDebug2Enabled() ) LOG.debug2( "Writing field " + type + " (" + ((Object[])VALID_TYPES[type])[1] + ") : \"" + value.toString() + "\"" );
-
 			writeField( file, value );
 		}
 		writeField( file, new PwsStringField( END_OF_RECORD, "" ) );
-		LOG.debug2( "----- END OF RECORD -----" );
 	}
 
 	/**

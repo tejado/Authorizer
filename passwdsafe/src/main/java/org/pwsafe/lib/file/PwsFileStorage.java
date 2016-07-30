@@ -55,9 +55,6 @@ public class PwsFileStorage extends PwsStreamStorage {
     @Override
     public boolean save(byte[] data, boolean isV3) {
         try {
-            LOG.debug1("Number of bytes to save = "+data.length);
-            LOG.debug1("Original file: "+ getIdentifier());
-
             File file = new File( getIdentifier() );
             if (!file.exists()) {
                 /* Original file doesn't exist, just go ahead and write it
@@ -66,7 +63,6 @@ public class PwsFileStorage extends PwsStreamStorage {
                 writeFile(file, data);
                 return true;
             }
-            LOG.debug1("Original file path: "+file.getAbsolutePath());
             File dir = file.getCanonicalFile().getParentFile();
             if (dir==null) {
                 LOG.error("Couldn't find the parent directory for: "+file.getAbsolutePath());
@@ -86,7 +82,6 @@ public class PwsFileStorage extends PwsStreamStorage {
                 createBackupFile(fromFile, toFile);
 
                 if (tempFile.renameTo(toFile)) {
-                    LOG.debug1("Temp file renamed to " + toFile);
                     tempFile = null;
                 } else {
                     throw new IOException("Error renaming " +

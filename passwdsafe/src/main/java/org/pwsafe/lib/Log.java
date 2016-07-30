@@ -18,12 +18,10 @@ package org.pwsafe.lib;
 public class Log
 {
     private String itsTag = "Log";
-	private int	DebugLevel;
 
 	private Log( String name )
 	{
 	    itsTag = name;
-		setDebugLevel( 3 );
 	}
 
 	/**
@@ -48,71 +46,6 @@ public class Log
 	public static Log getInstance( Class<?> aClass )
 	{
 		return new Log( aClass.getName() );
-	}
-
-	/**
-	 * Writes a message at debug level 1
-	 *
-	 * @param msg the message to issue.
-	 */
-	public final void debug1( String msg )
-	{
-		if ( isDebug1Enabled() )
-		{
-		    android.util.Log.d(itsTag, msg);
-		}
-	}
-
-	/**
-	 * Writes a message at debug level 2
-	 *
-	 * @param msg the message to issue.
-	 */
-	public final void debug2( String msg )
-	{
-		if ( isDebug2Enabled() )
-		{
-		    android.util.Log.d(itsTag, msg);
-		}
-	}
-
-	/**
-	 * Writes a message at debug level 3
-	 *
-	 * @param msg the message to issue.
-	 */
-	public final void debug3( String msg )
-	{
-		if ( isDebug3Enabled() )
-		{
-		    android.util.Log.d( itsTag, msg );
-		}
-	}
-
-	/**
-	 * Writes a message at debug level 4
-	 *
-	 * @param msg the message to issue.
-	 */
-	public final void debug4( String msg )
-	{
-		if ( isDebug4Enabled() )
-		{
-		    android.util.Log.d( itsTag, msg );
-		}
-	}
-
-	/**
-	 * Writes a message at debug level 5
-	 *
-	 * @param msg the message to issue.
-	 */
-	public final void debug5( String msg )
-	{
-		if ( isDebug5Enabled() )
-		{
-		    android.util.Log.d( itsTag, msg );
-		}
 	}
 
 	/**
@@ -147,16 +80,6 @@ public class Log
 	}
 
 	/**
-	 * Returns the current debug level.
-	 *
-	 * @return Returns the debugLevel.
-	 */
-	public final int getDebugLevel()
-	{
-		return DebugLevel;
-	}
-
-	/**
 	 * Writes a message at info level
 	 *
 	 * @param msg the message to issue.
@@ -164,74 +87,6 @@ public class Log
 	public final void info( String msg )
 	{
 	    android.util.Log.i( itsTag, msg );
-	}
-
-	/**
-	 * Returns <code>true</code> if debuuging at level 1 is enabled, <code>false</code> if it isn't.
-	 *
-	 * @return <code>true</code> if debuuging at level 1 is enabled, <code>false</code> if it isn't.
-	 */
-	public final boolean isDebug1Enabled()
-	{
-	    return android.util.Log.isLoggable(itsTag, android.util.Log.DEBUG);
-	}
-
-	/**
-	 * Returns <code>true</code> if debuuging at level 2 is enabled, <code>false</code> if it isn't.
-	 *
-	 * @return <code>true</code> if debuuging at level 2 is enabled, <code>false</code> if it isn't.
-	 */
-	public final boolean isDebug2Enabled()
-	{
-		return isDebug1Enabled() && (DebugLevel >= 2);
-	}
-
-	/**
-	 * Returns <code>true</code> if debuuging at level 3 is enabled, <code>false</code> if it isn't.
-	 *
-	 * @return <code>true</code> if debuuging at level 3 is enabled, <code>false</code> if it isn't.
-	 */
-	public final boolean isDebug3Enabled()
-	{
-		return isDebug1Enabled() && (DebugLevel >= 3);
-	}
-
-	/**
-	 * Returns <code>true</code> if debuuging at level 4 is enabled, <code>false</code> if it isn't.
-	 *
-	 * @return <code>true</code> if debuuging at level 4 is enabled, <code>false</code> if it isn't.
-	 */
-	public final boolean isDebug4Enabled()
-	{
-		return isDebug1Enabled() && (DebugLevel >= 4);
-	}
-
-	/**
-	 * Returns <code>true</code> if debuuging at level 5 is enabled, <code>false</code> if it isn't.
-	 *
-	 * @return <code>true</code> if debuuging at level 5 is enabled, <code>false</code> if it isn't.
-	 */
-	public final boolean isDebug5Enabled()
-	{
-		return isDebug1Enabled() && (DebugLevel >= 5);
-	}
-
-	/**
-	 * Sets the debug level.
-	 *
-	 * @param debugLevel The debugLevel to set.
-	 */
-	public final void setDebugLevel( int debugLevel )
-	{
-		if ( debugLevel < 1 )
-		{
-			debugLevel = 1;
-		}
-		else if ( debugLevel > 5 )
-		{
-			debugLevel = 5;
-		}
-		DebugLevel = debugLevel;
 	}
 
 	/**

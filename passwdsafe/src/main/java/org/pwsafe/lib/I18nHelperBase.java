@@ -41,12 +41,6 @@ public class I18nHelperBase
 	protected I18nHelperBase()
 	{
 		super();
-		// TODOlib Auto-generated constructor stub
-	}
-
-	static
-	{
-		LOG.debug1( "I18nHelper class loaded" );
 	}
 
 	/**
@@ -106,7 +100,6 @@ public class I18nHelperBase
 	{
 		if ( TheBundle == null )
 		{
-			LOG.debug1( "Loading resource bundle for locale " + TheLocale.toString() );
 			TheBundle = ResourceBundle.getBundle( getFilename(), TheLocale );
 			// TODOlib handle the case where the file cannot be found
 			// catch MissingResourceException
@@ -148,7 +141,5 @@ public class I18nHelperBase
 	{
 		TheLocale	= locale;
 		TheBundle	= null;
-
-		LOG.debug1( "Locale set to " + locale.toString() );
 	}
 }

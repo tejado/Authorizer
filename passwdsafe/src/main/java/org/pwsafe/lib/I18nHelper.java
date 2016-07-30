@@ -26,11 +26,6 @@ public class I18nHelper extends I18nHelperBase
 
 	private static final I18nHelper	TheInstance	= new I18nHelper();
 
-	static
-	{
-		LOG.debug1( "I18nHelper class loaded" );
-	}
-
 	/**
 	 * Private for the singleton pattern. 
 	 */

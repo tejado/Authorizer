@@ -74,7 +74,6 @@ public class PwsFileFactory {
 
 	    boolean validPassword = false;
 	    for (String charset : PwsFile.getPasswordEncodings()) {
-	        LOG.debug1("Trying " + charset);
 	        try {
 	            phash = genRandHash(passphrase, charset, fudged);
 	        } catch(UnsupportedEncodingException e) {
@@ -91,11 +90,9 @@ public class PwsFileFactory {
 
 	    if ( !validPassword )
 	    {
-	        LOG.debug1( "Password is incorrect - throwing InvalidPassphraseException" );
 	        throw new InvalidPassphraseException();
 	    }
 
-	    LOG.debug1( "Password is OK" );
 	    return encoding;
 	}
 
@@ -238,7 +235,6 @@ public class PwsFileFactory {
                 // First check for a v3 file...
                 byte[] first4Bytes = Util.getBytes(header, 0, 4);
                 if (Util.bytesAreEqual("PWS3".getBytes(), first4Bytes)) {
-                    LOG.debug1( "This is a V3 format file." );
                     file = new PwsFileV3(storage, passphrase);
                     file.readAll();
                     file.close();
@@ -260,16 +256,12 @@ public class PwsFileFactory {
                 // title of the first record set to the value of PwsFileV2.ID_STRING!
 
                 if ( rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING) ) {
-                    LOG.debug1( "This is a V2 format file." );
                     file = new PwsFileV2( storage, passphrase, encoding );
                 } else {
-                    LOG.debug1( "This is a V1 format file." );
                     file = new PwsFileV1( storage, passphrase, encoding );
                 }
                 file.readAll();
                 file.close();
-
-                LOG.debug1( "File contains " + file.getRecordCount() + " records." );
                 return file;
             } finally {
                 try {

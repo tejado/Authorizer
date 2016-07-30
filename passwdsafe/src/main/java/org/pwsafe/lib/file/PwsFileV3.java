@@ -130,7 +130,6 @@ public final class PwsFileV3 extends PwsFile {
 	                                   PwsFileHeaderV3 headerV3,
 	                                   int iter)
 	{
-        LOG.debug1("Trying " + encoding);
         try {
             byte[] stretch =
                 Util.stretchPassphrase(aPassphrase.getBytes(encoding),
@@ -161,7 +160,6 @@ public final class PwsFileV3 extends PwsFile {
 		setHeaderV3(theHeaderV3);
 
 		int iter = theHeaderV3.getIter();
-		LOG.debug1("Using iterations: [" + iter + "]");
 		stretchedPassword = null;
 
 		if (encoding != null) {
