@@ -184,7 +184,6 @@ public final class PwsFileV3 extends PwsFile {
 			stretchedPassword = Util.stretchPassphrase(Charset.defaultCharset().encode(buf).array(), theHeaderV3.getSalt(), iter);
 			if (Util.bytesAreEqual(theHeaderV3.getPassword(), SHA256Pws.digest(stretchedPassword))) {
 			    encoding = Charset.defaultCharset().name();
-				LOG.warn("Succeeded workaround for asymmetric password encoding bug");
 			} else {
 				throw new IOException("Invalid password");
 			}
