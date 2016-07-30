@@ -92,7 +92,6 @@
                 tools:ignore="UnusedAttribute">
 
                 <ImageButton
-                    android:id="@+id/gdrive_sync"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/sync"
@@ -196,7 +195,6 @@
                     tools:ignore="UnusedAttribute">
 
                     <ImageButton
-                        android:id="@+id/dropbox_sync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/sync"
@@ -309,7 +307,6 @@
                 tools:ignore="UnusedAttribute">
 
                 <ImageButton
-                    android:id="@+id/box_sync"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/sync"
@@ -414,7 +411,6 @@
                     tools:ignore="UnusedAttribute">
 
                     <ImageButton
-                        android:id="@+id/onedrive_sync"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="@string/sync"
@@ -423,7 +419,6 @@
                         android:src="@drawable/ic_action_sync"/>
 
                     <Button
-                        android:id="@+id/onedrive_choose_files"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -526,7 +521,6 @@
                 tools:ignore="UnusedAttribute">
 
                 <ImageButton
-                    android:id="@+id/owncloud_sync"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/sync"
@@ -534,7 +528,6 @@
                     android:src="@drawable/ic_action_sync"/>
 
                 <ImageButton
-                    android:id="@+id/owncloud_edit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/edit"
@@ -542,7 +535,6 @@
                     android:src="@drawable/ic_action_edit"/>
 
                 <Button
-                    android:id="@+id/owncloud_choose_files"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
