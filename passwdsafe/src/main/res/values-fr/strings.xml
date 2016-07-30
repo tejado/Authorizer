@@ -330,11 +330,11 @@
     <string name="unprotect_to_modify">Déprotéger les modifications</string>
     <string name="username">Nom utilisateur</string>
     <string name="use_count">Utiliser compteur</string>
-    <string name="use_digits">Utiliser chiffres</string>
+    <string name="use_digits">Chiffres</string>
     <string name="use_light_theme">Utilise le thème clair</string>
-    <string name="use_lowercase">Utiliser minuscules</string>
-    <string name="use_symbols">Utiliser symboles</string>
-    <string name="use_uppercase">Utiliser majuscules</string>
+    <string name="use_lowercase">Minuscules</string>
+    <string name="use_symbols">Symboles</string>
+    <string name="use_uppercase">Majuscules</string>
     <string name="username_header">NOM UTILISATEUR</string>
     <string name="view_password_expirations">Voir les expirations de mot de passe</string>
     <string name="word_wrap">Adapter les retours-chariot</string>
