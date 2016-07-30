@@ -35,7 +35,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.pwsafe.lib.I18nHelper;
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.crypto.InMemoryKey;
@@ -254,8 +253,7 @@ public abstract class PwsFile
 		int result;
 		if ( length < 0 )
 		{
-			LOG.error( I18nHelper.getInstance().formatMessage("E00004") );
-			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00004") );
+			throw new IllegalArgumentException("length");
 		}
 		result = ( length == 0 ) ? BLOCK_LENGTH : ( (length + (BLOCK_LENGTH - 1)) / BLOCK_LENGTH ) * BLOCK_LENGTH;
 		return result;
@@ -534,7 +532,7 @@ public abstract class PwsFile
 		}
 		else if ( count < bytes.length )
 		{
-			throw new IOException( I18nHelper.getInstance().formatMessage("E00006") );
+			throw new IOException("short read");
 		}
 	}
 

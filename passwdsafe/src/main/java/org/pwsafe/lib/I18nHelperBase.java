@@ -62,18 +62,6 @@ public class I18nHelperBase
 	}
 
 	/**
-	 * Returns the message with the given key from the <code>ResourceBundle</code>.
-	 *
-	 * @param key the ID of the message to retrieve.
-	 *
-	 * @return The message with the kiven key.
-	 */
-	public String formatMessage( String key )
-	{
-		return formatMessage( key, null );
-	}
-
-	/**
 	 * Returns the message with the given key from the <code>ResourceBundle</code>.  Where
 	 * paramaters are specified in the message they are replaced with the appropriate entry
 	 * from <code>args</code>.

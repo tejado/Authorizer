@@ -24,7 +24,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SealedObject;
 
-import org.pwsafe.lib.I18nHelper;
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.crypto.HmacPws;
@@ -354,7 +353,7 @@ public final class PwsFileV3 extends PwsFile {
 	{
 		if ( (buff.length == 0) || ((buff.length % getBlockSize()) != 0) )
 		{
-			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00001") );
+			throw new IllegalArgumentException("buff length");
 		}
 		readBytes( buff );
 		if (Util.bytesAreEqual(buff,  EOF_BYTES_RAW)) {
@@ -385,7 +384,7 @@ public final class PwsFileV3 extends PwsFile {
 	{
 		if ( (buff.length == 0) || ((buff.length % getBlockSize()) != 0) )
 		{
-			throw new IllegalArgumentException( I18nHelper.getInstance().formatMessage("E00001") );
+			throw new IllegalArgumentException("buff length");
 		}
 
 		byte [] temp; // = Util.cloneByteArray( buff );
