@@ -209,12 +209,7 @@ public final class Util
 
 		if ( (src.length == 0) || ((src.length % 4) != 0) )
 		{
-			String	msg;
-
-			msg = I18nHelper.getInstance().formatMessage( "E00009", new Object [] { Integer.valueOf(src.length) } );
-
-			LOG.error( msg );
-			throw new IllegalArgumentException( msg );
+			throw new IllegalArgumentException("src");
 		}
 
 		for ( int ii = 0; ii < src.length; ii += 4 )

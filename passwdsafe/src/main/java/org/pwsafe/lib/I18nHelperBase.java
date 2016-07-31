@@ -9,9 +9,7 @@
  */
 package org.pwsafe.lib;
 
-import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -44,24 +42,6 @@ public class I18nHelperBase
 	}
 
 	/**
-	 * Returns the message with the given key from the <code>ResourceBundle</code>.  Where
-	 * paramaters are specified in the message they are replaced with the appropriate entry
-	 * from <code>args</code>.
-	 *
-	 * @param key  the message ID
-	 * @param args arguments for paramater substitutions.
-	 *
-	 * @return The message with parameters substituted.
-	 */
-	public String formatMessage( String key, Object [] args )
-	{
-		String	msg;
-
-		msg = getString(key);
-		return (args == null) ? msg : MessageFormat.format( msg, args );
-	}
-
-	/**
 	 * Loads the localised strings using the current locale.
 	 *
 	 * @return The localised <code>ResourceBundle</code>.
@@ -86,20 +66,6 @@ public class I18nHelperBase
 	public String getFilename()
 	{
 		return "CorelibStrings";
-	}
-
-	private String getString( String key )
-	{
-		try
-		{
-			return getBundle().getString( key );
-		}
-		catch ( MissingResourceException e )
-		{
-			// N.B. Special case - this message is not loaded from the resource file.
-			LOG.error( getFilename() + ".properties : Missing Resource - \"" + key + "\"" );
-		}
-		return key + " (value not found)";
 	}
 
 	/**
