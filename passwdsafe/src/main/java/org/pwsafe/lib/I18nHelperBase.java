@@ -53,24 +53,6 @@ public class I18nHelperBase
 	 *
 	 * @return The message with parameters substituted.
 	 */
-	public String formatError( String key, Object [] args )
-	{
-		String	msg;
-
-		msg = getString(key);
-		return (args == null) ? msg : key + " - " + MessageFormat.format( msg, args );
-	}
-
-	/**
-	 * Returns the message with the given key from the <code>ResourceBundle</code>.  Where
-	 * paramaters are specified in the message they are replaced with the appropriate entry
-	 * from <code>args</code>.
-	 *
-	 * @param key  the message ID
-	 * @param args arguments for paramater substitutions.
-	 *
-	 * @return The message with parameters substituted.
-	 */
 	public String formatMessage( String key, Object [] args )
 	{
 		String	msg;
