@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.pwsafe.lib.I18nHelper;
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.EndOfFileException;
@@ -535,8 +534,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable, Clo
 			setModified();
 		} else {
 			throw new IllegalArgumentException(
-					I18nHelper.getInstance().formatMessage("E00003",
-							new Object[] { Integer.valueOf(theType) }));
+					"Invalid type: " + Integer.valueOf(theType));
 		}
 	}
 
