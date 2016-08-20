@@ -422,11 +422,15 @@ public class PasswdSafeListFragment extends ListFragment
                 itemViews = (ViewHolder)convertView.getTag();
             }
 
-            PasswdRecordListData item = getItem(position);
-            ListView list = (ListView)parent;
-            boolean isSelected = list.isItemChecked(position);
-            itemViews.update(item, isSelected,
-                             !itsIsContents && item.itsIsRecord);
+            if (position < getCount()) {
+                PasswdRecordListData item = getItem(position);
+                ListView list = (ListView)parent;
+                boolean isSelected = list.isItemChecked(position);
+                itemViews.update(item, isSelected,
+                                 !itsIsContents && item.itsIsRecord);
+            } else {
+                itemViews.reset();
+            }
             return convertView;
         }
 
@@ -468,6 +472,18 @@ public class PasswdSafeListFragment extends ListFragment
                 itsSelection.setChecked(selected);
                 GuiUtils.setVisible(itsSelection, isLeftListRecord);
 
+                itsTitle.requestLayout();
+            }
+
+            /** Reset the fields */
+            public void reset()
+            {
+                setText(itsTitle, null);
+                setText(itsUser, null);
+                setText(itsMatch, null);
+                itsIcon.setImageDrawable(null);
+                itsLastIconImage = -1;
+                itsSelection.setChecked(false);
                 itsTitle.requestLayout();
             }
 
