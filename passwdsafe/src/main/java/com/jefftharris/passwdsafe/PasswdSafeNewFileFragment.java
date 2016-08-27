@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -33,6 +33,7 @@ import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.AbstractTextWatcher;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
+import com.jefftharris.passwdsafe.util.CountedBool;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
@@ -69,6 +70,7 @@ public class PasswdSafeNewFileFragment
     private TextInputLayout itsPasswordConfirmInput;
     private TextView itsPasswordConfirm;
     private Button itsOkBtn;
+    private final CountedBool itsBackgroundDisable = new CountedBool();
     private final Validator itsValidator = new Validator();
     private NewTask itsNewTask;
     private boolean itsUseStorage = false;
@@ -165,7 +167,7 @@ public class PasswdSafeNewFileFragment
         cancelBtn.setOnClickListener(this);
         itsOkBtn = (Button)rootView.findViewById(R.id.ok);
         itsOkBtn.setOnClickListener(this);
-        itsOkBtn.setEnabled(false);
+        setValid(false);
 
         GuiUtils.setupFormKeyboard(itsFileName, itsPasswordConfirm, itsOkBtn,
                                    getActivity());
@@ -355,18 +357,18 @@ public class PasswdSafeNewFileFragment
         }
     }
 
-    /** Enable/disable field controls during background operations */
+    /**
+     * Derived-class handler to enable/disable field controls during
+     * background operations
+     */
     @Override
-    protected final void setFieldsEnabled(boolean enabled)
+    protected final void doSetFieldsEnabled(boolean enabled)
     {
         itsFileNameInput.setEnabled(enabled);
         itsPasswordInput.setEnabled(enabled);
         itsPasswordConfirmInput.setEnabled(enabled);
-        if (enabled) {
-            itsValidator.validate();
-        } else {
-            itsOkBtn.setEnabled(false);
-        }
+        itsBackgroundDisable.update(!enabled);
+        itsValidator.validate();
     }
 
     /**
@@ -428,6 +430,15 @@ public class PasswdSafeNewFileFragment
 
         return null;
     }
+
+    /**
+     * Set whether the fields are valid
+     */
+    private void setValid(boolean valid)
+    {
+        itsOkBtn.setEnabled(valid && !itsBackgroundDisable.get());
+    }
+
     /**
      * Class to validate fields in the fragment
      */
@@ -473,7 +484,7 @@ public class PasswdSafeNewFileFragment
                             getString(R.string.passwords_do_not_match) : null,
                     itsPasswordConfirmInput);
 
-            itsOkBtn.setEnabled(!isError);
+            setValid(!isError);
         }
     }
 
