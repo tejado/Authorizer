@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -15,17 +15,22 @@ import android.widget.ProgressBar;
 
 import com.jefftharris.passwdsafe.file.PasswdFileUri;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.util.CountedBool;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Base class for a fragment to open or create a new file
  */
 public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
 {
+    private final List<ResolveTask> itsResolveTasks = new ArrayList<>();
     private Uri itsFileUri;
     private ProgressBar itsProgress;
     private PasswdFileUri itsPasswdFileUri;
-    private ResolveTask itsResolveTask;
-    private int itsNumProgressUsers = 0;
+    private final CountedBool itsProgressVisible = new CountedBool();
+    private final CountedBool itsFieldsDisabled = new CountedBool();
     private boolean itsDoResolveOnStart = true;
 
     @Override
@@ -96,10 +101,11 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     /**
      * Start the resolve task
      */
-    protected void startResolve()
+    protected final void startResolve()
     {
-        itsResolveTask = new ResolveTask();
-        itsResolveTask.execute();
+        ResolveTask task = new ResolveTask();
+        itsResolveTasks.add(task);
+        task.execute();
     }
 
     /**
@@ -113,51 +119,73 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     protected abstract void doCancelFragment(boolean userCancel);
 
     /**
-     * Enable/disable field controls during background operations
+     * Derived-class handler to enable/disable field controls during
+     * background operations
      */
-    protected abstract void setFieldsEnabled(boolean enabled);
+    protected abstract void doSetFieldsEnabled(boolean enabled);
 
     /**
-     *  Cancel the fragment
+     * Cancel the fragment
      */
     protected final void cancelFragment(boolean userCancel)
     {
-        if (itsResolveTask != null) {
-            ResolveTask task = itsResolveTask;
-            itsResolveTask = null;
+        for (ResolveTask task: itsResolveTasks) {
             task.cancel(false);
         }
+        itsResolveTasks.clear();
         doCancelFragment(userCancel);
     }
 
     /**
      * Set whether the progress bar is visible
      */
-    protected void setProgressVisible(boolean visible,
-                                      boolean indeterminate)
+    protected final void setProgressVisible(boolean visible,
+                                            boolean indeterminate)
     {
-        if (visible) {
-            if (++itsNumProgressUsers == 1) {
-                itsProgress.setIndeterminate(indeterminate);
-                itsProgress.setVisibility(View.VISIBLE);
-            }
-        } else {
-            if (--itsNumProgressUsers <= 0) {
-                itsNumProgressUsers = 0;
-                itsProgress.setVisibility(View.INVISIBLE);
-            }
+        switch (itsProgressVisible.update(visible)) {
+        case TRUE: {
+            itsProgress.setIndeterminate(indeterminate);
+            itsProgress.setVisibility(View.VISIBLE);
+            break;
+        }
+        case FALSE: {
+            itsProgress.setVisibility(View.INVISIBLE);
+            break;
+        }
+        case SAME: {
+            break;
+        }
+        }
+    }
+
+    /**
+     * Disable field controls during background operations
+     */
+    protected final void setFieldsDisabled(boolean disabled)
+    {
+        switch (itsFieldsDisabled.update(disabled)) {
+        case TRUE: {
+            doSetFieldsEnabled(false);
+            break;
+        }
+        case FALSE: {
+            doSetFieldsEnabled(true);
+            break;
+        }
+        case SAME: {
+            break;
+        }
         }
     }
 
     /**
      * Handle when the resolve task is finished
      */
-    private void resolveTaskFinished(PasswdFileUri uri)
+    private void resolveTaskFinished(PasswdFileUri uri, ResolveTask task)
     {
-        if (itsResolveTask == null) {
+        if (!itsResolveTasks.remove(task)) {
             return;
         }
-        itsResolveTask = null;
         if ((uri == null) || !isAdded()) {
             cancelFragment(false);
             return;
@@ -176,7 +204,7 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     /**
      * Background task for resolving the file URI
      */
-    protected class ResolveTask extends BackgroundTask<PasswdFileUri>
+    private class ResolveTask extends BackgroundTask<PasswdFileUri>
     {
         private final PasswdFileUri.Creator itsUriCreator =
                 new PasswdFileUri.Creator(itsFileUri, getActivity());
@@ -204,7 +232,7 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
                         getString(R.string.file_not_found_perm_denied),
                         getActivity());
             } else {
-                resolveTaskFinished(uri);
+                resolveTaskFinished(uri, this);
             }
         }
     }
@@ -225,14 +253,14 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
         protected void onPreExecute()
         {
             setProgressVisible(true, true);
-            setFieldsEnabled(false);
+            setFieldsDisabled(true);
         }
 
         @Override
         protected void onPostExecute(ResultT data)
         {
             setProgressVisible(false, true);
-            setFieldsEnabled(true);
+            setFieldsDisabled(false);
         }
     }
 }

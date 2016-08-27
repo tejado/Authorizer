@@ -419,8 +419,6 @@ public class PasswdSafeOpenFileFragment
     @Override
     protected final void doResolveTaskFinished()
     {
-        // Set fields enabled now that file URI has been set
-        setFieldsEnabled(true);
         setPhase(Phase.WAITING_PASSWORD);
     }
 
@@ -444,9 +442,12 @@ public class PasswdSafeOpenFileFragment
         }
     }
 
-    /** Enable/disable field controls during background operations */
+    /**
+     * Derived-class handler to enable/disable field controls during
+     * background operations
+     */
     @Override
-    protected final void setFieldsEnabled(boolean enabled)
+    protected final void doSetFieldsEnabled(boolean enabled)
     {
         itsPasswordEdit.setEnabled(enabled);
         itsOkBtn.setEnabled(enabled);
@@ -513,13 +514,13 @@ public class PasswdSafeOpenFileFragment
             View root = getView();
             setVisibility(R.id.yubi_progress_text, false, root);
             setProgressVisible(false, false);
-            setFieldsEnabled(true);
+            setFieldsDisabled(true);
             itsYubiMgr.stop();
             break;
         }
         case SAVING_PASSWORD: {
             setProgressVisible(false, false);
-            setFieldsEnabled(true);
+            setFieldsDisabled(true);
             cancelSavedPasswordUsers();
             break;
         }
@@ -543,7 +544,7 @@ public class PasswdSafeOpenFileFragment
             View root = getView();
             setVisibility(R.id.yubi_progress_text, true, root);
             setProgressVisible(true, false);
-            setFieldsEnabled(false);
+            setFieldsDisabled(false);
             break;
         }
         case OPENING: {
@@ -551,7 +552,7 @@ public class PasswdSafeOpenFileFragment
             break;
         }
         case SAVING_PASSWORD: {
-            setFieldsEnabled(false);
+            setFieldsDisabled(false);
             setProgressVisible(true, false);
             break;
         }
