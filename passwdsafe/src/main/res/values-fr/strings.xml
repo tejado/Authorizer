@@ -345,6 +345,8 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
+        &lt;b&gt;6.4.3&lt;/b&gt; - Correction de bugs.
+        \n\n
         &lt;b&gt;6.4.2&lt;/b&gt; - Correction de bugs.
         \n\n
         &lt;b&gt;6.4.1&lt;/b&gt; - Correction plantage lors de l\'ouverture
