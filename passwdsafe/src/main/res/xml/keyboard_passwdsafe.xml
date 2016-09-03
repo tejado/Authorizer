@@ -1,0 +1,62 @@
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+          android:horizontalGap="0px"
+          android:keyHeight="50dp"
+          android:verticalGap="0px">
+
+    <Row>
+        <Key android:codes="-100"
+             android:keyEdgeFlags="left"
+             android:keyLabel="@string/username"
+             android:keyWidth="50%p"/>
+        <Key android:codes="-101"
+             android:keyEdgeFlags="right"
+             android:keyLabel="@string/password"
+             android:keyWidth="50%p"/>
+    </Row>
+    <Row>
+        <Key android:codes="-102"
+             android:keyEdgeFlags="left"
+             android:keyLabel="@string/url"
+             android:keyWidth="50%p"/>
+        <Key android:codes="-103"
+             android:keyEdgeFlags="right"
+             android:keyLabel="@string/email"
+             android:keyWidth="50%p"/>
+    </Row>
+    <Row>
+        <Key android:codes="-201"
+             android:keyEdgeFlags="left"
+             android:keyIcon="@drawable/ic_passwdsafe_light"
+             android:keyWidth="15%p"/>
+        <Key android:codes="-104"
+             android:keyLabel="@string/title"
+             android:keyWidth="35%p"/>
+        <Key android:codes="-105"
+             android:keyLabel="@string/notes"
+             android:keyWidth="35%p"/>
+        <Key android:codes="-5"
+             android:isRepeatable="true"
+             android:keyEdgeFlags="right"
+             android:keyIcon="@drawable/sym_keyboard_delete"
+             android:keyWidth="15%p"/>
+    </Row>
+    <Row android:rowEdgeFlags="bottom">
+        <Key android:codes="-2"
+             android:keyEdgeFlags="left"
+             android:keyLabel="ABC"
+             android:keyWidth="15%p"/>
+        <Key android:codes="-202"
+             android:horizontalGap="10%p"
+             android:keyIcon="@drawable/sym_keyboard_choose"
+             android:keyWidth="10%p"/>
+        <Key android:codes="32"
+             android:keyIcon="@drawable/sym_keyboard_space"
+             android:keyWidth="30%p"/>
+        <Key android:codes="-200"
+             android:horizontalGap="15%p"
+             android:keyEdgeFlags="right"
+             android:keyLabel="Enter"
+             android:keyWidth="20%p"/>
+    </Row>
+
+</Keyboard>

@@ -1,0 +1,58 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:mode="twoLine"
+              android:orientation="horizontal"
+              android:paddingBottom="2dip"
+              android:paddingTop="2dip">
+
+    <ImageView android:id="@+id/icon"
+               android:layout_width="wrap_content"
+               android:layout_height="fill_parent"
+               android:layout_weight="0"
+               android:adjustViewBounds="false"
+               android:src="?attr/drawableFolder"
+               android:contentDescription="@string/record_type"
+               android:scaleType="center"
+               android:minWidth="48dp"/>
+
+    <RelativeLayout android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+        <TextView android:id="@android:id/text1"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <TextView android:id="@android:id/text2"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignLeft="@android:id/text1"
+                  android:layout_alignStart="@android:id/text1"
+                  android:layout_below="@android:id/text1"
+                  android:singleLine="true"
+                  android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView android:id="@+id/match"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@android:id/text1"
+                  android:layout_toEndOf="@android:id/text2"
+                  android:layout_toRightOf="@android:id/text2"
+                  android:ellipsize="end"
+                  android:gravity="end"
+                  android:singleLine="true"
+                  android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+    </RelativeLayout>
+
+    <CheckBox android:id="@+id/selection"
+              android:layout_width="wrap_content"
+              android:layout_height="fill_parent"
+              android:button="?android:attr/listChoiceIndicatorSingle"
+              android:clickable="false"
+              android:focusable="false"/>
+
+</LinearLayout>

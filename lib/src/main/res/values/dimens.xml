@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="fragment_full_horizontal_margin">0dp</dimen>
+    <dimen name="fragment_full_vertical_margin">0dp</dimen>
+
+    <dimen name="keyboard_horizontal_margin">0dp</dimen>
+    <dimen name="keyboard_vertical_margin">6dp</dimen>
+    <dimen name="keyboard_header_margin">6dp</dimen>
+
+    <dimen name="listPreferredItemPaddingStart">24dp</dimen>
+    <dimen name="listPreferredItemPaddingEnd">24dp</dimen>
+
+    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+         https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <dimen name="navigation_drawer_width">280dp</dimen>
+</resources>

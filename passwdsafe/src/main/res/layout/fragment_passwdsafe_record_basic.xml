@@ -1,0 +1,203 @@
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.jefftharris.passwdsafe.PasswdSafeRecordBasicFragment">
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:paddingBottom="6dp">
+
+        <LinearLayout android:id="@+id/base_row"
+                      style="@style/RecordRow"
+                      android:clickable="true">
+
+            <TextView android:id="@+id/base_label"
+                      style="@style/RecordHeader"
+                      android:clickable="false"/>
+
+            <View style="@style/Separator"
+                  android:clickable="false"/>
+
+            <RelativeLayout android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="false">
+
+                <Button android:id="@+id/base_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:text="@string/go_to_shortcut"/>
+
+                <TextView android:id="@+id/base"
+                          style="@style/RecordField"
+                          android:layout_alignParentBottom="false"
+                          android:layout_alignParentLeft="true"
+                          android:layout_alignParentStart="true"
+                          android:layout_alignParentTop="false"
+                          android:layout_toLeftOf="@id/base_btn"
+                          android:layout_toStartOf="@id/base_btn"
+                          android:clickable="false"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/user_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/username_header" />
+
+            <View style="@style/Separator"/>
+
+            <TextView android:id="@+id/user"
+                      style="@style/RecordField.Large"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/password_row"
+                      style="@style/RecordRow"
+                      android:clickable="true">
+
+            <TextView style="@style/RecordHeader"
+                      android:clickable="false"
+                      android:text="@string/password_header" />
+
+            <View style="@style/Separator"
+                  android:clickable="false"/>
+
+            <LinearLayout style="@style/RecordField.Large"
+                          android:clickable="false"
+                          android:orientation="vertical">
+
+                <TextView android:id="@+id/password"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:clickable="false"
+                          android:textAppearance="?android:textAppearanceLarge" />
+
+                <SeekBar android:id="@+id/password_seek"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"/>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/url_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/url" />
+
+            <View style="@style/Separator"/>
+
+            <TextView android:id="@+id/url"
+                      style="@style/RecordField"
+                      android:autoLink="web"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/email_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/email_header" />
+
+            <View style="@style/Separator"/>
+
+            <TextView android:id="@+id/email"
+                      style="@style/RecordField"
+                      android:autoLink="email"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/group_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/group_header" />
+
+            <View style="@style/Separator"/>
+
+            <TextView android:id="@+id/group"
+                      style="@style/RecordField"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/times_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/times_header" />
+
+            <View style="@style/Separator"/>
+
+            <TableLayout style="@style/RecordField.Small"
+                         android:shrinkColumns="1"
+                         android:stretchColumns="1">
+
+                <TableRow android:id="@+id/creation_time_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                              android:text="@string/created"/>
+
+                    <TextView android:id="@+id/creation_time"
+                              android:layout_width="wrap_content"/>
+
+                </TableRow>
+
+                <TableRow android:id="@+id/last_mod_time_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                              android:text="@string/modified"/>
+
+                    <TextView android:id="@+id/last_mod_time"
+                              android:layout_width="wrap_content"/>
+                </TableRow>
+
+            </TableLayout>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/protected_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/protected_record_header" />
+
+            <View style="@style/Separator"/>
+
+            <TextView style="@style/RecordField"
+                      android:text="@string/unprotect_to_modify"/>
+
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/references_row"
+                      style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                      android:text="@string/references_label" />
+
+            <View style="@style/Separator"/>
+
+            <ListView android:id="@+id/references"
+                      style="@style/RecordField"
+                      tools:ignore="NestedScrolling"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

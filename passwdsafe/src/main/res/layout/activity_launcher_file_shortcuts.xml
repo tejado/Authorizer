@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/content"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="@dimen/activity_vertical_margin"
+              tools:context=".LauncherFileShortcuts">
+
+    <FrameLayout android:id="@+id/files"
+                 android:layout_width="match_parent"
+                 android:layout_height="0dp"
+                 android:layout_weight="1"
+                 tools:layout="@layout/fragment_file_list"/>
+
+    <FrameLayout android:id="@+id/sync"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"/>
+
+</LinearLayout>
