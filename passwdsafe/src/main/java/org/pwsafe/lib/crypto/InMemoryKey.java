@@ -9,6 +9,8 @@
  */
 package org.pwsafe.lib.crypto;
 
+import android.annotation.SuppressLint;
+
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
@@ -21,13 +23,12 @@ import java.util.Arrays;
  *
  * @author roxon
  */
-@SuppressWarnings("ALL")
 public class InMemoryKey {
 	private final static int BUFFER_SIZE = 1024;
-	final short[] access;
-	ByteBuffer buffer;
+	private final short[] access;
+	private ByteBuffer buffer;
 
-	public InMemoryKey (short aSize) {
+	private InMemoryKey(short aSize) {
 		access = new short[aSize];
 	}
 
@@ -35,6 +36,7 @@ public class InMemoryKey {
 		this( (short) aSize);
 	}
 
+	@SuppressLint("Assert")
 	public void init () {
 		final byte[] accessBytes = new byte[access.length * 2];
 		org.pwsafe.lib.Util.newRandBytes(accessBytes);
@@ -54,7 +56,7 @@ public class InMemoryKey {
 
 	public byte[] getKey (int size) {
 		if (buffer == null) {
-			throw new IllegalStateException("InMemoryKey has not been intialised or been disposed");
+			throw new IllegalStateException("InMemoryKey has not been initialized or been disposed");
 		}
 		if (size > access.length) {
 		    throw new IllegalArgumentException("Size " + size +
