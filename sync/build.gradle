@@ -8,13 +8,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion '23.0.3'
     defaultConfig {
         applicationId "com.jefftharris.passwdsafe.sync"
         minSdkVersion 10
         resConfigs "de", "fr"
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 30200
         versionName "3.2.0"
 
