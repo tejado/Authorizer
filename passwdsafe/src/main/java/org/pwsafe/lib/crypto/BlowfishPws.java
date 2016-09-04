@@ -1,7 +1,5 @@
 /*
- * $Id: BlowfishPws.java 317 2009-01-26 20:20:54Z ronys $
- * 
- * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -17,7 +15,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.PasswordSafeException;
 
-import java.nio.ByteBuffer;
 
 /**
  * A reimplementation of the BlowfishPws class to use the Bouncy Castle
@@ -132,13 +129,5 @@ public class BlowfishPws
             ret[i] = 0;
         }
         return ret;
-    }
-
-    public static byte[] makeByteKey(long key)
-    {
-        byte ivBytes[] = new byte[8];
-        ByteBuffer buf = ByteBuffer.wrap(ivBytes);
-        buf.putLong(key);
-        return ivBytes;
     }
 }
