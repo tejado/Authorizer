@@ -6,6 +6,7 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -199,7 +200,8 @@
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/password_input"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    app:passwordToggleEnabled="false">
                     <android.support.design.widget.TextInputEditText
                         android:id="@+id/password"
                         android:layout_width="match_parent"
@@ -237,7 +239,8 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/password_confirm_input"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:passwordToggleEnabled="false">
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/password_confirm"
                     android:layout_width="match_parent"
