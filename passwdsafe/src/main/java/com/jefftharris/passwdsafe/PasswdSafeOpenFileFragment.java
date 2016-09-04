@@ -46,6 +46,8 @@ import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
 import org.pwsafe.lib.exception.InvalidPassphraseException;
+import org.pwsafe.lib.file.Owner;
+import org.pwsafe.lib.file.PwsPassword;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -650,9 +652,14 @@ public class PasswdSafeOpenFileFragment
             itsSaveChange = SavePasswordChange.NONE;
         }
 
-        itsOpenTask = new OpenTask(
-                new StringBuilder(itsPasswordEdit.getText()), readonly);
-        itsOpenTask.execute();
+        Owner<PwsPassword> passwd =
+                new Owner<>(new PwsPassword(itsPasswordEdit.getText()));
+        try {
+            itsOpenTask = new OpenTask(passwd.pass(), readonly);
+            itsOpenTask.execute();
+        } finally {
+            passwd.close();
+        }
     }
 
     /**
@@ -821,12 +828,13 @@ public class PasswdSafeOpenFileFragment
      */
     private class OpenTask extends BackgroundTask<OpenResult>
     {
-        private final StringBuilder itsItsPassword;
+        private final Owner<PwsPassword> itsPassword;
         private final boolean itsItsIsReadOnly;
 
-        public OpenTask(StringBuilder itsPassword, boolean itsIsReadOnly)
+        public OpenTask(Owner<PwsPassword>.Param passwd,
+                        boolean itsIsReadOnly)
         {
-            itsItsPassword = itsPassword;
+            itsPassword = passwd.use();
             itsItsIsReadOnly = itsIsReadOnly;
         }
 
@@ -837,7 +845,8 @@ public class PasswdSafeOpenFileFragment
                     new PasswdFileData(getPasswdFileUri());
             try {
                 fileData.setYubikey(itsIsYubikey);
-                fileData.load(itsItsPassword, itsItsIsReadOnly, getActivity());
+                fileData.load(itsPassword.pass(), itsItsIsReadOnly,
+                              getActivity());
             } catch (Exception e) {
                 return new OpenResult(null, null, e);
             }
@@ -868,6 +877,7 @@ public class PasswdSafeOpenFileFragment
         {
             super.onPostExecute(data);
             openTaskFinished(data);
+            itsPassword.close();
         }
     }
 

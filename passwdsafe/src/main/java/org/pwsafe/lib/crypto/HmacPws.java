@@ -16,27 +16,27 @@ import org.bouncycastle.crypto.params.KeyParameter;
  *
  * @author Glen Smith
  */
-@SuppressWarnings("ALL")
-public class HmacPws {
+public class HmacPws
+{
 
-	private HMac mac;
+    private final HMac mac;
 
-	public HmacPws(byte[] key) {
+    public HmacPws(byte[] key)
+    {
+        mac = new HMac(new SHA256Digest());
+        KeyParameter kp = new KeyParameter(key);
+        mac.init(kp);
+    }
 
-		mac = new HMac(new SHA256Digest());
-		KeyParameter kp = new KeyParameter(key);
-		mac.init(kp);
-
-	}
-
-	public final void digest(byte[] incoming) {
+    public final void digest(byte[] incoming)
+    {
         mac.update(incoming, 0, incoming.length);
     }
 
-	public final byte[] doFinal() {
-		byte[] output = new byte[mac.getUnderlyingDigest().getDigestSize()];
-		mac.doFinal(output, 0);
-		return output;
-	}
-
+    public final byte[] doFinal()
+    {
+        byte[] output = new byte[mac.getUnderlyingDigest().getDigestSize()];
+        mac.doFinal(output, 0);
+        return output;
+    }
 }

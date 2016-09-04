@@ -27,6 +27,7 @@ import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
+import org.pwsafe.lib.file.Owner;
 import org.pwsafe.lib.file.PwsByteField;
 import org.pwsafe.lib.file.PwsField;
 import org.pwsafe.lib.file.PwsFieldTypeV2;
@@ -38,6 +39,7 @@ import org.pwsafe.lib.file.PwsFileV3;
 import org.pwsafe.lib.file.PwsIntegerField;
 import org.pwsafe.lib.file.PwsPasswdField;
 import org.pwsafe.lib.file.PwsPasswdUnicodeField;
+import org.pwsafe.lib.file.PwsPassword;
 import org.pwsafe.lib.file.PwsRecord;
 import org.pwsafe.lib.file.PwsRecordV1;
 import org.pwsafe.lib.file.PwsRecordV2;
@@ -86,8 +88,9 @@ public class PasswdFileData
         itsUri = uri;
     }
 
-    public void load(StringBuilder passwd, boolean readonly, Context context)
-        throws IOException, NoSuchAlgorithmException,
+    public void load(Owner<PwsPassword>.Param passwd, boolean readonly,
+                     Context context)
+            throws IOException, NoSuchAlgorithmException,
             EndOfFileException, InvalidPassphraseException,
             UnsupportedFileVersionException
     {
@@ -97,15 +100,15 @@ public class PasswdFileData
         if (itsIsOpenReadOnly || !itsUri.isWritable().first) {
             itsPwsFile.setReadOnly(true);
         }
-        finishOpenFile(passwd);
+        finishOpenFile();
     }
 
-    public void createNewFile(StringBuilder passwd, Context context)
+    public void createNewFile(Owner<PwsPassword>.Param passwd, Context context)
         throws IOException, NoSuchAlgorithmException
     {
         itsPwsFile = itsUri.createNew(passwd, context);
         save(context);
-        finishOpenFile(passwd);
+        finishOpenFile();
     }
 
     public void save(Context context)
@@ -230,7 +233,7 @@ public class PasswdFileData
         return true;
     }
 
-    public final void changePasswd(StringBuilder passwd)
+    public final void changePasswd(Owner<PwsPassword>.Param passwd)
     {
         itsPwsFile.setPassphrase(passwd);
     }
@@ -1199,14 +1202,8 @@ public class PasswdFileData
         }
     }
 
-    private void finishOpenFile(StringBuilder passwd)
+    private void finishOpenFile()
     {
-        for (int i = 0; i < passwd.length(); ++i) {
-            passwd.setCharAt(i, '\0');
-        }
-        passwd.delete(0, passwd.length());
-        //noinspection UnusedAssignment
-        passwd = null;
         indexRecords();
         notifyObservers(this);
         PasswdSafeUtil.dbginfo(TAG, "file loaded");

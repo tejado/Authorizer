@@ -92,7 +92,12 @@ public class PwsFileHeader
 	public void save( PwsFile file )
 	throws IOException
 	{
-		update( file.getPassphrase() );
+		Owner<PwsPassword> passwd = file.getPassphrase();
+		try {
+			update(passwd.pass());
+		} finally {
+			passwd.close();
+		}
 
 		file.writeBytes( RandStuff );
 		file.writeBytes( RandHash );
@@ -103,15 +108,15 @@ public class PwsFileHeader
 	/**
 	 * Updates the header ready for saving.
 	 * 
-	 * @param passphrase the passphrase to be used to encrypt the database.
+	 * @param passwd the passphrase to be used to encrypt the database.
 	 */
-	private void update( String passphrase )
+	private void update(Owner<PwsPassword>.Param passwd)
 	{
 		byte	temp[];
 
 		Util.newRandBytes(RandStuff);
 		temp		= Util.cloneByteArray( RandStuff, 10 );
-		RandHash	= PwsFileFactory.genRandHash( passphrase, temp );
+		RandHash	= PwsFileFactory.genRandHash(passwd, temp);
 		
 		Util.newRandBytes(Salt);
 		
