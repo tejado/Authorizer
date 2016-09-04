@@ -30,6 +30,9 @@ import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
+import org.pwsafe.lib.file.Owner;
+import org.pwsafe.lib.file.PwsPassword;
+
 /**
  * Fragment for changing a file's password
  */
@@ -168,16 +171,20 @@ public class PasswdSafeChangePasswordFragment
             return;
         }
 
-        useFileData(new PasswdFileDataUser()
-        {
-            @Override
-            public void useFileData(@NonNull PasswdFileData fileData)
+        final Owner<PwsPassword> passwd =
+                new Owner<>(new PwsPassword(itsPassword.getText()));
+        try {
+            useFileData(new PasswdFileDataUser()
             {
-                StringBuilder newPasswd =
-                        new StringBuilder(itsPassword.getText());
-                fileData.changePasswd(newPasswd);
-            }
-        });
+                @Override
+                public void useFileData(@NonNull PasswdFileData fileData)
+                {
+                    fileData.changePasswd(passwd.pass());
+                }
+            });
+        } finally {
+            passwd.close();
+        }
         getListener().finishChangePassword();
     }
 

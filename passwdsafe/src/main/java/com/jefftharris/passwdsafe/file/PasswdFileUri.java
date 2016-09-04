@@ -22,9 +22,11 @@ import java.util.regex.Pattern;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
+import org.pwsafe.lib.file.Owner;
 import org.pwsafe.lib.file.PwsFile;
 import org.pwsafe.lib.file.PwsFileFactory;
 import org.pwsafe.lib.file.PwsFileStorage;
+import org.pwsafe.lib.file.PwsPassword;
 import org.pwsafe.lib.file.PwsStorage;
 import org.pwsafe.lib.file.PwsStreamStorage;
 
@@ -229,7 +231,7 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Load the password file */
-    public PwsFile load(StringBuilder passwd, Context context)
+    public PwsFile load(Owner<PwsPassword>.Param passwd, Context context)
             throws NoSuchAlgorithmException, EndOfFileException,
                 InvalidPassphraseException, IOException,
                 UnsupportedFileVersionException
@@ -264,7 +266,7 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Create a new file */
-    public PwsFile createNew(StringBuilder passwd, Context context)
+    public PwsFile createNew(Owner<PwsPassword>.Param passwd, Context context)
             throws IOException
     {
         switch (itsType) {

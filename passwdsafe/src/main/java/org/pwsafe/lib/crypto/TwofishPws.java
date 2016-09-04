@@ -20,51 +20,42 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  *
  * @author Glen Smith
  */
-@SuppressWarnings("ALL")
-public class TwofishPws {
+public class TwofishPws
+{
+    private final CBCBlockCipher cipher;
 
-	CBCBlockCipher cipher;
+    public TwofishPws(byte[] key, boolean forEncryption, byte[] IV)
+    {
+        TwofishEngine tfe = new TwofishEngine();
+        cipher = new CBCBlockCipher(tfe);
+        KeyParameter kp = new KeyParameter(key);
+        ParametersWithIV piv = new ParametersWithIV(kp, IV);
+        cipher.init(forEncryption, piv);
+    }
 
-	public TwofishPws(byte[] key, boolean forEncryption, byte[] IV) {
-
-		TwofishEngine tfe = new TwofishEngine();
-    	cipher = new CBCBlockCipher(tfe);
-    	KeyParameter kp = new KeyParameter(key);
-    	ParametersWithIV piv = new ParametersWithIV(kp, IV);
-    	cipher.init(forEncryption, piv);
-
-	}
-
-	public final byte[] processCBC(byte[] input) {
-
-
-    	byte[]  out = new byte[input.length];
-
+    public final byte[] processCBC(byte[] input)
+    {
+        byte[] out = new byte[input.length];
         cipher.processBlock(input, 0, out, 0);
-
         return out;
+    }
 
-	}
-
-    public static byte[] processECB(byte[] key, boolean forEncryption, byte[] input) {
-
-    	BufferedBlockCipher cipher = new BufferedBlockCipher(new TwofishEngine());
-    	KeyParameter kp = new KeyParameter(key);
-    	cipher.init(forEncryption, kp);
-    	byte[]  out = new byte[input.length];
+    public static byte[] processECB(byte[] key, boolean forEncryption,
+                                    byte[] input)
+    {
+        BufferedBlockCipher cipher = new BufferedBlockCipher(
+                new TwofishEngine());
+        KeyParameter kp = new KeyParameter(key);
+        cipher.init(forEncryption, kp);
+        byte[] out = new byte[input.length];
 
         int len1 = cipher.processBytes(input, 0, input.length, out, 0);
 
-        try
-        {
+        try {
             cipher.doFinal(out, len1);
-        }
-        catch (CryptoException e)
-        {
+        } catch (CryptoException e) {
             throw new RuntimeException(e);
         }
         return out;
     }
-
-
 }
