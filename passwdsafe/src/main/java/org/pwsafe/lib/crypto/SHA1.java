@@ -20,20 +20,19 @@ package org.pwsafe.lib.crypto;
  * SHA-1 message digest implementation, translated from C source code (the
  * origin is unknown).
  */
-@SuppressWarnings("ALL")
 public class SHA1
 {
 	/**
 	 * size of a SHA-1 digest in octets
 	 */
-	public final static int DIGEST_SIZE = 20;
+	private final static int DIGEST_SIZE = 20;
 
 	///////////////////////////////////////////////////////////////////////////
 
-	private int[] m_state;
+	private final int[] m_state;
 	private long m_lCount;
-	private byte[] m_digestBits;
-	private int[] m_block;
+	private final byte[] m_digestBits;
+	private final int[] m_block;
 	private int m_nBlockIndex;
 
 	///////////////////////////////////////////////////////////////////////////
@@ -76,15 +75,15 @@ public class SHA1
 
 	///////////////////////////////////////////////////////////////////////////
 
-	final static int rol(int nValue, int nBits)
+	private static int rol(int nValue, int nBits)
 	{
 		return ((nValue << nBits) | (nValue >>> (32 - nBits)));
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 
-	final int blk0(
-		int nI)
+	private int blk0(
+			int nI)
 	{
 		return
 			m_block[nI] =
@@ -94,8 +93,8 @@ public class SHA1
 
 	///////////////////////////////////////////////////////////////////////////
 
-	final int blk(
-		int nI)
+	private int blk(
+			int nI)
 	{
 		return (
 			m_block[nI & 15] =
@@ -109,7 +108,8 @@ public class SHA1
 
 	///////////////////////////////////////////////////////////////////////////
 
-	final void r0(int data[], int nV, int nW, int nX, int nY, int nZ, int nI)
+	private void r0(int data[], int nV, int nW, int nX, int nY, int nZ,
+			int nI)
 	{
 		data[nZ] += ((data[nW] & (data[nX] ^ data[nY])) ^ data[nY])
 			+ blk0(nI)
@@ -118,7 +118,8 @@ public class SHA1
 		data[nW] = rol(data[nW], 30);
 	}
 
-	final void r1(int data[], int nV, int nW, int nX, int nY, int nZ, int nI)
+	private void r1(int data[], int nV, int nW, int nX, int nY, int nZ,
+			int nI)
 	{
 		data[nZ] += ((data[nW] & (data[nX] ^ data[nY])) ^ data[nY])
 			+ blk(nI)
@@ -127,7 +128,8 @@ public class SHA1
 		data[nW] = rol(data[nW], 30);
 	}
 
-	final void r2(int data[], int nV, int nW, int nX, int nY, int nZ, int nI)
+	private void r2(int data[], int nV, int nW, int nX, int nY, int nZ,
+			int nI)
 	{
 		data[nZ] += (data[nW] ^ data[nX] ^ data[nY])
 			+ blk(nI)
@@ -136,7 +138,8 @@ public class SHA1
 		data[nW] = rol(data[nW], 30);
 	}
 
-	final void r3(int data[], int nV, int nW, int nX, int nY, int nZ, int nI)
+	private void r3(int data[], int nV, int nW, int nX, int nY, int nZ,
+			int nI)
 	{
 		data[nZ]
 			+= (((data[nW] | data[nX]) & data[nY]) | (data[nW] & data[nX]))
@@ -146,7 +149,8 @@ public class SHA1
 		data[nW] = rol(data[nW], 30);
 	}
 
-	final void r4(int data[], int nV, int nW, int nX, int nY, int nZ, int nI)
+	private void r4(int data[], int nV, int nW, int nX, int nY, int nZ,
+			int nI)
 	{
 		data[nZ] += (data[nW] ^ data[nX] ^ data[nY])
 			+ blk(nI)
@@ -157,7 +161,7 @@ public class SHA1
 
 	///////////////////////////////////////////////////////////////////////////
 
-	void transform()
+	private void transform()
 	{
 
 		int[] dd = new int[5];
@@ -258,7 +262,7 @@ public class SHA1
 	/**
 	  * Initializes (or resets) the hasher for a new session.
 	  */
-	public void reset()
+	private void reset()
 	{
 
 		m_state[0] = 0x67452301;
@@ -276,8 +280,8 @@ public class SHA1
 	 * Adds a single byte to the digest.
 	 * @param bB the byte to add
 	 */
-	public void update(
-		byte bB)
+	private void update(
+			byte bB)
 	{
 
 		int nMask = (m_nBlockIndex & 3) << 3;
@@ -295,17 +299,6 @@ public class SHA1
 
 	///////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Adds a byte array to the digest.
-	 * @param data the data to add
-	 * @deprecated use update(byte[], int, int) instead
-	 */
-	@Deprecated
-    public void update(
-		byte[] data)
-	{
-		update(data, 0, data.length);
-	}
 
 	///////////////////////////////////////////////////////////////////////////
 
@@ -326,22 +319,6 @@ public class SHA1
 
 	///////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Adds an ASCII string (8bit) to the digest.
-	 * @param sData the string to add
-	 * @deprecated don't use this method anymore (it's not clean), you might
-	 * want to try update(sData.getBytes()) instead
-	 */
-	@Deprecated
-    public void update(
-		String sData)
-	{
-		for (int nI = 0, nC = sData.length(); nI < nC; nI++)
-		{
-			update((byte)(sData.charAt(nI) & 0x0ff));
-		}
-
-	}
 
 	///////////////////////////////////////////////////////////////////////////
 
@@ -349,8 +326,9 @@ public class SHA1
 	 * Finalizes the digest.
 	 */
 	@Override
-    public void finalize()
+    public void finalize() throws Throwable
 	{
+		super.finalize();
 		int nI;
 		byte bits[] = new byte[8];
 
@@ -393,19 +371,6 @@ public class SHA1
 
 	///////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Retrieves the digest into an existing buffer.
-	 * @param buf buffer to store the digst into
-	 * @param nOfs where to write to
-	 * @return number of bytes written
-	 */
-	public int getDigest(
-		byte[] buf,
-		int nOfs)
-	{
-		System.arraycopy(m_digestBits, 0, buf, nOfs, DIGEST_SIZE);
-		return DIGEST_SIZE;
-	}
 
 	///////////////////////////////////////////////////////////////////////////
 
@@ -429,48 +394,5 @@ public class SHA1
 		}
 
 		return sbuf.toString();
-	}
-
-	///////////////////////////////////////////////////////////////////////////
-
-	// references for the selftest
-
-	private final static String SELFTEST_MESSAGE =
-		"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
-
-	private final static byte[] SELFTEST_DIGEST =
-	{
-		(byte)0x84, (byte)0x98, (byte)0x3e, (byte)0x44, (byte)0x1c,
-		(byte)0x3b, (byte)0xd2, (byte)0x6e, (byte)0xba, (byte)0xae,
-		(byte)0x4a, (byte)0xa1, (byte)0xf9, (byte)0x51, (byte)0x29,
-		(byte)0xe5, (byte)0xe5, (byte)0x46, (byte)0x70, (byte)0xf1
-	};
-
-	/**
-	 * Runs an integrity test.
-	 * @return true: selftest passed / false: selftest failed
-	 */
-	public boolean selfTest()
-	{
-		int nI;
-		SHA1 tester;
-		byte[] digest;
-
-
-		tester = new SHA1();
-
-		tester.update(SELFTEST_MESSAGE);
-		tester.finalize();
-
-		digest = tester.getDigest();
-
-		for (nI = 0; nI < DIGEST_SIZE; nI++)
-		{
-			if (digest[nI] != SELFTEST_DIGEST[nI])
-			{
-				return false;
-			}
-		}
-		return true;
 	}
 }
