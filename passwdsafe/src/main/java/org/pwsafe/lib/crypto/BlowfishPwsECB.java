@@ -12,45 +12,17 @@ package org.pwsafe.lib.crypto;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.PasswordSafeException;
 
-@SuppressWarnings("ALL")
 public class BlowfishPwsECB extends BlowfishPws {
 	/**
 	 * Constructor, sets the initial vector to zero.
 	 * 
 	 * @param bfkey the encryption/decryption key.
-	 * @param cbc Use CBC mode (otherwise ECB is used).  Normally this should be true.
-	 * @throws PasswordSafeException 
 	 */
-	public BlowfishPwsECB( byte[] bfkey ) throws PasswordSafeException
+	public BlowfishPwsECB( byte[] bfkey )
 	{
 		super(bfkey, zeroIV(), false);
 	}
 
-	/**
-	 * Constructor, sets the initial vector to the value given.
-	 * 
-	 * @param bfkey      the encryption/decryption key.
-	 * @param lInitCBCIV the initial vector.
-	 * @param cbc Use CBC mode (otherwise ECB is used).  Normally this should be true.
-	 * @throws PasswordSafeException 
-	 */
-	public BlowfishPwsECB( byte[] bfkey, long lInitCBCIV ) throws PasswordSafeException
-	{
-		super(bfkey, makeByteKey(lInitCBCIV), false);
-	}
-
-	/**
-	 * Constructor, sets the initial vector to the value given.
-	 * 
-	 * @param bfkey      the encryption/decryption key.
-	 * @param ivBytes the initial vector.
-	 * @param cbc Use CBC mode (otherwise ECB is used).  Normally this should be true.
-	 * @throws PasswordSafeException 
-	 */
-	public BlowfishPwsECB( byte[] bfkey, byte[] ivBytes ) {
-		super(bfkey, ivBytes, false);
-	}
-	
 	/**
 	 * Decrypts <code>buffer</code> in place.
 	 * 
