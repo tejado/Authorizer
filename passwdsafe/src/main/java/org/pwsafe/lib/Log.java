@@ -14,7 +14,6 @@ package org.pwsafe.lib;
  *
  * @author Kevin Preece
  */
-@SuppressWarnings("ALL")
 public class Log
 {
     private String itsTag = "Log";
@@ -37,18 +36,6 @@ public class Log
 	}
 
 	/**
-	 * Returns an instance of <code>Log</code> for the logger named <code>Class.name</code>.
-	 *
-	 * @param name the logger name.
-	 *
-	 * @return An <code>Log</code> instance.
-	 */
-	public static Log getInstance( Class<?> aClass )
-	{
-		return new Log( aClass.getName() );
-	}
-
-	/**
 	 * Writes a message at error level
 	 *
 	 * @param msg the message to issue.
@@ -62,21 +49,11 @@ public class Log
 	 * Writes a message at error level along with details of the exception
 	 *
 	 * @param msg    the message to issue.
-	 * @param except the exeption to be logged.
+	 * @param except the exception to be logged.
 	 */
 	public final void error( String msg, Throwable except )
 	{
 	    android.util.Log.e( itsTag, msg, except );
-	}
-
-	/**
-	 * Logs the exception at a level of error.
-	 *
-	 * @param except the <code>Exception</code> to log.
-	 */
-	public final void error( Throwable except )
-	{
-		android.util.Log.e( itsTag, "An Exception has occurred", except );
 	}
 
 	/**
