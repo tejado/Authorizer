@@ -60,17 +60,18 @@ public abstract class PwsFileV1V2 extends PwsFile {
 
 	/**
 	 * @param storage
-	 * @param passphrase
+	 * @param passwd
 	 * @param encoding
 	 * @throws EndOfFileException
 	 * @throws IOException
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public PwsFileV1V2(PwsStorage storage, String passphrase, String encoding)
+	public PwsFileV1V2(PwsStorage storage,
+			   Owner<PwsPassword>.Param passwd, String encoding)
 			throws EndOfFileException, IOException,
 			UnsupportedFileVersionException, NoSuchAlgorithmException {
-		super(storage, passphrase, encoding);
+		super(storage, passwd, encoding);
 	}
 
 
@@ -105,13 +106,14 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	 * Constructs and initialises the blowfish encryption routines ready to decrypt or
 	 * encrypt data.
 	 *
-	 * @param aPassphrase
+	 * @param passwdParam
      * @param encoding the passphrase encoding (if known)
 	 *
 	 * @return A properly initialised {@link BlowfishPws} object.
 	 * @throws UnsupportedEncodingException
 	 */
-	private BlowfishPws makeBlowfish( String aPassphrase, String encoding )
+	private BlowfishPws makeBlowfish(Owner<PwsPassword>.Param passwdParam,
+					 String encoding )
 	    throws UnsupportedEncodingException
 	{
 		SHA1	sha1;
@@ -120,12 +122,15 @@ public abstract class PwsFileV1V2 extends PwsFile {
 		sha1 = new SHA1();
 		salt = header.getSalt();
 
-		byte[] passwordBytes = (encoding == null) ?
-		    aPassphrase.getBytes() : aPassphrase.getBytes(encoding);
-
-		sha1.update( passwordBytes, 0, passwordBytes.length );
-		sha1.update( salt, 0, salt.length );
-		sha1.finalize();
+		Owner<PwsPassword> passwd = passwdParam.use();
+		try {
+			byte[] passwordBytes = passwd.get().getBytes(encoding);
+			sha1.update(passwordBytes, 0, passwordBytes.length);
+			sha1.update(salt, 0, salt.length);
+			sha1.finalize();
+		} finally {
+			passwd.close();
+		}
 
 		return new BlowfishPws( sha1.getDigest(), header.getIpThing() );
 	}
@@ -133,7 +138,7 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	/**
 	 * Opens the database.
 	 *
-	 * @param aPassphrase the passphrase for the file.
+	 * @param passwd the passphrase for the file.
      * @param encoding the passphrase encoding (if known)
 	 *
 	 * @throws EndOfFileException
@@ -142,17 +147,17 @@ public abstract class PwsFileV1V2 extends PwsFile {
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
 	 */
 	@Override
-	protected void open( String aPassphrase, String encoding )
+	protected void open( Owner<PwsPassword>.Param passwd, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		setPassphrase(new StringBuilder(aPassphrase));
+		setPassphrase(passwd);
 
 		if (storage!=null) {
 			inStream		= new ByteArrayInputStream(storage.load());
 			lastStorageChange = storage.getModifiedDate();
 		}
 		header			= new PwsFileHeader( this );
-		algorithm		= makeBlowfish(aPassphrase, encoding);
+		algorithm		= makeBlowfish(passwd, encoding);
 
 		readExtraHeader( this );
 
@@ -218,9 +223,14 @@ public abstract class PwsFileV1V2 extends PwsFile {
 			header.save( this );
 
 			// Can only be created once the V1 header's been written.
-			//TODOlib: check whether this can be performed without toString
-			algorithm	= makeBlowfish(getPassphrase().toString(),
-			         	               PwsFile.getUpdatePasswordEncoding());
+			Owner<PwsPassword> passwd = getPassphrase();
+			try {
+				algorithm = makeBlowfish(
+						passwd.pass(),
+						PwsFile.getUpdatePasswordEncoding());
+			} finally {
+				passwd.close();
+			}
 
 			writeExtraHeader( this );
 

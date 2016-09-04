@@ -187,7 +187,7 @@ public abstract class PwsFile
 	 * Construct the PasswordSafe file by reading it from the file.
 	 *
 	 * @param aStorage  the storage of the database to open.
-	 * @param aPassphrase the passphrase for the database.
+	 * @param passwd the passphrase for the database.
 	 * @param encoding the passphrase encoding (if known)
 	 *
 	 * @throws EndOfFileException
@@ -195,11 +195,12 @@ public abstract class PwsFile
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
 	 */
-	protected PwsFile( PwsStorage aStorage, String aPassphrase, String encoding )
+	protected PwsFile( PwsStorage aStorage,
+			   Owner<PwsPassword>.Param passwd, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
 		this.storage = aStorage;
-		open( aPassphrase, encoding );
+		open( passwd, encoding );
 	}
 
 	/**
@@ -376,11 +377,12 @@ public abstract class PwsFile
 	 *
 	 * @return The file's passphrase.
 	 */
-	public String getPassphrase()
+	public Owner<PwsPassword> getPassphrase()
 	{
 		try {
-			return passphrase == null ?
-			    null : passphrase.getObject(getReadCipher()).toString();
+			return new Owner<PwsPassword>(
+					PwsPassword.unseal(passphrase,
+							   getReadCipher()));
 		} catch (IllegalBlockSizeException e) {
 			throw new RuntimeCryptoException(e.getMessage());
 		} catch (BadPaddingException e) {
@@ -458,7 +460,7 @@ public abstract class PwsFile
 	/**
 	 * Opens the database.
 	 *
-	 * @param aPassphrase the passphrase for the file.
+	 * @param passwd the passphrase for the file.
 	 * @param encoding the passphrase encoding (if known)
 	 *
 	 * @throws EndOfFileException
@@ -466,7 +468,8 @@ public abstract class PwsFile
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException if no SHA-1 implementation is found.
 	 */
-	protected abstract void open( String aPassphrase, String encoding )
+	protected abstract void open( Owner<PwsPassword>.Param passwd,
+				      String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException;
 
 	/**
@@ -622,31 +625,18 @@ public abstract class PwsFile
 
 	/**
 	 * Sets the passphrase that will be used to encrypt the file when it is saved.
-	 * @deprecated
-	 * @param pass
 	 */
-	@Deprecated
-	public void setPassphrase( String pass )
+	public void setPassphrase(Owner<PwsPassword>.Param passwdParam)
 	{
-        this.setPassphrase(new StringBuilder(pass));
-
-	}
-
-	/**
-	 * Sets the passphrase that will be used to encrypt the file when it is saved.
-	 *
-	 * @param pass
-	 */
-	public void setPassphrase( StringBuilder pass ) {
-	    // TODOlib: convert to byte[] first
+		Owner<PwsPassword> passwd = passwdParam.use();
 		try {
-			passphrase	= new SealedObject(pass, getWriteCipher());
-			// now overwrite given StringBuider
-			Util.clear(pass);
+			passphrase = passwd.get().seal(getWriteCipher());
 		} catch (IllegalBlockSizeException e) {
 			throw new RuntimeCryptoException(e.getMessage());
 		} catch (IOException e) {
 			throw new RuntimeCryptoException(e.getMessage());
+		} finally {
+			passwd.close();
 		}
 	}
 

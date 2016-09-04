@@ -46,20 +46,21 @@ public class PwsFileFactory {
 	}
 
 	/**
-	 * Verifies that <code>passphrase</code> is actually the passphrase for the file.  It returns
+	 * Verifies that <code>passwdParam</code> is actually the passphrase for the file.  It returns
 	 * normally if everything is OK or {@link InvalidPassphraseException} if the passphrase is
 	 * incorrect.
 	 *
 	 * @param header the file header bytes
-	 * @param passphrase the file's passphrase.
+	 * @param passwdParam the file's passphrase.
 	 *
 	 * @return the password encoding
 	 *
 	 * @throws InvalidPassphraseException If the passphrase is not the correct one for the file.
 	 * @throws NoSuchAlgorithmException   If no SHA-1 implementation is found.
 	 */
-	private static final String checkPassword( byte[] header,
-	                                           String passphrase )
+	private static final String checkPassword(
+			byte[] header,
+			Owner<PwsPassword>.Param passwdParam)
 	    throws InvalidPassphraseException, NoSuchAlgorithmException
 	{
 	    byte []			phash;
@@ -75,7 +76,7 @@ public class PwsFileFactory {
 	    boolean validPassword = false;
 	    for (String charset : PwsFile.getPasswordEncodings()) {
 	        try {
-	            phash = genRandHash(passphrase, charset, fudged);
+	            phash = genRandHash(passwdParam, charset, fudged);
 	        } catch(UnsupportedEncodingException e) {
 	            // Skip this charset
 	            continue;
@@ -96,10 +97,16 @@ public class PwsFileFactory {
 	    return encoding;
 	}
 
-	static final byte[] genRandHash(String passphrase, byte[] stuff)
+	static final byte[] genRandHash(Owner<PwsPassword>.Param passwdParam,
+					byte[] stuff)
 	{
 	    try {
-	        return genRandHash(passphrase, null, stuff);
+		    Owner<PwsPassword> passwd = passwdParam.use();
+		    try {
+			    return genRandHash(passwd.pass(), null, stuff);
+		    } finally {
+			    passwd.close();
+		    }
 	    } catch (UnsupportedEncodingException e) {
 	        return new byte[0];
 	    }
@@ -114,25 +121,27 @@ public class PwsFileFactory {
 	 *
 	 * @return the generated checksum.
 	 */
-	static final byte [] genRandHash( String passphrase,
-	                                  String charEnc,
-	                                  byte [] stuff )
+	static final byte [] genRandHash(Owner<PwsPassword>.Param passwdParam,
+					 String charEnc,
+					 byte [] stuff )
 	    throws UnsupportedEncodingException
 	{
 		SHA1			md;
 		BlowfishPwsECB	ecb;
-		byte []			pw;
 		byte []			digest;
 		byte []			tmp;
 
-		pw	= (charEnc == null) ?
-		    passphrase.getBytes() : passphrase.getBytes(charEnc);
-		md	= new SHA1();
-
-		md.update( stuff, 0, stuff.length );
-		md.update( pw, 0, pw.length );
-		md.finalize();
-		digest = md.getDigest();
+		Owner<PwsPassword> passwd = passwdParam.use();
+		try {
+			byte[] pw = passwd.get().getBytes(charEnc);
+			md = new SHA1();
+			md.update(stuff, 0, stuff.length);
+			md.update(pw, 0, pw.length);
+			md.finalize();
+			digest = md.getDigest();
+		} finally {
+			passwd.close();
+		}
 
 		try {
 			ecb = new BlowfishPwsECB(digest);
@@ -161,9 +170,8 @@ public class PwsFileFactory {
 	/**
 	 * Loads a Password Safe file.  It returns the appropriate subclass of {@link PwsFile}.
 	 *
-	 * @deprecated use the StringBuilder version instead
 	 * @param filename   the name of the file to open
-	 * @param passphrase the passphrase for the file
+	 * @param passwd the passphrase for the file
 	 *
 	 * @return The correct subclass of {@link PwsFile} for the file.
 	 *
@@ -174,33 +182,12 @@ public class PwsFileFactory {
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException        If no SHA-1 implementation is found.
 	 */
-	@Deprecated
-	public static final PwsFile loadFile( String filename, String passphrase )
-	throws EndOfFileException, FileNotFoundException, InvalidPassphraseException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
-	{
-		return loadFile(filename, new StringBuilder(passphrase));
-	}
-
-	/**
-	 * Loads a Password Safe file.  It returns the appropriate subclass of {@link PwsFile}.
-	 *
-	 * @param filename   the name of the file to open
-	 * @param passphrase the passphrase for the file
-	 *
-	 * @return The correct subclass of {@link PwsFile} for the file.
-	 *
-	 * @throws EndOfFileException
-	 * @throws FileNotFoundException
-	 * @throws InvalidPassphraseException
-	 * @throws IOException
-	 * @throws UnsupportedFileVersionException
-	 * @throws NoSuchAlgorithmException        If no SHA-1 implementation is found.
-	 */
-	public static final PwsFile loadFile( String filename, StringBuilder aPassphrase )
+	public static final PwsFile loadFile( String filename,
+					      Owner<PwsPassword>.Param passwd)
 	throws EndOfFileException, FileNotFoundException, InvalidPassphraseException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
 	    PwsStorage storage = new PwsFileStorage(filename, filename);
-	    PwsFile file = loadFromStorage(storage, aPassphrase);
+	    PwsFile file = loadFromStorage(storage, passwd);
 	    return file;
 	}
 
@@ -208,7 +195,7 @@ public class PwsFileFactory {
          * Loads a Password Safe file.  It returns the appropriate subclass of {@link PwsFile}.
          *
          * @param storage the password storage
-         * @param passphrase the passphrase for the file
+         * @param passwd the passphrase for the file
          *
          * @return The correct subclass of {@link PwsFile} for the file.
          *
@@ -218,16 +205,13 @@ public class PwsFileFactory {
          * @throws UnsupportedFileVersionException
          * @throws NoSuchAlgorithmException        If no SHA-1 implementation is found.
          */
-        public static final PwsFile loadFromStorage(PwsStorage storage,
-                                                    StringBuilder aPassphrase)
+        public static final PwsFile loadFromStorage(
+			PwsStorage storage,
+			Owner<PwsPassword>.Param passwd)
             throws EndOfFileException, InvalidPassphraseException, IOException,
                    UnsupportedFileVersionException, NoSuchAlgorithmException
         {
             PwsFile file;
-
-            //TODOlib change to StringBuilder Constructors
-            String passphrase = aPassphrase.toString();
-
             try
             {
                 byte[] header = storage.openForLoad(MAX_HEADER_LEN);
@@ -235,15 +219,15 @@ public class PwsFileFactory {
                 // First check for a v3 file...
                 byte[] first4Bytes = Util.getBytes(header, 0, 4);
                 if (Util.bytesAreEqual("PWS3".getBytes(), first4Bytes)) {
-                    file = new PwsFileV3(storage, passphrase);
+                    file = new PwsFileV3(storage, passwd);
                     file.readAll();
                     file.close();
                     return file;
                 }
 
                 PwsRecordV1     rec;
-                String encoding = checkPassword( header, passphrase );
-                file = new PwsFileV1( storage, passphrase, encoding );
+                String encoding = checkPassword( header, passwd );
+                file = new PwsFileV1( storage, passwd, encoding );
                 try {
                     rec = (PwsRecordV1) file.readRecord();
                 } catch (PasswordSafeException e) {
@@ -256,9 +240,9 @@ public class PwsFileFactory {
                 // title of the first record set to the value of PwsFileV2.ID_STRING!
 
                 if ( rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING) ) {
-                    file = new PwsFileV2( storage, passphrase, encoding );
+                    file = new PwsFileV2( storage, passwd, encoding );
                 } else {
-                    file = new PwsFileV1( storage, passphrase, encoding );
+                    file = new PwsFileV1( storage, passwd, encoding );
                 }
                 file.readAll();
                 file.close();

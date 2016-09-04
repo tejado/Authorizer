@@ -54,7 +54,7 @@ public class PwsFileV2 extends PwsFileV1V2 {
 	 * <b>N.B. </b>this constructor's visibility may be reduced in future releases.
 	 * </p>
 	 * @param filename   the name of the database to open.
-	 * @param passphrase the passphrase for the database.
+	 * @param passwd the passphrase for the database.
 	 * @param encoding the password encoding
 	 *
 	 * @throws EndOfFileException
@@ -62,10 +62,11 @@ public class PwsFileV2 extends PwsFileV1V2 {
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public PwsFileV2( PwsStorage storage, String passphrase, String encoding )
+	public PwsFileV2( PwsStorage storage,
+			  Owner<PwsPassword>.Param passwd, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		super( storage, passphrase, encoding );
+		super( storage, passwd, encoding );
 	}
 
 	/**

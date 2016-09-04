@@ -447,7 +447,20 @@ public final class Util
 	 */
 	public static byte[] stretchPassphrase(byte[] passphrase, byte[] salt, int iter) {
 		byte[] p = mergeBytes(passphrase, salt);
-
-		return SHA256Pws.digestN(p, iter);
+		try {
+			return SHA256Pws.digestN(p, iter);
+		} finally {
+			clearArray(p);
+		}
 	}
+
+	/**
+	 * Clear the contents of a byte array
+	 */
+	public static void clearArray(byte[] array)
+        {
+            Arrays.fill(array, (byte)0xA5);
+            Arrays.fill(array, (byte)0x5A);
+            Arrays.fill(array, (byte)0x00);
+        }
 }
