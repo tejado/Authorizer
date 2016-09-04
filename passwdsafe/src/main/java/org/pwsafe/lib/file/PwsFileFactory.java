@@ -1,7 +1,5 @@
 /*
- * $Id: PwsFileFactory.java 404 2009-09-21 19:19:25Z roxon $
- *
- * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -137,7 +135,7 @@ public class PwsFileFactory {
 			md = new SHA1();
 			md.update(stuff, 0, stuff.length);
 			md.update(pw, 0, pw.length);
-			md.finalize();
+			md.finish();
 			digest = md.getDigest();
 		} finally {
 			passwd.close();
@@ -159,7 +157,7 @@ public class PwsFileFactory {
 
 			md.clear();
 			md.update( tmp, 0, tmp.length );
-			md.finalize();
+			md.finish();
 
 		} catch (PasswordSafeException e) {
 			LOG.error(e.getMessage()); // This should not happen!
