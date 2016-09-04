@@ -28,6 +28,7 @@ import com.box.androidsdk.content.BoxException;
 import com.box.androidsdk.content.auth.BoxAuthentication;
 import com.box.androidsdk.content.models.BoxJsonObject;
 import com.box.androidsdk.content.models.BoxSession;
+import com.jefftharris.passwdsafe.lib.ObjectHolder;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
@@ -207,33 +208,35 @@ public class BoxProvider extends AbstractSyncTimerProvider
     @Override
     public boolean checkSyncConnectivity(Account acct) throws Exception
     {
-        // TODO: implement
-        return true;
+        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        useBoxService(new BoxUser()
+        {
+            @Override
+            public void useBox() throws Exception
+            {
+                BoxSyncer.getUser(itsClient);
+                online.set(true);
+            }
+        });
+        return online.get();
     }
 
     @Override
     public void sync(Account acct,
-                     DbProvider provider,
-                     SQLiteDatabase db,
-                     SyncLogRecord logrec) throws Exception
+                     final DbProvider provider,
+                     final SQLiteDatabase db,
+                     final SyncLogRecord logrec) throws Exception
     {
-        try {
-            boolean authorized = isAccountAuthorized();
-            PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
-            if (authorized) {
+        useBoxService(new BoxUser()
+        {
+            @Override
+            public void useBox() throws Exception
+            {
                 new BoxSyncer(itsClient, provider, db,
                               logrec, getContext()).sync();
+
             }
-        } catch (Exception e) {
-            Throwable t = e.getCause();
-            if (t instanceof BoxException.RefreshFailure) {
-                if (((BoxException.RefreshFailure)t).isErrorFatal()) {
-                    Log.e(TAG, "sync: fatal refresh", t);
-                    unlinkAccount();
-                }
-            }
-            throw e;
-        }
+        });
     }
 
     @Override
@@ -274,6 +277,37 @@ public class BoxProvider extends AbstractSyncTimerProvider
     {
         PasswdSafeUtil.dbginfo(TAG, "onLoggedOut: %s: %s",
                                boxToString(info), ex);
+    }
+
+    /**
+     * Interface for users of the Box service
+     */
+    private interface BoxUser
+    {
+        void useBox() throws Exception;
+    }
+
+    /**
+     * Use the Box service
+     */
+    private void useBoxService(BoxUser user) throws Exception
+    {
+        try {
+            boolean authorized = isAccountAuthorized();
+            PasswdSafeUtil.dbginfo(TAG, "account authorized: %b", authorized);
+            if (authorized) {
+                user.useBox();
+            }
+        } catch (Exception e) {
+            Throwable t = e.getCause();
+            if (t instanceof BoxException.RefreshFailure) {
+                if (((BoxException.RefreshFailure)t).isErrorFatal()) {
+                    Log.e(TAG, "sync: fatal refresh", t);
+                    unlinkAccount();
+                }
+            }
+            throw e;
+        }
     }
 
     /** Update the Box account client based on availability of authentication

@@ -226,8 +226,6 @@ public class GDriveProvider extends AbstractProvider
                 return SyncUpdateHandler.GDriveState.OK;
             }
         });
-        PasswdSafeUtil.dbginfo(TAG, "checkSyncConnectivity online %b",
-                               online.get());
         return online.get();
         // TODO: optimize by returning object/display name back to pass to sync
     }
