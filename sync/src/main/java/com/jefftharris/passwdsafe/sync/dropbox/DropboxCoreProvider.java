@@ -210,6 +210,13 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
 
 
     @Override
+    public boolean checkSyncConnectivity(Account acct) throws Exception
+    {
+        // TODO: implement
+        return true;
+    }
+
+    @Override
     public void sync(Account acct,
                      DbProvider provider,
                      SQLiteDatabase db,

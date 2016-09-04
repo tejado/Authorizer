@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.lib;
@@ -16,6 +17,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -246,22 +248,28 @@ public abstract class AbstractSyncTimerProvider extends AbstractProvider
         protected Void doInBackground(Void... params)
         {
             String acctUserId = getAccountUserId();
-            if (acctUserId != null) {
-                SyncDb syncDb = SyncDb.acquire();
-                SQLiteDatabase db = syncDb.getDb();
-                try {
-                    Account acct = getAccount(acctUserId);
-                    DbProvider provider =
-                            SyncHelper.getDbProviderForAcct(acct, db);
-                    if (provider != null) {
-                        SyncHelper.performSync(acct, provider,
-                                               AbstractSyncTimerProvider.this,
-                                               itsIsManual, db, itsContext);
-                    }
-                } finally {
-                    syncDb.release();
-                }
+            if (acctUserId == null) {
+                return null;
             }
+
+            Account account = getAccount(acctUserId);
+            DbProvider dbprovider;
+            SyncDb syncDb = SyncDb.acquire();
+            try {
+                dbprovider = SyncHelper.getDbProviderForAcct(account,
+                                                             syncDb.getDb());
+            } finally {
+                syncDb.release();
+            }
+
+            if (dbprovider == null) {
+                Log.e(itsTag, "No provider for sync of " + account);
+                return null;
+            }
+
+            SyncHelper.performSync(account, dbprovider,
+                                   AbstractSyncTimerProvider.this,
+                                   itsIsManual, itsContext);
             return null;
         }
 

@@ -58,6 +58,18 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
         itsFileFolders = new FileFolders(itsProviderClient);
     }
 
+    /**
+     * Get the account display name
+     */
+    public static String getDisplayName(Drive drive) throws IOException
+    {
+        About about = drive.about().get()
+                           .setFields(GDriveProvider.ABOUT_FIELDS)
+                           .execute();
+        return (about.getUser() != null) ?
+               about.getUser().getDisplayName() : null;
+    }
+
     /** Get the sync state */
     public SyncUpdateHandler.GDriveState getSyncState()
     {
@@ -218,13 +230,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
      */
     private void syncDisplayName() throws IOException
     {
-        About about = itsProviderClient.about().get()
-                                       .setFields(GDriveProvider.ABOUT_FIELDS)
-                                       .execute();
-        String displayName = null;
-        if (about.getUser() != null) {
-            displayName = about.getUser().getDisplayName();
-        }
+        String displayName = getDisplayName(itsProviderClient);
         PasswdSafeUtil.dbginfo(TAG, "user %s", displayName);
         if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,

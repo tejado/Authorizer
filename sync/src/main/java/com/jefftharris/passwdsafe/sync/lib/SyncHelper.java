@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.lib;
@@ -84,40 +85,106 @@ public class SyncHelper
         return provider;
     }
 
-
-    /** Perform a sync operation */
+    /**
+     * Perform a sync of a provider
+     */
     public static void performSync(Account acct,
                                    DbProvider provider,
                                    Provider providerImpl,
                                    boolean manual,
-                                   SQLiteDatabase db,
                                    Context ctx)
+    {
+        SyncLogRecord logrec = beginSync(acct, provider, manual, ctx);
+        SyncDb syncDb = null;
+        try {
+            checkSyncConnectivity(acct, providerImpl, logrec, ctx);
+
+            syncDb = SyncDb.acquire();
+            performSync(acct, provider, providerImpl, syncDb.getDb(), logrec);
+        } finally {
+            if (syncDb == null) {
+                syncDb = SyncDb.acquire();
+            }
+            try {
+                finishSync(acct, provider, logrec, syncDb.getDb(), ctx);
+            } finally {
+                syncDb.release();
+            }
+        }
+    }
+
+    /**
+     * Begin a sync of a provider
+     */
+    private static SyncLogRecord beginSync(Account acct,
+                                           DbProvider provider,
+                                           boolean manual,
+                                           Context ctx)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "Performing sync %s (%s), manual %b",
+                               acct.name, acct.type, manual);
+
+        String displayName = TextUtils.isEmpty(provider.itsDisplayName) ?
+                             provider.itsAcct : provider.itsDisplayName;
+
+        return new SyncLogRecord(displayName,
+                                 (provider.itsType != null)
+                                 ? provider.itsType.getName(ctx) : null,
+                                 manual);
+    }
+
+    /**
+     * Check the connectivity of a provider before syncing
+     */
+    private static void checkSyncConnectivity(Account acct,
+                                              Provider providerImpl,
+                                              SyncLogRecord logrec,
+                                              Context ctx)
     {
         ConnectivityManager connMgr = (ConnectivityManager)
                 ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
         boolean online = (netInfo != null) && netInfo.isConnected();
+        if (online) {
+            try {
+                online = providerImpl.checkSyncConnectivity(acct);
+            } catch (Exception e) {
+                Log.e(TAG, "checkSyncConnectivity error", e);
+                online = false;
+                logrec.addFailure(e);
+            }
+        }
+        logrec.setNotConnected(!online);
+    }
 
-        PasswdSafeUtil.dbginfo(
-                TAG, "Performing sync %s (%s), manual %b, online %b",
-                acct.name, acct.type, manual, online);
-
-        String displayName = TextUtils.isEmpty(provider.itsDisplayName) ?
-                provider.itsAcct : provider.itsDisplayName;
-        SyncLogRecord logrec =
-                new SyncLogRecord(displayName,
-                                  (provider.itsType != null)
-                                  ? provider.itsType.getName(ctx) : null,
-                                  manual);
+    /**
+     * Perform the sync of a provider
+     */
+    private static void performSync(Account acct,
+                                    DbProvider provider,
+                                    Provider providerImpl,
+                                    SQLiteDatabase db,
+                                    SyncLogRecord logrec)
+    {
         try {
-            logrec.setNotConnected(!online);
-            if (online) {
+            if (!logrec.isNotConnected()) {
                 providerImpl.sync(acct, provider, db, logrec);
             }
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);
             logrec.addFailure(e);
         }
+    }
+
+    /**
+     * Finish the sync of a provider
+     */
+    private static void finishSync(Account acct,
+                                   DbProvider provider,
+                                   SyncLogRecord logrec,
+                                   SQLiteDatabase db,
+                                   Context ctx)
+    {
         PasswdSafeUtil.dbginfo(TAG, "Sync finished for %s", acct.name);
         logrec.setEndTime();
 

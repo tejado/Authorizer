@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2013-2014 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync.gdrive;
@@ -37,6 +38,7 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.ObjectHolder;
 import com.jefftharris.passwdsafe.lib.PasswdSafeContract;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
@@ -210,19 +212,72 @@ public class GDriveProvider extends AbstractProvider
     }
 
     @Override
-    public void sync(Account acct, DbProvider provider,
-                     SQLiteDatabase db,
-                     SyncLogRecord logrec) throws Exception
+    public boolean checkSyncConnectivity(Account acct) throws Exception
+    {
+        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        useDriveService(
+                acct, new DriveUser()
+                {
+                    @Override
+                    public SyncUpdateHandler.GDriveState useDrive(Drive drive)
+                            throws Exception
+                    {
+                        GDriveSyncer.getDisplayName(drive);
+                        online.set(true);
+                        return SyncUpdateHandler.GDriveState.OK;
+                    }
+                });
+        PasswdSafeUtil.dbginfo(TAG, "checkSyncConnectivity online %b",
+                               online.get());
+        return online.get();
+        // TODO: optimize by returning object/display name back to pass to sync
+    }
+
+    @Override
+    public void sync(Account acct, final DbProvider provider,
+                     final SQLiteDatabase db,
+                     final SyncLogRecord logrec) throws Exception
+    {
+        useDriveService(
+                acct, new DriveUser()
+                {
+                    @Override
+                    public SyncUpdateHandler.GDriveState useDrive(Drive drive)
+                            throws Exception
+                    {
+                        GDriveSyncer sync = new GDriveSyncer(
+                                drive, provider, db, logrec, itsContext);
+                        sync.sync();
+                        return sync.getSyncState();
+                    }
+                });
+    }
+
+    /**
+     * Interface for users of the Drive service
+     */
+    private interface DriveUser
+    {
+        /**
+         * Callback to use the drive
+         */
+        SyncUpdateHandler.GDriveState useDrive(Drive drive) throws Exception;
+    }
+
+    /**
+     * Use the drive service
+     */
+    private void useDriveService(Account acct, DriveUser user) throws Exception
     {
         Pair<Drive, String> driveService = getDriveService(acct, itsContext);
-        
-        GDriveSyncer sync = new GDriveSyncer(driveService.first, provider, db,
-                                             logrec, itsContext);
         SyncUpdateHandler.GDriveState syncState =
                 SyncUpdateHandler.GDriveState.OK;
         try {
-            sync.sync();
-            syncState = sync.getSyncState();
+            if (driveService.first != null) {
+                syncState = user.useDrive(driveService.first);
+            } else {
+                syncState = SyncUpdateHandler.GDriveState.PENDING_AUTH;
+            }
         } catch (UserRecoverableAuthIOException e) {
             PasswdSafeUtil.dbginfo(TAG, e, "Recoverable google auth error");
             GoogleAuthUtil.clearToken(itsContext, driveService.second);
