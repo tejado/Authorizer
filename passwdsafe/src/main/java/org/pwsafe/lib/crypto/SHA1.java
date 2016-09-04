@@ -1,20 +1,11 @@
-package org.pwsafe.lib.crypto;
-
 /*
- * Copyright 1997-2005 Markus Hahn
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
+package org.pwsafe.lib.crypto;
 
 import org.pwsafe.lib.Util;
 
@@ -306,12 +297,10 @@ public class SHA1
     ///////////////////////////////////////////////////////////////////////////
 
     /**
-     * Finalizes the digest.
+     * Finishes the digest.
      */
-    @Override
-    public void finalize() throws Throwable
+    public void finish()
     {
-        super.finalize();
         int nI;
         byte bits[] = new byte[8];
 
