@@ -16,10 +16,9 @@ import org.bouncycastle.crypto.params.KeyParameter;
  *
  * @author Glen Smith
  */
-@SuppressWarnings("ALL")
 public class HmacPws {
 
-	private HMac mac;
+	private final HMac mac;
 
 	public HmacPws(byte[] key) {
 
