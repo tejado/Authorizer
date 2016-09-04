@@ -185,7 +185,8 @@ public class SyncHelper
                                    SQLiteDatabase db,
                                    Context ctx)
     {
-        PasswdSafeUtil.dbginfo(TAG, "Sync finished for %s", acct.name);
+        PasswdSafeUtil.dbginfo(TAG, "Sync finished for %s, online %b",
+                               acct.name, !logrec.isNotConnected());
         logrec.setEndTime();
 
         try {

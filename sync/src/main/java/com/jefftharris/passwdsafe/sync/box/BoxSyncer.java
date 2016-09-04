@@ -15,6 +15,7 @@ import android.text.TextUtils;
 
 import com.box.androidsdk.content.BoxApiFolder;
 import com.box.androidsdk.content.BoxApiSearch;
+import com.box.androidsdk.content.BoxApiUser;
 import com.box.androidsdk.content.BoxConstants;
 import com.box.androidsdk.content.BoxException;
 import com.box.androidsdk.content.models.BoxError;
@@ -58,6 +59,15 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxSession>
                      SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
     {
         super(client, provider, db, logrec, ctx, TAG);
+    }
+
+    /**
+     * Get the user for the session
+     */
+    public static BoxUser getUser(BoxSession client) throws Exception
+    {
+        BoxApiUser userApi = new BoxApiUser(client);
+        return userApi.getCurrentUserInfoRequest().send();
     }
 
     /** Get the folder for a file */
