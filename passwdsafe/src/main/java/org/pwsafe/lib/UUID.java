@@ -22,7 +22,6 @@ import java.util.TimeZone;
  *
  * @author Kevin Preece
  */
-@SuppressWarnings("ALL")
 public class UUID implements Comparable<Object>, Serializable
 {
 	/**
@@ -198,7 +197,7 @@ public class UUID implements Comparable<Object>, Serializable
 	 *
 	 * @return A <code>String</code> representation of this <code>UUID</code>.
 	 */
-	public static String toString( byte [] uuid )
+	private static String toString(byte[] uuid)
 	{
 		if ( uuid.length != 16 )
 		{
