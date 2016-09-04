@@ -15,14 +15,12 @@ import java.util.Arrays;
 import org.pwsafe.lib.crypto.SHA256Pws;
 
 /**
- * This class exposes various utilty methods.
+ * This class exposes various utility methods.
  *
  * @author Kevin Preece
  */
-@SuppressWarnings("ALL")
 public final class Util
 {
-	private static final Log LOG = Log.getInstance(Util.class.getPackage().getName());
 
 	private static final char	HEX_CHARS[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
@@ -33,28 +31,6 @@ public final class Util
 	 */
 	private Util()
 	{
-	}
-
-	/**
-	 * Adds more seed values to the internal {@link SecureRandom} generator.
-	 * @param seeds
-	 */
-	public static void addSeedBytes (byte[] seeds) {
-		randGen.setSeed(seeds);
-	}
-
-	/**
-	 * Allocates a byte array with a length of <code>length</code> and fills it with
-	 * random data.
-	 *
-	 * @param length the length of the array.
-	 *
-	 * @return A byte array initialised with random data.
-	 */
-	public static byte [] allocateByteArray( int length ) {
-		byte	array [] = new byte [ length ];
-		newRandBytes(array);
-		return array;
 	}
 
 	/**
@@ -114,21 +90,6 @@ public final class Util
 
 
 	/**
-	 * Converts a byte to its unsigned hexadecimal equivalent.  For example a value of -92 converts
-	 * to "a4".
-	 *
-	 * @param b the byte to convert
-	 *
-	 * @return A <code>String</code> representation of the value in hexadecimal
-	 */
-	public static String byteToHex( byte b )
-	{
-	    return String.valueOf(new char[] {
-	        HEX_CHARS[(b >>> 4) & 0x0f], HEX_CHARS[b & 0x0f]
-	        });
-	}
-
-	/**
 	 * Converts a byte array to a hexadecimal string.
 	 *
 	 * @param b the byte array to be converted to a hex string.
@@ -151,13 +112,13 @@ public final class Util
 	 * @return A string representation of the byte array.
 	 *
 	 * @throws IllegalArgumentException if <code>length</code> is negative.
-	 * @throws ArrayIndexOutOfBoundsException if <code>(offest + length) &gt; b.length</code>.
+	 * @throws ArrayIndexOutOfBoundsException if <code>(offset + length) &gt; b.length</code>.
 	 */
 	public static String bytesToHex( byte [] b, int offset, int length )
 	{
 		if ( length < 0 )
 		{
-			throw new IllegalArgumentException( "Lengh must be not be negative." );
+			throw new IllegalArgumentException( "Length must be not be negative." );
 		}
 
 		final StringBuilder sb = new StringBuilder( length << 1 );
@@ -167,31 +128,6 @@ public final class Util
 		    sb.append(HEX_CHARS[(b[ii] >>> 4) & 0x0f]);
 		    sb.append(HEX_CHARS[b[ii] & 0x0f]);
 		}
-		return sb.toString();
-	}
-
-	/**
-	 * Produces a string prepresentation of the byte array.
-	 *
-	 * @param b the array to be processed.
-	 *
-	 * @return A string representation of the byte array.
-	 */
-	public static String bytesToString( byte [] b )
-	{
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append( "{ " );
-		for ( int ii = 0; ii < b.length; ++ii )
-		{
-			if ( ii > 0 )
-			{
-				sb.append( ", " );
-			}
-			sb.append( b[ii] );
-		}
-		sb.append( " }" );
-
 		return sb.toString();
 	}
 
@@ -222,20 +158,6 @@ public final class Util
 			src[ii+1]	= src[ii+2];
 			src[ii+2]	= temp;
 		}
-	}
-
-	/**
-	 * Clears a StringBuilder by overwriting it's content and setting it to length 0.
-	 * After this a toString will return "".
-	 *
-	 * @param someChars
-	 */
-	public static void clear (final StringBuilder someChars) {
-		char[] filler = new char[someChars.length()];
-		Arrays.fill(filler, '0');
-		someChars.setLength(0);
-		someChars.append(filler);
-		someChars.setLength(0);
 	}
 
 	/**
@@ -335,15 +257,6 @@ public final class Util
     }
 
 	/**
-	 * Returns a random positive integer in the range 0 to <code>Integer.MAX_VALUE</code>.
-	 *
-	 * @return A random integer in the range 0 to <code>Integer.MAX_VALUE</code>.
-	 */
-	public static int positiveRand() {
-		return Math.abs(randGen.nextInt());
-	}
-
-	/**
 	 * Stores an integer in little endian order into <code>buff</code> starting at
 	 * offset <code>offset</code>.
 	 *
@@ -374,21 +287,7 @@ public final class Util
     }
 
 	/**
-	 * Convert an unsigned set of bytes to a signed set.
-	 *
-	 * @param ints an array of signed bytes
-	 * @return an array of unsigned bytes
-	 */
-	public static byte[] unsignedToSigned(int []ints) {
-		byte[] result = new byte[ints.length];
-		for (int i=0; i<ints.length; i++) {
-			result[i] = (byte) (ints[i] & 0xFF);
-		}
-		return result;
-	}
-
-	/**
-	 * Extracts an milliseconds from seconds strored in a byte array.
+	 * Extracts an milliseconds from seconds stored in a byte array.
 	 * The value is four bytes in little-endian order starting
 	 * at <code>offset</code>.
 	 *
