@@ -20,10 +20,9 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  *
  * @author Glen Smith
  */
-@SuppressWarnings("ALL")
 public class TwofishPws {
 
-	CBCBlockCipher cipher;
+	private final CBCBlockCipher cipher;
 
 	public TwofishPws(byte[] key, boolean forEncryption, byte[] IV) {
 
