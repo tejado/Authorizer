@@ -215,18 +215,17 @@ public class GDriveProvider extends AbstractProvider
     public boolean checkSyncConnectivity(Account acct) throws Exception
     {
         final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
-        useDriveService(
-                acct, new DriveUser()
-                {
-                    @Override
-                    public SyncUpdateHandler.GDriveState useDrive(Drive drive)
-                            throws Exception
-                    {
-                        GDriveSyncer.getDisplayName(drive);
-                        online.set(true);
-                        return SyncUpdateHandler.GDriveState.OK;
-                    }
-                });
+        useDriveService(acct, new DriveUser()
+        {
+            @Override
+            public SyncUpdateHandler.GDriveState useDrive(Drive drive)
+                    throws Exception
+            {
+                GDriveSyncer.getDisplayName(drive);
+                online.set(true);
+                return SyncUpdateHandler.GDriveState.OK;
+            }
+        });
         PasswdSafeUtil.dbginfo(TAG, "checkSyncConnectivity online %b",
                                online.get());
         return online.get();
@@ -238,19 +237,18 @@ public class GDriveProvider extends AbstractProvider
                      final SQLiteDatabase db,
                      final SyncLogRecord logrec) throws Exception
     {
-        useDriveService(
-                acct, new DriveUser()
-                {
-                    @Override
-                    public SyncUpdateHandler.GDriveState useDrive(Drive drive)
-                            throws Exception
-                    {
-                        GDriveSyncer sync = new GDriveSyncer(
-                                drive, provider, db, logrec, itsContext);
-                        sync.sync();
-                        return sync.getSyncState();
-                    }
-                });
+        useDriveService(acct, new DriveUser()
+        {
+            @Override
+            public SyncUpdateHandler.GDriveState useDrive(Drive drive)
+                    throws Exception
+            {
+                GDriveSyncer sync = new GDriveSyncer(
+                        drive, provider, db, logrec, itsContext);
+                sync.sync();
+                return sync.getSyncState();
+            }
+        });
     }
 
     /**
