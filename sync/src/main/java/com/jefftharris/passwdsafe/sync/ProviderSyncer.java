@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync;
@@ -23,25 +24,15 @@ import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
-import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 
 /**
  *  The ProviderSyncer class syncs password files from cloud services
  */
 public class ProviderSyncer
 {
+    // TODO: Refactor whole class to remove redundant name
+
     private static final String TAG = "ProviderSyncer";
-
-    private final Context itsContext;
-    private final Account itsAccount;
-
-    /** Constructor */
-    public ProviderSyncer(Context context, Account account)
-    {
-        itsContext = context;
-        itsAccount = account;
-    }
-
 
     /** Add a provider for an account */
     public static long addProvider(String acctName, ProviderType type,
@@ -125,25 +116,5 @@ public class ProviderSyncer
         }
         ctx.getContentResolver().notifyChange(PasswdSafeContract.CONTENT_URI,
                                               null);
-    }
-
-    /** Perform synchronization */
-    public void performSync(boolean manual)
-    {
-        SyncDb syncDb = SyncDb.acquire();
-        SQLiteDatabase db = syncDb.getDb();
-        try {
-            DbProvider provider = SyncHelper.getDbProviderForAcct(itsAccount,
-                                                                  db);
-            if (provider != null) {
-                Provider providerImpl =
-                        ProviderFactory.getProvider(provider.itsType,
-                                                    itsContext);
-                SyncHelper.performSync(itsAccount, provider, providerImpl,
-                                       manual, db, itsContext);
-            }
-        } finally {
-            syncDb.release();
-        }
     }
 }

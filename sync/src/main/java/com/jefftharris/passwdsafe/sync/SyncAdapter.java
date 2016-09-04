@@ -1,7 +1,8 @@
 /*
- * Copyright (©) 2013 Jeff Harris <jefftharris@gmail.com> All rights reserved.
- * Use of the code is allowed under the Artistic License 2.0 terms, as specified
- * in the LICENSE file distributed with this code, or available from
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package com.jefftharris.passwdsafe.sync;
@@ -12,9 +13,15 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncResult;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.sync.lib.DbProvider;
+import com.jefftharris.passwdsafe.sync.lib.Provider;
+import com.jefftharris.passwdsafe.sync.lib.SyncDb;
+import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 
 /**
  * The SyncAdapter class syncs files in a background thread
@@ -46,7 +53,28 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
     {
         boolean manual = (extras != null) &&
                 extras.getBoolean(ContentResolver.SYNC_EXTRAS_MANUAL);
-        ProviderSyncer syncer = new ProviderSyncer(itsContext, account);
-        syncer.performSync(manual);
+
+        // TODO: need a method to acquire/release providers to prevent deletes
+
+        DbProvider dbprovider;
+        Provider providerImpl = null;
+        SyncDb syncDb = SyncDb.acquire();
+        try {
+            SQLiteDatabase db = syncDb.getDb();
+            dbprovider = SyncHelper.getDbProviderForAcct(account, db);
+            if (dbprovider != null) {
+                providerImpl = ProviderFactory.getProvider(dbprovider.itsType,
+                                                           itsContext);
+            }
+        } finally {
+            syncDb.release();
+        }
+
+        if (providerImpl == null) {
+            Log.e(TAG, "onPerformSync no provider for " + account);
+            return;
+        }
+        SyncHelper.performSync(account, dbprovider, providerImpl,
+                               manual, itsContext);
     }
 }
