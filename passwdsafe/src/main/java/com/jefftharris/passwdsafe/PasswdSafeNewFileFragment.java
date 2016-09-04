@@ -37,6 +37,9 @@ import com.jefftharris.passwdsafe.util.CountedBool;
 import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
+import org.pwsafe.lib.file.Owner;
+import org.pwsafe.lib.file.PwsPassword;
+
 
 /**
  * Fragment for creating a new file
@@ -223,9 +226,14 @@ public class PasswdSafeNewFileFragment
 
                 startActivityForResult(createIntent, CREATE_DOCUMENT_REQUEST);
              } else {
-                itsNewTask = new NewTask(
-                        fileName, new StringBuilder(itsPassword.getText()));
-                itsNewTask.execute();
+                Owner<PwsPassword> passwd =
+                        new Owner<>(new PwsPassword(itsPassword.getText()));
+                try {
+                    itsNewTask = new NewTask(fileName, passwd.pass());
+                    itsNewTask.execute();
+                } finally {
+                    passwd.close();
+                }
             }
             break;
         }
@@ -289,9 +297,14 @@ public class PasswdSafeNewFileFragment
     {
         if (itsUseStorage) {
             String fileName = itsFileName.getText().toString();
-            itsNewTask = new NewTask(
-                    fileName, new StringBuilder(itsPassword.getText()));
-            itsNewTask.execute();
+            Owner<PwsPassword> passwd =
+                    new Owner<>(new PwsPassword(itsPassword.getText()));
+            try {
+                itsNewTask = new NewTask(fileName, passwd.pass());
+                itsNewTask.execute();
+            } finally {
+                passwd.close();
+            }
         } else {
             int titleId = R.string.new_file;
             PasswdFileUri uri = getPasswdFileUri();
@@ -494,16 +507,16 @@ public class PasswdSafeNewFileFragment
     private class NewTask extends BackgroundTask<Object>
     {
         private final String itsFileName;
-        private final StringBuilder itsPassword;
+        private final Owner<PwsPassword> itsPassword;
         private PasswdFileUri itsFileUri;
 
         /**
          * Constructor
          */
-        public NewTask(String fileName, StringBuilder password)
+        public NewTask(String fileName, Owner<PwsPassword>.Param passwd)
         {
             itsFileName = fileName;
-            itsPassword = password;
+            itsPassword = passwd.use();
         }
 
         @Override
@@ -518,7 +531,7 @@ public class PasswdSafeNewFileFragment
                                                                    ctx);
                 }
                 PasswdFileData fileData = new PasswdFileData(itsFileUri);
-                fileData.createNewFile(itsPassword, ctx);
+                fileData.createNewFile(itsPassword.pass(), ctx);
                 return fileData;
             } catch (Exception e) {
                 return e;
@@ -530,6 +543,7 @@ public class PasswdSafeNewFileFragment
         {
             super.onPostExecute(data);
             newTaskFinished(data, itsFileUri);
+            itsPassword.close();
         }
     }
 }

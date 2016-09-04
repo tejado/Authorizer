@@ -27,8 +27,6 @@ public class PwsFileV1 extends PwsFileV1V2 {
 	 */
 	public static final String FILE_EXTENSION = ".dat";
 
-//	private static final Log LOG = Log.getInstance(PwsFileV1.class.getPackage().getName());
-
 	/**
 	 * The PasswordSafe database version number that this class supports.
 	 */
@@ -50,7 +48,7 @@ public class PwsFileV1 extends PwsFileV1V2 {
 	 * <b>N.B. </b>this constructor's visibility may be reduced in future releases.
 	 * </p>
 	 * @param filename   the name of the database to read.
-	 * @param passphrase the passphrase needed to open the database.
+	 * @param passwd the passphrase needed to open the database.
 	 * @param encoding the password encoding
 	 *
 	 * @throws EndOfFileException
@@ -58,10 +56,11 @@ public class PwsFileV1 extends PwsFileV1V2 {
 	 * @throws UnsupportedFileVersionException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public PwsFileV1( PwsStorage storage, String passphrase, String encoding )
+	public PwsFileV1( PwsStorage storage,
+			  Owner<PwsPassword>.Param passwd, String encoding )
 	throws EndOfFileException, IOException, UnsupportedFileVersionException, NoSuchAlgorithmException
 	{
-		super( storage, passphrase, encoding );
+		super( storage, passwd, encoding );
 	}
 
 	/**

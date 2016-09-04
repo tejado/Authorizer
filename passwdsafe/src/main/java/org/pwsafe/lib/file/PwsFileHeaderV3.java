@@ -224,7 +224,12 @@ public class PwsFileHeaderV3 implements Serializable
     public void save(PwsFile file)
             throws IOException
     {
-        update(file.getPassphrase(), (PwsFileV3)file);
+        Owner<PwsPassword> passwd = file.getPassphrase();
+        try {
+            update(passwd.pass(), (PwsFileV3)file);
+        } finally {
+            passwd.close();
+        }
 
         file.writeBytes(tag);
         file.writeBytes(salt);
@@ -242,10 +247,10 @@ public class PwsFileHeaderV3 implements Serializable
     /**
      * Updates the header ready for saving.
      *
-     * @param aPassphrase the passphrase to be used to encrypt the database.
+     * @param passwdParam the passphrase to be used to encrypt the database.
      * @throws UnsupportedEncodingException
      */
-    private void update(String aPassphrase, PwsFileV3 file)
+    private void update(Owner<PwsPassword>.Param passwdParam, PwsFileV3 file)
             throws UnsupportedEncodingException
     {
         // According to the spec, salt is just random data. I don't think though,
@@ -254,36 +259,41 @@ public class PwsFileHeaderV3 implements Serializable
         updateRandHashedBytes(salt);
         updateRandHashedBytes(IV);
 
-        final byte[] stretchedPassword =
-                Util.stretchPassphrase(
-                        aPassphrase
-                                .getBytes(PwsFile.getUpdatePasswordEncoding()),
-                        salt, iter);
+        Owner<PwsPassword> passwd = passwdParam.use();
+        try {
+            final byte[] stretchedPassword =
+                    Util.stretchPassphrase(
+                            passwd.get().getBytes(
+                                    PwsFile.getUpdatePasswordEncoding()),
+                            salt, iter);
 
-        password = SHA256Pws.digest(stretchedPassword);
+            password = SHA256Pws.digest(stretchedPassword);
 
-        final byte[] b1pt = new byte[16];
-        Util.newRandBytes(b1pt);
+            final byte[] b1pt = new byte[16];
+            Util.newRandBytes(b1pt);
 
-        final byte[] b2pt = new byte[16];
-        Util.newRandBytes(b2pt);
+            final byte[] b2pt = new byte[16];
+            Util.newRandBytes(b2pt);
 
-        b1 = TwofishPws.processECB(stretchedPassword, true, b1pt);
-        b2 = TwofishPws.processECB(stretchedPassword, true, b2pt);
+            b1 = TwofishPws.processECB(stretchedPassword, true, b1pt);
+            b2 = TwofishPws.processECB(stretchedPassword, true, b2pt);
 
-        file.decryptedRecordKey = Util.mergeBytes(b1pt, b2pt);
+            file.decryptedRecordKey = Util.mergeBytes(b1pt, b2pt);
 
-        final byte[] b3pt = new byte[16];
-        Util.newRandBytes(b3pt);
+            final byte[] b3pt = new byte[16];
+            Util.newRandBytes(b3pt);
 
-        final byte[] b4pt = new byte[16];
-        Util.newRandBytes(b4pt);
+            final byte[] b4pt = new byte[16];
+            Util.newRandBytes(b4pt);
 
-        b3 = TwofishPws.processECB(stretchedPassword, true, b3pt);
-        b4 = TwofishPws.processECB(stretchedPassword, true, b4pt);
+            b3 = TwofishPws.processECB(stretchedPassword, true, b3pt);
+            b4 = TwofishPws.processECB(stretchedPassword, true, b4pt);
 
-        file.decryptedHmacKey = Util.mergeBytes(b3pt, b4pt);
-        file.hasher = new HmacPws(file.decryptedHmacKey);
+            file.decryptedHmacKey = Util.mergeBytes(b3pt, b4pt);
+            file.hasher = new HmacPws(file.decryptedHmacKey);
+        } finally {
+            passwd.close();
+        }
     }
 
     /**
