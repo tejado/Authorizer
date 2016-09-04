@@ -18,52 +18,52 @@ public class Log
 {
     private String itsTag = "Log";
 
-	private Log( String name )
-	{
-	    itsTag = name;
-	}
+    private Log(String name)
+    {
+        itsTag = name;
+    }
 
-	/**
-	 * Returns an instance of <code>Log</code> for the logger named <code>name</code>.
-	 *
-	 * @param name the logger name.
-	 *
-	 * @return An <code>Log</code> instance.
-	 */
-	public static Log getInstance( String name )
-	{
-		return new Log( name );
-	}
+    /**
+     * Returns an instance of <code>Log</code> for the logger named
+     * <code>name</code>.
+     *
+     * @param name the logger name.
+     * @return An <code>Log</code> instance.
+     */
+    public static Log getInstance(String name)
+    {
+        return new Log(name);
+    }
 
-	/**
-	 * Writes a message at error level
-	 *
-	 * @param msg the message to issue.
-	 */
-	public final void error( String msg )
-	{
-	    android.util.Log.e( itsTag, msg );
-	}
+    /**
+     * Writes a message at error level
+     *
+     * @param msg the message to issue.
+     */
+    public final void error(String msg)
+    {
+        android.util.Log.e(itsTag, msg);
+    }
 
-	/**
-	 * Writes a message at error level along with details of the exception
-	 *
-	 * @param msg    the message to issue.
-	 * @param except the exception to be logged.
-	 */
-	public final void error( String msg, Throwable except )
-	{
-	    android.util.Log.e( itsTag, msg, except );
-	}
+    /**
+     * Writes a message at error level along with details of the exception
+     *
+     * @param msg    the message to issue.
+     * @param except the exception to be logged.
+     */
+    public final void error(String msg, Throwable except)
+    {
+        android.util.Log.e(itsTag, msg, except);
+    }
 
-	/**
-	 * Logs a message at the warning level.
-	 *
-	 * @param msg the message to issue.
-	 */
-	public final void warn( String msg )
-	{
-	    android.util.Log.w( itsTag, msg );
-	}
+    /**
+     * Logs a message at the warning level.
+     *
+     * @param msg the message to issue.
+     */
+    public final void warn(String msg)
+    {
+        android.util.Log.w(itsTag, msg);
+    }
 
 }
