@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.sync.owncloud;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
@@ -58,6 +59,19 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
         itsIsAuthorized = itsProviderClient.hasCredentials();
     }
 
+    /**
+     * Get the account display name
+     */
+    public static String getDisplayName(OwnCloudClient client, Context ctx)
+            throws IOException
+    {
+        GetRemoteUserNameOperation oper = new GetRemoteUserNameOperation();
+        RemoteOperationResult res = oper.execute(client);
+        checkOperationResult(res, ctx);
+
+        return oper.getUserName() +
+               " (" + client.getBaseUri().toString() + ")";
+    }
 
     /** Check the result of an operation; An exception is thrown on an error */
     public static void checkOperationResult(RemoteOperationResult result,
@@ -173,15 +187,12 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     private void syncDisplayName()
             throws IOException
     {
-        GetRemoteUserNameOperation oper = new GetRemoteUserNameOperation();
-        RemoteOperationResult res = oper.execute(itsProviderClient);
-        checkOperationResult(res, itsContext);
-
-        PasswdSafeUtil.dbginfo(TAG, "syncDisplayName %s", oper.getUserName());
-        String displayName =
-                oper.getUserName() +
-                " (" + itsProviderClient.getBaseUri().toString() + ")";
-        SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName, itsDb);
+        String displayName = getDisplayName(itsProviderClient, itsContext);
+        PasswdSafeUtil.dbginfo(TAG, "syncDisplayName %s", displayName);
+        if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
+            SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
+                                             itsDb);
+        }
     }
 
 
