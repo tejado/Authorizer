@@ -50,6 +50,21 @@ public class OnedriveSyncer
     }
 
 
+    /**
+     * Get the account display name
+     */
+    public static String getDisplayName(IOneDriveService client)
+            throws RetrofitError
+    {
+        Drive drive = client.getDrive();
+        if ((drive != null) && (drive.Owner != null) &&
+            (drive.Owner.User != null)) {
+            return drive.Owner.User.DisplayName;
+        } else {
+            return null;
+        }
+    }
+
     /** Is the error a 404 not-found error */
     public static boolean isNot404Error(RetrofitError e)
     {
@@ -118,16 +133,10 @@ public class OnedriveSyncer
      */
     private void syncDisplayName() throws RetrofitError
     {
-        Drive drive = itsProviderClient.getDrive();
-        if ((drive != null) && (drive.Owner != null) &&
-            (drive.Owner.User != null)) {
-            String displayName = drive.Owner.User.DisplayName;
-            if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
-                SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
-                                                 itsDb);
-            }
-        } else {
-            SyncDb.updateProviderDisplayName(itsProvider.itsId, null, itsDb);
+        String displayName = getDisplayName(itsProviderClient);
+        if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
+            SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
+                                             itsDb);
         }
     }
 

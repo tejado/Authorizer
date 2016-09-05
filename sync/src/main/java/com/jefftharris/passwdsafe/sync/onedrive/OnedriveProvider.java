@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
+import com.jefftharris.passwdsafe.lib.ObjectHolder;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
@@ -240,8 +241,17 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     @Override
     public boolean checkSyncConnectivity(Account acct) throws Exception
     {
-        // TODO: implement
-        return true;
+        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        useOneDriveService(new OneDriveUser()
+        {
+            @Override
+            public void useOneDrive(IOneDriveService client) throws Exception
+            {
+                OnedriveSyncer.getDisplayName(client);
+                online.set(true);
+            }
+        });
+        return online.get();
     }
 
     /**
@@ -249,21 +259,20 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
      */
     @Override
     public void sync(Account acct,
-                     DbProvider provider,
-                     SQLiteDatabase db,
-                     SyncLogRecord logrec) throws Exception
+                     final DbProvider provider,
+                     final SQLiteDatabase db,
+                     final SyncLogRecord logrec) throws Exception
     {
-        boolean authorized = isAccountAuthorized();
-        PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
-        if (authorized) {
-            try {
-                IOneDriveService service = acquireOnedriveService();
-                new OnedriveSyncer(service, provider, db, logrec,
+        useOneDriveService(new OneDriveUser()
+        {
+            @Override
+            public void useOneDrive(IOneDriveService client) throws Exception
+            {
+                new OnedriveSyncer(client, provider, db, logrec,
                                    getContext()).sync();
-            } finally {
-                releaseOnedriveService();
+
             }
-        }
+        });
     }
 
     /**
@@ -305,6 +314,34 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     protected String getAccountUserId()
     {
         return itsUserId;
+    }
+
+    /**
+     * Interface for users of the OneDrive service
+     */
+    private interface OneDriveUser
+    {
+        /**
+         * Callback to use the service
+         */
+        void useOneDrive(IOneDriveService client) throws Exception;
+    }
+
+    /**
+     * Use the OneDrive service
+     */
+    private void useOneDriveService(OneDriveUser user) throws Exception
+    {
+        boolean authorized = isAccountAuthorized();
+        PasswdSafeUtil.dbginfo(TAG, "account authorized: %b", authorized);
+        if (authorized) {
+            try {
+                IOneDriveService service = acquireOnedriveService();
+                user.useOneDrive(service);
+            } finally {
+                releaseOnedriveService();
+            }
+        }
     }
 
     /**
