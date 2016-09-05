@@ -11,47 +11,17 @@ package org.pwsafe.lib.exception;
 
 /**
  * An exception to indicate that the passphrase given for a file is incorrect.
- * 
+ *
  * @author Kevin Preece
  */
-@SuppressWarnings("ALL")
 public class InvalidPassphraseException extends Exception
 {
-	/**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     /**
-	 * 
-	 */
-	public InvalidPassphraseException()
-	{
-		super();
-	}
-
-	/**
-	 * @param message
-	 */
-	public InvalidPassphraseException(String message)
-	{
-		super(message);
-	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public InvalidPassphraseException(String message, Throwable cause)
-	{
-		super(message, cause);
-	}
-
-	/**
-	 * @param cause
-	 */
-	public InvalidPassphraseException(Throwable cause)
-	{
-		super(cause);
-	}
+     * Constructor
+     */
+    public InvalidPassphraseException()
+    {
+    }
 }
