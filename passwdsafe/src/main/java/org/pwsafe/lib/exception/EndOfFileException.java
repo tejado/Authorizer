@@ -11,22 +11,17 @@ package org.pwsafe.lib.exception;
 
 /**
  * An exception class to indicate when end-of-file is reached.
- * 
- * @author Kevin Preece 
+ *
+ * @author Kevin Preece
  */
 public class EndOfFileException extends Exception
 {
-
-	/**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     /**
-	 * 
-	 */
-	public EndOfFileException()
-	{
-	}
-
+     * Constructor
+     */
+    public EndOfFileException()
+    {
+    }
 }
