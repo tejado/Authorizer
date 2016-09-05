@@ -28,10 +28,12 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -144,7 +146,7 @@ public class PasswdSafeProvider extends ContentProvider
                     return 0;
                 }
 
-                ProviderSyncer.deleteProvider(provider, db, getContext());
+                deleteProvider(provider, db);
                 db.setTransactionSuccessful();
                 return 1;
             } catch (Exception e) {
@@ -253,8 +255,7 @@ public class PasswdSafeProvider extends ContentProvider
             SyncDb syncDb = SyncDb.acquire();
             try {
                 SQLiteDatabase db = syncDb.beginTransaction();
-                long id = ProviderSyncer.addProvider(acct, type, db,
-                                                     getContext());
+                long id = addProvider(acct, type, db);
                 db.setTransactionSuccessful();
 
                 return ContentUris.withAppendedId(
@@ -329,7 +330,7 @@ public class PasswdSafeProvider extends ContentProvider
                         SyncDb syncDb = SyncDb.acquire();
                         try {
                             SQLiteDatabase db = syncDb.beginTransaction();
-                            ProviderSyncer.validateAccounts(db, getContext());
+                            validateAccounts(db);
                             db.setTransactionSuccessful();
                         } catch (Exception e) {
                             Log.e(TAG, "Error validating accounts", e);
@@ -518,8 +519,7 @@ public class PasswdSafeProvider extends ContentProvider
                 if ((syncFreq != null) && (provider.itsSyncFreq != syncFreq)) {
                     PasswdSafeUtil.dbginfo(TAG, "Update sync freq %d",
                                            syncFreq);
-                    ProviderSyncer.updateSyncFreq(provider, syncFreq,
-                                                db, getContext());
+                    updateSyncFreq(provider, syncFreq, db);
                 }
                 db.setTransactionSuccessful();
             } catch (Exception e) {
@@ -640,6 +640,81 @@ public class PasswdSafeProvider extends ContentProvider
         }
     }
 
+    /**
+     * Add a provider for an account
+     */
+    private long addProvider(String acctName,
+                             ProviderType type,
+                             SQLiteDatabase db)
+            throws Exception
+    {
+        Log.i(TAG, "Add provider: " + acctName);
+        Context ctx = getContext();
+        if (ctx == null) {
+            throw new IllegalStateException();
+        }
+        Provider providerImpl = ProviderFactory.getProvider(type, ctx);
+        providerImpl.checkProviderAdd(db);
+
+        int freq = ProviderSyncFreqPref.DEFAULT.getFreq();
+        long id = SyncDb.addProvider(acctName, type, freq, db);
+
+        Account acct = providerImpl.getAccount(acctName);
+        if (acct != null) {
+            providerImpl.updateSyncFreq(acct, freq);
+            providerImpl.requestSync(false);
+            ContentResolver.requestSync(acct, PasswdSafeContract.AUTHORITY,
+                                        new Bundle());
+        }
+        ctx.getContentResolver().notifyChange(
+                PasswdSafeContract.Providers.CONTENT_URI, null);
+        return id;
+    }
+
+    /**
+     * Delete the provider for the account
+     */
+    public void deleteProvider(DbProvider provider, SQLiteDatabase db)
+            throws Exception
+    {
+        Context ctx = getContext();
+        if (ctx == null) {
+            throw new IllegalStateException();
+        }
+        List<DbFile> dbfiles = SyncDb.getFiles(provider.itsId, db);
+        for (DbFile dbfile: dbfiles) {
+            if (dbfile.itsLocalFile != null) {
+                ctx.deleteFile(dbfile.itsLocalFile);
+            }
+        }
+
+        SyncDb.deleteProvider(provider.itsId, db);
+        Provider providerImpl =
+                ProviderFactory.getProvider(provider.itsType, ctx);
+        providerImpl.cleanupOnDelete(provider.itsAcct);
+        Account acct = providerImpl.getAccount(provider.itsAcct);
+        providerImpl.updateSyncFreq(acct, 0);
+        ctx.getContentResolver().notifyChange(PasswdSafeContract.CONTENT_URI,
+                                              null);
+    }
+
+    /**
+     * Update the sync frequency for a provider
+     */
+    public void updateSyncFreq(DbProvider provider, int freq, SQLiteDatabase db)
+            throws SQLException
+    {
+        Context ctx = getContext();
+        if (ctx == null) {
+            throw new IllegalStateException();
+        }
+        SyncDb.updateProviderSyncFreq(provider.itsId, freq, db);
+
+        Provider providerImpl =
+                ProviderFactory.getProvider(provider.itsType, ctx);
+        Account acct = providerImpl.getAccount(provider.itsAcct);
+        providerImpl.updateSyncFreq(acct, freq);
+    }
 
     /** Execute a method */
     private void doMethod(String[] args)
@@ -694,6 +769,29 @@ public class PasswdSafeProvider extends ContentProvider
         }
     }
 
+    /**
+     * Validate the provider accounts
+     */
+    private void validateAccounts(SQLiteDatabase db) throws Exception
+    {
+        PasswdSafeUtil.dbginfo(TAG, "Validating accounts");
+
+        Context ctx = getContext();
+        if (ctx == null) {
+            throw new IllegalStateException();
+        }
+        List<DbProvider> providers = SyncDb.getProviders(db);
+        for (DbProvider provider: providers) {
+            Provider providerImpl =
+                    ProviderFactory.getProvider(provider.itsType, ctx);
+            Account acct = providerImpl.getAccount(provider.itsAcct);
+            if (acct == null) {
+                deleteProvider(provider, db);
+            }
+        }
+        ctx.getContentResolver().notifyChange(PasswdSafeContract.CONTENT_URI,
+                                              null);
+    }
 
     /** Notify both files and remote files listeners for changes */
     private void notifyFileChanges(long providerId, long fileId)
