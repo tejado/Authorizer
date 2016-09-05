@@ -16,23 +16,19 @@ import android.support.annotation.NonNull;
  *
  * @author Jeff Harris
  */
-@SuppressWarnings("ALL")
 public class PwsByteField extends PwsField
 {
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     /**
      * Constructs the object
      *
-     * @param type  the field type.  Values depend on the version of the file being read.
+     * @param type  the field type.  Values depend on the version of the file
+     *              being read.
      * @param value the byte array holding the byte value.
-     *
      * @throws IndexOutOfBoundsException If <code>value.length</code> &lt; 1.
      */
-    public PwsByteField( int type, byte [] value )
+    public PwsByteField(int type, byte[] value)
     {
         super(type, value[0]);
     }
@@ -40,32 +36,32 @@ public class PwsByteField extends PwsField
     /**
      * Constructs the object
      *
-     * @param type  the field type.  Values depend on the version of the file being read.
+     * @param type  the field type.  Values depend on the version of the file
+     *              being read.
      * @param value the byte value.
      */
-    public PwsByteField( int type, byte value )
+    public PwsByteField(int type, byte value)
     {
         super(type, value);
     }
 
     /**
      * Returns this byte as an array of bytes.  The returned array will have
-     * a length of PwsFile.BLOCK_LENGTH and is thus suitable to be written to the
-     * database.
+     * a length of PwsFile.BLOCK_LENGTH and is thus suitable to be written to
+     * the database.
      *
      * @return a byte array containing the field's byte value.
-     *
      * @see org.pwsafe.lib.file.PwsField#getBytes()
      */
     @Override
     public byte[] getBytes()
     {
         byte value;
-        byte    retval[];
+        byte retval[];
 
-        value   = (Byte) super.getValue();
+        value = (Byte)super.getValue();
         // Force a size of 1, otherwise it would be set to a size of blocklength
-        retval  = new byte[1];
+        retval = new byte[1];
         retval[0] = value;
         return retval;
     }
@@ -77,79 +73,37 @@ public class PwsByteField extends PwsField
      * <code>other</code>.
      *
      * @param other the other field to compare to.
-     *
-     * @return An integer indicating whether this field's value is &lt;, = or &gt;
-     *         <code>other</code>'s value.
-     *
-     * @throws ClassCastException if <code>other</code> is not a <code>PwsByteField</code>.
-     *
+     * @return An integer indicating whether this field's value is &lt;, = or
+     * &gt; <code>other</code>'s value.
+     * @throws ClassCastException if <code>other</code> is not a
+     * <code>PwsByteField</code>.
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo( @NonNull Object other )
+    public int compareTo(@NonNull Object other)
     {
-        return ((Byte) getValue()).compareTo((Byte) ((PwsByteField) other).getValue());
+        return ((Byte)getValue()).compareTo((Byte)((PwsByteField)other)
+                .getValue());
     }
 
     /**
      * Compares this field's value to another <code>PwsByteField</code> or an
-     * Byte.  It returns <code>true</code> if they are equal and <code>false</code>
-     * if they're unequal.
+     * Byte.  It returns <code>true</code> if they are equal and
+     * <code>false</code> if they're unequal.
      *
      * @param arg0 the object to compare with.
-     *
      * @return <code>true</code> if the values of this and arg0 are equal,
-     *         <code>false</code> if they're unequal.
-     *
-     * @throws ClassCastException if <code>other</code> is neither a <code>PwsByteField</code>
-     *         nor an <code>Byte</code>.
+     * <code>false</code> if they're unequal.
+     * @throws ClassCastException if <code>other</code> is neither a
+     * <code>PwsByteField</code> nor an <code>Byte</code>.
      */
     @Override
-    public boolean equals( Object arg0 )
+    public boolean equals(Object arg0)
     {
-        if ( arg0 instanceof PwsByteField )
-        {
-            return equals( (PwsByteField) arg0 );
-        }
-        else if ( arg0 instanceof Byte )
-        {
-            return equals( (Byte) arg0 );
+        if (arg0 instanceof PwsByteField) {
+            return getValue().equals(((PwsByteField)arg0).getValue());
+        } else if (arg0 instanceof Byte) {
+            return getValue().equals(arg0);
         }
         throw new ClassCastException();
-    }
-
-    /**
-     * Compares this field's value to another <code>PwsByteField</code>.  It
-     * returns <code>true</code> if they are equal and <code>false</code>
-     * if they're unequal.
-     *
-     * @param arg0 the <code>PwsByteField</code> to compare to.
-     *
-     * @return <code>true</code> if the values of this and arg0 are equal,
-     *         <code>false</code> if they're unequal.
-     *
-     * @throws ClassCastException if <code>other</code> is neither a <code>PwsByteField</code>
-     *         nor an <code>Byte</code>.
-     */
-    public boolean equals( PwsByteField arg0 )
-    {
-        return getValue().equals(arg0.getValue());
-    }
-
-    /**
-     * Compares this field's value to an <code>Byte</code>.  It returns
-     * <code>true</code> if they are equal and <code>false</code>
-     * if they're unequal.
-     *
-     * @param arg0 the <code>Byte</code> to compare to.
-     *
-     * @return <code>true</code> if the values of this and arg0 are equal,
-     *         <code>false</code> if they're unequal.
-     *
-     * @throws ClassCastException if <code>other</code> is neither a <code>PwsByteField</code>
-     *         nor an <code>Byte</code>.
-     */
-    public boolean equals( Byte arg0 )
-    {
-        return getValue().equals(arg0);
     }
 }
