@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.ApiCompat;
+import com.jefftharris.passwdsafe.lib.ObjectHolder;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.R;
@@ -208,8 +209,17 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public boolean checkSyncConnectivity(Account acct) throws Exception
     {
-        // TODO: implement
-        return true;
+        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        useOwncloudService(new OwncloudUser()
+        {
+            @Override
+            public void useOwncloud(OwnCloudClient client) throws Exception
+            {
+                OwncloudSyncer.getDisplayName(client, getContext());
+                online.set(true);
+            }
+        });
+        return online.get();
     }
 
     /* (non-Javadoc)
@@ -217,27 +227,31 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
      */
     @Override
     public void sync(Account acct,
-                     DbProvider provider,
-                     SQLiteDatabase db,
-                     SyncLogRecord logrec) throws Exception
+                     final DbProvider provider,
+                     final SQLiteDatabase db,
+                     final SyncLogRecord logrec) throws Exception
     {
-        PasswdSafeUtil.dbginfo(TAG, "sync client: %b", itsAccountName);
-        if (itsAccountName == null) {
-            return;
-        }
-        OwncloudSyncer syncer =
-                new OwncloudSyncer(getClient(getContext()),
-                                   provider, db, logrec, getContext());
-        try {
-            syncer.sync();
-        } catch (SyncIOException e) {
-            if (e.isRetry()) {
-                requestSync(false);
+        useOwncloudService(new OwncloudUser()
+        {
+            @Override
+            public void useOwncloud(OwnCloudClient client) throws Exception
+            {
+                PasswdSafeUtil.dbginfo(TAG, "sync client: %b", itsAccountName);
+                OwncloudSyncer syncer =
+                        new OwncloudSyncer(client, provider, db, logrec,
+                                           getContext());
+                try {
+                    syncer.sync();
+                } catch (SyncIOException e) {
+                    if (e.isRetry()) {
+                        requestSync(false);
+                    }
+                    throw e;
+                } finally {
+                    itsIsSyncAuthError = !syncer.isAuthorized();
+                }
             }
-            throw e;
-        } finally {
-            itsIsSyncAuthError = !syncer.isAuthorized();
-        }
+        });
     }
 
 
@@ -286,6 +300,28 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     protected String getAccountUserId()
     {
         return itsAccountName;
+    }
+
+    /**
+     * Interface for users of the ownCloud service
+     */
+    private interface OwncloudUser
+    {
+        /**
+         * Callback to user the service
+         */
+        void useOwncloud(OwnCloudClient client) throws Exception;
+    }
+
+    /**
+     * Use the ownCloud service
+     */
+    private void useOwncloudService(OwncloudUser user) throws Exception
+    {
+        if (itsAccountName == null) {
+            return;
+        }
+        user.useOwncloud(getClient(getContext()));
     }
 
     /** Update the ownCloud account client based on availability of
