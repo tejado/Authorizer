@@ -42,7 +42,6 @@ import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 import com.jefftharris.passwdsafe.util.Pair;
 import com.jefftharris.passwdsafe.util.YubiState;
 import com.jefftharris.passwdsafe.view.ConfirmPromptDialog;
-import com.jefftharris.passwdsafe.view.PasswordVisibilityMenuHandler;
 import com.jefftharris.passwdsafe.view.TextInputUtils;
 
 import org.pwsafe.lib.exception.InvalidPassphraseException;
@@ -188,7 +187,6 @@ public class PasswdSafeOpenFileFragment
                 (TextInputLayout)rootView.findViewById(R.id.passwd_input);
         itsPasswordEdit = (TextView)rootView.findViewById(R.id.passwd_edit);
         TypefaceUtils.setMonospace(itsPasswordEdit, ctx);
-        PasswordVisibilityMenuHandler.set(ctx, itsPasswordEdit);
         itsPasswordEdit.setEnabled(false);
 
         itsReadonlyCb = (CheckBox)rootView.findViewById(R.id.read_only);
