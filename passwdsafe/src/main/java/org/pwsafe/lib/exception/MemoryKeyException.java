@@ -11,43 +11,24 @@ package org.pwsafe.lib.exception;
 
 /**
  * @author mueller
- *
  */
-@SuppressWarnings("ALL")
-public class MemoryKeyException extends RuntimeException {
-
-	/**
-     * 
-     */
+public class MemoryKeyException extends RuntimeException
+{
     private static final long serialVersionUID = 1L;
 
     /**
-	 * 
-	 */
-	public MemoryKeyException() {
-		super ("Memory Key handling problem");
-	}
+     * Constructor
+     */
+    public MemoryKeyException(Throwable cause)
+    {
+        super("Memory Key handling problem", cause);
+    }
 
-	/**
-	 * @param message
-	 */
-	public MemoryKeyException(String message) {
-		super(message);
-	}
-
-	/**
-	 * @param cause
-	 */
-	public MemoryKeyException(Throwable cause) {
-		super("Memory Key handling problem", cause);
-	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public MemoryKeyException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
+    /**
+     * Constructor
+     */
+    public MemoryKeyException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }
