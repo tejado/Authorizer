@@ -9,6 +9,8 @@ package org.pwsafe.lib.file;
 
 import android.support.annotation.NonNull;
 
+import org.bouncycastle.crypto.RuntimeCryptoException;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -18,10 +20,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SealedObject;
 
-import org.bouncycastle.crypto.RuntimeCryptoException;
 
-
-@SuppressWarnings("ALL")
 public abstract class AbstractPwsPasswdField extends PwsField
 {
     private static final long serialVersionUID = -5633832199601878672L;
@@ -63,51 +62,23 @@ public abstract class AbstractPwsPasswdField extends PwsField
 
 
     /**
-     * Compares this object to another <code>AbstractPwsPasswdField</code> or <code>String</code> returning
-     * <code>true</code> if they're equal or <code>false</code> otherwise.
+     * Compares this object to another <code>AbstractPwsPasswdField</code> or
+     * <code>String</code> returning <code>true</code> if they're equal or
+     * <code>false</code> otherwise.
      *
      * @param arg0 the other object to compare to.
-     *
-     * @return <code>true</code> if they're equal or <code>false</code> otherwise.
+     * @return <code>true</code> if they're equal or <code>false</code>
+     * otherwise.
      */
     @Override
-    public boolean equals( Object arg0 )
+    public boolean equals(Object arg0)
     {
-        if ( arg0 instanceof AbstractPwsPasswdField )
-        {
-            return equals( (AbstractPwsPasswdField) arg0 );
-        }
-        else if ( arg0 instanceof String )
-        {
-            return equals( (String) arg0 );
+        if (arg0 instanceof AbstractPwsPasswdField) {
+            return toString().equals(arg0.toString());
+        } else if (arg0 instanceof String) {
+            return toString().equals(arg0);
         }
         throw new ClassCastException();
-    }
-
-    /**
-     * Compares this object to another <code>AbstractPwsPasswdField</code> returning
-     * <code>true</code> if they're equal or <code>false</code> otherwise.
-     *
-     * @param arg0 the other object to compare to.
-     *
-     * @return <code>true</code> if they're equal or <code>false</code> otherwise.
-     */
-    public boolean equals( AbstractPwsPasswdField arg0 )
-    {
-        return toString().equals(arg0.toString());
-    }
-
-    /**
-     * Compares this object to a <code>String</code> returning <code>true</code> if they're equal
-     * or <code>false</code> otherwise.
-     *
-     * @param arg0 the other object to compare to.
-     *
-     * @return <code>true</code> if they're equal or <code>false</code> otherwise.
-     */
-    public boolean equals( String arg0 )
-    {
-        return toString().equals(arg0);
     }
 
 
@@ -119,10 +90,9 @@ public abstract class AbstractPwsPasswdField extends PwsField
             if (sealValue == null) {
                 return "";
             } else {
-                return (String) sealValue.getObject(itsReadCipher);
+                return (String)sealValue.getObject(itsReadCipher);
             }
-        }
-        catch (IllegalBlockSizeException | BadPaddingException |
+        } catch (IllegalBlockSizeException | BadPaddingException |
                 ClassNotFoundException e) {
             throw new RuntimeCryptoException(e.getMessage());
         } catch (IOException e) {
@@ -136,8 +106,7 @@ public abstract class AbstractPwsPasswdField extends PwsField
     {
         try {
             return toString().getBytes(itsStrEncoding);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -148,8 +117,7 @@ public abstract class AbstractPwsPasswdField extends PwsField
     {
         try {
             return sealValue(new String(value, encoding), cipher);
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -159,8 +127,7 @@ public abstract class AbstractPwsPasswdField extends PwsField
     {
         try {
             return new SealedObject(value, cipher);
-        }
-        catch (IllegalBlockSizeException | IOException e) {
+        } catch (IllegalBlockSizeException | IOException e) {
             throw new RuntimeCryptoException(e.getMessage());
         }
     }
