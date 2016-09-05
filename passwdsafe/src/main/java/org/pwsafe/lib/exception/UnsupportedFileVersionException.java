@@ -10,50 +10,20 @@
 package org.pwsafe.lib.exception;
 
 /**
- * An exception thrown to indicate that the file is in a format that is not supported
+ * An exception thrown to indicate that the file is in a format that is not
+ * supported
  * by this software.
- * 
+ *
  * @author Kevin Preece
  */
-@SuppressWarnings("ALL")
 public class UnsupportedFileVersionException extends Exception
 {
-
-	/**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     /**
-	 * 
-	 */
-	public UnsupportedFileVersionException()
-	{
-		super();
-	}
-
-	/**
-	 * @param arg0
-	 */
-	public UnsupportedFileVersionException(String arg0)
-	{
-		super(arg0);
-	}
-
-	/**
-	 * @param arg0
-	 */
-	public UnsupportedFileVersionException(Throwable arg0)
-	{
-		super(arg0);
-	}
-
-	/**
-	 * @param arg0
-	 * @param arg1
-	 */
-	public UnsupportedFileVersionException(String arg0, Throwable arg1)
-	{
-		super(arg0, arg1);
-	}
+     * Constructor
+     */
+    public UnsupportedFileVersionException()
+    {
+    }
 }
