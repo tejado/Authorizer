@@ -55,6 +55,15 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
                dbfile.itsLocalTitle.toLowerCase();
     }
 
+    /**
+     * Get the account display name
+     */
+    public static String getDisplayName(DbxClientV2 client) throws DbxException
+    {
+        FullAccount acct = client.users().getCurrentAccount();
+        return acct.getName().getDisplayName();
+    }
+
     /** Perform a sync of the files */
     @Override
     protected List<AbstractSyncOper<DbxClientV2>> performSync() throws Exception
@@ -95,8 +104,7 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
     /** Sync account display name */
     private void syncDisplayName() throws DbxException
     {
-        FullAccount acct = itsProviderClient.users().getCurrentAccount();
-        String name = acct.getName().getDisplayName();
+        String name = getDisplayName(itsProviderClient);
         if (!TextUtils.equals(itsProvider.itsDisplayName, name)) {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, name, itsDb);
         }

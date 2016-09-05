@@ -29,6 +29,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.users.FullAccount;
+import com.jefftharris.passwdsafe.lib.ObjectHolder;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
@@ -208,37 +209,38 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         }
     }
 
-
     @Override
     public boolean checkSyncConnectivity(Account acct) throws Exception
     {
-        // TODO: implement
-        return true;
+        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        useDropboxService(new DropboxUser()
+        {
+            @Override
+            public void useDropbox() throws Exception
+            {
+                DropboxCoreSyncer.getDisplayName(itsClient);
+                online.set(true);
+            }
+        });
+        return online.get();
     }
 
     @Override
     public void sync(Account acct,
-                     DbProvider provider,
-                     SQLiteDatabase db,
-                     SyncLogRecord logrec) throws Exception
+                     final DbProvider provider,
+                     final SQLiteDatabase db,
+                     final SyncLogRecord logrec) throws Exception
     {
-        try {
-            boolean authorized = isAccountAuthorized();
-            PasswdSafeUtil.dbginfo(TAG, "sync authorized: %b", authorized);
-            if (authorized) {
+        useDropboxService(new DropboxUser()
+        {
+            @Override
+            public void useDropbox() throws Exception
+            {
                 new DropboxCoreSyncer(itsClient, provider, db,
                                       logrec, getContext()).sync();
             }
-        } catch (InvalidAccessTokenException e) {
-            Log.e(TAG, "unlinked error", e);
-            saveAuthData(null);
-            updateDropboxAcct();
-            throw e;
-
-            // TODO: notification when providers fail to sync with auth error?
-        }
+        });
     }
-
 
     /** List files */
     public List<ProviderRemoteFile> listFiles(String path)
@@ -262,6 +264,38 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
         return files;
     }
 
+    /**
+     * Interface for users of Dropbox
+     */
+    private interface DropboxUser
+    {
+        /**
+         * Callback to use the client
+         */
+        void useDropbox() throws Exception;
+    }
+
+    /**
+     * Use the Dropbox service
+     */
+    private void useDropboxService(DropboxUser user) throws Exception
+    {
+        try {
+            boolean authorized = isAccountAuthorized();
+            PasswdSafeUtil.dbginfo(TAG, "account authorized: %b", authorized);
+            if (authorized) {
+                user.useDropbox();
+            }
+        } catch (InvalidAccessTokenException e) {
+            Log.e(TAG, "unlinked error", e);
+            saveAuthData(null);
+            updateDropboxAcct();
+            throw e;
+
+            // TODO: notification when providers fail to sync with auth error?
+        }
+
+    }
 
     /** Update the Dropbox account client based on availability of
      *  authentication information */
