@@ -9,34 +9,33 @@
  */
 package org.pwsafe.lib.file;
 
-@SuppressWarnings("ALL")
-public enum PwsFieldTypeV2 implements PwsFieldType {
+@SuppressWarnings("unused")
+public enum PwsFieldTypeV2 implements PwsFieldType
+{
+    V2_ID_STRING(0),
+    UUID(1),
+    GROUP(2),
+    TITLE(3),
+    USERNAME(4),
+    NOTES(5),
+    PASSWORD(6),
+    CREATION_TIME(7),
+    PASSWORD_MOD_TIME(8),
+    LAST_ACCESS_TIME(9),
+    PASSWORD_LIFETIME(10),
+    PASSWORD_POLICY(11),
+    LAST_MOD_TIME(12),
+    END_OF_RECORD(255);
 
-	V2_ID_STRING (0),
-	UUID (1),
-	GROUP (2),
-	TITLE (3),
-	USERNAME (4),
-	NOTES (5),
-	PASSWORD (6),
-	CREATION_TIME (7),
-	PASSWORD_MOD_TIME (8),
-	LAST_ACCESS_TIME (9),
-	PASSWORD_LIFETIME	(10),
-	PASSWORD_POLICY		(11),
-	LAST_MOD_TIME       (12),
-	END_OF_RECORD		(255);
+    private final int id;
 
-	private int id;
-	private String name;
+    PwsFieldTypeV2(int anId)
+    {
+        id = anId;
+    }
 
-	PwsFieldTypeV2(int anId) {
-		id = anId;
-		name = toString();
-	}
-
-	public int getId() {
-		return id;
-	}
-
+    public int getId()
+    {
+        return id;
+    }
 }
