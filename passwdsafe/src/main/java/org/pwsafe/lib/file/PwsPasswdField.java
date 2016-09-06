@@ -9,22 +9,19 @@ package org.pwsafe.lib.file;
 
 public class PwsPasswdField extends AbstractPwsPasswdField
 {
-
     private static final String ENCODING = "ISO-8859-1";
 
-
-    public PwsPasswdField(int type, byte[] value, PwsFile file)
-    {
-        super(type, value, file, ENCODING);
-    }
-
-
+    /**
+     * Constructor from value
+     */
     public PwsPasswdField(int type, String value, PwsFile file)
     {
         super(type, value, file, ENCODING);
     }
 
-
+    /**
+     * Constructor from type
+     */
     public PwsPasswdField(PwsFieldType type)
     {
         super(type, ENCODING);

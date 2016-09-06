@@ -10,22 +10,27 @@ package org.pwsafe.lib.file;
 
 public class PwsPasswdUnicodeField extends AbstractPwsPasswdField
 {
-
     private static final String ENCODING = "UTF-8";
 
-
+    /**
+     * Constructor from binary value
+     */
     public PwsPasswdUnicodeField(int type, byte[] value, PwsFile file)
     {
         super(type, value, file, ENCODING);
     }
 
-
+    /**
+     * Constructor from string
+     */
     public PwsPasswdUnicodeField(int type, String value, PwsFile file)
     {
         super(type, value, file, ENCODING);
     }
 
-
+    /**
+     * Constructor from type
+     */
     @SuppressWarnings("SameParameterValue")
     public PwsPasswdUnicodeField(PwsFieldType type)
     {
