@@ -226,11 +226,7 @@ public class PwsFileFactory {
                 PwsRecordV1     rec;
                 String encoding = checkPassword( header, passwd );
                 file = new PwsFileV1( storage, passwd, encoding );
-                try {
-                    rec = (PwsRecordV1) file.readRecord();
-                } catch (PasswordSafeException e) {
-                    throw new IllegalStateException(e);
-                }
+		    rec = (PwsRecordV1) file.readRecord();
                 file.close();
 
                 // TODOlib what can we do about this?
