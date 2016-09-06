@@ -1,6 +1,4 @@
 /*
- * $Id:$
- *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -9,37 +7,33 @@
  */
 package org.pwsafe.lib.file;
 
+import org.pwsafe.lib.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import org.pwsafe.lib.Log;
-
 /**
  * An implementation of the PwsStorage class that reads and writes to files.
- * @author mtiller
  *
+ * @author mtiller
  */
-@SuppressWarnings("ALL")
-public class PwsFileStorage extends PwsStreamStorage {
-
-    /**
-     * Default file extension of the password safe file.
-     */
-    public static final String FILE_EXTENSION = ".psafe3";
+public class PwsFileStorage extends PwsStreamStorage
+{
 
     /**
      * An object for logging activity in this class.
      */
-    private static final Log LOG = Log.getInstance(PwsFileStorage.class.getPackage().getName());
+    private static final Log LOG = Log
+            .getInstance(PwsFileStorage.class.getPackage().getName());
 
     /*
      * Build an implementation given the filename for the underlying storage.
      */
     public PwsFileStorage(String identifier, String fileToOpen)
-        throws IOException
+            throws IOException
     {
         super(identifier,
               (fileToOpen == null) ? null : new FileInputStream(fileToOpen));
@@ -47,15 +41,16 @@ public class PwsFileStorage extends PwsStreamStorage {
 
     /**
      * Takes the (encrypted) bytes and writes them out to the file.
-     *
+     * <p/>
      * This particular method takes steps to make sure that the
      * original file is not overwritten or deleted until the
      * new file has been successfully saved.
      */
     @Override
-    public boolean save(byte[] data, boolean isV3) {
+    public boolean save(byte[] data, boolean isV3)
+    {
         try {
-            File file = new File( getIdentifier() );
+            File file = new File(getIdentifier());
             if (!file.exists()) {
                 /* Original file doesn't exist, just go ahead and write it
                  * (no backup, temp files needed).
@@ -64,8 +59,9 @@ public class PwsFileStorage extends PwsStreamStorage {
                 return true;
             }
             File dir = file.getCanonicalFile().getParentFile();
-            if (dir==null) {
-                LOG.error("Couldn't find the parent directory for: "+file.getAbsolutePath());
+            if (dir == null) {
+                LOG.error("Couldn't find the parent directory for: " +
+                          file.getAbsolutePath());
                 return false;
             }
             File FilePath = dir.getAbsoluteFile();
@@ -84,13 +80,12 @@ public class PwsFileStorage extends PwsStreamStorage {
                 if (tempFile.renameTo(toFile)) {
                     tempFile = null;
                 } else {
-                    throw new IOException("Error renaming " +
-                                    tempFile + " to " +
-                                    toFile);
+                    throw new IOException("Error renaming " + tempFile +
+                                          " to " + toFile);
                 }
             } finally {
-                if (tempFile != null) {
-                    tempFile.delete();
+                if ((tempFile != null) && !tempFile.delete()) {
+                    LOG.error("Error deleting temp file");
                 }
             }
 
@@ -101,16 +96,9 @@ public class PwsFileStorage extends PwsStreamStorage {
         }
     }
 
-    /**
-     * This method is *not* part of the storage interface but specific to
-     * this particular implementation.
-     *
-     * @return Name of the file used for storage.
-     */
-    public String getFilename() { return getIdentifier(); }
-
     @Override
-    public Date getModifiedDate() {
+    public Date getModifiedDate()
+    {
         File file = new File(getIdentifier());
         Date modified = null;
         if (file.exists())
@@ -127,7 +115,7 @@ public class PwsFileStorage extends PwsStreamStorage {
     }
 
     private void createBackupFile(File fromFile, File toFile)
-        throws IOException
+            throws IOException
     {
         if (getSaveHelper() != null) {
             getSaveHelper().createBackupFile(fromFile, toFile);
@@ -138,14 +126,14 @@ public class PwsFileStorage extends PwsStreamStorage {
             if (bakFile.exists()) {
                 if (!bakFile.delete()) {
                     throw new IOException("Can not delete backup file: " +
-                                    bakFile);
+                                          bakFile);
                 }
             }
 
             if (toFile.exists()) {
                 if (!toFile.renameTo(bakFile)) {
                     throw new IOException("Can not create backup file: " +
-                                    bakFile);
+                                          bakFile);
                 }
             }
         }
