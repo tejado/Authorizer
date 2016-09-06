@@ -1,6 +1,4 @@
 /*
- * $Id: PwsFileHeader.java 307 2004-02-27 23:11:59 +0000 (Fri, 27 Feb 2004) preecek $
- *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -9,20 +7,19 @@
  */
 package org.pwsafe.lib.file;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-
-import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.crypto.HmacPws;
 import org.pwsafe.lib.crypto.SHA256Pws;
 import org.pwsafe.lib.crypto.TwofishPws;
 import org.pwsafe.lib.exception.EndOfFileException;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+
 /**
- * This class encapsulates the header fields of a PasswordSafe database.  The header comprises:
+ * This class encapsulates the header fields of a PasswordSafe database.  The
+ * header comprises:
  * </p><p>
  * <tt>
  * <pre>
@@ -45,16 +42,9 @@ import org.pwsafe.lib.exception.EndOfFileException;
  *
  * @author Glen Smith (based on the work of Kevin Preece)
  */
-@SuppressWarnings("ALL")
 public class PwsFileHeaderV3 implements Serializable
 {
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
-
-    private static final Log LOG = Log
-            .getInstance(PwsFileHeaderV3.class.getPackage().getName());
 
     private byte[] tag = new byte[4];
     private final byte[] salt = new byte[32];
@@ -79,11 +69,14 @@ public class PwsFileHeaderV3 implements Serializable
     }
 
     /**
-     * Constructs the PasswordSafe file header by reading the header data from <code>file</code>.
+     * Constructs the PasswordSafe file header by reading the header data
+     * from <code>file</code>.
      *
      * @param file the file to read the header from.
-     * @throws IOException        If an error occurs whilst reading from the file.
-     * @throws EndOfFileException If end of file is reached before reading all the data.
+     * @throws IOException        If an error occurs whilst reading from the
+     * file.
+     * @throws EndOfFileException If end of file is reached before reading
+     * all the data.
      */
     public PwsFileHeaderV3(PwsFile file)
             throws IOException, EndOfFileException
@@ -99,40 +92,6 @@ public class PwsFileHeaderV3 implements Serializable
         file.readBytes(b3);
         file.readBytes(b4);
         file.readBytes(IV);
-    }
-
-    /**
-     * Constructs the PasswordSafe file header by reading the
-     * header data from an <code>InputStream</code>.
-     *
-     * @param stream the file to read the header from.
-     * @throws IOException        If an error occurs whilst reading from the file.
-     * @throws EndOfFileException If end of file is reached before reading all the data.
-     */
-    public PwsFileHeaderV3(InputStream stream)
-            throws IOException
-    {
-        stream.read(tag);
-        stream.read(salt);
-        byte[] iterBytes = new byte[4];
-        stream.read(iterBytes);
-        iter = Util.getIntFromByteArray(iterBytes, 0);
-        stream.read(password);
-        stream.read(b1);
-        stream.read(b2);
-        stream.read(b3);
-        stream.read(b4);
-        stream.read(IV);
-    }
-
-    /**
-     * Gets a copy of Tag.
-     *
-     * @return A copy of Tag
-     */
-    public byte[] getTag()
-    {
-        return Util.cloneByteArray(tag);
     }
 
     /**
@@ -253,7 +212,8 @@ public class PwsFileHeaderV3 implements Serializable
     private void update(Owner<PwsPassword>.Param passwdParam, PwsFileV3 file)
             throws UnsupportedEncodingException
     {
-        // According to the spec, salt is just random data. I don't think though,
+        // According to the spec, salt is just random data. I don't think
+        // though,
         // that it's good practice to directly expose the generated randomness
         // to the attacker. Therefore, we'll hash the salt.
         updateRandHashedBytes(salt);
@@ -298,6 +258,7 @@ public class PwsFileHeaderV3 implements Serializable
 
     /**
      * Update random bytes that are also hashed with SHA256
+     *
      * @param bytes The bytes which are updated
      */
     private void updateRandHashedBytes(byte[] bytes)
