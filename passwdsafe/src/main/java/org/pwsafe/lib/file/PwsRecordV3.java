@@ -1,6 +1,5 @@
 /*
- * $Id: PwsRecordV2.java 561 2005-07-26 10:00:19 +0000 (Tue, 26 Jul 2005)
- * glen_a_smith $ Copyright (c) 2008-2009 David Muller
+ * Copyright (c) 2008-2009 David Muller
  * <roxon@users.sourceforge.net>. All rights reserved. Use of the code is
  * allowed under the Artistic License 2.0 terms, as specified in the LICENSE
  * file distributed with this code, or available from
@@ -8,43 +7,53 @@
  */
 package org.pwsafe.lib.file;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
+import android.support.annotation.NonNull;
 
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.UUID;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.EndOfFileException;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.Iterator;
+
 /**
  * Support for new v3 Record type.
  *
  * @author Glen Smith (based on Kevin's code for V2 records)
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings("WeakerAccess")
 public class PwsRecordV3 extends PwsRecord
 {
     private static final long serialVersionUID = -3160317668375599155L;
 
     private static final Log LOG =
-        Log.getInstance(PwsRecordV3.class.getPackage().getName());
+            Log.getInstance(PwsRecordV3.class.getPackage().getName());
 
     /**
      * Constant for the version 3 ID string field.
      */
     public static final int V3_ID_STRING = 0;
 
-    /** Minor version for PasswordSafe 3.25 with protected entry support */
+    /**
+     * Minor version for PasswordSafe 3.25 with protected entry support
+     */
     public static final byte DB_FMT_MINOR_3_25 = 8;
 
-    /** Minor version for PasswordSafe 3.28 with password policy support */
+    /**
+     * Minor version for PasswordSafe 3.28 with password policy support
+     */
     public static final byte DB_FMT_MINOR_3_28 = 10;
 
-    /** Minor version for PasswordSafe 3.30 */
+    /**
+     * Minor version for PasswordSafe 3.30
+     */
     public static final byte DB_FMT_MINOR_3_30 = 0x0D;
 
-    /** Minor version of the max supported database format */
+    /**
+     * Minor version of the max supported database format
+     */
     public static final byte DB_FMT_MINOR_VERSION = DB_FMT_MINOR_3_30;
 
     /**
@@ -152,16 +161,24 @@ public class PwsRecordV3 extends PwsRecord
      */
     public static final int PROTECTED_ENTRY = 21;
 
-    /** Own symbols for password */
+    /**
+     * Own symbols for password
+     */
     public static final int OWN_PASSWORD_SYMBOLS = 22;
 
-    /** Shift double-click action */
+    /**
+     * Shift double-click action
+     */
     public static final int SHIFT_DOUBLE_CLICK_ACTION = 23;
 
-    /** Password policy name */
+    /**
+     * Password policy name
+     */
     public static final int PASSWORD_POLICY_NAME = 24;
 
-    /** Entry keyboard shortcut */
+    /**
+     * Entry keyboard shortcut
+     */
     public static final int ENTRY_KEYBOARD_SHORTCUT = 25;
 
     /**
@@ -199,10 +216,15 @@ public class PwsRecordV3 extends PwsRecord
      */
     public static final int HEADER_LAST_SAVE_HOST = 8;
 
-    /** Header named password policies */
+    /**
+     * Header named password policies
+     */
     public static final int HEADER_NAMED_PASSWORD_POLICIES = 16;
 
-    /** Header for Yubico */
+    /**
+     * Header for Yubico
+     */
+    @SuppressWarnings("unused")
     public static final int HEADER_YUBICO = 0x12;
 
     /**
@@ -213,61 +235,61 @@ public class PwsRecordV3 extends PwsRecord
     /**
      * All the valid type codes.
      */
-    private static final Object[] VALID_TYPES =
-        new Object[] {
-            new Object[] { Integer.valueOf(V3_ID_STRING),
-                            "V3_ID_STRING", PwsVersionField.class },
-            new Object[] { Integer.valueOf(UUID),
-                            "UUID", PwsUUIDField.class },
-            new Object[] { Integer.valueOf(GROUP),
-                            "GROUP", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(TITLE),
-                            "TITLE", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(USERNAME),
-                            "USERNAME", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(NOTES),
-                            "NOTES", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(PASSWORD),
-                            "PASSWORD", PwsPasswdUnicodeField.class },
-            new Object[] { Integer.valueOf(CREATION_TIME),
-                            "CREATION_TIME", PwsTimeField.class },
-            new Object[] { Integer.valueOf(PASSWORD_MOD_TIME),
-                            "PASSWORD_MOD_TIME", PwsTimeField.class },
-            new Object[] { Integer.valueOf(LAST_ACCESS_TIME),
-                            "LAST_ACCESS_TIME", PwsTimeField.class },
-            new Object[] { Integer.valueOf(PASSWORD_LIFETIME),
-                            "PASSWORD_LIFETIME", PwsTimeField.class },
-            new Object[] { Integer.valueOf(PASSWORD_POLICY_DEPRECATED),
-                            "PASSWORD_POLICY_OLD", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(LAST_MOD_TIME),
-                            "LAST_MOD_TIME", PwsTimeField.class },
-            new Object[] { Integer.valueOf(URL),
-                            "URL", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(AUTOTYPE),
-                            "AUTOTYPE", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(PASSWORD_HISTORY),
-                            "PASSWORD_HISTORY", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(PASSWORD_POLICY),
-                            "PASSWORD_POLICY", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(PASSWORD_EXPIRY_INTERVAL),
-                            "PASSWORD_EXPIRY_INTERVAL", PwsIntegerField.class },
-            new Object[] { Integer.valueOf(RUN_COMMAND),
-                            "RUN_COMMAND", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(DOUBLE_CLICK_ACTION),
-                            "DOUBLE_CLICK_ACTION", PwsShortField.class },
-            new Object[] { Integer.valueOf(EMAIL),
-                            "EMAIL", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(PROTECTED_ENTRY),
-                            "PROTECTED_ENTRY", PwsByteField.class},
-            new Object[] { Integer.valueOf(OWN_PASSWORD_SYMBOLS),
-                            "OWN_PASSWORD_SYMBOLS", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(SHIFT_DOUBLE_CLICK_ACTION),
-                            "SHIFT_DOUBLE_CLICK_ACTION", PwsShortField.class },
-            new Object[] { Integer.valueOf(PASSWORD_POLICY_NAME),
-                            "PASSWORD_POLICY_NAME", PwsStringUnicodeField.class },
-            new Object[] { Integer.valueOf(ENTRY_KEYBOARD_SHORTCUT),
-                            "ENTRY_KEYBOARD_SHORTCUT", PwsIntegerField.class },
-    };
+    private static final Object[] VALID_TYPES = new Object[] {
+            new Object[]{Integer.valueOf(V3_ID_STRING),
+                         "V3_ID_STRING", PwsVersionField.class},
+            new Object[]{Integer.valueOf(UUID),
+                         "UUID", PwsUUIDField.class},
+            new Object[]{Integer.valueOf(GROUP),
+                         "GROUP", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(TITLE),
+                         "TITLE", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(USERNAME),
+                         "USERNAME", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(NOTES),
+                         "NOTES", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(PASSWORD),
+                         "PASSWORD", PwsPasswdUnicodeField.class},
+            new Object[]{Integer.valueOf(CREATION_TIME),
+                         "CREATION_TIME", PwsTimeField.class},
+            new Object[]{Integer.valueOf(PASSWORD_MOD_TIME),
+                         "PASSWORD_MOD_TIME", PwsTimeField.class},
+            new Object[]{Integer.valueOf(LAST_ACCESS_TIME),
+                         "LAST_ACCESS_TIME", PwsTimeField.class},
+            new Object[]{Integer.valueOf(PASSWORD_LIFETIME),
+                         "PASSWORD_LIFETIME", PwsTimeField.class},
+            new Object[]{Integer.valueOf(PASSWORD_POLICY_DEPRECATED),
+                         "PASSWORD_POLICY_OLD",
+                         PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(LAST_MOD_TIME),
+                         "LAST_MOD_TIME", PwsTimeField.class},
+            new Object[]{Integer.valueOf(URL),
+                         "URL", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(AUTOTYPE),
+                         "AUTOTYPE", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(PASSWORD_HISTORY),
+                         "PASSWORD_HISTORY", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(PASSWORD_POLICY),
+                         "PASSWORD_POLICY", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(PASSWORD_EXPIRY_INTERVAL),
+                         "PASSWORD_EXPIRY_INTERVAL", PwsIntegerField.class},
+            new Object[]{Integer.valueOf(RUN_COMMAND),
+                         "RUN_COMMAND", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(DOUBLE_CLICK_ACTION),
+                         "DOUBLE_CLICK_ACTION", PwsShortField.class},
+            new Object[]{Integer.valueOf(EMAIL),
+                         "EMAIL", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(PROTECTED_ENTRY),
+                         "PROTECTED_ENTRY", PwsByteField.class},
+            new Object[]{Integer.valueOf(OWN_PASSWORD_SYMBOLS),
+                         "OWN_PASSWORD_SYMBOLS", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(SHIFT_DOUBLE_CLICK_ACTION),
+                         "SHIFT_DOUBLE_CLICK_ACTION", PwsShortField.class},
+            new Object[]{Integer.valueOf(PASSWORD_POLICY_NAME),
+                         "PASSWORD_POLICY_NAME", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(ENTRY_KEYBOARD_SHORTCUT),
+                         "ENTRY_KEYBOARD_SHORTCUT", PwsIntegerField.class},
+            };
 
     /**
      * Create a new record with all mandatory fields given their default value.
@@ -280,7 +302,6 @@ public class PwsRecordV3 extends PwsRecord
         setField(new PwsStringUnicodeField(PwsFieldTypeV3.TITLE, ""));
         setField(new PwsPasswdUnicodeField(PwsFieldTypeV3.PASSWORD));
         setField(new PwsTimeField(PwsFieldTypeV3.CREATION_TIME, new Date()));
-
     }
 
     /**
@@ -288,11 +309,11 @@ public class PwsRecordV3 extends PwsRecord
      *
      * @param isHeader Marker for header record
      */
-    PwsRecordV3(boolean isHeader)
+    PwsRecordV3(@SuppressWarnings("UnusedParameters") boolean isHeader)
     {
         super(VALID_TYPES, true);
         setField(new PwsVersionField(HEADER_VERSION,
-                                     new byte[] { DB_FMT_MINOR_VERSION, 3 }));
+                                     new byte[]{DB_FMT_MINOR_VERSION, 3}));
         setField(new PwsUUIDField(HEADER_UUID, new UUID()));
     }
 
@@ -301,7 +322,7 @@ public class PwsRecordV3 extends PwsRecord
      *
      * @param file the file to read data from.
      * @throws EndOfFileException If end of file is reached
-     * @throws IOException If a read error occurs.
+     * @throws IOException        If a read error occurs.
      */
     PwsRecordV3(PwsFile file) throws EndOfFileException, IOException
     {
@@ -312,13 +333,14 @@ public class PwsRecordV3 extends PwsRecord
      * A special version which reads and ignores all headers since they have
      * different ids to standard types.
      *
-     * @param file the file to read data from.
-     * @param validTypes the types allowable in the incoming data
+     * @param file       the file to read data from.
+     * @param ignoreFieldTypes true if all fields types should be ignored,
+     *                         false otherwise
      * @throws EndOfFileException If end of file is reached
-     * @throws IOException If a read error occurs.
+     * @throws IOException        If a read error occurs.
      */
     PwsRecordV3(PwsFile file, boolean ignoreFieldTypes)
-        throws EndOfFileException, IOException
+            throws EndOfFileException, IOException
     {
         super(file, VALID_TYPES, ignoreFieldTypes);
     }
@@ -328,7 +350,7 @@ public class PwsRecordV3 extends PwsRecord
      *
      * @param base the record to copy.
      */
-    PwsRecordV3(PwsRecord base)
+    private PwsRecordV3(PwsRecord base)
     {
         super(base);
     }
@@ -363,17 +385,14 @@ public class PwsRecordV3 extends PwsRecord
      * <code>other</code>.
      *
      * @param other the record to compare this record to.
-     * @return A value &lt; zero if this record is "less than" <code>other</code>
-     *         , zero if they're equal and &gt; zero if this record is
-     *         "greater than" <code>other</code>.
-     * @throws ClassCastException If <code>other</code> is not a
-     *             <code>PwsRecordV1</code>.
+     * @return A value &lt; zero if this record is "less than"
+     * <code>other</code> , zero if they're equal and &gt; zero if this record
+     * is "greater than" <code>other</code>.
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo(Object other)
+    public int compareTo(@NonNull Object other)
     {
-        // TODOlib Implement me
         return 0;
     }
 
@@ -383,24 +402,18 @@ public class PwsRecordV3 extends PwsRecord
      *
      * @param that the record this one is compared to.
      * @return <code>true</code> if the records are equal, <code>false</code> if
-     *         they're unequal.
+     * they're unequal.
      * @throws ClassCastException if <code>that</code> is not a
-     *             <code>PwsRecordV1</code>.
+     *                            <code>PwsRecordV1</code>.
      */
     @Override
     public boolean equals(Object that)
     {
-        UUID thisUUID;
-        UUID thatUUID;
-
         if (that instanceof PwsRecordV3) {
-            thisUUID = (UUID) ((PwsUUIDField) getField(UUID)).getValue();
-            thatUUID =
-                (UUID) ((PwsUUIDField) ((PwsRecord) that).getField(UUID)).getValue();
-
+            UUID thisUUID = (UUID)getField(UUID).getValue();
+            UUID thatUUID = (UUID)((PwsRecord)that).getField(UUID).getValue();
             return thisUUID.equals(thatUUID);
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -416,24 +429,14 @@ public class PwsRecordV3 extends PwsRecord
     @Override
     protected boolean isValid()
     {
-        // TODOlib Ignore those records we read from the header....
         PwsField idField = getField(V3_ID_STRING);
-
-        if (idField != null) {
-            return false;
-        }
-        return true;
+        return idField == null;
     }
 
     protected boolean isHeaderRecord()
     {
-
         PwsField idField = getField(V3_ID_STRING);
-
-        if (idField != null) {
-            return true;
-        }
-        return false;
+        return idField != null;
     }
 
     static byte[] EOF_BYTES_RAW = "PWS3-EOFPWS3-EOF".getBytes();
@@ -445,15 +448,15 @@ public class PwsRecordV3 extends PwsRecord
             super();
             try {
                 rawData = file.readBlock();
-            }
-            catch (EndOfFileException eofe) {
+            } catch (EndOfFileException eofe) {
                 data = new byte[32]; // to hold closing HMAC
                 file.readBytes(data);
                 byte[] hash = file.hasher.doFinal();
                 if (!Util.bytesAreEqual(data, hash)) {
-                    LOG.error("HMAC record did not match. File may have been tampered");
-                    throw new IOException(
-                           "HMAC record did not match. File has been tampered");
+                    LOG.error("HMAC record did not match. File may have been " +
+                              "tampered");
+                    throw new IOException("HMAC record did not match. File " +
+                                          "has been tampered");
                 }
                 throw eofe;
             }
@@ -464,14 +467,13 @@ public class PwsRecordV3 extends PwsRecord
                 data = new byte[length];
             } catch (OutOfMemoryError e) {
                 throw new IOException(
-                    "Out of memory.  Record length too long: " + length);
+                        "Out of memory.  Record length too long: " + length);
             }
             byte[] remainingDataInRecord = Util.getBytes(rawData, 5, 11);
             if (length <= 11) {
                 Util.copyBytes(Util.getBytes(remainingDataInRecord, 0, length),
                                data);
-            }
-            else if (length > 11) {
+            } else if (length > 11) {
                 int bytesToRead = length - 11;
                 int blocksToRead = bytesToRead / file.getBlockSize();
 
@@ -486,18 +488,17 @@ public class PwsRecordV3 extends PwsRecord
                     file.readDecryptedBytes(nextBlock);
                     if (i == blocksToRead - 1) {
                         // last block, do magic
-                        nextBlock =
-                            Util.getBytes(nextBlock, 0, bytesToRead
-                                - remainingRecords.length);
+                        nextBlock = Util.getBytes(
+                                nextBlock, 0,
+                                bytesToRead - remainingRecords.length);
                     }
                     remainingRecords =
-                        Util.mergeBytes(remainingRecords, nextBlock);
+                            Util.mergeBytes(remainingRecords, nextBlock);
                 }
                 data = Util.mergeBytes(remainingDataInRecord, remainingRecords);
             }
             byte[] dataToHash = data;
             file.hasher.digest(dataToHash);
-
         }
     }
 
@@ -510,26 +511,24 @@ public class PwsRecordV3 extends PwsRecord
      */
     @Override
     protected void loadRecord(PwsFile file)
-        throws EndOfFileException, IOException
+            throws EndOfFileException, IOException
     {
         Item item;
-        PwsField itemVal = null;
+        PwsField itemVal;
 
-        for (;;) {
-            item = new ItemV3((PwsFileV3) file);
+        for (; ; ) {
+            item = new ItemV3((PwsFileV3)file);
 
             if (item.getType() == END_OF_RECORD) {
-                // LOG.debug2( "-- END OF RECORD --" );
                 break; // out of the for loop
             }
 
             if (ignoreFieldTypes) {
                 // header record has no valid types...
                 itemVal =
-                    new PwsUnknownField(item.getType(), item.getByteData());
-                attributes.put(Integer.valueOf(item.getType()), itemVal);
-            }
-            else {
+                        new PwsUnknownField(item.getType(), item.getByteData());
+                attributes.put(item.getType(), itemVal);
+            } else {
 
                 switch (item.getType()) {
                 case V3_ID_STRING:
@@ -617,16 +616,16 @@ public class PwsRecordV3 extends PwsRecord
     @Override
     protected void saveRecord(PwsFile file) throws IOException
     {
-        for (Iterator<Integer> iter = getFields(); iter.hasNext();) {
+        for (Iterator<Integer> iter = getFields(); iter.hasNext(); ) {
             int type;
             PwsField value;
 
-            type = iter.next().intValue();
+            type = iter.next();
             value = getField(type);
 
             writeField(file, value);
 
-            PwsFileV3 fileV3 = (PwsFileV3) file;
+            PwsFileV3 fileV3 = (PwsFileV3)file;
             fileV3.hasher.digest(value.getBytes());
         }
         writeField(file, new PwsStringField(END_OF_RECORD, ""));
@@ -635,15 +634,15 @@ public class PwsRecordV3 extends PwsRecord
     /**
      * Writes a single field to the file.
      *
-     * @param file the file to write the field to.
+     * @param file  the file to write the field to.
      * @param field the field to be written.
-     * @param type the type to write to the file instead of
-     *            <code>field.getType()</code>
+     * @param type  the type to write to the file instead of
+     *              <code>field.getType()</code>
      * @throws IOException
      */
     @Override
     protected void writeField(PwsFile file, PwsField field, int type)
-        throws IOException
+            throws IOException
     {
         byte lenBlock[];
         byte dataBlock[];
@@ -652,8 +651,7 @@ public class PwsRecordV3 extends PwsRecord
         dataBlock = field.getBytes();
 
         Util.putIntToByteArray(lenBlock, dataBlock.length, 0);
-        // Util.putIntToByteArray( lenBlock, type, 4 );
-        lenBlock[4] = (byte) type;
+        lenBlock[4] = (byte)type;
 
         // ensure encryption payload is equal blocks of 16
         int bytesToPad = 0;
@@ -662,9 +660,8 @@ public class PwsRecordV3 extends PwsRecord
             bytesToPad = 16 - (calcWriteLen % 16);
         }
 
-        // TODOlib put random bytes here
         dataBlock =
-            Util.cloneByteArray(dataBlock, dataBlock.length + bytesToPad);
+                Util.cloneByteArray(dataBlock, dataBlock.length + bytesToPad);
 
         // file.writeBytes(lenBlock);
         byte[] dataToWrite = Util.mergeBytes(lenBlock, dataBlock);
@@ -689,11 +686,11 @@ public class PwsRecordV3 extends PwsRecord
 
         sb.append("{ ");
 
-        for (Iterator<?> iter = getFields(); iter.hasNext();) {
-            Integer key;
+        for (Iterator<?> iter = getFields(); iter.hasNext(); ) {
+            int key;
             String value;
 
-            key = (Integer) iter.next();
+            key = (Integer)iter.next();
             value = getField(key).toString();
 
             if (!first) {
@@ -701,15 +698,19 @@ public class PwsRecordV3 extends PwsRecord
             }
             first = false;
 
-            int i = key.intValue();
-            if (i <= VALID_TYPES.length) {
-                sb.append(((Object[]) VALID_TYPES[i])[1]);
+            boolean showValue = true;
+            if (key <= VALID_TYPES.length) {
+                Object[] type = (Object[])VALID_TYPES[key];
+                sb.append(type[1]);
+                showValue = ((Integer)type[0] != PASSWORD);
             }
             else {
                 sb.append(key);
             }
             sb.append("=");
-            sb.append(value);
+            if (showValue) {
+                sb.append(value);
+            }
         }
         sb.append(" }");
 

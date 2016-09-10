@@ -1,6 +1,4 @@
 /*
- * $Id: PwsRecord.java 400 2009-09-07 21:37:16Z roxon $
- *
  * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
@@ -9,6 +7,13 @@
  */
 package org.pwsafe.lib.file;
 
+import android.support.annotation.NonNull;
+
+import org.pwsafe.lib.Log;
+import org.pwsafe.lib.Util;
+import org.pwsafe.lib.exception.EndOfFileException;
+import org.pwsafe.lib.exception.UnsupportedFileVersionException;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -16,11 +21,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.pwsafe.lib.Log;
-import org.pwsafe.lib.Util;
-import org.pwsafe.lib.exception.EndOfFileException;
-import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 /**
  * This abstract class implements the common features of PasswordSafe records.
@@ -47,556 +47,539 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
  *
  * @author Kevin Preece
  */
-@SuppressWarnings("ALL")
-public abstract class PwsRecord implements Comparable<Object>, Serializable, Cloneable {
-
-	/**
-     *
-     */
+public abstract class PwsRecord
+        implements Comparable<Object>, Serializable, Cloneable
+{
     private static final long serialVersionUID = 1L;
 
-    private static final Log LOG = Log.getInstance(PwsRecord.class.getPackage().getName());
+    private static final Log LOG = Log.getInstance(
+            PwsRecord.class.getPackage().getName());
 
-	/**
-	 * The default character set used for <code>byte[]</code> to
-	 * <code>String</code> conversions.
-	 */
-	public static final String DEFAULT_CHARSET = "ISO-8859-1";
+    /**
+     * The default character set used for <code>byte[]</code> to
+     * <code>String</code> conversions.
+     */
+    public static final String DEFAULT_CHARSET = "ISO-8859-1";
 
-	private boolean 					modified = false;
-	private boolean 					isLoaded = false;
-	protected Map<Integer, PwsField>	attributes = new TreeMap<Integer, PwsField>();
-	private final Object ValidTypes[];
+    private boolean modified = false;
+    private boolean isLoaded = false;
+    protected final Map<Integer, PwsField> attributes = new TreeMap<>();
+    private final Object ValidTypes[];
 
-	protected boolean ignoreFieldTypes = false;
+    protected boolean ignoreFieldTypes = false;
 
-	/**
-	 * A holder class for all the data about a single field. It holds the
-	 * field's length, data and, for those formats that use it, the field's
-	 * type.
-	 */
-	protected class Item {
-		protected byte []	rawData;
-		protected byte []	data;
-		protected int		length;
-		protected int		type;
+    /**
+     * A holder class for all the data about a single field. It holds the
+     * field's length, data and, for those formats that use it, the field's
+     * type.
+     */
+    protected class Item
+    {
+        protected byte[] rawData;
+        protected byte[] data;
+        protected int length;
+        protected int type;
 
-		/** No args constructor helps subclassing. */
-		protected Item() {
+        /**
+         * No args constructor helps subclassing.
+         */
+        protected Item()
+        {
 
-		}
+        }
 
-		/**
-		 * Reads a single item of data from the file.
-		 *
-		 * @param file the file the data should be read from.
-		 *
-		 * @throws EndOfFileException
-		 * @throws IOException
-		 */
-		public Item(PwsFile file) throws EndOfFileException, IOException {
-			rawData = file.readBlock();
-			length	= Util.getIntFromByteArray( rawData, 0 );
-			//type	= Util.getIntFromByteArray( RawData, 4 );
-			type = rawData[4] & 0x000000ff; // rest of header is now random data
-			try {
-			    data	= PwsFile.allocateBuffer( length );
-			} catch (OutOfMemoryError e) {
-			    throw new IOException(
-			        "Out of memory.  Record length too long: " +
-			        length);
-			}
+        /**
+         * Reads a single item of data from the file.
+         *
+         * @param file the file the data should be read from.
+         * @throws EndOfFileException
+         * @throws IOException
+         */
+        public Item(PwsFile file) throws EndOfFileException,
+                                         IOException
+        {
+            rawData = file.readBlock();
+            length = Util.getIntFromByteArray(rawData, 0);
+            //type	= Util.getIntFromByteArray( RawData, 4 );
+            type = rawData[4] & 0x000000ff; // rest of header is now random data
+            try {
+                data = PwsFile.allocateBuffer(length);
+            } catch (OutOfMemoryError e) {
+                throw new IOException(
+                        "Out of memory.  Record length too long: " +
+                        length);
+            }
 
-			file.readDecryptedBytes( data );
-		}
+            file.readDecryptedBytes(data);
+        }
 
-		/**
-		 * Gets this items data as an array of bytes.
-		 *
-		 * @return This items data as an array of bytes.
-		 */
-		public byte[] getByteData() {
-			if (length != data.length) {
-				return Util.cloneByteArray(data, length);
-			}
-			return data;
-		}
+        /**
+         * Gets this items data as an array of bytes.
+         *
+         * @return This items data as an array of bytes.
+         */
+        public byte[] getByteData()
+        {
+            if (length != data.length) {
+                return Util.cloneByteArray(data, length);
+            }
+            return data;
+        }
 
-		/**
-		 * Gets this items data as a <code>String</code>. The byte array is
-		 * converted to a <code>String</code> using <code>DEFAULT_CHARSET</code>
-		 * as the encoding.
-		 *
-		 * @return The item data as a <code>String</code>.
-		 */
-		public String getData() {
-			try {
-				// Use ISO-8859-1 because we may have some values outside the
-				// valid ASCII
-				// range.
-				//
-				// TODOlib This needs to be reviewed if the format ever changes to
-				// unicode
+        /**
+         * Gets this items data as a <code>String</code>. The byte array is
+         * converted to a <code>String</code> using
+         * <code>DEFAULT_CHARSET</code>
+         * as the encoding.
+         *
+         * @return The item data as a <code>String</code>.
+         */
+        public String getData()
+        {
+            try {
+                // Use ISO-8859-1 because we may have some
+                // values outside the
+                // valid ASCII
+                // range.
+                //
+                // TODOlib This needs to be reviewed if the format ever
+		    // changes to
+                // unicode
 
-				return new String(data, 0, length, DEFAULT_CHARSET);
-			} catch (UnsupportedEncodingException e) {
-				// Should never get here since all Java implementations must
-				// support the above charset.
-				return new String(data, 0, length);
-			}
-		}
+                return new String(data, 0, length, DEFAULT_CHARSET);
+            } catch (UnsupportedEncodingException e) {
+                // Should never get here since all Java implementations must
+                // support the above charset.
+                return new String(data, 0, length);
+            }
+        }
 
-		/**
-		 * Returns this items type. For V1 files this will always be zero.
-		 *
-		 * @return This items type.
-		 */
-		public int getType() {
-			return type;
-		}
+        /**
+         * Returns this items type. For V1 files this will always be zero.
+         *
+         * @return This items type.
+         */
+        public int getType()
+        {
+            return type;
+        }
 
-		/**
-		 * Returns details about this field as a <code>String</code> suitable
-		 * for debugging.
-		 *
-		 * @return A <code>String</code> representation of this object.
-		 */
-		@Override
-		public String toString() {
-			StringBuilder sb;
+        /**
+         * Returns details about this field as a <code>String</code>
+         * suitable
+         * for debugging.
+         *
+         * @return A <code>String</code> representation of this object.
+         */
+        @Override
+        public String toString()
+        {
+            StringBuilder sb;
 
-			sb = new StringBuilder();
-			sb.append("{ type=");
-			sb.append(type);
-			sb.append(", data=\"");
-			sb.append(getData());
-			sb.append("\" }");
+            sb = new StringBuilder();
+            sb.append("{ type=");
+            sb.append(type);
+            sb.append(", data=\"");
+            sb.append(getData());
+            sb.append("\" }");
 
-			return sb.toString();
-		}
+            return sb.toString();
+        }
 
-		public final void clear() {
-		    Arrays.fill(data, (byte)0);
-		    Arrays.fill(rawData, (byte)0);
-		    data = new byte[0];
-		    rawData = new byte[0];
-		    length = 0;
-		}
-	}
+        public final void clear()
+        {
+            Arrays.fill(data, (byte)0);
+            Arrays.fill(rawData, (byte)0);
+            data = new byte[0];
+            rawData = new byte[0];
+            length = 0;
+        }
+    }
 
-	/**
-	 * Simple constructor. Used when creating a new record to add to a file.
-	 *
-	 * @param validTypes
-	 *            an array of valid field types.
-	 */
-	PwsRecord(Object[] validTypes) {
-		super();
+    /**
+     * Simple constructor. Used when creating a new record to add to a file.
+     *
+     * @param validTypes an array of valid field types.
+     */
+    PwsRecord(Object[] validTypes)
+    {
+        super();
 
-		ValidTypes = validTypes;
-	}
+        ValidTypes = validTypes;
+    }
 
-	/**
-	 * This constructor is called when a record is to be read from the database.
-	 *
-	 * @param owner
-	 *            the file that data is to be read from and which "owns" this
-	 *            record.
-	 * @param validTypes
-	 *            an array of valid field types.
-	 *
-	 * @throws EndOfFileException
-	 * @throws IOException
-	 */
-	PwsRecord(PwsFile owner, Object[] validTypes) throws EndOfFileException,
-			IOException {
-		super();
+    /**
+     * This constructor is called when a record is to be read from the
+     * database.
+     *
+     * @param owner      the file that data is to be read from and which
+     *                   "owns" this record.
+     * @param validTypes an array of valid field types.
+     * @throws EndOfFileException
+     * @throws IOException
+     */
+    PwsRecord(PwsFile owner, Object[] validTypes) throws
+                                                  EndOfFileException,
+                                                  IOException
+    {
+        super();
 
-		ValidTypes = validTypes;
+        ValidTypes = validTypes;
 
-		loadRecord(owner);
+        loadRecord(owner);
 
-		isLoaded = true;
-	}
-
-	/**
-	 * Special constructor for use when ignoring field types.
-	 *
-	 * @param owner
-	 *            the file that data is to be read from and which "owns" this
-	 *            record.
-	 * @param validTypes
-	 *            an array of valid field types.
-	 * @param ignoreFieldTypes
-	 *            true if all fields types should be ignored, false otherwise
-	 *
-	 * @throws EndOfFileException
-	 * @throws IOException
-	 */
-	public PwsRecord(PwsFile owner, Object[] validTypes,
-			boolean ignoreFieldTypes) throws EndOfFileException, IOException {
-		super();
-
-		ValidTypes = validTypes;
-		this.ignoreFieldTypes = ignoreFieldTypes;
-
-		loadRecord(owner);
-
-		isLoaded = true;
-
-	}
+        isLoaded = true;
+    }
 
     /**
      * Special constructor for use when ignoring field types.
      *
-     * @param validTypes
-     *            an array of valid field types.
-     * @param ignoreFieldTypes
-     *            true if all fields types should be ignored, false otherwise
+     * @param owner            the file that data is to be read from and
+     *                         which "owns" this record.
+     * @param validTypes       an array of valid field types.
+     * @param ignoreFieldTypes true if all fields types should be ignored,
+     *                                false otherwise
+     * @throws EndOfFileException
+     * @throws IOException
+     */
+    public PwsRecord(PwsFile owner, Object[] validTypes,
+                     boolean ignoreFieldTypes) throws EndOfFileException,
+                                                      IOException
+    {
+        super();
+
+        ValidTypes = validTypes;
+        this.ignoreFieldTypes = ignoreFieldTypes;
+
+        loadRecord(owner);
+
+        isLoaded = true;
+
+    }
+
+    /**
+     * Special constructor for use when ignoring field types.
+     *
+     * @param validTypes       an array of valid field types.
+     * @param ignoreFieldTypes true if all fields types should be ignored,
+     *                         false otherwise
      */
     public PwsRecord(Object[] validTypes,
-                     boolean ignoreFieldTypes) {
+                     boolean ignoreFieldTypes)
+    {
         super();
 
         ValidTypes = validTypes;
         this.ignoreFieldTypes = ignoreFieldTypes;
     }
 
-	/**
-	 *
-	 * @param base
-	 */
-	PwsRecord(PwsRecord base) {
-		isLoaded = true;
-		ValidTypes = base.ValidTypes;
+    /**
+     * Copy constructor
+     */
+    PwsRecord(PwsRecord base)
+    {
+        isLoaded = true;
+        ValidTypes = base.ValidTypes;
 
-		for (Iterator<Integer> i = getFields(); i.hasNext();) {
-			Integer key = i.next();
-			attributes.put(key, getField(key));
-		}
-	}
+        for (Iterator<Integer> i = getFields(); i.hasNext(); ) {
+            Integer key = i.next();
+            attributes.put(key, getField(key));
+        }
+    }
 
-	// *************************************************************************
-	// * Abstract methods
-	// *************************************************************************
+    // *************************************************************************
+    // * Abstract methods
+    // *************************************************************************
 
-	/**
-	 * Returns a clone of this record that is a deep copy of it.
-	 *
-	 * @return A clone of this record.
-	 *
-	 */
-	@Override
-	public abstract Object clone();
+    /**
+     * Returns a clone of this record that is a deep copy of it.
+     *
+     * @return A clone of this record.
+     */
+    @Override
+    public abstract Object clone();
 
-	/**
-	 * Compares this record to another returning a value that is less than zero
-	 * if this record is "less than" <code>other</code>, zero if they are
-	 * "equal", or greater than zero if this record is "greater than"
-	 * <code>other</code>.
-	 *
-	 * @param other
-	 *            the record to compare this record to.
-	 *
-	 * @return A value &lt; zero if this record is "less than"
-	 *         <code>other</code>, zero if they're equal and &gt; zero if this
-	 *         record is "greater than" <code>other</code>.
-	 *
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public abstract int compareTo(Object other);
+    /**
+     * Compares this record to another returning a value that is less than
+     * zero if this record is "less than" <code>other</code>, zero if they are
+     * "equal", or greater than zero if this record is "greater than"
+     * <code>other</code>.
+     *
+     * @param other the record to compare this record to.
+     * @return A value &lt; zero if this record is "less than"
+     * <code>other</code>, zero if they're equal and &gt; zero if this
+     * record is "greater than" <code>other</code>.
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public abstract int compareTo(@NonNull Object other);
 
-	/**
-	 * Compares this record to another returning <code>true</code> if they're
-	 * equal and <code>false</code> if they're unequal.
-	 *
-	 * @param other
-	 *            the record this one is compared to.
-	 *
-	 * @return <code>true</code> if the records are equal, <code>false</code> if
-	 *         they're unequal.
-	 */
-	@Override
-	public abstract boolean equals(Object other);
+    /**
+     * Compares this record to another returning <code>true</code> if
+     * they're equal and <code>false</code> if they're unequal.
+     *
+     * @param other the record this one is compared to.
+     * @return <code>true</code> if the records are equal,
+     * <code>false</code> if
+     * they're unequal.
+     */
+    @Override
+    public abstract boolean equals(Object other);
 
-	/**
-	 * Validates the record, returning <code>true</code> if it's valid or
-	 * <code>false</code> if unequal.
-	 *
-	 * @return <code>true</code> if it's valid or <code>false</code> if unequal.
-	 */
-	protected abstract boolean isValid();
+    /**
+     * Validates the record, returning <code>true</code> if it's valid or
+     * <code>false</code> if unequal.
+     *
+     * @return <code>true</code> if it's valid or <code>false</code> if unequal.
+     */
+    protected abstract boolean isValid();
 
-	/**
-	 * Loads this record from <code>file</code>.
-	 *
-	 * @param file
-	 *            the file to load the record from.
-	 *
-	 * @throws EndOfFileException
-	 * @throws IOException
-	 */
-	protected abstract void loadRecord(PwsFile file) throws EndOfFileException,
-			IOException;
+    /**
+     * Loads this record from <code>file</code>.
+     *
+     * @param file the file to load the record from.
+     * @throws EndOfFileException
+     * @throws IOException
+     */
+    protected abstract void loadRecord(PwsFile file) throws
+                                                     EndOfFileException,
+                                                     IOException;
 
-	/**
-	 * Saves this record to <code>file</code>.
-	 *
-	 * @param file
-	 *            the file to save the record to.
-	 *
-	 * @throws IOException
-	 */
-	protected abstract void saveRecord(PwsFile file) throws IOException;
+    /**
+     * Saves this record to <code>file</code>.
+     *
+     * @param file the file to save the record to.
+     * @throws IOException
+     */
+    protected abstract void saveRecord(PwsFile file) throws IOException;
 
-	// Template Methods
+    /**
+     * Provide subclasses a means to handle unknown field values not
+     * included in ValidTypes. Used by PWSRecordV3. Defaults to false.
+     *
+     * @return false
+     */
+    protected boolean allowUnknownFieldTypes()
+    {
+        return false;
+    }
 
-	/**
-	 * Provide subclasses a means to handle unknown field values not included in
-	 * ValidTypes. Used by PWSRecordV3. Defaults to false.
-	 *
-	 * @return false
-	 */
-	protected boolean allowUnknownFieldTypes() {
-		return false;
-	}
+    // *************************************************************************
+    // * Class methods
+    // *************************************************************************
 
-	// *************************************************************************
-	// * Class methods
-	// *************************************************************************
+    /**
+     * Gets the value of a field. See the subclass documentation for valid
+     * values for <code>type</code>.
+     *
+     * @param aType the field to get.
+     * @return The value of the field.
+     */
+    public final PwsField getField(int aType)
+    {
+        return getField(Integer.valueOf(aType));
+    }
 
-	/**
-	 * Wipes any information from memory.
-	 *
-	 */
-	public void dispose () {
-		for (PwsField field : attributes.values()) {
-			field.dispose ();
-		}
-	}
+    /**
+     * Gets the value of a field. See the subclass documentation for valid
+     * values for <code>type</code>.
+     *
+     * @param aType the field to get.
+     * @return The value of the field.
+     */
+    public final PwsField getField(Integer aType)
+    {
+        return attributes.get(aType);
+    }
 
-	/**
-	 * Gets the value of a field. See the subclass documentation for valid
-	 * values for <code>type</code>.
-	 *
-	 * @param aType
-	 *            the field to get.
-	 *
-	 * @return The value of the field.
-	 */
-	public final PwsField getField(PwsFieldType aType) {
-		return getField(Integer.valueOf(aType.getId()));
-	}
+    /**
+     * Returns an <code>Iterator</code> that returns the field types (but
+     * not the values) that have been stored. Use one of the
+     * <code>getField</code> methods to get the value. The iterators
+     * <code>next()</code> method returns an <code>Integer</code>
+     *
+     * @return An <code>Iterator</code> over the stored field codes.
+     */
+    public Iterator<Integer> getFields()
+    {
+        return attributes.keySet().iterator();
+    }
 
-	/**
-	 * Gets the value of a field. See the subclass documentation for valid
-	 * values for <code>type</code>.
-	 *
-	 * @param aType the field to get.
-	 *
-	 * @return The value of the field.
-	 */
-	public final PwsField getField(int aType) {
-		return getField(Integer.valueOf(aType));
-	}
+    /**
+     * Returns <code>true</code> if the record has been modified or
+     * <code>false</code> if not.
+     *
+     * @return <code>true</code> if the record has been modified or
+     * <code>false</code> if not.
+     */
+    public boolean isModified()
+    {
+        return modified;
+    }
 
-	/**
-	 * Gets the value of a field. See the subclass documentation for valid
-	 * values for <code>type</code>.
-	 *
-	 * @param aType
-	 *            the field to get.
-	 *
-	 * @return The value of the field.
-	 */
-	public final PwsField getField(Integer aType) {
-		return attributes.get(aType);
-	}
+    /**
+     * Read a record from the given file.
+     *
+     * @param file the file to read the record from.
+     * @return The record that was read.
+     * @throws EndOfFileException
+     * @throws IOException
+     * @throws UnsupportedFileVersionException
+     */
+    public static PwsRecord read(PwsFile file)
+            throws EndOfFileException, IOException,
+                   UnsupportedFileVersionException
+    {
+        switch (file.getFileVersionMajor()) {
+        case PwsFileV1.VERSION:
+            return new PwsRecordV1(file);
 
-	/**
-	 * Returns an <code>Iterator</code> that returns the field types (but not
-	 * the values) that have been stored. Use one of the <code>getField</code>
-	 * methods to get the value. The iterators <code>next()</code> method
-	 * returns an <code>Integer</code>
-	 *
-	 * @return An <code>Iterator</code> over the stored field codes.
-	 */
-	public Iterator<Integer> getFields() {
-		return attributes.keySet().iterator();
-	}
+        case PwsFileV2.VERSION:
+            return new PwsRecordV2(file);
 
-	/**
-	 * Returns <code>true</code> if the record has been modified or
-	 * <code>false</code> if not.
-	 *
-	 * @return <code>true</code> if the record has been modified or
-	 *         <code>false</code> if not.
-	 */
-	public boolean isModified() {
-		return modified;
-	}
+        case PwsFileV3.VERSION:
+            return new PwsRecordV3(file);
+        }
+        throw new UnsupportedFileVersionException();
+    }
 
-	/**
-	 * Read a record from the given file.
-	 *
-	 * @param file the file to read the record from.
-	 *
-	 * @return The record that was read.
-	 *
-	 * @throws EndOfFileException
-	 * @throws IOException
-	 * @throws UnsupportedFileVersionException
-	 */
-	public static PwsRecord read(PwsFile file) throws EndOfFileException,
-			IOException, UnsupportedFileVersionException {
-		switch (file.getFileVersionMajor()) {
-		case PwsFileV1.VERSION:
-			return new PwsRecordV1(file);
+    /**
+     * Resets the modified flag.
+     */
+    public void resetModified()
+    {
+        modified = false;
+    }
 
-		case PwsFileV2.VERSION:
-			return new PwsRecordV2(file);
+    /**
+     * Mark the record as loaded
+     */
+    public final void setLoaded()
+    {
+        isLoaded = true;
+    }
 
-		case PwsFileV3.VERSION:
-			return new PwsRecordV3(file);
-		}
-		throw new UnsupportedFileVersionException();
-	}
+    /**
+     * Sets a field on this record from <code>value</code>.
+     *
+     * @param value the field to set
+     * @throws IllegalArgumentException if value is not the correct type
+     * for the file.
+     */
+    public void setField(PwsField value)
+    {
+        int theType;
 
-	/**
-	 * Resets the modified flag.
-	 */
-	public void resetModified() {
-		modified = false;
-	}
+        theType = value.getType();
 
-	/**
-	 * Mark the record as loaded
-	 */
-	public final void setLoaded()
-	{
-	    isLoaded = true;
-	}
+        if (ignoreFieldTypes) {
+            attributes.put(theType, value);
+            setModified();
+            return;
+        }
 
-	/**
-	 * Sets a field on this record from <code>value</code>.
-	 *
-	 * @param value
-	 *            the field to set
-	 *
-	 * @throws IllegalArgumentException
-	 *             if value is not the correct type for the file.
-	 */
-	public void setField(PwsField value) {
-		int theType;
+        // try a shortcut first
+        if (theType < ValidTypes.length) {
+            if ((Integer)((Object[])ValidTypes[theType])[0] == theType) {
+                Class<? extends PwsField> cl = value.getClass();
 
-		theType = value.getType();
+                if (cl == (((Object[])ValidTypes[theType])[2])) {
+                    attributes.put(theType, value);
+                    setModified();
+                    return;
+                }
+            }
+        }
+        // no chance, iterate over all values
+        for (Object ValidType : ValidTypes) {
+            int vType;
 
-		if (ignoreFieldTypes) {
-	        attributes.put(Integer.valueOf(theType), value);
-	        setModified();
-	        return;
-	    }
+            vType = (Integer)((Object[])ValidType)[0];
 
-		// try a shortcut first
-		if (theType < ValidTypes.length) {
-			if (((Integer) ((Object[]) ValidTypes[theType])[0]).intValue() == theType) {
-				Class<? extends PwsField> cl = value.getClass();
+            if (vType == theType) {
+                Class<? extends PwsField> cl = value.getClass();
 
-				if (cl == (((Object[]) ValidTypes[theType])[2])) {
-					attributes.put(Integer.valueOf(theType), value);
-					setModified();
-					return;
-				}
-			}
-		}
-		// no chance, iterate over all values
-		for (int ii = 0; ii < ValidTypes.length; ++ii) {
-			int vType;
+                if (cl == (((Object[])ValidType)[2])) {
+                    attributes.put(theType, value);
+                    setModified();
+                    return;
+                }
+            }
+        }
+        // before giving up, check if unknown fields are allowed
+        if (allowUnknownFieldTypes()) {
+            LOG.warn("Adding unknown field of type " + theType +
+                     ", class " + value.getClass() +
+                     " - maybe a new version is needed?");
+            attributes.put(theType, value);
+            setModified();
+        } else {
+            throw new IllegalArgumentException(
+                    "Invalid type: " + theType);
+        }
+    }
 
-			vType = ((Integer) ((Object[]) ValidTypes[ii])[0]).intValue();
+    /**
+     * Remove a field from this record
+     *
+     * @param type The type of field to remove
+     */
+    public void removeField(int type)
+    {
+        PwsField field = attributes.remove(type);
+        if (field != null) {
+            setModified();
+        }
+    }
 
-			if (vType == theType) {
-				Class<? extends PwsField> cl = value.getClass();
+    /**
+     * Sets the modified flag on this record, and also on the file this record
+     * belongs to.
+     */
+    private void setModified()
+    {
+        if (isLoaded) {
+            modified = true;
+        }
+    }
 
-				if (cl == (((Object[]) ValidTypes[ii])[2])) {
-					attributes.put(Integer.valueOf(theType), value);
-					setModified();
-					return;
-				}
-			}
-		}
-		// before giving up, check if unknown fields are allowed
-		if (allowUnknownFieldTypes()) {
-			LOG.warn("Adding unknown field of type " + theType  +
-			         ", class " + value.getClass() +
-			         " - maybe a new version is needed?");
-			attributes.put (Integer.valueOf(theType), value);
-			setModified();
-		} else {
-			throw new IllegalArgumentException(
-					"Invalid type: " + Integer.valueOf(theType));
-		}
-	}
+    /**
+     * Writes a single field to the file.
+     *
+     * @param file  the file to write the field to.
+     * @param field the field to be written.
+     * @param aType the type to write to the file instead of <code>field
+     *                     .getType()</code>
+     * @throws IOException
+     */
+    protected void writeField(PwsFile file, PwsField field, int aType)
+            throws IOException
+    {
+        byte lenBlock[];
+        byte dataBlock[];
 
-	/**
-	 * Remove a field from this record
-	 * @param type The type of field to remove
-	 */
-	public void removeField(int type)
-	{
-	    PwsField field = attributes.remove(type);
-	    if (field != null) {
-	        setModified();
-	    }
-	}
+        lenBlock = new byte[PwsFile.calcBlockLength(8)];
+        dataBlock = field.getBytes();
 
-	/**
-	 * Sets the modified flag on this record, and also on the file this record
-	 * belongs to.
-	 */
-	public void setModified() {
-		if (isLoaded) {
-			modified = true;
-		}
-	}
+        Util.putIntToByteArray(lenBlock, dataBlock.length, 0);
+        Util.putIntToByteArray(lenBlock, aType, 4);
+        // TODOlib put random bytes here
 
-	/**
-	 * Writes a single field to the file.
-	 *
-	 * @param file  the file to write the field to.
-	 * @param field the field to be written.
-	 * @param aType  the type to write to the file instead of <code>field.getType()</code>
-	 *
-	 * @throws IOException
-	 */
-	protected void writeField(PwsFile file, PwsField field, int aType)
-			throws IOException {
-		byte lenBlock[];
-		byte dataBlock[];
+        dataBlock = Util.cloneByteArray(dataBlock, PwsFile
+                .calcBlockLength(dataBlock.length));
 
-		lenBlock = new byte[PwsFile.calcBlockLength(8)];
-		dataBlock = field.getBytes();
+        file.writeEncryptedBytes(lenBlock);
+        file.writeEncryptedBytes(dataBlock);
+    }
 
-		Util.putIntToByteArray(lenBlock, dataBlock.length, 0);
-		Util.putIntToByteArray(lenBlock, aType, 4);
-		// TODOlib put random bytes here
-
-		dataBlock = Util.cloneByteArray(dataBlock, PwsFile
-				.calcBlockLength(dataBlock.length));
-
-		file.writeEncryptedBytes(lenBlock);
-		file.writeEncryptedBytes(dataBlock);
-	}
-
-	/**
-	 * Writes a single field to the file.
-	 *
-	 * @param file  the file to write the field to.
-	 * @param field the field to be written.
-	 *
-	 * @throws IOException
-	 */
-	protected void writeField(PwsFile file, PwsField field) throws IOException {
-		writeField(file, field, field.getType());
-	}
+    /**
+     * Writes a single field to the file.
+     *
+     * @param file  the file to write the field to.
+     * @param field the field to be written.
+     * @throws IOException
+     */
+    protected void writeField(PwsFile file, PwsField field) throws IOException
+    {
+        writeField(file, field, field.getType());
+    }
 }
