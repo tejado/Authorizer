@@ -20,6 +20,7 @@ import android.util.Log;
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
+import com.jefftharris.passwdsafe.sync.lib.ProviderSync;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncHelper;
 
@@ -74,7 +75,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
             Log.e(TAG, "onPerformSync no provider for " + account);
             return;
         }
-        SyncHelper.performSync(account, dbprovider, providerImpl,
-                               manual, itsContext);
+        new ProviderSync(account, dbprovider,
+                         providerImpl, itsContext).sync(manual);
     }
 }

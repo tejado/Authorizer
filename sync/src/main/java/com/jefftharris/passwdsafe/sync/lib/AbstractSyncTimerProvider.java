@@ -267,9 +267,9 @@ public abstract class AbstractSyncTimerProvider extends AbstractProvider
                 return null;
             }
 
-            SyncHelper.performSync(account, dbprovider,
-                                   AbstractSyncTimerProvider.this,
-                                   itsIsManual, itsContext);
+            new ProviderSync(account, dbprovider,
+                             AbstractSyncTimerProvider.this,
+                             itsContext).sync(itsIsManual);
             return null;
         }
 
