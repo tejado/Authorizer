@@ -346,16 +346,6 @@ public class PwsRecordV3 extends PwsRecord
     }
 
     /**
-     * Creates a new record that is a copy <code>base</code>.
-     *
-     * @param base the record to copy.
-     */
-    private PwsRecordV3(PwsRecord base)
-    {
-        super(base);
-    }
-
-    /**
      * The V3 format allows and requires the ability to add formerly unknown
      * fields.
      *
@@ -365,17 +355,6 @@ public class PwsRecordV3 extends PwsRecord
     protected boolean allowUnknownFieldTypes()
     {
         return true;
-    }
-
-    /**
-     * Creates a deep clone of this record.
-     *
-     * @return the new record.
-     */
-    @Override
-    public Object clone()
-    {
-        return new PwsRecordV3(this);
     }
 
     /**

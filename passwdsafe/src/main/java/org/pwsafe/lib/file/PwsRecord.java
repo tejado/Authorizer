@@ -28,27 +28,11 @@ import java.util.TreeMap;
  * <p>
  * When a record is added to a file it becomes "owned" by that file. Records can
  * only be owned by one file at a time and an exception will be thrown if an
- * attempt is made to add it to another file. If a record needs to be added to
- * more than one file, call the {link clone} method on the original record and
- * add the clone to the other file. For example:
- * </p>
- * <p>
- * <tt>
- * <pre> PwsFile file1;
- * PwsFile file2;
- * PwsFile file3;
- * RwsRecord rec;
- *     :
- * rec = file1.readRecord();
- * file2.add( (PwsRecord) rec.clone() );
- * file3.add( (PwsRecord) rec.clone() );</pre>
- * </tt>
- * </p>
+ * attempt is made to add it to another file.
  *
  * @author Kevin Preece
  */
-public abstract class PwsRecord
-        implements Comparable<Object>, Serializable, Cloneable
+public abstract class PwsRecord implements Comparable<Object>, Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -273,31 +257,9 @@ public abstract class PwsRecord
         this.ignoreFieldTypes = ignoreFieldTypes;
     }
 
-    /**
-     * Copy constructor
-     */
-    PwsRecord(PwsRecord base)
-    {
-        isLoaded = true;
-        ValidTypes = base.ValidTypes;
-
-        for (Iterator<Integer> i = getFields(); i.hasNext(); ) {
-            Integer key = i.next();
-            attributes.put(key, getField(key));
-        }
-    }
-
     // *************************************************************************
     // * Abstract methods
     // *************************************************************************
-
-    /**
-     * Returns a clone of this record that is a deep copy of it.
-     *
-     * @return A clone of this record.
-     */
-    @Override
-    public abstract Object clone();
 
     /**
      * Compares this record to another returning a value that is less than
