@@ -187,7 +187,6 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
 
     /** Sync the display name of the user */
     private void syncDisplayName()
-            throws IOException
     {
         String displayName = itsConnResult.getDisplayName();
         PasswdSafeUtil.dbginfo(TAG, "syncDisplayName %s", displayName);
