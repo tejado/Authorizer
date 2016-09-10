@@ -17,7 +17,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.Provider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderSync;
@@ -33,13 +32,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter
     private static final String TAG = "SyncAdapter";
 
     /** Constructor */
-    public SyncAdapter(
-            Context context,
-            @SuppressWarnings("SameParameterValue") boolean autoInitialize)
+    public SyncAdapter(Context context)
     {
-        super(context, autoInitialize);
+        super(context, true);
         itsContext = context;
-        PasswdSafeUtil.dbginfo(TAG, "ctor");
     }
 
     /* (non-Javadoc)
