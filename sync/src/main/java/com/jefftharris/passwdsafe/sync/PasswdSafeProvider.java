@@ -674,7 +674,7 @@ public class PasswdSafeProvider extends ContentProvider
     /**
      * Delete the provider for the account
      */
-    public void deleteProvider(DbProvider provider, SQLiteDatabase db)
+    private void deleteProvider(DbProvider provider, SQLiteDatabase db)
             throws Exception
     {
         Context ctx = getContext();
@@ -701,7 +701,9 @@ public class PasswdSafeProvider extends ContentProvider
     /**
      * Update the sync frequency for a provider
      */
-    public void updateSyncFreq(DbProvider provider, int freq, SQLiteDatabase db)
+    private void updateSyncFreq(DbProvider provider,
+                                int freq,
+                                SQLiteDatabase db)
             throws SQLException
     {
         Context ctx = getContext();
