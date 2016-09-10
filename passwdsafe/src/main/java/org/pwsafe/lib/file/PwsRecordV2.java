@@ -158,27 +158,6 @@ public class PwsRecordV2 extends PwsRecord
     }
 
     /**
-     * Creates a new record that is a copy <code>base</code>.
-     *
-     * @param base the record to copy.
-     */
-    private PwsRecordV2(PwsRecord base)
-    {
-        super(base);
-    }
-
-    /**
-     * Creates a deep clone of this record.
-     *
-     * @return the new record.
-     */
-    @Override
-    public Object clone()
-    {
-        return new PwsRecordV2(this);
-    }
-
-    /**
      * Compares this record to another returning a value that is less than
      * zero if this record is "less than" <code>other</code>, zero if they are
      * "equal", or greater than zero if this record is "greater than"
