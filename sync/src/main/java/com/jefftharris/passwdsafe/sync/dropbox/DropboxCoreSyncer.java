@@ -105,7 +105,7 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
 
 
     /** Sync account display name */
-    private void syncDisplayName() throws DbxException
+    private void syncDisplayName()
     {
         String name = itsConnResult.getDisplayName();
         if (!TextUtils.equals(itsProvider.itsDisplayName, name)) {

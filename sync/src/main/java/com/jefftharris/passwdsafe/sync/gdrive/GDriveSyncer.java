@@ -230,7 +230,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
     /**
      * Sync account display name
      */
-    private void syncDisplayName() throws IOException
+    private void syncDisplayName()
     {
         String displayName = itsConnResult.getDisplayName();
         PasswdSafeUtil.dbginfo(TAG, "user %s", displayName);
