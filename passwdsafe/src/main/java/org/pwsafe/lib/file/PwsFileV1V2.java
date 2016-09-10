@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.security.NoSuchAlgorithmException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
@@ -48,26 +47,16 @@ public abstract class PwsFileV1V2 extends PwsFile
 
 
     /**
-     * Constructor
-     */
-    public PwsFileV1V2()
-    {
-        super();
-        header = new PwsFileHeader();
-    }
-
-    /**
      * Create a v1 or v2 file from storage
      *
      * @throws EndOfFileException
      * @throws IOException
      * @throws UnsupportedFileVersionException
-     * @throws NoSuchAlgorithmException
      */
-    public PwsFileV1V2(PwsStorage storage,
-                       Owner<PwsPassword>.Param passwd, String encoding)
+    protected PwsFileV1V2(PwsStorage storage,
+                          Owner<PwsPassword>.Param passwd, String encoding)
             throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException, NoSuchAlgorithmException
+                   UnsupportedFileVersionException
     {
         super(storage, passwd, encoding);
     }
@@ -132,13 +121,11 @@ public abstract class PwsFileV1V2 extends PwsFile
      * @throws EndOfFileException
      * @throws IOException
      * @throws UnsupportedFileVersionException
-     * @throws NoSuchAlgorithmException        if no SHA-1 implementation
-     * is found.
      */
     @Override
     protected void open(Owner<PwsPassword>.Param passwd, String encoding)
             throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException, NoSuchAlgorithmException
+                   UnsupportedFileVersionException
     {
         setPassphrase(passwd);
 
@@ -187,15 +174,12 @@ public abstract class PwsFileV1V2 extends PwsFile
      * flag is also reset on the file and all records.
      *
      * @throws IOException                     if the attempt fails.
-     * @throws NoSuchAlgorithmException        if no SHA-1 implementation
-     * is found.
      * @throws ConcurrentModificationException if the underlying store was
      *                                         independently changed
      */
     @Override
     public void save()
-            throws IOException, NoSuchAlgorithmException,
-                   ConcurrentModificationException
+            throws IOException, ConcurrentModificationException
     {
         if (isReadOnly())
             throw new IOException("File is read only");

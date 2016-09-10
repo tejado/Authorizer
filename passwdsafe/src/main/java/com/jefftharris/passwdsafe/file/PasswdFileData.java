@@ -9,7 +9,6 @@ package com.jefftharris.passwdsafe.file;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -25,7 +24,6 @@ import org.pwsafe.lib.UUID;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
-import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 import org.pwsafe.lib.file.Owner;
 import org.pwsafe.lib.file.PwsByteField;
@@ -90,9 +88,8 @@ public class PasswdFileData
 
     public void load(Owner<PwsPassword>.Param passwd, boolean readonly,
                      Context context)
-            throws IOException, NoSuchAlgorithmException,
-            EndOfFileException, InvalidPassphraseException,
-            UnsupportedFileVersionException
+            throws IOException, EndOfFileException, InvalidPassphraseException,
+                   UnsupportedFileVersionException
     {
         itsIsOpenReadOnly = readonly;
         itsPwsFile = itsUri.load(passwd, context);
@@ -104,7 +101,7 @@ public class PasswdFileData
     }
 
     public void createNewFile(Owner<PwsPassword>.Param passwd, Context context)
-        throws IOException, NoSuchAlgorithmException
+        throws IOException
     {
         itsPwsFile = itsUri.createNew(passwd, context);
         save(context);
@@ -112,8 +109,7 @@ public class PasswdFileData
     }
 
     public void save(Context context)
-        throws IOException, NoSuchAlgorithmException,
-               ConcurrentModificationException
+        throws IOException, ConcurrentModificationException
     {
         if (itsPwsFile != null) {
             for (int idx = 0; idx < itsRecords.size(); ++idx) {
@@ -177,7 +173,6 @@ public class PasswdFileData
     }
 
     public final void addRecord(PwsRecord rec)
-        throws PasswordSafeException
     {
         if (itsPwsFile != null) {
             itsPwsFile.add(rec);

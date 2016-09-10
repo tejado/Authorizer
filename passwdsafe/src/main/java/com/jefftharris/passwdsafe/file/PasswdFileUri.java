@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -232,9 +231,8 @@ public class PasswdFileUri implements Parcelable
 
     /** Load the password file */
     public PwsFile load(Owner<PwsPassword>.Param passwd, Context context)
-            throws NoSuchAlgorithmException, EndOfFileException,
-                InvalidPassphraseException, IOException,
-                UnsupportedFileVersionException
+            throws EndOfFileException, InvalidPassphraseException, IOException,
+                   UnsupportedFileVersionException
     {
         switch (itsType) {
         case FILE: {

@@ -59,7 +59,6 @@ import com.jefftharris.passwdsafe.view.TextInputUtils;
 import com.jefftharris.passwdsafe.view.TimePickerDialogFragment;
 import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 
-import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.ArrayList;
@@ -1416,13 +1415,7 @@ public class PasswdSafeEditRecordFragment
         }
 
         if (newRecord) {
-            try {
-                fileData.addRecord(record);
-            } catch (PasswordSafeException e) {
-                PasswdSafeUtil.showFatalMsg(e, "Error saving record: " + e,
-                                            getActivity());
-                return null;
-            }
+            fileData.addRecord(record);
         }
 
         GuiUtils.setKeyboardVisible(itsTitle, getContext(), false);
