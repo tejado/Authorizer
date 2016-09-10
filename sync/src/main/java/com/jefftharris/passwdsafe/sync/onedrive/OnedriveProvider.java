@@ -27,6 +27,7 @@ import com.jefftharris.passwdsafe.lib.ProviderType;
 import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.microsoft.authenticate.AuthClient;
@@ -239,19 +240,21 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     }
 
     @Override
-    public boolean checkSyncConnectivity(Account acct) throws Exception
+    public SyncConnectivityResult checkSyncConnectivity(Account acct)
+            throws Exception
     {
-        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        final ObjectHolder<SyncConnectivityResult> connResult =
+                new ObjectHolder<>();
         useOneDriveService(new OneDriveUser()
         {
             @Override
             public void useOneDrive(IOneDriveService client) throws Exception
             {
-                OnedriveSyncer.getDisplayName(client);
-                online.set(true);
+                String displayName = OnedriveSyncer.getDisplayName(client);
+                connResult.set(new SyncConnectivityResult(displayName));
             }
         });
-        return online.get();
+        return connResult.get();
     }
 
     /**
@@ -260,6 +263,7 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     @Override
     public void sync(Account acct,
                      final DbProvider provider,
+                     final SyncConnectivityResult connResult,
                      final SQLiteDatabase db,
                      final SyncLogRecord logrec) throws Exception
     {
@@ -268,7 +272,7 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
             @Override
             public void useOneDrive(IOneDriveService client) throws Exception
             {
-                new OnedriveSyncer(client, provider, db, logrec,
+                new OnedriveSyncer(client, provider, connResult, db, logrec,
                                    getContext()).sync();
 
             }

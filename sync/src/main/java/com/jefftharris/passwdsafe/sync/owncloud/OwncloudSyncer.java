@@ -21,6 +21,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NotifUtils;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncIOException;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
@@ -51,11 +52,12 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     /** Constructor */
     public OwncloudSyncer(OwnCloudClient client,
                           DbProvider provider,
+                          SyncConnectivityResult connResult,
                           SQLiteDatabase db,
                           SyncLogRecord logrec,
                           Context ctx)
     {
-        super(client, provider, db, logrec, ctx, TAG);
+        super(client, provider, connResult, db, logrec, ctx, TAG);
         itsIsAuthorized = itsProviderClient.hasCredentials();
     }
 
@@ -187,7 +189,7 @@ public class OwncloudSyncer extends AbstractProviderSyncer<OwnCloudClient>
     private void syncDisplayName()
             throws IOException
     {
-        String displayName = getDisplayName(itsProviderClient, itsContext);
+        String displayName = itsConnResult.getDisplayName();
         PasswdSafeUtil.dbginfo(TAG, "syncDisplayName %s", displayName);
         if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,

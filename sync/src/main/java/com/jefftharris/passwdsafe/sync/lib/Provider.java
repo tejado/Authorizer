@@ -66,11 +66,12 @@ public interface Provider
     void requestSync(boolean manual);
 
     /** Check connectivity for a sync */
-    boolean checkSyncConnectivity(Account acct) throws Exception;
+    SyncConnectivityResult checkSyncConnectivity(Account acct) throws Exception;
 
     /** Sync a provider */
     void sync(Account acct,
               DbProvider provider,
+              SyncConnectivityResult connResult,
               SQLiteDatabase db,
               SyncLogRecord logrec)
             throws Exception;
