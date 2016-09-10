@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -46,11 +45,6 @@ public final class PwsFileV3 extends PwsFile
      * The string that identifies a database as V3 rather than V2 or V1
      */
     public static final byte[] ID_STRING = "PWS3".getBytes();
-
-    /**
-     * The file's standard header.
-     */
-    protected PwsFileHeaderV3 headerV3;
 
     private SealedObject sealedHeaderV3;
 
@@ -91,11 +85,10 @@ public final class PwsFileV3 extends PwsFile
      * @throws EndOfFileException
      * @throws IOException
      * @throws UnsupportedFileVersionException
-     * @throws NoSuchAlgorithmException
      */
     public PwsFileV3(PwsStorage storage, Owner<PwsPassword>.Param passwd)
             throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException, NoSuchAlgorithmException
+                   UnsupportedFileVersionException
     {
         super(storage, passwd, null);
     }

@@ -11,7 +11,6 @@ import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Encapsulates version 1 PasswordSafe files.
@@ -40,12 +39,11 @@ public class PwsFileV1 extends PwsFileV1V2
      * @throws EndOfFileException
      * @throws IOException
      * @throws UnsupportedFileVersionException
-     * @throws NoSuchAlgorithmException
      */
     public PwsFileV1(PwsStorage storage,
                      Owner<PwsPassword>.Param passwd, String encoding)
             throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException, NoSuchAlgorithmException
+                   UnsupportedFileVersionException
     {
         super(storage, passwd, encoding);
     }

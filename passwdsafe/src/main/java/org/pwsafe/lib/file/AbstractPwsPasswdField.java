@@ -28,8 +28,8 @@ public abstract class AbstractPwsPasswdField extends PwsField
     private final Cipher itsReadCipher;
     private final String itsStrEncoding;
 
-    public AbstractPwsPasswdField(int type, byte[] value, PwsFile file,
-                                  String encoding)
+    protected AbstractPwsPasswdField(int type, byte[] value, PwsFile file,
+                                     String encoding)
     {
         super(type, sealValue(value, encoding, file.getWriteCipher()));
         Arrays.fill(value, (byte)0);
@@ -38,8 +38,8 @@ public abstract class AbstractPwsPasswdField extends PwsField
     }
 
 
-    public AbstractPwsPasswdField(int type, String value, PwsFile file,
-                                  String encoding)
+    protected AbstractPwsPasswdField(int type, String value, PwsFile file,
+                                     String encoding)
     {
         super(type, sealValue(value, file.getWriteCipher()));
         itsReadCipher = file.getReadCipher();
@@ -47,7 +47,7 @@ public abstract class AbstractPwsPasswdField extends PwsField
     }
 
 
-    public AbstractPwsPasswdField(PwsFieldType type, String encoding)
+    protected AbstractPwsPasswdField(PwsFieldType type, String encoding)
     {
         super(type, null);
         itsReadCipher = null;

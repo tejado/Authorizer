@@ -19,7 +19,6 @@ import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * This is a singleton factory class used to load a PasswordSafe file.  It is
@@ -170,13 +169,11 @@ public class PwsFileFactory
      * @throws InvalidPassphraseException
      * @throws IOException
      * @throws UnsupportedFileVersionException
-     * @throws NoSuchAlgorithmException        If no SHA-1 implementation
-     * is found.
      */
     public static PwsFile loadFile(String filename,
                                    Owner<PwsPassword>.Param passwd)
             throws EndOfFileException, InvalidPassphraseException, IOException,
-                   UnsupportedFileVersionException, NoSuchAlgorithmException
+                   UnsupportedFileVersionException
     {
         PwsStorage storage = new PwsFileStorage(filename, filename);
         return loadFromStorage(storage, passwd);
@@ -193,13 +190,11 @@ public class PwsFileFactory
      * @throws InvalidPassphraseException
      * @throws IOException
      * @throws UnsupportedFileVersionException
-     * @throws NoSuchAlgorithmException        If no SHA-1 implementation
-     * is found.
      */
     public static PwsFile loadFromStorage(PwsStorage storage,
                                           Owner<PwsPassword>.Param passwd)
             throws EndOfFileException, InvalidPassphraseException, IOException,
-                   UnsupportedFileVersionException, NoSuchAlgorithmException
+                   UnsupportedFileVersionException
     {
         PwsFile file;
         try {

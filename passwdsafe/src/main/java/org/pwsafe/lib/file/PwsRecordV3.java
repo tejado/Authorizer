@@ -418,7 +418,7 @@ public class PwsRecordV3 extends PwsRecord
         return idField != null;
     }
 
-    static byte[] EOF_BYTES_RAW = "PWS3-EOFPWS3-EOF".getBytes();
+    static final byte[] EOF_BYTES_RAW = "PWS3-EOFPWS3-EOF".getBytes();
 
     protected class ItemV3 extends Item
     {

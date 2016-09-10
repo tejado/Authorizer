@@ -40,13 +40,6 @@ public class PwsFileHeader
     private final byte[] IpThing = new byte[8];
 
     /**
-     * Creates an empty file header.
-     */
-    PwsFileHeader()
-    {
-    }
-
-    /**
      * Constructs the PasswordSafe file header by reading the header data
      * from <code>file</code>.
      *

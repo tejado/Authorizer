@@ -218,13 +218,11 @@ public abstract class PwsFile
      * @throws EndOfFileException
      * @throws IOException
      * @throws UnsupportedFileVersionException
-     * @throws NoSuchAlgorithmException        if no SHA-1 implementation
-     * is found.
      */
     protected PwsFile(PwsStorage aStorage,
                       Owner<PwsPassword>.Param passwd, String encoding)
             throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException, NoSuchAlgorithmException
+                   UnsupportedFileVersionException
     {
         this.storage = aStorage;
         open(passwd, encoding);
@@ -487,13 +485,11 @@ public abstract class PwsFile
      * @throws EndOfFileException
      * @throws IOException
      * @throws UnsupportedFileVersionException
-     * @throws NoSuchAlgorithmException        if no SHA-1 implementation
-     * is found.
      */
     protected abstract void open(Owner<PwsPassword>.Param passwd,
                                  String encoding)
             throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException, NoSuchAlgorithmException;
+                   UnsupportedFileVersionException;
 
     /**
      * Reads all records from the file.
@@ -632,14 +628,11 @@ public abstract class PwsFile
      * reset on the file and all records.
      *
      * @throws IOException                     if the attempt fails.
-     * @throws NoSuchAlgorithmException        if no SHA-1 implementation is
-     * found.
      * @throws ConcurrentModificationException if the underlying store was
      *                                         independently changed
      */
     public abstract void save()
-            throws IOException, NoSuchAlgorithmException,
-                   ConcurrentModificationException;
+            throws IOException, ConcurrentModificationException;
 
     /**
      * Set the flag to indicate that the file has been modified.  There

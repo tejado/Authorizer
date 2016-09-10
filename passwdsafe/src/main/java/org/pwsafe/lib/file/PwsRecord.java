@@ -43,7 +43,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable
      * The default character set used for <code>byte[]</code> to
      * <code>String</code> conversions.
      */
-    public static final String DEFAULT_CHARSET = "ISO-8859-1";
+    protected static final String DEFAULT_CHARSET = "ISO-8859-1";
 
     private boolean modified = false;
     private boolean isLoaded = false;
@@ -226,9 +226,9 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable
      * @throws EndOfFileException
      * @throws IOException
      */
-    public PwsRecord(PwsFile owner, Object[] validTypes,
-                     boolean ignoreFieldTypes) throws EndOfFileException,
-                                                      IOException
+    protected PwsRecord(PwsFile owner, Object[] validTypes,
+                        boolean ignoreFieldTypes)
+            throws EndOfFileException, IOException
     {
         super();
 
@@ -248,8 +248,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable
      * @param ignoreFieldTypes true if all fields types should be ignored,
      *                         false otherwise
      */
-    public PwsRecord(Object[] validTypes,
-                     boolean ignoreFieldTypes)
+    protected PwsRecord(Object[] validTypes, boolean ignoreFieldTypes)
     {
         super();
 
@@ -348,7 +347,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable
      * @param aType the field to get.
      * @return The value of the field.
      */
-    public final PwsField getField(Integer aType)
+    protected final PwsField getField(Integer aType)
     {
         return attributes.get(aType);
     }
@@ -361,7 +360,7 @@ public abstract class PwsRecord implements Comparable<Object>, Serializable
      *
      * @return An <code>Iterator</code> over the stored field codes.
      */
-    public Iterator<Integer> getFields()
+    protected Iterator<Integer> getFields()
     {
         return attributes.keySet().iterator();
     }
