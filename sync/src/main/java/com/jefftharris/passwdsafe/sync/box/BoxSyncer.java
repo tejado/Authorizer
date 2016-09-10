@@ -37,6 +37,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.jefftharris.passwdsafe.sync.lib.SyncRemoteFiles;
@@ -56,18 +57,24 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxSession>
 
     /** Constructor */
     public BoxSyncer(BoxSession client, DbProvider provider,
+                     SyncConnectivityResult connResult,
                      SQLiteDatabase db, SyncLogRecord logrec, Context ctx)
     {
-        super(client, provider, db, logrec, ctx, TAG);
+        super(client, provider, connResult,  db, logrec, ctx, TAG);
     }
 
     /**
-     * Get the user for the session
+     * Get the account display name
      */
-    public static BoxUser getUser(BoxSession client) throws Exception
+    public static String getDisplayName(BoxSession client) throws Exception
     {
         BoxApiUser userApi = new BoxApiUser(client);
-        return userApi.getCurrentUserInfoRequest().send();
+        BoxUser user = userApi.getCurrentUserInfoRequest().send();
+        if (user != null) {
+            return user.getName() + " (" + user.getLogin() + ")";
+        } else {
+            return null;
+        }
     }
 
     /** Get the folder for a file */
@@ -137,12 +144,7 @@ public class BoxSyncer extends AbstractProviderSyncer<BoxSession>
     /** Sync account display name */
     private void syncDisplayName()
     {
-        BoxUser user = itsProviderClient.getUser();
-        PasswdSafeUtil.dbginfo(TAG, "user %s", boxToString(user));
-        String displayName = null;
-        if (user != null) {
-            displayName = user.getName() + " (" + user.getLogin() + ")";
-        }
+        String displayName = itsConnResult.getDisplayName();
         if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
                                              itsDb);

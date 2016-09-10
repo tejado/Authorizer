@@ -38,6 +38,7 @@ import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
 import com.jefftharris.passwdsafe.sync.lib.NotifUtils;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
@@ -210,24 +211,28 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
     }
 
     @Override
-    public boolean checkSyncConnectivity(Account acct) throws Exception
+    public SyncConnectivityResult checkSyncConnectivity(Account acct)
+            throws Exception
     {
-        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        final ObjectHolder<SyncConnectivityResult> connResult =
+                new ObjectHolder<>();
         useDropboxService(new DropboxUser()
         {
             @Override
             public void useDropbox() throws Exception
             {
-                DropboxCoreSyncer.getDisplayName(itsClient);
-                online.set(true);
+                String displayName =
+                        DropboxCoreSyncer.getDisplayName(itsClient);
+                connResult.set(new SyncConnectivityResult(displayName));
             }
         });
-        return online.get();
+        return connResult.get();
     }
 
     @Override
     public void sync(Account acct,
                      final DbProvider provider,
+                     final SyncConnectivityResult connResult,
                      final SQLiteDatabase db,
                      final SyncLogRecord logrec) throws Exception
     {
@@ -236,7 +241,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
             @Override
             public void useDropbox() throws Exception
             {
-                new DropboxCoreSyncer(itsClient, provider, db,
+                new DropboxCoreSyncer(itsClient, provider, connResult, db,
                                       logrec, getContext()).sync();
             }
         });

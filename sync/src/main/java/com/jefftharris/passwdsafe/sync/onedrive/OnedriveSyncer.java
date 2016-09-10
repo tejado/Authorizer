@@ -20,6 +20,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.jefftharris.passwdsafe.sync.lib.SyncRemoteFiles;
@@ -43,10 +44,12 @@ public class OnedriveSyncer
      * Constructor
      */
     public OnedriveSyncer(IOneDriveService service,
-                          DbProvider provider, SQLiteDatabase db,
+                          DbProvider provider,
+                          SyncConnectivityResult connResult,
+                          SQLiteDatabase db,
                           SyncLogRecord logrec, Context ctx)
     {
-        super(service, provider, db, logrec, ctx, TAG);
+        super(service, provider, connResult, db, logrec, ctx, TAG);
     }
 
 
@@ -133,7 +136,7 @@ public class OnedriveSyncer
      */
     private void syncDisplayName() throws RetrofitError
     {
-        String displayName = getDisplayName(itsProviderClient);
+        String displayName = itsConnResult.getDisplayName();
         if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,
                                              itsDb);

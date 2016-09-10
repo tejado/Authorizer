@@ -27,6 +27,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.jefftharris.passwdsafe.sync.lib.SyncRemoteFiles;
@@ -42,10 +43,12 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
 
     /** Constructor */
     public DropboxCoreSyncer(DbxClientV2 client,
-                             DbProvider provider, SQLiteDatabase db,
+                             DbProvider provider,
+                             SyncConnectivityResult connResult,
+                             SQLiteDatabase db,
                              SyncLogRecord logrec, Context ctx)
     {
-        super(client, provider, db, logrec, ctx, TAG);
+        super(client, provider, connResult, db, logrec, ctx, TAG);
     }
 
     /** Create a remote identifier from the local name of a file */
@@ -104,7 +107,7 @@ public class DropboxCoreSyncer extends AbstractProviderSyncer<DbxClientV2>
     /** Sync account display name */
     private void syncDisplayName() throws DbxException
     {
-        String name = getDisplayName(itsProviderClient);
+        String name = itsConnResult.getDisplayName();
         if (!TextUtils.equals(itsProvider.itsDisplayName, name)) {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, name, itsDb);
         }

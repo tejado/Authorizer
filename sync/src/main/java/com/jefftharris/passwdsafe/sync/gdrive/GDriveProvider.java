@@ -48,6 +48,7 @@ import com.jefftharris.passwdsafe.sync.SyncUpdateHandler;
 import com.jefftharris.passwdsafe.sync.lib.AbstractProvider;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 
@@ -212,26 +213,28 @@ public class GDriveProvider extends AbstractProvider
     }
 
     @Override
-    public boolean checkSyncConnectivity(Account acct) throws Exception
+    public SyncConnectivityResult checkSyncConnectivity(Account acct)
+            throws Exception
     {
-        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        final ObjectHolder<SyncConnectivityResult> connResult =
+                new ObjectHolder<>();
         useDriveService(acct, new DriveUser()
         {
             @Override
             public SyncUpdateHandler.GDriveState useDrive(Drive drive)
                     throws Exception
             {
-                GDriveSyncer.getDisplayName(drive);
-                online.set(true);
+                String displayName = GDriveSyncer.getDisplayName(drive);
+                connResult.set(new SyncConnectivityResult(displayName));
                 return SyncUpdateHandler.GDriveState.OK;
             }
         });
-        return online.get();
-        // TODO: optimize by returning object/display name back to pass to sync
+        return connResult.get();
     }
 
     @Override
     public void sync(Account acct, final DbProvider provider,
+                     final SyncConnectivityResult connResult,
                      final SQLiteDatabase db,
                      final SyncLogRecord logrec) throws Exception
     {
@@ -242,7 +245,7 @@ public class GDriveProvider extends AbstractProvider
                     throws Exception
             {
                 GDriveSyncer sync = new GDriveSyncer(
-                        drive, provider, db, logrec, itsContext);
+                        drive, provider, connResult, db, logrec, itsContext);
                 sync.sync();
                 return sync.getSyncState();
             }

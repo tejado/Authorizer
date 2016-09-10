@@ -97,10 +97,12 @@ public class SyncHelper
         SyncLogRecord logrec = beginSync(acct, provider, manual, ctx);
         SyncDb syncDb = null;
         try {
-            checkSyncConnectivity(acct, providerImpl, logrec, ctx);
+            SyncConnectivityResult connResult =
+                    checkSyncConnectivity(acct, providerImpl, logrec, ctx);
 
             syncDb = SyncDb.acquire();
-            performSync(acct, provider, providerImpl, syncDb.getDb(), logrec);
+            performSync(acct, provider, providerImpl, connResult,
+                        syncDb.getDb(), logrec);
         } finally {
             if (syncDb == null) {
                 syncDb = SyncDb.acquire();
@@ -136,18 +138,21 @@ public class SyncHelper
     /**
      * Check the connectivity of a provider before syncing
      */
-    private static void checkSyncConnectivity(Account acct,
-                                              Provider providerImpl,
-                                              SyncLogRecord logrec,
-                                              Context ctx)
+    private static SyncConnectivityResult checkSyncConnectivity(
+            Account acct,
+            Provider providerImpl,
+            SyncLogRecord logrec,
+            Context ctx)
     {
+        SyncConnectivityResult connResult = null;
         ConnectivityManager connMgr = (ConnectivityManager)
                 ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = connMgr.getActiveNetworkInfo();
         boolean online = (netInfo != null) && netInfo.isConnected();
         if (online) {
             try {
-                online = providerImpl.checkSyncConnectivity(acct);
+                connResult = providerImpl.checkSyncConnectivity(acct);
+                online = (connResult != null);
             } catch (Exception e) {
                 Log.e(TAG, "checkSyncConnectivity error", e);
                 online = false;
@@ -155,6 +160,7 @@ public class SyncHelper
             }
         }
         logrec.setNotConnected(!online);
+        return connResult;
     }
 
     /**
@@ -163,12 +169,13 @@ public class SyncHelper
     private static void performSync(Account acct,
                                     DbProvider provider,
                                     Provider providerImpl,
+                                    SyncConnectivityResult connResult,
                                     SQLiteDatabase db,
                                     SyncLogRecord logrec)
     {
         try {
             if (!logrec.isNotConnected()) {
-                providerImpl.sync(acct, provider, db, logrec);
+                providerImpl.sync(acct, provider, connResult, db, logrec);
             }
         } catch (Exception e) {
             Log.e(TAG, "Sync error", e);

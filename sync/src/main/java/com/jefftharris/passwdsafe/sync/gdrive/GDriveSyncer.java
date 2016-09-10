@@ -32,6 +32,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractSyncOper;
 import com.jefftharris.passwdsafe.sync.lib.DbFile;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.ProviderRemoteFile;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
 import com.jefftharris.passwdsafe.sync.lib.SyncRemoteFiles;
@@ -50,11 +51,12 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
     /** Constructor */
     public GDriveSyncer(Drive drive,
                         DbProvider provider,
+                        SyncConnectivityResult connResult,
                         SQLiteDatabase db,
                         SyncLogRecord logrec,
                         Context ctx)
     {
-        super(drive, provider, db, logrec, ctx, TAG);
+        super(drive, provider, connResult, db, logrec, ctx, TAG);
         itsFileFolders = new FileFolders(itsProviderClient);
     }
 
@@ -230,7 +232,7 @@ public class GDriveSyncer extends AbstractProviderSyncer<Drive>
      */
     private void syncDisplayName() throws IOException
     {
-        String displayName = getDisplayName(itsProviderClient);
+        String displayName = itsConnResult.getDisplayName();
         PasswdSafeUtil.dbginfo(TAG, "user %s", displayName);
         if (!TextUtils.equals(itsProvider.itsDisplayName, displayName)) {
             SyncDb.updateProviderDisplayName(itsProvider.itsId, displayName,

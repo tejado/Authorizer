@@ -35,6 +35,7 @@ import com.jefftharris.passwdsafe.sync.lib.AbstractSyncTimerProvider;
 import com.jefftharris.passwdsafe.sync.lib.AccountChooserDlg;
 import com.jefftharris.passwdsafe.sync.lib.DbProvider;
 import com.jefftharris.passwdsafe.sync.lib.NewAccountTask;
+import com.jefftharris.passwdsafe.sync.lib.SyncConnectivityResult;
 import com.jefftharris.passwdsafe.sync.lib.SyncDb;
 import com.jefftharris.passwdsafe.sync.lib.SyncIOException;
 import com.jefftharris.passwdsafe.sync.lib.SyncLogRecord;
@@ -207,19 +208,22 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     }
 
     @Override
-    public boolean checkSyncConnectivity(Account acct) throws Exception
+    public SyncConnectivityResult checkSyncConnectivity(Account acct)
+            throws Exception
     {
-        final ObjectHolder<Boolean> online = new ObjectHolder<>(false);
+        final ObjectHolder<SyncConnectivityResult> connResult =
+                new ObjectHolder<>();
         useOwncloudService(new OwncloudUser()
         {
             @Override
             public void useOwncloud(OwnCloudClient client) throws Exception
             {
-                OwncloudSyncer.getDisplayName(client, getContext());
-                online.set(true);
+                String displayName =
+                        OwncloudSyncer.getDisplayName(client, getContext());
+                connResult.set(new SyncConnectivityResult(displayName));
             }
         });
-        return online.get();
+        return connResult.get();
     }
 
     /* (non-Javadoc)
@@ -228,6 +232,7 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
     @Override
     public void sync(Account acct,
                      final DbProvider provider,
+                     final SyncConnectivityResult connResult,
                      final SQLiteDatabase db,
                      final SyncLogRecord logrec) throws Exception
     {
@@ -238,8 +243,8 @@ public class OwncloudProvider extends AbstractSyncTimerProvider
             {
                 PasswdSafeUtil.dbginfo(TAG, "sync client: %b", itsAccountName);
                 OwncloudSyncer syncer =
-                        new OwncloudSyncer(client, provider, db, logrec,
-                                           getContext());
+                        new OwncloudSyncer(client, provider, connResult, db,
+                                           logrec, getContext());
                 try {
                     syncer.sync();
                 } catch (SyncIOException e) {
