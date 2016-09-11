@@ -296,10 +296,7 @@ public class DropboxCoreProvider extends AbstractSyncTimerProvider
             saveAuthData(null);
             updateDropboxAcct();
             throw e;
-
-            // TODO: notification when providers fail to sync with auth error?
         }
-
     }
 
     /** Update the Dropbox account client based on availability of

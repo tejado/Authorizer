@@ -10,7 +10,6 @@ package com.jefftharris.passwdsafe.lib.view;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -241,19 +240,14 @@ public final class GuiUtils
                                         List<String> bigLines,
                                         PendingIntent intent,
                                         int notifyId,
+                                        String notifyTag,
                                         boolean autoCancel)
     {
-        BitmapDrawable b =
-                (BitmapDrawable)getDrawable(ctx.getResources(), bigIcon);
-        if (b == null) {
-            return;
-        }
         NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setContentIntent(intent)
                 .setSmallIcon(iconId)
-                .setLargeIcon(b.getBitmap())
                 .setTicker(tickerText)
                 .setAutoCancel(autoCancel);
         NotificationCompat.InboxStyle style =
@@ -270,8 +264,7 @@ public final class GuiUtils
         }
 
         builder.setStyle(style);
-        Notification notif = builder.build();
-        notifyMgr.notify(notifyId, notif);
+        showNotification(notifyMgr, builder, bigIcon, notifyId, notifyTag, ctx);
     }
 
 
@@ -284,22 +277,36 @@ public final class GuiUtils
                                               String content,
                                               PendingIntent intent,
                                               int notifyId,
+                                              String notifyTag,
                                               boolean autoCancel)
+    {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setContentIntent(intent)
+                .setSmallIcon(iconId)
+                .setTicker(title)
+                .setAutoCancel(autoCancel);
+        showNotification(notifyMgr, builder, bigIcon, notifyId, notifyTag, ctx);
+    }
+
+
+    /**
+     * Show a notification with a custom builder
+     */
+    public static void showNotification(NotificationManager notifyMgr,
+                                        NotificationCompat.Builder builder,
+                                        int bigIcon,
+                                        int notifyId,
+                                        String notifyTag,
+                                        Context ctx)
     {
         BitmapDrawable b =
                 (BitmapDrawable)getDrawable(ctx.getResources(), bigIcon);
         if (b == null) {
             return;
         }
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
-                .setContentTitle(title)
-                .setContentText(content)
-                .setContentIntent(intent)
-                .setSmallIcon(iconId)
-                .setLargeIcon(b.getBitmap())
-                .setTicker(title)
-                .setAutoCancel(autoCancel);
-        Notification notif = builder.build();
-        notifyMgr.notify(notifyId, notif);
+        builder.setLargeIcon(b.getBitmap());
+        notifyMgr.notify(notifyTag, notifyId, builder.build());
     }
 }

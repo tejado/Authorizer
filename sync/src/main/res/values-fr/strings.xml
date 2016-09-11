@@ -57,13 +57,13 @@
     <string name="owncloud_cert_trusted">Certificat est approuvé pour le compte ownCloud</string>
     <string name="owncloud_synced_files">ownCloud Fichiers Synchronisé</string>
     <string name="passwdsafe">PasswdSafe</string>
-    <string name="passwdsafe_sync_conflict">Conflit de synchronisation PasswdSafe</string>
     <string name="passwdsafe_synced_file">PasswdSafe fichier synchronisé</string>
     <string name="recreated_local_copy">Copie locale recréé</string>
     <string name="remove_account">Supprimer un compte?</string>
     <string name="removing_account">Retrait de compte&#8230;</string>
     <string name="show_all">Afficher Tout</string>
     <string name="sync">Synchroniser</string>
+    <string name="sync_conflict">Conflit de synchronisation</string>
     <string name="sync_conflict_log">Conflit de synchronisation avec le fichier %1$s qui a été %2$s sur place et %3$s à distance</string>
     <string name="sync_interval_label">Intervalle:</string>
     <string name="sync_log_record">Synchroniser %1$s, %2$s, %3$s, début: %4$tc, fin: %5$tc</string>
@@ -72,6 +72,8 @@
     <string name="sync_oper_rmfile">Supprimer le fichier: %1$s</string>
     <string name="sync_oper_rmfile_local">Supprimer le fichier local: %1$s</string>
     <string name="sync_oper_rmfile_remote">Supprimer le fichier distant: %1$s</string>
+    <string name="sync_results">Sync results</string>
+    <string name="syncing">Syncing…</string>
     <string name="updating_account">Mise à jour compte&#8230;</string>
 
     <string name="release_notes">

@@ -1,3 +1,10 @@
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <resources>
 
     <string name="about">About</string>
@@ -14,6 +21,7 @@
     <string name="dropbox">Dropbox</string>
     <string name="edit">Edit</string>
     <string name="error">Error</string>
+    <string name="error_fmt">Error: %1$s</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
     <string name="file_type_icon">File type icon</string>
     <string name="google_drive">Google Drive</string>
