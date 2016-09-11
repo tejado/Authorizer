@@ -64,27 +64,13 @@ public final class NotifUtils
     /** Show a notification with a custom content*/
     public static void showNotif(Type type, String content, Context ctx)
     {
-        showNotif(type, null, content, ctx);
-    }
-
-    /**
-     * Show a tagged notification with a custom content
-     */
-    public static void showNotif(Type type,
-                                 String tag,
-                                 String content,
-                                 Context ctx)
-    {
-        PendingIntent mainIntent = PendingIntent.getActivity(
-                ctx, type.itsNotifId, new Intent(ctx, MainActivity.class),
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        GuiUtils.showSimpleNotification(getNotifMgr(ctx), ctx,
-                                        R.drawable.ic_stat_app,
-                                        getTitle(type, ctx),
-                                        R.mipmap.ic_launcher_sync,
-                                        content, mainIntent, type.itsNotifId,
-                                        tag, true);
+        String title = getTitle(type, ctx);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setTicker(title)
+                .setAutoCancel(true);
+        showNotif(builder, type, null, ctx);
     }
 
     /**
