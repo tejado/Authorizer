@@ -74,6 +74,8 @@
     <string name="updating_account">Updating account&#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;3.3.0&lt;/b&gt; - Add notifications during syncing
+        \n\n
         &lt;b&gt;3.2.0&lt;/b&gt; - Update Dropbox to v2 API. Trigger a sync
         conflict if adding a file that already exists.
         \n\n
