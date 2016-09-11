@@ -18,6 +18,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.sync.R;
 
 import java.util.ArrayList;
@@ -229,19 +230,7 @@ public class ProviderSync
             builder.setCategory(NotificationCompat.CATEGORY_ERROR);
         }
 
-        NotificationCompat.InboxStyle style =
-                new NotificationCompat.InboxStyle(builder)
-                        .setBigContentTitle(title)
-                        .setSummaryText(content);
-        int numLines = Math.min(results.size(), 5);
-        for (int i = 0; i < numLines; ++i) {
-            style.addLine(results.get(i));
-        }
-        if (numLines < results.size()) {
-            style.addLine("…");
-            builder.setNumber(results.size());
-        }
-
+        GuiUtils.setInboxStyle(builder, title, content, results);
         NotifUtils.showNotif(builder, type, itsNotifTag, itsContext);
     }
 }
