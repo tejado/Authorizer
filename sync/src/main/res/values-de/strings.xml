@@ -75,6 +75,9 @@
     <string name="updating_account">Aktualisiere Konto &#8230;</string>
 
     <string name="release_notes">
+        &lt;b&gt;3.3.0&lt;/b&gt; - Mitteilung währen der Synchronisation
+        hinzugefügt
+        \n\n
         &lt;b&gt;3.2.0&lt;/b&gt; - Dropbox auf API v2 aktualisiert.  Löse eine
         Synchronisationskonflikt aus, wenn eine bereits vorhandene Datei
         hinzugefügt wird.
