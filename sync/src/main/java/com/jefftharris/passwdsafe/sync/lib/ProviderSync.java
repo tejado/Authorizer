@@ -8,21 +8,20 @@
 package com.jefftharris.passwdsafe.sync.lib;
 
 import android.accounts.Account;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
-import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.sync.R;
-import com.jefftharris.passwdsafe.sync.SyncLogsActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Encapsulation of a sync operation for a provider
@@ -35,6 +34,7 @@ public class ProviderSync
     private final DbProvider itsProvider;
     private final Provider itsProviderImpl;
     private final Context itsContext;
+    private final String itsNotifTag;
 
 
     /**
@@ -49,6 +49,7 @@ public class ProviderSync
         itsProvider = provider;
         itsProviderImpl = providerImpl;
         itsContext = ctx;
+        itsNotifTag = Long.toString(itsProvider.itsId);
     }
 
     /**
@@ -83,6 +84,7 @@ public class ProviderSync
                                itsAccount.name, itsAccount.type, manual);
         String displayName = TextUtils.isEmpty(itsProvider.itsDisplayName) ?
                              itsProvider.itsAcct : itsProvider.itsDisplayName;
+        showProgressNotif();
         return new SyncLogRecord(
                 displayName,
                 ((itsProvider.itsType != null) ?
@@ -147,7 +149,7 @@ public class ProviderSync
             SyncDb.deleteSyncLogs(
                     System.currentTimeMillis() - 2 * DateUtils.WEEK_IN_MILLIS,
                     db);
-            SyncDb.addSyncLog(logrec, db);
+            SyncDb.addSyncLog(logrec, db, itsContext);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.e(TAG, "Sync write log error", e);
@@ -155,23 +157,91 @@ public class ProviderSync
             db.endTransaction();
         }
 
-        if (!logrec.getConflictFiles().isEmpty()) {
-            NotificationManager notifMgr = (NotificationManager)
-                    itsContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotifUtils.cancelNotif(NotifUtils.Type.SYNC_PROGRESS,
+                               itsNotifTag, itsContext);
+        showResultNotifs(logrec);
+    }
 
-            PendingIntent logsIntent = PendingIntent.getActivity(
-                    itsContext, 0,
-                    new Intent(itsContext, SyncLogsActivity.class),
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+    /**
+     * Show the sync progress notification
+     */
+    private void showProgressNotif()
+    {
+        String title = NotifUtils.getTitle(NotifUtils.Type.SYNC_PROGRESS,
+                                           itsContext);
+        String content = itsProvider.getTypeAndDisplayName(itsContext);
 
-            String title =
-                    itsContext.getString(R.string.passwdsafe_sync_conflict);
-            GuiUtils.showNotification(
-                    notifMgr, itsContext, R.drawable.ic_stat_app,
-                    title, title, R.mipmap.ic_launcher_sync,
-                    itsProvider.getTypeAndDisplayName(itsContext),
-                    logrec.getConflictFiles(), logsIntent,
-                    (int)itsProvider.itsId, true);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(itsContext)
+                        .setContentTitle(title)
+                        .setContentText(content)
+                        .setTicker(title)
+                        .setAutoCancel(true)
+                        .setProgress(100, 0, true)
+                        .setCategory(NotificationCompat.CATEGORY_PROGRESS);
+        NotifUtils.showNotif(builder, NotifUtils.Type.SYNC_PROGRESS,
+                             itsNotifTag, itsContext);
+    }
+
+    /**
+     * Show any sync result notifications
+     */
+    private void showResultNotifs(SyncLogRecord logrec)
+    {
+        List<String> results = new ArrayList<>();
+        boolean success = true;
+        for (Exception failure: logrec.getFailures()) {
+            results.add(itsContext.getString(R.string.error_fmt,
+                                             failure.getLocalizedMessage()));
+            success = false;
         }
+        results.addAll(logrec.getEntries());
+        if (!results.isEmpty()) {
+            showResultNotif(NotifUtils.Type.SYNC_RESULTS, success, results);
+        }
+
+        results = logrec.getConflictFiles();
+        if (!results.isEmpty()) {
+            showResultNotif(NotifUtils.Type.SYNC_CONFLICT, false, results);
+        }
+    }
+
+    /**
+     * Show a sync result notification
+     */
+    private void showResultNotif(NotifUtils.Type type,
+                                 boolean success,
+                                 List<String> results)
+    {
+        String title = NotifUtils.getTitle(type, itsContext);
+        String content = itsProvider.getTypeAndDisplayName(itsContext);
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(itsContext)
+                        .setContentTitle(title)
+                        .setContentText(content)
+                        .setTicker(title)
+                        .setAutoCancel(true);
+        if (success) {
+            builder.setCategory(NotificationCompat.CATEGORY_STATUS);
+        } else {
+            builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+            builder.setCategory(NotificationCompat.CATEGORY_ERROR);
+        }
+
+        NotificationCompat.InboxStyle style =
+                new NotificationCompat.InboxStyle(builder)
+                        .setBigContentTitle(title)
+                        .setSummaryText(content);
+        int numLines = Math.min(results.size(), 5);
+        for (int i = 0; i < numLines; ++i) {
+            style.addLine(results.get(i));
+        }
+        if (numLines < results.size()) {
+            style.addLine("…");
+            builder.setNumber(results.size());
+        }
+
+        NotifUtils.showNotif(builder, type, itsNotifTag, itsContext);
     }
 }

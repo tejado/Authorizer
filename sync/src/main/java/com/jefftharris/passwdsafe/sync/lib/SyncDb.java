@@ -132,6 +132,8 @@ public class SyncDb
     /** Acquire a lock on the database */
     private void doAcquire()
     {
+        // TODO: need Mutex?
+        // perhaps use a txn everywhere instead?
         itsMutex.lock();
     }
 
@@ -446,14 +448,15 @@ public class SyncDb
 
 
     /** Add a sync log */
-    public static void addSyncLog(SyncLogRecord logrec, SQLiteDatabase db)
+    public static void addSyncLog(SyncLogRecord logrec, SQLiteDatabase db,
+                                  Context ctx)
         throws SQLException
     {
         ContentValues values = new ContentValues();
         values.put(DB_COL_SYNC_LOGS_ACCT, logrec.getAccount());
         values.put(DB_COL_SYNC_LOGS_START, logrec.getStartTime());
         values.put(DB_COL_SYNC_LOGS_END, logrec.getEndTime());
-        values.put(DB_COL_SYNC_LOGS_LOG, logrec.getActions());
+        values.put(DB_COL_SYNC_LOGS_LOG, logrec.getActions(ctx));
         values.put(DB_COL_SYNC_LOGS_STACK, logrec.getStacktrace());
 
         int flags = 0;

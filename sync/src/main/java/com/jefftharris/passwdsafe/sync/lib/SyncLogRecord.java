@@ -56,6 +56,12 @@ public class SyncLogRecord
         itsFailures.add(e);
     }
 
+    /** Get the exception failures */
+    public List<Exception> getFailures()
+    {
+        return itsFailures;
+    }
+
     /** Get the end time for a sync */
     public long getEndTime()
     {
@@ -92,6 +98,12 @@ public class SyncLogRecord
         itsEntries.add(entry);
     }
 
+    /** Get the sync operation entries */
+    public List<String> getEntries()
+    {
+        return itsEntries;
+    }
+
     /** Add a conflict file */
     public void addConflictFile(String filename)
     {
@@ -105,7 +117,7 @@ public class SyncLogRecord
     }
 
     /** Get a string representation of the actions in the record */
-    public String getActions()
+    public String getActions(Context ctx)
     {
         StringBuilder actions = new StringBuilder();
         for (String entry: itsEntries) {
@@ -118,7 +130,7 @@ public class SyncLogRecord
             if (actions.length() != 0) {
                 actions.append("\n");
             }
-            actions.append("FAILURE: ").append(e.toString());
+            actions.append(ctx.getString(R.string.error_fmt, e.toString()));
         }
         return actions.toString();
     }
@@ -156,6 +168,6 @@ public class SyncLogRecord
                                       R.string.network_connected),
                 itsStartTime, itsEndTime) +
                "\n" +
-               getActions();
+               getActions(ctx);
     }
 }
