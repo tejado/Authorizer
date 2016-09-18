@@ -25,7 +25,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -267,13 +266,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate(R.menu.activity_main, menu);
-
-        for (int id:
-                new int[] {R.id.menu_add, R.id.menu_about, R.id.menu_logs}) {
-            MenuItem item = menu.findItem(id);
-            MenuItemCompat.setShowAsAction(
-                    item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        }
         return true;
     }
 
@@ -304,6 +296,12 @@ public class MainActivity extends AppCompatActivity
         case R.id.menu_logs: {
             Intent intent = new Intent();
             intent.setClass(this, SyncLogsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        case R.id.menu_preferences: {
+            Intent intent = new Intent();
+            intent.setClass(this, PreferencesActivity.class);
             startActivity(intent);
             return true;
         }

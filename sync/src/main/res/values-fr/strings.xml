@@ -46,6 +46,7 @@
         l\'application ownCloud premier. Ensuite, il peut être sélectionné 
         pour PasswdSafe Sync.
     </string>
+    <string name="notifications">Notifications</string>
     <string name="onedrive_acct_unlinked">App dissociée de compte OneDrive. Synchronisez à nouveau pour permettre l\'accès OneDrive pour PasswdSafe Sync.</string>
     <string name="onedrive_synced_files">OneDrive Fichiers Synchronisé</string>
     <string name="open_app_reauthorize">Ouvrir l\'application d\'autoriser à nouveau</string>
@@ -62,6 +63,7 @@
     <string name="remove_account">Supprimer un compte?</string>
     <string name="removing_account">Retrait de compte&#8230;</string>
     <string name="show_all">Afficher Tout</string>
+    <string name="show_sync_notifications">Afficher les notifications de synchronisation</string>
     <string name="sync">Synchroniser</string>
     <string name="sync_conflict">Conflit de synchronisation</string>
     <string name="sync_conflict_log">Conflit de synchronisation avec le fichier %1$s qui a été %2$s sur place et %3$s à distance</string>
