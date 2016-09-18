@@ -14,7 +14,7 @@
         <!--suppress AndroidElementNotAllowed -->
         <com.jefftharris.passwdsafe.lib.view.LongSwitchPreference
             android:defaultValue="true"
-            android:key="showSyncNotifsPref"
+            android:key="notifShowSyncPref"
             android:title="@string/show_sync_notifications"/>
 
     </PreferenceCategory>
