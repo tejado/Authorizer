@@ -23,6 +23,7 @@ import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.sync.R;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -30,6 +31,9 @@ import java.util.List;
  */
 public class ProviderSync
 {
+    private static final HashSet<String> itsLastProviderFailures =
+            new HashSet<>();
+
     private static final String TAG = "ProviderSync";
 
     private final Account itsAccount;
@@ -205,11 +209,25 @@ public class ProviderSync
                                              failure.getLocalizedMessage()));
             success = false;
         }
+
+        boolean lastFailure;
+        synchronized (itsLastProviderFailures) {
+            lastFailure = itsLastProviderFailures.contains(itsNotifTag);
+            if (lastFailure && success) {
+                itsLastProviderFailures.remove(itsNotifTag);
+            } else if (!lastFailure && !success) {
+                itsLastProviderFailures.add(itsNotifTag);
+            }
+        }
+
         if (itsIsShowNotifs) {
             results.addAll(logrec.getEntries());
         }
         if (!results.isEmpty()) {
             showResultNotif(NotifUtils.Type.SYNC_RESULTS, success, results);
+        } else if (lastFailure && success) {
+            NotifUtils.cancelNotif(NotifUtils.Type.SYNC_RESULTS, itsNotifTag,
+                                   itsContext);
         }
 
         List<String> conflicts = logrec.getConflictFiles();
