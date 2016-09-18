@@ -77,8 +77,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     debugCompile project(path: ':lib', configuration: 'debug')
     releaseCompile project(path: ':lib', configuration: 'release')
-    compile 'com.android.support:preference-v7:24.2.0'
-    compile 'com.android.support:preference-v14:24.2.0'
 
     androidTestCompile 'com.android.support:support-annotations:24.2.0'
     androidTestCompile 'com.android.support.test:runner:0.5'

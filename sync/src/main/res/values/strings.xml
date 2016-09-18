@@ -44,6 +44,7 @@
         No ownCloud accounts available.  Add an account in the ownCloud app
         first.  Then, it can be selected for PasswdSafe Sync.
     </string>
+    <string name="notifications">Notifications</string>
     <string name="onedrive_acct_unlinked">App unlinked from OneDrive account.  Sync again to allow OneDrive access for PasswdSafe Sync.</string>
     <string name="onedrive_synced_files">OneDrive Synced Files</string>
     <string name="open_app_reauthorize">Open app to reauthorize</string>
@@ -59,6 +60,7 @@
     <string name="remove_account">Remove account?</string>
     <string name="removing_account">Removing account&#8230;</string>
     <string name="show_all">Show All</string>
+    <string name="show_sync_notifications">Show Sync Notifications</string>
     <string name="sync">Sync</string>
     <string name="sync_conflict">Sync conflict</string>
     <string name="sync_conflict_log">Sync conflict with file %1$s which was locally %2$s and remotely %3$s</string>

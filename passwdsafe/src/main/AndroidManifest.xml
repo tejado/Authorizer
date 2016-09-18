@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <manifest package="com.jefftharris.passwdsafe"
           xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
@@ -19,9 +26,6 @@
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="false"/>
-
-    <uses-sdk xmlns:tools="http://schemas.android.com/tools"
-              tools:overrideLibrary="android.support.v14.preference" />
 
     <application
         android:name=".PasswdSafeApp"

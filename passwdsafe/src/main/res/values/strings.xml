@@ -257,7 +257,6 @@
     <string name="policy_yes_sym_easy" tools:ignore="PluralsCandidate">Yes - At least %1$d from easy symbols: %2$s</string>
     <string name="policy_yes_sym_policy" tools:ignore="PluralsCandidate">Yes - At least %1$d from policy symbols: %2$s</string>
     <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Yes - Symbols: %2$s</string>
-    <string name="preferences">Preferences</string>
     <string name="press_again_close_warning">Press again to close the file</string>
     <string name="press_password_warning">Press Password again to paste into visible field</string>
     <string name="press_yubikey">Press YubiKey</string>

@@ -1,9 +1,20 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity">
 
     <item android:id="@+id/menu_add"
           android:icon="@drawable/ic_action_add"
           android:orderInCategory="100"
-          android:title="@string/add_account">
+          android:title="@string/add_account"
+          app:showAsAction="ifRoom">
         <menu>
             <item android:id="@+id/menu_add_box"
                   android:icon="@drawable/box"
@@ -27,16 +38,22 @@
         </menu>
     </item>
 
-    <item
-        android:id="@+id/menu_logs"
-        android:icon="@drawable/ic_action_history"
-        android:orderInCategory="100"
-        android:title="@string/logs"/>
+    <item android:id="@+id/menu_logs"
+          android:icon="@drawable/ic_action_history"
+          android:orderInCategory="100"
+          android:title="@string/logs"
+          app:showAsAction="ifRoom"/>
 
-    <item
-        android:id="@+id/menu_about"
-        android:icon="@drawable/ic_action_info"
-        android:orderInCategory="100"
-        android:title="@string/about"/>
+    <item android:id="@+id/menu_preferences"
+          android:icon="@drawable/ic_action_settings_light"
+          android:orderInCategory="100"
+          android:title="@string/preferences"
+          app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menu_about"
+          android:icon="@drawable/ic_action_info"
+          android:orderInCategory="100"
+          android:title="@string/about"
+          app:showAsAction="ifRoom"/>
 
 </menu>
