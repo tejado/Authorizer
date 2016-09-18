@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe.sync.lib;
 
 import android.accounts.Account;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -36,6 +37,7 @@ public class ProviderSync
     private final Provider itsProviderImpl;
     private final Context itsContext;
     private final String itsNotifTag;
+    private final boolean itsIsShowNotifs;
 
 
     /**
@@ -51,6 +53,9 @@ public class ProviderSync
         itsProviderImpl = providerImpl;
         itsContext = ctx;
         itsNotifTag = Long.toString(itsProvider.itsId);
+
+        SharedPreferences prefs = Preferences.getSharedPrefs(itsContext);
+        itsIsShowNotifs = Preferences.getNotifShowSyncPref(prefs);
     }
 
     /**
@@ -85,7 +90,9 @@ public class ProviderSync
                                itsAccount.name, itsAccount.type, manual);
         String displayName = TextUtils.isEmpty(itsProvider.itsDisplayName) ?
                              itsProvider.itsAcct : itsProvider.itsDisplayName;
-        showProgressNotif();
+        if (itsIsShowNotifs) {
+            showProgressNotif();
+        }
         return new SyncLogRecord(
                 displayName,
                 ((itsProvider.itsType != null) ?
@@ -158,8 +165,10 @@ public class ProviderSync
             db.endTransaction();
         }
 
-        NotifUtils.cancelNotif(NotifUtils.Type.SYNC_PROGRESS,
-                               itsNotifTag, itsContext);
+        if (itsIsShowNotifs) {
+            NotifUtils.cancelNotif(NotifUtils.Type.SYNC_PROGRESS,
+                                   itsNotifTag, itsContext);
+        }
         showResultNotifs(logrec);
     }
 
@@ -196,14 +205,16 @@ public class ProviderSync
                                              failure.getLocalizedMessage()));
             success = false;
         }
-        results.addAll(logrec.getEntries());
+        if (itsIsShowNotifs) {
+            results.addAll(logrec.getEntries());
+        }
         if (!results.isEmpty()) {
             showResultNotif(NotifUtils.Type.SYNC_RESULTS, success, results);
         }
 
-        results = logrec.getConflictFiles();
-        if (!results.isEmpty()) {
-            showResultNotif(NotifUtils.Type.SYNC_CONFLICT, false, results);
+        List<String> conflicts = logrec.getConflictFiles();
+        if (!conflicts.isEmpty()) {
+            showResultNotif(NotifUtils.Type.SYNC_CONFLICT, false, conflicts);
         }
     }
 
