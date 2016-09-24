@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity
     private boolean itsDropboxPendingAcctLink = false;
     private Uri itsBoxUri = null;
     private Uri itsOnedriveUri = null;
-    private boolean itsOnedrivePendingAcctLink = false;
     private Uri itsOwncloudUri = null;
     private int itsOwncloudSyncFreq = 0;
 
@@ -203,10 +202,6 @@ public class MainActivity extends AppCompatActivity
             itsDropboxPendingAcctLink = false;
             itsNewAccountTask = getDbxProvider().finishAccountLink(
                     Activity.RESULT_OK, null, itsDropboxUri);
-        } else if (itsOnedrivePendingAcctLink) {
-            itsOnedrivePendingAcctLink = false;
-            itsNewAccountTask = getOnedriveProvider().finishAccountLink(
-                    Activity.RESULT_OK, null, itsOnedriveUri);
         }
 
         if (itsNewAccountTask != null) {
@@ -226,6 +221,11 @@ public class MainActivity extends AppCompatActivity
             itsNewAccountTask =
                     getBoxProvider().finishAccountLink(resultCode, data,
                                                        itsBoxUri);
+            break;
+        }
+        case ONEDRIVE_LINK_RC: {
+            itsNewAccountTask = getOnedriveProvider().finishAccountLink(
+                    resultCode, null, itsOnedriveUri);
             break;
         }
         case OWNCLOUD_LINK_RC: {
@@ -486,7 +486,6 @@ public class MainActivity extends AppCompatActivity
         Provider onedriveProvider = getOnedriveProvider();
         try {
             onedriveProvider.startAccountLink(this, ONEDRIVE_LINK_RC);
-            itsOnedrivePendingAcctLink = true;
         } catch (Exception e) {
             Log.e(TAG, "OneDrive startAccountLink failed", e);
             onedriveProvider.unlinkAccount();

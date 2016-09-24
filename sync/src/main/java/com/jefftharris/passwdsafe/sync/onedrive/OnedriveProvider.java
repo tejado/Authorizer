@@ -71,10 +71,7 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
     public void init()
     {
         super.init();
-        itsAuthClient = new AuthClient(getContext(),
-                                       OneDriveOAuthConfig.getInstance(),
-                                       CLIENT_ID);
-        updateOnedriveAcct(null);
+        createAuthClient();
     }
 
     /**
@@ -89,6 +86,9 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
             @Override
             public void run()
             {
+                if (itsAuthClient.hasPendingLogin()) {
+                    createAuthClient();
+                }
                 itsAuthClient.login(activity, null, new AuthListener()
                 {
                     @Override
@@ -99,19 +99,11 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
                         PasswdSafeUtil.dbginfo(
                                 TAG, "login ok status %s, sess [%s]",
                                 status, session);
+                        boolean success = false;
 
                         switch (status) {
                         case CONNECTED: {
-                            Intent intent = new Intent();
-                            PendingIntent pendIntent =
-                                    activity.createPendingResult(
-                                            requestCode, intent,
-                                            PendingIntent.FLAG_ONE_SHOT);
-                            try {
-                                pendIntent.send(Activity.RESULT_OK);
-                            } catch (PendingIntent.CanceledException e) {
-                                Log.e(TAG, "login intent send failed", e);
-                            }
+                            success = true;
                             break;
                         }
                         case NOT_CONNECTED:
@@ -120,12 +112,33 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
                             break;
                         }
                         }
+                        sendResult(success);
                     }
 
                     @Override
-                    public void onAuthError(AuthException exception, Object userState)
+                    public void onAuthError(AuthException exception,
+                                            Object userState)
                     {
                         Log.e(TAG, "Auth error", exception);
+                        sendResult(false);
+                    }
+
+                    /**
+                     * Send the result of the login
+                     */
+                    private void sendResult(boolean success)
+                    {
+                        Intent intent = new Intent();
+                        PendingIntent pendIntent =
+                                activity.createPendingResult(
+                                        requestCode, intent,
+                                        PendingIntent.FLAG_ONE_SHOT);
+                        try {
+                            pendIntent.send(success ? Activity.RESULT_OK :
+                                            Activity.RESULT_CANCELED);
+                        } catch (PendingIntent.CanceledException e) {
+                            Log.e(TAG, "login intent send failed", e);
+                        }
                     }
                 });
             }
@@ -146,7 +159,7 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
                                             Intent activityData,
                                             Uri providerAcctUri)
     {
-        if (!isAccountAuthorized()) {
+        if ((activityResult != Activity.RESULT_OK) || !isAccountAuthorized()) {
             Log.e(TAG, "finishAccountLink auth failed");
             return null;
         }
@@ -329,6 +342,17 @@ public class OnedriveProvider extends AbstractSyncTimerProvider
          * Callback to use the service
          */
         void useOneDrive(IOneDriveService client) throws Exception;
+    }
+
+    /**
+     * Create an authentication client
+     */
+    private void createAuthClient()
+    {
+        itsAuthClient = new AuthClient(getContext(),
+                                       OneDriveOAuthConfig.getInstance(),
+                                       CLIENT_ID);
+        updateOnedriveAcct(null);
     }
 
     /**
