@@ -13,6 +13,11 @@ def hgId() {
     return 'hg id'.execute().text.trim();
 }
 
+def gitRevision() {
+    def cmd = "git rev-parse --short HEAD"
+    return cmd.execute().text.trim()
+}
+
 def buildTime() {
     def df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss Z");
     return df.format(new Date());
@@ -27,7 +32,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
-        buildConfigField 'String', 'BUILD_ID', "\"${hgId()}\""
+        buildConfigField 'String', 'BUILD_ID', "\"${gitRevision()}\""
         buildConfigField 'String', 'BUILD_DATE', "\"${buildTime()}\""
     }
     compileOptions {
