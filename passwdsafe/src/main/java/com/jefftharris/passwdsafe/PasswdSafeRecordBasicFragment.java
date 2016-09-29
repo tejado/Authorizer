@@ -9,6 +9,7 @@ package com.jefftharris.passwdsafe;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.ContextMenu;
@@ -23,17 +24,24 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Button;
+import android.content.DialogInterface;
 
+import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
 import com.jefftharris.passwdsafe.lib.view.GuiUtils;
 import com.jefftharris.passwdsafe.lib.ObjectHolder;
 import com.jefftharris.passwdsafe.view.CopyField;
 import com.jefftharris.passwdsafe.view.PasswdLocation;
 import com.jefftharris.passwdsafe.lib.view.TypefaceUtils;
 
+import net.tjado.authorizer.OutputInterface;
+import net.tjado.authorizer.OutputKeyboard;
+
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -56,6 +64,7 @@ public class PasswdSafeRecordBasicFragment
     private View itsPasswordRow;
     private TextView itsPassword;
     private SeekBar itsPasswordSeek;
+    private Button itsPasswordSend;
     private View itsUrlRow;
     private TextView itsUrl;
     private View itsEmailRow;
@@ -123,6 +132,21 @@ public class PasswdSafeRecordBasicFragment
                     {
                     }
                 });
+        itsPasswordSend = (Button)root.findViewById(R.id.password_send);
+        itsPasswordSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendPasswordUsb(OutputInterface.Language.de_DE);
+            }
+        });
+        itsPasswordSend.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                sendPasswordUsbCustomLang();
+                return true;
+            }
+        });
         itsUrlRow = root.findViewById(R.id.url_row);
         itsUrl = (TextView)root.findViewById(R.id.url);
         itsEmailRow = root.findViewById(R.id.email_row);
@@ -412,6 +436,67 @@ public class PasswdSafeRecordBasicFragment
         Activity act = getActivity();
         TypefaceUtils.enableMonospace(itsPassword, itsIsPasswordShown, act);
         GuiUtils.invalidateOptionsMenu(act);
+    }
+
+    /**
+     * send password over USB HID
+     */
+    private void sendPasswordUsb(OutputInterface.Language lang) {
+
+        String password = getPassword();
+
+        try {
+            OutputInterface ct = new OutputKeyboard(lang);
+            int ret = ct.sendText(password);
+            if( ret == 1 ) {
+                PasswdSafeUtil.showErrorMsg("Lost characters in output due to missing mapping!", getContext());
+            }
+            ct.destruct();
+
+        } catch (Exception e) {
+            PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
+        }
+
+    }
+
+    /**
+     * send password over USB HID
+     */
+    private void sendPasswordUsb(String usbKbdLang) {
+
+        if( usbKbdLang.equals("null") ) {
+            PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", "Getting systems language default");
+            usbKbdLang = Locale.getDefault().toString();
+        }
+
+        PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", "Identified language: " + usbKbdLang);
+
+        OutputInterface.Language lang;
+        try {
+            lang = OutputInterface.Language.valueOf(usbKbdLang);
+        } catch (IllegalArgumentException e) {
+            PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", "No scancode mapping for '" + usbKbdLang +"' - using en_US!");
+            lang = OutputInterface.Language.en_US;
+        }
+
+        sendPasswordUsb(lang);
+    }
+
+    public void sendPasswordUsbCustomLang() {
+
+        // Build an AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder.setTitle(R.string.title_usbkbd_language)
+               .setItems(R.array.usbkbd_languages_titels, new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int which) {
+                       sendPasswordUsb( getResources().getStringArray(R.array.usbkbd_languages_values)[which] );
+                   }
+               });
+
+        AlertDialog dialog = builder.create();
+        // Display the alert dialog on interface
+        dialog.show();
     }
 
     /**

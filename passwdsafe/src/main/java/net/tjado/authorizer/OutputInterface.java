@@ -1,19 +1,17 @@
-/*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
- * All rights reserved. Use of the code is allowed under the
- * Artistic License 2.0 terms, as specified in the LICENSE file
- * distributed with this code, or available from
- * http://www.opensource.org/licenses/artistic-license-2.0.php
+/**
+ * Authorizer
+ *
+ *  Copyright 2016 by Tjado Mäcke <tjado@maecke.de>
+ *  Licensed under GNU General Public License 3.0.
+ *
+ * @license GPL-3.0 <https://opensource.org/licenses/GPL-3.0>
  */
+
 package net.tjado.authorizer;
 
-/**
- * Created by tm on 21.04.16.
- */
 public interface OutputInterface {
-
-    public enum Language { en_US, de_DE};
+    public enum Language { en_US, de_DE, AppleMac_de_DE};
     public boolean setLanguage(OutputInterface.Language lang);
-    public void sendText(String text) throws Exception;
+    public int sendText(String text) throws Exception;
     public void destruct() throws Exception;
 }

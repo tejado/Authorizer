@@ -89,6 +89,11 @@
                 <SeekBar android:id="@+id/password_seek"
                          android:layout_width="match_parent"
                          android:layout_height="wrap_content"/>
+                <Button
+                    android:text="@string/password_send_usb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/password_send"/>
 
 
             </LinearLayout>

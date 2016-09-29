@@ -540,4 +540,10 @@
         <item>Aussprechbar</item>
         <item>Hexadezimal</item>
     </string-array>
+    <string name="password_send_usb">Passwort über USB senden</string>
+    <string name="usbkbd_language_default">Androids System Standard</string>
+    <string name="usbkbd_language_english">Englisch (US)</string>
+    <string name="usbkbd_language_german">Deutsch</string>
+    <string name="usbkbd_language_german_apple">Deutsch (Apple)</string>
+    <string name="title_usbkbd_language">USB Keyboard Layout</string>
 </resources>
