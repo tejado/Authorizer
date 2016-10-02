@@ -7,7 +7,7 @@ The idea behind Authorizer is, to use old smartphones as a hardware password man
   
 Authorizer is based on [PasswdSafe](https://sourceforge.net/projects/passwdsafe/) a Password Safe port for Android smartphones.  
 
-#### Roadmap
+### Roadmap
 * Bluetooth support
 * NFC support
 * Smartcard emulation (e.g. OpenPGP cards, etc.)
