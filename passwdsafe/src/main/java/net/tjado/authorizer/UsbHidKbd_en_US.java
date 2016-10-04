@@ -1,10 +1,12 @@
-/*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
- * All rights reserved. Use of the code is allowed under the
- * Artistic License 2.0 terms, as specified in the LICENSE file
- * distributed with this code, or available from
- * http://www.opensource.org/licenses/artistic-license-2.0.php
+/**
+ * Authorizer
+ *
+ *  Copyright 2016 by Tjado Mäcke <tjado@maecke.de>
+ *  Licensed under GNU General Public License 3.0.
+ *
+ * @license GPL-3.0 <https://opensource.org/licenses/GPL-3.0>
  */
+
 package net.tjado.authorizer;
 
 
@@ -91,6 +93,8 @@ public class UsbHidKbd_en_US extends UsbHidKbd {
 
         kbdVal.put("return",			new byte[] {0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00} );
         kbdVal.put("enter",				new byte[] {0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00} );
+        kbdVal.put("tab",				new byte[] {0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x00, 0x00} );
+        kbdVal.put("tabulator",				new byte[] {0x00, 0x00, 0x2b, 0x00, 0x00, 0x00, 0x00, 0x00} );
         kbdVal.put("esc",				new byte[] {0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x00, 0x00} );
         kbdVal.put("escape",			new byte[] {0x00, 0x00, 0x29, 0x00, 0x00, 0x00, 0x00, 0x00} );
         kbdVal.put("bckspc",			new byte[] {0x00, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x00, 0x00} );

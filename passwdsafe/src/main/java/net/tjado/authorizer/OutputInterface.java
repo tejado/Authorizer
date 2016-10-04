@@ -13,5 +13,7 @@ public interface OutputInterface {
     public enum Language { en_US, de_DE, AppleMac_de_DE};
     public boolean setLanguage(OutputInterface.Language lang);
     public int sendText(String text) throws Exception;
+    public int sendReturn() throws Exception;
+    public int sendTabulator() throws Exception;
     public void destruct() throws Exception;
 }

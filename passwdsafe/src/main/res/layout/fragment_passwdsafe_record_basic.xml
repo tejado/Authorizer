@@ -89,11 +89,41 @@
                 <SeekBar android:id="@+id/password_seek"
                          android:layout_width="match_parent"
                          android:layout_height="wrap_content"/>
-                <Button
-                    android:text="@string/password_send_usb"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <Button
+                        android:text="@string/username_send_usb"
+                        android:layout_width="191dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/username_send"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button"/>
+                    <Button
+                        android:text="@string/credential_send_usb"
+                        android:layout_width="187dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/credential_send"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button.Colored"/>
+                    <Button
+                        android:text="@string/password_send_usb"
+                        android:layout_width="191dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/password_send"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button"/>
+                </LinearLayout>
+                <CheckBox
+                    android:text="@string/send_return_suffix"
+                    android:layout_width="375dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/password_send"/>
+                    android:id="@+id/send_return_suffix"
+                    android:checked="true"/>
 
 
             </LinearLayout>

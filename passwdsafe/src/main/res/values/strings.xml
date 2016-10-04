@@ -542,7 +542,7 @@
     </string-array>
 
     <!-- added by TM -->
-    <string name="password_send_usb">Send password over USB</string>
+    <string name="password_send_usb">Send Password over USB</string>
 
     <string name="title_usbkbd_language">USB Keyboard Layout</string>
     <string name="usbkbd_language_default">Android Systems Default</string>
@@ -563,4 +563,7 @@
         <item>de_DE</item>
         <item>AppleMac_de_DE</item>
     </string-array>
+    <string name="send_return_suffix">Send \"Return\" key after password</string>
+    <string name="credential_send_usb">Send User name and Password over USB</string>
+    <string name="username_send_usb">Send User name over USB</string>
 </resources>

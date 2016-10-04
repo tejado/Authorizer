@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -64,6 +65,8 @@ public class PasswdSafeRecordBasicFragment
     private View itsPasswordRow;
     private TextView itsPassword;
     private SeekBar itsPasswordSeek;
+    private Button itsUsernameSend;
+    private Button itsCredentialSend;
     private Button itsPasswordSend;
     private View itsUrlRow;
     private TextView itsUrl;
@@ -132,21 +135,58 @@ public class PasswdSafeRecordBasicFragment
                     {
                     }
                 });
+
+        // username send
+        itsUsernameSend = (Button)root.findViewById(R.id.username_send);
+        itsUsernameSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendCredentialUsb(OutputInterface.Language.de_DE, true, false);
+            }
+        });
+        itsUsernameSend.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                sendCredentialUsbCustomLang(true, false);
+                return true;
+            }
+        });
+
+        // credential send
+        itsCredentialSend = (Button)root.findViewById(R.id.credential_send);
+        itsCredentialSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendCredentialUsb(OutputInterface.Language.de_DE, true, true);
+            }
+        });
+        itsCredentialSend.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                sendCredentialUsbCustomLang(true, true);
+                return true;
+            }
+        });
+
+        // password send
         itsPasswordSend = (Button)root.findViewById(R.id.password_send);
         itsPasswordSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendPasswordUsb(OutputInterface.Language.de_DE);
+                sendCredentialUsb(OutputInterface.Language.de_DE, false, true);
             }
         });
         itsPasswordSend.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
 
-                sendPasswordUsbCustomLang();
+                sendCredentialUsbCustomLang(false, true);
                 return true;
             }
         });
+
         itsUrlRow = root.findViewById(R.id.url_row);
         itsUrl = (TextView)root.findViewById(R.id.url);
         itsEmailRow = root.findViewById(R.id.email_row);
@@ -439,18 +479,46 @@ public class PasswdSafeRecordBasicFragment
     }
 
     /**
-     * send password over USB HID
+     * send credential over USB HID
      */
-    private void sendPasswordUsb(OutputInterface.Language lang) {
+    private void sendCredentialUsb(OutputInterface.Language lang,
+                                   Boolean sendUsername, Boolean sendPassword)
+    {
 
+        String username = getUsername();
         String password = getPassword();
+        CheckBox cb_send_return = (CheckBox) getView().findViewById(R.id.send_return_suffix);
 
         try {
             OutputInterface ct = new OutputKeyboard(lang);
-            int ret = ct.sendText(password);
-            if( ret == 1 ) {
-                PasswdSafeUtil.showErrorMsg("Lost characters in output due to missing mapping!", getContext());
+
+            if( sendUsername == true && username != null ) {
+                int ret = ct.sendText(username);
+
+                if (ret == 1) {
+                    PasswdSafeUtil.showErrorMsg(
+                            "Lost characters in output due to missing mapping!",
+                            getContext());
+                }
             }
+
+            if( sendUsername && sendPassword )
+            {
+                ct.sendTabulator();
+            }
+
+            if( sendPassword && password != null ) {
+
+                int ret = ct.sendText(password);
+                if( ret == 1 ) {
+                    PasswdSafeUtil.showErrorMsg("Lost characters in output due to missing mapping!", getContext());
+                }
+
+                if( cb_send_return.isChecked() ) {
+                    ct.sendReturn();
+                }
+            }
+
             ct.destruct();
 
         } catch (Exception e) {
@@ -460,9 +528,10 @@ public class PasswdSafeRecordBasicFragment
     }
 
     /**
-     * send password over USB HID
+     * send credential over USB HID
      */
-    private void sendPasswordUsb(String usbKbdLang) {
+    private void sendCredentialUsb(String usbKbdLang, Boolean sendUsername, Boolean sendPassword)
+    {
 
         if( usbKbdLang.equals("null") ) {
             PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", "Getting systems language default");
@@ -479,10 +548,12 @@ public class PasswdSafeRecordBasicFragment
             lang = OutputInterface.Language.en_US;
         }
 
-        sendPasswordUsb(lang);
+        sendCredentialUsb(lang, sendUsername, sendPassword);
     }
 
-    public void sendPasswordUsbCustomLang() {
+    public void sendCredentialUsbCustomLang(final Boolean sendUsername,
+                                            final Boolean sendPassword)
+    {
 
         // Build an AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -490,7 +561,7 @@ public class PasswdSafeRecordBasicFragment
         builder.setTitle(R.string.title_usbkbd_language)
                .setItems(R.array.usbkbd_languages_titels, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int which) {
-                       sendPasswordUsb( getResources().getStringArray(R.array.usbkbd_languages_values)[which] );
+                       sendCredentialUsb( getResources().getStringArray(R.array.usbkbd_languages_values)[which], sendUsername, sendPassword );
                    }
                });
 
@@ -529,6 +600,23 @@ public class PasswdSafeRecordBasicFragment
     private void copyEmail()
     {
         getListener().copyField(CopyField.EMAIL, getLocation().getRecord());
+    }
+
+    /**
+     * Get the username
+     */
+    private String getUsername()
+    {
+        final ObjectHolder<String> username = new ObjectHolder<>();
+        useRecordInfo(new RecordInfoUser()
+        {
+            @Override
+            public void useRecordInfo(@NonNull RecordInfo info)
+            {
+                username.set(info.itsFileData.getUsername(info.itsRec));
+            }
+        });
+        return username.get();
     }
 
     /**

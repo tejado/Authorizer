@@ -101,6 +101,39 @@ public class OutputKeyboard implements OutputInterface
         return ret;
     }
 
+    public int sendSingleKey(String keyName) throws IOException
+    {
+
+        byte[] scancode;
+        int ret = 0;
+
+        try {
+            scancode = kbdKeyInterpreter.getScancode(keyName);
+            Utilities.dbginfo(TAG, "'" + keyName + "' > " + Utilities
+                    .bytesToHex(scancode) );
+
+            device.write(scancode);
+            clean();
+        }
+        catch (NoSuchElementException e) {
+            Utilities.dbginfo(TAG,  "'" + keyName + "' mapping not found" );
+            ret = 1;
+        }
+
+        return ret;
+    }
+
+    public int sendReturn() throws IOException
+    {
+        return sendSingleKey("return");
+    }
+
+    public int sendTabulator() throws IOException
+    {
+        return sendSingleKey("return");
+    }
+
+
     public void sendScancode(byte[] output) throws FileNotFoundException,
                                                    IOException
     {

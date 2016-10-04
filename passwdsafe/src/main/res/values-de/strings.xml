@@ -546,4 +546,7 @@
     <string name="usbkbd_language_german">Deutsch</string>
     <string name="usbkbd_language_german_apple">Deutsch (Apple)</string>
     <string name="title_usbkbd_language">USB Keyboard Layout</string>
+    <string name="credential_send_usb">User name/Passwort über USB senden</string>
+    <string name="username_send_usb">User name über USB senden</string>
+    <string name="send_return_suffix">\"Enter\"-Taste nach Passwort senden</string>
 </resources>
