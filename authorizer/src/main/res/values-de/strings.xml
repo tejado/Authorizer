@@ -334,6 +334,7 @@
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
     <string name="release_notes">
+        \n
         &lt;b&gt;0.2.3&lt;/b&gt; - Design Anpassungen.
         \n\n
         &lt;b&gt;0.2.0&lt;/b&gt; - Erstes Authorizer Release - eine neue App
@@ -341,7 +342,9 @@
         \n\n
         &lt;b&gt;0.1.0&lt;/b&gt; - Authorizer Proof-of-Concept Version.
         \n\n
-        &lt;b&gt;--------------------------&lt;/b&gt;
+        &lt;b&gt;---------------------------------------------&lt;/b&gt;
+        \n\n
+        &lt;b&gt;Alte PasswdSafe Release Notes:&lt;/b&gt;
         \n\n
         &lt;b&gt;6.4.3&lt;/b&gt; - Fehlerbehebungen.
         \n\n
