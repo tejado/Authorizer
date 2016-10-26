@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:app="http://schemas.android.com/apk/res-auto"
+           xmlns:tools="http://schemas.android.com/tools">
+    <!--
+        Base application themes, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="AppBaseTheme_Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="AppBaseThemeDark" parent="Theme.AppCompat">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <style name="AppBaseThemeDark_Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+
+    <!-- Light application theme -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="cardViewStyle">@style/CardView.Light</item>
+        <item name="navViewStyle">@style/AppTheme_NavView</item>
+        <item name="drawableActionHome">@drawable/ic_action_home_dark</item>
+        <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_dark</item>
+        <item name="drawableActionNewPassword">@drawable/ic_action_new_password</item>
+        <item name="drawableActionVisibility">@drawable/ic_action_visibility</item>
+        <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
+        <item name="drawableFolder">@drawable/ic_folder</item>
+        <item name="drawableFolderUp">@drawable/ic_folder_up</item>
+        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
+        <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
+        <item name="textColorError">@color/textinput_error_color_light</item>
+        <item name="textColorGreen">@color/text_color_green_dark</item>
+    </style>
+
+    <style name="AppTheme_Dialog" parent="AppBaseTheme_Dialog">
+        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="cardViewStyle">@style/CardView.Light</item>
+        <item name="navViewStyle">@style/AppTheme_NavView</item>
+        <item name="drawableActionHome">@drawable/ic_action_home_dark</item>
+        <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_dark</item>
+        <item name="drawableActionNewPassword">@drawable/ic_action_new_password</item>
+        <item name="drawableActionVisibility">@drawable/ic_action_visibility</item>
+        <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
+        <item name="drawableFolder">@drawable/ic_folder</item>
+        <item name="drawableFolderUp">@drawable/ic_folder_up</item>
+        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
+        <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
+        <item name="textColorError">@color/textinput_error_color_light</item>
+        <item name="textColorGreen">@color/text_color_green_dark</item>
+    </style>
+
+    <style name="AppTheme_NavView">
+        <!-- Nothing to override -->
+    </style>
+
+    <!-- Dark application theme -->
+    <style name="AppThemeDark" parent="AppBaseThemeDark">
+        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="cardViewStyle">@style/CardView.Dark</item>
+        <item name="navViewStyle">@style/AppThemeDark_NavView</item>
+        <item name="drawableActionHome">@drawable/ic_action_home_light</item>
+        <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_light</item>
+        <item name="drawableActionNewPassword">@drawable/ic_action_new_password_light</item>
+        <item name="drawableActionVisibility">@drawable/ic_action_visibility_light</item>
+        <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
+        <item name="drawableFolder">@drawable/ic_folder_light</item>
+        <item name="drawableFolderUp">@drawable/ic_folder_up_light</item>
+        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
+        <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
+        <item name="textColorError">@color/textinput_error_color_dark</item>
+        <item name="textColorGreen">@color/text_color_green_light</item>
+    </style>
+
+    <style name="AppThemeDark_Dialog" parent="AppBaseThemeDark_Dialog">
+        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
+        <item name="cardViewStyle">@style/CardView.Dark</item>
+        <item name="navViewStyle">@style/AppThemeDark_NavView</item>
+        <item name="drawableActionHome">@drawable/ic_action_home_light</item>
+        <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_light</item>
+        <item name="drawableActionNewPassword">@drawable/ic_action_new_password_light</item>
+        <item name="drawableActionVisibility">@drawable/ic_action_visibility_light</item>
+        <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
+        <item name="drawableFolder">@drawable/ic_folder_light</item>
+        <item name="drawableFolderUp">@drawable/ic_folder_up_light</item>
+        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
+        <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
+        <item name="textColorError">@color/textinput_error_color_dark</item>
+        <item name="textColorGreen">@color/text_color_green_light</item>
+    </style>
+
+    <style name="AppThemeDark_NavView">
+        <item name="itemTextColor">?android:attr/textColorPrimary</item>
+        <item name="itemIconTint">?android:attr/textColorPrimary</item>
+    </style>
+
+    <!-- Other styles -->
+    <style name="AppTheme.ListSeparatorTextView">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?colorAccent</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <style name="InputMethodText">
+        <!-- Should match the keyboard view's keyTextColor -->
+        <item name="android:textColor">#FFFFFFFF</item>
+    </style>
+
+    <style name="RecordRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="RecordHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">5dp</item>
+    </style>
+
+    <style name="RecordField">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:minHeight">38dp</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+
+    <style name="RecordField.Small">
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+    </style>
+
+    <style name="RecordField.Large">
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+    </style>
+
+    <style name="TableLabelColumn">
+        <item name="android:paddingRight">3dp</item>
+    </style>
+
+    <style name="ListItem">
+        <item name="android:minHeight">?attr/listPreferredItemHeight</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+
+    <style name="ListItemText">
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+    </style>
+
+    <style name="ListItemSeconday" parent="TextAppearance.AppCompat.Body1"/>
+
+
+    <style name="TreeNodeStyleCustom">
+        <item name="android:paddingLeft">20dp</item>
+        <!--<item name="android:showDividers">middle</item>-->
+        <!--<item name="android:divider">@android:drawable/divider_horizontal_bright</item>-->
+    </style>
+
+    <style name="TreeNodeStyleDivided">
+        <item name="android:showDividers">middle</item>
+        <item name="android:divider">@android:drawable/divider_horizontal_bright</item>
+    </style>
+
+</resources>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/keyboard_background"
+              android:orientation="vertical"
+              android:paddingBottom="@dimen/keyboard_vertical_margin"
+              android:paddingLeft="@dimen/keyboard_horizontal_margin"
+              android:paddingRight="@dimen/keyboard_horizontal_margin"
+              android:paddingTop="@dimen/keyboard_vertical_margin"
+              tools:ignore="Overdraw">
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/keyboard_header_margin"
+                    android:paddingRight="@dimen/keyboard_header_margin">
+
+        <TextView android:id="@+id/record"
+                  style="@style/InputMethodText"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentEnd="true"
+                  android:layout_alignParentLeft="true"
+                  android:layout_alignParentRight="true"
+                  android:layout_alignParentStart="true"
+                  android:layout_alignParentTop="true"
+                  android:drawableLeft="@drawable/ic_passwdsafe_light"
+                  android:drawablePadding="6dp"
+                  android:drawableStart="@drawable/ic_passwdsafe_light"
+                  android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <TextView android:id="@+id/password_warning"
+                  style="@style/InputMethodText"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentLeft="true"
+                  android:layout_alignParentStart="true"
+                  android:layout_below="@+id/record"
+                  android:contentDescription="?android:attr/textAppearance"
+                  android:text="@string/press_password_warning"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:textStyle="bold"
+                  android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <net.tjado.passwdsafe.PasswdSafeIMEKeyboardView
+        android:id="@+id/keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:keyBackground="@drawable/btn_keyboard_key_ics"/>
+
+</LinearLayout>

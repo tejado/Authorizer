@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The attributes in this XML file provide configuration information -->
+<!-- for the Search Manager. -->
+
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:icon="@mipmap/ic_launcher"
+              android:supportsSwitchingToNextInputMethod="true"
+              tools:ignore="UnusedAttribute"/>

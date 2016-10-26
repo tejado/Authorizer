@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context="net.tjado.passwdsafe.FileListFragment">
+
+    <TextView android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/select_file_label"
+              android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+    <RelativeLayout android:id="@+id/current_group_panel"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:longClickable="true">
+
+        <ImageButton android:id="@+id/home"
+                     style="@style/Widget.AppCompat.ActionButton"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_alignParentEnd="true"
+                     android:layout_alignParentRight="true"
+                     android:layout_centerVertical="true"
+                     android:contentDescription="@string/home"
+                     android:longClickable="true"
+                     android:minHeight="48dp"
+                     android:minWidth="48dp"
+                     android:scaleType="center"
+                     android:src="?attr/drawableActionHome"/>
+
+        <TextView android:id="@+id/current_group_label"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentLeft="true"
+                  android:layout_alignParentStart="true"
+                  android:layout_centerVertical="true"
+                  android:layout_toLeftOf="@id/home"
+                  android:layout_toStartOf="@id/home"
+                  android:drawableLeft="?attr/drawableFolderUp"
+                  android:drawablePadding="8dp"
+                  android:drawableStart="?attr/drawableFolderUp"
+                  android:gravity="center_vertical"
+                  android:text="@string/group"/>
+
+    </RelativeLayout>
+
+    <View style="@style/Separator.Accent"
+          android:layout_marginBottom="8dp"
+          android:layout_marginTop="8dp"/>
+
+    <ListView android:id="@android:id/list"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:layout_weight="1"
+              android:drawSelectorOnTop="false"
+              android:fastScrollEnabled="true"/>
+
+    <TextView android:id="@android:id/empty"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:layout_weight="1"
+              android:text="@string/no_files"
+              android:textSize="16sp"
+              android:textStyle="bold"/>
+
+</LinearLayout>

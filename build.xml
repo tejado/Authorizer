@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="PasswdSafe" basedir=".">
+<project name="Authorizer" basedir=".">
     <target name="hg-push">
         <do-hg-push dest="default"/>
         <do-hg-push dest="win"/>

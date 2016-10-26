@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/PasswdSafe.iml" filepath="$PROJECT_DIR$/PasswdSafe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Authorizer.iml" filepath="$PROJECT_DIR$/Authorizer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/authorizer/authorizer.iml" filepath="$PROJECT_DIR$/authorizer/authorizer.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/passwdsafe/passwdsafe.iml" filepath="$PROJECT_DIR$/passwdsafe/passwdsafe.iml" />
     </modules>
   </component>
 </project>

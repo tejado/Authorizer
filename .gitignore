@@ -37,3 +37,8 @@ captures/
 
 # Keystore files
 *.jks
+
+# other files
+*.so
+*.o
+*.o.d

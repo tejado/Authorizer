@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto"
+                  xmlns:tools="http://schemas.android.com/tools"
+                  android:key="top_prefs">
+
+    <PreferenceCategory android:key="fileOptions"
+                        android:title="@string/files">
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongEditTextPreference
+            android:name="FileDir Pref"
+            android:key="fileDirPref"
+            android:title="@string/directory_for_files"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongPreference
+            android:name="defaultFile Pref"
+            android:key="defFilePref"
+            android:title="@string/default_file_to_open"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongListPreference
+            android:name="fileTimeout Pref"
+            android:key="fileCloseTimeoutPref"
+            android:title="@string/file_close_timeout"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="fileCloseScreenOff Pref"
+            android:defaultValue="false"
+            android:key="fileCloseScreenOffPref"
+            android:title="@string/close_file_screen_off"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongListPreference
+            android:name="fileBackup Pref"
+            android:key="fileBackupPref"
+            android:title="@string/file_backups"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="showBackupFiles Pref"
+            android:defaultValue="false"
+            android:key="showBackupFilesPref"
+            android:title="@string/show_backup_files"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="fileCloseClearClipboard Pref"
+            android:defaultValue="true"
+            android:key="fileCloseClearClipboardPref"
+            android:title="@string/clear_clipboard_on_close"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="fileLegacyFileChooser Pref"
+            android:defaultValue="true"
+            android:key="fileLegacyFileChooserPref"
+            android:summary="@string/legacy_file_chooser_summary"
+            android:title="@string/legacy_file_chooser"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="passwordOptions"
+                        android:title="@string/passwords">
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongListPreference
+            android:name="passwordEncoding Pref"
+            android:key="passwordEncodingPref"
+            android:title="@string/file_password_encoding"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongListPreference
+            android:name="passwordExpiryNotify Pref"
+            android:key="passwordExpiryNotifyPref"
+            android:title="@string/expired_password_notification"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongEditTextPreference
+            android:key="passwordDefaultSymbolsPref"
+            android:title="@string/default_symbols"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongPreference
+            android:key="passwordClearAllNotifsPref"
+            android:summary="@string/erase_all_expiration_notifications"
+            android:title="@string/clear_password_notifications"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongPreference
+            android:key="passwordClearAllSavedPref"
+            android:summary="@string/erase_all_saved_passwords"
+            android:title="@string/clear_all_saved_passwords"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="recordOptions"
+                        android:title="@string/records">
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="sortCaseSensitive Pref"
+            android:defaultValue="true"
+            android:key="sortCaseSensitivePref"
+            android:title="@string/case_sensitive_sorting"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="groupRecords Pref"
+            android:defaultValue="true"
+            android:key="groupRecordsPref"
+            android:title="@string/group_records"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongListPreference
+            android:name="recordSortOrder Pref"
+            android:key="recordSortOrderPref"
+            android:title="@string/record_sort_order"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="searchOptions"
+                        android:title="@string/search">
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="searchCaseSensitive Pref"
+            android:defaultValue="false"
+            android:key="searchCaseSensitivePref"
+            android:title="@string/case_sensitive"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="searchRegex Pref"
+            android:defaultValue="false"
+            android:key="searchRegexPref"
+            android:summary="@string/regular_expression_summary"
+            android:title="@string/regular_expression"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="displayOptions"
+                        android:title="@string/display">
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="displayTheme Pref"
+            android:defaultValue="true"
+            android:key="displayThemeLightPref"
+            android:title="@string/use_light_theme"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="displayList Pref"
+            android:defaultValue="false"
+            android:key="displayListTreeViewPref"
+            android:title="@string/use_treeview_list"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <ImageView android:id="@+id/icon"
+               android:layout_width="72dp"
+               android:layout_height="72dp"
+               android:layout_alignParentLeft="true"
+               android:layout_alignParentStart="true"
+               android:layout_alignParentTop="true"
+               android:layout_marginBottom="8dp"
+               android:layout_marginLeft="16dp"
+               android:layout_marginStart="16dp"
+               android:layout_marginTop="16dp"
+               android:contentDescription="@string/app_name"
+               android:scaleType="fitCenter"
+               android:src="@mipmap/ic_launcher"/>
+
+    <TextView android:id="@+id/file_name"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignParentEnd="true"
+              android:layout_alignParentLeft="true"
+              android:layout_alignParentRight="true"
+              android:layout_alignParentStart="true"
+              android:layout_below="@+id/icon"
+              android:layout_marginBottom="8dp"
+              android:layout_marginLeft="16dp"
+              android:layout_marginRight="16dp"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:textColor="?android:colorForeground"
+              android:textSize="14sp"
+              android:textStyle="bold"/>
+
+    <View style="@style/Separator.Accent"
+          android:layout_alignParentEnd="true"
+          android:layout_alignParentLeft="true"
+          android:layout_alignParentRight="true"
+          android:layout_alignParentStart="true"
+          android:layout_below="@+id/file_name"
+          android:layout_marginBottom="8dp"
+          android:layout_marginLeft="16dp"
+          android:layout_marginRight="16dp"/>
+
+</RelativeLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.tjado.passwdsafe.net.tjado.passwdsafe.PasswdSafeOpenFileFragment">
+
+    <group android:id="@+id/menu_group_slots"
+           android:checkableBehavior="single">
+        <item android:id="@+id/menu_slot_1"
+              android:title="@string/yubikey_slot_1"/>
+
+        <item android:id="@+id/menu_slot_2"
+              android:title="@string/yubikey_slot_2"/>
+    </group>
+
+    <item android:id="@+id/menu_file_open_help"
+          android:title="@string/help"
+          android:icon="@drawable/ic_action_help"
+          app:showAsAction="ifRoom"/>
+
+</menu>

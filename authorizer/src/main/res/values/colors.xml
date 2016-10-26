@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="text_lgray">#808080</color>
+    <color name="text_gray">#323232</color>
+    <color name="treeview_icons">#259AC0</color>
+
+    <color name="primary">#259AC0</color>
+    <color name="background_light">#FAFAFA</color>
+    <color name="background_dark">#212121</color>
+</resources>
