@@ -2,7 +2,11 @@
 A Password Manager for Android with USB Keyboard emulation.  
   
 The idea behind Authorizer is, to use old smartphones as a hardware password manager only. To avoid manual typing of long and complex passwords everytime you need them, Authorizer pretends to be an USB keyboard (e.g. over an USB On-The-Go adapter). With a button press inside the App, it will automatically enters the password for you on your pc, laptop, tablet or main smartphone.  
-  
+
+Currently available on the Play store.
+
+<a href="https://play.google.com/store/apps/details?id=net.tjado.passwdsafe"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height=36px /></a>
+
 #### Video Demo:
 [![Alt text](https://img.youtube.com/vi/KL2qjMogQMY/0.jpg)](https://www.youtube.com/watch?v=KL2qjMogQMY)
   
