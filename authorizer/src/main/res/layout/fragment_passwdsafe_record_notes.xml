@@ -9,7 +9,7 @@
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="com.tjado.passwdsafe.net.tjado.passwdsafe.PasswdSafeRecordNotesFragment">
+            tools:context="net.tjado.passwdsafe.PasswdSafeRecordNotesFragment">
 
     <TextView android:id="@+id/notes"
               android:layout_width="fill_parent"

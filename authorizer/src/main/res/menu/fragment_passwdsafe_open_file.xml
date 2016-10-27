@@ -9,7 +9,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.tjado.passwdsafe.net.tjado.passwdsafe.PasswdSafeOpenFileFragment">
+      tools:context="net.tjado.passwdsafe.PasswdSafeOpenFileFragment">
 
     <group android:id="@+id/menu_group_slots"
            android:checkableBehavior="single">
