@@ -37,6 +37,7 @@ import net.tjado.passwdsafe.lib.view.TypefaceUtils;
 
 import net.tjado.authorizer.OutputInterface;
 import net.tjado.authorizer.OutputKeyboard;
+import net.tjado.authorizer.OutputKeyboardAsRoot;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -490,7 +491,7 @@ public class PasswdSafeRecordBasicFragment
         CheckBox cb_send_return = (CheckBox) getView().findViewById(R.id.send_return_suffix);
 
         try {
-            OutputInterface ct = new OutputKeyboard(lang);
+            OutputInterface ct = new OutputKeyboardAsRoot(lang);
 
             if( sendUsername == true && username != null ) {
                 int ret = ct.sendText(username);
