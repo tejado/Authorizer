@@ -120,7 +120,7 @@ public final class GuiUtils
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    
+
     /**
      * Set whether a TextInputLayout is visible
      */

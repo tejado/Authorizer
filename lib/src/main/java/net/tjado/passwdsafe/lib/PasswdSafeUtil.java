@@ -53,6 +53,14 @@ public class PasswdSafeUtil
         return intent;
     }
 
+    /** Create an intent to create a new file */
+    public static Intent createNewFileIntent(Uri dirUri)
+    {
+        Intent intent = new Intent(NEW_INTENT, dirUri);
+        intent.setClassName(PACKAGE, PACKAGE + ".PasswdSafe");
+        return intent;
+    }
+
     /** Start the main activity for a package */
     public static void startMainActivity(String pkgName, Context ctx)
     {

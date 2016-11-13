@@ -105,6 +105,11 @@ public class LauncherFileShortcuts extends AppCompatActivity
     }
 
     @Override
+    public void createNewFile(Uri dirUri)
+    {
+    }
+
+    @Override
     public void showSyncProviderFiles(Uri uri)
     {
         FragmentManager fragMgr = getSupportFragmentManager();

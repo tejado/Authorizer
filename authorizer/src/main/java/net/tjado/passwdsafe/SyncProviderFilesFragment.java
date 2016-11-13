@@ -9,7 +9,6 @@ package net.tjado.passwdsafe;
 
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,6 +46,9 @@ public class SyncProviderFilesFragment extends ListFragment
     {
         /** Open a file */
         void openFile(Uri uri, String fileName);
+
+        /** Create a new file */
+        void createNewFile(Uri dirUri);
 
         /** Update the view for a list of sync files */
         void updateViewSyncFiles();
@@ -269,7 +271,7 @@ public class SyncProviderFilesFragment extends ListFragment
             return true;
         }
         case R.id.menu_file_new: {
-            startActivity(new Intent(PasswdSafeUtil.NEW_INTENT, itsFilesUri));
+            itsListener.createNewFile(itsFilesUri);
             return true;
         }
         default: {

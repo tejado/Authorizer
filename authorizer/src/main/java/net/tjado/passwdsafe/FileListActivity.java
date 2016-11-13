@@ -277,6 +277,12 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
+    public void createNewFile(Uri dirUri)
+    {
+        startActivity(PasswdSafeUtil.createNewFileIntent(dirUri));
+    }
+
+    @Override
     public boolean activityHasMenu()
     {
         return true;
