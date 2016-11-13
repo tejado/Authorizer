@@ -590,7 +590,18 @@ public class PasswdSafeOpenFileFragment
                 }
             }
         }
-        itsYubikeyCb.setChecked(Preferences.getFileOpenYubikeyPref(prefs));
+
+        switch (itsYubiState) {
+            case ENABLED: {
+                itsYubikeyCb.setChecked(Preferences.getFileOpenYubikeyPref(prefs));
+                break;
+            }
+            case DISABLED:
+            case UNAVAILABLE: {
+                itsYubikeyCb.setChecked(false);
+                break;
+            }
+        }
     }
 
     /**
