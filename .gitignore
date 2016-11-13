@@ -44,3 +44,4 @@ captures/
 *.o.d
 .idea/libraries/
 .idea/workspace.xml
+.DS_Store
