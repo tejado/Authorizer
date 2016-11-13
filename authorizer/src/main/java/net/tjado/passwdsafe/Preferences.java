@@ -25,6 +25,8 @@ import net.tjado.passwdsafe.pref.FileTimeoutPref;
 import net.tjado.passwdsafe.pref.PasswdExpiryNotifPref;
 import net.tjado.passwdsafe.pref.RecordSortOrderPref;
 
+import net.tjado.authorizer.OutputInterface;
+
 /**
  * The Preferences class manages preferences for the application
  *
@@ -129,6 +131,12 @@ public class Preferences
     private static final String PREF_GEN_LENGTH_DEF = "8";
     private static final String PREF_DEF_PASSWD_POLICY = "defaultPasswdPolicy";
     private static final String PREF_DEF_PASSWD_POLICY_DEF = "";
+
+    public static final String PREF_USBKBD_ENABLE = "usbkbdEnablePref";
+    private static final boolean PREF_USBKBD_ENABLE_DEF = true;
+
+    public static final String PREF_USBKBD_LANGUAGE = "usbkbdLanguagePref";
+    private static final OutputInterface.Language PREF_USBKBD_LANGUAGE_DEF = OutputInterface.Language.en_US;
 
     private static final String TAG = "Preferences";
 
@@ -444,7 +452,7 @@ public class Preferences
     }
 
     /**
-     * Get whether to use the light theme
+     * Get whether to use the treeview list
      */
     public static boolean getDisplayListTreeView(SharedPreferences prefs)
     {
@@ -469,5 +477,25 @@ public class Preferences
                                               SharedPreferences prefs)
     {
         prefs.edit().putBoolean(PREF_COPY_PASSWORD_CONFIRM, confirm).apply();
+    }
+
+    /**
+     * Get whether to enable USB Keyboard Output
+     */
+    public static boolean getUsbkbdEnabled(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_USBKBD_ENABLE,
+                                PREF_USBKBD_ENABLE_DEF);
+    }
+
+    public static OutputInterface.Language getUsbkbdLanguagePref(SharedPreferences prefs)
+    {
+        try {
+            return OutputInterface.Language.valueOf(
+                    prefs.getString(PREF_USBKBD_LANGUAGE,
+                                    PREF_USBKBD_LANGUAGE_DEF.name()));
+        } catch (IllegalArgumentException e) {
+            return PREF_USBKBD_LANGUAGE_DEF;
+        }
     }
 }

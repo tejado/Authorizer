@@ -166,4 +166,22 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory android:key="usbkbdOutputOptions"
+                        android:title="@string/usbkbd_output">
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="usbkbdEnable Pref"
+            android:defaultValue="true"
+            android:key="usbkbdEnablePref"
+            android:title="@string/usbkbd_enable"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongListPreference
+            android:name="usbkbdLanguage Pref"
+            android:key="usbkbdLanguagePref"
+            android:title="@string/title_usbkbd_language"/>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

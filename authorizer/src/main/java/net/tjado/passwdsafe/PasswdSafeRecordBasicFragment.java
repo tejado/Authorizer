@@ -10,6 +10,7 @@ package net.tjado.passwdsafe;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.ContextMenu;
@@ -187,6 +188,14 @@ public class PasswdSafeRecordBasicFragment
                 return true;
             }
         });
+
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+        if ( Preferences.getUsbkbdEnabled(prefs) != true ) {
+            itsUsernameSend.setVisibility(View.GONE);
+            itsCredentialSend.setVisibility(View.GONE);
+            itsPasswordSend.setVisibility(View.GONE);
+            ((CheckBox) root.findViewById(R.id.send_return_suffix)).setVisibility(View.GONE);
+        }
 
         itsUrlRow = root.findViewById(R.id.url_row);
         itsUrl = (TextView)root.findViewById(R.id.url);

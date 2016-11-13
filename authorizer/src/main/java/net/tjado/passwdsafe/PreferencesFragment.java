@@ -7,6 +7,8 @@
  */
 package net.tjado.passwdsafe;
 
+import java.util.List;
+import java.util.Arrays;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,6 +26,7 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
+import net.tjado.authorizer.OutputInterface;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdPolicy;
 import net.tjado.passwdsafe.lib.ApiCompat;
@@ -71,6 +74,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     private EditTextPreference itsFileDirPref;
     private Preference itsDefFilePref;
     private ListPreference itsFileClosePref;
+    private ListPreference itsUsbkbdLangPref;
     private ListPreference itsFileBackupPref;
     private ListPreference itsPasswdEncPref;
     private ListPreference itsPasswdExpiryNotifPref;
@@ -161,6 +165,12 @@ public class PreferencesFragment extends PreferenceFragmentCompat
                 RecordSortOrderPref.getDisplayNames(res));
         itsRecordSortOrderPref.setEntryValues(RecordSortOrderPref.getValues());
         onSharedPreferenceChanged(prefs, Preferences.PREF_RECORD_SORT_ORDER);
+
+        itsUsbkbdLangPref = (ListPreference)
+                findPreference(Preferences.PREF_USBKBD_LANGUAGE);
+        itsUsbkbdLangPref.setEntries(R.array.usbkbd_languages_titels);
+        itsUsbkbdLangPref.setEntryValues(R.array.usbkbd_languages_values);
+        onSharedPreferenceChanged(prefs, Preferences.PREF_USBKBD_LANGUAGE);
     }
 
     @Override
@@ -254,6 +264,20 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         }
         case Preferences.PREF_DISPLAY_LIST_TREEVIEW: {
             ApiCompat.recreateActivity(getActivity());
+            break;
+        }
+        case Preferences.PREF_USBKBD_ENABLE: {
+            ApiCompat.recreateActivity(getActivity());
+            break;
+        }
+        case Preferences.PREF_USBKBD_LANGUAGE: {
+            OutputInterface.Language pref = Preferences.getUsbkbdLanguagePref(prefs);
+
+            List<String> myOptions = Arrays.asList((getResources().getStringArray(R.array.usbkbd_languages_values)));
+
+            int value = myOptions.indexOf(pref.name());
+
+            itsUsbkbdLangPref.setSummary(getResources().getStringArray(R.array.usbkbd_languages_titels)[value]);
             break;
         }
         }

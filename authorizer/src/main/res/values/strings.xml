@@ -579,6 +579,8 @@
     <string name="credential_send_usb">Send User name and Password over USB</string>
     <string name="username_send_usb">Send User name over USB</string>
     <string name="use_treeview_list">Use tree list</string>
+    <string name="usbkbd_output">USB Keyboard Output</string>
+    <string name="usbkbd_enable">Enable USB Keyboard Output</string>
 
     <string name="ic_access_alarms">&#xe000;</string>
     <string name="ic_access_time">&#xe001;</string>
