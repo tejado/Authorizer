@@ -224,7 +224,7 @@ public class PasswdFileDataView
 
                     records.add(new PasswdRecordListData(
                             entry.getKey(), str, null,
-                            null, itsFolderIcon, false));
+                            null, "", itsFolderIcon, false));
                 }
             }
         }
@@ -514,7 +514,7 @@ public class PasswdFileDataView
         }
 
         return new PasswdRecordListData(title, user, rec.itsUuid, rec.itsMatch,
-                                        itsRecordIcon, true);
+                                        rec.itsIcon, itsRecordIcon, true);
     }
 
 
@@ -598,6 +598,7 @@ public class PasswdFileDataView
         public final String itsUsername;
         public final String itsUuid;
         public final String itsMatch;
+        public final String itsIcon;
 
         public MatchPwsRecord(PwsRecord rec,
                               PasswdFileData fileData,
@@ -607,6 +608,7 @@ public class PasswdFileDataView
             itsUsername = fileData.getUsername(rec);
             itsUuid = fileData.getUUID(rec);
             itsMatch = match;
+            itsIcon = fileData.getIcon(rec);
         }
     }
 

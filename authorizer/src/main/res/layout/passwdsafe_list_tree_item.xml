@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:minHeight="48dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/spacer"
+        android:layout_alignParentLeft="true"
+        android:visibility="invisible"/>
+
+    <com.mikepenz.iconics.view.IconicsTextView
+        android:layout_alignWithParentIfMissing="true"
+        android:id="@+id/arrow_icon"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="10dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/spacer"
+        android:visibility="invisible"
+        android:text="@string/ic_arrow_right"
+        android:textColor="@color/treeview_icons"
+        android:textSize="20dp" />
+
+    <com.mikepenz.iconics.view.IconicsTextView
+        android:layout_marginLeft="10dp"
+        android:layout_alignWithParentIfMissing="true"
+        android:id="@+id/icon"
+        android:layout_toRightOf="@id/arrow_icon"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/treeview_icons"
+        android:textSize="24dp"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"/>
+
+    <com.mikepenz.iconics.view.IconicsTextView
+        android:id="@+id/icon_usbkbd_output"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:textColor="@color/text_lgray"
+        android:textSize="28dp"
+        android:text="@string/ic_keyboard"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/icon"
+        android:layout_toLeftOf="@id/icon_usbkbd_output"
+        android:layout_toEndOf="@id/icon"
+        android:layout_toStartOf="@id/icon_usbkbd_output"
+        android:layout_centerVertical="true">
+
+        <TextView
+            android:textSize="16sp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:id="@+id/item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textSize="9sp"
+            android:textColor="@color/text_lgray"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/group_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

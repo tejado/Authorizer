@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
@@ -32,11 +33,12 @@ import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.view.CopyField;
 import net.tjado.passwdsafe.view.PasswdLocation;
 import net.tjado.passwdsafe.view.PasswdRecordListData;
-import net.tjado.passwdsafe.view.PasswdRecordListHeaderHolder;
 import net.tjado.passwdsafe.view.PasswdRecordListItemHolder;
+
 import com.unnamed.b.atv.model.TreeNode;
 import com.unnamed.b.atv.view.AndroidTreeView;
 
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -74,6 +76,8 @@ public class PasswdSafeListFragmentTree extends ListFragment
 
         /** Update the view for a list of records */
         void updateViewList(PasswdLocation location);
+
+        void sendCredentialOverUsbByRecordLocation(final String recUuid);
     }
 
     private static final String STATE_SELECTED_RECORD = "selectedRecord";
@@ -86,15 +90,28 @@ public class PasswdSafeListFragmentTree extends ListFragment
     private TextView itsEmptyText;
     private ItemListAdapter itsAdapter;
     private String itsSelectedRecord;
-    private AndroidTreeView itsAndroidTreeView;
-    private TreeNode itsTreeNodeRoot;
-    private View itsRoot;
+    private View tvView;
+
+    /* with this, we have our own TreeView state which
+       is faster than the TV internal stateRestore */
+    private HashSet<String> treeViewState;
+
+    private static int[] scrollState;
+
+    private static final String TAG = "AuthorizerFragmentTree";
 
     private static PasswdSafeListFragmentTree instance;
     public static synchronized PasswdSafeListFragmentTree newInstance(
             PasswdLocation location,
-            @SuppressWarnings("SameParameterValue") boolean isContents)
+            @SuppressWarnings("SameParameterValue") boolean isContents,
+            boolean search)
     {
+        if( search ) {
+            PasswdSafeUtil.dbginfo(TAG, "New search list fragment");
+            return PasswdSafeListFragmentTree.newInstance_internal(location, isContents);
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "Standard list fragment (no search)");
         if (PasswdSafeListFragmentTree.instance == null) {
             PasswdSafeListFragmentTree.instance = PasswdSafeListFragmentTree.newInstance_internal(location, isContents);
         }
@@ -140,6 +157,8 @@ public class PasswdSafeListFragmentTree extends ListFragment
             itsSelectedRecord =
                     savedInstanceState.getString(STATE_SELECTED_RECORD);
         }
+
+        treeViewState = new HashSet<>();
     }
 
 
@@ -162,124 +181,82 @@ public class PasswdSafeListFragmentTree extends ListFragment
         View root = inflater.inflate(R.layout.fragment_passwdsafe_list_tree,
                                      container, false);
 
-        itsEmptyText = (TextView)root.findViewById(android.R.id.empty);
+        itsEmptyText = (TextView) root.findViewById(android.R.id.empty);
 
+        final TreeNode itsTreeNodeRoot = TreeNode.root();
+        addGroup(itsTreeNodeRoot, itsRootLocation, 0);
 
-        itsRoot = root;
-        /*
-        List<String> x = itsLocation.getGroups();
-        String y = itsLocation.getRecord();
-
-        PasswdSafeUtil.dbginfo("test", String.valueOf(x.size()));
-        for(String n : x) {
-            PasswdSafeUtil.dbginfo("test", n);
-            TreeNode node = new TreeNode(new PasswdRecordListItemHolder.IconTreeItem(R.string.ic_folder, n)).setViewHolder(new PasswdRecordListHeaderHolder(getActivity()));
-            itsTreeNodeRoot.addChild(node);
-        }
-
-        TreeNode parent = new TreeNode(new PasswdRecordListItemHolder.IconTreeItem(R.string.ic_folder, "Folder with very long name 1")).setViewHolder(new PasswdRecordListHeaderHolder(getActivity()));
-        TreeNode child0 = new TreeNode(new PasswdRecordListItemHolder.IconTreeItem(R.string.ic_folder, "Folder with very long name 2")).setViewHolder(new PasswdRecordListHeaderHolder(getActivity()));
-        TreeNode child1 = new TreeNode(new PasswdRecordListItemHolder.IconTreeItem(R.string.ic_folder, "Folder with very long name 3")).setViewHolder(new PasswdRecordListHeaderHolder(getActivity()));
-        parent.addChildren(child0, child1);
-        itsTreeNodeRoot.addChild(parent);
-
-        TreeNode parent1 = new TreeNode(new PasswdRecordListItemHolder.IconTreeItem(R.string.ic_folder, "Folder with very long name 4")).setViewHolder(new PasswdRecordListHeaderHolder(getActivity()));
-        TreeNode child01 = new TreeNode(new PasswdRecordListItemHolder.IconTreeItem(R.string.ic_folder, "Folder with very long name 5")).setViewHolder(new PasswdRecordListHeaderHolder(getActivity()));
-        TreeNode child11 = new TreeNode(new PasswdRecordListItemHolder.IconTreeItem(R.string.ic_folder, "Folder with very long name 6")).setViewHolder(new PasswdRecordListHeaderHolder(getActivity()));
-        parent1.addChildren(child01, child11);
-        itsTreeNodeRoot.addChild(parent1);*/
-
-
-        itsTreeNodeRoot = TreeNode.root();
-
-        addGroup(itsRootLocation, itsTreeNodeRoot);
-
-        //itsListener.updateViewList(itsRootLocation);
-        //List<PasswdRecordListData> data3 = itsListener.getBackgroundRecordItems(true,true);
-
-        /*
-        if (data3 != null) {
-            for (PasswdRecordListData item : data3) {
-
-                int icon = R.string.ic_drive_file;
-                String title = item.itsTitle;
-                if( ! item.itsIsRecord ) {
-                    icon = R.string.ic_folder;
-
-                    TreeNode node = new TreeNode(
-                            new PasswdRecordListItemHolder.IconTreeItem(
-                                    icon, title))
-                            .setViewHolder(new PasswdRecordListHeaderHolder(
-                                    getActivity()));
-                    itsTreeNodeRoot.addChild(node);
-
-                    PasswdLocation newLoc = itsRootLocation.selectGroup(item.itsTitle);
-                    itsListener.updateViewList(newLoc);
-                    List<PasswdRecordListData> data2 = itsListener.getBackgroundRecordItems(true,true);
-
-                    for (PasswdRecordListData item2 : data2) {
-                        String title2 = item2.itsTitle;
-                        int icon2 = R.string.ic_drive_file;
-                        TreeNode node1 = new TreeNode(
-                                new PasswdRecordListItemHolder.IconTreeItem(
-                                        icon2, title2))
-                                .setViewHolder(new PasswdRecordListHeaderHolder(
-                                        getActivity()));
-                        node.addChild(node1);
-                    }
-                } else {
-
-                    TreeNode node = new TreeNode(
-                            new PasswdRecordListItemHolder.IconTreeItem(
-                                    icon, title))
-                            .setViewHolder(new PasswdRecordListHeaderHolder(
-                                    getActivity()));
-                    itsTreeNodeRoot.addChild(node);
-                }
-            }
-        }*/
-
-
-        itsAndroidTreeView = new AndroidTreeView(getActivity(), itsTreeNodeRoot);
-        itsAndroidTreeView.setDefaultAnimation(true);
-        itsAndroidTreeView.setUse2dScroll(true);
-        itsAndroidTreeView.setDefaultContainerStyle(R.style.TreeNodeStyleCustom);
+        final AndroidTreeView itsAndroidTreeView = new AndroidTreeView(getActivity(), itsTreeNodeRoot);
+        itsAndroidTreeView.setDefaultContainerStyle(R.style.TreeNodeStyleCustom, true);
         itsAndroidTreeView.setDefaultNodeClickListener(nodeClickListener);
 
-        ViewGroup containerView = (ViewGroup) itsRoot.findViewById(R.id.container);
-        containerView.removeAllViews();
-        containerView.addView(itsAndroidTreeView.getView());
+        tvView = itsAndroidTreeView.getView();
+
+        final ViewGroup containerView = (ViewGroup)root.findViewById(R.id.container);
+        //containerView.removeAllViews();
+        containerView.addView( tvView );
+
+        if(scrollState != null)
+            tvView.post(new Runnable() {
+                public void run() {
+                    tvView.scrollTo(scrollState[0], scrollState[1]);
+                }
+            });
 
         return root;
     }
 
-    public void addGroup(PasswdLocation location, TreeNode node) {
+    public int addGroup(TreeNode node, PasswdLocation location, int level) {
+
+        int countEntries = 0;
 
         itsListener.updateViewList(location);
         List<PasswdRecordListData> data = itsListener.getBackgroundRecordItems(true,true);
 
         for (PasswdRecordListData item : data) {
+            int countEntriesSub = 0;
+
             PasswdLocation sublocation;
-            int icon;
+            String icon = item.itsRecordIcon;
             String title = item.itsTitle;
 
             if( item.itsIsRecord ) {
                 sublocation = location.selectRecord(item.itsTitle);
-                icon = R.string.ic_drive_file;
             } else {
                 sublocation = location.selectGroup(item.itsTitle);
-                icon = R.string.ic_folder;
             }
 
-            TreeNode subnode = new TreeNode(
-                    new PasswdRecordListItemHolder.IconTreeItem(icon, title, item.itsUuid, location))
-                    .setViewHolder(new PasswdRecordListHeaderHolder(getActivity()));
+            final String uuid = item.itsUuid;
+            PasswdRecordListItemHolder itemHolder = new PasswdRecordListItemHolder(getActivity());
+            itemHolder.setIcon2ViewOnClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    itsListener.sendCredentialOverUsbByRecordLocation(uuid);
+                    return true;
+                }
+            });
+
+            PasswdRecordListItemHolder.IconTreeItem nodeInfo = new PasswdRecordListItemHolder.IconTreeItem(level, icon, title, item.itsUuid, location);
+            TreeNode subnode = new TreeNode(nodeInfo).setViewHolder(itemHolder);
             node.addChild(subnode);
 
-            if( ! item.itsIsRecord ) {
-                addGroup(sublocation, subnode);
+            if(treeViewState.contains(subnode.getPath())) {
+                PasswdSafeUtil.dbginfo(TAG, "TreeView State: expand " + subnode.getPath());
+                subnode.setExpanded(true);
             }
+
+            if( ! item.itsIsRecord ) {
+                countEntriesSub += addGroup(subnode, sublocation, level + 1);
+            } else {
+                countEntriesSub++;
+            }
+
+            nodeInfo.setGroupCount(countEntriesSub);
+            countEntries += countEntriesSub;
         }
+
+        return countEntries;
     }
 
     private TreeNode.TreeNodeClickListener nodeClickListener = new TreeNode.TreeNodeClickListener() {
@@ -287,16 +264,34 @@ public class PasswdSafeListFragmentTree extends ListFragment
         public void onClick(TreeNode node, Object value) {
             final PasswdRecordListItemHolder.IconTreeItem item = (PasswdRecordListItemHolder.IconTreeItem) value;
 
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    itsListener.changeLocation(item.location.selectRecord(item.uuid));
+            if( node.isLeaf() ) {
+
+                scrollState = new int[]{
+                        tvView.getScrollX(),
+                        tvView.getScrollY()
+                };
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        itsListener.changeLocation(
+                                item.location.selectRecord(item.uuid));
+                    }
+                }, 50);
+            } else {
+                if (treeViewState.contains(node.getPath())) {
+                    PasswdSafeUtil.dbginfo(TAG, "TreeView State: remove expand " + node.getPath());
+                    treeViewState.remove(node.getPath());
+                } else {
+                    PasswdSafeUtil.dbginfo(TAG, "TreeView State: add expand " + node.getPath());
+                    treeViewState.add(node.getPath());
                 }
-            }, 100);
+            }
         }
     };
-
 
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
@@ -332,7 +327,15 @@ public class PasswdSafeListFragmentTree extends ListFragment
     {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_SELECTED_RECORD, itsSelectedRecord);
+
+        if( tvView != null ) {
+            scrollState = new int[]{
+                    tvView.getScrollX(),
+                    tvView.getScrollY()
+            };
+        }
     }
+
 
     @Override
     public void onDetach()
@@ -418,57 +421,6 @@ public class PasswdSafeListFragmentTree extends ListFragment
                 break;
             }
         }
-        */
-    }
-
-
-    /** Update the location shown by the list */
-    public void updateLocationView(PasswdLocation location, Mode mode)
-    {
-        /* dummy */
-
-        //itsLocation = location;
-        //itsMode = mode;
-        //refreshList();
-    }
-
-
-    /** Refresh the list due to file changes */
-    private void refreshList()
-    {
-        if (!isResumed()) {
-            return;
-        }
-
-        LoaderManager lm = getLoaderManager();
-        lm.destroyLoader(0);
-        lm.restartLoader(0, null, this);
-
-        boolean groupVisible = false;
-        switch (itsMode) {
-            case RECORDS:
-            case NONE: {
-                groupVisible = false;
-                break;
-            }
-            case GROUPS:
-            case ALL: {
-                groupVisible = true;
-                break;
-            }
-        }
-
-        /*
-        if (groupVisible) {
-            String groupPath = itsLocation.getGroupPath();
-            if (TextUtils.isEmpty(groupPath)) {
-                groupVisible = false;
-            } else {
-                itsGroupLabel.setText(groupPath);
-            }
-        }
-
-        itsGroupPanel.setVisibility(groupVisible ? View.VISIBLE : View.GONE);
         */
     }
 
@@ -569,87 +521,9 @@ public class PasswdSafeListFragmentTree extends ListFragment
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            ViewHolder itemViews;
-            if (convertView == null) {
-                convertView = itsInflater.inflate(R.layout.passwdsafe_list_item,
-                                                  parent, false);
-                itemViews = new ViewHolder(convertView);
-                convertView.setTag(itemViews);
-            } else {
-                itemViews = (ViewHolder)convertView.getTag();
-            }
-
-            if (position < getCount()) {
-                PasswdRecordListData item = getItem(position);
-                ListView list = (ListView)parent;
-                boolean isSelected = list.isItemChecked(position);
-                itemViews.update(item, isSelected,
-                                 !itsIsContents && item.itsIsRecord);
-            } else {
-                itemViews.reset();
-            }
             return convertView;
         }
 
-        /**
-         * Holder for the views for an item in the list
-         */
-        private static class ViewHolder
-        {
-            private final TextView itsTitle;
-            private final TextView itsUser;
-            private final TextView itsMatch;
-            private final ImageView itsIcon;
-            private final CheckBox itsSelection;
-            private int itsLastIconImage;
-
-            /** Constructor */
-            public ViewHolder(View view)
-            {
-                itsTitle = (TextView)view.findViewById(android.R.id.text1);
-                itsUser = (TextView)view.findViewById(android.R.id.text2);
-                itsMatch = (TextView)view.findViewById(R.id.match);
-                itsIcon = (ImageView)view.findViewById(R.id.icon);
-                itsSelection = (CheckBox)view.findViewById(R.id.selection);
-                itsLastIconImage = -1;
-            }
-
-            /** Update the fields for a list item */
-            public void update(PasswdRecordListData item,
-                               boolean selected,
-                               boolean isLeftListRecord)
-            {
-                setText(itsTitle, item.itsTitle);
-                setText(itsUser, item.itsUser);
-                setText(itsMatch, item.itsMatch);
-                if (itsLastIconImage != item.itsIcon) {
-                    itsIcon.setImageResource(item.itsIcon);
-                    itsLastIconImage = item.itsIcon;
-                }
-                itsSelection.setChecked(selected);
-                GuiUtils.setVisible(itsSelection, isLeftListRecord);
-
-                itsTitle.requestLayout();
-            }
-
-            /** Reset the fields */
-            public void reset()
-            {
-                setText(itsTitle, null);
-                setText(itsUser, null);
-                setText(itsMatch, null);
-                itsIcon.setImageDrawable(null);
-                itsLastIconImage = -1;
-                itsSelection.setChecked(false);
-                itsTitle.requestLayout();
-            }
-
-            /** Set text in a field */
-            private static void setText(TextView tv, String text)
-            {
-                tv.setText((text == null) ? "" : text);
-            }
-        }
     }
 
 

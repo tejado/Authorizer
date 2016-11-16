@@ -465,9 +465,9 @@ public class PasswdSafeListFragment extends ListFragment
                 setText(itsTitle, item.itsTitle);
                 setText(itsUser, item.itsUser);
                 setText(itsMatch, item.itsMatch);
-                if (itsLastIconImage != item.itsIcon) {
-                    itsIcon.setImageResource(item.itsIcon);
-                    itsLastIconImage = item.itsIcon;
+                if (itsLastIconImage != item.itsAppIcon) {
+                    itsIcon.setImageResource(item.itsAppIcon);
+                    itsLastIconImage = item.itsAppIcon;
                 }
                 itsSelection.setChecked(selected);
                 GuiUtils.setVisible(itsSelection, isLeftListRecord);

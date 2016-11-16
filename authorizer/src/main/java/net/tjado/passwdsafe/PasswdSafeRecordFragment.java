@@ -108,6 +108,10 @@ public class PasswdSafeRecordFragment
                     return PasswdSafeRecordNotesFragment.newInstance(
                             getLocation());
                 }
+                case 3: {
+                    return PasswdSafeRecordIconFragment.newInstance(
+                            getLocation());
+                }
                 }
                 return null;
             }
@@ -115,7 +119,7 @@ public class PasswdSafeRecordFragment
             @Override
             public int getCount()
             {
-                return 3;
+                return 4;
             }
 
             @Override
@@ -130,6 +134,9 @@ public class PasswdSafeRecordFragment
                 }
                 case 2: {
                     return getString(R.string.notes);
+                }
+                case 3: {
+                    return "Icon";
                 }
                 }
                 return null;
@@ -249,7 +256,7 @@ public class PasswdSafeRecordFragment
     private void updateNotesTab()
     {
         TabLayout.Tab tab =
-                (itsTabs.getTabCount() >= 3) ? itsTabs.getTabAt(2) : null;
+                (itsTabs.getTabCount() >= 4) ? itsTabs.getTabAt(2) : null;
         if (tab != null) {
             String title = getString(R.string.notes);
             if (itsHasNotes) {

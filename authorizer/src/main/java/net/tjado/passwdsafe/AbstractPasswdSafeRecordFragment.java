@@ -36,6 +36,9 @@ public abstract class AbstractPasswdSafeRecordFragment
 
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
+
+        /** Finish editing a record */
+        void finishEditRecord(boolean save, PasswdLocation newLocation, boolean popBack);
     }
 
     @Override

@@ -33,6 +33,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.tjado.authorizer.OutputInterface;
+import net.tjado.authorizer.OutputKeyboardAsRoot;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.file.PasswdFileUri;
@@ -757,6 +759,37 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
+    public void sendCredentialOverUsbByRecordLocation(final String recUuid){
+
+        final ObjectHolder<String> copyStr = new ObjectHolder<>();
+        itsFileDataFrag.useFileData(new PasswdFileDataUser()
+        {
+            @Override
+            public void useFileData(@NonNull PasswdFileData fileData)
+            {
+                PwsRecord rec = fileData.getRecord(recUuid);
+                if (rec == null) {
+                    return;
+                }
+
+                PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+                if (passwdRec != null) {
+                    copyStr.set(passwdRec.getPassword(fileData));
+                }
+            }
+        });
+
+        try {
+            OutputInterface ct = new OutputKeyboardAsRoot(
+                    OutputInterface.Language.AppleMac_de_DE);
+
+            ct.sendText(copyStr.get());
+        } catch (Exception e) {
+            PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
+        }
+    }
+
+    @Override
     public void copyField(final CopyField field, final String recUuid)
     {
         switch (field) {
@@ -931,6 +964,11 @@ public class PasswdSafe extends AppCompatActivity
     public void finishEditRecord(boolean save, PasswdLocation newLocation)
     {
         finishEdit(save, true, null, newLocation, null);
+    }
+
+    public void finishEditRecord(boolean save, PasswdLocation newLocation, boolean popBack)
+    {
+        finishEdit(save, popBack, null, newLocation, null);
     }
 
     @Override
@@ -1273,33 +1311,13 @@ public class PasswdSafe extends AppCompatActivity
         Fragment viewFrag;
         ChangeMode viewMode;
 
-        PasswdSafeUtil.dbginfo( TAG, String.valueOf(itsIsDisplayListTreeView));
-
-        /*if( itsIsDisplayListTreeView ) {
-            if (location.isRecord()) {
-                viewFrag = PasswdSafeRecordFragment.newInstance(location);
-                viewMode = ChangeMode.RECORD;
-            } else {
-                viewFrag = PasswdSafeListFragmentTree.newInstance(location, true);
-                viewMode = initial ? ChangeMode.OPEN_INIT : ChangeMode.OPEN;
-            }
-        } else {
-            if (location.isRecord()) {
-                viewFrag = PasswdSafeRecordFragment.newInstance(location);
-                viewMode = ChangeMode.RECORD;
-            } else {
-                viewFrag = PasswdSafeListFragment.newInstance(location, true);
-                viewMode = initial ? ChangeMode.OPEN_INIT : ChangeMode.OPEN;
-            }
-        }*/
-
-
         if (location.isRecord()) {
             viewFrag = PasswdSafeRecordFragment.newInstance(location);
             viewMode = ChangeMode.RECORD;
         } else {
             if( itsIsDisplayListTreeView ) {
-                viewFrag = PasswdSafeListFragmentTree.newInstance(location, true);
+                boolean search = itsFileDataFrag.getFileDataView().getRecordFilter() != null;
+                viewFrag = PasswdSafeListFragmentTree.newInstance(location, true, search);
                 viewMode = initial ? ChangeMode.OPEN_INIT : ChangeMode.OPEN;
             } else {
                 viewFrag = PasswdSafeListFragment.newInstance(location, true);
@@ -1498,9 +1516,6 @@ public class PasswdSafe extends AppCompatActivity
                                 itsIsTwoPane ?
                                 PasswdSafeListFragmentTree.Mode.RECORDS :
                                 PasswdSafeListFragmentTree.Mode.ALL;
-                        ((PasswdSafeListFragmentTree)contentsFrag)
-                                .updateLocationView(
-                                        itsLocation, contentsMode);
                     }
                 } else {
                     if (contentsFrag instanceof PasswdSafeListFragment) {

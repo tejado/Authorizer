@@ -1353,6 +1353,13 @@ public class PasswdSafeEditRecordFragment
                 }
             }
 
+            /*
+            updateStr = getUpdatedField(fileData.getIcon(record), itsIcon);
+            if (updateStr != null) {
+                fileData.setIcon(updateStr, record);
+            }
+            */
+
             if (itsIsProtected != fileData.isProtected(record)) {
                 fileData.setProtected(itsIsProtected, record);
             }

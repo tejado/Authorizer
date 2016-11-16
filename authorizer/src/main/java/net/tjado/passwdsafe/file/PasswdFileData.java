@@ -490,6 +490,18 @@ public class PasswdFileData
         setPasswdPolicyImpl(policy, rec, true);
     }
 
+    /** Get the icon contained in a record */
+    public final String getIcon(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.ICON);
+    }
+
+    /** Set the icon for a record */
+    public final void setIcon(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.ICON);
+    }
+
     public final boolean isProtected(PwsRecord rec)
     {
         boolean prot = false;
@@ -1089,6 +1101,7 @@ public class PasswdFileData
             case PwsRecordV3.NOTES:
             case PwsRecordV3.TITLE:
             case PwsRecordV3.URL:
+            case PwsRecordV3.ICON:
             case PwsRecordV3.USERNAME:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PASSWORD_POLICY:
