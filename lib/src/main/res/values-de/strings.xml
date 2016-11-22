@@ -19,6 +19,7 @@
     <string name="copy_trace_and_close">Trace kopieren und schließen</string>
     <string name="dropbox">Dropbox</string>
     <string name="edit">Bearbeiten</string>
+    <string name="info">Info</string>
     <string name="error">Fehler</string>
     <string name="error_fmt">Fehler: %1$s</string>
     <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>

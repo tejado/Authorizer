@@ -13,6 +13,9 @@
 
     <group android:id="@+id/menu_group_slots"
            android:checkableBehavior="single">
+        <item android:id="@+id/menu_slot_none"
+              android:title="@string/yubikey_slot_none"/>
+
         <item android:id="@+id/menu_slot_1"
               android:title="@string/yubikey_slot_1"/>
 

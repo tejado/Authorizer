@@ -330,6 +330,7 @@
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
     <string name="yubikey_error">Error communicating with the YubiKey</string>
+    <string name="yubikey_slot_none">Deactivated</string>
     <string name="yubikey_slot_1">YubiKey Slot 1</string>
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
 
@@ -584,6 +585,7 @@
 
     <string name="entry">entry</string>
     <string name="entries">entries</string>
+    <string name="overflow_descriptor">Overflow</string>
 
     <string name="ic_keyboard">{gmi_keyboard}</string>
     <string name="ic_arrow_right">{gmi_chevron_right}</string>

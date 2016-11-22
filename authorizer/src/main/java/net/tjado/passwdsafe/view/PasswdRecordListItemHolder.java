@@ -97,9 +97,9 @@ public class PasswdRecordListItemHolder
             // show the amount of items in this group
             String group_count_text = String.valueOf(itemValues.group_count);
             if( itemValues.group_count == 1) {
-                group_count_text = group_count_text + context.getResources().getString(R.string.entry);
+                group_count_text = group_count_text + " " + context.getResources().getString(R.string.entry);
             } else {
-                group_count_text = group_count_text + context.getResources().getString(R.string.entries);
+                group_count_text = group_count_text + " " + context.getResources().getString(R.string.entries);
             }
             final TextView tvGroupCount = (TextView) view.findViewById(R.id.group_count);
             tvGroupCount.setVisibility(View.VISIBLE);

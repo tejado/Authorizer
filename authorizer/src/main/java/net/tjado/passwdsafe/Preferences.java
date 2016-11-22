@@ -106,10 +106,10 @@ public class Preferences
     public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
 
     public static final String PREF_DISPLAY_THEME_LIGHT = "displayThemeLightPref";
-    private static final boolean PREF_DISPLAY_THEME_LIGHT_DEF = true;
+    private static final boolean PREF_DISPLAY_THEME_LIGHT_DEF = false;
 
     public static final String PREF_DISPLAY_LIST_TREEVIEW = "displayListTreeViewPref";
-    private static final boolean PREF_DISPLAY_LIST_TREEVIEW_DEF = false;
+    private static final boolean PREF_DISPLAY_LIST_TREEVIEW_DEF = true;
 
     private static final String PREF_COPY_PASSWORD_CONFIRM =
             "copyPasswordConfirm";

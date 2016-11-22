@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -129,25 +130,26 @@ public final class StorageFileListFragment extends ListFragment
                                                 int columnIdx)
                     {
                         switch (view.getId()) {
-                        case R.id.text: {
-                            TextView tv = (TextView)view;
-                            String title = cursor.getString(columnIdx);
-                            tv.setText(title);
-                            tv.requestLayout();
-                            return false;
-                        }
-                        case R.id.icon: {
-                            ImageView iv = (ImageView)view;
-                            iv.setImageResource(itsFileIcon);
-                            return true;
-                        }
-                        case R.id.mod_date: {
-                            TextView tv = (TextView)view;
-                            long date = cursor.getLong(
-                                    RecentFilesDb.QUERY_COL_DATE);
-                            tv.setText(Utils.formatDate(date, getActivity()));
-                            return true;
-                        }
+                            case R.id.text: {
+                                TextView tv = (TextView)view;
+                                String title = cursor.getString(columnIdx);
+                                tv.setText(title);
+                                tv.requestLayout();
+                                return false;
+                            }
+                            case R.id.icon: {
+                                ImageView iv = (ImageView)view;
+                                iv.setImageResource(itsFileIcon);
+                                iv.setColorFilter(getResources().getColor(R.color.treeview_icons));
+                                return true;
+                            }
+                            case R.id.mod_date: {
+                                TextView tv = (TextView)view;
+                                long date = cursor.getLong(
+                                        RecentFilesDb.QUERY_COL_DATE);
+                                tv.setText(Utils.formatDate(date, getActivity()));
+                                return true;
+                            }
                         }
                         return false;
                     }

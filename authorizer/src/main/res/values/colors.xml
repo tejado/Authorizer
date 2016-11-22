@@ -4,7 +4,14 @@
     <color name="text_gray">#323232</color>
     <color name="treeview_icons">#259AC0</color>
 
+    <color name="colorAccent">#259AC0</color>
+    <color name="colorPrimary">#259AC0</color>
+    <color name="colorPrimaryDark">#259AC0</color>
+
     <color name="primary">#259AC0</color>
     <color name="background_light">#FAFAFA</color>
     <color name="background_dark">#212121</color>
+
+    <color name="menu_icon_color">#F0F0F0</color>
+
 </resources>

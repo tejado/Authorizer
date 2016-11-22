@@ -20,6 +20,10 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -212,6 +216,17 @@ public class PasswdSafeUtil
         dlg.show();
     }
 
+    public static void showInfoMsg(String msg, Context context)
+    {
+        AlertDialog.Builder dlg = new AlertDialog.Builder(context)
+                .setTitle(PasswdSafeUtil.getAppTitle(context) + " - " +
+                          context.getString(R.string.info))
+                .setMessage(msg)
+                .setCancelable(true)
+                .setPositiveButton(R.string.close, null);
+        dlg.show();
+    }
+
     /** Log a debug message at info level */
     public static void dbginfo(String tag, String msg)
     {
@@ -241,5 +256,26 @@ public class PasswdSafeUtil
         if (DEBUG) {
             Log.i(tag, String.format(fmt, args), t);
         }
+    }
+
+    /* http://stackoverflow.com/a/20149601
+    *  thanks to William T. Mallard <http://stackoverflow.com/users/933969/william-t-mallard> */
+    public static Drawable scaleImage (Drawable image, float scaleFactor, Resources res) {
+
+        if ((image == null) || !(image instanceof BitmapDrawable)) {
+            return image;
+        }
+
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+
+        int sizeX = Math.round(image.getIntrinsicWidth() * scaleFactor);
+        int sizeY = Math.round(image.getIntrinsicHeight() * scaleFactor);
+
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, sizeX, sizeY, false);
+
+        image = new BitmapDrawable(res, bitmapResized);
+
+        return image;
+
     }
 }

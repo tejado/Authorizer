@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,6 +36,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -385,21 +387,27 @@ public final class FileListFragment extends ListFragment
                                             String textRepresentation)
                 {
                     switch (view.getId()) {
-                    case R.id.text: {
-                        TextView tv = (TextView)view;
-                        tv.setText(textRepresentation);
-                        tv.requestLayout();
-                        return true;
-                    }
-                    case R.id.mod_date: {
-                        if (data == null) {
-                            view.setVisibility(View.GONE);
+                        case R.id.icon: {
+                            ImageView iv = (ImageView)view;
+                            iv.setImageResource((int) data);
+                            iv.setColorFilter(getResources().getColor(R.color.treeview_icons));
                             return true;
-                        } else {
-                            view.setVisibility(View.VISIBLE);
-                            return false;
                         }
-                    }
+                        case R.id.text: {
+                            TextView tv = (TextView)view;
+                            tv.setText(textRepresentation);
+                            tv.requestLayout();
+                            return true;
+                        }
+                        case R.id.mod_date: {
+                            if (data == null) {
+                                view.setVisibility(View.GONE);
+                                return true;
+                            } else {
+                                view.setVisibility(View.VISIBLE);
+                                return false;
+                            }
+                        }
                     }
                     return false;
                 }
