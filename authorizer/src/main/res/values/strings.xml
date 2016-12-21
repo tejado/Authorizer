@@ -336,6 +336,13 @@
 
     <string name="release_notes">
         \n
+        &lt;b&gt;0.2.4&lt;/b&gt;\n
+        - Using now superuser/root to access /dev/hidg0 (USB HID device)\n
+        - Added setting to deactivate USB Keyboard output\n
+        - A lot of design adjustments, e.g. major rework of TreeView\n
+        - Added icons for password entries (shown in TreeView)\n
+        - Some merges with the original PasswdSafe for Android app
+        \n\n
         &lt;b&gt;0.2.3&lt;/b&gt; - Design enhancements.
         \n\n
         &lt;b&gt;0.2.0&lt;/b&gt; - First release of Authorizer - a new app
@@ -585,7 +592,6 @@
 
     <string name="entry">entry</string>
     <string name="entries">entries</string>
-    <string name="overflow_descriptor">Overflow</string>
 
     <string name="ic_keyboard">{gmi_keyboard}</string>
     <string name="ic_arrow_right">{gmi_chevron_right}</string>

@@ -336,10 +336,17 @@
 
     <string name="release_notes">
         \n
+        &lt;b&gt;0.2.4&lt;/b&gt;\n
+        - Nutzung von superuser/root zum Zugriff auf /dev/hidg0 (USB HID device)\n
+        - Neue Einstellung zum deaktivieren der USB Keyboard Ausgabe\n
+        - Viele Design Anpassungen, z.B. große Anpassung von der Baumansicht\n
+        - Icons für Passwort Einträge hinzugefügt (werden in TreeView angezeigt)\n
+        - Verschiedene Bugfixes von PasswdSafe für Android hinzugefügt
+        \n\n
         &lt;b&gt;0.2.3&lt;/b&gt; - Design Anpassungen.
         \n\n
         &lt;b&gt;0.2.0&lt;/b&gt; - Erstes Authorizer Release - eine neue App
-        basierend auf (eine Abspaltung von) Passwd Safe für Android.
+        basierend auf (eine Abspaltung von) PasswdSafe für Android.
         \n\n
         &lt;b&gt;0.1.0&lt;/b&gt; - Authorizer Proof-of-Concept Version.
         \n\n
