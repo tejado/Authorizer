@@ -201,7 +201,9 @@
                     android:id="@+id/password_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:passwordToggleEnabled="false">
+                    app:passwordToggleEnabled="false"
+                    android:layout_toLeftOf="@+id/password_visibility"
+                    android:layout_toStartOf="@+id/password_visibility">
                     <android.support.design.widget.TextInputEditText
                         android:id="@+id/password"
                         android:layout_width="match_parent"
@@ -221,34 +223,43 @@
                            android:clickable="true"
                            android:contentDescription="@string/show_passwords"
                            android:longClickable="true"
-                           android:src="?attr/drawableActionVisibility"/>
+                           android:src="?attr/drawableActionVisibility"
+                           android:tint="@color/colorPrimary"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/password_confirm_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:passwordToggleEnabled="false"
+                    android:layout_toLeftOf="@+id/password_generate"
+                    android:layout_toStartOf="@+id/password_generate">
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/password_confirm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/confirm"
+                        android:inputType="textPassword"
+                        android:singleLine="true"/>
+                </android.support.design.widget.TextInputLayout>
 
                 <ImageView android:id="@+id/password_generate"
                            style="@style/Widget.AppCompat.ActionButton"
                            android:layout_width="wrap_content"
                            android:layout_height="wrap_content"
                            android:layout_marginTop="10dp"
-                           android:layout_toLeftOf="@id/password_visibility"
-                           android:layout_toStartOf="@id/password_visibility"
+                           android:layout_alignParentEnd="true"
+                           android:layout_alignParentRight="true"
                            android:clickable="true"
                            android:contentDescription="@string/generate_password"
                            android:longClickable="true"
-                           android:src="?attr/drawableActionNewPassword"/>
-            </RelativeLayout>
+                           android:src="?attr/drawableActionNewPassword"
+                           android:tint="@color/colorPrimary"/>
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/password_confirm_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:passwordToggleEnabled="false">
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/password_confirm"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/confirm"
-                    android:inputType="textPassword"
-                    android:singleLine="true"/>
-            </android.support.design.widget.TextInputLayout>
+            </RelativeLayout>
 
             <!-- Password policy -->
             <TextView android:layout_width="match_parent"

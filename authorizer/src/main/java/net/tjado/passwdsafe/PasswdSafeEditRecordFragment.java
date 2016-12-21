@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.MotionEvent;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -222,7 +223,35 @@ public class PasswdSafeEditRecordFragment
         TypefaceUtils.setMonospace(itsPasswordCurrent, ctx);
         itsPasswordInput = (TextInputLayout)
                 rootView.findViewById(R.id.password_input);
+
+
         itsPassword = (TextView)rootView.findViewById(R.id.password);
+
+        // disable vertical scrolling if scrolling is already in progress in the TextView
+        // http://stackoverflow.com/a/22609646
+        // thanks to Hardik <http://stackoverflow.com/users/1135548/hardik>
+        itsPassword.setOnTouchListener(new TextView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    // Disallow View to intercept touch events.
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    // Allow View to intercept touch events.
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                    break;
+                }
+
+                // Handle HorizontalScrollView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+
         TypefaceUtils.setMonospace(itsPassword, ctx);
         View passwordVisibility =
                 rootView.findViewById(R.id.password_visibility);
@@ -237,6 +266,29 @@ public class PasswdSafeEditRecordFragment
                 rootView.findViewById(R.id.password_confirm_input);
         itsPasswordConfirm = (TextView)
                 rootView.findViewById(R.id.password_confirm);
+        itsPasswordConfirm.setOnTouchListener(new TextView.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                case MotionEvent.ACTION_DOWN:
+                    // Disallow View to intercept touch events.
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    // Allow View to intercept touch events.
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                    break;
+                }
+
+                // Handle HorizontalScrollView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+
+
         TypefaceUtils.setMonospace(itsPasswordConfirm, ctx);
         itsValidator.registerTextView(itsPasswordConfirm);
 
