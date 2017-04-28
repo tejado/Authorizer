@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import net.tjado.authorizer.OutputInterface;
+import net.tjado.authorizer.Utilities;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdPolicy;
 import net.tjado.passwdsafe.lib.ApiCompat;
@@ -278,6 +279,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             int value = myOptions.indexOf(pref.name());
 
             itsUsbkbdLangPref.setSummary(getResources().getStringArray(R.array.usbkbd_languages_titels)[value]);
+            Utilities.dbginfo(TAG, pref.name());
             break;
         }
         }
