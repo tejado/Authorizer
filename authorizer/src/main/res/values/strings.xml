@@ -569,7 +569,8 @@
     <string name="usbkbd_language_english">English (US)</string>
     <string name="usbkbd_language_german">German</string>
     <string name="usbkbd_language_german_apple">German (Apple)</string>
-    <string name="usbkbd_language_swiss_german">Swiss German</string>
+    <string name="usbkbd_language_swiss_german">German (CH)</string>
+    <string name="usbkbd_language_swiss_french">French (CH)</string>
 
     <string-array name="usbkbd_languages_titels">
         <item>@string/usbkbd_language_default</item>
@@ -577,6 +578,7 @@
         <item>@string/usbkbd_language_german</item>
         <item>@string/usbkbd_language_german_apple</item>
         <item>@string/usbkbd_language_swiss_german</item>
+        <item>@string/usbkbd_language_swiss_french</item>
     </string-array>
 
     <string-array name="usbkbd_languages_values">
@@ -585,6 +587,7 @@
         <item>de_DE</item>
         <item>AppleMac_de_DE</item>
         <item>de_CH</item>
+        <item>fr_CH</item>
     </string-array>
     <string name="send_return_suffix">Send \"Return\" key after password</string>
     <string name="credential_send_usb">Send User name and Password over USB</string>
