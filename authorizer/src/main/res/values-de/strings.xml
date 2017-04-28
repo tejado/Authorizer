@@ -565,11 +565,13 @@
     <string name="usbkbd_language_english">Englisch (US)</string>
     <string name="usbkbd_language_german">Deutsch</string>
     <string name="usbkbd_language_german_apple">Deutsch (Apple)</string>
+    <string name="usbkbd_language_swiss_german">Deutsch (CH)</string>
     <string-array name="usbkbd_languages_titels">
         <item>@string/usbkbd_language_default</item>
         <item>@string/usbkbd_language_english</item>
         <item>@string/usbkbd_language_german</item>
         <item>@string/usbkbd_language_german_apple</item>
+        <item>@string/usbkbd_language_swiss_german</item>
     </string-array>
 
     <string-array name="usbkbd_languages_values">
@@ -577,6 +579,7 @@
         <item>en_US</item>
         <item>de_DE</item>
         <item>AppleMac_de_DE</item>
+        <item>de_CH</item>
     </string-array>
     <string name="title_usbkbd_language">USB Keyboard Layout</string>
     <string name="credential_send_usb">User name/Passwort über USB senden</string>
