@@ -1,9 +1,10 @@
-/*
- * Copyright (©) 2017 Jeff Harris <jefftharris@gmail.com>
- * All rights reserved. Use of the code is allowed under the
- * Artistic License 2.0 terms, as specified in the LICENSE file
- * distributed with this code, or available from
- * http://www.opensource.org/licenses/artistic-license-2.0.php
+/**
+ * Authorizer
+ *
+ *  Copyright 2016 by Tjado Mäcke <tjado@maecke.de>
+ *  Licensed under GNU General Public License 3.0.
+ *
+ *  Layout provided by Julian Wampfler <me@absturztaube.ch>
  */
 
 package net.tjado.authorizer;

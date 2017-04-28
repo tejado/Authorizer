@@ -4,7 +4,7 @@
  *  Copyright 2016 by Tjado Mäcke <tjado@maecke.de>
  *  Licensed under GNU General Public License 3.0.
  *
- * Added de_CH by Julian Wampfler <absturztaube@geek.ch>
+ *  Layout provided by Julian Wampfler <me@absturztaube.ch>
  */
 
 package net.tjado.authorizer;
