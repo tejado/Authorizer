@@ -22,6 +22,9 @@ Authorizer is based on [PasswdSafe](https://sourceforge.net/projects/passwdsafe/
 * English (US)
 * German
 * German (Apple)
+* German (CH)
+* French (CH)
+* Neo 2 (Layer 1,2 and 3)
 
 ##  Requirements
 * Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget)

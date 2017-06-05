@@ -19,7 +19,6 @@ public abstract class UsbHidKbd {
     protected Map<String, byte[]> kbdVal= new HashMap<String, byte[]>();
 
     public byte[] getScancode(String key) {
-
         byte[] value = (byte[]) kbdVal.get(key);
 
         if ( value == null ) {

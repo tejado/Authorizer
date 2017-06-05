@@ -143,7 +143,10 @@ public class PasswdSafeRecordBasicFragment
         itsUsernameSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendCredentialUsb(OutputInterface.Language.de_DE, true, false);
+                SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+                OutputInterface.Language lang;
+                lang = Preferences.getUsbkbdLanguagePref(prefs);
+                sendCredentialUsb(lang, true, false);
             }
         });
         itsUsernameSend.setOnLongClickListener(new View.OnLongClickListener() {
@@ -160,7 +163,10 @@ public class PasswdSafeRecordBasicFragment
         itsCredentialSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendCredentialUsb(OutputInterface.Language.de_DE, true, true);
+                SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+                OutputInterface.Language lang;
+                lang = Preferences.getUsbkbdLanguagePref(prefs);
+                sendCredentialUsb(lang, true, true);
             }
         });
         itsCredentialSend.setOnLongClickListener(new View.OnLongClickListener() {
@@ -177,7 +183,10 @@ public class PasswdSafeRecordBasicFragment
         itsPasswordSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendCredentialUsb(OutputInterface.Language.de_DE, false, true);
+                SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+                OutputInterface.Language lang;
+                lang = Preferences.getUsbkbdLanguagePref(prefs);
+                sendCredentialUsb(lang, false, true);
             }
         });
         itsPasswordSend.setOnLongClickListener(new View.OnLongClickListener() {
