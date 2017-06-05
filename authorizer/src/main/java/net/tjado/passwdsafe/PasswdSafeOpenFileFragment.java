@@ -179,7 +179,6 @@ public class PasswdSafeOpenFileFragment
             itsYubiSlot = savedInstanceState.getInt(STATE_SLOT, 2);
         }
 
-        setOverflowButton(getActivity());
     }
 
     /* http://stackoverflow.com/a/27672844
@@ -380,10 +379,12 @@ public class PasswdSafeOpenFileFragment
                 case ENABLED:
                     setYubikeyState(true, itsYubiSlot);
                     PasswdSafeUtil.dbginfo(TAG, "YUBIKEY ENABLED");
+                    setOverflowButton(getActivity());
                     break;
                 case DISABLED: {
                     setYubikeyState(false, 0);
                     PasswdSafeUtil.dbginfo(TAG, "YUBIKEY DISABLED");
+                    setOverflowButton(getActivity());
                     break;
                 }
                 case UNAVAILABLE: {
