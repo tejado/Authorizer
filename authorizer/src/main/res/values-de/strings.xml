@@ -567,7 +567,7 @@
     <string name="usbkbd_language_german_apple">Deutsch (Apple)</string>
     <string name="usbkbd_language_swiss_german">Deutsch (CH)</string>
     <string name="usbkbd_language_swiss_french">Französisch (CH)</string>
-    <string name="usbkbd_langauge_neo">Neo 2.0</string>
+    <string name="usbkbd_language_neo">Neo 2.0</string>
     <string-array name="usbkbd_languages_titels">
         <item>@string/usbkbd_language_default</item>
         <item>@string/usbkbd_language_english</item>
@@ -575,7 +575,7 @@
         <item>@string/usbkbd_language_german_apple</item>
         <item>@string/usbkbd_language_swiss_german</item>
         <item>@string/usbkbd_language_swiss_french</item>
-        <item>@string/usbkbd_langauge_neo</item>
+        <item>@string/usbkbd_language_neo</item>
     </string-array>
 
     <string-array name="usbkbd_languages_values">
