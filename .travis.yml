@@ -1,0 +1,21 @@
+language: android
+
+android:
+   components:
+   - tools
+   - tools #Running this twice get's the latest build tools (https://github.com/codepath/android_guides/wiki/Setting-up-Travis-CI)
+   - platform-tools
+   - android-24
+   - build-tools-23.0.3
+   - extra
+
+before_install:
+   - git clone https://github.com/urho3d/android-ndk.git $HOME/android-ndk-root
+   - export ANDROID_NDK_HOME=$HOME/android-ndk-root
+
+jdk: oraclejdk8
+
+sudo: true
+
+script:
+   - ./gradlew clean build
