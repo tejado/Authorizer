@@ -1,4 +1,4 @@
-# Authorizer
+# Authorizer [![Build Status](https://travis-ci.org/tejado/Authorizer.svg?branch=master)](https://travis-ci.org/tejado/Authorizer)
 A Password Manager for Android with USB Keyboard emulation.  
   
 The idea behind Authorizer is, to use old smartphones as a hardware password manager only. To avoid manual typing of long and complex passwords everytime you need them, Authorizer pretends to be an USB keyboard (e.g. over an USB On-The-Go adapter). With a button press inside the App, it will automatically enters the password for you on your pc, laptop, tablet or main smartphone.  
