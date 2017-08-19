@@ -379,17 +379,17 @@ public class PasswdSafeOpenFileFragment
                 case ENABLED:
                     setYubikeyState(true, itsYubiSlot);
                     PasswdSafeUtil.dbginfo(TAG, "YUBIKEY ENABLED");
-                    setOverflowButton(getActivity());
+                    //setOverflowButton(getActivity());
                     break;
                 case DISABLED: {
                     setYubikeyState(false, 0);
                     PasswdSafeUtil.dbginfo(TAG, "YUBIKEY DISABLED");
-                    setOverflowButton(getActivity());
+                    //setOverflowButton(getActivity());
                     break;
                 }
                 case UNAVAILABLE: {
                     setYubikeyState(false, -1);
-                    menu.setGroupVisible(R.id.menu_group_slots, false);
+                    //menu.setGroupVisible(R.id.menu_group_slots, false);
                     PasswdSafeUtil.dbginfo(TAG, "YUBIKEY UNAVAILABLE");
                     break;
                 }
