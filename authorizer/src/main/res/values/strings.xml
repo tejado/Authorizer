@@ -336,6 +336,8 @@
 
     <string name="release_notes">
         \n
+        &lt;b&gt;0.2.5&lt;/b&gt; - New keyboard layouts and bug fixes.
+        \n\n
         &lt;b&gt;0.2.4&lt;/b&gt;\n
         - Using now superuser/root to access /dev/hidg0 (USB HID device)\n
         - Added setting to deactivate USB Keyboard output\n

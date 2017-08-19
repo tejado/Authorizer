@@ -336,6 +336,8 @@
 
     <string name="release_notes">
         \n
+        &lt;b&gt;0.2.5&lt;/b&gt; - Neue Tastatur Layouts und Fehlerbehebungen.
+        \n\n
         &lt;b&gt;0.2.4&lt;/b&gt;\n
         - Nutzung von superuser/root zum Zugriff auf /dev/hidg0 (USB HID device)\n
         - Neue Einstellung zum deaktivieren der USB Keyboard Ausgabe\n
