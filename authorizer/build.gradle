@@ -5,23 +5,19 @@
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
-import org.apache.tools.ant.taskdefs.condition.Os
 
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '23.0.3'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId 'net.tjado.passwdsafe'
         minSdkVersion 14
         resConfigs "de"
-        targetSdkVersion 24
+        targetSdkVersion 27
         versionCode 205
         versionName '0.2.5'
-        ndk {
-            moduleName "PasswdSafe"
-        }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         versionNameSuffix 'beta'
 
@@ -34,59 +30,30 @@ android {
             proguardFiles += 'proguard-rules.pro'
         }
     }
-    sourceSets.main {
-        jni.srcDirs = []
-        jniLibs.srcDir 'src/main/libs'
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     productFlavors {
     }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
 }
-
-
-task buildNative(type: Exec, description: 'Compile JNI source') {
-    def ndkDir = project.plugins.findPlugin('android').sdkHandler.ndkFolder
-    def ndkBuild = Os.isFamily(Os.FAMILY_WINDOWS) ? "ndk-build.cmd" : "ndk-build"
-    commandLine "$ndkDir/$ndkBuild",
-            '-C', file('src/main/jni').absolutePath,
-            '-j', Runtime.runtime.availableProcessors(),
-            'all'
-
-}
-
-
-task cleanNative(type: Exec, description: 'Clean JNI object files') {
-    def ndkDir = project.plugins.findPlugin('android').sdkHandler.ndkFolder
-    def ndkBuild = Os.isFamily(Os.FAMILY_WINDOWS) ? "ndk-build.cmd" : "ndk-build"
-    commandLine "$ndkDir/$ndkBuild",
-            '-C', file('src/main/jni').absolutePath,
-            'clean'
-}
-
-
-clean.dependsOn 'cleanNative'
-
-
-tasks.withType(JavaCompile) {
-    compileTask -> compileTask.dependsOn "buildNative"
-}
-
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    debugCompile project(path: ':lib', configuration: 'debug')
-    releaseCompile project(path: ':lib', configuration: 'release')
-    androidTestCompile 'com.android.support:support-annotations:24.2.0'
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.github.bmelnychuk:atv:1.2.+'
-    compile 'com.mikepenz:iconics-core:2.8.1@aar'
-    compile 'com.mikepenz:material-design-iconic-typeface:2.2.0.2@aar'
-    compile 'com.mikepenz:devicon-typeface:2.0.0.2@aar'
-    compile 'com.mikepenz:materialize:1.0.0@aar'
-    compile 'com.mikepenz:fastadapter:2.0.0@aar'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':lib')
+    androidTestImplementation 'com.android.support:support-annotations:27.1.0'
+    androidTestImplementation 'com.android.support.test:runner:0.5'
+    androidTestImplementation 'com.android.support.test:rules:0.5'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'com.github.bmelnychuk:atv:1.2.+'
+    implementation 'com.mikepenz:iconics-core:2.8.1@aar'
+    implementation 'com.mikepenz:material-design-iconic-typeface:2.2.0.2@aar'
+    implementation 'com.mikepenz:devicon-typeface:2.0.0.2@aar'
+    implementation 'com.mikepenz:materialize:1.0.0@aar'
+    implementation 'com.mikepenz:fastadapter:2.0.0@aar'
 }

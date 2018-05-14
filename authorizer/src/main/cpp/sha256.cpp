@@ -9,9 +9,8 @@
 // SHA256 for PasswordSafe, based on LibTomCrypt by
 // Tom St Denis, tomstdenis@iahu.ca, http://libtomcrypt.org
 //-----------------------------------------------------------------------------
+#include <cstring>
 #include "sha256.h"
-#include "PwsPlatform.h"
-#include "Util.h"
 
 //#define LTC_CLEAN_STACK
 
@@ -38,7 +37,7 @@ static const unsigned long K[64] = {
 
 /* Various logical functions */
 #define Ch(x,y,z)       (z ^ (x & (y ^ z)))
-#define Maj(x,y,z)      (((x | y) & z) | (x & y)) 
+#define Maj(x,y,z)      (((x | y) & z) | (x & y))
 #define S(x, n)         RORc((x),(n))
 #define R(x, n)         (((x)&0xFFFFFFFFUL)>>(n))
 #define Sigma0(x)       (S(x, 2) ^ S(x, 13) ^ S(x, 22))
@@ -72,11 +71,11 @@ static void  sha256_compress(ulong32 state[8], const unsigned char *buf)
   /* fill W[16..63] */
   for (i = 16; i < 64; i++) {
     W[i] = Gamma1(W[i - 2]) + W[i - 7] + Gamma0(W[i - 15]) + W[i - 16];
-  }        
+  }
 
   /* Compress */
-#ifdef LTC_SMALL_CODE   
-#define RND(a,b,c,d,e,f,g,h,i)                         \
+#ifdef LTC_SMALL_CODE
+  #define RND(a,b,c,d,e,f,g,h,i)                         \
   t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[i];   \
   t1 = Sigma0(a) + Maj(a, b, c);                    \
   d += t0;                                          \
@@ -84,10 +83,10 @@ static void  sha256_compress(ulong32 state[8], const unsigned char *buf)
 
   for (i = 0; i < 64; ++i) {
     RND(S[0],S[1],S[2],S[3],S[4],S[5],S[6],S[7],i);
-    t = S[7]; S[7] = S[6]; S[6] = S[5]; S[5] = S[4]; 
+    t = S[7]; S[7] = S[6]; S[6] = S[5]; S[5] = S[4];
     S[4] = S[3]; S[3] = S[2]; S[2] = S[1]; S[1] = S[0]; S[0] = t;
-  }  
-#else 
+  }
+#else
 #define RND(a,b,c,d,e,f,g,h,i,ki)                    \
   t0 = h + Sigma1(e) + Ch(e, f, g) + ki + W[i];   \
   t1 = Sigma0(a) + Maj(a, b, c);                  \
@@ -159,9 +158,9 @@ static void  sha256_compress(ulong32 state[8], const unsigned char *buf)
   RND(S[2],S[3],S[4],S[5],S[6],S[7],S[0],S[1],62,0xbef9a3f7);
   RND(S[1],S[2],S[3],S[4],S[5],S[6],S[7],S[0],63,0xc67178f2);
 
-#undef RND     
+#undef RND
 
-#endif     
+#endif
 
   /* feedback */
   for (i = 0; i < 8; i++) {
@@ -217,7 +216,7 @@ void SHA256::Update(const unsigned char *in, size_t inlen)
       in             += block_size;
       inlen          -= block_size;
     } else {
-      n = MIN(inlen, (block_size - curlen));
+      n = std::min(inlen, (block_size - curlen));
       memcpy(buf + curlen, in, static_cast<size_t>(n));
       curlen += n;
       in             += n;
