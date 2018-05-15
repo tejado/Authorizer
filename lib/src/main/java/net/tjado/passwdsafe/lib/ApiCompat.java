@@ -36,9 +36,6 @@ public final class ApiCompat
     public static final int SDK_KITKAT = 19;
     public static final int SDK_LOLLIPOP = 21;
 
-    /** Copy of Intent.FLAG_ACTIVITY_CLEAR_TASK available on API 11 */
-    public static final int INTENT_FLAG_ACTIVITY_CLEAR_TASK = 0x00008000;
-
     public static final int SDK_VERSION = Build.VERSION.SDK_INT;
 
     /** Request a manual sync of a content provider */

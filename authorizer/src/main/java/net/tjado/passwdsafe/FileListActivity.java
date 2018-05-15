@@ -268,7 +268,7 @@ public class FileListActivity extends AppCompatActivity
             if (itsIsCloseOnOpen) {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.addFlags(ApiCompat.INTENT_FLAG_ACTIVITY_CLEAR_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             }
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
