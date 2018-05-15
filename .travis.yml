@@ -20,7 +20,10 @@ install:
   - echo yes | sdkmanager "tools"
   - echo yes | sdkmanager "platforms;android-27"
   - echo yes | sdkmanager "build-tools;27.0.3"
-
+  - echo yes | sdkmanager "ndk-bundle"
+  - echo yes | sdkmanager "cmake"
+  - echo yes | sdkmanager "lldb"
+  
 jdk: oraclejdk8
 
 sudo: true
