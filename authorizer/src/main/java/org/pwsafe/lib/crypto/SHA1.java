@@ -284,7 +284,9 @@ public class SHA1
      *
      * @param data the data to add
      */
-    public void update(byte[] data, int nOfs, int nLen)
+    public void update(byte[] data,
+                       @SuppressWarnings("SameParameterValue") int nOfs,
+                       int nLen)
     {
         for (int nEnd = nOfs + nLen; nOfs < nEnd; nOfs++) {
             update(data[nOfs]);

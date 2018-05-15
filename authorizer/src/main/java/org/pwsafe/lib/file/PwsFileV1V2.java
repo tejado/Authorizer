@@ -105,7 +105,6 @@ public abstract class PwsFileV1V2 extends PwsFile
             byte[] passwordBytes = passwd.get().getBytes(encoding);
             sha1.update(passwordBytes, 0, passwordBytes.length);
             sha1.update(salt, 0, salt.length);
-            sha1.finish();
         } finally {
             passwd.close();
         }

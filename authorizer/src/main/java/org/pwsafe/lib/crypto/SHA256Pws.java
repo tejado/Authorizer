@@ -7,16 +7,19 @@
  */
 package org.pwsafe.lib.crypto;
 
+import android.os.Build;
+import android.support.annotation.NonNull;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 
-import org.bouncycastle.crypto.digests.SHA256Digest;
-
-import android.os.Build;
-
 /**
- * SHA256 implementation. Currently uses BouncyCastle provider underneath.
+ * SHA256 implementation. Currently uses default digester provider or native
+ * code underneath.
  *
  * @author Glen Smith
+ * @author Jeff Harris
  */
 public class SHA256Pws {
 
@@ -26,6 +29,9 @@ public class SHA256Pws {
         IS_CHROME = (brand.contains("chromium"));
     }
 
+    /**
+     * Hash the incoming bytes iter+1 times
+     */
     public static byte[] digestN(byte[] p, int iter)
     {
         if (IS_CHROME) {
@@ -35,40 +41,46 @@ public class SHA256Pws {
         }
     }
 
+    /**
+     * Hash the incoming bytes
+     */
     public static byte[] digest(byte[] incoming) {
 
-    	SHA256Digest digest = new SHA256Digest();
-    	byte[] output = new byte[digest.getDigestSize()];
-
-    	digest.update(incoming, 0, incoming.length);
-    	digest.doFinal(output, 0);
-
-    	return output;
-
+        return getSha().digest(incoming);
     }
 
-    private static byte[] digestNJava(byte[] p, int iter)
+    /**
+     * Hash the incoming bytes iter+1 times using the Java provider
+     */
+    public static byte[] digestNJava(byte[] p, int iter)
     {
-        SHA256Digest digest = new SHA256Digest();
-        byte[] output = new byte[digest.getDigestSize()];
-        byte[] input = new byte[digest.getDigestSize()];
-        byte[] t;
-
-        digest.update(p, 0, p.length);
-        digest.doFinal(output, 0);
+        MessageDigest digest = getSha();
+        byte[] output = digest.digest(p);
 
         for (int i = 0; i < iter; ++i) {
-            t = input;
-            input = output;
-            output = t;
-
-            digest.reset();
-            digest.update(input, 0, input.length);
-            digest.doFinal(output, 0);
+            output = digest.digest(output);
         }
 
         return output;
     }
 
-    private static native byte[] digestNNative(byte[] p, int iter);
+    /**
+     * Hash the incoming bytes iter+1 times using native code
+     */
+    public static native byte[] digestNNative(byte[] p, int iter);
+
+    /**
+     * Get the default provider's SHA-256 digester
+     */
+    @NonNull
+    private static MessageDigest getSha()
+    {
+        try {
+            return MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            //noinspection ConstantConditions
+            return null;
+        }
+    }
 }

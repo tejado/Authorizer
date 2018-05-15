@@ -128,7 +128,6 @@ public class PwsFileFactory
             md = new SHA1();
             md.update(stuff, 0, stuff.length);
             md.update(pw, 0, pw.length);
-            md.finish();
             digest = md.getDigest();
         } finally {
             passwd.close();
@@ -149,7 +148,6 @@ public class PwsFileFactory
 
             md.clear();
             md.update(tmp, 0, tmp.length);
-            md.finish();
 
         } catch (PasswordSafeException e) {
             LOG.error(e.getMessage()); // This should not happen!
