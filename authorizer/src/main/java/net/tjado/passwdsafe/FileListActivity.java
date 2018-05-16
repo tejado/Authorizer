@@ -43,9 +43,7 @@ public class FileListActivity extends AppCompatActivity
                    FileListNavDrawerFragment.Listener,
                    PreferencesFragment.Listener,
                    SharedPreferences.OnSharedPreferenceChangeListener,
-                   StorageFileListFragment.Listener,
-                   SyncProviderFragment.Listener,
-                   SyncProviderFilesFragment.Listener
+                   StorageFileListFragment.Listener
 {
     public static final String INTENT_EXTRA_CLOSE_ON_OPEN = "closeOnOpen";
 
@@ -101,7 +99,6 @@ public class FileListActivity extends AppCompatActivity
                         R.id.navigation_drawer);
         itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
         itsFiles = findViewById(R.id.files);
-        itsSync = findViewById(R.id.sync);
         itsNoPermGroup = findViewById(R.id.no_permission_group);
 
         Intent intent = getIntent();
@@ -245,22 +242,6 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
-    public void showSyncProviderFiles(Uri uri)
-    {
-        FragmentManager fragMgr = getSupportFragmentManager();
-        Fragment syncFrag = fragMgr.findFragmentById(R.id.sync);
-
-        SyncProviderFilesFragment syncFilesFrag =
-                SyncProviderFilesFragment.newInstance(uri);
-
-        FragmentTransaction txn = fragMgr.beginTransaction();
-        txn.remove(syncFrag);
-        txn.replace(R.id.files, syncFilesFrag);
-        txn.addToBackStack(null);
-        txn.commit();
-    }
-
-    @Override
     public void openFile(Uri uri, String fileName)
     {
         try {
@@ -307,12 +288,6 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
-    public void updateViewSyncFiles()
-    {
-        doUpdateView(ViewMode.VIEW_FILES);
-    }
-
-    @Override
     public boolean isNavDrawerClosed()
     {
         return !itsNavDrawerFrag.isDrawerOpen();
@@ -339,7 +314,7 @@ public class FileListActivity extends AppCompatActivity
     @Override
     public void showAbout()
     {
-        doChangeView(ChangeMode.VIEW_ABOUT, AboutFragment.newInstance(), null);
+        doChangeView(ChangeMode.VIEW_ABOUT, AboutFragment.newInstance());
     }
 
     @Override
@@ -352,7 +327,7 @@ public class FileListActivity extends AppCompatActivity
     public void showPreferences()
     {
         doChangeView(ChangeMode.VIEW_PREFERENCES,
-                     PreferencesFragment.newInstance(), null);
+                     PreferencesFragment.newInstance());
     }
 
     /**
@@ -371,7 +346,7 @@ public class FileListActivity extends AppCompatActivity
 
             doChangeView(initial ?
                          ChangeMode.VIEW_FILES_INIT : ChangeMode.VIEW_FILES,
-                         filesFrag, new SyncProviderFragment());
+                         filesFrag);
         } else {
             itsTitle = savedState.getCharSequence(STATE_TITLE);
         }
@@ -383,8 +358,7 @@ public class FileListActivity extends AppCompatActivity
      * Change the view of the activity
      */
     private void doChangeView(ChangeMode mode,
-                              Fragment filesFrag,
-                              Fragment syncFrag)
+                              Fragment filesFrag)
     {
         boolean clearBackStack = false;
         boolean supportsBack = false;
@@ -416,15 +390,6 @@ public class FileListActivity extends AppCompatActivity
             txn.replace(R.id.files, filesFrag);
         } else {
             Fragment currFrag = fragMgr.findFragmentById(R.id.files);
-            if ((currFrag != null) && currFrag.isAdded()) {
-                txn.remove(currFrag);
-            }
-        }
-
-        if (syncFrag != null) {
-            txn.replace(R.id.sync, syncFrag);
-        } else {
-            Fragment currFrag = fragMgr.findFragmentById(R.id.sync);
             if ((currFrag != null) && currFrag.isAdded()) {
                 txn.remove(currFrag);
             }
@@ -472,7 +437,6 @@ public class FileListActivity extends AppCompatActivity
         itsNavDrawerFrag.updateView(drawerMode);
         GuiUtils.setVisible(itsNoPermGroup, !hasPermission);
         GuiUtils.setVisible(itsFiles, hasPermission);
-        GuiUtils.setVisible(itsSync, hasPermission);
         restoreActionBar();
     }
 

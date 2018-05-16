@@ -30,10 +30,6 @@
                      android:layout_weight="1"
                      tools:layout="@layout/fragment_file_list"/>
 
-        <FrameLayout android:id="@+id/sync"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"/>
-
         <LinearLayout android:id="@+id/no_permission_group"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"

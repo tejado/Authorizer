@@ -21,9 +21,7 @@ import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 
 public class LauncherFileShortcuts extends AppCompatActivity
         implements FileListFragment.Listener,
-                   StorageFileListFragment.Listener,
-                   SyncProviderFragment.Listener,
-                   SyncProviderFilesFragment.Listener
+                   StorageFileListFragment.Listener
 {
     public static final String EXTRA_IS_DEFAULT_FILE = "isDefFile";
 
@@ -41,7 +39,7 @@ public class LauncherFileShortcuts extends AppCompatActivity
 
         FragmentManager fragMgr = getSupportFragmentManager();
         FragmentTransaction txn = fragMgr.beginTransaction();
-        txn.replace(R.id.sync, new SyncProviderFragment());
+        //txn.replace(R.id.sync, new SyncProviderFragment());
         txn.commit();
 
         if (savedInstanceState == null) {
@@ -110,22 +108,6 @@ public class LauncherFileShortcuts extends AppCompatActivity
     }
 
     @Override
-    public void showSyncProviderFiles(Uri uri)
-    {
-        FragmentManager fragMgr = getSupportFragmentManager();
-        Fragment syncFrag = fragMgr.findFragmentById(R.id.sync);
-
-        SyncProviderFilesFragment syncFilesFrag =
-                SyncProviderFilesFragment.newInstance(uri);
-
-        FragmentTransaction txn = fragMgr.beginTransaction();
-        txn.remove(syncFrag);
-        txn.replace(R.id.files, syncFilesFrag);
-        txn.addToBackStack(null);
-        txn.commit();
-    }
-
-    @Override
     public boolean activityHasMenu()
     {
         return false;
@@ -145,11 +127,6 @@ public class LauncherFileShortcuts extends AppCompatActivity
 
     @Override
     public void updateViewFiles()
-    {
-    }
-
-    @Override
-    public void updateViewSyncFiles()
     {
     }
 
