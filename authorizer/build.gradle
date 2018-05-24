@@ -66,4 +66,5 @@ dependencies {
     implementation 'com.mikepenz:devicon-typeface:2.0.0.2@aar'
     implementation 'com.mikepenz:materialize:1.0.0@aar'
     implementation 'com.mikepenz:fastadapter:2.0.0@aar'
+    implementation 'com.madgag.spongycastle:core:1.58.0.0'
 }

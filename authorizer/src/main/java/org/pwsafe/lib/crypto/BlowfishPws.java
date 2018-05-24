@@ -7,11 +7,11 @@
  */
 package org.pwsafe.lib.crypto;
 
-import org.bouncycastle.crypto.BlockCipher;
-import org.bouncycastle.crypto.engines.BlowfishEngine;
-import org.bouncycastle.crypto.modes.CBCBlockCipher;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.spongycastle.crypto.BlockCipher;
+import org.spongycastle.crypto.engines.BlowfishEngine;
+import org.spongycastle.crypto.modes.CBCBlockCipher;
+import org.spongycastle.crypto.params.KeyParameter;
+import org.spongycastle.crypto.params.ParametersWithIV;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.PasswordSafeException;
 

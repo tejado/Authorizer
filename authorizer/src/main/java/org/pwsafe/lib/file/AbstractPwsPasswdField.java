@@ -9,7 +9,7 @@ package org.pwsafe.lib.file;
 
 import android.support.annotation.NonNull;
 
-import org.bouncycastle.crypto.RuntimeCryptoException;
+import org.spongycastle.crypto.RuntimeCryptoException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
