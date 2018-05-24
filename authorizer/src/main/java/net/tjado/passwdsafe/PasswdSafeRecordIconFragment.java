@@ -346,6 +346,9 @@ public class PasswdSafeRecordIconFragment
             }
         });
 
+        if (rc == null || rc.get() == null) {
+            return;
+        }
         getListener().finishEditRecord(rc.get().first, rc.get().second, false);
     }
 
