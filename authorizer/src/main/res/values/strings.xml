@@ -337,7 +337,7 @@
     <string name="release_notes">
         \n
         &lt;b&gt;0.2.6&lt;/b&gt;\n
-        - New feature: GPG encrypted backup on USB mass storage
+        - New feature: GPG encrypted backup on USB mass storage\n
         - Bug fixes and clean up
         \n\n
         &lt;b&gt;0.2.5&lt;/b&gt; - New keyboard layouts and bug fixes.
