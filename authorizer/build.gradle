@@ -16,8 +16,8 @@ android {
         minSdkVersion 21
         resConfigs "de"
         targetSdkVersion 27
-        versionCode 205
-        versionName '0.2.5'
+        versionCode 206
+        versionName '0.2.6'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         versionNameSuffix 'beta'
 
