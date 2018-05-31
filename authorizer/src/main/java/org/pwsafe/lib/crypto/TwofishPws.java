@@ -7,12 +7,12 @@
  */
 package org.pwsafe.lib.crypto;
 
-import org.spongycastle.crypto.BufferedBlockCipher;
-import org.spongycastle.crypto.CryptoException;
-import org.spongycastle.crypto.engines.TwofishEngine;
-import org.spongycastle.crypto.modes.CBCBlockCipher;
-import org.spongycastle.crypto.params.KeyParameter;
-import org.spongycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.CryptoException;
+import org.bouncycastle.crypto.engines.TwofishEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  * Twofish implementation wrapper. Current implementation uses

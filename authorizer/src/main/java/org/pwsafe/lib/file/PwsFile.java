@@ -9,7 +9,7 @@
  */
 package org.pwsafe.lib.file;
 
-import org.spongycastle.crypto.RuntimeCryptoException;
+import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.crypto.InMemoryKey;

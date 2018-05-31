@@ -13,7 +13,7 @@ android {
     buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId 'net.tjado.passwdsafe'
-        minSdkVersion 14
+        minSdkVersion 21
         resConfigs "de"
         targetSdkVersion 27
         versionCode 205
@@ -66,5 +66,6 @@ dependencies {
     implementation 'com.mikepenz:devicon-typeface:2.0.0.2@aar'
     implementation 'com.mikepenz:materialize:1.0.0@aar'
     implementation 'com.mikepenz:fastadapter:2.0.0@aar'
-    implementation 'com.madgag.spongycastle:core:1.58.0.0'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.59'
+    implementation 'org.bouncycastle:bcpg-jdk15on:1.59'
 }
