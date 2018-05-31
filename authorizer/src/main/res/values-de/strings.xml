@@ -605,4 +605,14 @@
     <string name="ic_arrow_down">{gmi_chevron_down}</string>
     <string name="ic_key">{gmi_key}</string>
     <string name="ic_folder">{gmi_folder}</string>
+
+    <string name="file_backup_usb_gpg">Aktiviere GPG Backup auf USB Speicher</string>
+    <string name="file_backup_usb_gpg_info">
+        Wenn diese Funktion aktiviert ist, öffnet sich ein Backup Dialog sobald
+        ein USB Massenspeicher angeschlossen ist. Beim Drücken des \"Backup now!\"
+        Buttons, kann man ein beliebiges Verzeichnis auswählen. In diesem Verzeichnis
+        wird nach der Datei \"pubkey.asc\" gesucht, die einen GPG Public Key
+        enthalten muss. Ist diese vorhanden, wird eine Kopie der Standarddatei mit dem Key
+        verschlüsselt und im ausgewählten Verzeichnis gespeichert.
+    </string>
 </resources>

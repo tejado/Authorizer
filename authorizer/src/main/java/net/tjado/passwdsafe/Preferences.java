@@ -101,6 +101,12 @@ public class Preferences
     private static final String PREF_SHOW_HIDDEN_FILES = "showBackupFilesPref";
     private static final boolean PREF_SHOW_HIDDEN_FILES_DEF = false;
 
+    public static final String PREF_FILE_BACKUP_USB_GPG = "fileBackupUsbGpgPref";
+    public static final boolean PREF_FILE_BACKUP_USB_GPG_DEF = false;
+
+    private static final String PREF_FILE_BACKUP_USB_GPG_KEY = "fileBackupUsbGpgKeyPref";
+    private static final String PREF_FILE_BACKUP_USB_GPG_KEY_DEF = "";
+
     public static final String PREF_SORT_CASE_SENSITIVE =
         "sortCaseSensitivePref";
     public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
@@ -434,6 +440,26 @@ public class Preferences
     {
         return prefs.getBoolean(PREF_SHOW_HIDDEN_FILES,
                                 PREF_SHOW_HIDDEN_FILES_DEF);
+    }
+
+    public static boolean getFileBackupUsbGpg(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_BACKUP_USB_GPG,
+                                PREF_FILE_BACKUP_USB_GPG_DEF);
+
+    }
+
+    public static String getFileBackupUsbGpgKey(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_FILE_BACKUP_USB_GPG_KEY,
+                                PREF_FILE_BACKUP_USB_GPG_KEY_DEF);
+
+    }
+
+    public static void setFileBackupUsbGpgKey(String keyId,
+                                              SharedPreferences prefs)
+    {
+        prefs.edit().putString(PREF_FILE_BACKUP_USB_GPG_KEY, keyId).apply();
     }
 
     public static boolean getSortCaseSensitivePref(SharedPreferences prefs)

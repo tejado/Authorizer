@@ -609,4 +609,13 @@
     <string name="ic_arrow_down">{gmi_chevron_down}</string>
     <string name="ic_key">{gmi_key}</string>
     <string name="ic_folder">{gmi_folder}</string>
+
+    <string name="file_backup_usb_gpg">Enable GPG backup on USB storage</string>
+    <string name="file_backup_usb_gpg_info">
+        If this function is enabled, a backup dialog will open as soon as a
+        USB mass storage is connected. You can select a backup folder by pressing
+        the \"Backup now!\" button. A file named \"pubkey.asc\" - containing a GPG public
+        key - has to be inside this folder. If it exists, a copy of the default file
+        will be encrypted with this key and stored in the selected folder.
+    </string>
 </resources>

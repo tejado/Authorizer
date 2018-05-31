@@ -62,6 +62,11 @@
         </activity>
 
         <activity
+            android:name=".UsbGpgBackupActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity
             android:name=".PasswdSafe"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -241,6 +246,17 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="net.tjado.passwdsafe.UsbGpgBackupReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                       android:resource="@xml/device_filter" />
         </receiver>
 
         <service

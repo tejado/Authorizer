@@ -54,6 +54,13 @@
 
         <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="fileBackupUsbGpg Pref"
+            android:defaultValue="false"
+            android:key="fileBackupUsbGpgPref"
+            android:title="@string/file_backup_usb_gpg"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
             android:name="fileCloseClearClipboard Pref"
             android:defaultValue="true"
             android:key="fileCloseClearClipboardPref"

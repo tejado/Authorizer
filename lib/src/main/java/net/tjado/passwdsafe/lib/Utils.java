@@ -10,6 +10,10 @@ package net.tjado.passwdsafe.lib;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import android.content.Context;
@@ -56,6 +60,14 @@ public final class Utils
         return DateUtils.formatDateTime(ctx, date, flags);
     }
 
+    /**
+     * Format a time and/or date in milliseconds in an uri safe format
+     */
+    public static String formatDateUriSafe(Date date)
+    {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
+        return dateFormat.format(date);
+    }
 
     /** Copy the input stream to the output */
     public static void copyStream(InputStream is, OutputStream os)

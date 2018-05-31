@@ -31,11 +31,14 @@ import net.tjado.authorizer.Utilities;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdPolicy;
 import net.tjado.passwdsafe.lib.ApiCompat;
+import net.tjado.passwdsafe.lib.PasswdSafeUtil;
+import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.pref.FileBackupPref;
 import net.tjado.passwdsafe.pref.FileTimeoutPref;
 import net.tjado.passwdsafe.pref.PasswdExpiryNotifPref;
 import net.tjado.passwdsafe.pref.RecordSortOrderPref;
 import net.tjado.passwdsafe.view.ConfirmPromptDialog;
+import net.tjado.passwdsafe.view.LongCheckBoxPreference;
 
 import org.pwsafe.lib.file.PwsFile;
 
@@ -81,6 +84,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     private ListPreference itsPasswdExpiryNotifPref;
     private EditTextPreference itsPasswdDefaultSymsPref;
     private ListPreference itsRecordSortOrderPref;
+    private LongCheckBoxPreference itsFileBackupUsbGpgPref;
 
     /**
      * Create a new instance
@@ -127,6 +131,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         itsFileBackupPref.setEntries(FileBackupPref.getDisplayNames(res));
         itsFileBackupPref.setEntryValues(FileBackupPref.getValues());
         onSharedPreferenceChanged(prefs, Preferences.PREF_FILE_BACKUP);
+
+        itsFileBackupUsbGpgPref = (LongCheckBoxPreference)
+                findPreference(Preferences.PREF_FILE_BACKUP_USB_GPG);
+        itsFileBackupUsbGpgPref.setSummary(String.format("Key ID: %s", Preferences.getFileBackupUsbGpgKey(prefs)));
 
         itsPasswdEncPref = (ListPreference)
                 findPreference(Preferences.PREF_PASSWD_ENC);
@@ -232,6 +240,14 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         case Preferences.PREF_FILE_BACKUP: {
             FileBackupPref pref = Preferences.getFileBackupPref(prefs);
             itsFileBackupPref.setSummary(pref.getDisplayName(getResources()));
+            break;
+        }
+        case Preferences.PREF_FILE_BACKUP_USB_GPG: {
+            boolean pref = Preferences.getFileBackupUsbGpg(prefs);
+            if (pref) {
+                PasswdSafeUtil.showInfoMsg(getResources().getString(
+                        R.string.file_backup_usb_gpg_info), getContext());
+            }
             break;
         }
         case Preferences.PREF_PASSWD_ENC: {
