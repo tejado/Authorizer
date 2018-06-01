@@ -24,4 +24,7 @@
         <ignore path="res/layout/record_edit.xml" />
     </issue>
     <issue id="ManifestResource" severity="ignore" />
+    <issue id="InvalidPackage">
+        <ignore path="**/bcprov-*.jar"/>
+    </issue>
 </lint>
