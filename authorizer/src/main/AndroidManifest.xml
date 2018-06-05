@@ -225,6 +225,18 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".otp.AddActivity"
+            android:label="Add Token"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar"
+            android:windowSoftInputMode="stateVisible"
+            />
+
+        <activity
+            android:name=".otp.ScanActivity"
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"
+            />
+
         <provider
             android:name="net.tjado.passwdsafe.file.PasswdClientProvider"
             android:authorities="net.tjado.authorizer.client.provider"

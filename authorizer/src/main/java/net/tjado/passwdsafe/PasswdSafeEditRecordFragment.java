@@ -346,6 +346,12 @@ public class PasswdSafeEditRecordFragment
         itsHistoryList = (ListView)rootView.findViewById(R.id.history);
         registerForContextMenu(itsHistoryList);
 
+        if (itsHistory == null) {
+            itsHistory = new PasswdHistory();
+            itsHistory.setMaxSize(25);
+            historyChanged(true);
+        }
+
         // Notes
         itsNotesLabel = rootView.findViewById(R.id.notes_label);
         itsNotes = (TextView)rootView.findViewById(R.id.notes);

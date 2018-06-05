@@ -622,4 +622,26 @@
         key - has to be inside this folder. If it exists, a copy of the default file
         will be encrypted with this key and stored in the selected folder.
     </string>
+
+    <string-array name="algorithms">
+        <item>MD5</item>
+        <item>SHA1</item>
+        <item>SHA256</item>
+        <item>SHA512</item>
+    </string-array>
+
+    <string name="error_camera_open">Error while opening camera!</string>
+    <string name="otp_header">OTP</string>
+    <string name="otp_overwrite">Replace the current OTP? It will be lost forever!</string>
+    <string name="replace">Replace</string>
+    <string name="secret">Secret</string>
+    <string name="base32">(Base32)</string>
+    <string name="totp">TOTP</string>
+    <string name="hotp">HOTP</string>
+    <string name="digits">Digits</string>
+    <string name="algorithm">Algorithm</string>
+    <string name="counter">Counter</string>
+    <string name="otp_token">Token:</string>
+    <string name="add_otp_manually">Add OTP manually</string>
+    <string name="add_otp_camera">Scan OTP QR Code</string>
 </resources>

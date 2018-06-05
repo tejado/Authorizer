@@ -619,4 +619,26 @@
         enthalten muss. Ist diese vorhanden, wird eine Kopie der Standarddatei mit dem Key
         verschlüsselt und im ausgewählten Verzeichnis gespeichert.
     </string>
+
+    <string-array name="algorithms">
+        <item>MD5</item>
+        <item>SHA1</item>
+        <item>SHA256</item>
+        <item>SHA512</item>
+    </string-array>
+
+    <string name="error_camera_open">Fehler beim Öffnen der Kamera!</string>
+    <string name="otp_header">OTP</string>
+    <string name="otp_overwrite">Aktuellen OTP ersetzen? Dieser kann nicht wiederhergestellt werden!</string>
+    <string name="replace">Ersetzen</string>
+    <string name="secret">Geheimnis</string>
+    <string name="base32">(Base32)</string>
+    <string name="totp">TOTP</string>
+    <string name="hotp">HOTP</string>
+    <string name="digits">Ziffern</string>
+    <string name="algorithm">Algorithmus</string>
+    <string name="counter">Zähler</string>
+    <string name="otp_token">Token:</string>
+    <string name="add_otp_manually">OTP manuell hinzufügen</string>
+    <string name="add_otp_camera">OTP QR Code scannen</string>
 </resources>

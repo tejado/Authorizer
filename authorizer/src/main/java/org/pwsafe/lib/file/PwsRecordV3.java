@@ -182,9 +182,14 @@ public class PwsRecordV3 extends PwsRecord
     public static final int ENTRY_KEYBOARD_SHORTCUT = 25;
 
     /**
-     * Icon
+     * Icon (not compliant to original Pws file format)
      */
     public static final int ICON = 191;
+
+    /**
+     * OTP Token (not compliant to original Pws file format)
+     */
+    public static final int OTP = 192;
 
     /**
      * Header database version
@@ -296,6 +301,8 @@ public class PwsRecordV3 extends PwsRecord
                          "ENTRY_KEYBOARD_SHORTCUT", PwsIntegerField.class},
             new Object[]{Integer.valueOf(ICON),
                          "ICON", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(OTP),
+                         "OTP", PwsStringUnicodeField.class},
             };
 
     /**
@@ -541,6 +548,7 @@ public class PwsRecordV3 extends PwsRecord
                 case EMAIL:
                 case OWN_PASSWORD_SYMBOLS:
                 case ICON:
+                case OTP:
                 case PASSWORD_POLICY_NAME:
                     itemVal = new PwsStringUnicodeField(item.getType(),
                                                         item.getByteData());

@@ -502,6 +502,18 @@ public class PasswdFileData
         setField(str, rec, PwsRecordV3.ICON);
     }
 
+    /** Get the OTP contained in a record */
+    public final String getOtp(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.OTP);
+    }
+
+    /** Set the OTP for a record */
+    public final void setOtp(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.OTP);
+    }
+
     public final boolean isProtected(PwsRecord rec)
     {
         boolean prot = false;
@@ -1102,6 +1114,7 @@ public class PasswdFileData
             case PwsRecordV3.TITLE:
             case PwsRecordV3.URL:
             case PwsRecordV3.ICON:
+            case PwsRecordV3.OTP:
             case PwsRecordV3.USERNAME:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PASSWORD_POLICY:

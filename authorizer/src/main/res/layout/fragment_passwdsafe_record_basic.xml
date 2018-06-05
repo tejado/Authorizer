@@ -90,6 +90,11 @@
                          android:layout_width="match_parent"
                          android:layout_height="wrap_content"/>
                 <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+                </LinearLayout>
+                <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -124,9 +129,71 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/send_return_suffix"
                     android:checked="true"/>
-
-
             </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/otp_row"
+                      style="@style/RecordRow"
+                      android:clickable="true">
+
+            <TextView style="@style/RecordHeader"
+                      android:clickable="false"
+                      android:text="@string/otp_header" />
+
+            <View style="@style/Separator"
+                  android:clickable="false"/>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/otp_token_row"
+                    android:visibility="gone">
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <TextView
+                            android:id="@+id/otp_headline"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/otp_token"
+                            android:textSize="30dp"
+                            android:gravity="right"/>
+                        <TextView
+                            android:id="@+id/otp_code"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:text="------"
+                            android:textSize="30dp"/>
+                    </LinearLayout>
+                    <ProgressBar
+                        android:id="@+id/otp_time"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:max="1000"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <Button
+                        android:id="@+id/otp_new"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/add_otp_manually"/>
+                    <Button
+                        android:id="@+id/otp_new_camera"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/add_otp_camera"/>
+                </LinearLayout>
 
         </LinearLayout>
 
