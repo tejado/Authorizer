@@ -47,7 +47,6 @@ import java.util.Locale;
 public class AddActivity extends Activity
         implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private final int SHA1_OFFSET = 1;
-    private ImageButton mImage;
     private EditText mSecret;
     private EditText mInterval;
     private EditText mCounter;
@@ -61,7 +60,6 @@ public class AddActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_otp_add);
 
-        mImage = (ImageButton) findViewById(R.id.image);
         mSecret = (EditText) findViewById(R.id.secret);
         mInterval = (EditText) findViewById(R.id.interval);
         mCounter = (EditText) findViewById(R.id.counter);
