@@ -54,9 +54,11 @@ import net.tjado.passwdsafe.view.PasswdRecordListData;
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * The main PasswdSafe activity for showing a password file
@@ -783,7 +785,40 @@ public class PasswdSafe extends AppCompatActivity
             OutputInterface ct = new OutputKeyboardAsRoot(
                     OutputInterface.Language.AppleMac_de_DE);
 
-            ct.sendText(copyStr.get());
+            String SUB_OTP = getResources().getString(R.string.SUB_OTP);
+            String SUB_TAB = getResources().getString(R.string.SUB_TAB);
+            String SUB_RETURN = getResources().getString(R.string.SUB_RETURN);
+            String quoteSubReturn = Pattern.quote(SUB_RETURN);
+            String quoteSubTab = Pattern.quote(SUB_TAB);
+
+            String password = copyStr.get();
+            if (password.contains(SUB_OTP)) {
+                PasswdSafeUtil.showErrorMsg(
+                        "Password QuickSend not possible as it contains an OTP!",
+                        this);
+                return;
+            }
+
+            String[] passwordArray = password.split(String.format("((?<=(%1$s|%2$s))|(?=(%1$s|%2$s)))", quoteSubReturn, quoteSubTab));
+            PasswdSafeUtil.dbginfo(TAG, "Password Substitution Array: %s".format(Arrays.toString(passwordArray)));
+
+            int ret = 0;
+            for (String str : passwordArray){
+
+                if (str.equals(SUB_RETURN)) {
+                    ct.sendReturn();
+                } else if (str.equals(SUB_TAB)) {
+                    ct.sendTabulator();
+                } else {
+                    ret = ct.sendText(str);
+                }
+
+                if (ret == 1) {
+                    PasswdSafeUtil.showErrorMsg(
+                            "Lost characters in output due to missing mapping!",
+                            this);
+                }
+            }
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
         }

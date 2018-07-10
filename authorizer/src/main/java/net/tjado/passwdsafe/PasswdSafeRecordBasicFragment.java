@@ -32,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Button;
@@ -56,9 +57,11 @@ import net.tjado.authorizer.OutputKeyboardAsRoot;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -70,6 +73,8 @@ public class PasswdSafeRecordBasicFragment
         extends AbstractPasswdSafeRecordFragment
         implements View.OnClickListener
 {
+    private static final String TAG = "PasswdSafeRecordBasicFragment";
+
     private boolean itsIsPasswordShown = false;
     private String itsHiddenPasswordStr;
     private String itsTitle;
@@ -86,6 +91,8 @@ public class PasswdSafeRecordBasicFragment
     private Button itsUsernameSend;
     private Button itsCredentialSend;
     private Button itsPasswordSend;
+    private CheckBox itsSendReturnSuffix;
+    private RadioGroup itsSendDelimiter;
     private View itsUrlRow;
     private TextView itsUrl;
     private View itsEmailRow;
@@ -107,6 +114,9 @@ public class PasswdSafeRecordBasicFragment
 
     private boolean itsOtpConfirmation;
 
+    private String SUB_OTP;
+    private String SUB_TAB;
+    private String SUB_RETURN;
     private final int PERMISSIONS_REQUEST_CAMERA = 1;
 
     /**
@@ -224,12 +234,16 @@ public class PasswdSafeRecordBasicFragment
             }
         });
 
+
+        itsSendReturnSuffix = (CheckBox) root.findViewById(R.id.send_return_suffix);
+        itsSendDelimiter = (RadioGroup) root.findViewById(R.id.send_delimiter);
         SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
-        if ( Preferences.getUsbkbdEnabled(prefs) != true ) {
+        if ( ! Preferences.getUsbkbdEnabled(prefs)) {
             itsUsernameSend.setVisibility(View.GONE);
             itsCredentialSend.setVisibility(View.GONE);
             itsPasswordSend.setVisibility(View.GONE);
-            ((CheckBox) root.findViewById(R.id.send_return_suffix)).setVisibility(View.GONE);
+            itsSendReturnSuffix.setVisibility(View.GONE);
+            itsSendDelimiter.setVisibility(View.GONE);
         }
 
         itsUrlRow = root.findViewById(R.id.url_row);
@@ -287,6 +301,10 @@ public class PasswdSafeRecordBasicFragment
                 generateOtpToken();
             }
         });
+
+        SUB_OTP = getResources().getString(R.string.SUB_OTP);
+        SUB_TAB = getResources().getString(R.string.SUB_TAB);
+        SUB_RETURN = getResources().getString(R.string.SUB_RETURN);
 
         return root;
     }
@@ -686,37 +704,86 @@ public class PasswdSafeRecordBasicFragment
     private void sendCredentialUsb(OutputInterface.Language lang,
                                    Boolean sendUsername, Boolean sendPassword)
     {
-
         String username = getUsername();
         String password = getPassword();
-        CheckBox cb_send_return = (CheckBox) getView().findViewById(R.id.send_return_suffix);
+        String quoteSubReturn = Pattern.quote(SUB_RETURN);
+        String quoteSubTab = Pattern.quote(SUB_TAB);
 
         try {
             OutputInterface ct = new OutputKeyboardAsRoot(lang);
 
+            boolean otpTokenGenerated = false;
             if( sendUsername == true && username != null ) {
-                int ret = ct.sendText(username);
+                if (username.contains(SUB_OTP)){
+                    generateOtpToken();
+                    otpTokenGenerated = true;
 
-                if (ret == 1) {
-                    PasswdSafeUtil.showErrorMsg(
-                            "Lost characters in output due to missing mapping!",
-                            getContext());
+                    username = username.replace(SUB_OTP, itsOtp.getCurrentCode());
+                }
+
+                String[] usernameArray = username.split(String.format("((?<=(%1$s|%2$s))|(?=(%1$s|%2$s)))", quoteSubReturn, quoteSubTab));
+                PasswdSafeUtil.dbginfo(TAG, "Username Substitution Array: %s".format(Arrays.toString(usernameArray)));
+
+                int ret = 0;
+                for (String str : usernameArray){
+
+                    if (str.equals(SUB_RETURN)) {
+                        ct.sendReturn();
+                    } else if (str.equals(SUB_TAB)) {
+                        ct.sendTabulator();
+                    } else {
+                        ret = ct.sendText(str);
+                    }
+
+                    if (ret == 1) {
+                        PasswdSafeUtil.showErrorMsg(
+                                "Lost characters in output due to missing mapping!",
+                                getContext());
+                    }
                 }
             }
 
             if( sendUsername && sendPassword )
             {
-                ct.sendTabulator();
+                int checkedId = itsSendDelimiter.getCheckedRadioButtonId();
+                if (checkedId == R.id.send_delimiter_return) {
+                    ct.sendReturn();
+                } else if (checkedId == R.id.send_delimiter_tab) {
+                    ct.sendTabulator();
+                }
             }
 
             if( sendPassword && password != null ) {
+                if (password.contains(SUB_OTP)){
+                    if (otpTokenGenerated == false) {
+                        generateOtpToken();
+                    }
 
-                int ret = ct.sendText(password);
-                if( ret == 1 ) {
-                    PasswdSafeUtil.showErrorMsg("Lost characters in output due to missing mapping!", getContext());
+                    password = password.replace(SUB_OTP, itsOtp.getCurrentCode());
                 }
 
-                if( cb_send_return.isChecked() ) {
+                String[] passwordArray = password.split(String.format("((?<=(%1$s|%2$s))|(?=(%1$s|%2$s)))", quoteSubReturn, quoteSubTab));
+                PasswdSafeUtil.dbginfo(TAG, "Password Substitution Array: %s".format(Arrays.toString(passwordArray)));
+
+                int ret = 0;
+                for (String str : passwordArray){
+
+                    if (str.equals(SUB_RETURN)) {
+                        ct.sendReturn();
+                    } else if (str.equals(SUB_TAB)) {
+                        ct.sendTabulator();
+                    } else {
+                        ret = ct.sendText(str);
+                    }
+
+                    if (ret == 1) {
+                        PasswdSafeUtil.showErrorMsg(
+                                "Lost characters in output due to missing mapping!",
+                                getContext());
+                    }
+                }
+
+                if( itsSendReturnSuffix.isChecked() ) {
                     ct.sendReturn();
                 }
             }

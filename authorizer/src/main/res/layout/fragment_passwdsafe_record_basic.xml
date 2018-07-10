@@ -127,8 +127,25 @@
                     android:text="@string/send_return_suffix"
                     android:layout_width="375dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/send_return_suffix"
-                    android:checked="true"/>
+                    android:id="@+id/send_return_suffix" />
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:id="@+id/send_delimiter"
+                    android:checkedButton="@+id/send_delimiter_tab">
+                    <RadioButton
+                        android:id="@+id/send_delimiter_return"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/send_delimiter_return" />
+                    <RadioButton
+                        android:id="@+id/send_delimiter_tab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/send_delimiter_tab" />
+                </RadioGroup>
             </LinearLayout>
         </LinearLayout>
 

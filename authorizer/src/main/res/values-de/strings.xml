@@ -596,7 +596,7 @@
     <string name="title_usbkbd_language">USB Keyboard Layout</string>
     <string name="credential_send_usb">User name/Passwort über USB senden</string>
     <string name="username_send_usb">User name über USB senden</string>
-    <string name="send_return_suffix">\"Enter\"-Taste nach Passwort senden</string>
+    <string name="send_return_suffix">\"Enter\" nach Passwort senden</string>
     <string name="use_treeview_list">Baumansicht</string>
     <string name="usbkbd_enable">Aktiviere USB Keyboard Ausgabe</string>
     <string name="usbkbd_output">USB Keyboard Ausgabe</string>
@@ -641,4 +641,7 @@
     <string name="otp_token">Token:</string>
     <string name="add_otp_manually">OTP manuell hinzufügen</string>
     <string name="add_otp_camera">OTP QR Code scannen</string>
+    <string name="send_delimiter_return">Enter</string>
+    <string name="send_delimiter_tab">Tab</string>
+    <string name="send_delimiter_desc">Trennzeichen:></string>
 </resources>

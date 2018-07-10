@@ -598,7 +598,7 @@
         <item>fr_CH</item>
         <item>neo</item>
     </string-array>
-    <string name="send_return_suffix">Send \"Return\" key after password</string>
+    <string name="send_return_suffix">Send \"Return\" after password</string>
     <string name="credential_send_usb">Send User name and Password over USB</string>
     <string name="username_send_usb">Send User name over USB</string>
     <string name="use_treeview_list">Use tree list</string>
@@ -644,4 +644,12 @@
     <string name="otp_token">Token:</string>
     <string name="add_otp_manually">Add OTP manually</string>
     <string name="add_otp_camera">Scan OTP QR Code</string>
+
+    <string name="send_delimiter_return">Return</string>
+    <string name="send_delimiter_tab">Tab</string>
+    <string name="send_delimiter_desc">Delimiter:</string>
+
+    <string name="SUB_OTP" translatable="false">{OTP}</string>
+    <string name="SUB_TAB" translatable="false">{TAB}</string>
+    <string name="SUB_RETURN" translatable="false">{RET}</string>
 </resources>
