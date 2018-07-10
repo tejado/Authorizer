@@ -13,22 +13,27 @@ The idea behind Authorizer is, to use old smartphones as a hardware password man
   
 Authorizer is based on [PasswdSafe](https://sourceforge.net/projects/passwdsafe/) a Password Safe port for Android smartphones.  
 
+## Features
+* USB Keyboard emulation
+* Different keyboard languages ([scancodes](https://en.wikipedia.org/wiki/Scancode))
+  * English (US)
+  * German
+  * German (Apple)
+  * German (CH)
+  * French (CH)
+  * Neo 2 (Layer 1,2 and 3)
+* Asymmetric encrypted backup on USB mass storage
+* OTP integration
+* Tree list style
+* Icons
+
 ## Roadmap
 * Bluetooth support
 * NFC support
 * Smartcard emulation (e.g. OpenPGP cards, etc.)
 * Redesign of the App
-* OTP integration
 
-##  Supported keyboard languages ([scancodes](https://en.wikipedia.org/wiki/Scancode))
-* English (US)
-* German
-* German (Apple)
-* German (CH)
-* French (CH)
-* Neo 2 (Layer 1,2 and 3)
-
-##  Requirements
+##  Requirements for USB Keyboard emulation
 * Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget)
 
 ## Proof of Concept
