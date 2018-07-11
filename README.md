@@ -39,8 +39,8 @@ The OTP secret can be added to a password entry manually or by scanning a QR cod
 Like username, password and other data, the OTP secret is stored in the password file.
 
 #### Additional placeholders
-In addition to the {OTP} placeholder, Authorizer also supports {TAB} and {RET} for the tabulator and return key. Adding one of these to the username and/or password will result in sending the respective key (tab or return) instead of the placeholder.
-Example: if "peter{TAB}{OTP}" is set as the username and it will be send over USB, "peter" will be typed followed by the tabulator key followed by a typed OTP.
+In addition to the {OTP} placeholder, Authorizer also supports {TAB} and {RET} for the tabulator and return key. Adding these to the username and/or password will result in sending the respective key (tab or return) instead of the placeholder.
+Example: if "peter{TAB}{OTP}" is set as the username and it will be send over USB, "peter" will be typed followed by the tabulator key followed by a newly generated OTP.
 
 ## Roadmap
 * Bluetooth support
