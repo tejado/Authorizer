@@ -189,6 +189,7 @@
                           android:layout_marginLeft="6dp"
                           android:layout_marginStart="6dp"
                           android:inputType="textPassword"
+                          android:importantForAccessibility="no"
                           android:textAppearance="?android:attr/textAppearanceMedium"
                           android:typeface="monospace"
                           tools:ignore="TextViewEdits"/>
@@ -210,6 +211,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/password"
                         android:inputType="textPassword"
+                        android:importantForAccessibility="no"
                         android:singleLine="true"/>
                 </android.support.design.widget.TextInputLayout>
 
@@ -243,6 +245,7 @@
                         android:layout_height="wrap_content"
                         android:hint="@string/confirm"
                         android:inputType="textPassword"
+                        android:importantForAccessibility="no"
                         android:singleLine="true"/>
                 </android.support.design.widget.TextInputLayout>
 
