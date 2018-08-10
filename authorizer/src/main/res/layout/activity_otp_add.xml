@@ -65,6 +65,7 @@
                         android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ234567="
                         android:hint="@string/base32"
                         android:inputType="textVisiblePassword|textCapCharacters|textNoSuggestions"
+                        android:importantForAccessibility="no"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
                 </TableRow>
 

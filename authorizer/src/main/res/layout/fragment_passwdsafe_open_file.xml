@@ -45,6 +45,7 @@
                     android:hint="@string/password"
                     android:imeOptions="actionGo"
                     android:inputType="textPassword"
+                    android:importantForAccessibility="no"
                     android:scrollHorizontally="true"
                     android:singleLine="true"
                     android:textAppearance="?android:attr/textAppearanceMedium"/>
