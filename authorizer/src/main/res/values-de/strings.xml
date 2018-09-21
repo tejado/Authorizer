@@ -336,6 +336,12 @@
 
     <string name="release_notes">
         \n
+        &lt;b&gt;0.3.0&lt;/b&gt;\n
+        - Neue Funktion: OTP Support\n
+        - Neue Funktion: Platzhalter im Benutzername und Passwort\n
+        - Beta Status entfernt\n
+        - Verbesserung der Sicherheit
+        \n\n
         &lt;b&gt;0.2.6&lt;/b&gt;\n
         - Neue Funktion: GPG verschlüsseltes Backup auf USB Speicher\n
         - Fehlerbehebungen

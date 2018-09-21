@@ -16,10 +16,9 @@ android {
         minSdkVersion 21
         resConfigs "de"
         targetSdkVersion 27
-        versionCode 206
-        versionName '0.2.6'
+        versionCode 300
+        versionName '0.3.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionNameSuffix 'beta'
 
         //Reference them in .xml files.
         resValue "string", "application_id", "${applicationId}"
