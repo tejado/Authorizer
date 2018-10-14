@@ -575,6 +575,7 @@
 
     <!-- added by TM -->
     <string name="password_send_usb">Send Password over USB</string>
+    <string name="password_send_otp">Send OTP over USB</string>
 
     <string name="title_usbkbd_language">USB Keyboard Layout</string>
     <string name="usbkbd_language_default">Android Systems Default</string>
