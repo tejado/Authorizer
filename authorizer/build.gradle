@@ -61,8 +61,8 @@ dependencies {
         exclude module: 'recyclerview-v7'
     }
     androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.1'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:27.1.0'
+    implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.github.bmelnychuk:atv:1.2.+'
     implementation 'com.mikepenz:iconics-core:2.8.1@aar'
     implementation 'com.mikepenz:material-design-iconic-typeface:2.2.0.2@aar'
