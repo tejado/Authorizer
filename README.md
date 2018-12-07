@@ -51,5 +51,9 @@ Example: if "peter{TAB}{OTP}" is set as the username and it will be send over US
 ##  Requirements for USB Keyboard emulation
 * Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget)
 
+## Contributions & Community
+Contributions are highly welcome.  
+For support & development discussions around Authorizer, feel free to join our [private Mattermost](https://mm.ramrod.top/signup_user_complete/?id=uhqbkjwkdt865p5i6q75nodmrc).
+
 ## Proof of Concept
 Proof-of-Concept app for USB Keyboard emulation: [Authorizer-PoC](https://github.com/tejado/Authorizer-PoC)
