@@ -24,8 +24,8 @@ def buildTime() {
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     publishNonDefault true
     defaultConfig {
         minSdkVersion 10
