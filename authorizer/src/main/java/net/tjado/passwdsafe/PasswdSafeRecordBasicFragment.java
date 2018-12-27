@@ -91,6 +91,7 @@ public class PasswdSafeRecordBasicFragment
     private Button itsUsernameSend;
     private Button itsCredentialSend;
     private Button itsPasswordSend;
+    private Button itsOTPSend;
     private CheckBox itsSendReturnSuffix;
     private RadioGroup itsSendDelimiter;
     private View itsUrlRow;
@@ -182,14 +183,34 @@ public class PasswdSafeRecordBasicFragment
                 SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
                 OutputInterface.Language lang;
                 lang = Preferences.getUsbkbdLanguagePref(prefs);
-                sendCredentialUsb(lang, true, false);
+                sendCredentialUsb(lang, true, false, false);
             }
         });
         itsUsernameSend.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
 
-                sendCredentialUsbCustomLang(true, false);
+                sendCredentialUsbCustomLang(true, false, false);
+                return true;
+            }
+        });
+
+        // otp send
+        itsOTPSend = (Button)root.findViewById(R.id.password_send_otp);
+        itsOTPSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+                OutputInterface.Language lang;
+                lang = Preferences.getUsbkbdLanguagePref(prefs);
+                sendCredentialUsb(lang, false, false, true);
+            }
+        });
+        itsOTPSend.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                sendCredentialUsbCustomLang(true, false, false);
                 return true;
             }
         });
@@ -202,14 +223,14 @@ public class PasswdSafeRecordBasicFragment
                 SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
                 OutputInterface.Language lang;
                 lang = Preferences.getUsbkbdLanguagePref(prefs);
-                sendCredentialUsb(lang, true, true);
+                sendCredentialUsb(lang, true, true, false);
             }
         });
         itsCredentialSend.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
 
-                sendCredentialUsbCustomLang(true, true);
+                sendCredentialUsbCustomLang(true, true, false);
                 return true;
             }
         });
@@ -222,14 +243,14 @@ public class PasswdSafeRecordBasicFragment
                 SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
                 OutputInterface.Language lang;
                 lang = Preferences.getUsbkbdLanguagePref(prefs);
-                sendCredentialUsb(lang, false, true);
+                sendCredentialUsb(lang, false, true, false);
             }
         });
         itsPasswordSend.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
 
-                sendCredentialUsbCustomLang(false, true);
+                sendCredentialUsbCustomLang(false, true, false);
                 return true;
             }
         });
@@ -242,6 +263,7 @@ public class PasswdSafeRecordBasicFragment
             itsUsernameSend.setVisibility(View.GONE);
             itsCredentialSend.setVisibility(View.GONE);
             itsPasswordSend.setVisibility(View.GONE);
+            itsOTPSend.setVisibility(View.GONE);
             itsSendReturnSuffix.setVisibility(View.GONE);
             itsSendDelimiter.setVisibility(View.GONE);
         }
@@ -702,17 +724,32 @@ public class PasswdSafeRecordBasicFragment
      * send credential over USB HID
      */
     private void sendCredentialUsb(OutputInterface.Language lang,
-                                   Boolean sendUsername, Boolean sendPassword)
+                                   Boolean sendUsername, Boolean sendPassword, Boolean sendOTP)
     {
         String username = getUsername();
         String password = getPassword();
+        String otp = getOtp();
         String quoteSubReturn = Pattern.quote(SUB_RETURN);
         String quoteSubTab = Pattern.quote(SUB_TAB);
 
         try {
             OutputInterface ct = new OutputKeyboardAsRoot(lang);
-
             boolean otpTokenGenerated = false;
+
+            if( sendOTP == true && otp != null ) {
+                generateOtpToken();
+                otpTokenGenerated = true;
+
+                int ret = 0;
+                ret = ct.sendText(itsOtp.getCurrentCode());
+
+                if (ret == 1) {
+                    PasswdSafeUtil.showErrorMsg(
+                            "Unvalid OTP token generated!",
+                            getContext());
+                }
+            }
+
             if( sendUsername == true && username != null ) {
                 if (username.contains(SUB_OTP)){
                     generateOtpToken();
@@ -799,7 +836,7 @@ public class PasswdSafeRecordBasicFragment
     /**
      * send credential over USB HID
      */
-    private void sendCredentialUsb(String usbKbdLang, Boolean sendUsername, Boolean sendPassword)
+    private void sendCredentialUsb(String usbKbdLang, Boolean sendUsername, Boolean sendPassword, Boolean sendOtp)
     {
 
         if( usbKbdLang.equals("null") ) {
@@ -817,11 +854,12 @@ public class PasswdSafeRecordBasicFragment
             lang = OutputInterface.Language.en_US;
         }
 
-        sendCredentialUsb(lang, sendUsername, sendPassword);
+        sendCredentialUsb(lang, sendUsername, sendPassword, sendOtp);
     }
 
     public void sendCredentialUsbCustomLang(final Boolean sendUsername,
-                                            final Boolean sendPassword)
+                                            final Boolean sendPassword,
+                                            final Boolean sendOTP)
     {
 
         // Build an AlertDialog
@@ -830,7 +868,7 @@ public class PasswdSafeRecordBasicFragment
         builder.setTitle(R.string.title_usbkbd_language)
                .setItems(R.array.usbkbd_languages_titels, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int which) {
-                       sendCredentialUsb( getResources().getStringArray(R.array.usbkbd_languages_values)[which], sendUsername, sendPassword );
+                       sendCredentialUsb( getResources().getStringArray(R.array.usbkbd_languages_values)[which], sendUsername, sendPassword, sendOTP );
                    }
                });
 

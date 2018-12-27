@@ -573,6 +573,7 @@
         <item>Hexadezimal</item>
     </string-array>
     <string name="password_send_usb">Passwort über USB senden</string>
+    <string name="password_send_otp">OTP über USB senden</string>
     <string name="usbkbd_language_default">Androids System Standard</string>
     <string name="usbkbd_language_english">Englisch (US)</string>
     <string name="usbkbd_language_german">Deutsch</string>

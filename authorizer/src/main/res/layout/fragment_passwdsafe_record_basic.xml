@@ -106,14 +106,7 @@
                         android:layout_weight="1"
                         android:textSize="10sp"
                         style="@style/Widget.AppCompat.Button"/>
-                    <Button
-                        android:text="@string/credential_send_usb"
-                        android:layout_width="187dp"
-                        android:layout_height="match_parent"
-                        android:id="@+id/credential_send"
-                        android:layout_weight="1"
-                        android:textSize="10sp"
-                        style="@style/Widget.AppCompat.Button.Colored"/>
+
                     <Button
                         android:text="@string/password_send_usb"
                         android:layout_width="191dp"
@@ -122,6 +115,26 @@
                         android:layout_weight="1"
                         android:textSize="10sp"
                         style="@style/Widget.AppCompat.Button"/>
+                    <Button
+                        android:text="@string/password_send_otp"
+                        android:layout_width="191dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/password_send_otp"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <Button
+                    android:text="@string/credential_send_usb"
+                    android:layout_width="187dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/credential_send"
+                    android:layout_weight="1"
+                    android:textSize="10sp"
+                    style="@style/Widget.AppCompat.Button.Colored"/>
                 </LinearLayout>
                 <CheckBox
                     android:text="@string/send_return_suffix"
