@@ -1130,7 +1130,7 @@ public class PasswdSafeOpenFileFragment
                 break;
             }
             case ERROR: {
-                textColor = R.attr.textColorError;
+                textColor = R.attr.colorError;
                 resolve = true;
                 break;
             }
