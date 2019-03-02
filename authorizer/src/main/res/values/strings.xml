@@ -574,10 +574,14 @@
     </string-array>
 
     <!-- added by TM -->
-    <string name="password_send_usb">Send Password over USB</string>
-    <string name="password_send_otp">Send OTP over USB</string>
+    <string name="send_usb_header">Send over USB</string>
+    <string name="send_bluetooth_header">Send over Bluetooth</string>
 
-    <string name="title_usbkbd_language">USB Keyboard Layout</string>
+    <string name="send_username">Username</string>
+    <string name="send_password">Password</string>
+    <string name="send_otp">OTP</string>
+    <string name="send_credentials">Name/Pass</string>
+
     <string name="usbkbd_language_default">Android Systems Default</string>
     <string name="usbkbd_language_english">English (US)</string>
     <string name="usbkbd_language_german">German</string>
@@ -605,9 +609,9 @@
         <item>fr_CH</item>
         <item>neo</item>
     </string-array>
+
+    <string name="title_usbkbd_language">USB Keyboard Layout</string>
     <string name="send_return_suffix">Send \"Return\" after password</string>
-    <string name="credential_send_usb">Send User name and Password over USB</string>
-    <string name="username_send_usb">Send User name over USB</string>
     <string name="use_treeview_list">Use tree list</string>
     <string name="usbkbd_output">USB Keyboard Output</string>
     <string name="usbkbd_enable">Enable USB Keyboard Output</string>
@@ -637,6 +641,9 @@
         <item>SHA512</item>
     </string-array>
 
+    <string name="bluetooth_enabled">Bluetooth enabled!</string>
+    <string name="bluetooth_enable_error">Bluetooth could not be enabled!</string>
+    <string name="error_permission_camera_open">No permission to open the camera!</string>
     <string name="error_camera_open">Error while opening camera!</string>
     <string name="otp_header">OTP</string>
     <string name="otp_overwrite">Replace the current OTP? It will be lost forever!</string>

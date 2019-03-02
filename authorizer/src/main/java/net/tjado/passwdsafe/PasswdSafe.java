@@ -34,7 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.tjado.authorizer.OutputInterface;
-import net.tjado.authorizer.OutputKeyboardAsRoot;
+import net.tjado.authorizer.OutputUsbKeyboardAsRoot;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.file.PasswdFileUri;
@@ -782,7 +782,7 @@ public class PasswdSafe extends AppCompatActivity
         });
 
         try {
-            OutputInterface ct = new OutputKeyboardAsRoot(
+            OutputInterface ct = new OutputUsbKeyboardAsRoot(
                     OutputInterface.Language.AppleMac_de_DE);
 
             String SUB_OTP = getResources().getString(R.string.SUB_OTP);

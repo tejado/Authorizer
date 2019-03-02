@@ -89,17 +89,30 @@
                 <SeekBar android:id="@+id/password_seek"
                          android:layout_width="match_parent"
                          android:layout_height="wrap_content"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/send_usb_row"
+                      style="@style/RecordRow"
+                      android:clickable="true">
+
+            <TextView style="@style/RecordHeader"
+                      android:clickable="false"
+                      android:text="@string/send_usb_header" />
+
+            <View style="@style/Separator"
+                  android:clickable="false"/>
+
+            <LinearLayout style="@style/RecordField.Large"
+                          android:clickable="false"
+                          android:orientation="vertical">
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <Button
-                        android:text="@string/username_send_usb"
+                        android:text="@string/send_username"
                         android:layout_width="191dp"
                         android:layout_height="match_parent"
                         android:id="@+id/username_send"
@@ -108,7 +121,7 @@
                         style="@style/Widget.AppCompat.Button"/>
 
                     <Button
-                        android:text="@string/password_send_usb"
+                        android:text="@string/send_password"
                         android:layout_width="191dp"
                         android:layout_height="match_parent"
                         android:id="@+id/password_send"
@@ -116,26 +129,79 @@
                         android:textSize="10sp"
                         style="@style/Widget.AppCompat.Button"/>
                     <Button
-                        android:text="@string/password_send_otp"
+                        android:text="@string/send_otp"
                         android:layout_width="191dp"
                         android:layout_height="match_parent"
                         android:id="@+id/password_send_otp"
                         android:layout_weight="1"
                         android:textSize="10sp"
                         style="@style/Widget.AppCompat.Button"/>
+                    <Button
+                        android:text="@string/send_credentials"
+                        android:layout_width="187dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/credential_send"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button.Colored"/>
                 </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/send_bt_row"
+                      style="@style/RecordRow"
+                      android:clickable="true">
+
+            <TextView style="@style/RecordHeader"
+                      android:clickable="false"
+                      android:text="@string/send_bluetooth_header" />
+
+            <View style="@style/Separator"
+                  android:clickable="false"/>
+
+            <LinearLayout style="@style/RecordField.Large"
+                          android:clickable="false"
+                          android:orientation="vertical">
+
                 <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <Button
-                    android:text="@string/credential_send_usb"
-                    android:layout_width="187dp"
-                    android:layout_height="match_parent"
-                    android:id="@+id/credential_send"
-                    android:layout_weight="1"
-                    android:textSize="10sp"
-                    style="@style/Widget.AppCompat.Button.Colored"/>
+                        android:text="@string/send_username"
+                        android:layout_width="191dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/bluetooth_username_send"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button"/>
+
+                    <Button
+                        android:text="@string/send_password"
+                        android:layout_width="191dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/bluetooth_password_send"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button"/>
+                    <Button
+                        android:text="@string/send_otp"
+                        android:layout_width="191dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/bluetooth_password_send_otp"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button"/>
+                    <Button
+                        android:text="@string/send_credentials"
+                        android:layout_width="187dp"
+                        android:layout_height="match_parent"
+                        android:id="@+id/bluetooth_credential_send"
+                        android:layout_weight="1"
+                        android:textSize="10sp"
+                        style="@style/Widget.AppCompat.Button.Colored"/>
                 </LinearLayout>
+
                 <CheckBox
                     android:text="@string/send_return_suffix"
                     android:layout_width="375dp"
