@@ -44,4 +44,8 @@ captures/
 *.o.d
 .idea/libraries/
 .idea/workspace.xml
+.idea/caches/
 .DS_Store
+authorizer/debug/
+authorizer/release/
+authorizer/.externalNativeBuild/
