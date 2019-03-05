@@ -572,8 +572,16 @@
         <item>Aussprechbar</item>
         <item>Hexadezimal</item>
     </string-array>
-    <string name="password_send_usb">Passwort über USB senden</string>
-    <string name="password_send_otp">OTP über USB senden</string>
+
+    <!-- added by TM -->
+    <string name="send_usb_header">Über USB senden</string>
+    <string name="send_bluetooth_header">Über Bluetooth senden</string>
+
+    <string name="send_username">Name</string>
+    <string name="send_password">Passwort</string>
+    <string name="send_otp">OTP</string>
+    <string name="send_credentials">Name/Pass</string>
+
     <string name="usbkbd_language_default">Androids System Standard</string>
     <string name="usbkbd_language_english">Englisch (US)</string>
     <string name="usbkbd_language_german">Deutsch</string>
@@ -581,6 +589,7 @@
     <string name="usbkbd_language_swiss_german">Deutsch (CH)</string>
     <string name="usbkbd_language_swiss_french">Französisch (CH)</string>
     <string name="usbkbd_language_neo">Neo 2.0</string>
+
     <string-array name="usbkbd_languages_titels">
         <item>@string/usbkbd_language_default</item>
         <item>@string/usbkbd_language_english</item>
@@ -600,13 +609,15 @@
         <item>fr_CH</item>
         <item>neo</item>
     </string-array>
+
     <string name="title_usbkbd_language">USB Keyboard Layout</string>
-    <string name="credential_send_usb">User name/Passwort über USB senden</string>
-    <string name="username_send_usb">User name über USB senden</string>
+    <string name="title_bluetoothkbd_device">Gekoppelte Bluetooth Geräte</string>
     <string name="send_return_suffix">\"Enter\" nach Passwort senden</string>
     <string name="use_treeview_list">Baumansicht</string>
-    <string name="usbkbd_enable">Aktiviere USB Keyboard Ausgabe</string>
     <string name="usbkbd_output">USB Keyboard Ausgabe</string>
+    <string name="usbkbd_enable">Aktiviere USB Keyboard Ausgabe</string>
+    <string name="bluetoothkbd_enable">Aktiviere Bluetooth Keyboard Ausgabe</string>
+    <string name="bluetoothkbd_enable_version">Android Pie (28) oder höher benötigt.</string>
 
     <string name="entry">Eintrag</string>
     <string name="entries">Einträge</string>
@@ -634,6 +645,9 @@
         <item>SHA512</item>
     </string-array>
 
+    <string name="bluetooth_enabled">Bluetooth aktiviert!</string>
+    <string name="bluetooth_enable_error">Bluetooth konnte nicht aktiviert werden!</string>
+    <string name="error_permission_camera_open">Keine Berechtigung um die Kamera zu öffnen!</string>
     <string name="error_camera_open">Fehler beim Öffnen der Kamera!</string>
     <string name="otp_header">OTP</string>
     <string name="otp_overwrite">Aktuellen OTP ersetzen? Dieser kann nicht wiederhergestellt werden!</string>
@@ -648,6 +662,7 @@
     <string name="otp_token">Token:</string>
     <string name="add_otp_manually">OTP manuell hinzufügen</string>
     <string name="add_otp_camera">OTP QR Code scannen</string>
+
     <string name="send_delimiter_return">Enter</string>
     <string name="send_delimiter_tab">Tab</string>
     <string name="send_delimiter_desc">Trennzeichen:></string>

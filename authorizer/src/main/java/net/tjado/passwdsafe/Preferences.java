@@ -141,6 +141,9 @@ public class Preferences
     public static final String PREF_USBKBD_ENABLE = "usbkbdEnablePref";
     private static final boolean PREF_USBKBD_ENABLE_DEF = true;
 
+    public static final String PREF_BLUETOOTHKBD_ENABLE = "bluetoothkbdEnablePref";
+    private static final boolean PREF_BLUETOOTHKBD_ENABLE_DEF = true;
+
     public static final String PREF_USBKBD_LANGUAGE = "usbkbdLanguagePref";
     private static final OutputInterface.Language PREF_USBKBD_LANGUAGE_DEF = OutputInterface.Language.en_US;
 
@@ -512,6 +515,15 @@ public class Preferences
     {
         return prefs.getBoolean(PREF_USBKBD_ENABLE,
                                 PREF_USBKBD_ENABLE_DEF);
+    }
+
+    /**
+     * Get whether to enable USB Keyboard Output
+     */
+    public static boolean getBluetoothkbdEnabled(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_BLUETOOTHKBD_ENABLE,
+                                PREF_BLUETOOTHKBD_ENABLE_DEF);
     }
 
     public static OutputInterface.Language getUsbkbdLanguagePref(SharedPreferences prefs)

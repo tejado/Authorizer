@@ -18,6 +18,9 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
     <uses-permission android:name="net.tjado.authorizer.client.provider.permission.ACCESS"/>
     <uses-permission android:name="android.permission.NFC"/>

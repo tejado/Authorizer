@@ -184,6 +184,13 @@
             android:title="@string/usbkbd_enable"/>
 
         <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongCheckBoxPreference
+            android:name="bluetoothkbdEnable Pref"
+            android:defaultValue="true"
+            android:key="bluetoothkbdEnablePref"
+            android:title="@string/bluetoothkbd_enable"/>
+
+        <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongListPreference
             android:name="usbkbdLanguage Pref"
             android:key="usbkbdLanguagePref"
