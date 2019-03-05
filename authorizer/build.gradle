@@ -13,7 +13,7 @@ android {
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId 'net.tjado.passwdsafe'
-        minSdkVersion 28 //21
+        minSdkVersion 21
         resConfigs "de"
         targetSdkVersion 28
         versionCode 300

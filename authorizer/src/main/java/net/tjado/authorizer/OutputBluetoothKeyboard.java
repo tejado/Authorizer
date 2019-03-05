@@ -16,7 +16,9 @@ import android.bluetooth.BluetoothHidDevice;
 import android.bluetooth.BluetoothHidDeviceAppSdpSettings;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.os.Build;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -26,7 +28,7 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-
+@RequiresApi(Build.VERSION_CODES.P)
 public class OutputBluetoothKeyboard implements OutputInterface
 {
     private static final String TAG = "OutputBluetoothKeyboard";
@@ -189,7 +191,6 @@ public class OutputBluetoothKeyboard implements OutputInterface
     {
         Utilities.dbginfo(TAG,"deinitializeBluetoothHidDevice");
 
-
         // disconnect not necessary as unregisterApp will do it for us...
         //if(btDevice != null) {
         //    Utilities.dbginfo(TAG,"disconnect: " + btDevice);
@@ -216,7 +217,7 @@ public class OutputBluetoothKeyboard implements OutputInterface
                     Utilities.dbginfo(TAG, "onConnectionStateChanged: CONNECTED");
 
                     // delay required otherwise the device is not ready yet to receive the data
-                    SystemClock.sleep(100);
+                    SystemClock.sleep(300);
 
                     // connection ready ... send data to device
                     send();

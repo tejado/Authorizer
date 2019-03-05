@@ -17,6 +17,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.preference.EditTextPreference;
@@ -32,7 +33,6 @@ import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdPolicy;
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
-import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.pref.FileBackupPref;
 import net.tjado.passwdsafe.pref.FileTimeoutPref;
 import net.tjado.passwdsafe.pref.PasswdExpiryNotifPref;
@@ -85,6 +85,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     private EditTextPreference itsPasswdDefaultSymsPref;
     private ListPreference itsRecordSortOrderPref;
     private LongCheckBoxPreference itsFileBackupUsbGpgPref;
+    private LongCheckBoxPreference itsUsbkbdEnablePref;
 
     /**
      * Create a new instance
@@ -180,6 +181,17 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         itsUsbkbdLangPref.setEntries(R.array.usbkbd_languages_titels);
         itsUsbkbdLangPref.setEntryValues(R.array.usbkbd_languages_values);
         onSharedPreferenceChanged(prefs, Preferences.PREF_USBKBD_LANGUAGE);
+
+        itsUsbkbdEnablePref = (LongCheckBoxPreference)
+                findPreference(Preferences.PREF_BLUETOOTHKBD_ENABLE);
+        itsUsbkbdEnablePref.setSummary(R.string.bluetoothkbd_enable_version);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            itsUsbkbdEnablePref.setEnabled(false);
+            itsUsbkbdEnablePref.setChecked(false);
+        }
+
+
     }
 
     @Override
@@ -280,10 +292,6 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             break;
         }
         case Preferences.PREF_DISPLAY_LIST_TREEVIEW: {
-            ApiCompat.recreateActivity(getActivity());
-            break;
-        }
-        case Preferences.PREF_USBKBD_ENABLE: {
             ApiCompat.recreateActivity(getActivity());
             break;
         }

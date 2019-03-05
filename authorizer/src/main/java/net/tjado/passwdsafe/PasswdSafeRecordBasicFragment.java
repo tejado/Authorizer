@@ -16,10 +16,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -31,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
@@ -204,7 +207,6 @@ public class PasswdSafeRecordBasicFragment
         itsUsernameSend.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-
                 sendCredentialUsbCustomLang(true, false, false);
                 return true;
             }
@@ -215,15 +217,12 @@ public class PasswdSafeRecordBasicFragment
         itsPasswordSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 sendCredentialUsb(lang, false, true, false);
             }
         });
         itsPasswordSend.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-
                 sendCredentialUsbCustomLang(false, true, false);
                 return true;
             }
@@ -240,7 +239,6 @@ public class PasswdSafeRecordBasicFragment
         itsOTPSend.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-
                 sendCredentialUsbCustomLang(true, false, false);
                 return true;
             }
@@ -257,97 +255,97 @@ public class PasswdSafeRecordBasicFragment
         itsCredentialSend.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-
                 sendCredentialUsbCustomLang(true, true, false);
                 return true;
             }
         });
 
 
-        // username send
-        itsBluetoothUsernameSend = (Button)root.findViewById(R.id.bluetooth_username_send);
-        itsBluetoothUsernameSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendCredentialBluetooth(lang, true, false, false);
-            }
-        });
-        itsBluetoothUsernameSend.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
 
-                sendCredentialBluetoothCustomLang(true, false, false);
-                return true;
-            }
-        });
+        LinearLayout sendUsbRow = root.findViewById(R.id.send_usb_row);
+        LinearLayout sendBluetoothRow = root.findViewById(R.id.send_bt_row);
+        LinearLayout sendSettingsRow = root.findViewById(R.id.send_settings_row);
 
-        // password send
-        itsBluetoothPasswordSend = (Button)root.findViewById(R.id.bluetooth_password_send);
-        itsBluetoothPasswordSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if (Preferences.getBluetoothkbdEnabled(prefs) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // username send
+            itsBluetoothUsernameSend = (Button)root.findViewById(R.id.bluetooth_username_send);
+            itsBluetoothUsernameSend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sendCredentialBluetooth(lang, true, false, false);
+                }
+            });
+            itsBluetoothUsernameSend.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
 
+                    sendCredentialBluetoothCustomLang(true, false, false);
+                    return true;
+                }
+            });
 
-                sendCredentialBluetooth(lang, false, true, false);
-            }
-        });
-        itsBluetoothPasswordSend.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
+            // password send
+            itsBluetoothPasswordSend = (Button)root.findViewById(R.id.bluetooth_password_send);
+            itsBluetoothPasswordSend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sendCredentialBluetooth(lang, false, true, false);
+                }
+            });
+            itsBluetoothPasswordSend.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    sendCredentialBluetoothCustomLang(false, true, false);
+                    return true;
+                }
+            });
 
-                sendCredentialBluetoothCustomLang(false, true, false);
-                return true;
-            }
-        });
+            // otp send
+            itsBluetoothOTPSend = (Button)root.findViewById(R.id.bluetooth_password_send_otp);
+            itsBluetoothOTPSend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sendCredentialBluetooth(lang, false, false, true);
+                }
+            });
+            itsBluetoothOTPSend.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    sendCredentialBluetoothCustomLang(true, false, false);
+                    return true;
+                }
+            });
 
-        // otp send
-        itsBluetoothOTPSend = (Button)root.findViewById(R.id.bluetooth_password_send_otp);
-        itsBluetoothOTPSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendCredentialBluetooth(lang, false, false, true);
-            }
-        });
-        itsBluetoothOTPSend.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
+            // credential send
+            itsBluetoothCredentialSend = (Button)root.findViewById(R.id.bluetooth_credential_send);
+            itsBluetoothCredentialSend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sendCredentialBluetooth(lang, true, true, false);
+                }
+            });
+            itsBluetoothCredentialSend.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    sendCredentialBluetoothCustomLang(true, true, false);
+                    return true;
+                }
+            });
 
-                sendCredentialBluetoothCustomLang(true, false, false);
-                return true;
-            }
-        });
+        } else {
+            sendBluetoothRow.setVisibility(View.GONE);
+        }
 
-        // credential send
-        itsBluetoothCredentialSend = (Button)root.findViewById(R.id.bluetooth_credential_send);
-        itsBluetoothCredentialSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendCredentialBluetooth(lang, true, true, false);
-            }
-        });
-        itsBluetoothCredentialSend.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
+        if ( ! Preferences.getUsbkbdEnabled(prefs)) {
+            sendUsbRow.setVisibility(View.GONE);
+        }
 
-                sendCredentialBluetoothCustomLang(true, true, false);
-                return true;
-            }
-        });
-
-
-
+        if (sendUsbRow.getVisibility() == View.GONE && sendBluetoothRow.getVisibility() == View.GONE) {
+            sendSettingsRow.setVisibility(View.GONE);
+        }
 
         itsSendReturnSuffix = (CheckBox) root.findViewById(R.id.send_return_suffix);
         itsSendDelimiter = (RadioGroup) root.findViewById(R.id.send_delimiter);
-
-        if ( ! Preferences.getUsbkbdEnabled(prefs)) {
-            itsUsernameSend.setVisibility(View.GONE);
-            itsCredentialSend.setVisibility(View.GONE);
-            itsPasswordSend.setVisibility(View.GONE);
-            itsOTPSend.setVisibility(View.GONE);
-            itsSendReturnSuffix.setVisibility(View.GONE);
-            itsSendDelimiter.setVisibility(View.GONE);
-        }
 
         itsUrlRow = root.findViewById(R.id.url_row);
         itsUrl = (TextView)root.findViewById(R.id.url);
@@ -778,6 +776,7 @@ public class PasswdSafeRecordBasicFragment
     /**
      * send credential over Bluetooth HID
      */
+    @RequiresApi(Build.VERSION_CODES.P)
     private void sendCredentialBluetooth(OutputInterface.Language lang,
                                    Boolean sendUsername, Boolean sendPassword, Boolean sendOTP)
     {
@@ -883,7 +882,7 @@ public class PasswdSafeRecordBasicFragment
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(R.string.title_usbkbd_language)
+        builder.setTitle(R.string.title_bluetoothkbd_device)
                .setItems(cs, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int which) {
                        itsOutputBluetoothKeyboard.connectDeviceAndSend( deviceList.get(cs[which]), outputStream.toByteArray() );
@@ -898,6 +897,7 @@ public class PasswdSafeRecordBasicFragment
     /**
      * send credential over Bluetooth HID
      */
+    @RequiresApi(Build.VERSION_CODES.P)
     private void sendCredentialBluetooth(String usbKbdLang, Boolean sendUsername, Boolean sendPassword, Boolean sendOtp)
     {
 
@@ -919,7 +919,7 @@ public class PasswdSafeRecordBasicFragment
         sendCredentialBluetooth(lang, sendUsername, sendPassword, sendOtp);
     }
 
-
+    @RequiresApi(Build.VERSION_CODES.P)
     public void sendCredentialBluetoothCustomLang(final Boolean sendUsername,
                                             final Boolean sendPassword,
                                             final Boolean sendOTP)
