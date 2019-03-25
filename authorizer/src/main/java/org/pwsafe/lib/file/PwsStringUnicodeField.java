@@ -7,7 +7,7 @@
  */
 package org.pwsafe.lib.file;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.io.UnsupportedEncodingException;
 

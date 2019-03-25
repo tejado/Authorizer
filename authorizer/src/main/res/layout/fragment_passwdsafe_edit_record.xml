@@ -71,11 +71,11 @@
 
         </LinearLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/title_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -83,8 +83,8 @@
                 android:inputType="textCapSentences|textAutoCorrect"
                 android:singleLine="true">
                 <requestFocus/>
-            </android.support.design.widget.TextInputEditText>
-        </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputEditText>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -119,43 +119,43 @@
 
         </LinearLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/user"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/username"
                 android:inputType="textNoSuggestions"
                 android:singleLine="true"/>
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/url_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/url"
                 android:inputType="textUri"
                 android:singleLine="true"/>
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/email_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"
                 android:singleLine="true"/>
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Password fields -->
         <TextView android:id="@+id/password_label"
@@ -198,14 +198,14 @@
 
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="wrap_content">
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/password_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:passwordToggleEnabled="false"
                     android:layout_toLeftOf="@+id/password_visibility"
                     android:layout_toStartOf="@+id/password_visibility">
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -213,7 +213,7 @@
                         android:inputType="textPassword"
                         android:importantForAccessibility="no"
                         android:singleLine="true"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <ImageView android:id="@+id/password_visibility"
                            style="@style/Widget.AppCompat.ActionButton"
@@ -232,14 +232,14 @@
 
             <RelativeLayout android:layout_width="match_parent"
                             android:layout_height="wrap_content">
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/password_confirm_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:passwordToggleEnabled="false"
                     android:layout_toLeftOf="@+id/password_generate"
                     android:layout_toStartOf="@+id/password_generate">
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/password_confirm"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -247,7 +247,7 @@
                         android:inputType="textPassword"
                         android:importantForAccessibility="no"
                         android:singleLine="true"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <ImageView android:id="@+id/password_generate"
                            style="@style/Widget.AppCompat.ActionButton"
@@ -346,18 +346,18 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/expire_interval_val_input"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
-                        <android.support.design.widget.TextInputEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/expire_interval_val"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/days"
                             android:inputType="number"
                             android:minWidth="64dp"/>
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <CheckBox android:id="@+id/expire_interval_recurring"
                               android:layout_width="wrap_content"
@@ -404,7 +404,7 @@
                           android:layout_marginTop="16dp"
                           android:text="@string/enabled"/>
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/history_max_size_input"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -413,7 +413,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_toEndOf="@+id/history_enabled"
                     android:layout_toRightOf="@+id/history_enabled">
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/history_max_size"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -421,7 +421,7 @@
                         android:inputType="number"
                         android:minWidth="100dip"
                         android:singleLine="false"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <ListView android:id="@+id/history"
                           android:layout_width="fill_parent"

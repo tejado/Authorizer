@@ -10,9 +10,9 @@ package net.tjado.passwdsafe.lib.view;
 import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.os.OperationCanceledException;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.core.os.OperationCanceledException;
 
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 

@@ -10,8 +10,8 @@ package net.tjado.passwdsafe;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ListFragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.ListFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;

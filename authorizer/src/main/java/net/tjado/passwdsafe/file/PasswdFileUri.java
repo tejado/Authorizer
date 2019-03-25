@@ -40,7 +40,7 @@ import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.OpenableColumns;
-import android.support.v4.os.EnvironmentCompat;
+import androidx.core.os.EnvironmentCompat;
 import android.util.Log;
 
 import net.tjado.passwdsafe.Preferences;

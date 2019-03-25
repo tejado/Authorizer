@@ -7,8 +7,8 @@
  */
 package org.pwsafe.lib.file;
 
-import android.support.annotation.CheckResult;
-import android.support.annotation.NonNull;
+import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
 
 import java.io.Closeable;
 import java.io.IOException;

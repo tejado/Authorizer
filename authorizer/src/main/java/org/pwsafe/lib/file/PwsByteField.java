@@ -7,7 +7,7 @@
  */
 package org.pwsafe.lib.file;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Provides a wrapper for fields that hold a byte value. Byte values

@@ -44,12 +44,12 @@ android {
 }
 
 dependencies {
-    api 'com.android.support:appcompat-v7:28.0.0'
-    api 'com.android.support:cardview-v7:28.0.0'
-    api 'com.android.support:design:28.0.0'
-    api 'com.android.support:gridlayout-v7:28.0.0'
-    api 'com.android.support:preference-v7:28.0.0'
-    api 'com.android.support:preference-v14:28.0.0'
-    api 'com.android.support:support-v4:28.0.0'
-    api 'com.android.support:support-annotations:28.0.0'
+    api 'androidx.appcompat:appcompat:1.0.2'
+    api 'androidx.cardview:cardview:1.0.0'
+    api 'com.google.android.material:material:1.0.0'
+    api 'androidx.gridlayout:gridlayout:1.0.0'
+    api 'androidx.preference:preference:1.0.0'
+    api 'androidx.legacy:legacy-preference-v14:1.0.0'
+    api 'androidx.legacy:legacy-support-v4:1.0.0'
+    api 'androidx.annotation:annotation:1.0.2'
 }

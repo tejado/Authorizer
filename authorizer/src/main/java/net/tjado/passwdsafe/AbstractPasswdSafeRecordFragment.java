@@ -7,7 +7,7 @@
  */
 package net.tjado.passwdsafe;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 

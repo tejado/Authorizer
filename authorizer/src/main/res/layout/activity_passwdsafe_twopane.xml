@@ -6,7 +6,7 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 
-<android.support.v4.widget.DrawerLayout
+<androidx.drawerlayout.widget.DrawerLayout
     android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -72,4 +72,4 @@
               android:layout_gravity="start"
               tools:layout="@layout/fragment_passwdsafe_nav_drawer"/>
 
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

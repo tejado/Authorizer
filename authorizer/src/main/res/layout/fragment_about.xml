@@ -21,11 +21,11 @@
                   android:layout_height="wrap_content"
                   android:orientation="vertical">
 
-        <android.support.v7.widget.GridLayout android:id="@+id/file_details_group"
-                                              android:layout_width="match_parent"
-                                              android:layout_height="wrap_content"
-                                              app:columnCount="2"
-                                              app:useDefaultMargins="true">
+        <androidx.gridlayout.widget.GridLayout android:id="@+id/file_details_group"
+                                               android:layout_width="match_parent"
+                                               android:layout_height="wrap_content"
+                                               app:columnCount="2"
+                                               app:useDefaultMargins="true">
 
             <TextView android:layout_width="wrap_content"
                       android:text="@string/file"
@@ -79,7 +79,7 @@
             <TextView android:id="@+id/last_save_time"
                       style="@style/GridField.W3"/>
 
-        </android.support.v7.widget.GridLayout>
+        </androidx.gridlayout.widget.GridLayout>
 
         <include layout="@layout/fragment_about_common"/>
 

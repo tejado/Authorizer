@@ -7,7 +7,7 @@
  */
 package net.tjado.passwdsafe.view;
 
-import android.support.design.widget.TextInputLayout;
+import com.google.android.material.textfield.TextInputLayout;
 import android.text.TextUtils;
 
 /**

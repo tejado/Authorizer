@@ -7,8 +7,8 @@
  */
 package net.tjado.passwdsafe.test.util;
 
-import android.support.design.widget.TextInputLayout;
-import android.support.test.espresso.matcher.BoundedMatcher;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.test.espresso.matcher.BoundedMatcher;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Adapter;
@@ -18,7 +18,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-import static android.support.test.espresso.intent.Checks.checkNotNull;
+import static androidx.test.espresso.intent.Checks.checkNotNull;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 

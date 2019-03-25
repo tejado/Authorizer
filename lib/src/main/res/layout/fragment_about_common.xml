@@ -9,10 +9,10 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
        xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v7.widget.GridLayout android:layout_width="match_parent"
-                                          android:layout_height="wrap_content"
-                                          app:columnCount="2"
-                                          app:useDefaultMargins="true">
+    <androidx.gridlayout.widget.GridLayout android:layout_width="match_parent"
+                                           android:layout_height="wrap_content"
+                                           app:columnCount="2"
+                                           app:useDefaultMargins="true">
 
         <TextView style="@style/GridLabelFixed"
                   android:text="@string/version"
@@ -34,7 +34,7 @@
         <TextView android:id="@+id/build_date"
                   style="@style/GridField"/>
 
-    </android.support.v7.widget.GridLayout>
+    </androidx.gridlayout.widget.GridLayout>
 
     <TextView android:id="@+id/release_notes_title"
               android:layout_width="match_parent"

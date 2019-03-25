@@ -12,10 +12,10 @@
               android:orientation="vertical"
               android:padding="16dp">
 
-    <android.support.design.widget.TextInputLayout
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
-        <android.support.design.widget.TextInputEditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/new_group"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -23,6 +23,6 @@
             android:imeOptions="actionGo"
             android:inputType="textCapSentences|textAutoCorrect"
             android:singleLine="true"/>
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

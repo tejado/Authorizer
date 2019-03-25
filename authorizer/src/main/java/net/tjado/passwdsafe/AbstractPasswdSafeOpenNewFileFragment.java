@@ -9,7 +9,7 @@ package net.tjado.passwdsafe;
 
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.View;
 import android.widget.ProgressBar;
 

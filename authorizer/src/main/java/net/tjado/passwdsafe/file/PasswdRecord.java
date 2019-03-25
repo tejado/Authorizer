@@ -13,7 +13,7 @@ import java.util.Locale;
 
 import org.pwsafe.lib.file.PwsRecord;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 

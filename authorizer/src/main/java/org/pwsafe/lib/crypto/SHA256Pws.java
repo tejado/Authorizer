@@ -8,7 +8,7 @@
 package org.pwsafe.lib.crypto;
 
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

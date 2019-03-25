@@ -8,7 +8,7 @@
 package net.tjado.passwdsafe;
 
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
+import androidx.drawerlayout.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
