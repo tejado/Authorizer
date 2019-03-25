@@ -17,6 +17,7 @@ Authorizer is based on [PasswdSafe](https://sourceforge.net/projects/passwdsafe/
 * USB Keyboard emulation
 * Different keyboard languages ([scancodes](https://en.wikipedia.org/wiki/Scancode))
   * English (US)
+  * English (GB)
   * German
   * German (Apple)
   * German (CH)

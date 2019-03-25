@@ -583,7 +583,8 @@
     <string name="send_credentials">Name/Pass</string>
 
     <string name="usbkbd_language_default">Androids System Standard</string>
-    <string name="usbkbd_language_english">Englisch (US)</string>
+    <string name="usbkbd_language_english_US">Englisch (US)</string>
+    <string name="usbkbd_language_english_GB">Englisch (GB)</string>
     <string name="usbkbd_language_german">Deutsch</string>
     <string name="usbkbd_language_german_apple">Deutsch (Apple)</string>
     <string name="usbkbd_language_swiss_german">Deutsch (CH)</string>
@@ -592,7 +593,8 @@
 
     <string-array name="usbkbd_languages_titels">
         <item>@string/usbkbd_language_default</item>
-        <item>@string/usbkbd_language_english</item>
+        <item>@string/usbkbd_language_english_US</item>
+        <item>@string/usbkbd_language_english_GB</item>
         <item>@string/usbkbd_language_german</item>
         <item>@string/usbkbd_language_german_apple</item>
         <item>@string/usbkbd_language_swiss_german</item>
@@ -603,6 +605,7 @@
     <string-array name="usbkbd_languages_values">
         <item>null</item>
         <item>en_US</item>
+        <item>en_GB</item>
         <item>de_DE</item>
         <item>AppleMac_de_DE</item>
         <item>de_CH</item>
