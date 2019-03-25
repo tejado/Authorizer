@@ -819,6 +819,9 @@ public class PasswdSafe extends AppCompatActivity
                             this);
                 }
             }
+        } catch (SecurityException e) {
+            PasswdSafeUtil.showInfoMsg(getResources().getString(
+                    R.string.usbkbd_root_rejected), this);
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
         }

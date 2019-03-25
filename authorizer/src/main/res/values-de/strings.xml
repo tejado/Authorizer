@@ -619,6 +619,10 @@
     <string name="bluetoothkbd_enable">Aktiviere Bluetooth Keyboard Ausgabe</string>
     <string name="bluetoothkbd_enable_version">Android Pie (28) oder höher benötigt.</string>
 
+    <string name="usbkbd_root_rejected">
+        FEHLER: root Zugriff verweigert. Die Keyboard Ausgabe über USB ist fehlgeschlagen da für dieses Feature root Zugriff benötigt wird!
+    </string>
+
     <string name="entry">Eintrag</string>
     <string name="entries">Einträge</string>
 

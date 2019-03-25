@@ -619,6 +619,10 @@
     <string name="bluetoothkbd_enable">Enable Bluetooth Keyboard Output</string>
     <string name="bluetoothkbd_enable_version">Android Pie (28) or higher required.</string>
 
+    <string name="usbkbd_root_rejected">
+        ERROR: root access rejected. Could not send output over USB as this feature of Authorizer requires root access!
+    </string>
+
     <string name="entry">entry</string>
     <string name="entries">entries</string>
 

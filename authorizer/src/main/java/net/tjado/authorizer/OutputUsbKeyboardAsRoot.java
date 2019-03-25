@@ -24,7 +24,9 @@ public class OutputUsbKeyboardAsRoot implements OutputInterface
 
     public OutputUsbKeyboardAsRoot(Language lang)
     {
-        ExecuteAsRootUtil.canRunRootCommands();
+        if( !ExecuteAsRootUtil.canRunRootCommands() ) {
+            throw new SecurityException("Root access rejected!");
+        }
 
         setLanguage(lang);
     }

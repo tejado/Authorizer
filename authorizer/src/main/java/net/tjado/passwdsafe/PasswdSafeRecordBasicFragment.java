@@ -1048,6 +1048,9 @@ public class PasswdSafeRecordBasicFragment
 
             ct.destruct();
 
+        } catch (SecurityException e) {
+            PasswdSafeUtil.showInfoMsg(getResources().getString(
+                    R.string.usbkbd_root_rejected), getContext());
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
         }
