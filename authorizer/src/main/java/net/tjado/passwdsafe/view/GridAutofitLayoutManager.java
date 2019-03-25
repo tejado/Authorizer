@@ -58,7 +58,7 @@ public class GridAutofitLayoutManager extends GridLayoutManager
         if (mColumnWidthChanged && mColumnWidth > 0 && width > 0 && height > 0)
         {
             int totalSpace;
-            if (getOrientation() == VERTICAL)
+            if (getOrientation() == RecyclerView.VERTICAL)
             {
                 totalSpace = width - getPaddingRight() - getPaddingLeft();
             }
