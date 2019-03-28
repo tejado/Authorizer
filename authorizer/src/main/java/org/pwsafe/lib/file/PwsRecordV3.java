@@ -192,6 +192,16 @@ public class PwsRecordV3 extends PwsRecord
     public static final int OTP = 192;
 
     /**
+     * Autotype Delimiter (not compliant to original Pws file format)
+     */
+    public static final int AUTOTYPE_DELIMITER = 193;
+
+    /**
+     * Autotype Return Suffix (not compliant to original Pws file format)
+     */
+    public static final int AUTOTYPE_RETURNSUFFIX = 194;
+
+    /**
      * Header database version
      */
     public static final int HEADER_VERSION = 0;
@@ -303,6 +313,10 @@ public class PwsRecordV3 extends PwsRecord
                          "ICON", PwsStringUnicodeField.class},
             new Object[]{Integer.valueOf(OTP),
                          "OTP", PwsStringUnicodeField.class},
+            new Object[]{Integer.valueOf(AUTOTYPE_DELIMITER),
+                         "AUTOTYPE_DELIMITER", PwsIntegerField.class},
+            new Object[]{Integer.valueOf(AUTOTYPE_RETURNSUFFIX),
+                         "AUTOTYPE_RETURNSUFFIX", PwsIntegerField.class},
             };
 
     /**
@@ -574,6 +588,8 @@ public class PwsRecordV3 extends PwsRecord
                                                item.getByteData());
                     break;
 
+                case AUTOTYPE_DELIMITER:
+                case AUTOTYPE_RETURNSUFFIX:
                 case PASSWORD_EXPIRY_INTERVAL:
                 case ENTRY_KEYBOARD_SHORTCUT:
                     itemVal = new PwsIntegerField(item.getType(),

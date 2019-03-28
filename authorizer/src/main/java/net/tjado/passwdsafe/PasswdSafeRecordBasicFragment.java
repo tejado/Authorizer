@@ -345,7 +345,31 @@ public class PasswdSafeRecordBasicFragment
         }
 
         itsSendReturnSuffix = (CheckBox) root.findViewById(R.id.send_return_suffix);
+        itsSendReturnSuffix.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Integer ival = 0;
+                if (itsSendReturnSuffix.isChecked()){
+                    ival = 1;
+                }
+                saveAutotypeReturnSuffix(ival);
+            }
+        });
+
         itsSendDelimiter = (RadioGroup) root.findViewById(R.id.send_delimiter);
+
+        View.OnClickListener sendDelimiterOnClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Integer ival = 2;
+                if (itsSendDelimiter.getCheckedRadioButtonId() == R.id.send_delimiter_return){
+                    ival = 1;
+                }
+                saveAutotypeDelimiterChange(ival);
+            }
+        };
+        root.findViewById(R.id.send_delimiter_return).setOnClickListener(sendDelimiterOnClickListener);
+        root.findViewById(R.id.send_delimiter_tab).setOnClickListener(sendDelimiterOnClickListener);
 
         itsUrlRow = root.findViewById(R.id.url_row);
         itsUrl = (TextView)root.findViewById(R.id.url);
@@ -576,6 +600,8 @@ public class PasswdSafeRecordBasicFragment
         String otp = null;
         Date creationTime = null;
         Date lastModTime = null;
+        Integer autotypeDelimiter = null;
+        Integer autotypeReturnSuffix = null;
         switch (info.itsPasswdRec.getType()) {
         case NORMAL: {
             itsBaseRow.setVisibility(View.GONE);
@@ -584,6 +610,9 @@ public class PasswdSafeRecordBasicFragment
             otp = info.itsFileData.getOtp(info.itsRec);
             creationTime = info.itsFileData.getCreationTime(info.itsRec);
             lastModTime = info.itsFileData.getLastModTime(info.itsRec);
+
+            autotypeDelimiter = info.itsFileData.getAutotypeDelimiter(info.itsRec);
+            autotypeReturnSuffix = info.itsFileData.getAutotypeReturnSuffix(info.itsRec);
             break;
         }
         case ALIAS: {
@@ -597,6 +626,9 @@ public class PasswdSafeRecordBasicFragment
             otp = info.itsFileData.getOtp(info.itsRec);
             creationTime = info.itsFileData.getCreationTime(recForPassword);
             lastModTime = info.itsFileData.getLastModTime(recForPassword);
+
+            autotypeDelimiter = info.itsFileData.getAutotypeDelimiter(info.itsRec);
+            autotypeReturnSuffix = info.itsFileData.getAutotypeReturnSuffix(info.itsRec);
             break;
         }
         case SHORTCUT: {
@@ -630,6 +662,14 @@ public class PasswdSafeRecordBasicFragment
 
         if (otp != null && !otp.equals("")) {
             itsOtpTokenRow.setVisibility(View.VISIBLE);
+        }
+
+        if( autotypeDelimiter != null && autotypeDelimiter == 1 ) {
+            itsSendDelimiter.check(R.id.send_delimiter_return);
+        }
+
+        if( autotypeReturnSuffix != null && autotypeReturnSuffix == 1 ) {
+            itsSendReturnSuffix.setChecked(true);
         }
 
         GuiUtils.setVisible(itsTimesRow,
@@ -1192,6 +1232,92 @@ public class PasswdSafeRecordBasicFragment
                         hist.addPasswd(oldOtp, passwdDate);
                         fileData.setPasswdHistory(hist, record, true);
                     }
+                }
+
+                if (newRecord) {
+                    fileData.addRecord(record);
+                }
+
+                rc.set(new Pair<>((newRecord || record.isModified()), new PasswdLocation(record, fileData)));
+
+            }
+        });
+
+        if (rc == null || rc.get() == null) {
+            return;
+        }
+        getListener().finishEditRecord(rc.get().first, rc.get().second, false);
+    }
+
+    private void saveAutotypeDelimiterChange(final Integer itemValue) {
+        final ObjectHolder<Pair<Boolean, PasswdLocation>> rc = new ObjectHolder<>();
+        useRecordFile(new RecordFileUser()
+        {
+            @Override
+            public void useFile(@Nullable RecordInfo info,
+                                @NonNull PasswdFileData fileData)
+            {
+
+                PwsRecord record;
+                boolean newRecord;
+                if (info != null) {
+                    record = info.itsRec;
+                    newRecord = false;
+                } else {
+                    record = fileData.createRecord();
+                    record.setLoaded();
+                    newRecord = true;
+                }
+
+                if( fileData.isProtected(record)) {
+                    return;
+                }
+
+                if (fileData.getAutotypeDelimiter(record) != itemValue) {
+                    fileData.setAutotypeDelimiter(itemValue, record);
+                }
+
+                if (newRecord) {
+                    fileData.addRecord(record);
+                }
+
+                rc.set(new Pair<>((newRecord || record.isModified()), new PasswdLocation(record, fileData)));
+
+            }
+        });
+
+        if (rc == null || rc.get() == null) {
+            return;
+        }
+        getListener().finishEditRecord(rc.get().first, rc.get().second, false);
+    }
+
+    private void saveAutotypeReturnSuffix(final Integer itemValue) {
+        final ObjectHolder<Pair<Boolean, PasswdLocation>> rc = new ObjectHolder<>();
+        useRecordFile(new RecordFileUser()
+        {
+            @Override
+            public void useFile(@Nullable RecordInfo info,
+                                @NonNull PasswdFileData fileData)
+            {
+
+                PwsRecord record;
+                boolean newRecord;
+                if (info != null) {
+                    record = info.itsRec;
+                    newRecord = false;
+                } else {
+                    record = fileData.createRecord();
+                    record.setLoaded();
+                    newRecord = true;
+                }
+
+                if( fileData.isProtected(record)) {
+                    return;
+                }
+
+                if (fileData.getAutotypeReturnSuffix(record) != itemValue) {
+                    fileData.setAutotypeReturnSuffix(itemValue, record);
                 }
 
                 if (newRecord) {

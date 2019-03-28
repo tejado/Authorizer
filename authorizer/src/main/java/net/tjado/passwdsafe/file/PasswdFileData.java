@@ -514,6 +514,30 @@ public class PasswdFileData
         setField(str, rec, PwsRecordV3.OTP);
     }
 
+    /** Get the Autotype Delimiter contained in a record */
+    public final Integer getAutotypeDelimiter(PwsRecord rec)
+    {
+        return getIntField(rec, PwsRecordV3.AUTOTYPE_DELIMITER);
+    }
+
+    /** Set the Autotype Delimiter for a record */
+    public final void setAutotypeDelimiter(Integer str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.AUTOTYPE_DELIMITER);
+    }
+
+    /** Get the Autotype Return Suffix contained in a record */
+    public final Integer getAutotypeReturnSuffix(PwsRecord rec)
+    {
+        return getIntField(rec, PwsRecordV3.AUTOTYPE_RETURNSUFFIX);
+    }
+
+    /** Set the Autotype Return Suffix for a record */
+    public final void setAutotypeReturnSuffix(Integer str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.AUTOTYPE_RETURNSUFFIX);
+    }
+
     public final boolean isProtected(PwsRecord rec)
     {
         boolean prot = false;
@@ -1149,6 +1173,8 @@ public class PasswdFileData
                 }
                 break;
             }
+            case PwsRecordV3.AUTOTYPE_DELIMITER:
+            case PwsRecordV3.AUTOTYPE_RETURNSUFFIX:
             case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL: {
                 Integer ival = (Integer)val;
                 if ((ival != null) && (ival != 0)) {
