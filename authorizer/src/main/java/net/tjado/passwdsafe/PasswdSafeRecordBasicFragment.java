@@ -857,7 +857,7 @@ public class PasswdSafeRecordBasicFragment
                 }
 
                 String[] usernameArray = username.split(String.format("((?<=(%1$s|%2$s))|(?=(%1$s|%2$s)))", quoteSubReturn, quoteSubTab));
-                PasswdSafeUtil.dbginfo(TAG, "Username Substitution Array: %s".format(Arrays.toString(usernameArray)));
+                PasswdSafeUtil.dbginfo(TAG, String.format("Username Substitution Array: %s", Arrays.toString(usernameArray)));
 
                 for (String str : usernameArray){
 
@@ -891,7 +891,7 @@ public class PasswdSafeRecordBasicFragment
                 }
 
                 String[] passwordArray = password.split(String.format("((?<=(%1$s|%2$s))|(?=(%1$s|%2$s)))", quoteSubReturn, quoteSubTab));
-                PasswdSafeUtil.dbginfo(TAG, "Password Substitution Array: %s".format(Arrays.toString(passwordArray)));
+                PasswdSafeUtil.dbginfo(TAG, String.format("Password Substitution Array: %s", Arrays.toString(passwordArray)));
 
                 for (String str : passwordArray){
 
@@ -1020,7 +1020,7 @@ public class PasswdSafeRecordBasicFragment
                 }
 
                 String[] usernameArray = username.split(String.format("((?<=(%1$s|%2$s))|(?=(%1$s|%2$s)))", quoteSubReturn, quoteSubTab));
-                PasswdSafeUtil.dbginfo(TAG, "Username Substitution Array: %s".format(Arrays.toString(usernameArray)));
+                PasswdSafeUtil.dbginfo(TAG, String.format("Username Substitution Array: %s", Arrays.toString(usernameArray)));
 
                 int ret = 0;
                 for (String str : usernameArray){
@@ -1061,7 +1061,7 @@ public class PasswdSafeRecordBasicFragment
                 }
 
                 String[] passwordArray = password.split(String.format("((?<=(%1$s|%2$s))|(?=(%1$s|%2$s)))", quoteSubReturn, quoteSubTab));
-                PasswdSafeUtil.dbginfo(TAG, "Password Substitution Array: %s".format(Arrays.toString(passwordArray)));
+                PasswdSafeUtil.dbginfo(TAG, String.format("Password Substitution Array: %s", Arrays.toString(passwordArray)));
 
                 int ret = 0;
                 for (String str : passwordArray){
