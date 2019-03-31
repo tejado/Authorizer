@@ -460,15 +460,15 @@ public class PasswdSafeRecordBasicFragment
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAMERA: {
-                if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startOtpCameraAddActivity();
-                } else {
-                    Toast.makeText(getActivity(), R.string.error_permission_camera_open, Toast.LENGTH_LONG).show();
-                }
-                return;
+        case PERMISSIONS_REQUEST_CAMERA: {
+            if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startOtpCameraAddActivity();
+            } else {
+                Toast.makeText(getActivity(), R.string.error_permission_camera_open, Toast.LENGTH_LONG).show();
             }
+            return;
+        }
         }
     }
 
@@ -661,6 +661,13 @@ public class PasswdSafeRecordBasicFragment
 
         if (otp != null && !otp.equals("")) {
             itsOtpTokenRow.setVisibility(View.VISIBLE);
+            itsAutoTypeUsbOtp.setEnabled(true);
+            itsAutoTypeBluetoothOtp.setEnabled(true);
+        }
+
+        if(itsUserRow.getVisibility() == View.GONE) {
+            itsAutoTypeUsbUsername.setEnabled(false);
+            itsAutoTypeBluetoothUsername.setEnabled(false);
         }
 
         if( autotypeDelimiter != null && autotypeDelimiter == 1 ) {
