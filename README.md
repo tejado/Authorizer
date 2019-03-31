@@ -7,11 +7,8 @@ The idea behind Authorizer is, to use old smartphones as a hardware password man
 <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
 <a href="https://play.google.com/store/apps/details?id=net.tjado.passwdsafe" target="_blank">
 <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="80"/></a>
-
-#### Video Demo:
-[![Alt text](https://img.youtube.com/vi/KL2qjMogQMY/0.jpg)](https://www.youtube.com/watch?v=KL2qjMogQMY)
   
-Authorizer is based on [PasswdSafe](https://sourceforge.net/projects/passwdsafe/) a Password Safe port for Android smartphones and [FreeOTP](https://github.com/freeotp/freeotp-android).  
+Authorizer is based on [PasswdSafe](https://sourceforge.net/projects/passwdsafe/) a Password Safe port for Android and [FreeOTP](https://github.com/freeotp/freeotp-android).  
 
 ## Features
 * Auto-Type over USB
@@ -31,6 +28,16 @@ Authorizer is based on [PasswdSafe](https://sourceforge.net/projects/passwdsafe/
 
 ### Features in Detail
 
+#### Auto-Type over USB and Bluetooth
+<a href="https://www.youtube.com/watch?v=KL2qjMogQMY"><img src="https://img.youtube.com/vi/KL2qjMogQMY/0.jpg" align="right" height="200" alt="Authorizer PoC YouTube video"></a>
+Authorizer is able to pretend to be an HID Keyboard so it can auto-type the credentials over USB and Bluetooth.  
+There are Auto-Type buttons at the password entry view. If a button is pressed longer, a different keyboard layout can be choosen. Additional, there is a USB Quick Auto-Type button in the TreeView which auto-types the respective password on a long press.  
+There are different settings per password entry like delimiter and the password return suffix. In the general App preferences a default keyboard layout can be choosen.
+
+Auto-Type over USB requires currently an Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget) and root access.
+
+Auto-Type over Bluetooth is currently an experimental feature and only available on Android Pie (9.0) or higher.
+
 #### Asymmetric encrypted backup on USB mass storage
 The concept behind Authorizer is to have an offline device. As a consequence, it can't create password file backups over the network. To create backups in a comfortable way, Authorizer will open a backup dialog if it detects a new connected mass-storage (e.g. an USB stick connected over an USB On-The-Go adapter). By pressing "Backup now" in this dialog, a backup folder can be selected. It must contain a GPG public key with the file name "pubkey.asc". The default password file will be encrypted with this GPG key and stored in the selected folder.  
 This feature can be enabled over the general App preference "Enable GPG backup on USB storage".
@@ -41,7 +48,7 @@ The OTP secret can be added to a password entry manually or by scanning a QR cod
 Like username, password and other data, the OTP secret is stored in the password file.
 
 #### Additional Auto-Type placeholders
-In addition to the {OTP} placeholder, Authorizer also supports {TAB} and {RET} for the tabulator and return key. Adding these to the username and/or password will result in auto-typing the respective key (tab or return) instead of the placeholder.
+In addition to the {OTP} placeholder, Authorizer also supports {TAB} and {RET} for the tabulator and return key. Adding these to the username and/or password will result in auto-typing the respective key (tab or return) instead of the placeholder.  
 Example: if "peter{TAB}{OTP}" is set as the username, "peter" followed by the tabulator key and a newly generated OTP will be auto-typed.
 
 ## Roadmap
