@@ -78,14 +78,15 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     private EditTextPreference itsFileDirPref;
     private Preference itsDefFilePref;
     private ListPreference itsFileClosePref;
-    private ListPreference itsUsbkbdLangPref;
     private ListPreference itsFileBackupPref;
     private ListPreference itsPasswdEncPref;
     private ListPreference itsPasswdExpiryNotifPref;
     private EditTextPreference itsPasswdDefaultSymsPref;
     private ListPreference itsRecordSortOrderPref;
+
+    private ListPreference itsAutoTypeLangPref;
+    private LongCheckBoxPreference itsAutoTypeBtEnablePref;
     private LongCheckBoxPreference itsFileBackupUsbGpgPref;
-    private LongCheckBoxPreference itsUsbkbdEnablePref;
 
     /**
      * Create a new instance
@@ -176,19 +177,19 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         itsRecordSortOrderPref.setEntryValues(RecordSortOrderPref.getValues());
         onSharedPreferenceChanged(prefs, Preferences.PREF_RECORD_SORT_ORDER);
 
-        itsUsbkbdLangPref = (ListPreference)
-                findPreference(Preferences.PREF_USBKBD_LANGUAGE);
-        itsUsbkbdLangPref.setEntries(R.array.usbkbd_languages_titels);
-        itsUsbkbdLangPref.setEntryValues(R.array.usbkbd_languages_values);
-        onSharedPreferenceChanged(prefs, Preferences.PREF_USBKBD_LANGUAGE);
+        itsAutoTypeLangPref = (ListPreference)
+                findPreference(Preferences.PREF_AUTOTYPE_LANG);
+        itsAutoTypeLangPref.setEntries(R.array.autotype_lang_titles);
+        itsAutoTypeLangPref.setEntryValues(R.array.autotype_lang_values);
+        onSharedPreferenceChanged(prefs, Preferences.PREF_AUTOTYPE_LANG);
 
-        itsUsbkbdEnablePref = (LongCheckBoxPreference)
-                findPreference(Preferences.PREF_BLUETOOTHKBD_ENABLE);
-        itsUsbkbdEnablePref.setSummary(R.string.bluetoothkbd_enable_version);
+        itsAutoTypeBtEnablePref = (LongCheckBoxPreference)
+                findPreference(Preferences.PREF_AUTOTYPE_BT_ENABLE);
+        itsAutoTypeBtEnablePref.setSummary(R.string.autotype_bt_enable_summary);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            itsUsbkbdEnablePref.setEnabled(false);
-            itsUsbkbdEnablePref.setChecked(false);
+            itsAutoTypeBtEnablePref.setEnabled(false);
+            itsAutoTypeBtEnablePref.setChecked(false);
         }
 
 
@@ -295,14 +296,14 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             ApiCompat.recreateActivity(getActivity());
             break;
         }
-        case Preferences.PREF_USBKBD_LANGUAGE: {
-            OutputInterface.Language pref = Preferences.getUsbkbdLanguagePref(prefs);
+        case Preferences.PREF_AUTOTYPE_LANG: {
+            OutputInterface.Language pref = Preferences.getAutoTypeLanguagePref(prefs);
 
-            List<String> myOptions = Arrays.asList((getResources().getStringArray(R.array.usbkbd_languages_values)));
+            List<String> myOptions = Arrays.asList((getResources().getStringArray(R.array.autotype_lang_values)));
 
             int value = myOptions.indexOf(pref.name());
 
-            itsUsbkbdLangPref.setSummary(getResources().getStringArray(R.array.usbkbd_languages_titels)[value]);
+            itsAutoTypeLangPref.setSummary(getResources().getStringArray(R.array.autotype_lang_titles)[value]);
             Utilities.dbginfo(TAG, pref.name());
             break;
         }

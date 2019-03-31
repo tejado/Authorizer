@@ -574,35 +574,35 @@
     </string-array>
 
     <!-- added by TM -->
-    <string name="send_usb_header">Send over USB</string>
-    <string name="send_bluetooth_header">Send over Bluetooth</string>
+    <string name="autotype_usb_header">Auto-Type over USB</string>
+    <string name="autotype_bt_header">Auto-Type over Bluetooth</string>
 
-    <string name="send_username">Username</string>
-    <string name="send_password">Password</string>
-    <string name="send_otp">OTP</string>
-    <string name="send_credentials">Name/Pass</string>
+    <string name="autotype_username">Username</string>
+    <string name="autotype_password">Password</string>
+    <string name="autotype_otp">OTP</string>
+    <string name="autotype_credentials">Name/Pass</string>
 
-    <string name="usbkbd_language_default">Android Systems Default</string>
-    <string name="usbkbd_language_english_US">English (US)</string>
-    <string name="usbkbd_language_english_GB">English (GB)</string>
-    <string name="usbkbd_language_german">German</string>
-    <string name="usbkbd_language_german_apple">German (Apple)</string>
-    <string name="usbkbd_language_swiss_german">German (CH)</string>
-    <string name="usbkbd_language_swiss_french">French (CH)</string>
-    <string name="usbkbd_language_neo">Neo 2.0</string>
+    <string name="autotype_lang_default">Android Systems Default</string>
+    <string name="autotype_lang_english_US">English (US)</string>
+    <string name="autotype_lang_english_GB">English (GB)</string>
+    <string name="autotype_lang_german">German</string>
+    <string name="autotype_lang_german_apple">German (Apple)</string>
+    <string name="autotype_lang_swiss_german">German (CH)</string>
+    <string name="autotype_lang_swiss_french">French (CH)</string>
+    <string name="autotype_lang_neo">Neo 2.0</string>
 
-    <string-array name="usbkbd_languages_titels">
-        <item>@string/usbkbd_language_default</item>
-        <item>@string/usbkbd_language_english_US</item>
-        <item>@string/usbkbd_language_english_GB</item>
-        <item>@string/usbkbd_language_german</item>
-        <item>@string/usbkbd_language_german_apple</item>
-        <item>@string/usbkbd_language_swiss_german</item>
-        <item>@string/usbkbd_language_swiss_french</item>
-        <item>@string/usbkbd_language_neo</item>
+    <string-array name="autotype_lang_titles">
+        <item>@string/autotype_lang_default</item>
+        <item>@string/autotype_lang_english_US</item>
+        <item>@string/autotype_lang_english_GB</item>
+        <item>@string/autotype_lang_german</item>
+        <item>@string/autotype_lang_german_apple</item>
+        <item>@string/autotype_lang_swiss_german</item>
+        <item>@string/autotype_lang_swiss_french</item>
+        <item>@string/autotype_lang_neo</item>
     </string-array>
 
-    <string-array name="usbkbd_languages_values">
+    <string-array name="autotype_lang_values">
         <item>null</item>
         <item>en_US</item>
         <item>en_GB</item>
@@ -613,19 +613,19 @@
         <item>neo</item>
     </string-array>
 
-    <string name="title_usbkbd_language">USB Keyboard Layout</string>
-    <string name="title_bluetoothkbd_device">Paired Bluetooth Devices</string>
-    <string name="send_return_suffix">Send \"Return\" after password</string>
-    <string name="use_treeview_list">Use tree list</string>
-    <string name="usbkbd_output">USB Keyboard Output</string>
-    <string name="usbkbd_enable">Enable USB Keyboard Output</string>
-    <string name="bluetoothkbd_enable">Enable Bluetooth Keyboard Output</string>
-    <string name="bluetoothkbd_enable_version">Android Pie (28) or higher required.</string>
+    <string name="autotype_lang">Auto-Type Keyboard Layout</string>
+    <string name="autotype_bluetooth_devices">Paired Bluetooth Devices</string>
+    <string name="autotype_return_suffix">Type \"Return\" after password</string>
+    <string name="autotype_header">Auto-Type</string>
+    <string name="autotype_usb_enable">Enable Auto-Type over USB</string>
+    <string name="autotype_bt_enable">Enable Auto-Type over Bluetooth</string>
+    <string name="autotype_bt_enable_summary">Android Pie (28) or higher required.</string>
 
-    <string name="usbkbd_root_rejected">
-        ERROR: root access rejected. Could not send output over USB as this feature of Authorizer requires root access!
+    <string name="autotype_usb_root_denied">
+        ERROR: root access denied. Could not auto-type over USB as this requires root access!
     </string>
 
+    <string name="use_treeview_list">Use tree list</string>
     <string name="entry">entry</string>
     <string name="entries">entries</string>
 
@@ -666,12 +666,12 @@
     <string name="algorithm">Algorithm</string>
     <string name="counter">Counter</string>
     <string name="otp_token">Token:</string>
-    <string name="add_otp_manually">Add OTP manually</string>
-    <string name="add_otp_camera">Scan OTP QR Code</string>
+    <string name="otp_add_manually">Add OTP manually</string>
+    <string name="otp_add_camera">Scan OTP QR Code</string>
 
-    <string name="send_delimiter_return">Return</string>
-    <string name="send_delimiter_tab">Tab</string>
-    <string name="send_delimiter_desc">Delimiter:</string>
+    <string name="autotype_delimiter_return">Return</string>
+    <string name="autotype_delimiter_tab">Tab</string>
+    <string name="autotype_delimiter">Delimiter:</string>
 
     <string name="SUB_OTP" translatable="false">{OTP}</string>
     <string name="SUB_TAB" translatable="false">{TAB}</string>

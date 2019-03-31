@@ -794,7 +794,7 @@ public class PasswdSafe extends AppCompatActivity
             String password = copyStr.get();
             if (password.contains(SUB_OTP)) {
                 PasswdSafeUtil.showErrorMsg(
-                        "Password QuickSend not possible as it contains an OTP!",
+                        "Password Quick Auto-Type not possible as it contains an OTP!",
                         this);
                 return;
             }
@@ -821,7 +821,7 @@ public class PasswdSafe extends AppCompatActivity
             }
         } catch (SecurityException e) {
             PasswdSafeUtil.showInfoMsg(getResources().getString(
-                    R.string.usbkbd_root_rejected), this);
+                    R.string.autotype_usb_root_denied), this);
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
         }

@@ -138,14 +138,14 @@ public class Preferences
     private static final String PREF_DEF_PASSWD_POLICY = "defaultPasswdPolicy";
     private static final String PREF_DEF_PASSWD_POLICY_DEF = "";
 
-    public static final String PREF_USBKBD_ENABLE = "usbkbdEnablePref";
-    private static final boolean PREF_USBKBD_ENABLE_DEF = true;
+    public static final String PREF_AUTOTYPE_USB_ENABLE = "usbkbdEnablePref";
+    private static final boolean PREF_AUTOTYPE_USB_ENABLE_DEF = true;
 
-    public static final String PREF_BLUETOOTHKBD_ENABLE = "bluetoothkbdEnablePref";
-    private static final boolean PREF_BLUETOOTHKBD_ENABLE_DEF = true;
+    public static final String PREF_AUTOTYPE_BT_ENABLE = "bluetoothkbdEnablePref";
+    private static final boolean PREF_AUTOTYPE_BT_ENABLE_DEF = true;
 
-    public static final String PREF_USBKBD_LANGUAGE = "usbkbdLanguagePref";
-    private static final OutputInterface.Language PREF_USBKBD_LANGUAGE_DEF = OutputInterface.Language.en_US;
+    public static final String PREF_AUTOTYPE_LANG = "usbkbdLanguagePref";
+    private static final OutputInterface.Language PREF_AUTOTYPE_LANG_DEF = OutputInterface.Language.en_US;
 
     private static final String TAG = "Preferences";
 
@@ -511,29 +511,29 @@ public class Preferences
     /**
      * Get whether to enable USB Keyboard Output
      */
-    public static boolean getUsbkbdEnabled(SharedPreferences prefs)
+    public static boolean getAutoTypeUsbEnabled(SharedPreferences prefs)
     {
-        return prefs.getBoolean(PREF_USBKBD_ENABLE,
-                                PREF_USBKBD_ENABLE_DEF);
+        return prefs.getBoolean(PREF_AUTOTYPE_USB_ENABLE,
+                                PREF_AUTOTYPE_USB_ENABLE_DEF);
     }
 
     /**
      * Get whether to enable USB Keyboard Output
      */
-    public static boolean getBluetoothkbdEnabled(SharedPreferences prefs)
+    public static boolean getAutoTypeBluetoothEnabled(SharedPreferences prefs)
     {
-        return prefs.getBoolean(PREF_BLUETOOTHKBD_ENABLE,
-                                PREF_BLUETOOTHKBD_ENABLE_DEF);
+        return prefs.getBoolean(PREF_AUTOTYPE_BT_ENABLE,
+                                PREF_AUTOTYPE_BT_ENABLE_DEF);
     }
 
-    public static OutputInterface.Language getUsbkbdLanguagePref(SharedPreferences prefs)
+    public static OutputInterface.Language getAutoTypeLanguagePref(SharedPreferences prefs)
     {
         try {
             return OutputInterface.Language.valueOf(
-                    prefs.getString(PREF_USBKBD_LANGUAGE,
-                                    PREF_USBKBD_LANGUAGE_DEF.name()));
+                    prefs.getString(PREF_AUTOTYPE_LANG,
+                                    PREF_AUTOTYPE_LANG_DEF.name()));
         } catch (IllegalArgumentException e) {
-            return PREF_USBKBD_LANGUAGE_DEF;
+            return PREF_AUTOTYPE_LANG_DEF;
         }
     }
 }

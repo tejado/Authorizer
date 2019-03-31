@@ -92,13 +92,13 @@
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/send_usb_row"
+        <LinearLayout android:id="@+id/autotype_usb_row"
                       style="@style/RecordRow"
                       android:clickable="true">
 
             <TextView style="@style/RecordHeader"
                       android:clickable="false"
-                      android:text="@string/send_usb_header" />
+                      android:text="@string/autotype_usb_header" />
 
             <View style="@style/Separator"
                   android:clickable="false"/>
@@ -107,48 +107,48 @@
                  android:layout_width="match_parent"
                  android:layout_height="match_parent">
                  <Button
-                     android:text="@string/send_username"
+                     android:text="@string/autotype_username"
                      android:layout_width="191dp"
                      android:layout_height="match_parent"
-                     android:id="@+id/username_send"
+                     android:id="@+id/autotype_usb_username"
                      android:layout_weight="1"
                      android:textSize="10sp"
                      style="@style/Widget.AppCompat.Button"/>
 
                  <Button
-                     android:text="@string/send_password"
+                     android:text="@string/autotype_password"
                      android:layout_width="191dp"
                      android:layout_height="match_parent"
-                     android:id="@+id/password_send"
+                     android:id="@+id/autotype_usb_password"
                      android:layout_weight="1"
                      android:textSize="10sp"
                      style="@style/Widget.AppCompat.Button"/>
                  <Button
-                     android:text="@string/send_otp"
+                     android:text="@string/autotype_otp"
                      android:layout_width="191dp"
                      android:layout_height="match_parent"
-                     android:id="@+id/password_send_otp"
+                     android:id="@+id/autotype_usb_otp"
                      android:layout_weight="1"
                      android:textSize="10sp"
                      style="@style/Widget.AppCompat.Button"/>
                  <Button
-                     android:text="@string/send_credentials"
+                     android:text="@string/autotype_credentials"
                      android:layout_width="187dp"
                      android:layout_height="match_parent"
-                     android:id="@+id/credential_send"
+                     android:id="@+id/autotype_usb_credentials"
                      android:layout_weight="1"
                      android:textSize="10sp"
                      style="@style/Widget.AppCompat.Button.Colored"/>
              </LinearLayout>
 
         </LinearLayout>
-        <LinearLayout android:id="@+id/send_bt_row"
+        <LinearLayout android:id="@+id/autotype_bt_row"
                       style="@style/RecordRow"
                       android:clickable="true">
 
             <TextView style="@style/RecordHeader"
                       android:clickable="false"
-                      android:text="@string/send_bluetooth_header" />
+                      android:text="@string/autotype_bt_header" />
 
             <View style="@style/Separator"
                   android:clickable="false"/>
@@ -157,66 +157,66 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <Button
-                    android:text="@string/send_username"
+                    android:text="@string/autotype_username"
                     android:layout_width="191dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/bluetooth_username_send"
+                    android:id="@+id/autotype_bt_username"
                     android:layout_weight="1"
                     android:textSize="10sp"
                     style="@style/Widget.AppCompat.Button"/>
 
                 <Button
-                    android:text="@string/send_password"
+                    android:text="@string/autotype_password"
                     android:layout_width="191dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/bluetooth_password_send"
+                    android:id="@+id/autotype_bt_password"
                     android:layout_weight="1"
                     android:textSize="10sp"
                     style="@style/Widget.AppCompat.Button"/>
                 <Button
-                    android:text="@string/send_otp"
+                    android:text="@string/autotype_otp"
                     android:layout_width="191dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/bluetooth_password_send_otp"
+                    android:id="@+id/autotype_bt_otp"
                     android:layout_weight="1"
                     android:textSize="10sp"
                     style="@style/Widget.AppCompat.Button"/>
                 <Button
-                    android:text="@string/send_credentials"
+                    android:text="@string/autotype_credentials"
                     android:layout_width="187dp"
                     android:layout_height="match_parent"
-                    android:id="@+id/bluetooth_credential_send"
+                    android:id="@+id/autotype_bt_credentials"
                     android:layout_weight="1"
                     android:textSize="10sp"
                     style="@style/Widget.AppCompat.Button.Colored"/>
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/send_settings_row"
+        <LinearLayout android:id="@+id/autotype_settings_row"
                   style="@style/RecordRow"
                   android:clickable="true">
             <CheckBox
-                android:text="@string/send_return_suffix"
+                android:text="@string/autotype_return_suffix"
                 android:layout_width="375dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/send_return_suffix" />
+                android:id="@+id/autotype_return_suffix" />
 
             <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:id="@+id/send_delimiter"
-                android:checkedButton="@+id/send_delimiter_tab">
+                android:id="@+id/autotype_delimiter"
+                android:checkedButton="@+id/autotype_delimiter_tab">
                 <RadioButton
-                    android:id="@+id/send_delimiter_return"
+                    android:id="@+id/autotype_delimiter_return"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/send_delimiter_return" />
+                    android:text="@string/autotype_delimiter_return" />
                 <RadioButton
-                    android:id="@+id/send_delimiter_tab"
+                    android:id="@+id/autotype_delimiter_tab"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/send_delimiter_tab" />
+                    android:text="@string/autotype_delimiter_tab" />
             </RadioGroup>
         </LinearLayout>
 
@@ -274,13 +274,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/add_otp_manually"/>
+                        android:text="@string/otp_add_manually"/>
                     <Button
                         android:id="@+id/otp_new_camera"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/add_otp_camera"/>
+                        android:text="@string/otp_add_camera"/>
                 </LinearLayout>
 
         </LinearLayout>

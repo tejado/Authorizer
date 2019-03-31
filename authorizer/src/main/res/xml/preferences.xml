@@ -160,41 +160,41 @@
         <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongCheckBoxPreference
             android:name="displayTheme Pref"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="displayThemeLightPref"
             android:title="@string/use_light_theme"/>
 
         <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongCheckBoxPreference
             android:name="displayList Pref"
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="displayListTreeViewPref"
             android:title="@string/use_treeview_list"/>
 
     </PreferenceCategory>
 
     <PreferenceCategory android:key="usbkbdOutputOptions"
-                        android:title="@string/usbkbd_output">
+                        android:title="@string/autotype_header">
 
         <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongCheckBoxPreference
             android:name="usbkbdEnable Pref"
             android:defaultValue="true"
             android:key="usbkbdEnablePref"
-            android:title="@string/usbkbd_enable"/>
+            android:title="@string/autotype_usb_enable"/>
 
         <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongCheckBoxPreference
             android:name="bluetoothkbdEnable Pref"
             android:defaultValue="true"
             android:key="bluetoothkbdEnablePref"
-            android:title="@string/bluetoothkbd_enable"/>
+            android:title="@string/autotype_bt_enable"/>
 
         <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongListPreference
             android:name="usbkbdLanguage Pref"
             android:key="usbkbdLanguagePref"
-            android:title="@string/title_usbkbd_language"/>
+            android:title="@string/autotype_lang"/>
 
     </PreferenceCategory>
 

@@ -108,7 +108,7 @@ public class PasswdRecordListItemHolder
 
         // hide the USB Keyboard Output button if the functionality is disabled
         SharedPreferences prefs = Preferences.getSharedPrefs(context);
-        if ( ! Preferences.getUsbkbdEnabled(prefs) ) {
+        if ( ! Preferences.getAutoTypeUsbEnabled(prefs) ) {
             iconUsbkbdOutput.setVisibility(View.GONE);
         }
 
