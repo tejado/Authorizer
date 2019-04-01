@@ -63,8 +63,7 @@ Example: if "peter{TAB}{OTP}" is set as the username, "peter" followed by the ta
 * For Auto-Type over USB: an Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget) is required
 * For Auto-Type over Bluetooth: Android Pie or higher is required. Tested devices:
   * Samsung Galaxy S8: WORKING
-  * HTC One M8 (LineageOS 16.0): not working
-
+  * HTC One M8 (LineageOS 16.0): WORKING
 
 ## Contributions & Community
 Contributions are highly welcome.  
