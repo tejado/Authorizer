@@ -253,6 +253,11 @@ public class PasswdSafeNewFileFragment
             Context ctx = getContext();
             Uri newUri = data.getData();
             String title = RecentFilesDb.getSafDisplayName(newUri, ctx);
+
+            boolean checkPermissions = isCheckPermissions();
+            if (!checkPermissions && (title == null)) {
+                title = data.getStringExtra("__test_display_name");
+            }
             String error = validateFileName(title);
             if (error != null) {
                 ContentResolver cr = ctx.getContentResolver();
@@ -269,7 +274,13 @@ public class PasswdSafeNewFileFragment
                     newUri, (Intent.FLAG_GRANT_READ_URI_PERMISSION |
                              Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
                     ctx);
-            if (title != null) {
+            if (checkPermissions) {
+                RecentFilesDb.updateOpenedSafFile(
+                        newUri, (Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                                 Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
+                        ctx);
+            }
+            if (!TextUtils.isEmpty(title)) {
                 RecentFilesDb recentFilesDb = new RecentFilesDb(ctx);
                 try {
                     recentFilesDb.insertOrUpdateFile(newUri, title);
@@ -450,6 +461,14 @@ public class PasswdSafeNewFileFragment
     private void setValid(boolean valid)
     {
         itsOkBtn.setEnabled(valid && !itsBackgroundDisable.get());
+    }
+
+    /**
+     *  Whether permissions should be checked
+     */
+    private static boolean isCheckPermissions()
+    {
+        return !PasswdSafeUtil.isTesting();
     }
 
     /**

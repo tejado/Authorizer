@@ -45,6 +45,8 @@ public class PasswdSafeUtil
 
     private static final String TAG = "AuthorizerUtil";
 
+    private static boolean TESTING = false;
+
     /** Create an intent to open a URI */
     public static Intent createOpenIntent(Uri uri, String recToOpen)
     {
@@ -225,6 +227,23 @@ public class PasswdSafeUtil
                 .setCancelable(true)
                 .setPositiveButton(R.string.close, null);
         dlg.show();
+    }
+
+    /**
+     * Get whether the app is running while testing
+     */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public static boolean isTesting()
+    {
+        return DEBUG && TESTING;
+    }
+
+    /**
+     * Set whether the app is running while testing
+     */
+    public static void setIsTesting(boolean testing)
+    {
+        TESTING = DEBUG && testing;
     }
 
     /** Log a debug message at info level */

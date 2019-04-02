@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2019 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -12,26 +12,33 @@ import java.util.List;
 import java.util.Locale;
 
 import android.annotation.SuppressLint;
-import android.test.AndroidTestCase;
-import android.test.MoreAsserts;
 
 import net.tjado.passwdsafe.file.PasswdPolicy;
-//import com.jefftharris.passwdsafe.lib.PasswdSafeUtil;
+
+import org.junit.Test;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.TestCase.assertNotNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.empty;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests for the PasswdPolicy class
  */
-public class PasswdPolicyTest extends AndroidTestCase
+@SuppressWarnings("unused")
+public class PasswdPolicyTest
 {
     //private static final String TAG = "PasswdPolicyTest";
 
-    /** Constructor */
-    public PasswdPolicyTest()
-    {
-        super();
-    }
-
     /** Test an empty header policy */
+    @Test
     public void testHdrEmpty()
     {
         List<PasswdPolicy> policies;
@@ -46,12 +53,13 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test zero header policies */
+    @Test
     public void testHdrZero()
     {
         doTestBadHdrPolicy("0", "Policies length (1) too short: 2");
 
         List<PasswdPolicy> policies = PasswdPolicy.parseHdrPolicies("00");
-        MoreAsserts.assertEmpty(policies);
+        assertThat(policies, is(empty()));
         String str = PasswdPolicy.hdrPoliciesToString(policies);
         assertEquals("00", str);
 
@@ -60,6 +68,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test one valid header policy */
+    @Test
     public void testHdrOneValid()
     {
         String policiesStr = "0107Policy1fe00abc111aaa000fff03!@#";
@@ -87,6 +96,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test one valid header policy with zero min lengths */
+    @Test
     public void testHdrOneValidZeros()
     {
         String policiesStr = "0107Policy1fe00abc00000000000003!@#";
@@ -114,6 +124,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test a default header policy */
+    @Test
     public void testHdrDefault()
     {
         PasswdPolicy policy = new PasswdPolicy("policy1",
@@ -134,10 +145,11 @@ public class PasswdPolicyTest extends AndroidTestCase
 
         assertEquals("0107policy1f00000c00100100100100",
                      PasswdPolicy.hdrPoliciesToString(
-                         Collections.singletonList(policy)));
+                             Collections.singletonList(policy)));
     }
 
     /** Test multiple valid header policies */
+    @Test
     public void testHdrMultiValid()
     {
         String policiesStr = "060ceasy to readb40000a0010010010010008hex only08000140010010010010008policy 1f00000f0040020050030009pronounced200008001001001001000dspecial charsf00000d0030010040020a!@#$%^&*()05zerosf00000e00000000000000";
@@ -235,17 +247,18 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test max valid header policies */
+    @Test
     @SuppressLint("DefaultLocale")
     public void testHdrMaxValid()
     {
         StringBuilder policiesStr = new StringBuilder("ff");
         for (int i = 0; i < 255; ++i) {
             policiesStr.append(
-                String.format("09Policy%03dfe00%03x%03x%03x%03x%03x03!@#",
-                              i, i + 1, i + 2, i + 3, i + 4, i + 5));
+                    String.format("09Policy%03dfe00%03x%03x%03x%03x%03x03!@#",
+                                  i, i + 1, i + 2, i + 3, i + 4, i + 5));
         }
         List<PasswdPolicy> policies =
-            PasswdPolicy.parseHdrPolicies(policiesStr.toString());
+                PasswdPolicy.parseHdrPolicies(policiesStr.toString());
         assertNotNull(policies);
         assertEquals(255, policies.size());
         for (int i = 0; i < 255; ++i) {
@@ -273,6 +286,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test an invalid header policy */
+    @Test
     public void testHdrOneInvalid()
     {
         doTestBadHdrPolicy("01",
@@ -334,6 +348,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test multiple invalid header policies */
+    @Test
     public void testHdrMultiInvalid()
     {
         doTestBadHdrPolicy("0207Policy1fe00abc111aaa000fff03!@#",
@@ -395,18 +410,20 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test a record without a policy */
+    @Test
     public void testRecNone()
     {
         PasswdPolicy policy = PasswdPolicy.parseRecordPolicy(null, null, null);
         assertNull(policy);
 
         PasswdPolicy.RecordPolicyStrs strs =
-            PasswdPolicy.recordPolicyToString(null);
+                PasswdPolicy.recordPolicyToString(null);
         //noinspection ConstantConditions
         assertNull(strs);
     }
 
     /** Test a record with a policy name */
+    @Test
     public void testRecPolicyName()
     {
         doTestRecordPolicyName("policy1", null, null);
@@ -416,6 +433,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test a record with its own policy */
+    @Test
     public void testRecPolicy()
     {
         // easy to read
@@ -465,6 +483,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test an invalid record policy */
+    @Test
     public void testRecPolicyInvalid()
     {
         doTestBadRecPolicy("",
@@ -506,40 +525,45 @@ public class PasswdPolicyTest extends AndroidTestCase
     }
 
     /** Test default password generation */
+    @Test
     public void testPasswdGenDefault()
     {
         PasswdPolicy policy =
-            new PasswdPolicy("", PasswdPolicy.Location.DEFAULT);
+                new PasswdPolicy("", PasswdPolicy.Location.DEFAULT);
         verifyGenPasswd(policy);
     }
 
 
     /** Test normal type password generation */
+    @Test
     public void testPasswdGenNormal()
     {
         doTestPasswdGen(PasswdPolicy.Type.NORMAL);
     }
 
     /** Test easy-to-read type password generation */
+    @Test
     public void testPasswdGenEasy()
     {
         doTestPasswdGen(PasswdPolicy.Type.EASY_TO_READ);
     }
 
     /** Test easy-to-read type password generation */
+    @Test
     public void testPasswdGenHex()
     {
         for (int len = 0; len < 100; ++len) {
             PasswdPolicy policy =
-                new PasswdPolicy("", PasswdPolicy.Location.DEFAULT,
-                                 PasswdPolicy.FLAG_USE_HEX_DIGITS,
-                                 len, 0, 0, 0, 0, null);
+                    new PasswdPolicy("", PasswdPolicy.Location.DEFAULT,
+                                     PasswdPolicy.FLAG_USE_HEX_DIGITS,
+                                     len, 0, 0, 0, 0, null);
             assertEquals(PasswdPolicy.Type.HEXADECIMAL, policy.getType());
             verifyGenPasswd(policy);
         }
     }
 
     /** Test pronounceable type password generation */
+    @Test
     public void testPasswdGenPronounceable()
     {
         doTestPasswdGen(PasswdPolicy.Type.PRONOUNCEABLE);
@@ -550,7 +574,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     {
         try {
             PasswdPolicy.parseHdrPolicies(policyStr);
-            fail();
+            assertTrue(false);
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalArgumentException);
             assertEquals(exMsg, t.getMessage());
@@ -562,7 +586,7 @@ public class PasswdPolicyTest extends AndroidTestCase
     {
         try {
             PasswdPolicy.parseRecordPolicy(null, policyStr, null);
-            fail();
+            assertTrue(false);
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalArgumentException);
             assertEquals(exMsg, t.getMessage());
@@ -593,7 +617,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertNull(policy.getSpecialSymbols());
 
         PasswdPolicy.RecordPolicyStrs strs =
-            PasswdPolicy.recordPolicyToString(policy);
+                PasswdPolicy.recordPolicyToString(policy);
         assertNotNull(strs);
         assertEquals(policyName, strs.itsPolicyName);
         assertEquals(null, strs.itsPolicyStr);
@@ -636,7 +660,7 @@ public class PasswdPolicyTest extends AndroidTestCase
         assertEquals(ownSymbols, policy.getSpecialSymbols());
 
         PasswdPolicy.RecordPolicyStrs strs =
-            PasswdPolicy.recordPolicyToString(policy);
+                PasswdPolicy.recordPolicyToString(policy);
         assertNotNull(strs);
         assertEquals(policyName, strs.itsPolicyName);
         assertTrue(policyStr.startsWith(strs.itsPolicyStr));
@@ -701,23 +725,23 @@ public class PasswdPolicyTest extends AndroidTestCase
                 for (int lowerIdx = 0; lowerIdx <= MAX_LEN;
                      lowerIdx += LEN_STEP) {
                     for (int upperIdx = 0;
-                        upperIdx <= MAX_LEN - lowerIdx; upperIdx += LEN_STEP) {
+                         upperIdx <= MAX_LEN - lowerIdx; upperIdx += LEN_STEP) {
                         for (int digitIdx = 0;
-                            digitIdx <= MAX_LEN - lowerIdx - upperIdx;
-                            digitIdx += LEN_STEP) {
+                             digitIdx <= MAX_LEN - lowerIdx - upperIdx;
+                             digitIdx += LEN_STEP) {
                             for (int symbolIdx = 0;
-                                symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
-                                symbolIdx += LEN_STEP) {
+                                 symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
+                                 symbolIdx += LEN_STEP) {
                                 /*
                             PasswdSafeUtil.dbginfo(TAG, "Iter %x %d %d %d %d",
                                                   flags, lowerIdx, upperIdx,
                                                   digitIdx, symbolIdx);
                                  */
                                 policy = new PasswdPolicy(
-                                    "", PasswdPolicy.Location.DEFAULT,
-                                    flags, MAX_LEN + minLen, lowerIdx,
-                                    upperIdx, digitIdx, symbolIdx,
-                                    null);
+                                        "", PasswdPolicy.Location.DEFAULT,
+                                        flags, MAX_LEN + minLen, lowerIdx,
+                                        upperIdx, digitIdx, symbolIdx,
+                                        null);
                                 assertEquals(type, policy.getType());
                                 verifyGenPasswd(policy);
                             }
@@ -730,8 +754,8 @@ public class PasswdPolicyTest extends AndroidTestCase
                 for (int len: new int[] {0, 1, 2, 3, 5, 10, 20}) {
                     //PasswdSafeApp.dbginfo("TAG", "Iter %x %d", flags, len);
                     policy = new PasswdPolicy(
-                        "", PasswdPolicy.Location.DEFAULT,
-                        flags, len, 1, 1, 1, 1, null);
+                            "", PasswdPolicy.Location.DEFAULT,
+                            flags, len, 1, 1, 1, 1, null);
                     assertEquals(type, policy.getType());
                     verifyGenPasswd(policy);
                 }
