@@ -336,6 +336,14 @@
 
     <string name="release_notes">
         \n
+        &lt;b&gt;0.4.0&lt;/b&gt;\n
+        - Neue Funktion: Bluetooth Auto-Type (min. Android Pie benötigt)\n
+        - Neue Funktion: OTP Auto-Type Button\n
+        - Neues Tastatur Layout (en_GB)\n
+        - Anpassung des Wortlauts\n
+        - Weitere kleine Verbesserungen\n
+        - Fehlerbehebungen
+        \n\n
         &lt;b&gt;0.3.0&lt;/b&gt;\n
         - Neue Funktion: OTP Support\n
         - Neue Funktion: Platzhalter im Benutzername und Passwort\n
