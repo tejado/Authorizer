@@ -266,9 +266,13 @@ public class PasswdSafeRecordBasicFragment
         LinearLayout autotypeBluetoothRow = root.findViewById(R.id.autotype_bt_row);
         LinearLayout autotypeSettingsRow = root.findViewById(R.id.autotype_settings_row);
 
+        itsAutoTypeBluetoothUsername = (Button)root.findViewById(R.id.autotype_bt_username);
+        itsAutoTypeBluetoothPassword = (Button)root.findViewById(R.id.autotype_bt_password);
+        itsAutoTypeBluetoothOtp = (Button)root.findViewById(R.id.autotype_bt_otp);
+        itsAutoTypeBluetoothCredential = (Button)root.findViewById(R.id.autotype_bt_credentials);
+
         if (Preferences.getAutoTypeBluetoothEnabled(prefs) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // Auto-Type Bluetooth username
-            itsAutoTypeBluetoothUsername = (Button)root.findViewById(R.id.autotype_bt_username);
             itsAutoTypeBluetoothUsername.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -284,7 +288,6 @@ public class PasswdSafeRecordBasicFragment
             });
 
             // Auto-Type Bluetooth password
-            itsAutoTypeBluetoothPassword = (Button)root.findViewById(R.id.autotype_bt_password);
             itsAutoTypeBluetoothPassword.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -300,7 +303,6 @@ public class PasswdSafeRecordBasicFragment
             });
 
             // Auto-Type Bluetooth OTP
-            itsAutoTypeBluetoothOtp = (Button)root.findViewById(R.id.autotype_bt_otp);
             itsAutoTypeBluetoothOtp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -316,7 +318,6 @@ public class PasswdSafeRecordBasicFragment
             });
 
             // Auto-Type Bluetooth credentials
-            itsAutoTypeBluetoothCredential = (Button)root.findViewById(R.id.autotype_bt_credentials);
             itsAutoTypeBluetoothCredential.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
