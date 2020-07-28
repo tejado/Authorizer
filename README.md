@@ -1,4 +1,4 @@
-# Authorizer [![Build Status](https://travis-ci.org/tejado/Authorizer.svg?branch=master)](https://travis-ci.org/tejado/Authorizer)
+# Authorizer ![CI](https://github.com/tejado/Authorizer/workflows/CI/badge.svg?branch=master&event=push)
 A Password Manager for Android with Auto-Type over USB and Bluetooth, OTP and much more.
   
 The idea behind Authorizer is, to use old smartphones as a hardware password manager only. To avoid manual typing of long and complex passwords everytime you need them, Authorizer provides Auto-Type features over USB and Bluetooth. It pretends to be a keyboard (e.g. over an USB On-The-Go adapter) and with a button press inside the app, it will automatically type the password for you on your pc, laptop, tablet or other smartphone.  
