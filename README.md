@@ -34,7 +34,7 @@ Authorizer is able to pretend to be an HID Keyboard so it can auto-type the cred
 There are Auto-Type buttons at the password entry view. If a button is pressed longer, a different keyboard layout can be choosen. Additional, there is a USB Quick Auto-Type button in the TreeView which auto-types the respective password on a long press.  
 There are different settings per password entry like delimiter and the password return suffix. In the general App preferences a default keyboard layout can be choosen.
 
-Auto-Type over USB requires currently an Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget) and root access.
+**Auto-Type over USB requires support of the USB HID device role. This can be enabled with my [USB Gadget Tool](https://github.com/tejado/android-usb-gadget).** 
 
 Auto-Type over Bluetooth is currently an experimental feature and only available on Android Pie (9.0) or higher.
 
@@ -56,11 +56,10 @@ Example: if "peter{TAB}{OTP}" is set as the username, "peter" followed by the ta
 * Smartcard emulation (e.g. OpenPGP cards, etc.)
 * CTAP + CTAP2 integration for U2F and WebAuthn
 * Redesign of the App
-* Replacing Android Keyboard Gadget with FunctionFS HID integration (Kernel >=3.18 required)
 * Refactoring the HID Keyboard Layout code
 
 ##  Requirements
-* For Auto-Type over USB: an Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget) is required
+* For Auto-Type over USB: **[USB Gadget Tool](https://github.com/tejado/android-usb-gadget)** or an Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget) is required
 * For Auto-Type over Bluetooth: Android Pie or higher is required. Tested devices:
   * Samsung Galaxy S8: WORKING
   * HTC One M8 (LineageOS 16.0): WORKING
