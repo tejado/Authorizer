@@ -16,8 +16,8 @@ android {
         minSdkVersion 21
         resConfigs "de"
         targetSdkVersion 28
-        versionCode 400
-        versionName '0.4.0'
+        versionCode 401
+        versionName '0.4.1'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         //Reference them in .xml files.

@@ -336,6 +336,9 @@
 
     <string name="release_notes">
         \n
+        &lt;b&gt;0.4.1&lt;/b&gt;\n
+        - Bug fixes
+        \n\n
         &lt;b&gt;0.4.0&lt;/b&gt;\n
         - New feature: Bluetooth Auto-Type (min. Android Pie required)\n
         - New feature: OTP Auto-Type Button\n
