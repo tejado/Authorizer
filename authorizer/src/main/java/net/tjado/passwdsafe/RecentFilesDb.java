@@ -167,7 +167,7 @@ public final class RecentFilesDb extends SQLiteOpenHelper
         try {
             if ((cursor != null) && (cursor.moveToFirst())) {
                 return cursor.getString(
-                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                        cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
             }
         } finally {
             if (cursor != null) {
