@@ -93,7 +93,7 @@ public class OutputUsbKeyboardAsRoot implements OutputInterface
 
         // Using printf instead of echo with xxd - this should provide a better compability
         scancodesHex = scancodesHex.replaceAll("(.{2})", "\\\\x$1");;
-        String command = String.format("printf '%s' > %s\n", scancodesHex, devicePath);
+        String command = String.format("printf '%s' | dd bs=8 of=%s\n", scancodesHex, devicePath);
 
         Utilities.dbginfo(TAG,  "Handing over to ExecuteAsRootUtil -> " + command );
         boolean cr = ExecuteAsRootUtil.execute( command );
