@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="add">Legg til</string>
+    <string name="add_policy">Legg til praksis</string>
+    <string name="add_record">Legg til oppføring</string>
+    <string name="alias_base_record_header">Alias</string>
+    <string name="alias_to_same_record">Alias til samme oppføring</string>
+    <string name="any_changes_will_be_lost">Alle endringer av oppføringen vil gå tapt.</string>
+    <string name="app_desc">Få tilgang til PasswordSafe-databaser på Android</string>
+    <string name="app_name">Authorizer</string>
+    <string name="at_least">Ihvertfall</string>
+    <string name="basic">Grunnleggende</string>
+    <string name="canceled">Avbrutt</string>
+    <string name="cannot_create_file">Kan ikke opprette fil: %1$s</string>
+    <string name="case_sensitive">Forskjell på små og store bokstaver</string>
+    <string name="case_sensitive_sorting">Sortering som gjør forskjell på små og store bokstaver</string>
+    <string name="change_password">Endre passord</string>
+    <string name="choose">Velg</string>
+    <string name="choose_group">Velg gruppe</string>
+    <string name="choose_record">Velg oppføring</string>
+    <string name="choose_type">Velg type</string>
+    <string name="clear">Tøm</string>
+    <string name="clear_all_saved_passwords">Tøm alle lagrede passord</string>
+    <string name="clear_clipboard_on_close">Tøm utklippstavlen ved programslutt</string>
+    <string name="clear_password_notifications">Tøm passordsmerknad</string>
+    <string name="clear_recent">Tøm nylige</string>
+    <string name="close_file">Lukk fil</string>
+    <string name="close_file_screen_off">Lukk fil første gang skjermen slås av</string>
+    <string name="confirm">Bekreft</string>
+    <string name="cannot_delete_record">Kan ikke slette oppføring — %1$s</string>
+    <string name="content_file">Innholdsfil</string>
+    <string name="continue_str">Fortsett</string>
+    <string name="continue_p">Fortsett?</string>
+    <string name="copy_clipboard">Kopier til utklippstavle</string>
+    <string name="copy_email">Kopier e-post</string>
+    <string name="copy_notes">Kopier notater</string>
+    <string name="copy_password">Kopier passord</string>
+    <string name="copy_password_warning">
+        Advarsel: Alle programmer kan lese innholdet i utklippstavlen, og
+        utklippstavlen kan ikke tømmes på pålitelig vis. Det alternative «PasswdSafe-
+        tasturet er en skirere måte å skrive inn passord i andre programmer.
+    </string>
+    <string name="copy_url">Kopier nettadresse</string>
+    <string name="copy_user">Kopier brukernavn</string>
+    <string name="created">Opprettet</string>
+    <string name="current">Nåværende</string>
+    <string name="custom_symbols">Egendefinerte symboler</string>
+    <string name="custom_symbol_not_alphanum">Egendefinerte symboler kan ikke være alfanumeriske eller kun blanktegn</string>
+    <string name="database_policy">Databasepraksis — %s</string>
+    <string name="database_version">Databaseversjon</string>
+    <string name="days">Dager</string>
+    <string name="default_file_to_open">Forvalgt fil å åpne</string>
+    <string name="default_policy">Forvalgt praksis</string>
+    <string name="default_symbols">Forvalgte symboler</string>
+    <string name="default_symbols_empty_pref">Bruk en tom innstilling for forvalgte symboler: %1$s</string>
+    <string name="delete">Slett</string>
+    <string name="delete_file">Slett fil</string>
+    <string name="delete_file_msg">Slett «%1$s»-filen?</string>
+    <string name="delete_policy">Slett praksis</string>
+    <string name="delete_policy_msg">Slett «%1$s»-praksisen?</string>
+    <string name="delete_record_msg">Slett «%1$s»-oppføringen?</string>
+    <string name="directory_for_files">Mappe for filer</string>
+    <string name="display">Vis</string>
+    <string name="done">Ferdig</string>
+    <string name="duplicate_entry">Dupliser oppføring</string>
+    <string name="duplicate_name">Dupliser navn</string>
+    <string name="edit_item">Rediger %s</string>
+    <string name="edit_policy">Rediger praksis</string>
+    <string name="email">E-post</string>
+    <string name="email_attachment">E-postvedlegg</string>
+    <string name="email_header">E-post</string>
+    <string name="empty_custom_symbols">Tøm egendefinerte symboler</string>
+    <string name="empty_file_name">Tøm filnavn</string>
+    <string name="empty_name">Tøm navn</string>
+    <string name="empty_password">Tøm passord</string>
+    <string name="empty_title">Tøm navn</string>
+    <string name="enable_expiration_notifications">Skru på utløpsmerknader</string>
+    <string name="enable">Skru på</string>
+    <string name="enabled">Påskrud</string>
+    <string name="erase_all_expiration_notifications">Tøm alle merknader om passordutløp og sporing av filer</string>
+    <string name="erase_all_saved_passwords">Tøm alle passord og nøkler</string>
+    <string name="expiration">Utløp</string>
+    <string name="expiration_notifications">Utløpsmerknader</string>
+    <string name="expiration_notifications_warning">Å skru på utløpsmerknader krever PasswdSafe for å lagre utløpsinfo for filen (oppføringsnavn, gruppe, og utløpsdato). Infoen lagres ukryptert på enheten. Ingen passord lagres.</string>
+    <string name="expired_password_notification">Merknad om utløpt passord</string>
+    <string name="expiring_password">Passord utløper</string>
+    <string name="ext_storage_not_mounted">Eksternlagring er ikke montert. Monter denne for å vise filer.</string>
+    <string name="file_backups">Filsikkerhetskopier</string>
+    <string name="file_close_timeout">Tidsavbrudd for fillukking</string>
+    <string name="file_exists">Filen finnes</string>
+    <string name="file">Fil</string>
+    <string name="file_name">Filenavn</string>
+    <string name="file_not_found_perm_denied">Fant ikke fil, eller ble nektet tilgang</string>
+    <string name="file_open_help">
+        Filpassord kan lagres på enheter med fingeravtrykksskanner på
+        Android 6.0+. Passordene krypteres med AES-256-nøkler som beskyttes
+        av en fingeravtrykksskanning.
+        \n
+        - For å lagre et passord må du først sørge for at et fingeravtrykk
+        er lagret på enheten i sikkerhetsinnstillingene. Velg så lagring,
+        skriv inn passordet, og trykk «OK». Etter at passordet er bekreftet
+        skanner du et fingeravtrykk når du blir spurt om det. Passordet vil
+        bli kryptert og lagret, og filen vil åpnes.
+        \n
+        - For å bruke et lagret passord, kan du skanne et fingeravtrykk
+        i stedet for å skrive inn et passord. Hvis skanningen er vellykket,
+        dekrypteres passordet og det brukes til å åpne filen. Hvis en YubiKey
+        brukes, vil nøkkelen bli lest etter at fingeravtrykket er skannet.
+        \n
+        - For å fjerne et lagret passord kan du oppheve lagringsvalget og åpne
+        filen. Det lagrede passordet vil bli slettet fra enheten. Alle lagrede
+        passord kan fjernes fra passordsinnstillingene.
+        \n
+        \nFor å bruke YubiKey NEO, følger du disse stegene:\n
+        - Skru på NFC-støtte i enhetsinnstillingene\n
+        - Skriv inn brukerpassord til filen\n
+        - Velg hvilken plass på YubiKey-en som har utfordring-svar-nøkkelen.
+        Vanligvis brukes plass 2 for Password Safe.\n
+        - Velg YubiKey-alternativet\n
+        - Klikk OK\n
+        - I løpet av 30 sekunder kan du trykke YubiKey-en til baksiden av
+        telefonen eller nettbrettet. Det vil ta noen sekunder å lese nøkkelen.
+        Hvis enheten ikke svarer med en økende tone kan du flytte nøkkelen rundt.
+        Litt prøving og feiling trengs for å finne riktig posisjon. Knappen på
+        selve YubiKey-en trenger man ikke å trykke på.\n
+        - Når en nøkkel blir funnet, vil den brukes til å identitetsbekrefte med
+        passordet. Filen vil åpnes automatisk.
+    </string>
+    <string name="file_operations">Filoperasjoner…</string>
+    <string name="file_password_encoding">Koding for filpassord</string>
+    <string name="files">Filer</string>
+    <string name="fingerprint_not_recognized">Fingeravtrykket gjenkjennes ikke</string>
+    <string name="generate">Generer</string>
+    <string name="generate_password">Generer passord</string>
+    <string name="go">Start</string>
+    <string name="go_to_shortcut">Gå til</string>
+    <string name="group">Gruppe</string>
+    <string name="group_cannot_start_with_dot">Gruppe kan ikke starte med \'.\'</string>
+    <string name="group_header">Gruppe</string>
+    <string name="group_records">Gruppeoppføringer</string>
+    <string name="help">Hjelp</string>
+    <string name="hidden_password_alias">***** (fra alias, trykk for å vise)</string>
+    <string name="hidden_password_normal">***** (trykk for å vise)</string>
+    <string name="hidden_password_shortcut">***** (fra snarvei, trykk for å vise)</string>
+    <string name="hide_password">Skjul passord</string>
+    <string name="hide_passwords">Skjul passord</string>
+    <string name="history">Historikk</string>
+    <string name="history_header">Historikk</string>
+    <string name="home">Hjem</string>
+    <string name="interval">Intervall</string>
+    <string name="invalid_file_name">Ugyldig filnavn</string>
+    <string name="invalid_history_max_size" tools:ignore="PluralsCandidate">Størrelse må være mellom %1$d og %2$d</string>
+    <string name="invalid_length">Ugyldig lengde</string>
+    <string name="invalid_option_length">Ugyldig alternativslengde</string>
+    <string name="invalid_password">Ugyldig passord</string>
+    <string name="key_error">Nøkkelfeil for %1$s: %2$s</string>
+    <string name="key_not_found">Fant nøkkel for $1%s</string>
+    <string name="kitkat_sdcard_warning">
+        %1$s
+        \n\nPå Android KitKat og nyere forhindres programmer fra å skrive til
+        fjernbare SD-kort. Hvis filen er å finne på et kart, vil den måtte
+        flyttes til internlagring.
+    </string>
+    <string name="last_save_app">Sist lagret program</string>
+    <string name="last_save_by">Sist lagret av</string>
+    <string name="last_save_time">Siste lagringstid</string>
+    <string name="legacy_file_chooser">Gammeldags filvelger</string>
+    <string name="legacy_file_chooser_summary">Kan brukes på Kitkat og nyere</string>
+    <string name="length">Lengde</string>
+    <string name="length_even_hex">Lengde må samsvare for heksadesimal</string>
+    <string name="length_min_val">Lengde må være minst %1$d</string>
+    <string name="length_max_val">Lengde kan toppen være %1$d</string>
+    <string name="loading_file">Laster inn %s…</string>
+    <string name="location">Posisjon</string>
+    <string name="max_size">Maksimal størrelse</string>
+    <string name="max_size_label">Maksimal størrelse:</string>
+    <string name="menu">Meny</string>
+    <string name="modified">Endret</string>
+    <string name="monospace">Fastbredde</string>
+    <string name="n_a">I/T</string>
+    <string name="name">Navn</string>
+    <string name="navigation_drawer_open">Åpne navigasjonsskuff</string>
+    <string name="navigation_drawer_close">Lukk navigasjonsskuff</string>
+    <string name="new_box_file">Ny boksfil</string>
+    <string name="new_entry">Ny oppføring</string>
+    <string name="new_file">Ny fil</string>
+    <string name="new_dropbox_file">Ny Dropbox-fil</string>
+    <string name="new_file_not_supp_uri">Ny fil støttes ikke for «%1$s»-URI-en</string>
+    <string name="new_group">Ny gruppe</string>
+    <string name="new_group_menu">Ny gruppe…</string>
+    <string name="new_local_file">Ny lokal fil</string>
+    <string name="new_onedrive_file">Ny OneDrive-fil</string>
+    <string name="new_owncloud_file">Ny ownCloud-fil</string>
+    <string name="new_policy">Ny praksis</string>
+    <string name="next">Neste</string>
+    <string name="no_alias_chosen">Alias er ikke valgt</string>
+    <string name="no_file_permission">
+        PasswdSafe krever filtilganger.
+        \n\nTrykk «Last inn igjen» for ny spørring. Hvis spørringen ikke vises
+        trykker du på innstillinger og skrur på lagringstilganger.
+    </string>
+    <string name="no_files_select_to_open">
+        Ingen filer — Velg handling for å åpne eller opprette en ny fil
+        \n\nHvis filer ikke vises på dokumentskjermen bruker du menyen for å
+        vise internlagringen eller SD-kortet.
+        \n\nForrige filvelger er påskrudd i innstillingene som
+        gammeldags filvelger.
+    </string>
+    <string name="no_fingerprints_registered">Ingen fingeravtrykk er registrert</string>
+    <string name="no_groups">Ingen grupper</string>
+    <string name="no_shortcut_chosen">Ingen snarvei valgt</string>
+    <string name="no_policies">Ingen praksiser</string>
+    <string name="no_records">Ingen oppføringer</string>
+    <string name="no_records_open_file">Ingen oppføringer. Åpne en fil først og prøv igjen.</string>
+    <string name="none_paren">(Ingen)</string>
+    <string name="none_selected_open">Ingen valgt. Åpne PasswdSafe for å velge.</string>
+    <string name="notes">Notater</string>
+    <string name="num_records">Antall oppføringer</string>
+    <string name="ok">OK</string>
+    <string name="open_file">Åpne %s</string>
+    <string name="open_file_title">Åpne fil</string>
+    <string name="option_not_selected">Minst ett altnerativ må velges</string>
+    <string name="password">Passord</string>
+    <string name="password_encoding">Passordkodring</string>
+    <string name="password_expiration">Passordutløp</string>
+    <string name="password_expiration_in_past">Passordutløp er i fortiden</string>
+    <string name="password_expiration_invalid_interval">Intervall må være mellom 1&#8211;3650</string>
+    <string name="password_expired">Passord utløpt</string>
+    <string name="password_expires_before">Passordet utløper før %1$s</string>
+    <string name="password_expires_today">Passordet utløper i dag</string>
+    <string name="password_file">Passordfil</string>
+    <string name="password_header">Passord</string>
+    <string name="password_len_short_opt">Passordslengde er for kort for alternativer</string>
+    <string name="password_loaded">Passord innlastet</string>
+    <string name="password_not_found">Fant ikke passordet for %1$s</string>
+    <string name="password_policy">Passordpraksis</string>
+    <string name="password_policies">Passordpraksiser</string>
+    <string name="password_record">Passordsoppføring</string>
+    <string name="password_save_canceled_key_error">Passordslagring avbrutt. Klarte ikke å opprette en krypteringsnøkkel: %s</string>
+    <string name="password_saved">Passord lagret</string>
+    <string name="password_times_header">Passordtider</string>
+    <string name="password_with_expiration">Passord med utløpsdato</string>
+    <string name="passwords">Passord</string>
+    <string name="passwords_do_not_match">Passordene samsvarer ikke</string>
+    <string name="permissions">Tilganger</string>
+    <string name="policy_header">Praksis</string>
+    <string name="policy_no">Nei</string>
+    <string name="policy_yes_len">Ja — Ihvertfall %1$d</string>
+    <string name="policy_yes_sym_default" tools:ignore="PluralsCandidate">Ja — Ihvertfall %1$d fra forvalgte symboler: %2$s</string>
+    <string name="policy_yes_sym_easy" tools:ignore="PluralsCandidate">Ja — Ihvertfall %1$d fra enkle symboler: %2$s</string>
+    <string name="policy_yes_sym_policy" tools:ignore="PluralsCandidate">Ja — Ihvertfall %1$d fra praksissymboler: %2$s</string>
+    <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Ja — Symboler: %2$s</string>
+    <string name="press_again_close_warning">Trykk igjen for å lukke filen</string>
+    <string name="press_password_warning">Trykk «Passord» igjen for å lime inn i synlig felt</string>
+    <string name="press_yubikey">Trykk «YubiKey»</string>
+    <string name="protect_all">Beskytt alle oppføringer</string>
+    <string name="protect_group">Beskytt gruppeoppføringer</string>
+    <string name="protected_record">Beskyttet</string>
+    <string name="protected_record_header">Beskyttet oppføring</string>
+    <string name="psafe3_ext">.psafe3</string>
+    <string name="query_label">Søk: %1$s</string>
+    <string name="recent_files">Nylige filer</string>
+    <string name="record">Oppføring</string>
+    <string name="records">Oppføringer</string>
+    <string name="record_has_references">Oppføringen har referanser</string>
+    <string name="record_not_found">Fant ikke oppføring</string>
+    <string name="record_policy">Oppføringspraksis</string>
+    <string name="record_sort_order">Sorteringsrekkefølge for oppføringer</string>
+    <string name="record_type">Oppføringstype</string>
+    <string name="read_only_about">Skrivebeskyttet</string>
+    <string name="read_only_file">Skrivebeskyttet</string>
+    <string name="read_only_media">Filen finnes på skrivebeskyttet lagring. Situasjonen kan oppstå på Kitkat og nyere med fjernbare SD-kort.</string>
+    <string name="read_write">Les og skriv</string>
+    <string name="references_label">Referanser</string>
+    <string name="regular_expression">Regulært uttrykk</string>
+    <string name="regular_expression_summary">Bruk et regulært uttrykk for å søke istedenfor en understreng</string>
+    <string name="remove">Fjern</string>
+    <string name="recurring">Gjentagende</string>
+    <string name="save">Lagre</string>
+    <string name="save_password">Lagre passord</string>
+    <string name="save_password_p">Lagre passord?</string>
+    <string name="save_password_warning">
+        Etter at filen er åpnet, vil innskrevet passord lagres lokalt.
+        Passordet er kryptert med en AES-256-nøkkel og er beskyttet av
+        en fingeravtrykksskanning. Fingeravtrykksskanningen er ikke nødvendigvis
+        like sikkert som selve passordet.
+    </string>
+    <string name="saving_file">Lagrer %s…</string>
+    <string name="search">Søk</string>
+    <string name="search_hint">Søk i PasswdSafe</string>
+    <string name="select_accounts">Velg kontoer</string>
+    <string name="select_file_label">Velg passordsfil:</string>
+    <string name="send">Send</string>
+    <string name="set_password">Sett passord</string>
+    <string name="shortcut_base_record_header">Snarvei</string>
+    <string name="shortcut_file">Snarveisfil</string>
+    <string name="shortcut_record">Snarveisoppføring</string>
+    <string name="shortcut_to_same_record">Snarvei til samme oppføring</string>
+    <string name="show_backup_files">Vis sikkerhetskopifiler</string>
+    <string name="show_password">Vis passord</string>
+    <string name="show_passwords">Vis passord</string>
+    <string name="symbols_used_by_default">Symboler brukt som forvalg i en passordspraksis: %1$s</string>
+    <string name="sync">Synkroniser</string>
+    <string name="times_header">Tider</string>
+    <string name="title">Navn</string>
+    <string name="touch_sensor_to_save_the_password">Trykk på sensoren for å lagre passordet</string>
+    <string name="touch_sensor_to_load_saved_password">Trykk på sensor for å laste inn lagret passord</string>
+    <string name="unknown_sync_file">Ukjent synkroniseringsfil</string>
+    <string name="unprotect_all">Opphev beskyttelse av alle oppføringer</string>
+    <string name="unprotect_group">Opphev beskyttelse av gruppeoppføringer</string>
+    <string name="unprotect_to_modify">Opphev beskyttelse for å endre</string>
+    <string name="username">Brukernavn</string>
+    <string name="use_count">Bruk</string>
+    <string name="use_digits">Siffer</string>
+    <string name="use_light_theme">Bruk lys drakt</string>
+    <string name="use_lowercase">Små bokstaver</string>
+    <string name="use_symbols">Symboler</string>
+    <string name="use_uppercase">Store bokstaver</string>
+    <string name="username_header">Brukernavn</string>
+    <string name="view_password_expirations">Vis passordsutløp</string>
+    <string name="word_wrap">Ordlinjebryting</string>
+    <string name="yes">Ja</string>
+    <string name="yubikey">YubiKey</string>
+    <string name="yubikey_disabled">YubiKey avskrudd. Skru på NFC for å bruke.</string>
+    <string name="yubikey_error">Kunne ikke kommunisere med YubiKey-en</string>
+    <string name="yubikey_slot_none">Avslått</string>
+    <string name="yubikey_slot_1">YubiKey plass 1</string>
+    <string name="yubikey_slot_2">YubiKey plass 2</string>
+
+    <string name="release_notes">
+        \n
+        &lt;b&gt;0.4.1&lt;/b&gt;\n
+        - Feilfikser
+        \n\n
+        &lt;b&gt;0.4.0&lt;/b&gt;\n
+        - New feature: Bluetooth Auto-Type (min. Android Pie required)\n
+        - New feature: OTP Auto-Type Button\n
+        - New keyboard layout (en_GB)\n
+        - Wording adjusted\n
+        - Additional small improvements\n
+        - Bug fixes
+        \n\n
+        &lt;b&gt;0.3.0&lt;/b&gt;\n
+        - New feature: OTP support\n
+        - New feature: Placeholders in username and password\n
+        - Beta status removed\n
+        - Increase of security
+        \n\n
+        &lt;b&gt;0.2.6&lt;/b&gt;\n
+        - New feature: GPG encrypted backup on USB mass storage\n
+        - Bug fixes and clean up
+        \n\n
+        &lt;b&gt;0.2.5&lt;/b&gt; - New keyboard layouts and bug fixes.
+        \n\n
+        &lt;b&gt;0.2.4&lt;/b&gt;\n
+        - Using now superuser/root to access /dev/hidg0 (USB HID device)\n
+        - Added setting to deactivate USB Keyboard output\n
+        - A lot of design adjustments, e.g. major rework of TreeView\n
+        - Added icons for password entries (shown in TreeView)\n
+        - Some merges with the original PasswdSafe for Android app
+        \n\n
+        &lt;b&gt;0.2.3&lt;/b&gt; - Design enhancements.
+        \n\n
+        &lt;b&gt;0.2.0&lt;/b&gt; - First release of Authorizer - a new app
+        based on (a fork of) Passwd Safe for Android.
+        \n\n
+        &lt;b&gt;0.1.0&lt;/b&gt; - Authorizer Proof-of-Concept version.
+        \n\n
+        &lt;b&gt;---------------------------------------------&lt;/b&gt;
+        \n\n
+        &lt;b&gt;Old PasswdSafe Release Notes:&lt;/b&gt;
+        \n\n
+        &lt;b&gt;6.4.3&lt;/b&gt; - Bug fixes.
+        \n\n
+        &lt;b&gt;6.4.2&lt;/b&gt; - Bug fixes.
+        \n\n
+        &lt;b&gt;6.4.1&lt;/b&gt; - Fix crash when opening file with saved
+        password.  Fix dark text in keyboard.  Improve German translation.
+        Show licenses in About screen.
+        \n\n
+        &lt;b&gt;6.4.0&lt;/b&gt; - Add option to save file passwords
+        protected by a fingerprint scan on Android 6.0 and higher
+        \n\n
+        &lt;b&gt;6.3.0&lt;/b&gt; - Improve keyboard usability.  Add basic
+        keyboard keys for password entry.  Support cycling between keyboards.
+        \n\n
+        &lt;b&gt;6.2.0&lt;/b&gt; - Allow a few retries for an invalid password
+        when opening a file.  Add menu items to copy URL and email fields.  Use
+        a font with a slashed zero for passwords.
+        \n\n
+        &lt;b&gt;6.1.2&lt;/b&gt; - Fix crash when opening preferences. Bug
+        fixes.
+        \n\n
+        &lt;b&gt;6.1.1&lt;/b&gt; - Request storage permission if needed.  Fix
+        copy-and-paste bug.
+        \n\n
+        &lt;b&gt;6.1.0&lt;/b&gt; - Add preference to choose a dark theme.
+        Improve French translation.  Add long-press handlers to copy user names
+        and passwords.
+        \n\n
+        &lt;b&gt;6.0.2&lt;/b&gt; - Improve German translation. Attempt a fix for
+        permission denial error when opening files.
+        \n\n
+        &lt;b&gt;6.0.1&lt;/b&gt; - Add a menu option to copy the password to the
+        clipboard with a warning
+        \n\n
+        &lt;b&gt;6.0.0&lt;/b&gt; - User interface rewrite for material design
+        and tablet support
+        \n\n
+        &lt;b&gt;5.4.0&lt;/b&gt;\n
+        - Add OneDrive support.  After authenticating an account, choose the
+        files to sync.\n
+        - Add record preference to sort groups before, after, or mixed with
+        records
+        \n\n
+        &lt;b&gt;5.3.2&lt;/b&gt; - Use previous file chooser by default
+        \n\n
+        &lt;b&gt;5.3.1&lt;/b&gt; - Add help for enabling internal storage for
+        the new chooser or enabling the legacy chooser.
+        \n\n
+        &lt;b&gt;5.3.0&lt;/b&gt; - Add slider to reveal parts of a password. On
+        Kitkat and higher, use the built-in document manager to open or create
+        files.
+        \n\n
+        &lt;b&gt;5.2.0&lt;/b&gt; - Add ownCloud support.  Accounts are chosen
+        from the list in the ownCloud app.  Once access is authorized, password
+        files can be chosen to sync. 
+        \n\n
+        &lt;b&gt;5.1.0&lt;/b&gt; - Add multi-window support for Samsung devices.
+        Enable selection of notes text.
+        \n\n
+        &lt;b&gt;5.0.0&lt;/b&gt; - YubiKey NEO support for devices with NFC
+        \n\n
+        &lt;b&gt;4.7.3&lt;/b&gt; - Maintain an open file when the app is 
+        launched from the home screen
+        \n\n
+        &lt;b&gt;4.7.2&lt;/b&gt; - Performance improvement when opening a file 
+        with many password iterations.
+        \n\n
+        &lt;b&gt;4.7.1&lt;/b&gt; - Fix crash with preferences
+        \n\n
+        &lt;b&gt;4.7.0&lt;/b&gt; - Add German translation
+        \n\n        
+        &lt;b&gt;4.6.0&lt;/b&gt;\n
+        - Attempt to detect read-only files on SD cards with Kitkat.  Please
+        send feedback if the detection is or is not working.\n
+        - Show the current password while editing for reference\n
+        - Show modification time of local files in file list
+        \n\n
+        &lt;b&gt;4.5.0&lt;/b&gt; - Add Box support with PasswdSafe Sync.  
+        Password files (.psafe3) are synced from the top folder and any folder 
+        tagged with \'passwdsafe\'.
+        \n\n
+        &lt;b&gt;4.4.0&lt;/b&gt;\n
+        - Add a password preference for the set of symbols to use by default in
+        password policies\n
+        - The current group is set as the default for new records\n
+        - Synchronized files can be set as a default file
+        \n\n
+        &lt;b&gt;4.3.0&lt;/b&gt; - Show a file\'s folder.
+        \n\n
+        &lt;b&gt;4.2.0&lt;/b&gt; - An input method is available which can paste
+        fields from the last selected password record. The input method must be
+        enabled in the system settings before it can be used.
+        \n\nTo use:\n
+        - Select a record in PasswdSafe\n
+        - Open the app which will use the record\'s fields\n
+        - Switch to the PasswdSafe input method\n
+        - Select the fields to paste values into the app\n
+        - Select the PasswdSafe icon to choose a different record if needed\n
+    </string>
+
+    <plurals name="expiring_passwords">
+        <item quantity="one">Ett passord som utløper</item>
+        <item quantity="other">%1$d passord som utløper</item>
+    </plurals>
+
+    <plurals name="group_items">
+        <item quantity="one">[Ett element]</item>
+        <item quantity="other">[%d elementer]</item>
+    </plurals>
+
+    <plurals name="interval_days">
+        <item quantity="one">Daglig</item>
+        <item quantity="other">%d dager</item>
+    </plurals>
+
+    <!-- Order must match FileBackupPref enum values -->
+    <string-array name="file_backup_pref">
+        <item>Ingen</item>
+        <item>1 sikkerhetskopi</item>
+        <item>2 sikkerhetskopier</item>
+        <item>5 sikkerhetskopier</item>
+        <item>10 sikkerhetskopier</item>
+        <item>Alle</item>
+    </string-array>
+
+    <!-- Order must match FileTimeoutPref enum values -->
+    <string-array name="file_timeout_pref">
+        <item>Ingen</item>
+        <item>30 sekunder</item>
+        <item>2 minutter</item>
+        <item>5 minutter</item>
+        <item>15 minutter</item>
+        <item>1 time</item>
+    </string-array>
+
+    <!-- Order must match constants in RecordSortOrderPref -->
+    <string-array name="record_sort_order_pref">
+        <item>Grupper først</item>
+        <item>Grupper blandet</item>
+        <item>Grupper sist</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdSafeEditRecordFragment -->
+    <string-array name="record_type">
+        <item>Normal</item>
+        <item>Alias</item>
+        <item>Snarvei</item>
+    </string-array>
+
+    <!-- Order must match values of PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filters">
+        <item>Utløpt</item>
+        <item>I dag</item>
+        <item>Om en uke</item>
+        <item>Om to uker</item>
+        <item>Om en måned</item>
+        <item>Om et år</item>
+        <item>Vilkårlig</item>
+        <item>Egendefinert</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_record">
+        <item>Ett passord har utløpt</item>
+        <item>Ett passord utløper i dag</item>
+        <item>Ett passord utløper i løpet av én uke</item>
+        <item>Ett passord utløper i løpet av to uker</item>
+        <item>Ett passord utløper i løpet av én måned</item>
+        <item>Ett passord utløper utløper i løpet av ett år</item>
+    </string-array>
+
+    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <string-array name="expire_filter_records">
+        <item>%1$s passord har utløpt</item>
+        <item>%1$s passord utløper i dag</item>
+        <item>%1$s passord utløper i løpet av én uke</item>
+        <item>%1$s passord utløper i løpet av to uker</item>
+        <item>%1$s passord utløper i løpet av én måned</item>
+        <item>%1$s passord utløper i løpet av året</item>
+    </string-array>
+
+    <!-- Order must match PasswdExpiryNotifPref enum values -->
+    <string-array name="passwd_expiry_notif_pref">
+        <item>Ingen</item>
+        <item>Utløpt</item>
+        <item>I dag</item>
+        <item>Om en uke</item>
+        <item>Om to uker</item>
+        <item>Om en måned</item>
+        <item>Om ett år</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdExpiration.Type -->
+    <string-array name="expire_type">
+        <item>Aldri</item>
+        <item>Dato</item>
+        <item>Intervall</item>
+    </string-array>
+
+    <!-- Order must match constants in PasswdPolicy.Type -->
+    <string-array name="policy_type">
+        <item>Normal</item>
+        <item>Lettleselig</item>
+        <item>Uttalbart</item>
+        <item>Heksadesimalt</item>
+    </string-array>
+
+    <!-- added by TM -->
+    <string name="autotype_usb_header">Inntast automatisk over USB</string>
+    <string name="autotype_bt_header">Inntast automatisk over Blåtann</string>
+
+    <string name="autotype_username">Brukernavn</string>
+    <string name="autotype_password">Passord</string>
+    <string name="autotype_otp">OTP</string>
+    <string name="autotype_credentials">Navn/pass</string>
+
+    <string name="autotype_lang_default">Android-systemforvalg</string>
+    <string name="autotype_lang_english_US">Engelsk (US)</string>
+    <string name="autotype_lang_english_GB">Engelsk (GB)</string>
+    <string name="autotype_lang_german">Tysk</string>
+    <string name="autotype_lang_german_apple">Tysk (Apple)</string>
+    <string name="autotype_lang_swiss_german">Tysk (CH)</string>
+    <string name="autotype_lang_swiss_french">Fransk (CH)</string>
+    <string name="autotype_lang_neo">Neo 2.0</string>
+
+    <string-array name="autotype_lang_titles">
+        <item>@string/autotype_lang_default</item>
+        <item>@string/autotype_lang_english_US</item>
+        <item>@string/autotype_lang_english_GB</item>
+        <item>@string/autotype_lang_german</item>
+        <item>@string/autotype_lang_german_apple</item>
+        <item>@string/autotype_lang_swiss_german</item>
+        <item>@string/autotype_lang_swiss_french</item>
+        <item>@string/autotype_lang_neo</item>
+    </string-array>
+
+    <string-array name="autotype_lang_values">
+        <item>null</item>
+        <item>en_US</item>
+        <item>en_GB</item>
+        <item>de_DE</item>
+        <item>AppleMac_de_DE</item>
+        <item>de_CH</item>
+        <item>fr_CH</item>
+        <item>neo</item>
+    </string-array>
+
+    <string name="autotype_lang">Tastaturoppsett for automatisk inntasting</string>
+    <string name="autotype_bluetooth_devices">Sammenkoblede Blåtannsenheter</string>
+    <string name="autotype_return_suffix">Skriv \"Return\" etter passordet</string>
+    <string name="autotype_header">Automatisk inntasting</string>
+    <string name="autotype_usb_enable">Skru på automatisk inntasting over USB</string>
+    <string name="autotype_bt_enable">Skru på automatisk inntasting over Blåtann</string>
+    <string name="autotype_bt_enable_summary">Android Pie (28) eller nyere kreves.</string>
+
+    <string name="autotype_usb_root_denied">
+        Feil: rot-tilgang ble ikke innvilget. Kunne ikke inntaste automatisk over USB siden dette krever rot-tilgang.
+    </string>
+
+    <string name="use_treeview_list">Bruk tre-liste</string>
+    <string name="entry">oppføringy</string>
+    <string name="entries">oppføringer</string>
+
+    <string name="ic_keyboard">{gmi_keyboard}</string>
+    <string name="ic_arrow_right">{gmi_chevron_right}</string>
+    <string name="ic_arrow_down">{gmi_chevron_down}</string>
+    <string name="ic_key">{gmi_key}</string>
+    <string name="ic_folder">{gmi_folder}</string>
+
+    <string name="file_backup_usb_gpg">Skru på GPG-sikkerhetskopi på USB-lagring</string>
+    <string name="file_backup_usb_gpg_info">
+        Hvis denne funksjonen er påslått vil en sikkerhetskopieringsdialog åpnes så snart
+        USB-masselagring er tilkoblet. Du kan velge en sikkerhetskopimappe ved å trykke
+        «Sikkerhetskopier nå»-knappen. En fil ved navn «pubkey.asc» inneholder en offentlig
+        GPG-nøkkel, som må være i denne mappen. Hvis den finnes vil en kopi av forvalgt fil
+        krypteres med denne nøkkelen i valgt mappe.
+    </string>
+
+    <string-array name="algorithms">
+        <item>MD5</item>
+        <item>SHA-1</item>
+        <item>SHA-256</item>
+        <item>SHA-512</item>
+    </string-array>
+
+    <string name="bluetooth_enabled">Blåtann påskrudd.</string>
+    <string name="bluetooth_enable_error">Kunne ikke skru på Blåtann</string>
+    <string name="error_permission_camera_open">Mangler tilgang til å åpne kameraet</string>
+    <string name="error_camera_open">Kunne ikke åpne kameraet</string>
+    <string name="otp_header">OTP</string>
+    <string name="otp_overwrite">Erstatt nåværende OTP? (Vil gå tapt for godt.)</string>
+    <string name="replace">Erstatt</string>
+    <string name="secret">Hemmelighet</string>
+    <string name="base32">(Base32)</string>
+    <string name="totp">TOTP</string>
+    <string name="hotp">HOTP</string>
+    <string name="digits">Siffer</string>
+    <string name="algorithm">Algoritme</string>
+    <string name="counter">Teller</string>
+    <string name="otp_token">Symbol:</string>
+    <string name="otp_add_manually">Legg til OTP manuelt</string>
+    <string name="otp_add_camera">Skann OTP-QR-kode</string>
+
+    <string name="autotype_delimiter_return">Tilbake</string>
+    <string name="autotype_delimiter_tab">Tabulator</string>
+    <string name="autotype_delimiter">Inndeling:</string>
+
+    <string name="SUB_OTP" translatable="false">{OTP}</string>
+    <string name="SUB_TAB" translatable="false">{TAB}</string>
+    <string name="SUB_RETURN" translatable="false">{RET}</string>
+</resources>
