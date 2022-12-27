@@ -9,13 +9,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 33
     defaultConfig {
         applicationId 'net.tjado.passwdsafe'
         minSdkVersion 21
-        resConfigs "de"
-        targetSdkVersion 28
+        resConfigs 'de'
+        targetSdkVersion 33
         versionCode 401
         versionName '0.4.1'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -30,8 +29,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     productFlavors {
     }
@@ -41,29 +40,31 @@ android {
         }
     }
     ndkVersion '20.0.5594570'
+    namespace 'net.tjado.passwdsafe'
 }
 
 repositories {
     maven { url 'https://jitpack.io' }
+    mavenCentral()
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':lib')
-    androidTestImplementation 'androidx.annotation:annotation:1.0.2'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test:rules:1.1.1'
-    androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    androidTestImplementation('androidx.test.espresso:espresso-contrib:3.1.0') {
+    androidTestImplementation 'androidx.annotation:annotation:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.1'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'org.hamcrest:hamcrest-library:2.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation('androidx.test.espresso:espresso-contrib:3.5.0') {
         exclude module: 'support-v4'
         exclude module: 'appcompat-v7'
         exclude module: 'design'
         exclude module: 'recyclerview-v7'
     }
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.1'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.github.bmelnychuk:atv:1.2.9'
     implementation 'com.mikepenz:iconics-core:2.8.1@aar'
@@ -71,8 +72,14 @@ dependencies {
     implementation 'com.mikepenz:devicon-typeface:2.0.0.2@aar'
     implementation 'com.mikepenz:materialize:1.0.0@aar'
     implementation 'com.mikepenz:fastadapter:2.0.0@aar'
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.59'
-    implementation 'org.bouncycastle:bcpg-jdk15on:1.59'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.72'
+    implementation 'org.bouncycastle:bcpg-jdk18on:1.72.2'
     implementation 'io.fotoapparat.fotoapparat:library:1.4.1'
-    implementation 'com.google.zxing:core:3.3.0'
+    implementation 'com.google.zxing:core:3.5.1'
+
+    implementation 'androidx.biometric:biometric:1.1.0'
+
+    def room_version = "2.4.3"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
 }

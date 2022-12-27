@@ -515,15 +515,18 @@ public class PasswdFileUri implements Parcelable
 
 
     /** Get the URI type */
-    private static Type getUriType(Uri uri)
+    public static Type getUriType(Uri uri)
     {
-        if (uri.getScheme().equals(ContentResolver.SCHEME_FILE)) {
-            return Type.FILE;
+        String scheme = uri.getScheme();
+        if (scheme != null) {
+            if (scheme.equals(ContentResolver.SCHEME_FILE)) {
+                return Type.FILE;
+            }
         }
         String auth = uri.getAuthority();
         if (PasswdSafeContract.AUTHORITY.equals(auth)) {
             return Type.SYNC_PROVIDER;
-        } else if (auth.contains("mail")) {
+        } else if ((auth != null) && auth.contains("mail")) {
             return Type.EMAIL;
         }
         return Type.GENERIC_PROVIDER;

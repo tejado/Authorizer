@@ -247,7 +247,7 @@ public class PasswdSafeRecordFragment
             }
         });
         updateNotesTab();
-        GuiUtils.invalidateOptionsMenu(getActivity());
+        requireActivity().invalidateOptionsMenu();
     }
 
     /**

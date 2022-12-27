@@ -17,7 +17,7 @@ import java.io.IOException;
  * The Owner class encapsulates an object to ensure it is closed after all
  * users are finished with it
  */
-public final class Owner<T extends Closeable>
+public final class Owner<T extends Closeable> implements Closeable
 {
     private T itsItem;
     private int itsRefCount = 1;
@@ -32,7 +32,7 @@ public final class Owner<T extends Closeable>
         /**
          * Constructor
          */
-        public Param(@NonNull Owner<T> item)
+        private Param(@NonNull Owner<T> item)
         {
             itsOwnedItem = item;
         }
@@ -76,6 +76,7 @@ public final class Owner<T extends Closeable>
     /**
      * Close the owner and its owned object if the last user
      */
+    @Override
     public void close()
     {
         if (itsItem != null) {

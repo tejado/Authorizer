@@ -24,32 +24,30 @@ def buildTime() {
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 33
     publishNonDefault true
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 33
         buildConfigField 'String', 'BUILD_ID', "\"${gitRevision()}\""
         buildConfigField 'String', 'BUILD_DATE', "\"${buildTime()}\""
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     productFlavors {
     }
+    namespace 'net.tjado.passwdsafe.lib'
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.0.2'
+    api 'androidx.appcompat:appcompat:1.5.1'
     api 'androidx.cardview:cardview:1.0.0'
-    api 'com.google.android.material:material:1.0.0'
+    api 'com.google.android.material:material:1.7.0'
     api 'androidx.gridlayout:gridlayout:1.0.0'
-    api 'androidx.preference:preference:1.0.0'
+    api 'androidx.preference:preference:1.2.0'
     api 'androidx.legacy:legacy-preference-v14:1.0.0'
     api 'androidx.legacy:legacy-support-v4:1.0.0'
-    api 'androidx.annotation:annotation:1.0.2'
+    api 'androidx.annotation:annotation:1.5.0'
 }

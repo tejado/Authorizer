@@ -117,7 +117,7 @@ public class PasswdPolicyView extends LinearLayout
     {
         if (item.getItemId() == MENU_COPY) {
             PasswdSafeUtil.copyToClipboard(
-                itsGeneratedPasswd.getText().toString(), getContext());
+                    itsGeneratedPasswd.getText().toString(), true, getContext());
             return true;
         }
         return false;

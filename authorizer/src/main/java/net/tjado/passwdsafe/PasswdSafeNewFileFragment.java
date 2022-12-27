@@ -18,6 +18,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import net.tjado.passwdsafe.db.PasswdSafeDb;
+import net.tjado.passwdsafe.db.RecentFilesDao;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.lib.ApiCompat;
@@ -81,6 +84,8 @@ public class PasswdSafeNewFileFragment
     private static final String ARG_URI = "uri";
 
     private static final int CREATE_DOCUMENT_REQUEST = 0;
+
+    private static final String TAG = "PasswdSafeNewFileFrag";
 
     /**
      * Create a new instance
@@ -252,7 +257,7 @@ public class PasswdSafeNewFileFragment
 
             Context ctx = getContext();
             Uri newUri = data.getData();
-            String title = RecentFilesDb.getSafDisplayName(newUri, ctx);
+            String title = RecentFilesDao.getSafDisplayName(newUri, ctx);
 
             boolean checkPermissions = isCheckPermissions();
             if (!checkPermissions && (title == null)) {
@@ -270,22 +275,19 @@ public class PasswdSafeNewFileFragment
                 break;
             }
 
-            RecentFilesDb.updateOpenedSafFile(
-                    newUri, (Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                             Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
-                    ctx);
             if (checkPermissions) {
-                RecentFilesDb.updateOpenedSafFile(
+                RecentFilesDao.updateOpenedSafFile(
                         newUri, (Intent.FLAG_GRANT_READ_URI_PERMISSION |
                                  Intent.FLAG_GRANT_WRITE_URI_PERMISSION),
                         ctx);
             }
-            if (!TextUtils.isEmpty(title)) {
-                RecentFilesDb recentFilesDb = new RecentFilesDb(ctx);
+
+            if ((newUri != null) && !TextUtils.isEmpty(title)) {
+                RecentFilesDao recentFilesDao = PasswdSafeDb.get(ctx).accessRecentFiles();
                 try {
-                    recentFilesDb.insertOrUpdateFile(newUri, title);
-                } finally {
-                    recentFilesDb.close();
+                    recentFilesDao.insertOrUpdate(newUri, title);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error saving recent file: " + newUri, e);
                 }
             }
             setFileUri(newUri);

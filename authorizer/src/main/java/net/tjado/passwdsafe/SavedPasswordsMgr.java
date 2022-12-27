@@ -20,6 +20,9 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import net.tjado.passwdsafe.db.PasswdSafeDb;
+import net.tjado.passwdsafe.db.SavedPassword;
+import net.tjado.passwdsafe.db.SavedPasswordsDao;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 
 import java.io.IOException;

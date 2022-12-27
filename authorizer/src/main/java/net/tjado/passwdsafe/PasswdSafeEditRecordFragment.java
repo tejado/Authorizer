@@ -409,7 +409,7 @@ public class PasswdSafeEditRecordFragment
             }
         }
 
-        GuiUtils.invalidateOptionsMenu(getActivity());
+        requireActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -1092,7 +1092,7 @@ public class PasswdSafeEditRecordFragment
         // Prev type needs to be updated before setting spinner to prevent
         // recursion
         itsRecType = type;
-        GuiUtils.invalidateOptionsMenu(getActivity());
+        requireActivity().invalidateOptionsMenu();
 
         if (init) {
             int pos = TYPE_NORMAL;
@@ -1775,7 +1775,7 @@ public class PasswdSafeEditRecordFragment
 
             if (valid != itsIsValid) {
                 itsIsValid = valid;
-                GuiUtils.invalidateOptionsMenu(getActivity());
+                requireActivity().invalidateOptionsMenu();
             }
         }
 

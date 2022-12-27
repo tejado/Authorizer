@@ -130,7 +130,7 @@ public class PasswdSafeFileDataFragment extends Fragment
                 itsFileDataView.clearFileData();
                 itsFileData.close();
                 if (itsIsCloseClearClipboard) {
-                    PasswdSafeUtil.copyToClipboard("", getContext());
+                    PasswdSafeUtil.clearClipboard(getContext());
                 }
             }
             itsFileData = fileData;

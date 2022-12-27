@@ -7,6 +7,7 @@
  */
 package net.tjado.passwdsafe.lib;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,6 +19,7 @@ import java.util.Date;
 
 import android.content.Context;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 /**
  * The Utils class provides general utilities
@@ -70,28 +72,30 @@ public final class Utils
     }
 
     /** Copy the input stream to the output */
-    public static void copyStream(InputStream is, OutputStream os)
+    public static int copyStream(InputStream is, OutputStream os)
             throws IOException
     {
+        int streamSize = 0;
         byte[] buf = new byte[4096];
         int len;
         while ((len = is.read(buf)) > 0) {
             os.write(buf, 0, len);
+            streamSize += len;
         }
+        return streamSize;
     }
 
 
     /** Close the streams */
-    public static void closeStreams(InputStream is, OutputStream os)
-            throws IOException
+    public static void closeStreams(Closeable... cs)
     {
-        try {
-            if (is != null) {
-                is.close();
-            }
-        } finally {
-            if (os != null) {
-                os.close();
+        for (Closeable c: cs) {
+            try {
+                if (c != null) {
+                    c.close();
+                }
+            } catch (Exception e) {
+                Log.e(Utils.class.getSimpleName(), "Error closing", e);
             }
         }
     }

@@ -35,6 +35,8 @@ import android.widget.Toast;
 
 import net.tjado.authorizer.OutputInterface;
 import net.tjado.authorizer.OutputUsbKeyboardAsRoot;
+import net.tjado.passwdsafe.db.PasswdSafeDb;
+import net.tjado.passwdsafe.db.RecentFilesDao;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.file.PasswdFileUri;
@@ -830,6 +832,7 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public void copyField(final CopyField field, final String recUuid)
     {
+        boolean sensitive = true;
         switch (field) {
         case PASSWORD: {
             SharedPreferences prefs = Preferences.getSharedPrefs(this);
@@ -852,6 +855,7 @@ public class PasswdSafe extends AppCompatActivity
         case USER_NAME:
         case URL:
         case EMAIL: {
+            sensitive = false;
             break;
         }
         }
@@ -897,7 +901,7 @@ public class PasswdSafe extends AppCompatActivity
             }
         });
         if (copyStr.get() != null) {
-            PasswdSafeUtil.copyToClipboard(copyStr.get(), PasswdSafe.this);
+            PasswdSafeUtil.copyToClipboard(copyStr.get(), sensitive,PasswdSafe.this);
         }
     }
 
@@ -1649,7 +1653,7 @@ public class PasswdSafe extends AppCompatActivity
             }
         }
 
-        GuiUtils.invalidateOptionsMenu(this);
+        invalidateOptionsMenu();
         boolean fileOpen = isFileOpen();
         itsNavDrawerFrag.updateView(drawerMode, fileNameUpdate, fileOpen);
         restoreActionBar();
@@ -1788,12 +1792,17 @@ public class PasswdSafe extends AppCompatActivity
         protected void handleDoInBackground() throws Exception
         {
             Context ctx = getContext();
-            RecentFilesDb recentFilesDb = new RecentFilesDb(ctx);
-            try {
-                recentFilesDb.removeUri(itsFileUri.getUri());
-            } finally {
-                recentFilesDb.close();
+            RecentFilesDao recentFilesDao =
+                    PasswdSafeDb.get(ctx).accessRecentFiles();
+
+            SharedPreferences prefs = Preferences.getSharedPrefs(ctx);
+            Uri defaultFile = Preferences.getDefFilePref(prefs);
+
+            Uri fileUri = itsFileUri.getUri();
+            if (fileUri.equals(defaultFile)) {
+                Preferences.clearDefFilePref(prefs);
             }
+            recentFilesDao.removeUri(fileUri.toString());
 
             itsFileUri.delete(ctx);
         }

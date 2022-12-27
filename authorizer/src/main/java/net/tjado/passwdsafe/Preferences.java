@@ -19,6 +19,7 @@ import androidx.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import net.tjado.passwdsafe.file.PasswdPolicy;
+import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.pref.FileBackupPref;
 import net.tjado.passwdsafe.pref.FileTimeoutPref;
@@ -264,10 +265,16 @@ public class Preferences
         return Uri.parse(defFile);
     }
 
+    public static void clearDefFilePref(SharedPreferences prefs)
+    {
+        prefs.edit().remove(PREF_DEF_FILE).apply();
+    }
+
     /** Get the preference for use of the legacy file chooser */
     public static boolean getFileLegacyFileChooserPref(SharedPreferences prefs)
     {
-        return prefs.getBoolean(PREF_FILE_LEGACY_FILE_CHOOSER,
+        return ApiCompat.supportsExternalFilesDirs() &&
+               prefs.getBoolean(PREF_FILE_LEGACY_FILE_CHOOSER,
                                 PREF_FILE_LEGACY_FILE_CHOOSER_DEF);
     }
 

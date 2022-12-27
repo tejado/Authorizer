@@ -7,21 +7,27 @@
  */
 package net.tjado.passwdsafe.lib;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.net.Uri;
+import android.os.IBinder;
+import android.os.Vibrator;
+import android.view.inputmethod.InputMethodManager;
+
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import android.annotation.TargetApi;
-import android.content.ContentResolver;
-import android.net.Uri;
-import android.os.IBinder;
-import android.view.inputmethod.InputMethodManager;
+import java.util.Objects;
 
 /**
  *  The ApiCompatKitkat class contains helper compatibility methods for Kitkat
  *  and higher
  */
+@SuppressLint("ObsoleteSdkInt")
 @TargetApi(19)
 @SuppressWarnings({"unchecked", "CanBeFinal"})
 public final class ApiCompatKitkat
@@ -51,20 +57,30 @@ public final class ApiCompatKitkat
                     ContentResolver.class.getMethod(
                             "getPersistedUriPermissions");
 
-            ClassLoader loader = ApiCompatKitkat.class.getClassLoader();
-            Class docContractClass =
+            ClassLoader loader = Objects.requireNonNull(
+                    ApiCompatKitkat.class.getClassLoader());
+            Class<?> docContractClass =
                     loader.loadClass("android.provider.DocumentsContract");
 
             itsDeleteDocumentMeth = docContractClass.getMethod(
                     "deleteDocument", ContentResolver.class, Uri.class);
 
-            Class uriPermissionsClass =
+            Class<?> uriPermissionsClass =
                     loader.loadClass("android.content.UriPermission");
             itsUriPermissionsGetUriMeth =
                     uriPermissionsClass.getMethod("getUri");
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * API compatible call for Context.getExternalFilesDirs
+     */
+    public static File[] getExternalFilesDirs(Context ctx, String type)
+    {
+        return ctx.getExternalFilesDirs(type);
     }
 
 
@@ -86,7 +102,8 @@ public final class ApiCompatKitkat
                                                           Uri uri)
     {
         try {
-            Object rc = itsDeleteDocumentMeth.invoke(null, cr, uri);
+            Object rc = Objects.requireNonNull(
+                    itsDeleteDocumentMeth.invoke(null, cr, uri));
             return (Boolean)rc;
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,8 +130,8 @@ public final class ApiCompatKitkat
     public static List<Uri> getPersistedUriPermissions(ContentResolver cr)
     {
         try {
-            List<Object> perms =
-                    (List<Object>) itsGetPersistedUriPermissionsMeth.invoke(cr);
+            List<Object> perms = (List<Object>) Objects.requireNonNull(
+                    itsGetPersistedUriPermissionsMeth.invoke(cr));
 
             List<Uri> uris = new ArrayList<>(perms.size());
             for (Object perm: perms) {
@@ -148,5 +165,13 @@ public final class ApiCompatKitkat
                                                   boolean onlyCurrentIme)
     {
         return imm.switchToNextInputMethod(imeToken, onlyCurrentIme);
+    }
+
+    /**
+     * Does the device have a system vibrator
+     */
+    public static boolean hasVibrator(Vibrator vib)
+    {
+        return (vib != null) && vib.hasVibrator();
     }
 }

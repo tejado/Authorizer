@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
 
+import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.pref.FileTimeoutPref;
 
@@ -47,7 +48,7 @@ public class FileTimeoutReceiver extends BroadcastReceiver
                 itsActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(PasswdSafeApp.FILE_TIMEOUT_INTENT);
         intent.setPackage(BuildConfig.APPLICATION_ID);
-        itsCloseIntent = PendingIntent.getBroadcast(itsActivity, 0, intent, 0);
+        itsCloseIntent = PendingIntent.getBroadcast(itsActivity, 0, intent, ApiCompat.getPendingIntentImmutableFlag());
         IntentFilter filter =
                 new IntentFilter(PasswdSafeApp.FILE_TIMEOUT_INTENT);
         filter.addAction(Intent.ACTION_SCREEN_OFF);

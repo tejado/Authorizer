@@ -131,15 +131,26 @@ public class PasswdSafeUtil
     /**
      * Copy text to the clipboard
      */
-    public static void copyToClipboard(String str, Context ctx)
+    public static void copyToClipboard(String str,
+                                       boolean sensitive,
+                                       Context ctx)
     {
         try {
-            ApiCompat.copyToClipboard(str, ctx);
+            ApiCompat.copyToClipboard(str, sensitive, ctx);
         } catch (Throwable e) {
-            String err = ctx.getString(R.string.copy_clipboard_error,
-                                       getAppTitle(ctx));
-            Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
-            Log.e(TAG, err + ": " + e.toString());
+            showClipboardError(e, ctx);
+        }
+    }
+
+    /**
+     * Clear the clipboard
+     */
+    public static void clearClipboard(Context ctx)
+    {
+        try {
+            ApiCompat.clearClipboard(ctx);
+        } catch (Throwable e) {
+            showClipboardError(e, ctx);
         }
     }
 
@@ -172,24 +183,25 @@ public class PasswdSafeUtil
                                     final Activity activity,
                                     boolean copyTrace)
     {
-        if (copyTrace && (t != null)) {
-            StringWriter writer = new StringWriter();
-            t.printStackTrace(new PrintWriter(writer));
-            String trace = writer.toString();
-            Log.e(TAG, trace);
-            copyToClipboard(trace, activity);
+        if (t != null) {
+            Log.e(TAG, msg, t);
+            if (copyTrace) {
+                StringWriter writer = new StringWriter();
+                t.printStackTrace(new PrintWriter(writer));
+                copyToClipboard(writer.toString(), false, activity);
+            }
         }
 
         AbstractDialogClickListener dlgClick = new AbstractDialogClickListener()
         {
             @Override
-            public final void onOkClicked(DialogInterface dialog)
+            public void onOkClicked(DialogInterface dialog)
             {
                 activity.finish();
             }
 
             @Override
-            public final void onCancelClicked()
+            public void onCancelClicked()
             {
                 activity.finish();
             }
@@ -207,15 +219,33 @@ public class PasswdSafeUtil
         dlg.show();
     }
 
-    public static void showErrorMsg(String msg, Context context)
+    /**
+     * Show an error message
+     */
+    public static void showErrorMsg(String msg, Context ctx)
     {
-        AlertDialog.Builder dlg = new AlertDialog.Builder(context)
-                .setTitle(PasswdSafeUtil.getAppTitle(context) + " - " +
-                          context.getString(R.string.error))
+        if (ctx == null) {
+            return;
+        }
+        AlertDialog.Builder dlg = new AlertDialog.Builder(ctx)
+                .setTitle(PasswdSafeUtil.getAppTitle(ctx) + " - " +
+                          ctx.getString(R.string.error))
                 .setMessage(msg)
                 .setCancelable(true)
                 .setPositiveButton(R.string.close, null);
         dlg.show();
+    }
+
+    /**
+     * Show and error message with logged exception
+     */
+    public static void showError(String msg,
+                                 String logTag,
+                                 Throwable error,
+                                 Context context)
+    {
+        Log.e(logTag, msg, error);
+        showErrorMsg(msg, context);
     }
 
     public static void showInfoMsg(String msg, Context context)
@@ -275,6 +305,17 @@ public class PasswdSafeUtil
         if (DEBUG) {
             Log.i(tag, String.format(fmt, args), t);
         }
+    }
+
+    /**
+     * Show an error from updating the clipboard
+     */
+    private static void showClipboardError(Throwable e, Context ctx)
+    {
+        String err = ctx.getString(R.string.copy_clipboard_error,
+                                   getAppTitle(ctx));
+        Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
+        Log.e(TAG, err + ": " + e.toString());
     }
 
     /* http://stackoverflow.com/a/20149601

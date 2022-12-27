@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.widget.Toast;
 
+import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.util.YubiState;
 
@@ -96,7 +97,7 @@ public class YubikeyMgr
         if (itsTagIntent == null) {
             Intent intent = new Intent(act, act.getClass());
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            itsTagIntent = PendingIntent.getActivity(act, 0, intent, 0);
+            itsTagIntent = PendingIntent.getActivity(act, 0, intent, ApiCompat.getPendingIntentMutableFlag());
         }
 
         if (!itsIsRegistered) {

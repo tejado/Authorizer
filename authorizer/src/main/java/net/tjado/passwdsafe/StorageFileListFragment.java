@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2022 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,21 +7,17 @@
  */
 package net.tjado.passwdsafe;
 
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.ListFragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.AsyncTaskLoader;
-import androidx.loader.content.Loader;
-import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -30,14 +26,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.view.animation.BounceInterpolator;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
+import net.tjado.passwdsafe.db.PasswdSafeDb;
+import net.tjado.passwdsafe.db.RecentFilesDao;
+import net.tjado.passwdsafe.file.PasswdFileUri;
+import net.tjado.passwdsafe.lib.ActContext;
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.DocumentsContractCompat;
+import net.tjado.passwdsafe.lib.ManagedRef;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
-import net.tjado.passwdsafe.lib.Utils;
+import net.tjado.passwdsafe.lib.view.GuiUtils;
 
 import java.util.List;
 
@@ -46,12 +52,11 @@ import java.util.List;
  *  the storage access framework on Kitkat and higher
  */
 @TargetApi(19)
-public final class StorageFileListFragment extends ListFragment
-        implements LoaderManager.LoaderCallbacks<Cursor>
+public final class StorageFileListFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+                   View.OnClickListener,
+                   StorageFileListOps
 {
-    // TODO: recent sync files
-    // TODO: swipe to remove an individual recent item
-
     /** Listener interface for the owning activity */
     public interface Listener
     {
@@ -60,6 +65,9 @@ public final class StorageFileListFragment extends ListFragment
 
         /** Does the activity have a menu */
         boolean activityHasMenu();
+
+        /** Does the activity have a 'none' item */
+        boolean activityHasNoneItem();
 
         /** Update the view for a list of files */
         void updateViewFiles();
@@ -72,12 +80,19 @@ public final class StorageFileListFragment extends ListFragment
     private static final int LOADER_FILES = 0;
 
     private Listener itsListener;
-    private RecentFilesDb itsRecentFilesDb;
-    private SimpleCursorAdapter itsFilesAdapter;
+    private RecentFilesDao itsRecentFilesDao;
+    private ManagedRef<RecentFilesDao> itsRecentFilesDaoRef;
+    private View itsEmptyText;
+    private View itsFab;
+    private boolean itsIsFabBounced = false;
+    private boolean itsIsDebugOpened = false;
+    private StorageFileListAdapter itsFilesAdapter;
     private int itsFileIcon;
+    private Uri itsLastOpenUri;
+
 
     @Override
-    public void onAttach(Context ctx)
+    public void onAttach(@NonNull Context ctx)
     {
         super.onAttach(ctx);
         itsListener = (Listener)ctx;
@@ -92,78 +107,108 @@ public final class StorageFileListFragment extends ListFragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        itsRecentFilesDb = new RecentFilesDb(getActivity());
+
+        itsRecentFilesDao =
+                PasswdSafeDb.get(requireContext()).accessRecentFiles();
+        itsRecentFilesDaoRef = new ManagedRef<>(itsRecentFilesDao);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
-     */
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
-        if (itsListener.activityHasMenu()) {
+        boolean hasMenu = itsListener.activityHasMenu();
+        if (hasMenu) {
             setHasOptionsMenu(true);
         }
 
-        return inflater.inflate(R.layout.fragment_storage_file_list,
-                                container, false);
+        View rootView = inflater.inflate(R.layout.fragment_storage_file_list,
+                                         container, false);
+
+        itsEmptyText = rootView.findViewById(R.id.empty);
+        GuiUtils.setVisible(itsEmptyText, false);
+
+        itsFilesAdapter = new StorageFileListAdapter(this);
+        RecyclerView files = rootView.findViewById(R.id.files);
+        files.setAdapter(itsFilesAdapter);
+
+        itsFab = rootView.findViewById(R.id.fab);
+        View noDefault = rootView.findViewById(R.id.no_default);
+        if (hasMenu) {
+            ItemTouchHelper.SimpleCallback swipeCb =
+                    new ItemTouchHelper.SimpleCallback(
+                            0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
+            {
+                @Override
+                public float getSwipeEscapeVelocity(float defaultValue)
+                {
+                    return defaultValue * 7f;
+                }
+
+                @Override
+                public float getSwipeThreshold(
+                        @NonNull RecyclerView.ViewHolder viewHolder)
+                {
+                    return .75f;
+                }
+
+                @Override
+                public boolean onMove(
+                        @NonNull RecyclerView recyclerView,
+                        @NonNull RecyclerView.ViewHolder viewHolder,
+                        @NonNull RecyclerView.ViewHolder target)
+                {
+                    return false;
+                }
+
+                @Override
+                public void onSwiped(
+                        @NonNull RecyclerView.ViewHolder viewHolder,
+                        int direction)
+                {
+                    removeFile(((StorageFileListHolder)viewHolder).getUri());
+                }
+            };
+            ItemTouchHelper swipeHelper = new ItemTouchHelper(swipeCb);
+            swipeHelper.attachToRecyclerView(files);
+
+            itsFab.setOnClickListener(this);
+        } else {
+            GuiUtils.setVisible(itsFab, false);
+
+            // Wrap content for entries when shown in chooser dialog
+            files.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            rootView.getLayoutParams().height =
+                    ViewGroup.LayoutParams.WRAP_CONTENT;
+        }
+
+        if (itsListener.activityHasNoneItem()) {
+            noDefault.setOnClickListener(this);
+        } else {
+            GuiUtils.setVisible(noDefault, false);
+        }
+
+        return rootView;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View fragView, Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
-        itsFilesAdapter = new SimpleCursorAdapter(
-                getActivity(), R.layout.file_list_item, null,
-                new String[] { RecentFilesDb.DB_COL_FILES_TITLE,
-                               RecentFilesDb.DB_COL_FILES_ID,
-                               RecentFilesDb.DB_COL_FILES_DATE },
-                new int[] { R.id.text, R.id.icon, R.id.mod_date }, 0);
-        itsFilesAdapter.setViewBinder(
-                new SimpleCursorAdapter.ViewBinder()
-                {
-                    @Override
-                    public boolean setViewValue(View view, Cursor cursor,
-                                                int columnIdx)
-                    {
-                        switch (view.getId()) {
-                            case R.id.text: {
-                                TextView tv = (TextView)view;
-                                String title = cursor.getString(columnIdx);
-                                tv.setText(title);
-                                tv.requestLayout();
-                                return false;
-                            }
-                            case R.id.icon: {
-                                ImageView iv = (ImageView)view;
-                                iv.setImageResource(itsFileIcon);
-                                iv.setColorFilter(getResources().getColor(R.color.treeview_icons));
-                                return true;
-                            }
-                            case R.id.mod_date: {
-                                TextView tv = (TextView)view;
-                                long date = cursor.getLong(
-                                        RecentFilesDb.QUERY_COL_DATE);
-                                tv.setText(Utils.formatDate(date, getActivity()));
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-                });
+        super.onViewCreated(fragView, savedInstanceState);
+        Context ctx = getContext();
+        if (ctx == null) {
+            return;
+        }
 
-        setListAdapter(itsFilesAdapter);
-
-        LoaderManager lm = getLoaderManager();
-        lm.initLoader(LOADER_FILES, null, this);
+        LoaderManager.getInstance(this).initLoader(LOADER_FILES, null, this);
     }
 
     @Override
     public void onResume()
     {
         super.onResume();
+        LoaderManager.getInstance(this).restartLoader(LOADER_FILES, null, this);
         itsListener.updateViewFiles();
     }
 
@@ -171,14 +216,11 @@ public final class StorageFileListFragment extends ListFragment
     public void onDestroy()
     {
         super.onDestroy();
-        if (itsRecentFilesDb != null) {
-            itsRecentFilesDb.close();
-        }
+        itsRecentFilesDao = null;
+        itsRecentFilesDaoRef.clear();
+        itsRecentFilesDaoRef = null;
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onActivityResult(int, int, android.content.Intent)
-     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -199,17 +241,31 @@ public final class StorageFileListFragment extends ListFragment
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id)
+    public void onClick(View v)
     {
-        Cursor item = (Cursor)l.getItemAtPosition(position);
-        String uristr = item.getString(RecentFilesDb.QUERY_COL_URI);
-        String title = item.getString(RecentFilesDb.QUERY_COL_TITLE);
+        int id = v.getId();
+        if (id == R.id.fab) {
+            startOpenFile();
+        } else if (id == R.id.no_default) {
+            openUri(null, null);
+        }
+    }
+
+    @Override
+    public void storageFileClicked(String uristr, String title)
+    {
         Uri uri = Uri.parse(uristr);
         openUri(uri, title);
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    public int getStorageFileIcon()
+    {
+        return itsFileIcon;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.fragment_storage_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -218,135 +274,86 @@ public final class StorageFileListFragment extends ListFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId()) {
-        case R.id.menu_file_open: {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_file_open) {
             startOpenFile();
             return true;
-        }
-        case R.id.menu_file_new: {
+        } else if (itemId == R.id.menu_file_new) {
             startActivity(new Intent(PasswdSafeUtil.NEW_INTENT));
             return true;
-        }
-        case R.id.menu_clear_recent: {
+        } else if (itemId == R.id.menu_clear_recent) {
             try {
-                ContentResolver cr = getActivity().getContentResolver();
-                int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-                Cursor cursor = itsRecentFilesDb.queryFiles();
-                if (cursor != null) {
-                    try {
-                        while (cursor.moveToNext()) {
-                            Uri uri = Uri.parse(cursor.getString(
-                                    RecentFilesDb.QUERY_COL_URI));
-                            ApiCompat.releasePersistableUriPermission(cr, uri,
-                                                                      flags);
-                        }
-                    } finally {
-                        cursor.close();
-                    }
+                Context ctx = getContext();
+                if (ctx == null) {
+                    return true;
                 }
-                itsRecentFilesDb.clear();
-
-                List<Uri> permUris = ApiCompat.getPersistedUriPermissions(cr);
-                for (Uri permUri: permUris) {
-                    ApiCompat.releasePersistableUriPermission(cr, permUri,
-                                                              flags);
-                }
-
-                getLoaderManager().restartLoader(LOADER_FILES, null, this);
+                itsRecentFilesDao.deleteAll();
+                LoaderManager.getInstance(this).restartLoader(LOADER_FILES,
+                                                              null, this);
             } catch (Exception e) {
                 PasswdSafeUtil.showFatalMsg(e, "Clear recent error",
                                             getActivity());
             }
             return true;
         }
-        default: {
-            return super.onOptionsItemSelected(item);
-        }
-        }
+        return super.onOptionsItemSelected(item);
     }
 
 
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle)
     {
-        return new AsyncTaskLoader<Cursor>(getActivity())
-        {
-            /** Handle when the loader is reset */
-            @Override
-            protected void onReset()
-            {
-                super.onReset();
-                onStopLoading();
+        return new FileLoader(itsRecentFilesDaoRef, requireContext());
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> cursorLoader,
+                               Cursor cursor)
+    {
+        boolean empty = (cursor == null) || (cursor.getCount() == 0);
+        GuiUtils.setVisible(itsEmptyText, empty);
+        if (empty && !itsIsFabBounced) {
+            bounceView(itsFab);
+            itsIsFabBounced = true;
+        }
+        itsFilesAdapter.changeCursor(cursor);
+
+        //noinspection ConstantConditions
+        if ((PasswdSafeApp.DEBUG_AUTO_FILE != null) &&
+            !empty && !itsIsDebugOpened && !PasswdSafeUtil.isTesting()) {
+            itsIsDebugOpened = true;
+            Uri rootUri = ApiCompat.getPrimaryStorageRootUri(
+                    requireContext());
+            if (rootUri != null) {
+                rootUri = rootUri.buildUpon().path(
+                        PasswdSafeApp.DEBUG_AUTO_FILE).build();
+                openUri(rootUri, PasswdSafeApp.DEBUG_AUTO_FILE);
+                return;
             }
+        }
 
-            /** Handle when the loader is started */
-            @Override
-            protected void onStartLoading()
-            {
-                forceLoad();
-            }
-
-            /** Handle when the loader is stopped */
-            @Override
-            protected void onStopLoading()
-            {
-                cancelLoad();
-            }
-
-            /** Load the files in the background */
-            @Override
-            public Cursor loadInBackground()
-            {
-                PasswdSafeUtil.dbginfo(TAG, "loadInBackground");
-                int flags =
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION |
-                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-                ContentResolver cr = getContext().getContentResolver();
-                List<Uri> permUris = ApiCompat.getPersistedUriPermissions(cr);
-                for (Uri permUri: permUris) {
-                    PasswdSafeUtil.dbginfo(TAG, "Checking persist perm %s",
-                                           permUri);
-                    Cursor cursor = null;
-                    try {
-                        cursor = cr.query(permUri, null, null, null, null);
-                        if ((cursor != null) && (cursor.moveToFirst())) {
-                            ApiCompat.takePersistableUriPermission(
-                                    cr, permUri, flags);
-                        } else {
-                            ApiCompat.releasePersistableUriPermission(
-                                    cr, permUri, flags);
-                            itsRecentFilesDb.removeUri(permUri);
-                        }
-                    } catch (Exception e) {
-                        Log.e(TAG, "File remove error: " + permUri, e);
-                    } finally {
-                        if (cursor != null) {
-                            cursor.close();
-                        }
-                    }
-                }
-
+        // Open the default file
+        Activity act = requireActivity();
+        PasswdSafeApp app = (PasswdSafeApp)act.getApplication();
+        if (app.checkOpenDefault()) {
+            SharedPreferences prefs = Preferences.getSharedPrefs(act);
+            Uri defFile = Preferences.getDefFilePref(prefs);
+            if (defFile != null) {
                 try {
-                    return itsRecentFilesDb.queryFiles();
+                    itsRecentFilesDao.touchFile(defFile);
                 } catch (Exception e) {
-                    Log.e(TAG, "Files load error", e);
+                    Log.e(TAG, "Error touching file", e);
                 }
-                return null;
+                itsListener.openFile(defFile, null);
             }
-        };
+        }
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor)
+    public void onLoaderReset(@NonNull Loader<Cursor> cursorLoader)
     {
-        itsFilesAdapter.swapCursor(cursor);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader)
-    {
-        itsFilesAdapter.swapCursor(null);
+        onLoadFinished(cursorLoader, null);
     }
 
     /** Start the intent to open a file */
@@ -354,6 +361,17 @@ public final class StorageFileListFragment extends ListFragment
     {
         Intent intent = new Intent(
                 DocumentsContractCompat.INTENT_ACTION_OPEN_DOCUMENT);
+
+        Uri initialUri = (itsLastOpenUri != null) ? itsLastOpenUri :
+                         ApiCompat.getPrimaryStorageRootUri(requireContext());
+        if (initialUri != null) {
+            intent.putExtra(DocumentsContractCompat.EXTRA_INITIAL_URI,
+                            initialUri);
+        }
+
+        intent.putExtra(DocumentsContractCompat.EXTRA_PROMPT,
+                        getString(R.string.open_password_file));
+        intent.putExtra(DocumentsContractCompat.EXTRA_SHOW_ADVANCED, true);
 
         // Filter to only show results that can be "opened", such as a
         // file (as opposed to a list of contacts or timezones)
@@ -368,15 +386,28 @@ public final class StorageFileListFragment extends ListFragment
     /** Open a password file URI from an intent */
     private void openUri(Intent openIntent)
     {
+        Context ctx = requireContext();
+
         Uri uri = openIntent.getData();
+        if (uri == null) {
+            PasswdSafeUtil.showError("No URI to open: " + openIntent, TAG, null, ctx);
+            return;
+        }
+
         int flags = openIntent.getFlags() &
                     (Intent.FLAG_GRANT_READ_URI_PERMISSION |
                      Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
-        Context ctx = getContext();
-        String title = RecentFilesDb.getSafDisplayName(uri, ctx);
-        RecentFilesDb.updateOpenedSafFile(uri, flags, ctx);
+        String title = RecentFilesDao.getSafDisplayName(uri, ctx);
+        if (isCheckPermissions()) {
+            RecentFilesDao.updateOpenedSafFile(uri, flags, ctx);
+        } else {
+            if (title == null) {
+                title = openIntent.getStringExtra("__test_display_name");
+            }
+        }
         if (title != null) {
+            itsLastOpenUri = uri;
             openUri(uri, title);
         }
     }
@@ -387,12 +418,185 @@ public final class StorageFileListFragment extends ListFragment
     {
         PasswdSafeUtil.dbginfo(TAG, "openUri %s: %s", uri, title);
 
-        try {
-            itsRecentFilesDb.insertOrUpdateFile(uri, title);
-        } catch (Exception e) {
-            Log.e(TAG, "Error inserting recent file", e);
+        if (uri != null) {
+            try {
+                itsRecentFilesDao.insertOrUpdate(uri, title);
+            } catch (Exception e) {
+                Log.e(TAG, "Error inserting recent file", e);
+            }
         }
 
         itsListener.openFile(uri, title);
+    }
+
+    /**
+     * Remove a recent file entry
+     */
+    private void removeFile(String uristr)
+    {
+        try {
+            Uri uri = Uri.parse(uristr);
+            itsRecentFilesDao.removeUri(uristr);
+
+            if (isCheckPermissions()) {
+                ContentResolver cr = requireContext().getContentResolver();
+                int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+                ApiCompat.releasePersistableUriPermission(cr, uri, flags);
+            }
+
+            LoaderManager.getInstance(this).restartLoader(LOADER_FILES,
+                                                          null, this);
+        } catch (Exception e) {
+            PasswdSafeUtil.showFatalMsg(e, "Remove recent file error",
+                                        requireActivity());
+        }
+    }
+
+    /**
+     * Bounce a view
+     */
+    private static void bounceView(View v)
+    {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(v, "translationY",
+                                                     0, -30, 0);
+        anim.setInterpolator(new BounceInterpolator());
+        anim.setStartDelay(1000);
+        anim.setDuration(2500);
+        anim.start();
+    }
+
+    /**
+     *  Whether permissions should be checked
+     */
+    private static boolean isCheckPermissions()
+    {
+        return !PasswdSafeUtil.isTesting();
+    }
+
+    /**
+     * Background file loader
+     */
+    private static final class FileLoader extends AsyncTaskLoader<Cursor>
+    {
+        private final ManagedRef<RecentFilesDao> itsRecentFilesDao;
+
+        /**
+         * Constructor
+         */
+        private FileLoader(ManagedRef<RecentFilesDao> recentFilesDao,
+                           Context ctx)
+        {
+            super(ctx.getApplicationContext());
+            itsRecentFilesDao = recentFilesDao;
+        }
+
+        /** Handle when the loader is reset */
+        @Override
+        protected void onReset()
+        {
+            super.onReset();
+            onStopLoading();
+        }
+
+        /** Handle when the loader is started */
+        @Override
+        protected void onStartLoading()
+        {
+            forceLoad();
+        }
+
+        /** Handle when the loader is stopped */
+        @Override
+        protected void onStopLoading()
+        {
+            cancelLoad();
+        }
+
+        /** Load the files in the background */
+        @Override
+        public Cursor loadInBackground()
+        {
+            PasswdSafeUtil.dbginfo(TAG, "loadInBackground");
+
+            RecentFilesDao recentFilesDb = itsRecentFilesDao.get();
+            if (recentFilesDb == null) {
+                return null;
+            }
+
+            if (isCheckPermissions()) {
+                Context ctx = getContext();
+                ContentResolver cr = ctx.getContentResolver();
+
+                // Check default file
+                SharedPreferences prefs = Preferences.getSharedPrefs(ctx);
+                Uri defaultFile = Preferences.getDefFilePref(prefs);
+                if (defaultFile != null) {
+                    switch (PasswdFileUri.getUriType(defaultFile)) {
+                    case GENERIC_PROVIDER: {
+                        checkUriPerm(defaultFile, defaultFile, cr,
+                                     recentFilesDb, prefs);
+                        break;
+                    }
+                    case FILE:
+                    case EMAIL:
+                    case SYNC_PROVIDER: {
+                        break;
+                    }
+                    }
+                }
+
+                // Check any file for which we have permissions
+                List<Uri> permUris = ApiCompat.getPersistedUriPermissions(cr);
+                for (Uri permUri : permUris) {
+                    checkUriPerm(permUri, defaultFile, cr, recentFilesDb,
+                                 prefs);
+                }
+            }
+
+            try {
+                return recentFilesDb.getOrderedByDateCursor();
+            } catch (Exception e) {
+                Log.e(TAG, "Files load error", e);
+            }
+            return null;
+        }
+
+        /**
+         * Check permissions on a URI
+         */
+        private static void checkUriPerm(Uri uri,
+                                         Uri defaultFile,
+                                         ContentResolver cr,
+                                         RecentFilesDao recentFilesDao,
+                                         SharedPreferences prefs)
+        {
+            PasswdSafeUtil.dbginfo(TAG, "Checking persist perm %s", uri);
+
+            boolean doRemove = false;
+            try (Cursor ignored = cr.query(uri, null, null, null, null)) {
+                // Acquire the cursor to attempt to launch the app providing
+                // the file
+                ApiCompat.takePersistableUriPermission(
+                        cr, uri,
+                        (Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                         Intent.FLAG_GRANT_WRITE_URI_PERMISSION));
+            } catch (Exception e) {
+                Log.e(TAG, "Take permission error for: " + uri, e);
+                doRemove = true;
+            }
+
+            if (doRemove) {
+                try {
+                    recentFilesDao.removeUri(uri.toString());
+                } catch (Exception e) {
+                    Log.e(TAG, "Recent files remove error: " + uri, e);
+                }
+
+                if (uri.equals(defaultFile)) {
+                    Preferences.clearDefFilePref(prefs);
+                }
+            }
+        }
     }
 }

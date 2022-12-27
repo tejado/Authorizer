@@ -702,7 +702,7 @@ public class PasswdSafeRecordBasicFragment
         GuiUtils.setListViewHeightBasedOnChildren(itsReferences);
         GuiUtils.setVisible(itsReferencesRow, hasReferences);
 
-        GuiUtils.invalidateOptionsMenu(getActivity());
+        requireActivity().invalidateOptionsMenu();
     }
 
     private void generateOtpToken() {
@@ -809,7 +809,7 @@ public class PasswdSafeRecordBasicFragment
         itsPassword.setText(password);
         Activity act = getActivity();
         TypefaceUtils.enableMonospace(itsPassword, itsIsPasswordShown, act);
-        GuiUtils.invalidateOptionsMenu(act);
+        act.invalidateOptionsMenu();
     }
 
 

@@ -61,7 +61,7 @@ public class PasswdSafeRecordNotesFragment
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record_notes,
                                      container, false);
         itsNotes = (TextView)root.findViewById(R.id.notes);
-        GuiUtils.setTextSelectable(itsNotes);
+        itsNotes.setTextIsSelectable(true);
         return root;
     }
 
@@ -71,7 +71,7 @@ public class PasswdSafeRecordNotesFragment
         switch (item.getItemId()) {
         case R.id.menu_copy_notes: {
             PasswdSafeUtil.copyToClipboard(itsNotes.getText().toString(),
-                                           getActivity());
+                                           true, getActivity());
             return true;
         }
         case R.id.menu_monospace: {
@@ -144,7 +144,7 @@ public class PasswdSafeRecordNotesFragment
         itsIsWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
         itsIsMonospace = prefs.getBoolean(MONOSPACE_PREF, false);
         setNotesOptions();
-        GuiUtils.invalidateOptionsMenu(getActivity());
+        requireActivity().invalidateOptionsMenu();
     }
 
     /**

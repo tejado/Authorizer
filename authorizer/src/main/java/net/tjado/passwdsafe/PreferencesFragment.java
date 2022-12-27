@@ -192,7 +192,12 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             itsAutoTypeBtEnablePref.setChecked(false);
         }
 
-
+        if (!ApiCompat.supportsExternalFilesDirs()) {
+            Preference fileChooserPref = findPreference(
+                    Preferences.PREF_FILE_LEGACY_FILE_CHOOSER);
+            fileChooserPref.setEnabled(false);
+            fileChooserPref.setVisible(false);
+        }
     }
 
     @Override
@@ -289,11 +294,11 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             break;
         }
         case Preferences.PREF_DISPLAY_THEME_LIGHT: {
-            ApiCompat.recreateActivity(getActivity());
+            requireActivity().recreate();
             break;
         }
         case Preferences.PREF_DISPLAY_LIST_TREEVIEW: {
-            ApiCompat.recreateActivity(getActivity());
+            requireActivity().recreate();
             break;
         }
         case Preferences.PREF_AUTOTYPE_LANG: {

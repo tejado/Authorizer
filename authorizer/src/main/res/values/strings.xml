@@ -201,17 +201,18 @@
     <string name="new_policy">New Policy</string>
     <string name="next">Next</string>
     <string name="no_alias_chosen">No alias chosen</string>
+    <string name="no_biometrics_registered">No biometric credentials are registered</string>
     <string name="no_file_permission">
         PasswdSafe requires file permissions.
         \n\nPress reload for another prompt.  If no prompt is shown, press app
         settings and enable storage permissions.
     </string>
     <string name="no_files_select_to_open">
-        No Files - Select action to open or create a new file
-        \n\nIf files are not showing in the documents screen, use the menu to
-        show internal storage or the SD card.
-        \n\nThe previous file chooser is enabled in the Preferences as the
-        legacy file chooser.
+        Select action button to open a file or use menu to create a new file.
+        \n\n
+        Using the file chooser:\n
+        - For local files, use the menu to show internal storage\n
+        - Use the top-left menu to select different file locations.
     </string>
     <string name="no_fingerprints_registered">No fingerprints are registered</string>
     <string name="no_groups">No Groups</string>
@@ -226,6 +227,7 @@
     <string name="ok">OK</string>
     <string name="open_file">Open %s</string>
     <string name="open_file_title">Open File</string>
+    <string name="open_password_file">Open password file</string>
     <string name="option_not_selected">At least one option must be selected</string>
     <string name="password">Password</string>
     <string name="password_encoding">Password encoding</string>

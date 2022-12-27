@@ -499,7 +499,7 @@ public final class FileListFragment extends ListFragment
         }
         setFileDir(newDir);
         showFiles();
-        GuiUtils.invalidateOptionsMenu(getActivity());
+        requireActivity().invalidateOptionsMenu();
     }
 
 

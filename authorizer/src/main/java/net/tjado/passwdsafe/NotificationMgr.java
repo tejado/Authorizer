@@ -41,6 +41,7 @@ import net.tjado.passwdsafe.file.PasswdFileDataObserver;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdRecord;
 import net.tjado.passwdsafe.file.PasswdRecordFilter;
+import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
@@ -403,7 +404,9 @@ public class NotificationMgr implements PasswdFileDataObserver
                 Intent intent =
                     new Intent(PasswdSafeApp.EXPIRATION_TIMEOUT_INTENT);
                 itsTimerIntent = PendingIntent.getBroadcast(
-                    itsCtx, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    itsCtx, 0, intent,
+                    (PendingIntent.FLAG_CANCEL_CURRENT |
+                     ApiCompat.getPendingIntentImmutableFlag()));
             }
             long nextTimer = System.currentTimeMillis() +
                 (nextExpiration.itsValue - expiration);
@@ -474,7 +477,8 @@ public class NotificationMgr implements PasswdFileDataObserver
 
         PendingIntent intent = PendingIntent.getActivity(
             itsCtx, 0, PasswdSafeUtil.createOpenIntent(uri, record),
-            PendingIntent.FLAG_UPDATE_CURRENT);
+            (PendingIntent.FLAG_UPDATE_CURRENT |
+             ApiCompat.getPendingIntentImmutableFlag()));
 
         String title = itsCtx.getResources().getQuantityString(
             R.plurals.expiring_passwords, numExpired, numExpired);

@@ -201,16 +201,20 @@
     <string name="new_policy">Neue Regel</string>
     <string name="next">Weiter</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
+    <string name="no_biometrics_registered">Es ist kein biometrisches Merkmal registriert</string>
     <string name="no_file_permission">
         PasswdSafe benötigt Speicherberechtigung
         \n\nDrücke Neu Laden um diese neu zu gewähren, wenn dies nicht geht,
         können Sie die Speicherberechtigung in den App-Einstellungen aktivieren.
     </string>
     <string name="no_files_select_to_open">
-        Keine Dateien - Öffnen Sie eine Datei oder erstellen Sie eine Neue.
-        \n\nWenn Ihre Dateien beim öffnen nicht angezeigt werden, können Sie
-        im Menü den internen Speicher und/oder die SD-Karte einblenden.
-        \n\nDie alte Dateiauswahl können Sie in den Einstellungen aktivieren.
+        Aktionsbutton auswählen um eine Datei zu öffnen oder das Menü, um eine
+        neue Datei zu erstellen.
+        \n\n
+        Die Dateiauswahl benutzen:\n
+        - Für lokale Dateien, nutze das Menü um den internen Speicher
+        anzuzeigen.\n
+        - Nutze das Menü oben links um einen anderen Dateiort auszuwählen.
     </string>
     <string name="no_fingerprints_registered">Keine Fingerabdrücke registriert</string>
     <string name="no_groups">Keine Gruppen</string>
@@ -225,6 +229,7 @@
     <string name="ok">OK</string>
     <string name="open_file">%s öffnen</string>
     <string name="open_file_title">Datei öffnen</string>
+    <string name="open_password_file">Passwortdatei öffnen</string>
     <string name="option_not_selected">Mindestens eine Option auswählen</string>
     <string name="password">Passwort</string>
     <string name="password_encoding">Passwortkodierung</string>
