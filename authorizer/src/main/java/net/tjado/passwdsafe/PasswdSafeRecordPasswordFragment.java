@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -9,7 +9,6 @@ package net.tjado.passwdsafe;
 
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 
 import net.tjado.passwdsafe.file.HeaderPasswdPolicies;
 import net.tjado.passwdsafe.file.PasswdExpiration;
@@ -67,31 +67,28 @@ public class PasswdSafeRecordPasswordFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState)
     {
-        View root = inflater.inflate(
-                R.layout.fragment_passwdsafe_record_password, container, false);
+        View root = inflater.inflate(R.layout.fragment_passwdsafe_record_password, container, false);
         itsPolicyRow = root.findViewById(R.id.policy_row);
-        itsPolicy = (PasswdPolicyView)root.findViewById(R.id.policy);
+        itsPolicy = root.findViewById(R.id.policy);
         itsPolicy.setGenerateEnabled(false);
         itsPasswordTimesRow = root.findViewById(R.id.password_times_row);
         itsExpirationTimeRow = root.findViewById(R.id.expiration_time_row);
-        itsExpirationTime = (TextView)root.findViewById(R.id.expiration_time);
-        itsExpirationIntervalRow =
-                root.findViewById(R.id.expiration_interval_row);
-        itsExpirationInterval =
-                (TextView)root.findViewById(R.id.expiration_interval);
+        itsExpirationTime = root.findViewById(R.id.expiration_time);
+        itsExpirationIntervalRow = root.findViewById(R.id.expiration_interval_row);
+        itsExpirationInterval = root.findViewById(R.id.expiration_interval);
         itsPasswordModTimeRow = root.findViewById(R.id.password_mod_time_row);
-        itsPasswordModTime =
-                (TextView)root.findViewById(R.id.password_mod_time);
-        itsHistoryEnabledCb = (CheckBox)root.findViewById(R.id.history_enabled);
+        itsPasswordModTime = root.findViewById(R.id.password_mod_time);
+        itsHistoryEnabledCb = root.findViewById(R.id.history_enabled);
         itsHistoryEnabledCb.setClickable(false);
-        itsHistoryMaxSizeLabel =
-                (TextView)root.findViewById(R.id.history_max_size_label);
-        itsHistoryMaxSize = (TextView)root.findViewById(R.id.history_max_size);
-        itsHistory = (ListView)root.findViewById(R.id.history);
+        itsHistoryMaxSizeLabel = root.findViewById(R.id.history_max_size_label);
+        itsHistoryMaxSize = root.findViewById(R.id.history_max_size);
+        itsHistory = root.findViewById(R.id.history);
         itsHistory.setEnabled(false);
+
         return root;
     }
 
@@ -113,7 +110,7 @@ public class PasswdSafeRecordPasswordFragment
             policy = info.itsPasswdRec.getPasswdPolicy();
             if (policy == null) {
                 PasswdSafeApp app =
-                        (PasswdSafeApp)getActivity().getApplication();
+                        (PasswdSafeApp)requireActivity().getApplication();
                 policy = app.getDefaultPasswdPolicy();
                 policyLoc = getString(R.string.default_policy);
             } else if (policy.getLocation() ==
@@ -187,7 +184,7 @@ public class PasswdSafeRecordPasswordFragment
             itsHistory.setAdapter(null);
         }
         GuiUtils.setListViewHeightBasedOnChildren(itsHistory);
-        itsHistoryEnabledCb.setChecked(historyEnabled);
+        GuiUtils.setCheckedNoAnim(itsHistoryEnabledCb, historyEnabled);
         itsHistoryEnabledCb.setEnabled(historyExists);
         itsHistoryMaxSize.setText(historyMaxSize);
         GuiUtils.setVisible(itsHistoryMaxSize, historyExists);

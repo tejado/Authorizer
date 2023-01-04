@@ -13,17 +13,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
 
 import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.lib.AboutUtils;
@@ -31,6 +33,8 @@ import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.DynamicPermissionMgr;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
+
+import java.util.Objects;
 
 
 /**
@@ -41,9 +45,11 @@ public class FileListActivity extends AppCompatActivity
         implements AboutFragment.Listener,
                    FileListFragment.Listener,
                    FileListNavDrawerFragment.Listener,
+                   BackupFilesFragment.Listener,
                    PreferencesFragment.Listener,
                    SharedPreferences.OnSharedPreferenceChangeListener,
-                   StorageFileListFragment.Listener
+                   StorageFileListFragment.Listener,
+                   PreferenceFragmentCompat.OnPreferenceStartScreenCallback
 {
     public static final String INTENT_EXTRA_CLOSE_ON_OPEN = "closeOnOpen";
 
@@ -54,26 +60,30 @@ public class FileListActivity extends AppCompatActivity
 
     private static final String TAG = "AuthFileListActivity";
 
-    private enum ChangeMode
+    private enum ViewChange
     {
         /** View about info */
-        VIEW_ABOUT,
+        ABOUT,
+        /** View backup files */
+        BACKUP_FILES,
         /** View files */
-        VIEW_FILES,
+        FILES,
         /** Initial view of files */
-        VIEW_FILES_INIT,
+        FILES_INIT,
         /** View preferences */
-        VIEW_PREFERENCES
+        PREFERENCES
     }
 
     private enum ViewMode
     {
         /** Viewing about info */
-        VIEW_ABOUT,
+        ABOUT,
+        /** Viewing backup files */
+        BACKUP_FILES,
         /** Viewing files */
-        VIEW_FILES,
+        FILES,
         /** Viewing preferences */
-        VIEW_PREFERENCES
+        PREFERENCES
     }
 
     private FileListNavDrawerFragment itsNavDrawerFrag;
@@ -97,7 +107,8 @@ public class FileListActivity extends AppCompatActivity
         itsNavDrawerFrag = (FileListNavDrawerFragment)
                 getSupportFragmentManager().findFragmentById(
                         R.id.navigation_drawer);
-        itsNavDrawerFrag.setUp((DrawerLayout)findViewById(R.id.drawer_layout));
+        Objects.requireNonNull(itsNavDrawerFrag)
+               .setUp(findViewById(R.id.drawer_layout));
         itsFiles = findViewById(R.id.files);
         itsNoPermGroup = findViewById(R.id.no_permission_group);
 
@@ -140,7 +151,7 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState)
+    protected void onSaveInstanceState(@NonNull Bundle outState)
     {
         super.onSaveInstanceState(outState);
         outState.putCharSequence(STATE_TITLE, itsTitle);
@@ -209,10 +220,20 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    public void onSharedPreferenceChanged(SharedPreferences prefs, @Nullable String key)
     {
-        switch (key) {
-        case Preferences.PREF_FILE_LEGACY_FILE_CHOOSER: {
+        boolean updateLegacyFileChooser = false;
+        if (key == null) {
+            updateLegacyFileChooser = true;
+        } else {
+            switch (key) {
+            case Preferences.PREF_FILE_LEGACY_FILE_CHOOSER: {
+                updateLegacyFileChooser = true;
+                break;
+            }
+            }
+        }
+        if (updateLegacyFileChooser) {
             boolean legacy =
                     ((ApiCompat.SDK_VERSION < ApiCompat.SDK_KITKAT) ||
                      Preferences.getFileLegacyFileChooserPref(prefs));
@@ -220,8 +241,6 @@ public class FileListActivity extends AppCompatActivity
                 itsIsLegacyChooser = legacy;
                 itsIsLegacyChooserChanged = true;
             }
-            break;
-        }
         }
     }
 
@@ -244,7 +263,22 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller,
+                                           PreferenceScreen pref)
+    {
+        doChangeView(ViewChange.PREFERENCES,
+                     PreferencesFragment.newInstance(pref.getKey()));
+        return true;
+    }
+
+    @Override
     public void openFile(Uri uri, String fileName)
+    {
+        openFile(uri);
+    }
+
+    @Override
+    public void openFile(Uri uri)
     {
         try {
             Intent intent = PasswdSafeUtil.createOpenIntent(uri, null);
@@ -284,9 +318,15 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
+    public void updateViewBackupFiles()
+    {
+        doUpdateView(ViewMode.BACKUP_FILES);
+    }
+
+    @Override
     public void updateViewFiles()
     {
-        doUpdateView(ViewMode.VIEW_FILES);
+        doUpdateView(ViewMode.FILES);
     }
 
     @Override
@@ -296,27 +336,36 @@ public class FileListActivity extends AppCompatActivity
     }
 
     @Override
-    public void useFileData(PasswdFileDataUser user)
+    public <RetT> RetT useFileData(PasswdFileDataUser<RetT> user)
     {
         // No file data for about fragment
+        return null;
     }
+
 
     @Override
     public void updateViewAbout()
     {
-        doUpdateView(ViewMode.VIEW_ABOUT);
+        doUpdateView(ViewMode.ABOUT);
     }
 
     @Override
     public void updateViewPreferences()
     {
-        doUpdateView(ViewMode.VIEW_PREFERENCES);
+        doUpdateView(ViewMode.PREFERENCES);
     }
 
     @Override
     public void showAbout()
     {
-        doChangeView(ChangeMode.VIEW_ABOUT, AboutFragment.newInstance());
+        doChangeView(ViewChange.ABOUT, AboutFragment.newInstance());
+    }
+
+    @Override
+    public void showBackupFiles()
+    {
+        doChangeView(ViewChange.BACKUP_FILES,
+                     BackupFilesFragment.newInstance());
     }
 
     @Override
@@ -328,8 +377,8 @@ public class FileListActivity extends AppCompatActivity
     @Override
     public void showPreferences()
     {
-        doChangeView(ChangeMode.VIEW_PREFERENCES,
-                     PreferencesFragment.newInstance());
+        doChangeView(ViewChange.PREFERENCES,
+                     PreferencesFragment.newInstance(null));
     }
 
     /**
@@ -346,8 +395,7 @@ public class FileListActivity extends AppCompatActivity
                 filesFrag = new StorageFileListFragment();
             }
 
-            doChangeView(initial ?
-                         ChangeMode.VIEW_FILES_INIT : ChangeMode.VIEW_FILES,
+            doChangeView(initial ? ViewChange.FILES_INIT : ViewChange.FILES,
                          filesFrag);
         } else {
             itsTitle = savedState.getCharSequence(STATE_TITLE);
@@ -359,19 +407,19 @@ public class FileListActivity extends AppCompatActivity
     /**
      * Change the view of the activity
      */
-    private void doChangeView(ChangeMode mode,
-                              Fragment filesFrag)
+    private void doChangeView(ViewChange mode, Fragment filesFrag)
     {
         boolean clearBackStack = false;
         boolean supportsBack = false;
         switch (mode) {
-        case VIEW_FILES_INIT: {
+        case FILES_INIT: {
             clearBackStack = true;
             break;
         }
-        case VIEW_ABOUT:
-        case VIEW_FILES:
-        case VIEW_PREFERENCES: {
+        case ABOUT:
+        case BACKUP_FILES:
+        case FILES:
+        case PREFERENCES: {
             supportsBack = true;
             break;
         }
@@ -415,19 +463,25 @@ public class FileListActivity extends AppCompatActivity
                 FileListNavDrawerFragment.Mode.INIT;
         boolean hasPermission = true;
         switch (mode) {
-        case VIEW_ABOUT: {
+        case ABOUT: {
             drawerMode = FileListNavDrawerFragment.Mode.ABOUT;
             itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.about),
                                                  this);
             break;
         }
-        case VIEW_FILES: {
+        case BACKUP_FILES: {
+            drawerMode = FileListNavDrawerFragment.Mode.BACKUP_FILES;
+            itsTitle = PasswdSafeApp.getAppTitle(
+                    getString(R.string.file_backups), this);
+            break;
+        }
+        case FILES: {
             drawerMode = FileListNavDrawerFragment.Mode.FILES;
             itsTitle = getString(R.string.app_name);
             hasPermission = itsPermissionMgr.hasRequiredPerms();
             break;
         }
-        case VIEW_PREFERENCES: {
+        case PREFERENCES: {
             drawerMode = FileListNavDrawerFragment.Mode.PREFERENCES;
             itsTitle = PasswdSafeApp.getAppTitle(
                     getString(R.string.preferences), this);

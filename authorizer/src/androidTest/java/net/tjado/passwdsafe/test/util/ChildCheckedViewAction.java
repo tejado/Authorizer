@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2018 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,10 +7,10 @@
  */
 package net.tjado.passwdsafe.test.util;
 
-import androidx.test.espresso.UiController;
-import androidx.test.espresso.ViewAction;
 import android.view.View;
 import android.widget.Checkable;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -47,7 +47,8 @@ public class ChildCheckedViewAction implements ViewAction
     @Override
     public Matcher<View> getConstraints()
     {
-        return new BaseMatcher<View>() {
+        return new BaseMatcher<>()
+        {
             @Override
             public boolean matches(Object item)
             {

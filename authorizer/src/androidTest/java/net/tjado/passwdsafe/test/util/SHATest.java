@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2017 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -11,8 +11,6 @@ import org.junit.Test;
 import org.pwsafe.lib.crypto.SHA1;
 import org.pwsafe.lib.crypto.SHA256Pws;
 
-import java.security.NoSuchAlgorithmException;
-
 import static org.junit.Assert.assertArrayEquals;
 
 /**
@@ -23,7 +21,7 @@ import static org.junit.Assert.assertArrayEquals;
 public final class SHATest
 {
     @Test
-    public void testSha1() throws NoSuchAlgorithmException
+    public void testSha1()
     {
         sha1Test("", "da39a3ee5e6b4b0d3255bfef95601890afd80709");
         sha1Test("36", "c1dfd96eea8cc2b62785275bca38ac261256e278");
@@ -35,7 +33,7 @@ public final class SHATest
     }
 
     @Test
-    public void testSha256() throws NoSuchAlgorithmException
+    public void testSha256()
     {
         sha256Test("",
                    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

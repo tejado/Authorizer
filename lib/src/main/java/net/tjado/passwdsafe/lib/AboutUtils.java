@@ -7,18 +7,18 @@
  */
 package net.tjado.passwdsafe.lib;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+import androidx.preference.PreferenceManager;
 
 import net.tjado.passwdsafe.lib.view.GuiUtils;
 
@@ -41,13 +41,13 @@ public class AboutUtils
      */
     public static String updateAboutFields(View detailsView,
                                            final String extraLicenseInfo,
-                                           Context ctx)
+                                           final Activity act)
     {
         String name;
         StringBuilder version = new StringBuilder();
-        PackageInfo pkgInfo = PasswdSafeUtil.getAppPackageInfo(ctx);
+        final PackageInfo pkgInfo = PasswdSafeUtil.getAppPackageInfo(act);
         if (pkgInfo != null) {
-            name = ctx.getString(pkgInfo.applicationInfo.labelRes);
+            name = act.getString(pkgInfo.applicationInfo.labelRes);
             version.append(pkgInfo.versionName);
         } else {
             name = null;
@@ -57,29 +57,21 @@ public class AboutUtils
             version.append(" (DEBUG)");
         }
 
-        TextView tv = (TextView)detailsView.findViewById(R.id.version);
+        TextView tv = detailsView.findViewById(R.id.version);
         tv.setText(version);
-        tv = (TextView)detailsView.findViewById(R.id.build_id);
+        tv = detailsView.findViewById(R.id.build_id);
         tv.setText(BuildConfig.BUILD_ID);
-        tv = (TextView)detailsView.findViewById(R.id.build_date);
+        tv = detailsView.findViewById(R.id.build_date);
         tv.setText(BuildConfig.BUILD_DATE);
-        tv = (TextView)detailsView.findViewById(R.id.release_notes);
+        tv = detailsView.findViewById(R.id.release_notes);
         tv.setText(
                 Html.fromHtml(tv.getText().toString().replace("\n", "<br>")));
 
-        ToggleButton btn =
-                (ToggleButton)detailsView.findViewById(R.id.toggle_license);
-        final TextView licenseView =
-                (TextView)detailsView.findViewById(R.id.license);
-        btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked)
-            {
-                licenseView.setText(extraLicenseInfo);
-                GuiUtils.setVisible(licenseView, isChecked);
-            }
+        ToggleButton btn = detailsView.findViewById(R.id.toggle_license);
+        final TextView licenseView = detailsView.findViewById(R.id.license);
+        btn.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            licenseView.setText(extraLicenseInfo);
+            GuiUtils.setVisible(licenseView, isChecked);
         });
         GuiUtils.setVisible(btn, !TextUtils.isEmpty(extraLicenseInfo));
         return name;

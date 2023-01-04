@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -8,9 +8,11 @@
 package net.tjado.passwdsafe;
 
 import android.content.Context;
-import androidx.fragment.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import net.tjado.passwdsafe.file.PasswdFileDataUser;
 
@@ -27,7 +29,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
     public interface Listener
     {
         /** Use the file data */
-        void useFileData(PasswdFileDataUser user);
+        <RetT> RetT useFileData(PasswdFileDataUser<RetT> user);
 
         /** Is the navigation drawer closed */
         boolean isNavDrawerClosed();
@@ -36,7 +38,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
     private ListenerT itsListener;
 
     @Override
-    public void onAttach(Context ctx)
+    public void onAttach(@NonNull Context ctx)
     {
         super.onAttach(ctx);
         //noinspection unchecked
@@ -51,7 +53,8 @@ public abstract class AbstractPasswdSafeFileDataFragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    public void onCreateOptionsMenu(@NonNull Menu menu,
+                                    @NonNull MenuInflater inflater)
     {
         if ((itsListener != null) && itsListener.isNavDrawerClosed()) {
             doOnCreateOptionsMenu(menu, inflater);
@@ -76,10 +79,11 @@ public abstract class AbstractPasswdSafeFileDataFragment
     /**
      * Use the file data
      */
-    protected final void useFileData(PasswdFileDataUser user)
+    protected final <RetT> RetT useFileData(PasswdFileDataUser<RetT> user)
     {
         if (isAdded() && itsListener != null) {
-            itsListener.useFileData(user);
+            return itsListener.useFileData(user);
         }
+        return null;
     }
 }

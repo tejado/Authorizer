@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2020 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -20,7 +20,7 @@ import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 /**
  * PasswdSafe database
  */
-@Database(entities = {RecentFile.class, SavedPassword.class},
+@Database(entities = {BackupFile.class, RecentFile.class, SavedPassword.class},
           version = 3)
 public abstract class PasswdSafeDb extends RoomDatabase
 {
@@ -47,6 +47,18 @@ public abstract class PasswdSafeDb extends RoomDatabase
             // previous database formats to V3.
 
             PasswdSafeUtil.dbginfo(TAG, "Migrate v2->v3");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + BackupFile.TABLE + " (" +
+                       BackupFile.COL_ID + " INTEGER PRIMARY KEY " +
+                       "AUTOINCREMENT NOT NULL, " +
+                       BackupFile.COL_TITLE + " TEXT NOT NULL, " +
+                       BackupFile.COL_FILE_URI + " TEXT NOT NULL, " +
+                       BackupFile.COL_DATE + " INTEGER NOT NULL, " +
+                       BackupFile.COL_HAS_FILE +
+                       " INTEGER NOT NULL DEFAULT 1, " +
+                       BackupFile.COL_HAS_URI_PERM +
+                       " INTEGER NOT NULL DEFAULT 1" +
+                       ");");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS " + RecentFile.TABLE + " (" +
                        RecentFile.COL_ID + " INTEGER PRIMARY KEY," +
@@ -91,6 +103,11 @@ public abstract class PasswdSafeDb extends RoomDatabase
         }
         return INSTANCE;
     }
+
+    /**
+     * Access the backup files
+     */
+    public abstract BackupFilesDao accessBackupFiles();
 
     /**
      * Access the recent files

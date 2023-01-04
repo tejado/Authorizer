@@ -10,6 +10,8 @@ package net.tjado.passwdsafe;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.ListFragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
@@ -17,6 +19,8 @@ import androidx.loader.content.Loader;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,11 +71,20 @@ public class PasswdSafeListFragmentTree extends ListFragment
         /** Copy a field */
         void copyField(CopyField field, String recUuid);
 
+        /** Show the record preferences */
+        void showRecordPreferences();
+
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
 
         /** Update the view for a list of records */
         void updateViewList(PasswdLocation location);
+
+        /** Does the activity have a menu */
+        boolean activityHasMenu();
+
+        /** Is the navigation drawer closed */
+        boolean isNavDrawerClosed();
 
         void sendCredentialOverUsbByRecordLocation(final String recUuid);
     }
@@ -128,9 +141,6 @@ public class PasswdSafeListFragmentTree extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onCreate(android.os.Bundle)
-     */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -174,6 +184,7 @@ public class PasswdSafeListFragmentTree extends ListFragment
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
+        setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_passwdsafe_list_tree,
                                      container, false);
 
@@ -289,13 +300,10 @@ public class PasswdSafeListFragmentTree extends ListFragment
         }
     };
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
-     */
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
 
         if (itsListener.isCopySupported()) {
             registerForContextMenu(getListView());
@@ -338,6 +346,28 @@ public class PasswdSafeListFragmentTree extends ListFragment
     {
         super.onDetach();
         itsListener = null;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater)
+    {
+        if (itsIsContents && (itsListener != null) &&
+            itsListener.activityHasMenu() && itsListener.isNavDrawerClosed()) {
+            inflater.inflate(R.menu.fragment_passwdsafe_list, menu);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.menu_sort) {
+            if (itsListener != null) {
+                itsListener.showRecordPreferences();
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

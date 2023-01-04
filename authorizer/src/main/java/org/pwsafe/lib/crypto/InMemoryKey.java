@@ -34,7 +34,7 @@ public class InMemoryKey
         access = new short[aSize];
     }
 
-    public InMemoryKey(int aSize)
+    public InMemoryKey(@SuppressWarnings("SameParameterValue") int aSize)
     {
         this((short)aSize);
     }
@@ -58,7 +58,7 @@ public class InMemoryKey
         buffer.flip();
     }
 
-    public byte[] getKey(int size)
+    public byte[] getKey(@SuppressWarnings("SameParameterValue") int size)
     {
         if (buffer == null) {
             throw new IllegalStateException(

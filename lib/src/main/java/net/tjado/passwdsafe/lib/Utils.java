@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2012 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import android.content.Context;
@@ -62,14 +60,6 @@ public final class Utils
         return DateUtils.formatDateTime(ctx, date, flags);
     }
 
-    /**
-     * Format a time and/or date in milliseconds in an uri safe format
-     */
-    public static String formatDateUriSafe(Date date)
-    {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
-        return dateFormat.format(date);
-    }
 
     /** Copy the input stream to the output */
     public static int copyStream(InputStream is, OutputStream os)
@@ -98,5 +88,14 @@ public final class Utils
                 Log.e(Utils.class.getSimpleName(), "Error closing", e);
             }
         }
+    }
+
+    /**
+     * Format a time and/or date in milliseconds in an uri safe format
+     */
+    public static String formatDateUriSafe(Date date)
+    {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
+        return dateFormat.format(date);
     }
 }

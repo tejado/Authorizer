@@ -139,37 +139,37 @@ public final class StorageFileListFragment extends Fragment
             ItemTouchHelper.SimpleCallback swipeCb =
                     new ItemTouchHelper.SimpleCallback(
                             0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
-            {
-                @Override
-                public float getSwipeEscapeVelocity(float defaultValue)
-                {
-                    return defaultValue * 7f;
-                }
+                    {
+                        @Override
+                        public float getSwipeEscapeVelocity(float defaultValue)
+                        {
+                            return defaultValue * 7f;
+                        }
 
-                @Override
-                public float getSwipeThreshold(
-                        @NonNull RecyclerView.ViewHolder viewHolder)
-                {
-                    return .75f;
-                }
+                        @Override
+                        public float getSwipeThreshold(
+                                @NonNull RecyclerView.ViewHolder viewHolder)
+                        {
+                            return .75f;
+                        }
 
-                @Override
-                public boolean onMove(
-                        @NonNull RecyclerView recyclerView,
-                        @NonNull RecyclerView.ViewHolder viewHolder,
-                        @NonNull RecyclerView.ViewHolder target)
-                {
-                    return false;
-                }
+                        @Override
+                        public boolean onMove(
+                                @NonNull RecyclerView recyclerView,
+                                @NonNull RecyclerView.ViewHolder viewHolder,
+                                @NonNull RecyclerView.ViewHolder target)
+                        {
+                            return false;
+                        }
 
-                @Override
-                public void onSwiped(
-                        @NonNull RecyclerView.ViewHolder viewHolder,
-                        int direction)
-                {
-                    removeFile(((StorageFileListHolder)viewHolder).getUri());
-                }
-            };
+                        @Override
+                        public void onSwiped(
+                                @NonNull RecyclerView.ViewHolder viewHolder,
+                                int direction)
+                        {
+                            removeFile(((StorageFileListHolder)viewHolder).getUri());
+                        }
+                    };
             ItemTouchHelper swipeHelper = new ItemTouchHelper(swipeCb);
             swipeHelper.attachToRecyclerView(files);
 
@@ -363,7 +363,7 @@ public final class StorageFileListFragment extends Fragment
                 DocumentsContractCompat.INTENT_ACTION_OPEN_DOCUMENT);
 
         Uri initialUri = (itsLastOpenUri != null) ? itsLastOpenUri :
-                         ApiCompat.getPrimaryStorageRootUri(requireContext());
+                ApiCompat.getPrimaryStorageRootUri(requireContext());
         if (initialUri != null) {
             intent.putExtra(DocumentsContractCompat.EXTRA_INITIAL_URI,
                             initialUri);
@@ -390,7 +390,8 @@ public final class StorageFileListFragment extends Fragment
 
         Uri uri = openIntent.getData();
         if (uri == null) {
-            PasswdSafeUtil.showError("No URI to open: " + openIntent, TAG, null, ctx);
+            PasswdSafeUtil.showError("No URI to open: " + openIntent, TAG, null,
+                                     new ActContext(ctx));
             return;
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2019 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,12 +7,12 @@
  */
 package net.tjado.passwdsafe.test.util;
 
+import android.view.View;
 import androidx.test.espresso.PerformException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.util.HumanReadables;
 import androidx.test.espresso.util.TreeIterables;
-import android.view.View;
 
 import org.hamcrest.Matcher;
 

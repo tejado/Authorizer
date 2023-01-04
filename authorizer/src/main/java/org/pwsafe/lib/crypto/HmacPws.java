@@ -7,36 +7,52 @@
  */
 package org.pwsafe.lib.crypto;
 
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.macs.HMac;
-import org.bouncycastle.crypto.params.KeyParameter;
+import androidx.annotation.NonNull;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
- * HMAC implementation. Currently uses BouncyCastle provider underneath.
+ * HMAC implementation. Currently uses default digester provider.
  *
  * @author Glen Smith
+ * @author Jeff Harris
  */
 public class HmacPws
 {
+    private final Mac itsMac;
 
-    private final HMac mac;
-
-    public HmacPws(byte[] key)
+    public HmacPws(byte[] key) throws InvalidKeyException
     {
-        mac = new HMac(new SHA256Digest());
-        KeyParameter kp = new KeyParameter(key);
-        mac.init(kp);
+        itsMac = getHmac();
+        itsMac.init(new SecretKeySpec(key, itsMac.getAlgorithm()));
     }
 
     public final void digest(byte[] incoming)
     {
-        mac.update(incoming, 0, incoming.length);
+        itsMac.update(incoming);
     }
 
     public final byte[] doFinal()
     {
-        byte[] output = new byte[mac.getUnderlyingDigest().getDigestSize()];
-        mac.doFinal(output, 0);
-        return output;
+        return itsMac.doFinal();
+    }
+
+    /**
+     * Get the default provider's HMAC SHA-256
+     */
+    @NonNull
+    private static Mac getHmac()
+    {
+        try {
+            return Mac.getInstance("HmacSHA256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            //noinspection ConstantConditions
+            return null;
+        }
     }
 }

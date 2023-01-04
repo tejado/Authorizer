@@ -9,21 +9,30 @@ package net.tjado.passwdsafe;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import androidx.core.hardware.fingerprint.FingerprintManagerCompat;
-import androidx.core.os.CancellationSignal;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import net.tjado.passwdsafe.db.PasswdSafeDb;
 import net.tjado.passwdsafe.db.SavedPassword;
 import net.tjado.passwdsafe.db.SavedPasswordsDao;
+import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
+
+import org.pwsafe.lib.Util;
+import org.pwsafe.lib.file.Owner;
+import org.pwsafe.lib.file.PwsPassword;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -32,11 +41,12 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Collections;
+import java.util.Enumeration;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -54,52 +64,36 @@ public final class SavedPasswordsMgr
     private static final String KEYSTORE = "AndroidKeyStore";
     private static final String TAG = "SavedPasswordsMgr";
 
-    private final FingerprintManagerCompat itsFingerprintMgr;
     private final Context itsContext;
+    private final SavedPasswordsDao itsDao;
+    private @Nullable BiometricPrompt itsBioPrompt;
+    private boolean itsHasBioHw;
+    private boolean itsHasEnrolledBio;
+    private User itsActiveUser;
+    private boolean itsHasAuthenticated = false;
+
+    private static final MessageDigest MD_SHA256;
+    static {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        MD_SHA256 = md;
+    }
+
 
     /**
      * User of the saved password manager
      */
     public static abstract class User
-            extends FingerprintManagerCompat.AuthenticationCallback
-            implements CancellationSignal.OnCancelListener
+            extends BiometricPrompt.AuthenticationCallback
     {
-        private final CancellationSignal itsCancelSignal;
-
-        /**
-         * Constructor
-         */
-        public User()
-        {
-            itsCancelSignal = new CancellationSignal();
-            itsCancelSignal.setOnCancelListener(this);
-        }
-
-        /**
-         * Cancel use of the manager
-         */
-        public void cancel()
-        {
-            itsCancelSignal.cancel();
-        }
-
         /**
          * Is the user for encryption or decryption
          */
         protected abstract boolean isEncrypt();
-
-        /**
-         * Callback when the user has started
-         */
-        protected abstract void onStart();
-
-        /**
-         * Get the cancellation signaler
-         */
-        private CancellationSignal getCancelSignal()
-        {
-            return itsCancelSignal;
-        }
     }
 
     /**
@@ -107,8 +101,53 @@ public final class SavedPasswordsMgr
      */
     public SavedPasswordsMgr(Context ctx)
     {
-        itsFingerprintMgr = FingerprintManagerCompat.from(ctx);
-        itsContext = ctx;
+        itsContext = ctx.getApplicationContext();
+        itsDao = PasswdSafeDb.get(itsContext).accessSavedPasswords();
+        itsDao.processDbUpgrade(itsContext);
+        itsHasBioHw = false;
+        itsHasEnrolledBio = false;
+        itsBioPrompt = null;
+    }
+
+    /**
+     * Attach to its owning fragment
+     */
+    public void attach(Fragment frag)
+    {
+        BiometricManager bioMgr = BiometricManager.from(itsContext);
+        switch (bioMgr.canAuthenticate()) {
+        case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+        case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+        case BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED:
+        case BiometricManager.BIOMETRIC_ERROR_UNSUPPORTED:
+        case BiometricManager.BIOMETRIC_STATUS_UNKNOWN: {
+            break;
+        }
+        case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED: {
+            itsHasBioHw = true;
+            break;
+        }
+        case BiometricManager.BIOMETRIC_SUCCESS: {
+            itsHasBioHw = true;
+            itsHasEnrolledBio = true;
+            break;
+        }
+        }
+
+        itsBioPrompt = new BiometricPrompt(
+                frag, ContextCompat.getMainExecutor(itsContext),
+                new BioAuthenticationCallback());
+    }
+
+    /**
+     * Detach from its owning fragment
+     */
+    public void detach()
+    {
+        itsActiveUser = null;
+        if ((itsBioPrompt != null) && itsHasAuthenticated) {
+            itsBioPrompt.cancelAuthentication();
+        }
     }
 
     /**
@@ -116,33 +155,39 @@ public final class SavedPasswordsMgr
      */
     public boolean isAvailable()
     {
-        return itsFingerprintMgr.isHardwareDetected();
+        return itsHasBioHw;
     }
 
     /**
      * Is there a saved password for a file
      */
-    public synchronized boolean isSaved(Uri fileUri)
+    public synchronized boolean isSaved(PasswdFileUri fileUri)
     {
-        return getPrefs().contains(getPrefsKey(fileUri));
+        try {
+            return getSavedPassword(fileUri) != null;
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking saved for " + fileUri, e);
+            return false;
+        }
     }
 
     /**
      * Generate a saved password key for a file
      */
     @TargetApi(Build.VERSION_CODES.M)
-    public synchronized void generateKey(Uri fileUri)
+    public synchronized void generateKey(PasswdFileUri fileUri)
             throws InvalidAlgorithmParameterException, NoSuchAlgorithmException,
-            NoSuchProviderException, IOException
+                   NoSuchProviderException, IOException
     {
-        PasswdSafeUtil.dbginfo(TAG, "generateKey: %s", fileUri);
+        String keyName = getUriAlias2(fileUri.getUri());
+        PasswdSafeUtil.dbginfo(TAG, "generateKey: %s, key: %s",
+                               fileUri, keyName);
 
-        if (!itsFingerprintMgr.hasEnrolledFingerprints()) {
+        if (!itsHasEnrolledBio) {
             throw new IOException(
-                    itsContext.getString(R.string.no_fingerprints_registered));
+                    itsContext.getString(R.string.no_biometrics_registered));
         }
 
-        String keyName = getPrefsKey(fileUri);
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance(
                     KeyProperties.KEY_ALGORITHM_AES, KEYSTORE);
@@ -169,77 +214,131 @@ public final class SavedPasswordsMgr
     /**
      * Start access to the key protecting the saved password for a file
      */
-    public void startPasswordAccess(Uri fileUri, User user)
+    public boolean startPasswordAccess(PasswdFileUri fileUri, User user)
     {
         try {
-            Cipher cipher = getKeyCipher(fileUri, user.isEncrypt());
-            FingerprintManagerCompat.CryptoObject cryptoObj =
-                    new FingerprintManagerCompat.CryptoObject(cipher);
-            itsFingerprintMgr.authenticate(cryptoObj, 0, user.getCancelSignal(),
-                                           user, null);
-            user.onStart();
+            if (itsBioPrompt == null) {
+                throw new IOException("Not attached");
+            }
+
+            boolean isEncrypt = user.isEncrypt();
+            Cipher cipher = getKeyCipher(fileUri, isEncrypt);
+
+            int descId = isEncrypt ?
+                    R.string.touch_sensor_to_save_the_password :
+                    R.string.touch_sensor_to_load_saved_password;
+
+            BiometricPrompt.PromptInfo prompt =
+                    new BiometricPrompt.PromptInfo.Builder()
+                            .setTitle(itsContext.getString(R.string.app_name))
+                            .setSubtitle(fileUri.getIdentifier(itsContext,
+                                                               true))
+                            .setDescription(itsContext.getString(descId))
+                            .setNegativeButtonText(
+                                    itsContext.getString(R.string.cancel))
+                            .setConfirmationRequired(false)
+                            .build();
+            itsActiveUser = user;
+            itsHasAuthenticated = true;
+            itsBioPrompt.authenticate(prompt,
+                                      new BiometricPrompt.CryptoObject(cipher));
+            return true;
         } catch (CertificateException | NoSuchAlgorithmException |
                 KeyStoreException | UnrecoverableKeyException |
                 NoSuchPaddingException | InvalidKeyException |
                 InvalidAlgorithmParameterException | IOException e) {
-            String msg = itsContext.getString(R.string.key_error, fileUri,
-                                              e.getLocalizedMessage());
+            if (e.getClass().getName().equals(
+                    "android.security.keystore." +
+                    "KeyPermanentlyInvalidatedException")) {
+                removeSavedPassword(fileUri);
+            }
+
+            String msg = itsContext.getString(
+                    R.string.key_error, fileUri.getIdentifier(itsContext, true),
+                    e.getLocalizedMessage());
             Log.e(TAG, msg, e);
-            user.onAuthenticationError(0, msg);
+            user.onAuthenticationError(BiometricPrompt.ERROR_UNABLE_TO_PROCESS,
+                                       msg);
+            return false;
         }
     }
 
     /**
      * Load a saved password for a file
      */
-    public String loadSavedPassword(Uri fileUri, Cipher cipher)
+    public @CheckResult
+    Owner<PwsPassword> loadSavedPassword(PasswdFileUri fileUri, Cipher cipher)
             throws IOException, BadPaddingException, IllegalBlockSizeException
     {
-        String keyName = getPrefsKey(fileUri);
-        SharedPreferences prefs = getPrefs();
-        String encStr = prefs.getString(keyName, null);
-        if (TextUtils.isEmpty(encStr)) {
-            throw new IOException(
-                    itsContext.getString(R.string.password_not_found, fileUri));
+        SavedPassword saved = null;
+        Exception exc = null;
+        try {
+            saved = getSavedPassword(fileUri);
+        } catch (Exception e) {
+            exc = e;
         }
 
-        byte[] enc = Base64.decode(encStr, Base64.NO_WRAP);
+        if ((saved == null) || TextUtils.isEmpty(saved.encPasswd)) {
+            throw new IOException(
+                    itsContext.getString(R.string.password_not_found, fileUri),
+                    exc);
+        }
+
+        byte[] enc = Base64.decode(saved.encPasswd, Base64.NO_WRAP);
         byte[] decPassword = cipher.doFinal(enc);
-        return new String(decPassword, "UTF-8");
+        try {
+            return PwsPassword.create(decPassword, "UTF-8");
+        } finally {
+            Util.clearArray(decPassword);
+            Util.clearArray(enc);
+        }
     }
 
     /**
      * Add a saved password for a file
      */
-    public void addSavedPassword(Uri fileUri, String password, Cipher cipher)
-            throws UnsupportedEncodingException, BadPaddingException,
-            IllegalBlockSizeException
+    public void addSavedPassword(PasswdFileUri fileUri,
+                                 Owner<PwsPassword>.Param passwordParam,
+                                 Cipher cipher)
+            throws Exception
     {
-        byte[] enc = cipher.doFinal(password.getBytes("UTF-8"));
-        String encStr = Base64.encodeToString(enc, Base64.NO_WRAP);
-        String ivStr = Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP);
+        try (Owner<PwsPassword> password = passwordParam.use()) {
+            byte[] enc = cipher.doFinal(password.get().getBytes("UTF-8"));
+            String encStr = Base64.encodeToString(enc, Base64.NO_WRAP);
+            String ivStr = Base64
+                    .encodeToString(cipher.getIV(), Base64.NO_WRAP);
 
-        String keyName = getPrefsKey(fileUri);
-        SharedPreferences prefs = getPrefs();
-        prefs.edit()
-             .putString(keyName, encStr)
-             .putString(getIvPrefsKey(keyName), ivStr)
-             .apply();
+            itsDao.add(fileUri, ivStr, encStr, itsContext);
+        }
     }
 
     /**
      * Removed the saved password and key for a file
      */
-    public synchronized void removeSavedPassword(Uri fileUri)
+    public synchronized void removeSavedPassword(PasswdFileUri fileUri)
     {
-        String keyName = getPrefsKey(fileUri);
-        getPrefs().edit()
-                  .remove(keyName).remove(getIvPrefsKey(keyName)).apply();
+        Uri uri = fileUri.getUri();
+        try {
+            SavedPassword saved = getSavedPassword(fileUri);
+            if (saved != null) {
+                uri = Uri.parse(saved.uri);
+            }
+            itsDao.remove(uri);
+        } catch (Exception e) {
+            Log.e(TAG, "Error removing " + fileUri, e);
+        }
         if (isAvailable()) {
             PasswdSafeUtil.dbginfo(TAG, "removeSavedPassword: %s", fileUri);
             try {
                 KeyStore keyStore = getKeystore();
-                keyStore.deleteEntry(keyName);
+                for (String keyName : new String[]
+                        { getUriAlias2(uri), getUriAlias1(uri) }) {
+                    try {
+                        keyStore.deleteEntry(keyName);
+                    } catch (KeyStoreException e) {
+                        e.printStackTrace();
+                    }
+                }
             } catch (KeyStoreException | CertificateException |
                     IOException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
@@ -252,14 +351,22 @@ public final class SavedPasswordsMgr
      */
     public synchronized void removeAllSavedPasswords()
     {
-        getPrefs().edit().clear().apply();
+        try {
+            itsDao.removeAll();
+        } catch (Exception e) {
+            Log.e(TAG, "Error removing passwords", e);
+        }
         if (isAvailable()) {
             try {
                 KeyStore keyStore = getKeystore();
-                for (String key: Collections.list(keyStore.aliases())) {
-                    PasswdSafeUtil.dbginfo(
-                            TAG, "removeAllSavedPasswords key: %s", key);
-                    keyStore.deleteEntry(key);
+                Enumeration<String> aliases = keyStore.aliases();
+                if (aliases != null) {
+                    while (aliases.hasMoreElements()) {
+                        String key = aliases.nextElement();
+                        PasswdSafeUtil.dbginfo(
+                                TAG, "removeAllSavedPasswords key: %s", key);
+                        keyStore.deleteEntry(key);
+                    }
                 }
             } catch (CertificateException | NoSuchAlgorithmException |
                     IOException | KeyStoreException e) {
@@ -272,18 +379,39 @@ public final class SavedPasswordsMgr
      * Get the cipher for the key protecting the saved password for a file
      */
     @TargetApi(Build.VERSION_CODES.M)
-    private Cipher getKeyCipher(Uri fileUri, boolean encrypt)
+    private Cipher getKeyCipher(PasswdFileUri fileUri, boolean encrypt)
             throws CertificateException, NoSuchAlgorithmException,
                    KeyStoreException, IOException, UnrecoverableKeyException,
                    NoSuchPaddingException, InvalidKeyException,
                    InvalidAlgorithmParameterException
     {
-        String keyName = getPrefsKey(fileUri);
+        Uri uri = fileUri.getUri();
+        SavedPassword saved = null;
+        Exception exc = null;
+        if (!encrypt) {
+            try {
+                saved = getSavedPassword(fileUri);
+                if (saved != null) {
+                    uri = Uri.parse(saved.uri);
+                }
+            } catch (Exception e) {
+                exc = e;
+            }
+        }
+
         KeyStore keystore = getKeystore();
-        Key key = keystore.getKey(keyName, null);
+        Key key = null;
+        for (String keyName : new String[]
+                { getUriAlias2(uri), getUriAlias1(uri) }) {
+            key = keystore.getKey(keyName, null);
+            if (key != null) {
+                PasswdSafeUtil.dbginfo(TAG, "getKeyCipher name %s", keyName);
+                break;
+            }
+        }
         if (key == null) {
             throw new IOException(itsContext.getString(R.string.key_not_found,
-                                                       fileUri));
+                                                       uri));
         }
 
         Cipher ciph = Cipher.getInstance(
@@ -293,12 +421,10 @@ public final class SavedPasswordsMgr
         if (encrypt) {
             ciph.init(Cipher.ENCRYPT_MODE, key);
         } else {
-            SharedPreferences prefs = getPrefs();
-            String ivStr = prefs.getString(getIvPrefsKey(keyName), null);
-            if (TextUtils.isEmpty(ivStr)) {
-                throw new IOException("Key IV not found for " + fileUri);
+            if ((saved == null) || TextUtils.isEmpty(saved.iv)) {
+                throw new IOException("Key IV not found for " + fileUri, exc);
             }
-            byte[] iv = Base64.decode(ivStr, Base64.NO_WRAP);
+            byte[] iv = Base64.decode(saved.iv, Base64.NO_WRAP);
             ciph.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(iv));
         }
         return ciph;
@@ -309,7 +435,7 @@ public final class SavedPasswordsMgr
      */
     private KeyStore getKeystore()
             throws KeyStoreException, CertificateException,
-            NoSuchAlgorithmException, IOException
+                   NoSuchAlgorithmException, IOException
     {
         KeyStore store = KeyStore.getInstance(KEYSTORE);
         store.load(null);
@@ -317,27 +443,77 @@ public final class SavedPasswordsMgr
     }
 
     /**
-     * Get the preferences for saved passwords
+     * Get the v2 keystore alias for a URI
      */
-    private SharedPreferences getPrefs()
+    private static String getUriAlias2(Uri uri)
+            throws UnsupportedEncodingException
     {
-        return itsContext.getSharedPreferences("saved", Context.MODE_PRIVATE);
+        return "key2_" + getUriKey(uri);
     }
 
     /**
-     * Get the preferences key for a file
+     * Get the v1 keystore alias for a URI
      */
-    private String getPrefsKey(Uri uri)
+    private static String getUriAlias1(Uri uri)
     {
         return "key_" + uri.toString();
     }
 
     /**
-     * Get the preferences key for the IV of an encryption key
+     * Get the saved password for a file URI
      */
-    private String getIvPrefsKey(String filePrefsKey)
+    private SavedPassword getSavedPassword(PasswdFileUri fileUri)
     {
-        return "iv_" + filePrefsKey;
+        return itsDao.get(fileUri, itsContext);
     }
 
+    /**
+     * Get a unique key for a URI
+     */
+    private static String getUriKey(Uri uri)
+            throws UnsupportedEncodingException
+    {
+        String uristr = uri.toString();
+        @SuppressWarnings("CharsetObjectCanBeUsed")
+        byte[] digest = MD_SHA256.digest(uristr.getBytes("UTF-8"));
+        return Base64.encodeToString(digest, Base64.NO_WRAP);
+    }
+
+    /**
+     * Biometric authentication callback
+     */
+    private class BioAuthenticationCallback
+            extends BiometricPrompt.AuthenticationCallback
+    {
+        @Override
+        public void onAuthenticationError(int errorCode,
+                                          @NonNull CharSequence errString)
+        {
+            super.onAuthenticationError(errorCode, errString);
+            if (itsActiveUser != null) {
+                itsActiveUser.onAuthenticationError(errorCode, errString);
+                itsActiveUser = null;
+            }
+        }
+
+        @Override
+        public void onAuthenticationSucceeded(
+                @NonNull BiometricPrompt.AuthenticationResult result)
+        {
+            super.onAuthenticationSucceeded(result);
+            if (itsActiveUser != null) {
+                itsActiveUser.onAuthenticationSucceeded(result);
+                itsActiveUser = null;
+            }
+        }
+
+        @Override
+        public void onAuthenticationFailed()
+        {
+            super.onAuthenticationFailed();
+            if (itsActiveUser != null) {
+                itsActiveUser.onAuthenticationFailed();
+            }
+        }
+    }
 }

@@ -15,7 +15,7 @@ import org.pwsafe.lib.exception.EndOfFileException;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 
 /**
  * This class encapsulates the header fields of a PasswordSafe database.  The
@@ -178,7 +178,6 @@ public class PwsFileHeaderV3 implements Serializable
      * Write the header to the file.
      *
      * @param file the file to write the header to.
-     * @throws IOException
      */
     public void save(PwsFile file)
             throws IOException
@@ -207,10 +206,9 @@ public class PwsFileHeaderV3 implements Serializable
      * Updates the header ready for saving.
      *
      * @param passwdParam the passphrase to be used to encrypt the database.
-     * @throws UnsupportedEncodingException
      */
     private void update(Owner<PwsPassword>.Param passwdParam, PwsFileV3 file)
-            throws UnsupportedEncodingException
+            throws IOException
     {
         // According to the spec, salt is just random data. I don't think
         // though,
@@ -251,6 +249,8 @@ public class PwsFileHeaderV3 implements Serializable
 
             file.decryptedHmacKey = Util.mergeBytes(b3pt, b4pt);
             file.hasher = new HmacPws(file.decryptedHmacKey);
+        } catch (InvalidKeyException e) {
+            throw new IOException("Error updating header", e);
         } finally {
             passwd.close();
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2018 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,9 +7,9 @@
  */
 package net.tjado.passwdsafe.test.util;
 
-import androidx.test.espresso.ViewAssertion;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.ViewAssertion;
 
 import org.hamcrest.Matcher;
 import org.junit.Assert;
@@ -34,7 +34,7 @@ public final class RecyclerViewAssertions
     /**
      * Match against the number of entries in the view
      */
-    public static ViewAssertion withRecyclerViewCount(
+    private static ViewAssertion withRecyclerViewCount(
             final Matcher<Integer> matcher)
     {
         return (view, noViewFoundException) -> {
@@ -43,7 +43,7 @@ public final class RecyclerViewAssertions
             }
 
             RecyclerView rv = (RecyclerView)view;
-            RecyclerView.Adapter adapter = rv.getAdapter();
+            RecyclerView.Adapter<?> adapter = rv.getAdapter();
             Assert.assertNotNull(adapter);
             assertThat(adapter.getItemCount(), matcher);
         };

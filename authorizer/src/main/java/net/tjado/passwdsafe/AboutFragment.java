@@ -9,19 +9,16 @@ package net.tjado.passwdsafe;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
-import net.tjado.passwdsafe.file.PasswdFileData;
-import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.lib.AboutUtils;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
-import net.tjado.passwdsafe.lib.ObjectHolder;
 
 import java.util.Locale;
 
@@ -62,14 +59,14 @@ public class AboutFragment extends Fragment
     }
 
     @Override
-    public void onAttach(Context ctx)
+    public void onAttach(@NonNull Context ctx)
     {
         super.onAttach(ctx);
         itsListener = (Listener)ctx;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
         setHasOptionsMenu(true);
@@ -77,21 +74,21 @@ public class AboutFragment extends Fragment
                                          container, false);
 
         String licenses = AboutUtils.getLicenses(
-                getContext(), "license-PasswdSafe.txt",
+                requireContext(), "license-PasswdSafe.txt",
                 "license-android.txt", "license-AndroidAssetStudio.txt",
+                "license-MaterialIcons.txt", "license-icons.txt",
                 "license-RobotoMono.txt");
 
-        AboutUtils.updateAboutFields(rootView, licenses, getContext());
+        AboutUtils.updateAboutFields(rootView, licenses, getActivity());
         itsFileDetailsGroup = rootView.findViewById(R.id.file_details_group);
-        itsFile = (TextView)rootView.findViewById(R.id.file);
-        itsPermissions = (TextView)rootView.findViewById(R.id.permissions);
-        itsNumRecords = (TextView)rootView.findViewById(R.id.num_records);
-        itsPasswordEnc = (TextView)
-                rootView.findViewById(R.id.password_encoding);
-        itsDatabaseVer = (TextView)rootView.findViewById(R.id.database_version);
-        itsLastSaveBy = (TextView)rootView.findViewById(R.id.last_save_by);
-        itsLastSaveApp = (TextView)rootView.findViewById(R.id.last_save_app);
-        itsLastSaveTime = (TextView)rootView.findViewById(R.id.last_save_time);
+        itsFile = rootView.findViewById(R.id.file);
+        itsPermissions = rootView.findViewById(R.id.permissions);
+        itsNumRecords = rootView.findViewById(R.id.num_records);
+        itsPasswordEnc = rootView.findViewById(R.id.password_encoding);
+        itsDatabaseVer = rootView.findViewById(R.id.database_version);
+        itsLastSaveBy = rootView.findViewById(R.id.last_save_by);
+        itsLastSaveApp = rootView.findViewById(R.id.last_save_app);
+        itsLastSaveTime = rootView.findViewById(R.id.last_save_time);
         return rootView;
     }
 
@@ -101,48 +98,46 @@ public class AboutFragment extends Fragment
         super.onResume();
         itsListener.updateViewAbout();
 
-        final ObjectHolder<Boolean> called = new ObjectHolder<>(false);
-        itsListener.useFileData(new PasswdFileDataUser()
-        {
-            @Override
-            public void useFileData(@NonNull PasswdFileData fileData)
-            {
-                called.set(true);
-                itsFile.setText(fileData.getUri().toString());
-                itsPermissions.setText(
-                        fileData.canEdit() ?
-                        R.string.read_write : R.string.read_only_about);
-                itsNumRecords.setText(String.format(
-                        Locale.getDefault(), "%d",
-                        fileData.getRecords().size()));
-                itsPasswordEnc.setText(fileData.getOpenPasswordEncoding());
-                if (fileData.isV3()) {
-                    StringBuilder build = new StringBuilder();
-                    String str = fileData.getHdrLastSaveUser();
-                    if (!TextUtils.isEmpty(str)) {
-                        build.append(str);
-                    }
-                    str = fileData.getHdrLastSaveHost();
-                    if (!TextUtils.isEmpty(str)) {
-                        if (build.length() > 0) {
-                            build.append(" on ");
+        Boolean called = itsListener.useFileData(
+                fileData -> {
+                    itsFile.setText(fileData.getUri().toString());
+                    itsPermissions.setText(
+                            fileData.canEdit() ?
+                                    R.string.read_write : R.string.read_only_about);
+                    itsNumRecords.setText(String.format(
+                            Locale.getDefault(), "%d",
+                            fileData.getRecords().size()));
+                    itsPasswordEnc.setText(
+                            fileData.getOpenPasswordEncoding());
+                    if (fileData.isV3()) {
+                        StringBuilder build = new StringBuilder();
+                        String str = fileData.getHdrLastSaveUser();
+                        if (!TextUtils.isEmpty(str)) {
+                            build.append(str);
                         }
-                        build.append(str);
-                    }
+                        str = fileData.getHdrLastSaveHost();
+                        if (!TextUtils.isEmpty(str)) {
+                            if (build.length() > 0) {
+                                build.append(" on ");
+                            }
+                            build.append(str);
+                        }
 
-                    itsDatabaseVer.setText(fileData.getHdrVersion());
-                    itsLastSaveBy.setText(build);
-                    itsLastSaveApp.setText(fileData.getHdrLastSaveApp());
-                    itsLastSaveTime.setText(fileData.getHdrLastSaveTime());
-                } else {
-                    itsDatabaseVer.setText(null);
-                    itsLastSaveBy.setText(null);
-                    itsLastSaveApp.setText(null);
-                    itsLastSaveTime.setText(null);
-                }
-            }
-        });
-        GuiUtils.setVisible(itsFileDetailsGroup, called.get());
+                        itsDatabaseVer.setText(fileData.getHdrVersion());
+                        itsLastSaveBy.setText(build);
+                        itsLastSaveApp.setText(
+                                fileData.getHdrLastSaveApp());
+                        itsLastSaveTime.setText(
+                                fileData.getHdrLastSaveTime());
+                    } else {
+                        itsDatabaseVer.setText(null);
+                        itsLastSaveBy.setText(null);
+                        itsLastSaveApp.setText(null);
+                        itsLastSaveTime.setText(null);
+                    }
+                    return true;
+                });
+        GuiUtils.setVisible(itsFileDetailsGroup, (called != null) && called);
     }
 
     @Override

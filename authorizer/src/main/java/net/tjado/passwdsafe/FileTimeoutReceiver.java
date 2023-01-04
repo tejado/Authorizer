@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -17,6 +17,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
+import androidx.annotation.Nullable;
 
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
@@ -26,7 +27,7 @@ import net.tjado.passwdsafe.pref.FileTimeoutPref;
  * The FileTimeoutReceiver class manages a timeout for file activity
  */
 public class FileTimeoutReceiver extends BroadcastReceiver
-    implements SharedPreferences.OnSharedPreferenceChangeListener
+        implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     private final Activity itsActivity;
     private final AlarmManager itsAlarmMgr;
@@ -36,7 +37,7 @@ public class FileTimeoutReceiver extends BroadcastReceiver
             Preferences.PREF_FILE_CLOSE_SCREEN_OFF_DEF;
     private boolean itsIsPaused = true;
 
-    private static final String TAG = "AuthFileTimeoutReceiver";
+    private static final String TAG = "FileTimeoutReceiver";
 
     /**
      * Constructor
@@ -48,7 +49,9 @@ public class FileTimeoutReceiver extends BroadcastReceiver
                 itsActivity.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(PasswdSafeApp.FILE_TIMEOUT_INTENT);
         intent.setPackage(BuildConfig.APPLICATION_ID);
-        itsCloseIntent = PendingIntent.getBroadcast(itsActivity, 0, intent, ApiCompat.getPendingIntentImmutableFlag());
+        itsCloseIntent = PendingIntent.getBroadcast(
+                itsActivity, 0, intent,
+                ApiCompat.getPendingIntentImmutableFlag());
         IntentFilter filter =
                 new IntentFilter(PasswdSafeApp.FILE_TIMEOUT_INTENT);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -96,7 +99,7 @@ public class FileTimeoutReceiver extends BroadcastReceiver
     public void onReceive(Context ctx, Intent intent)
     {
         boolean close = false;
-        switch (intent.getAction()) {
+        switch (String.valueOf(intent.getAction())) {
         case PasswdSafeApp.FILE_TIMEOUT_INTENT: {
             Log.i(TAG, "File timeout");
             close = true;
@@ -116,14 +119,19 @@ public class FileTimeoutReceiver extends BroadcastReceiver
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    public void onSharedPreferenceChanged(SharedPreferences prefs,
+                                          @Nullable String key)
     {
-        switch (key) {
-        case Preferences.PREF_FILE_CLOSE_SCREEN_OFF:
-        case Preferences.PREF_FILE_CLOSE_TIMEOUT: {
+        if (key == null) {
             updatePrefs(prefs);
-            break;
-        }
+        } else {
+            switch (key) {
+            case Preferences.PREF_FILE_CLOSE_SCREEN_OFF:
+            case Preferences.PREF_FILE_CLOSE_TIMEOUT: {
+                updatePrefs(prefs);
+                break;
+            }
+            }
         }
     }
 

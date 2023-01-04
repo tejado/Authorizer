@@ -20,7 +20,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.tjado.passwdsafe.R;
 import net.tjado.passwdsafe.file.PasswdPolicy;
+import net.tjado.passwdsafe.lib.ActContext;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.view.TypefaceUtils;
 
@@ -52,11 +54,11 @@ public class PasswdPolicyView extends LinearLayout
     /** Show the policy location */
     public void showLocation(String location)
     {
-        View row = findViewById(net.tjado.passwdsafe.R.id.policy_view_location_row);
+        View row = findViewById(R.id.policy_view_location_row);
         row.setVisibility((location == null) ? View.GONE : View.VISIBLE);
 
         if (location != null) {
-            TextView tv = (TextView)findViewById(net.tjado.passwdsafe.R.id.policy_view_location);
+            TextView tv = findViewById(R.id.policy_view_location);
             tv.setText(location);
         }
     }
@@ -75,30 +77,20 @@ public class PasswdPolicyView extends LinearLayout
         itsPolicy = policy;
         int length = itsPolicy.getLength();
         PasswdPolicy.Type type = itsPolicy.getType();
-        String lowercase = getPolicyOption(itsPolicy,
-                                           PasswdPolicy.FLAG_USE_LOWERCASE);
-        String uppercase = getPolicyOption(itsPolicy,
-                                           PasswdPolicy.FLAG_USE_UPPERCASE);
-        String digits = getPolicyOption(itsPolicy,
-                                        PasswdPolicy.FLAG_USE_DIGITS);
-        String symbols = getPolicyOption(itsPolicy,
-                                         PasswdPolicy.FLAG_USE_SYMBOLS);
+        String lowercase = getPolicyOption(itsPolicy, PasswdPolicy.FLAG_USE_LOWERCASE);
+        String uppercase = getPolicyOption(itsPolicy, PasswdPolicy.FLAG_USE_UPPERCASE);
+        String digits = getPolicyOption(itsPolicy, PasswdPolicy.FLAG_USE_DIGITS);
+        String symbols = getPolicyOption(itsPolicy, PasswdPolicy.FLAG_USE_SYMBOLS);
 
         boolean optionsVisible = (type != PasswdPolicy.Type.HEXADECIMAL);
-        setTextStr(net.tjado.passwdsafe.R.id.policy_view_length, net.tjado.passwdsafe.R.id.policy_view_length_label,
-                   Integer.toString(length), true);
-        setTextStr(net.tjado.passwdsafe.R.id.policy_view_type, net.tjado.passwdsafe.R.id.policy_view_type_label,
-                   PasswdPolicy.getTypeStr(type, getContext()), true);
-        setTextStr(net.tjado.passwdsafe.R.id.policy_view_lowercase, net.tjado.passwdsafe.R.id.policy_view_lowercase_label,
-                   lowercase, optionsVisible);
-        setTextStr(net.tjado.passwdsafe.R.id.policy_view_uppercase, net.tjado.passwdsafe.R.id.policy_view_uppercase_label,
-                   uppercase, optionsVisible);
-        setTextStr(net.tjado.passwdsafe.R.id.policy_view_digits, net.tjado.passwdsafe.R.id.policy_view_digits_label,
-                   digits, optionsVisible);
-        setTextStr(net.tjado.passwdsafe.R.id.policy_view_symbols, net.tjado.passwdsafe.R.id.policy_view_symbols_label,
-                   symbols, optionsVisible);
+        setTextStr(R.id.policy_view_length, R.id.policy_view_length_label, Integer.toString(length), true);
+        setTextStr(R.id.policy_view_type, R.id.policy_view_type_label, PasswdPolicy.getTypeStr(type, getContext()), true);
+        setTextStr(R.id.policy_view_lowercase, R.id.policy_view_lowercase_label, lowercase, optionsVisible);
+        setTextStr(R.id.policy_view_uppercase, R.id.policy_view_uppercase_label, uppercase, optionsVisible);
+        setTextStr(R.id.policy_view_digits, R.id.policy_view_digits_label, digits, optionsVisible);
+        setTextStr(R.id.policy_view_symbols, R.id.policy_view_symbols_label, symbols, optionsVisible);
 
-        setTextStr(net.tjado.passwdsafe.R.id.policy_view_use_count, net.tjado.passwdsafe.R.id.policy_view_use_count_label,
+        setTextStr(R.id.policy_view_use_count, R.id.policy_view_use_count_label,
                    Integer.toString(useCount), (useCount >= 0));
     }
 
@@ -106,7 +98,7 @@ public class PasswdPolicyView extends LinearLayout
     public void setGenerateEnabled(
             @SuppressWarnings("SameParameterValue") boolean enabled)
     {
-        View row = findViewById(net.tjado.passwdsafe.R.id.policy_view_generate_row);
+        View row = findViewById(R.id.policy_view_generate_row);
         row.setVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
@@ -131,8 +123,8 @@ public class PasswdPolicyView extends LinearLayout
                                     ContextMenuInfo menuInfo)
     {
         if (v == itsGeneratedPasswd) {
-            menu.setHeaderTitle(net.tjado.passwdsafe.R.string.password);
-            menu.add(0, MENU_COPY, 0, net.tjado.passwdsafe.R.string.copy_clipboard).
+            menu.setHeaderTitle(R.string.password);
+            menu.add(0, MENU_COPY, 0, R.string.copy_clipboard).
                 setOnMenuItemClickListener(this);
         }
     }
@@ -140,7 +132,7 @@ public class PasswdPolicyView extends LinearLayout
     /** Initialize the view */
     private void init(Context context)
     {
-        inflate(context, net.tjado.passwdsafe.R.layout.passwd_policy_view, this);
+        inflate(context, R.layout.passwd_policy_view, this);
         if (isInEditMode()) {
             return;
         }
@@ -148,17 +140,10 @@ public class PasswdPolicyView extends LinearLayout
         showLocation(null);
         showPolicy(null, -1);
 
-        Button btn = (Button)findViewById(net.tjado.passwdsafe.R.id.policy_view_generate);
-        btn.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                generatePasswd();
-            }
-        });
+        Button btn = findViewById(R.id.policy_view_generate);
+        btn.setOnClickListener(v -> generatePasswd());
 
-        itsGeneratedPasswd =
-            (TextView)findViewById(net.tjado.passwdsafe.R.id.policy_view_generated_passwd);
+        itsGeneratedPasswd = findViewById(R.id.policy_view_generated_passwd);
         itsGeneratedPasswd.setOnCreateContextMenuListener(this);
         TypefaceUtils.setMonospace(itsGeneratedPasswd, context);
     }
@@ -171,7 +156,7 @@ public class PasswdPolicyView extends LinearLayout
             try {
                 passwd = itsPolicy.generate();
             } catch (Exception e) {
-                PasswdSafeUtil.showErrorMsg(e.toString(), getContext());
+                PasswdSafeUtil.showErrorMsg(e.toString(), new ActContext(getContext()));
             }
         }
         itsGeneratedPasswd.setText(passwd);
@@ -181,13 +166,13 @@ public class PasswdPolicyView extends LinearLayout
     private void setTextStr(int id, int labelId, String str, boolean visible)
     {
         View label = findViewById(labelId);
-        TextView tv = (TextView)findViewById(id);
+        TextView tv = findViewById(id);
         if (visible) {
             label.setVisibility(View.VISIBLE);
             tv.setVisibility(View.VISIBLE);
             Context ctx = getContext();
             tv.setText((str != null) ? str : ctx.getString(
-                    net.tjado.passwdsafe.R.string.policy_no));
+                    R.string.policy_no));
         } else {
             label.setVisibility(View.GONE);
             tv.setVisibility(View.GONE);
@@ -201,7 +186,7 @@ public class PasswdPolicyView extends LinearLayout
         String str = null;
         if (policy.checkFlags(flag)) {
             int strId = (policy.getType() == PasswdPolicy.Type.PRONOUNCEABLE)
-                        ? net.tjado.passwdsafe.R.string.yes : net.tjado.passwdsafe.R.string.policy_yes_len;
+                        ? R.string.yes : R.string.policy_yes_len;
             switch (flag) {
             case PasswdPolicy.FLAG_USE_LOWERCASE: {
                 str = ctx.getString(strId, policy.getMinLowercase());
@@ -219,17 +204,17 @@ public class PasswdPolicyView extends LinearLayout
                 String symbols = policy.getSpecialSymbols();
                 int id;
                 if (!TextUtils.isEmpty(symbols)) {
-                    id = net.tjado.passwdsafe.R.string.policy_yes_sym_policy;
+                    id = R.string.policy_yes_sym_policy;
                 } else if (policy.checkFlags(
                                PasswdPolicy.FLAG_USE_EASY_VISION)) {
-                    id = net.tjado.passwdsafe.R.string.policy_yes_sym_easy;
+                    id = R.string.policy_yes_sym_easy;
                     symbols = PasswdPolicy.SYMBOLS_EASY;
                 } else if (policy.checkFlags(
                                PasswdPolicy.FLAG_MAKE_PRONOUNCEABLE)) {
-                    id = net.tjado.passwdsafe.R.string.policy_yes_sym_pronounce;
+                    id = R.string.policy_yes_sym_pronounce;
                     symbols = PasswdPolicy.SYMBOLS_PRONOUNCE;
                 } else {
-                    id = net.tjado.passwdsafe.R.string.policy_yes_sym_default;
+                    id = R.string.policy_yes_sym_default;
                     symbols = PasswdPolicy.SYMBOLS_DEFAULT;
                 }
                 str = ctx.getString(id, policy.getMinSymbols(), symbols);

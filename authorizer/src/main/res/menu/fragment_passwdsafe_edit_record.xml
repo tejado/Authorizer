@@ -17,7 +17,8 @@
           app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/menu_save"
-          android:title="@string/save"
-          app:showAsAction="ifRoom"/>
+        android:icon="@drawable/ic_action_save"
+        android:title="@string/save"
+        app:showAsAction="ifRoom"/>
 
 </menu>

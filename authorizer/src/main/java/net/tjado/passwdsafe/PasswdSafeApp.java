@@ -7,50 +7,58 @@
  */
 package net.tjado.passwdsafe;
 
-import org.pwsafe.lib.file.PwsFile;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.mikepenz.iconics.Iconics;
+import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
+
+import androidx.annotation.Nullable;
+
+import net.tjado.passwdsafe.file.PasswdExpiryFilter;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdPolicy;
 import net.tjado.passwdsafe.file.PasswdRecordFilter;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 
-public class PasswdSafeApp extends Application
+import org.pwsafe.lib.file.PwsFile;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+
+public final class PasswdSafeApp extends Application
     implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     public static final String DEBUG_AUTO_FILE =
-        null;
-        //Preferences.PREF_FILE_DIR_DEF + "/test.psafe3";
+            null;
+            //"/document/primary:test.psafe3";
 
     public static final String EXPIRATION_TIMEOUT_INTENT =
-        "com.jefftharris.passwdsafe.action.EXPIRATION_TIMEOUT";
+        "net.tjado.passwdsafe.action.EXPIRATION_TIMEOUT";
     public static final String FILE_TIMEOUT_INTENT =
-        "com.jefftharris.passwdsafe.action.FILE_TIMEOUT";
+        "net.tjado.passwdsafe.action.FILE_TIMEOUT";
     public static final String CHOOSE_RECORD_INTENT =
-        "com.jefftharris.passwdsafe.action.CHOOSE_RECORD_INTENT";
+        "net.tjado.passwdsafe.action.CHOOSE_RECORD_INTENT";
 
     public static final String RESULT_DATA_UUID = "uuid";
 
     private PasswdPolicy itsDefaultPasswdPolicy = null;
     private NotificationMgr itsNotifyMgr;
     private boolean itsIsOpenDefault = true;
+    private final ExecutorService itsThreadExecutor = Executors.newSingleThreadExecutor();
 
     private static final String TAG = "PasswdSafeApp";
 
     static {
         System.loadLibrary("PasswdSafe");
-    }
-
-    public PasswdSafeApp()
-    {
     }
 
     /* (non-Javadoc)
@@ -60,6 +68,7 @@ public class PasswdSafeApp extends Application
     public void onCreate()
     {
         super.onCreate();
+        PasswdRecordFilter.initMatches(getApplicationContext());
         SharedPreferences prefs = Preferences.getSharedPrefs(this);
 
         AlarmManager alarmMgr =
@@ -86,36 +95,39 @@ public class PasswdSafeApp extends Application
             fileListEdit.apply();
             prefsEdit.apply();
         }
-        Preferences.upgradePasswdPolicy(prefs, this);
-        Preferences.upgradeDefaultFilePref(prefs);
+        Preferences.upgrade(prefs, this);
 
-        setPasswordEncodingPref(prefs);
-        setPasswordDefaultSymsPref(prefs);
-        itsDefaultPasswdPolicy = Preferences.getDefPasswdPolicyPref(prefs,
-                                                                    this);
+        Iconics.registerFont(new MaterialDesignIconic());
+
+        initPrefs(prefs);
     }
 
-    /* (non-Javadoc)
-     * @see android.content.SharedPreferences.OnSharedPreferenceChangeListener#onSharedPreferenceChanged(android.content.SharedPreferences, java.lang.String)
-     */
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs,
+                                          @Nullable String key)
     {
-        PasswdSafeUtil.dbginfo(TAG, "Preference change: %s, value: %s",
-                               key, prefs.getAll().get(key));
-
-        switch (key) {
-        case Preferences.PREF_PASSWD_ENC: {
-            setPasswordEncodingPref(prefs);
-            break;
-        }
-        case Preferences.PREF_PASSWD_DEFAULT_SYMS: {
-            setPasswordDefaultSymsPref(prefs);
-            break;
-        }
-        case Preferences.PREF_PASSWD_EXPIRY_NOTIF: {
+        if (key == null) {
+            initPrefs(prefs);
             itsNotifyMgr.setPasswdExpiryFilter(getPasswdExpiryNotifPref(prefs));
-            break;
-        }
+        } else {
+            PasswdSafeUtil.dbginfo(TAG, "Preference change: %s, value: %s", key,
+                                   prefs.getAll().get(key));
+
+            switch (key) {
+            case Preferences.PREF_PASSWD_ENC: {
+                setPasswordEncodingPref(prefs);
+                break;
+            }
+            case Preferences.PREF_PASSWD_DEFAULT_SYMS: {
+                setPasswordDefaultSymsPref(prefs);
+                break;
+            }
+            case Preferences.PREF_PASSWD_EXPIRY_NOTIF: {
+                itsNotifyMgr.setPasswdExpiryFilter(
+                        getPasswdExpiryNotifPref(prefs));
+                break;
+            }
+            }
         }
     }
 
@@ -141,7 +153,9 @@ public class PasswdSafeApp extends Application
         }
         Uri.Builder builder = uri.buildUpon();
         builder.fragment("");
-        builder.query("");
+        if (uri.isHierarchical()) {
+            builder.query("");
+        }
         return builder.build();
     }
 
@@ -174,9 +188,7 @@ public class PasswdSafeApp extends Application
      */
     public static void setupTheme(Activity act)
     {
-        SharedPreferences prefs = Preferences.getSharedPrefs(act);
-        act.setTheme(Preferences.getDisplayThemeLight(prefs) ?
-                     R.style.AppTheme : R.style.AppThemeDark);
+        setupActTheme(act, false);
     }
 
     /**
@@ -184,9 +196,7 @@ public class PasswdSafeApp extends Application
      */
     public static void setupDialogTheme(Activity act)
     {
-        SharedPreferences prefs = Preferences.getSharedPrefs(act);
-        act.setTheme(Preferences.getDisplayThemeLight(prefs) ?
-                     R.style.AppTheme_Dialog : R.style.AppThemeDark_Dialog);
+        setupActTheme(act, true);
     }
 
     /**
@@ -221,6 +231,15 @@ public class PasswdSafeApp extends Application
         return builder.toString();
     }
 
+    /**
+     * Schedule a background task
+     */
+    public static void scheduleTask(Runnable run, Context ctx)
+    {
+        PasswdSafeApp app = (PasswdSafeApp)ctx.getApplicationContext();
+        app.itsThreadExecutor.submit(run);
+    }
+
     private static void setPasswordEncodingPref(SharedPreferences prefs)
     {
         PwsFile.setPasswordEncoding(Preferences.getPasswordEncodingPref(prefs));
@@ -235,9 +254,59 @@ public class PasswdSafeApp extends Application
 
     /** Get the password expiration filter for notifications from a
      * preference */
-    private static PasswdRecordFilter.ExpiryFilter
+    private static PasswdExpiryFilter
         getPasswdExpiryNotifPref(SharedPreferences prefs)
     {
         return Preferences.getPasswdExpiryNotifPref(prefs).getFilter();
+    }
+
+    /**
+     * Setup the theme on a normal or dialog activity
+     */
+    private static void setupActTheme(Activity act, boolean isDialog)
+    {
+        int uimode = Configuration.UI_MODE_NIGHT_UNDEFINED;
+
+        SharedPreferences prefs = Preferences.getSharedPrefs(act);
+        switch (Preferences.getDisplayTheme(prefs)) {
+        case FOLLOW_SYSTEM: {
+            uimode = act.getResources().getConfiguration().uiMode &
+                     Configuration.UI_MODE_NIGHT_MASK;
+            break;
+        }
+        case LIGHT: {
+            uimode = Configuration.UI_MODE_NIGHT_NO;
+            break;
+        }
+        case DARK: {
+            uimode = Configuration.UI_MODE_NIGHT_YES;
+            break;
+        }
+        }
+
+        switch (uimode) {
+        case Configuration.UI_MODE_NIGHT_NO:
+        case Configuration.UI_MODE_NIGHT_UNDEFINED: {
+            act.setTheme(isDialog ? R.style.PwsAppTheme_Dialog :
+                                 R.style.PwsAppTheme);
+            break;
+        }
+        case Configuration.UI_MODE_NIGHT_YES: {
+            act.setTheme(isDialog ? R.style.PwsAppThemeDark_Dialog :
+                                 R.style.PwsAppThemeDark);
+            break;
+        }
+        }
+    }
+
+    /**
+     * Initialize settings from preferences
+     */
+    private void initPrefs(SharedPreferences prefs)
+    {
+        setPasswordEncodingPref(prefs);
+        setPasswordDefaultSymsPref(prefs);
+        itsDefaultPasswdPolicy = Preferences.getDefPasswdPolicyPref(prefs,
+                                                                    this);
     }
 }

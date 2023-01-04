@@ -69,7 +69,7 @@ public class PwsIntegerField extends PwsField
     public byte[] getBytes()
     {
         int value;
-        byte retval[];
+        byte[] retval;
 
         value = (Integer)super.getValue();
         // Force a size of 4, otherwise it would be set to a size of blocklength

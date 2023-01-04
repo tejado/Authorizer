@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,15 +7,16 @@
  */
 package net.tjado.passwdsafe.view;
 
-import java.util.ArrayList;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import androidx.annotation.NonNull;
 
 import net.tjado.passwdsafe.file.PasswdFileData;
 
 import org.pwsafe.lib.file.PwsRecord;
+
+import java.util.ArrayList;
 
 /**
  * The PasswdLocation class encapsulates a location within a password file
@@ -23,7 +24,8 @@ import org.pwsafe.lib.file.PwsRecord;
 public class PasswdLocation implements Parcelable
 {
     public static final Parcelable.Creator<PasswdLocation> CREATOR =
-            new Parcelable.Creator<PasswdLocation>() {
+            new Parcelable.Creator<>()
+            {
                 public PasswdLocation createFromParcel(Parcel in)
                 {
                     return new PasswdLocation(in);
@@ -61,6 +63,15 @@ public class PasswdLocation implements Parcelable
             PasswdFileData.splitGroup(group, itsGroups);
         }
         itsRecord = fileData.getUUID(rec);
+    }
+
+    /** Constructor from a group */
+    public PasswdLocation(String group)
+    {
+        if (!TextUtils.isEmpty(group)) {
+            PasswdFileData.splitGroup(group, itsGroups);
+        }
+        itsRecord = null;
     }
 
     /** Constructor from a parcel */
@@ -168,10 +179,8 @@ public class PasswdLocation implements Parcelable
                TextUtils.equals(itsRecord, location.itsRecord);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
+    @NonNull
     public String toString()
     {
         return String.format("{rec: %s, groups: %s}",

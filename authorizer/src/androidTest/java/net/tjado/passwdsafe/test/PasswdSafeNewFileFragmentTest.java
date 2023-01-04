@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2017 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -10,19 +10,22 @@ package net.tjado.passwdsafe.test;
 import android.content.Intent;
 import android.net.Uri;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
 
 import net.tjado.passwdsafe.PasswdSafe;
 import net.tjado.passwdsafe.R;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
+import net.tjado.passwdsafe.test.util.TestModeRule;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
+import java.io.IOException;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.replaceText;
@@ -43,9 +46,12 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 public class PasswdSafeNewFileFragmentTest
 {
-    @Rule
+    @Rule(order=1)
+    public TestModeRule itsTestMode = new TestModeRule();
+
+    @Rule(order=2)
     public ActivityTestRule<PasswdSafe> itsActivityRule =
-            new ActivityTestRule<PasswdSafe>(PasswdSafe.class)
+            new ActivityTestRule<>(PasswdSafe.class)
             {
                 @Override
                 protected Intent getActivityIntent()
@@ -54,6 +60,14 @@ public class PasswdSafeNewFileFragmentTest
                             Uri.fromFile(FileListActivityTest.DIR));
                 }
             };
+
+    @Before
+    public void setup()
+    {
+        if (FileListActivityTest.FILE.exists()) {
+            Assert.assertTrue(FileListActivityTest.FILE.delete());
+        }
+    }
 
     @Test
     public void testInitialState()
@@ -78,21 +92,21 @@ public class PasswdSafeNewFileFragmentTest
     }
 
     @Test
-    public void testExistingFile()
+    public void testExistingFile() throws IOException
     {
-        Assert.assertTrue(
-                new File(FileListActivityTest.DIR, "test.psafe3").exists());
-        Assert.assertTrue(
-                !new File(FileListActivityTest.DIR, "ZZZtest.psafe3").exists());
+        Assert.assertTrue(FileListActivityTest.FILE.createNewFile());
+        Assert.assertTrue(FileListActivityTest.FILE.exists());
+        Assert.assertFalse(
+                new File(FileListActivityTest.DIR, "ZZZnotest.psafe3").exists());
 
         onFileNameView()
-                .perform(replaceText("ZZZtest.psafe3"));
+                .perform(replaceText("ZZZnotest.psafe3"));
         onView(withId(R.id.file_name_input))
                 .check(matches(withTextInputError(null)));
 
         onView(allOf(withId(R.id.file_name),
                      withParent(withParent(withId(R.id.file_name_input)))))
-                .perform(replaceText("test.psafe3"));
+                .perform(replaceText(FileListActivityTest.FILE.getName()));
         onView(withId(R.id.file_name_input))
                 .check(matches(withTextInputError("File exists")));
     }
@@ -110,13 +124,13 @@ public class PasswdSafeNewFileFragmentTest
         onView(withId(R.id.file_name_input))
                 .check(matches(withTextInputError(null)));
 
-        for (char c: "1234567890abcxyzABCXYZ".toCharArray()) {
+        for (char c: "1234567890abcxyzABCXYZ-_".toCharArray()) {
             onFileNameView().perform(replaceText("ZZZ" + c + "test.psafe3"));
             onView(withId(R.id.file_name_input))
                     .check(matches(withTextInputError(null)));
         }
 
-        for (char c: "`~!@#$%^&*()_+-={}[]|\\;:'\"<>,./?".toCharArray()) {
+        for (char c: "`~!@#$%^&*()+={}[]|\\;:'\"<>,./?".toCharArray()) {
             onFileNameView()
                     .perform(replaceText("ZZZ" + c + "test.psafe3"));
             onView(withId(R.id.file_name_input))
@@ -147,8 +161,8 @@ public class PasswdSafeNewFileFragmentTest
     public void testPassword()
     {
         // Check initial with valid file name
-        Assert.assertTrue(
-                !new File(FileListActivityTest.DIR, "ZZZtest.psafe3").exists());
+        Assert.assertFalse(
+                new File(FileListActivityTest.DIR, "ZZZtest.psafe3").exists());
         onFileNameView()
                 .perform(replaceText("ZZZtest.psafe3"));
         onView(withId(R.id.file_name_input))

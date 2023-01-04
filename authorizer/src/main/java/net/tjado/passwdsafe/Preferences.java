@@ -7,10 +7,6 @@
  */
 package net.tjado.passwdsafe;
 
-import java.io.File;
-
-import org.pwsafe.lib.file.PwsFile;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -24,9 +20,18 @@ import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.pref.FileBackupPref;
 import net.tjado.passwdsafe.pref.FileTimeoutPref;
 import net.tjado.passwdsafe.pref.PasswdExpiryNotifPref;
+import net.tjado.passwdsafe.pref.PasswdTimeoutPref;
+import net.tjado.passwdsafe.pref.RecordFieldSortPref;
 import net.tjado.passwdsafe.pref.RecordSortOrderPref;
+import net.tjado.passwdsafe.pref.ThemePref;;
 
 import net.tjado.authorizer.OutputInterface;
+
+import org.pwsafe.lib.file.PwsFile;
+
+import java.io.File;
+import java.util.Objects;
+
 
 /**
  * The Preferences class manages preferences for the application
@@ -48,21 +53,20 @@ public class Preferences
 
     public static final String PREF_FILE_BACKUP = "fileBackupPref";
     private static final FileBackupPref PREF_FILE_BACKUP_DEF =
-        FileBackupPref.BACKUP_1;
+        FileBackupPref.BACKUP_5;
+    private static final String PREF_FILE_BACKUP_SHOW_HELP =
+            "fileBackupShowHelpPref";
+    private static final boolean PREF_FILE_BACKUP_SHOW_HELP_DEF = true;
 
     public static final String PREF_FILE_CLOSE_CLEAR_CLIPBOARD =
         "fileCloseClearClipboardPref";
     public static final boolean PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF = true;
 
-    private static final String PREF_FILE_OPEN_READ_ONLY =
-        "fileOpenReadOnly";
-    private static final boolean PREF_FILE_OPEN_READ_ONLY_DEF = false;
-
     private static final String PREF_FILE_OPEN_YUBIKEY = "fileOpenYubikey";
     private static final boolean PREF_FILE_OPEN_YUBIKEY_DEF = false;
 
     private static final String PREF_FILE_SAVED_PASSWORD_CONFIRM =
-            "fileSavedPasswordConfirm";
+            "fileSavedPasswordConfirm2";
     private static final boolean PREF_FILE_SAVED_PASSWORD_CONFIRM_DEF = false;
 
     public static final String PREF_DEF_FILE = "defFilePref";
@@ -88,10 +92,19 @@ public class Preferences
         "passwordClearAllNotifsPref";
     public static final String PREF_PASSWD_CLEAR_ALL_SAVED =
         "passwordClearAllSavedPref";
+    public static final String PREF_PASSWD_VISIBLE_TIMEOUT =
+            "passwordVisibleTimeoutPref";
+    private static final PasswdTimeoutPref PREF_PASSWD_VISIBLE_TIMEOUT_DEF =
+            PasswdTimeoutPref.TO_NONE;
 
     public static final String PREF_RECORD_SORT_ORDER = "recordSortOrderPref";
     public static final RecordSortOrderPref PREF_RECORD_SORT_ORDER_DEF =
             RecordSortOrderPref.GROUP_FIRST;
+
+    public static final String PREF_RECORD_FIELD_SORT =
+            "recordFieldSortPref";
+    public static final RecordFieldSortPref PREF_RECORD_FIELD_SORT_DEF =
+            RecordFieldSortPref.TITLE;
 
     public static final String PREF_SEARCH_CASE_SENSITIVE =
         "searchCaseSensitivePref";
@@ -108,15 +121,22 @@ public class Preferences
     private static final String PREF_FILE_BACKUP_USB_GPG_KEY = "fileBackupUsbGpgKeyPref";
     private static final String PREF_FILE_BACKUP_USB_GPG_KEY_DEF = "";
 
+    public static final String PREF_SORT_ASCENDING = "sortAscendingPref";
+    public static final boolean PREF_SORT_ASCENDING_DEF = true;
+
     public static final String PREF_SORT_CASE_SENSITIVE =
         "sortCaseSensitivePref";
     public static final boolean PREF_SORT_CASE_SENSITIVE_DEF = true;
 
-    public static final String PREF_DISPLAY_THEME_LIGHT = "displayThemeLightPref";
-    private static final boolean PREF_DISPLAY_THEME_LIGHT_DEF = false;
+    public static final String PREF_DISPLAY_THEME = "displayThemePref";
+    private static final ThemePref PREF_DISPLAY_THEME_DEF = ThemePref.FOLLOW_SYSTEM;
 
     public static final String PREF_DISPLAY_LIST_TREEVIEW = "displayListTreeViewPref";
     private static final boolean PREF_DISPLAY_LIST_TREEVIEW_DEF = true;
+
+    public static final String PREF_DISPLAY_VIBRATE_KEYBOARD =
+            "displayVibrateKeyboard";
+    private static final boolean PREF_DISPLAY_VIBRATE_KEYBOARD_DEF = false;
 
     private static final String PREF_COPY_PASSWORD_CONFIRM =
             "copyPasswordConfirm";
@@ -187,24 +207,28 @@ public class Preferences
         }
     }
 
+    /**
+     * Get the preference to show help for file backups
+     */
+    public static boolean getFileBackupShowHelpPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_FILE_BACKUP_SHOW_HELP,
+                                PREF_FILE_BACKUP_SHOW_HELP_DEF);
+    }
+
+    /**
+     * Set the preference to show help for file backups
+     */
+    public static void setFileBackupShowHelpPref(boolean show,
+                                                 SharedPreferences prefs)
+    {
+        prefs.edit().putBoolean(PREF_FILE_BACKUP_SHOW_HELP, show).apply();
+    }
+
     public static boolean getFileCloseClearClipboardPref(SharedPreferences prefs)
     {
         return prefs.getBoolean(PREF_FILE_CLOSE_CLEAR_CLIPBOARD,
                                 PREF_FILE_CLOSE_CLEAR_CLIPBOARD_DEF);
-    }
-
-    public static boolean getFileOpenReadOnlyPref(SharedPreferences prefs)
-    {
-        return prefs.getBoolean(PREF_FILE_OPEN_READ_ONLY,
-                                PREF_FILE_OPEN_READ_ONLY_DEF);
-    }
-
-    public static void setFileOpenReadOnlyPref(boolean readonly,
-                                               SharedPreferences prefs)
-    {
-        SharedPreferences.Editor prefsEdit = prefs.edit();
-        prefsEdit.putBoolean(PREF_FILE_OPEN_READ_ONLY, readonly);
-        prefsEdit.apply();
     }
 
     /**
@@ -240,13 +264,16 @@ public class Preferences
      */
     public static void setFileSavedPasswordConfirmed(SharedPreferences prefs)
     {
-        prefs.edit().putBoolean(PREF_FILE_SAVED_PASSWORD_CONFIRM, true).apply();
+        prefs.edit().putBoolean(PREF_FILE_SAVED_PASSWORD_CONFIRM, true)
+             // Remove old pref
+             .remove("fileSavedPasswordConfirm")
+             .apply();
     }
 
     public static File getFileDirPref(SharedPreferences prefs)
     {
         String prefstr = prefs.getString(PREF_FILE_DIR, PREF_FILE_DIR_DEF);
-        return (prefstr != null) ? new File(prefstr) : null;
+        return new File(Objects.requireNonNull(prefstr));
     }
 
     public static void setFileDirPref(File dir, SharedPreferences prefs)
@@ -313,83 +340,15 @@ public class Preferences
         return val;
     }
 
-    /** Upgrade the default password policy preference if needed */
-    public static void upgradePasswdPolicy(SharedPreferences prefs,
-                                           Context ctx)
+    public static PasswdTimeoutPref getPasswdVisibleTimeoutPref(
+            SharedPreferences prefs)
     {
-        if (prefs.contains(PREF_DEF_PASSWD_POLICY)) {
-            PasswdSafeUtil.dbginfo(TAG, "Have default policy");
-            return;
-        }
-
-        SharedPreferences.Editor prefsEdit = prefs.edit();
-        String policyStr = PREF_DEF_PASSWD_POLICY_DEF;
-        if (prefs.contains(PREF_GEN_LOWER) ||
-            prefs.contains(PREF_GEN_UPPER) ||
-            prefs.contains(PREF_GEN_DIGITS) ||
-            prefs.contains(PREF_GEN_SYMBOLS) ||
-            prefs.contains(PREF_GEN_EASY) ||
-            prefs.contains(PREF_GEN_HEX) ||
-            prefs.contains(PREF_GEN_LENGTH)) {
-            PasswdSafeUtil.dbginfo(TAG, "Upgrade old prefs");
-
-            int flags = 0;
-            if (prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF)) {
-                flags |= PasswdPolicy.FLAG_USE_HEX_DIGITS;
-            } else {
-                if (prefs.getBoolean(PREF_GEN_EASY, PREF_GEN_EASY_DEF)) {
-                    flags |= PasswdPolicy.FLAG_USE_EASY_VISION;
-                }
-
-                if (prefs.getBoolean(PREF_GEN_LOWER, PREF_GEN_LOWER_DEF)) {
-                    flags |= PasswdPolicy.FLAG_USE_LOWERCASE;
-                }
-                if (prefs.getBoolean(PREF_GEN_UPPER, PREF_GEN_UPPER_DEF)) {
-                    flags |= PasswdPolicy.FLAG_USE_UPPERCASE;
-                }
-                if (prefs.getBoolean(PREF_GEN_DIGITS, PREF_GEN_DIGITS_DEF)) {
-                    flags |= PasswdPolicy.FLAG_USE_DIGITS;
-                }
-                if (prefs.getBoolean(PREF_GEN_SYMBOLS, PREF_GEN_SYMBOLS_DEF)) {
-                    flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
-                }
-            }
-            int length;
-            try {
-                length = Integer.parseInt(prefs.getString(PREF_GEN_LENGTH,
-                                                          PREF_GEN_LENGTH_DEF));
-            } catch (NumberFormatException e) {
-                length = Integer.parseInt(PREF_GEN_LENGTH_DEF);
-            }
-            PasswdPolicy policy = PasswdPolicy.createDefaultPolicy(ctx, flags,
-                                                                   length);
-            policyStr = policy.toHdrPolicyString();
-
-            prefsEdit.remove(PREF_GEN_LOWER);
-            prefsEdit.remove(PREF_GEN_UPPER);
-            prefsEdit.remove(PREF_GEN_DIGITS);
-            prefsEdit.remove(PREF_GEN_SYMBOLS);
-            prefsEdit.remove(PREF_GEN_EASY);
-            prefsEdit.remove(PREF_GEN_HEX);
-            prefsEdit.remove(PREF_GEN_LENGTH);
-        }
-
-        PasswdSafeUtil.dbginfo(TAG, "Save new default policy: %s", policyStr);
-        prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policyStr);
-        prefsEdit.apply();
-    }
-
-    /** Upgrade the default file preference if needed */
-    public static void upgradeDefaultFilePref(SharedPreferences prefs)
-    {
-        Uri defFileUri = getDefFilePref(prefs);
-        if ((defFileUri != null) && (defFileUri.getScheme() == null)) {
-            File defDir = getFileDirPref(prefs);
-            File def = new File(defDir, defFileUri.getPath());
-            defFileUri = Uri.fromFile(def);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(PREF_DEF_FILE, defFileUri.toString());
-            editor.apply();
+        try {
+            return PasswdTimeoutPref.prefValueOf(
+                    prefs.getString(PREF_PASSWD_VISIBLE_TIMEOUT,
+                                    PREF_PASSWD_VISIBLE_TIMEOUT_DEF.name()));
+        } catch (IllegalArgumentException e) {
+            return PREF_PASSWD_VISIBLE_TIMEOUT_DEF;
         }
     }
 
@@ -435,6 +394,18 @@ public class Preferences
         }
     }
 
+    public static RecordFieldSortPref getRecordFieldSortPref(
+            SharedPreferences prefs)
+    {
+        try {
+            return RecordFieldSortPref.valueOf(
+                    prefs.getString(PREF_RECORD_FIELD_SORT,
+                                    PREF_RECORD_FIELD_SORT_DEF.toString()));
+        } catch (IllegalArgumentException e) {
+            return PREF_RECORD_FIELD_SORT_DEF;
+        }
+    }
+
     public static boolean getSearchCaseSensitivePref(SharedPreferences prefs)
     {
         return prefs.getBoolean(PREF_SEARCH_CASE_SENSITIVE,
@@ -472,6 +443,14 @@ public class Preferences
         prefs.edit().putString(PREF_FILE_BACKUP_USB_GPG_KEY, keyId).apply();
     }
 
+    /**
+     * Get whether to sort ascending
+     */
+    public static boolean getSortAscendingPref(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_SORT_ASCENDING, PREF_SORT_ASCENDING_DEF);
+    }
+
     public static boolean getSortCaseSensitivePref(SharedPreferences prefs)
     {
         return prefs.getBoolean(PREF_SORT_CASE_SENSITIVE,
@@ -479,12 +458,17 @@ public class Preferences
     }
 
     /**
-     * Get whether to use the light theme
+     * Get which theme is used
      */
-    public static boolean getDisplayThemeLight(SharedPreferences prefs)
+    public static ThemePref getDisplayTheme(SharedPreferences prefs)
     {
-        return prefs.getBoolean(PREF_DISPLAY_THEME_LIGHT,
-                                PREF_DISPLAY_THEME_LIGHT_DEF);
+        try {
+            return ThemePref.valueOf(
+                    prefs.getString(PREF_DISPLAY_THEME,
+                                    PREF_DISPLAY_THEME_DEF.toString()));
+        } catch (IllegalArgumentException e) {
+            return PREF_DISPLAY_THEME_DEF;
+        }
     }
 
     /**
@@ -494,6 +478,15 @@ public class Preferences
     {
         return prefs.getBoolean(PREF_DISPLAY_LIST_TREEVIEW,
                                 PREF_DISPLAY_LIST_TREEVIEW_DEF);
+    }
+
+    /**
+     * Get whether to vibrate the keyboard
+     */
+    public static boolean getDisplayVibrateKeyboard(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_DISPLAY_VIBRATE_KEYBOARD,
+                                PREF_DISPLAY_VIBRATE_KEYBOARD_DEF);
     }
 
     /**
@@ -541,6 +534,121 @@ public class Preferences
                                     PREF_AUTOTYPE_LANG_DEF.name()));
         } catch (IllegalArgumentException e) {
             return PREF_AUTOTYPE_LANG_DEF;
+        }
+    }
+
+    /**
+     * Upgrade preferences
+     */
+    public static void upgrade(SharedPreferences prefs, Context ctx)
+    {
+        upgradePasswdPolicy(prefs, ctx);
+        upgradeDefaultFilePref(prefs);
+        if (!ApiCompat.supportsExternalFilesDirs() &&
+            getFileLegacyFileChooserPref(prefs)) {
+            prefs.edit().putBoolean(PREF_FILE_LEGACY_FILE_CHOOSER, false)
+                 .apply();
+        }
+
+        String oldThemePrefKey = "displayThemeLightPref";
+        if (prefs.contains(oldThemePrefKey)) {
+            boolean oldThemePref = prefs.getBoolean(oldThemePrefKey, true);
+            SharedPreferences.Editor edit = prefs.edit();
+            if (!oldThemePref) {
+                edit.putString(PREF_DISPLAY_THEME, ThemePref.DARK.toString());
+            }
+            edit.remove(oldThemePrefKey);
+            edit.apply();
+        }
+    }
+
+    /** Upgrade the default password policy preference if needed */
+    private static void upgradePasswdPolicy(SharedPreferences prefs,
+                                            Context ctx)
+    {
+        if (prefs.contains(PREF_DEF_PASSWD_POLICY)) {
+            PasswdSafeUtil.dbginfo(TAG, "Have default policy");
+            return;
+        }
+
+        SharedPreferences.Editor prefsEdit = prefs.edit();
+        String policyStr = PREF_DEF_PASSWD_POLICY_DEF;
+        if (prefs.contains(PREF_GEN_LOWER) ||
+            prefs.contains(PREF_GEN_UPPER) ||
+            prefs.contains(PREF_GEN_DIGITS) ||
+            prefs.contains(PREF_GEN_SYMBOLS) ||
+            prefs.contains(PREF_GEN_EASY) ||
+            prefs.contains(PREF_GEN_HEX) ||
+            prefs.contains(PREF_GEN_LENGTH)) {
+            PasswdSafeUtil.dbginfo(TAG, "Upgrade old prefs");
+
+            int flags = 0;
+            if (prefs.getBoolean(PREF_GEN_HEX, PREF_GEN_HEX_DEF)) {
+                flags |= PasswdPolicy.FLAG_USE_HEX_DIGITS;
+            } else {
+                if (prefs.getBoolean(PREF_GEN_EASY, PREF_GEN_EASY_DEF)) {
+                    flags |= PasswdPolicy.FLAG_USE_EASY_VISION;
+                }
+
+                if (prefs.getBoolean(PREF_GEN_LOWER, PREF_GEN_LOWER_DEF)) {
+                    flags |= PasswdPolicy.FLAG_USE_LOWERCASE;
+                }
+                if (prefs.getBoolean(PREF_GEN_UPPER, PREF_GEN_UPPER_DEF)) {
+                    flags |= PasswdPolicy.FLAG_USE_UPPERCASE;
+                }
+                if (prefs.getBoolean(PREF_GEN_DIGITS, PREF_GEN_DIGITS_DEF)) {
+                    flags |= PasswdPolicy.FLAG_USE_DIGITS;
+                }
+                if (prefs.getBoolean(PREF_GEN_SYMBOLS, PREF_GEN_SYMBOLS_DEF)) {
+                    flags |= PasswdPolicy.FLAG_USE_SYMBOLS;
+                }
+            }
+            int length;
+            try {
+                length = Integer.parseInt(Objects.requireNonNull(
+                        prefs.getString(PREF_GEN_LENGTH, PREF_GEN_LENGTH_DEF)));
+            } catch (NumberFormatException | NullPointerException e) {
+                length = Integer.parseInt(PREF_GEN_LENGTH_DEF);
+            }
+            PasswdPolicy policy = PasswdPolicy.createDefaultPolicy(ctx, flags,
+                                                                   length);
+            policyStr = policy.toHdrPolicyString();
+
+            prefsEdit.remove(PREF_GEN_LOWER);
+            prefsEdit.remove(PREF_GEN_UPPER);
+            prefsEdit.remove(PREF_GEN_DIGITS);
+            prefsEdit.remove(PREF_GEN_SYMBOLS);
+            prefsEdit.remove(PREF_GEN_EASY);
+            prefsEdit.remove(PREF_GEN_HEX);
+            prefsEdit.remove(PREF_GEN_LENGTH);
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "Save new default policy: %s", policyStr);
+        prefsEdit.putString(PREF_DEF_PASSWD_POLICY, policyStr);
+        prefsEdit.apply();
+    }
+
+    /** Upgrade the default file preference if needed */
+    private static void upgradeDefaultFilePref(SharedPreferences prefs)
+    {
+        Uri defFileUri = getDefFilePref(prefs);
+        if (ApiCompat.supportsExternalFilesDirs()) {
+            if ((defFileUri != null) && (defFileUri.getScheme() == null)) {
+                String path = defFileUri.getPath();
+                if (path != null) {
+                    File defDir = getFileDirPref(prefs);
+                    File def = new File(defDir, path);
+                    defFileUri = Uri.fromFile(def);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString(PREF_DEF_FILE, defFileUri.toString());
+                    editor.apply();
+                }
+            }
+        } else {
+            if ((defFileUri != null) &&
+                (TextUtils.equals(defFileUri.getScheme(), "file"))) {
+                prefs.edit().remove(PREF_DEF_FILE).apply();
+            }
         }
     }
 }

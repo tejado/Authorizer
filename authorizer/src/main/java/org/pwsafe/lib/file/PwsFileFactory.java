@@ -16,9 +16,9 @@ import org.pwsafe.lib.exception.InvalidPassphraseException;
 import org.pwsafe.lib.exception.PasswordSafeException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 
 /**
  * This is a singleton factory class used to load a PasswordSafe file.  It is
@@ -29,8 +29,8 @@ import java.io.UnsupportedEncodingException;
  */
 public class PwsFileFactory
 {
-    private static final Log LOG = Log
-            .getInstance(PwsFileFactory.class.getPackage().getName());
+    private static final Log LOG = Log.getInstance(Objects.requireNonNull(
+            PwsFileFactory.class.getPackage()).getName());
 
     private static final int MAX_HEADER_LEN = PwsFile.STUFF_LENGTH +
                                               PwsFile.HASH_LENGTH;
@@ -128,6 +128,7 @@ public class PwsFileFactory
             md = new SHA1();
             md.update(stuff, 0, stuff.length);
             md.update(pw, 0, pw.length);
+            md.finish();
             digest = md.getDigest();
         } finally {
             passwd.close();
@@ -148,6 +149,7 @@ public class PwsFileFactory
 
             md.clear();
             md.update(tmp, 0, tmp.length);
+            md.finish();
 
         } catch (PasswordSafeException e) {
             LOG.error(e.getMessage()); // This should not happen!
@@ -162,11 +164,6 @@ public class PwsFileFactory
      * @param filename the name of the file to open
      * @param passwd   the passphrase for the file
      * @return The correct subclass of {@link PwsFile} for the file.
-     * @throws EndOfFileException
-     * @throws FileNotFoundException
-     * @throws InvalidPassphraseException
-     * @throws IOException
-     * @throws UnsupportedFileVersionException
      */
     public static PwsFile loadFile(String filename,
                                    Owner<PwsPassword>.Param passwd)
@@ -184,10 +181,6 @@ public class PwsFileFactory
      * @param storage the password storage
      * @param passwd  the passphrase for the file
      * @return The correct subclass of {@link PwsFile} for the file.
-     * @throws EndOfFileException
-     * @throws InvalidPassphraseException
-     * @throws IOException
-     * @throws UnsupportedFileVersionException
      */
     public static PwsFile loadFromStorage(PwsStorage storage,
                                           Owner<PwsPassword>.Param passwd)
@@ -212,14 +205,14 @@ public class PwsFileFactory
             file = new PwsFileV1(storage, passwd, encoding);
             rec = (PwsRecordV1)file.readRecord();
             file.close();
+            if (rec == null) {
+                return file;
+            }
 
-            // TODOlib what can we do about this?
-            // it will probably be fooled if someone is daft enough to create
-            // a V1 file with the
-            // title of the first record set to the value of PwsFileV2
-		// .ID_STRING!
-
-            if (rec.getField(PwsRecordV1.TITLE).equals(PwsFileV2.ID_STRING)) {
+            // The test will probably be fooled if someone is daft enough to
+            // create a V1 file with the title of the first record set to the
+            // value of PwsFileV2 .ID_STRING!
+            if (PwsFileV2.isV2Header(rec)) {
                 file = new PwsFileV2(storage, passwd, encoding);
             } else {
                 file = new PwsFileV1(storage, passwd, encoding);

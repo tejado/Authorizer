@@ -12,6 +12,8 @@ import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.util.AttributeSet;
 
+import net.tjado.passwdsafe.lib.view.GuiUtils;
+
 /**
  * The keyboard view for the PasswdSafe IME
  */
@@ -24,6 +26,7 @@ public class PasswdSafeIMEKeyboardView extends KeyboardView
                                      AttributeSet attrs)
     {
         super(context, attrs);
+        GuiUtils.disableForceDark(this);
     }
 
     /**
@@ -33,13 +36,13 @@ public class PasswdSafeIMEKeyboardView extends KeyboardView
                                      int defStyleAttr)
     {
         super(context, attrs, defStyleAttr);
+        GuiUtils.disableForceDark(this);
     }
 
     @Override
     protected boolean onLongPress(Keyboard.Key key)
     {
         switch (key.codes[0]) {
-        case ' ':
         case PasswdSafeIME.KEYBOARD_NEXT_KEY:
         case PasswdSafeIME.KEYBOARD_CHOOSE_KEY: {
             getOnKeyboardActionListener().onKey(

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2017 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,41 +7,47 @@
  */
 package net.tjado.passwdsafe.file;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 
+import net.tjado.passwdsafe.R;
 import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.lib.view.TypefaceUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class PasswdHistory
 {
     public static class Entry implements Comparable<Entry>
     {
-        private final Date itsDate;
+        private Date itsDate;
         private final String itsPasswd;
 
-        public Entry(Date date, String passwd)
+        protected Entry(Date date, String passwd)
         {
             itsDate = date;
             itsPasswd = passwd;
         }
 
-        public Date getDate()
+        protected Date getDate()
         {
             return itsDate;
+        }
+
+        protected void setDate(Date date)
+        {
+            itsDate = date;
         }
 
         public String getPasswd()
@@ -56,6 +62,7 @@ public class PasswdHistory
         }
 
         @Override
+        @NonNull
         public String toString()
         {
             return itsPasswd + " [" + itsDate + "]";
@@ -71,44 +78,44 @@ public class PasswdHistory
     private final List<Entry> itsPasswds = new ArrayList<>();
 
     public PasswdHistory(String historyStr)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         int historyLen = historyStr.length();
         if (historyLen < 5) {
             throw new IllegalArgumentException(
-                "Field length (" + historyLen + ") too short: " + 5);
+                    "Field length (" + historyLen + ") too short: " + 5);
         }
 
         itsIsEnabled = historyStr.charAt(0) != '0';
         itsMaxSize = Integer.parseInt(historyStr.substring(1, 3), 16);
         if (itsMaxSize > 255) {
             throw new IllegalArgumentException(
-                "Invalid max size: " + itsMaxSize);
+                    "Invalid max size: " + itsMaxSize);
         }
 
         int numEntries = Integer.parseInt(historyStr.substring(3, 5), 16);
         if (numEntries > 255) {
             throw new IllegalArgumentException(
-                "Invalid numEntries: " + numEntries);
+                    "Invalid numEntries: " + numEntries);
         }
 
         int pos = 5;
         while (pos < historyLen) {
             if (pos + 12 >= historyLen) {
                 throw new IllegalArgumentException(
-                    "Field length (" + historyLen + ") too short: " +
-                    (pos + 12));
+                        "Field length (" + historyLen + ") too short: " +
+                        (pos + 12));
             }
 
             long date = Long.parseLong(historyStr.substring(pos, pos + 8), 16);
             int passwdLen =
-                Integer.parseInt(historyStr.substring(pos + 8, pos + 12), 16);
+                    Integer.parseInt(historyStr.substring(pos + 8, pos + 12), 16);
             pos += 12;
 
             if (pos + passwdLen > historyLen) {
                 throw new IllegalArgumentException(
-                    "Field length (" + historyLen + ") too short: " +
-                    (pos + passwdLen));
+                        "Field length (" + historyLen + ") too short: " +
+                        (pos + passwdLen));
             }
 
             String passwd = historyStr.substring(pos, pos + passwdLen);
@@ -171,12 +178,25 @@ public class PasswdHistory
             if (passwdDate == null) {
                 passwdDate = new Date();
             }
+
+            // Adjust times of current entries if they are later than the
+            // date for the new password.  Ensure the same relative ordering
+            // is kept.
+            Date maxDate = passwdDate;
+            for (Entry entry: itsPasswds) {
+                if (entry.getDate().compareTo(maxDate) >= 0) {
+                    entry.setDate(maxDate);
+                    maxDate = new Date(maxDate.getTime() - 1*1000);
+                }
+            }
+
             itsPasswds.add(new Entry(passwdDate, passwd));
             Collections.sort(itsPasswds);
         }
     }
 
     @Override
+    @NonNull
     public String toString()
     {
         StringBuilder strbld = new StringBuilder();
@@ -267,25 +287,27 @@ public class PasswdHistory
         /**
          * Constructor
          */
-        public HistoryAdapter(ArrayList<Entry> entries,
-                              boolean enabled,
-                              boolean hasContextMenu,
-                              Context ctx)
+        protected HistoryAdapter(ArrayList<Entry> entries,
+                                 boolean enabled,
+                                 boolean hasContextMenu,
+                                 Context ctx)
         {
-            super(ctx, net.tjado.passwdsafe.R.layout.passwd_history_list_item, entries);
+            super(ctx, R.layout.passwd_history_list_item, entries);
             itsIsEnabled = enabled;
             itsHasContextMenu = hasContextMenu;
             itsInflater = LayoutInflater.from(ctx);
         }
 
+        @NonNull
         @Override
-        public View getView(int position, View convertView, ViewGroup parent)
+        public View getView(int position, View convertView,
+                            @NonNull ViewGroup parent)
         {
             ViewHolder itemViews;
             Context ctx = getContext();
             if (convertView == null) {
                 convertView = itsInflater.inflate(
-                        net.tjado.passwdsafe.R.layout.passwd_history_list_item, parent, false);
+                        R.layout.passwd_history_list_item, parent, false);
                 itemViews = new ViewHolder(convertView, itsIsEnabled,
                                            itsHasContextMenu, ctx);
                 convertView.setTag(itemViews);
@@ -294,7 +316,9 @@ public class PasswdHistory
             }
 
             Entry entry = getItem(position);
-            itemViews.update(entry, ctx);
+            if (entry != null) {
+                itemViews.update(entry, ctx);
+            }
             return convertView;
         }
 
@@ -309,21 +333,20 @@ public class PasswdHistory
             /**
              * Constructor
              */
-            public ViewHolder(View view,
-                              boolean enabled,
-                              boolean hasContextMenu,
-                              Context ctx)
+            protected ViewHolder(View view,
+                                 boolean enabled,
+                                 boolean hasContextMenu,
+                                 Context ctx)
             {
-                itsPassword = (TextView)view.findViewById(
-                        net.tjado.passwdsafe.R.id.password);
+                itsPassword = view.findViewById(R.id.password);
                 TypefaceUtils.setMonospace(itsPassword, ctx);
-                itsDate = (TextView)view.findViewById(net.tjado.passwdsafe.R.id.date);
+                itsDate = view.findViewById(R.id.date);
 
                 view.setEnabled(enabled);
                 itsPassword.setEnabled(enabled);
                 itsDate.setEnabled(enabled);
 
-                View menuBtn = view.findViewById(net.tjado.passwdsafe.R.id.item_menu);
+                View menuBtn = view.findViewById(R.id.item_menu);
                 if (hasContextMenu) {
                     menuBtn.setEnabled(enabled);
                     menuBtn.setOnClickListener(this);
@@ -335,7 +358,7 @@ public class PasswdHistory
             /**
              * Update the layout fields with values from the entry
              */
-            public void update(Entry entry, Context ctx)
+            protected void update(Entry entry, Context ctx)
             {
                 itsPassword.setText(entry.getPasswd());
                 itsDate.setText(Utils.formatDate(entry.getDate(), ctx));

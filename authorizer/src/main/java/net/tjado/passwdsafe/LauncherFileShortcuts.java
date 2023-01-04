@@ -11,10 +11,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AppCompatActivity;
 
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
@@ -39,7 +39,6 @@ public class LauncherFileShortcuts extends AppCompatActivity
 
         FragmentManager fragMgr = getSupportFragmentManager();
         FragmentTransaction txn = fragMgr.beginTransaction();
-        //txn.replace(R.id.sync, new SyncProviderFragment());
         txn.commit();
 
         if (savedInstanceState == null) {
@@ -95,7 +94,7 @@ public class LauncherFileShortcuts extends AppCompatActivity
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, fileName);
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                             Intent.ShortcutIconResource.fromContext(
-                                this, R.mipmap.ic_launcher_passwdsafe));
+                                    this, R.mipmap.ic_launcher_passwdsafe));
             setResult(RESULT_OK, intent);
         }
 

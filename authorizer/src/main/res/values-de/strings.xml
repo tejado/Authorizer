@@ -16,6 +16,20 @@
     <string name="app_desc">Programm zum Zugriff und Bearbeiten von PasswordSafe-Datenbanken für Android</string>
     <string name="app_name">Authorizer</string>
     <string name="at_least">Mind.</string>
+    <string name="backup_creation_failed">Backup fehlgeschlagen</string>
+    <string name="backup_file">Backupdatei</string>
+    <string name="backup_file_help">
+        Um eine Backupdatei wiederherzustellen, wählen Sie sie auf und öffnen
+        sie. Danach wählen Sie das Wiederherstellen-Icon um die Originaldatei
+        zu ersetzen. Die Wiederherstellung kann nicht möglich sein, wenn die
+        Berechtigung für die Originaldatei fehlt. Eine geöffnete Backupdatei
+        kann vom Gerät exportiert werden.
+        \n
+        \nBackupdateien sind in einem privaten Verzeichnis gespeichert Die
+        Dateien werden gelöscht, wenn die App deinstalliert wird oder die Daten
+        gelöscht werden.
+    </string>
+    <string name="backup_for_file_on">Backup für %1$s vom %2$s</string>
     <string name="basic">Allgemein</string>
     <string name="canceled">Abgebrochen</string>
     <string name="cannot_create_file">Datei kann nicht erstellt werden: %1$s</string>
@@ -46,7 +60,8 @@
         Warnung: Alle Apps können den Inhalt der Zwischenablage lesen. Die
         Zwischenablage kann nicht zuverlässig geleert werden. Die alternative
         Tastatur von PasswdSafe ist eine sicherere Möglichkeit um Kennwörter
-        in andere Apps einzufügen.
+        in andere Apps einzufügen.  Auf Aktivieren klicken, um die
+        Tastatureinstellungen zu öffnen.
     </string>
     <string name="copy_url">URL kopieren</string>
     <string name="copy_user">Benutzername kopieren</string>
@@ -62,6 +77,9 @@
     <string name="default_symbols">Standardsymbole</string>
     <string name="default_symbols_empty_pref">Leere Voreinstellung für Standardsymbole verwenden: %1$s</string>
     <string name="delete">Löschen</string>
+    <string name="delete_all">Alle löschen</string>
+    <string name="delete_all_backups_p">Alle Backups löschen?</string>
+    <string name="delete_backup_p">Backup löschen?</string>
     <string name="delete_file">Datei löschen</string>
     <string name="delete_file_msg">Datei \"%1$s\" löschen?</string>
     <string name="delete_policy">Regel löschen</string>
@@ -100,21 +118,22 @@
     <string name="file_name">Dateiname</string>
     <string name="file_not_found_perm_denied">Datei nicht gefunden oder keine Berechtigung</string>
     <string name="file_open_help">
-        Dateipasswörter können auf dem Gerät gespeichert werden, wenn ein
-        Fingerabdrucksensor und Android 6.0 oder höher vorhanden sind. Die
-        Passwörter werden mittels AES-256-Schlüssel verschlüsselt, welcher
-        per Fingerabdruck gesichert wird.
+        Dateipasswörter können mit biometrischen Merkmalen auf Geräten mit
+        Android 6.0 oder höher gesichert werden. Passwörter werden mit einem
+        AES-256-Schlüssel verschlüsselt und sind durch biometrischen Merkmale
+        geschützt.
         \n
-        - Um ein Passwort zu speichern, muss ein Fingerabdruck in den Sicherheits-
-        Einstellungen auf dem Gerät registriert sein. Setze danach das Häkchen bei
-        \"Passwort speichern\", gib das Passwort ein und bestätige mit OK. Nachdem
-        das Passwort überprüft wurde, wird nach dem Fingerabdruck gefragt.
-        Das Passwort wird verschlüsselt gespeichert und die Datei wird geöffnet.
+        - Bevor ein Passwort gepeichert werden kann, stellen Sie sicher, dass
+        ein biometrisches Merkmal auf Ihrem Gerät in den
+        Sicherheitseinstellungen registriert ist. Danach klicken Sie auf
+        "Passwort speichern" und werden dann aufgefordert ihr biometrisches
+        Merkmal zu erfassen. Ihr Passwort wird dann verschlüsselt und
+        gespeichert.
         \n
-        - Um ein gespeichertes Passwort zu nutzen, einfach beim Öffnen einer
-        Passwortdatei den Fingerabdrucksensor berühren anstatt das Passwort
-        einzugeben. Wenn ein YubiKey zum Einsatz kommt, wird dieser nach dem
-        Fingerabdruck gelesen.
+        Um das gespeicherte Passwort zu nutzen, erfassen sie das biometrische
+        Merkmal statt das Passwort einzugeben. Wenn dies erfolgreich ist, wird
+        die Datei freigegeben. Wenn Sie einen YubiKey benutzen, wird dieser
+        nach dem Erfassen des biometrischen Merkmals gelesen.
         \n
         - Um ein gespeichertes Passwort zu löschen, das Häkchen bei \"Passwort
         speichern\" entfernen und die Datei wie gewohnt mit Eingabe des Passworts
@@ -136,7 +155,6 @@
     <string name="file_operations">Datei …</string>
     <string name="file_password_encoding">Passwortkodierung</string>
     <string name="files">Dateien</string>
-    <string name="fingerprint_not_recognized">Fingerabdruck nicht erkannt</string>
     <string name="generate">Erzeugen</string>
     <string name="generate_password">Passwort erzeugen</string>
     <string name="go">Los</string>
@@ -161,7 +179,7 @@
     <string name="invalid_option_length">Ungültige Optionslänge</string>
     <string name="invalid_password">Ungültiges Passwort</string>
     <string name="key_error">Schlüsselfehler für %1$s: %2$s</string>
-    <string name="key_not_found">Schlüssel nicht gefunden: $1%s</string>
+    <string name="key_not_found">Schlüssel nicht gefunden: %1$s</string>
     <string name="kitkat_sdcard_warning">
         %1$s
         \n\nAuf Android KitKat und höher können Apps nicht auf 
@@ -183,6 +201,7 @@
     <string name="max_size_label">Anzahl:</string>
     <string name="menu">Menü</string>
     <string name="modified">Geändert</string>
+    <string name="modify">Bearbeiten</string>
     <string name="monospace">Monospace-Schrift</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
@@ -201,7 +220,9 @@
     <string name="new_policy">Neue Regel</string>
     <string name="next">Weiter</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
+    <string name="no_backup_file">Keine Backupdatei</string>
     <string name="no_biometrics_registered">Es ist kein biometrisches Merkmal registriert</string>
+    <string name="no_errors">Keine Fehler</string>
     <string name="no_file_permission">
         PasswdSafe benötigt Speicherberechtigung
         \n\nDrücke Neu Laden um diese neu zu gewähren, wenn dies nicht geht,
@@ -216,15 +237,16 @@
         anzuzeigen.\n
         - Nutze das Menü oben links um einen anderen Dateiort auszuwählen.
     </string>
-    <string name="no_fingerprints_registered">Keine Fingerabdrücke registriert</string>
     <string name="no_groups">Keine Gruppen</string>
-    <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
+    <string name="no_permission">Keine Berechtigung</string>
     <string name="no_policies">Keine Regeln</string>
     <string name="no_records">Keine Einträge</string>
     <string name="no_records_open_file">Keine Einträge. Öffne eine Datei und probier es nochmal.</string>
+    <string name="no_shortcut_chosen">Keine Verknüpfung ausgewählt</string>
     <string name="none_paren">(Keine)</string>
     <string name="none_selected_open">Nichts gewählt. Öffne eine Datei in PasswdSafe.</string>
     <string name="notes">Notizen</string>
+    <string name="notes_truncated_msg">\ … (gekürzt)</string>
     <string name="num_records">Anzahl Einträge</string>
     <string name="ok">OK</string>
     <string name="open_file">%s öffnen</string>
@@ -249,7 +271,15 @@
     <string name="password_record">Passworteintrag</string>
     <string name="password_save_canceled_key_error">Speichern des Passworts abgebrochen. Verschlüsselungsschlüssel konnte nicht erstellt werden: %1$s</string>
     <string name="password_saved">Passwort gespeichert</string>
+    <string name="password_subset">Passwortteilmenge</string>
+    <string name="password_subset_error">
+        Positionen sind getrennt durch Leerzeichen, Kommata oder Semikolons.
+        Sie sind nummeriert von 1 bis zur Passwortlänge, %1$d. Negative Werte
+        zählen vom Ende des Passworts.
+    </string>
+    <string name="password_subset_hint">Passwortteilmenge. z.B. 1,5,-1</string>
     <string name="password_times_header">PASSWORTZEITEN</string>
+    <string name="password_visibility_timeout">Passwort automatisch verbergen</string>
     <string name="password_with_expiration">Passwort mit Ablaufdatum</string>
     <string name="passwords">Passwörter</string>
     <string name="passwords_do_not_match">Passwörter stimmen nicht überein</string>
@@ -264,6 +294,7 @@
     <string name="press_again_close_warning">Erneut drücken, um die Datei zu schließen</string>
     <string name="press_password_warning">Passwort erneut berühren, um es in ein sichtbares Feld zu kopieren</string>
     <string name="press_yubikey">Drücken Sie die YubiKey</string>
+    <string name="previous">Vorheriges</string>
     <string name="protect_all">Alle Einträge schützen</string>
     <string name="protect_group">Gruppe schützen</string>
     <string name="protected_record">Geschützt</string>
@@ -273,37 +304,71 @@
     <string name="recent_files">Letzte</string>
     <string name="record">Eintrag</string>
     <string name="records">Einträge</string>
+    <string name="record_errors">Eintragsfehler</string>
+    <string name="record_error_note">
+        Ein oder mehrere Einträge konnten nicht geladen werden. Die erfolgreich
+        geladenenen Einträge sind verfügbar, die Fehler werden darunter
+        aufgelistet.
+
+        \n\nUm die Datei zu retten, gehe in das Menü um sie zu speichern oder
+        zu exportieren. So werden die fehlerfreien Einträge erhalten.
+    </string>
     <string name="record_has_references">Eintrag mit Verweisen</string>
     <string name="record_not_found">Eintrag nicht gefunden</string>
     <string name="record_policy">Eintragsregeln</string>
+    <string name="record_sort_field">Sortiere Einträge nach</string>
     <string name="record_sort_order">Sortierreihenfolge für Einträge</string>
     <string name="record_type">Eintragstyp</string>
     <string name="read_only_about">Nur Lesen</string>
-    <string name="read_only_file">Schreibgeschützt</string><!-- Open File dialog should use 'Schreibgeschützt', About screen should use 'Nur Lesen' -->
     <string name="read_only_media">Datei befindet sich auf einem schreibgeschützten Medium. Dies kann auf KitKat und höher bei entnehmbaren SD-Karten passieren.</string>
+    <string name="read_only_provider">
+        Der Dienst für der Datei unterstützt kein Schreiben oder es wurde keine
+        Erlaubnis zum Schreiben erteilt
+    </string>
+    <string name="read_only_sdcard">
+        Die Datei befindet sich der SD-Karte, welche schreibgeschützt ist.
+        Verschieben Sie die Datei in den internen Speicher or benutzen Sie den
+        neuen Dateiauswahldialog, welcher in den Einstellungen aktiviert werden
+        kann.
+    </string>
     <string name="read_write">Lesen und Schreiben</string>
+    <string name="recurring">Wiederkehrend</string>
     <string name="references_label">VERWEISE</string>
     <string name="regular_expression">Reguläre Ausdrücke</string>
     <string name="regular_expression_summary">Suche mit regulären Ausdrücken statt Wortteilen.</string>
     <string name="remove">Entfernen</string>
-    <string name="recurring">Wiederkehrend</string>
+    <string name="restore">Wiederherstellen</string>
+    <string name="restore_failed_msg">Wiederherstellen fehlgeschlagen: %1$s</string>
+    <string name="restore_file_not_accessible">Wiederherstellungs-Datei ist nicht erreichbar</string>
+    <string name="restore_file_not_found">Wiederherstellungs-Datei nicht gefunden</string>
+    <string name="restore_file_not_writable">Wiederherstellungs-Datei schreibgeschützt</string>
+    <string name="restore_file_p">Wiederherstellungs-Datei %1$s vom %2$s</string>
+    <string name="restoring">Wiederherstellen…</string>
     <string name="save">Speichern</string>
     <string name="save_password">Passwort speichern</string>
     <string name="save_password_p">Passwort speichern?</string>
     <string name="save_password_warning">
-        Nachdem die Datei geöffnet wurde, wird das Passwort lokal
-        gespeichert und mit einem AES-256-Schlüssel verschlüsselt. Dieser ist
-        mit dem Fingerabdruck geschützt. Das Benutzen des Fingerabdrucksensors
-        kann unter Umständen unsicherer als das Verwenden des Dateipassworts
-        selbst sein.
+        Wenn die Datei geöffnet ist, wird das Passwort lokal gespeichert. Das
+        Passwort ist mit einem AES-256-Schlüssel verschlüselt und durch ein
+        biometrisches Merkmal geschützt. Biometrischen Merkmale können
+        unsicherer als ein Dateipasswort sein.
+        \n
+        \nDas gespeicherte Passwort kann bei Update oder Fingerabdruckwechsel
+        verloren gehen. Bitte behalten Sie das Passwort im Gedächnis um
+        weiterhin Zugriff auf die Datei zu haben.
     </string>
     <string name="saving_file">Speichere %s …</string>
     <string name="search">Suchen</string>
     <string name="search_hint">In PasswdSafe suchen</string>
     <string name="select_accounts">Konto auswählen</string>
-    <string name="select_file_label">Datei auswählen:</string>
+    <string name="select_file_label">Datei auswählen</string>
     <string name="send">Senden</string>
     <string name="set_password">Passwort wieder verwenden</string>
+    <string name="share">Teilen</string>
+    <string name="share_file">Datei teilen</string>
+    <string name="share_file_msg">Durchs Teilen werden andere Apps Zugriff auf deine Passwörter erhalten</string>
+    <string name="share_file_p">Datei teilen?</string>
+    <string name="sharing_file">Teile %1$s…</string>
     <string name="shortcut_base_record_header">VERKNÜPFUNG</string>
     <string name="shortcut_file">Verknüpfungsdatei</string>
     <string name="shortcut_record">Verknüpfungseintrag</string>
@@ -311,8 +376,11 @@
     <string name="show_backup_files">Zeige Sicherungen an</string>
     <string name="show_password">Passwort anzeigen</string>
     <string name="show_passwords">Passwörter anzeigen</string>
+    <string name="sort">Sortieren</string>
+    <string name="sort_ascending">Aufsteigend sortieren</string>
     <string name="symbols_used_by_default">Standardsymbole in der Passwortregel: %1$s</string>
     <string name="sync">Synchronisieren</string>
+    <string name="theme">Theme</string>
     <string name="times_header">ZEITEN</string>
     <string name="title">Titel</string>
     <string name="touch_sensor_to_save_the_password">Sensor berühren um das Passwort zu speichern</string>
@@ -324,13 +392,15 @@
     <string name="username">Benutzername</string>
     <string name="use_count">Verwendungen</string>
     <string name="use_digits">Ziffern</string>
-    <string name="use_light_theme">Benutze helles Design</string>
     <string name="use_lowercase">Kleinbuchstaben</string>
     <string name="use_symbols">Symbole</string>
     <string name="use_uppercase">Großbuchstaben</string>
     <string name="username_header">BENUTZERNAME</string>
+    <string name="vibrate_keyboard_on_press">Vibrieren bei Tastendruck</string>
+    <string name="view">Ansehen</string>
     <string name="view_password_expirations">Passwortlaufzeiten anzeigen</string>
     <string name="word_wrap">Zeilenumbruch</string>
+    <string name="writable">Beschreibbar</string>
     <string name="yes">Ja</string>
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey deaktiviert. NFC einschalten, um es benutzen zu können.</string>
@@ -517,6 +587,13 @@
         <item>1 Stunde</item>
     </string-array>
 
+    <!-- Order must match constants in RecordFieldSortPref -->
+    <string-array name="record_field_sort_pref">
+        <item>Titel</item>
+        <item>Erstellungsdatum</item>
+        <item>Änderungsdatum</item>
+    </string-array>
+
     <!-- Order must match constants in RecordSortOrderPref -->
     <string-array name="record_sort_order_pref">
         <item>Gruppen zuerst</item>
@@ -531,7 +608,7 @@
         <item>Verknüpfung</item>
     </string-array>
 
-    <!-- Order must match values of PasswdRecordFilter.ExpiryFilter -->
+    <!-- Order must match values of PasswdExpiryFilter -->
     <string-array name="expire_filters">
         <item>Abgelaufen</item>
         <item>Heute</item>
@@ -543,7 +620,7 @@
         <item>Eigener Zeitraum</item>
     </string-array>
 
-    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <!-- Indexes must match PasswdExpiryFilter -->
     <string-array name="expire_filter_record">
         <item>1 Passwort ist abgelaufen</item>
         <item>1 Passwort läuft heute ab</item>
@@ -553,7 +630,7 @@
         <item>1 Passwort läuft innerhalb 1 Jahr ab</item>
     </string-array>
 
-    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <!-- Indexes must match PasswdExpiryFilter -->
     <string-array name="expire_filter_records">
         <item>%1$s Passwörter ist abgelaufen</item>
         <item>%1$s Passwörter läuft heute ab</item>
@@ -573,6 +650,22 @@
         <item>In 1 Monat</item>
         <item>In 1 Jahr</item>
      </string-array>
+
+    <!-- Order must match PasswdTimeoutPref enum values -->
+    <string-array name="passwd_timeout_pref">
+        <item>Keine</item>
+        <item>15 Sekunden</item>
+        <item>30 Sekunden</item>
+        <item>1 Minute</item>
+        <item>5 Minuten</item>
+    </string-array>
+
+    <!-- Order must match ThemePref enum values -->
+    <string-array name="theme_pref">
+        <item>Wie System</item>
+        <item>Immer hell</item>
+        <item>Immer dunkel</item>
+    </string-array>
 
     <!-- Order must match constants in PasswdExpiration.Type -->
     <string-array name="expire_type">

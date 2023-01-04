@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -12,7 +12,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,11 +19,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 
+import net.tjado.passwdsafe.file.PasswdNotes;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
-import net.tjado.passwdsafe.lib.view.GuiUtils;
-import net.tjado.passwdsafe.view.PasswdLocation;
 import net.tjado.passwdsafe.lib.view.TypefaceUtils;
+import net.tjado.passwdsafe.view.PasswdLocation;
 
 
 /**
@@ -54,13 +54,14 @@ public class PasswdSafeRecordNotesFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState)
     {
         setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record_notes,
                                      container, false);
-        itsNotes = (TextView)root.findViewById(R.id.notes);
+        itsNotes = root.findViewById(R.id.notes);
         itsNotes.setTextIsSelectable(true);
         return root;
     }
@@ -68,30 +69,25 @@ public class PasswdSafeRecordNotesFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId()) {
-        case R.id.menu_copy_notes: {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_copy_notes) {
             PasswdSafeUtil.copyToClipboard(itsNotes.getText().toString(),
                                            true, getActivity());
             return true;
-        }
-        case R.id.menu_monospace: {
+        } else if (itemId == R.id.menu_monospace) {
             itsIsMonospace = !itsIsMonospace;
             item.setChecked(itsIsMonospace);
             saveNotesOptionsPrefs();
             setNotesOptions();
             return true;
-        }
-        case R.id.menu_word_wrap: {
+        } else if (itemId == R.id.menu_word_wrap) {
             itsIsWordWrap = !itsIsWordWrap;
             item.setChecked(itsIsWordWrap);
             saveNotesOptionsPrefs();
             setNotesOptions();
             return true;
         }
-        default: {
-            return super.onOptionsItemSelected(item);
-        }
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -130,8 +126,9 @@ public class PasswdSafeRecordNotesFragment
         switch (info.itsPasswdRec.getType()) {
         case NORMAL:
         case ALIAS: {
-            String notes = info.itsFileData.getNotes(info.itsRec);
-            itsNotes.setText(notes);
+            PasswdNotes notes = info.itsFileData.getNotes(info.itsRec,
+                                                          getContext());
+            itsNotes.setText(notes.getNotes());
             break;
         }
         case SHORTCUT: {
@@ -140,7 +137,7 @@ public class PasswdSafeRecordNotesFragment
         }
 
         SharedPreferences prefs =
-                getActivity().getPreferences(Context.MODE_PRIVATE);
+                requireActivity().getPreferences(Context.MODE_PRIVATE);
         itsIsWordWrap = prefs.getBoolean(WORD_WRAP_PREF, true);
         itsIsMonospace = prefs.getBoolean(MONOSPACE_PREF, false);
         setNotesOptions();
@@ -153,7 +150,7 @@ public class PasswdSafeRecordNotesFragment
     private void saveNotesOptionsPrefs()
     {
         SharedPreferences prefs =
-                getActivity().getPreferences(Context.MODE_PRIVATE);
+                requireActivity().getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(WORD_WRAP_PREF, itsIsWordWrap);
         editor.putBoolean(MONOSPACE_PREF, itsIsMonospace);

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -22,14 +22,15 @@ import static junit.framework.Assert.assertSame;
 /**
  * Unit tests for Owner
  */
+@SuppressWarnings({"ConstantConditions"})
 public class OwnerTest
 {
     private Item itsOwnedItem;
     private Owner<Item> itsItem;
 
-    public static class Item implements Closeable
+    protected static class Item implements Closeable
     {
-        public int itsCloseCount = 0;
+        protected int itsCloseCount = 0;
 
         @Override
         public void close() throws IOException

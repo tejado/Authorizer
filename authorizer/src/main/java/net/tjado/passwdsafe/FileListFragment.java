@@ -8,7 +8,6 @@
 package net.tjado.passwdsafe;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,11 +22,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.fragment.app.ListFragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.app.LoaderManager.LoaderCallbacks;
-import androidx.loader.content.AsyncTaskLoader;
-import androidx.loader.content.Loader;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +34,12 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.ListFragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.Utils;
@@ -77,32 +77,33 @@ public final class FileListFragment extends ListFragment
     }
 
     /** File data information for the list */
-    public static final class FileData
+    protected static final class FileData
     {
-        public final File itsFile;
+        private final File itsFile;
         private final String itsName;
 
-        public FileData(File f)
+        private FileData(File f)
         {
             itsFile = f;
             itsName = itsFile.getName();
         }
 
         /** Constructor for a null file */
-        public FileData(Context ctx)
+        private FileData(Context ctx)
         {
             itsFile = null;
             itsName = ctx.getString(R.string.none_paren);
         }
 
         @Override
-        public final String toString()
+        @NonNull
+        public String toString()
         {
             return itsName;
         }
 
         /** Does the data indicate a directory */
-        public boolean isDirectory()
+        private boolean isDirectory()
         {
             return (itsFile != null) && (itsFile.isDirectory());
         }
@@ -119,7 +120,7 @@ public final class FileListFragment extends ListFragment
     private Listener itsListener;
 
     @Override
-    public void onAttach(Context ctx)
+    public void onAttach(@NonNull Context ctx)
     {
         super.onAttach(ctx);
         itsListener = (Listener)ctx;
@@ -130,7 +131,7 @@ public final class FileListFragment extends ListFragment
      * @see android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
      */
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
@@ -151,19 +152,11 @@ public final class FileListFragment extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
-     */
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View viewFrag, Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
-        //noinspection ConstantConditions
-        if (PasswdSafeApp.DEBUG_AUTO_FILE != null) {
-            openFile(new File(PasswdSafeApp.DEBUG_AUTO_FILE));
-        }
-
-        LoaderManager lm = getLoaderManager();
+        super.onViewCreated(viewFrag, savedInstanceState);
+        LoaderManager lm = LoaderManager.getInstance(this);
         lm.initLoader(0, null, this);
     }
 
@@ -185,7 +178,7 @@ public final class FileListFragment extends ListFragment
      * @see android.support.v4.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
      */
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater)
     {
         inflater.inflate(R.menu.fragment_file_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -205,16 +198,14 @@ public final class FileListFragment extends ListFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId()) {
-        case R.id.menu_file_new: {
+        int menuId = item.getItemId();
+        if (menuId == R.id.menu_file_new) {
             if (itsDir != null) {
                 itsListener.createNewFile(Uri.fromFile(itsDir));
             }
             return true;
-        }
-        default: {
+        } else {
             return super.onOptionsItemSelected(item);
-        }
         }
     }
 
@@ -223,7 +214,7 @@ public final class FileListFragment extends ListFragment
      * @see android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
      */
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id)
+    public void onListItemClick(ListView l, @NonNull View v, int position, long id)
     {
         @SuppressWarnings("unchecked")
         Map<String, Object> item =
@@ -248,37 +239,32 @@ public final class FileListFragment extends ListFragment
     @Override
     public void onClick(View v)
     {
-        switch (v.getId()) {
-        case R.id.current_group_panel: {
+        int id = v.getId();
+        if (id == R.id.current_group_panel) {
             doParentPressed();
-            break;
-        }
-        case R.id.home: {
+        } else if (id == R.id.home) {
             doHomePressed();
-            break;
-        }
         }
     }
 
     @Override
     public boolean onLongClick(View v)
     {
-        switch (v.getId()) {
-        case R.id.current_group_panel: {
+        int id = v.getId();
+        if (id == R.id.current_group_panel) {
             Toast.makeText(getContext(), R.string.parent_directory,
                            Toast.LENGTH_SHORT).show();
             return true;
-        }
-        case R.id.home: {
+        } else if (id == R.id.home) {
             Toast.makeText(getContext(), R.string.home,
                            Toast.LENGTH_SHORT).show();
             return true;
-        }
         }
         return false;
     }
 
     /** Create a loader for files */
+    @NonNull
     @Override
     public Loader<List<Map<String, Object>>> onCreateLoader(int id, Bundle args)
     {
@@ -288,7 +274,7 @@ public final class FileListFragment extends ListFragment
 
     /** Callback when a loader is finished */
     @Override
-    public void onLoadFinished(Loader<List<Map<String, Object>>> loader,
+    public void onLoadFinished(@NonNull Loader<List<Map<String, Object>>> loader,
                                List<Map<String, Object>> data)
     {
         updateFiles(data);
@@ -296,7 +282,7 @@ public final class FileListFragment extends ListFragment
 
     /** Callback when a loader is reset */
     @Override
-    public void onLoaderReset(Loader<List<Map<String, Object>>> loader)
+    public void onLoaderReset(@NonNull Loader<List<Map<String, Object>>> loader)
     {
         updateFiles(null);
     }
@@ -321,22 +307,20 @@ public final class FileListFragment extends ListFragment
             final boolean showHiddenFiles,
             @SuppressWarnings("SameParameterValue") final boolean showDirs)
     {
-        File[] files = dir.listFiles(new FileFilter() {
-            public final boolean accept(File pathname) {
-                String filename = pathname.getName();
-                if (pathname.isDirectory()) {
-                    return showDirs &&
-                            (showHiddenFiles ||
-                             !(filename.startsWith(".") ||
-                               filename.equalsIgnoreCase("LOST.DIR")));
-                }
-                return filename.endsWith(".psafe3") ||
-                        filename.endsWith(".dat") ||
-                        (showHiddenFiles &&
-                                (filename.endsWith(".psafe3~") ||
-                                 filename.endsWith(".dat~") ||
-                                 filename.endsWith(".ibak")));
+        File[] files = dir.listFiles(pathname -> {
+            String filename = pathname.getName();
+            if (pathname.isDirectory()) {
+                return showDirs &&
+                       (showHiddenFiles ||
+                        !(filename.startsWith(".") ||
+                          filename.equalsIgnoreCase("LOST.DIR")));
             }
+            return filename.endsWith(".psafe3") ||
+                   filename.endsWith(".dat") ||
+                   (showHiddenFiles &&
+                    (filename.endsWith(".psafe3~") ||
+                     filename.endsWith(".dat~") ||
+                     filename.endsWith(".ibak")));
         });
 
         FileData[] data;
@@ -364,7 +348,7 @@ public final class FileListFragment extends ListFragment
             itsDir = getFileDir();
         }
 
-        LoaderManager lm = getLoaderManager();
+        LoaderManager lm = LoaderManager.getInstance(this);
         lm.restartLoader(0, null, this);
     }
 
@@ -378,38 +362,23 @@ public final class FileListFragment extends ListFragment
                                         new String[] { TITLE, ICON, MOD_DATE },
                                         new int[] { R.id.text, R.id.icon,
                                                     R.id.mod_date });
-            adapter.setViewBinder(new SimpleAdapter.ViewBinder()
-            {
-                @Override
-                public boolean setViewValue(View view,
-                                            Object data,
-                                            String textRepresentation)
-                {
-                    switch (view.getId()) {
-                        case R.id.icon: {
-                            ImageView iv = (ImageView)view;
-                            iv.setImageResource((int) data);
-                            iv.setColorFilter(getResources().getColor(R.color.treeview_icons));
-                            return true;
-                        }
-                        case R.id.text: {
-                            TextView tv = (TextView)view;
-                            tv.setText(textRepresentation);
-                            tv.requestLayout();
-                            return true;
-                        }
-                        case R.id.mod_date: {
-                            if (data == null) {
-                                view.setVisibility(View.GONE);
-                                return true;
-                            } else {
-                                view.setVisibility(View.VISIBLE);
-                                return false;
-                            }
-                        }
+            adapter.setViewBinder((view, data, textRepresentation) -> {
+                int id = view.getId();
+                if (id == R.id.text) {
+                    TextView tv = (TextView)view;
+                    tv.setText(textRepresentation);
+                    tv.requestLayout();
+                    return true;
+                } else if (id == R.id.mod_date) {
+                    if (data == null) {
+                        view.setVisibility(View.GONE);
+                        return true;
+                    } else {
+                        view.setVisibility(View.VISIBLE);
+                        return false;
                     }
-                    return false;
                 }
+                return false;
             });
         }
 
@@ -419,10 +388,8 @@ public final class FileListFragment extends ListFragment
             return;
         }
         View groupPanel = rootView.findViewById(R.id.current_group_panel);
-        TextView groupLabel =
-                (TextView)rootView.findViewById(R.id.current_group_label);
-        TextView emptyLabel =
-                (TextView)rootView.findViewById(android.R.id.empty);
+        TextView groupLabel = rootView.findViewById(R.id.current_group_label);
+        TextView emptyLabel = rootView.findViewById(android.R.id.empty);
         if (itsDir == null) {
             groupPanel.setVisibility(View.GONE);
             groupLabel.setText("");
@@ -437,7 +404,7 @@ public final class FileListFragment extends ListFragment
 
         // Open the default file
         if (getListAdapter() != null) {
-            Activity act = getActivity();
+            Activity act = requireActivity();
             PasswdSafeApp app = (PasswdSafeApp)act.getApplication();
             if (app.checkOpenDefault()) {
                 SharedPreferences prefs = Preferences.getSharedPrefs(act);
@@ -528,7 +495,7 @@ public final class FileListFragment extends ListFragment
         private final int itsFileIcon;
 
         /** Constructor */
-        public FileLoader(File dir, boolean includeNone, Context context)
+        protected FileLoader(File dir, boolean includeNone, Context context)
         {
             super(context);
             itsDir = dir;

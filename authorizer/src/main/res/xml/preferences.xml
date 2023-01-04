@@ -11,131 +11,179 @@
                   xmlns:tools="http://schemas.android.com/tools"
                   android:key="top_prefs">
 
-    <PreferenceCategory android:key="fileOptions"
-                        android:title="@string/files">
+    <PreferenceScreen android:key="fileOptions"
+        android:title="@string/files">
+        <PreferenceCategory android:title="@string/files">
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongEditTextPreference
-            android:name="FileDir Pref"
-            android:key="fileDirPref"
-            android:title="@string/directory_for_files"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongEditTextPreference
+                android:name="FileDir Pref"
+                android:key="fileDirPref"
+                android:title="@string/directory_for_files"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongPreference
-            android:name="defaultFile Pref"
-            android:key="defFilePref"
-            android:title="@string/default_file_to_open"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongPreference
+                android:name="defaultFile Pref"
+                android:key="defFilePref"
+                android:title="@string/default_file_to_open"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongListPreference
-            android:name="fileTimeout Pref"
-            android:key="fileCloseTimeoutPref"
-            android:title="@string/file_close_timeout"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongListPreference
+                android:name="fileTimeout Pref"
+                android:key="fileCloseTimeoutPref"
+                android:title="@string/file_close_timeout"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="fileCloseScreenOff Pref"
-            android:defaultValue="false"
-            android:key="fileCloseScreenOffPref"
-            android:title="@string/close_file_screen_off"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="fileCloseScreenOff Pref"
+                android:defaultValue="false"
+                android:key="fileCloseScreenOffPref"
+                android:title="@string/close_file_screen_off"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongListPreference
-            android:name="fileBackup Pref"
-            android:key="fileBackupPref"
-            android:title="@string/file_backups"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongListPreference
+                android:name="fileBackup Pref"
+                android:key="fileBackupPref"
+                android:title="@string/file_backups"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="showBackupFiles Pref"
-            android:defaultValue="false"
-            android:key="showBackupFilesPref"
-            android:title="@string/show_backup_files"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="showBackupFiles Pref"
+                android:defaultValue="false"
+                android:key="showBackupFilesPref"
+                android:title="@string/show_backup_files"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="fileBackupUsbGpg Pref"
-            android:defaultValue="false"
-            android:key="fileBackupUsbGpgPref"
-            android:title="@string/file_backup_usb_gpg"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="fileBackupUsbGpg Pref"
+                android:defaultValue="false"
+                android:key="fileBackupUsbGpgPref"
+                android:title="@string/file_backup_usb_gpg"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="fileCloseClearClipboard Pref"
-            android:defaultValue="true"
-            android:key="fileCloseClearClipboardPref"
-            android:title="@string/clear_clipboard_on_close"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="fileCloseClearClipboard Pref"
+                android:defaultValue="true"
+                android:key="fileCloseClearClipboardPref"
+                android:title="@string/clear_clipboard_on_close"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="fileLegacyFileChooser Pref"
-            android:defaultValue="true"
-            android:key="fileLegacyFileChooserPref"
-            android:summary="@string/legacy_file_chooser_summary"
-            android:title="@string/legacy_file_chooser"/>
-    </PreferenceCategory>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="fileLegacyFileChooser Pref"
+                android:defaultValue="true"
+                android:key="fileLegacyFileChooserPref"
+                android:summary="@string/legacy_file_chooser_summary"
+                android:title="@string/legacy_file_chooser"/>
+        </PreferenceCategory>
+    </PreferenceScreen>
 
-    <PreferenceCategory android:key="passwordOptions"
-                        android:title="@string/passwords">
+    <PreferenceScreen android:key="passwordOptions"
+        android:title="@string/passwords">
+        <PreferenceCategory android:title="@string/passwords">
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongListPreference
-            android:name="passwordEncoding Pref"
-            android:key="passwordEncodingPref"
-            android:title="@string/file_password_encoding"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongListPreference
+                android:name="passwordVisibleTimeout Pref"
+                android:key="passwordVisibleTimeoutPref"
+                android:title="@string/password_visibility_timeout"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongListPreference
-            android:name="passwordExpiryNotify Pref"
-            android:key="passwordExpiryNotifyPref"
-            android:title="@string/expired_password_notification"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongListPreference
+                android:name="passwordEncoding Pref"
+                android:key="passwordEncodingPref"
+                android:title="@string/file_password_encoding"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongEditTextPreference
-            android:key="passwordDefaultSymbolsPref"
-            android:title="@string/default_symbols"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongListPreference
+                android:name="passwordExpiryNotify Pref"
+                android:key="passwordExpiryNotifyPref"
+                android:title="@string/expired_password_notification"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongPreference
-            android:key="passwordClearAllNotifsPref"
-            android:summary="@string/erase_all_expiration_notifications"
-            android:title="@string/clear_password_notifications"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongEditTextPreference
+                android:key="passwordDefaultSymbolsPref"
+                android:title="@string/default_symbols"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongPreference
-            android:key="passwordClearAllSavedPref"
-            android:summary="@string/erase_all_saved_passwords"
-            android:title="@string/clear_all_saved_passwords"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongPreference
+                android:key="passwordClearAllNotifsPref"
+                android:summary="@string/erase_all_expiration_notifications"
+                android:title="@string/clear_password_notifications"/>
 
-    </PreferenceCategory>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongPreference
+                android:key="passwordClearAllSavedPref"
+                android:summary="@string/erase_all_saved_passwords"
+                android:title="@string/clear_all_saved_passwords"/>
+        </PreferenceCategory>
 
-    <PreferenceCategory android:key="recordOptions"
-                        android:title="@string/records">
+        <PreferenceCategory android:key="usbkbdOutputOptions"
+            android:title="@string/autotype_header">
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="sortCaseSensitive Pref"
-            android:defaultValue="true"
-            android:key="sortCaseSensitivePref"
-            android:title="@string/case_sensitive_sorting"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="usbkbdEnable Pref"
+                android:defaultValue="true"
+                android:key="usbkbdEnablePref"
+                android:title="@string/autotype_usb_enable"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="groupRecords Pref"
-            android:defaultValue="true"
-            android:key="groupRecordsPref"
-            android:title="@string/group_records"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="bluetoothkbdEnable Pref"
+                android:defaultValue="true"
+                android:key="bluetoothkbdEnablePref"
+                android:title="@string/autotype_bt_enable"/>
 
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongListPreference
-            android:name="recordSortOrder Pref"
-            android:key="recordSortOrderPref"
-            android:title="@string/record_sort_order"/>
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongListPreference
+                android:name="usbkbdLanguage Pref"
+                android:key="usbkbdLanguagePref"
+                android:title="@string/autotype_lang"/>
 
-    </PreferenceCategory>
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <PreferenceScreen android:key="recordOptions"
+        android:title="@string/records">
+        <PreferenceCategory android:title="@string/records">
+
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="sortCaseSensitive Pref"
+                android:defaultValue="true"
+                android:key="sortCaseSensitivePref"
+                android:title="@string/case_sensitive_sorting"/>
+
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="sortAscending Pref"
+                android:defaultValue="true"
+                android:key="sortAscendingPref"
+                android:title="@string/sort_ascending"/>
+
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="groupRecords Pref"
+                android:defaultValue="true"
+                android:key="groupRecordsPref"
+                android:title="@string/group_records"/>
+
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongListPreference
+                android:name="recordSortOrder Pref"
+                android:key="recordSortOrderPref"
+                android:title="@string/record_sort_order"/>
+
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongListPreference
+                android:name="recordFieldSortPref"
+                android:key="recordFieldSortPref"
+                android:title="@string/record_sort_field"/>
+        </PreferenceCategory>
+    </PreferenceScreen>
 
     <PreferenceCategory android:key="searchOptions"
-                        android:title="@string/search">
+        android:title="@string/search">
 
         <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongCheckBoxPreference
@@ -158,11 +206,10 @@
                         android:title="@string/display">
 
         <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="displayTheme Pref"
-            android:defaultValue="false"
-            android:key="displayThemeLightPref"
-            android:title="@string/use_light_theme"/>
+        <net.tjado.passwdsafe.view.LongListPreference
+            android:name="displayThemePref"
+            android:key="displayThemePref"
+            android:title="@string/theme"/>
 
         <!--suppress AndroidElementNotAllowed -->
         <net.tjado.passwdsafe.view.LongCheckBoxPreference
@@ -171,30 +218,12 @@
             android:key="displayListTreeViewPref"
             android:title="@string/use_treeview_list"/>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory android:key="usbkbdOutputOptions"
-                        android:title="@string/autotype_header">
-
         <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="usbkbdEnable Pref"
-            android:defaultValue="true"
-            android:key="usbkbdEnablePref"
-            android:title="@string/autotype_usb_enable"/>
-
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongCheckBoxPreference
-            android:name="bluetoothkbdEnable Pref"
-            android:defaultValue="true"
-            android:key="bluetoothkbdEnablePref"
-            android:title="@string/autotype_bt_enable"/>
-
-        <!--suppress AndroidElementNotAllowed -->
-        <net.tjado.passwdsafe.view.LongListPreference
-            android:name="usbkbdLanguage Pref"
-            android:key="usbkbdLanguagePref"
-            android:title="@string/autotype_lang"/>
+        <net.tjado.passwdsafe.lib.view.LongSwitchPreference
+            android:name="displayVibrateKeyboard Pref"
+            android:defaultValue="false"
+            android:key="displayVibrateKeyboard"
+            android:title="@string/vibrate_keyboard_on_press"/>
 
     </PreferenceCategory>
 

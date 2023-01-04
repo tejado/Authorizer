@@ -1,15 +1,11 @@
 /*
- * Copyright (©) 2019 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
  * http://www.opensource.org/licenses/artistic-license-2.0.php
  */
 package net.tjado.passwdsafe.test.file;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
 
 import android.annotation.SuppressLint;
 
@@ -22,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.empty;
@@ -29,10 +26,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
+
 /**
  * Tests for the PasswdPolicy class
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"ConstantConditions"})
 public class PasswdPolicyTest
 {
     //private static final String TAG = "PasswdPolicyTest";
@@ -145,7 +143,7 @@ public class PasswdPolicyTest
 
         assertEquals("0107policy1f00000c00100100100100",
                      PasswdPolicy.hdrPoliciesToString(
-                             Collections.singletonList(policy)));
+                         Collections.singletonList(policy)));
     }
 
     /** Test multiple valid header policies */
@@ -254,11 +252,11 @@ public class PasswdPolicyTest
         StringBuilder policiesStr = new StringBuilder("ff");
         for (int i = 0; i < 255; ++i) {
             policiesStr.append(
-                    String.format("09Policy%03dfe00%03x%03x%03x%03x%03x03!@#",
-                                  i, i + 1, i + 2, i + 3, i + 4, i + 5));
+                String.format("09Policy%03dfe00%03x%03x%03x%03x%03x03!@#",
+                              i, i + 1, i + 2, i + 3, i + 4, i + 5));
         }
         List<PasswdPolicy> policies =
-                PasswdPolicy.parseHdrPolicies(policiesStr.toString());
+            PasswdPolicy.parseHdrPolicies(policiesStr.toString());
         assertNotNull(policies);
         assertEquals(255, policies.size());
         for (int i = 0; i < 255; ++i) {
@@ -417,7 +415,7 @@ public class PasswdPolicyTest
         assertNull(policy);
 
         PasswdPolicy.RecordPolicyStrs strs =
-                PasswdPolicy.recordPolicyToString(null);
+            PasswdPolicy.recordPolicyToString(null);
         //noinspection ConstantConditions
         assertNull(strs);
     }
@@ -529,7 +527,7 @@ public class PasswdPolicyTest
     public void testPasswdGenDefault()
     {
         PasswdPolicy policy =
-                new PasswdPolicy("", PasswdPolicy.Location.DEFAULT);
+            new PasswdPolicy("", PasswdPolicy.Location.DEFAULT);
         verifyGenPasswd(policy);
     }
 
@@ -554,9 +552,9 @@ public class PasswdPolicyTest
     {
         for (int len = 0; len < 100; ++len) {
             PasswdPolicy policy =
-                    new PasswdPolicy("", PasswdPolicy.Location.DEFAULT,
-                                     PasswdPolicy.FLAG_USE_HEX_DIGITS,
-                                     len, 0, 0, 0, 0, null);
+                new PasswdPolicy("", PasswdPolicy.Location.DEFAULT,
+                                 PasswdPolicy.FLAG_USE_HEX_DIGITS,
+                                 len, 0, 0, 0, 0, null);
             assertEquals(PasswdPolicy.Type.HEXADECIMAL, policy.getType());
             verifyGenPasswd(policy);
         }
@@ -574,7 +572,7 @@ public class PasswdPolicyTest
     {
         try {
             PasswdPolicy.parseHdrPolicies(policyStr);
-            assertTrue(false);
+            fail();
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalArgumentException);
             assertEquals(exMsg, t.getMessage());
@@ -586,7 +584,7 @@ public class PasswdPolicyTest
     {
         try {
             PasswdPolicy.parseRecordPolicy(null, policyStr, null);
-            assertTrue(false);
+            fail();
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalArgumentException);
             assertEquals(exMsg, t.getMessage());
@@ -617,11 +615,11 @@ public class PasswdPolicyTest
         assertNull(policy.getSpecialSymbols());
 
         PasswdPolicy.RecordPolicyStrs strs =
-                PasswdPolicy.recordPolicyToString(policy);
+            PasswdPolicy.recordPolicyToString(policy);
         assertNotNull(strs);
         assertEquals(policyName, strs.itsPolicyName);
-        assertEquals(null, strs.itsPolicyStr);
-        assertEquals(null, strs.itsOwnSymbols);
+        assertNull(strs.itsPolicyStr);
+        assertNull(strs.itsOwnSymbols);
     }
 
     /** Check a record with its own password policy */
@@ -660,7 +658,7 @@ public class PasswdPolicyTest
         assertEquals(ownSymbols, policy.getSpecialSymbols());
 
         PasswdPolicy.RecordPolicyStrs strs =
-                PasswdPolicy.recordPolicyToString(policy);
+            PasswdPolicy.recordPolicyToString(policy);
         assertNotNull(strs);
         assertEquals(policyName, strs.itsPolicyName);
         assertTrue(policyStr.startsWith(strs.itsPolicyStr));
@@ -694,7 +692,7 @@ public class PasswdPolicyTest
                 break;
             }
             case HEXADECIMAL: {
-                assertTrue(false);
+                fail();
                 break;
             }
             }
@@ -725,23 +723,18 @@ public class PasswdPolicyTest
                 for (int lowerIdx = 0; lowerIdx <= MAX_LEN;
                      lowerIdx += LEN_STEP) {
                     for (int upperIdx = 0;
-                         upperIdx <= MAX_LEN - lowerIdx; upperIdx += LEN_STEP) {
+                        upperIdx <= MAX_LEN - lowerIdx; upperIdx += LEN_STEP) {
                         for (int digitIdx = 0;
-                             digitIdx <= MAX_LEN - lowerIdx - upperIdx;
-                             digitIdx += LEN_STEP) {
+                            digitIdx <= MAX_LEN - lowerIdx - upperIdx;
+                            digitIdx += LEN_STEP) {
                             for (int symbolIdx = 0;
-                                 symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
-                                 symbolIdx += LEN_STEP) {
-                                /*
-                            PasswdSafeUtil.dbginfo(TAG, "Iter %x %d %d %d %d",
-                                                  flags, lowerIdx, upperIdx,
-                                                  digitIdx, symbolIdx);
-                                 */
+                                symbolIdx <= MAX_LEN - lowerIdx - upperIdx - digitIdx;
+                                symbolIdx += LEN_STEP) {
                                 policy = new PasswdPolicy(
-                                        "", PasswdPolicy.Location.DEFAULT,
-                                        flags, MAX_LEN + minLen, lowerIdx,
-                                        upperIdx, digitIdx, symbolIdx,
-                                        null);
+                                    "", PasswdPolicy.Location.DEFAULT,
+                                    flags, MAX_LEN + minLen, lowerIdx,
+                                    upperIdx, digitIdx, symbolIdx,
+                                    null);
                                 assertEquals(type, policy.getType());
                                 verifyGenPasswd(policy);
                             }
@@ -754,15 +747,15 @@ public class PasswdPolicyTest
                 for (int len: new int[] {0, 1, 2, 3, 5, 10, 20}) {
                     //PasswdSafeApp.dbginfo("TAG", "Iter %x %d", flags, len);
                     policy = new PasswdPolicy(
-                            "", PasswdPolicy.Location.DEFAULT,
-                            flags, len, 1, 1, 1, 1, null);
+                        "", PasswdPolicy.Location.DEFAULT,
+                        flags, len, 1, 1, 1, 1, null);
                     assertEquals(type, policy.getType());
                     verifyGenPasswd(policy);
                 }
                 break;
             }
             case HEXADECIMAL: {
-                assertTrue(false);
+                fail();
                 break;
             }
             }
@@ -770,7 +763,6 @@ public class PasswdPolicyTest
     }
 
     /** Verify a generated password */
-    @SuppressWarnings("ConstantConditions")
     private static void verifyGenPasswd(PasswdPolicy policy)
     {
         boolean useLower = policy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
@@ -802,7 +794,7 @@ public class PasswdPolicyTest
                     } else if (symbols.indexOf(c) >= 0) {
                         ++numSymbols;
                     } else {
-                        assertTrue(false);
+                        fail();
                     }
                 }
                 verifyPolicyNumChars(useLower, numLower,
@@ -830,7 +822,7 @@ public class PasswdPolicyTest
                     } else if (symbols.indexOf(c) >= 0) {
                         ++numSymbols;
                     } else {
-                        assertTrue(false);
+                        fail();
                     }
                 }
                 verifyPolicyNumChars(useLower, numLower,
@@ -856,13 +848,10 @@ public class PasswdPolicyTest
                     } else if (PasswdPolicy.SYMBOLS_PRONOUNCE.indexOf(c) >= 0) {
                         ++numSymbols;
                     } else {
-                        assertTrue(false);
+                        fail();
                     }
                 }
 
-                /*if (!useLower) {
-                    assertEquals(0, numLower);
-                }*/
                 if (!useUpper) {
                     assertEquals(0, numUpper);
                 }

@@ -36,8 +36,7 @@
 
     </androidx.gridlayout.widget.GridLayout>
 
-    <TextView android:id="@+id/release_notes_title"
-              android:layout_width="match_parent"
+    <TextView android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_marginLeft="4dp"
               android:layout_marginRight="4dp"

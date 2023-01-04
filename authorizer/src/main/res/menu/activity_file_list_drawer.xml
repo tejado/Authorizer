@@ -7,17 +7,31 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
-        <item android:id="@+id/menu_drawer_files"
-              android:icon="@drawable/ic_passwdsafe_dark"
-              android:title="@string/files"/>
+    <group
+        android:id="@+id/menu_group_main"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_drawer_files"
+            android:icon="@drawable/ic_passwdsafe_dark"
+            android:orderInCategory="0"
+            android:title="@string/files" />
 
-        <item android:id="@+id/menu_drawer_preferences"
-              android:icon="@drawable/ic_action_settings_dark"
-              android:title="@string/preferences"/>
+        <item
+            android:id="@+id/menu_drawer_backup_files"
+            android:icon="@drawable/ic_action_restore_dark"
+            android:orderInCategory="100"
+            android:title="@string/file_backups" />
 
-        <item android:id="@+id/menu_drawer_about"
-              android:icon="@drawable/ic_action_info_dark"
-              android:title="@string/about"/>
+        <item
+            android:id="@+id/menu_drawer_preferences"
+            android:icon="@drawable/ic_action_settings_dark"
+            android:orderInCategory="101"
+            android:title="@string/preferences" />
+
+        <item
+            android:id="@+id/menu_drawer_about"
+            android:icon="@drawable/ic_action_info_dark"
+            android:orderInCategory="102"
+            android:title="@string/about" />
     </group>
 </menu>

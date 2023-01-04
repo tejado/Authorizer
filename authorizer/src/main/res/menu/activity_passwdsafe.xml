@@ -22,6 +22,12 @@
           android:orderInCategory="100"
           app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/menu_restore"
+        android:icon="@drawable/ic_action_restore"
+        android:title="@string/restore"
+        app:showAsAction="ifRoom"/>
+
     <item android:id="@+id/menu_file_ops"
           android:title="@string/file_operations"
           android:orderInCategory="100">
@@ -40,10 +46,17 @@
         </menu>
     </item>
 
+    <item
+        android:id="@+id/menu_share"
+        android:title="@string/share_file"
+        android:icon="@drawable/ic_action_share_light"
+        android:orderInCategory="1000"
+        app:showAsAction="ifRoom"/>
+
     <item android:id="@+id/menu_close"
           android:title="@string/close_file"
           android:icon="@drawable/ic_action_close_cancel"
-          android:orderInCategory="100"
+          android:orderInCategory="1000"
           app:showAsAction="ifRoom"/>
 
 </menu>

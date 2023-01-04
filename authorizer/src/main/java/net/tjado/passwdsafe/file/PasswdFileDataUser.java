@@ -12,10 +12,10 @@ import androidx.annotation.NonNull;
 /**
  * Interface for users of password file data
  */
-public interface PasswdFileDataUser
+public interface PasswdFileDataUser<RetT>
 {
     /**
      * Callback to use the password file data
      */
-    void useFileData(@NonNull PasswdFileData fileData);
+    RetT useFileData(@NonNull PasswdFileData fileData);
 }

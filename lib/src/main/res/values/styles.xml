@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
-           xmlns:app="http://schemas.android.com/apk/res-auto"
            xmlns:tools="http://schemas.android.com/tools">
 
     <style name="GridLabel">
@@ -39,9 +38,10 @@
         <item name="android:background">?colorAccent</item>
     </style>
 
-    <style name="Preference_TextAppearanceMaterialBody2">
+    <style name="Preference_TextAppearanceMaterialBody2"
+        tools:ignore="PrivateResource">
         <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif-medium</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean" tools:ignore="ObsoleteSdkInt">sans-serif-medium</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>

@@ -11,19 +11,22 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import com.google.android.material.navigation.NavigationView;
-import androidx.fragment.app.Fragment;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.navigation.NavigationView;
 
 /**
  * Abstract fragment for the navigation drawer of an activity
@@ -42,10 +45,11 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     private View itsFragmentContainerView;
     private boolean itsFromSavedInstanceState;
     private boolean itsUserLearnedDrawer;
+    private boolean itsInitShowDrawer = false;
     private ListenerT itsListener;
 
     @Override
-    public void onAttach(Context ctx)
+    public void onAttach(@NonNull Context ctx)
     {
         super.onAttach(ctx);
         //noinspection unchecked
@@ -66,9 +70,9 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View viewFrag, Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
+        super.onViewCreated(viewFrag, savedInstanceState);
         setHasOptionsMenu(true);
     }
 
@@ -80,7 +84,7 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig)
+    public void onConfigurationChanged(@NonNull Configuration newConfig)
     {
         super.onConfigurationChanged(newConfig);
         // Forward the new configuration the drawer toggle component.
@@ -88,7 +92,8 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    public void onCreateOptionsMenu(@NonNull Menu menu,
+                                    @NonNull MenuInflater inflater)
     {
         // If the drawer is open, show the global app actions in the action bar
         if (itsDrawerLayout != null && isDrawerOpen()) {
@@ -101,7 +106,7 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
     {
         return itsDrawerToggle.onOptionsItemSelected(item) ||
                super.onOptionsItemSelected(item);
@@ -110,13 +115,13 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     /**
      * Users of this fragment must call this method to set up the navigation
      * drawer interactions.
-     *
-     * @param drawerLayout The DrawerLayout containing this fragment's UI.
      */
-    protected void setUp(DrawerLayout drawerLayout)
+    protected void doSetUp(DrawerLayout drawerLayout,
+                           String drawerOpenPref,
+                           int expectedDrawerOpenVal)
     {
         itsFragmentContainerView =
-                getActivity().findViewById(R.id.navigation_drawer);
+                requireActivity().findViewById(R.id.navigation_drawer);
         itsDrawerLayout = drawerLayout;
 
         // set a custom shadow that overlays the main content when the drawer
@@ -143,7 +148,7 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
                     return;
                 }
 
-                getActivity().supportInvalidateOptionsMenu();
+                requireActivity().invalidateOptionsMenu();
             }
 
             @Override
@@ -165,11 +170,18 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
                       .apply();
                 }
 
-                getActivity().supportInvalidateOptionsMenu();
+                requireActivity().invalidateOptionsMenu();
             }
         };
 
         itsDrawerLayout.addDrawerListener(itsDrawerToggle);
+
+        SharedPreferences prefs = Preferences.getSharedPrefs(getContext());
+        int shown = prefs.getInt(drawerOpenPref, 0);
+        if (shown != expectedDrawerOpenVal) {
+            prefs.edit().putInt(drawerOpenPref, expectedDrawerOpenVal).apply();
+            itsInitShowDrawer = true;
+        }
     }
 
     /** Is the drawer open */
@@ -222,8 +234,12 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     /**
      * Should the drawer be opened automatically
      */
-    protected boolean shouldOpenDrawer()
+    protected final boolean shouldOpenDrawer()
     {
+        if (itsInitShowDrawer) {
+            itsInitShowDrawer = false;
+            return true;
+        }
         return !itsUserLearnedDrawer && !itsFromSavedInstanceState;
     }
 
@@ -261,6 +277,6 @@ public abstract class AbstractNavDrawerFragment<ListenerT> extends Fragment
     /** Get the action bar */
     private ActionBar getActionBar()
     {
-        return ((AppCompatActivity) getActivity()).getSupportActionBar();
+        return ((AppCompatActivity) requireActivity()).getSupportActionBar();
     }
 }

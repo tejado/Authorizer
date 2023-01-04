@@ -1,0 +1,6 @@
+This application contains icons from the following sources:
+
+Refresh icon from https://www.iconfinder.com/icons/118801/refresh_icon, used
+under Creative Commons Attribution-Non-Commercial 3.0 Netherlands
+(http://creativecommons.org/licenses/by-nc/3.0/nl/deed.en_GB), modified for
+colors and included in the PasswdSafe Sync icon

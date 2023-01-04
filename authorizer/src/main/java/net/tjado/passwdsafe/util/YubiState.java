@@ -12,6 +12,7 @@ package net.tjado.passwdsafe.util;
  */
 public enum YubiState
 {
+    UNKNOWN,
     UNAVAILABLE,
     DISABLED,
     ENABLED

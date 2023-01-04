@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2022 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -44,11 +44,11 @@ import java.util.List;
 public final class GuiUtils
 {
     private static final int INPUT_TEXT_PASSWORD =
-        InputType.TYPE_CLASS_TEXT |
-        InputType.TYPE_TEXT_VARIATION_PASSWORD;
+            InputType.TYPE_CLASS_TEXT |
+            InputType.TYPE_TEXT_VARIATION_PASSWORD;
     private static final int INPUT_TEXT_PASSWORD_VISIBLE =
-        InputType.TYPE_CLASS_TEXT |
-        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+            InputType.TYPE_CLASS_TEXT |
+            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
 
 
     /**
@@ -146,9 +146,12 @@ public final class GuiUtils
     public static void setMenuEnabled(MenuItem item, boolean enabled)
     {
         item.setEnabled(enabled);
-        Drawable d = item.getIcon().mutate();
-        d.setAlpha(enabled ? 255 : 138);
-        item.setIcon(d);
+        var icon = item.getIcon();
+        if (icon != null) {
+            Drawable d = icon.mutate();
+            d.setAlpha(enabled ? 255 : 138);
+            item.setIcon(d);
+        }
     }
 
     /**
@@ -223,7 +226,7 @@ public final class GuiUtils
     public static void setKeyboardVisible(View v, Context ctx, boolean visible)
     {
         InputMethodManager imm = (InputMethodManager)
-            ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+                ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm == null) {
             return;
         }

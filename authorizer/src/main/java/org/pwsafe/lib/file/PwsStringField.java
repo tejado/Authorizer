@@ -53,6 +53,7 @@ public class PwsStringField extends PwsField
     {
         byte[] bytes;
         try {
+            //noinspection CharsetObjectCanBeUsed
             bytes = ((String)super.getValue()).getBytes("ISO-8859-1");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);

@@ -18,7 +18,8 @@
 
         <LinearLayout android:id="@+id/base_row"
                       style="@style/RecordRow"
-                      android:clickable="true">
+                      android:clickable="true"
+                      android:focusable="true">
 
             <TextView android:id="@+id/base_label"
                       style="@style/RecordHeader"
@@ -76,20 +77,63 @@
             <View style="@style/Separator"
                   android:clickable="false"/>
 
-            <LinearLayout style="@style/RecordField.Large"
-                          android:clickable="false"
-                          android:orientation="vertical">
+            <RelativeLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false">
+
+                <ToggleButton android:id="@+id/password_subset_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:checked="false"
+                    android:minWidth="48dp"
+                    android:text="@string/password_subset_btn"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textOff="@string/password_subset_btn"
+                    android:textOn="@string/password_subset_btn"/>
 
                 <TextView android:id="@+id/password"
-                          android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:clickable="false"
-                          android:textAppearance="?android:textAppearanceLarge" />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_toLeftOf="@id/password_subset_btn"
+                    android:layout_toStartOf="@id/password_subset_btn"
+                    android:clickable="false"
+                    android:textAppearance="?android:textAppearanceLarge"/>
 
                 <SeekBar android:id="@+id/password_seek"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"/>
-            </LinearLayout>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@id/password"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignRight="@id/password"
+                    android:layout_below="@+id/password"
+                    android:indeterminate="false"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/password_subset_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/password_subset_btn"
+                    android:hint="@string/password_subset_hint">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/password_subset"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:maxLines="1"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </RelativeLayout>
         </LinearLayout>
 
         <LinearLayout android:id="@+id/autotype_usb_row"

@@ -7,6 +7,8 @@
  */
 package net.tjado.passwdsafe.pref;
 
+import net.tjado.passwdsafe.R;
+import net.tjado.passwdsafe.file.PasswdExpiryFilter;
 import net.tjado.passwdsafe.file.PasswdRecordFilter;
 
 import android.content.res.Resources;
@@ -17,26 +19,19 @@ import android.content.res.Resources;
 public enum PasswdExpiryNotifPref
 {
     // Values in display order
-    NONE            ("",
-                     null),
-    EXPIRED         ("EXPIRED",
-                     PasswdRecordFilter.ExpiryFilter.EXPIRED),
-    TODAY           ("TODAY",
-                     PasswdRecordFilter.ExpiryFilter.TODAY),
-    IN_A_WEEK       ("IN_A_WEEK",
-                     PasswdRecordFilter.ExpiryFilter.IN_A_WEEK),
-    IN_TWO_WEEKS    ("IN_TWO_WEEKS",
-                     PasswdRecordFilter.ExpiryFilter.IN_TWO_WEEKS),
-    IN_A_MONTH      ("IN_A_MONTH",
-                     PasswdRecordFilter.ExpiryFilter.IN_A_MONTH),
-    IN_A_YEAR       ("IN_A_YEAR",
-                     PasswdRecordFilter.ExpiryFilter.IN_A_YEAR);
+    NONE            ("", null),
+    EXPIRED         ("EXPIRED", PasswdExpiryFilter.EXPIRED),
+    TODAY           ("TODAY", PasswdExpiryFilter.TODAY),
+    IN_A_WEEK       ("IN_A_WEEK", PasswdExpiryFilter.IN_A_WEEK),
+    IN_TWO_WEEKS    ("IN_TWO_WEEKS", PasswdExpiryFilter.IN_TWO_WEEKS),
+    IN_A_MONTH      ("IN_A_MONTH", PasswdExpiryFilter.IN_A_MONTH),
+    IN_A_YEAR       ("IN_A_YEAR", PasswdExpiryFilter.IN_A_YEAR);
 
     private final String itsValue;
-    private final PasswdRecordFilter.ExpiryFilter itsFilter;
+    private final PasswdExpiryFilter itsFilter;
 
     /** Constructor */
-    PasswdExpiryNotifPref(String value, PasswdRecordFilter.ExpiryFilter filter)
+    PasswdExpiryNotifPref(String value, PasswdExpiryFilter filter)
     {
         itsValue = value;
         itsFilter = filter;
@@ -49,7 +44,7 @@ public enum PasswdExpiryNotifPref
     }
 
     /** Get the expiration filter from the preference */
-    public final PasswdRecordFilter.ExpiryFilter getFilter()
+    public final PasswdExpiryFilter getFilter()
     {
         return itsFilter;
     }
@@ -97,6 +92,6 @@ public enum PasswdExpiryNotifPref
     /** Get the display names array for the preferences */
     private static String[] getDisplayNamesArray(Resources res)
     {
-        return res.getStringArray(net.tjado.passwdsafe.R.array.passwd_expiry_notif_pref);
+        return res.getStringArray(R.array.passwd_expiry_notif_pref);
     }
 }

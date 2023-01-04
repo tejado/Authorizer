@@ -11,7 +11,7 @@ package org.pwsafe.lib.file;
 
 public enum PwsFieldTypeV1 implements PwsFieldType
 {
-    @SuppressWarnings("unused") DEFAULT(0),
+    // --Commented out for Inspection suppression:DEFAULT(0),
     TITLE(3),
     USERNAME(4),
     NOTES(5),

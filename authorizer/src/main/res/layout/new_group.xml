@@ -7,22 +7,25 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
               android:padding="16dp">
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:hint="@string/new_group">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/new_group"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/new_group"
             android:imeOptions="actionGo"
             android:inputType="textCapSentences|textAutoCorrect"
-            android:singleLine="true"/>
+            android:maxLines="1"
+            android:windowSoftInputMode="stateVisible"  />
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

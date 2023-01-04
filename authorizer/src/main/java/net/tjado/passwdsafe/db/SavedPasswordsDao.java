@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2020 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -43,6 +43,10 @@ public abstract class SavedPasswordsDao
             }
             Pair<String, String> provdisp = getProviderAndDisplay(fileUri, ctx);
             return queryByProvUriAndDispName(provdisp.first, provdisp.second);
+        }
+        case BACKUP: {
+            BackupFile backup = fileUri.getBackupFile();
+            return (backup != null) ? queryByUri(backup.fileUri) : null;
         }
         case FILE:
         case SYNC_PROVIDER:

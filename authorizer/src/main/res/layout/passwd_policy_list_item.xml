@@ -54,7 +54,6 @@
     </RelativeLayout>
 
     <androidx.cardview.widget.CardView
-        style="?attr/cardViewStyle"
         android:id="@+id/policy_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

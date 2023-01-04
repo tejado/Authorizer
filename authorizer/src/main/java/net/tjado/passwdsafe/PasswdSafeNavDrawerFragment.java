@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,7 +7,6 @@
  */
 package net.tjado.passwdsafe;
 
-import androidx.drawerlayout.widget.DrawerLayout;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -15,21 +14,39 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import net.tjado.passwdsafe.lib.view.GuiUtils;
+
+import java.util.Objects;
 
 /**
  * Fragment for the navigation drawer of the PasswdSafe activity
  */
 public class PasswdSafeNavDrawerFragment
         extends AbstractNavDrawerFragment<PasswdSafeNavDrawerFragment.Listener>
+        implements CompoundButton.OnCheckedChangeListener
 {
+    /** Preference for initial forced open count */
+    private static final String PREF_SHOWN_DRAWER =
+            "passwdsafe_navigation_drawer_shown_passwdsafe";
+
+    /** Counter for how often the drawer is forced open for user to see
+     *  changes */
+    private static final int SHOW_DRAWER_COUNT = 1;
+
     /** Listener interface for the owning activity */
     public interface Listener
     {
         /** Show the file records */
         void showFileRecords();
+
+        /** Show the file record errors */
+        void showFileRecordErrors();
 
         /** Show the file password policies */
         void showFilePasswordPolicies();
@@ -42,6 +59,15 @@ public class PasswdSafeNavDrawerFragment
 
         /** Show the about dialog */
         void showAbout();
+
+        /** Is the file writable */
+        boolean isFileWritable();
+
+        /** Set the file writable */
+        void setFileWritable(boolean writable);
+
+        /** Is the file capable of being writable */
+        boolean isFileWriteCapable();
     }
 
     /** Mode of the navigation drawer */
@@ -57,6 +83,8 @@ public class PasswdSafeNavDrawerFragment
         RECORDS_ACTION,
         /** Password policies */
         POLICIES,
+        /** Record errors */
+        RECORD_ERRORS,
         /** Password expirations */
         EXPIRATIONS,
         /** Preferences */
@@ -66,17 +94,33 @@ public class PasswdSafeNavDrawerFragment
     }
 
     private TextView itsFileName;
+    private SwitchCompat itsWritableSw;
     private NavMenuItem itsSelNavItem = null;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState)
     {
         View fragView = doCreateView(inflater, container,
                                      R.layout.fragment_passwdsafe_nav_drawer);
         View header = getNavView().getHeaderView(0);
-        itsFileName = (TextView)header.findViewById(R.id.file_name);
+        itsFileName = header.findViewById(R.id.file_name);
+
+        MenuItem writableItem =
+                getNavView().getMenu().findItem(R.id.menu_drawer_writable);
+        itsWritableSw = Objects.requireNonNull(writableItem.getActionView())
+                       .findViewById(R.id.switch_item);
+        itsWritableSw.setOnCheckedChangeListener(this);
+
         return fragView;
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        itsWritableSw.setChecked(getListener().isFileWritable());
     }
 
     /**
@@ -87,7 +131,7 @@ public class PasswdSafeNavDrawerFragment
      */
     public void setUp(DrawerLayout drawerLayout)
     {
-        super.setUp(drawerLayout);
+        doSetUp(drawerLayout, PREF_SHOWN_DRAWER, SHOW_DRAWER_COUNT);
         updateView(Mode.INIT, "", false);
     }
 
@@ -128,6 +172,11 @@ public class PasswdSafeNavDrawerFragment
             selNavItem = NavMenuItem.PASSWORD_POLICIES;
             break;
         }
+        case RECORD_ERRORS: {
+            drawerEnabled = true;
+            selNavItem = NavMenuItem.RECORD_ERRORS;
+            break;
+        }
         case EXPIRATIONS: {
             drawerEnabled = true;
             selNavItem = NavMenuItem.EXPIRED_PASSWORDS;
@@ -147,6 +196,9 @@ public class PasswdSafeNavDrawerFragment
 
         updateDrawerToggle(drawerEnabled, upIndicator);
 
+        Listener listener = getListener();
+        boolean writeCapable = listener.isFileWriteCapable();
+
         Menu menu = getNavView().getMenu();
         for (int i = 0; i < menu.size(); ++i) {
             MenuItem item = menu.getItem(i);
@@ -154,6 +206,7 @@ public class PasswdSafeNavDrawerFragment
             if (selNavItem == null) {
                 item.setChecked(false);
             } else if (selNavItem.itsMenuId == itemId) {
+                item.setVisible(true);
                 item.setChecked(true);
             }
 
@@ -161,6 +214,9 @@ public class PasswdSafeNavDrawerFragment
                 (itemId == NavMenuItem.PASSWORD_POLICIES.itsMenuId) ||
                 (itemId == NavMenuItem.EXPIRED_PASSWORDS.itsMenuId)) {
                 item.setEnabled(fileOpen);
+            } else if (itemId == R.id.menu_drawer_writable) {
+                item.setVisible(fileOpen);
+                item.setEnabled(writeCapable);
             }
         }
         itsSelNavItem = selNavItem;
@@ -171,12 +227,21 @@ public class PasswdSafeNavDrawerFragment
             itsFileName.setText(fileNameUpdate);
         }
 
+        itsWritableSw.setEnabled(writeCapable);
+        itsWritableSw.setChecked(listener.isFileWritable());
+
         openDrawer(openDrawer);
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem menuItem)
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem)
     {
+        if (menuItem.getItemId() == R.id.menu_drawer_writable) {
+            if (itsWritableSw.isEnabled()) {
+                itsWritableSw.toggle();
+            }
+            return true;
+        }
         closeDrawer();
 
         Listener listener = getListener();
@@ -185,6 +250,10 @@ public class PasswdSafeNavDrawerFragment
             switch (navItem) {
             case RECORDS: {
                 listener.showFileRecords();
+                break;
+            }
+            case RECORD_ERRORS: {
+                listener.showFileRecordErrors();
                 break;
             }
             case PASSWORD_POLICIES: {
@@ -209,18 +278,26 @@ public class PasswdSafeNavDrawerFragment
         return true;
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+    {
+        getListener().setFileWritable(isChecked);
+        closeDrawer();
+    }
+
     /**
      * A menu item
      */
     private enum NavMenuItem
     {
         RECORDS              (R.id.menu_drawer_records),
+        RECORD_ERRORS        (R.id.menu_drawer_record_errors),
         PASSWORD_POLICIES    (R.id.menu_drawer_passwd_policies),
         EXPIRED_PASSWORDS    (R.id.menu_drawer_expired_passwords),
         PREFERENCES          (R.id.menu_drawer_preferences),
         ABOUT                (R.id.menu_drawer_about);
 
-        public final int itsMenuId;
+        private final int itsMenuId;
 
         /**
          * Constructor
@@ -233,7 +310,7 @@ public class PasswdSafeNavDrawerFragment
         /**
          * Get the enum from a menu id
          */
-        public static NavMenuItem fromMenuId(int menuId)
+        private static NavMenuItem fromMenuId(int menuId)
         {
             for (NavMenuItem item: NavMenuItem.values()) {
                 if (item.itsMenuId == menuId) {

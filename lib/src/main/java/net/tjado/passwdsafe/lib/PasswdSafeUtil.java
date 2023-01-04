@@ -25,21 +25,26 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
+import androidx.annotation.Keep;
+import androidx.appcompat.app.AlertDialog;
 
 import net.tjado.passwdsafe.lib.view.AbstractDialogClickListener;
 
 /**
  * The PasswdSafeUtil class contains common helper methods
  */
-@SuppressWarnings("SameParameterValue")
 public class PasswdSafeUtil
 {
-    private static final String PACKAGE = "net.tjado.passwdsafe";
+    public static final String PACKAGE = "net.tjado.passwdsafe";
+    public static final String SYNC_PACKAGE = PACKAGE + ".sync";
     public static final String NEW_INTENT = PACKAGE + ".action.NEW";
     public static final String VIEW_INTENT = PACKAGE + ".action.VIEW";
+    public static final String SEARCH_VIEW_INTENT =
+            PACKAGE + ".action.SEARCH_VIEW";
+
+    public static final String MIME_TYPE_PSAFE3 = "application/psafe3";
 
     public static final boolean DEBUG = BuildConfig.DEBUG;
 
@@ -84,9 +89,7 @@ public class PasswdSafeUtil
         intent.setPackage(pkgName);
         PackageManager pm = ctx.getPackageManager();
         List<ResolveInfo> infos = pm.queryIntentActivities(intent, 0);
-        if (infos == null) {
-            return null;
-        }
+
         for (ResolveInfo info: infos) {
             ActivityInfo actInfo = info.activityInfo;
             if ((actInfo != null) && (pkgName.equals(actInfo.packageName))) {
@@ -166,7 +169,7 @@ public class PasswdSafeUtil
 
     public static void showFatalMsg(String msg,
                                     Activity activity,
-                                    boolean copyTrace)
+                                    @SuppressWarnings("SameParameterValue") boolean copyTrace)
     {
         showFatalMsg(null, msg, activity, copyTrace);
     }
@@ -222,8 +225,9 @@ public class PasswdSafeUtil
     /**
      * Show an error message
      */
-    public static void showErrorMsg(String msg, Context ctx)
+    public static void showErrorMsg(String msg, ActContext context)
     {
+        Context ctx = context.getContext();
         if (ctx == null) {
             return;
         }
@@ -242,7 +246,7 @@ public class PasswdSafeUtil
     public static void showError(String msg,
                                  String logTag,
                                  Throwable error,
-                                 Context context)
+                                 ActContext context)
     {
         Log.e(logTag, msg, error);
         showErrorMsg(msg, context);
@@ -259,6 +263,12 @@ public class PasswdSafeUtil
         dlg.show();
     }
 
+    /** Log a formatted message at info level */
+    public static void info(String tag, String fmt, Object... args)
+    {
+        Log.i(tag, String.format(fmt, args));
+    }
+
     /**
      * Get whether the app is running while testing
      */
@@ -271,6 +281,7 @@ public class PasswdSafeUtil
     /**
      * Set whether the app is running while testing
      */
+    @Keep
     public static void setIsTesting(boolean testing)
     {
         TESTING = DEBUG && testing;
@@ -299,8 +310,11 @@ public class PasswdSafeUtil
     }
 
     /** Log a formatted debug message and exception at info level */
-    public static void dbginfo(String tag, Throwable t,
-                               String fmt, Object... args)
+    public static void dbginfo(
+            @SuppressWarnings("SameParameterValue") String tag,
+            Throwable t,
+            @SuppressWarnings("SameParameterValue") String fmt,
+            Object... args)
     {
         if (DEBUG) {
             Log.i(tag, String.format(fmt, args), t);

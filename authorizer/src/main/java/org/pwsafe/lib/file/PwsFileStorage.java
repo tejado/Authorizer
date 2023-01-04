@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2009 David Muller <roxon@users.sourceforge.net>.
+ * Copyright (©) 2017 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * An implementation of the PwsStorage class that reads and writes to files.
@@ -26,8 +27,8 @@ public class PwsFileStorage extends PwsStreamStorage
     /**
      * An object for logging activity in this class.
      */
-    private static final Log LOG = Log
-            .getInstance(PwsFileStorage.class.getPackage().getName());
+    private static final Log LOG = Log.getInstance(Objects.requireNonNull(
+            PwsFileStorage.class.getPackage()).getName());
 
     /*
      * Build an implementation given the filename for the underlying storage.
@@ -155,7 +156,11 @@ public class PwsFileStorage extends PwsStreamStorage
             throw e;
         } finally {
             if (outStream != null) {
-                outStream.close();
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    LOG.error("close", e);
+                }
             }
         }
     }

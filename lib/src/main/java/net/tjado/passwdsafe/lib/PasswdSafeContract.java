@@ -7,6 +7,7 @@
  */
 package net.tjado.passwdsafe.lib;
 
+import android.app.SearchManager;
 import android.content.ContentResolver;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -22,11 +23,11 @@ public final class PasswdSafeContract
 {
     /** The sync provider's authority */
     public static final String AUTHORITY =
-        "com.jefftharris.passwdsafe.sync.provider";
+            PasswdSafeUtil.SYNC_PACKAGE + ".provider";
 
     /** The base URI for the provider */
     public static final Uri CONTENT_URI =
-        Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + AUTHORITY);
+            Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + AUTHORITY);
 
     public static final UriMatcher MATCHER;
     public static final int MATCH_PROVIDERS = 1;
@@ -48,11 +49,11 @@ public final class PasswdSafeContract
                        MATCH_PROVIDER);
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.Providers.TABLE + "/#/" +
-                               PasswdSafeContract.Files.TABLE,
+                       PasswdSafeContract.Files.TABLE,
                        MATCH_PROVIDER_FILES);
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.Providers.TABLE + "/#/" +
-                               PasswdSafeContract.Files.TABLE + "/#",
+                       PasswdSafeContract.Files.TABLE + "/#",
                        MATCH_PROVIDER_FILE);
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.SyncLogs.TABLE,
@@ -62,18 +63,18 @@ public final class PasswdSafeContract
                        MATCH_METHODS);
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.Providers.TABLE + "/#/" +
-                               PasswdSafeContract.RemoteFiles.TABLE,
+                       PasswdSafeContract.RemoteFiles.TABLE,
                        MATCH_PROVIDER_REMOTE_FILES);
         MATCHER.addURI(PasswdSafeContract.AUTHORITY,
                        PasswdSafeContract.Providers.TABLE + "/#/" +
-                               PasswdSafeContract.RemoteFiles.TABLE + "/#",
+                       PasswdSafeContract.RemoteFiles.TABLE + "/#",
                        MATCH_PROVIDER_REMOTE_FILE);
     }
 
     /** The table of providers */
     public static final class Providers implements BaseColumns
     {
-        public static final String TABLE = "providers";
+        private static final String TABLE = "providers";
         public static final Uri CONTENT_URI =
                 Uri.withAppendedPath(PasswdSafeContract.CONTENT_URI, TABLE);
         public static final String CONTENT_TYPE =
@@ -90,18 +91,18 @@ public final class PasswdSafeContract
                 COL_TYPE + " ASC, " + COL_DISPLAY_NAME + " ASC";
 
         public static final String[] PROJECTION = {
-            Providers._ID,
-            Providers.COL_TYPE,
-            Providers.COL_ACCT,
-            Providers.COL_SYNC_FREQ,
-            Providers.COL_DISPLAY_NAME
+                Providers._ID,
+                Providers.COL_TYPE,
+                Providers.COL_ACCT,
+                Providers.COL_SYNC_FREQ,
+                Providers.COL_DISPLAY_NAME
         };
 
         public static final int PROJECTION_IDX_ID = 0;
         public static final int PROJECTION_IDX_TYPE = 1;
         public static final int PROJECTION_IDX_ACCT = 2;
         public static final int PROJECTION_IDX_SYNC_FREQ = 3;
-        public static final int PROJECTION_IDX_DISPLAY_NAME = 4;
+        private static final int PROJECTION_IDX_DISPLAY_NAME = 4;
 
         /** Get the provider's display name */
         public static String getDisplayName(Cursor cursor)
@@ -119,7 +120,7 @@ public final class PasswdSafeContract
         /** Get the provider id from the URI */
         public static long getId(Uri uri)
         {
-            return Long.valueOf(getIdStr(uri));
+            return Long.parseLong(getIdStr(uri));
         }
 
         /** Get the provider id string from the URI */
@@ -130,6 +131,7 @@ public final class PasswdSafeContract
     }
 
     /** The table of files */
+    @SuppressWarnings("CommentedOutCode")
     public static final class Files implements BaseColumns
     {
         public static final String TABLE = "files";
@@ -150,12 +152,12 @@ public final class PasswdSafeContract
                 COL_FOLDER + " ASC, " + COL_TITLE + " ASC";
 
         public static final String[] PROJECTION = {
-            Files._ID,
-            Files.COL_PROVIDER,
-            Files.COL_TITLE,
-            Files.COL_MOD_DATE,
-            Files.COL_FILE,
-            Files.COL_FOLDER
+                Files._ID,
+                Files.COL_PROVIDER,
+                Files.COL_TITLE,
+                Files.COL_MOD_DATE,
+                Files.COL_FILE,
+                Files.COL_FOLDER
         };
 
         //public static final int PROJECTION_IDX_ID = 0;
@@ -168,7 +170,7 @@ public final class PasswdSafeContract
         /** Get the file id from the URI */
         public static long getId(Uri uri)
         {
-            return Long.valueOf(getIdStr(uri));
+            return Long.parseLong(getIdStr(uri));
         }
 
         /** Get the file id string from the URI */
@@ -193,8 +195,8 @@ public final class PasswdSafeContract
                 "not local_deleted and not remote_deleted";
 
         public static final String[] PROJECTION = {
-            RemoteFiles._ID,
-            RemoteFiles.COL_REMOTE_ID
+                RemoteFiles._ID,
+                RemoteFiles.COL_REMOTE_ID
         };
 
         public static final int PROJECTION_IDX_ID = 0;
@@ -208,9 +210,10 @@ public final class PasswdSafeContract
     }
 
     /** The table of sync logs */
+    @SuppressWarnings("CommentedOutCode")
     public static final class SyncLogs implements BaseColumns
     {
-        public static final String TABLE = "sync_logs";
+        private static final String TABLE = "sync_logs";
         public static final Uri CONTENT_URI =
                 Uri.withAppendedPath(PasswdSafeContract.CONTENT_URI, TABLE);
         public static final String CONTENT_TYPE =
@@ -229,13 +232,13 @@ public final class PasswdSafeContract
         public static final String DEFAULT_SELECTION = COL_LOG + " != ''";
 
         public static final String[] PROJECTION = {
-            SyncLogs._ID,
-            SyncLogs.COL_ACCT,
-            SyncLogs.COL_START,
-            SyncLogs.COL_END,
-            SyncLogs.COL_FLAGS,
-            SyncLogs.COL_LOG,
-            SyncLogs.COL_STACK
+                SyncLogs._ID,
+                SyncLogs.COL_ACCT,
+                SyncLogs.COL_START,
+                SyncLogs.COL_END,
+                SyncLogs.COL_FLAGS,
+                SyncLogs.COL_LOG,
+                SyncLogs.COL_STACK
         };
 
         //public static final int PROJECTION_IDX_ID = 0;
@@ -254,7 +257,7 @@ public final class PasswdSafeContract
     /** The 'table' for methods */
     public static final class Methods
     {
-        public static final String TABLE = "methods";
+        private static final String TABLE = "methods";
         public static final Uri CONTENT_URI =
                 Uri.withAppendedPath(PasswdSafeContract.CONTENT_URI, TABLE);
         public static final String CONTENT_TYPE =
@@ -264,17 +267,20 @@ public final class PasswdSafeContract
     }
 
     /** The client provider's authority */
-    public static final String CLIENT_AUTHORITY =
-            "com.jefftharris.passwdsafe.client.provider";
+    public static final String CLIENT_AUTHORITY = "net.tjado.passwdsafe.client.provider";
 
     /** The base URI for the client provider */
     public static final Uri CLIENT_CONTENT_URI =
-        Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + CLIENT_AUTHORITY);
+            Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + CLIENT_AUTHORITY);
 
     /** The client files */
     public static final class ClientFiles
     {
         public static final String TABLE = "files";
     }
+
+    /** The client file search suggestions */
+    public static final String CLIENT_SEARCH_SUGGESTIONS =
+            SearchManager.SUGGEST_URI_PATH_QUERY;
 }
 

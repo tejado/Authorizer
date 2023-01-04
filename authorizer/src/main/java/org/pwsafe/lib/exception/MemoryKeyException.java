@@ -27,7 +27,9 @@ public class MemoryKeyException extends RuntimeException
     /**
      * Constructor
      */
-    public MemoryKeyException(String message, Throwable cause)
+    public MemoryKeyException(
+            @SuppressWarnings("SameParameterValue") String message,
+            Throwable cause)
     {
         super(message, cause);
     }

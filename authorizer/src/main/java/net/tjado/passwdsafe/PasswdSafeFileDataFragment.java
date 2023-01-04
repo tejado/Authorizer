@@ -47,7 +47,7 @@ public class PasswdSafeFileDataFragment extends Fragment
     private static final String TAG = "AuthorizerFileDataFragment";
 
     @Override
-    public void onAttach(Context ctx)
+    public void onAttach(@NonNull Context ctx)
     {
         super.onAttach(ctx);
         SharedPreferences prefs = Preferences.getSharedPrefs(ctx);
@@ -85,15 +85,25 @@ public class PasswdSafeFileDataFragment extends Fragment
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences prefs, String key)
+    public void onSharedPreferenceChanged(SharedPreferences prefs,
+                                          @Nullable String key)
     {
-        switch (key) {
-        case Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD: {
-            itsIsCloseClearClipboard =
-                    Preferences.getFileCloseClearClipboardPref(prefs);
-            break;
+        boolean updateCloseClearClipboard = false;
+        if (key == null) {
+            updateCloseClearClipboard = true;
+        } else {
+            switch (key) {
+            case Preferences.PREF_FILE_CLOSE_CLEAR_CLIPBOARD: {
+                updateCloseClearClipboard = true;
+                break;
+            }
+            }
         }
+
+        if (updateCloseClearClipboard) {
+            itsIsCloseClearClipboard = Preferences.getFileCloseClearClipboardPref(prefs);
         }
+
         if (itsFileDataView.handleSharedPreferenceChanged(prefs, key)) {
             refreshFileData();
         }
@@ -110,9 +120,9 @@ public class PasswdSafeFileDataFragment extends Fragment
     /**
      * Use the password file data.  Only one thread will use the data at a time.
      */
-    public void useFileData(PasswdFileDataUser user)
+    public <RetT> RetT useFileData(PasswdFileDataUser<RetT> user)
     {
-        useOpenFileData(user);
+        return useOpenFileData(user);
     }
 
     /** Get the view of the password file data */
@@ -164,14 +174,15 @@ public class PasswdSafeFileDataFragment extends Fragment
     /**
      * Use the global open password file data
      */
-    public static void useOpenFileData(PasswdFileDataUser user)
+    public static <RetT> RetT useOpenFileData(PasswdFileDataUser<RetT> user)
     {
         PasswdFileToken token = acquireFileData();
         try {
             PasswdFileData fileData = token.getFileData();
             if (fileData != null) {
-                user.useFileData(fileData);
+                return user.useFileData(fileData);
             }
+            return null;
         } finally {
             token.release();
         }

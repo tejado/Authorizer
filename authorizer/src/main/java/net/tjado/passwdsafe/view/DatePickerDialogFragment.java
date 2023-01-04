@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -10,11 +10,12 @@ package net.tjado.passwdsafe.view;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.widget.DatePicker;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
-import android.widget.DatePicker;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 /**
  * Dialog to pick a date
@@ -50,14 +51,14 @@ public class DatePickerDialogFragment extends DialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
-        Bundle args = getArguments();
+        Bundle args = requireArguments();
         Calendar now = Calendar.getInstance();
         int year = args.getInt("year", now.get(Calendar.YEAR));
         int monthOfYear = args.getInt("monthOfYear", now.get(Calendar.MONTH));
         int dayOfMonth = args.getInt("dayOfMonth",
                                      now.get(Calendar.DAY_OF_MONTH));
 
-        return new DatePickerDialog(getContext(), this, year, monthOfYear,
+        return new DatePickerDialog(requireContext(), this, year, monthOfYear,
                                     dayOfMonth);
     }
 
@@ -66,8 +67,9 @@ public class DatePickerDialogFragment extends DialogFragment
                           int dayOfMonth)
     {
         if (isResumed()) {
-            ((Listener)getTargetFragment()).handleDatePicked(year, monthOfYear,
-                                                             dayOfMonth);
+            Listener listener =
+                    Objects.requireNonNull((Listener)getTargetFragment());
+            listener.handleDatePicked(year, monthOfYear, dayOfMonth);
         }
     }
 }

@@ -9,6 +9,8 @@ package net.tjado.passwdsafe.pref;
 
 import android.content.res.Resources;
 
+import net.tjado.passwdsafe.R;
+
 public enum FileTimeoutPref
 {
     // Values in their display order
@@ -84,6 +86,6 @@ public enum FileTimeoutPref
 
     private static String[] getDisplayNamesArray(Resources res)
     {
-        return res.getStringArray(net.tjado.passwdsafe.R.array.file_timeout_pref);
+        return res.getStringArray(R.array.file_timeout_pref);
     }
 }

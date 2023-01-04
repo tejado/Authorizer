@@ -7,6 +7,7 @@
 package net.tjado.passwdsafe.lib;
 
 import android.content.Context;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,28 +25,41 @@ public enum ProviderType
     /** Set the ImageView to the icon of the provider type */
     public void setIcon(ImageView iv)
     {
+        iv.setImageResource(getIconId(false));
+    }
+
+    /** Set the ImageView to the icon of the provider type */
+    public void setIcon(MenuItem item)
+    {
+        item.setIcon(getIconId(true));
+    }
+
+    /**
+     * Get the icon resource id for the provider type
+     */
+    public int getIconId(boolean forMenu)
+    {
         switch (this) {
         case GDRIVE: {
-            iv.setImageResource(R.drawable.google_drive);
-            break;
+            return R.drawable.google_drive;
         }
         case DROPBOX: {
-            iv.setImageResource(R.drawable.dropbox);
-            break;
+            /*if (forMenu) {
+                return R.drawable.dropbox_trace;
+            }*/
+            return R.drawable.dropbox;
         }
         case BOX: {
-            iv.setImageResource(R.drawable.box);
-            break;
+            return R.drawable.box;
         }
         case ONEDRIVE: {
-            iv.setImageResource(R.drawable.onedrive);
-            break;
+            return R.drawable.onedrive;
         }
         case OWNCLOUD: {
-            iv.setImageResource(R.drawable.owncloud);
-            break;
+            return R.drawable.owncloud;
         }
         }
+        return 0;
     }
 
     /** Set the TextView to the name of the provider type */
@@ -87,3 +101,4 @@ public enum ProviderType
         }
     }
 }
+
