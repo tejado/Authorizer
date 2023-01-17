@@ -541,7 +541,8 @@ public final class StorageFileListFragment extends Fragment
                     }
                     case FILE:
                     case EMAIL:
-                    case SYNC_PROVIDER: {
+                    case SYNC_PROVIDER:
+                    case BACKUP: {
                         break;
                     }
                     }
