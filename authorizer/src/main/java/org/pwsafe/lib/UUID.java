@@ -106,8 +106,8 @@ public class UUID implements Comparable<Object>, Serializable
         if (that == null)
             return false;
 
-        byte b1[];
-        byte b2[];
+        byte[] b1;
+        byte[] b2;
 
         b1 = this.getBytes();
         b2 = that.getBytes();
@@ -187,6 +187,7 @@ public class UUID implements Comparable<Object>, Serializable
      * <code>UUID</code>.
      */
     @Override
+    @NonNull
     public String toString()
     {
         return toString(TheUUID);

@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2012 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,20 +7,21 @@
  */
 package net.tjado.passwdsafe.file;
 
-import java.security.NoSuchAlgorithmException;
+import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.text.TextUtils;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+
+import net.tjado.passwdsafe.R;
+import net.tjado.passwdsafe.util.Pair;
+
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import net.tjado.passwdsafe.util.Pair;
-
-import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
-import androidx.annotation.NonNull;
-import android.text.TextUtils;
 
 /**
  * The PasswdPolicy class represents a password policy for a file or record
@@ -57,7 +58,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
      * Parcelable CREATOR instance
      */
     public static final Parcelable.Creator<PasswdPolicy> CREATOR =
-            new Parcelable.Creator<PasswdPolicy>()
+            new Parcelable.Creator<>()
             {
                 @Override
                 public PasswdPolicy createFromParcel(Parcel source)
@@ -80,7 +81,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
         RECORD_NAME     (2),
         RECORD          (3);
 
-        public final int itsSortOrder;
+        private final int itsSortOrder;
 
         Location(int sortOrder)
         {
@@ -95,9 +96,9 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
         public final String itsPolicyStr;
         public final String itsOwnSymbols;
 
-        public RecordPolicyStrs(String policyName,
-                                String policyStr,
-                                String ownSymbols)
+        protected RecordPolicyStrs(String policyName,
+                                   String policyStr,
+                                   String ownSymbols)
         {
             itsPolicyName = policyName;
             itsPolicyStr = policyStr;
@@ -146,36 +147,31 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     private static final Random itsRandom = getRandom();
     private static Random getRandom()
     {
-        Random random;
-        try {
-            random = SecureRandom.getInstance("SHA1PRNG");
-        } catch (NoSuchAlgorithmException e) {
-            random = new SecureRandom();
-        }
+        Random random = new SecureRandom();
         random.nextBytes(new byte[32]);
         return random;
     }
 
     // 'Leet' digits that can replace a character
     private static final char[] LEETS_DIGITS = {
-        '4', '8', 0, 0, // a, b, c, d
-        '3', 0, '6', 0, // e, f, g, h
-        '1', 0, 0, '1', // i, j, k, l
-        0, 0, '0', 0,   // m, n, o, p
-        0, 0, '5', '7', // q, r, s, t
-        0, 0, 0, 0,     // u, v, w, x
-        0, '2'          // y, z
+            '4', '8', 0, 0, // a, b, c, d
+            '3', 0, '6', 0, // e, f, g, h
+            '1', 0, 0, '1', // i, j, k, l
+            0, 0, '0', 0,   // m, n, o, p
+            0, 0, '5', '7', // q, r, s, t
+            0, 0, 0, 0,     // u, v, w, x
+            0, '2'          // y, z
     };
 
     // 'Leet' symbols that can replace a character
     private static final char[] LEETS_SYMBOLS = {
-        '@', '&', '(', 0,       // a, b, c, d
-        0, 0, 0, '#',           // e, f, g, h
-        '!', 0, 0, '|',         // i, j, k, l
-        0, 0, 0, 0,             // m, n, o, p
-        0, 0, '$', '+',         // q, r, s, t
-        0, 0, 0, 0,             // u, v, w, x
-        0, 0                    // y, z
+            '@', '&', '(', 0,       // a, b, c, d
+            0, 0, 0, '#',           // e, f, g, h
+            '!', 0, 0, '|',         // i, j, k, l
+            0, 0, 0, 0,             // m, n, o, p
+            0, 0, '$', '+',         // q, r, s, t
+            0, 0, 0, 0,             // u, v, w, x
+            0, 0                    // y, z
     };
 
     /**
@@ -232,7 +228,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     /** Create a default policy */
     public static PasswdPolicy createDefaultPolicy(Context ctx)
     {
-        return new PasswdPolicy(ctx.getString(net.tjado.passwdsafe.R.string.default_policy),
+        return new PasswdPolicy(ctx.getString(R.string.default_policy),
                                 PasswdPolicy.Location.DEFAULT);
     }
 
@@ -240,7 +236,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     public static PasswdPolicy createDefaultPolicy(Context ctx,
                                                    int flags, int length)
     {
-        return new PasswdPolicy(ctx.getString(net.tjado.passwdsafe.R.string.default_policy),
+        return new PasswdPolicy(ctx.getString(R.string.default_policy),
                                 PasswdPolicy.Location.DEFAULT,
                                 flags, length, 1, 1, 1, 1, null);
     }
@@ -258,6 +254,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     }
 
     /** Get the policy flags */
+    @Keep
     public int getFlags()
     {
         return itsFlags;
@@ -286,7 +283,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     public static String getTypeStr(Type type, Context ctx)
     {
         return ctx.getResources().getStringArray(
-                net.tjado.passwdsafe.R.array.policy_type)[type.itsStrIdx];
+                R.array.policy_type)[type.itsStrIdx];
     }
 
     /** Get the password length */
@@ -365,7 +362,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
                            EASY_DIGITS, passwd, allchars);
             addRandomChars(FLAG_USE_SYMBOLS, itsMinSymbols,
                            (itsSpecialSymbols == null) ?
-                               SYMBOLS_EASY: itsSpecialSymbols,
+                                   SYMBOLS_EASY: itsSpecialSymbols,
                            passwd, allchars);
             break;
         }
@@ -400,6 +397,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
 
     /** Convert the object to a string */
     @Override
+    @NonNull
     public String toString()
     {
         return itsName;
@@ -412,7 +410,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     {
         if (itsLocation != policy.itsLocation) {
             return (itsLocation.itsSortOrder < policy.itsLocation.itsSortOrder)
-                ? -1 : 1;
+                    ? -1 : 1;
         }
         return itsName.compareTo(policy.itsName);
     }
@@ -471,7 +469,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
                                                              int pos,
                                                              int policyNum,
                                                              Location loc)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         int fieldStart = pos;
         int nameLen = getPolicyStrInt(policyStr, policyNum, fieldStart, 2,
@@ -497,16 +495,16 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
         }
 
         PasswdPolicy policy =
-            new PasswdPolicy(name, loc, fields.itsFlags, fields.itsLength,
-                             fields.itsMinLowercase, fields.itsMinUppercase,
-                             fields.itsMinDigits, fields.itsMinSymbols,
-                             specialSyms);
+                new PasswdPolicy(name, loc, fields.itsFlags, fields.itsLength,
+                                 fields.itsMinLowercase, fields.itsMinUppercase,
+                                 fields.itsMinDigits, fields.itsMinSymbols,
+                                 specialSyms);
         return new Pair<>(policy, fieldStart);
     }
 
     /** Parse policies from the header named policies field */
     public static List<PasswdPolicy> parseHdrPolicies(String policyStr)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         if (TextUtils.isEmpty(policyStr)) {
             return null;
@@ -515,7 +513,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
         int policyLen = policyStr.length();
         if (policyLen < 2) {
             throw new IllegalArgumentException(
-                "Policies length (" + policyLen + ") too short: 2");
+                    "Policies length (" + policyLen + ") too short: 2");
         }
 
         int numPolicies = Integer.parseInt(policyStr.substring(0, 2), 16);
@@ -532,7 +530,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
 
         if (policyStart != policyLen) {
             throw new IllegalArgumentException(
-                "Policies field does not end at the last policy");
+                    "Policies field does not end at the last policy");
         }
 
         return policies;
@@ -566,14 +564,14 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
             int endPos = fields.itsFieldsEnd;
             if (endPos > policyStr.length()) {
                 throw new IllegalArgumentException(
-                    "Password policy too long: " + policyStr);
+                        "Password policy too long: " + policyStr);
             }
             policy =
-                new PasswdPolicy(null, Location.RECORD,
-                                 fields.itsFlags, fields.itsLength,
-                                 fields.itsMinLowercase, fields.itsMinUppercase,
-                                 fields.itsMinDigits, fields.itsMinSymbols,
-                                 ownSymbols);
+                    new PasswdPolicy(null, Location.RECORD,
+                                     fields.itsFlags, fields.itsLength,
+                                     fields.itsMinLowercase, fields.itsMinUppercase,
+                                     fields.itsMinDigits, fields.itsMinSymbols,
+                                     ownSymbols);
         }
         return policy;
     }
@@ -610,16 +608,16 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
     /** Fields parsed from a policy flags and length string */
     private static class ParsedFields
     {
-        public final int itsFlags;
-        public final int itsLength;
-        public final int itsMinLowercase;
-        public final int itsMinUppercase;
-        public final int itsMinDigits;
-        public final int itsMinSymbols;
-        public final int itsFieldsEnd;
+        protected final int itsFlags;
+        protected final int itsLength;
+        protected final int itsMinLowercase;
+        protected final int itsMinUppercase;
+        protected final int itsMinDigits;
+        protected final int itsMinSymbols;
+        protected final int itsFieldsEnd;
 
-        public ParsedFields(int flags, int pwLen, int minLower, int minUpper,
-                            int minDigits, int minSymbols, int fieldsEnd)
+        protected ParsedFields(int flags, int pwLen, int minLower, int minUpper,
+                               int minDigits, int minSymbols, int fieldsEnd)
         {
             itsFlags = flags;
             itsLength = pwLen;
@@ -680,7 +678,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
                                        int fieldStart,
                                        int fieldLen,
                                        String fieldName)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         return Integer.parseInt(getPolicyStrField(policyStr, policyNum,
                                                   fieldStart, fieldLen,
@@ -693,11 +691,11 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
                                             int fieldStart,
                                             int fieldLen,
                                             String fieldName)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         if (policyStr.length() < fieldStart + fieldLen) {
             throw new IllegalArgumentException(
-                "Policy " + policyNum + " too short for " +
+                    "Policy " + policyNum + " too short for " +
                     fieldName + ": " + fieldLen);
         }
         return policyStr.substring(fieldStart, fieldStart + fieldLen);
@@ -715,7 +713,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
         // Pronounceable passwords generation code copied from
         // CPasswordCharPool::MakePronounceable from Password Safe project
 
-        /**
+        /*
          * Following based on gpw.C from
          * http://www.multicians.org/thvv/tvvtools.html
          * Thanks to Tom Van Vleck, Morrie Gasser, and Dan Edwards.
@@ -776,7 +774,7 @@ public class PasswdPolicy implements Comparable<PasswdPolicy>, Parcelable
             if (sumfreq == 0) { // If there is no possible extension..
                 ranno = 0;
             } else {
-                 // Weight by sum of frequencies
+                // Weight by sum of frequencies
                 ranno = itsRandom.nextInt(sumfreq+1);
             }
             sum = 0;

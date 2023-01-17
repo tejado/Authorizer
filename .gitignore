@@ -49,3 +49,4 @@ captures/
 authorizer/debug/
 authorizer/release/
 authorizer/.externalNativeBuild/
+.cxx

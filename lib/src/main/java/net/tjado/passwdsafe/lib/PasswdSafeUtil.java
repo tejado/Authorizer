@@ -25,21 +25,26 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import androidx.appcompat.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
+import androidx.annotation.Keep;
+import androidx.appcompat.app.AlertDialog;
 
 import net.tjado.passwdsafe.lib.view.AbstractDialogClickListener;
 
 /**
  * The PasswdSafeUtil class contains common helper methods
  */
-@SuppressWarnings("SameParameterValue")
 public class PasswdSafeUtil
 {
-    private static final String PACKAGE = "net.tjado.passwdsafe";
+    public static final String PACKAGE = "net.tjado.passwdsafe";
+    public static final String SYNC_PACKAGE = PACKAGE + ".sync";
     public static final String NEW_INTENT = PACKAGE + ".action.NEW";
     public static final String VIEW_INTENT = PACKAGE + ".action.VIEW";
+    public static final String SEARCH_VIEW_INTENT =
+            PACKAGE + ".action.SEARCH_VIEW";
+
+    public static final String MIME_TYPE_PSAFE3 = "application/psafe3";
 
     public static final boolean DEBUG = BuildConfig.DEBUG;
 
@@ -84,9 +89,7 @@ public class PasswdSafeUtil
         intent.setPackage(pkgName);
         PackageManager pm = ctx.getPackageManager();
         List<ResolveInfo> infos = pm.queryIntentActivities(intent, 0);
-        if (infos == null) {
-            return null;
-        }
+
         for (ResolveInfo info: infos) {
             ActivityInfo actInfo = info.activityInfo;
             if ((actInfo != null) && (pkgName.equals(actInfo.packageName))) {
@@ -131,15 +134,26 @@ public class PasswdSafeUtil
     /**
      * Copy text to the clipboard
      */
-    public static void copyToClipboard(String str, Context ctx)
+    public static void copyToClipboard(String str,
+                                       boolean sensitive,
+                                       Context ctx)
     {
         try {
-            ApiCompat.copyToClipboard(str, ctx);
+            ApiCompat.copyToClipboard(str, sensitive, ctx);
         } catch (Throwable e) {
-            String err = ctx.getString(R.string.copy_clipboard_error,
-                                       getAppTitle(ctx));
-            Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
-            Log.e(TAG, err + ": " + e.toString());
+            showClipboardError(e, ctx);
+        }
+    }
+
+    /**
+     * Clear the clipboard
+     */
+    public static void clearClipboard(Context ctx)
+    {
+        try {
+            ApiCompat.clearClipboard(ctx);
+        } catch (Throwable e) {
+            showClipboardError(e, ctx);
         }
     }
 
@@ -155,7 +169,7 @@ public class PasswdSafeUtil
 
     public static void showFatalMsg(String msg,
                                     Activity activity,
-                                    boolean copyTrace)
+                                    @SuppressWarnings("SameParameterValue") boolean copyTrace)
     {
         showFatalMsg(null, msg, activity, copyTrace);
     }
@@ -172,24 +186,25 @@ public class PasswdSafeUtil
                                     final Activity activity,
                                     boolean copyTrace)
     {
-        if (copyTrace && (t != null)) {
-            StringWriter writer = new StringWriter();
-            t.printStackTrace(new PrintWriter(writer));
-            String trace = writer.toString();
-            Log.e(TAG, trace);
-            copyToClipboard(trace, activity);
+        if (t != null) {
+            Log.e(TAG, msg, t);
+            if (copyTrace) {
+                StringWriter writer = new StringWriter();
+                t.printStackTrace(new PrintWriter(writer));
+                copyToClipboard(writer.toString(), false, activity);
+            }
         }
 
         AbstractDialogClickListener dlgClick = new AbstractDialogClickListener()
         {
             @Override
-            public final void onOkClicked(DialogInterface dialog)
+            public void onOkClicked(DialogInterface dialog)
             {
                 activity.finish();
             }
 
             @Override
-            public final void onCancelClicked()
+            public void onCancelClicked()
             {
                 activity.finish();
             }
@@ -207,15 +222,34 @@ public class PasswdSafeUtil
         dlg.show();
     }
 
-    public static void showErrorMsg(String msg, Context context)
+    /**
+     * Show an error message
+     */
+    public static void showErrorMsg(String msg, ActContext context)
     {
-        AlertDialog.Builder dlg = new AlertDialog.Builder(context)
-                .setTitle(PasswdSafeUtil.getAppTitle(context) + " - " +
-                          context.getString(R.string.error))
+        Context ctx = context.getContext();
+        if (ctx == null) {
+            return;
+        }
+        AlertDialog.Builder dlg = new AlertDialog.Builder(ctx)
+                .setTitle(PasswdSafeUtil.getAppTitle(ctx) + " - " +
+                          ctx.getString(R.string.error))
                 .setMessage(msg)
                 .setCancelable(true)
                 .setPositiveButton(R.string.close, null);
         dlg.show();
+    }
+
+    /**
+     * Show and error message with logged exception
+     */
+    public static void showError(String msg,
+                                 String logTag,
+                                 Throwable error,
+                                 ActContext context)
+    {
+        Log.e(logTag, msg, error);
+        showErrorMsg(msg, context);
     }
 
     public static void showInfoMsg(String msg, Context context)
@@ -227,6 +261,12 @@ public class PasswdSafeUtil
                 .setCancelable(true)
                 .setPositiveButton(R.string.close, null);
         dlg.show();
+    }
+
+    /** Log a formatted message at info level */
+    public static void info(String tag, String fmt, Object... args)
+    {
+        Log.i(tag, String.format(fmt, args));
     }
 
     /**
@@ -241,6 +281,7 @@ public class PasswdSafeUtil
     /**
      * Set whether the app is running while testing
      */
+    @Keep
     public static void setIsTesting(boolean testing)
     {
         TESTING = DEBUG && testing;
@@ -269,12 +310,26 @@ public class PasswdSafeUtil
     }
 
     /** Log a formatted debug message and exception at info level */
-    public static void dbginfo(String tag, Throwable t,
-                               String fmt, Object... args)
+    public static void dbginfo(
+            @SuppressWarnings("SameParameterValue") String tag,
+            Throwable t,
+            @SuppressWarnings("SameParameterValue") String fmt,
+            Object... args)
     {
         if (DEBUG) {
             Log.i(tag, String.format(fmt, args), t);
         }
+    }
+
+    /**
+     * Show an error from updating the clipboard
+     */
+    private static void showClipboardError(Throwable e, Context ctx)
+    {
+        String err = ctx.getString(R.string.copy_clipboard_error,
+                                   getAppTitle(ctx));
+        Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
+        Log.e(TAG, err + ": " + e.toString());
     }
 
     /* http://stackoverflow.com/a/20149601

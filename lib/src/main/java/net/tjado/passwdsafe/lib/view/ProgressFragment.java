@@ -37,7 +37,8 @@ public class ProgressFragment extends DialogFragment
         setCancelable(false);
         ProgressDialog dlg = new ProgressDialog(getActivity());
         dlg.setIndeterminate(true);
-        dlg.setMessage(getArguments().getString("msg"));
+        Bundle args = requireArguments();
+        dlg.setMessage(args.getString("msg"));
         return dlg;
     }
 }

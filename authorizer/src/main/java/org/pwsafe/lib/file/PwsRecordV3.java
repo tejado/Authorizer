@@ -13,23 +13,28 @@ import org.pwsafe.lib.Log;
 import org.pwsafe.lib.UUID;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.EndOfFileException;
+import org.pwsafe.lib.exception.RecordLoadException;
+
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Support for new v3 Record type.
  *
  * @author Glen Smith (based on Kevin's code for V2 records)
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "RedundantSuppression"})
 public class PwsRecordV3 extends PwsRecord
 {
     private static final long serialVersionUID = -3160317668375599155L;
 
-    private static final Log LOG =
-            Log.getInstance(PwsRecordV3.class.getPackage().getName());
+    private static final Log LOG = Log.getInstance(Objects.requireNonNull(
+            PwsRecordV3.class.getPackage()).getName());
 
     /**
      * Constant for the version 3 ID string field.
@@ -256,66 +261,66 @@ public class PwsRecordV3 extends PwsRecord
      * All the valid type codes.
      */
     private static final Object[] VALID_TYPES = new Object[] {
-            new Object[]{Integer.valueOf(V3_ID_STRING),
+            new Object[]{V3_ID_STRING,
                          "V3_ID_STRING", PwsVersionField.class},
-            new Object[]{Integer.valueOf(UUID),
+            new Object[]{UUID,
                          "UUID", PwsUUIDField.class},
-            new Object[]{Integer.valueOf(GROUP),
+            new Object[]{GROUP,
                          "GROUP", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(TITLE),
+            new Object[]{TITLE,
                          "TITLE", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(USERNAME),
+            new Object[]{USERNAME,
                          "USERNAME", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(NOTES),
+            new Object[]{NOTES,
                          "NOTES", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(PASSWORD),
+            new Object[]{PASSWORD,
                          "PASSWORD", PwsPasswdUnicodeField.class},
-            new Object[]{Integer.valueOf(CREATION_TIME),
+            new Object[]{CREATION_TIME,
                          "CREATION_TIME", PwsTimeField.class},
-            new Object[]{Integer.valueOf(PASSWORD_MOD_TIME),
+            new Object[]{PASSWORD_MOD_TIME,
                          "PASSWORD_MOD_TIME", PwsTimeField.class},
-            new Object[]{Integer.valueOf(LAST_ACCESS_TIME),
+            new Object[]{LAST_ACCESS_TIME,
                          "LAST_ACCESS_TIME", PwsTimeField.class},
-            new Object[]{Integer.valueOf(PASSWORD_LIFETIME),
+            new Object[]{PASSWORD_LIFETIME,
                          "PASSWORD_LIFETIME", PwsTimeField.class},
-            new Object[]{Integer.valueOf(PASSWORD_POLICY_DEPRECATED),
+            new Object[]{PASSWORD_POLICY_DEPRECATED,
                          "PASSWORD_POLICY_OLD",
                          PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(LAST_MOD_TIME),
+            new Object[]{LAST_MOD_TIME,
                          "LAST_MOD_TIME", PwsTimeField.class},
-            new Object[]{Integer.valueOf(URL),
+            new Object[]{URL,
                          "URL", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(AUTOTYPE),
+            new Object[]{AUTOTYPE,
                          "AUTOTYPE", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(PASSWORD_HISTORY),
+            new Object[]{PASSWORD_HISTORY,
                          "PASSWORD_HISTORY", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(PASSWORD_POLICY),
+            new Object[]{PASSWORD_POLICY,
                          "PASSWORD_POLICY", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(PASSWORD_EXPIRY_INTERVAL),
+            new Object[]{PASSWORD_EXPIRY_INTERVAL,
                          "PASSWORD_EXPIRY_INTERVAL", PwsIntegerField.class},
-            new Object[]{Integer.valueOf(RUN_COMMAND),
+            new Object[]{RUN_COMMAND,
                          "RUN_COMMAND", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(DOUBLE_CLICK_ACTION),
+            new Object[]{DOUBLE_CLICK_ACTION,
                          "DOUBLE_CLICK_ACTION", PwsShortField.class},
-            new Object[]{Integer.valueOf(EMAIL),
+            new Object[]{EMAIL,
                          "EMAIL", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(PROTECTED_ENTRY),
+            new Object[]{PROTECTED_ENTRY,
                          "PROTECTED_ENTRY", PwsByteField.class},
-            new Object[]{Integer.valueOf(OWN_PASSWORD_SYMBOLS),
+            new Object[]{OWN_PASSWORD_SYMBOLS,
                          "OWN_PASSWORD_SYMBOLS", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(SHIFT_DOUBLE_CLICK_ACTION),
+            new Object[]{SHIFT_DOUBLE_CLICK_ACTION,
                          "SHIFT_DOUBLE_CLICK_ACTION", PwsShortField.class},
-            new Object[]{Integer.valueOf(PASSWORD_POLICY_NAME),
+            new Object[]{PASSWORD_POLICY_NAME,
                          "PASSWORD_POLICY_NAME", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(ENTRY_KEYBOARD_SHORTCUT),
+            new Object[]{ENTRY_KEYBOARD_SHORTCUT,
                          "ENTRY_KEYBOARD_SHORTCUT", PwsIntegerField.class},
-            new Object[]{Integer.valueOf(ICON),
+            new Object[]{ICON,
                          "ICON", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(OTP),
+            new Object[]{OTP,
                          "OTP", PwsStringUnicodeField.class},
-            new Object[]{Integer.valueOf(AUTOTYPE_DELIMITER),
+            new Object[]{AUTOTYPE_DELIMITER,
                          "AUTOTYPE_DELIMITER", PwsIntegerField.class},
-            new Object[]{Integer.valueOf(AUTOTYPE_RETURNSUFFIX),
+            new Object[]{AUTOTYPE_RETURNSUFFIX,
                          "AUTOTYPE_RETURNSUFFIX", PwsIntegerField.class},
             };
 
@@ -337,7 +342,8 @@ public class PwsRecordV3 extends PwsRecord
      *
      * @param isHeader Marker for header record
      */
-    PwsRecordV3(@SuppressWarnings("UnusedParameters") boolean isHeader)
+    PwsRecordV3(@SuppressWarnings({"UnusedParameters",
+                                   "SameParameterValue"}) boolean isHeader)
     {
         super(VALID_TYPES, true);
         setField(new PwsVersionField(HEADER_VERSION,
@@ -352,7 +358,7 @@ public class PwsRecordV3 extends PwsRecord
      * @throws EndOfFileException If end of file is reached
      * @throws IOException        If a read error occurs.
      */
-    PwsRecordV3(PwsFile file) throws EndOfFileException, IOException
+    PwsRecordV3(PwsFile file) throws EndOfFileException, IOException, RecordLoadException
     {
         super(file, VALID_TYPES);
     }
@@ -367,11 +373,12 @@ public class PwsRecordV3 extends PwsRecord
      * @throws EndOfFileException If end of file is reached
      * @throws IOException        If a read error occurs.
      */
-    PwsRecordV3(PwsFile file, boolean ignoreFieldTypes)
-            throws EndOfFileException, IOException
+    PwsRecordV3(PwsFile file, @SuppressWarnings("SameParameterValue") boolean ignoreFieldTypes)
+            throws EndOfFileException, IOException, RecordLoadException
     {
         super(file, VALID_TYPES, ignoreFieldTypes);
     }
+
 
     /**
      * The V3 format allows and requires the ability to add formerly unknown
@@ -448,7 +455,7 @@ public class PwsRecordV3 extends PwsRecord
 
     static final byte[] EOF_BYTES_RAW = "PWS3-EOFPWS3-EOF".getBytes();
 
-    protected class ItemV3 extends Item
+    protected static class ItemV3 extends Item
     {
         public ItemV3(PwsFileV3 file) throws EndOfFileException, IOException
         {
@@ -478,31 +485,31 @@ public class PwsRecordV3 extends PwsRecord
             }
             byte[] remainingDataInRecord = Util.getBytes(rawData, 5, 11);
             if (length <= 11) {
-                Util.copyBytes(Util.getBytes(remainingDataInRecord, 0, length),
-                               data);
-            } else if (length > 11) {
+                System.arraycopy(remainingDataInRecord, 0, data, 0, length);
+            } else {
                 int bytesToRead = length - 11;
-                int blocksToRead = bytesToRead / file.getBlockSize();
+                final int blockSize = file.getBlockSize();
+                int blocksToRead = bytesToRead / blockSize;
+
+                System.arraycopy(remainingDataInRecord, 0, data, 0,
+                                 remainingDataInRecord.length);
+                int pos = remainingDataInRecord.length;
+
+                byte[] nextBlock = new byte[blockSize];
+                int nextBlockLen = nextBlock.length;
+                for (int i = 0; i < blocksToRead; i++, pos += nextBlockLen) {
+                    file.readDecryptedBytes(nextBlock);
+                    System.arraycopy(nextBlock, 0, data, pos, nextBlockLen);
+                }
 
                 // if blocksToRead doesn't fit neatly into current block
                 // size, add an extra block for the remaining bytes
-                if (bytesToRead % file.getBlockSize() != 0)
-                    blocksToRead++;
-
-                byte[] remainingRecords = new byte[0];
-                for (int i = 0; i < blocksToRead; i++) {
-                    byte[] nextBlock = new byte[file.getBlockSize()];
+                if ((bytesToRead % blockSize) != 0) {
                     file.readDecryptedBytes(nextBlock);
-                    if (i == blocksToRead - 1) {
-                        // last block, do magic
-                        nextBlock = Util.getBytes(
-                                nextBlock, 0,
-                                bytesToRead - remainingRecords.length);
-                    }
-                    remainingRecords =
-                            Util.mergeBytes(remainingRecords, nextBlock);
+                    int bytesRead = pos - remainingDataInRecord.length;
+                    nextBlockLen = bytesToRead - bytesRead;
+                    System.arraycopy(nextBlock, 0, data, pos, nextBlockLen);
                 }
-                data = Util.mergeBytes(remainingDataInRecord, remainingRecords);
             }
             byte[] dataToHash = data;
             file.hasher.digest(dataToHash);
@@ -513,107 +520,114 @@ public class PwsRecordV3 extends PwsRecord
      * Initialises this record by reading its data from <code>file</code>.
      *
      * @param file the file to read the data from.
-     * @throws EndOfFileException
-     * @throws IOException
      */
     @Override
     protected void loadRecord(PwsFile file)
-            throws EndOfFileException, IOException
+            throws EndOfFileException, RecordLoadException
     {
-        Item item;
-        PwsField itemVal;
-
+        ArrayList<Throwable> itemErrors = null;
         for (; ; ) {
-            item = new ItemV3((PwsFileV3)file);
+            try {
+                Item item = new ItemV3((PwsFileV3)file);
 
-            if (item.getType() == END_OF_RECORD) {
-                break; // out of the for loop
-            }
+                if (item.getType() == END_OF_RECORD) {
+                    break; // out of the for loop
+                }
 
-            if (ignoreFieldTypes) {
-                // header record has no valid types...
-                itemVal =
-                        new PwsUnknownField(item.getType(), item.getByteData());
-                attributes.put(item.getType(), itemVal);
-            } else {
-
-                switch (item.getType()) {
-                case V3_ID_STRING:
-                    // itemVal = new PwsIntegerField( item.getType(), new byte[]
-                    // {3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} );
-                    itemVal = new PwsVersionField(item.getType(),
-                                                  item.getByteData());
-                    break;
-
-                case UUID:
-                    itemVal = new PwsUUIDField(item.getType(),
-                                               item.getByteData());
-                    break;
-
-                case GROUP:
-                case TITLE:
-                case USERNAME:
-                case NOTES:
-                case PASSWORD_POLICY:
-                case PASSWORD_HISTORY:
-                case URL:
-                case AUTOTYPE:
-                case RUN_COMMAND:
-                case EMAIL:
-                case OWN_PASSWORD_SYMBOLS:
-                case ICON:
-                case OTP:
-                case PASSWORD_POLICY_NAME:
-                    itemVal = new PwsStringUnicodeField(item.getType(),
-                                                        item.getByteData());
-                    break;
-
-                case PASSWORD:
-                    itemVal = new PwsPasswdUnicodeField(item.getType(),
-                                                        item.getByteData(),
-                                                        file);
-                    item.clear();
-                    break;
-
-                case CREATION_TIME:
-                case PASSWORD_MOD_TIME:
-                case LAST_ACCESS_TIME:
-                case LAST_MOD_TIME:
-                    itemVal = new PwsTimeField(item.getType(),
-                                               item.getByteData());
-                    break;
-
-                case PASSWORD_LIFETIME:
-                    itemVal = new PwsTimeField(item.getType(),
-                                               item.getByteData());
-                    break;
-
-                case AUTOTYPE_DELIMITER:
-                case AUTOTYPE_RETURNSUFFIX:
-                case PASSWORD_EXPIRY_INTERVAL:
-                case ENTRY_KEYBOARD_SHORTCUT:
-                    itemVal = new PwsIntegerField(item.getType(),
-                                                  item.getByteData());
-                    break;
-
-                case DOUBLE_CLICK_ACTION:
-                case SHIFT_DOUBLE_CLICK_ACTION:
-                    itemVal = new PwsShortField(item.getType(),
-                                                item.getByteData());
-                    break;
-
-                case PROTECTED_ENTRY:
-                    itemVal = new PwsByteField(item.getType(),
-                                               item.getByteData());
-                    break;
-
-                default:
+                PwsField itemVal;
+                if (ignoreFieldTypes) {
+                    // header record has no valid types...
                     itemVal = new PwsUnknownField(item.getType(),
                                                   item.getByteData());
-                    break;
+                    attributes.put(item.getType(), itemVal);
+                } else {
+
+                    switch (item.getType()) {
+                    case V3_ID_STRING:
+                        itemVal = new PwsVersionField(item.getType(),
+                                                      item.getByteData());
+                        break;
+
+                    case UUID:
+                        itemVal = new PwsUUIDField(item.getType(),
+                                                   item.getByteData());
+                        break;
+
+                    case GROUP:
+                    case TITLE:
+                    case USERNAME:
+                    case NOTES:
+                    case PASSWORD_POLICY:
+                    case PASSWORD_HISTORY:
+                    case URL:
+                    case AUTOTYPE:
+                    case RUN_COMMAND:
+                    case EMAIL:
+                    case OWN_PASSWORD_SYMBOLS:
+                    case ICON:
+                    case OTP:
+                    case PASSWORD_POLICY_NAME:
+                        itemVal = new PwsStringUnicodeField(item.getType(),
+                                                            item.getByteData());
+                        break;
+
+                    case PASSWORD:
+                        itemVal = new PwsPasswdUnicodeField(item.getType(),
+                                                            item.getByteData(),
+                                                            file);
+                        item.clear();
+                        break;
+
+                    case CREATION_TIME:
+                    case PASSWORD_MOD_TIME:
+                    case LAST_ACCESS_TIME:
+                    case LAST_MOD_TIME:
+                    case PASSWORD_LIFETIME:
+                        itemVal = new PwsTimeField(item.getType(),
+                                                   item.getByteData());
+                        break;
+
+                    case AUTOTYPE_DELIMITER:
+                    case AUTOTYPE_RETURNSUFFIX:
+                    case PASSWORD_EXPIRY_INTERVAL:
+                    case ENTRY_KEYBOARD_SHORTCUT:
+                        itemVal = new PwsIntegerField(item.getType(),
+                                                      item.getByteData());
+                        break;
+
+                    case DOUBLE_CLICK_ACTION:
+                    case SHIFT_DOUBLE_CLICK_ACTION:
+                        itemVal = new PwsShortField(item.getType(),
+                                                    item.getByteData());
+                        break;
+
+                    case PROTECTED_ENTRY:
+                        itemVal = new PwsByteField(item.getType(),
+                                                   item.getByteData());
+                        break;
+
+                    default:
+                        itemVal = new PwsUnknownField(item.getType(),
+                                                      item.getByteData());
+                        break;
+                    }
+                    setField(itemVal);
                 }
-                setField(itemVal);
+            } catch (EndOfFileException eof) {
+                if (itemErrors != null) {
+                    throw new RecordLoadException(this, itemErrors);
+                }
+                throw eof;
+            } catch (Throwable t) {
+                if (itemErrors == null) {
+                    itemErrors = new ArrayList<>();
+                }
+                itemErrors.add(t);
             }
+        }
+
+        if (itemErrors != null) {
+            throw new RecordLoadException(this, itemErrors);
         }
     }
 
@@ -655,31 +669,38 @@ public class PwsRecordV3 extends PwsRecord
     protected void writeField(PwsFile file, PwsField field, int type)
             throws IOException
     {
-        byte lenBlock[];
-        byte dataBlock[];
-
-        lenBlock = new byte[5];
-        dataBlock = field.getBytes();
+        byte[] lenBlock = new byte[5];
+        byte[] dataBlock = field.getBytes();
 
         Util.putIntToByteArray(lenBlock, dataBlock.length, 0);
         lenBlock[4] = (byte)type;
 
-        // ensure encryption payload is equal blocks of 16
-        int bytesToPad = 0;
-        int calcWriteLen = lenBlock.length + dataBlock.length;
-        if (calcWriteLen % 16 != 0) {
-            bytesToPad = 16 - (calcWriteLen % 16);
-        }
+        final int blockSize = 16;
+        byte[] nextBlock = new byte[blockSize];
 
-        dataBlock =
-                Util.cloneByteArray(dataBlock, dataBlock.length + bytesToPad);
+        int firstBlockLen = Math.min(dataBlock.length, 11);
+        System.arraycopy(lenBlock, 0, nextBlock, 0, lenBlock.length);
+        System.arraycopy(dataBlock, 0,
+                         nextBlock, lenBlock.length, firstBlockLen);
+        file.writeEncryptedBytes(nextBlock);
 
-        // file.writeBytes(lenBlock);
-        byte[] dataToWrite = Util.mergeBytes(lenBlock, dataBlock);
+        int bytesToWrite = dataBlock.length - 11;
+        if (bytesToWrite > 0) {
+            int blocksToWrite = bytesToWrite / blockSize;
+            int pos = 11;
+            int nextBlockLen = nextBlock.length;
+            for (int i = 0; i < blocksToWrite; ++i, pos += nextBlockLen) {
+                System.arraycopy(dataBlock, pos, nextBlock, 0, nextBlockLen);
+                file.writeEncryptedBytes(nextBlock);
+            }
 
-        for (int i = 0; i < (dataToWrite.length / 16); i++) {
-            byte[] nextBlock = Util.getBytes(dataToWrite, i * 16, 16);
-            file.writeEncryptedBytes(nextBlock);
+            if ((bytesToWrite % blockSize) != 0) {
+                int bytesWritten = pos - 11;
+                nextBlockLen = bytesToWrite - bytesWritten;
+                System.arraycopy(dataBlock, pos, nextBlock, 0, nextBlockLen);
+                Arrays.fill(nextBlock, nextBlockLen, nextBlock.length, (byte)0);
+                file.writeEncryptedBytes(nextBlock);
+            }
         }
 
     }
@@ -690,6 +711,7 @@ public class PwsRecordV3 extends PwsRecord
      * @return A string representation of this object.
      */
     @Override
+    @NonNull
     public String toString()
     {
         boolean first = true;
@@ -713,7 +735,8 @@ public class PwsRecordV3 extends PwsRecord
             if (key <= VALID_TYPES.length) {
                 Object[] type = (Object[])VALID_TYPES[key];
                 sb.append(type[1]);
-                showValue = ((Integer)type[0] != PASSWORD);
+                int typeVal = (Integer)type[0];
+                showValue = (typeVal != PASSWORD) && (typeVal != NOTES);
             }
             else {
                 sb.append(key);

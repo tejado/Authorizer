@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2017 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,14 +7,15 @@
  */
 package net.tjado.passwdsafe.view;
 
-import net.tjado.passwdsafe.lib.view.AbstractTextWatcher;
-
 import android.content.Context;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.TextView;
+
+import net.tjado.passwdsafe.R;
+import net.tjado.passwdsafe.lib.view.AbstractTextWatcher;
 
 public abstract class DialogValidator
 {
@@ -28,8 +29,8 @@ public abstract class DialogValidator
         /**
          * Constructor with a specific view and optional password fields
          */
-        public AlertCompatValidator(androidx.appcompat.app.AlertDialog dlg,
-                                    View view, Context ctx)
+        protected AlertCompatValidator(androidx.appcompat.app.AlertDialog dlg,
+                                       View view, Context ctx)
         {
             super(view, ctx);
             itsDialog = dlg;
@@ -49,7 +50,7 @@ public abstract class DialogValidator
     private final String itsErrorFmt;
     private final TextWatcher itsTextWatcher = new AbstractTextWatcher()
     {
-        public final void afterTextChanged(Editable s)
+        public void afterTextChanged(Editable s)
         {
             validate();
         }
@@ -58,11 +59,11 @@ public abstract class DialogValidator
     /**
      * Constructor with a specific view and optional password fields
      */
-    protected DialogValidator(View view, Context ctx)
+    private DialogValidator(View view, Context ctx)
     {
         itsContext = ctx;
-        itsErrorMsgView = (TextView)view.findViewById(net.tjado.passwdsafe.R.id.error_msg);
-        itsErrorFmt = view.getResources().getString(net.tjado.passwdsafe.R.string.error_msg);
+        itsErrorMsgView = view.findViewById(R.id.error_msg);
+        itsErrorFmt = view.getResources().getString(R.string.error_msg);
     }
 
 

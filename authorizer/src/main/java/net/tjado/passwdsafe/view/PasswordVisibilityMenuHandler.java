@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2011-2012, 2014 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -30,7 +30,7 @@ public class PasswordVisibilityMenuHandler
     }
 
     private static class MenuListener
-        implements OnCreateContextMenuListener, OnMenuItemClickListener
+            implements OnCreateContextMenuListener, OnMenuItemClickListener
     {
         private static final int MENU_TOGGLE_PASSWORD = 0;
 
@@ -38,7 +38,7 @@ public class PasswordVisibilityMenuHandler
         private final TextView[] itsViews;
         private final TextView itsView;
 
-        public MenuListener(Context ctx, TextView view, TextView[] views)
+        protected MenuListener(Context ctx, TextView view, TextView[] views)
         {
             itsContext = ctx;
             itsViews = views;
@@ -63,8 +63,8 @@ public class PasswordVisibilityMenuHandler
 
             boolean visible = GuiUtils.isPasswordVisible(itsView);
             int title = (itsViews.length > 1) ?
-                (visible ? R.string.hide_passwords : R.string.show_passwords) :
-                (visible ? R.string.hide_password : R.string.show_password);
+                    (visible ? R.string.hide_passwords : R.string.show_passwords) :
+                    (visible ? R.string.hide_password : R.string.show_password);
 
             mi = menu.add(0, MENU_TOGGLE_PASSWORD, 0, title);
             mi.setOnMenuItemClickListener(this);

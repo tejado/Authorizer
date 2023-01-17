@@ -16,8 +16,9 @@
     <color name="accent_material_dark" tools:override="true">@color/accentDark</color>
     <color name="primary_dark_material_dark" tools:override="true">@color/colorPrimary</color>
     <color name="primary_material_dark" tools:override="true">@color/colorPrimary</color>
+
     <!-- this is needed as preference_category_material layout uses this color as the text color -->
-    <color name="preference_fallback_accent_color">@color/accent</color>
+    <color name="preference_fallback_accent_color" tools:ignore="PrivateResource">@color/accent</color>
 
     <!-- Copied from design compat library -->
     <color name="textinput_error_color_light">#FFD50000</color>

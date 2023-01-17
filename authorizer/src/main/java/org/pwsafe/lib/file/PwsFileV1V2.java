@@ -13,6 +13,7 @@ import org.pwsafe.lib.crypto.BlowfishPws;
 import org.pwsafe.lib.crypto.SHA1;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.PasswordSafeException;
+import org.pwsafe.lib.exception.RecordLoadException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 import java.io.ByteArrayInputStream;
@@ -20,8 +21,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Superclass for common functionality for V1 and V2 Files.
@@ -30,8 +31,8 @@ import java.util.Iterator;
  */
 public abstract class PwsFileV1V2 extends PwsFile
 {
-    private static final Log LOG = Log.getInstance(
-            PwsFileV1V2.class.getPackage().getName());
+    private static final Log LOG = Log.getInstance(Objects.requireNonNull(
+            PwsFileV1V2.class.getPackage()).getName());
 
 
     /**
@@ -48,10 +49,6 @@ public abstract class PwsFileV1V2 extends PwsFile
 
     /**
      * Create a v1 or v2 file from storage
-     *
-     * @throws EndOfFileException
-     * @throws IOException
-     * @throws UnsupportedFileVersionException
      */
     protected PwsFileV1V2(PwsStorage storage,
                           Owner<PwsPassword>.Param passwd, String encoding)
@@ -88,14 +85,13 @@ public abstract class PwsFileV1V2 extends PwsFile
      * @param passwdParam the passphrase
      * @param encoding    the passphrase encoding (if known)
      * @return A properly initialised {@link BlowfishPws} object.
-     * @throws UnsupportedEncodingException
      */
     private BlowfishPws makeBlowfish(Owner<PwsPassword>.Param passwdParam,
                                      String encoding)
             throws UnsupportedEncodingException
     {
         SHA1 sha1;
-        byte salt[];
+        byte[] salt;
 
         sha1 = new SHA1();
         salt = header.getSalt();
@@ -105,6 +101,7 @@ public abstract class PwsFileV1V2 extends PwsFile
             byte[] passwordBytes = passwd.get().getBytes(encoding);
             sha1.update(passwordBytes, 0, passwordBytes.length);
             sha1.update(salt, 0, salt.length);
+            sha1.finish();
         } finally {
             passwd.close();
         }
@@ -117,9 +114,6 @@ public abstract class PwsFileV1V2 extends PwsFile
      *
      * @param passwd   the passphrase for the file.
      * @param encoding the passphrase encoding (if known)
-     * @throws EndOfFileException
-     * @throws IOException
-     * @throws UnsupportedFileVersionException
      */
     @Override
     protected void open(Owner<PwsPassword>.Param passwd, String encoding)
@@ -135,11 +129,15 @@ public abstract class PwsFileV1V2 extends PwsFile
         header = new PwsFileHeader(this);
         algorithm = makeBlowfish(passwd, encoding);
 
-        readExtraHeader(this);
+        try {
+            readExtraHeader();
+        } catch (RecordLoadException rle) {
+            throw new IOException("Error reading header record", rle);
+        }
 
         setOpenPasswordEncoding(
                 (encoding == null) ? Charset.defaultCharset().name() :
-                encoding);
+                        encoding);
     }
 
     /**
@@ -168,32 +166,9 @@ public abstract class PwsFileV1V2 extends PwsFile
         }
     }
 
-    /**
-     * Writes this file back to the filesystem.  If successful the modified
-     * flag is also reset on the file and all records.
-     *
-     * @throws IOException                     if the attempt fails.
-     * @throws ConcurrentModificationException if the underlying store was
-     *                                         independently changed
-     */
     @Override
-    public void save()
-            throws IOException, ConcurrentModificationException
+    public void saveAs(PwsStorage saveStorage) throws IOException
     {
-        if (isReadOnly())
-            throw new IOException("File is read only");
-
-        if (lastStorageChange != null && // check for concurrent change
-            storage.getModifiedDate().after(lastStorageChange)) {
-            throw new ConcurrentModificationException(
-                    "Password store was changed independently - no save " +
-                    "possible!");
-        }
-
-        // For safety we'll write to a temporary file which will be renamed
-	    // to the
-        // real name if we manage to write it successfully.
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         outStream = baos;
 
@@ -222,10 +197,7 @@ public abstract class PwsFileV1V2 extends PwsFile
 
             outStream.close();
 
-            if (storage.save(baos.toByteArray(), false)) {
-                modified = false;
-                lastStorageChange = storage.getModifiedDate();
-            } else {
+            if (!saveStorage.save(baos.toByteArray(), false)) {
                 throw new IOException("Unable to save file");
             }
         } catch (IOException e) {
@@ -245,7 +217,6 @@ public abstract class PwsFileV1V2 extends PwsFile
      * Encrypts then writes the contents of <code>buff</code> to the file.
      *
      * @param buff the data to be written.
-     * @throws IOException
      */
     @Override
     public void writeEncryptedBytes(byte[] buff)

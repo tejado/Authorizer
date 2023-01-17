@@ -13,22 +13,25 @@ import android.content.res.Resources;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
+import androidx.annotation.Nullable;
 
 import net.tjado.passwdsafe.Preferences;
 import net.tjado.passwdsafe.R;
+import net.tjado.passwdsafe.file.PasswdExpiryFilter;
 import net.tjado.passwdsafe.file.PasswdExpiration;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdRecord;
 import net.tjado.passwdsafe.file.PasswdRecordFilter;
+import net.tjado.passwdsafe.lib.ActContext;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.pref.PasswdExpiryNotifPref;
-import net.tjado.passwdsafe.pref.RecordSortOrderPref;
 
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -38,7 +41,7 @@ import java.util.regex.PatternSyntaxException;
 /**
  * The PasswdFileDataView contains state for viewing a password file
  */
-public class PasswdFileDataView
+public final class PasswdFileDataView
 {
     /**
      * Visitor interface for iterating records
@@ -55,19 +58,16 @@ public class PasswdFileDataView
     private PasswdRecordFilter itsFilter;
     private int itsNumExpired = 0;
     private boolean itsIsExpiryChanged = true;
-    private boolean itsIsGroupRecords =
-            Preferences.PREF_GROUP_RECORDS_DEF;
-    private boolean itsIsSortCaseSensitive =
-            Preferences.PREF_SORT_CASE_SENSITIVE_DEF;
+    private PasswdRecordDisplayOptions itsRecordOptions =
+            new PasswdRecordDisplayOptions();
     private boolean itsIsSearchCaseSensitive =
             Preferences.PREF_SEARCH_CASE_SENSITIVE_DEF;
     private boolean itsIsSearchRegex =
             Preferences.PREF_SEARCH_REGEX_DEF;
-    private RecordSortOrderPref itsRecordSortOrder =
-            Preferences.PREF_RECORD_SORT_ORDER_DEF;
     private PasswdExpiryNotifPref itsExpiryNotifPref =
             Preferences.PREF_PASSWD_EXPIRY_NOTIF_DEF;
     private Context itsContext;
+    private ActContext itsActContext;
     private int itsFolderIcon;
     private int itsRecordIcon;
 
@@ -87,12 +87,11 @@ public class PasswdFileDataView
     public void onAttach(Context ctx, SharedPreferences prefs)
     {
         itsContext = ctx.getApplicationContext();
-        itsIsGroupRecords = Preferences.getGroupRecordsPref(prefs);
-        itsIsSortCaseSensitive = Preferences.getSortCaseSensitivePref(prefs);
+        itsActContext = new ActContext(ctx);
+        itsRecordOptions = new PasswdRecordDisplayOptions(prefs);
         itsIsSearchCaseSensitive =
                 Preferences.getSearchCaseSensitivePref(prefs);
         itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
-        itsRecordSortOrder = Preferences.getRecordSortOrderPref(prefs);
         itsExpiryNotifPref = Preferences.getPasswdExpiryNotifPref(prefs);
 
         Resources.Theme theme = ctx.getTheme();
@@ -109,63 +108,67 @@ public class PasswdFileDataView
     public void onDetach()
     {
         itsContext = null;
+        itsActContext = null;
     }
 
     /**
      * Handle a shared preference change
      * @return Whether the file data should be refreshed
      */
-    public boolean handleSharedPreferenceChanged(SharedPreferences prefs,
-                                                 String key)
+    public boolean handleSharedPreferenceChanged(SharedPreferences prefs, @Nullable String key)
     {
         boolean rebuild = false;
         boolean rebuildSearch = false;
-        switch (key) {
-        case Preferences.PREF_GROUP_RECORDS: {
-            itsIsGroupRecords = Preferences.getGroupRecordsPref(prefs);
-            rebuild = true;
-            break;
-        }
-        case Preferences.PREF_SORT_CASE_SENSITIVE: {
-            itsIsSortCaseSensitive =
-                    Preferences.getSortCaseSensitivePref(prefs);
-            rebuild = true;
-            break;
-        }
-        case Preferences.PREF_SEARCH_CASE_SENSITIVE: {
+        if (key == null) {
+            itsRecordOptions = new PasswdRecordDisplayOptions(prefs);
             itsIsSearchCaseSensitive =
                     Preferences.getSearchCaseSensitivePref(prefs);
-            rebuildSearch = true;
-            break;
-        }
-        case Preferences.PREF_SEARCH_REGEX: {
             itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
-            rebuildSearch = true;
-            break;
-        }
-        case Preferences.PREF_RECORD_SORT_ORDER: {
-            itsRecordSortOrder = Preferences.getRecordSortOrderPref(prefs);
-            rebuild = true;
-            break;
-        }
-        case Preferences.PREF_PASSWD_EXPIRY_NOTIF: {
             itsExpiryNotifPref = Preferences.getPasswdExpiryNotifPref(prefs);
+            rebuildSearch = true;
             rebuild = true;
             itsIsExpiryChanged = true;
-            break;
-        }
+        } else {
+            switch (key) {
+            case Preferences.PREF_SORT_ASCENDING:
+            case Preferences.PREF_SORT_CASE_SENSITIVE:
+            case Preferences.PREF_GROUP_RECORDS:
+            case Preferences.PREF_RECORD_SORT_ORDER:
+            case Preferences.PREF_RECORD_FIELD_SORT: {
+                itsRecordOptions = new PasswdRecordDisplayOptions(prefs);
+                rebuild = true;
+                break;
+            }
+            case Preferences.PREF_SEARCH_CASE_SENSITIVE: {
+                itsIsSearchCaseSensitive =
+                        Preferences.getSearchCaseSensitivePref(prefs);
+                rebuildSearch = true;
+                break;
+            }
+            case Preferences.PREF_SEARCH_REGEX: {
+                itsIsSearchRegex = Preferences.getSearchRegexPref(prefs);
+                rebuildSearch = true;
+                break;
+            }
+            case Preferences.PREF_PASSWD_EXPIRY_NOTIF: {
+                itsExpiryNotifPref =
+                        Preferences.getPasswdExpiryNotifPref(prefs);
+                rebuild = true;
+                itsIsExpiryChanged = true;
+                break;
+            }
+            }
         }
 
-        if (rebuildSearch &&
-            (itsFilter != null) && itsFilter.isQueryType()) {
+        if (rebuildSearch && (itsFilter != null) && itsFilter.isQueryType()) {
             try {
-                PasswdRecordFilter filter =
-                        createRecordFilter(itsFilter.toString(itsContext));
+                PasswdRecordFilter filter = createRecordFilter(
+                        itsFilter.toString(itsContext));
                 setRecordFilter(filter);
             } catch (Exception e) {
                 String msg = e.getMessage();
                 Log.e(TAG, msg, e);
-                PasswdSafeUtil.showErrorMsg(msg, itsContext);
+                PasswdSafeUtil.showError(e.getMessage(), TAG, e, itsActContext);
             }
         }
 
@@ -209,7 +212,11 @@ public class PasswdFileDataView
             boolean incGroups)
     {
         List<PasswdRecordListData> records = new ArrayList<>();
-        if (itsCurrGroupNode == null) {
+        if ((itsCurrGroupNode == null) || (itsContext == null)) {
+            return records;
+        }
+        Resources res = itsContext.getResources();
+        if (res == null) {
             return records;
         }
 
@@ -219,11 +226,11 @@ public class PasswdFileDataView
                 for (Map.Entry<String, GroupNode> entry:
                         entryGroups.entrySet()) {
                     int items = entry.getValue().getNumRecords();
-                    String str = itsContext.getResources().getQuantityString(
-                            R.plurals.group_items, items, items);
+                    String str = res.getQuantityString(R.plurals.group_items,
+                                                       items, items);
 
                     records.add(new PasswdRecordListData(
-                            entry.getKey(), str, null,
+                            entry.getKey(), str, null, null, null,
                             null, "", itsFolderIcon, false));
                 }
             }
@@ -239,8 +246,8 @@ public class PasswdFileDataView
         }
 
         PasswdRecordListDataComparator comp =
-                new PasswdRecordListDataComparator(itsIsSortCaseSensitive,
-                                                   itsRecordSortOrder);
+                new PasswdRecordListDataComparator(itsRecordOptions);
+
         Collections.sort(records, comp);
         return records;
     }
@@ -282,11 +289,20 @@ public class PasswdFileDataView
     }
 
     /**
+     * Is the view grouping records
+     */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean isGroupingRecords()
+    {
+        return itsRecordOptions.itsIsGroupRecords;
+    }
+
+    /**
      * Get the record filter
      */
     public synchronized PasswdRecordFilter getRecordFilter()
     {
-        return itsFilter;
+        return (itsFilter != null) ? itsFilter : null;
     }
 
     /**
@@ -319,9 +335,18 @@ public class PasswdFileDataView
         return filter;
     }
 
+    /**
+     * Set the record filter
+     */
     public synchronized void setRecordFilter(PasswdRecordFilter filter)
     {
-        itsFilter = filter;
+        if (itsFilter != null) {
+            itsFilter = null;
+        }
+
+        if (filter != null) {
+            itsFilter = filter;
+        }
     }
 
     /**
@@ -364,7 +389,7 @@ public class PasswdFileDataView
     public String getExpiredRecordsStr(Context ctx)
     {
         String str = null;
-        PasswdRecordFilter.ExpiryFilter filter = itsExpiryNotifPref.getFilter();
+        PasswdExpiryFilter filter = itsExpiryNotifPref.getFilter();
         if (filter != null) {
             str = filter.getRecordsExpireStr(itsNumExpired, ctx.getResources());
         }
@@ -374,7 +399,7 @@ public class PasswdFileDataView
     /**
      * Get the filter for expired records
      */
-    public PasswdRecordFilter.ExpiryFilter getExpiredRecordsFilter()
+    public PasswdExpiryFilter getExpiredRecordsFilter()
     {
         return itsExpiryNotifPref.getFilter();
     }
@@ -392,9 +417,15 @@ public class PasswdFileDataView
         }
 
         List<PwsRecord> records = fileData.getRecords();
-        if (itsIsGroupRecords) {
-            Comparator<String> groupComp = itsIsSortCaseSensitive ?
-                    new StringComparator() : String.CASE_INSENSITIVE_ORDER;
+        if (itsRecordOptions.itsIsGroupRecords) {
+            Comparator<String> groupComp =
+                    itsRecordOptions.itsIsSortCaseSensitive ?
+                            new StringComparator() : String.CASE_INSENSITIVE_ORDER;
+
+            if (!itsRecordOptions.itsIsSortAscending) {
+                final Comparator<String> comp = groupComp;
+                groupComp = (s1, s2) -> -comp.compare(s1, s2);
+            }
 
             for (PwsRecord rec: records) {
                 String match = filterRecord(rec, fileData);
@@ -430,7 +461,7 @@ public class PasswdFileDataView
         }
         updateCurrentGroup();
 
-        PasswdRecordFilter.ExpiryFilter filter = itsExpiryNotifPref.getFilter();
+        PasswdExpiryFilter filter = itsExpiryNotifPref.getFilter();
         if (filter != null) {
             long expiration = filter.getExpiryFromNow(null);
             for (PasswdRecord rec : fileData.getPasswdRecords()) {
@@ -452,9 +483,7 @@ public class PasswdFileDataView
             GroupNode childNode = itsCurrGroupNode.getGroup(group);
             if (childNode == null) {
                 // Prune groups from current item in the stack on down
-                for (int j = itsCurrGroups.size() - 1; j >= i; --j) {
-                    itsCurrGroups.remove(j);
-                }
+                itsCurrGroups.subList(i, itsCurrGroups.size()).clear();
                 break;
             }
             itsCurrGroupNode = childNode;
@@ -513,8 +542,9 @@ public class PasswdFileDataView
             user = "[" + user + "]";
         }
 
-        return new PasswdRecordListData(title, user, rec.itsUuid, rec.itsMatch,
-                                        rec.itsIcon, itsRecordIcon, true);
+        return new PasswdRecordListData(title, user, rec.itsUuid,
+                                        rec.itsCreationTime, rec.itsModTime,
+                                        rec.itsMatch,  rec.itsIcon, itsRecordIcon, true);
     }
 
 
@@ -527,12 +557,12 @@ public class PasswdFileDataView
         private TreeMap<String, GroupNode> itsGroups = null;
 
         /** Constructor */
-        public GroupNode()
+        protected GroupNode()
         {
         }
 
         /** Add a record */
-        public final void addRecord(MatchPwsRecord rec)
+        protected final void addRecord(MatchPwsRecord rec)
         {
             if (itsRecords == null) {
                 itsRecords = new ArrayList<>();
@@ -541,13 +571,13 @@ public class PasswdFileDataView
         }
 
         /** Get the records */
-        public final List<MatchPwsRecord> getRecords()
+        protected final List<MatchPwsRecord> getRecords()
         {
             return itsRecords;
         }
 
         /** Put a child group */
-        public final void putGroup(String name, GroupNode node,
+        protected final void putGroup(String name, GroupNode node,
                                    Comparator<String> groupComp)
         {
             if (itsGroups == null) {
@@ -557,7 +587,7 @@ public class PasswdFileDataView
         }
 
         /** Get a group */
-        public final GroupNode getGroup(String name)
+        protected final GroupNode getGroup(String name)
         {
             if (itsGroups == null) {
                 return null;
@@ -567,13 +597,13 @@ public class PasswdFileDataView
         }
 
         /** Get the groups */
-        public final Map<String, GroupNode> getGroups()
+        protected final Map<String, GroupNode> getGroups()
         {
             return itsGroups;
         }
 
         /** Get the number of records */
-        public final int getNumRecords()
+        protected final int getNumRecords()
         {
             int num = 0;
             if (itsRecords != null) {
@@ -594,19 +624,32 @@ public class PasswdFileDataView
      */
     public static final class MatchPwsRecord
     {
-        public final String itsTitle;
-        public final String itsUsername;
-        public final String itsUuid;
-        public final String itsMatch;
-        public final String itsIcon;
+        protected final String itsTitle;
+        protected final String itsUsername;
+        protected final String itsUuid;
+        protected final String itsMatch;
+        protected final Date itsCreationTime;
+        protected final Date itsModTime;
+        protected final String itsIcon;
 
-        public MatchPwsRecord(PwsRecord rec,
+        protected MatchPwsRecord(PwsRecord rec,
                               PasswdFileData fileData,
                               String match)
         {
             itsTitle = fileData.getTitle(rec);
             itsUsername = fileData.getUsername(rec);
             itsUuid = fileData.getUUID(rec);
+            itsCreationTime = fileData.getCreationTime(rec);
+            Date modTime = fileData.getLastModTime(rec);
+            Date passwdModTime = fileData.getPasswdLastModTime(rec);
+            if ((modTime != null) && (passwdModTime != null)) {
+                if (passwdModTime.compareTo(modTime) > 0) {
+                    modTime = passwdModTime;
+                }
+            } else if (modTime == null) {
+                modTime = passwdModTime;
+            }
+            itsModTime = modTime;
             itsMatch = match;
             itsIcon = fileData.getIcon(rec);
         }

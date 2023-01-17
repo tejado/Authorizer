@@ -51,6 +51,7 @@
              android:keyWidth="10%p"/>
         <Key android:codes="32"
              android:keyIcon="@drawable/sym_keyboard_space"
+             android:popupKeyboard="@xml/keyboard_popup_space"
              android:keyWidth="30%p"/>
         <Key android:codes="-200"
              android:horizontalGap="15%p"

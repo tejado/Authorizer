@@ -31,11 +31,11 @@ public abstract class AbstractDialogClickListener
         onCancelClicked();
     }
 
-    public void onOkClicked(DialogInterface dialog)
+    protected void onOkClicked(DialogInterface dialog)
     {
     }
 
-    public void onCancelClicked()
+    protected void onCancelClicked()
     {
     }
 }

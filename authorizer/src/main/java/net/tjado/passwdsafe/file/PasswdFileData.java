@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2009-2013 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,23 +7,25 @@
  */
 package net.tjado.passwdsafe.file;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.text.TextUtils;
+import android.text.format.DateUtils;
+import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import net.tjado.passwdsafe.R;
+import net.tjado.passwdsafe.lib.ActContext;
+import net.tjado.passwdsafe.lib.PasswdSafeUtil;
+import net.tjado.passwdsafe.util.Pair;
 
 import org.pwsafe.lib.UUID;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.InvalidPassphraseException;
+import org.pwsafe.lib.exception.RecordLoadException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 import org.pwsafe.lib.file.Owner;
 import org.pwsafe.lib.file.PwsByteField;
@@ -31,6 +33,7 @@ import org.pwsafe.lib.file.PwsField;
 import org.pwsafe.lib.file.PwsFieldTypeV2;
 import org.pwsafe.lib.file.PwsFieldTypeV3;
 import org.pwsafe.lib.file.PwsFile;
+import org.pwsafe.lib.file.PwsFileStorage;
 import org.pwsafe.lib.file.PwsFileV1;
 import org.pwsafe.lib.file.PwsFileV2;
 import org.pwsafe.lib.file.PwsFileV3;
@@ -49,15 +52,20 @@ import org.pwsafe.lib.file.PwsTimeField;
 import org.pwsafe.lib.file.PwsUUIDField;
 import org.pwsafe.lib.file.PwsUnknownField;
 
-import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.text.TextUtils;
-import android.text.format.DateUtils;
-import android.util.Log;
-
-import net.tjado.passwdsafe.lib.PasswdSafeUtil;
-import net.tjado.passwdsafe.util.Pair;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 @SuppressWarnings("SameParameterValue")
 public class PasswdFileData
@@ -66,10 +74,10 @@ public class PasswdFileData
     private PwsFile itsPwsFile;
     private final HashMap<String, PwsRecord> itsRecordsByUUID = new HashMap<>();
     private final Map<PwsRecord, PasswdRecord> itsPasswdRecords =
-        new IdentityHashMap<>();
+            new IdentityHashMap<>();
     private final ArrayList<PwsRecord> itsRecords = new ArrayList<>();
     private HeaderPasswdPolicies itsHdrPolicies = new HeaderPasswdPolicies();
-    private boolean itsIsOpenReadOnly = false;
+    private boolean itsIsUriWritable = false;
     private boolean itsIsYubikey = false;
 
     private static final List<PasswdFileDataObserver> itsObservers =
@@ -80,57 +88,73 @@ public class PasswdFileData
     private static final int FIELD_UNSUPPORTED = -1;
     private static final int FIELD_NOT_PRESENT = -2;
 
+    public enum EmailStyle
+    {
+        FULL,
+        ADDR_ONLY
+    }
+
+    public enum UrlStyle
+    {
+        FULL,
+        URL_ONLY
+    }
+
     public PasswdFileData(PasswdFileUri uri)
     {
         itsUri = uri;
     }
 
-    public void load(Owner<PwsPassword>.Param passwd, boolean readonly,
-                     Context context)
+    public void load(Owner<PwsPassword>.Param passwd, boolean readonly, Context context)
             throws IOException, EndOfFileException, InvalidPassphraseException,
                    UnsupportedFileVersionException
     {
-        itsIsOpenReadOnly = readonly;
         itsPwsFile = itsUri.load(passwd, context);
+        itsIsUriWritable = itsUri.isWritable().first;
 
-        if (itsIsOpenReadOnly || !itsUri.isWritable().first) {
+        if (readonly || !itsIsUriWritable) {
             itsPwsFile.setReadOnly(true);
         }
         finishOpenFile();
     }
 
     public void createNewFile(Owner<PwsPassword>.Param passwd, Context context)
-        throws IOException
+            throws IOException
     {
         itsPwsFile = itsUri.createNew(passwd, context);
+        itsPwsFile.setReadOnly(false);
+        itsIsUriWritable = true;
         save(context);
         finishOpenFile();
     }
 
+    /**
+     * Save the file
+     */
     public void save(Context context)
-        throws IOException, ConcurrentModificationException
+            throws IOException, ConcurrentModificationException
     {
-        if (itsPwsFile != null) {
-            for (int idx = 0; idx < itsRecords.size(); ++idx) {
-                PwsRecord rec = itsRecords.get(idx);
-                if (rec.isModified()) {
-                    PasswdSafeUtil.dbginfo(TAG, "Updating idx: %d", idx);
-                    itsPwsFile.set(idx, rec);
-                    rec.resetModified();
-                }
-            }
+        doSave(new PasswdFileSaveHelper(context), null, context);
+    }
 
-            setSaveHdrFields(context);
+    /**
+     * Save the file to the given file name without a backup
+     */
+    public void saveAsNoBackup(@NonNull File file, Context context)
+            throws IOException, ConcurrentModificationException
+    {
+        doSave(null, new PwsFileStorage(file.getPath(), null), context);
+    }
 
-            PwsStorage storage = itsPwsFile.getStorage();
-            try {
-                storage.setSaveHelper(new PasswdFileUri.SaveHelper(context));
-                itsPwsFile.save();
-                notifyObservers(this);
-            } finally {
-                storage.setSaveHelper(null);
-            }
-        }
+    /**
+     * Save the file to the given URI
+     */
+    public void saveAs(@NonNull PasswdFileUri fileUri,
+                       @NonNull Context context)
+            throws IOException, ConcurrentModificationException
+    {
+        doSave(new PasswdFileSaveHelper(context),
+               fileUri.createStorageForSave(context), context);
     }
 
     public void close()
@@ -138,6 +162,7 @@ public class PasswdFileData
         itsUri = null;
         itsPwsFile.dispose();
         itsPwsFile = null;
+        itsIsUriWritable = false;
         indexRecords();
     }
 
@@ -179,49 +204,16 @@ public class PasswdFileData
         }
     }
 
-    public final boolean removeRecord(PwsRecord rec, Context context)
+    public final boolean removeRecord(PwsRecord rec, ActContext context)
     {
-        int errMsg = 0;
-        do {
-            if (itsPwsFile == null) {
-                errMsg = net.tjado.passwdsafe.R.string.record_not_found;
-                break;
-            }
-            PasswdRecord passwdRec = getPasswdRecord(rec);
-            if (passwdRec == null) {
-                errMsg = net.tjado.passwdsafe.R.string.record_not_found;
-                break;
-            }
-            if (!passwdRec.getRefsToRecord().isEmpty()) {
-                errMsg = net.tjado.passwdsafe.R.string.record_has_references;
-                break;
-            }
-
-            String recuuid = getUUID(rec);
-            if (recuuid == null) {
-                errMsg = net.tjado.passwdsafe.R.string.record_not_found;
-                break;
-            }
-
-            for (int i = 0; i < itsRecords.size(); ++i) {
-                PwsRecord r = itsRecords.get(i);
-                String ruuid = getUUID(r);
-                if (recuuid.equals(ruuid)) {
-                    boolean rc = itsPwsFile.removeRecord(i);
-                    if (rc) {
-                        indexRecords();
-                    } else {
-                        errMsg = net.tjado.passwdsafe.R.string.record_not_found;
-                    }
-                    break;
-                }
-            }
-        } while(false);
-
+        int errMsg = doRemoveRecord(rec);
         if (errMsg != 0) {
-            String msg = context.getString(net.tjado.passwdsafe.R.string.cannot_delete_record,
-                                           context.getString(errMsg));
-            PasswdSafeUtil.showErrorMsg(msg, context);
+            Context ctx = context.getContext();
+            if (ctx != null) {
+                String msg = ctx.getString(R.string.cannot_delete_record,
+                                           ctx.getString(errMsg));
+                PasswdSafeUtil.showErrorMsg(msg, context);
+            }
             return false;
         }
         return true;
@@ -253,37 +245,62 @@ public class PasswdFileData
         itsIsYubikey = yubikey;
     }
 
+    /**
+     * Is the file writable
+     */
+    public final boolean isWritable()
+    {
+        return itsIsUriWritable &&
+               (itsPwsFile != null) && !itsPwsFile.isReadOnly();
+    }
+
+    /**
+     * Set the file writable if allowed
+     */
+    public final void setWritable(boolean writable)
+    {
+        if (itsPwsFile != null) {
+            itsPwsFile.setReadOnly(!(writable && itsIsUriWritable));
+        }
+    }
+
+    /**
+     * Is the file capable of being written
+     */
+    public final boolean isWriteCapable()
+    {
+        return itsIsUriWritable;
+    }
+
     public final boolean canEdit()
     {
-        return !itsIsOpenReadOnly &&
+        return isWritable() &&
                (itsPwsFile != null) &&
-               !itsPwsFile.isReadOnly() &&
                ((itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION) ||
                 (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION));
     }
 
     public final boolean canDelete()
     {
-        return (itsPwsFile != null) && !itsPwsFile.isReadOnly() &&
-               itsUri.isDeletable();
+        return isWritable() && itsUri.isDeletable();
     }
 
     public final boolean isV3()
     {
         return (itsPwsFile != null) &&
-            (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
+               (itsPwsFile.getFileVersionMajor() == PwsFileV3.VERSION);
     }
 
     private boolean isV2()
     {
         return (itsPwsFile != null) &&
-            (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION);
+               (itsPwsFile.getFileVersionMajor() == PwsFileV2.VERSION);
     }
 
     public final String getOpenPasswordEncoding()
     {
         return (itsPwsFile != null) ? itsPwsFile.getOpenPasswordEncoding() :
-            null;
+                null;
     }
 
     public final String getId(PwsRecord rec)
@@ -298,9 +315,24 @@ public class PasswdFileData
         return getDateField(rec, PwsRecordV3.CREATION_TIME);
     }
 
-    public final String getEmail(PwsRecord rec)
+    public final String getEmail(PwsRecord rec, EmailStyle style)
     {
-        return getField(rec, PwsRecordV3.EMAIL);
+        String email = getField(rec, PwsRecordV3.EMAIL);
+        switch (style) {
+        case FULL: {
+            break;
+        }
+        case ADDR_ONLY: {
+            if (!TextUtils.isEmpty(email)) {
+                int queryPos = email.indexOf('?');
+                if (queryPos != -1) {
+                    email = email.substring(0, queryPos);
+                }
+            }
+            break;
+        }
+        }
+        return email;
     }
 
     public final void setEmail(String str, PwsRecord rec)
@@ -344,13 +376,9 @@ public class PasswdFileData
         return getDateField(rec, PwsRecordV3.LAST_MOD_TIME);
     }
 
-    public final String getNotes(PwsRecord rec)
+    public final @NonNull PasswdNotes getNotes(PwsRecord rec, Context ctx)
     {
-        String s = getField(rec, PwsRecordV3.NOTES);
-        if (s != null) {
-            s = s.replace("\r\n", "\n");
-        }
-        return s;
+        return new PasswdNotes(getField(rec, PwsRecordV3.NOTES), ctx);
     }
 
     public final void setNotes(String str, PwsRecord rec)
@@ -414,7 +442,7 @@ public class PasswdFileData
         Date expTime = getDateField(rec, PwsRecordV3.PASSWORD_LIFETIME);
         if (expTime != null) {
             Integer expInt =
-                getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
+                    getIntField(rec, PwsRecordV3.PASSWORD_EXPIRY_INTERVAL);
             boolean haveInt = (expInt != null);
             expiry = new PasswdExpiration(expTime, haveInt ? expInt : 0,
                                           haveInt);
@@ -460,7 +488,7 @@ public class PasswdFileData
         String fieldStr = getField(rec, PwsRecordV3.PASSWORD_HISTORY);
         if (!TextUtils.isEmpty(fieldStr)) {
             try {
-                return new PasswdHistory(fieldStr);
+                return new PasswdHistory(Objects.requireNonNull(fieldStr));
             } catch (Exception e) {
                 Log.e(TAG, "Error reading password history: " + e, e);
             }
@@ -479,9 +507,9 @@ public class PasswdFileData
     public final PasswdPolicy getPasswdPolicy(PwsRecord rec)
     {
         return PasswdPolicy.parseRecordPolicy(
-            getField(rec, PwsRecordV3.PASSWORD_POLICY_NAME),
-            getField(rec, PwsRecordV3.PASSWORD_POLICY),
-            getField(rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS));
+                getField(rec, PwsRecordV3.PASSWORD_POLICY_NAME),
+                getField(rec, PwsRecordV3.PASSWORD_POLICY),
+                getField(rec, PwsRecordV3.OWN_PASSWORD_SYMBOLS));
     }
 
     /** Set the password policy for a record */
@@ -578,9 +606,24 @@ public class PasswdFileData
         setField(str, rec, PwsRecordV3.USERNAME);
     }
 
-    public final String getURL(PwsRecord rec)
+    public final String getURL(PwsRecord rec, UrlStyle style)
     {
-        return getField(rec, PwsRecordV3.URL);
+        String url = getField(rec, PwsRecordV3.URL);
+        switch (style) {
+        case FULL: {
+            break;
+        }
+        case URL_ONLY: {
+            if (!TextUtils.isEmpty(url)) {
+                for (String key: new String[]{"[alt]", "{alt}", "[ssh]",
+                                              "[autotype]", "[xa]"}) {
+                    url = url.replace(key, "");
+                }
+            }
+            break;
+        }
+        }
+        return url;
     }
 
     public final void setURL(String str, PwsRecord rec)
@@ -664,7 +707,7 @@ public class PasswdFileData
                 PasswdPolicy recPolicy = rec.getPasswdPolicy();
                 if ((recPolicy == null) ||
                     (recPolicy.getLocation() !=
-                        PasswdPolicy.Location.RECORD_NAME) ||
+                     PasswdPolicy.Location.RECORD_NAME) ||
                     (!recPolicy.getName().equals(policyRename.first))) {
                     continue;
                 }
@@ -679,6 +722,15 @@ public class PasswdFileData
         } else {
             indexPasswdPolicies();
         }
+    }
+
+    /**
+     * Get the errors which occurred when opening the file
+     * @return The list of errors; null if none occurred
+     */
+    public @Nullable List<RecordLoadException> getRecordErrors()
+    {
+        return itsPwsFile.getLoadErrors();
     }
 
     private static int hexBytesToInt(byte[] bytes, int pos, int len)
@@ -720,11 +772,11 @@ public class PasswdFileData
 
     /** Set the password policy for a record and optionally update indexes */
     private void setPasswdPolicyImpl(PasswdPolicy policy,
-                                           PwsRecord rec,
-                                           boolean index)
+                                     PwsRecord rec,
+                                     boolean index)
     {
         PasswdPolicy.RecordPolicyStrs strs =
-            PasswdPolicy.recordPolicyToString(policy);
+                PasswdPolicy.recordPolicyToString(policy);
         setField((strs == null) ? null : strs.itsPolicyName,
                  rec, PwsRecordV3.PASSWORD_POLICY_NAME);
         setField((strs == null) ? null : strs.itsPolicyStr,
@@ -743,6 +795,7 @@ public class PasswdFileData
     }
 
     /** Get a field value as a string */
+    @Nullable
     private String getField(PwsRecord rec, int fieldId)
     {
         if (itsPwsFile == null) {
@@ -758,27 +811,30 @@ public class PasswdFileData
     }
 
     /** Get a field value as an 4 byte integer */
+    @Nullable
     private Integer getIntField(PwsRecord rec, int fieldId)
     {
         Integer val = null;
         PwsField field = doGetRecField(rec, fieldId);
-        if ((field != null) && (field instanceof PwsIntegerField)) {
+        if (field instanceof PwsIntegerField) {
             val = (Integer)field.getValue();
         }
         return val;
     }
 
     /** Get a field value as a Date */
+    @Nullable
     private Date getDateField(PwsRecord rec, int fieldId)
     {
         Date date = null;
         PwsField field = doGetRecField(rec, fieldId);
-        if ((field != null) && (field instanceof PwsTimeField)) {
+        if (field instanceof PwsTimeField) {
             date = (Date)field.getValue();
         }
         return date;
     }
 
+    @SuppressWarnings("ConstantConditions")
     private int getVersionFieldId(int fieldId)
     {
         if (itsPwsFile == null) {
@@ -956,7 +1012,7 @@ public class PasswdFileData
                 {
                     byte[] binbytes = new byte[4];
                     Util.putIntToByteArray(
-                        binbytes, hexBytesToInt(bytes, 0, bytes.length), 0);
+                            binbytes, hexBytesToInt(bytes, 0, bytes.length), 0);
                     bytes = binbytes;
                 }
                 Date d = new Date(Util.getMillisFromByteArray(bytes, 0));
@@ -1070,6 +1126,7 @@ public class PasswdFileData
     private static String doHdrFieldToString(PwsField field)
     {
         try {
+            //noinspection CharsetObjectCanBeUsed
             return new String(field.getBytes(), "UTF-8");
         }
         catch (UnsupportedEncodingException e) {
@@ -1084,6 +1141,7 @@ public class PasswdFileData
         try {
             PwsField field = null;
             if (val != null) {
+                //noinspection CharsetObjectCanBeUsed
                 field = new PwsUnknownField(fieldId, val.getBytes("UTF-8"));
             }
             setOrRemoveField(field, fieldId, rec);
@@ -1232,7 +1290,7 @@ public class PasswdFileData
             setOrRemoveField(field, fieldId, rec);
             if (updateModTime && isV3() && itsPasswdRecords.containsKey(rec)) {
                 int modFieldId = (fieldId == PwsRecordV3.PASSWORD) ?
-                    PwsRecordV3.PASSWORD_MOD_TIME : PwsRecordV3.LAST_MOD_TIME;
+                        PwsRecordV3.PASSWORD_MOD_TIME : PwsRecordV3.LAST_MOD_TIME;
                 rec.setField(new PwsTimeField(modFieldId, new Date()));
             }
         }
@@ -1271,8 +1329,8 @@ public class PasswdFileData
                     // will not be marked as modified unless the user manually
                     // edits it.
                     PwsUUIDField uuidField = new PwsUUIDField(
-                        isV2() ? PwsFieldTypeV2.UUID : PwsFieldTypeV3.UUID,
-                        new UUID());
+                            isV2() ? PwsFieldTypeV2.UUID : PwsFieldTypeV3.UUID,
+                            new UUID());
                     boolean modified = rec.isModified();
                     rec.setField(uuidField);
                     if (!modified) {
@@ -1303,12 +1361,91 @@ public class PasswdFileData
     private void indexPasswdPolicies()
     {
         List<PasswdPolicy> hdrPolicies =
-            PasswdPolicy.parseHdrPolicies(
-                getHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES));
+                PasswdPolicy.parseHdrPolicies(
+                        getHdrField(PwsRecordV3.HEADER_NAMED_PASSWORD_POLICIES));
         itsHdrPolicies = new HeaderPasswdPolicies(itsPasswdRecords.values(),
                                                   hdrPolicies);
     }
 
+    /**
+     * Implementation of saving the file or saving as another file
+     */
+    private void doSave(PwsStorage.SaveHelper saveHelper,
+                        PwsStorage saveAsStorage,
+                        Context context)
+            throws IOException, ConcurrentModificationException
+    {
+        if (itsPwsFile != null) {
+            for (int idx = 0; idx < itsRecords.size(); ++idx) {
+                PwsRecord rec = itsRecords.get(idx);
+                if (rec.isModified()) {
+                    PasswdSafeUtil.dbginfo(TAG, "Updating idx: %d", idx);
+                    itsPwsFile.set(idx, rec);
+                    rec.resetModified();
+                }
+            }
+
+            setSaveHdrFields(context);
+
+            PwsStorage storage = (saveAsStorage != null) ?
+                    saveAsStorage : itsPwsFile.getStorage();
+            try {
+                if (saveHelper != null) {
+                    storage.setSaveHelper(saveHelper);
+                }
+
+                if (saveAsStorage != null) {
+                    itsPwsFile.saveAs(saveAsStorage);
+                } else {
+                    itsPwsFile.save();
+                }
+                notifyObservers(this);
+            } finally {
+                if (saveHelper != null) {
+                    storage.setSaveHelper(null);
+                }
+            }
+        }
+    }
+
+    /**
+     * Implementation of removing a record
+     * @return 0 if successful; error message id otherwise
+     */
+    private int doRemoveRecord(PwsRecord rec)
+    {
+        if (itsPwsFile == null) {
+            return R.string.record_not_found;
+        }
+        PasswdRecord passwdRec = getPasswdRecord(rec);
+        if (passwdRec == null) {
+            return R.string.record_not_found;
+        }
+        if (!passwdRec.getRefsToRecord().isEmpty()) {
+            return R.string.record_has_references;
+        }
+
+        String recuuid = getUUID(rec);
+        if (recuuid == null) {
+            return R.string.record_not_found;
+        }
+
+        for (int i = 0; i < itsRecords.size(); ++i) {
+            PwsRecord r = itsRecords.get(i);
+            String ruuid = getUUID(r);
+            if (recuuid.equals(ruuid)) {
+                boolean rc = itsPwsFile.removeRecord(i);
+                if (rc) {
+                    indexRecords();
+                } else {
+                    return R.string.record_not_found;
+                }
+                break;
+            }
+        }
+
+        return 0;
+    }
 
     private static int getHdrMinorVersion(PwsRecord rec)
     {
@@ -1384,23 +1521,27 @@ public class PasswdFileData
     /** Notify observer of file changes */
     private static void notifyObservers(PasswdFileData fileData)
     {
-        AsyncTask<PasswdFileData, Void, PasswdFileData> notifyTask =
-            new AsyncTask<PasswdFileData, Void, PasswdFileData>()
-            {
-                @Override
-                protected PasswdFileData doInBackground(PasswdFileData... params)
-                {
-                    return params[0];
-                }
+        new NotifyTask().execute(fileData);
+    }
 
-                @Override
-                protected void onPostExecute(PasswdFileData fileData)
-                {
-                    for (PasswdFileDataObserver obs: itsObservers) {
-                        obs.passwdFileDataChanged(fileData);
-                    }
-                }
-            };
-        notifyTask.execute(fileData);
+    /**
+     * Async task to notify observers of a file change
+     */
+    private static class NotifyTask
+            extends AsyncTask<PasswdFileData, Void, PasswdFileData>
+    {
+        @Override
+        protected PasswdFileData doInBackground(PasswdFileData... params)
+        {
+            return params[0];
+        }
+
+        @Override
+        protected void onPostExecute(PasswdFileData fileData)
+        {
+            for (PasswdFileDataObserver obs: itsObservers) {
+                obs.passwdFileDataChanged(fileData);
+            }
+        }
     }
 }

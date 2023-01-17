@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2012 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -13,24 +13,23 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatDialogFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDialogFragment;
 
 import net.tjado.passwdsafe.Preferences;
+import net.tjado.passwdsafe.R;
 import net.tjado.passwdsafe.file.PasswdPolicy;
+import net.tjado.passwdsafe.lib.ActContext;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.view.AbstractDialogClickListener;
 import net.tjado.passwdsafe.lib.view.TypefaceUtils;
@@ -93,34 +92,27 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
             itsPolicy = null;
         }
 
-        Context ctx = getContext();
+        Context ctx = requireContext();
         LayoutInflater factory = LayoutInflater.from(ctx);
-        itsView = factory.inflate(net.tjado.passwdsafe.R.layout.passwd_policy_edit, null);
+        itsView = factory.inflate(R.layout.passwd_policy_edit, null);
 
         SharedPreferences prefs = Preferences.getSharedPrefs(ctx);
 
         itsIsNameEditable = true;
-        itsNameEdit = (TextView)itsView.findViewById(net.tjado.passwdsafe.R.id.name);
-        itsLengthEdit = (TextView)itsView.findViewById(net.tjado.passwdsafe.R.id.length);
-        itsOptions[0] = (CheckBox)itsView.findViewById(net.tjado.passwdsafe.R.id.lowercase);
-        itsOptions[1] = (CheckBox)itsView.findViewById(net.tjado.passwdsafe.R.id.uppercase);
-        itsOptions[2] = (CheckBox)itsView.findViewById(net.tjado.passwdsafe.R.id.digits);
-        itsOptions[3] = (CheckBox)itsView.findViewById(net.tjado.passwdsafe.R.id.symbols);
-        itsOptionLens[0] = (TextView)itsView.findViewById(
-                net.tjado.passwdsafe.R.id.lowercase_len);
-        itsOptionLens[1] = (TextView)itsView.findViewById(
-                net.tjado.passwdsafe.R.id.uppercase_len);
-        itsOptionLens[2] = (TextView)itsView.findViewById(
-                net.tjado.passwdsafe.R.id.digits_len);
-        itsOptionLens[3] = (TextView)itsView.findViewById(
-                net.tjado.passwdsafe.R.id.symbols_len);
-        itsUseCustomSymbols =
-            (CheckBox)itsView.findViewById(net.tjado.passwdsafe.R.id.use_custom_symbols);
-        itsCustomSymbolsEdit =
-            (TextView)itsView.findViewById(net.tjado.passwdsafe.R.id.symbols_custom);
+        itsNameEdit = itsView.findViewById(R.id.name);
+        itsLengthEdit = itsView.findViewById(R.id.length);
+        itsOptions[0] = itsView.findViewById(R.id.lowercase);
+        itsOptions[1] = itsView.findViewById(R.id.uppercase);
+        itsOptions[2] = itsView.findViewById(R.id.digits);
+        itsOptions[3] = itsView.findViewById(R.id.symbols);
+        itsOptionLens[0] = itsView.findViewById(R.id.lowercase_len);
+        itsOptionLens[1] = itsView.findViewById(R.id.uppercase_len);
+        itsOptionLens[2] = itsView.findViewById(R.id.digits_len);
+        itsOptionLens[3] = itsView.findViewById(R.id.symbols_len);
+        itsUseCustomSymbols = itsView.findViewById(R.id.use_custom_symbols);
+        itsCustomSymbolsEdit = itsView.findViewById(R.id.symbols_custom);
         TypefaceUtils.setMonospace(itsCustomSymbolsEdit, ctx);
-        itsGeneratedPasswd =
-                (TextView)itsView.findViewById(net.tjado.passwdsafe.R.id.generated_passwd);
+        itsGeneratedPasswd = itsView.findViewById(R.id.generated_passwd);
         TypefaceUtils.setMonospace(itsGeneratedPasswd, ctx);
         itsDefaultSymbols = Preferences.getPasswdDefaultSymbolsPref(prefs);
 
@@ -147,25 +139,25 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
             }
             }
 
-            titleId = net.tjado.passwdsafe.R.string.edit_policy;
+            titleId = R.string.edit_policy;
             name = itsPolicy.getName();
             len = itsPolicy.getLength();
             origType = itsPolicy.getType();
             useOptions[0] =
-                itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
+                    itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_LOWERCASE);
             useOptions[1] =
-                itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE);
+                    itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_UPPERCASE);
             useOptions[2] =
-                itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_DIGITS);
+                    itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_DIGITS);
             useOptions[3] =
-                itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS);
+                    itsPolicy.checkFlags(PasswdPolicy.FLAG_USE_SYMBOLS);
             optionLens[0] = itsPolicy.getMinLowercase();
             optionLens[1] = itsPolicy.getMinUppercase();
             optionLens[2] = itsPolicy.getMinDigits();
             optionLens[3] = itsPolicy.getMinSymbols();
             customSymbols = itsPolicy.getSpecialSymbols();
         } else {
-            titleId = net.tjado.passwdsafe.R.string.new_policy;
+            titleId = R.string.new_policy;
             name = "";
             len = 12;
             origType = PasswdPolicy.Type.NORMAL;
@@ -177,30 +169,32 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         }
 
         AbstractDialogClickListener dlgClick =
-            new AbstractDialogClickListener()
-            {
-                @Override
-                public void onOkClicked(DialogInterface dialog)
+                new AbstractDialogClickListener()
                 {
-                    dialog.dismiss();
-                    Listener listener = (Listener)getTargetFragment();
-                    listener.handlePolicyEditComplete(itsPolicy,
-                                                      createPolicy());
-                }
-            };
+                    @Override
+                    public void onOkClicked(DialogInterface dialog)
+                    {
+                        dialog.dismiss();
+                        Listener listener = (Listener)getTargetFragment();
+                        if (listener != null) {
+                            listener.handlePolicyEditComplete(itsPolicy,
+                                                              createPolicy());
+                        }
+                    }
+                };
 
         AlertDialog.Builder alert = new AlertDialog.Builder(ctx)
-            .setTitle(titleId)
-            .setView(itsView)
-            .setPositiveButton(net.tjado.passwdsafe.R.string.ok, dlgClick)
-            .setNegativeButton(net.tjado.passwdsafe.R.string.cancel, dlgClick)
-            .setOnCancelListener(dlgClick);
+                .setTitle(titleId)
+                .setView(itsView)
+                .setPositiveButton(R.string.ok, dlgClick)
+                .setNegativeButton(R.string.cancel, dlgClick)
+                .setOnCancelListener(dlgClick);
         AlertDialog dialog = alert.create();
         itsValidator = new Validator(dialog, itsView, ctx);
 
         // Must set text before registering view so validation isn't
         // triggered right away
-        View v = itsView.findViewById(net.tjado.passwdsafe.R.id.name_row);
+        View v = itsView.findViewById(R.id.name_row);
         v.setVisibility(itsIsNameEditable ? View.VISIBLE: View.GONE);
         itsNameEdit.setText(name);
         itsValidator.registerTextView(itsNameEdit);
@@ -218,14 +212,8 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         itsCustomSymbolsEdit.setText(customSymbols);
         itsValidator.registerTextView(itsCustomSymbolsEdit);
 
-        Button btn = (Button)itsView.findViewById(net.tjado.passwdsafe.R.id.generate);
-        btn.setOnClickListener(new OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                generatePasswd();
-            }
-        });
+        Button btn = itsView.findViewById(R.id.generate);
+        btn.setOnClickListener(btnView -> generatePasswd());
 
         return dialog;
     }
@@ -313,11 +301,11 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         }
 
         return new PasswdPolicy(
-            itsNameEdit.getText().toString(),
-            (itsPolicy != null) ? itsPolicy.getLocation() :
-                PasswdPolicy.Location.HEADER,
-            flags, length,
-            minLower, minUpper, minDigits, minSymbols, customSymbols);
+                itsNameEdit.getText().toString(),
+                (itsPolicy != null) ? itsPolicy.getLocation() :
+                        PasswdPolicy.Location.HEADER,
+                flags, length,
+                minLower, minUpper, minDigits, minSymbols, customSymbols);
     }
 
     /** Generate a password from the policy */
@@ -325,13 +313,11 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
     {
         String passwd = null;
         PasswdPolicy policy = createPolicy();
-        if (policy != null) {
-            try {
-                passwd = policy.generate();
-            } catch (Exception e) {
-                PasswdSafeUtil.showErrorMsg(e.toString(),
-                                            itsView.getContext());
-            }
+        try {
+            passwd = policy.generate();
+        } catch (Exception e) {
+            PasswdSafeUtil.showErrorMsg(e.toString(),
+                                        new ActContext(itsView.getContext()));
         }
         itsGeneratedPasswd.setText(passwd);
     }
@@ -345,8 +331,7 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
 
         itsType = type;
         if (init) {
-            Spinner typeSpin = (Spinner)itsView.findViewById(
-                    net.tjado.passwdsafe.R.id.type);
+            Spinner typeSpin = itsView.findViewById(R.id.type);
             typeSpin.setSelection(itsType.itsStrIdx);
             typeSpin.setOnItemSelectedListener(new OnItemSelectedListener()
             {
@@ -382,20 +367,19 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
             break;
         }
         case HEXADECIMAL: {
-            optionsVisible = false;
             break;
         }
         }
 
-        setVisible(net.tjado.passwdsafe.R.id.lowercase_row, optionsVisible);
-        setVisible(net.tjado.passwdsafe.R.id.uppercase_row, optionsVisible);
-        setVisible(net.tjado.passwdsafe.R.id.digits_row, optionsVisible);
-        setVisible(net.tjado.passwdsafe.R.id.symbols_row, optionsVisible);
+        setVisible(R.id.lowercase_row, optionsVisible);
+        setVisible(R.id.uppercase_row, optionsVisible);
+        setVisible(R.id.digits_row, optionsVisible);
+        setVisible(R.id.symbols_row, optionsVisible);
         for (CheckBox option: itsOptions) {
             setOptionLenVisible(option);
         }
         setCustomSymbolsVisible();
-        setTextView(net.tjado.passwdsafe.R.id.symbols_default, defaultSymbols);
+        setTextView(R.id.symbols_default, defaultSymbols);
 
         if (!init) {
             itsValidator.validate();
@@ -408,18 +392,13 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
     {
         if (init) {
             option.setChecked(use);
-            option.setOnCheckedChangeListener(new OnCheckedChangeListener()
-            {
-                public void onCheckedChanged(CompoundButton buttonView,
-                                             boolean isChecked)
-                {
-                    setOption((CheckBox)buttonView, isChecked, false);
-                }
-            });
+            option.setOnCheckedChangeListener(
+                    (buttonView, isChecked) ->
+                            setOption((CheckBox)buttonView, isChecked, false));
         }
 
         setOptionLenVisible(option);
-        if (option.getId() == net.tjado.passwdsafe.R.id.symbols) {
+        if (option.getId() == R.id.symbols) {
             setCustomSymbolsVisible();
         }
 
@@ -435,20 +414,19 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         if (init) {
             itsUseCustomSymbols.setChecked(useCustom);
             itsUseCustomSymbols.setOnCheckedChangeListener(
-                new OnCheckedChangeListener()
-                {
-                    public void onCheckedChanged(CompoundButton buttonView,
-                                                 boolean isChecked)
-                    {
-                        setCustomSymbolsOption(isChecked, false);
-                    }
-                });
+                    (buttonView, isChecked) ->
+                            setCustomSymbolsOption(isChecked, false));
         }
 
-        View defView = itsView.findViewById(net.tjado.passwdsafe.R.id.symbols_default);
+        View defView = itsView.findViewById(R.id.symbols_default);
         if (useCustom) {
             defView.setVisibility(View.GONE);
             itsCustomSymbolsEdit.setVisibility(View.VISIBLE);
+
+            if (TextUtils.isEmpty(itsCustomSymbolsEdit.getText())) {
+                itsCustomSymbolsEdit.setText(itsDefaultSymbols);
+            }
+
             itsCustomSymbolsEdit.requestFocus();
         } else {
             defView.setVisibility(View.VISIBLE);
@@ -467,18 +445,17 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         boolean visible = false;
         switch (itsType) {
         case NORMAL: {
-            CheckBox cb = (CheckBox)itsView.findViewById(net.tjado.passwdsafe.R.id.symbols);
+            CheckBox cb = itsView.findViewById(R.id.symbols);
             visible = cb.isChecked();
             break;
         }
         case EASY_TO_READ:
         case PRONOUNCEABLE:
         case HEXADECIMAL: {
-            visible = false;
             break;
         }
         }
-        setVisible(net.tjado.passwdsafe.R.id.custom_symbols_set, visible);
+        setVisible(R.id.custom_symbols_set, visible);
     }
 
 
@@ -490,27 +467,19 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
 
         int labelId = 0;
         int lengthId = 0;
-        switch (option.getId()) {
-        case net.tjado.passwdsafe.R.id.lowercase: {
-            labelId = net.tjado.passwdsafe.R.id.lowercase_label;
-            lengthId = net.tjado.passwdsafe.R.id.lowercase_len;
-            break;
-        }
-        case net.tjado.passwdsafe.R.id.uppercase: {
-            labelId = net.tjado.passwdsafe.R.id.uppercase_label;
-            lengthId = net.tjado.passwdsafe.R.id.uppercase_len;
-            break;
-        }
-        case net.tjado.passwdsafe.R.id.digits: {
-            labelId = net.tjado.passwdsafe.R.id.digits_label;
-            lengthId = net.tjado.passwdsafe.R.id.digits_len;
-            break;
-        }
-        case net.tjado.passwdsafe.R.id.symbols: {
-            labelId = net.tjado.passwdsafe.R.id.symbols_label;
-            lengthId = net.tjado.passwdsafe.R.id.symbols_len;
-            break;
-        }
+        int id = option.getId();
+        if (id == R.id.lowercase) {
+            labelId = R.id.lowercase_label;
+            lengthId = R.id.lowercase_len;
+        } else if (id == R.id.uppercase) {
+            labelId = R.id.uppercase_label;
+            lengthId = R.id.uppercase_len;
+        } else if (id == R.id.digits) {
+            labelId = R.id.digits_label;
+            lengthId = R.id.digits_len;
+        } else if (id == R.id.symbols) {
+            labelId = R.id.symbols_label;
+            lengthId = R.id.symbols_len;
         }
 
         if (labelId != 0) {
@@ -530,7 +499,7 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
 
     /** Get an integer value from a text view */
     private int getTextViewInt(TextView tv)
-        throws NumberFormatException
+            throws NumberFormatException
     {
         return Integer.valueOf(tv.getText().toString(), 10);
     }
@@ -548,7 +517,7 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
     private void setTextView(@SuppressWarnings("SameParameterValue") int id,
                              String value)
     {
-        TextView tv = (TextView)itsView.findViewById(id);
+        TextView tv = itsView.findViewById(id);
         tv.setText(value);
     }
 
@@ -565,20 +534,21 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
         @Override
         protected String doValidation()
         {
-            View generateRow = itsView.findViewById(net.tjado.passwdsafe.R.id.generate_row);
+            View generateRow = itsView.findViewById(R.id.generate_row);
             generateRow.setVisibility(View.GONE);
 
             if (itsIsNameEditable) {
                 String name = itsNameEdit.getText().toString();
                 if (TextUtils.isEmpty(name)) {
-                    return getString(net.tjado.passwdsafe.R.string.empty_name);
+                    return getString(R.string.empty_name);
                 }
 
                 if ((itsPolicy == null) ||
                     !itsPolicy.getName().equals(name)) {
                     Listener listener = (Listener)getTargetFragment();
-                    if (listener.isDuplicatePolicy(name)) {
-                        return getString(net.tjado.passwdsafe.R.string.duplicate_name);
+                    if ((listener != null) &&
+                        listener.isDuplicatePolicy(name)) {
+                        return getString(R.string.duplicate_name);
                     }
                 }
             }
@@ -587,16 +557,16 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
             try {
                 length = getTextViewInt(itsLengthEdit);
                 if (length < 4) {
-                    return getString(net.tjado.passwdsafe.R.string.length_min_val, 4);
+                    return getString(R.string.length_min_val, 4);
                 } else if (length > 1024) {
-                    return getString(net.tjado.passwdsafe.R.string.length_max_val, 1024);
+                    return getString(R.string.length_max_val, 1024);
                 } else if ((itsType == PasswdPolicy.Type.HEXADECIMAL) &&
                            ((length % 2) != 0) ) {
-                    return getString(net.tjado.passwdsafe.R.string.length_even_hex);
+                    return getString(R.string.length_even_hex);
                 }
 
             } catch (NumberFormatException e) {
-                return getString(net.tjado.passwdsafe.R.string.invalid_length);
+                return getString(R.string.invalid_length);
             }
 
             if (itsType != PasswdPolicy.Type.HEXADECIMAL) {
@@ -608,7 +578,7 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
                     }
                 }
                 if (!oneSelected) {
-                    return getString(net.tjado.passwdsafe.R.string.option_not_selected);
+                    return getString(R.string.option_not_selected);
                 }
             }
 
@@ -621,26 +591,26 @@ public class PasswdPolicyEditDialog extends AppCompatDialogFragment
                             minOptionsLen += len;
                         } catch (NumberFormatException e) {
                             return getString(
-                                    net.tjado.passwdsafe.R.string.invalid_option_length);
+                                    R.string.invalid_option_length);
                         }
                     }
                 }
                 if (minOptionsLen > length) {
-                    return getString(net.tjado.passwdsafe.R.string.password_len_short_opt);
+                    return getString(R.string.password_len_short_opt);
                 }
             }
 
             if (itsUseCustomSymbols.isChecked()) {
                 String syms = itsCustomSymbolsEdit.getText().toString();
                 if (TextUtils.isEmpty(syms)) {
-                    return getString(net.tjado.passwdsafe.R.string.empty_custom_symbols);
+                    return getString(R.string.empty_custom_symbols);
                 }
                 for (int i = 0; i < syms.length(); ++i) {
                     char c = syms.charAt(i);
                     if (Character.isLetterOrDigit(c) ||
                         Character.isSpaceChar(c)) {
                         return getString(
-                                net.tjado.passwdsafe.R.string.custom_symbol_not_alphanum);
+                                R.string.custom_symbol_not_alphanum);
                     }
                 }
             }

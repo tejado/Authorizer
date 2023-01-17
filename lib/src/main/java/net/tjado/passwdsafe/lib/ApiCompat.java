@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2016, 2021 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,20 +7,22 @@
  */
 package net.tjado.passwdsafe.lib;
 
-import android.accounts.Account;
-import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.text.ClipboardManager;
+import android.os.Vibrator;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,53 +32,79 @@ import java.util.List;
  */
 public final class ApiCompat
 {
-    private static final int SDK_ECLAIR =
-            android.os.Build.VERSION_CODES.ECLAIR;
-    public static final int SDK_HONEYCOMB = 11;
     public static final int SDK_KITKAT = 19;
-    public static final int SDK_LOLLIPOP = 21;
+    private static final int SDK_M = 23;
+    private static final int SDK_N = 24;
+    public static final int SDK_OREO = 26;
+    private static final int SDK_P = 28;
+    public static final int SDK_Q = 29;
+    private static final int SDK_S = 31;
+    private static final int SDK_TIRAMISU = 33;
 
     public static final int SDK_VERSION = Build.VERSION.SDK_INT;
-
-    /** Request a manual sync of a content provider */
-    @SuppressWarnings("SameParameterValue")
-    public static void requestManualSync(Account acct,
-                                         Uri uri,
-                                         Bundle extras)
-    {
-        if (SDK_VERSION >= SDK_ECLAIR) {
-            ApiCompatEclair.requestManualSync(acct, uri.getAuthority(), extras);
-        }
-    }
-
 
     /** Set whether the window is visible in the recent apps list */
     public static void setRecentAppsVisible(
             Window w, @SuppressWarnings("SameParameterValue") boolean visible)
     {
-        /* The screen appears garbled before honeycomb, and the screenshot
-         * feature started with honeycomb */
-        if (SDK_VERSION >= SDK_HONEYCOMB) {
-            if (visible) {
-                w.clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-            } else {
-                w.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
-            }
+        if (visible) {
+            w.clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        } else {
+            w.addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         }
     }
 
 
     /**
-     * Recreate the activity
+     * API compatible call for Context.getExternalFilesDirs
      */
-    public static void recreateActivity(Activity act)
+    @SuppressWarnings("SameParameterValue")
+    public static File[] getExternalFilesDirs(Context ctx, String type)
     {
-        if (SDK_VERSION >= SDK_HONEYCOMB) {
-            ApiCompatHoneycomb.recreateActivity(act);
+        if (SDK_VERSION >= SDK_KITKAT) {
+            return ApiCompatKitkat.getExternalFilesDirs(ctx, type);
         } else {
-            Intent startIntent = act.getIntent();
-            act.finish();
-            act.startActivity(startIntent);
+            return new File[] {ctx.getExternalFilesDir(type)};
+        }
+    }
+
+
+    /**
+     * Are the external files directories supported
+     */
+    public static boolean supportsExternalFilesDirs()
+    {
+        return SDK_VERSION < SDK_Q;
+    }
+
+
+    /**
+     * Is the write external storage permission supported
+     */
+    public static boolean supportsWriteExternalStoragePermission()
+    {
+        return SDK_VERSION < SDK_TIRAMISU;
+    }
+
+
+    /**
+     * Is the post notifications permission supported
+     */
+    public static boolean supportsPostNotificationsPermission()
+    {
+        return SDK_VERSION >= SDK_TIRAMISU;
+    }
+
+    /**
+     * Are notifications enabled
+     */
+    public static boolean areNotificationsEnabled(
+            @NonNull NotificationManager notifyMgr)
+    {
+        if (SDK_VERSION >= SDK_N) {
+            return ApiCompatN.areNotificationsEnabled(notifyMgr);
+        } else {
+            return true;
         }
     }
 
@@ -126,21 +154,38 @@ public final class ApiCompat
                                                           Uri uri)
     {
         return (SDK_VERSION >= SDK_KITKAT) &&
-                ApiCompatKitkat.documentsContractDeleteDocument(cr, uri);
+               ApiCompatKitkat.documentsContractDeleteDocument(cr, uri);
+    }
+
+    /**
+     * API compatible call to get the root URI for the primary storage volume
+     */
+    public static @Nullable Uri getPrimaryStorageRootUri(@NonNull Context ctx)
+    {
+        if (SDK_VERSION >= SDK_Q) {
+            return ApiCompatQ.getPrimaryStorageRootUri(ctx);
+        }
+        return null;
     }
 
     /**
      * Copy text to the clipboard
      */
-    public static void copyToClipboard(String str, Context ctx)
+    public static void copyToClipboard(String str,
+                                       boolean sensitive,
+                                       Context ctx)
     {
-        if (SDK_VERSION >= SDK_HONEYCOMB) {
-            ApiCompatHoneycomb.copyToClipboard(str, ctx);
-        } else {
-            @SuppressWarnings("deprecation")
-            ClipboardManager clipMgr = (ClipboardManager)
-                    ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-            clipMgr.setText(str);
+        setClipboardText(str, sensitive, ctx);
+    }
+
+    /**
+     * Clear the clipboard
+     */
+    public static void clearClipboard(Context ctx)
+    {
+        ClipboardManager clipMgr = setClipboardText("", true, ctx);
+        if ((clipMgr != null) && (SDK_VERSION >= SDK_P)) {
+            ApiCompatP.clearClipboard(clipMgr);
         }
     }
 
@@ -149,14 +194,9 @@ public final class ApiCompat
      */
     public static boolean clipboardHasText(Context ctx)
     {
-        if (SDK_VERSION >= SDK_HONEYCOMB) {
-            return ApiCompatHoneycomb.clipboardHasText(ctx);
-        } else {
-            @SuppressWarnings("deprecation")
-            ClipboardManager clipMgr = (ClipboardManager)
-                    ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-            return clipMgr.hasText();
-        }
+        ClipboardManager clipMgr = (ClipboardManager)
+                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+        return (clipMgr != null) && clipMgr.hasPrimaryClip();
     }
 
     /**
@@ -184,5 +224,53 @@ public final class ApiCompat
         return (SDK_VERSION >= SDK_KITKAT) &&
                ApiCompatKitkat.switchToNextInputMethod(imm, imeToken,
                                                        onlyCurrentIme);
+    }
+
+    /**
+     * Does the device have a system vibrator
+     */
+    public static boolean hasVibrator(Context ctx)
+    {
+        Vibrator vib = (Vibrator)ctx.getSystemService(Context.VIBRATOR_SERVICE);
+        return (vib != null) &&
+               ((SDK_VERSION < SDK_KITKAT) || ApiCompatKitkat.hasVibrator(vib));
+    }
+
+    /**
+     * Get the immutable flag for a pending intent
+     */
+    public static int getPendingIntentImmutableFlag()
+    {
+        return (SDK_VERSION < SDK_M) ?
+                0 : ApiCompatM.PENDING_INTENT_FLAG_IMMUTABLE;
+    }
+
+    /**
+     * Get the immutable flag for a pending intent
+     */
+    public static int getPendingIntentMutableFlag()
+    {
+        return (SDK_VERSION < SDK_S) ?
+                0 : ApiCompatS.PENDING_INTENT_FLAG_MUTABLE;
+    }
+
+    /**
+     * Set the text in the clipboard
+     * @return The clipboard manager
+     */
+    private static ClipboardManager setClipboardText(String str,
+                                                     boolean sensitive,
+                                                     Context ctx)
+    {
+        ClipboardManager clipMgr = (ClipboardManager)
+                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipMgr != null) {
+            ClipData clip = ClipData.newPlainText(null, str);
+            if (sensitive && (SDK_VERSION >= SDK_N)) {
+                ApiCompatN.setClipboardSensitive(clip);
+            }
+            clipMgr.setPrimaryClip(clip);
+        }
+        return clipMgr;
     }
 }

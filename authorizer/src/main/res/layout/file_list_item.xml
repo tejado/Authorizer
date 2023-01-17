@@ -3,6 +3,7 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:orientation="horizontal"
+              android:background="?android:attr/selectableItemBackground"
               tools:ignore="InefficientWeight">
 
     <ImageView android:id="@+id/icon"

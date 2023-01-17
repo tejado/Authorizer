@@ -7,31 +7,34 @@
  */
 package net.tjado.passwdsafe.lib.view;
 
-import java.util.List;
-
-import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.fragment.app.FragmentActivity;
-import androidx.core.app.NotificationCompat;
 import android.text.InputType;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.res.ResourcesCompat;
 
+import com.google.android.material.textfield.TextInputLayout;
 import net.tjado.passwdsafe.lib.ApiCompat;
+
+import java.util.List;
 
 /**
  * @author jharris
@@ -41,11 +44,11 @@ import net.tjado.passwdsafe.lib.ApiCompat;
 public final class GuiUtils
 {
     private static final int INPUT_TEXT_PASSWORD =
-        InputType.TYPE_CLASS_TEXT |
-        InputType.TYPE_TEXT_VARIATION_PASSWORD;
+            InputType.TYPE_CLASS_TEXT |
+            InputType.TYPE_TEXT_VARIATION_PASSWORD;
     private static final int INPUT_TEXT_PASSWORD_VISIBLE =
-        InputType.TYPE_CLASS_TEXT |
-        InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+            InputType.TYPE_CLASS_TEXT |
+            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
 
 
     /**
@@ -59,38 +62,33 @@ public final class GuiUtils
         }
 
         // Defer measurement so listview is rendered to get its width
-        listView.post(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                int width = View.MeasureSpec.makeMeasureSpec(
-                        listView.getMeasuredWidth(), View.MeasureSpec.AT_MOST);
-                int height = View.MeasureSpec.makeMeasureSpec(
-                        0, View.MeasureSpec.UNSPECIFIED);
-                int totalHeight = 0;
-                int numItems = listAdapter.getCount();
-                for (int i = 0; i < numItems; i++) {
-                    View listItem = listAdapter.getView(i, null, listView);
-                    listItem.measure(width, height);
-                    totalHeight += listItem.getMeasuredHeight();
-                }
-
-                ViewGroup.LayoutParams params = listView.getLayoutParams();
-                params.height = totalHeight;
-                if (numItems > 0) {
-                    params.height +=
-                            listView.getDividerHeight() * (numItems - 1);
-                }
-                listView.setLayoutParams(params);
+        listView.post(() -> {
+            int width = View.MeasureSpec.makeMeasureSpec(
+                    listView.getMeasuredWidth(), View.MeasureSpec.AT_MOST);
+            int height = View.MeasureSpec.makeMeasureSpec(
+                    0, View.MeasureSpec.UNSPECIFIED);
+            int totalHeight = 0;
+            int numItems = listAdapter.getCount();
+            for (int i = 0; i < numItems; i++) {
+                View listItem = listAdapter.getView(i, null, listView);
+                listItem.measure(width, height);
+                totalHeight += listItem.getMeasuredHeight();
             }
+
+            ViewGroup.LayoutParams params = listView.getLayoutParams();
+            params.height = totalHeight;
+            if (numItems > 0) {
+                params.height += listView.getDividerHeight() * (numItems - 1);
+            }
+            listView.setLayoutParams(params);
         });
     }
 
 
     public static boolean isPasswordVisible(TextView tv)
     {
-        return tv.getInputType() == INPUT_TEXT_PASSWORD_VISIBLE;
+        return (tv.getInputType() & InputType.TYPE_MASK_VARIATION) ==
+               InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
     }
 
 
@@ -102,8 +100,15 @@ public final class GuiUtils
                                           Context ctx)
     {
         int pos = tv.getSelectionStart();
-        tv.setInputType(visible ? INPUT_TEXT_PASSWORD_VISIBLE :
-                                INPUT_TEXT_PASSWORD);
+        int type = tv.getInputType();
+        boolean hasMultiline =
+                (type & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0;
+        type = visible ? INPUT_TEXT_PASSWORD_VISIBLE : INPUT_TEXT_PASSWORD;
+        if (hasMultiline) {
+            type |= InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+        }
+
+        tv.setInputType(type);
         // Reset monospace as the input type change resets to default monospace
         // font
         TypefaceUtils.setMonospace(tv, ctx);
@@ -114,12 +119,49 @@ public final class GuiUtils
     }
 
 
+    /**
+     * Clear the contents of an EditText
+     */
+    public static void clearEditText(EditText tv)
+    {
+        tv.getText().clear();
+        Runtime.getRuntime().gc();
+    }
+
+    /**
+     * Is a view visible
+     */
+    public static boolean isVisible(@NonNull View view)
+    {
+        return view.getVisibility() == View.VISIBLE;
+    }
+
     /** Set whether a view is visible */
     public static void setVisible(View view, boolean visible)
     {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    /** Set whether a menu item is enabled */
+    public static void setMenuEnabled(MenuItem item, boolean enabled)
+    {
+        item.setEnabled(enabled);
+        var icon = item.getIcon();
+        if (icon != null) {
+            Drawable d = icon.mutate();
+            d.setAlpha(enabled ? 255 : 138);
+            item.setIcon(d);
+        }
+    }
+
+    /**
+     * Set a button checked without animation
+     */
+    public static void setCheckedNoAnim(CompoundButton view, boolean checked)
+    {
+        view.setChecked(checked);
+        view.jumpDrawablesToCurrentState();
+    }
 
     /**
      * Set whether a TextInputLayout is visible
@@ -129,16 +171,8 @@ public final class GuiUtils
     {
         // Use a delayed post to prevent stack overflow errors on gingerbread
         // from repeated toggles on Gingerbread
-        view.post(new Runnable()
-        {
-            @Override
-           public void run()
-            {
-                view.setVisibility(visible ? View.VISIBLE : View.GONE);
-           }
-       });
+        view.post(() -> view.setVisibility(visible ? View.VISIBLE : View.GONE));
     }
-
 
     /**
      * Setup the keyboard on a form.  The final field clicks the supplied OK
@@ -149,16 +183,12 @@ public final class GuiUtils
                                          final Button okBtn,
                                          Context ctx)
     {
-        setupFormKeyboard(firstField, finalField, ctx, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                if (okBtn.isEnabled()) {
-                    okBtn.performClick();
-                }
-            }
-        });
+        setupFormKeyboard(firstField, finalField, ctx,
+                          () -> {
+                              if (okBtn.isEnabled()) {
+                                  okBtn.performClick();
+                              }
+                          });
     }
 
 
@@ -172,24 +202,20 @@ public final class GuiUtils
                                          final Runnable enterRunnable)
     {
         if (firstField != null) {
-            GuiUtilsFroyo.showKeyboard(firstField, ctx);
+            firstField.post(new KeyboardViewer(firstField, ctx));
         }
 
-        finalField.setOnKeyListener(new OnKeyListener()
-        {
-            public boolean onKey(View v, int keyCode, KeyEvent event)
-            {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (keyCode) {
-                    case KeyEvent.KEYCODE_DPAD_CENTER:
-                    case KeyEvent.KEYCODE_ENTER: {
-                        enterRunnable.run();
-                        return true;
-                    }
-                    }
+        finalField.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                switch (keyCode) {
+                case KeyEvent.KEYCODE_DPAD_CENTER:
+                case KeyEvent.KEYCODE_ENTER: {
+                    enterRunnable.run();
+                    return true;
                 }
-                return false;
+                }
             }
+            return false;
         });
     }
 
@@ -200,14 +226,12 @@ public final class GuiUtils
     public static void setKeyboardVisible(View v, Context ctx, boolean visible)
     {
         InputMethodManager imm = (InputMethodManager)
-            ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+                ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) {
+            return;
+        }
         if (visible) {
-            if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
-                imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
-            } else {
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
-                                    InputMethodManager.HIDE_IMPLICIT_ONLY);
-            }
+            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
         } else {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
@@ -215,23 +239,12 @@ public final class GuiUtils
 
 
     /**
-     * Invalidate the options menu on an activity
+     * Disable force-dark mode
      */
-    public static void invalidateOptionsMenu(Activity act)
+    public static void disableForceDark(View view)
     {
-        if (act instanceof FragmentActivity) {
-            ((FragmentActivity)act).supportInvalidateOptionsMenu();
-        } else if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
-            GuiUtilsHoneycomb.invalidateOptionsMenu(act);
-        }
-    }
-
-
-    /** Set the text in a TextView as selectable */
-    public static void setTextSelectable(TextView tv)
-    {
-        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_HONEYCOMB) {
-            GuiUtilsHoneycomb.setTextSelectable(tv);
+        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_Q) {
+            GuiUtilsQ.disableForceDark(view);
         }
     }
 
@@ -241,11 +254,7 @@ public final class GuiUtils
      */
     public static Drawable getDrawable(Resources res, int id)
     {
-        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_LOLLIPOP) {
-            return GuiUtilsLollipop.getDrawable(res, id);
-        } else {
-            return GuiUtilsFroyo.getDrawable(res, id);
-        }
+        return ResourcesCompat.getDrawable(res, id, null);
     }
 
 
@@ -263,7 +272,7 @@ public final class GuiUtils
                                         String notifyTag,
                                         boolean autoCancel)
     {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
+        NotificationCompat.Builder builder = createNotificationBuilder(ctx)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setContentIntent(intent)
@@ -285,12 +294,26 @@ public final class GuiUtils
                                         String notifyTag,
                                         Context ctx)
     {
-        BitmapDrawable b =
-                (BitmapDrawable)getDrawable(ctx.getResources(), bigIcon);
-        if (b == null) {
+        if (!ApiCompat.areNotificationsEnabled(notifyMgr)) {
             return;
         }
-        builder.setLargeIcon(b.getBitmap());
+
+        Drawable draw = getDrawable(ctx.getResources(), bigIcon);
+        Bitmap icon;
+        if (draw instanceof BitmapDrawable) {
+            icon = ((BitmapDrawable)draw).getBitmap();
+        } else if (draw != null) {
+            icon = Bitmap.createBitmap(draw.getIntrinsicWidth(),
+                                       draw.getIntrinsicHeight(),
+                                       Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(icon);
+            draw = draw.mutate();
+            draw.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            draw.draw(canvas);
+        } else {
+            return;
+        }
+        builder.setLargeIcon(icon);
         notifyMgr.notify(notifyTag, notifyId, builder.build());
     }
 
@@ -317,5 +340,18 @@ public final class GuiUtils
             style.addLine("…");
             builder.setNumber(linesSize);
         }
+    }
+
+    /**
+     * Create a notification builder
+     */
+    public static NotificationCompat.Builder createNotificationBuilder(
+            Context ctx)
+    {
+        if (ApiCompat.SDK_VERSION >= ApiCompat.SDK_OREO) {
+            return GuiUtilsOreo.createNotificationBuilder(ctx);
+        }
+        //noinspection deprecation
+        return new NotificationCompat.Builder(ctx);
     }
 }

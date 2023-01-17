@@ -29,7 +29,7 @@ public abstract class AbstractPwsPasswdField extends PwsField
     private final String itsStrEncoding;
 
     protected AbstractPwsPasswdField(int type, byte[] value, PwsFile file,
-                                     String encoding)
+                                     @SuppressWarnings("SameParameterValue") String encoding)
     {
         super(type, sealValue(value, encoding, file.getWriteCipher()));
         Arrays.fill(value, (byte)0);
@@ -83,6 +83,7 @@ public abstract class AbstractPwsPasswdField extends PwsField
 
 
     @Override
+    @NonNull
     public String toString()
     {
         SealedObject sealValue = (SealedObject)getValue();

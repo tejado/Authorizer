@@ -13,10 +13,14 @@
           tools:ignore="UnusedAttribute">
 
     <permission
-        android:name="net.tjado.authorizer.client.provider.permission.ACCESS"
+        android:name="net.tjado.passwdsafe.client.provider.permission.ACCESS"
         android:protectionLevel="signature"/>
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"
+        tools:ignore="ScopedStorage"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <!--Before Android 12-->
@@ -26,13 +30,20 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
+    <!--suppress DeprecatedClassUsageInspection -->
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
-    <uses-permission android:name="net.tjado.authorizer.client.provider.permission.ACCESS"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <uses-permission android:name="net.tjado.passwdsafe.client.provider.permission.ACCESS"/>
     <uses-permission android:name="android.permission.NFC"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="false"/>
+
+    <queries>
+        <provider android:authorities="net.tjado.passwdsafe.file" />
+    </queries>
 
     <application
         android:name=".PasswdSafeApp"
@@ -41,47 +52,30 @@
         android:description="@string/app_desc"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/PwsAppTheme">
         <meta-data
             android:name="com.sec.android.support.multiwindow"
             android:value="true"/>
 
+        <!-- Single UI-activity -->
         <activity
-            android:name=".FileListActivity"
-            android:label="@string/app_name">
+            android:name=".PasswdSafe"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER"/>
             </intent-filter>
+
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED"/>
             </intent-filter>
 
-            <meta-data
-                android:name="com.sec.minimode.icon.portrait.normal"
-                android:resource="@mipmap/ic_launcher"
-                tools:ignore="ManifestResource"/>
-            <meta-data
-                android:name="com.sec.minimode.icon.landscape.normal"
-                android:resource="@mipmap/ic_launcher"
-                tools:ignore="ManifestResource"/>
-        </activity>
 
-        <activity
-            android:name=".UsbGpgBackupActivity"
-            android:label="@string/app_name">
-        </activity>
-
-        <activity
-            android:name=".PasswdSafe"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:parentActivityName=".FileListActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".FileListActivity"/>
             <!-- View files -->
             <intent-filter>
                 <action android:name="net.tjado.passwdsafe.action.VIEW"/>
@@ -115,7 +109,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
 
-            <!-- Dropbox, Astro -->
+            <!-- Local files (legacy) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -186,7 +180,7 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.ibak"/>
             </intent-filter>
 
-            <!-- Content providers - e.g. mail app attachments -->
+            <!-- Content providers - e.g. opening from other apps -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -198,7 +192,20 @@
                 <data android:mimeType="application/x-psafe3"/>
                 <data android:mimeType="application/x-psafe"/>
                 <data android:mimeType="application/x-dat"/>
+                <data android:mimeType="application/application/x-psafe3"/>
+                <data android:mimeType="application/application/x-psafe"/>
+                <data android:mimeType="application/spplication/x-dat"/>
                 <data android:mimeType="application/octet-stream"/>
+            </intent-filter>
+
+            <!-- Google Files app -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:scheme="content"
+                    android:host="com.google.android.apps.nbu.files.provider"
+                    android:mimeType="*/*"/>
             </intent-filter>
 
             <!-- Search -->
@@ -212,10 +219,15 @@
         </activity>
 
         <activity
+            android:name=".UsbGpgBackupActivity"
+            android:label="@string/app_name">
+        </activity>
+
+        <activity
             android:name=".LauncherFileShortcuts"
             android:label="@string/password_file"
-            android:theme="@style/AppTheme_Dialog"
-            tools:ignore="ExportedActivity">
+            android:theme="@style/PwsAppTheme_Dialog"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -225,8 +237,8 @@
         <activity
             android:name=".LauncherRecordShortcuts"
             android:label="@string/password_record"
-            android:theme="@style/AppTheme_Dialog"
-            tools:ignore="ExportedActivity">
+            android:theme="@style/PwsAppTheme_Dialog"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -246,23 +258,23 @@
             />
 
         <provider
-            android:name="net.tjado.passwdsafe.file.PasswdClientProvider"
-            android:authorities="net.tjado.authorizer.client.provider"
+            android:name=".file.PasswdClientProvider"
+            android:authorities="net.tjado.passwdsafe.client.provider"
             android:exported="true"
-            android:permission="net.tjado.authorizer.client.provider.permission.ACCESS"
+            android:permission="net.tjado.passwdsafe.client.provider.permission.ACCESS"
             android:syncable="false">
         </provider>
 
         <receiver
             android:name="net.tjado.passwdsafe.ExpirationTimeoutReceiver"
-            tools:ignore="ExportedReceiver">
+            android:exported="false">
             <intent-filter>
                 <action android:name="action.EXPIRATION_TIMEOUT"/>
             </intent-filter>
         </receiver>
         <receiver
-            android:name="net.tjado.passwdsafe.StartupReceiver"
-            tools:ignore="ExportedReceiver">
+            android:name="net.tjado.passwdsafe.lib.StartupReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
@@ -282,7 +294,8 @@
         <service
             android:name="net.tjado.passwdsafe.PasswdSafeIME"
             android:label="@string/app_name"
-            android:permission="android.permission.BIND_INPUT_METHOD">
+            android:permission="android.permission.BIND_INPUT_METHOD"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.view.InputMethod"/>
             </intent-filter>

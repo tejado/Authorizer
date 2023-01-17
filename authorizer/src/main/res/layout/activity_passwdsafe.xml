@@ -6,62 +6,86 @@
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
 
-<androidx.drawerlayout.widget.DrawerLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="net.tjado.passwdsafe.PasswdSafe">
 
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+    <LinearLayout android:id="@+id/no_permission_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <include android:id="@+id/bottom_panels"
-                 layout="@layout/activity_passwdsafe_bottom_panels"
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content"/>
+        <TextView android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_file_permission"/>
 
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:layout_above="@id/bottom_panels"
-                      android:layout_alignParentEnd="true"
-                      android:layout_alignParentLeft="true"
-                      android:layout_alignParentRight="true"
-                      android:layout_alignParentStart="true"
-                      android:layout_alignParentTop="true"
-                      android:layout_marginEnd="16dp"
-                      android:layout_marginLeft="16dp"
-                      android:layout_marginRight="16dp"
-                      android:layout_marginStart="16dp"
-                      android:orientation="vertical">
+        <Button android:id="@+id/reload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reload"/>
 
-            <FrameLayout android:id="@+id/content"
-                         android:layout_width="match_parent"
-                         android:layout_height="match_parent"/>
+        <Button android:id="@+id/app_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_settings"/>
 
-            <!-- Need an invisible content list in single view so that fragments
-                 can resume without error when rotating between single and double
-                 panes -->
-            <fragment android:id="@+id/content_list"
-                      android:name="net.tjado.passwdsafe.PasswdSafeListFragment"
-                      android:layout_width="0dp"
-                      android:layout_height="0dp"
-                      android:visibility="gone"
-                      tools:layout="@android:layout/list_content"/>
+    </LinearLayout>
 
-        </LinearLayout>
-    </RelativeLayout>
+    <FrameLayout android:id="@+id/content"
+                android:layout_width="match_parent"
+       android:layout_height="0dp"
+       android:layout_alignParentEnd="true"
+       android:layout_alignParentStart="true"
+       android:layout_alignParentTop="true"
+       android:paddingBottom="8dp"
+       android:layout_marginEnd="16dp"
+       android:layout_marginLeft="16dp"
+       android:layout_marginRight="16dp"
+       android:layout_marginStart="16dp"
+       app:layout_constraintBottom_toTopOf="@+id/bottom_panels"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent"/>
 
-    <!-- The drawer is given a fixed width in dp and extends the full height of
-         the container. -->
-    <fragment android:id="@+id/navigation_drawer"
-              android:name="net.tjado.passwdsafe.PasswdSafeNavDrawerFragment"
-              android:layout_width="@dimen/navigation_drawer_width"
-              android:layout_height="match_parent"
-              android:layout_gravity="left|start"
-              tools:layout="@layout/fragment_passwdsafe_nav_drawer"
-              tools:ignore="RtlHardcoded"/>
 
-</androidx.drawerlayout.widget.DrawerLayout>
+    <include android:id="@+id/bottom_panels"
+        layout="@layout/activity_passwdsafe_bottom_panels"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/content"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+       android:id="@+id/bottom_navigation_view"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_gravity="bottom"
+       style="@style/BottomNavigation"
+       app:labelVisibilityMode="labeled"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:menu="@menu/bottom_nav_passwdsafe"
+       app:elevation="8dp"
+       app:itemIconSize="26dp"
+       app:itemBackground="@color/tab_bg_color"
+       app:itemIconTint="@color/tab_color"
+       app:itemTextColor="@color/tab_color"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

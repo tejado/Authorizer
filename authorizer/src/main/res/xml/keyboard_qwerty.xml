@@ -97,6 +97,7 @@
              android:keyIcon="@drawable/sym_keyboard_choose"/>
         <Key android:codes="32"
              android:keyIcon="@drawable/sym_keyboard_space"
+             android:popupKeyboard="@xml/keyboard_popup_space"
              android:keyWidth="35%p"/>
         <Key android:codes="46"
              android:keyLabel="."/>

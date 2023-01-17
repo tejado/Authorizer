@@ -16,6 +16,18 @@
     <string name="app_desc">Access PasswordSafe databases on Android</string>
     <string name="app_name">Authorizer</string>
     <string name="at_least">At least</string>
+    <string name="backup_creation_failed">Backup creation failed</string>
+    <string name="backup_file">Backup file</string>
+    <string name="backup_file_help">
+        To restore a backup file, select and open it.  Then, select the restore
+        icon to replace the original file.  The restore may not be possible if
+        the app no longer has permission to write to the original file.  An
+        opened backup file may be shared to export it from the device.
+        \n
+        \nBackup files are stored in a private directory.  The files will be
+        deleted if the app is uninstalled or its data is cleared.
+    </string>
+    <string name="backup_for_file_on">Backup for %1$s on %2$s</string>
     <string name="basic">Basic</string>
     <string name="canceled">Canceled</string>
     <string name="cannot_create_file">Cannot create file: %1$s</string>
@@ -45,7 +57,8 @@
     <string name="copy_password_warning">
         Warning: All apps can read the clipboard contents, and the clipboard
         cannot be reliably cleared.  The PasswdSafe alternate keyboard is a
-        more secure method for entering passwords into other apps.
+        more secure method for entering passwords into other apps.  Click Enable
+        to open the keyboard settings.
     </string>
     <string name="copy_url">Copy URL</string>
     <string name="copy_user">Copy User Name</string>
@@ -61,6 +74,9 @@
     <string name="default_symbols">Default symbols</string>
     <string name="default_symbols_empty_pref">Use an empty preference for default symbols: %1$s</string>
     <string name="delete">Delete</string>
+    <string name="delete_all">Delete All</string>
+    <string name="delete_all_backups_p">Delete all backups?</string>
+    <string name="delete_backup_p">Delete backup?</string>
     <string name="delete_file">Delete File</string>
     <string name="delete_file_msg">Delete file \"%1$s\"?</string>
     <string name="delete_policy">Delete Policy</string>
@@ -99,20 +115,20 @@
     <string name="file_name">File Name</string>
     <string name="file_not_found_perm_denied">File not found or permission denied</string>
     <string name="file_open_help">
-        File passwords can be saved on devices with a fingerprint scanner and
+        File passwords can be saved on devices with biometrics scanner and
         Android 6.0 or higher.  The passwords are encrypted using AES-256
-        keys that are protected by a fingerprint scan.
+        keys that are protected by a biometrics scan.
         \n
-        - To save a password, first ensure a fingerprint is registered
+        - To save a password, first ensure a biometrics scan is registered
         with the device in the security settings.  Then, check the save option,
         enter the password, and click OK. After the password is verified,
-        scan a fingerprint when prompted. The password will be encrypted and
-        saved, and the file will open.
+        scan the biometric credential when prompted. The password will be
+        encrypted and saved, and the file will open.
         \n
-        - To use a saved password, scan a fingerprint instead of entering a
-        password.  If the scan is successful, the password is decrypted and
-        used to open the file.  If a YubiKey is used, the key will be read
-        after the fingerprint is scanned.
+        - To use a saved password, scan the biometric credential instead of
+        entering a password.  If the scan is successful, the password is
+        decrypted and used to open the file.  If a YubiKey is used, the key
+        will be read after the biometric credential is scanned.
         \n
         - To remove a saved password, uncheck the save option and open the file.
         The saved password will be erased from the device.  All saved
@@ -136,7 +152,6 @@
     <string name="file_operations">File Operations…</string>
     <string name="file_password_encoding">File password encoding</string>
     <string name="files">Files</string>
-    <string name="fingerprint_not_recognized">Fingerprint not recognized</string>
     <string name="generate">Generate</string>
     <string name="generate_password">Generate Password</string>
     <string name="go">Go</string>
@@ -161,7 +176,7 @@
     <string name="invalid_option_length">Invalid option length</string>
     <string name="invalid_password">Invalid password</string>
     <string name="key_error">Key error for %1$s: %2$s</string>
-    <string name="key_not_found">Key not found for $1%s</string>
+    <string name="key_not_found">Key not found for %1$s</string>
     <string name="kitkat_sdcard_warning">
         %1$s
         \n\nOn Android KitKat and higher, apps are prevented from writing to
@@ -183,6 +198,7 @@
     <string name="max_size_label">Maximum size:</string>
     <string name="menu">Menu</string>
     <string name="modified">Modified</string>
+    <string name="modify">Modify</string>
     <string name="monospace">Monospace</string>
     <string name="n_a">N/A</string>
     <string name="name">Name</string>
@@ -201,31 +217,36 @@
     <string name="new_policy">New Policy</string>
     <string name="next">Next</string>
     <string name="no_alias_chosen">No alias chosen</string>
+    <string name="no_backup_file">No backup file</string>
+    <string name="no_biometrics_registered">No biometric credentials are registered</string>
+    <string name="no_errors">No Errors</string>
     <string name="no_file_permission">
         PasswdSafe requires file permissions.
         \n\nPress reload for another prompt.  If no prompt is shown, press app
         settings and enable storage permissions.
     </string>
     <string name="no_files_select_to_open">
-        No Files - Select action to open or create a new file
-        \n\nIf files are not showing in the documents screen, use the menu to
-        show internal storage or the SD card.
-        \n\nThe previous file chooser is enabled in the Preferences as the
-        legacy file chooser.
+        Select action button to open a file or use menu to create a new file.
+        \n\n
+        Using the file chooser:\n
+        - For local files, use the menu to show internal storage\n
+        - Use the top-left menu to select different file locations.
     </string>
-    <string name="no_fingerprints_registered">No fingerprints are registered</string>
     <string name="no_groups">No Groups</string>
-    <string name="no_shortcut_chosen">No shortcut chosen</string>
+    <string name="no_permission">No permission</string>
     <string name="no_policies">No Policies</string>
     <string name="no_records">No Records</string>
     <string name="no_records_open_file">No Records. Open a file first and then retry.</string>
+    <string name="no_shortcut_chosen">No shortcut chosen</string>
     <string name="none_paren">(None)</string>
     <string name="none_selected_open">None selected.  Open PasswdSafe to choose.</string>
     <string name="notes">Notes</string>
+    <string name="notes_truncated_msg">\ … (truncated)</string>
     <string name="num_records">Number of records</string>
     <string name="ok">OK</string>
     <string name="open_file">Open %s</string>
     <string name="open_file_title">Open File</string>
+    <string name="open_password_file">Open password file</string>
     <string name="option_not_selected">At least one option must be selected</string>
     <string name="password">Password</string>
     <string name="password_encoding">Password encoding</string>
@@ -245,7 +266,16 @@
     <string name="password_record">Password record</string>
     <string name="password_save_canceled_key_error">Password save canceled.  Failed to create an encryption key: %s</string>
     <string name="password_saved">Password saved</string>
+    <string name="password_subset">Password subset</string>
+    <string name="password_subset_btn" translatable="false">a**d</string>
+    <string name="password_subset_error">
+        Positions are separated by spaces, commas, or semicolons. They are
+        numbered from 1 to the password length, %1$d. Negative values count
+        from the end.
+    </string>
+    <string name="password_subset_hint">Password subset. E.g. 1,5,-1</string>
     <string name="password_times_header">PASSWORD TIMES</string>
+    <string name="password_visibility_timeout">Password visibility timeout</string>
     <string name="password_with_expiration">Password with expiration date</string>
     <string name="passwords">Passwords</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
@@ -260,6 +290,7 @@
     <string name="press_again_close_warning">Press again to close the file</string>
     <string name="press_password_warning">Press Password again to paste into visible field</string>
     <string name="press_yubikey">Press YubiKey</string>
+    <string name="previous">Previous</string>
     <string name="protect_all">Protect All Records</string>
     <string name="protect_group">Protect Group Records</string>
     <string name="protected_record">Protected</string>
@@ -269,34 +300,67 @@
     <string name="recent_files">Recent Files</string>
     <string name="record">Record</string>
     <string name="records">Records</string>
+    <string name="record_errors">Record Errors</string>
+    <string name="record_error_note">
+        One or more records have failed to load.  The successful records are
+        available on the Records screen, and the errors are listed below.
+
+        \n\nTo recover, use the menu to save or export the file to preserve the
+        successful records.
+    </string>
     <string name="record_has_references">Record has references</string>
     <string name="record_not_found">Record not found</string>
     <string name="record_policy">Record Policy</string>
+    <string name="record_sort_field">Record sort field</string>
     <string name="record_sort_order">Record sort order</string>
     <string name="record_type">Record type</string>
     <string name="read_only_about">Read-only</string>
-    <string name="read_only_file">Read-only</string>
+    <string name="read_only_file">Open read-only</string>
     <string name="read_only_media">File is located on read-only media.  This situation can occur with Kitkat and higher on removable SD cards.</string>
+    <string name="read_only_provider">
+        The provider of the file doesn\'t support writes or hasn\'t granted
+        write permission
+    </string>
+    <string name="read_only_sdcard">
+        File is located on a SD card, which is not writable.  Move the file to
+        the internal storage, or use the newer file chooser which can be enabled
+        in the file preferences.
+    </string>
     <string name="read_write">Read-write</string>
+    <string name="recurring">Recurring</string>
     <string name="references_label">REFERENCES</string>
     <string name="regular_expression">Regular expression</string>
     <string name="regular_expression_summary">Use a regular expression to search instead of a sub-string</string>
     <string name="remove">Remove</string>
-    <string name="recurring">Recurring</string>
+    <string name="restore">Restore</string>
+    <string name="restore_failed_msg">Restore failed: %1$s</string>
+    <string name="restore_file_not_accessible">Restore file not accessible</string>
+    <string name="restore_file_not_found">Restore file not found</string>
+    <string name="restore_file_not_writable">Restore file not writable</string>
+    <string name="restore_file_p">Restore file %1$s from %2$s?</string>
+    <string name="restoring">Restoring…</string>
     <string name="save">Save</string>
     <string name="save_password">Save password</string>
     <string name="save_password_p">Save password?</string>
     <string name="save_password_warning">
         After the file is opened, the entered password will be saved locally.
         The password is encrypted with an AES-256 key that is protected by a
-        fingerprint scan.  The fingerprint scan may not be as secure as the file
-        password itself.
+        biometrics scan.  The biometrics credential may not be as secure as the
+        file password itself.
+        \n
+        \nThe saved password may be lost during an upgrade or fingerprint
+        change.  Remember the password to ensure the file remains openable.
     </string>
     <string name="saving_file">Saving %s…</string>
     <string name="search">Search</string>
     <string name="search_hint">Search PasswdSafe</string>
+    <string name="share">Share</string>
+    <string name="share_file">Share File</string>
+    <string name="share_file_msg">Sharing will export the password file to other apps</string>
+    <string name="share_file_p">Share file?</string>
+    <string name="sharing_file">Sharing %1$s…</string>
     <string name="select_accounts">Select accounts</string>
-    <string name="select_file_label">Select password file:</string>
+    <string name="select_file_label">Select password file</string>
     <string name="send">Send</string>
     <string name="set_password">Set Password</string>
     <string name="shortcut_base_record_header">SHORTCUT</string>
@@ -306,8 +370,11 @@
     <string name="show_backup_files">Show backup files</string>
     <string name="show_password">Show Password</string>
     <string name="show_passwords">Show Passwords</string>
+    <string name="sort">Sort</string>
+    <string name="sort_ascending">Sort ascending</string>
     <string name="symbols_used_by_default">Symbols used by default in a password policy: %1$s</string>
     <string name="sync">Sync</string>
+    <string name="theme">Theme</string>
     <string name="times_header">TIMES</string>
     <string name="title">Title</string>
     <string name="touch_sensor_to_save_the_password">Touch sensor to save the password</string>
@@ -319,13 +386,15 @@
     <string name="username">User Name</string>
     <string name="use_count">Uses</string>
     <string name="use_digits">Digits</string>
-    <string name="use_light_theme">Use light theme</string>
     <string name="use_lowercase">Lowercase</string>
     <string name="use_symbols">Symbols</string>
     <string name="use_uppercase">Uppercase</string>
     <string name="username_header">USER NAME</string>
+    <string name="vibrate_keyboard_on_press">Vibrate keyboard on press</string>
+    <string name="view">View</string>
     <string name="view_password_expirations">View password expirations</string>
     <string name="word_wrap">Word Wrap</string>
+    <string name="writable">Writable</string>
     <string name="yes">Yes</string>
     <string name="yubikey">YubiKey</string>
     <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
@@ -512,6 +581,13 @@
         <item>1 hour</item>
     </string-array>
 
+    <!-- Order must match constants in RecordFieldSortPref -->
+    <string-array name="record_field_sort_pref">
+        <item>Title</item>
+        <item>Creation date</item>
+        <item>Modification date</item>
+    </string-array>
+
     <!-- Order must match constants in RecordSortOrderPref -->
     <string-array name="record_sort_order_pref">
         <item>Groups first</item>
@@ -526,7 +602,7 @@
         <item>Shortcut</item>
     </string-array>
 
-    <!-- Order must match values of PasswdRecordFilter.ExpiryFilter -->
+    <!-- Order must match values of PasswdExpiryFilter -->
     <string-array name="expire_filters">
         <item>Expired</item>
         <item>Today</item>
@@ -538,7 +614,7 @@
         <item>Custom</item>
     </string-array>
 
-    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <!-- Indexes must match PasswdExpiryFilter -->
     <string-array name="expire_filter_record">
         <item>One password has expired</item>
         <item>One password expires today</item>
@@ -548,7 +624,7 @@
         <item>One password expires within a year</item>
     </string-array>
 
-    <!-- Indexes must match PasswdRecordFilter.ExpiryFilter -->
+    <!-- Indexes must match PasswdExpiryFilter -->
     <string-array name="expire_filter_records">
         <item>%1$s passwords have expired</item>
         <item>%1$s passwords expire today</item>
@@ -567,6 +643,22 @@
         <item>In Two Weeks</item>
         <item>In a Month</item>
         <item>In a Year</item>
+    </string-array>
+
+    <!-- Order must match PasswdTimeoutPref enum values -->
+    <string-array name="passwd_timeout_pref">
+        <item>None</item>
+        <item>15 seconds</item>
+        <item>30 seconds</item>
+        <item>1 minute</item>
+        <item>5 minutes</item>
+    </string-array>
+
+    <!-- Order must match ThemePref enum values -->
+    <string-array name="theme_pref">
+        <item>Follow system</item>
+        <item>Always light</item>
+        <item>Always dark</item>
     </string-array>
 
     <!-- Order must match constants in PasswdExpiration.Type -->
@@ -687,4 +779,11 @@
     <string name="SUB_OTP" translatable="false">{OTP}</string>
     <string name="SUB_TAB" translatable="false">{TAB}</string>
     <string name="SUB_RETURN" translatable="false">{RET}</string>
+    <string name="version_file_info"><![CDATA[Version & file information]]></string>
+    <string name="about_app">About Authorizer</string>
+    <string name="show_license">Show license</string>
+    <string name="hide_license">Hide license</string>
+    <string name="usb_native_mode">USB Auto-Type Native Mode</string>
+    <string name="usb_native_mode_summary">Advanced users: USB gadget access without root</string>
+    <string name="writeable_summary">Allow to write to the current open file</string>
 </resources>

@@ -10,8 +10,6 @@ package net.tjado.passwdsafe;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.textfield.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,15 +18,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import com.google.android.material.textfield.TextInputLayout;
 
-import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.lib.view.AbstractTextWatcher;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
+import net.tjado.passwdsafe.lib.view.TextInputUtils;
 import net.tjado.passwdsafe.lib.view.TypefaceUtils;
 import net.tjado.passwdsafe.view.PasswordVisibilityMenuHandler;
-import net.tjado.passwdsafe.view.TextInputUtils;
 
 import org.pwsafe.lib.file.Owner;
 import org.pwsafe.lib.file.PwsPassword;
@@ -55,9 +55,9 @@ public class PasswdSafeChangePasswordFragment
 
     private TextView itsTitle;
     private TextInputLayout itsPasswordInput;
-    private TextView itsPassword;
+    private EditText itsPassword;
     private TextInputLayout itsPasswordConfirmInput;
-    private TextView itsPasswordConfirm;
+    private EditText itsPasswordConfirm;
     private final Validator itsValidator = new Validator();
 
     /**
@@ -69,7 +69,7 @@ public class PasswdSafeChangePasswordFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
         setHasOptionsMenu(true);
@@ -77,32 +77,23 @@ public class PasswdSafeChangePasswordFragment
                 R.layout.fragment_passwdsafe_change_password, container, false);
         Context ctx = getContext();
 
-        itsTitle = (TextView)rootView.findViewById(R.id.title);
-        itsPasswordInput = (TextInputLayout)
-                rootView.findViewById(R.id.password_input);
-        itsPassword = (TextView)rootView.findViewById(R.id.password);
+        itsTitle = rootView.findViewById(R.id.title);
+        itsPasswordInput = rootView.findViewById(R.id.password_input);
+        itsPassword = rootView.findViewById(R.id.password);
+
         TypefaceUtils.setMonospace(itsPassword, ctx);
         itsValidator.registerTextView(itsPassword);
         itsPasswordInput.setTypeface(Typeface.DEFAULT);
 
-        itsPasswordConfirmInput = (TextInputLayout)
-                rootView.findViewById(R.id.password_confirm_input);
-        itsPasswordConfirm = (TextView)
-                rootView.findViewById(R.id.password_confirm);
+        itsPasswordConfirmInput = rootView.findViewById(R.id.password_confirm_input);
+        itsPasswordConfirm = rootView.findViewById(R.id.password_confirm);
         TypefaceUtils.setMonospace(itsPasswordConfirm, ctx);
         itsValidator.registerTextView(itsPasswordConfirm);
         itsPasswordConfirmInput.setTypeface(Typeface.DEFAULT);
         PasswordVisibilityMenuHandler.set(ctx, itsPassword, itsPasswordConfirm);
 
         GuiUtils.setupFormKeyboard(itsPassword, itsPasswordConfirm,
-                                   getContext(), new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        save();
-                    }
-                });
+                                   getContext(), this::save);
 
         return rootView;
     }
@@ -111,14 +102,10 @@ public class PasswdSafeChangePasswordFragment
     public void onResume()
     {
         super.onResume();
-        useFileData(new PasswdFileDataUser()
-        {
-            @Override
-            public void useFileData(@NonNull PasswdFileData fileData)
-            {
-                itsTitle.setText(fileData.getUri().getIdentifier(getContext(),
-                                                                 true));
-            }
+        useFileData((PasswdFileDataUser<Void>)fileData -> {
+            itsTitle.setText(fileData.getUri().getIdentifier(getContext(),
+                                                             true));
+            return null;
         });
         getListener().updateViewChangingPassword();
         itsValidator.validate();
@@ -128,11 +115,21 @@ public class PasswdSafeChangePasswordFragment
     public void onPause()
     {
         super.onPause();
-        GuiUtils.setKeyboardVisible(itsPassword, getContext(), false);
+        GuiUtils.setKeyboardVisible(itsPassword, requireContext(), false);
+        GuiUtils.clearEditText(itsPassword);
+        GuiUtils.clearEditText(itsPasswordConfirm);
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu)
+    public void onDetach()
+    {
+        super.onDetach();
+        itsValidator.unregisterTextView(itsPassword);
+        itsValidator.unregisterTextView(itsPasswordConfirm);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu)
     {
         super.onPrepareOptionsMenu(menu);
 
@@ -145,15 +142,11 @@ public class PasswdSafeChangePasswordFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId()) {
-        case R.id.menu_save: {
+        if (item.getItemId() == R.id.menu_save) {
             save();
             return true;
         }
-        default: {
-            return super.onOptionsItemSelected(item);
-        }
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -171,19 +164,12 @@ public class PasswdSafeChangePasswordFragment
             return;
         }
 
-        final Owner<PwsPassword> passwd =
-                new Owner<>(new PwsPassword(itsPassword.getText()));
-        try {
-            useFileData(new PasswdFileDataUser()
-            {
-                @Override
-                public void useFileData(@NonNull PasswdFileData fileData)
-                {
-                    fileData.changePasswd(passwd.pass());
-                }
+        try (Owner<PwsPassword> passwd = PwsPassword.create(itsPassword.getText()))
+        {
+            useFileData((PasswdFileDataUser<Void>)fileData -> {
+                fileData.changePasswd(passwd.pass());
+                return null;
             });
-        } finally {
-            passwd.close();
         }
         getListener().finishChangePassword();
     }
@@ -198,15 +184,23 @@ public class PasswdSafeChangePasswordFragment
         /**
          * Register a text view with the validator
          */
-        public void registerTextView(TextView tv)
+        protected void registerTextView(TextView tv)
         {
             tv.addTextChangedListener(this);
         }
 
         /**
+         * Unregister a text view
+         */
+        protected void unregisterTextView(TextView tv)
+        {
+            tv.removeTextChangedListener(this);
+        }
+
+        /**
          * Validate the fragment
          */
-        public final void validate()
+        protected final void validate()
         {
             boolean valid;
 
@@ -224,14 +218,14 @@ public class PasswdSafeChangePasswordFragment
 
             if (valid != itsIsValid) {
                 itsIsValid = valid;
-                GuiUtils.invalidateOptionsMenu(getActivity());
+                requireActivity().invalidateOptionsMenu();
             }
         }
 
         /**
          * Is valid
          */
-        public final boolean isValid()
+        protected final boolean isValid()
         {
             return itsIsValid;
         }

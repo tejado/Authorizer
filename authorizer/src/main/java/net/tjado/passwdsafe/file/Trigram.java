@@ -13,7 +13,7 @@ package net.tjado.passwdsafe.file;
 public class Trigram
 {
     public static final int SIGMA = 611062;
-    public static final short TRIS[][][] = new short[26][][];
+    public static final short[][][] TRIS = new short[26][][];
 
     static {
         TRIS[0] = new short[][]

@@ -10,9 +10,11 @@ package org.pwsafe.lib.file;
 import androidx.annotation.NonNull;
 
 import org.pwsafe.lib.exception.EndOfFileException;
+import org.pwsafe.lib.exception.RecordLoadException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 
 /**
  * Encapsulates a version 1 record.
@@ -74,15 +76,15 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
      */
     private static final Object[] VALID_TYPES = new Object[]
             {
-                    new Object[]{Integer.valueOf(TITLE), "TITLE",
+                    new Object[]{TITLE, "TITLE",
                                  PwsStringField.class},
-                    new Object[]{Integer.valueOf(USERNAME), "USERNAME",
+                    new Object[]{USERNAME, "USERNAME",
                                  PwsStringField.class},
-                    new Object[]{Integer.valueOf(NOTES), "NOTES",
+                    new Object[]{NOTES, "NOTES",
                                  PwsStringField.class},
-                    new Object[]{Integer.valueOf(PASSWORD), "PASSWORD",
+                    new Object[]{PASSWORD, "PASSWORD",
                                  PwsPasswdField.class},
-                    new Object[]{Integer.valueOf(UUID), "UUID",
+                    new Object[]{UUID, "UUID",
                                  PwsStringField.class}
             };
 
@@ -119,7 +121,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
      * @throws IOException        If a read error occurs.
      */
     PwsRecordV1(PwsFile file)
-            throws EndOfFileException, IOException
+            throws EndOfFileException, IOException, RecordLoadException
     {
         super(file, VALID_TYPES);
     }
@@ -231,49 +233,53 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
      * Initialises this record by reading its data from <code>file</code>.
      *
      * @param file the file to read the data from.
-     * @throws EndOfFileException
-     * @throws IOException
      */
     @Override
     protected void loadRecord(PwsFile file)
-            throws EndOfFileException, IOException
+            throws EndOfFileException, RecordLoadException
     {
-        String str;
-        int pos;
+        try {
+            String str;
+            int pos;
 
-        str = new Item(file).getData();
+            str = new Item(file).getData();
 
-        String title;
-        String username;
-        pos = str.indexOf(SplitChar);
-        if (pos == -1) {
-            // This is not a composite of title and username
-
-            pos = str.indexOf(DefUserString);
+            String title;
+            String username;
+            pos = str.indexOf(SplitChar);
             if (pos == -1) {
-                title = str;
-            } else {
-                title = str.substring(0, pos);
-            }
-            username = "";
-        } else {
-            title = str.substring(0, pos).trim();
-            username = str.substring(pos + 1).trim();
-        }
-        setField(new PwsStringField(TITLE, title));
-        setField(new PwsStringField(USERNAME, username));
-        Item item = new Item(file);
-        setField(new PwsPasswdField(PASSWORD, item.getData(), file));
-        item.clear();
-        setField(new PwsStringField(NOTES, new Item(file).getData()));
+                // This is not a composite of title and username
 
-        String uuid;
-        if (username.trim().length() == 0) {
-            uuid = title;
-        } else {
-            uuid = title + SplitString + username;
+                pos = str.indexOf(DefUserString);
+                if (pos == -1) {
+                    title = str;
+                } else {
+                    title = str.substring(0, pos);
+                }
+                username = "";
+            } else {
+                title = str.substring(0, pos).trim();
+                username = str.substring(pos + 1).trim();
+            }
+            setField(new PwsStringField(TITLE, title));
+            setField(new PwsStringField(USERNAME, username));
+            Item item = new Item(file);
+            setField(new PwsPasswdField(PASSWORD, item.getData(), file));
+            item.clear();
+            setField(new PwsStringField(NOTES, new Item(file).getData()));
+
+            String uuid;
+            if (username.trim().length() == 0) {
+                uuid = title;
+            } else {
+                uuid = title + SplitString + username;
+            }
+            setField(new PwsStringField(UUID, uuid));
+        } catch (EndOfFileException eof) {
+            throw eof;
+        } catch (Throwable t) {
+            throw new RecordLoadException(this, Collections.singletonList(t));
         }
-        setField(new PwsStringField(UUID, uuid));
     }
 
     /**
@@ -307,6 +313,7 @@ public class PwsRecordV1 extends PwsRecord implements Comparable<Object>
      * @return A string representation of this object.
      */
     @Override
+    @NonNull
     public String toString()
     {
         return "{ \"" + getField(TITLE) + "\", \"" +

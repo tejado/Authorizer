@@ -24,7 +24,7 @@ public class HeaderPasswdPolicies
         private int itsUseCount;
 
         /** Constructor */
-        public HdrPolicy(PasswdPolicy policy)
+        protected HdrPolicy(PasswdPolicy policy)
         {
             itsPolicy = policy;
             itsUseCount = 0;
@@ -37,13 +37,13 @@ public class HeaderPasswdPolicies
         }
 
         /** Get the number of records referencing this policy */
-        public int getUseCount()
+        protected int getUseCount()
         {
             return itsUseCount;
         }
 
         /** Increment the number of records referencing this policy */
-        public void incUseCount()
+        protected void incUseCount()
         {
             ++itsUseCount;
         }

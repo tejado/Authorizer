@@ -16,7 +16,8 @@
               android:layout_height="wrap_content"
               android:autoLink="all"
               android:clickable="false"
+              android:paddingBottom="6dp"
               android:paddingTop="6dp"
-              android:paddingBottom="6dp"/>
+              android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
 </ScrollView>

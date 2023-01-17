@@ -7,34 +7,37 @@
  */
 package net.tjado.passwdsafe;
 
-import org.pwsafe.lib.file.PwsRecord;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
 import android.os.IBinder;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.InputType;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
 
 import net.tjado.passwdsafe.file.PasswdFileData;
-import net.tjado.passwdsafe.file.PasswdFileDataUser;
+import net.tjado.passwdsafe.file.PasswdHistory;
+import net.tjado.passwdsafe.file.PasswdRecord;
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
-import net.tjado.passwdsafe.lib.ObjectHolder;
 import net.tjado.passwdsafe.util.Pair;
+
+import org.pwsafe.lib.file.PwsRecord;
+
+import java.util.List;
 
 /**
  *  Input method for selecting fields from a record
@@ -46,17 +49,19 @@ public class PasswdSafeIME extends InputMethodService
 {
     // Password fields
     private static final int USER_KEY = -100;
-    private static final int PASSWORD_KEY = -101;
+    public static final int PASSWORD_KEY = -101;
     private static final int URL_KEY = -102;
     private static final int EMAIL_KEY = -103;
     private static final int TITLE_KEY = -104;
     private static final int NOTES_KEY = -105;
+    private static final int PREVIOUS_PASSWORD_KEY = -106;
 
     // Control keys
     public static final int ENTER_KEY = -200;
     public static final int PASSWDSAFE_KEY = -201;
     public static final int KEYBOARD_NEXT_KEY = -202;
     public static final int KEYBOARD_CHOOSE_KEY = -203;
+    private static final int DEL_KEY = -204;
 
     private static boolean itsResetKeyboard = false;
 
@@ -72,6 +77,7 @@ public class PasswdSafeIME extends InputMethodService
     private boolean itsIsPasswordField = false;
     private long itsLastShiftTime = Long.MIN_VALUE;
     private boolean itsCapsLock = false;
+    private boolean itsIsVibrate = false;
 
     /**
      * Reset the keyboard shown when next visible
@@ -100,11 +106,11 @@ public class PasswdSafeIME extends InputMethodService
     {
         View view = getLayoutInflater().inflate(R.layout.input_method, null);
 
-        itsKeyboardView = (KeyboardView)view.findViewById(R.id.keyboard);
+        itsKeyboardView = view.findViewById(R.id.keyboard);
         itsKeyboardView.setPreviewEnabled(false);
         itsKeyboardView.setOnKeyboardActionListener(new KeyboardListener());
 
-        itsRecord = (TextView)view.findViewById(R.id.record);
+        itsRecord = view.findViewById(R.id.record);
         itsRecord.setOnClickListener(this);
         itsPasswordWarning = view.findViewById(R.id.password_warning);
 
@@ -181,6 +187,9 @@ public class PasswdSafeIME extends InputMethodService
         setKeyboard(keyboard);
         itsKeyboardView.closing();
         itsKeyboardView.invalidateAllKeys();
+
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
+        itsIsVibrate = Preferences.getDisplayVibrateKeyboard(prefs);
     }
 
     @Override
@@ -203,11 +212,8 @@ public class PasswdSafeIME extends InputMethodService
     @Override
     public void onClick(View v)
     {
-        switch (v.getId()) {
-        case R.id.record: {
+        if (v.getId() == R.id.record) {
             openPasswdSafe();
-            break;
-        }
         }
     }
 
@@ -216,42 +222,35 @@ public class PasswdSafeIME extends InputMethodService
      */
     private void openPasswdSafe()
     {
-        final ObjectHolder<Pair<Intent, Boolean>> rc = new ObjectHolder<>();
-        refresh(new RefreshUser()
-        {
-            @Override
-            public void refresh(@Nullable PasswdFileData fileData,
-                                @Nullable PwsRecord rec)
-            {
-                Intent intent;
-                if (fileData == null) {
-                    intent = PasswdSafeUtil.getMainActivityIntent(
-                            BuildConfig.APPLICATION_ID, PasswdSafeIME.this);
-                    if (intent == null) {
-                        return;
-                    }
-                    intent.putExtra(FileListActivity.INTENT_EXTRA_CLOSE_ON_OPEN,
-                                    true);
-                } else {
-                    String uuid = null;
-                    if (rec != null) {
-                        uuid = fileData.getUUID(rec);
-                    }
-                    intent = PasswdSafeUtil.createOpenIntent(
-                            fileData.getUri().getUri(), uuid);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Pair<Intent, Boolean> rc = refresh((fileData, rec) -> {
+            Intent intent;
+            if (fileData == null) {
+                intent = PasswdSafeUtil.getMainActivityIntent(
+                        BuildConfig.APPLICATION_ID, PasswdSafeIME.this);
+                if (intent == null) {
+                    return null;
                 }
-                rc.set(new Pair<>(intent, (fileData != null)));
+                intent.putExtra(PasswdSafe.INTENT_EXTRA_CLOSE_ON_OPEN,
+                                true);
+            } else {
+                String uuid = null;
+                if (rec != null) {
+                    uuid = fileData.getUUID(rec);
+                }
+                intent = PasswdSafeUtil.createOpenIntent(
+                        fileData.getUri().getUri(), uuid);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             }
+            return new Pair<>(intent, (fileData != null));
         });
-        if (rc.get() != null) {
-            if (rc.get().second) {
+        if (rc != null) {
+            if (rc.second) {
                 setKeyboard(itsPasswdSafeKeyboard);
             } else {
                 setKeyboard(itsQwertyKeyboard);
             }
-            startActivity(rc.get().first);
+            startActivity(rc.first);
         }
     }
 
@@ -276,66 +275,83 @@ public class PasswdSafeIME extends InputMethodService
         }
         }
 
+        if (itsIsVibrate) {
+            itsKeyboardView.performHapticFeedback(
+                    HapticFeedbackConstants.VIRTUAL_KEY,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+        }
+
         switch (keycode) {
         case USER_KEY:
         case PASSWORD_KEY:
         case TITLE_KEY:
         case URL_KEY:
         case EMAIL_KEY:
-        case NOTES_KEY: {
-            final ObjectHolder<String> keyStr = new ObjectHolder<>();
-            refresh(new RefreshUser()
-            {
-                @Override
-                public void refresh(@Nullable PasswdFileData fileData,
-                                    @Nullable PwsRecord rec)
-                {
-                    if ((fileData == null) || (rec == null)) {
-                        return;
-                    }
-                    switch (keycode) {
-                    case USER_KEY: {
-                        keyStr.set(fileData.getUsername(rec));
-                        break;
-                    }
-                    case PASSWORD_KEY: {
-                        showPasswordWarning(!itsAllowPassword);
-                        if (itsAllowPassword) {
-                            keyStr.set(fileData.getPassword(rec));
-                            itsAllowPassword = itsIsPasswordField;
-                        } else {
-                            itsAllowPassword = true;
-                        }
-                        break;
-                    }
-                    case TITLE_KEY: {
-                        keyStr.set(fileData.getTitle(rec));
-                        break;
-                    }
-                    case URL_KEY: {
-                        keyStr.set(fileData.getURL(rec));
-                        break;
-                    }
-                    case EMAIL_KEY: {
-                        keyStr.set(fileData.getEmail(rec));
-                        break;
-                    }
-                    case NOTES_KEY: {
-                        keyStr.set(fileData.getNotes(rec));
-                        break;
-                    }
-                    }
+        case NOTES_KEY:
+        case PREVIOUS_PASSWORD_KEY: {
+            String keyStr = refresh((fileData, rec) -> {
+                if ((fileData == null) || (rec == null)) {
+                    return null;
                 }
+                switch (keycode) {
+                case USER_KEY: {
+                    return fileData.getUsername(rec);
+                }
+                case PASSWORD_KEY: {
+                    showPasswordWarning(!itsAllowPassword);
+                    if (itsAllowPassword) {
+                        itsAllowPassword = itsIsPasswordField;
+                        PasswdRecord pwsrec = fileData.getPasswdRecord(rec);
+                        if (pwsrec != null) {
+                            return pwsrec.getPassword(fileData);
+                        } else {
+                            return fileData.getPassword(rec);
+                        }
+                    } else {
+                        itsAllowPassword = true;
+                    }
+                    break;
+                }
+                case TITLE_KEY: {
+                    return fileData.getTitle(rec);
+                }
+                case URL_KEY: {
+                    return fileData.getURL(
+                            rec, PasswdFileData.UrlStyle.URL_ONLY);
+                }
+                case EMAIL_KEY: {
+                    return fileData.getEmail(
+                            rec, PasswdFileData.EmailStyle.ADDR_ONLY);
+                }
+                case NOTES_KEY: {
+                    return fileData.getNotes(rec, this).getNotes();
+                }
+                case PREVIOUS_PASSWORD_KEY: {
+                    PasswdHistory hist = fileData.getPasswdHistory(rec);
+                    if (hist == null) {
+                        return null;
+                    }
+                    List<PasswdHistory.Entry> entries = hist.getPasswds();
+                    if (entries.size() == 0) {
+                        return null;
+                    }
+                    return entries.get(0).getPasswd();
+                }
+                }
+                return null;
             });
-            String str = keyStr.get();
-            if (str != null) {
-                conn.commitText(str, 1);
+            if (keyStr != null) {
+                conn.commitText(keyStr, 1);
             }
             break;
         }
         case Keyboard.KEYCODE_DELETE: {
             conn.deleteSurroundingText(1, 0);
             updateShiftKeyState();
+            break;
+        }
+        case DEL_KEY: {
+            conn.deleteSurroundingText(0, 1);
             break;
         }
         case ENTER_KEY: {
@@ -350,9 +366,10 @@ public class PasswdSafeIME extends InputMethodService
             InputMethodManager inputMgr =
                     (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
             IBinder token = getToken();
-            if (!ApiCompat.shouldOfferSwitchingToNextInputMethod(inputMgr,
-                                                                 token) ||
-                !ApiCompat.switchToNextInputMethod(inputMgr, token, false)) {
+            if ((inputMgr != null) &&
+                (!ApiCompat.shouldOfferSwitchingToNextInputMethod(inputMgr,
+                                                                  token) ||
+                 !ApiCompat.switchToNextInputMethod(inputMgr, token, false))) {
                 inputMgr.showInputMethodPicker();
             }
             break;
@@ -360,7 +377,9 @@ public class PasswdSafeIME extends InputMethodService
         case KEYBOARD_CHOOSE_KEY: {
             InputMethodManager inputMgr =
                     (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-            inputMgr.showInputMethodPicker();
+            if (inputMgr != null) {
+                inputMgr.showInputMethodPicker();
+            }
             break;
         }
         case Keyboard.KEYCODE_MODE_CHANGE: {
@@ -435,8 +454,10 @@ public class PasswdSafeIME extends InputMethodService
             int caps = 0;
             EditorInfo ei = getCurrentInputEditorInfo();
             if ((ei != null) && (ei.inputType != InputType.TYPE_NULL)) {
-                caps = getCurrentInputConnection().getCursorCapsMode(
-                        ei.inputType);
+                InputConnection conn = getCurrentInputConnection();
+                if (conn != null) {
+                    caps = conn.getCursorCapsMode(ei.inputType);
+                }
             }
             itsKeyboardView.setShifted(itsCapsLock || (caps != 0));
         }
@@ -447,51 +468,54 @@ public class PasswdSafeIME extends InputMethodService
      * @param user The user callback to handle the refresh.  Called even if
      *             there is no file data
      */
-    private void refresh(@Nullable final RefreshUser user)
+    private <RetT> RetT refresh(@Nullable final RefreshUser<RetT> user)
     {
-        final ObjectHolder<Pair<String, String>> labels = new ObjectHolder<>();
-        PasswdSafeFileDataFragment.useOpenFileData(new PasswdFileDataUser()
-        {
-            @Override
-            public void useFileData(@NonNull PasswdFileData fileData)
-            {
-                String fileLabel = fileData.getUri().getIdentifier(
-                        PasswdSafeIME.this, true);
+        RefreshResult<RetT> rc = PasswdSafeFileDataFragment.useOpenFileData(
+                fileData -> {
+                    String fileLabel = fileData.getUri().getIdentifier(
+                            PasswdSafeIME.this, true);
 
-                PwsRecord rec = null;
-                String uuid = PasswdSafeFileDataFragment.getLastViewedRecord();
-                if (uuid != null) {
-                    rec = fileData.getRecord(uuid);
-                }
+                    String uuid =
+                            PasswdSafeFileDataFragment.getLastViewedRecord();
+                    PwsRecord rec =
+                            (uuid != null) ? fileData.getRecord(uuid) : null;
 
-                String recLabel;
-                if (rec != null) {
-                    recLabel = fileData.getId(rec);
-                } else {
-                    recLabel = getString(R.string.none_selected_open);
-                }
+                    String recLabel;
+                    boolean hasPrevious = false;
+                    if (rec != null) {
+                        recLabel = fileData.getId(rec);
+                        PasswdHistory history = fileData.getPasswdHistory(rec);
+                        hasPrevious = (history != null) &&
+                                      (history.getMaxSize() > 0);
+                    } else {
+                        recLabel = getString(R.string.none_selected_open);
+                    }
 
-                labels.set(new Pair<>(fileLabel, recLabel));
-                if (user != null) {
-                    user.refresh(fileData, rec);
-                }
-            }
-        });
+                    RetT ret = (user != null) ?
+                            user.refresh(fileData, rec) : null;
+                    return new RefreshResult<>(fileLabel, recLabel,
+                                               hasPrevious, ret);
+                });
 
         StringBuilder label = new StringBuilder();
-        if (labels.get() != null) {
+        boolean hasPreviousPassword;
+        RetT ret;
+        if (rc != null) {
             label.append(getString(R.string.record)).append(": ");
-            label.append(labels.get().first);
+            label.append(rc.itsFileLabel);
             label.append(" - ");
-            label.append(labels.get().second);
+            label.append(rc.itsRecordLabel);
+            hasPreviousPassword = rc.itsHasPreviousPassword;
+            ret = rc.itsResult;
         } else {
             label.append(getString(R.string.file)).append(": ")
-                    .append(getString(R.string.none_selected_open));
-            if (user != null) {
-                user.refresh(null, null);
-            }
+                 .append(getString(R.string.none_selected_open));
+            hasPreviousPassword = false;
+            ret = (user != null) ? user.refresh(null, null) : null;
         }
         itsRecord.setText(label.toString());
+        itsPasswdSafeKeyboard.setHasPreviousPassword(hasPreviousPassword);
+        return ret;
     }
 
     /**
@@ -521,13 +545,38 @@ public class PasswdSafeIME extends InputMethodService
     /**
      * User for the refresh call
      */
-    private interface RefreshUser
+    private interface RefreshUser<RetT>
     {
         /**
          * Callback to refresh with the optional file data and record
          */
-        void refresh(@Nullable PasswdFileData fileData,
+        RetT refresh(@Nullable PasswdFileData fileData,
                      @Nullable PwsRecord rec);
+    }
+
+    /**
+     * Result of a refresh
+     */
+    private static class RefreshResult<RetT>
+    {
+        protected final String itsFileLabel;
+        protected final String itsRecordLabel;
+        protected final boolean itsHasPreviousPassword;
+        protected final RetT itsResult;
+
+        /**
+         * Constructor
+         */
+        protected RefreshResult(String fileLabel,
+                                String recLabel,
+                                boolean hasPreviousPassword,
+                                RetT result)
+        {
+            itsFileLabel = fileLabel;
+            itsRecordLabel = recLabel;
+            itsHasPreviousPassword = hasPreviousPassword;
+            itsResult = result;
+        }
     }
 
     /**

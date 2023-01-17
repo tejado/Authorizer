@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.tjado.passwdsafe.file.PasswdFileData;
-import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.file.PasswdRecord;
 import net.tjado.passwdsafe.view.PasswdLocation;
 
@@ -30,16 +29,16 @@ public abstract class AbstractPasswdSafeLocationFragment
      */
     protected static class RecordInfo
     {
-        public final PwsRecord itsRec;
-        public final PasswdRecord itsPasswdRec;
-        public final PasswdFileData itsFileData;
+        protected final PwsRecord itsRec;
+        protected final PasswdRecord itsPasswdRec;
+        protected final PasswdFileData itsFileData;
 
         /**
          * Constructor
          */
-        public RecordInfo(@NonNull PwsRecord rec,
-                          @NonNull PasswdRecord passwdRec,
-                          @NonNull PasswdFileData fileData)
+        protected RecordInfo(@NonNull PwsRecord rec,
+                             @NonNull PasswdRecord passwdRec,
+                             @NonNull PasswdFileData fileData)
         {
             itsRec = rec;
             itsPasswdRec = passwdRec;
@@ -50,23 +49,23 @@ public abstract class AbstractPasswdSafeLocationFragment
     /**
      * Interface for users of a file data record
      */
-    protected interface RecordInfoUser
+    protected interface RecordInfoUser<RetT>
     {
         /**
          * Callback to use the file data record
          */
-        void useRecordInfo(@NonNull RecordInfo info);
+        RetT useRecordInfo(@NonNull RecordInfo info);
     }
 
     /**
      * Interfaces for users of file data with an optional record
      */
-    protected interface RecordFileUser
+    protected interface RecordFileUser<RetT>
     {
         /**
          * Callback to use the file data and record
          */
-        void useFile(@Nullable RecordInfo info,
+        RetT useFile(@Nullable RecordInfo info,
                      @NonNull PasswdFileData fileData);
     }
 
@@ -105,45 +104,33 @@ public abstract class AbstractPasswdSafeLocationFragment
     /**
      * Use the file data record at the current location
      */
-    protected final void useRecordInfo(final RecordInfoUser user)
+    protected final <RetT> RetT useRecordInfo(final RecordInfoUser<RetT> user)
     {
-        useRecordFile(new RecordFileUser()
-        {
-            @Override
-            public void useFile(@Nullable RecordInfo info,
-                                @NonNull PasswdFileData fileData)
-            {
-                if (info != null) {
-                    user.useRecordInfo(info);
-                }
+        return useRecordFile((info, fileData) -> {
+            if (info != null) {
+                return user.useRecordInfo(info);
             }
+            return null;
         });
     }
 
     /**
      * Use the file data with an optional record at the current location
      */
-    protected final void useRecordFile(final RecordFileUser user)
+    protected final <RetT> RetT useRecordFile(final RecordFileUser<RetT> user)
     {
-        useFileData(new PasswdFileDataUser()
-        {
-            @Override
-            public void useFileData(@NonNull PasswdFileData fileData)
-            {
-                PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
-                if (rec == null) {
-                    user.useFile(null, fileData);
-                    return;
-                }
-                PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
-                if (passwdRec == null) {
-                    user.useFile(null, fileData);
-                    return;
-                }
-
-                user.useFile(new RecordInfo(rec, passwdRec, fileData),
-                             fileData);
+        return useFileData(fileData -> {
+            PwsRecord rec = fileData.getRecord(itsLocation.getRecord());
+            if (rec == null) {
+                return user.useFile(null, fileData);
             }
+            PasswdRecord passwdRec = fileData.getPasswdRecord(rec);
+            if (passwdRec == null) {
+                return user.useFile(null, fileData);
+            }
+
+            return user.useFile(new RecordInfo(rec, passwdRec, fileData),
+                                fileData);
         });
     }
 }

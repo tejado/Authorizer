@@ -11,8 +11,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.inputmethodservice.Keyboard;
-import androidx.annotation.NonNull;
 import android.view.inputmethod.EditorInfo;
+import androidx.annotation.NonNull;
 
 import net.tjado.passwdsafe.lib.view.GuiUtils;
 
@@ -22,6 +22,7 @@ import net.tjado.passwdsafe.lib.view.GuiUtils;
 public final class PasswdSafeIMEKeyboard extends Keyboard
 {
     private Key itsEnterKey;
+    private PasswdSafeKey itsPasswordKey;
 
     /**
      * Constructor
@@ -76,7 +77,16 @@ public final class PasswdSafeIMEKeyboard extends Keyboard
                 (enterText != -1) ? res.getString(enterText) : null;
         itsEnterKey.icon =
                 (enterIcon != -1) ?
-                GuiUtils.getDrawable(res, enterIcon) : null;
+                        GuiUtils.getDrawable(res, enterIcon) : null;
+    }
+
+    /**
+     * Set whether a previous password should be enabled
+     */
+    public void setHasPreviousPassword(boolean hasPreviousPassword)
+    {
+        itsPasswordKey.setHasLongPress(hasPreviousPassword,
+                                       R.xml.keyboard_popup_password);
     }
 
     @Override
@@ -84,9 +94,16 @@ public final class PasswdSafeIMEKeyboard extends Keyboard
                                    @NonNull Row parent,
                                    int x, int y, XmlResourceParser parser)
     {
-        Key key = new PasswdSafeKey(res, parent, x, y, parser);
-        if (key.codes[0] == PasswdSafeIME.ENTER_KEY) {
+        PasswdSafeKey key = new PasswdSafeKey(res, parent, x, y, parser);
+        switch (key.codes[0]) {
+        case PasswdSafeIME.ENTER_KEY: {
             itsEnterKey = key;
+            break;
+        }
+        case PasswdSafeIME.PASSWORD_KEY: {
+            itsPasswordKey = key;
+            break;
+        }
         }
         return key;
     }
@@ -101,13 +118,34 @@ public final class PasswdSafeIMEKeyboard extends Keyboard
         private static final int[] ACTION_KEY_PRESSED = {
                 android.R.attr.state_single, android.R.attr.state_pressed };
 
+        private final CharSequence itsLabel;
+
         /**
          * Constructor
          */
-        public PasswdSafeKey(Resources res, Row parent, int x, int y,
-                             XmlResourceParser parser)
+        private PasswdSafeKey(Resources res,
+                              Row parent,
+                              int x,
+                              int y,
+                              XmlResourceParser parser)
         {
             super(res, parent, x, y, parser);
+            itsLabel = label;
+        }
+
+        /**
+         * Set whether the key has a popup for long-press behavior
+         */
+        private void setHasLongPress(boolean hasLongPress,
+                                     @SuppressWarnings("SameParameterValue") int longPressPopup)
+        {
+            if (hasLongPress) {
+                label = itsLabel + " …";
+                popupResId = longPressPopup;
+            } else {
+                label = itsLabel;
+                popupResId = 0;
+            }
         }
 
         @Override

@@ -84,6 +84,7 @@ public class PwsUnknownField extends PwsField
     }
 
     @Override
+    @NonNull
     public String toString()
     {
         return new String(((byte[])super.getValue()));

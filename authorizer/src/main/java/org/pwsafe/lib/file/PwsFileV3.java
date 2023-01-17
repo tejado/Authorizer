@@ -13,6 +13,7 @@ import org.pwsafe.lib.crypto.SHA256Pws;
 import org.pwsafe.lib.crypto.TwofishPws;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.MemoryKeyException;
+import org.pwsafe.lib.exception.RecordLoadException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 import java.io.ByteArrayInputStream;
@@ -21,7 +22,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 import javax.crypto.BadPaddingException;
@@ -54,8 +54,8 @@ public final class PwsFileV3 extends PwsFile
     private static final byte[] EOF_BYTES_RAW = "PWS3-EOFPWS3-EOF".getBytes();
 
     private byte[] stretchedPassword;
-    protected byte[] decryptedRecordKey;
-    protected byte[] decryptedHmacKey;
+    public byte[] decryptedRecordKey;
+    public byte[] decryptedHmacKey;
 
     private TwofishPws twofishCbc;
     HmacPws hasher;
@@ -82,9 +82,6 @@ public final class PwsFileV3 extends PwsFile
      *
      * @param storage the underlying storage to use to open the database.
      * @param passwd  the passphrase for the database.
-     * @throws EndOfFileException
-     * @throws IOException
-     * @throws UnsupportedFileVersionException
      */
     public PwsFileV3(PwsStorage storage, Owner<PwsPassword>.Param passwd)
             throws EndOfFileException, IOException,
@@ -136,8 +133,7 @@ public final class PwsFileV3 extends PwsFile
 
     @Override
     protected void open(Owner<PwsPassword>.Param passwdParam, String encoding)
-            throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException
+            throws EndOfFileException, IOException
     {
         setPassphrase(passwdParam);
 
@@ -205,34 +201,22 @@ public final class PwsFileV3 extends PwsFile
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IOException("Error reading encrypted fields");
+            throw new IOException("Error reading encrypted fields", e);
         }
         twofishCbc = new TwofishPws(decryptedRecordKey, false,
                                     theHeaderV3.getIV());
 
-        readExtraHeader(this);
+        try {
+            readExtraHeader();
+        } catch (RecordLoadException rle) {
+            throw new IOException("Error reading header record", rle);
+        }
     }
 
 
-    /**
-     * Writes this file back to the filesystem.  If successful the modified
-     * flag is also reset on the file and all records.
-     *
-     * @throws IOException if the attempt fails.
-     */
     @Override
-    public void save() throws IOException
+    public void saveAs(PwsStorage saveStorage) throws IOException
     {
-        if (isReadOnly())
-            throw new IOException("File is read only");
-
-        if (lastStorageChange != null && // check for concurrent change
-            storage.getModifiedDate().after(lastStorageChange)) {
-            throw new ConcurrentModificationException(
-                    "Password store was changed independently - no save " +
-                    "possible!");
-        }
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         outStream = baos;
 
@@ -260,10 +244,7 @@ public final class PwsFileV3 extends PwsFile
 
             outStream.close();
 
-            if (storage.save(baos.toByteArray(), true)) {
-                modified = false;
-                lastStorageChange = storage.getModifiedDate();
-            } else {
+            if (!saveStorage.save(baos.toByteArray(), true)) {
                 throw new IOException("Unable to save file");
             }
         } catch (IOException e) {
@@ -311,19 +292,15 @@ public final class PwsFileV3 extends PwsFile
     }
 
     /**
-     * Reads the extra header present in version 2 files.
+     * Reads the extra header present in version 3 files.
      *
-     * @param file the file to read the header from.
      * @throws EndOfFileException              If end of file is reached.
      * @throws IOException                     If an error occurs whilst
      * reading.
-     * @throws UnsupportedFileVersionException If the header is not a
-     * valid V2 header.
      */
     @Override
-    protected void readExtraHeader(PwsFile file)
-            throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException
+    protected void readExtraHeader()
+            throws EndOfFileException, IOException, RecordLoadException
     {
         //headerRecord = (PwsRecordV3) readRecord();
         headerRecord = new PwsRecordV3(this, true);
@@ -379,7 +356,6 @@ public final class PwsFileV3 extends PwsFile
      * Encrypts then writes the contents of <code>buff</code> to the file.
      *
      * @param buff the data to be written.
-     * @throws IOException
      */
     @Override
     public void writeEncryptedBytes(byte[] buff)

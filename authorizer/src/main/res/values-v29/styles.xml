@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources>
+
+    <!--
+      Base application themes for API 29+. These themes completely replace
+      AppBase themes from res/values/styles.xml on API 17+ devices.
+    -->
+    <style name="PwsAppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="autoCompleteTextViewStyle">@style/PwsAppTheme_AutoComplete</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+        <item name="textAppearanceSearchResultSubtitle">@style/PwsAppTheme_SearchSubTitle</item>
+        <item name="textAppearanceSearchResultTitle">@style/PwsAppTheme_SearchTitle</item>
+    </style>
+
+    <style name="PwsAppBaseTheme_Dialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="PwsAppBaseThemeDark" parent="Theme.AppCompat">
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="PwsAppBaseThemeDark_Dialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+</resources>

@@ -9,6 +9,8 @@ package net.tjado.passwdsafe;
 
 import android.content.Context;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.ListFragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
@@ -16,22 +18,28 @@ import androidx.loader.content.Loader;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
+import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.view.CopyField;
 import net.tjado.passwdsafe.view.PasswdLocation;
 import net.tjado.passwdsafe.view.PasswdRecordListData;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 
 /**
  *  Fragment showing lists of items from a PasswdSafe file
@@ -62,14 +70,24 @@ public class PasswdSafeListFragment extends ListFragment
         /** Copy a field */
         void copyField(CopyField field, String recUuid);
 
+        /** Show the record preferences */
+        void showRecordPreferences();
+
         /** Change the location in the password file */
         void changeLocation(PasswdLocation location);
 
         /** Update the view for a list of records */
         void updateViewList(PasswdLocation location);
+
+        /** Does the activity have a menu */
+        boolean activityHasMenu();
+
+        /** Is the navigation drawer closed */
+        boolean isNavDrawerClosed();
     }
 
     private static final String STATE_SELECTED_RECORD = "selectedRecord";
+    private static final String STATE_SELECTED_POS = "selectedPos";
 
     private Mode itsMode = Mode.NONE;
     private PasswdLocation itsLocation;
@@ -80,6 +98,7 @@ public class PasswdSafeListFragment extends ListFragment
     private TextView itsEmptyText;
     private ItemListAdapter itsAdapter;
     private String itsSelectedRecord;
+    private int itsSelectedPos = -1;
 
     /** Create a new instance */
     public static PasswdSafeListFragment newInstance(
@@ -95,9 +114,6 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onCreate(android.os.Bundle)
-     */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -114,49 +130,39 @@ public class PasswdSafeListFragment extends ListFragment
         }
         itsLocation = location;
         itsIsContents = isContents;
-
-        if (savedInstanceState != null) {
-            itsSelectedRecord =
-                    savedInstanceState.getString(STATE_SELECTED_RECORD);
-        }
     }
 
 
     @Override
-    public void onAttach(Context ctx)
+    public void onAttach(@NonNull Context ctx)
     {
         super.onAttach(ctx);
         itsListener = (Listener)ctx;
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
-     */
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState)
     {
+        setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_passwdsafe_list,
                                      container, false);
 
         itsGroupPanel = root.findViewById(R.id.current_group_panel);
         itsGroupPanel.setOnClickListener(this);
-        itsGroupLabel = (TextView)root.findViewById(R.id.current_group_label);
-        itsEmptyText = (TextView)root.findViewById(android.R.id.empty);
+        itsGroupLabel = root.findViewById(R.id.current_group_label);
+        itsEmptyText = root.findViewById(android.R.id.empty);
 
         return root;
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onActivityCreated(android.os.Bundle)
-     */
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
 
         if (itsListener.isCopySupported()) {
             registerForContextMenu(getListView());
@@ -166,9 +172,18 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onResume()
-     */
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState)
+    {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            itsSelectedRecord =
+                    savedInstanceState.getString(STATE_SELECTED_RECORD);
+            itsSelectedPos =
+                    savedInstanceState.getInt(STATE_SELECTED_POS, -1);
+        }
+    }
+
     @Override
     public void onResume()
     {
@@ -180,10 +195,11 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState)
+    public void onSaveInstanceState(@NonNull Bundle outState)
     {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_SELECTED_RECORD, itsSelectedRecord);
+        outState.putInt(STATE_SELECTED_POS, itsSelectedPos);
     }
 
     @Override
@@ -194,6 +210,28 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater)
+    {
+         if (itsIsContents && (itsListener != null) &&
+            itsListener.activityHasMenu() && itsListener.isNavDrawerClosed()) {
+            inflater.inflate(R.menu.fragment_passwdsafe_list, menu);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.menu_sort) {
+            if (itsListener != null) {
+                itsListener.showRecordPreferences();
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo)
     {
@@ -201,7 +239,7 @@ public class PasswdSafeListFragment extends ListFragment
         AdapterView.AdapterContextMenuInfo info =
                 (AdapterView.AdapterContextMenuInfo)menuInfo;
         PasswdRecordListData listItem = itsAdapter.getItem(info.position);
-        if (listItem.itsIsRecord) {
+        if ((listItem != null) && listItem.itsIsRecord) {
             menu.setHeaderTitle(listItem.itsTitle);
 
             int group = itsIsContents ? PasswdSafe.CONTEXT_GROUP_LIST_CONTENTS :
@@ -215,41 +253,44 @@ public class PasswdSafeListFragment extends ListFragment
     public boolean onContextItemSelected(MenuItem item)
     {
         int group = itsIsContents ? PasswdSafe.CONTEXT_GROUP_LIST_CONTENTS :
-                    PasswdSafe.CONTEXT_GROUP_LIST;
+                PasswdSafe.CONTEXT_GROUP_LIST;
         if (item.getGroupId() != group) {
             return super.onContextItemSelected(item);
         }
 
-        switch (item.getItemId()) {
-        case R.id.menu_copy_password:
-        case R.id.menu_copy_user: {
-                AdapterView.AdapterContextMenuInfo info =
+        int itemId = item.getItemId();
+        if ((itemId == R.id.menu_copy_password) ||
+            (itemId == R.id.menu_copy_user)) {
+            AdapterView.AdapterContextMenuInfo info =
                     (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-            final PasswdRecordListData listItem =
-                    itsAdapter.getItem(info.position);
-            if (listItem.itsIsRecord) {
+            final PasswdRecordListData listItem = (info != null) ? itsAdapter.getItem(info.position) : null;
+            if ((listItem != null) && listItem.itsIsRecord) {
                 itsSelectedRecord = listItem.itsUuid;
                 itsListener.copyField(
                         (item.getItemId() == R.id.menu_copy_password) ?
-                        CopyField.PASSWORD : CopyField.USER_NAME,
+                                CopyField.PASSWORD : CopyField.USER_NAME,
                         listItem.itsUuid);
             }
 
             return true;
         }
-        }
         return super.onContextItemSelected(item);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
-     */
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
+        if (!isResumed()) {
+            return;
+        }
         PasswdRecordListData item = itsAdapter.getItem(position);
+        if (item == null) {
+            return;
+        }
         if (item.itsIsRecord) {
             itsSelectedRecord = item.itsUuid;
+            itsSelectedPos = position;
             itsListener.changeLocation(itsLocation.selectRecord(item.itsUuid));
         } else {
             itsListener.changeLocation(itsLocation.selectGroup(item.itsTitle));
@@ -257,17 +298,11 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.view.View.OnClickListener#onClick(android.view.View)
-     */
     @Override
     public void onClick(View v)
     {
-        switch(v.getId()) {
-        case R.id.current_group_panel: {
+        if (v.getId() == R.id.current_group_panel) {
             itsListener.changeLocation(itsLocation.popGroup());
-            break;
-        }
         }
     }
 
@@ -280,6 +315,18 @@ public class PasswdSafeListFragment extends ListFragment
         refreshList();
     }
 
+    /**
+     * Update the record which is selected by the list
+     */
+    public void updateSelection(PasswdLocation location)
+    {
+        if (location.isRecord()) {
+            itsSelectedPos = -1;
+            itsSelectedRecord = location.getRecord();
+            refreshList();
+        }
+    }
+
 
     /** Refresh the list due to file changes */
     private void refreshList()
@@ -288,15 +335,18 @@ public class PasswdSafeListFragment extends ListFragment
             return;
         }
 
-        LoaderManager lm = getLoaderManager();
-        lm.destroyLoader(0);
+        LoaderManager lm = LoaderManager.getInstance(this);
+        if (lm.hasRunningLoaders()) {
+            // Trash loader if running.  See
+            // https://code.google.com/p/android/issues/detail?id=56464
+            lm.destroyLoader(0);
+        }
         lm.restartLoader(0, null, this);
 
         boolean groupVisible = false;
         switch (itsMode) {
         case RECORDS:
         case NONE: {
-            groupVisible = false;
             break;
         }
         case GROUPS:
@@ -319,9 +369,7 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
-     */
+    @NonNull
     @Override
     public Loader<List<PasswdRecordListData>> onCreateLoader(int id, Bundle args)
     {
@@ -329,52 +377,73 @@ public class PasswdSafeListFragment extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoadFinished(android.support.v4.content.Loader, java.lang.Object)
-     */
     @Override
-    public void onLoadFinished(Loader<List<PasswdRecordListData>> loader,
+    public void onLoadFinished(@NonNull Loader<List<PasswdRecordListData>> loader,
                                List<PasswdRecordListData> data)
     {
+        if (!isResumed()) {
+            return;
+        }
+
+        ListView list = getListView();
+        int firstPos = list.getFirstVisiblePosition();
+        int lastPos = list.getLastVisiblePosition();
+        View topView = list.getChildAt(0);
+        int top = (topView == null) ?
+                0 : (topView.getTop() - list.getPaddingTop());
+
         int selPos = itsAdapter.setData(
                 data,
                 itsIsContents ? itsSelectedRecord : itsLocation.getRecord());
-        if (isResumed()) {
-            ListView list = getListView();
-            if (selPos != -1) {
+        if (selPos != -1) {
+            if (itsIsContents) {
+                // List typically takes care of position unless it changes
+                if (selPos != itsSelectedPos) {
+                    list.setSelection(selPos);
+                    itsSelectedPos = selPos;
+                }
+            } else {
+                // If item is outside previous visible range, update selection.
+                // Otherwise don't scroll to reduce jumpy UI
+                if ((selPos <= firstPos) ||
+                    ((lastPos > firstPos) && (selPos > lastPos))) {
+                    list.setSelection(selPos);
+                } else {
+                    list.setSelectionFromTop(firstPos, top);
+                }
+
                 list.setItemChecked(selPos, true);
                 list.smoothScrollToPosition(selPos);
-            } else {
-                list.clearChoices();
             }
+        } else {
+            itsSelectedPos = -1;
+            list.clearChoices();
+        }
 
-            if (itsEmptyText.getText().length() == 0) {
-                itsEmptyText.setText(itsIsContents ? R.string.no_records :
-                                             R.string.no_groups);
-            }
+        if (itsEmptyText.getText().length() == 0) {
+            itsEmptyText.setText(itsIsContents ? R.string.no_records : R.string.no_groups);
         }
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoaderReset(android.support.v4.content.Loader)
-     */
     @Override
-    public void onLoaderReset(Loader<List<PasswdRecordListData>> loader)
+    public void onLoaderReset(@NonNull Loader<List<PasswdRecordListData>> loader)
     {
         onLoadFinished(loader, null);
     }
 
 
     /** List adapter for file items */
-    private static class ItemListAdapter
+    private static final class ItemListAdapter
             extends ArrayAdapter<PasswdRecordListData>
+            implements SectionIndexer
     {
         private final LayoutInflater itsInflater;
         private final boolean itsIsContents;
+        private ItemSection[] itsSections = new ItemSection[0];
 
         /** Constructor */
-        public ItemListAdapter(boolean isContents, Context context)
+        private ItemListAdapter(boolean isContents, Context context)
         {
             super(context, R.layout.passwdsafe_list_item, android.R.id.text1);
             itsInflater = (LayoutInflater)context.getSystemService(
@@ -383,16 +452,29 @@ public class PasswdSafeListFragment extends ListFragment
         }
 
         /** Set the list data */
-        public int setData(List<PasswdRecordListData> data,
+        private int setData(List<PasswdRecordListData> data,
                            String selectedRecord)
         {
             int selectedPos = -1;
             setNotifyOnChange(false);
             clear();
+
+            ArrayList<ItemSection> sectionIdxs = new ArrayList<>();
+            ItemSection currSection = null;
+
             if (data != null) {
                 int idx = 0;
                 for (PasswdRecordListData item: data) {
                     add(item);
+
+                    String str = TextUtils.isEmpty(item.itsTitle) ?
+                            " " : item.itsTitle.substring(0, 1).toUpperCase();
+                    if ((idx == 0) ||
+                        !TextUtils.equals(currSection.itsTitle, str)) {
+                        currSection = new ItemSection(str, idx);
+                        sectionIdxs.add(currSection);
+                    }
+
                     if ((selectedRecord != null) &&
                         TextUtils.equals(item.itsUuid, selectedRecord)) {
                         selectedPos = idx;
@@ -401,16 +483,15 @@ public class PasswdSafeListFragment extends ListFragment
                 }
             }
 
+            itsSections = sectionIdxs.toArray(new ItemSection[0]);
             setNotifyOnChange(true);
             notifyDataSetChanged();
             return selectedPos;
         }
 
-        /* (non-Javadoc)
-         * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
-         */
+        @NonNull
         @Override
-        public View getView(int position, View convertView, ViewGroup parent)
+        public View getView(int position, View convertView,  @NonNull ViewGroup parent)
         {
             ViewHolder itemViews;
             if (convertView == null) {
@@ -423,7 +504,8 @@ public class PasswdSafeListFragment extends ListFragment
             }
 
             if (position < getCount()) {
-                PasswdRecordListData item = getItem(position);
+                PasswdRecordListData item =
+                        Objects.requireNonNull(getItem(position));
                 ListView list = (ListView)parent;
                 boolean isSelected = list.isItemChecked(position);
                 itemViews.update(item, isSelected,
@@ -432,6 +514,60 @@ public class PasswdSafeListFragment extends ListFragment
                 itemViews.reset();
             }
             return convertView;
+        }
+
+        @Override
+        public Object[] getSections()
+        {
+            return itsSections;
+        }
+
+        @Override
+        public int getPositionForSection(int sectionIndex)
+        {
+            if (sectionIndex < 0) {
+                return 0;
+            } else if (sectionIndex >= itsSections.length) {
+                return itsSections[itsSections.length - 1].itsPosition;
+            }
+            return itsSections[sectionIndex].itsPosition;
+        }
+
+        @Override
+        public int getSectionForPosition(int position)
+        {
+            for (int section = 0; section < itsSections.length; ++section)
+            {
+                if (itsSections[section].itsPosition >= position) {
+                    return section;
+                }
+            }
+            return 0;
+        }
+
+        /**
+         * An indexed section item
+         */
+        private static final class ItemSection
+        {
+            private final String itsTitle;
+            private final int itsPosition;
+
+            /**
+             * Constructor
+             */
+            private ItemSection(String title, int position)
+            {
+                itsTitle = title;
+                itsPosition = position;
+            }
+
+            @Override
+            @NonNull
+            public String toString()
+            {
+                return itsTitle;
+            }
         }
 
         /**
@@ -443,22 +579,22 @@ public class PasswdSafeListFragment extends ListFragment
             private final TextView itsUser;
             private final TextView itsMatch;
             private final ImageView itsIcon;
-            private final CheckBox itsSelection;
+            private final View itsSelection;
             private int itsLastIconImage;
 
             /** Constructor */
-            public ViewHolder(View view)
+            protected ViewHolder(View view)
             {
-                itsTitle = (TextView)view.findViewById(android.R.id.text1);
-                itsUser = (TextView)view.findViewById(android.R.id.text2);
-                itsMatch = (TextView)view.findViewById(R.id.match);
-                itsIcon = (ImageView)view.findViewById(R.id.icon);
-                itsSelection = (CheckBox)view.findViewById(R.id.selection);
+                itsTitle = view.findViewById(android.R.id.text1);
+                itsUser = view.findViewById(android.R.id.text2);
+                itsMatch = view.findViewById(R.id.match);
+                itsIcon = view.findViewById(R.id.icon);
+                itsSelection = view.findViewById(R.id.selection);
                 itsLastIconImage = -1;
             }
 
             /** Update the fields for a list item */
-            public void update(PasswdRecordListData item,
+            protected void update(PasswdRecordListData item,
                                boolean selected,
                                boolean isLeftListRecord)
             {
@@ -469,21 +605,19 @@ public class PasswdSafeListFragment extends ListFragment
                     itsIcon.setImageResource(item.itsAppIcon);
                     itsLastIconImage = item.itsAppIcon;
                 }
-                itsSelection.setChecked(selected);
-                GuiUtils.setVisible(itsSelection, isLeftListRecord);
+                GuiUtils.setVisible(itsSelection, isLeftListRecord && selected);
 
                 itsTitle.requestLayout();
             }
 
             /** Reset the fields */
-            public void reset()
+            protected void reset()
             {
                 setText(itsTitle, null);
                 setText(itsUser, null);
                 setText(itsMatch, null);
                 itsIcon.setImageDrawable(null);
                 itsLastIconImage = -1;
-                itsSelection.setChecked(false);
                 itsTitle.requestLayout();
             }
 
@@ -504,7 +638,7 @@ public class PasswdSafeListFragment extends ListFragment
         private final Listener itsActListener;
 
         /** Constructor */
-        public ItemLoader(Mode mode, Listener actListener,
+        protected ItemLoader(Mode mode, Listener actListener,
                           Context context)
         {
             super(context);
@@ -519,9 +653,6 @@ public class PasswdSafeListFragment extends ListFragment
             forceLoad();
         }
 
-        /* (non-Javadoc)
-         * @see android.support.v4.content.AsyncTaskLoader#loadInBackground()
-         */
         @Override
         public List<PasswdRecordListData> loadInBackground()
         {

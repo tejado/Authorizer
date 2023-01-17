@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -19,12 +25,12 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/name_row"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:hint="@string/name">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/name"
                     android:inputType="textCapSentences"/>
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -34,28 +40,26 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:hint="@string/length">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/length"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0"
-                        android:hint="@string/length"
-                        android:inputType="number"
-                        android:text="12"
-                        tools:ignore="HardcodedText"/>
+                        android:inputType="number"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <Spinner android:id="@+id/type"
                          style="@style/Widget.AppCompat.Spinner.Underlined"
                          android:layout_width="0dp"
                          android:layout_height="wrap_content"
+                         android:layout_gravity="bottom"
                          android:layout_weight="1"
                          android:entries="@array/policy_type"
                          android:prompt="@string/choose_type"
                          android:spinnerMode="dropdown"
-                         tools:ignore="UnusedAttribute"
-                         android:layout_gravity="bottom"/>
+                         tools:ignore="UnusedAttribute"/>
 
             </LinearLayout>
 
@@ -74,7 +78,10 @@
                               android:text="@string/at_least"/>
 
                     <EditText android:id="@+id/lowercase_len"
-                              android:inputType="number"/>
+                              android:hint="@string/length"
+                              android:importantForAutofill="no"
+                              android:inputType="number"
+                              tools:targetApi="o"/>
                 </TableRow>
 
                 <TableRow android:id="@+id/uppercase_row">
@@ -87,7 +94,10 @@
                               android:text="@string/at_least"/>
 
                     <EditText android:id="@+id/uppercase_len"
-                              android:inputType="number"/>
+                              android:hint="@string/length"
+                              android:importantForAutofill="no"
+                              android:inputType="number"
+                              tools:targetApi="o"/>
                 </TableRow>
 
                 <TableRow android:id="@+id/digits_row">
@@ -100,7 +110,10 @@
                               android:text="@string/at_least"/>
 
                     <EditText android:id="@+id/digits_len"
-                              android:inputType="number"/>
+                              android:hint="@string/length"
+                              android:importantForAutofill="no"
+                              android:inputType="number"
+                              tools:targetApi="o"/>
                 </TableRow>
 
                 <TableRow android:id="@+id/symbols_row">
@@ -113,7 +126,10 @@
                               android:text="@string/at_least"/>
 
                     <EditText android:id="@+id/symbols_len"
-                              android:inputType="number"/>
+                              android:hint="@string/length"
+                              android:importantForAutofill="no"
+                              android:inputType="number"
+                              tools:targetApi="o"/>
                 </TableRow>
             </TableLayout>
 
@@ -140,7 +156,11 @@
                           android:layout_height="wrap_content"
                           android:layout_marginLeft="32dip"
                           android:layout_marginStart="32dip"
-                          android:inputType="text"/>
+                          android:hint="@string/custom_symbols"
+                          android:importantForAutofill="no"
+                          android:inputType="text"
+                          android:selectAllOnFocus="true"
+                          tools:targetApi="o"/>
 
             </LinearLayout>
 
@@ -155,6 +175,7 @@
                         android:text="@string/generate"/>
 
                 <TextView android:id="@+id/generated_passwd"
+                          style="@android:style/Widget.EditText"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:textAppearance="?android:textAppearanceSmall"

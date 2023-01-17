@@ -7,6 +7,8 @@
  */
 package net.tjado.passwdsafe.view;
 
+import java.util.Date;
+
 /**
  * Holder class for password record data in a list view
  */
@@ -18,6 +20,10 @@ public class PasswdRecordListData
 
     public final String itsUuid;
 
+    public final Date itsCreationTime;
+
+    public final Date itsModTime;
+
     public final String itsMatch;
 
     public final String itsRecordIcon;
@@ -27,12 +33,14 @@ public class PasswdRecordListData
     public final boolean itsIsRecord;
 
     /** Constructor */
-    public PasswdRecordListData(String title, String user, String uuid,
+    public PasswdRecordListData(String title, String user, String uuid, Date creationTime, Date modTime,
                                 String match, String iconRecord, int iconApp, boolean isRecord)
     {
         itsTitle = title;
         itsUser = user;
         itsUuid = uuid;
+        itsCreationTime = creationTime;
+        itsModTime = modTime;
         itsMatch = match;
         itsRecordIcon = iconRecord;
         itsAppIcon = iconApp;

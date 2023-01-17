@@ -8,6 +8,7 @@
 package org.pwsafe.lib.file;
 
 import org.pwsafe.lib.exception.EndOfFileException;
+import org.pwsafe.lib.exception.RecordLoadException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 import java.io.IOException;
@@ -27,9 +28,20 @@ public class PwsFileV2 extends PwsFileV1V2
     /**
      * The string that identifies a database as V2 rather than V1
      */
-    public static final String ID_STRING = " !!!Version 2 File Format!!! " +
-                                           "Please upgrade to PasswordSafe 2.0" +
-					   " or later";
+    public static final String ID_STRING =
+            " !!!Version 2 File Format!!! Please upgrade to PasswordSafe 2.0" +
+            " or later";
+
+    /**
+     * Return whether the record header represents a V2 file format header
+     */
+    public static boolean isV2Header(PwsRecordV1 header)
+    {
+        PwsField title = header.getField(PwsRecordV1.TITLE);
+        return (title != null) &&
+               title.equals(new PwsStringField(PwsRecordV1.TITLE,
+                                               PwsFileV2.ID_STRING));
+    }
 
     /**
      * Use of this constructor to load a PasswordSafe database is STRONGLY
@@ -42,9 +54,6 @@ public class PwsFileV2 extends PwsFileV1V2
      * @param storage the password file storage
      * @param passwd   the passphrase for the database.
      * @param encoding the password encoding
-     * @throws EndOfFileException
-     * @throws IOException
-     * @throws UnsupportedFileVersionException
      */
     public PwsFileV2(PwsStorage storage,
                      Owner<PwsPassword>.Param passwd, String encoding)
@@ -81,24 +90,21 @@ public class PwsFileV2 extends PwsFileV1V2
     /**
      * Reads the extra header present in version 2 files.
      *
-     * @param file the file to read the header from.
      * @throws EndOfFileException              If end of file is reached.
-     * @throws IOException                     If an error occurs whilst
-     * reading.
      * @throws UnsupportedFileVersionException If the header is not a
      * valid V2 header.
      */
     @Override
-    protected void readExtraHeader(PwsFile file)
-            throws EndOfFileException, IOException,
-                   UnsupportedFileVersionException
+    protected void readExtraHeader() throws EndOfFileException,
+                                            UnsupportedFileVersionException,
+                                            RecordLoadException
     {
         PwsRecordV1 hdr;
 
         hdr = new PwsRecordV1();
-        hdr.loadRecord(file);
+        hdr.loadRecord(this);
 
-        if (!hdr.getField(PwsRecordV1.TITLE).equals(ID_STRING)) {
+        if (!isV2Header(hdr)) {
             throw new UnsupportedFileVersionException();
         }
     }

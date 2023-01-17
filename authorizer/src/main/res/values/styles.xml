@@ -6,34 +6,31 @@
   ~ distributed with this code, or available from
   ~ http://www.opensource.org/licenses/artistic-license-2.0.php
   -->
-<resources xmlns:android="http://schemas.android.com/apk/res/android"
-           xmlns:app="http://schemas.android.com/apk/res-auto"
-           xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!--
         Base application themes, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="PwsAppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
-    <style name="AppBaseTheme_Dialog" parent="Theme.AppCompat.Light.Dialog">
+    <style name="PwsAppBaseTheme_Dialog" parent="Theme.AppCompat.Light.Dialog">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
-    <style name="AppBaseThemeDark" parent="Theme.AppCompat">
+    <style name="PwsAppBaseThemeDark" parent="Theme.AppCompat">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
-    <style name="AppBaseThemeDark_Dialog" parent="Theme.AppCompat.Dialog">
+    <style name="PwsAppBaseThemeDark_Dialog" parent="Theme.AppCompat.Dialog">
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <!-- Light application theme -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
-        <item name="cardViewStyle">@style/CardView.Light</item>
-        <item name="navViewStyle">@style/AppTheme_NavView</item>
+    <style name="PwsAppTheme" parent="PwsAppBaseTheme">
+        <item name="android:listSeparatorTextViewStyle">@style/PwsAppTheme.ListSeparatorTextView</item>
+        <item name="navViewStyle">@style/PwsAppTheme_NavView</item>
         <item name="drawableActionHome">@drawable/ic_action_home_dark</item>
         <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_dark</item>
         <item name="drawableActionNewPassword">@drawable/ic_action_new_password</item>
@@ -41,16 +38,18 @@
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
         <item name="drawableFolder">@drawable/ic_folder</item>
         <item name="drawableFolderUp">@drawable/ic_folder_up</item>
-        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
+        <item name="drawablePasswdsafe">@drawable/ic_action_file_dark</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
         <item name="colorError">@color/textinput_error_color_light</item>
         <item name="textColorGreen">@color/text_color_green_dark</item>
+        <item name="textAppearanceSearchResultTitle">@style/PwsAppTheme.SearchResultTitle</item>
+        <item name="textAppearanceSearchResultSubtitle">@style/PwsAppTheme.SearchResultSubtitle</item>
+        <item name="android:navigationBarColor">@color/md_grey_100</item>
     </style>
 
-    <style name="AppTheme_Dialog" parent="AppBaseTheme_Dialog">
-        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
-        <item name="cardViewStyle">@style/CardView.Light</item>
-        <item name="navViewStyle">@style/AppTheme_NavView</item>
+    <style name="PwsAppTheme_Dialog" parent="PwsAppBaseTheme_Dialog">
+        <item name="android:listSeparatorTextViewStyle">@style/PwsAppTheme.ListSeparatorTextView</item>
+        <item name="navViewStyle">@style/PwsAppTheme_NavView</item>
         <item name="drawableActionHome">@drawable/ic_action_home_dark</item>
         <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_dark</item>
         <item name="drawableActionNewPassword">@drawable/ic_action_new_password</item>
@@ -58,21 +57,20 @@
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
         <item name="drawableFolder">@drawable/ic_folder</item>
         <item name="drawableFolderUp">@drawable/ic_folder_up</item>
-        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
+        <item name="drawablePasswdsafe">@drawable/ic_action_file_dark</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
         <item name="colorError">@color/textinput_error_color_light</item>
         <item name="textColorGreen">@color/text_color_green_dark</item>
     </style>
 
-    <style name="AppTheme_NavView">
+    <style name="PwsAppTheme_NavView">
         <!-- Nothing to override -->
     </style>
 
     <!-- Dark application theme -->
-    <style name="AppThemeDark" parent="AppBaseThemeDark">
-        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
-        <item name="cardViewStyle">@style/CardView.Dark</item>
-        <item name="navViewStyle">@style/AppThemeDark_NavView</item>
+    <style name="PwsAppThemeDark" parent="PwsAppBaseThemeDark">
+        <item name="android:listSeparatorTextViewStyle">@style/PwsAppTheme.ListSeparatorTextView</item>
+        <item name="navViewStyle">@style/PwsAppThemeDark_NavView</item>
         <item name="drawableActionHome">@drawable/ic_action_home_light</item>
         <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_light</item>
         <item name="drawableActionNewPassword">@drawable/ic_action_new_password_light</item>
@@ -80,16 +78,18 @@
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
         <item name="drawableFolder">@drawable/ic_folder_light</item>
         <item name="drawableFolderUp">@drawable/ic_folder_up_light</item>
-        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
+        <item name="drawablePasswdsafe">@drawable/ic_action_file</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
         <item name="colorError">@color/textinput_error_color_dark</item>
         <item name="textColorGreen">@color/text_color_green_light</item>
+        <item name="textAppearanceSearchResultTitle">@style/PwsAppTheme.SearchResultTitle.Dark</item>
+        <item name="textAppearanceSearchResultSubtitle">@style/PwsAppTheme.SearchResultSubtitle.Dark</item>
+        <item name="android:navigationBarColor">@color/md_grey_100</item>
     </style>
 
-    <style name="AppThemeDark_Dialog" parent="AppBaseThemeDark_Dialog">
-        <item name="android:listSeparatorTextViewStyle">@style/AppTheme.ListSeparatorTextView</item>
-        <item name="cardViewStyle">@style/CardView.Dark</item>
-        <item name="navViewStyle">@style/AppThemeDark_NavView</item>
+    <style name="PwsAppThemeDark_Dialog" parent="PwsAppBaseThemeDark_Dialog">
+        <item name="android:listSeparatorTextViewStyle">@style/PwsAppTheme.ListSeparatorTextView</item>
+        <item name="navViewStyle">@style/PwsAppThemeDark_NavView</item>
         <item name="drawableActionHome">@drawable/ic_action_home_light</item>
         <item name="drawableActionNavigationMoreVert">@drawable/ic_action_navigation_more_vert_light</item>
         <item name="drawableActionNewPassword">@drawable/ic_action_new_password_light</item>
@@ -97,24 +97,41 @@
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
         <item name="drawableFolder">@drawable/ic_folder_light</item>
         <item name="drawableFolderUp">@drawable/ic_folder_up_light</item>
-        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
+        <item name="drawablePasswdsafe">@drawable/ic_action_file</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
         <item name="colorError">@color/textinput_error_color_dark</item>
         <item name="textColorGreen">@color/text_color_green_light</item>
     </style>
 
-    <style name="AppThemeDark_NavView">
+    <style name="PwsAppThemeDark_NavView">
         <item name="itemTextColor">?android:attr/textColorPrimary</item>
         <item name="itemIconTint">?android:attr/textColorPrimary</item>
     </style>
 
     <!-- Other styles -->
-    <style name="AppTheme.ListSeparatorTextView">
+    <style name="PwsAppTheme.ListSeparatorTextView">
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?colorAccent</item>
         <item name="android:paddingTop">16dp</item>
         <item name="android:layout_marginBottom">16dp</item>
+    </style>
+
+    <style name="PwsAppTheme.SearchResultTitle"
+        parent="TextAppearance.AppCompat.SearchResult.Title">
+        <item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="PwsAppTheme.SearchResultTitle.Dark">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+    <style name="PwsAppTheme.SearchResultSubtitle"
+        parent="TextAppearance.AppCompat.SearchResult.Subtitle">
+        <item name="android:textColor">?android:attr/textColorSecondaryInverse</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    <style name="PwsAppTheme.SearchResultSubtitle.Dark">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
     <style name="InputMethodText">
@@ -200,4 +217,9 @@
         <item name="android:paddingRight">16dp</item>
         <item name="android:layout_weight">1</item>
     </style>
+
+    <style name="BottomNavigation">
+        <item name="android:background">@color/md_grey_100</item>
+    </style>
+
 </resources>

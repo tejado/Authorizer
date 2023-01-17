@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2017 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2023 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -7,12 +7,13 @@
  */
 package net.tjado.passwdsafe.test.util;
 
-import com.google.android.material.textfield.TextInputLayout;
-import androidx.test.espresso.matcher.BoundedMatcher;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import androidx.test.espresso.matcher.BoundedMatcher;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -48,7 +49,7 @@ public class TestUtils
             final Matcher<Object> dataMatcher)
     {
         checkNotNull(dataMatcher);
-        return new TypeSafeMatcher<View>()
+        return new TypeSafeMatcher<>()
         {
             @Override
             public void describeTo(Description description)
@@ -56,13 +57,14 @@ public class TestUtils
                 description.appendText("with class name: ");
                 dataMatcher.describeTo(description);
             }
+
             @Override
             public boolean matchesSafely(View view)
             {
                 if (!(view instanceof AdapterView)) {
                     return false;
                 }
-                Adapter adapter = ((AdapterView) view).getAdapter();
+                Adapter adapter = ((AdapterView<?>)view).getAdapter();
                 for (int i = 0; i < adapter.getCount(); i++) {
                     if (dataMatcher.matches(adapter.getItem(i))) {
                         return true;
@@ -82,7 +84,7 @@ public class TestUtils
                 TextUtils.isEmpty(error) ?
                 isEmptyOrNullString() : equalTo(error);
         checkNotNull(errorMatcher);
-        return new BoundedMatcher<View, TextInputLayout>(TextInputLayout.class)
+        return new BoundedMatcher<>(TextInputLayout.class)
         {
             @Override
             protected boolean matchesSafely(TextInputLayout item)

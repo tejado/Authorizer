@@ -1,5 +1,5 @@
 /*
- * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+ * Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
  * Artistic License 2.0 terms, as specified in the LICENSE file
  * distributed with this code, or available from
@@ -10,12 +10,13 @@ package net.tjado.passwdsafe.view;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 /**
  * Dialog to pick a time
@@ -49,7 +50,7 @@ public class TimePickerDialogFragment extends DialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
-        Bundle args = getArguments();
+        Bundle args = requireArguments();
         Calendar now = Calendar.getInstance();
         int hourOfDay = args.getInt("hourOfDay", now.get(Calendar.HOUR_OF_DAY));
         int minute = args.getInt("minute", now.get(Calendar.MINUTE));
@@ -62,7 +63,9 @@ public class TimePickerDialogFragment extends DialogFragment
     public void onTimeSet(TimePicker view, int hourOfDay, int minute)
     {
         if (isResumed()) {
-            ((Listener)getTargetFragment()).handleTimePicked(hourOfDay, minute);
+            Listener listener =
+                    Objects.requireNonNull((Listener)getTargetFragment());
+            listener.handleTimePicked(hourOfDay, minute);
         }
     }
 }

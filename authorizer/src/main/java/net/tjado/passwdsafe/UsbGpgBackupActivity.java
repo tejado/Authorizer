@@ -7,12 +7,24 @@
  */
 package net.tjado.passwdsafe;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.documentfile.provider.DocumentFile;
+
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,6 +32,7 @@ import android.widget.TextView;
 import net.tjado.passwdsafe.lib.Utils;
 
 import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
@@ -34,13 +47,18 @@ import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -152,7 +170,7 @@ public class UsbGpgBackupActivity extends Activity
                 }
 
                 textInfo.append("Encrypt & write backup file...\n");
-                encryptFile(outputStream, defFile.getPath(), pubKey);
+                encryptFile(outputStream, defFile, pubKey);
                 Utils.closeStreams(inputStream, outputStream);
 
                 textInfo.append("Backup finished!\n");
@@ -170,31 +188,65 @@ public class UsbGpgBackupActivity extends Activity
         return String.format("backup_%s.gpg", date);
     }
 
+
     /*
-     * code adopted (and slightly modified) from https://stackoverflow.com/a/33216302
-     * Thanks to sheckoo90 <https://stackoverflow.com/users/893019/sheckoo90>
+     * code adopted (and slightly modified) from https://github.com/keith0591/pgp-encryption/
+     * Thanks to  Malkeith Singh <https://github.com/keith0591/>
      */
-    public static void encryptFile(OutputStream out, String fileName, PGPPublicKey encKey) throws IOException, PGPException {
+    @SuppressLint("NewApi")
+    public void encryptFile(OutputStream encryptedOut, Uri inputFileUri, PGPPublicKey publicKey) throws IOException, PGPException {
         Security.addProvider(new BouncyCastleProvider());
+        int bufferSize = 1 << 16;
 
-        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-        PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(PGPCompressedData.ZLIB);
+        ContentResolver cr = this.getContentResolver();
+        InputStream plaintextInputStream = cr.openInputStream(inputFileUri);
 
-        PGPUtil.writeFileToLiteralData(comData.open(bOut), PGPLiteralData.BINARY, new File(fileName));
-        comData.close();
 
-        PGPEncryptedDataGenerator cPk = new PGPEncryptedDataGenerator(new BcPGPDataEncryptorBuilder(
+        AssetFileDescriptor fileDescriptor = getApplicationContext().getContentResolver().openAssetFileDescriptor(inputFileUri , "r");
+        long fileSize = fileDescriptor.getLength();
+
+        textInfo.append(String.format("File size: %d!\n", fileSize));
+
+        PGPCompressedDataGenerator dataCompressor = new PGPCompressedDataGenerator(PGPCompressedData.ZLIB);
+
+        PGPEncryptedDataGenerator dataEncryptor = new PGPEncryptedDataGenerator(new BcPGPDataEncryptorBuilder(
                 SymmetricKeyAlgorithmTags.AES_256).setSecureRandom(new SecureRandom()).setWithIntegrityPacket(true));
-        cPk.addMethod(new BcPublicKeyKeyEncryptionMethodGenerator(encKey));
+        dataEncryptor.addMethod(new BcPublicKeyKeyEncryptionMethodGenerator(publicKey));
 
-        byte[] bytes = bOut.toByteArray();
-
-        OutputStream cOut;
-        cOut = cPk.open(out, bytes.length);
-        cOut.write(bytes);
+        OutputStream cOut = dataEncryptor.open(encryptedOut, new byte[bufferSize]);
+        copyAsLiteralData(dataCompressor.open(cOut), plaintextInputStream, fileSize, bufferSize);
+        dataCompressor.close();
         cOut.close();
+        encryptedOut.close();
+    }
 
-        out.close();
+    /**
+     * Copies "length" amount of data from the input stream and writes it pgp literal data to the provided output stream
+     *
+     * @param outputStream the output stream to which data is to be written
+     * @param in           the input stream from which data is to be read
+     * @param length       the length of data to be read
+     * @param bufferSize   the buffer size, as it uses buffer to speed up copying
+     * @throws IOException for IO related errors
+     */
+    static void copyAsLiteralData(OutputStream outputStream, InputStream in, long length, int bufferSize) throws IOException {
+        PGPLiteralDataGenerator lData = new PGPLiteralDataGenerator();
+        OutputStream pOut = lData.open(outputStream, PGPLiteralData.BINARY, PGPLiteralData.CONSOLE, new Date(), new byte[bufferSize]);
+        byte[] buff = new byte[bufferSize];
+        try {
+            int len;
+            long totalBytesWritten = 0L;
+            while (totalBytesWritten <= length && (len = in.read(buff)) > 0) {
+                pOut.write(buff, 0, len);
+                totalBytesWritten += len;
+            }
+            pOut.close();
+        } finally {
+            // Clearing buffer
+            Arrays.fill(buff, (byte) 0);
+            // Closing inputstream
+            in.close();
+        }
     }
 
     /*

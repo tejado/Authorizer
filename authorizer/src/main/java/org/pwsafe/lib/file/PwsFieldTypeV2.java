@@ -9,7 +9,7 @@
  */
 package org.pwsafe.lib.file;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "RedundantSuppression"})
 public enum PwsFieldTypeV2 implements PwsFieldType
 {
     V2_ID_STRING(0),

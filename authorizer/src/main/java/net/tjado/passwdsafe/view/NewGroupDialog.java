@@ -9,16 +9,18 @@ package net.tjado.passwdsafe.view;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 
 import net.tjado.passwdsafe.R;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
@@ -62,38 +64,42 @@ public class NewGroupDialog extends DialogFragment
                     @Override
                     public void onOkClicked(DialogInterface dialog)
                     {
-                        EditText newGroup = (EditText)
-                                view.findViewById(R.id.new_group);
-                        ((Listener)getTargetFragment()).handleNewGroup(
-                                newGroup.getText().toString());
+                        EditText newGroup = view.findViewById(R.id.new_group);
+                        Listener listener = (Listener)getTargetFragment();
+                        if (listener != null) {
+                            listener.handleNewGroup(
+                                    newGroup.getText().toString());
+                        }
                     }
 
                     @Override
                     public void onCancelClicked()
                     {
-                        ((Listener)getTargetFragment()).handleNewGroup(null);
+                        Listener listener = (Listener)getTargetFragment();
+                        if (listener != null) {
+                            listener.handleNewGroup(null);
+                        }
                     }
                 };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext())
-                .setTitle(PasswdSafeUtil.getAppTitle(getContext()))
+        Context ctx = requireContext();
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx)
+                .setTitle(PasswdSafeUtil.getAppTitle(ctx))
                 .setView(view)
                 .setPositiveButton(R.string.ok, dlgClick)
                 .setNegativeButton(R.string.cancel, dlgClick)
                 .setOnCancelListener(dlgClick);
         final AlertDialog alertDialog = builder.create();
-        TextView tv = (TextView)view.findViewById(R.id.new_group);
-        GuiUtils.setupFormKeyboard(tv, tv, getContext(), new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Button btn = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                if (btn.isEnabled()) {
-                    btn.performClick();
-                }
+        TextView tv = view.findViewById(R.id.new_group);
+        GuiUtils.setupFormKeyboard(tv, tv, getContext(), () -> {
+            Button btn = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            if (btn.isEnabled()) {
+                btn.performClick();
             }
         });
+
+        // show keyboard per default
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         return alertDialog;
     }
 }

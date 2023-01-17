@@ -7,9 +7,9 @@
  */
 package net.tjado.passwdsafe;
 
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 
 import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
@@ -84,25 +84,14 @@ public abstract class AbstractPasswdSafeRecordFragment
      */
     private void refresh()
     {
-        useRecordInfo(new RecordInfoUser()
-        {
-            @Override
-            public void useRecordInfo(@NonNull RecordInfo info)
-            {
-                doRefresh(info);
-            }
+        useRecordInfo((RecordInfoUser<Void>)info -> {
+            doRefresh(info);
+            return null;
         });
 
         final View root = getView();
         if (root != null) {
-            root.post(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    root.scrollTo(0, 0);
-                }
-            });
+            root.post(() -> root.scrollTo(0, 0));
         }
     }
 }

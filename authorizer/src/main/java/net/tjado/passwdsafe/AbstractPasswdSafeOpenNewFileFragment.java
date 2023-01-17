@@ -8,24 +8,24 @@
 package net.tjado.passwdsafe;
 
 import android.net.Uri;
-import android.os.AsyncTask;
-import androidx.fragment.app.Fragment;
 import android.view.View;
 import android.widget.ProgressBar;
+import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import net.tjado.passwdsafe.file.PasswdFileUri;
+import net.tjado.passwdsafe.lib.ManagedTask;
+import net.tjado.passwdsafe.lib.ManagedTasks;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.util.CountedBool;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Base class for a fragment to open or create a new file
  */
 public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
 {
-    private final List<ResolveTask> itsResolveTasks = new ArrayList<>();
+    private final ManagedTasks itsTasks = new ManagedTasks();
     private Uri itsFileUri;
     private ProgressBar itsProgress;
     private PasswdFileUri itsPasswdFileUri;
@@ -82,6 +82,14 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     }
 
     /**
+     * Set the password file URI
+     */
+    protected void setPasswdFileUri(PasswdFileUri uri)
+    {
+        itsPasswdFileUri = uri;
+    }
+
+    /**
      * Get the progress bar
      */
     protected final ProgressBar getProgress()
@@ -94,7 +102,7 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
      */
     protected final void setupView(View rootView)
     {
-        itsProgress = (ProgressBar)rootView.findViewById(R.id.progress);
+        itsProgress = rootView.findViewById(R.id.progress);
         itsProgress.setVisibility(View.INVISIBLE);
     }
 
@@ -103,9 +111,23 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
      */
     protected final void startResolve()
     {
-        ResolveTask task = new ResolveTask();
-        itsResolveTasks.add(task);
-        task.execute();
+        startTask(new ResolveTask(itsFileUri, this));
+    }
+
+    /**
+     * Start a managed task
+     */
+    protected final void startTask(ManagedTask<?,?> task)
+    {
+        itsTasks.startTask(task);
+    }
+
+    /**
+     * Update the tasks when one is finished.  Called from BackgroundTask.
+     */
+    protected final void taskFinished(ManagedTask<?,?> task)
+    {
+        itsTasks.taskFinished(task);
     }
 
     /**
@@ -129,10 +151,7 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
      */
     protected final void cancelFragment(boolean userCancel)
     {
-        for (ResolveTask task: itsResolveTasks) {
-            task.cancel(false);
-        }
-        itsResolveTasks.clear();
+        itsTasks.cancelTasks();
         doCancelFragment(userCancel);
     }
 
@@ -181,86 +200,106 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     /**
      * Handle when the resolve task is finished
      */
-    private void resolveTaskFinished(PasswdFileUri uri, ResolveTask task)
+    private void resolveTaskFinished(PasswdFileUri uri, Throwable error)
     {
-        if (!itsResolveTasks.remove(task)) {
-            return;
+        if ((uri != null) && isAdded()) {
+            if (uri.exists()) {
+                itsPasswdFileUri = uri;
+                doResolveTaskFinished();
+            } else {
+                PasswdSafeUtil.showFatalMsg("File doesn't exist: " + uri,
+                                            getActivity());
+            }
+        } else if (error != null) {
+            PasswdSafeUtil.showFatalMsg(
+                    error, getString(R.string.file_not_found_perm_denied),
+                    getActivity(), false);
+        } else {
+            cancelFragment(isAdded());
         }
-        if ((uri == null) || !isAdded()) {
-            cancelFragment(false);
-            return;
-        }
-
-        if (!uri.exists()) {
-            PasswdSafeUtil.showFatalMsg("File doesn't exist: " + uri,
-                                        getActivity());
-            return;
-        }
-
-        itsPasswdFileUri = uri;
-        doResolveTaskFinished();
     }
 
     /**
      * Background task for resolving the file URI
      */
-    private class ResolveTask extends BackgroundTask<PasswdFileUri>
+    private static final class ResolveTask
+            extends BackgroundTask<PasswdFileUri,
+            AbstractPasswdSafeOpenNewFileFragment>
     {
-        private final PasswdFileUri.Creator itsUriCreator =
-                new PasswdFileUri.Creator(itsFileUri, getActivity());
+        private final PasswdFileUri.Creator itsUriCreator;
+
+        /**
+         * Constructor
+         */
+        private ResolveTask(Uri uri,
+                            AbstractPasswdSafeOpenNewFileFragment frag)
+        {
+            super(frag);
+            itsUriCreator = new PasswdFileUri.Creator(uri, getContext());
+        }
 
         @Override
-        protected final void onPreExecute()
+        protected void onTaskStarted(
+                @NonNull AbstractPasswdSafeOpenNewFileFragment frag)
         {
-            super.onPreExecute();
+            super.onTaskStarted(frag);
             itsUriCreator.onPreExecute();
         }
 
         @Override
-        protected final PasswdFileUri doInBackground(Void... voids)
+        protected PasswdFileUri doInBackground() throws Throwable
         {
             return itsUriCreator.finishCreate();
         }
 
         @Override
-        protected final void onPostExecute(PasswdFileUri uri)
+        protected void onTaskFinished(
+                PasswdFileUri result,
+                Throwable error,
+                @NonNull AbstractPasswdSafeOpenNewFileFragment frag)
         {
-            super.onPostExecute(uri);
-            Throwable resolveEx = itsUriCreator.getResolveEx();
-            if (resolveEx != null) {
-                PasswdSafeUtil.showFatalMsg(
-                        getString(R.string.file_not_found_perm_denied),
-                        getActivity());
-            } else {
-                resolveTaskFinished(uri, this);
-            }
+            super.onTaskFinished(result, error, frag);
+            frag.resolveTaskFinished(result, error);
         }
     }
 
     /**
      * Background task
      */
-    protected abstract class BackgroundTask<ResultT>
-            extends AsyncTask<Void, Void, ResultT>
+    protected static abstract class BackgroundTask<
+            ResultT, FragT extends AbstractPasswdSafeOpenNewFileFragment>
+            extends ManagedTask<ResultT, FragT>
     {
-        @Override
-        protected final void onCancelled()
+        /**
+         * Constructor
+         */
+        protected BackgroundTask(FragT frag)
         {
-            onPostExecute(null);
+            super(frag, frag.requireContext());
         }
 
-        @Override
-        protected void onPreExecute()
+        @Override @CallSuper
+        protected void onTaskStarted(@NonNull FragT frag)
         {
-            setProgressVisible(true, true);
-            setFieldsDisabled(true);
+            setRunning(true, frag);
         }
 
-        @Override
-        protected void onPostExecute(ResultT data)
+        @Override @CallSuper
+        protected void onTaskFinished(ResultT result,
+                                      Throwable error,
+                                      @NonNull FragT frag)
         {
-            setProgressVisible(false, true);
-            setFieldsDisabled(false);
+            frag.taskFinished(this);
+            setRunning(false, frag);
+        }
+
+        /**
+         * Set whether the task is running
+         */
+        private void setRunning(boolean running, FragT frag)
+        {
+            frag.setProgressVisible(running, true);
+            frag.setFieldsDisabled(running);
         }
     }
 }

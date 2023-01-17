@@ -62,7 +62,7 @@ public class BlowfishPws
             decipher.init(false, div);
             encipher.init(true, eiv);
         } else {
-                        /* ECB mode */
+            /* ECB mode */
             decipher = new BlowfishEngine();
             encipher = new BlowfishEngine();
             dkp = new KeyParameter(bfkey);
@@ -76,7 +76,6 @@ public class BlowfishPws
      * Decrypts <code>buffer</code> in place.
      *
      * @param buffer the buffer to be decrypted.
-     * @throws PasswordSafeException
      */
     public void decrypt(byte[] buffer) throws PasswordSafeException
     {
@@ -101,7 +100,6 @@ public class BlowfishPws
      * Encrypts <code>buffer</code> in place.
      *
      * @param buffer the buffer to be encrypted.
-     * @throws PasswordSafeException
      */
     public void encrypt(byte[] buffer) throws PasswordSafeException
     {

@@ -29,8 +29,14 @@ public interface PwsStorage
 {
     interface SaveHelper
     {
+        /**
+         * For file storage, get the file name for a file to save
+         */
         String getSaveFileName(File file, boolean isV3);
 
+        /**
+         * For file storage, create a backup
+         */
         void createBackupFile(File fromFile, File toFile)
                 throws IOException;
     }
@@ -39,22 +45,19 @@ public interface PwsStorage
      * Open the file for loading
      *
      * @return The header bytes
-     * @throws IOException
      */
-    byte[] openForLoad(int headerLen) throws IOException;
+    byte[] openForLoad(@SuppressWarnings("SameParameterValue") int headerLen)
+            throws IOException;
 
     /**
      * Grab all the bytes in the file
      *
      * @return The bytes in the file
-     * @throws IOException
      */
     byte[] load() throws IOException;
 
     /**
      * Close the file after being loaded
-     *
-     * @throws IOException
      */
     void closeAfterLoad() throws IOException;
 
@@ -71,6 +74,7 @@ public interface PwsStorage
      * @param isV3 Is the file version 3
      * @return true if save was successful
      */
+    @SuppressWarnings({"BooleanMethodIsAlwaysInverted", "RedundantSuppression"})
     boolean save(byte[] data, boolean isV3);
 
     /**

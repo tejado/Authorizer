@@ -1,4 +1,5 @@
-
+Website: https://sourceforge.net/projects/passwdsafe/
+License: Artistic License 2.0
                          Artistic License 2.0
 
 Copyright (c) 2000-2006, The Perl Foundation.

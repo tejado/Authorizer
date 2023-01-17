@@ -57,7 +57,7 @@ public class PwsByteField extends PwsField
     public byte[] getBytes()
     {
         byte value;
-        byte retval[];
+        byte[] retval;
 
         value = (Byte)super.getValue();
         // Force a size of 1, otherwise it would be set to a size of blocklength

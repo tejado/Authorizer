@@ -7,17 +7,6 @@
  */
 package net.tjado.passwdsafe;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.pwsafe.lib.file.PwsRecord;
-
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -31,26 +20,36 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
 import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.collection.LongSparseArray;
+import androidx.fragment.app.DialogFragment;
 
 import net.tjado.passwdsafe.file.PasswdExpiration;
+import net.tjado.passwdsafe.file.PasswdExpiryFilter;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdFileDataObserver;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdRecord;
-import net.tjado.passwdsafe.file.PasswdRecordFilter;
+import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.util.LongReference;
 import net.tjado.passwdsafe.view.ConfirmPromptDialog;
 
+import org.pwsafe.lib.file.PwsRecord;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 /**
  * The NotificationMgr class encapsulates the notifications provided by the app
  */
-@SuppressWarnings("TryFinallyCanBeTryWithResources")
 public class NotificationMgr implements PasswdFileDataObserver
 {
     private static final String TAG = "NotificationMgr";
@@ -69,29 +68,30 @@ public class NotificationMgr implements PasswdFileDataObserver
     private static final String DB_COL_EXPIRYS_GROUP = "rec_group";
     private static final String DB_COL_EXPIRYS_EXPIRE = "rec_expire";
     private static final String DB_MATCH_EXPIRYS_URI =
-        DB_COL_EXPIRYS_URI + " = ?";
+            DB_COL_EXPIRYS_URI + " = ?";
     private static final String DB_MATCH_EXPIRYS_ID =
-        DB_COL_EXPIRYS_ID + " = ?";
+            DB_COL_EXPIRYS_ID + " = ?";
 
     private final Context itsCtx;
     private final AlarmManager itsAlarmMgr;
     private final NotificationManager itsNotifyMgr;
     private final DbHelper itsDbHelper;
-    private final HashMap<Long, UriNotifInfo> itsUriNotifs = new HashMap<>();
+    private final LongSparseArray<UriNotifInfo> itsUriNotifs =
+            new LongSparseArray<>();
     private final HashSet<Uri> itsNotifUris = new HashSet<>();
     private int itsNextNotifId = 1;
-    private PasswdRecordFilter.ExpiryFilter itsExpiryFilter = null;
+    private PasswdExpiryFilter itsExpiryFilter;
     private PendingIntent itsTimerIntent;
 
     /** Constructor */
     public NotificationMgr(Context ctx,
                            AlarmManager alarmMgr,
-                           PasswdRecordFilter.ExpiryFilter expiryFilter)
+                           PasswdExpiryFilter expiryFilter)
     {
         itsCtx = ctx;
         itsAlarmMgr = alarmMgr;
         itsNotifyMgr = (NotificationManager)
-            ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                ctx.getSystemService(Context.NOTIFICATION_SERVICE);
         itsExpiryFilter = expiryFilter;
 
         itsDbHelper = new DbHelper(ctx);
@@ -139,7 +139,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
     /* (non-Javadoc)
-     * @see com.jefftharris.passwdsafe.file.PasswdFileDataObserver#passwdFileDataChanged(com.jefftharris.passwdsafe.file.PasswdFileData)
+     * @see net.tjado.passwdsafe.file.PasswdFileDataObserver#passwdFileDataChanged(net.tjado.passwdsafe.file.PasswdFileData)
      */
     public void passwdFileDataChanged(PasswdFileData fileData)
     {
@@ -200,7 +200,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             try {
                 SQLiteDatabase db = itsDbHelper.getReadableDatabase();
                 Long id = getDbUriId(uri, db);
-                UriNotifInfo info = itsUriNotifs.get(id);
+                UriNotifInfo info = (id != null) ? itsUriNotifs.get(id) : null;
                 if (info != null) {
                     itsNotifyMgr.cancel(info.getNotifId());
                 }
@@ -212,7 +212,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
     /** Set the password expiration filter */
-    public void setPasswdExpiryFilter(PasswdRecordFilter.ExpiryFilter filter)
+    public void setPasswdExpiryFilter(PasswdExpiryFilter filter)
     {
         itsExpiryFilter = filter;
         loadEntries();
@@ -237,14 +237,16 @@ public class NotificationMgr implements PasswdFileDataObserver
         case FILE: {
             Uri fileUri = uri.getUri();
             String path = fileUri.getPath();
-            return (!path.contains("/data/com.google.android.apps.") &&
+            return ((path != null) &&
+                    !path.contains("/data/com.google.android.apps.") &&
                     !path.contains("/data/com.dropbox.android"));
         }
         case SYNC_PROVIDER: {
             return true;
         }
         case EMAIL:
-        case GENERIC_PROVIDER: {
+        case GENERIC_PROVIDER:
+        case BACKUP: {
             return false;
         }
         }
@@ -268,24 +270,24 @@ public class NotificationMgr implements PasswdFileDataObserver
     private void doUpdatePasswdFileData(long uriId,
                                         PasswdFileData fileData,
                                         SQLiteDatabase db)
-        throws SQLException
+            throws SQLException
     {
         PasswdSafeUtil.dbginfo(TAG, "Update %s, id: %d",
                                fileData.getUri(), uriId);
 
         TreeMap<ExpiryEntry, Long> entries = new TreeMap<>();
         Cursor cursor =
-            db.query(DB_TABLE_EXPIRYS,
-                     new String[] { DB_COL_EXPIRYS_ID, DB_COL_EXPIRYS_UUID,
-                                    DB_COL_EXPIRYS_TITLE, DB_COL_EXPIRYS_GROUP,
-                                    DB_COL_EXPIRYS_EXPIRE },
-                     DB_MATCH_EXPIRYS_URI,
-                     new String[] { Long.toString(uriId) }, null, null, null);
+                db.query(DB_TABLE_EXPIRYS,
+                         new String[] { DB_COL_EXPIRYS_ID, DB_COL_EXPIRYS_UUID,
+                                        DB_COL_EXPIRYS_TITLE, DB_COL_EXPIRYS_GROUP,
+                                        DB_COL_EXPIRYS_EXPIRE },
+                         DB_MATCH_EXPIRYS_URI,
+                         new String[] { Long.toString(uriId) }, null, null, null);
         try {
             while (cursor.moveToNext()) {
                 ExpiryEntry entry =
-                    new ExpiryEntry(cursor.getString(1), cursor.getString(2),
-                                    cursor.getString(3), cursor.getLong(4));
+                        new ExpiryEntry(cursor.getString(1), cursor.getString(2),
+                                        cursor.getString(3), cursor.getLong(4));
                 entries.put(entry, cursor.getLong(0));
             }
         } finally {
@@ -349,7 +351,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
     /** Load the expiration entries from the database */
     private void loadEntries(SQLiteDatabase db)
-        throws SQLException
+            throws SQLException
     {
         long expiration;
         if (itsExpiryFilter != null) {
@@ -363,9 +365,9 @@ public class NotificationMgr implements PasswdFileDataObserver
         HashSet<Long> uris = new HashSet<>();
         ArrayList<Long> removeUriIds = new ArrayList<>();
         Cursor uriCursor =
-            db.query(DB_TABLE_URIS,
-                     new String[] { DB_COL_URIS_ID, DB_COL_URIS_URI },
-                     null, null, null, null, null);
+                db.query(DB_TABLE_URIS,
+                         new String[] { DB_COL_URIS_ID, DB_COL_URIS_URI },
+                         null, null, null, null, null);
         try {
             while (uriCursor.moveToNext()) {
                 long id = uriCursor.getLong(0);
@@ -380,13 +382,10 @@ public class NotificationMgr implements PasswdFileDataObserver
             uriCursor.close();
         }
 
-        Iterator<HashMap.Entry<Long, UriNotifInfo>> iter =
-            itsUriNotifs.entrySet().iterator();
-        while (iter.hasNext()) {
-            HashMap.Entry<Long, UriNotifInfo> entry = iter.next();
-            if (!uris.contains(entry.getKey())) {
-                itsNotifyMgr.cancel(entry.getValue().getNotifId());
-                iter.remove();
+        for (int i = itsUriNotifs.size() - 1; i >= 0; --i) {
+            if (!uris.contains(itsUriNotifs.keyAt(i))) {
+                itsNotifyMgr.cancel(itsUriNotifs.valueAt(i).getNotifId());
+                itsUriNotifs.removeAt(i);
             }
         }
 
@@ -401,12 +400,16 @@ public class NotificationMgr implements PasswdFileDataObserver
             (itsExpiryFilter != null)) {
             if (itsTimerIntent == null) {
                 Intent intent =
-                    new Intent(PasswdSafeApp.EXPIRATION_TIMEOUT_INTENT);
+                        new Intent(PasswdSafeApp.EXPIRATION_TIMEOUT_INTENT);
+                intent.setClass(itsCtx.getApplicationContext(),
+                                ExpirationTimeoutReceiver.class);
                 itsTimerIntent = PendingIntent.getBroadcast(
-                    itsCtx, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                        itsCtx, 0, intent,
+                        (PendingIntent.FLAG_CANCEL_CURRENT |
+                         ApiCompat.getPendingIntentImmutableFlag()));
             }
             long nextTimer = System.currentTimeMillis() +
-                (nextExpiration.itsValue - expiration);
+                             (nextExpiration.itsValue - expiration);
             PasswdSafeUtil.dbginfo(TAG, "nextTimer: %tc", nextTimer);
             itsAlarmMgr.set(AlarmManager.RTC, nextTimer, itsTimerIntent);
         } else if (itsTimerIntent != null) {
@@ -426,10 +429,15 @@ public class NotificationMgr implements PasswdFileDataObserver
                             final long expiration,
                             final LongReference nextExpiration,
                             final SQLiteDatabase db)
-        throws SQLException
+            throws SQLException
     {
         PasswdFileUri.Creator creator = new PasswdFileUri.Creator(uri, itsCtx);
-        PasswdFileUri passwdUri = creator.finishCreate();
+        PasswdFileUri passwdUri;
+        try {
+            passwdUri = creator.finishCreate();
+        } catch (Throwable e) {
+            passwdUri = null;
+        }
         if ((passwdUri == null) || !passwdUri.exists()) {
             PasswdSafeUtil.dbginfo(TAG, "Notif file doesn't exist: %s", uri);
             return false;
@@ -439,7 +447,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         PasswdSafeUtil.dbginfo(TAG, "Load %s", uri);
 
         TreeSet<ExpiryEntry> expired =
-            loadUriEntries(uriId, expiration, nextExpiration, db);
+                loadUriEntries(uriId, expiration, nextExpiration, db);
 
         if (expired.isEmpty()) {
             return true;
@@ -473,17 +481,18 @@ public class NotificationMgr implements PasswdFileDataObserver
         }
 
         PendingIntent intent = PendingIntent.getActivity(
-            itsCtx, 0, PasswdSafeUtil.createOpenIntent(uri, record),
-            PendingIntent.FLAG_UPDATE_CURRENT);
+                itsCtx, 0, PasswdSafeUtil.createOpenIntent(uri, record),
+                (PendingIntent.FLAG_UPDATE_CURRENT |
+                 ApiCompat.getPendingIntentImmutableFlag()));
 
         String title = itsCtx.getResources().getQuantityString(
-            R.plurals.expiring_passwords, numExpired, numExpired);
+                R.plurals.expiring_passwords, numExpired, numExpired);
         GuiUtils.showNotification(
-            itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
-            itsCtx.getString(R.string.expiring_password),
-            title, R.mipmap.ic_launcher_passwdsafe,
-            passwdUri.getIdentifier(itsCtx, false),
-            strs, intent, info.getNotifId(), null, false);
+                itsNotifyMgr, itsCtx, R.drawable.ic_stat_app,
+                itsCtx.getString(R.string.expiring_password),
+                title, R.mipmap.ic_launcher_passwdsafe,
+                passwdUri.getIdentifier(itsCtx, false),
+                strs, intent, info.getNotifId(), null, false);
         return true;
     }
 
@@ -494,7 +503,7 @@ public class NotificationMgr implements PasswdFileDataObserver
                    final long expiration,
                    final LongReference nextExpiration,
                    final SQLiteDatabase db)
-        throws SQLException
+            throws SQLException
     {
         TreeSet<ExpiryEntry> expired = new TreeSet<>();
         Cursor cursor = db.query(DB_TABLE_EXPIRYS,
@@ -532,7 +541,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
     /** Remove the URI from the database */
     private static void removeUri(Long id, SQLiteDatabase db)
-        throws SQLException
+            throws SQLException
     {
         String[] idarg = new String[] { id.toString() };
         db.delete(DB_TABLE_EXPIRYS, DB_MATCH_EXPIRYS_URI, idarg);
@@ -542,7 +551,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
     /** Get the id for a URI or null if not found */
     private static Long getDbUriId(PasswdFileUri uri, SQLiteDatabase db)
-        throws SQLException
+            throws SQLException
     {
         Cursor cursor = db.query(DB_TABLE_URIS, new String[] { DB_COL_URIS_ID },
                                  DB_MATCH_URIS_URI,
@@ -566,7 +575,7 @@ public class NotificationMgr implements PasswdFileDataObserver
         private static final int DB_VERSION = 1;
 
         /** Constructor */
-        public DbHelper(Context context)
+        private DbHelper(Context context)
         {
             super(context, DB_NAME, null, DB_VERSION);
         }
@@ -587,7 +596,7 @@ public class NotificationMgr implements PasswdFileDataObserver
             db.execSQL("CREATE TABLE " + DB_TABLE_EXPIRYS + " (" +
                        DB_COL_EXPIRYS_ID + " INTEGER PRIMARY KEY, " +
                        DB_COL_EXPIRYS_URI + " INTEGER REFERENCES " +
-                           DB_TABLE_URIS + "(" + DB_COL_URIS_ID +") NOT NULL, " +
+                       DB_TABLE_URIS + "(" + DB_COL_URIS_ID +") NOT NULL, " +
                        DB_COL_EXPIRYS_UUID + " TEXT NOT NULL, " +
                        DB_COL_EXPIRYS_TITLE + " TEXT NOT NULL, " +
                        DB_COL_EXPIRYS_GROUP + " TEXT, " +
@@ -619,10 +628,10 @@ public class NotificationMgr implements PasswdFileDataObserver
 
         /** Enable support for foreign keys on the open database connection */
         private void enableForeignKey(SQLiteDatabase db)
-            throws SQLException
+                throws SQLException
         {
             if (!db.isReadOnly()) {
-                db.execSQL("PRAGMA foreign_keys = ON;");
+                db.execSQL("PRAGMA foreign_keys = \"ON\";");
             }
         }
     }
@@ -631,13 +640,16 @@ public class NotificationMgr implements PasswdFileDataObserver
     /** The ExpiryEntry class represents an expiration entry for notifications */
     private static final class ExpiryEntry implements Comparable<ExpiryEntry>
     {
-        public final String itsUuid;
-        public final String itsTitle;
-        public final String itsGroup;
-        public final long itsExpiry;
+        private final String itsUuid;
+        private final String itsTitle;
+        private final String itsGroup;
+        private final long itsExpiry;
 
         /** Constructor */
-        public ExpiryEntry(String uuid, String title, String group, long expiry)
+        private ExpiryEntry(String uuid,
+                            String title,
+                            String group,
+                            long expiry)
         {
             itsUuid = uuid;
             itsTitle = title;
@@ -671,7 +683,7 @@ public class NotificationMgr implements PasswdFileDataObserver
 
 
         /** Convert the entry to a string for users */
-        public final String toString(Context ctx)
+        private String toString(Context ctx)
         {
             return PasswdRecord.getRecordId(itsGroup, itsTitle, null) +
                    " (" + Utils.formatDate(itsExpiry, ctx, false, true, true) +
@@ -702,25 +714,25 @@ public class NotificationMgr implements PasswdFileDataObserver
         private final TreeSet<ExpiryEntry> itsEntries = new TreeSet<>();
 
         /** Constructor */
-        public UriNotifInfo(int notifId)
+        private UriNotifInfo(int notifId)
         {
             itsNotifId = notifId;
         }
 
         /** Get the notification id */
-        public int getNotifId()
+        private int getNotifId()
         {
             return itsNotifId;
         }
 
         /** Get the expired entries */
-        public SortedSet<ExpiryEntry> getEntries()
+        private SortedSet<ExpiryEntry> getEntries()
         {
             return itsEntries;
         }
 
         /** Set the expired entries */
-        public void setEntries(Set<ExpiryEntry> entries)
+        private void setEntries(Set<ExpiryEntry> entries)
         {
             itsEntries.clear();
             itsEntries.addAll(entries);

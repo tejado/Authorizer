@@ -7,6 +7,8 @@
  */
 package net.tjado.passwdsafe.util;
 
+import androidx.annotation.NonNull;
+
 /**
  * Generic pair class
  */
@@ -24,6 +26,7 @@ public class Pair<T, U>
 
     /** Convert the object to a string */
     @Override
+    @NonNull
     public String toString()
     {
         return "[[" + first + "], [" + second + "]]";

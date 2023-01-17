@@ -19,6 +19,20 @@ public interface DocumentsContractCompat
     String INTENT_ACTION_CREATE_DOCUMENT =
             "android.intent.action.CREATE_DOCUMENT";
 
+    /** Initial URI for the documents chooser UI */
+    String EXTRA_INITIAL_URI = "android.provider.extra.INITIAL_URI";
+
+    /** Prompt in the documents chooser UI */
+    String EXTRA_PROMPT = "android.provider.extra.PROMPT";
+
+    /** Show advanced mode for the documents chooser UI.  The internal storage
+     * should be visible. */
+    String EXTRA_SHOW_ADVANCED = "android.provider.extra.SHOW_ADVANCED";
+
+    /** Column for DocumentsContract.Document.COLUMN_DOCUMENT_ID available on
+     * API 19 */
+    String COLUMN_DOCUMENT_ID = "document_id";
+
     /** Column for DocumentsContract.Document.COLUMN_FLAGS available on
      * API 19 */
     String COLUMN_FLAGS = "flags";

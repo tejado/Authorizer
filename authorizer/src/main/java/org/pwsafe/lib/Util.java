@@ -9,10 +9,10 @@
  */
 package org.pwsafe.lib;
 
+import org.pwsafe.lib.crypto.SHA256Pws;
+
 import java.security.SecureRandom;
 import java.util.Arrays;
-
-import org.pwsafe.lib.crypto.SHA256Pws;
 
 /**
  * This class exposes various utility methods.
@@ -22,7 +22,7 @@ import org.pwsafe.lib.crypto.SHA256Pws;
 public final class Util
 {
 
-    private static final char HEX_CHARS[] = {'0', '1', '2', '3', '4', '5', '6',
+    private static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6',
                                              '7', '8', '9', 'a', 'b', 'c', 'd',
                                              'e', 'f'};
 
@@ -118,18 +118,25 @@ public final class Util
      */
     public static String bytesToHex(byte[] b, int offset, int length)
     {
+        return new String(bytesToHexChars(b, offset, length));
+    }
+
+    /**
+     * Converts a byte array to hexadecimal characters
+     */
+    public static char[] bytesToHexChars(byte[] b, int offset, int length)
+    {
         if (length < 0) {
             throw new IllegalArgumentException(
                     "Length must be not be negative.");
         }
 
-        final StringBuilder sb = new StringBuilder(length << 1);
-
-        for (int ii = offset; ii < (offset + length); ++ii) {
-            sb.append(HEX_CHARS[(b[ii] >>> 4) & 0x0f]);
-            sb.append(HEX_CHARS[b[ii] & 0x0f]);
+        final char[] chars = new char[length << 1];
+        for (int ii = offset, pos = 0; ii < (offset + length); ++ii) {
+            chars[pos++] = HEX_CHARS[(b[ii] >>> 4) & 0x0f];
+            chars[pos++] = HEX_CHARS[b[ii] & 0x0f];
         }
-        return sb.toString();
+        return chars;
     }
 
     /**
@@ -187,7 +194,7 @@ public final class Util
      */
     public static byte[] cloneByteArray(byte[] src, int length)
     {
-        int max = (length < src.length) ? length : src.length;
+        int max = Math.min(length, src.length);
         final byte[] dst = new byte[length];
 
         System.arraycopy(src, 0, dst, 0, max);
@@ -204,7 +211,9 @@ public final class Util
      * @throws IndexOutOfBoundsException if offset is negative or <code>buff
      * .length</code> &lt; <code>offset + 4</code>.
      */
-    public static int getIntFromByteArray(byte[] buff, int offset)
+    public static int getIntFromByteArray(
+            byte[] buff,
+            @SuppressWarnings("SameParameterValue") int offset)
     {
         int result;
 
@@ -226,7 +235,9 @@ public final class Util
      * @throws IndexOutOfBoundsException if offset is negative or <code>buff
      * .length</code> &lt; <code>offset + 2</code>.
      */
-    public static short getShortFromByteArray(byte[] buff, int offset)
+    public static short getShortFromByteArray(
+            byte[] buff,
+            @SuppressWarnings("SameParameterValue") int offset)
     {
         short result;
 
@@ -281,7 +292,9 @@ public final class Util
      * @param value  the short value to store.
      * @param offset the offset at which to store the value.
      */
-    public static void putShortToByteArray(byte[] buff, short value, int offset)
+    public static void putShortToByteArray(
+            byte[] buff, short value,
+            @SuppressWarnings("SameParameterValue") int offset)
     {
         buff[offset + 0] = (byte)(value & 0xff);
         buff[offset + 1] = (byte)((value & 0xff00) >>> 8);
@@ -298,7 +311,9 @@ public final class Util
      * @throws IndexOutOfBoundsException if offset is negative or <code>buff
      * .length</code> &lt; <code>offset + 4</code>.
      */
-    public static long getMillisFromByteArray(byte[] buff, int offset)
+    public static long getMillisFromByteArray(
+            byte[] buff,
+            @SuppressWarnings("SameParameterValue") int offset)
     {
 
         long result;
@@ -306,7 +321,7 @@ public final class Util
         result = (buff[offset + 0] & 0x000000ff)
                  | ((buff[offset + 1] & 0x000000ff) << 8)
                  | ((buff[offset + 2] & 0x000000ff) << 16)
-                 | ((buff[offset + 3] & 0x000000ff) << 24);
+                 | ((long)(buff[offset + 3] & 0x000000ff) << 24);
 
         result *= 1000L; // convert from seconds to millis
 
@@ -321,7 +336,9 @@ public final class Util
      * @param value  the millis long value to store.
      * @param offset the offset at which to store the value.
      */
-    public static void putMillisToByteArray(byte[] buff, long value, int offset)
+    public static void putMillisToByteArray(
+            byte[] buff, long value,
+            @SuppressWarnings("SameParameterValue") int offset)
     {
         value /= 1000L; // convert from millis to seconds
 
@@ -363,5 +380,15 @@ public final class Util
         Arrays.fill(array, (byte)0xA5);
         Arrays.fill(array, (byte)0x5A);
         Arrays.fill(array, (byte)0x00);
+    }
+
+    /**
+     * Clear the contents of a char array
+     */
+    public static void clearArray(char[] array)
+    {
+        Arrays.fill(array, (char)0xA5A5);
+        Arrays.fill(array, (char)0x5A5A);
+        Arrays.fill(array, (char)0x0000);
     }
 }

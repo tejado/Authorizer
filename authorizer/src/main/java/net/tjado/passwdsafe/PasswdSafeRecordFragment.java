@@ -9,11 +9,6 @@ package net.tjado.passwdsafe;
 
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,7 +16,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import com.google.android.material.tabs.TabLayout;
 
+import net.tjado.passwdsafe.file.PasswdNotes;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.view.PasswdLocation;
 
@@ -73,14 +74,15 @@ public class PasswdSafeRecordFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState)
     {
         setHasOptionsMenu(true);
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record,
                                      container, false);
 
-        final ViewPager viewPager = (ViewPager)root.findViewById(R.id.viewpager);
+        final ViewPager viewPager = root.findViewById(R.id.viewpager);
         viewPager.addOnPageChangeListener(
                 new ViewPager.SimpleOnPageChangeListener()
                 {
@@ -90,13 +92,17 @@ public class PasswdSafeRecordFragment
                         itsLastSelectedTab = position;
                     }
                 });
-        viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager())
+        viewPager.setAdapter(new FragmentPagerAdapter(
+                getChildFragmentManager(),
+                FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT)
         {
+            @NonNull
             @Override
             public Fragment getItem(int position)
             {
                 switch (position) {
-                case 0: {
+                case 0:
+                default: {
                     return PasswdSafeRecordBasicFragment.newInstance(
                             getLocation());
                 }
@@ -113,7 +119,6 @@ public class PasswdSafeRecordFragment
                             getLocation());
                 }
                 }
-                return null;
             }
 
             @Override
@@ -144,18 +149,13 @@ public class PasswdSafeRecordFragment
         });
         viewPager.setCurrentItem(itsLastSelectedTab);
 
-        itsTabs = (TabLayout)root.findViewById(R.id.tabs);
-        itsTabs.post(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                if (!isAdded()) {
-                    return;
-                }
-                itsTabs.setupWithViewPager(viewPager);
-                updateNotesTab();
+        itsTabs = root.findViewById(R.id.tabs);
+        itsTabs.post(() -> {
+            if (!isAdded()) {
+                return;
             }
+            itsTabs.setupWithViewPager(viewPager);
+            updateNotesTab();
         });
 
         return root;
@@ -188,25 +188,21 @@ public class PasswdSafeRecordFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId()) {
-        case R.id.menu_edit: {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_edit) {
             Listener listener = getListener();
             if (listener != null) {
                 listener.editRecord(getLocation());
             }
             return true;
-        }
-        case R.id.menu_delete: {
+        } else if (itemId == R.id.menu_delete) {
             Listener listener = getListener();
             if (listener != null) {
                 listener.deleteRecord(getLocation(), itsTitle);
             }
             return true;
         }
-        default: {
-            return super.onOptionsItemSelected(item);
-        }
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -220,34 +216,30 @@ public class PasswdSafeRecordFragment
      */
     private void refresh()
     {
-        useRecordInfo(new RecordInfoUser()
-        {
-            @Override
-            public void useRecordInfo(@NonNull RecordInfo info)
-            {
-                itsCanEdit = info.itsFileData.canEdit();
-                itsTitle = info.itsFileData.getTitle(info.itsRec);
-                boolean isProtected = info.itsFileData.isProtected(info.itsRec);
-                List<PwsRecord> refs = info.itsPasswdRec.getRefsToRecord();
-                boolean hasRefs = (refs != null) && !refs.isEmpty();
-                itsCanDelete = itsCanEdit && !hasRefs && !isProtected;
+        useRecordInfo((RecordInfoUser<Void>)info -> {
+            itsCanEdit = info.itsFileData.canEdit();
+            itsTitle = info.itsFileData.getTitle(info.itsRec);
+            boolean isProtected = info.itsFileData.isProtected(info.itsRec);
+            List<PwsRecord> refs = info.itsPasswdRec.getRefsToRecord();
+            boolean hasRefs = (refs != null) && !refs.isEmpty();
+            itsCanDelete = itsCanEdit && !hasRefs && !isProtected;
 
-                switch (info.itsPasswdRec.getType()) {
-                case NORMAL:
-                case ALIAS: {
-                    String notes = info.itsFileData.getNotes(info.itsRec);
-                    itsHasNotes = !TextUtils.isEmpty(notes);
-                    break;
-                }
-                case SHORTCUT: {
-                    itsHasNotes = false;
-                    break;
-                }
-                }
+            switch (info.itsPasswdRec.getType()) {
+            case NORMAL:
+            case ALIAS: {
+                PasswdNotes notes = info.itsFileData.getNotes(info.itsRec, getContext());
+                itsHasNotes = !TextUtils.isEmpty(notes.getNotes());
+                break;
             }
+            case SHORTCUT: {
+                itsHasNotes = false;
+                break;
+            }
+            }
+            return null;
         });
         updateNotesTab();
-        GuiUtils.invalidateOptionsMenu(getActivity());
+        requireActivity().invalidateOptionsMenu();
     }
 
     /**

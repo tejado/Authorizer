@@ -21,11 +21,6 @@ package net.tjado.passwdsafe;
 
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,6 +28,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.MotionEvent;
 import android.text.TextUtils;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
 
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.lib.ObjectHolder;
@@ -104,12 +104,13 @@ public class PasswdSafeRecordIconFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState)
     {
         View root = inflater.inflate(R.layout.fragment_passwdsafe_record_icon, null, false);
 
-        itsSearchView = (SearchView) root.findViewById(R.id.search_view);
+        itsSearchView = root.findViewById(R.id.search_view);
         itsSearchView.setIconifiedByDefault(false);
         itsSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -130,6 +131,14 @@ public class PasswdSafeRecordIconFragment
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        //getListener().updateViewRecord(getLocation());
+        //refresh();
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
 
@@ -139,7 +148,7 @@ public class PasswdSafeRecordIconFragment
         final float scale = getResources().getDisplayMetrics().density;
         final int spaceWidth = (int) (56.0f * scale + 0.5f);
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
+        RecyclerView recyclerView = view.findViewById(R.id.list);
         recyclerView.setLayoutManager(new GridAutofitLayoutManager(getActivity(), spaceWidth));
         //animator not yet working
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -149,12 +158,7 @@ public class PasswdSafeRecordIconFragment
 
         // sort them... I want to have the devicon set before material design set
         final List<ITypeface> mFonts = new ArrayList<>(Iconics.getRegisteredFonts(getActivity()));
-        Collections.sort(mFonts, new Comparator<ITypeface>() {
-            @Override
-            public int compare(final ITypeface object1, final ITypeface object2) {
-                return object1.getFontName().compareTo(object2.getFontName());
-            }
-        });
+        Collections.sort(mFonts, (object1, object2) -> object1.getFontName().compareTo(object2.getFontName()));
 
         for (ITypeface iTypeface : mFonts) {
             PasswdSafeUtil.dbginfo(TAG, "Font: " + iTypeface.getFontName() );
@@ -310,40 +314,40 @@ public class PasswdSafeRecordIconFragment
     }
 
     void saveIconChange(final String itemValue) {
+
         final ObjectHolder<Pair<Boolean, PasswdLocation>> rc = new ObjectHolder<>();
-        useRecordFile(new RecordFileUser()
-        {
-            @Override
-            public void useFile(@Nullable RecordInfo info,
-                                @NonNull PasswdFileData fileData)
-            {
+        useRecordFile((RecordFileUser)(info, fileData) -> {
 
-                PwsRecord record;
-                boolean newRecord;
-                if (info != null) {
-                    record = info.itsRec;
-                    newRecord = false;
-                } else {
-                    record = fileData.createRecord();
-                    record.setLoaded();
-                    newRecord = true;
-                }
-
-                if( fileData.isProtected(record)) {
-                    return;
-                }
-
-                if (fileData.getIcon(record) != itemValue) {
-                    fileData.setIcon(itemValue, record);
-                }
-
-                if (newRecord) {
-                    fileData.addRecord(record);
-                }
-
-                rc.set(new Pair<>((newRecord || record.isModified()), new PasswdLocation(record, fileData)));
-
+            PwsRecord record;
+            boolean newRecord;
+            if (info != null) {
+                record = info.itsRec;
+                newRecord = false;
+            } else {
+                record = fileData.createRecord();
+                record.setLoaded();
+                newRecord = true;
             }
+
+            if(fileData.isProtected(record)) {
+                return null;
+            }
+
+            /*if(!fileData.canEdit()) {
+                return null;
+            }*/
+
+            if (fileData.getIcon(record) != itemValue) {
+                fileData.setIcon(itemValue, record);
+            }
+
+            if (newRecord) {
+                fileData.addRecord(record);
+            }
+
+            rc.set(new Pair<>((newRecord || record.isModified()), new PasswdLocation(record, fileData)));
+
+            return null;
         });
 
         if (rc == null || rc.get() == null) {

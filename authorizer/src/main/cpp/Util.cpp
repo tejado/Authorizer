@@ -1,3 +1,6 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "readability-magic-numbers"
+#pragma ide diagnostic ignored "cppcoreguidelines-avoid-magic-numbers"
 /*
 * Copyright (c) 2003-2014 Rony Shapiro <ronys@users.sourceforge.net>.
 * All rights reserved. Use of the code is allowed under the
@@ -8,9 +11,9 @@
 /// \file Util.cpp
 //-----------------------------------------------------------------------------
 
+#include <array>
 #include <cstring>
 
-#include "PwsPlatform.h"
 #include "Util.h"
 
 //-----------------------------------------------------------------------------
@@ -20,31 +23,26 @@
 // see http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html
 // and http://www.cypherpunks.to/~peter/usenix01.pdf
 
-#ifdef _WIN32
-#pragma optimize("",off)
-#endif
-void trashMemory(void *buffer, size_t length)
+[[gnu::noinline]] void trashMemory(void *buffer, size_t length)
 {
-  ASSERT(buffer != NULL);
-  // {kjp} no point in looping around doing nothing is there?
   if (length > 0) {
     std::memset(buffer, 0x55, length);
     std::memset(buffer, 0xAA, length);
-    std::memset(buffer,    0, length);
+    std::memset(buffer, 0, length);
   }
 }
-#ifdef _WIN32
-#pragma optimize("",on)
-#endif
 
 /**
 Burn some stack memory
 @param len amount of stack to burn in bytes
 */
-void burnStack(unsigned long len)
+[[gnu::noinline]] void burnStack(size_t len)
 {
-  unsigned char buf[32];
-  trashMemory(buf, sizeof(buf));
-  if (len > static_cast<unsigned long>(sizeof(buf)))
-    burnStack(len - sizeof(buf));
+  std::array<unsigned char, 32> buf{};
+  trashMemory(buf.data(), buf.size());
+  if (len > buf.size()) {
+    burnStack(len - buf.size());
+  }
 }
+
+#pragma clang diagnostic pop

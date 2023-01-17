@@ -9,12 +9,15 @@
  */
 package org.pwsafe.lib.file;
 
+import androidx.annotation.Nullable;
+
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.pwsafe.lib.Log;
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.crypto.InMemoryKey;
 import org.pwsafe.lib.exception.EndOfFileException;
 import org.pwsafe.lib.exception.MemoryKeyException;
+import org.pwsafe.lib.exception.RecordLoadException;
 import org.pwsafe.lib.exception.UnsupportedFileVersionException;
 
 import java.io.IOException;
@@ -33,6 +36,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -81,7 +85,7 @@ import javax.crypto.spec.SecretKeySpec;
 public abstract class PwsFile
 {
     private static final Log LOG = Log.getInstance(
-            PwsFile.class.getPackage().getName());
+            Objects.requireNonNull(PwsFile.class.getPackage()).getName());
 
     /**
      * Length of RandStuff in bytes.
@@ -178,7 +182,7 @@ public abstract class PwsFile
      * the storage has been modified in memory and not yet written back to the
      * filesystem.
      */
-    protected boolean modified = false;
+    private boolean modified = false;
 
     /**
      * Flag indicating whether the storage may be changed or saved.
@@ -201,6 +205,8 @@ public abstract class PwsFile
      */
     private String itsOpenPasswordEncoding;
 
+    private ArrayList<RecordLoadException> itsLoadErrors = null;
+
     /**
      * Constructs and initialises a new, empty PasswordSafe database in memory.
      */
@@ -215,9 +221,6 @@ public abstract class PwsFile
      * @param aStorage the storage of the database to open.
      * @param passwd   the passphrase for the database.
      * @param encoding the passphrase encoding (if known)
-     * @throws EndOfFileException
-     * @throws IOException
-     * @throws UnsupportedFileVersionException
      */
     protected PwsFile(PwsStorage aStorage,
                       Owner<PwsPassword>.Param passwd, String encoding)
@@ -281,7 +284,7 @@ public abstract class PwsFile
             throw new IllegalArgumentException("length");
         }
         result = (length == 0) ? BLOCK_LENGTH :
-                 ((length + (BLOCK_LENGTH - 1)) / BLOCK_LENGTH) * BLOCK_LENGTH;
+                ((length + (BLOCK_LENGTH - 1)) / BLOCK_LENGTH) * BLOCK_LENGTH;
         return result;
     }
 
@@ -435,11 +438,20 @@ public abstract class PwsFile
     }
 
     /**
+     * Get the list of record errors that occurred while loading
+     * @return The record errors; null if none occurred
+     */
+    public @Nullable List<RecordLoadException> getLoadErrors()
+    {
+        return itsLoadErrors;
+    }
+
+    /**
      * Returns a record.
      *
      * @return the PwsRecord at that index
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public PwsRecord getRecord(int index)
     {
         return records.get(index);
@@ -452,7 +464,7 @@ public abstract class PwsFile
      * @return <code>true</code> if the file has been modified,
      * <code>false</code> if it hasn't.
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "RedundantSuppression"})
     public boolean isModified()
     {
         return modified;
@@ -482,9 +494,6 @@ public abstract class PwsFile
      *
      * @param passwd   the passphrase for the file.
      * @param encoding the passphrase encoding (if known)
-     * @throws EndOfFileException
-     * @throws IOException
-     * @throws UnsupportedFileVersionException
      */
     protected abstract void open(Owner<PwsPassword>.Param passwd,
                                  String encoding)
@@ -504,10 +513,14 @@ public abstract class PwsFile
         try {
             //noinspection InfiniteLoopStatement
             for (; ; ) {
-                final PwsRecord rec = PwsRecord.read(this);
+                try {
+                    final PwsRecord rec = PwsRecord.read(this);
 
-                if (rec.isValid()) {
-                    this.doAdd(rec);
+                    if (rec.isValid()) {
+                        this.doAdd(rec);
+                    }
+                } catch (RecordLoadException rle) {
+                    addLoadError(rle);
                 }
             }
         } catch (EndOfFileException e) {
@@ -574,14 +587,13 @@ public abstract class PwsFile
      * Reads any additional header from the file.  Subclasses should override
      * this a necessary as the default implementation does nothing.
      *
-     * @param file the {@link PwsFile} instance to read the header from.
-     *
      * @throws EndOfFileException              If end of file is reached.
      * @throws IOException                     If an error occurs while reading the file.
      * @throws UnsupportedFileVersionException If the file's version is unsupported.
      */
-    protected void readExtraHeader( PwsFile file )
-            throws EndOfFileException, IOException, UnsupportedFileVersionException
+    protected void readExtraHeader() throws EndOfFileException, IOException,
+                                            UnsupportedFileVersionException,
+                                            RecordLoadException
     {
     }
 
@@ -592,7 +604,6 @@ public abstract class PwsFile
      *
      * @return The record read from the file.
      * @throws EndOfFileException              When end-of-file is reached.
-     * @throws IOException
      * @throws UnsupportedFileVersionException If this version of the file
      * cannot be handled.
      */
@@ -600,13 +611,18 @@ public abstract class PwsFile
             throws EndOfFileException, IOException,
                    UnsupportedFileVersionException
     {
-        final PwsRecord rec = PwsRecord.read(this);
+        try {
+            final PwsRecord rec = PwsRecord.read(this);
 
-        if (rec.isValid()) {
-            this.add(rec);
+            if (rec.isValid()) {
+                this.add(rec);
+            }
+
+            return rec;
+        } catch (RecordLoadException rle) {
+            addLoadError(rle);
+            return null;
         }
-
-        return rec;
     }
 
     /**
@@ -631,8 +647,34 @@ public abstract class PwsFile
      * @throws ConcurrentModificationException if the underlying store was
      *                                         independently changed
      */
-    public abstract void save()
-            throws IOException, ConcurrentModificationException;
+    public final void save()
+            throws IOException, ConcurrentModificationException
+    {
+        if (isReadOnly())
+            throw new IOException("File is read only");
+
+        // check for concurrent change
+        if (lastStorageChange != null) {
+            Date modDate = storage.getModifiedDate();
+            if ((modDate != null) && (modDate.after(lastStorageChange))) {
+                throw new ConcurrentModificationException(
+                        "Password store was changed independently - no save " +
+                        "possible!");
+            }
+        }
+
+        saveAs(storage);
+        modified = false;
+        lastStorageChange = storage.getModifiedDate();
+    }
+
+    /**
+     * Writes this file to the given storage
+     *
+     * @param storage The storage to which the file is written
+     * @throws IOException if the attempt fails.
+     */
+    public abstract void saveAs(PwsStorage storage) throws IOException;
 
     /**
      * Set the flag to indicate that the file has been modified.  There
@@ -666,7 +708,6 @@ public abstract class PwsFile
      * Writes unencrypted bytes to the file.
      *
      * @param buffer the data to be written.
-     * @throws IOException
      */
     public void writeBytes(byte[] buffer)
             throws IOException
@@ -678,7 +719,6 @@ public abstract class PwsFile
      * Encrypts then writes the contents of <code>buff</code> to the file.
      *
      * @param buff the data to be written.
-     * @throws IOException
      */
     public abstract void writeEncryptedBytes(byte[] buff)
             throws IOException;
@@ -688,8 +728,6 @@ public abstract class PwsFile
      * Subclasses should override this as necessary.
      *
      * @param file the {@link PwsFile} instance to write the header to.
-     *
-     * @throws IOException
      */
     protected void writeExtraHeader( PwsFile file )
             throws IOException
@@ -718,7 +756,8 @@ public abstract class PwsFile
      *
      * @param readOnly the readOnly to set
      */
-    public void setReadOnly(boolean readOnly)
+    public void setReadOnly(
+            @SuppressWarnings("SameParameterValue") boolean readOnly)
     {
         this.readOnly = readOnly;
     }
@@ -750,6 +789,17 @@ public abstract class PwsFile
     }
 
     /**
+     * Add a record load error
+     */
+    private void addLoadError(RecordLoadException rle)
+    {
+        if (itsLoadErrors == null) {
+            itsLoadErrors = new ArrayList<>();
+        }
+        itsLoadErrors.add(rle);
+    }
+
+    /**
      * This provides a wrapper around the <code>Iterator</code> that is returned
      * by the <code>iterator()</code> method on the Collections class used to
      * store the PasswordSafe records.  It allows us to mark the file as
@@ -758,8 +808,8 @@ public abstract class PwsFile
      */
     private class FileIterator implements Iterator<PwsRecord>
     {
-        private final Log LOG = Log
-                .getInstance(FileIterator.class.getPackage().getName());
+        private final Log LOG = Log.getInstance(Objects.requireNonNull(
+                FileIterator.class.getPackage()).getName());
 
         private final PwsFile file;
         private final Iterator<PwsRecord> recDelegate;
@@ -771,7 +821,7 @@ public abstract class PwsFile
          * @param file the file this iterator is linked to.
          * @param iter the <code>Iterator</code> over the records.
          */
-        public FileIterator(PwsFile file, Iterator<PwsRecord> iter)
+        protected FileIterator(PwsFile file, Iterator<PwsRecord> iter)
         {
             this.file = file;
             recDelegate = iter;
