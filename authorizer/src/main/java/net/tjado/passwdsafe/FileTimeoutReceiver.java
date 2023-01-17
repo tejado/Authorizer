@@ -114,7 +114,7 @@ public class FileTimeoutReceiver extends BroadcastReceiver
         }
         }
         if (close) {
-            itsActivity.finish();
+            itsActivity.startActivity(Intent.makeRestartActivityTask(itsActivity.getIntent().getComponent()));
         }
     }
 

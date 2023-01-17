@@ -105,13 +105,16 @@ public class PasswdFileData
         itsUri = uri;
     }
 
-    public void load(Owner<PwsPassword>.Param passwd, Context context)
+    public void load(Owner<PwsPassword>.Param passwd, boolean readonly, Context context)
             throws IOException, EndOfFileException, InvalidPassphraseException,
                    UnsupportedFileVersionException
     {
         itsPwsFile = itsUri.load(passwd, context);
-        itsPwsFile.setReadOnly(true);
         itsIsUriWritable = itsUri.isWritable().first;
+
+        if (readonly || !itsIsUriWritable) {
+            itsPwsFile.setReadOnly(true);
+        }
         finishOpenFile();
     }
 

@@ -135,6 +135,7 @@ public class PasswdSafeOpenFileFragment
     private TextView itsSavedPasswordMsg;
     private int itsSavedPasswordTextColor;
     private TextView itsReadonlyMsg;
+    private CheckBox itsReadonlyCb;
     private CheckBox itsSavePasswdCb;
     private CheckBox itsYubikeyCb;
     private Button itsOpenBtn;
@@ -263,6 +264,8 @@ public class PasswdSafeOpenFileFragment
         itsOpenBtn = rootView.findViewById(R.id.open);
         itsOpenBtn.setOnClickListener(this);
         itsOpenBtn.setEnabled(false);
+
+        itsReadonlyCb = (CheckBox)rootView.findViewById(R.id.read_only);
 
         itsSavedPasswordMsg = rootView.findViewById(R.id.saved_password);
         itsSavedPasswordTextColor = itsSavedPasswordMsg.getCurrentTextColor();
@@ -815,6 +818,7 @@ public class PasswdSafeOpenFileFragment
         var openData = itsOpenModel.getDataValue();
 
         boolean doSave = itsSavePasswdCb.isChecked();
+        boolean readonly = itsReadonlyCb.isChecked();
         boolean passwordSaved = false;
         switch (openData.getSavedPasswordState()) {
         case UNKNOWN:
@@ -840,7 +844,7 @@ public class PasswdSafeOpenFileFragment
         try (var openPassword = openData.getOpenPassword()) {
             if (openPassword != null) {
                 startTask(new OpenTask(openPassword.pass(),
-                                       openData.isOpenYubikey(), this));
+                                       openData.isOpenYubikey(), readonly, this));
             }
         }
     }
@@ -1088,19 +1092,21 @@ public class PasswdSafeOpenFileFragment
         private final PasswdFileUri itsFileUri;
         private final Owner<PwsPassword> itsPassword;
         private final boolean itsIsOpenYubikey;
+        private final boolean itsItsIsReadOnly;
         private final SavePasswordChange itsSaveChange;
         private final SavedPasswordsMgr itsSavedPasswordsMgr;
 
         /**
          * Constructor
          */
-        private OpenTask(Owner<PwsPassword>.Param passwd, boolean fromYubikey,
+        private OpenTask(Owner<PwsPassword>.Param passwd, boolean fromYubikey, boolean readonly,
                         PasswdSafeOpenFileFragment frag)
         {
             super(frag);
             itsFileUri = frag.getPasswdFileUri();
             itsPassword = passwd.use();
             itsIsOpenYubikey = fromYubikey;
+            itsItsIsReadOnly = readonly;
             itsSaveChange = frag.itsSaveChange;
             itsSavedPasswordsMgr = frag.itsSavedPasswordsMgr;
         }
@@ -1110,7 +1116,7 @@ public class PasswdSafeOpenFileFragment
         {
             PasswdFileData fileData = new PasswdFileData(itsFileUri);
             fileData.setYubikey(itsIsOpenYubikey);
-            fileData.load(itsPassword.pass(), getContext());
+            fileData.load(itsPassword.pass(), itsItsIsReadOnly, getContext());
 
             Exception keygenError = null;
             switch (itsSaveChange) {

@@ -111,7 +111,7 @@ public class PasswdSafePolicyListFragment extends ListFragment
     public void onCreateOptionsMenu(@NonNull Menu menu,
                                     @NonNull MenuInflater inflater)
     {
-        if ((itsListener != null) && itsListener.isNavDrawerClosed()) {
+        if ((itsListener != null)) {
             inflater.inflate(R.menu.fragment_passwdsafe_policy_list, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);

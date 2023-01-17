@@ -38,12 +38,13 @@
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
         <item name="drawableFolder">@drawable/ic_folder</item>
         <item name="drawableFolderUp">@drawable/ic_folder_up</item>
-        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
+        <item name="drawablePasswdsafe">@drawable/ic_action_file_dark</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
         <item name="colorError">@color/textinput_error_color_light</item>
         <item name="textColorGreen">@color/text_color_green_dark</item>
         <item name="textAppearanceSearchResultTitle">@style/PwsAppTheme.SearchResultTitle</item>
         <item name="textAppearanceSearchResultSubtitle">@style/PwsAppTheme.SearchResultSubtitle</item>
+        <item name="android:navigationBarColor">@color/md_grey_100</item>
     </style>
 
     <style name="PwsAppTheme_Dialog" parent="PwsAppBaseTheme_Dialog">
@@ -56,7 +57,7 @@
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel_dark</item>
         <item name="drawableFolder">@drawable/ic_folder</item>
         <item name="drawableFolderUp">@drawable/ic_folder_up</item>
-        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_dark</item>
+        <item name="drawablePasswdsafe">@drawable/ic_action_file_dark</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline</item>
         <item name="colorError">@color/textinput_error_color_light</item>
         <item name="textColorGreen">@color/text_color_green_dark</item>
@@ -77,12 +78,13 @@
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
         <item name="drawableFolder">@drawable/ic_folder_light</item>
         <item name="drawableFolderUp">@drawable/ic_folder_up_light</item>
-        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
+        <item name="drawablePasswdsafe">@drawable/ic_action_file</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
         <item name="colorError">@color/textinput_error_color_dark</item>
         <item name="textColorGreen">@color/text_color_green_light</item>
         <item name="textAppearanceSearchResultTitle">@style/PwsAppTheme.SearchResultTitle.Dark</item>
         <item name="textAppearanceSearchResultSubtitle">@style/PwsAppTheme.SearchResultSubtitle.Dark</item>
+        <item name="android:navigationBarColor">@color/md_grey_100</item>
     </style>
 
     <style name="PwsAppThemeDark_Dialog" parent="PwsAppBaseThemeDark_Dialog">
@@ -95,7 +97,7 @@
         <item name="drawableCloseCancel">@drawable/ic_action_close_cancel</item>
         <item name="drawableFolder">@drawable/ic_folder_light</item>
         <item name="drawableFolderUp">@drawable/ic_folder_up_light</item>
-        <item name="drawablePasswdsafe">@drawable/ic_passwdsafe_light</item>
+        <item name="drawablePasswdsafe">@drawable/ic_action_file</item>
         <item name="drawablePersonOutline">@drawable/ic_action_person_outline_light</item>
         <item name="colorError">@color/textinput_error_color_dark</item>
         <item name="textColorGreen">@color/text_color_green_light</item>
@@ -215,4 +217,9 @@
         <item name="android:paddingRight">16dp</item>
         <item name="android:layout_weight">1</item>
     </style>
+
+    <style name="BottomNavigation">
+        <item name="android:background">@color/md_grey_100</item>
+    </style>
+
 </resources>

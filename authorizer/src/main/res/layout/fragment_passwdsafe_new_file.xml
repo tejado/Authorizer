@@ -49,7 +49,7 @@
                 android:gravity="fill_horizontal"
                 android:inputType="textNoSuggestions"
                 android:maxLines="1"
-                android:scrollHorizontally="true">
+                android:scrollHorizontally="true" >
                 <requestFocus/>
             </com.google.android.material.textfield.TextInputEditText>
         </com.google.android.material.textfield.TextInputLayout>

@@ -11,8 +11,20 @@
                   xmlns:tools="http://schemas.android.com/tools"
                   android:key="top_prefs">
 
+    <PreferenceCategory android:key="currentFileOptions"
+        android:title="Current file">
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.lib.view.LongSwitchPreference
+            android:name="fileWriteablePref Pref"
+            android:defaultValue="false"
+            android:key="fileWriteablePref"
+            android:title="@string/writable"
+            android:summary="@string/writeable_summary"/>
+
+    </PreferenceCategory>>
+
     <PreferenceScreen android:key="fileOptions"
-        android:title="@string/files">
+        android:title="@string/files" app:allowDividerAbove="true">
         <PreferenceCategory android:title="@string/files">
 
             <!--suppress AndroidElementNotAllowed -->
@@ -67,13 +79,6 @@
                 android:key="fileCloseClearClipboardPref"
                 android:title="@string/clear_clipboard_on_close"/>
 
-            <!--suppress AndroidElementNotAllowed -->
-            <net.tjado.passwdsafe.view.LongCheckBoxPreference
-                android:name="fileLegacyFileChooser Pref"
-                android:defaultValue="true"
-                android:key="fileLegacyFileChooserPref"
-                android:summary="@string/legacy_file_chooser_summary"
-                android:title="@string/legacy_file_chooser"/>
         </PreferenceCategory>
     </PreferenceScreen>
 
@@ -139,6 +144,14 @@
                 android:name="usbkbdLanguage Pref"
                 android:key="usbkbdLanguagePref"
                 android:title="@string/autotype_lang"/>
+
+            <!--suppress AndroidElementNotAllowed -->
+            <net.tjado.passwdsafe.view.LongCheckBoxPreference
+                android:name="usbNativeMode Pref"
+                android:defaultValue="false"
+                android:key="usbNativeModePref"
+                android:title="@string/usb_native_mode"
+                android:summary="@string/usb_native_mode_summary"/>
 
         </PreferenceCategory>
     </PreferenceScreen>
@@ -224,6 +237,81 @@
             android:defaultValue="false"
             android:key="displayVibrateKeyboard"
             android:title="@string/vibrate_keyboard_on_press"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:key="appOptions"
+        android:title="App">
+
+        <PreferenceScreen android:key="aboutOptions"
+            android:title="@string/about_app"
+            android:summary="@string/version_file_info">
+
+            <PreferenceCategory android:title="@string/file" android:key="aboutFileCat" app:isPreferenceVisible="false">
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="permissionsPref"
+                    android:title="@string/permissions"/>
+
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="numRecordsPref"
+                    android:title="@string/num_records"/>
+
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="aboutPasswordEncPref"
+                    android:title="@string/password_encoding"/>
+
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="databaseVersionPref"
+                    android:title="@string/database_version"/>
+
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="lastSaveByPref"
+                    android:title="@string/last_save_by"/>
+
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="lastSaveAppPref"
+                    android:title="@string/last_save_app"/>
+
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="lastSaveTimePref"
+                    android:title="@string/last_save_time"/>
+            </PreferenceCategory>
+
+            <PreferenceCategory android:title="Authorizer">
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="versionPref"
+                    android:title="@string/version"/>
+
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="buildIdPref"
+                    android:title="@string/build_id"/>
+
+                <!--suppress AndroidElementNotAllowed -->
+                <net.tjado.passwdsafe.view.LongPreference
+                    android:key="buildDatePref"
+                    android:title="@string/build_date"/>
+
+            </PreferenceCategory>
+        </PreferenceScreen>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongPreference
+            android:key="releaseNotesFrag"
+            android:title="@string/release_notes_title"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <net.tjado.passwdsafe.view.LongPreference
+            android:key="licensesFrag"
+            android:title="@string/licenses"/>
 
     </PreferenceCategory>
 

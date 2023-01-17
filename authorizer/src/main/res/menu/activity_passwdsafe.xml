@@ -57,6 +57,7 @@
           android:title="@string/close_file"
           android:icon="@drawable/ic_action_close_cancel"
           android:orderInCategory="1000"
-          app:showAsAction="ifRoom"/>
+          android:visible="false"
+          app:showAsAction="never" />
 
 </menu>

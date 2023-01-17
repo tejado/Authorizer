@@ -315,6 +315,7 @@
     <string name="record_sort_order">Record sort order</string>
     <string name="record_type">Record type</string>
     <string name="read_only_about">Read-only</string>
+    <string name="read_only_file">Open read-only</string>
     <string name="read_only_media">File is located on read-only media.  This situation can occur with Kitkat and higher on removable SD cards.</string>
     <string name="read_only_provider">
         The provider of the file doesn\'t support writes or hasn\'t granted
@@ -778,4 +779,11 @@
     <string name="SUB_OTP" translatable="false">{OTP}</string>
     <string name="SUB_TAB" translatable="false">{TAB}</string>
     <string name="SUB_RETURN" translatable="false">{RET}</string>
+    <string name="version_file_info"><![CDATA[Version & file information]]></string>
+    <string name="about_app">About Authorizer</string>
+    <string name="show_license">Show license</string>
+    <string name="hide_license">Hide license</string>
+    <string name="usb_native_mode">USB Auto-Type Native Mode</string>
+    <string name="usb_native_mode_summary">Advanced users: USB gadget access without root</string>
+    <string name="writeable_summary">Allow to write to the current open file</string>
 </resources>

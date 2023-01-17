@@ -72,10 +72,6 @@ public class Preferences
     public static final String PREF_DEF_FILE = "defFilePref";
     private static final String PREF_DEF_FILE_DEF = "";
 
-    public static final String PREF_FILE_LEGACY_FILE_CHOOSER =
-            "fileLegacyFileChooserPref";
-    public static final boolean PREF_FILE_LEGACY_FILE_CHOOSER_DEF = true;
-
     public static final String PREF_GROUP_RECORDS = "groupRecordsPref";
     public static final boolean PREF_GROUP_RECORDS_DEF = true;
 
@@ -167,6 +163,26 @@ public class Preferences
 
     public static final String PREF_AUTOTYPE_LANG = "usbkbdLanguagePref";
     private static final OutputInterface.Language PREF_AUTOTYPE_LANG_DEF = OutputInterface.Language.en_US;
+
+    public static final String PREF_USB_NATIVE_MODE = "usbNativeModePref";
+    private static final boolean PREF_USB_NATIVE_MODE_DEF = false;
+
+    public static final String PREF_FILE_WRITEABLE = "fileWriteablePref";
+
+    public static final String PREF_ABOUT = "aboutOptions";
+    public static final String PREF_ABOUT_FILE = "aboutFileCat";
+    public static final String PREF_ABOUT_PERM = "permissionsPref";
+    public static final String PREF_ABOUT_NUMRECORDS = "numRecordsPref";
+    public static final String PREF_ABOUT_PWENC = "aboutPasswordEncPref";
+    public static final String PREF_ABOUT_DBVER = "databaseVersionPref";
+    public static final String PREF_ABOUT_LASTSAVEBY = "lastSaveByPref";
+    public static final String PREF_ABOUT_LASTSAVEAPP = "lastSaveAppPref";
+    public static final String PREF_ABOUT_LASTSAVETIME = "lastSaveTimePref";
+    public static final String PREF_ABOUT_VERSION = "versionPref";
+    public static final String PREF_ABOUT_BUILD_ID = "buildIdPref";
+    public static final String PREF_ABOUT_BUILD_DATE = "buildDatePref";
+    public static final String PREF_FRAG_RELEASENOTES = "releaseNotesFrag";
+    public static final String PREF_FRAG_LICENSES = "licensesFrag";
 
     private static final String TAG = "Preferences";
 
@@ -295,14 +311,6 @@ public class Preferences
     public static void clearDefFilePref(SharedPreferences prefs)
     {
         prefs.edit().remove(PREF_DEF_FILE).apply();
-    }
-
-    /** Get the preference for use of the legacy file chooser */
-    public static boolean getFileLegacyFileChooserPref(SharedPreferences prefs)
-    {
-        return ApiCompat.supportsExternalFilesDirs() &&
-               prefs.getBoolean(PREF_FILE_LEGACY_FILE_CHOOSER,
-                                PREF_FILE_LEGACY_FILE_CHOOSER_DEF);
     }
 
     public static boolean getGroupRecordsPref(SharedPreferences prefs)
@@ -538,16 +546,25 @@ public class Preferences
     }
 
     /**
+     * Get whether to enable USB Keyboard Output
+     */
+    public static boolean getUsbNativeEnabled(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_USB_NATIVE_MODE,
+                                PREF_USB_NATIVE_MODE_DEF);
+    }
+
+    /**
      * Upgrade preferences
      */
     public static void upgrade(SharedPreferences prefs, Context ctx)
     {
         upgradePasswdPolicy(prefs, ctx);
         upgradeDefaultFilePref(prefs);
-        if (!ApiCompat.supportsExternalFilesDirs() &&
-            getFileLegacyFileChooserPref(prefs)) {
-            prefs.edit().putBoolean(PREF_FILE_LEGACY_FILE_CHOOSER, false)
-                 .apply();
+
+        String oldLegacyFIleChooserPrefKey = "displayThemeLightPref";
+        if (prefs.contains(oldLegacyFIleChooserPrefKey)) {
+            prefs.edit().remove("fileLegacyFileChooserPref");
         }
 
         String oldThemePrefKey = "displayThemeLightPref";

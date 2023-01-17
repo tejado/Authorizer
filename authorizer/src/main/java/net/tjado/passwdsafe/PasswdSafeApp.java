@@ -213,8 +213,7 @@ public final class PasswdSafeApp extends Application
      */
     public static String getAppFileTitle(PasswdFileUri uri, Context ctx)
     {
-        return getAppTitle((uri != null) ? uri.getIdentifier(ctx, true) : null,
-                           ctx);
+        return getAppTitle((uri != null) ? uri.getIdentifier(ctx, true) : null, ctx);
     }
 
     /**

@@ -10,12 +10,6 @@ package net.tjado.passwdsafe;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.ListFragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.AsyncTaskLoader;
-import androidx.loader.content.Loader;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -28,6 +22,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.ListFragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.view.CopyField;
@@ -167,7 +166,6 @@ public class PasswdSafeListFragmentTree extends ListFragment
         treeViewState = new HashSet<>();
     }
 
-
     @Override
     public void onAttach(Context ctx)
     {
@@ -175,10 +173,6 @@ public class PasswdSafeListFragmentTree extends ListFragment
         itsListener = (Listener)ctx;
     }
 
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
-     */
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
@@ -188,7 +182,7 @@ public class PasswdSafeListFragmentTree extends ListFragment
         View root = inflater.inflate(R.layout.fragment_passwdsafe_list_tree,
                                      container, false);
 
-        itsEmptyText = (TextView) root.findViewById(android.R.id.empty);
+        itsEmptyText = (TextView) root.findViewById(R.id.empty);
 
         final TreeNode itsTreeNodeRoot = TreeNode.root();
         addGroup(itsTreeNodeRoot, itsRootLocation, 0);
@@ -312,10 +306,6 @@ public class PasswdSafeListFragmentTree extends ListFragment
         setListAdapter(itsAdapter);
     }
 
-
-    /* (non-Javadoc)
-     * @see android.support.v4.app.Fragment#onResume()
-     */
     @Override
     public void onResume()
     {
@@ -418,9 +408,7 @@ public class PasswdSafeListFragmentTree extends ListFragment
         return super.onContextItemSelected(item);
     }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
-     */
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
@@ -434,9 +422,6 @@ public class PasswdSafeListFragmentTree extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.view.View.OnClickListener#onClick(android.view.View)
-     */
     @Override
     public void onClick(View v)
     {
@@ -450,10 +435,44 @@ public class PasswdSafeListFragmentTree extends ListFragment
         */
     }
 
+    /** Update the location shown by the list */
+    public void updateLocationView(PasswdLocation location, Mode mode)
+    {
+        itsLocation = location;
+        itsMode = mode;
+        refreshList();
+    }
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
+    /**
+     * Update the record which is selected by the list
      */
+    public void updateSelection(PasswdLocation location)
+    {
+        if (location.isRecord()) {
+            itsSelectedRecord = location.getRecord();
+            refreshList();
+        }
+    }
+
+
+    /** Refresh the list due to file changes */
+    private void refreshList()
+    {
+        if (!isResumed()) {
+            return;
+        }
+
+        LoaderManager lm = LoaderManager.getInstance(this);
+        if (lm.hasRunningLoaders()) {
+            // Trash loader if running.  See
+            // https://code.google.com/p/android/issues/detail?id=56464
+            lm.destroyLoader(0);
+        }
+        lm.restartLoader(0, null, this);
+    }
+
+
+    @NonNull
     @Override
     public Loader<List<PasswdRecordListData>> onCreateLoader(int id, Bundle args)
     {
@@ -461,40 +480,37 @@ public class PasswdSafeListFragmentTree extends ListFragment
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoadFinished(android.support.v4.content.Loader, java.lang.Object)
-     */
     @Override
-    public void onLoadFinished(Loader<List<PasswdRecordListData>> loader,
+    public void onLoadFinished(@NonNull Loader<List<PasswdRecordListData>> loader,
                                List<PasswdRecordListData> data)
     {
+        if (!isResumed()) {
+            return;
+        }
+
+
         int selPos = itsAdapter.setData(
                 data,
                 itsIsContents ? itsSelectedRecord : itsLocation.getRecord());
 
 
-        if (isResumed()) {
-            ListView list = getListView();
-            if (selPos != -1) {
-                list.setItemChecked(selPos, true);
-                list.smoothScrollToPosition(selPos);
-            } else {
-                list.clearChoices();
-            }
-
-            if (itsEmptyText.getText().length() == 0) {
-                itsEmptyText.setText(itsIsContents ? R.string.no_records :
-                                             R.string.no_groups);
-            }
+        ListView list = getListView();
+        if (selPos != -1) {
+            list.setItemChecked(selPos, true);
+            list.smoothScrollToPosition(selPos);
+        } else {
+            list.clearChoices();
         }
+
+        if (itsEmptyText.getText().length() == 0 && data.size() == 0) {
+            itsEmptyText.setText(itsIsContents ? R.string.no_records : R.string.no_groups);
+        }
+
     }
 
 
-    /* (non-Javadoc)
-     * @see android.support.v4.app.LoaderManager.LoaderCallbacks#onLoaderReset(android.support.v4.content.Loader)
-     */
     @Override
-    public void onLoaderReset(Loader<List<PasswdRecordListData>> loader)
+    public void onLoaderReset(@NonNull Loader<List<PasswdRecordListData>> loader)
     {
         onLoadFinished(loader, null);
     }
@@ -526,7 +542,7 @@ public class PasswdSafeListFragmentTree extends ListFragment
             if (data != null) {
                 int idx = 0;
                 for (PasswdRecordListData item: data) {
-                    PasswdSafeUtil.dbginfo("test_tm", item.itsTitle);
+                    //PasswdSafeUtil.dbginfo("test_tm", item.itsTitle);
                     add(item);
                     if ((selectedRecord != null) &&
                         TextUtils.equals(item.itsUuid, selectedRecord)) {
@@ -541,9 +557,6 @@ public class PasswdSafeListFragmentTree extends ListFragment
             return selectedPos;
         }
 
-        /* (non-Javadoc)
-         * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
-         */
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
@@ -576,9 +589,6 @@ public class PasswdSafeListFragmentTree extends ListFragment
             forceLoad();
         }
 
-        /* (non-Javadoc)
-         * @see android.support.v4.content.AsyncTaskLoader#loadInBackground()
-         */
         @Override
         public List<PasswdRecordListData> loadInBackground()
         {

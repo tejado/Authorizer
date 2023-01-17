@@ -230,7 +230,7 @@ public class PasswdSafeIME extends InputMethodService
                 if (intent == null) {
                     return null;
                 }
-                intent.putExtra(FileListActivity.INTENT_EXTRA_CLOSE_ON_OPEN,
+                intent.putExtra(PasswdSafe.INTENT_EXTRA_CLOSE_ON_OPEN,
                                 true);
             } else {
                 String uuid = null;

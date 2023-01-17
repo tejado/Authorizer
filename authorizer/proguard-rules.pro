@@ -17,3 +17,4 @@
 #}
 
 -keep,includedescriptorclasses class net.tjado.passwdsafe.lib.StartupReceiver
+-keep class net.tjado.authorizer.*

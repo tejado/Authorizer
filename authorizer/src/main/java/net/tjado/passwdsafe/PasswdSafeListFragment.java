@@ -421,8 +421,7 @@ public class PasswdSafeListFragment extends ListFragment
         }
 
         if (itsEmptyText.getText().length() == 0) {
-            itsEmptyText.setText(itsIsContents ? R.string.no_records :
-                                         R.string.no_groups);
+            itsEmptyText.setText(itsIsContents ? R.string.no_records : R.string.no_groups);
         }
     }
 

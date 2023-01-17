@@ -31,8 +31,6 @@ public abstract class AbstractPasswdSafeFileDataFragment
         /** Use the file data */
         <RetT> RetT useFileData(PasswdFileDataUser<RetT> user);
 
-        /** Is the navigation drawer closed */
-        boolean isNavDrawerClosed();
     }
 
     private ListenerT itsListener;
@@ -56,7 +54,7 @@ public abstract class AbstractPasswdSafeFileDataFragment
     public void onCreateOptionsMenu(@NonNull Menu menu,
                                     @NonNull MenuInflater inflater)
     {
-        if ((itsListener != null) && itsListener.isNavDrawerClosed()) {
+        if ((itsListener != null)) {
             doOnCreateOptionsMenu(menu, inflater);
         }
         super.onCreateOptionsMenu(menu, inflater);

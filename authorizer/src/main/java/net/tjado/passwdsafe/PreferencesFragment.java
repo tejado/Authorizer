@@ -25,15 +25,21 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
 
 import net.tjado.authorizer.OutputInterface;
 import net.tjado.authorizer.Utilities;
+import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdPolicy;
+import net.tjado.passwdsafe.lib.BuildConfig;
+import net.tjado.passwdsafe.util.AboutUtils;
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.ManagedRef;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
+import net.tjado.passwdsafe.lib.view.LongSwitchPreference;
 import net.tjado.passwdsafe.pref.FileBackupPref;
 import net.tjado.passwdsafe.pref.FileTimeoutPref;
 import net.tjado.passwdsafe.pref.PasswdExpiryNotifPref;
@@ -43,12 +49,14 @@ import net.tjado.passwdsafe.pref.RecordSortOrderPref;
 import net.tjado.passwdsafe.pref.ThemePref;
 import net.tjado.passwdsafe.view.ConfirmPromptDialog;
 import net.tjado.passwdsafe.view.LongCheckBoxPreference;
+import net.tjado.passwdsafe.view.LongPreference;
 
 import org.pwsafe.lib.file.PwsFile;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -62,6 +70,20 @@ public class PreferencesFragment extends PreferenceFragmentCompat
     {
         /** Update the view for preferences */
         void updateViewPreferences();
+
+        void setFileWritable(boolean writable);
+
+        boolean isFileWritable();
+
+        boolean isFileWriteCapable();
+
+        <RetT> RetT useFileData(PasswdFileDataUser<RetT> user);
+
+        boolean isFileOpen();
+
+        void showReleaseNotes();
+
+        void showLicenses();
     }
 
     public static final String SCREEN_RECORD = "recordOptions";
@@ -118,11 +140,12 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             itsScreen = new FilesScreen(prefs, res);
         } else if (key.equals("passwordOptions")) {
             itsScreen = new PasswordScreen(prefs, res);
+        } else if (key.equals("aboutOptions")) {
+            itsScreen = new AboutScreen();
         } else if (key.equals(SCREEN_RECORD)) {
             itsScreen = new RecordScreen(prefs, res);
         } else {
-            PasswdSafeUtil.showFatalMsg("Unknown preferences screen: " + key,
-                                        getActivity());
+            PasswdSafeUtil.showFatalMsg("Unknown preferences screen: " + key, getActivity());
         }
     }
 
@@ -198,6 +221,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         pref.setVisible(false);
     }
 
+    public boolean isRootScreen() {
+        return itsScreen != null && itsScreen.toString().contains("RootScreen");
+    }
+
     /**
      * A screen of preferences
      */
@@ -251,6 +278,45 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             if (pref != null) {
                 pref.setVisible(ApiCompat.hasVibrator(requireContext()));
             }
+
+            PreferenceScreen itsAboutFrag = requirePreference(Preferences.PREF_ABOUT);
+            itsAboutFrag.setOnPreferenceClickListener(this);
+            itsAboutFrag.setTitle(itsAboutFrag.getTitle() + " " + AboutUtils.getVersion(requireActivity()));
+
+            LongPreference itsReleaseNotestFrag = requirePreference(Preferences.PREF_FRAG_RELEASENOTES);
+            itsReleaseNotestFrag.setOnPreferenceClickListener(this);
+
+            LongPreference itsLicensestFrag = requirePreference(Preferences.PREF_FRAG_LICENSES);
+            itsLicensestFrag.setOnPreferenceClickListener(this);
+
+            LongSwitchPreference itsWriteable = requirePreference(Preferences.PREF_FILE_WRITEABLE);
+            itsWriteable.setChecked(itsListener.isFileWritable());
+            if(itsListener.isFileWriteCapable()) {
+                itsWriteable.setOnPreferenceChangeListener(
+                        (Preference preference, Object newValue) -> {
+                            itsListener.setFileWritable((boolean)newValue);
+                            return true;
+                        });
+            } else {
+                itsWriteable.setEnabled(false);
+            }
+        }
+
+        @Override
+        public boolean onPreferenceClick(Preference preference)
+        {
+            switch (preference.getKey()) {
+                case Preferences.PREF_FRAG_RELEASENOTES: {
+                    itsListener.showReleaseNotes();
+                    return true;
+                }
+                case Preferences.PREF_FRAG_LICENSES: {
+                    itsListener.showLicenses();
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         @Override
@@ -262,10 +328,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat
                 updateTheme = true;
             } else {
                 switch (key) {
-                case Preferences.PREF_DISPLAY_THEME: {
-                    updateTheme = true;
-                    break;
-                }
+                    case Preferences.PREF_DISPLAY_THEME: {
+                        updateTheme = true;
+                        break;
+                    }
                 }
             }
             if (updateTheme) {
@@ -323,7 +389,6 @@ public class PreferencesFragment extends PreferenceFragmentCompat
 
             if (!ApiCompat.supportsExternalFilesDirs()) {
                 hidePreference(Preferences.PREF_FILE_DIR);
-                hidePreference(Preferences.PREF_FILE_LEGACY_FILE_CHOOSER);
             }
         }
 
@@ -781,6 +846,84 @@ public class PreferencesFragment extends PreferenceFragmentCompat
                 summary = result.getIdentifier(frag.getContext(), false);
             }
             screen.itsDefFilePref.setSummary(summary);
+        }
+    }
+
+    /**
+     * The root screen of preferences
+     */
+    private final class AboutScreen extends Screen
+    {
+        /**
+         * Constructor
+         */
+        private AboutScreen()
+        {
+
+            setSummary(Preferences.PREF_ABOUT_VERSION, AboutUtils.getVersion(requireActivity()));
+            setSummary(Preferences.PREF_ABOUT_BUILD_ID, BuildConfig.BUILD_DATE);
+            setSummary(Preferences.PREF_ABOUT_BUILD_ID, BuildConfig.BUILD_DATE);
+
+            if(!itsListener.isFileOpen()) {
+                return;
+            }
+
+            PreferenceCategory prefCat = requirePreference("aboutFileCat");
+            prefCat.setVisible(true);
+
+            itsListener.useFileData(fileData -> {
+                String fileName = fileData.getUri().toString()
+                                          .replace("%3A", ":")
+                                          .replace("%2F", "/")
+                                          .replace("content://", "");
+
+                fileName = fileName.substring(fileName.lastIndexOf(fileName.contains(":") ? ":" : "/") + 1);
+
+                LongPreference pref = requirePreference(Preferences.PREF_ABOUT_PERM);
+                pref.setSummary(fileData.canEdit() ? R.string.read_write : R.string.read_only_about);
+
+                setSummary(Preferences.PREF_ABOUT_FILE, fileName);
+                setSummary(Preferences.PREF_ABOUT_NUMRECORDS, String.format(Locale.getDefault(), "%d", fileData.getRecords().size()));
+                setSummary(Preferences.PREF_ABOUT_PWENC, fileData.getOpenPasswordEncoding());
+
+                if (fileData.isV3()) {
+                    StringBuilder build = new StringBuilder();
+                    String str = fileData.getHdrLastSaveUser();
+                    if (!TextUtils.isEmpty(str)) {
+                        build.append(str);
+                    }
+                    str = fileData.getHdrLastSaveHost();
+                    if (!TextUtils.isEmpty(str)) {
+                        if (build.length() > 0) {
+                            build.append(" on ");
+                        }
+                        build.append(str);
+                    }
+
+                    setSummary(Preferences.PREF_ABOUT_DBVER, fileData.getHdrVersion());
+                    setSummary(Preferences.PREF_ABOUT_LASTSAVEBY, String.valueOf(build));
+                    setSummary(Preferences.PREF_ABOUT_LASTSAVEAPP, fileData.getHdrLastSaveApp());
+                    setSummary(Preferences.PREF_ABOUT_LASTSAVETIME, fileData.getHdrLastSaveTime());
+                } else {
+                    setSummary(Preferences.PREF_ABOUT_DBVER, "< v3");
+                    setSummary(Preferences.PREF_ABOUT_LASTSAVEBY, "n/a");
+                    setSummary(Preferences.PREF_ABOUT_LASTSAVEAPP, "n/a");
+                    setSummary(Preferences.PREF_ABOUT_LASTSAVETIME, "n/a");
+                }
+
+                return true;
+            });
+        }
+
+        private void setSummary(String prefName, String summary) {
+            Preference pref = requirePreference(prefName);
+            pref.setSummary(summary);
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(
+                SharedPreferences sharedPreferences, String s)
+        {
         }
     }
 }

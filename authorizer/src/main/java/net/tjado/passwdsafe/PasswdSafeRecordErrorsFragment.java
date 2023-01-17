@@ -96,7 +96,7 @@ public class PasswdSafeRecordErrorsFragment extends ListFragment
     public void onCreateOptionsMenu(@NonNull Menu menu,
                                     @NonNull MenuInflater inflater)
     {
-        if ((itsListener != null) && itsListener.isNavDrawerClosed()) {
+        if ((itsListener != null)) {
             inflater.inflate(R.menu.fragment_passwdsafe_record_errors, menu);
         }
         super.onCreateOptionsMenu(menu, inflater);
