@@ -731,9 +731,9 @@
     <string name="autotype_bt_enable">Aktiviere Auto-Type über Bluetooth</string>
     <string name="autotype_bt_enable_summary">Android Pie (28) oder höher benötigt.</string>
 
-    <string name="autotype_usb_root_denied">
-        FEHLER: root Zugriff verweigert. Auto-Type über USB ist fehlgeschlagen da dafür root Zugriff benötigt wird!
-    </string>
+    <string name="autotype_usb_root_denied">root Zugriff verweigert. Auto-Type über USB ist fehlgeschlagen da dafür root Zugriff benötigt wird!</string>
+
+    <string name="autotype_usb_hidg_not_found">Auto-Type über USB nicht möglich;: USB HID Gerätedatei (/dev/hidg0) nicht gefunden! Es kann über "USB Gadget Tool" aktiviert werden (root Zugriff benötigt).</string>
 
     <string name="use_treeview_list">Baumansicht</string>
     <string name="entry">Eintrag</string>

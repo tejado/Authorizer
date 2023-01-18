@@ -10,6 +10,7 @@
 package net.tjado.authorizer;
 
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,8 +25,13 @@ public class OutputUsbKeyboard implements OutputInterface
 
     private static final String TAG = "OutputUsbKeyboard";
 
-    public OutputUsbKeyboard(OutputInterface.Language lang) throws IOException
+    public OutputUsbKeyboard(OutputInterface.Language lang) throws IOException, FileNotFoundException
     {
+        File devicePathFile = new File(devicePath);
+        if(!devicePathFile.exists()) {
+            throw new FileNotFoundException(String.format("No HID support: %s not found!", devicePath));
+        }
+
         setLanguage(lang);
 
         openDevice();

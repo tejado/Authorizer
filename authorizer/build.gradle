@@ -9,6 +9,8 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'net.tjado.passwdsafe'
+
     compileSdkVersion 33
     defaultConfig {
         applicationId 'net.tjado.passwdsafe'
@@ -62,8 +64,7 @@ android {
         }
     }
     ndkVersion = '21.3.6528147'
-    namespace 'net.tjado.passwdsafe'
-
+    
     packagingOptions {
         jniLibs {
             useLegacyPackaging false

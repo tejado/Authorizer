@@ -80,6 +80,7 @@ import net.tjado.authorizer.OutputBluetoothKeyboard;
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -1175,9 +1176,8 @@ public class PasswdSafeRecordBasicFragment
         String quoteSubTab = Pattern.quote(SUB_TAB);
 
         try {
-            boolean root = Preferences.getUsbNativeEnabled(Preferences.getSharedPrefs(getContext()));
-
-            OutputInterface ct = root ? new OutputUsbKeyboardAsRoot(lang) : new OutputUsbKeyboard(lang);
+            boolean nativeMode = Preferences.getUsbNativeEnabled(Preferences.getSharedPrefs(getContext()));
+            OutputInterface ct = nativeMode ? new OutputUsbKeyboard(lang) : new OutputUsbKeyboardAsRoot(lang);
             boolean otpTokenGenerated = false;
 
             if(sendOTP && otp != null ) {
@@ -1272,10 +1272,12 @@ public class PasswdSafeRecordBasicFragment
             ct.destruct();
 
         } catch (SecurityException e) {
-            PasswdSafeUtil.showInfoMsg(getResources().getString(
-                    R.string.autotype_usb_root_denied), getContext());
+            PasswdSafeUtil.showErrorMsg(getResources().getString(R.string.autotype_usb_root_denied), new ActContext(requireContext()));
+        } catch (FileNotFoundException e) {
+            PasswdSafeUtil.showErrorMsg(getResources().getString(R.string.autotype_usb_hidg_not_found), new ActContext(requireContext()));
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
+            PasswdSafeUtil.showErrorMsg(String.format("PasswdSafeRecordBasicFragment Exception: %s", e.getLocalizedMessage()), new ActContext(requireContext()));
         }
 
     }

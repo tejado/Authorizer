@@ -24,6 +24,8 @@ static def buildTime() {
 }
 
 android {
+    namespace 'net.tjado.passwdsafe.lib'
+
     compileSdkVersion 33
     publishNonDefault true
     defaultConfig {
@@ -38,7 +40,6 @@ android {
     }
     productFlavors {
     }
-    namespace 'net.tjado.passwdsafe.lib'
 }
 
 dependencies {

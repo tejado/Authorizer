@@ -724,9 +724,9 @@
     <string name="autotype_bt_enable">Enable Auto-Type over Bluetooth</string>
     <string name="autotype_bt_enable_summary">Android Pie (28) or higher required.</string>
 
-    <string name="autotype_usb_root_denied">
-        ERROR: root access denied. Could not auto-type over USB as this requires root access!
-    </string>
+    <string name="autotype_usb_root_denied">root access denied. Could not auto-type over USB as this requires root access!</string>
+
+    <string name="autotype_usb_hidg_not_found">No USB auto-type possible: USB HID device file (/dev/hidg0) not found! It can be activated by using "USB Gadget Tool" (root access required).</string>
 
     <string name="use_treeview_list">Use tree list</string>
     <string name="entry">entry</string>

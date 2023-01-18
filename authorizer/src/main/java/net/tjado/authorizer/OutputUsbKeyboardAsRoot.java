@@ -9,6 +9,7 @@
 
 package net.tjado.authorizer;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
@@ -22,8 +23,13 @@ public class OutputUsbKeyboardAsRoot implements OutputInterface
 
     private static final String TAG = "OutputUsbKeyboardAsRoot";
 
-    public OutputUsbKeyboardAsRoot(Language lang)
+    public OutputUsbKeyboardAsRoot(Language lang) throws FileNotFoundException
     {
+        File devicePathFile = new File(devicePath);
+        if(!devicePathFile.exists()) {
+            throw new FileNotFoundException(String.format("No HID support: %s not found!", devicePath));
+        }
+
         if( !ExecuteAsRootUtil.canRunRootCommands() ) {
             throw new SecurityException("Root access rejected!");
         }

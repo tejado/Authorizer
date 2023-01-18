@@ -72,6 +72,7 @@ import net.tjado.passwdsafe.view.PasswdRecordListData;
 
 import org.pwsafe.lib.file.PwsRecord;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -1215,8 +1216,7 @@ public class PasswdSafe extends AppCompatActivity
         });
 
         try {
-            OutputInterface ct = new OutputUsbKeyboardAsRoot(
-                    OutputInterface.Language.AppleMac_de_DE);
+            OutputInterface ct = new OutputUsbKeyboardAsRoot(OutputInterface.Language.AppleMac_de_DE);
 
             String SUB_OTP = getResources().getString(R.string.SUB_OTP);
             String SUB_TAB = getResources().getString(R.string.SUB_TAB);
@@ -1252,10 +1252,13 @@ public class PasswdSafe extends AppCompatActivity
                 }
             }
         } catch (SecurityException e) {
-            PasswdSafeUtil.showInfoMsg(getResources().getString(
-                    R.string.autotype_usb_root_denied), this);
+            PasswdSafeUtil.showErrorMsg(getResources().getString(
+                    R.string.autotype_usb_root_denied), new ActContext(this));
+        } catch (FileNotFoundException e) {
+            PasswdSafeUtil.showErrorMsg(getResources().getString(R.string.autotype_usb_hidg_not_found), new ActContext(this));
         } catch (Exception e) {
             PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
+            PasswdSafeUtil.showErrorMsg(String.format("PasswdSafeRecordBasicFragment Exception: %s", e.getLocalizedMessage()) ,new ActContext(this));
         }
     }
 
