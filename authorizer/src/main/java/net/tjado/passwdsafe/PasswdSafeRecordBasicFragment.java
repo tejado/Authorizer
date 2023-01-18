@@ -121,6 +121,7 @@ public class PasswdSafeRecordBasicFragment
              '-', ' ', ',', ';', '?'};
 
     private boolean itsIsPasswordShown = false;
+    private boolean itsShowOtp = false;
     private String itsHiddenPasswordStr;
     private String itsSubsetErrorStr;
     private String itsTitle;
@@ -428,7 +429,10 @@ public class PasswdSafeRecordBasicFragment
         itsOtpTimer = root.findViewById(R.id.otp_time);
         itsOtpTokenRow = root.findViewById(R.id.otp_token_row);
 
-        itsOtpCode.setOnClickListener(view -> generateOtpToken());
+        itsOtpCode.setOnClickListener(view -> {
+            itsShowOtp = !itsShowOtp;
+            generateOtpToken();
+        });
 
         SUB_OTP = getResources().getString(R.string.SUB_OTP);
         SUB_TAB = getResources().getString(R.string.SUB_TAB);
@@ -752,7 +756,6 @@ public class PasswdSafeRecordBasicFragment
     private void generateOtpToken()
     {
         String otp = getOtp();
-
         Token token = null;
         try {
             PasswdSafeUtil.dbginfo("OTP", String.format("LOAD OTP: %s", otp));
@@ -765,7 +768,7 @@ public class PasswdSafeRecordBasicFragment
                         token.getCounter()));
                 saveOtpChange(token.toString(), true);
             }
-            setFieldText(itsOtpCode, null, itsOtp.getCurrentCode());
+            setFieldText(itsOtpCode, null, itsShowOtp ? itsOtp.getCurrentCode() : "XXXXXX");
 
             itsOtpTimer.setProgress(itsOtp.getCurrentProgress());
         } catch (Exception e) {
@@ -790,7 +793,7 @@ public class PasswdSafeRecordBasicFragment
                 }
 
                 itsOtpTimer.setProgress(currentProgress);
-                setFieldText(itsOtpCode, null, currentCode);
+                setFieldText(itsOtpCode, null, itsShowOtp ? itsOtp.getCurrentCode() : "XXXXXX");
             }
 
             @Override
