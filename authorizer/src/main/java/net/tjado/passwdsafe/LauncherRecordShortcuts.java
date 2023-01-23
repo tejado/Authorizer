@@ -9,6 +9,9 @@ package net.tjado.passwdsafe;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -31,6 +34,7 @@ import net.tjado.passwdsafe.view.PasswdRecordListData;
 import org.pwsafe.lib.file.PwsRecord;
 
 import java.util.List;
+import java.util.UUID;
 
 public class LauncherRecordShortcuts extends AppCompatActivity
         implements PasswdSafeListFragment.Listener,
@@ -74,22 +78,17 @@ public class LauncherRecordShortcuts extends AppCompatActivity
         itsFileDataView.onAttach(this, prefs);
 
         Intent intent = getIntent();
-        switch (String.valueOf(intent.getAction())) {
-        case Intent.ACTION_CREATE_SHORTCUT: {
+        String s = String.valueOf(intent.getAction());
+        if (Intent.ACTION_CREATE_SHORTCUT.equals(s)) {
             setTitle(R.string.shortcut_record);
             itsMode = Mode.SHORTCUT;
-            break;
-        }
-        case PasswdSafeApp.CHOOSE_RECORD_INTENT: {
+        } else if (PasswdSafeApp.CHOOSE_RECORD_INTENT.equals(s)) {
             setTitle(R.string.choose_record);
             itsMode = Mode.CHOOSE_RECORD;
             GuiUtils.setVisible(itsFile, false);
-            break;
-        }
-        default: {
+        } else {
             finish();
             return;
-        }
         }
 
         int options = PasswdRecordFilter.OPTS_DEFAULT;
@@ -184,8 +183,7 @@ public class LauncherRecordShortcuts extends AppCompatActivity
             FragmentManager fragMgr = getSupportFragmentManager();
             FragmentTransaction txn = fragMgr.beginTransaction();
             txn.setTransition(FragmentTransaction.TRANSIT_NONE);
-            txn.replace(R.id.contents,
-                        PasswdSafeListFragment.newInstance(location, true));
+            txn.replace(R.id.contents, PasswdSafeListFragment.newInstance(location, true));
             txn.addToBackStack(null);
             txn.commit();
         }
@@ -235,34 +233,43 @@ public class LauncherRecordShortcuts extends AppCompatActivity
      */
     private void selectRecord(final String uuid)
     {
-        switch (itsMode) {
-        case SHORTCUT: {
+        if (itsMode == Mode.SHORTCUT) {
+
             Pair<Uri, String> rc = PasswdSafeFileDataFragment.useOpenFileData(
                     fileData -> {
                         PwsRecord rec = fileData.getRecord(uuid);
                         String title = fileData.getTitle(rec);
                         return new Pair<>(fileData.getUri().getUri(), title);
                     });
-            if (rc != null) {
-                Intent shortcutIntent = PasswdSafeUtil.createOpenIntent(
-                        rc.first, uuid);
 
-                Intent intent = new Intent();
-                intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-                intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, rc.second);
-                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-                                Intent.ShortcutIconResource.fromContext(
-                                        this, R.mipmap.ic_launcher_passwdsafe));
+            if (rc != null) {
+                Intent shortcutIntent = PasswdSafeUtil.createOpenIntent(rc.first, uuid);
+
+                Intent intent = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(this, UUID.randomUUID().toString())
+                            .setShortLabel(rc.second)
+                            .setLongLabel(rc.second)
+                            .setIcon(Icon.createWithResource(this, R.mipmap.ic_launcher_passwdsafe))
+                            .setIntent(shortcutIntent)
+                            .build();
+                    ShortcutManager sm = this.getSystemService(ShortcutManager.class);
+                    intent = sm.createShortcutResultIntent(shortcutInfo);
+                } else {
+                    intent = new Intent();
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, rc.second);
+                    intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+                            Intent.ShortcutIconResource.fromContext(
+                                    this, R.mipmap.ic_launcher_passwdsafe));
+                }
+
                 setResult(RESULT_OK, intent);
             }
-            break;
-        }
-        case CHOOSE_RECORD: {
+        } else if (itsMode == Mode.CHOOSE_RECORD) {
             Intent intent = new Intent();
             intent.putExtra(PasswdSafeApp.RESULT_DATA_UUID, uuid);
             setResult(RESULT_OK, intent);
-            break;
-        }
         }
         finish();
     }

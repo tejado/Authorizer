@@ -11,7 +11,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              android:padding="@dimen/activity_vertical_margin"
               tools:context="net.tjado.passwdsafe.LauncherRecordShortcuts">
 
     <TextView android:id="@+id/file"

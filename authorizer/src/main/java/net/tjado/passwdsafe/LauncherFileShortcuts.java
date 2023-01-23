@@ -7,7 +7,11 @@
  */
 package net.tjado.passwdsafe;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +21,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
+
+import java.util.UUID;
 
 public class LauncherFileShortcuts extends AppCompatActivity
         implements StorageFileListFragment.Listener
@@ -78,12 +84,25 @@ public class LauncherFileShortcuts extends AppCompatActivity
                 openIntent = PasswdSafeUtil.createOpenIntent(uri, null);
             }
 
-            Intent intent = new Intent();
-            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, openIntent);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, fileName);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
-                            Intent.ShortcutIconResource.fromContext(
-                                    this, R.mipmap.ic_launcher_passwdsafe));
+            Intent intent = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(this, UUID.randomUUID().toString())
+                        .setShortLabel(fileName)
+                        .setLongLabel(fileName)
+                        .setIcon(Icon.createWithResource(this, R.mipmap.ic_launcher_passwdsafe))
+                        .setIntent(openIntent)
+                        .build();
+                ShortcutManager sm = this.getSystemService(ShortcutManager.class);
+                intent = sm.createShortcutResultIntent(shortcutInfo);
+            } else {
+                intent = new Intent();
+                intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, openIntent);
+                intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, fileName);
+                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
+                                Intent.ShortcutIconResource.fromContext(
+                                        this, R.mipmap.ic_launcher_passwdsafe));
+            }
+
             setResult(RESULT_OK, intent);
         }
 
