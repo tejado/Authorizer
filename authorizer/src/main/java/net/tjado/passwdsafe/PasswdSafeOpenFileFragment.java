@@ -862,15 +862,10 @@ public class PasswdSafeOpenFileFragment
         GuiUtils.setVisible(itsSavedPasswordMsg, true);
         itsSavedPasswordMsg.setText(finishMsg);
         int textColor = itsSavedPasswordTextColor;
-        switch (finishMode) {
-        case SUCCESS: {
+        if (finishMode == SavedPasswordFinish.SUCCESS) {
             textColor = R.attr.textColorGreen;
-            break;
-        }
-        case ERROR: {
+        } else if (finishMode == SavedPasswordFinish.ERROR) {
             textColor = R.attr.colorError;
-            break;
-        }
         }
 
         Context ctx = getContext();
@@ -888,6 +883,7 @@ public class PasswdSafeOpenFileFragment
             if (loadedPassword != null) {
                 try (var password = loadedPassword.use()) {
                     password.get().setInto(itsPasswordEdit);
+                    itsOpenBtn.performClick();
                 }
             }
 
@@ -895,18 +891,12 @@ public class PasswdSafeOpenFileFragment
             switch (itsOpenModel.getDataValue().getSavedPasswordState()) {
                 case AVAILABLE: {
                     var newState = SavedPasswordState.AVAILABLE;
-                    switch (finishMode) {
-                    case SUCCESS: {
+                    if (finishMode == SavedPasswordFinish.SUCCESS) {
                         newState = SavedPasswordState.LOADED_SUCCESS;
-                        break;
-                    }
-                    case ERROR: {
+                    } else if (finishMode == SavedPasswordFinish.ERROR) {
                         newState = SavedPasswordState.LOADED_FAILURE;
-                        break;
                     }
-                    }
-                    itsOpenModel.setSavedPasswordState(newState, finishMsg,
-                                                       loadedPassword);
+                    itsOpenModel.setSavedPasswordState(newState, finishMsg, loadedPassword);
                     break;
                 }
                 case UNKNOWN:
