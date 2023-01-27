@@ -85,7 +85,7 @@ public class LauncherFileShortcuts extends AppCompatActivity
             }
 
             Intent intent = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O && !itsIsDefaultFile) {
                 ShortcutInfo shortcutInfo = new ShortcutInfo.Builder(this, UUID.randomUUID().toString())
                         .setShortLabel(fileName)
                         .setLongLabel(fileName)
