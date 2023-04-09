@@ -1,5 +1,9 @@
 package net.tjado.webauthn.models;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -19,6 +23,7 @@ import net.tjado.webauthn.fido.ctap2.Messages;
 import net.tjado.webauthn.util.Pkcs8PemParser;
 import net.tjado.webauthn.util.WebAuthnCryptography;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class PackedBasicAttestation extends AttestationObject {
 
     private static final String ATTESTATION_CERTIFICATE =

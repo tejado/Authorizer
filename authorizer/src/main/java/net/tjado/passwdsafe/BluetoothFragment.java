@@ -42,6 +42,7 @@ import net.tjado.bluetooth.BluetoothDeviceListing;
 import net.tjado.bluetooth.BluetoothUtils;
 import net.tjado.bluetooth.HidDeviceProfile;
 import net.tjado.passwdsafe.lib.ActContext;
+import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.DynamicPermissionMgr;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.bluetooth.BluetoothDeviceWrapper;
@@ -115,10 +116,6 @@ public class BluetoothFragment extends Fragment
     {
         super.onAttach(ctx);
         itsListener = (Listener)ctx;
-    }
-
-    public boolean androidSupportsBluetoothHid() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
     }
 
     @Override
@@ -201,7 +198,7 @@ public class BluetoothFragment extends Fragment
 
         btScanToggle.setOnClickListener(item -> bluetoothScanToggle());
 
-        if (!androidSupportsBluetoothHid()) {
+        if (!ApiCompat.supportsBluetoothHid()) {
             PasswdSafeUtil.dbginfo(TAG, "Android API version too low - aborting");
             flipperOverall.setDisplayedChild(1);
             return rootView;
@@ -300,7 +297,7 @@ public class BluetoothFragment extends Fragment
         super.onResume();
         itsListener.updateViewBluetooth();
 
-        if(!androidSupportsBluetoothHid() || !itsPermissionMgr.hasRequiredPerms()) {
+        if(!ApiCompat.supportsBluetoothHid() || !itsPermissionMgr.hasRequiredPerms()) {
             return;
         }
 

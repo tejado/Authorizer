@@ -96,6 +96,14 @@ public final class ApiCompat
     }
 
     /**
+     * Is Bluetooth HID supported
+     */
+    public static boolean supportsBluetoothHid()
+    {
+        return SDK_VERSION >= SDK_P;
+    }
+
+    /**
      * Are notifications enabled
      */
     public static boolean areNotificationsEnabled(

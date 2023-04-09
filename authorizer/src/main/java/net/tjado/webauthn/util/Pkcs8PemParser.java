@@ -1,5 +1,9 @@
 package net.tjado.webauthn.util;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,6 +17,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class Pkcs8PemParser {
 
     public static final String TAG = "Pkcs8PemParser";

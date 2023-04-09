@@ -1,5 +1,9 @@
 package net.tjado.webauthn.models;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -14,6 +18,7 @@ import net.tjado.webauthn.exceptions.VirgilException;
 import net.tjado.webauthn.util.Pkcs8PemParser;
 import net.tjado.webauthn.util.WebAuthnCryptography;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class U2fBasicAttestation extends AttestationObject {
 
     private static final String ATTESTATION_CERTIFICATE =

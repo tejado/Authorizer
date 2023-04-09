@@ -1,10 +1,12 @@
 package net.tjado.webauthn;
 
+import android.os.Build;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 
 import java.io.ByteArrayInputStream;
@@ -32,6 +34,7 @@ import net.tjado.webauthn.fido.hid.Framing;
 import net.tjado.webauthn.fido.u2f.RawMessages;
 import net.tjado.webauthn.util.SelectCredentialDialogFragment;
 
+@RequiresApi(api = Build.VERSION_CODES.P)
 public class TransactionManager {
 
     private final String TAG = "TransactionManager";

@@ -566,7 +566,7 @@ public class Preferences
      */
     public static boolean getBluetoothEnabled(SharedPreferences prefs)
     {
-        return prefs.getBoolean(PREF_BLUETOOTH_ENABLED,
+        return ApiCompat.supportsBluetoothHid() && prefs.getBoolean(PREF_BLUETOOTH_ENABLED,
                 PREF_BLUETOOTH_ENABLED_DEF);
     }
 

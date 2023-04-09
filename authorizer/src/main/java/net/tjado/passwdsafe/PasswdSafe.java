@@ -566,7 +566,7 @@ public class PasswdSafe extends AppCompatActivity
 
         foregroundHandler.removeCallbacksAndMessages(null);
 
-        if (mTransactionManager == null) {
+        if (ApiCompat.supportsBluetoothHid() && mTransactionManager == null) {
             try {
                 PasswdSafeCredentialBackend credentialBackend = new PasswdSafeCredentialBackend(this, false, this);
                 mAuthenticator = new Authenticator(this, false, credentialBackend);
@@ -618,6 +618,10 @@ public class PasswdSafe extends AppCompatActivity
 
         if (AboutUtils.checkShowNotes(this)) {
             showReleaseNotes();
+        }
+
+        if(!ApiCompat.supportsBluetoothHid()) {
+            return;
         }
 
         if (mTransactionManager != null) {

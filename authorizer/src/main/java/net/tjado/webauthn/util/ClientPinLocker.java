@@ -3,18 +3,17 @@ package net.tjado.webauthn.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
@@ -24,6 +23,7 @@ import java.security.cert.CertificateException;
 
 import net.tjado.webauthn.exceptions.VirgilException;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class ClientPinLocker {
     private static final String TAG = "ClientPINEntry";
 

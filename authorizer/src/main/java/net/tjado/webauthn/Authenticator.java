@@ -2,6 +2,7 @@ package net.tjado.webauthn;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.util.Pair;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.biometric.BiometricPrompt.CryptoObject;
 import androidx.fragment.app.FragmentActivity;
 
@@ -72,6 +74,7 @@ import net.tjado.webauthn.util.WioBiometricPrompt;
 import net.tjado.webauthn.util.WioBiometricPrompt.PromptCallback;
 import net.tjado.webauthn.util.WioRequestDialog;
 
+@RequiresApi(api = Build.VERSION_CODES.P)
 public final class Authenticator {
     private static final String TAG = "WebauthnAuthenticator";
 
@@ -488,7 +491,6 @@ public final class Authenticator {
      * @return the credential assertion
      * @throws CtapException Error to be returned through the current transport
      */
-    @SuppressLint("NewApi")
     public GetAssertionResult getInternalAssertion(GetAssertionOptions options,
                                                    PublicKeyCredentialSource selectedCredential,
                                                    Signature signature,
