@@ -8,6 +8,7 @@
 package net.tjado.passwdsafe;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -561,6 +562,7 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
+    @SuppressLint("NewApi")
     protected void onResume() {
         super.onResume();
 
@@ -612,6 +614,7 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
+    @SuppressLint("NewApi")
     protected void onStart()
     {
         super.onStart();
