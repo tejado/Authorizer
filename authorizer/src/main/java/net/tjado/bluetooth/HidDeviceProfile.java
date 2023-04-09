@@ -68,7 +68,7 @@ public class HidDeviceProfile {
      * @param device Device to check.
      * @return {@code true} if the HID Host profile is supported, {@code false} otherwise.
      */
-    public boolean isProfileSupported(BluetoothDevice device) {
+    public static boolean isProfileSupported(BluetoothDevice device) {
         // If a device reports itself as a HID Device, then it isn't a HID Host.
         ParcelUuid[] uuidArray = device.getUuids();
         if (uuidArray != null) {
@@ -140,6 +140,10 @@ public class HidDeviceProfile {
     void connect(BluetoothDevice device) {
         if (service != null && isProfileSupported(device)) {
             service.connect(device);
+        } else if (service == null) {
+            Log.w(TAG, "connect: service is null");
+        } else {
+            Log.w(TAG, "connect: profile not supported");
         }
     }
 
@@ -152,6 +156,10 @@ public class HidDeviceProfile {
     void disconnect(BluetoothDevice device) {
         if (service != null && isProfileSupported(device)) {
             service.disconnect(device);
+        } else if (service == null) {
+            Log.w(TAG, "disconnect: service is null");
+        } else {
+            Log.w(TAG, "disconnect: profile not supported");
         }
     }
 

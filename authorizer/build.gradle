@@ -35,7 +35,7 @@ android {
     buildTypes {
         debug {
             debuggable true
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles += 'proguard-rules.pro'
             proguardFiles += 'proguard-rules-debug.pro'
             testProguardFiles += 'proguard-rules-test.pro'
@@ -64,7 +64,7 @@ android {
         }
     }
     ndkVersion = '21.3.6528147'
-    
+
     packagingOptions {
         jniLibs {
             useLegacyPackaging false
@@ -75,6 +75,9 @@ android {
     }
 }
 
+if (project.file('../sign/sign.gradle').exists()) {
+    apply from: '../sign/sign.gradle'
+}
 
 dependencies {
     def room_version = "2.4.3"
@@ -95,11 +98,16 @@ dependencies {
     implementation 'com.mikepenz:devicon-typeface:2.0.0.2@aar'
     implementation 'com.mikepenz:materialize:1.0.0@aar'
     implementation 'com.mikepenz:fastadapter:2.0.0@aar'
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.72'
-    implementation 'org.bouncycastle:bcpg-jdk18on:1.72.2'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.71.1'
+    implementation 'org.bouncycastle:bcpg-jdk18on:1.71.1'
     implementation 'io.fotoapparat.fotoapparat:library:1.4.1'
     implementation 'com.google.zxing:core:3.5.1'
 
+    // FIDO (WebAuthn/U2F) dependencies
+    implementation 'co.nstant.in:cbor:0.9'
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.guava:guava:31.1-android'
+    implementation 'rocks.xmpp:precis:1.1.0'
 
     implementation "androidx.room:room-runtime:$room_version"
 

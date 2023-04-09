@@ -34,9 +34,7 @@ import androidx.annotation.WorkerThread;
 /** Helper class that holds all data about the HID Device's SDP record and wraps data sending. */
 @SuppressLint({"MissingPermission", "NewApi"})
 public class HidDeviceApp
-        implements MouseReport.MouseDataSender,
-                KeyboardReport.KeyboardDataSender,
-                BatteryReport.BatteryDataSender {
+        implements KeyboardReport.KeyboardDataSender {
 
     private static final String TAG = "HidDeviceApp";
 
@@ -54,9 +52,12 @@ public class HidDeviceApp
         /** Callback that receives the app unregister event. */
         @MainThread
         void onAppStatusChanged(boolean registered);
+
+        /** Callback that handles the interrupt requests of the current device */
+        void onInterruptData(BluetoothDevice device, int reportId,
+                             byte[] data, BluetoothHidDevice inputHost);
     }
 
-    private final MouseReport mouseReport = new MouseReport();
     private final KeyboardReport keyboardReport = new KeyboardReport();
     private final BatteryReport batteryReport = new BatteryReport();
     private final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
@@ -110,6 +111,16 @@ public class HidDeviceApp
                         inputHost.reportError(device, BluetoothHidDevice.ERROR_RSP_SUCCESS);
                     }
                 }
+
+                @Override
+                @BinderThread
+                public void onInterruptData(BluetoothDevice device , byte reportId, byte[] data) {
+                    super.onInterruptData(device, reportId, data);
+
+                    if (inputHost!= null && device != null) {
+                        HidDeviceApp.this.onInterruptData(device, reportId, data, inputHost);
+                    }
+                }
             };
 
     @Nullable private BluetoothHidDevice inputHost;
@@ -121,10 +132,17 @@ public class HidDeviceApp
      * @param inputHost Interface for managing the paired HID Host devices and sending the data.
      */
     @MainThread
-    void registerApp(BluetoothProfile inputHost) {
+    boolean registerApp(BluetoothProfile inputHost, int mode) {
+
         this.inputHost = ((BluetoothHidDevice) inputHost);
-        this.inputHost.registerApp(
-                Constants.SDP_RECORD, null, Constants.QOS_OUT, Runnable::run, callback);
+
+        if (mode == Constants.MODE_FIDO) {
+            return this.inputHost.registerApp(Constants.SDP_RECORD_FIDO, null, Constants.QOS_OUT_FIDO, Runnable::run, callback);
+        } else if (mode == Constants.MODE_KEYBOARD) {
+            return this.inputHost.registerApp(Constants.SDP_RECORD_KEYBOARD, null, Constants.QOS_OUT_KEYBOARD, Runnable::run, callback);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     /** Unregister the HID Device's SDP record. */
@@ -164,28 +182,6 @@ public class HidDeviceApp
 
     @Override
     @WorkerThread
-    public void sendMouse(boolean left, boolean right, boolean middle, int dX, int dY, int dWheel) {
-        // Store the current values in case the host will try to read them with a GET_REPORT call.
-        byte[] report = mouseReport.setValue(left, right, middle, dX, dY, dWheel);
-        if (inputHost != null && device != null) {
-            // Check if there is any data to send at all. Save power by skipping zero reports.
-            boolean isZeroReport = true;
-            for (int i = 0; i < report.length && isZeroReport; i++) {
-                if (report[i] != 0) {
-                    isZeroReport = false;
-                }
-            }
-
-            // Allow sending one zero report to release the buttons, but no more than that.
-            if (!isZeroReport || !lastReportZero) {
-                inputHost.sendReport(device, Constants.ID_MOUSE, report);
-            }
-            lastReportZero = isZeroReport;
-        }
-    }
-
-    @Override
-    @WorkerThread
     public void sendKeyboard(
             int modifier, int key1, int key2, int key3, int key4, int key5, int key6) {
         // Store the current values in case the host will try to read them with a GET_REPORT call.
@@ -205,16 +201,6 @@ public class HidDeviceApp
         }
     }
 
-    @Override
-    @MainThread
-    public void sendBatteryLevel(float level) {
-        // Store the current values in case the host will try to read them with a GET_REPORT call.
-        byte[] report = batteryReport.setValue(level);
-        if (inputHost != null && device != null) {
-            inputHost.sendReport(device, Constants.ID_BATTERY, report);
-        }
-    }
-
     @BinderThread
     private void onConnectionStateChanged(BluetoothDevice device, int state) {
         mainThreadHandler.post(() -> {
@@ -229,6 +215,18 @@ public class HidDeviceApp
         mainThreadHandler.post(() -> {
             if (deviceStateListener != null) {
                 deviceStateListener.onAppStatusChanged(registered);
+            }
+        });
+    }
+
+    @BinderThread
+    private void onInterruptData(BluetoothDevice device,
+                                 byte reportId,
+                                 byte[] data,
+                                 BluetoothHidDevice inputHost) {
+        mainThreadHandler.post(() -> {
+            if (deviceStateListener != null) {
+                deviceStateListener.onInterruptData(device, reportId, data, inputHost);
             }
         });
     }
@@ -252,12 +250,6 @@ public class HidDeviceApp
         switch (id) {
             case Constants.ID_KEYBOARD:
                 return keyboardReport.getReport();
-
-            case Constants.ID_MOUSE:
-                return mouseReport.getReport();
-
-            case Constants.ID_BATTERY:
-                return batteryReport.getReport();
 
             default: // fall out
         }

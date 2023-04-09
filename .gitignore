@@ -51,3 +51,4 @@ authorizer/debug/
 authorizer/release/
 authorizer/.externalNativeBuild/
 .cxx
+sign/

@@ -84,6 +84,8 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         void showReleaseNotes();
 
         void showLicenses();
+
+        void showBluetooth();
     }
 
     public static final String SCREEN_RECORD = "recordOptions";
@@ -289,6 +291,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             LongPreference itsLicensestFrag = requirePreference(Preferences.PREF_FRAG_LICENSES);
             itsLicensestFrag.setOnPreferenceClickListener(this);
 
+            LongPreference itsBluetoothFrag = requirePreference(Preferences.PREF_FRAG_BLUETOOTH);
+            itsBluetoothFrag.setOnPreferenceClickListener(this);
+
             LongSwitchPreference itsWriteable = requirePreference(Preferences.PREF_FILE_WRITEABLE);
             itsWriteable.setChecked(itsListener.isFileWritable());
             if(itsListener.isFileWriteCapable()) {
@@ -312,6 +317,10 @@ public class PreferencesFragment extends PreferenceFragmentCompat
                 }
                 case Preferences.PREF_FRAG_LICENSES: {
                     itsListener.showLicenses();
+                    return true;
+                }
+                case Preferences.PREF_FRAG_BLUETOOTH: {
+                    itsListener.showBluetooth();
                     return true;
                 }
             }
@@ -468,39 +477,33 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         @Override
         public boolean onPreferenceClick(Preference preference)
         {
-            switch (preference.getKey()) {
-            case Preferences.PREF_DEF_FILE: {
+            if (Preferences.PREF_DEF_FILE.equals(preference.getKey())) {
                 Intent intent = new Intent(Intent.ACTION_CREATE_SHORTCUT, null,
-                                           getContext(),
-                                           LauncherFileShortcuts.class);
-                intent.putExtra(LauncherFileShortcuts.EXTRA_IS_DEFAULT_FILE,
-                                true);
+                        getContext(),
+                        LauncherFileShortcuts.class);
+                intent.putExtra(LauncherFileShortcuts.EXTRA_IS_DEFAULT_FILE, true);
                 startActivityForResult(intent, REQUEST_DEFAULT_FILE);
                 return true;
-            }
             }
             return false;
         }
 
         @Override
-        public boolean onActivityResult(int requestCode, int resultCode,
-                                        Intent data)
+        public boolean onActivityResult(int requestCode, int resultCode, Intent data)
         {
-            switch (requestCode) {
-            case REQUEST_DEFAULT_FILE: {
+            if (requestCode == REQUEST_DEFAULT_FILE) {
                 if (resultCode != Activity.RESULT_OK) {
                     return true;
                 }
-                Intent val =
-                        data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
+
+                Intent val = data.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
                 Uri uri = (val != null) ? val.getData() : null;
                 setDefFilePref((uri != null) ? uri.toString() : null);
+
                 return true;
             }
-            default: {
-                return false;
-            }
-            }
+
+            return false;
         }
 
         /**
@@ -861,8 +864,8 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         {
 
             setSummary(Preferences.PREF_ABOUT_VERSION, AboutUtils.getVersion(requireActivity()));
-            setSummary(Preferences.PREF_ABOUT_BUILD_ID, BuildConfig.BUILD_DATE);
-            setSummary(Preferences.PREF_ABOUT_BUILD_ID, BuildConfig.BUILD_DATE);
+            setSummary(Preferences.PREF_ABOUT_BUILD_DATE, BuildConfig.BUILD_DATE);
+            setSummary(Preferences.PREF_ABOUT_BUILD_ID, BuildConfig.BUILD_ID);
 
             if(!itsListener.isFileOpen()) {
                 return;

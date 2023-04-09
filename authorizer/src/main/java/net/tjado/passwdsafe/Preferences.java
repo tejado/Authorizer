@@ -167,6 +167,12 @@ public class Preferences
     public static final String PREF_USB_NATIVE_MODE = "usbNativeModePref";
     private static final boolean PREF_USB_NATIVE_MODE_DEF = false;
 
+    public static final String PREF_BLUETOOTH_ENABLED = "bluetoothEnabledPref";
+    private static final boolean PREF_BLUETOOTH_ENABLED_DEF = true;
+
+    public static final String PREF_BLUETOOTH_FIDO_ENABLED = "bluetoothFidoPref";
+    private static final boolean PREF_BLUETOOTH_FIDO_ENABLED_DEF = true;
+
     public static final String PREF_FILE_WRITEABLE = "fileWriteablePref";
 
     public static final String PREF_ABOUT = "aboutOptions";
@@ -183,6 +189,7 @@ public class Preferences
     public static final String PREF_ABOUT_BUILD_DATE = "buildDatePref";
     public static final String PREF_FRAG_RELEASENOTES = "releaseNotesFrag";
     public static final String PREF_FRAG_LICENSES = "licensesFrag";
+    public static final String PREF_FRAG_BLUETOOTH = "bluetoothFrag";
 
     private static final String TAG = "Preferences";
 
@@ -552,6 +559,42 @@ public class Preferences
     {
         return prefs.getBoolean(PREF_USB_NATIVE_MODE,
                                 PREF_USB_NATIVE_MODE_DEF);
+    }
+
+    /**
+     * Get whether to enable Bluetooth
+     */
+    public static boolean getBluetoothEnabled(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_BLUETOOTH_ENABLED,
+                PREF_BLUETOOTH_ENABLED_DEF);
+    }
+
+    /**
+     * Set the preference whether Bluetooth is enabled or not
+     */
+    public static void setBluetoothEnabledPref(boolean enabled,
+                                                 SharedPreferences prefs)
+    {
+        prefs.edit().putBoolean(PREF_BLUETOOTH_ENABLED, enabled).apply();
+    }
+
+    /**
+     * Get whether to enable Bluetooth FIDO U2F/WebAuthn
+     */
+    public static boolean getBluetoothFidoEnabled(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_BLUETOOTH_FIDO_ENABLED,
+                PREF_BLUETOOTH_FIDO_ENABLED_DEF);
+    }
+
+    /**
+     * Set the preference whether Bluetooth is enabled or not
+     */
+    public static void setBluetoothFidoEnabledPref(boolean enabled,
+                                               SharedPreferences prefs)
+    {
+        prefs.edit().putBoolean(PREF_BLUETOOTH_FIDO_ENABLED, enabled).apply();
     }
 
     /**

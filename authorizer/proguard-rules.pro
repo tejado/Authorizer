@@ -18,3 +18,6 @@
 
 -keep,includedescriptorclasses class net.tjado.passwdsafe.lib.StartupReceiver
 -keep class net.tjado.authorizer.*
+-keepclasseswithmembernames,includedescriptorclasses class org.pwsafe.lib.crypto.SHA256Pws {
+    native <methods>;
+}

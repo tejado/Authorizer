@@ -15,11 +15,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.mikepenz.iconics.Iconics;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.tjado.passwdsafe.file.PasswdExpiryFilter;
@@ -54,6 +56,8 @@ public final class PasswdSafeApp extends Application
     private NotificationMgr itsNotifyMgr;
     private boolean itsIsOpenDefault = true;
     private final ExecutorService itsThreadExecutor = Executors.newSingleThreadExecutor();
+
+    private PasswdSafe passwdSafeActivity;
 
     private static final String TAG = "PasswdSafeApp";
 
@@ -100,6 +104,47 @@ public final class PasswdSafeApp extends Application
         Iconics.registerFont(new MaterialDesignIconic());
 
         initPrefs(prefs);
+
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+
+            @Override
+            public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle bundle) {
+                PasswdSafeUtil.dbginfo(TAG, "onActivityCreated: " + activity.getPackageName());
+            }
+            @Override
+            public void onActivityStarted(Activity activity) {
+                PasswdSafeUtil.dbginfo(TAG, "onActivityStarted: " + activity.getPackageName());
+            }
+            @Override
+            public void onActivityResumed(Activity activity) {
+                PasswdSafeUtil.dbginfo(TAG, "onActivityResumed: " + activity.getPackageName());
+                if(activity instanceof PasswdSafe) {
+                    passwdSafeActivity = (PasswdSafe) activity;
+                }
+            }
+            @Override
+            public void onActivityPaused(Activity activity) {
+                PasswdSafeUtil.dbginfo(TAG, "onActivityPaused: " + activity.getPackageName());
+                if(activity instanceof PasswdSafe) {
+                    passwdSafeActivity = null;
+                }
+            }
+            @Override
+            public void onActivityStopped(Activity activity) {
+                PasswdSafeUtil.dbginfo(TAG, "onActivityStopped: " + activity.getPackageName());
+            }
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+            }
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+                PasswdSafeUtil.dbginfo(TAG, "onActivityDestroyed: " + activity.getPackageName());
+            }
+        });
+    }
+
+    public PasswdSafe getActiveActivity(){
+        return passwdSafeActivity;
     }
 
     @Override
@@ -113,20 +158,12 @@ public final class PasswdSafeApp extends Application
             PasswdSafeUtil.dbginfo(TAG, "Preference change: %s, value: %s", key,
                                    prefs.getAll().get(key));
 
-            switch (key) {
-            case Preferences.PREF_PASSWD_ENC: {
+            if (Preferences.PREF_PASSWD_ENC.equals(key)) {
                 setPasswordEncodingPref(prefs);
-                break;
-            }
-            case Preferences.PREF_PASSWD_DEFAULT_SYMS: {
+            } else if (Preferences.PREF_PASSWD_DEFAULT_SYMS.equals(key)) {
                 setPasswordDefaultSymsPref(prefs);
-                break;
-            }
-            case Preferences.PREF_PASSWD_EXPIRY_NOTIF: {
-                itsNotifyMgr.setPasswdExpiryFilter(
-                        getPasswdExpiryNotifPref(prefs));
-                break;
-            }
+            } else if (Preferences.PREF_PASSWD_EXPIRY_NOTIF.equals(key)) {
+                itsNotifyMgr.setPasswdExpiryFilter(getPasswdExpiryNotifPref(prefs));
             }
         }
     }
@@ -305,7 +342,6 @@ public final class PasswdSafeApp extends Application
     {
         setPasswordEncodingPref(prefs);
         setPasswordDefaultSymsPref(prefs);
-        itsDefaultPasswdPolicy = Preferences.getDefPasswdPolicyPref(prefs,
-                                                                    this);
+        itsDefaultPasswdPolicy = Preferences.getDefPasswdPolicyPref(prefs, this);
     }
 }

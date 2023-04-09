@@ -27,7 +27,7 @@ public abstract class AbstractPasswdSafeLocationFragment
     /**
      * Wrapper class for record information
      */
-    protected static class RecordInfo
+    public static class RecordInfo
     {
         protected final PwsRecord itsRec;
         protected final PasswdRecord itsPasswdRec;
@@ -60,7 +60,7 @@ public abstract class AbstractPasswdSafeLocationFragment
     /**
      * Interfaces for users of file data with an optional record
      */
-    protected interface RecordFileUser<RetT>
+    public interface RecordFileUser<RetT>
     {
         /**
          * Callback to use the file data and record

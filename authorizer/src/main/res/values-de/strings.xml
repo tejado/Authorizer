@@ -224,7 +224,7 @@
     <string name="no_biometrics_registered">Es ist kein biometrisches Merkmal registriert</string>
     <string name="no_errors">Keine Fehler</string>
     <string name="no_file_permission">
-        PasswdSafe benötigt Speicherberechtigung
+        Authorizer benötigt Speicherberechtigung
         \n\nDrücke Neu Laden um diese neu zu gewähren, wenn dies nicht geht,
         können Sie die Speicherberechtigung in den App-Einstellungen aktivieren.
     </string>
@@ -791,4 +791,90 @@
     <string name="usb_native_mode">USB Auto-Type Native Mode</string>
     <string name="usb_native_mode_summary">Expertenmodus: USB Gadget Zugriff ohne root</string>
     <string name="writeable_summary">Schreibmodus der aktuellen geöffneten Datei aktivieren</string>
+
+    <string name="bluetooth">Bluetooth</string>
+    <string name="bt_scan_description">Um nach Bluetooth Geräten in deiner Umgebung zu suchen, starte den Gerätescan.</string>
+    <string name="bt_stop_scan">Stoppe Gerätescan</string>
+    <string name="bt_start_scan">Starte Gerätescan</string>
+    <string name="bt_no_scan_permission_desc">Bluetooth Scan ist aufgrund von fehlenden Berechtigungen deaktiviert.\n\Drücke \"Berechtigungen anfordern\" - wenn keine Anfrage angezeigt wird, klicke auf App-Einstellungen und erlaube den Zugriff auf den Standort.</string>
+    <string name="bt_paired_as">Gekoppelt als %s</string>
+    <string name="bt_no_unpair">Funktion \'removeBond\' nicht gefunden! Bitte das Gerät über die Android Einstellungen entkoppeln!</string>
+    <string name="bt_pairing_no_service">Authorizer Bluetooth Dienst ist nicht Verfügbar. Kopplung nicht möglich!</string>
+    <string name="bt_feature_enable">Aktiviere Bluetooth Feature</string>
+    <string name="bt_fido_enable">Aktiviere FIDO U2F/WebAuthn</string>
+    <string name="bt_paired_devices">Gekoppelte Geräte</string>
+    <string name="bt_no_paired_devices">Keine Geräte gekoppelt!</string>
+    <string name="bt_available_devices">Gefundene Geräte</string>
+    <string name="bt_feature_disabled">Bluetooth Feature ist in Authorizer deaktiviert!</string>
+    <string name="bt_switched_off">Bluetooth ist nicht eingeschaltet!</string>
+    <string name="bt_api_too_old">Die Android Version ist zu alt und unterstützt die erforderlichen Bluetooth Funktion nicht.</string>
+    <string name="bt_no_adapter">Keinen Bluetooth Adapter gefunden.</string>
+    <string name="bt_unpair">Gerät entfernen</string>
+    <string name="bt_reconnect">Verbinden</string>
+    <string name="bt_connected">Verbunden</string>
+    <string name="bt_pair_keyboard">Koppeln als Tastatur</string>
+    <string name="bt_pair_fido">Koppeln als FIDO Key</string>
+    <string name="bt_autotype_no_devices"><![CDATA[Keine Geräte im Tastatur-Modus gekoppelt!\nBitte die Geräte nur innerhalb Authoirzer koppeln (Einstellungen -> Bluetooth).]]></string>
+    <string name="bt_autotype_no_service">Authorizer Bluetooth Service ist nicht verfügbar. Auto-typing ist dadurch nicht möglich!</string>
+    <string name="bt_unclean_state_error"><![CDATA[Bluetooth HID Stack ist in einem fehlerhaften Zustand - bitte beenden und starten Sie Bluetooth in Android und versuchen Sie es erneut!]]></string>
+    <string name="bt_unpair_info">Heben Sie zunächst die Kopplung auf dem gekoppelten Gerät auf.\n\nSobald das geschehen ist, bestätigen Sie diesen Dialog.</string>
+    <string name="bt_help"><![CDATA[In Authorizer gibt es zwei Hauptfunktionen, die über Bluetooth verwendet werden können:
+    \n - Auto-Type (Tastatur)
+    \n - FIDO-Sicherheitsschlüssel: U2F & WebAuthn
+    \n\nWenn Sie Bluetooth überhaupt nicht verwenden möchten, deaktivieren Sie es in den Einstellungen.
+    \n\nWenn Sie es verwenden möchten, stellen Sie bitte sicher, dass Sie Geräte nur über den Authorizer und nicht über die Android-Einstellungen koppeln. Dies ist notwendig, da sonst dem gekoppelten Gerät nicht die entsprechende Funktion (Tastatur oder FIDO-Schlüssel) zugewiesen werden kann.
+    \n\nLeider kann ein Gerät aufgrund von Einschränkungen im Bluetooth-Stack nur als Tastatur ODER als FIDO-Sicherheitsschlüssel gekoppelt werden und nicht beides.
+    \n\nAußerdem kann sich die Bluetooth-Funktionalität im Authorizer instabil verhalten, abhängig von den Gerätetreibern, der Android-Version und dem jeweiligen gekoppelten Gerät.
+    \n\nBitte informieren Sie den Entwickler über etwaige Probleme.]]></string>
+
+    <string name="notification_body_bt_unclean"><![CDATA[ACHTUNG: Bitte beenden und starten Sie den Bluetooth-Dienst in Ihren Android Systemeinstellungen!]]></string>
+    <string name="notification_body_init">Initialisiere Bluetooth...</string>
+
+    <string name="settings">Einstellungen</string>
+    <string name="default_option">Default</string>
+    <string name="request_permission">Berechtigungen anfordern</string>
+    <string name="set_as_default">Als Standard festlegen</string>
+
+    <!-- net.tjado.webauthn -->
+    <string name="dialog_select_credential">Wählen Sie einen Eintrag zum Anmelden aus</string>
+
+    <string name="dialog_excludedTitle">Dieser Authentifikator ist ausgeschlossen</string>
+    <string name="dialog_excludedSubtitle">Wählen Sie eine der beiden Optionen, um fortzufahren</string>
+
+    <string name="credentials_makeTitle">Registrierungsanfrage von %s</string>
+    <string name="credentials_makeSubtitle">Möchten Sie sich mit\n\n\tBenutzername: %s\n\tName: %s\n\nauf der Webseite "%s" (%s) registieren?</string>
+    <string name="credentials_userName">Benutzername: %s\n</string>
+    <string name="credentials_userId">Benutzer-ID: %s</string>
+
+    <string name="credentials_deleteTitle">Eingehende Anfrage zum Löschen von Anmeldeinformationen</string>
+    <string name="credentials_deleteSubtitle">Anmeldeinformation "%s" für die Webseite "%s" löschen?</string>
+    <string name="credentials_deleteAllTitle">Löschung aller gespeicherten Anmeldeinformationen</string>
+    <string name="credentials_deleteAllSubtitle">Sind Sie sicher? Bestätigen, um fortzufahren!</string>
+
+    <string name="pin_missed3Title">3 aufeinanderfolgende PIN-Fehlversuche, Authentifizierung gesperrt!</string>
+    <string name="pin_missed3Subtitle">Ok</string>
+    <string name="pin_nullPinTitle">Leere PIN empfangen</string>
+    <string name="pin_nullPinSubtitle">Möchten Sie fortfahren?</string>
+    <string name="pin_resetTitle">Anfrage zum PIN-Reset</string>
+    <string name="pin_resetSubtitle">Möchten Sie fortfahren?</string>
+    <string name="pin_changeTitle">Anfrage zur PIN-Änderung</string>
+    <string name="pin_changeSubtitle">Möchten Sie fortfahren und die Änderung anwenden?</string>
+
+    <string name="reset_requestTitle">Eingehende Anfrage zum RESET des Authentifikators</string>
+    <string name="reset_requestSubtitle">Sind Sie sicher, dass alle FIDO Anmeldedaten gelöscht werden sollen?</string>
+
+    <string name="request_title">Login für %s</string>
+    <string name="request_subtitle">Möchten Sie fortfahren?</string>
+    <string name="request_subtitleDialog">Möchten Sie sich mit:\n\n\tBenutzername: %s\n\tName: %s\n\nauf der Webseite "%s" (%s) anmelden?</string>
+
+    <string name="extensions_txsimpleAuth_suffix">Nachricht vom Server:\n</string>
+
+    <string name="u2f_registerTitle">U2F Registrierungsanfrage</string>
+    <string name="u2f_registerSubtitle">Möchten Sie fortfahren?</string>
+    <string name="u2f_registerDummyTitle">Eingehende DUMMY U2F Registrierungsanfrage</string>
+    <string name="u2f_registerDummySubtitle">Möchten Sie fortfahren?</string>
+
+    <string name="notification_title_actionrequired">"Aktion erforderlich"</string>
+    <string name="notification_body_actionrequired">Authentifizierungsanfrage</string>
+    <string name="notification_body_foregroundservice">Bluetooth Service läuft im Hintergrund</string>
 </resources>

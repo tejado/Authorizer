@@ -42,6 +42,10 @@ android {
     }
 }
 
+if (project.file('../sign/sign.gradle').exists()) {
+    apply from: '../sign/sign.gradle'
+}
+
 dependencies {
     api 'androidx.annotation:annotation:1.5.0'
     api 'androidx.appcompat:appcompat:1.6.0-rc01'

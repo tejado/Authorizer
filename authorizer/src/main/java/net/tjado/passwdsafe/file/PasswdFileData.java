@@ -566,6 +566,114 @@ public class PasswdFileData
         setField(str, rec, PwsRecordV3.AUTOTYPE_RETURNSUFFIX);
     }
 
+    /** Get the FIDO RP ID in a record */
+    public final String getFidoRpId(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.FIDO_RP_ID);
+    }
+
+    /** Set the FIDO RP ID for a record */
+    public final void setFidoRpId(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_RP_ID);
+    }
+
+    /** Get the FIDO RP NAME in a record */
+    public final String getFidoRpName(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.FIDO_RP_NAME);
+    }
+
+    /** Set the FIDO RP NAME for a record */
+    public final void setFidoRpName(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_RP_NAME);
+    }
+
+    /** Get the FIDO User Handle in a record */
+    public final String getFidoUserHandle(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.FIDO_USER_HANDLE);
+    }
+
+    /** Set the FIDO User Handle for a record */
+    public final void setFidoUserHandle(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_USER_HANDLE);
+    }
+
+    /** Get the FIDO User Name in a record */
+    public final String getFidoUserName(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.FIDO_USER_NAME);
+    }
+
+    /** Set the FIDO User Name for a record */
+    public final void setFidoUserName(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_USER_NAME);
+    }
+
+    /** Get the FIDO User Display Name in a record */
+    public final String getFidoUserDisplayName(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.FIDO_USER_DISPLAYNAME);
+    }
+
+    /** Set the FIDO User Display Name for a record */
+    public final void setFidoUserDisplayName(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_USER_DISPLAYNAME);
+    }
+
+    /** Get the FIDO HMAC Secret in a record */
+    public final String getFidoHmacSecret(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.FIDO_HMAC_SECRET);
+    }
+
+    /** Set the FIDO HMAC Secret for a record */
+    public final void setFidoHmacSecret(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_HMAC_SECRET);
+    }
+
+    /** Get the FIDO U2F RP ID in a record */
+    public final String getFidoU2fRpId(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.FIDO_U2F_RP_ID);
+    }
+
+    /** Set the FIDO U2F RP ID for a record */
+    public final void setFidoU2fRpId(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_U2F_RP_ID);
+    }
+
+    /** Get the FIDO Key Pair in a record */
+    public final String getFidoKeyPair(PwsRecord rec)
+    {
+        return getField(rec, PwsRecordV3.FIDO_KEY_PAIR);
+    }
+
+    /** Set the FIDO Key Pair for a record */
+    public final void setFidoKeyPair(String str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_KEY_PAIR);
+    }
+
+    /** Get the FIDO Key Use Counter in a record */
+    public final Integer getFidoKeyUseCounter(PwsRecord rec)
+    {
+        return getIntField(rec, PwsRecordV3.FIDO_KEY_USE_COUNTER);
+    }
+
+    /** Set the FIDO Key Use Counter for a record */
+    public final void setFidoKeyUseCounter(Integer str, PwsRecord rec)
+    {
+        setField(str, rec, PwsRecordV3.FIDO_KEY_USE_COUNTER);
+    }
+
     public final boolean isProtected(PwsRecord rec)
     {
         boolean prot = false;
@@ -1197,6 +1305,14 @@ public class PasswdFileData
             case PwsRecordV3.URL:
             case PwsRecordV3.ICON:
             case PwsRecordV3.OTP:
+            case PwsRecordV3.FIDO_RP_ID:
+            case PwsRecordV3.FIDO_RP_NAME:
+            case PwsRecordV3.FIDO_USER_HANDLE:
+            case PwsRecordV3.FIDO_USER_NAME:
+            case PwsRecordV3.FIDO_USER_DISPLAYNAME:
+            case PwsRecordV3.FIDO_U2F_RP_ID:
+            case PwsRecordV3.FIDO_KEY_PAIR:
+            case PwsRecordV3.FIDO_HMAC_SECRET:
             case PwsRecordV3.USERNAME:
             case PwsRecordV3.PASSWORD_HISTORY:
             case PwsRecordV3.PASSWORD_POLICY:
@@ -1233,7 +1349,8 @@ public class PasswdFileData
             }
             case PwsRecordV3.AUTOTYPE_DELIMITER:
             case PwsRecordV3.AUTOTYPE_RETURNSUFFIX:
-            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL: {
+            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL:
+            case PwsRecordV3.FIDO_KEY_USE_COUNTER:{
                 Integer ival = (Integer)val;
                 if ((ival != null) && (ival != 0)) {
                     field = new PwsIntegerField(fieldId, ival);
