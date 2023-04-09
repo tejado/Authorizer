@@ -319,7 +319,7 @@ public class BluetoothFragment extends Fragment
     {
         super.onPause();
 
-        if (itsPermissionMgr.hasRequiredPerms()) {
+        if (itsPermissionMgr != null && itsPermissionMgr.hasRequiredPerms()) {
             stopBluetoothDiscovery();
 
             try {
