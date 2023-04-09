@@ -44,7 +44,6 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
 import android.content.DialogInterface;
-import android.bluetooth.BluetoothAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -57,6 +56,7 @@ import net.tjado.authorizer.OutputUsbKeyboard;
 import net.tjado.authorizer.Utilities;
 import net.tjado.bluetooth.BluetoothDeviceListing;
 import net.tjado.bluetooth.BluetoothDeviceWrapper;
+import net.tjado.bluetooth.BluetoothUtils;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdHistory;
 import net.tjado.passwdsafe.lib.ActContext;
@@ -969,14 +969,6 @@ public class PasswdSafeRecordBasicFragment
     }
 
 
-    public void enableBluetooth()
-    {
-        Intent enableBtIntent = new Intent(
-                BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-    }
-
-
     /**
      * Auto-Type over Bluetooth HID
      */
@@ -987,10 +979,11 @@ public class PasswdSafeRecordBasicFragment
                                    Boolean sendOTP)
     {
         BluetoothForegroundService btService = ((PasswdSafe) requireActivity()).btService;
-        if(btService == null) {
-            PasswdSafeUtil.showErrorMsg(getString(R.string.bt_autotype_no_service), new ActContext(requireActivity()));
-        } else if (!btService.isBluetoothEnabled()) {
-            Toast.makeText(getActivity(), "Bluetooth is disabled", Toast.LENGTH_LONG).show();
+        if (!BluetoothUtils.isBluetoothEnabled(requireActivity().getApplication())) {
+            Toast.makeText(getActivity(), R.string.bt_is_disabled, Toast.LENGTH_LONG).show();
+            return;
+        } else if(btService == null) {
+            Toast.makeText(getActivity(), getString(R.string.bt_autotype_no_service), Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -1100,7 +1093,7 @@ public class PasswdSafeRecordBasicFragment
 
         List<BluetoothDeviceWrapper> bondedDevices = new BluetoothDeviceListing(requireContext()).getAvailableKeyboardHostDevices();
         if(bondedDevices.size() < 1) {
-            PasswdSafeUtil.showErrorMsg(getString(R.string.bt_autotype_no_devices), new ActContext(requireContext()));
+            Toast.makeText(getActivity(), getString(R.string.bt_autotype_no_devices), Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -1118,7 +1111,7 @@ public class PasswdSafeRecordBasicFragment
                     PasswdSafeUtil.dbginfo(TAG, "btService.isAppRegistered is TRUE");
                 } else {
                     PasswdSafeUtil.dbginfo(TAG, "btService.isAppRegistered is FALSE");
-                    PasswdSafeUtil.showErrorMsg(getString(R.string.bt_unclean_state_error), new ActContext(requireContext()));
+                    Toast.makeText(getActivity(), getString(R.string.bt_unclean_state_error), Toast.LENGTH_LONG).show();
                 }
             }, 200);
        });

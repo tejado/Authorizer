@@ -308,22 +308,9 @@ public class BluetoothForegroundService extends Service {
         return hidDeviceController.getConnectedDevice();
     }
 
-    public boolean isBluetoothEnabled()
-    {
-        BluetoothManager bluetoothManager = (BluetoothManager) getApplication().getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter btAdapter = bluetoothManager.getAdapter();
-        if (btAdapter != null) {
-            return btAdapter.isEnabled();
-        }
-
-        return false;
-    }
-
-
     public boolean isAppRegistered() {
         return !isBtProfileAlreadyRegistered && hidDeviceController.getRegisterAppStatus();
     }
-
 
     private void checkBluetoothState(Integer state) {
         if (state == null) {

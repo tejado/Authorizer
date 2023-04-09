@@ -9,7 +9,10 @@ package net.tjado.bluetooth;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Application;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -105,6 +108,16 @@ public class BluetoothUtils {
         return (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED);
     }
 
+    public static boolean isBluetoothEnabled(Application application)
+    {
+        BluetoothManager bluetoothManager = (BluetoothManager) application.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter btAdapter = bluetoothManager.getAdapter();
+        if (btAdapter != null) {
+            return btAdapter.isEnabled();
+        }
+
+        return false;
+    }
 
     public static String parseBondState(int state) {
         if (state == BluetoothDevice.BOND_BONDED) {

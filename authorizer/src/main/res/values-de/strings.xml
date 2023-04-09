@@ -826,6 +826,7 @@
     \n\nLeider kann ein Gerät aufgrund von Einschränkungen im Bluetooth-Stack nur als Tastatur ODER als FIDO-Sicherheitsschlüssel gekoppelt werden und nicht beides.
     \n\nAußerdem kann sich die Bluetooth-Funktionalität im Authorizer instabil verhalten, abhängig von den Gerätetreibern, der Android-Version und dem jeweiligen gekoppelten Gerät.
     \n\nBitte informieren Sie den Entwickler über etwaige Probleme.]]></string>
+    <string name="bt_is_disabled">Nicht möglich - Bluetooth ist deaktiviert.</string>
 
     <string name="notification_body_bt_unclean"><![CDATA[ACHTUNG: Bitte beenden und starten Sie den Bluetooth-Dienst in Ihren Android Systemeinstellungen!]]></string>
     <string name="notification_body_init">Initialisiere Bluetooth...</string>

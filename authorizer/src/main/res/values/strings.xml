@@ -821,6 +821,7 @@
     \n\nUnfortunately, a device can only be paired as Keyboard OR as FIDO Security key and not both due to limitations in the Bluetooth stack.
     \n\nAdditionally, Bluetooth functionality in Authorizer could behave unstable, depending on device drivers, Android version and the respective paired device.
     \n\nPlease inform the developer about any issues.]]></string>
+    <string name="bt_is_disabled">Not possible - Bluetooth is disabled</string>
 
     <string name="notification_body_bt_unclean"><![CDATA[ATTENTION: Please stop & start Bluetooth service in your Systems settings!]]></string>
     <string name="notification_body_init">Initializing Bluetooth...</string>
