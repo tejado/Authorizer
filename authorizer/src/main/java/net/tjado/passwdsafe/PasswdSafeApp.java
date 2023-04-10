@@ -305,33 +305,33 @@ public final class PasswdSafeApp extends Application
 
         SharedPreferences prefs = Preferences.getSharedPrefs(act);
         switch (Preferences.getDisplayTheme(prefs)) {
-        case FOLLOW_SYSTEM: {
-            uimode = act.getResources().getConfiguration().uiMode &
-                     Configuration.UI_MODE_NIGHT_MASK;
-            break;
-        }
-        case LIGHT: {
-            uimode = Configuration.UI_MODE_NIGHT_NO;
-            break;
-        }
-        case DARK: {
-            uimode = Configuration.UI_MODE_NIGHT_YES;
-            break;
-        }
+            case FOLLOW_SYSTEM: {
+                uimode = act.getResources().getConfiguration().uiMode &
+                         Configuration.UI_MODE_NIGHT_MASK;
+                break;
+            }
+            case LIGHT: {
+                uimode = Configuration.UI_MODE_NIGHT_NO;
+                break;
+            }
+            case DARK: {
+                uimode = Configuration.UI_MODE_NIGHT_YES;
+                break;
+            }
         }
 
         switch (uimode) {
-        case Configuration.UI_MODE_NIGHT_NO:
-        case Configuration.UI_MODE_NIGHT_UNDEFINED: {
-            act.setTheme(isDialog ? R.style.PwsAppTheme_Dialog :
-                                 R.style.PwsAppTheme);
-            break;
-        }
-        case Configuration.UI_MODE_NIGHT_YES: {
-            act.setTheme(isDialog ? R.style.PwsAppThemeDark_Dialog :
-                                 R.style.PwsAppThemeDark);
-            break;
-        }
+            case Configuration.UI_MODE_NIGHT_NO:
+            case Configuration.UI_MODE_NIGHT_UNDEFINED: {
+                act.setTheme(isDialog ? R.style.PwsAppTheme_Dialog :
+                                     R.style.PwsAppTheme);
+                break;
+            }
+            case Configuration.UI_MODE_NIGHT_YES: {
+                act.setTheme(isDialog ? R.style.PwsAppThemeDark_Dialog :
+                                     R.style.PwsAppThemeDark);
+                break;
+            }
         }
     }
 
