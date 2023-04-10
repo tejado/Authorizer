@@ -309,7 +309,7 @@ public class BluetoothForegroundService extends Service {
     }
 
     public boolean isAppRegistered() {
-        return !isBtProfileAlreadyRegistered && hidDeviceController.getRegisterAppStatus();
+        return !isBtProfileAlreadyRegistered /*&& hidDeviceController.getRegisterAppStatus()*/;
     }
 
     private void checkBluetoothState(Integer state) {
