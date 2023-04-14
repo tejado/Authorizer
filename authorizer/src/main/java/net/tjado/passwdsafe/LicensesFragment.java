@@ -45,7 +45,7 @@ public class LicensesFragment extends Fragment
             extends AbstractPasswdSafeFileDataFragment.Listener
     {
         /** Update the view */
-        void updateViewLicenses();
+        void updateViewPrefLicenses();
     }
 
     private Listener itsListener;
@@ -97,7 +97,7 @@ public class LicensesFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewLicenses();
+        itsListener.updateViewPrefLicenses();
     }
 
     @Override

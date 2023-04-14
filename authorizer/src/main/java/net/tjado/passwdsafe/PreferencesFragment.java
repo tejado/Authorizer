@@ -81,11 +81,13 @@ public class PreferencesFragment extends PreferenceFragmentCompat
 
         boolean isFileOpen();
 
-        void showReleaseNotes();
+        void showPrefReleaseNotes();
 
-        void showLicenses();
+        void showPrefLicenses();
 
-        void showBluetooth();
+        void showPrefBluetooth();
+
+        void showPrefUsernames();
     }
 
     public static final String SCREEN_RECORD = "recordOptions";
@@ -294,6 +296,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat
             LongPreference itsBluetoothFrag = requirePreference(Preferences.PREF_FRAG_BLUETOOTH);
             itsBluetoothFrag.setOnPreferenceClickListener(this);
 
+            LongPreference itsUsernamesFrag = requirePreference(Preferences.PREF_FRAG_USERNAMES);
+            itsUsernamesFrag.setOnPreferenceClickListener(this);
+
             LongSwitchPreference itsWriteable = requirePreference(Preferences.PREF_FILE_WRITEABLE);
             itsWriteable.setChecked(itsListener.isFileWritable());
             if(itsListener.isFileWriteCapable()) {
@@ -312,15 +317,19 @@ public class PreferencesFragment extends PreferenceFragmentCompat
         {
             switch (preference.getKey()) {
                 case Preferences.PREF_FRAG_RELEASENOTES: {
-                    itsListener.showReleaseNotes();
+                    itsListener.showPrefReleaseNotes();
                     return true;
                 }
                 case Preferences.PREF_FRAG_LICENSES: {
-                    itsListener.showLicenses();
+                    itsListener.showPrefLicenses();
                     return true;
                 }
                 case Preferences.PREF_FRAG_BLUETOOTH: {
-                    itsListener.showBluetooth();
+                    itsListener.showPrefBluetooth();
+                    return true;
+                }
+                case Preferences.PREF_FRAG_USERNAMES: {
+                    itsListener.showPrefUsernames();
                     return true;
                 }
             }

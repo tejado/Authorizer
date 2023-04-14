@@ -836,6 +836,11 @@
     <string name="request_permission">Berechtigungen anfordern</string>
     <string name="set_as_default">Als Standard festlegen</string>
 
+    <string name="usernames">Benutzernamen</string>
+    <string name="usernames_description"><![CDATA[Hier können Sie Benutzernamen anlegen, die während der Bearbeitung von Einträgen schnell ausgewählt werden können.
+\n\nFügen Sie {TITLE} in den Benutzernamen ein, um es automatisch durch den Titel des Datensatzes zu ersetzen. Wenn zum Beispiel der Titel "github" ist und Ihre Benutzernamenvorlage "name+{TITLE}@mail.com" lautet, wird der generierte Benutzername "name+github@mail.com" sein.
+\n\nUm die Cursorposition für nahtloses Bearbeiten anzugeben, fügen Sie das Zeichen "#" im Benutzernamen ein. Wenn zum Beispiel Ihre Benutzernamenvorlage "name+{TITLE}#@mail.com" lautet, wird der Cursor direkt nach dem ersetzen Titel positioniert, wenn der Eintrag ausgewählt ist.]]></string>
+
     <!-- net.tjado.webauthn -->
     <string name="dialog_select_credential">Wählen Sie einen Eintrag zum Anmelden aus</string>
 

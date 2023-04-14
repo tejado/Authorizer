@@ -119,6 +119,7 @@ public class PasswdSafe extends AppCompatActivity
                    ReleaseNotesFragment.Listener,
                    LicensesFragment.Listener,
                    BluetoothFragment.Listener,
+                   UsernamesFragment.Listener,
                    PreferencesFragment.Listener,
                    PreferenceFragmentCompat.OnPreferenceStartScreenCallback
 {
@@ -167,11 +168,13 @@ public class PasswdSafe extends AppCompatActivity
         /** Refresh the preferences */
         REFRESH_PREFERENCES,
         /** Viewing release notes */
-        VIEW_RELEASE_NOTES,
+        VIEW_PREF_RELEASE_NOTES,
         /** Viewing license/credits info */
-        VIEW_LICENSES,
+        VIEW_PREF_LICENSES,
         /** Viewing bluetooth settings */
-        VIEW_BLUETOOTH,
+        VIEW_PREF_BLUETOOTH,
+        /** Viewing username settings */
+        VIEW_PREF_USERNAMES,
         /** View backup files */
         BACKUP_FILES,
         /** View files */
@@ -205,11 +208,13 @@ public class PasswdSafe extends AppCompatActivity
         /** Viewing preferences */
         VIEW_PREFERENCES,
         /** Viewing release notes */
-        VIEW_RELEASE_NOTES,
+        VIEW_PREF_RELEASE_NOTES,
         /** Viewing license/credits info */
-        VIEW_LICENSES,
+        VIEW_PREF_LICENSES,
         /** Viewing bluetooth settings */
-        VIEW_BLUETOOTH,
+        VIEW_PREF_BLUETOOTH,
+        /** Viewing usernames settings */
+        VIEW_PREF_USERNAMES,
         /** Viewing backup files */
         BACKUP_FILES,
         /** Viewing files */
@@ -620,7 +625,7 @@ public class PasswdSafe extends AppCompatActivity
         super.onStart();
 
         if (AboutUtils.checkShowNotes(this)) {
-            showReleaseNotes();
+            showPrefReleaseNotes();
         }
 
         if(!ApiCompat.supportsBluetoothHid()) {
@@ -725,7 +730,7 @@ public class PasswdSafe extends AppCompatActivity
                     break;
                 }
                 case VIEW_RECORD: {
-                    options.set(MENU_BIT_CAN_ADD, fileEditable);
+                    options.set(MENU_BIT_CAN_ADD, false);
                     options.set(MENU_BIT_HAS_RESTORE, fileCanRestore);
                     options.set(MENU_BIT_HAS_RESTORE_ENABLED, fileCanRestoreEnabled);
                     options.set(MENU_BIT_HAS_CLOSE, true);
@@ -743,9 +748,10 @@ public class PasswdSafe extends AppCompatActivity
                 case FILE_NEW:
                 case EDIT_RECORD:
                 case CHANGING_PASSWORD:
-                case VIEW_RELEASE_NOTES:
-                case VIEW_LICENSES:
-                case VIEW_BLUETOOTH:
+                case VIEW_PREF_RELEASE_NOTES:
+                case VIEW_PREF_LICENSES:
+                case VIEW_PREF_BLUETOOTH:
+                case VIEW_PREF_USERNAMES:
                 case BACKUP_FILES:
                 case FILES: {
                     options.set(MENU_BIT_HAS_CLOSE, false);
@@ -969,11 +975,13 @@ public class PasswdSafe extends AppCompatActivity
                 } else if(frag instanceof PreferencesFragment) {
                     itsCurrViewMode = ViewMode.VIEW_PREFERENCES;
                 } else if(frag instanceof LicensesFragment) {
-                    itsCurrViewMode = ViewMode.VIEW_LICENSES;
+                    itsCurrViewMode = ViewMode.VIEW_PREF_LICENSES;
                 } else if(frag instanceof ReleaseNotesFragment) {
-                    itsCurrViewMode = ViewMode.VIEW_RELEASE_NOTES;
-                }else if(frag instanceof BluetoothFragment) {
-                    itsCurrViewMode = ViewMode.VIEW_BLUETOOTH;
+                    itsCurrViewMode = ViewMode.VIEW_PREF_RELEASE_NOTES;
+                } else if(frag instanceof BluetoothFragment) {
+                    itsCurrViewMode = ViewMode.VIEW_PREF_BLUETOOTH;
+                } else if(frag instanceof UsernamesFragment) {
+                    itsCurrViewMode = ViewMode.VIEW_PREF_USERNAMES;
                 }
 
                 doUpdateView(itsCurrViewMode, itsLocation);
@@ -1096,25 +1104,33 @@ public class PasswdSafe extends AppCompatActivity
     /**
      * Show the release notes
      */
-    public void showReleaseNotes()
+    public void showPrefReleaseNotes()
     {
-        doShowReleaseNotes();
+        doShowPrefReleaseNotes();
     }
 
     /**
      * Show the preferences
      */
-    public void showLicenses()
+    public void showPrefLicenses()
     {
-        doShowLicenses();
+        doShowPrefLicenses();
     }
 
     /**
      * Show the preferences
      */
-    public void showBluetooth()
+    public void showPrefBluetooth()
     {
-        doShowBluetooth();
+        doShowPrefBluetooth();
+    }
+
+    /**
+     * Show the preferences
+     */
+    public void showPrefUsernames()
+    {
+        doShowPrefUsernames();
     }
 
     /**
@@ -1188,24 +1204,28 @@ public class PasswdSafe extends AppCompatActivity
                 doShowPreferences(true);
                 break;
             }
-            case VIEW_RELEASE_NOTES:{
-                doShowReleaseNotes();
+            case VIEW_PREF_RELEASE_NOTES:{
+                doShowPrefReleaseNotes();
                 break;
             }
-            case VIEW_LICENSES: {
-                doShowLicenses();
+            case VIEW_PREF_LICENSES: {
+                doShowPrefLicenses();
                 break;
             }
-            case VIEW_BLUETOOTH: {
-                doShowBluetooth();
+            case VIEW_PREF_BLUETOOTH: {
+                doShowPrefBluetooth();
+                break;
+            }
+            case VIEW_PREF_USERNAMES: {
+                doShowPrefUsernames();
                 break;
             }
             case FILES: {
-                doShowLicenses();
+                doShowPrefLicenses();
                 break;
             }
             case BACKUP_FILES: {
-                doShowLicenses();
+                doShowPrefLicenses();
                 break;
             }
             }
@@ -1651,21 +1671,26 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
-    public void updateViewLicenses()
+    public void updateViewPrefLicenses()
     {
-        doUpdateView(ViewMode.VIEW_LICENSES, itsLocation);
+        doUpdateView(ViewMode.VIEW_PREF_LICENSES, itsLocation);
     }
 
     @Override
-    public void updateViewBluetooth()
+    public void updateViewPrefBluetooth()
     {
-        doUpdateView(ViewMode.VIEW_BLUETOOTH, itsLocation);
+        doUpdateView(ViewMode.VIEW_PREF_BLUETOOTH, itsLocation);
+    }
+
+    public void updateViewPrefUsernames()
+    {
+        doUpdateView(ViewMode.VIEW_PREF_USERNAMES, itsLocation);
     }
 
     @Override
-    public void updateViewReleaseNotes()
+    public void updateViewPrefReleaseNotes()
     {
-        doUpdateView(ViewMode.VIEW_RELEASE_NOTES, itsLocation);
+        doUpdateView(ViewMode.VIEW_PREF_RELEASE_NOTES, itsLocation);
     }
 
     @Override
@@ -2000,28 +2025,37 @@ public class PasswdSafe extends AppCompatActivity
     /**
      * Show the release notes
      */
-    private void doShowReleaseNotes()
+    private void doShowPrefReleaseNotes()
     {
-        doChangeView(ChangeMode.VIEW_RELEASE_NOTES,
+        doChangeView(ChangeMode.VIEW_PREF_RELEASE_NOTES,
                      ReleaseNotesFragment.newInstance());
     }
 
     /**
      * Show the licenses/credits
      */
-    private void doShowLicenses()
+    private void doShowPrefLicenses()
     {
-        doChangeView(ChangeMode.VIEW_LICENSES,
+        doChangeView(ChangeMode.VIEW_PREF_LICENSES,
                      LicensesFragment.newInstance());
     }
 
     /**
-     * Show the licenses/credits
+     * Show bluetooth preferences
      */
-    private void doShowBluetooth()
+    private void doShowPrefBluetooth()
     {
-        doChangeView(ChangeMode.VIEW_BLUETOOTH,
+        doChangeView(ChangeMode.VIEW_PREF_BLUETOOTH,
                 BluetoothFragment.newInstance());
+    }
+
+    /**
+     * Show username preferences
+     */
+    private void doShowPrefUsernames()
+    {
+        doChangeView(ChangeMode.VIEW_PREF_USERNAMES,
+                UsernamesFragment.newInstance());
     }
 
     /**
@@ -2088,9 +2122,10 @@ public class PasswdSafe extends AppCompatActivity
             case VIEW_POLICY_LIST:
             case VIEW_RECORD_ERRORS:
             case VIEW_PREFERENCES:
-            case VIEW_RELEASE_NOTES:
-            case VIEW_LICENSES:
-            case VIEW_BLUETOOTH:
+            case VIEW_PREF_RELEASE_NOTES:
+            case VIEW_PREF_LICENSES:
+            case VIEW_PREF_BLUETOOTH:
+            case VIEW_PREF_USERNAMES:
             case BACKUP_FILES:
             case FILES:{
                 supportsBack = true;
@@ -2310,24 +2345,31 @@ public class PasswdSafe extends AppCompatActivity
                 }
                 break;
             }
-            case VIEW_RELEASE_NOTES: {
+            case VIEW_PREF_RELEASE_NOTES: {
                 showHomeNav = true;
                 fileTimeoutPaused = false;
                 itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.release_notes_title),
                                                      this);
                 break;
             }
-            case VIEW_LICENSES: {
+            case VIEW_PREF_LICENSES: {
                 showHomeNav = true;
                 fileTimeoutPaused = false;
                 itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.licenses),
                                                      this);
                 break;
             }
-            case VIEW_BLUETOOTH: {
+            case VIEW_PREF_BLUETOOTH: {
                 showHomeNav = true;
                 fileTimeoutPaused = false;
                 itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.bluetooth),
+                        this);
+                break;
+            }
+            case VIEW_PREF_USERNAMES: {
+                showHomeNav = true;
+                fileTimeoutPaused = false;
+                itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.usernames),
                         this);
                 break;
             }
@@ -2422,9 +2464,10 @@ public class PasswdSafe extends AppCompatActivity
         }
         case VIEW_RECORD_ERRORS:
         case VIEW_PREFERENCES:
-        case VIEW_RELEASE_NOTES:
-        case VIEW_LICENSES:
-        case VIEW_BLUETOOTH:
+        case VIEW_PREF_RELEASE_NOTES:
+        case VIEW_PREF_LICENSES:
+        case VIEW_PREF_BLUETOOTH:
+        case VIEW_PREF_USERNAMES:
         case BACKUP_FILES: {
             parentMenuItem = R.id.menu_preferences;
             break;

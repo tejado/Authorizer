@@ -67,7 +67,7 @@ public class BluetoothFragment extends Fragment
             extends AbstractPasswdSafeFileDataFragment.Listener
     {
         /** Update the view */
-        void updateViewBluetooth();
+        void updateViewPrefBluetooth();
 
         void checkBluetoothState();
     }
@@ -295,7 +295,7 @@ public class BluetoothFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewBluetooth();
+        itsListener.updateViewPrefBluetooth();
 
         if(!ApiCompat.supportsBluetoothHid() || !itsPermissionMgr.hasRequiredPerms()) {
             return;

@@ -82,6 +82,11 @@
         </PreferenceCategory>
     </PreferenceScreen>
 
+    <!--suppress AndroidElementNotAllowed -->
+    <net.tjado.passwdsafe.view.LongPreference
+        android:key="usernamesFrag"
+        android:title="@string/usernames"/>
+
     <PreferenceScreen android:key="passwordOptions"
         android:title="@string/passwords">
         <PreferenceCategory android:title="@string/passwords">

@@ -831,6 +831,14 @@
     <string name="request_permission">Request Permission</string>
     <string name="set_as_default">Set as default</string>
 
+    <string name="usernames">Usernames</string>
+    <string name="usernames_description"><![CDATA[You can create usernames for fast selection while editing records.
+\n\nUse {TITLE} in the username to automatically replace it with the record title. For instance, if the record title is "github" and your username template is "name+{TITLE}@mail.com", the generated username will be "name+github@mail.com".
+\n\nTo specify the cursor position for seamless editing, include the "#" character in the username. For example, if your username template is "name+{TITLE}#@mail.com", the cursor will be positioned right after the replaced title when the item is selected.]]></string>
+    <string name="USERNAMES_SUB_TITLE" translatable="false">{TITLE}</string>
+    <string name="USERNAMES_SUB_CURSOR_POSITION" translatable="false">#</string>
+
+
     <!-- net.tjado.webauthn -->
     <string name="dialog_select_credential">Select a Credential</string>
 
