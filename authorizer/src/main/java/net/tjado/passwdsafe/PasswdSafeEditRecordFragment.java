@@ -183,6 +183,9 @@ public class PasswdSafeEditRecordFragment
     private static final int TYPE_NORMAL = 0;
     private static final int TYPE_ALIAS = 1;
     private static final int TYPE_SHORTCUT = 2;
+
+    private static String USERNAMES_SUB_TITLE;
+    private boolean titleHadFocus = false;
     SharedPreferences prefs;
 
     /**
@@ -203,9 +206,14 @@ public class PasswdSafeEditRecordFragment
         setHasOptionsMenu(true);
         Context ctx = requireContext();
         View rootView = inflater.inflate(R.layout.fragment_passwdsafe_edit_record, container, false);
+
+        // setting input mode so that the drop down popups are not behind the keyboard
+        requireActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
         prefs = Preferences.getSharedPrefs(getContext());
 
         BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.bottom_navigation_view);
+        USERNAMES_SUB_TITLE = getResources().getString(R.string.USERNAMES_SUB_TITLE);
 
         itsTypeGroup = rootView.findViewById(R.id.type_group);
         itsType = (Spinner)rootView.findViewById(R.id.type);
@@ -214,7 +222,27 @@ public class PasswdSafeEditRecordFragment
         itsLinkRef = (TextView)rootView.findViewById(R.id.link_ref);
         itsLinkRef.setOnClickListener(this);
         itsTitleInput = (TextInputLayout)rootView.findViewById(R.id.title_input);
+
         itsTitle = (TextView)rootView.findViewById(R.id.title);
+        itsTitle.setOnFocusChangeListener((view, hasFocus) -> {
+            PasswdSafeUtil.dbginfo(TAG, "hasFocus: " + hasFocus);
+            if(!hasFocus && itsUuid == null && titleHadFocus) {
+                String usernameDefault = Preferences.getUsernameDefault(prefs);
+                String username = usernameDefault.replace(USERNAMES_SUB_TITLE, itsTitle.getText().toString());
+
+                if(itsUser.getText().length() == 0) {
+                    setInputCursorPosition(itsUser, username, true);
+                }
+
+                if(itsEmail.getText().length() == 0 && username.contains("@")) {
+                    setInputCursorPosition(itsEmail, username, true);
+                }
+            }
+
+            titleHadFocus = true;
+        });
+
+
         itsValidator.registerTextView(itsTitle);
         itsGroup = (Spinner)rootView.findViewById(R.id.group);
         itsGroup.setOnItemSelectedListener(this);
@@ -222,16 +250,13 @@ public class PasswdSafeEditRecordFragment
 
         itsUser = rootView.findViewById(R.id.user);
         itsUser.setOnClickListener(view -> openUserDropDown(false, itsUser));
-        itsUser.setOnFocusChangeListener((view, hasFocus) -> { hasFocus : openUserDropDown(false, itsUser); });
-
-        itsUser.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedString = (String) parent.getItemAtPosition(position);
-            int index = selectedString.indexOf(getResources().getString(R.string.USERNAMES_SUB_CURSOR_POSITION));
-            if (index != -1) {
-                itsUser.setText(selectedString.substring(0, index) + selectedString.substring(index + 1));
-                itsUser.setSelection(index);
+        itsUser.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                openUserDropDown(false, itsUser);
             }
         });
+
+        itsUser.setOnItemClickListener((parent, view, position, id) -> setInputCursorPosition(itsUser, (String) parent.getItemAtPosition(position), false));
 
         itsValidator.registerTextView(itsUser);
         itsUrlInput = rootView.findViewById(R.id.url_input);
@@ -240,16 +265,13 @@ public class PasswdSafeEditRecordFragment
 
         itsEmail = rootView.findViewById(R.id.email);
         itsEmail.setOnClickListener(view -> openUserDropDown(true, itsEmail));
-        itsEmail.setOnFocusChangeListener((view, hasFocus) -> { hasFocus : openUserDropDown(true, itsEmail); });
-
-        itsEmail.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedString = (String) parent.getItemAtPosition(position);
-            int index = selectedString.indexOf(getResources().getString(R.string.USERNAMES_SUB_CURSOR_POSITION));
-            if (index != -1) {
-                itsEmail.setText(selectedString.substring(0, index) + selectedString.substring(index + 1));
-                itsEmail.setSelection(index);
+        itsEmail.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                openUserDropDown(true, itsEmail);
             }
         });
+
+        itsEmail.setOnItemClickListener((parent, view, position, id) -> setInputCursorPosition(itsEmail, (String) parent.getItemAtPosition(position), false));
 
         // Password
         itsPasswordLabel = rootView.findViewById(R.id.password_label);
@@ -323,9 +345,6 @@ public class PasswdSafeEditRecordFragment
         itsNotes = rootView.findViewById(R.id.notes);
         PasswdSafeRecordNotesFragment.setNotesOptions(itsNotes, requireActivity());
 
-        // setting input mode so that the drop down popups are not behind the keyboard
-        requireActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
         // hide bottom navigation when keyboard is visible as it will be otherwise on top of the
         // keyboard due to SOFT_INPUT_ADJUST_RESIZE
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
@@ -394,6 +413,10 @@ public class PasswdSafeEditRecordFragment
         super.onResume();
         getListener().updateViewEditRecord(getLocation());
         itsValidator.validate();
+
+        if(itsUuid == null) {
+            GuiUtils.setKeyboardVisible(itsTitle, requireContext(), true);
+        }
     }
 
     @Override
@@ -1568,7 +1591,6 @@ public class PasswdSafeEditRecordFragment
 
     private void openUserDropDown(boolean isMail, AutoCompleteTextView itsView) {
         Set<String> usernames = Preferences.getUsernames(prefs);
-        String USERNAMES_SUB_TITLE = getResources().getString(R.string.USERNAMES_SUB_TITLE);
 
         List<String> suggestionList = new ArrayList<>();
         for (String username : usernames) {
@@ -1585,6 +1607,16 @@ public class PasswdSafeEditRecordFragment
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, suggestions);
         itsView.setAdapter(adapter);
         itsView.showDropDown();
+    }
+
+    private void setInputCursorPosition(AutoCompleteTextView view, String selectedString, boolean forceSet) {
+        int index = selectedString.indexOf(getResources().getString(R.string.USERNAMES_SUB_CURSOR_POSITION));
+        if (index != -1) {
+            view.setText(selectedString.substring(0, index) + selectedString.substring(index + 1));
+            view.setSelection(index);
+        } else if(forceSet) {
+            view.setText(selectedString);
+        }
     }
 
     private boolean isKeyboardVisible(View rootView) {
