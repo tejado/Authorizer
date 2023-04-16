@@ -1,7 +1,9 @@
 # Authorizer ![CI](https://github.com/tejado/Authorizer/workflows/CI/badge.svg?branch=master&event=push)
-<img src="https://user-images.githubusercontent.com/3774136/232328062-ed34e91c-d239-499f-9a48-b8f6a19820ed.png" align="right" height="400" alt="Authorizer Screenshot">
+
 **Transform Android devices into secure, offline password managers with USB/Bluetooth Auto-Type, OTP, and FIDO support.**
-  
+
+<img src="https://user-images.githubusercontent.com/3774136/232328062-ed34e91c-d239-499f-9a48-b8f6a19820ed.png" align="right" height="400" alt="Authorizer Screenshot">
+
 Use your Android device as a dedicated hardware password manager. It avoids manual typing of lengthy and complicated passwords by offering USB and Bluetooth Auto-Type features. Acting as a keyboard, Authorizer enables users to automatically input passwords on their PC, laptop, tablet, or another smartphone with a simple in-app button press.
 
 By having your Authorizer-device offline using airplane mode, you create a physical separation between your credentials and the devices commonly used for daily activities. Similar to Security Keys but with enhanced functionality and comfort.
