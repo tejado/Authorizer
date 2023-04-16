@@ -1,4 +1,5 @@
 # Authorizer ![CI](https://github.com/tejado/Authorizer/workflows/CI/badge.svg?branch=master&event=push)
+<img src="https://user-images.githubusercontent.com/3774136/232328062-ed34e91c-d239-499f-9a48-b8f6a19820ed.png" align="right" height="400" alt="Authorizer Screenshot">
 **Transform Android devices into secure, offline password managers with USB/Bluetooth Auto-Type, OTP, and FIDO support.**
   
 Use your Android device as a dedicated hardware password manager. It avoids manual typing of lengthy and complicated passwords by offering USB and Bluetooth Auto-Type features. Acting as a keyboard, Authorizer enables users to automatically input passwords on their PC, laptop, tablet, or another smartphone with a simple in-app button press.
@@ -16,7 +17,6 @@ Encrypted offline backups eliminates the risk of security breaches in online ser
 <img src="https://user-images.githubusercontent.com/3774136/232325067-c6e08d0b-0383-4d80-8e09-b6bf2a55c170.png" alt="Get it on GitHub" height="80"/></a>
 
 ## Table of Contents
-
 - [Features](#features)
 - [Getting started ](#getting-started)
 	- [Device Recommendation](#device-recommendation)
@@ -86,7 +86,6 @@ Authorizer does not require root permissions when it is allowed to write to /dev
 ## Features in Detail
 
 #### Auto-Type over USB and Bluetooth
-<a href="https://www.youtube.com/watch?v=KL2qjMogQMY"><img src="https://img.youtube.com/vi/KL2qjMogQMY/0.jpg" align="right" height="200" alt="Authorizer PoC YouTube video"></a>
 Authorizer is able to pretend to be an HID Keyboard so it can auto-type the credentials over USB and Bluetooth.  
 There are Auto-Type buttons at the password entry view. If a button is pressed longer, a different keyboard layout can be choosen. Additional, there is a USB Quick Auto-Type button in the TreeView which auto-types the respective password on a long press.  
 There are different settings per password entry like delimiter and the password return suffix. In the general App preferences a default keyboard layout can be choosen.
