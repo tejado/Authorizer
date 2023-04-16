@@ -12,6 +12,8 @@ Encrypted offline backups eliminates the risk of security breaches in online ser
 <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
 <a href="https://play.google.com/store/apps/details?id=net.tjado.passwdsafe" target="_blank">
 <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="80"/></a>
+<a href="https://github.com/tejado/Authorizer/releases" target="_blank">
+<img src="https://user-images.githubusercontent.com/3774136/232325067-c6e08d0b-0383-4d80-8e09-b6bf2a55c170.png" alt="Get it on GitHub" height="80"/></a>
 
 ## Table of Contents
 
