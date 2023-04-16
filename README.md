@@ -1,32 +1,87 @@
 # Authorizer ![CI](https://github.com/tejado/Authorizer/workflows/CI/badge.svg?branch=master&event=push)
-A Password Manager for Android with Auto-Type over USB and Bluetooth, OTP and much more.
+**Transform Android devices into secure, offline password managers with USB/Bluetooth Auto-Type, OTP, and FIDO support.**
   
-The idea behind Authorizer is, to use old smartphones as a hardware password manager only. To avoid manual typing of long and complex passwords everytime you need them, Authorizer provides Auto-Type features over USB and Bluetooth. It pretends to be a keyboard (e.g. over an USB On-The-Go adapter) and with a button press inside the app, it will automatically type the password for you on your pc, laptop, tablet or other smartphone.  
+Use your Android device as a dedicated hardware password manager. It avoids manual typing of lengthy and complicated passwords by offering USB and Bluetooth Auto-Type features. Acting as a keyboard, Authorizer enables users to automatically input passwords on their PC, laptop, tablet, or another smartphone with a simple in-app button press.
+
+By having your Authorizer-device offline using airplane mode, you create a physical separation between your credentials and the devices commonly used for daily activities. Similar to Security Keys but with enhanced functionality and comfort.
+This concept helps reduce the likelihood of password breaches and unauthorized access, ensuring stored credentials remain secure from online threats and unrelated apps.
+
+Encrypted offline backups eliminates the risk of security breaches in online service-backends, such as the recent LastPass hack. Even if you don't fully trust the Authorizer app, you can maintain security as long as your Authorizer-device's underlying OS provides network isolation and data encryption.
 
 <a href="https://f-droid.org/packages/net.tjado.passwdsafe/" target="_blank">
 <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
 <a href="https://play.google.com/store/apps/details?id=net.tjado.passwdsafe" target="_blank">
 <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="80"/></a>
-  
-Authorizer is based on [PasswdSafe](https://sourceforge.net/projects/passwdsafe/) a Password Safe port for Android and [FreeOTP](https://github.com/freeotp/freeotp-android).  
+
+## Table of Contents
+
+- [Features](#features)
+- [Getting started ](#getting-started)
+	- [Device Recommendation](#device-recommendation)
+	- [Requirements](#requirements)
+	- [Compatibility](#compatibility)
+- [Features in Detail](#features-in-detail)
+- [Roadmap](#roadmap)
+- [FAQ](#faq)
+- [Limitations and Known Issues](#limitations-and-known-issues)
+- [Contributions & Community](#contributions--community)
+- [Special Thanks](#special-thanks)
+- [Privacy Policy](#privacy-policy)
 
 ## Features
-* Auto-Type over USB
-* Auto-Type over Bluetooth (experimental)
-* Different keyboard languages ([HID Usage Tables](https://www.usb.org/document-library/hid-usage-tables-112))
-  * English (US)
-  * English (GB)
-  * German
-  * German (Apple)
-  * German (CH)
-  * French (CH)
-  * Neo 2 (Layer 1,2 and 3)
-* Asymmetric encrypted backup on USB mass storage
-* OTP integration (TOTP/HOTP)
-* Tree list style
-* Icons
+- Auto-Type over USB
+- Auto-Type over Bluetooth
+- Auto-type keyboard layouts for English, German, French, Apple and Neo 2
+- Bluetooth FIDO U2F & WebAuthn integration
+- OTP integration (TOTP/HOTP)
+- Asymmetric encrypted offline backup
+- Auto-type keyboard-"commands" like TAB or ENTER for Username and Password fields
+- Predefined usernames with placeholders for fast record creation
+- Tree list
+- Icons
+- pwsafe3 file compatible (*)
+- Yubikey support (*)
+- Biometric protection of your file password (*)
+- Time-based file-close (*)
+- Screen off can trigger file-close (*)
+- Read-only file mode (*)
+- Record protection (*)
+- Local file backup (*)
+- Password expirations (*)
+- Password Policies (*)
+- Password History (*)
+- Notes (*)
+- Groups (*)
+- Shortcut & alias records (*)
+- Home screen widgets (*)
+- Powerful Search (*)
+- Light & Dark mode (*)
 
-### Features in Detail
+\* As Authorizer has its foundation in PasswdSafe for Android, it has also adopted these features.
+
+## Getting started 
+  
+### Device Recommendation
+For security and privacy reasons, the recommended device is any maintained Google Pixel with GrapheneOS.  
+Other devices might work as well. But as a lot of smartphone vendors are not publishing its underyling kernel and Android source, they can't be recommended.
+
+### Requirements
+Authorizer can run on every Android device with version 5 or higher (Lollipop: API/SDK level 21).  
+For Bluetooth features, minimum version 9 is required (Pie: API/SDK level 28). Higher is recommended for stability reasons.
+
+For Auto-Type over USB, low-level root permissions are required to run **[USB Gadget Tool](https://github.com/tejado/android-usb-gadget)**.  
+Authorizer does not require root permissions when it is allowed to write to /dev/hidg1 natively (file permissions and selinux needs to be configured for this).
+
+### Compatibility
+
+| Features          | Windows | Linux | MacOS | iOS | Android |
+| ----------------- | :-----: | :---: | :---: | :---: | :-----: |
+| AutoType - USB    |    X    |   X   |   X   |   X   |    X    |
+| AutoType - Bluetooth |    X    |   X   |   X   |   X   |    X    |
+| FIDO U2F          |    X    |   X   |       |       |    X    |
+| FIDO WebAuthn     |    X    |   X   |       |       |    X    |
+
+## Features in Detail
 
 #### Auto-Type over USB and Bluetooth
 <a href="https://www.youtube.com/watch?v=KL2qjMogQMY"><img src="https://img.youtube.com/vi/KL2qjMogQMY/0.jpg" align="right" height="200" alt="Authorizer PoC YouTube video"></a>
@@ -52,21 +107,40 @@ In addition to the {OTP} placeholder, Authorizer also supports {TAB} and {RET} f
 Example: if "peter{TAB}{OTP}" is set as the username, "peter" followed by the tabulator key and a newly generated OTP will be auto-typed.
 
 ## Roadmap
-* NFC support
-* Smartcard emulation (e.g. OpenPGP cards, etc.)
-* CTAP + CTAP2 integration for U2F and WebAuthn
-* Redesign of the App
-* Refactoring the HID Keyboard Layout code
+Please see [Authorizer Roadmap](https://github.com/users/tejado/projects/3).
 
-##  Requirements
-* For Auto-Type over USB: **[USB Gadget Tool](https://github.com/tejado/android-usb-gadget)** or an Android Kernel compiled with [Android Keyboard Gadget](https://github.com/pelya/android-keyboard-gadget) is required
-* For Auto-Type over Bluetooth: Android Pie or higher is required. Tested devices:
-  * Samsung Galaxy S8: WORKING
-  * HTC One M8 (LineageOS 16.0): WORKING
+## FAQ
+In progress
+
+## Limitations and Known Issues
+- When Authorizer creates or modifies psafe3 files, it will add extra fields like auto-type settings, FIDO keys, and icons, which may not be displayed when using other software that supports psafe3.
+- Running Authorizer app on tablets is currently not tested.
+- The experience of Bluetooth-stack stability can differ between devices, as it is dependent on both the Android version and the specific device being used.
+- Due to limitations in the Bluetooth-stack, Authorizer can only be paired as Keyboard OR as FIDO Security key and not both.
+- It is important to unpair from the other device as well to prevent unexpected behavior, when establishing a new pairing under a separate profile (like Keyboard or FIDO).
+- FIDO U2F & WebAuthn is currently not compatible with Apple MacOS and Apple iOS, as they expecting a different HID_REPORT_SIZE.
+- Currently, FIDO credentials can't be added to existing records.
+
 
 ## Contributions & Community
 Contributions are highly welcome.  
-For support & development discussions around Authorizer, feel free to contact me.
+For contributions, discussions and questions around Authorizer, feel free to
+- Create an [issue](https://github.com/tejado/Authorizer/issues)
+- Create a discussion [discussion](https://github.com/tejado/Authorizer/discussions)
 
-## Proof of Concept
-Proof-of-Concept app for Auto-Typing (USB Keyboard emulation): [Authorizer-PoC](https://github.com/tejado/Authorizer-PoC)
+Please note that I am not interested in further localization of Authorizer, except for auto-type keyboard layouts.
+
+## Special Thanks
+Authorizer is based on 
+- [PasswdSafe](https://sourceforge.net/projects/passwdsafe/) a Password Safe port for Android 
+- [FreeOTP](https://github.com/freeotp/freeotp-android)
+- [WioKey](https://github.com/WIOsense/wiokey-android)
+- and [many further](https://github.com/tejado/Authorizer/tree/master/lib/src/main/assets)
+
+## Privacy Policy
+Authorizer does not collect any data from your mobile device.
+- Camera access is used only for scanning OTP QR codes.
+- Location access only used for Bluetooth device scanning and it is optional.
+
+If you believe this policy has been violated in any way, please file an [issue](https://github.com/tejado/Authorizer/issues).
+
