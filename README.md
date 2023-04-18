@@ -2,21 +2,21 @@
 
 **Transform Android devices into secure, offline password managers with USB/Bluetooth Auto-Type, OTP, and FIDO support.**
 
-<img src="https://user-images.githubusercontent.com/3774136/232328062-ed34e91c-d239-499f-9a48-b8f6a19820ed.png" align="right" height="400" alt="Authorizer Screenshot">
+<img src="https://user-images.githubusercontent.com/3774136/232328062-ed34e91c-d239-499f-9a48-b8f6a19820ed.png" align="right" height="350" alt="Authorizer Screenshot">
 
 Use your Android device as a dedicated hardware password manager. It avoids manual typing of lengthy and complicated passwords by offering USB and Bluetooth Auto-Type features. Acting as a keyboard, Authorizer enables users to automatically input passwords on their PC, laptop, tablet, or another smartphone with a simple in-app button press.
 
 By having your Authorizer-device offline using airplane mode, you create a physical separation between your credentials and the devices commonly used for daily activities. Similar to Security Keys but with enhanced functionality and comfort.
 This concept helps reduce the likelihood of password breaches and unauthorized access, ensuring stored credentials remain secure from online threats and unrelated apps.
 
-Encrypted offline backups eliminates the risk of security breaches in online service-backends, such as the recent LastPass hack. Even if you don't fully trust the Authorizer app, you can maintain security as long as your Authorizer-device's underlying OS provides network isolation and data encryption.
+Even if you don't fully trust the Authorizer app, you can maintain security as long as your Authorizer-device's underlying OS provides network isolation and data encryption.
 
 <a href="https://f-droid.org/packages/net.tjado.passwdsafe/" target="_blank">
 <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"/></a>
 <a href="https://play.google.com/store/apps/details?id=net.tjado.passwdsafe" target="_blank">
 <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="80"/></a>
 <a href="https://github.com/tejado/Authorizer/releases" target="_blank">
-<img src="https://user-images.githubusercontent.com/3774136/232325067-c6e08d0b-0383-4d80-8e09-b6bf2a55c170.png" alt="Get it on GitHub" height="80"/></a>
+<img src="https://user-images.githubusercontent.com/3774136/232871820-ad460558-0b9a-4b69-8180-62e5b3ac5032.png" alt="Get it on GitHub" height="80"/></a>
 
 ## Table of Contents
 - [Features](#features)
