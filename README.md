@@ -19,6 +19,8 @@ Even if you don't fully trust the Authorizer app, you can maintain security as l
 <img src="https://user-images.githubusercontent.com/3774136/232871820-ad460558-0b9a-4b69-8180-62e5b3ac5032.png" alt="Get it on GitHub" height="80"/></a>
 
 ## Table of Contents
+<a href="https://youtu.be/8ai8X0W5sh4"><img src="https://user-images.githubusercontent.com/3774136/236646289-bdfbc28a-3b15-41ec-8bea-e90c1a72ed72.jpg" align="right" height="250" alt="Authorizer Demo YouTube video"></a>
+
 - [Features](#features)
 - [Getting started ](#getting-started)
 	- [Device Recommendation](#device-recommendation)
