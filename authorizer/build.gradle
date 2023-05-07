@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId 'net.tjado.passwdsafe'
         minSdkVersion 21
-        resConfigs 'de'
+        resourceConfigurations += ['de']
         targetSdkVersion 33
         versionCode 401
         versionName '0.4.1'

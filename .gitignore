@@ -51,4 +51,5 @@ authorizer/debug/
 authorizer/release/
 authorizer/.externalNativeBuild/
 .cxx
-sign/
+sign/**
+!sign/sign.example.gradle

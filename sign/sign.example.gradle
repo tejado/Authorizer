@@ -1,0 +1,19 @@
+def keystoreFile = file("../sign/keystore.jks")
+if (!keystoreFile.exists()) throw new IllegalStateException("sign/keystore.jks file missing")
+
+android.signingConfigs.create("debug1", {
+    storeFile keystoreFile
+    storePassword 'storePassword'
+    keyAlias 'keyAlias'
+    keyPassword 'keyPassword'
+})
+
+android.signingConfigs.create("release1", {
+    storeFile keystoreFile
+    storePassword 'storePassword'
+    keyAlias 'keyAlias'
+    keyPassword 'keyPassword'
+})
+
+android.buildTypes["debug"].signingConfig = android.signingConfigs["debug1"]
+android.buildTypes["release"].signingConfig = android.signingConfigs["release1"]
