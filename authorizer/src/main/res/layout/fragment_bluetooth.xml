@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (©) 2015 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="@dimen/fragment_full_vertical_margin"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="@dimen/fragment_full_vertical_margin"
+    android:layout_marginEnd="0dp"
+    android:layout_marginLeft="0dp"
+    android:layout_marginRight="0dp"
+    android:layout_marginStart="0dp"
+    tools:context="net.tjado.passwdsafe.BluetoothFragment"
+    android:orientation="vertical">
+
+    <ViewFlipper
+        android:id="@+id/flipperOverall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- flipper 0 -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_headline_settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="@string/settings"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:paddingTop="20dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_pref_bt"
+                        android:gravity="start"
+                        android:text="@string/bt_feature_enable"
+                        android:textSize="16sp"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:paddingStart="20dp" />
+                    <CheckBox
+                        android:id="@+id/cb_pref_bt"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="8"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_pref_bt_fido"
+                        android:gravity="start"
+                        android:text="@string/bt_fido_enable"
+                        android:textSize="16sp"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:paddingStart="20dp" />
+                    <CheckBox
+                        android:id="@+id/cb_pref_bt_fido"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="8"/>
+                </LinearLayout>
+
+                <ViewFlipper
+                    android:id="@+id/flipperSub"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_headline_paired_devices"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:text="@string/bt_paired_devices"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:paddingTop="20dp" />
+
+                        <TextView
+                            android:id="@+id/tv_no_paired_devices"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:text="@string/bt_no_paired_devices"
+                            android:textSize="18sp"
+                            android:paddingTop="5dp"
+                            android:paddingStart="30dp"/>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_bluetooth_devices_paired"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/tv_headline_available_devices"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="start"
+                            android:text="@string/bt_available_devices"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:paddingTop="20dp" />
+
+                        <TextView
+                            android:id="@+id/scan_description"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="2dp"
+                            android:text="@string/bt_scan_description"/>
+
+                        <Button android:id="@+id/request_permissions"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/request_permission"
+                            android:visibility="gone"/>
+
+                        <Button android:id="@+id/app_settings"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app_settings"
+                            android:visibility="gone"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button android:id="@+id/btn_scan"
+                                style="@style/Widget.AppCompat.Button.Colored"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/bt_start_scan"/>
+
+
+                            <ProgressBar
+                                android:id="@+id/scan_progress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:indeterminate="true"
+                                android:visibility="gone"/>
+
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_bluetooth_devices_scan"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp" />
+
+                    </LinearLayout>
+
+                    <!-- sub flipper 1 -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/bt_disabled_app"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            android:text="@string/bt_feature_disabled"
+                            android:textSize="25sp" />
+                    </RelativeLayout>
+
+                    <!-- sub flipper 2 -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/bt_disabled_os"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerHorizontal="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center"
+                            android:text="@string/bt_switched_off"
+                            android:textSize="25sp" />
+                    </RelativeLayout>
+
+                </ViewFlipper>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- flipper 1 -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/low_api_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="@string/bt_api_too_old"
+                android:textSize="25sp" />
+        </RelativeLayout>
+
+        <!-- flipper 2 -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/no_adapter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:text="@string/bt_no_adapter"
+                android:textSize="25sp" />
+        </RelativeLayout>
+    </ViewFlipper>
+
+</LinearLayout>

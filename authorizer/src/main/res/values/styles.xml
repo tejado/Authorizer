@@ -45,6 +45,7 @@
         <item name="textAppearanceSearchResultTitle">@style/PwsAppTheme.SearchResultTitle</item>
         <item name="textAppearanceSearchResultSubtitle">@style/PwsAppTheme.SearchResultSubtitle</item>
         <item name="android:navigationBarColor">@color/md_grey_100</item>
+        <item name="customNavigationBarColor">@color/md_grey_100</item>
     </style>
 
     <style name="PwsAppTheme_Dialog" parent="PwsAppBaseTheme_Dialog">
@@ -84,7 +85,8 @@
         <item name="textColorGreen">@color/text_color_green_light</item>
         <item name="textAppearanceSearchResultTitle">@style/PwsAppTheme.SearchResultTitle.Dark</item>
         <item name="textAppearanceSearchResultSubtitle">@style/PwsAppTheme.SearchResultSubtitle.Dark</item>
-        <item name="android:navigationBarColor">@color/md_grey_100</item>
+        <item name="android:navigationBarColor">@color/background_dark</item>
+        <item name="customNavigationBarColor">@color/background_dark</item>
     </style>
 
     <style name="PwsAppThemeDark_Dialog" parent="PwsAppBaseThemeDark_Dialog">
@@ -219,7 +221,7 @@
     </style>
 
     <style name="BottomNavigation">
-        <item name="android:background">@color/md_grey_100</item>
+        <item name="android:background">?attr/customNavigationBarColor</item>
     </style>
 
 </resources>

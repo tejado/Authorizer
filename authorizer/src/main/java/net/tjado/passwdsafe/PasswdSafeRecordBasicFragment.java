@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -43,8 +44,6 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
 import android.content.DialogInterface;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,6 +54,9 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import net.tjado.authorizer.OutputUsbKeyboard;
 import net.tjado.authorizer.Utilities;
+import net.tjado.bluetooth.BluetoothDeviceListing;
+import net.tjado.bluetooth.BluetoothDeviceWrapper;
+import net.tjado.bluetooth.BluetoothUtils;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdHistory;
 import net.tjado.passwdsafe.lib.ActContext;
@@ -88,7 +90,6 @@ import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
-import java.util.Set;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -176,8 +177,6 @@ public class PasswdSafeRecordBasicFragment
     private final int REQUEST_SAVE_OTP_MANUAL = 1;
     private final int REQUEST_SAVE_OTP_CAMERA = 2;
     private final int REQUEST_ENABLE_BT = 3;
-
-    private OutputBluetoothKeyboard itsOutputBluetoothKeyboard = null;
 
     /**
      * Create a new instance of the fragment
@@ -323,8 +322,11 @@ public class PasswdSafeRecordBasicFragment
         itsAutoTypeBluetoothCredential = root.findViewById(
                 R.id.autotype_bt_credentials);
 
-        if (Preferences.getAutoTypeBluetoothEnabled(prefs) &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (
+            Preferences.getBluetoothEnabled(prefs) &&
+            Preferences.getAutoTypeBluetoothEnabled(prefs) &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+        ){
             // Auto-Type Bluetooth username
             itsAutoTypeBluetoothUsername.setOnClickListener(
                     view -> autotypeBluetooth(lang, true, false, false));
@@ -446,11 +448,6 @@ public class PasswdSafeRecordBasicFragment
     {
         super.onPause();
         Utilities.dbginfo(TAG, "onPause");
-        if(itsOutputBluetoothKeyboard != null) {
-            itsOutputBluetoothKeyboard.deinitializeBluetoothHidDevice();
-            itsOutputBluetoothKeyboard = null;
-        }
-
         itsPassword.removeCallbacks(itsPasswordHideRun);
     }
 
@@ -972,14 +969,6 @@ public class PasswdSafeRecordBasicFragment
     }
 
 
-    public void enableBluetooth()
-    {
-        Intent enableBtIntent = new Intent(
-                BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-    }
-
-
     /**
      * Auto-Type over Bluetooth HID
      */
@@ -989,12 +978,16 @@ public class PasswdSafeRecordBasicFragment
                                    Boolean sendUsername, Boolean sendPassword,
                                    Boolean sendOTP)
     {
-        itsOutputBluetoothKeyboard = new OutputBluetoothKeyboard(lang, getContext());
-        if (!itsOutputBluetoothKeyboard.checkBluetoothStatus()) {
-            Toast.makeText(getActivity(), "Bluetooth is disabled",
-                           Toast.LENGTH_LONG).show();
+        BluetoothForegroundService btService = ((PasswdSafe) requireActivity()).btService;
+        if (!BluetoothUtils.isBluetoothEnabled(requireActivity().getApplication())) {
+            Toast.makeText(getActivity(), R.string.bt_is_disabled, Toast.LENGTH_LONG).show();
+            return;
+        } else if(btService == null) {
+            Toast.makeText(getActivity(), getString(R.string.bt_autotype_no_service), Toast.LENGTH_LONG).show();
             return;
         }
+
+        OutputBluetoothKeyboard itsOutputBluetoothKeyboard = new OutputBluetoothKeyboard(lang, getContext());
 
         String username = getUsername();
         String password = getPassword();
@@ -1095,24 +1088,33 @@ public class PasswdSafeRecordBasicFragment
             }
 
         } catch (Exception e) {
-            PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e,
-                                   e.getLocalizedMessage());
+            PasswdSafeUtil.dbginfo("PasswdSafeRecordBasicFragment", e, e.getLocalizedMessage());
         }
 
-        Set<BluetoothDevice> bondedDevices = itsOutputBluetoothKeyboard.getBondedDevices();
+        List<BluetoothDeviceWrapper> bondedDevices = new BluetoothDeviceListing(requireContext()).getAvailableKeyboardHostDevices();
+        if(bondedDevices.size() < 1) {
+            Toast.makeText(getActivity(), getString(R.string.bt_autotype_no_devices), Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        SortedMap<String, BluetoothDevice> deviceList = new TreeMap<>();
+        SortedMap<String, BluetoothDeviceWrapper> deviceList = new TreeMap<>();
         bondedDevices.forEach(device -> deviceList.put(device.getName(), device));
         CharSequence[] cs = deviceList.keySet().toArray(new CharSequence[deviceList.size()]);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        builder.setTitle(R.string.autotype_bluetooth_devices)
-               .setItems(cs, new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int which) {
-                       itsOutputBluetoothKeyboard.connectDeviceAndSend( deviceList.get(cs[which]), outputStream.toByteArray() );
-                   }
-               });
+        builder.setTitle(R.string.autotype_bluetooth_devices).setItems(cs, (dialog, which) -> {
+            btService.connectAndType(deviceList.get(cs[which]).getDevice(), outputStream.toByteArray());
+
+            new Handler().postDelayed(() -> {
+                if(btService.isAppRegistered()) {
+                    PasswdSafeUtil.dbginfo(TAG, "btService.isAppRegistered is TRUE");
+                } else {
+                    PasswdSafeUtil.dbginfo(TAG, "btService.isAppRegistered is FALSE");
+                    Toast.makeText(getActivity(), getString(R.string.bt_unclean_state_error), Toast.LENGTH_LONG).show();
+                }
+            }, 200);
+       });
 
         AlertDialog dialog = builder.create();
         // Display the alert dialog on interface

@@ -221,7 +221,7 @@
     <string name="no_biometrics_registered">No biometric credentials are registered</string>
     <string name="no_errors">No Errors</string>
     <string name="no_file_permission">
-        PasswdSafe requires file permissions.
+        Authorizer requires file permissions.
         \n\nPress reload for another prompt.  If no prompt is shown, press app
         settings and enable storage permissions.
     </string>
@@ -786,4 +786,99 @@
     <string name="usb_native_mode">USB Auto-Type Native Mode</string>
     <string name="usb_native_mode_summary">Advanced users: USB gadget access without root</string>
     <string name="writeable_summary">Allow to write to the current open file</string>
+
+    <string name="bluetooth">Bluetooth</string>
+    <string name="bt_scan_description">To search for visible Bluetooth devices in your area, start device scan.</string>
+    <string name="bt_stop_scan">Stop Device Scan</string>
+    <string name="bt_start_scan">Start Device Scan</string>
+    <string name="bt_no_scan_permission_desc">Bluetooth scan is disabled due to missing permissions.\n\nPress \"Request Permission\" - if no prompt is shown, press app settings and enable location permissions.</string>
+    <string name="bt_paired_as">Paired as %s</string>
+    <string name="bt_no_unpair">Method \'removeBond\' not found! Please unpair over Android Settings!</string>
+    <string name="bt_pairing_no_service">Authorizer Bluetooth Service is not available. Pairing not possible!</string>
+    <string name="bt_feature_enable">Enable Bluetooth feature</string>
+    <string name="bt_fido_enable">Enable FIDO U2F/WebAuthn</string>
+    <string name="bt_paired_devices">Paired Devices</string>
+    <string name="bt_no_paired_devices">No devices are paired!</string>
+    <string name="bt_available_devices">Available Devices</string>
+    <string name="bt_feature_disabled">Bluetooth feature in Authorizer is disabled.</string>
+    <string name="bt_switched_off">Bluetooth is switched off!</string>
+    <string name="bt_api_too_old">Your Android is too old and does not support required Bluetooth features.</string>
+    <string name="bt_no_adapter">No Bluetooth Adapter found.</string>
+    <string name="bt_unpair">Unpair</string>
+    <string name="bt_reconnect">Connect</string>
+    <string name="bt_connected">Connected</string>
+    <string name="bt_pair_keyboard">Pair as Keyboard</string>
+    <string name="bt_pair_fido">Pair as FIDO Key</string>
+    <string name="bt_autotype_no_devices"><![CDATA[No device paired in keyboard mode!\nPlease pair devices only over Authorizer (Preferences -> Bluetooth).]]></string>
+    <string name="bt_autotype_no_service">Authorizer Bluetooth Service is not available. Auto-typing is not possible!</string>
+    <string name="bt_unclean_state_error"><![CDATA[Bluetooth HID stack is in an unclean state - please stop & start Bluetooth in Android and try again!]]></string>
+    <string name="bt_unpair_info">At first, remove the pairing on the paired device.\n\nOnce that\'s done, proceed by confirming this dialog.</string>
+    <string name="bt_help"><![CDATA[In Authorizer, there are two main features that can be used over Bluetooth:
+    \n - Auto-typing (Keyboard)
+    \n - FIDO Security Key: U2F & WebAuthn
+    \n\nIf you don\'t want to use Bluetooth at all, deactivate it in settings.
+    \n\nIf you want to use it, please ensure that you only pair devices over Authorizer and not over Android Settings. This is necessary as otherwise the paired device can\'t be assigned the respective feature (Keyboard or FIDO Key).
+    \n\nUnfortunately, a device can only be paired as Keyboard OR as FIDO Security key and not both due to limitations in the Bluetooth stack.
+    \n\nAdditionally, Bluetooth functionality in Authorizer could behave unstable, depending on device drivers, Android version and the respective paired device.
+    \n\nPlease inform the developer about any issues.]]></string>
+    <string name="bt_is_disabled">Not possible - Bluetooth is disabled</string>
+
+    <string name="notification_body_bt_unclean"><![CDATA[ATTENTION: Please stop & start Bluetooth service in your Systems settings!]]></string>
+    <string name="notification_body_init">Initializing Bluetooth...</string>
+
+    <string name="settings">Settings</string>
+    <string name="default_option">Default</string>
+    <string name="request_permission">Request Permission</string>
+    <string name="set_as_default">Set as default</string>
+
+    <string name="usernames">Usernames</string>
+    <string name="usernames_description"><![CDATA[You can create usernames for fast selection while editing records.
+\n\nUse {TITLE} in the username to automatically replace it with the record title. For instance, if the record title is \"github\" and your username template is \"name+{TITLE}@mail.com\", the generated username will be \"name+github@mail.com\".
+\n\nTo specify the cursor position for seamless editing, include the \"#\" character in the username. For example, if your username template is \"name+{TITLE}#@mail.com\", the cursor will be positioned right after the replaced title when the item is selected.]]></string>
+    <string name="USERNAMES_SUB_TITLE" translatable="false">{TITLE}</string>
+    <string name="USERNAMES_SUB_CURSOR_POSITION" translatable="false">#</string>
+
+
+    <!-- net.tjado.webauthn -->
+    <string name="dialog_select_credential">Select a Credential</string>
+
+    <string name="dialog_excludedTitle">This authenticator is excluded</string>
+    <string name="dialog_excludedSubtitle">Select either option to proceed</string>
+
+    <string name="credentials_makeTitle">Create credential request from %s</string>
+    <string name="credentials_makeSubtitle">Do you want to create\n\n\tUsername: %s\n\tName: %s\n\non website %s (%s)?</string>
+    <string name="credentials_userName">User name: %s\n</string>
+    <string name="credentials_userId">User id: %s</string>
+
+    <string name="credentials_deleteTitle">Incoming request to delete credential</string>
+    <string name="credentials_deleteSubtitle">Delete user name %s for website %s?</string>
+    <string name="credentials_deleteAllTitle">You are requesting to delete all stored credentials</string>
+    <string name="credentials_deleteAllSubtitle">Are you sure? Verify to proceed</string>
+
+    <string name="pin_missed3Title">3 consecutive PIN missmatches, authentication blocked!</string>
+    <string name="pin_missed3Subtitle">Click here</string>
+    <string name="pin_nullPinTitle">Received empty pin</string>
+    <string name="pin_nullPinSubtitle">Verify to proceed</string>
+    <string name="pin_resetTitle">You are requesting to reset the ClientPIN"</string>
+    <string name="pin_resetSubtitle">Verify to proceed</string>
+    <string name="pin_changeTitle">You are requesting to modify the ClientPIN</string>
+    <string name="pin_changeSubtitle">Verify to proceed and apply changes</string>
+
+    <string name="reset_requestTitle">Incoming request to RESET the authenticator</string>
+    <string name="reset_requestSubtitle">Are you sure to DELETE all FIDO credentials? Verify to proceed!</string>
+
+    <string name="request_title">Login request from %s</string>
+    <string name="request_subtitle">Verify to proceed</string>
+    <string name="request_subtitleDialog">Allow login for:\n\n\tUsername: %s\n\tName: %s\n\non website %s (%s)?</string>
+
+    <string name="extensions_txsimpleAuth_suffix">Message from server:\n</string>
+
+    <string name="u2f_registerTitle">Create U2F credential request</string>
+    <string name="u2f_registerSubtitle">Verify user presence!</string>
+    <string name="u2f_registerDummyTitle">Incoming dummy U2F request</string>
+    <string name="u2f_registerDummySubtitle">Accept to continue</string>
+
+    <string name="notification_title_actionrequired">"Action Required"</string>
+    <string name="notification_body_actionrequired">Authentication request</string>
+    <string name="notification_body_foregroundservice">Bluetooth Service is running in the background</string>
 </resources>

@@ -207,6 +207,55 @@ public class PwsRecordV3 extends PwsRecord
     public static final int AUTOTYPE_RETURNSUFFIX = 194;
 
     /**
+     * FIDO - RP ID
+     */
+    public static final int FIDO_RP_ID = 210;
+
+    /**
+     * FIDO - RP Name
+     */
+    public static final int FIDO_RP_NAME = 211;
+
+    /**
+     * FIDO - User Handle
+     */
+    public static final int FIDO_USER_HANDLE = 212;
+
+    /**
+     * FIDO - User Name
+     */
+    public static final int FIDO_USER_NAME = 213;
+
+    /**
+     * FIDO - User Name
+     */
+    public static final int FIDO_USER_DISPLAYNAME = 214;
+
+    /**
+     * FIDO - U2F RP ID
+     */
+    public static final int FIDO_U2F_RP_ID = 215;
+
+    /**
+     * FIDO - KeyPair
+     *   String Format: publicKey:privateKey
+     *   Keys are encoded in base64
+     */
+    public static final int FIDO_KEY_PAIR = 216;
+
+    /**
+     * FIDO - KEY USE COUNTER
+     */
+    public static final int FIDO_KEY_USE_COUNTER = 217;
+
+    /**
+     * FIDO - HMAC SECRET
+     */
+    public static final int FIDO_HMAC_SECRET = 218;
+
+
+
+    /**
      * Header database version
      */
     public static final int HEADER_VERSION = 0;
@@ -322,6 +371,24 @@ public class PwsRecordV3 extends PwsRecord
                          "AUTOTYPE_DELIMITER", PwsIntegerField.class},
             new Object[]{AUTOTYPE_RETURNSUFFIX,
                          "AUTOTYPE_RETURNSUFFIX", PwsIntegerField.class},
+            new Object[]{FIDO_RP_ID,
+                         "FIDO_RP_ID", PwsStringUnicodeField.class},
+            new Object[]{FIDO_RP_NAME,
+                         "FIDO_RP_NAME", PwsStringUnicodeField.class},
+            new Object[]{FIDO_USER_HANDLE,
+                         "FIDO_USER_HANDLE", PwsStringUnicodeField.class},
+            new Object[]{FIDO_USER_NAME,
+                         "FIDO_USER_NAME", PwsStringUnicodeField.class},
+            new Object[]{FIDO_USER_DISPLAYNAME,
+                         "FIDO_USER_DISPLAYNAME", PwsStringUnicodeField.class},
+            new Object[]{FIDO_U2F_RP_ID,
+                         "FIDO_U2F_RP_ID", PwsStringUnicodeField.class},
+            new Object[]{FIDO_KEY_PAIR,
+                         "FIDO_KEY_PAIR", PwsStringUnicodeField.class},
+            new Object[]{FIDO_KEY_USE_COUNTER,
+                         "FIDO_KEY_USE_COUNTER", PwsIntegerField.class},
+            new Object[]{FIDO_HMAC_SECRET,
+                         "FIDO_HMAC_SECRET", PwsStringUnicodeField.class},
             };
 
     /**
@@ -566,6 +633,14 @@ public class PwsRecordV3 extends PwsRecord
                     case OWN_PASSWORD_SYMBOLS:
                     case ICON:
                     case OTP:
+                    case FIDO_RP_ID:
+                    case FIDO_RP_NAME:
+                    case FIDO_USER_HANDLE:
+                    case FIDO_USER_NAME:
+                    case FIDO_USER_DISPLAYNAME:
+                    case FIDO_U2F_RP_ID:
+                    case FIDO_KEY_PAIR:
+                    case FIDO_HMAC_SECRET:
                     case PASSWORD_POLICY_NAME:
                         itemVal = new PwsStringUnicodeField(item.getType(),
                                                             item.getByteData());
@@ -591,6 +666,7 @@ public class PwsRecordV3 extends PwsRecord
                     case AUTOTYPE_RETURNSUFFIX:
                     case PASSWORD_EXPIRY_INTERVAL:
                     case ENTRY_KEYBOARD_SHORTCUT:
+                    case FIDO_KEY_USE_COUNTER:
                         itemVal = new PwsIntegerField(item.getType(),
                                                       item.getByteData());
                         break;

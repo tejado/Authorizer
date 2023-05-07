@@ -8,16 +8,26 @@
 package net.tjado.passwdsafe;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +40,10 @@ import com.google.android.material.navigation.NavigationBarView;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -69,6 +82,10 @@ import net.tjado.passwdsafe.view.EditRecordResult;
 import net.tjado.passwdsafe.view.PasswdFileDataView;
 import net.tjado.passwdsafe.view.PasswdLocation;
 import net.tjado.passwdsafe.view.PasswdRecordListData;
+import net.tjado.webauthn.Authenticator;
+import net.tjado.webauthn.PasswdSafeCredentialBackend;
+import net.tjado.webauthn.TransactionManager;
+import net.tjado.webauthn.fido.hid.Framing;
 
 import org.pwsafe.lib.file.PwsRecord;
 
@@ -79,7 +96,6 @@ import java.util.BitSet;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.Objects;
 
 /**
  * The main PasswdSafe activity for showing a password file
@@ -102,9 +118,13 @@ public class PasswdSafe extends AppCompatActivity
                    PasswdSafeRecordFragment.Listener,
                    ReleaseNotesFragment.Listener,
                    LicensesFragment.Listener,
+                   BluetoothFragment.Listener,
+                   UsernamesFragment.Listener,
                    PreferencesFragment.Listener,
                    PreferenceFragmentCompat.OnPreferenceStartScreenCallback
 {
+    private static final String TAG = "Authorizer";
+
     public static final int CONTEXT_GROUP_RECORD_BASIC = 1;
     public static final int CONTEXT_GROUP_LIST = 2;
     public static final int CONTEXT_GROUP_LIST_CONTENTS = 3;
@@ -148,9 +168,13 @@ public class PasswdSafe extends AppCompatActivity
         /** Refresh the preferences */
         REFRESH_PREFERENCES,
         /** Viewing release notes */
-        VIEW_RELEASE_NOTES,
+        VIEW_PREF_RELEASE_NOTES,
         /** Viewing license/credits info */
-        VIEW_LICENSES,
+        VIEW_PREF_LICENSES,
+        /** Viewing bluetooth settings */
+        VIEW_PREF_BLUETOOTH,
+        /** Viewing username settings */
+        VIEW_PREF_USERNAMES,
         /** View backup files */
         BACKUP_FILES,
         /** View files */
@@ -184,9 +208,13 @@ public class PasswdSafe extends AppCompatActivity
         /** Viewing preferences */
         VIEW_PREFERENCES,
         /** Viewing release notes */
-        VIEW_RELEASE_NOTES,
+        VIEW_PREF_RELEASE_NOTES,
         /** Viewing license/credits info */
-        VIEW_LICENSES,
+        VIEW_PREF_LICENSES,
+        /** Viewing bluetooth settings */
+        VIEW_PREF_BLUETOOTH,
+        /** Viewing usernames settings */
+        VIEW_PREF_USERNAMES,
         /** Viewing backup files */
         BACKUP_FILES,
         /** Viewing files */
@@ -253,16 +281,12 @@ public class PasswdSafe extends AppCompatActivity
     /** The search menu item */
     private MenuItem itsSearchItem = null;
 
-    private NavSelectListener itsNavSelectListener = new NavSelectListener();
+    private final NavSelectListener itsNavSelectListener = new NavSelectListener();
     private View itsContent;
     private View itsNoPermGroup;
 
     /** Bottom Navigation View */
     BottomNavigationView itsBottomNav;
-
-    /** Fragment managing the behaviors, interactions and presentation of the
-     * navigation drawer. */
-    //private PasswdSafeNavDrawerFragment itsNavDrawerFrag;
 
     /** Currently running tasks */
     private final ManagedTasks itsTasks = new ManagedTasks();
@@ -318,7 +342,38 @@ public class PasswdSafe extends AppCompatActivity
     private static final int MENU_BIT_HAS_RESTORE = 9;
     private static final int MENU_BIT_HAS_RESTORE_ENABLED = 10;
 
-    private static final String TAG = "Authorizer";
+    @Nullable
+    public static TransactionManager mTransactionManager;
+    public static Authenticator mAuthenticator;
+    private static final AuthListener authenticatorListener = new AuthListener();
+    private static final Handler foregroundHandler = new Handler();
+    public BluetoothForegroundService btService;
+    private final ServiceConnection btServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            PasswdSafeUtil.info(TAG, "Service bound");
+            btService = ((BluetoothForegroundService.BluetoothForegroundBinder)service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            PasswdSafeUtil.info(TAG, "Service unbound");
+            btService = null;
+        }
+    };
+
+    private final BroadcastReceiver btStatusBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                checkBluetoothState(state);
+            }
+        }
+    };
 
 
     @Override
@@ -343,10 +398,13 @@ public class PasswdSafe extends AppCompatActivity
                 this, REQUEST_STORAGE_PERM, REQUEST_APP_SETTINGS,
                 BuildConfig.APPLICATION_ID, R.id.reload, R.id.app_settings);
         itsPermissionMgr.addPerm(Manifest.permission.WRITE_EXTERNAL_STORAGE, true);
-        itsPermissionMgr.addPerm(Manifest.permission.BLUETOOTH_SCAN, true);
-        itsPermissionMgr.addPerm(Manifest.permission.BLUETOOTH_CONNECT, true);
         itsPermissionMgr.addPerm(Manifest.permission.WRITE_EXTERNAL_STORAGE, true);
         itsPermissionMgr.addPerm(DynamicPermissionMgr.PERM_POST_NOTIFICATIONS, false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            itsPermissionMgr.addPerm(Manifest.permission.BLUETOOTH_SCAN, true);
+        } else {
+            itsPermissionMgr.addPerm(Manifest.permission.BLUETOOTH, true);
+        }
 
 
         itsQueryPanel = findViewById(R.id.query_panel);
@@ -407,7 +465,7 @@ public class PasswdSafe extends AppCompatActivity
                     break;
                 }
                 default: {
-                    Log.e(TAG, "Unknown action for intent: " + intent);
+                    PasswdSafeUtil.info(TAG, "Unknown action for intent: " + intent);
                     finish();
                     break;
                 }
@@ -490,7 +548,6 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     protected void onPostCreate(Bundle savedInstanceState)
     {
-        //itsNavDrawerFrag.onPostCreate();
         super.onPostCreate(savedInstanceState);
     }
 
@@ -505,7 +562,28 @@ public class PasswdSafe extends AppCompatActivity
             }
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "Can't open uri: " + uri, e);
+            PasswdSafeUtil.info(TAG, "Can't open uri: " + uri, e);
+        }
+    }
+
+    @Override
+    @SuppressLint("NewApi")
+    protected void onResume() {
+        super.onResume();
+
+        foregroundHandler.removeCallbacksAndMessages(null);
+
+        if (ApiCompat.supportsBluetoothHid() && mTransactionManager == null) {
+            try {
+                PasswdSafeCredentialBackend credentialBackend = new PasswdSafeCredentialBackend(this, false, this);
+                mAuthenticator = new Authenticator(this, false, credentialBackend);
+            } catch (Exception e) {
+                PasswdSafeUtil.info(TAG, "Error initializing authenticator", e);
+            }
+
+            mTransactionManager = new TransactionManager(this, mAuthenticator);
+            mTransactionManager.registerListener((Framing.WebAuthnListener) authenticatorListener);
+            mTransactionManager.registerListener((Framing.U2fAuthnListener) authenticatorListener);
         }
     }
 
@@ -541,12 +619,37 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
+    @SuppressLint("NewApi")
     protected void onStart()
     {
         super.onStart();
+
         if (AboutUtils.checkShowNotes(this)) {
-            showReleaseNotes();
+            showPrefReleaseNotes();
         }
+
+        if(!ApiCompat.supportsBluetoothHid()) {
+            return;
+        }
+
+        if (mTransactionManager != null) {
+            mTransactionManager.updateActivity(this);
+        }
+
+        IntentFilter btStatusIntentFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        registerReceiver(btStatusBroadcastReceiver, btStatusIntentFilter);
+
+        checkBluetoothState(null);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        try {
+            unbindService(btServiceConnection);
+            unregisterReceiver(btStatusBroadcastReceiver);
+        } catch (Exception ignored) {}
     }
 
     @Override
@@ -627,7 +730,7 @@ public class PasswdSafe extends AppCompatActivity
                     break;
                 }
                 case VIEW_RECORD: {
-                    options.set(MENU_BIT_CAN_ADD, fileEditable);
+                    options.set(MENU_BIT_CAN_ADD, false);
                     options.set(MENU_BIT_HAS_RESTORE, fileCanRestore);
                     options.set(MENU_BIT_HAS_RESTORE_ENABLED, fileCanRestoreEnabled);
                     options.set(MENU_BIT_HAS_CLOSE, true);
@@ -645,8 +748,10 @@ public class PasswdSafe extends AppCompatActivity
                 case FILE_NEW:
                 case EDIT_RECORD:
                 case CHANGING_PASSWORD:
-                case VIEW_RELEASE_NOTES:
-                case VIEW_LICENSES:
+                case VIEW_PREF_RELEASE_NOTES:
+                case VIEW_PREF_LICENSES:
+                case VIEW_PREF_BLUETOOTH:
+                case VIEW_PREF_USERNAMES:
                 case BACKUP_FILES:
                 case FILES: {
                     options.set(MENU_BIT_HAS_CLOSE, false);
@@ -823,39 +928,18 @@ public class PasswdSafe extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        FragmentManager fragMgr = getSupportFragmentManager();
-        if (fragMgr.getBackStackEntryCount() == 0) {
-            switch (itsCurrViewMode) {
-            case VIEW_LIST: {
-                if (itsIsConfirmBackClosed) {
-                    Toast.makeText(this, R.string.press_again_close_warning,
-                                   Toast.LENGTH_SHORT).show();
-                    itsIsConfirmBackClosed = false;
-                    return;
-                } else {
-                    closeFile();
-                    return;
-                }
-            }
-            case FILE_OPEN: {
+        if (itsCurrViewMode == ViewMode.VIEW_LIST) {
+            if (itsIsConfirmBackClosed) {
+                Toast.makeText(this, R.string.press_again_close_warning,
+                        Toast.LENGTH_SHORT).show();
+                itsIsConfirmBackClosed = false;
+                return;
+            } else {
                 closeFile();
+                return;
             }
-            case INIT:
-            case CHANGING_PASSWORD:
-            case EDIT_RECORD:
-            case FILE_NEW:
-            case VIEW_RECORD:
-            case VIEW_EXPIRATION:
-            case VIEW_POLICY_LIST:
-            case VIEW_RECORD_ERRORS:
-            case VIEW_PREFERENCES:
-            case VIEW_RELEASE_NOTES:
-            case VIEW_LICENSES:
-            case FILES:
-            case BACKUP_FILES: {
-                break;
-            }
-            }
+        } else if (itsCurrViewMode == ViewMode.FILE_OPEN) {
+            closeFile();
         }
 
         /*if(itsCurrViewMode == ViewMode.VIEW_RECORD) {
@@ -891,9 +975,13 @@ public class PasswdSafe extends AppCompatActivity
                 } else if(frag instanceof PreferencesFragment) {
                     itsCurrViewMode = ViewMode.VIEW_PREFERENCES;
                 } else if(frag instanceof LicensesFragment) {
-                    itsCurrViewMode = ViewMode.VIEW_LICENSES;
+                    itsCurrViewMode = ViewMode.VIEW_PREF_LICENSES;
                 } else if(frag instanceof ReleaseNotesFragment) {
-                    itsCurrViewMode = ViewMode.VIEW_RELEASE_NOTES;
+                    itsCurrViewMode = ViewMode.VIEW_PREF_RELEASE_NOTES;
+                } else if(frag instanceof BluetoothFragment) {
+                    itsCurrViewMode = ViewMode.VIEW_PREF_BLUETOOTH;
+                } else if(frag instanceof UsernamesFragment) {
+                    itsCurrViewMode = ViewMode.VIEW_PREF_USERNAMES;
                 }
 
                 doUpdateView(itsCurrViewMode, itsLocation);
@@ -1016,17 +1104,33 @@ public class PasswdSafe extends AppCompatActivity
     /**
      * Show the release notes
      */
-    public void showReleaseNotes()
+    public void showPrefReleaseNotes()
     {
-        doShowReleaseNotes();
+        doShowPrefReleaseNotes();
     }
 
     /**
      * Show the preferences
      */
-    public void showLicenses()
+    public void showPrefLicenses()
     {
-        doShowLicenses();
+        doShowPrefLicenses();
+    }
+
+    /**
+     * Show the preferences
+     */
+    public void showPrefBluetooth()
+    {
+        doShowPrefBluetooth();
+    }
+
+    /**
+     * Show the preferences
+     */
+    public void showPrefUsernames()
+    {
+        doShowPrefUsernames();
     }
 
     /**
@@ -1100,20 +1204,28 @@ public class PasswdSafe extends AppCompatActivity
                 doShowPreferences(true);
                 break;
             }
-            case VIEW_RELEASE_NOTES:{
-                doShowReleaseNotes();
+            case VIEW_PREF_RELEASE_NOTES:{
+                doShowPrefReleaseNotes();
                 break;
             }
-            case VIEW_LICENSES: {
-                doShowLicenses();
+            case VIEW_PREF_LICENSES: {
+                doShowPrefLicenses();
+                break;
+            }
+            case VIEW_PREF_BLUETOOTH: {
+                doShowPrefBluetooth();
+                break;
+            }
+            case VIEW_PREF_USERNAMES: {
+                doShowPrefUsernames();
                 break;
             }
             case FILES: {
-                doShowLicenses();
+                doShowPrefLicenses();
                 break;
             }
             case BACKUP_FILES: {
-                doShowLicenses();
+                doShowPrefLicenses();
                 break;
             }
             }
@@ -1559,15 +1671,26 @@ public class PasswdSafe extends AppCompatActivity
     }
 
     @Override
-    public void updateViewLicenses()
+    public void updateViewPrefLicenses()
     {
-        doUpdateView(ViewMode.VIEW_LICENSES, itsLocation);
+        doUpdateView(ViewMode.VIEW_PREF_LICENSES, itsLocation);
     }
 
     @Override
-    public void updateViewReleaseNotes()
+    public void updateViewPrefBluetooth()
     {
-        doUpdateView(ViewMode.VIEW_RELEASE_NOTES, itsLocation);
+        doUpdateView(ViewMode.VIEW_PREF_BLUETOOTH, itsLocation);
+    }
+
+    public void updateViewPrefUsernames()
+    {
+        doUpdateView(ViewMode.VIEW_PREF_USERNAMES, itsLocation);
+    }
+
+    @Override
+    public void updateViewPrefReleaseNotes()
+    {
+        doUpdateView(ViewMode.VIEW_PREF_RELEASE_NOTES, itsLocation);
     }
 
     @Override
@@ -1874,6 +1997,7 @@ public class PasswdSafe extends AppCompatActivity
                 viewMode = ChangeMode.REFRESH_LIST;
             }
         }
+
         doChangeView(viewMode, viewFrag, location.getRecord());
     }
 
@@ -1901,19 +2025,37 @@ public class PasswdSafe extends AppCompatActivity
     /**
      * Show the release notes
      */
-    private void doShowReleaseNotes()
+    private void doShowPrefReleaseNotes()
     {
-        doChangeView(ChangeMode.VIEW_RELEASE_NOTES,
+        doChangeView(ChangeMode.VIEW_PREF_RELEASE_NOTES,
                      ReleaseNotesFragment.newInstance());
     }
 
     /**
      * Show the licenses/credits
      */
-    private void doShowLicenses()
+    private void doShowPrefLicenses()
     {
-        doChangeView(ChangeMode.VIEW_LICENSES,
+        doChangeView(ChangeMode.VIEW_PREF_LICENSES,
                      LicensesFragment.newInstance());
+    }
+
+    /**
+     * Show bluetooth preferences
+     */
+    private void doShowPrefBluetooth()
+    {
+        doChangeView(ChangeMode.VIEW_PREF_BLUETOOTH,
+                BluetoothFragment.newInstance());
+    }
+
+    /**
+     * Show username preferences
+     */
+    private void doShowPrefUsernames()
+    {
+        doChangeView(ChangeMode.VIEW_PREF_USERNAMES,
+                UsernamesFragment.newInstance());
     }
 
     /**
@@ -1980,8 +2122,10 @@ public class PasswdSafe extends AppCompatActivity
             case VIEW_POLICY_LIST:
             case VIEW_RECORD_ERRORS:
             case VIEW_PREFERENCES:
-            case VIEW_RELEASE_NOTES:
-            case VIEW_LICENSES:
+            case VIEW_PREF_RELEASE_NOTES:
+            case VIEW_PREF_LICENSES:
+            case VIEW_PREF_BLUETOOTH:
+            case VIEW_PREF_USERNAMES:
             case BACKUP_FILES:
             case FILES:{
                 supportsBack = true;
@@ -2201,18 +2345,32 @@ public class PasswdSafe extends AppCompatActivity
                 }
                 break;
             }
-            case VIEW_RELEASE_NOTES: {
+            case VIEW_PREF_RELEASE_NOTES: {
                 showHomeNav = true;
                 fileTimeoutPaused = false;
                 itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.release_notes_title),
                                                      this);
                 break;
             }
-            case VIEW_LICENSES: {
+            case VIEW_PREF_LICENSES: {
                 showHomeNav = true;
                 fileTimeoutPaused = false;
                 itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.licenses),
                                                      this);
+                break;
+            }
+            case VIEW_PREF_BLUETOOTH: {
+                showHomeNav = true;
+                fileTimeoutPaused = false;
+                itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.bluetooth),
+                        this);
+                break;
+            }
+            case VIEW_PREF_USERNAMES: {
+                showHomeNav = true;
+                fileTimeoutPaused = false;
+                itsTitle = PasswdSafeApp.getAppTitle(getString(R.string.usernames),
+                        this);
                 break;
             }
             case BACKUP_FILES: {
@@ -2306,8 +2464,10 @@ public class PasswdSafe extends AppCompatActivity
         }
         case VIEW_RECORD_ERRORS:
         case VIEW_PREFERENCES:
-        case VIEW_RELEASE_NOTES:
-        case VIEW_LICENSES:
+        case VIEW_PREF_RELEASE_NOTES:
+        case VIEW_PREF_LICENSES:
+        case VIEW_PREF_BLUETOOTH:
+        case VIEW_PREF_USERNAMES:
         case BACKUP_FILES: {
             parentMenuItem = R.id.menu_preferences;
             break;
@@ -2338,9 +2498,72 @@ public class PasswdSafe extends AppCompatActivity
     /**
      * close file / restart app
      */
-    void closeFile() {
+    void closeFile()
+    {
         itsFileDataFrag.onDestroy();
         startActivity(Intent.makeRestartActivityTask(getIntent().getComponent()));
+    }
+
+    public boolean openDefaultFile() {
+        SharedPreferences prefs = Preferences.getSharedPrefs(this);
+        Uri defFile = Preferences.getDefFilePref(prefs);
+
+        if (defFile != null) {
+            openFile(defFile, null);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void checkBluetoothState() {
+        checkBluetoothState(null);
+    }
+
+    private void checkBluetoothState(Integer state) {
+        if (state == null) {
+            BluetoothManager bluetoothManager = (BluetoothManager) getApplication().getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
+            BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+
+            if(bluetoothAdapter == null) {
+                PasswdSafeUtil.dbginfo(TAG, "BluetoothAdapter is NULL - Running in emulator or not supported device - aborting");
+                return;
+            }
+
+            state = bluetoothAdapter.getState();
+        }
+
+        PasswdSafeUtil.dbginfo(TAG, "checkBluetoothState: " + state);
+
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            PasswdSafeUtil.dbginfo(TAG, "Android API version too low - aborting");
+            return;
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+            PasswdSafeUtil.dbginfo(TAG, "Aborting checkBluetoothState: missing required permissions");
+            return;
+        }
+
+        if (state == BluetoothAdapter.STATE_OFF) {
+            PasswdSafeUtil.dbginfo(TAG, "BluetoothAdapter.STATE_OFF");
+        } else if (state == BluetoothAdapter.STATE_TURNING_OFF) {
+            PasswdSafeUtil.dbginfo(TAG, "BluetoothAdapter.STATE_TURNING_OFF");
+
+        } else if (state == BluetoothAdapter.STATE_ON) {
+            PasswdSafeUtil.dbginfo(TAG, "BluetoothAdapter.STATE_ON");
+
+            SharedPreferences prefs = Preferences.getSharedPrefs(this);
+            if(Preferences.getBluetoothEnabled(prefs)) {
+                bindService(new Intent(this, BluetoothForegroundService.class), btServiceConnection, Context.BIND_AUTO_CREATE);
+
+                Intent serviceIntent = new Intent(this, BluetoothForegroundService.class);
+                ContextCompat.startForegroundService(this, serviceIntent);
+            }
+        } else if (state == BluetoothAdapter.STATE_TURNING_ON) {
+            PasswdSafeUtil.dbginfo(TAG, "BluetoothAdapter.STATE_TURNING_ON");
+        }
     }
 
     /**
@@ -2737,6 +2960,30 @@ public class PasswdSafe extends AppCompatActivity
                 doShowPreferences(false);
             }
             return true;
+        }
+    }
+
+
+    private static class AuthListener implements Framing.WebAuthnListener, Framing.U2fAuthnListener {
+
+        @Override
+        public void onCompleteMakeCredential() {
+            PasswdSafeUtil.dbginfo(TAG, "EVENT_ACCOUNTREGISTERED");
+        }
+
+        @Override
+        public void onCompleteGetAssertion() {
+            PasswdSafeUtil.dbginfo(TAG, "EVENT_ACCOUNTLOGIN");
+        }
+
+        @Override
+        public void onRegistrationResponse() {
+            PasswdSafeUtil.dbginfo(TAG, "EVENT_U2F_REGISTRATION");
+        }
+
+        @Override
+        public void onAuthenticationResponse() {
+            PasswdSafeUtil.dbginfo(TAG, "EVENT_U2F_AUTHENTICATION");
         }
     }
 }

@@ -45,7 +45,7 @@ public class LicensesFragment extends Fragment
             extends AbstractPasswdSafeFileDataFragment.Listener
     {
         /** Update the view */
-        void updateViewLicenses();
+        void updateViewPrefLicenses();
     }
 
     private Listener itsListener;
@@ -80,7 +80,7 @@ public class LicensesFragment extends Fragment
                 "license-Android.txt", "license-AndroidAssetStudio.txt","license-AndroidTreeView.txt",
                 "license-BouncyCastle", "license-FastAdapter.txt", "license-Fotoapparat.txt",
                 "license-FreeOTP.txt", "license-Iconics.txt", "license-MaterialIcons.txt",
-                "license-RobotoMono.txt", "license-Truth.txt", "license-ZXing.txt");
+                "license-RobotoMono.txt", "license-Truth.txt", "license-ZXing.txt", "license-WIOsenseRoamingAuthenticator.txt");
 
         RecyclerView rvLicenses = rootView.findViewById(R.id.rv_licenses);
 
@@ -97,7 +97,7 @@ public class LicensesFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewLicenses();
+        itsListener.updateViewPrefLicenses();
     }
 
     @Override
@@ -162,10 +162,10 @@ public class LicensesFragment extends Fragment
 
 
     public class LicenseModel {
-        private String product;
-        private String website;
-        private String license;
-        private String licenseText;
+        private final String product;
+        private final String website;
+        private final String license;
+        private final String licenseText;
 
         public LicenseModel(String product, String website, String license, String licenseText) {
             this.product = product;

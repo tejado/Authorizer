@@ -20,4 +20,6 @@
     <attr name="drawablePersonOutline" format="reference"/>
 
     <attr name="textColorGreen" format="reference"/>
+
+    <attr name="customNavigationBarColor" format="reference" />
 </resources>

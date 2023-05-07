@@ -19,47 +19,43 @@ package net.tjado.bluetooth;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothHidDevice;
 import android.bluetooth.BluetoothProfile;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.BatteryManager;
+import android.os.SystemClock;
 import android.util.ArraySet;
 import android.util.Log;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
-import androidx.annotation.WorkerThread;
+
+import net.tjado.authorizer.Utilities;
 
 
 /** Central point for enabling the HID SDP record and sending all data. */
-public class HidDataSender
-        implements MouseReport.MouseDataSender, KeyboardReport.KeyboardDataSender {
+@SuppressLint("MissingPermission")
+public class HidDeviceController
+        implements KeyboardReport.KeyboardDataSender {
 
-    private static final String TAG = "HidDataSender";
+    private static final String TAG = "HidDeviceController";
 
     /** Compound interface that listens to both device and service state changes. */
     public interface ProfileListener
             extends HidDeviceApp.DeviceStateListener, HidDeviceProfile.ServiceStateListener {}
 
     static final class InstanceHolder {
-        static final HidDataSender INSTANCE = createInstance();
+        static final HidDeviceController INSTANCE = createInstance();
 
-        private static HidDataSender createInstance() {
-            return new HidDataSender(new HidDeviceApp(), new HidDeviceProfile());
+        private static HidDeviceController createInstance() {
+            return new HidDeviceController(new HidDeviceApp(), new HidDeviceProfile());
         }
     }
-
-    private final BroadcastReceiver batteryReceiver =
-            new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    onBatteryChanged(intent);
-                }
-            };
 
     private final HidDeviceApp hidDeviceApp;
     private final HidDeviceProfile hidDeviceProfile;
@@ -77,13 +73,26 @@ public class HidDataSender
 
     private boolean isAppRegistered;
 
+    private boolean registerAppReturnStatus;
+
+    private int currentMode = Constants.MODE_FIDO;
+
     /**
      * @param hidDeviceApp HID Device App interface.
      * @param hidDeviceProfile Interface to manage paired HID Host devices.
      */
-    private HidDataSender(HidDeviceApp hidDeviceApp, HidDeviceProfile hidDeviceProfile) {
+    private HidDeviceController(HidDeviceApp hidDeviceApp, HidDeviceProfile hidDeviceProfile) {
         this.hidDeviceApp = hidDeviceApp;
         this.hidDeviceProfile = hidDeviceProfile;
+    }
+
+
+    public boolean isHidKeyboardMode() {
+        return currentMode == Constants.MODE_KEYBOARD;
+    }
+
+    public boolean isHidFidoMode() {
+        return currentMode == Constants.MODE_FIDO;
     }
 
     /**
@@ -91,8 +100,18 @@ public class HidDataSender
      *
      * @return Singleton instance.
      */
-    public static HidDataSender getInstance() {
+    public static HidDeviceController getInstance() {
         return InstanceHolder.INSTANCE;
+    }
+
+    public HidDeviceProfile registerKeyboard(Context context, ProfileListener listener) {
+        Log.i(TAG, "registerKeyboard");
+        return register(context, listener, Constants.MODE_KEYBOARD);
+    }
+
+    public HidDeviceProfile registerFido(Context context, ProfileListener listener) {
+        Log.i(TAG, "registerFido");
+        return register(context, listener, Constants.MODE_FIDO);
     }
 
     /**
@@ -104,7 +123,7 @@ public class HidDataSender
      * @return Interface for managing the paired HID Host devices.
      */
     @MainThread
-    public HidDeviceProfile register(Context context, ProfileListener listener) {
+    public HidDeviceProfile register(Context context, ProfileListener listener, int mode) {
         synchronized (lock) {
             Log.i(TAG, "register");
             if (!listeners.add(listener)) {
@@ -116,11 +135,11 @@ public class HidDataSender
                 return hidDeviceProfile;
             }
 
+            currentMode = mode;
+
             context = (context).getApplicationContext();
             hidDeviceProfile.registerServiceListener(context, profileListener);
             hidDeviceApp.registerDeviceListener(profileListener);
-            context.registerReceiver(
-                    batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         }
         return hidDeviceProfile;
     }
@@ -129,11 +148,10 @@ public class HidDataSender
      * Stop listening for the profile events. When the last listener is unregistered, the SD record
      * for HID Device will also be unregistered.
      *
-     * @param context Context that is required to listen for battery charge.
      * @param listener Callback to unregisterDeviceListener.
      */
     @MainThread
-    public void unregister(Context context, ProfileListener listener) {
+    public void unregister(ProfileListener listener) {
         Log.i(TAG, "unregister");
 
         synchronized (lock) {
@@ -148,8 +166,6 @@ public class HidDataSender
                 return;
             }
 
-            context = (context).getApplicationContext();
-            context.unregisterReceiver(batteryReceiver);
             hidDeviceApp.unregisterDeviceListener();
 
             for (BluetoothDevice device : hidDeviceProfile.getConnectedDevices()) {
@@ -176,6 +192,10 @@ public class HidDataSender
         return (connectedDevice != null);
     }
 
+    public BluetoothDevice getConnectedDevice() {
+        return connectedDevice;
+    }
+
     /**
      * Initiate connection sequence for the specified HID Host. If another device is already
      * connected, it will be disconnected first. If the parameter is {@code null}, then the service
@@ -185,7 +205,8 @@ public class HidDataSender
      */
     @MainThread
     public boolean requestConnect(BluetoothDevice device) {
-        Log.i(TAG, "requestConnect");
+        String deviceName = device != null ? device.getName() : "null";
+        Log.i(TAG, "requestConnect: " + deviceName);
 
         synchronized (lock) {
             waitingForDevice = device;
@@ -208,18 +229,21 @@ public class HidDataSender
         return true;
     }
 
-    @Override
-    @WorkerThread
-    public void sendMouse(boolean left, boolean right, boolean middle, int dX, int dY, int dWheel) {
-        synchronized (lock) {
-            if (connectedDevice != null) {
-                hidDeviceApp.sendMouse(left, right, middle, dX, dY, dWheel);
-            }
+    public void disconnect() {
+        if (isConnected()) {
+            requestConnect(null);
         }
     }
 
-    @Override
-    @WorkerThread
+    public int getMode() {
+        return currentMode;
+    }
+
+    public boolean getRegisterAppStatus() {
+        return registerAppReturnStatus;
+    }
+
+
     public void sendKeyboard(
             int modifier, int key1, int key2, int key3, int key4, int key5, int key6) {
         synchronized (lock) {
@@ -229,12 +253,54 @@ public class HidDataSender
         }
     }
 
+    public void sendToKeyboardHost(byte[] keyboardOutput) {
+        Log.d(TAG, "sendToKeyboardHost");
+
+        synchronized (lock) {
+            Utilities.dbginfo(TAG, "send");
+            try
+            {
+                if (keyboardOutput != null) {
+
+                    int blockSize = 8;
+                    int blockCount = keyboardOutput.length / blockSize;
+
+                    int start = 0;
+                    for (int i = 0; i < blockCount; i++) {
+                        byte[] scancode = Arrays.copyOfRange(keyboardOutput, start, start + blockSize);
+                        Utilities.dbginfo(TAG, "send: " + Utilities.bytesToHex(scancode) );
+
+                        sendScancodeInternal(scancode);
+                        clean();
+                        start += blockSize;
+                    }
+                }
+            } catch (IOException e) {
+                Utilities.dbginfo(TAG, "send error: " + e.getLocalizedMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void clean() throws IOException
+    {
+        // overwriting the last keystroke, otherwise it will be repeated until the next writing
+        // and it would not be possible to repeat the keystroke
+        byte[] scancode = new byte[] {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        Utilities.dbginfo(TAG, "RST > " + Utilities.bytesToHex(scancode));
+        sendScancode(scancode);
+    }
+
     public void sendScancode(byte[] scancode) {
         synchronized (lock) {
             if (connectedDevice != null) {
-                hidDeviceApp.sendScancode(scancode);
+                sendScancodeInternal(scancode);
             }
         }
+    }
+
+    private void sendScancodeInternal(byte[] scancode) {
+        hidDeviceApp.sendScancode(scancode);
     }
 
     private final ProfileListener profileListener =
@@ -251,7 +317,11 @@ public class HidDataSender
                                 onAppStatusChanged(false);
                             }
                         } else {
-                            hidDeviceApp.registerApp(proxy);
+                            registerAppReturnStatus = hidDeviceApp.registerApp(proxy, currentMode);
+                            Log.i(TAG, "Internal profileListener - registerApp return value: " + registerAppReturnStatus);
+                            if(isAppRegistered && registerAppReturnStatus == false) {
+                                Log.i(TAG, "Internal profileListener - isAppRegistered state: " + isAppRegistered);
+                            }
                         }
 
                         updateDeviceList();
@@ -265,7 +335,7 @@ public class HidDataSender
                 @Override
                 @MainThread
                 public void onConnectionStateChanged(BluetoothDevice device, int state) {
-                    Log.i(TAG, "Internal profileListener - onConnectionStateChanged");
+                    Log.i(TAG, "Internal profileListener - onConnectionStateChanged: " + state);
                     synchronized (lock) {
                         if (state == BluetoothProfile.STATE_CONNECTED) {
                             // A new connection was established. If we weren't expecting that, it
@@ -279,6 +349,7 @@ public class HidDataSender
                                 waitingForDevice = null;
                             }
                         }
+
                         updateDeviceList();
                         for (ProfileListener listener : listeners) {
                             listener.onConnectionStateChanged(device, state);
@@ -300,9 +371,31 @@ public class HidDataSender
                         for (ProfileListener listener : listeners) {
                             listener.onAppStatusChanged(registered);
                         }
+
                         if (registered && waitingForDevice != null) {
                             // Fulfill the postponed request to connect.
+                            Log.d(TAG, "Fulfill the postponed request to connect: " + waitingForDevice.getName());
                             requestConnect(waitingForDevice);
+                        }
+                    }
+                }
+
+                @Override
+                @MainThread
+                public void onInterruptData(BluetoothDevice device,
+                                            int reportId, byte[] data,
+                                            BluetoothHidDevice inputHost) {
+                    Log.i(TAG, "Internal profileListener - onInterruptData");
+                    synchronized (lock) {
+                        if (data == null) {
+                            // No data to process - nothing to do
+                            return;
+                        }
+
+                        for (ProfileListener listener : listeners) {
+                            if (listener != null) {
+                                listener.onInterruptData(device, reportId, data, inputHost);
+                            }
                         }
                     }
                 }
@@ -319,21 +412,28 @@ public class HidDataSender
                 if (device.equals(waitingForDevice) || device.equals(connectedDevice)) {
                     connected = device;
                 } else {
+                    Log.i(TAG, "updateDeviceList: disconnecting device: " + device.getName());
                     hidDeviceProfile.disconnect(device);
+                    SystemClock.sleep(50);
                 }
             }
 
             // If there is nothing going on, and we want to connect, then do it.
-            if (hidDeviceProfile
-                            .getDevicesMatchingConnectionStates(
-                                    new int[] {
-                                        BluetoothProfile.STATE_CONNECTED,
-                                        BluetoothProfile.STATE_CONNECTING,
-                                        BluetoothProfile.STATE_DISCONNECTING
-                                    })
-                            .isEmpty()
-                    && waitingForDevice != null) {
+            List<BluetoothDevice> connectionStateDevices = hidDeviceProfile.getDevicesMatchingConnectionStates(
+                        new int[] {
+                                BluetoothProfile.STATE_CONNECTED,
+                                BluetoothProfile.STATE_CONNECTING,
+                                BluetoothProfile.STATE_DISCONNECTING
+                        });
+            if (connectionStateDevices.isEmpty() && waitingForDevice != null) {
                 hidDeviceProfile.connect(waitingForDevice);
+            } else if(waitingForDevice == null) {
+                Log.i(TAG, "updateDeviceList: waitingForDevice is null");
+            } else {
+                Log.i(TAG, "updateDeviceList: getDevicesMatchingConnectionStates is not empty: " );
+                for (BluetoothDevice device : connectionStateDevices) {
+                    Log.i(TAG, "updateDeviceList: still connected device: " + device.getName());
+                }
             }
 
             if (connectedDevice == null && connected != null) {
@@ -346,15 +446,4 @@ public class HidDataSender
         }
     }
 
-    @MainThread
-    private void onBatteryChanged(Intent intent) {
-        int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-        if (level >= 0 && scale > 0) {
-            float batteryLevel = (float) level / (float) scale;
-            hidDeviceApp.sendBatteryLevel(batteryLevel);
-        } else {
-            Log.e(TAG, "Bad battery level data received: level=" + level + ", scale=" + scale);
-        }
-    }
 }

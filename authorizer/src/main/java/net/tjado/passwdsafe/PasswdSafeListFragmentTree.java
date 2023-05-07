@@ -197,12 +197,7 @@ public class PasswdSafeListFragmentTree extends ListFragment
         //containerView.removeAllViews();
         containerView.addView( tvView );
 
-        if(scrollState != null)
-            tvView.post(new Runnable() {
-                public void run() {
-                    tvView.scrollTo(scrollState[0], scrollState[1]);
-                }
-            });
+        if(scrollState != null) tvView.post(() -> tvView.scrollTo(scrollState[0], scrollState[1]));
 
         return root;
     }
@@ -229,13 +224,10 @@ public class PasswdSafeListFragmentTree extends ListFragment
 
             final String uuid = item.itsUuid;
             PasswdRecordListItemHolder itemHolder = new PasswdRecordListItemHolder(getActivity());
-            itemHolder.setIcon2ViewOnClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
+            itemHolder.setIcon2ViewOnClickListener(v -> {
 
-                    itsListener.sendCredentialOverUsbByRecordLocation(uuid);
-                    return true;
-                }
+                itsListener.sendCredentialOverUsbByRecordLocation(uuid);
+                return true;
             });
 
             PasswdRecordListItemHolder.IconTreeItem nodeInfo = new PasswdRecordListItemHolder.IconTreeItem(level, icon, title, item.itsUuid, location);
@@ -273,15 +265,7 @@ public class PasswdSafeListFragmentTree extends ListFragment
                 };
 
                 Handler handler = new Handler();
-                handler.postDelayed(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        itsListener.changeLocation(
-                                item.location.selectRecord(item.uuid));
-                    }
-                }, 50);
+                handler.postDelayed(() -> itsListener.changeLocation(item.location.selectRecord(item.uuid)), 50);
             } else {
                 if (treeViewState.contains(node.getPath())) {
                     PasswdSafeUtil.dbginfo(TAG, "TreeView State: remove expand " + node.getPath());
@@ -312,7 +296,7 @@ public class PasswdSafeListFragmentTree extends ListFragment
         super.onResume();
 
         if (itsIsContents) {
-            itsListener.updateViewList(itsLocation);
+            itsListener.updateViewList(itsRootLocation);
         }
     }
 

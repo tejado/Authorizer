@@ -82,6 +82,11 @@
         </PreferenceCategory>
     </PreferenceScreen>
 
+    <!--suppress AndroidElementNotAllowed -->
+    <net.tjado.passwdsafe.view.LongPreference
+        android:key="usernamesFrag"
+        android:title="@string/usernames"/>
+
     <PreferenceScreen android:key="passwordOptions"
         android:title="@string/passwords">
         <PreferenceCategory android:title="@string/passwords">
@@ -137,7 +142,8 @@
                 android:name="bluetoothkbdEnable Pref"
                 android:defaultValue="true"
                 android:key="bluetoothkbdEnablePref"
-                android:title="@string/autotype_bt_enable"/>
+                android:title="@string/autotype_bt_enable"
+                android:summary="@string/autotype_bt_enable_summary"/>
 
             <!--suppress AndroidElementNotAllowed -->
             <net.tjado.passwdsafe.view.LongListPreference
@@ -194,6 +200,11 @@
                 android:title="@string/record_sort_field"/>
         </PreferenceCategory>
     </PreferenceScreen>
+
+    <!--suppress AndroidElementNotAllowed -->
+    <net.tjado.passwdsafe.view.LongPreference
+        android:key="bluetoothFrag"
+        android:title="@string/bluetooth"/>
 
     <PreferenceCategory android:key="searchOptions"
         android:title="@string/search">

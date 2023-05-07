@@ -36,7 +36,7 @@ public class ReleaseNotesFragment extends Fragment
             extends AbstractPasswdSafeFileDataFragment.Listener
     {
         /** Update the view */
-        void updateViewReleaseNotes();
+        void updateViewPrefReleaseNotes();
     }
 
     private Listener itsListener;
@@ -74,7 +74,7 @@ public class ReleaseNotesFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        itsListener.updateViewReleaseNotes();
+        itsListener.updateViewPrefReleaseNotes();
     }
 
     @Override

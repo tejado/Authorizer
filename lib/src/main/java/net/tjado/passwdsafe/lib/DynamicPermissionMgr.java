@@ -16,6 +16,8 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
+
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -38,6 +40,9 @@ public class DynamicPermissionMgr implements View.OnClickListener
     private final String itsPackageName;
     private final View itsReloadBtn;
     private final View itsAppSettingsBtn;
+    private final ActivityResultLauncher<String[]> itsRequestPermissionLauncher;
+
+    private static final String TAG = "DynamicPermissionMgr";
 
     /**
      * Constructor
@@ -58,6 +63,32 @@ public class DynamicPermissionMgr implements View.OnClickListener
         itsReloadBtn.setOnClickListener(this);
         itsAppSettingsBtn = act.findViewById(appSettingsId);
         itsAppSettingsBtn.setOnClickListener(this);
+
+        itsRequestPermissionLauncher = null;
+    }
+
+    /**
+     * Constructor
+     */
+    public DynamicPermissionMgr(Activity act,
+                                View view,
+                                int permsRequestCode,
+                                int appSettingsRequestCode,
+                                String packageName,
+                                int reloadId,
+                                int appSettingsId,
+                                ActivityResultLauncher<String[]> requestPermissionLauncher)
+    {
+        itsActivity = act;
+        itsPermsRequestCode = permsRequestCode;
+        itsAppSettingsRequestCode = appSettingsRequestCode;
+        itsPackageName = packageName;
+
+        itsReloadBtn = view.findViewById(reloadId);
+        itsReloadBtn.setOnClickListener(this);
+        itsAppSettingsBtn = view.findViewById(appSettingsId);
+        itsAppSettingsBtn.setOnClickListener(this);
+        itsRequestPermissionLauncher = requestPermissionLauncher;
     }
 
     /**
@@ -101,9 +132,15 @@ public class DynamicPermissionMgr implements View.OnClickListener
         }
 
         if (checkPerms != null) {
-            ActivityCompat.requestPermissions(
-                    itsActivity, checkPerms.toArray(new String[0]),
-                    itsPermsRequestCode);
+            if(itsRequestPermissionLauncher == null) {
+                PasswdSafeUtil.dbginfo(TAG, "launch ActivityCompat.requestPermissions");
+                ActivityCompat.requestPermissions(itsActivity, checkPerms.toArray(new String[0]), itsPermsRequestCode);
+            } else {
+                PasswdSafeUtil.dbginfo(TAG, "launch itsRequestPermissionLauncher");
+                itsRequestPermissionLauncher.launch(checkPerms.toArray(new String[0]));
+            }
+        } else {
+            PasswdSafeUtil.dbginfo(TAG, "checkPerms is null");
         }
 
         return hasRequiredPerms();
@@ -154,17 +191,15 @@ public class DynamicPermissionMgr implements View.OnClickListener
     @Override
     public void onClick(View v)
     {
+        PasswdSafeUtil.dbginfo(TAG, "onClick");
         int id = v.getId();
         if (id == itsReloadBtn.getId()) {
             checkPerms();
         } else if (id == itsAppSettingsBtn.getId()) {
-            Intent intent = new Intent(
-                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             intent.setData(Uri.parse("package:" + itsPackageName));
-            if (intent.resolveActivity(itsActivity.getPackageManager()) !=
-                null) {
-                itsActivity.startActivityForResult(intent,
-                                                   itsAppSettingsRequestCode);
+            if (intent.resolveActivity(itsActivity.getPackageManager()) != null) {
+                itsActivity.startActivityForResult(intent, itsAppSettingsRequestCode);
             }
         }
     }
@@ -190,8 +225,7 @@ public class DynamicPermissionMgr implements View.OnClickListener
         {
             itsIsRequired = required;
 
-            if (TextUtils.equals(permission,
-                                 Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
+            if (TextUtils.equals(permission, Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
                 !ApiCompat.supportsWriteExternalStoragePermission()) {
                 itsIsGranted = true;
             } else if (TextUtils.equals(permission, PERM_POST_NOTIFICATIONS) &&

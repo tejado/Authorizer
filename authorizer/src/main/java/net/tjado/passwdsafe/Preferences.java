@@ -30,7 +30,9 @@ import net.tjado.authorizer.OutputInterface;
 import org.pwsafe.lib.file.PwsFile;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -167,6 +169,15 @@ public class Preferences
     public static final String PREF_USB_NATIVE_MODE = "usbNativeModePref";
     private static final boolean PREF_USB_NATIVE_MODE_DEF = false;
 
+    public static final String PREF_BLUETOOTH_ENABLED = "bluetoothEnabledPref";
+    private static final boolean PREF_BLUETOOTH_ENABLED_DEF = true;
+
+    public static final String PREF_BLUETOOTH_FIDO_ENABLED = "bluetoothFidoPref";
+    private static final boolean PREF_BLUETOOTH_FIDO_ENABLED_DEF = true;
+
+    public static final String PREF_USERNAMES = "usernamesPref";
+    public static final String PREF_USERNAMES_DEFAULT = "usernamesDefaultPref";
+
     public static final String PREF_FILE_WRITEABLE = "fileWriteablePref";
 
     public static final String PREF_ABOUT = "aboutOptions";
@@ -183,6 +194,9 @@ public class Preferences
     public static final String PREF_ABOUT_BUILD_DATE = "buildDatePref";
     public static final String PREF_FRAG_RELEASENOTES = "releaseNotesFrag";
     public static final String PREF_FRAG_LICENSES = "licensesFrag";
+    public static final String PREF_FRAG_BLUETOOTH = "bluetoothFrag";
+
+    public static final String PREF_FRAG_USERNAMES = "usernamesFrag";
 
     private static final String TAG = "Preferences";
 
@@ -552,6 +566,73 @@ public class Preferences
     {
         return prefs.getBoolean(PREF_USB_NATIVE_MODE,
                                 PREF_USB_NATIVE_MODE_DEF);
+    }
+
+    /**
+     * Get whether to enable Bluetooth
+     */
+    public static boolean getBluetoothEnabled(SharedPreferences prefs)
+    {
+        return ApiCompat.supportsBluetoothHid() && prefs.getBoolean(PREF_BLUETOOTH_ENABLED,
+                PREF_BLUETOOTH_ENABLED_DEF);
+    }
+
+    /**
+     * Set the preference whether Bluetooth is enabled or not
+     */
+    public static void setBluetoothEnabledPref(boolean enabled,
+                                                 SharedPreferences prefs)
+    {
+        prefs.edit().putBoolean(PREF_BLUETOOTH_ENABLED, enabled).apply();
+    }
+
+    /**
+     * Get whether to enable Bluetooth FIDO U2F/WebAuthn
+     */
+    public static boolean getBluetoothFidoEnabled(SharedPreferences prefs)
+    {
+        return prefs.getBoolean(PREF_BLUETOOTH_FIDO_ENABLED,
+                PREF_BLUETOOTH_FIDO_ENABLED_DEF);
+    }
+
+    /**
+     * Set the preference whether Bluetooth is enabled or not
+     */
+    public static void setBluetoothFidoEnabledPref(boolean enabled, SharedPreferences prefs)
+    {
+        prefs.edit().putBoolean(PREF_BLUETOOTH_FIDO_ENABLED, enabled).apply();
+    }
+
+    /**
+     * Get usernames
+     */
+    public static Set<String> getUsernames(SharedPreferences prefs)
+    {
+        return new HashSet<>(prefs.getStringSet(PREF_USERNAMES, new HashSet<String>()));
+    }
+
+    /**
+     * Set the preference to set of usernames
+     */
+    public static void setUsernamesPref(Set<String> usernames, SharedPreferences prefs)
+    {
+        prefs.edit().putStringSet(PREF_USERNAMES, usernames).apply();
+    }
+
+    /**
+     * Get username default
+     */
+    public static String getUsernameDefault(SharedPreferences prefs)
+    {
+        return prefs.getString(PREF_USERNAMES_DEFAULT, "");
+    }
+
+    /**
+     * Set the preference to set of usernames
+     */
+    public static void setUsernameDefaultPref(String username, SharedPreferences prefs)
+    {
+        prefs.edit().putString(PREF_USERNAMES_DEFAULT, username).apply();
     }
 
     /**
