@@ -412,6 +412,14 @@
 
     <string name="release_notes">
         \n
+        &lt;b&gt;0.5.0&lt;/b&gt;\n
+        - Neue Funktion: FIDO U2F und FIDO2 WebAuthn\n
+        - Neue Funktion: Vordefinierte Benutzernamen und E-Mails\n
+        - Neue Authorizer Bluetooth Integration\n
+        - Neue Navigation\n
+        - Viele Änderungen von PasswdSafe übernommen\n
+        - Fehlerbehebungen
+        \n\n
         &lt;b&gt;0.4.1&lt;/b&gt;\n
         - Fehlerbehebungen
         \n\n

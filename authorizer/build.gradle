@@ -17,8 +17,8 @@ android {
         minSdkVersion 21
         resourceConfigurations += ['de']
         targetSdkVersion 33
-        versionCode 401
-        versionName '0.4.1'
+        versionCode 500
+        versionName '0.5.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         //Reference them in .xml files.
