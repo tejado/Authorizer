@@ -53,9 +53,11 @@ public class U2fSelfAttestation extends AttestationObject {
             throws VirgilException {
         this.authData = authData;
         this.fmt = FormatType.U2F_LEGACY;
-        this.certificate = null;
+
 
         KeyPair keyPair = credentialSource.keyPair;
+
+        this.certificate = keyPair.getPublic().getEncoded();
 
         // Sign the content
         try {
