@@ -14,7 +14,7 @@ import android.content.Context;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
-import net.tjado.passwdsafe.lib.R;
+import net.tjado.passwdsafe.R;
 
 /**
  * The GuiUtilsOreo class contains helper GUI methods that are usable on

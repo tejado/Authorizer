@@ -34,7 +34,6 @@ import net.tjado.authorizer.Utilities;
 import net.tjado.passwdsafe.file.PasswdFileDataUser;
 import net.tjado.passwdsafe.file.PasswdFileUri;
 import net.tjado.passwdsafe.file.PasswdPolicy;
-import net.tjado.passwdsafe.lib.BuildConfig;
 import net.tjado.passwdsafe.util.AboutUtils;
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.ManagedRef;

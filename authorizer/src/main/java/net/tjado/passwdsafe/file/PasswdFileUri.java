@@ -8,7 +8,6 @@
 package net.tjado.passwdsafe.file;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +16,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.OpenableColumns;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.os.EnvironmentCompat;
@@ -30,7 +28,6 @@ import net.tjado.passwdsafe.db.PasswdSafeDb;
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.DocumentsContractCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeContract;
-import net.tjado.passwdsafe.lib.ProviderType;
 import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.passwdsafe.util.Pair;
 
@@ -65,7 +62,6 @@ public class PasswdFileUri
     private String itsTitle = null;
     private Pair<Boolean, Integer> itsWritableInfo;
     private boolean itsIsDeletable;
-    private ProviderType itsSyncType = null;
 
     /** The type of URI */
     public enum Type
@@ -166,12 +162,6 @@ public class PasswdFileUri
             itsFile = null;
             itsBackupFile = null;
             resolveGenericProviderUri(ctx);
-            return;
-        }
-        case SYNC_PROVIDER: {
-            itsFile = null;
-            itsBackupFile = null;
-            resolveSyncProviderUri(ctx);
             return;
         }
         case BACKUP: {
@@ -393,19 +383,16 @@ public class PasswdFileUri
     public boolean exists()
     {
         switch (itsType) {
-        case FILE: {
-            return (itsFile != null) && itsFile.exists();
-        }
-        case SYNC_PROVIDER: {
-            return (itsSyncType != null);
-        }
-        case EMAIL:
-        case GENERIC_PROVIDER: {
-            return true;
-        }
-        case BACKUP: {
-            return (itsBackupFile != null);
-        }
+            case FILE: {
+                return (itsFile != null) && itsFile.exists();
+            }
+            case EMAIL:
+            case GENERIC_PROVIDER: {
+                return true;
+            }
+            case BACKUP: {
+                return (itsBackupFile != null);
+            }
         }
         return false;
     }
@@ -437,12 +424,6 @@ public class PasswdFileUri
         return itsType;
     }
 
-
-    /** Get the sync type of the URI */
-    public ProviderType getSyncType()
-    {
-        return itsSyncType;
-    }
 
     /** Get the backup file */
     public BackupFile getBackupFile()
@@ -486,13 +467,6 @@ public class PasswdFileUri
             } else {
                 return itsUri.getPath();
             }
-        }
-        case SYNC_PROVIDER: {
-            if (itsSyncType != null) {
-                return String.format("%s - %s",
-                                     itsSyncType.getName(context), itsTitle);
-            }
-            return context.getString(R.string.unknown_sync_file);
         }
         case EMAIL: {
             return context.getString(R.string.email_attachment);
@@ -687,89 +661,6 @@ public class PasswdFileUri
         }
 
         return new Pair<>(true, true);
-    }
-
-
-    /** Resolve fields for a sync provider URI */
-    private void resolveSyncProviderUri(Context context)
-    {
-        itsWritableInfo = new Pair<>(true, null);
-        itsIsDeletable = true;
-        if (itsSyncType != null) {
-            return;
-        }
-
-        long providerId = -1;
-        boolean isFile = false;
-        switch (PasswdSafeContract.MATCHER.match(itsUri)) {
-        case PasswdSafeContract.MATCH_PROVIDER:
-        case PasswdSafeContract.MATCH_PROVIDER_FILES: {
-            providerId = Long.parseLong(itsUri.getPathSegments().get(1));
-            break;
-        }
-        case PasswdSafeContract.MATCH_PROVIDER_FILE: {
-            providerId = Long.parseLong(itsUri.getPathSegments().get(1));
-            isFile = true;
-            break;
-        }
-        }
-
-        if (providerId != -1) {
-            ContentResolver cr = context.getContentResolver();
-            resolveSyncProvider(providerId, cr);
-            if (isFile) {
-                resolveSyncFile(cr);
-            }
-        }
-    }
-
-
-    /** Resolve sync provider information */
-    private void resolveSyncProvider(long providerId,
-                                     ContentResolver cr)
-    {
-        Uri providerUri = ContentUris.withAppendedId(
-                PasswdSafeContract.Providers.CONTENT_URI, providerId);
-        Cursor providerCursor = cr.query(
-                providerUri,
-                PasswdSafeContract.Providers.PROJECTION,
-                null, null, null);
-        try {
-            if ((providerCursor != null) && providerCursor.moveToFirst()) {
-                String typeStr = providerCursor.getString(
-                        PasswdSafeContract.Providers.PROJECTION_IDX_TYPE);
-                try {
-                    itsSyncType = ProviderType.valueOf(typeStr);
-                    itsTitle = providerCursor.getString(
-                            PasswdSafeContract.Providers.PROJECTION_IDX_ACCT);
-                } catch (IllegalArgumentException e) {
-                    Log.e(TAG, "Unknown provider type: " + typeStr);
-                }
-            }
-        } finally {
-            if (providerCursor != null) {
-                providerCursor.close();
-            }
-        }
-    }
-
-
-    /** Resolve sync file information */
-    private void resolveSyncFile(ContentResolver cr)
-    {
-        Cursor fileCursor = cr.query(itsUri,
-                                     PasswdSafeContract.Files.PROJECTION,
-                                     null, null, null);
-        try {
-            if ((fileCursor != null) && fileCursor.moveToFirst()) {
-                itsTitle = fileCursor.getString(
-                        PasswdSafeContract.Files.PROJECTION_IDX_TITLE);
-            }
-        } finally {
-            if (fileCursor != null) {
-                fileCursor.close();
-            }
-        }
     }
 
     /**

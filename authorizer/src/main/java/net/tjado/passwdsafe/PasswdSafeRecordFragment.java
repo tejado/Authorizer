@@ -23,7 +23,6 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 
 import net.tjado.passwdsafe.file.PasswdNotes;
-import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.view.PasswdLocation;
 
 import org.pwsafe.lib.file.PwsRecord;

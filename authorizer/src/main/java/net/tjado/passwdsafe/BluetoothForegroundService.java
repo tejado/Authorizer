@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -329,6 +330,15 @@ public class BluetoothForegroundService extends Service {
         }
     }
 
+    private static String bytesToHexString(@NonNull byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xFF & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 
     private final class BtServiceProfileListener implements HidDeviceController.ProfileListener {
         @Override
@@ -411,12 +421,20 @@ public class BluetoothForegroundService extends Service {
                 PasswdSafeUtil.dbginfo(TAG, "onInterruptData - received data with FIDO disabled... aborting");
             }
 
+
+            PasswdSafeUtil.dbginfo(TAG, "incoming 1");
+
             PasswdSafe activity = ((PasswdSafeApp) getApplication()).getActiveActivity();
             if (PasswdSafe.mTransactionManager != null && activity != null && activity.isFileOpen()) {
                 openFileStarted = false;
 
+                PasswdSafeUtil.dbginfo(TAG, "incoming 2");
+
                 PasswdSafe.mTransactionManager.handleReport(data, (rawReports) -> {
                     for (byte[] report : rawReports) {
+                        PasswdSafeUtil.dbginfo(TAG, "reportId ID " + reportId);
+                        PasswdSafeUtil.dbginfo(TAG, "sendReprot: " + bytesToHexString(report));
+
                         inputHost.sendReport(device, reportId, report);
                     }
                 });

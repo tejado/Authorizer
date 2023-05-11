@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 /*
  * Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
  * All rights reserved. Use of the code is allowed under the
@@ -7,6 +9,16 @@
  */
 
 apply plugin: 'com.android.application'
+
+static def gitRevision() {
+    def cmd = "git rev-parse --short HEAD"
+    return cmd.execute().text.trim()
+}
+
+static def buildTime() {
+    def df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss Z")
+    return df.format(new Date())
+}
 
 android {
     namespace 'net.tjado.passwdsafe'
@@ -19,6 +31,10 @@ android {
         targetSdkVersion 33
         versionCode 500
         versionName '0.5.0'
+
+        buildConfigField 'String', 'BUILD_ID', "\"${gitRevision()}\""
+        buildConfigField 'String', 'BUILD_DATE', "\"${buildTime()}\""
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         //Reference them in .xml files.
@@ -82,8 +98,16 @@ if (project.file('../sign/sign.gradle').exists()) {
 dependencies {
     def room_version = "2.4.3"
 
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':lib')
+    api 'androidx.annotation:annotation:1.5.0'
+    api 'androidx.cardview:cardview:1.0.0'
+    api 'androidx.constraintlayout:constraintlayout:2.1.4'
+    api 'androidx.gridlayout:gridlayout:1.0.0'
+    api 'androidx.legacy:legacy-preference-v14:1.0.0'
+    api 'androidx.legacy:legacy-support-v4:1.0.0'
+    api 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
+    api 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    api 'androidx.preference:preference:1.2.0'
+    api 'com.google.android.material:material:1.7.0'
 
     implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
     implementation 'androidx.biometric:biometric:1.1.0'

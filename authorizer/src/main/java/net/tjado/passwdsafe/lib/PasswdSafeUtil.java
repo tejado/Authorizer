@@ -30,6 +30,8 @@ import android.widget.Toast;
 import androidx.annotation.Keep;
 import androidx.appcompat.app.AlertDialog;
 
+import net.tjado.passwdsafe.BuildConfig;
+import net.tjado.passwdsafe.R;
 import net.tjado.passwdsafe.lib.view.AbstractDialogClickListener;
 
 /**

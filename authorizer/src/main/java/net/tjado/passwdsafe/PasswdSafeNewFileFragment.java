@@ -324,36 +324,6 @@ public class PasswdSafeNewFileFragment
                 titleId = R.string.new_local_file;
                 break;
             }
-            case SYNC_PROVIDER: {
-                if (uri.getSyncType() == null) {
-                    PasswdSafeUtil.showFatalMsg("Unknown sync type",
-                                                getActivity());
-                    break;
-                }
-                switch (uri.getSyncType()) {
-                case GDRIVE: {
-                    titleId = R.string.new_drive_file;
-                    break;
-                }
-                case DROPBOX: {
-                    titleId = R.string.new_dropbox_file;
-                    break;
-                }
-                case BOX: {
-                    titleId = R.string.new_box_file;
-                    break;
-                }
-                case ONEDRIVE: {
-                    titleId = R.string.new_onedrive_file;
-                    break;
-                }
-                case OWNCLOUD: {
-                    titleId = R.string.new_owncloud_file;
-                    break;
-                }
-                }
-                break;
-            }
             case EMAIL:
             case GENERIC_PROVIDER:
             case BACKUP: {

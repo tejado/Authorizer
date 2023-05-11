@@ -34,7 +34,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 
-import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.lib.ObjectHolder;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.util.Pair;
@@ -54,7 +53,6 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
