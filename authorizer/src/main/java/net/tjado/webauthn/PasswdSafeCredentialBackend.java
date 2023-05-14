@@ -232,9 +232,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
      */
     protected final <RetT> RetT useRecordFile(final AbstractPasswdSafeLocationFragment.RecordFileUser<RetT> user)
     {
-        return activity.useFileData(fileData -> {
-                return user.useFile(null, fileData);
-        });
+        return activity.useFileData(fileData -> user.useFile(null, fileData));
     }
 
     public String keyToString(Key key) {
@@ -264,7 +262,16 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
     }
 
     public PublicKeyCredentialSource recordToCredential(PasswdFileData fileData, PwsRecord rec) {
-        String[] keys = fileData.getFidoKeyPair(rec).split(":");
+        if(rec == null) {
+            return null;
+        }
+
+        String fileKeyPair = fileData.getFidoKeyPair(rec);
+        if(fileKeyPair == null) {
+            return null;
+        }
+
+        String[] keys = fileKeyPair.split(":");
 
         PublicKey publicKey = null;
         PrivateKey privateKey = null;
@@ -277,7 +284,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
 
         KeyPair keyPair = new KeyPair(publicKey, privateKey);
 
-        PublicKeyCredentialSource credentialSource = new PublicKeyCredentialSource(
+        return new PublicKeyCredentialSource(
                 fileData.getUUID(rec).getBytes(StandardCharsets.UTF_8),
                 fileData.getFidoRpId(rec),
                 fileData.getFidoRpName(rec),
@@ -289,8 +296,6 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
                 keyPair,
                 base64ToSecretKey(fileData.getFidoHmacSecret(rec))
         );
-
-        return  credentialSource;
     }
 
     public SecretKey generateSymmetricKey() {
