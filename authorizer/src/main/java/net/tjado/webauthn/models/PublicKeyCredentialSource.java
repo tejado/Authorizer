@@ -50,7 +50,7 @@ public class PublicKeyCredentialSource {
      */
     public PublicKeyCredentialSource(byte[] id, @NonNull String rpId, String rpName,
                                      byte[] userHandle, String userName, String userDisplayName, boolean generateHmacSecret,
-                                     String u2fRpId, KeyPair keyPair, SecretKey hmacSecret) {
+                                     String u2fRpId, KeyPair keyPair, Integer keyUseCounter, SecretKey hmacSecret) {
         ensureRandomInitialized();
 
         this.id = id;
@@ -63,7 +63,12 @@ public class PublicKeyCredentialSource {
         this.u2fRpId = u2fRpId;
 
         this.keyPair = keyPair;
-        this.keyUseCounter = 1;
+
+        if (keyUseCounter != null) {
+            this.keyUseCounter = keyUseCounter;
+        } else {
+            this.keyUseCounter = 0;
+        }
 
         this.hmacSecret = hmacSecret;
 

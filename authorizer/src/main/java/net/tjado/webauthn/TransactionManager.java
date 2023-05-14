@@ -202,7 +202,6 @@ public class TransactionManager {
                     CommandApdu u2fRequestApdu = new CommandApdu(payload);
                     RawMessages.RequestU2F u2fRequest = RawMessages.parseU2Frequest(u2fRequestApdu);
                     RawMessages.Response u2fResponse = handleU2F(activity, u2fRequest);
-
                     if (!u2fResponse.userVerification) {
                         // No user presence check needed, continue right away
                         ResponseApdu u2fResponseApdu = new ResponseApdu(
@@ -301,16 +300,21 @@ public class TransactionManager {
             if (packet.channelId == 0) {
                 throw new CtapHidException(CtapHidException.CtapHidError.InvalidCmd, packet.channelId);
             }
+
             if (packet instanceof Framing.InitPacket) {
                 Framing.InitPacket initPacket = (Framing.InitPacket)packet;
+
+                Log.d(TAG, "InitPacket Command: "+ initPacket.cmd);
 
                 switch (initPacket.cmd) {
                     case Init:
                         if (initPacket.totalLength != (short)Constants.INIT_CMD_NONCE_LENGTH) {
+                            Log.d(TAG, "Wrong packet length: " + initPacket.totalLength);
                             throw new CtapHidException(CtapHidException.CtapHidError.InvalidLen, packet.channelId);
                         }
                         if (message != null && (initPacket.channelId == message.channelId)) {
                             // INIT command used to resync on the active channel.
+                            Log.d(TAG, "INIT received on current channel; resetting transaction");
                             resetTransaction();
                         }
                         int newChannelId;
@@ -320,8 +324,10 @@ public class TransactionManager {
                             if (freeChannelId == Constants.BROADCAST_CHANNEL_ID) {
                                 freeChannelId = 1;
                             }
+                            Log.d(TAG, "Assigning new channel ID: " + newChannelId);
                         } else {
                             newChannelId = packet.channelId;
+                            Log.d(TAG, "Using previous channel ID: " + newChannelId);
                         }
                         submit.submit(new Framing.InitResponse(
                                 packet.channelId,
@@ -331,8 +337,9 @@ public class TransactionManager {
                     case Cancel:
                         if (message == null) return;
                         if (message.channelId == packet.channelId) {
+                            Log.d(TAG, "Cancelling current transaction");
+
                             if (activeCborJob != null) activeCborJob.cancel(true);
-                            Log.i(TAG, "Cancelling current transaction");
                             authenticator.cancelBiometricPrompt();
                             activeCborJob = null;
                         }
@@ -364,13 +371,16 @@ public class TransactionManager {
             } else if (packet instanceof Framing.ContPacket) {
                 if (packet.channelId == Constants.BROADCAST_CHANNEL_ID) {
                     // Only INIT messages are allowed on the broadcast channel.
+                    Log.d(TAG, "Only INIT messages are allowed on the broadcast channel.");
                     throw new CtapHidException(CtapHidException.CtapHidError.InvalidCid, packet.channelId);
                 }
                 if (message != null && (!message.append((Framing.ContPacket)packet))) {
+                    Log.d(TAG, "Spurious continuation packet dropped");
                     // Spurious continuation packets are dropped without timeout renewal.
                     return;
                 }
             }
+
             haltTimeout();
             if (!handleMessageIfComplete(submit)) {
                 startTimeout(submit);

@@ -21,7 +21,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -32,6 +31,7 @@ import net.tjado.passwdsafe.lib.ActContext;
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.bluetooth.BluetoothDeviceWrapper;
+import net.tjado.passwdsafe.lib.Utils;
 
 import static android.app.Notification.DEFAULT_SOUND;
 import static android.app.Notification.DEFAULT_VIBRATE;
@@ -330,16 +330,6 @@ public class BluetoothForegroundService extends Service {
         }
     }
 
-    private static String bytesToHexString(@NonNull byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xFF & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
     private final class BtServiceProfileListener implements HidDeviceController.ProfileListener {
         @Override
         public void onAppStatusChanged(boolean registered) {
@@ -433,7 +423,7 @@ public class BluetoothForegroundService extends Service {
                 PasswdSafe.mTransactionManager.handleReport(data, (rawReports) -> {
                     for (byte[] report : rawReports) {
                         PasswdSafeUtil.dbginfo(TAG, "reportId ID " + reportId);
-                        PasswdSafeUtil.dbginfo(TAG, "sendReprot: " + bytesToHexString(report));
+                        PasswdSafeUtil.dbginfo(TAG, "sendReprot: " + Utils.bytesToHexString(report));
 
                         inputHost.sendReport(device, reportId, report);
                     }

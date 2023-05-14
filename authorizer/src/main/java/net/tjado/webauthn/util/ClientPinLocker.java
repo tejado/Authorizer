@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 
+import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.webauthn.exceptions.VirgilException;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
@@ -60,7 +61,7 @@ public class ClientPinLocker {
             throw new VirgilException("Failed to hash data", e);
         }
         md.update(clientData);
-        this.clientId = bytesToHexString(md.digest());
+        this.clientId = Utils.bytesToHexString(md.digest());
         this.cpkAlias = "cpk" + this.clientId;
         this.lockerId = CLIENT_PIN_TYPE + this.clientId;
 
@@ -80,7 +81,7 @@ public class ClientPinLocker {
     public ClientPinLocker setToken(@NonNull byte[] token) {
         if (token.length % 16 != 0) return this;
 
-        String tokenString = bytesToHexString(token);
+        String tokenString = Utils.bytesToHexString(token);
         locker.edit()
                 .putString(CLIENT_PIN_FIELD_PIN_TOKEN, tokenString)
                 .apply();
@@ -88,7 +89,7 @@ public class ClientPinLocker {
     }
 
     public boolean lockPin(@NonNull byte[] pin) {
-        String pinString = bytesToHexString(pin);
+        String pinString = Utils.bytesToHexString(pin);
         try {
             refreshToken();
         } catch (VirgilException e) {
@@ -100,7 +101,7 @@ public class ClientPinLocker {
     }
 
     public boolean isPinMatch(@NonNull byte[] pinTry) {
-        String pinTryString = bytesToHexString(pinTry);
+        String pinTryString = Utils.bytesToHexString(pinTry);
         String pinReference = locker.getString(CLIENT_PIN_FIELD_PIN_SHA256,
                 CLIENT_PIN_FIELD_PIN_SHA256_VALUE);
 
@@ -205,16 +206,6 @@ public class ClientPinLocker {
     private String getLockerUri() {
         ApplicationInfo appInfo = new ApplicationInfo();
         return appInfo.dataDir + "/shared_prefs/" + lockerId + ".xml";
-    }
-
-    private String bytesToHexString(@NonNull byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xFF & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
     }
 
     private @Nullable byte[] hexStringToBytes(String str) {

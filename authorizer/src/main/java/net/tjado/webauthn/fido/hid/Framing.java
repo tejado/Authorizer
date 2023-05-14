@@ -1,5 +1,7 @@
 package net.tjado.webauthn.fido.hid;
 
+import android.util.Log;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
@@ -9,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.webauthn.exceptions.CtapHidException;
 import net.tjado.webauthn.exceptions.CtapHidException.CtapHidError;
 import net.tjado.webauthn.fido.hid.Constants.CtapHidCommand;
@@ -28,11 +31,13 @@ public class Framing {
         abstract byte[] toRawReport();
 
         public static Packet parse(byte[] bytes) throws CtapHidException {
+            Log.d("Framing", "Parsing Packet: " + Utils.bytesToHexString(bytes));
+
             int reportOffset;
             if (bytes.length == (Constants.HID_REPORT_SIZE) + 1) {
                 reportOffset = 1; // Linux (hidraw) includes the report ID
-            } else if (bytes.length == Constants.HID_REPORT_SIZE) {
-                reportOffset = 0; // Windows (hidsdi.h) does not include the report ID
+            } else if (bytes.length == Constants.HID_REPORT_SIZE || bytes.length == Constants.HID_REPORT_SIZE - 2) {
+                reportOffset = 0; // Windows, iOS and macOS does not include the report ID
             } else {
                 throw new CtapHidException(CtapHidError.InvalidLen, bytes.length);
             }
@@ -40,6 +45,7 @@ public class Framing {
             int channelId = bytes2int(bytes, reportOffset);
             if ((bytes[reportOffset + 4] & Constants.MESSAGE_TYPE_MASK) == Constants.MESSAGE_TYPE_INIT) {
                 // Initialization packet
+                Log.i("Framing", "Parsing Init packet");
                 CtapHidCommand cmd;
                 try {
                     cmd = CtapHidCommand.fromByte((byte)(bytes[reportOffset + 4] & (byte)Constants.COMMAND_MASK));
@@ -54,6 +60,7 @@ public class Framing {
                 return new InitPacket(channelId, cmd, totalLength, data);
             } else {
                 // Continuation packet
+                Log.i("Framing", "Parsing Continuation packet");
                 byte seq = bytes[reportOffset + 4];
                 byte[] data = Arrays.copyOfRange(bytes, reportOffset + 4 + 1, bytes.length);
                 return new ContPacket(channelId, seq, data);
@@ -156,6 +163,7 @@ public class Framing {
         public boolean append(ContPacket packet) throws CtapHidException {
             if (packet.channelId != channelId) {
                 // Spurious continuation packets are dropped without error.
+                Log.d("Framing", "Spurious continuation packet dropped.");
                 return false;
             }
             if (isComplete() || packet.seq != seq) {

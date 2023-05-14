@@ -217,7 +217,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
         PublicKeyCredentialSource credentialSource;
         credentialSource = new PublicKeyCredentialSource(id[0], rpEntityId, rpDisplayName,
                 userHandle, userName, userDisplayName,
-                generateHmacSecret, u2fRpId, keyPair, null);
+                generateHmacSecret, u2fRpId, keyPair, 0, null);
 
         if (generateHmacSecret && (symmetricKey == null)) {
             deleteCredential(credentialSource);
@@ -294,6 +294,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
                 false,
                 fileData.getFidoU2fRpId(rec),
                 keyPair,
+                fileData.getFidoKeyUseCounter(rec),
                 base64ToSecretKey(fileData.getFidoHmacSecret(rec))
         );
     }
@@ -370,7 +371,12 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
             for (PwsRecord rec: fileData.getRecords()) {
                 String rpId = fileData.getFidoRpId(rec);
                 if (rpId != null && rpId.equals(rpEntityId)) {
-                    credentialSources.add(recordToCredential(fileData, rec));
+                    PublicKeyCredentialSource cred = recordToCredential(fileData, rec);
+                    if (cred != null) {
+                        credentialSources.add(cred);
+                    } else {
+                        Log.d(TAG, "getKeysForEntity - credential is empty - skipping");
+                    }
                 }
             }
             return null;

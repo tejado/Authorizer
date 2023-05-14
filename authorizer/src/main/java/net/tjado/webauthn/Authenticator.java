@@ -42,6 +42,7 @@ import co.nstant.in.cbor.model.Map;
 import co.nstant.in.cbor.model.UnicodeString;
 
 import net.tjado.passwdsafe.R;
+import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.webauthn.exceptions.ApduException;
 import net.tjado.webauthn.exceptions.ApduException.StatusWord;
 import net.tjado.webauthn.exceptions.CtapException;
@@ -188,7 +189,7 @@ public final class Authenticator {
                 if (existingCredentialSource != null &&
                     existingCredentialSource.rpId.equals(options.rpEntity.id) &&
                     PublicKeyCredentialSource.type.equals(descriptor.type)) {
-                    showDialog(activity, "This authenticator is excluded!", "");
+                    showToast(activity, "Already registered - Registration canceled!", Toast.LENGTH_SHORT);
 
                     throw new CtapException(CtapError.CREDENTIAL_EXCLUDED);
                 }
@@ -227,7 +228,8 @@ public final class Authenticator {
         // 8. Obtain user consent for creating a new credential
         // if we need to obtain user verification, create a biometric prompt for that
         // else just generate a new credential/attestation object
-        /*boolean permission;
+        boolean permission;
+        /*
         if (options.requireUserVerification) {
             String subtitle = "";
             if (options.userEntity.name != null) {
@@ -248,18 +250,17 @@ public final class Authenticator {
                                     activity.getString(R.string.credentials_makeTitle, options.rpEntity.id),
                                     subtitle, cryptoObject);
         } else {*/
-            //permission = showDialog(activity,
-            showDialog(activity,
+            permission = showDialog(activity,
                     activity.getString(R.string.credentials_makeTitle, options.rpEntity.id),
                     activity.getString(R.string.credentials_makeSubtitle, options.userEntity.name, options.userEntity.displayName, options.rpEntity.id, options.rpEntity.name));
         //}
 
-        /*if (!permission) {
+        if (!permission) {
             // TODO: Check why using the original credentialSource _does not_ delete the credential
-            credentialSource = credentialSafe.getCredentialSourceById(credentialSource.id);
-            credentialSafe.deleteCredential(credentialSource);
+            //credentialSource = credentialSafe.getCredentialSourceById(credentialSource.id);
+            //credentialSafe.deleteCredential(credentialSource);
             throw new CtapException(CtapError.OPERATION_DENIED);
-        }*/
+        }
 
         // 9. Generate a new credential
         boolean genHmacSec = extensionOutput.getKeys().contains(new UnicodeString("hmac-secret"));
@@ -377,12 +378,15 @@ public final class Authenticator {
         // 0. Check if all supplied parameters are well-formed
         options.areWellFormed();
         boolean preFlight = !options.requireUserPresence;
+        Log.d(TAG, "getAssertion - User Presence: " + options.requireUserPresence);
+        Log.d(TAG, "getAssertion - User Verification: " + options.requireUserVerification);
 
         // 2-3. Parse allowCredentialDescriptorList
         // we do this slightly out of order, see below.
 
         // 4-5. Get keys that match this relying party ID
         List<PublicKeyCredentialSource> credentials = this.credentialSafe.getKeysForEntity(options.rpId);
+        Log.d(TAG, String.format("getAssertion - Got %d for rpID %s", credentials.size(), options.rpId));
 
         // 2-3. Parse allowCredentialDescriptorList
         if (options.allowCredentialDescriptorList != null && options.allowCredentialDescriptorList.size() > 0) {
@@ -390,6 +394,7 @@ public final class Authenticator {
             Set<ByteBuffer> allowedCredentialIds = new HashSet<>();
             for (PublicKeyCredentialDescriptor descriptor: options.allowCredentialDescriptorList) {
                 allowedCredentialIds.add(ByteBuffer.wrap(descriptor.id));
+                Log.d(TAG, String.format("getAssertion - Filtering %s", Utils.bytesToHexString(descriptor.id)));
             }
 
             for (PublicKeyCredentialSource credential : credentials) {
@@ -397,6 +402,7 @@ public final class Authenticator {
                     filteredCredentials.add(credential);
                 }
             }
+            Log.d(TAG, String.format("getAssertion - Filtered credentials to %d", filteredCredentials.size()));
             credentials = filteredCredentials;
         }
 
@@ -411,11 +417,14 @@ public final class Authenticator {
 
         // 7. Allow the user to pick a specific credential, get verification
         PublicKeyCredentialSource selectedCredential;
-        if(!preFlight && selectedPreflightCredential != null) {
+        if(!preFlight && selectedPreflightCredential != null && selectedPreflightCredential.rpId.equals(options.rpId)) {
+            Log.d(TAG, "getAssertion - Using selectedPreflightCredential: " + selectedPreflightCredential.userName);
             selectedCredential = selectedPreflightCredential;
         } else if (credentials.size() == 1) {
+            Log.d(TAG, "getAssertion - credentials count is one!");
             selectedCredential = credentials.get(0);
         } else {
+            Log.d(TAG, "getAssertion - Start credential selector");
             selectedCredential = credentialSelector.selectFrom(credentials);
             if (selectedCredential == null) {
                 throw new VirgilException("User did not select credential");
@@ -453,6 +462,7 @@ public final class Authenticator {
                     selectedCredential.rpName
                 )
             );
+            selectedPreflightCredential = null;
         }
 
         if (!permission) {
@@ -461,7 +471,10 @@ public final class Authenticator {
 
         GetAssertionResult result = getInternalAssertion(options, selectedCredential,
                     biometricSignature, uv, extensionOutput, preFlight);
-        showToast(activity, "Authenticated for " + options.rpId, Toast.LENGTH_SHORT);
+
+        if(!preFlight) {
+            showToast(activity, "Authenticated for " + options.rpId, Toast.LENGTH_SHORT);
+        }
 
         return result;
     }
@@ -527,8 +540,10 @@ public final class Authenticator {
                     rpIdHash = WebAuthnCryptography.sha256(selectedCredential.u2fRpId);
                 }
 
-            } else {
+            } else if (options.rpId != null) {
                 rpIdHash = WebAuthnCryptography.sha256(options.rpId); // 32 bytes
+            } else {
+                throw new CtapException(CtapError.OTHER);
             }
 
             authenticatorData = constructAuthenticatorData(rpIdHash, null,
@@ -785,8 +800,11 @@ public final class Authenticator {
     public Response authenticationRequest(RawMessages.AuthenticationRequest req,
                                           FragmentActivity activity) throws ApduException {
 
-        PublicKeyCredentialSource credentialSource = credentialSafe.getCredentialSourceById(
-                                                                            req.keyHandle);
+        PublicKeyCredentialSource credentialSource = credentialSafe.getCredentialSourceById(req.keyHandle);
+
+        if(credentialSource == null) {
+            throw new ApduException(StatusWord.WRONG_DATA);
+        }
 
         boolean userVerification;
         if (KnownFacets.isDummyRequest(req.application, req.challenge)) {
@@ -815,7 +833,7 @@ public final class Authenticator {
             }
         } catch (VirgilException | CtapException e) {
             e.printStackTrace();
-            throw new ApduException(StatusWord.MEMORY_FAILURE);
+            throw new ApduException(StatusWord.WRONG_DATA);
         }
         
         ByteBuffer buff = ByteBuffer.allocate(5 + assertion.signature.length);

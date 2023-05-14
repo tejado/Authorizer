@@ -19,6 +19,8 @@ import android.content.Context;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 /**
  * The Utils class provides general utilities
  */
@@ -97,5 +99,15 @@ public final class Utils
     {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
         return dateFormat.format(date);
+    }
+
+    public static String bytesToHexString(@NonNull byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xFF & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 }
