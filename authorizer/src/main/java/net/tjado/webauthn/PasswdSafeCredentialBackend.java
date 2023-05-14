@@ -211,7 +211,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
         });
 
         if (rc != null) {
-            activity.finishEditRecord(rc);
+            activity.finishEditFidoRecord(rc);
         }
 
         PublicKeyCredentialSource credentialSource;

@@ -242,6 +242,7 @@ public class PasswdSafe extends AppCompatActivity
     private enum EditFinish
     {
         ADD_RECORD,
+        ADD_FIDO_RECORD,
         CHANGE_PASSWORD,
         DELETE_RECORD,
         EDIT_NOSAVE_RECORD,
@@ -1581,6 +1582,16 @@ public class PasswdSafe extends AppCompatActivity
                    null, result.itsNewLocation, null);
     }
 
+    public void finishEditFidoRecord(EditRecordResult result)
+    {
+        finishEdit(result.itsIsNewRecord ?
+                        EditFinish.ADD_FIDO_RECORD :
+                        (result.itsIsSave ?
+                                EditFinish.EDIT_SAVE_RECORD :
+                                EditFinish.EDIT_NOSAVE_RECORD),
+                null, result.itsNewLocation, null);
+    }
+
     public void finishEditRecord(boolean save, PasswdLocation newLocation, boolean popBack)
     {
         EditFinish finish = EditFinish.EDIT_NOSAVE_RECORD;
@@ -1927,7 +1938,7 @@ public class PasswdSafe extends AppCompatActivity
                 if (contentsFrag instanceof PasswdSafeListFragment) {
                     ((PasswdSafeListFragment)contentsFrag).updateSelection(saveState.itsNewLocation);
                 } else if (contentsFrag instanceof PasswdSafeListFragmentTree) {
-                    /* TODO: implement me */
+                    changeOpenView(itsLocation, OpenViewChange.REFRESH);
                 }
             }
         } else if (saveState.shouldResetLoc(itsFileDataFrag.getFileDataView(),
@@ -2590,6 +2601,12 @@ public class PasswdSafe extends AppCompatActivity
                 itsIsAddRecord = true;
                 itsIsSave = true;
                 itsIsPopBack = true;
+                break;
+            }
+            case ADD_FIDO_RECORD: {
+                itsIsAddRecord = true;
+                itsIsSave = true;
+                itsIsPopBack = false;
                 break;
             }
             case CHANGE_PASSWORD:
