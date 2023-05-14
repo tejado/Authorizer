@@ -411,20 +411,13 @@ public class BluetoothForegroundService extends Service {
                 PasswdSafeUtil.dbginfo(TAG, "onInterruptData - received data with FIDO disabled... aborting");
             }
 
-
-            PasswdSafeUtil.dbginfo(TAG, "incoming 1");
-
             PasswdSafe activity = ((PasswdSafeApp) getApplication()).getActiveActivity();
             if (PasswdSafe.mTransactionManager != null && activity != null && activity.isFileOpen()) {
                 openFileStarted = false;
 
-                PasswdSafeUtil.dbginfo(TAG, "incoming 2");
-
                 PasswdSafe.mTransactionManager.handleReport(data, (rawReports) -> {
                     for (byte[] report : rawReports) {
-                        PasswdSafeUtil.dbginfo(TAG, "reportId ID " + reportId);
-                        PasswdSafeUtil.dbginfo(TAG, "sendReprot: " + Utils.bytesToHexString(report));
-
+                        PasswdSafeUtil.dbginfo(TAG, "Send report: " + Utils.bytesToHexString(report));
                         inputHost.sendReport(device, reportId, report);
                     }
                 });
