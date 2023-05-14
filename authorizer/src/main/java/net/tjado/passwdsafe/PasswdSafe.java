@@ -1990,8 +1990,7 @@ public class PasswdSafe extends AppCompatActivity
                 viewFrag = PasswdSafeListFragment.newInstance(location, true);
             }
 
-            if (change == OpenViewChange.INITIAL) {
-            } else if (change == OpenViewChange.VIEW) {
+            if (change == OpenViewChange.VIEW) {
                 viewMode = ChangeMode.OPEN;
             } else if (change == OpenViewChange.REFRESH) {
                 viewMode = ChangeMode.REFRESH_LIST;
@@ -2149,7 +2148,7 @@ public class PasswdSafe extends AppCompatActivity
             // is the current fragment is the target fragment, skip change if no refresh
             if(!refresh && currFrag != null &&
                contentFrag != null && currFrag.getClass() == contentFrag.getClass() &&
-               mode != ChangeMode.VIEW_PREFERENCES
+               mode != ChangeMode.VIEW_PREFERENCES && itsIsDisplayListTreeView
             ){
                 return;
             }
