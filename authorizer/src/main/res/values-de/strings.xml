@@ -707,6 +707,7 @@
     <string name="autotype_lang_german_apple">Deutsch (Apple)</string>
     <string name="autotype_lang_swiss_german">Deutsch (CH)</string>
     <string name="autotype_lang_swiss_french">Französisch (CH)</string>
+    <string name="autotype_lang_swiss_french">Französisch (FR)</string>	
     <string name="autotype_lang_neo">Neo 2.0</string>
 
     <string-array name="autotype_lang_titles">
@@ -717,6 +718,7 @@
         <item>@string/autotype_lang_german_apple</item>
         <item>@string/autotype_lang_swiss_german</item>
         <item>@string/autotype_lang_swiss_french</item>
+		<item>@string/autotype_lang_french_FR</item>	
         <item>@string/autotype_lang_neo</item>
     </string-array>
 
@@ -728,6 +730,7 @@
         <item>AppleMac_de_DE</item>
         <item>de_CH</item>
         <item>fr_CH</item>
+		<item>fr_FR</item>
         <item>neo</item>
     </string-array>
 
