@@ -17,6 +17,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputLayout;
@@ -461,7 +462,22 @@ public class PasswdSafeEditRecordFragment
     {
         int itemId = item.getItemId();
         if (itemId == R.id.menu_save) {
-            saveRecord();
+
+            if(itsValidator.isPasswordValid()) {
+                saveRecord();
+                return true;
+            }
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.confirm))
+                .setMessage("Save with empty password?")
+                .setPositiveButton(R.string.confirm,
+                    (dialog, whichButton) -> {
+                        saveRecord();
+                    })
+                .setNegativeButton(R.string.cancel, null);
+            alert.show();
+
             return true;
         } else if (itemId == R.id.menu_protect) {
             itsIsProtected = !itsIsProtected;
@@ -1634,6 +1650,7 @@ public class PasswdSafeEditRecordFragment
     private class Validator extends AbstractTextWatcher
     {
         private boolean itsIsValid = false;
+        private boolean itsIsPasswordValid = false;
         private boolean itsIsPaused = false;
 
         /**
@@ -1695,8 +1712,7 @@ public class PasswdSafeEditRecordFragment
             itsTypeError.setText(typeError);
 
             boolean valid = (typeError == null);
-            valid &= !TextInputUtils.setTextInputError(validateTitle(),
-                                                       itsTitleInput);
+            valid &= !TextInputUtils.setTextInputError(validateTitle(), itsTitleInput);
 
             String group = getGroupVal();
             String groupError = null;
@@ -1707,10 +1723,8 @@ public class PasswdSafeEditRecordFragment
             itsGroupError.setText(groupError);
             valid &= (groupError == null);
 
-            valid &= !TextInputUtils.setTextInputError(validatePassword(),
-                                                       itsPasswordInput);
-            valid &= !TextInputUtils.setTextInputError(
-                    validatePasswordConfirm(), itsPasswordConfirmInput);
+            itsIsPasswordValid = !TextInputUtils.setTextInputError(validatePassword(), itsPasswordInput);
+            valid &= !TextInputUtils.setTextInputError(validatePasswordConfirm(), itsPasswordConfirmInput);
 
             if (itsIsV3) {
                 boolean warnExpiryDate = false;
@@ -1762,6 +1776,14 @@ public class PasswdSafeEditRecordFragment
             return itsIsValid;
         }
 
+        /**
+         * Is password valid
+         */
+        protected final boolean isPasswordValid()
+        {
+            return itsIsPasswordValid;
+        }
+
         @Override
         public final void afterTextChanged(Editable s)
         {
@@ -1794,18 +1816,10 @@ public class PasswdSafeEditRecordFragment
          */
         private String validatePassword()
         {
-            switch (itsRecType) {
-            case NORMAL: {
-                if (itsPassword.getText().length() == 0) {
-                    return getString(R.string.empty_password);
-                }
-                break;
+            if (itsRecType == PasswdRecord.Type.NORMAL && itsPassword.getText().length() == 0) {
+                return getString(R.string.empty_password);
             }
-            case ALIAS:
-            case SHORTCUT: {
-                break;
-            }
-            }
+
             return null;
         }
 

@@ -47,4 +47,12 @@ public final class CountedBool
     {
         return (itsCount > 0);
     }
+
+    /**
+     * Reset to the initial false value
+     */
+    public void reset()
+    {
+        itsCount = 0;
+    }
 }

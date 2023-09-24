@@ -4,8 +4,9 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.core.util.Preconditions;
+
+import net.tjado.passwdsafe.lib.Utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -67,16 +68,6 @@ public final class BluetoothDeviceWrapper {
         return devAddress;
     }
 
-    private String bytesToHexString(@NonNull byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xFF & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
     @Override
     public boolean equals(Object obj) {
 
@@ -97,7 +88,7 @@ public final class BluetoothDeviceWrapper {
         try {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.update(devString.getBytes());
-            devHash = bytesToHexString(messageDigest.digest());
+            devHash = Utils.bytesToHexString(messageDigest.digest());
         } catch (NoSuchAlgorithmException e) {
             Log.d(TAG, "Failed to use SHA-256 for hashing - using literal representation");
             devHash = devString;

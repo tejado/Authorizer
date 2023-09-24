@@ -134,19 +134,26 @@
         The saved password will be erased from the device.  All saved
         passwords can be removed from the password preferences.
         \n
-        \nTo use a YubiKey NEO, follow these steps:\n
-        - Enable NFC support in the device settings\n
+        \nTo use a YubiKey, follow these steps:\n
+        - If using a NFC-enabled YubiKey (e.g. a NEO), enable NFC support in the
+        device settings\n
         - Enter the user password to the file\n
         - Choose which slot on the YubiKey has the challenge-response key.
         Usually slot 2 is used for Password Safe.\n
         - Check the YubiKey option\n
         - Click OK\n
-        - Within 30 seconds, press the YubiKey to the back of the phone or
+        - Within 30 seconds, activate the YubiKey\n
+        - For NFC, press the YubiKey to the back of the phone or
         tablet.  There will be sounds as the key is being read.  If the device
         doesn\'t respond with a rising tone, try moving the key around.  A bit
         of trial-and-error is needed to find the correct location.  The button
         on the YubiKey itself does not need to be pressed.\n
-        - Once the key is found, it will be used to authenticate with your
+        - For USB, insert the YubiKey and allow PasswdSafe access to the key.  The key
+        can be inserted at any time while opening the file.  If set in the
+        configuration of the YubiKey, the button may need to be pressed after
+        clicking OK.  The indicator on the button should blink if a press is
+        required.\n
+        - Once the key is found and activated, it will be used to authenticate with your
         password.  The file will open automatically.
     </string>
     <string name="file_operations">File Operations…</string>
@@ -216,6 +223,7 @@
     <string name="new_owncloud_file">New ownCloud File</string>
     <string name="new_policy">New Policy</string>
     <string name="next">Next</string>
+    <string name="nfc_settings">NFC Settings</string>
     <string name="no_alias_chosen">No alias chosen</string>
     <string name="no_backup_file">No backup file</string>
     <string name="no_biometrics_registered">No biometric credentials are registered</string>
@@ -288,6 +296,7 @@
     <string name="policy_yes_sym_policy" tools:ignore="PluralsCandidate">Yes - At least %1$d from policy symbols: %2$s</string>
     <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Yes - Symbols: %2$s</string>
     <string name="press_again_close_warning">Press again to close the file</string>
+    <string name="press_or_insert_yubikey">Press or insert YubiKey</string>
     <string name="press_password_warning">Press Password again to paste into visible field</string>
     <string name="press_yubikey">Press YubiKey</string>
     <string name="previous">Previous</string>
@@ -384,6 +393,8 @@
     <string name="unprotect_group">Unprotect Group Records</string>
     <string name="unprotect_to_modify">Unprotect to modify</string>
     <string name="username">User Name</string>
+    <string name="usb_yubikey_present">USB YubiKey present</string>
+    <string name="usb_yubikey_present_check_button">USB YubiKey present.  Check button press to activate.</string>
     <string name="use_count">Uses</string>
     <string name="use_digits">Digits</string>
     <string name="use_lowercase">Lowercase</string>
@@ -397,8 +408,8 @@
     <string name="writable">Writable</string>
     <string name="yes">Yes</string>
     <string name="yubikey">YubiKey</string>
-    <string name="yubikey_disabled">YubiKey disabled. Enable NFC to use.</string>
-    <string name="yubikey_error">Error communicating with the YubiKey</string>
+    <string name="yubikey_error">Error communicating with the YubiKey: %1$s</string>
+    <string name="yubikey_nfc_disabled">YubiKey NFC disabled. To enable, use the menu to open the NFC settings.</string>
     <string name="yubikey_slot_none">Deactivated</string>
     <string name="yubikey_slot_1">YubiKey Slot 1</string>
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
@@ -849,6 +860,14 @@
     <string name="USERNAMES_SUB_TITLE" translatable="false">{TITLE}</string>
     <string name="USERNAMES_SUB_CURSOR_POSITION" translatable="false">#</string>
 
+    <string name="fido_header">FIDO U2F/WebAuthn</string>
+    <string name="rp_id">Website / App ID</string>
+    <string name="rp_name">Website / App Name</string>
+    <string name="user_handle">User ID</string>
+    <string name="user_displayname">User Displayname</string>
+    <string name="usage_counter">Usage Counter</string>
+    <string name="u2f_handle">U2F ID</string>
+
 
     <!-- net.tjado.webauthn -->
     <string name="dialog_select_credential">Select a Credential</string>
@@ -892,4 +911,39 @@
     <string name="notification_title_actionrequired">"Action Required"</string>
     <string name="notification_body_actionrequired">Authentication request</string>
     <string name="notification_body_foregroundservice">Bluetooth Service is running in the background</string>
+
+    <!-- lib -->
+    <string name="about">About</string>
+    <string name="app_settings">App Settings</string>
+    <string name="box">Box</string>
+    <string name="build_date">Build date</string>
+    <string name="build_id">Build ID</string>
+    <string name="cancel">Cancel</string>
+    <string name="choose_files">Choose Files</string>
+    <string name="close">Close</string>
+    <string name="copy_clipboard_error">%1$s - Error copying to the clipboard.  The error may be due to a known error in Samsung devices.</string>
+    <string name="copy_trace_and_close">Copy Trace and Close</string>
+    <string name="dropbox">Dropbox</string>
+    <string name="edit">Edit</string>
+    <string name="info">Info</string>
+    <string name="error">Error</string>
+    <string name="error_fmt">Error: %1$s</string>
+    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
+    <string name="file_type_icon">File type icon</string>
+    <string name="google_drive">Google Drive</string>
+    <string name="licenses">Licenses</string>
+    <string name="new_drive_file">New Drive File</string>
+    <string name="no_files">No Files</string>
+    <string name="none">None</string>
+    <string name="open">Open</string>
+    <string name="onedrive">OneDrive</string>
+    <string name="owncloud">ownCloud</string>
+    <string name="parent_directory">Parent Directory</string>
+    <string name="preferences">Preferences</string>
+    <string name="release_notes_title">Release Notes</string>
+    <string name="reload">Reload</string>
+    <string name="type">Type</string>
+    <string name="url">URL</string>
+    <string name="version">Version</string>
+    <string name="fido_file_closed">Incoming FIDO request - please open respective PasswdSafe file!</string>
 </resources>

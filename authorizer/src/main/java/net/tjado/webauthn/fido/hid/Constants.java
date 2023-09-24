@@ -11,7 +11,7 @@ import net.tjado.webauthn.exceptions.CtapException;
 import kotlin.UInt;
 
 public class Constants {
-    public static final int HID_REPORT_SIZE = 62;
+    public static final int HID_REPORT_SIZE = 64;
 
     static final int INIT_PACKET_PAYLOAD_SIZE = HID_REPORT_SIZE - 7;
     static final int CONT_PACKET_PAYLOAD_SIZE = HID_REPORT_SIZE - 5;

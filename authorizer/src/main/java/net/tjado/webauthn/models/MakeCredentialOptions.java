@@ -168,13 +168,11 @@ public class MakeCredentialOptions extends AuthenticatorOptions {
                 uv = (options.get(new UnicodeString("uv"))).equals(SimpleValue.TRUE);
             } catch (Exception ignore) {}
 
-            if (up == null && uv == null) {
-                up = true;
-                uv = false;
-            } else if (up != null) {
-                uv = !up;
-            } else {
-                up = !uv;
+            if (up == null) {
+                up = true;  // UP is true by default
+            }
+            if (uv == null) {
+                uv = false;  // UV is false by default
             }
 
             requireUserPresence = up;
@@ -223,11 +221,6 @@ public class MakeCredentialOptions extends AuthenticatorOptions {
         if (userEntity.id.length <= 0 || userEntity.id.length > 64) {
             throw new CtapException(CtapError.INVALID_LENGTH,
                     "User id with invalind length: " + userEntity.id.length);
-        }
-
-        if (requireUserPresence == requireUserVerification) { // only one may be set
-            throw new CtapException(CtapError.UNSUPPORTED_OPTION, "Both uv and up are " +
-                        requireUserVerification);
         }
 
         ClientPINOptions.pinOptionsWellFormed(pinProtocol, pinAuth);

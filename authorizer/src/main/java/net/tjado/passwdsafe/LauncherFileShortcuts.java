@@ -7,7 +7,6 @@
  */
 package net.tjado.passwdsafe;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
@@ -19,7 +18,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 
 import java.util.UUID;

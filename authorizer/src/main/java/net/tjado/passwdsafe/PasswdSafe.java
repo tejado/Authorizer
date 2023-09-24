@@ -242,6 +242,7 @@ public class PasswdSafe extends AppCompatActivity
     private enum EditFinish
     {
         ADD_RECORD,
+        ADD_FIDO_RECORD,
         CHANGE_PASSWORD,
         DELETE_RECORD,
         EDIT_NOSAVE_RECORD,
@@ -486,62 +487,54 @@ public class PasswdSafe extends AppCompatActivity
 
         PasswdSafeUtil.dbginfo(TAG, "onNewIntent: %s", intent);
         switch (String.valueOf(intent.getAction())) {
-        case PasswdSafeUtil.VIEW_INTENT:
-        case Intent.ACTION_VIEW: {
-            final Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
-            Boolean reopen = itsFileDataFrag.useFileData(
-                    fileData -> !fileData.getUri().getUri().equals(openUri));
-            if ((reopen == null) || reopen) {
-                // Close and reopen the new file
-                itsFileDataFrag.setFileData(null);
-                doUpdateView(ViewMode.INIT, new PasswdLocation());
-                changeInitialView();
-                changeFileOpenView(intent);
-            }
-            break;
-        }
-        case Intent.ACTION_SEARCH: {
-            setRecordQueryFilter(intent.getStringExtra(SearchManager.QUERY));
-            break;
-        }
-        case PasswdSafeUtil.SEARCH_VIEW_INTENT: {
-            collapseSearch();
-            String data = intent.getStringExtra(SearchManager.EXTRA_DATA_KEY);
-            if (data == null) {
+            case PasswdSafeUtil.VIEW_INTENT:
+            case Intent.ACTION_VIEW: {
+                final Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
+                Boolean reopen = itsFileDataFrag.useFileData(
+                        fileData -> !fileData.getUri().getUri().equals(openUri));
+                if ((reopen == null) || reopen) {
+                    // Close and reopen the new file
+                    itsFileDataFrag.setFileData(null);
+                    doUpdateView(ViewMode.INIT, new PasswdLocation());
+                    changeInitialView();
+                    changeFileOpenView(intent);
+                }
                 break;
             }
-            PasswdLocation loc = null;
-            if (data.startsWith(PasswdRecordFilter.SEARCH_VIEW_RECORD)) {
-                int pfxlen = PasswdRecordFilter.SEARCH_VIEW_RECORD.length();
-                final String uuid = data.substring(pfxlen);
-                loc = useFileData(fileData -> {
-                    PwsRecord rec = fileData.getRecord(uuid);
-                    if (rec == null) {
-                        return null;
-                    }
-                    return new PasswdLocation(rec, fileData);
-                });
-            } else if (data.startsWith(PasswdRecordFilter.SEARCH_VIEW_GROUP)) {
-                int pfxlen = PasswdRecordFilter.SEARCH_VIEW_GROUP.length();
-                loc = new PasswdLocation(data.substring(pfxlen));
+            case Intent.ACTION_SEARCH: {
+                setRecordQueryFilter(intent.getStringExtra(SearchManager.QUERY));
+                break;
             }
-            if (loc != null) {
-                changeLocation(loc);
+            case PasswdSafeUtil.SEARCH_VIEW_INTENT: {
+                collapseSearch();
+                String data = intent.getStringExtra(SearchManager.EXTRA_DATA_KEY);
+                if (data == null) {
+                    break;
+                }
+                PasswdLocation loc = null;
+                if (data.startsWith(PasswdRecordFilter.SEARCH_VIEW_RECORD)) {
+                    int pfxlen = PasswdRecordFilter.SEARCH_VIEW_RECORD.length();
+                    final String uuid = data.substring(pfxlen);
+                    loc = useFileData(fileData -> {
+                        PwsRecord rec = fileData.getRecord(uuid);
+                        if (rec == null) {
+                            return null;
+                        }
+                        return new PasswdLocation(rec, fileData);
+                    });
+                } else if (data.startsWith(PasswdRecordFilter.SEARCH_VIEW_GROUP)) {
+                    int pfxlen = PasswdRecordFilter.SEARCH_VIEW_GROUP.length();
+                    loc = new PasswdLocation(data.substring(pfxlen));
+                }
+                if (loc != null) {
+                    changeLocation(loc);
+                }
+                break;
             }
-            break;
-        }
-        case PasswdSafeUtil.NEW_INTENT: {
-            changeFileNewView(intent);
-            break;
-        }
-        default: {
-            FragmentManager fragMgr = getSupportFragmentManager();
-            Fragment frag = fragMgr.findFragmentById(R.id.content);
-            if (frag instanceof PasswdSafeOpenFileFragment) {
-                ((PasswdSafeOpenFileFragment)frag).onNewIntent(intent);
+            case PasswdSafeUtil.NEW_INTENT: {
+                changeFileNewView(intent);
+                break;
             }
-            break;
-        }
         }
     }
 
@@ -1581,6 +1574,16 @@ public class PasswdSafe extends AppCompatActivity
                    null, result.itsNewLocation, null);
     }
 
+    public void finishEditFidoRecord(EditRecordResult result)
+    {
+        finishEdit(result.itsIsNewRecord ?
+                        EditFinish.ADD_FIDO_RECORD :
+                        (result.itsIsSave ?
+                                EditFinish.EDIT_SAVE_RECORD :
+                                EditFinish.EDIT_NOSAVE_RECORD),
+                null, result.itsNewLocation, null);
+    }
+
     public void finishEditRecord(boolean save, PasswdLocation newLocation, boolean popBack)
     {
         EditFinish finish = EditFinish.EDIT_NOSAVE_RECORD;
@@ -1927,7 +1930,7 @@ public class PasswdSafe extends AppCompatActivity
                 if (contentsFrag instanceof PasswdSafeListFragment) {
                     ((PasswdSafeListFragment)contentsFrag).updateSelection(saveState.itsNewLocation);
                 } else if (contentsFrag instanceof PasswdSafeListFragmentTree) {
-                    /* TODO: implement me */
+                    changeOpenView(itsLocation, OpenViewChange.REFRESH);
                 }
             }
         } else if (saveState.shouldResetLoc(itsFileDataFrag.getFileDataView(),
@@ -1990,8 +1993,7 @@ public class PasswdSafe extends AppCompatActivity
                 viewFrag = PasswdSafeListFragment.newInstance(location, true);
             }
 
-            if (change == OpenViewChange.INITIAL) {
-            } else if (change == OpenViewChange.VIEW) {
+            if (change == OpenViewChange.VIEW) {
                 viewMode = ChangeMode.OPEN;
             } else if (change == OpenViewChange.REFRESH) {
                 viewMode = ChangeMode.REFRESH_LIST;
@@ -2149,7 +2151,7 @@ public class PasswdSafe extends AppCompatActivity
             // is the current fragment is the target fragment, skip change if no refresh
             if(!refresh && currFrag != null &&
                contentFrag != null && currFrag.getClass() == contentFrag.getClass() &&
-               mode != ChangeMode.VIEW_PREFERENCES
+               mode != ChangeMode.VIEW_PREFERENCES && itsIsDisplayListTreeView
             ){
                 return;
             }
@@ -2566,6 +2568,10 @@ public class PasswdSafe extends AppCompatActivity
         }
     }
 
+    public boolean isEditMode() {
+        return (itsCurrViewMode == ViewMode.EDIT_RECORD);
+    }
+
     /**
      * Information for finishing the save of the file
      */
@@ -2591,6 +2597,12 @@ public class PasswdSafe extends AppCompatActivity
                 itsIsAddRecord = true;
                 itsIsSave = true;
                 itsIsPopBack = true;
+                break;
+            }
+            case ADD_FIDO_RECORD: {
+                itsIsAddRecord = true;
+                itsIsSave = true;
+                itsIsPopBack = false;
                 break;
             }
             case CHANGE_PASSWORD:

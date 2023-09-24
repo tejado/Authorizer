@@ -30,7 +30,6 @@ import android.widget.ListView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
-import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.view.GuiUtils;
 import net.tjado.passwdsafe.view.CopyField;
 import net.tjado.passwdsafe.view.PasswdLocation;

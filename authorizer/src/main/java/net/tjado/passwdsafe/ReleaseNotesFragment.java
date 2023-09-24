@@ -10,16 +10,10 @@ package net.tjado.passwdsafe;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import net.tjado.passwdsafe.lib.view.GuiUtils;
-import net.tjado.passwdsafe.util.AboutUtils;
-
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

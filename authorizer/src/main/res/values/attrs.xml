@@ -22,4 +22,6 @@
     <attr name="textColorGreen" format="reference"/>
 
     <attr name="customNavigationBarColor" format="reference" />
+    <attr name="layout_columnWeight" format="float" />"
+    <attr name="preferenceTheme" format="reference" />"
 </resources>

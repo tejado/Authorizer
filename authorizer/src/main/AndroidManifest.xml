@@ -41,6 +41,12 @@
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.usb.host"
+        android:required="false"/>
+
+    <uses-sdk xmlns:tools="http://schemas.android.com/tools"
+        tools:overrideLibrary="android.support.v14.preference" />
 
     <queries>
         <provider android:authorities="net.tjado.passwdsafe.file" />
@@ -62,6 +68,7 @@
         <activity
             android:name=".PasswdSafe"
             android:launchMode="singleTop"
+            android:configChanges="keyboard|keyboardHidden"
             android:exported="true"
             android:windowSoftInputMode="stateAlwaysVisible|adjustPan">
 
@@ -71,11 +78,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER"/>
             </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.nfc.action.TECH_DISCOVERED"/>
-            </intent-filter>
-
 
             <!-- View files -->
             <intent-filter>

@@ -31,6 +31,7 @@ import net.tjado.passwdsafe.lib.ActContext;
 import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.bluetooth.BluetoothDeviceWrapper;
+import net.tjado.passwdsafe.lib.Utils;
 
 import static android.app.Notification.DEFAULT_SOUND;
 import static android.app.Notification.DEFAULT_VIBRATE;
@@ -329,7 +330,6 @@ public class BluetoothForegroundService extends Service {
         }
     }
 
-
     private final class BtServiceProfileListener implements HidDeviceController.ProfileListener {
         @Override
         public void onAppStatusChanged(boolean registered) {
@@ -412,17 +412,21 @@ public class BluetoothForegroundService extends Service {
             }
 
             PasswdSafe activity = ((PasswdSafeApp) getApplication()).getActiveActivity();
-            if (PasswdSafe.mTransactionManager != null && activity != null && activity.isFileOpen()) {
+            if (PasswdSafe.mTransactionManager != null && activity != null && activity.isFileOpen() && !activity.isEditMode()) {
                 openFileStarted = false;
 
                 PasswdSafe.mTransactionManager.handleReport(data, (rawReports) -> {
                     for (byte[] report : rawReports) {
+                        PasswdSafeUtil.dbginfo(TAG, "Send report: " + Utils.bytesToHexString(report));
                         inputHost.sendReport(device, reportId, report);
                     }
                 });
-
             } else {
-                if(activity != null && !openFileStarted) {
+                if (activity != null && activity.isEditMode()) {
+                    PasswdSafeUtil.dbginfo(TAG, "App is open - notify user inside app");
+                    PasswdSafeUtil.showErrorMsg(getString(R.string.fido_file_closed), new ActContext(activity));
+
+                } else if(activity != null && !openFileStarted) {
                     PasswdSafeUtil.dbginfo(TAG, "App is open - notify user inside app");
 
                     // setting flag that file opening getting triggered on multiple interrupts of
@@ -432,7 +436,7 @@ public class BluetoothForegroundService extends Service {
                     openFileResetHandler.postDelayed(() -> openFileStarted = false, OPEN_FILE_TIMEOUT_MS);
 
                     if (!activity.openDefaultFile()) {
-                        PasswdSafeUtil.showErrorMsg("Incoming FIDO request - please open respective PasswdSafe file!", new ActContext(activity));
+                        PasswdSafeUtil.showErrorMsg(getString(R.string.fido_file_closed), new ActContext(activity));
                     }
                 }
 

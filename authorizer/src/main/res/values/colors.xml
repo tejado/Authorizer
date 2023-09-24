@@ -5,14 +5,33 @@
     <color name="treeview_icons">#259AC0</color>
     <color name="treeview_icons_background">#323232</color>
 
+    <color name="accent">#259AC0</color>
+    <color name="accentDark">#259AC0</color>
     <color name="colorAccent">#259AC0</color>
     <color name="colorPrimary">#259AC0</color>
     <color name="colorPrimaryDark">#259AC0</color>
+    <color name="colorBackground">#259AC0</color>
 
     <color name="primary">#259AC0</color>
     <color name="background_light">#FAFAFA</color>
     <color name="background_dark">#212121</color>
 
     <color name="menu_icon_color">#F0F0F0</color>
+
+    <color name="accent_material_light" tools:override="true">@color/accent</color>
+    <color name="accent_material_dark" tools:override="true">@color/accentDark</color>
+    <color name="primary_dark_material_dark" tools:override="true">@color/colorPrimary</color>
+    <color name="primary_material_dark" tools:override="true">@color/colorPrimary</color>
+
+    <!-- this is needed as preference_category_material layout uses this color as the text color -->
+    <color name="preference_fallback_accent_color" tools:ignore="PrivateResource">@color/accent</color>
+
+
+    <!-- Copied from design compat library -->
+    <color name="textinput_error_color_light">#FFD50000</color>
+    <color name="textinput_error_color_dark">#FFFF6E6E</color>
+
+    <color name="text_color_green_light">#FF99CC00</color>
+    <color name="text_color_green_dark">#FF669900</color>
 
 </resources>

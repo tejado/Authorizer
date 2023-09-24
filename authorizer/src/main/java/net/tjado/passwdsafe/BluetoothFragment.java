@@ -145,8 +145,6 @@ public class BluetoothFragment extends Fragment
 
         prefs = Preferences.getSharedPrefs(getContext());
 
-        BluetoothForegroundService btService = ((PasswdSafe) requireActivity()).btService;
-
         cbBluetoothFeature.setChecked(Preferences.getBluetoothEnabled(prefs));
         if(Preferences.getBluetoothEnabled(prefs)) {
             cbBluetoothFido.setEnabled(true);
@@ -171,6 +169,7 @@ public class BluetoothFragment extends Fragment
                 cbBluetoothFido.setChecked(false);
                 cbBluetoothFido.setEnabled(false);
 
+                BluetoothForegroundService btService = ((PasswdSafe) requireActivity()).btService;
                 if(btService != null) {
                     btService.stopForegroundService();
                 }
@@ -186,6 +185,7 @@ public class BluetoothFragment extends Fragment
                 rvDiscoveredDevicesAdapter.notifyDataSetChanged();
             }
 
+            BluetoothForegroundService btService = ((PasswdSafe) requireActivity()).btService;
             if (btService != null) {
                 if(cbBluetoothFido.isChecked()) {
                     btService.requireFidoMode();
@@ -461,11 +461,9 @@ public class BluetoothFragment extends Fragment
 
     public class RvPairedDevicesAdapter extends RecyclerView.Adapter<ViewHolderPairedDevice> {
         private final List<BluetoothDeviceWrapper> devices;
-        private final BluetoothForegroundService btService;
 
         public RvPairedDevicesAdapter(List<BluetoothDeviceWrapper> devices) {
             this.devices = devices;
-            this.btService = ((PasswdSafe) requireActivity()).btService;
         }
 
         @NonNull
@@ -501,6 +499,7 @@ public class BluetoothFragment extends Fragment
             holder.btnReconnect.setText(R.string.bt_reconnect);
             holder.btnReconnect.setTextAppearance(requireContext(), R.style.Widget_AppCompat_Button_Colored);
 
+            BluetoothForegroundService btService = ((PasswdSafe) requireActivity()).btService;
             if(btService != null && btService.getConnectedDevice() != null)  {
                 BluetoothDeviceWrapper connectedDevice = new BluetoothDeviceWrapper(btService.getConnectedDevice());
                 if(device.equals(connectedDevice)) {
@@ -512,9 +511,10 @@ public class BluetoothFragment extends Fragment
 
             // Reconnect in case of several paired FIDO devices
             holder.btnReconnect.setOnClickListener(item -> {
-                if(btService != null) {
-                    if(btService.getConnectedDevice() != null)  {
-                        BluetoothDeviceWrapper connectedDevice = new BluetoothDeviceWrapper(btService.getConnectedDevice());
+                BluetoothForegroundService btServiceInner = ((PasswdSafe) requireActivity()).btService;
+                if(btServiceInner != null) {
+                    if(btServiceInner.getConnectedDevice() != null)  {
+                        BluetoothDeviceWrapper connectedDevice = new BluetoothDeviceWrapper(btServiceInner.getConnectedDevice());
                         if(device.equals(connectedDevice)) {
                             holder.btnReconnect.setEnabled(false);
                             holder.btnReconnect.setText(R.string.bt_connected);
@@ -531,10 +531,10 @@ public class BluetoothFragment extends Fragment
                     // As the standard connect does not work to switch between FIDO devices,
                     // the Bluetooth HID profile gets reinitialized. As device is already paired
                     // the pairing dialog is not shown and the device gets connected.
-                    btService.pairAsFido(device.getDevice());
+                    btServiceInner.pairAsFido(device.getDevice());
 
                     checkBtProfileStateHandler.postDelayed(() -> {
-                        if(btService.isAppRegistered()) {
+                        if(btServiceInner.isAppRegistered()) {
                             PasswdSafeUtil.dbginfo(TAG, "btService.isAppRegistered is TRUE");
                         } else {
                             PasswdSafeUtil.dbginfo(TAG, "btService.isAppRegistered is FALSE");

@@ -80,12 +80,14 @@ Authorizer does not require root permissions when it is allowed to write to /dev
 
 ### Compatibility
 
-| Features          | Windows | Linux | MacOS | iOS | Android |
-| ----------------- | :-----: | :---: | :---: | :---: | :-----: |
-| AutoType - USB    |    X    |   X   |   X   |   X   |    X    |
-| AutoType - Bluetooth |    X    |   X   |   X   |   X   |    X    |
-| FIDO U2F          |    X    |   X   |       |       |    X    |
-| FIDO WebAuthn     |    X    |   X   |       |       |    X    |
+| Features             | Windows | Linux (⚠️) | macOS (⚠️) | iOS | Android |
+| -------------------- | :-----: | :---: | :---: | :---: | :-----: |
+| AutoType - USB       |    ✅   |   ✅   |   ✅  |   ✅   |    ✅    |
+| AutoType - Bluetooth |    ✅   |   ✅   |   ✅  |   ✅   |    ✅    |
+| FIDO U2F             |    ✅   |   ✅   |   ✅  |   ✅   |    ✅    |
+| FIDO WebAuthn        |    ✅   |   ✅   |   ✅  |   ✅   |    ✅    |
+
+⚠️ For macOS and Linux, Chrome or other compatible browser is required. Firefox does not support FIDO / FIDO2 over Bluetooth natively on these platforms.
 
 ## Features in Detail
 
@@ -123,7 +125,6 @@ In progress
 - The experience of Bluetooth-stack stability can differ between devices, as it is dependent on both the Android version and the specific device being used.
 - Due to limitations in the Bluetooth-stack, Authorizer can only be paired as Keyboard OR as FIDO Security key and not both.
 - It is important to unpair from the other device as well to prevent unexpected behavior, when establishing a new pairing under a separate profile (like Keyboard or FIDO).
-- FIDO U2F & WebAuthn is currently not compatible with Apple MacOS and Apple iOS, as they expecting a different HID_REPORT_SIZE.
 - Currently, FIDO credentials can't be added to existing records.
 
 

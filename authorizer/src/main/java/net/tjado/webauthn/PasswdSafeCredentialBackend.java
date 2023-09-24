@@ -173,7 +173,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
         Log.w(TAG, "generateCredential");
         if(!activity.isFileWritable()) {
             Log.w(TAG, "PasswdSafe File is not writeable... exit");
-            return null;
+            throw new VirgilException("PasswdSafe File is not writeable");
         }
 
         KeyPair keyPair = generateNewES256KeyPairLocal();
@@ -211,13 +211,13 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
         });
 
         if (rc != null) {
-            activity.finishEditRecord(rc);
+            activity.finishEditFidoRecord(rc);
         }
 
         PublicKeyCredentialSource credentialSource;
         credentialSource = new PublicKeyCredentialSource(id[0], rpEntityId, rpDisplayName,
                 userHandle, userName, userDisplayName,
-                generateHmacSecret, u2fRpId, keyPair, null);
+                generateHmacSecret, u2fRpId, keyPair, 0, null);
 
         if (generateHmacSecret && (symmetricKey == null)) {
             deleteCredential(credentialSource);
@@ -228,13 +228,19 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
     }
 
     /**
+     * Check if a file record is currently in edit mode
+     */
+    public boolean isEditMode()
+    {
+        return activity.isEditMode();
+    }
+
+    /**
      * Use the file data with an optional record at the current location
      */
     protected final <RetT> RetT useRecordFile(final AbstractPasswdSafeLocationFragment.RecordFileUser<RetT> user)
     {
-        return activity.useFileData(fileData -> {
-                return user.useFile(null, fileData);
-        });
+        return activity.useFileData(fileData -> user.useFile(null, fileData));
     }
 
     public String keyToString(Key key) {
@@ -264,7 +270,16 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
     }
 
     public PublicKeyCredentialSource recordToCredential(PasswdFileData fileData, PwsRecord rec) {
-        String[] keys = fileData.getFidoKeyPair(rec).split(":");
+        if(rec == null) {
+            return null;
+        }
+
+        String fileKeyPair = fileData.getFidoKeyPair(rec);
+        if(fileKeyPair == null) {
+            return null;
+        }
+
+        String[] keys = fileKeyPair.split(":");
 
         PublicKey publicKey = null;
         PrivateKey privateKey = null;
@@ -277,7 +292,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
 
         KeyPair keyPair = new KeyPair(publicKey, privateKey);
 
-        PublicKeyCredentialSource credentialSource = new PublicKeyCredentialSource(
+        return new PublicKeyCredentialSource(
                 fileData.getUUID(rec).getBytes(StandardCharsets.UTF_8),
                 fileData.getFidoRpId(rec),
                 fileData.getFidoRpName(rec),
@@ -287,10 +302,9 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
                 false,
                 fileData.getFidoU2fRpId(rec),
                 keyPair,
+                fileData.getFidoKeyUseCounter(rec),
                 base64ToSecretKey(fileData.getFidoHmacSecret(rec))
         );
-
-        return  credentialSource;
     }
 
     public SecretKey generateSymmetricKey() {
@@ -365,7 +379,12 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
             for (PwsRecord rec: fileData.getRecords()) {
                 String rpId = fileData.getFidoRpId(rec);
                 if (rpId != null && rpId.equals(rpEntityId)) {
-                    credentialSources.add(recordToCredential(fileData, rec));
+                    PublicKeyCredentialSource cred = recordToCredential(fileData, rec);
+                    if (cred != null) {
+                        credentialSources.add(cred);
+                    } else {
+                        Log.d(TAG, "getKeysForEntity - credential is empty - skipping");
+                    }
                 }
             }
             return null;
@@ -507,7 +526,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
         });
 
         if (rc != null) {
-            activity.finishEditRecord(rc);
+            activity.finishEditFidoRecord(rc);
         }
 
         return currentCounter[0];

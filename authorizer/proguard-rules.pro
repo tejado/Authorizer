@@ -21,3 +21,31 @@
 -keepclasseswithmembernames,includedescriptorclasses class org.pwsafe.lib.crypto.SHA256Pws {
     native <methods>;
 }
+
+#
+# logback-android.  From project wiki narrowed to just what is needed for logcat
+#
+
+# Issue #229
+-keepclassmembers class ch.qos.logback.classic.pattern.* { <init>(); }
+
+-keep public class org.slf4j.impl.** { *; }
+-keep public class ch.qos.logback.classic.** { *; }
+-keepattributes *Annotation*
+-dontwarn ch.qos.logback.core.net.*
+
+#
+# For stack traces
+#
+-keepattributes LineNumberTable,SourceFile
+-renamesourcefileattribute SourceFile
+
+#
+# Misc
+#
+-dontwarn edu.umd.cs.findbugs.annotations.SuppressFBWarnings
+-dontwarn javax.annotation.Nonnull
+-dontwarn javax.annotation.Nullable
+
+
+#-printconfiguration /tmp/full-r8-config.txt

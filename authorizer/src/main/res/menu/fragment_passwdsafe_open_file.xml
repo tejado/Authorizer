@@ -28,4 +28,9 @@
           android:icon="@drawable/ic_action_help"
           app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/menu_nfc_settings"
+        android:title="@string/nfc_settings"
+        app:showAsAction="never"/>
+
 </menu>
