@@ -72,8 +72,7 @@ public final class FileSharer
         Uri fileUri = FileProvider.getUriForFile(act,
                                                  itsPkgName + ".fileprovider",
                                                  itsFile);
-        Intent sendIntent = ShareCompat.IntentBuilder
-                .from(act)
+        Intent sendIntent = new ShareCompat.IntentBuilder(act)
                 .setStream(fileUri)
                 .setType(contentType)
                 .setEmailTo(emailAddrs)

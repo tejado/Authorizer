@@ -140,17 +140,23 @@
         öffnen. Das Passwort wird auf dem Gerät gelöscht. In den Einstellungen
         können zusätzlich alle gespeicherten Passwörter auf einmal entfernt werden.
         \n
-        \nUm YubiKey mit PasswdSafe zu benutzen, befolgen bitte Sie
-        folgende Schritte:\n
-        - NFC-Unterstützung in den Einstellungen einschalten\n
+        \nUm einen YubiKey zu benutzen, folgen Sie diesem Ablauf:\n
+        - Wenn ein YubiKey via NFC benutzen, aktivieren Sie NFC in den
+        Geräte-Einstellungen\n
         - Passwort für die Passwortdatei eingeben\n
         - Schlüssel-Slot auf dem YubiKey auswählen (Dies ist meist Slot 2)\n
         - Die YubiKey-Taste einmal drücken\n
-        - Innerhalb von 30 Sekunden, den YubiKey an den Rücken dieses Geräts
+        - Aktivieren Sie den YubiKey innerhalb von 30 Sekunden.\n
+        - Für NFC, den YubiKey an den Rücken dieses Geräts
         halten. Dies ist erfolgreich abgeschlossen, wenn Sie eine akustische
         Rückmeldung erhalten.\n
-        - Jetzt kann der YubiKey zum automatischen öffnen der Passwortdatei
-        benutzt werden.
+        - Für USB, YubiKey einstecken und PasswdSafe den Zugriff auf den
+        Schlüssel erlauben. Der Schlüssel kann jederzeit eingesteckt werden
+        während die Datei geöffnet wird. Der Knopf vom YubiKey muss eventuell
+        nach dem Drücken von OK ebenfalls gedrückt werden. In diesem Fall
+        sollte eine Leuchte am Schlüssel blinken.\n
+        - Wenn der Schlüssel ist gefunden und aktiviert, wird er mit Ihrem
+        Passwort zu authentifizieren benutzt.
     </string>
     <string name="file_operations">Datei …</string>
     <string name="file_password_encoding">Passwortkodierung</string>
@@ -219,6 +225,7 @@
     <string name="new_owncloud_file">Neue ownCloud-Datei</string>
     <string name="new_policy">Neue Regel</string>
     <string name="next">Weiter</string>
+    <string name="nfc_settings">NFC Einstellungen</string>
     <string name="no_alias_chosen">Kein Alias ausgewählt</string>
     <string name="no_backup_file">Keine Backupdatei</string>
     <string name="no_biometrics_registered">Es ist kein biometrisches Merkmal registriert</string>
@@ -292,6 +299,7 @@
     <string name="policy_yes_sym_policy">Ja - Mind. %1$d aus Regelsymbolen: %2$s</string>
     <string name="policy_yes_sym_pronounce" tools:ignore="StringFormatCount">Ja - Symbole: %2$s</string>
     <string name="press_again_close_warning">Erneut drücken, um die Datei zu schließen</string>
+    <string name="press_or_insert_yubikey">YubiKey einstecken oder drücken</string>
     <string name="press_password_warning">Passwort erneut berühren, um es in ein sichtbares Feld zu kopieren</string>
     <string name="press_yubikey">Drücken Sie die YubiKey</string>
     <string name="previous">Vorheriges</string>
@@ -391,6 +399,8 @@
     <string name="unprotect_group">Gruppe freigeben</string>
     <string name="unprotect_to_modify">Freigeben um Eintrag zu bearbeiten</string>
     <string name="username">Benutzername</string>
+    <string name="usb_yubikey_present">USB YubiKey gefunden</string>
+    <string name="usb_yubikey_present_check_button">USB YubiKey gefunden. Zum aktivieren, Knopf drücken.</string>
     <string name="use_count">Verwendungen</string>
     <string name="use_digits">Ziffern</string>
     <string name="use_lowercase">Kleinbuchstaben</string>
@@ -404,8 +414,8 @@
     <string name="writable">Beschreibbar</string>
     <string name="yes">Ja</string>
     <string name="yubikey">YubiKey</string>
-    <string name="yubikey_disabled">YubiKey deaktiviert. NFC einschalten, um es benutzen zu können.</string>
-    <string name="yubikey_error">Fehler bei der Kommunikation mit dem YubiKey</string>
+    <string name="yubikey_error">Fehler bei der Kommunikation mit dem YubiKey: %1$s</string>
+    <string name="yubikey_nfc_disabled">YubiKey NFC ist deaktiviert. Zum Aktivieren öffne über das Menü die NFC-Einstellungen.</string>
     <string name="yubikey_slot_none">Deaktiviert</string>
     <string name="yubikey_slot_1">YubiKey Slot 1</string>
     <string name="yubikey_slot_2">YubiKey Slot 2</string>
@@ -849,6 +859,15 @@
 \n\nFügen Sie {TITLE} in den Benutzernamen ein, um es automatisch durch den Titel des Datensatzes zu ersetzen. Wenn zum Beispiel der Titel \"github\" ist und Ihre Benutzernamenvorlage \"name+{TITLE}@mail.com\" lautet, wird der generierte Benutzername \"name+github@mail.com\" sein.
 \n\nUm die Cursorposition für nahtloses Bearbeiten anzugeben, fügen Sie das Zeichen \"#\" im Benutzernamen ein. Wenn zum Beispiel Ihre Benutzernamenvorlage \"name+{TITLE}#@mail.com\" lautet, wird der Cursor direkt nach dem ersetzen Titel positioniert, wenn der Eintrag ausgewählt ist.]]></string>
 
+    <string name="fido_header">FIDO U2F/WebAuthn</string>
+    <string name="rp_id">Website / App ID</string>
+    <string name="rp_name">Website / App Name</string>
+    <string name="user_handle">Benutzer ID</string>
+    <string name="user_displayname">Benutzer Anzeigename</string>
+    <string name="usage_counter">Nutzungszähler</string>
+    <string name="u2f_handle">U2F ID</string>
+
+
     <!-- net.tjado.webauthn -->
     <string name="dialog_select_credential">Wählen Sie einen Eintrag zum Anmelden aus</string>
 
@@ -925,4 +944,5 @@
     <string name="type">Typ</string>
     <string name="url">URL</string>
     <string name="version">Version</string>
+    <string name="fido_file_closed">Incoming FIDO request - please open respective PasswdSafe file!</string>
 </resources>

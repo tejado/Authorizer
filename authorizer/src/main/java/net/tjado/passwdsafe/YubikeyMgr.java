@@ -7,30 +7,27 @@
  */
 package net.tjado.passwdsafe;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.IsoDep;
 import android.os.CountDownTimer;
 import android.util.Log;
-import android.widget.Toast;
 import androidx.annotation.CheckResult;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.UiThread;
+import androidx.fragment.app.Fragment;
 
-import net.tjado.passwdsafe.lib.ApiCompat;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
-import net.tjado.passwdsafe.lib.Utils;
 import net.tjado.passwdsafe.util.ClearingByteArrayOutputStream;
-import net.tjado.passwdsafe.util.YubiState;
+import net.tjado.passwdsafe.view.CloseableLiveData;
+import com.yubico.yubikit.core.YubiKeyDevice;
+import com.yubico.yubikit.yubiotp.Slot;
+import com.yubico.yubikit.yubiotp.YubiOtpSession;
 
 import org.pwsafe.lib.Util;
 import org.pwsafe.lib.file.Owner;
 import org.pwsafe.lib.file.PwsPassword;
 
+import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
 
 
@@ -39,35 +36,26 @@ import java.io.UnsupportedEncodingException;
  */
 public class YubikeyMgr
 {
-    /// Command to select the app running on the key
-    private static final byte[] SELECT_CMD =
-            {0x00, (byte) 0xA4, 0x04, 0x00, 0x07,
-             (byte) 0xA0, 0x00, 0x00, 0x05, 0x27, 0x20, 0x01, 0x00};
-    /// Command to perform a hash operation
-    private static final byte[] HASH_CMD = {0x00, 0x01, 0x00, 0x00 };
-
-    private static final byte SLOT_CHAL_HMAC1 = 0x30;
-    private static final byte SLOT_CHAL_HMAC2 = 0x38;
-
     private static final int SHA1_MAX_BLOCK_SIZE = 64;
-
-    private static final boolean TEST = false;//PasswdSafeUtil.DEBUG;
 
     private static final String TAG = "YubikeyMgr";
 
+    private final YubikeyViewModel itsYubikeyModel;
     private User itsUser = null;
-    private boolean itsIsRegistered = false;
-    private PendingIntent itsTagIntent = null;
     private CountDownTimer itsTimer = null;
+    private final CloseableLiveData<KeyResult> itsResult =
+            new CloseableLiveData<>();
 
     /// Interface for a user of the YubikeyMgr
     public interface User
     {
         /// Get the activity using the key
+        @NonNull
         Activity getActivity();
 
         /// Get the password to be sent to the key
-        @CheckResult @Nullable
+        @CheckResult
+        @Nullable
         Owner<PwsPassword> getUserPassword();
 
         /// Get the slot number to use on the key
@@ -81,92 +69,37 @@ public class YubikeyMgr
                        int remainingTime);
     }
 
-    /** Get the state of support for the Yubikey */
-    public YubiState getState(Activity act)
+    /**
+     * Constructor
+     */
+    public YubikeyMgr(@NonNull YubikeyViewModel yubikeyModel,
+                      @NonNull Fragment openFrag)
     {
-        if (TEST) {
-            return YubiState.ENABLED;
-        }
-
-        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
-        if (adapter == null) {
-            return YubiState.UNAVAILABLE;
-        } else if (!adapter.isEnabled()) {
-            return YubiState.DISABLED;
-        }
-        return YubiState.ENABLED;
+        itsYubikeyModel = yubikeyModel;
+        var fragLifecycleOwner = openFrag.getViewLifecycleOwner();
+        itsResult.observe(fragLifecycleOwner, this::onYubikeyResultChanged);
+        itsYubikeyModel.getDeviceData().observe(fragLifecycleOwner,
+                this::onYubikeyDeviceChanged);
     }
 
-    /// Start the interaction with the YubiKey
-    @SuppressLint("UnspecifiedImmutableFlag")
-    public void start(User user)
+    /**
+     * Start the interaction with the YubiKey
+     */
+    public void start(@NonNull User user)
     {
         if (itsUser != null) {
             stop();
         }
-
         itsUser = user;
-        Activity act = itsUser.getActivity();
-        if (itsTagIntent == null) {
-            Intent intent = new Intent(act, act.getClass());
-            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            itsTagIntent = PendingIntent.getActivity(
-                    act, 0, intent, ApiCompat.getPendingIntentMutableFlag());
+
+        if (YubikeyViewModel.TEST) {
+            testYubikey();
+        } else {
+            startYubikey();
         }
 
-        if (TEST) {
-            new CountDownTimer(5000, 5000) {
-                @Override
-                public void onTick(long millisUntilFinished)
-                {
-                }
-
-                @Override
-                public void onFinish()
-                {
-                    if (itsUser != null) {
-                        try (Owner<PwsPassword> password =
-                                     itsUser.getUserPassword()) {
-                            if (password == null) {
-                                stopUser(null, null);
-                                return;
-                            }
-                            String utf8 = "UTF-8";
-                            byte[] bytes = password.get().getBytes(utf8);
-                            String passwordStr =
-                                    new String(bytes, utf8).toLowerCase();
-                            try (Owner<PwsPassword> newPassword =
-                                         PwsPassword.create(passwordStr)) {
-                                stopUser(newPassword.pass(), null);
-                            }
-                        } catch (UnsupportedEncodingException e) {
-                            Log.e(TAG, "encode error", e);
-                        }
-                    }
-                }
-            }.start();
-        } else if (!itsIsRegistered) {
-            NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
-            if (adapter == null) {
-                Toast.makeText(act, "NO NFC", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            if (!adapter.isEnabled()) {
-                Toast.makeText(act, "NFC DISABLED", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            IntentFilter iso =
-                    new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-            adapter.enableForegroundDispatch(
-                    act, itsTagIntent, new IntentFilter[] { iso },
-                    new String[][]
-                            { new String[] { IsoDep.class.getName() } });
-            itsIsRegistered = true;
-        }
-
-        itsTimer = new CountDownTimer(30 * 1000, 1 * 1000) {
+        itsTimer = new CountDownTimer(YubikeyViewModel.KEY_TIMEOUT, 1 * 1000)
+        {
             @Override
             public void onFinish()
             {
@@ -176,80 +109,73 @@ public class YubikeyMgr
             @Override
             public void onTick(long millisUntilFinished)
             {
-                itsUser.timerTick(30, (int)(millisUntilFinished / 1000));
+                itsUser.timerTick(YubikeyViewModel.KEY_TIMEOUT / 1000,
+                        (int)(millisUntilFinished / 1000));
             }
         };
         itsTimer.start();
     }
 
-    /** Handle a pause of the activity */
-    public void onPause()
-    {
-        if (itsUser == null) {
-            return;
-        }
-        Activity act = itsUser.getActivity();
-
-        if (itsIsRegistered) {
-            NfcAdapter adapter = NfcAdapter.getDefaultAdapter(act);
-            if ((adapter == null) || !adapter.isEnabled()) {
-                return;
-            }
-
-            adapter.disableForegroundDispatch(act);
-            itsIsRegistered = false;
-        }
-
-        if (itsTagIntent != null) {
-            itsTagIntent.cancel();
-            itsTagIntent = null;
-        }
-    }
-
-    /// Stop the interaction with the key
+    /**
+     * Stop the interaction with the key
+     */
     public void stop()
     {
         onPause();
         stopUser(null, null);
+        itsResult.close();
         itsTimer = null;
         itsUser = null;
     }
 
-    /// Handle the intent for when the key is discovered
-    public void handleKeyIntent(Intent intent)
+    /**
+     * Handle a pause of the using fragment
+     */
+    public void onPause()
     {
-        if (!NfcAdapter.ACTION_TECH_DISCOVERED.equals(intent.getAction())) {
+        if (itsUser != null) {
+            itsYubikeyModel.stopNfc(itsUser.getActivity());
+        }
+    }
+
+    /**
+     * Use a discovered YubiKey
+     */
+    @UiThread
+    private void useYubikey(YubiKeyDevice device)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "Use YubiKey %s, has user: %b", device,
+                (itsUser != null));
+        if (itsUser == null) {
             return;
         }
 
-        PasswdSafeUtil.dbginfo(TAG, "calculate");
-        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        if ((tag == null) || (itsUser == null)) {
-            return;
+        try (var userPassword = itsUser.getUserPassword()) {
+            doUseYubikey(device,
+                    (userPassword != null) ? userPassword.pass() : null,
+                    itsUser.getSlotNum(), itsResult);
         }
+    }
 
-        IsoDep isotag = IsoDep.get(tag);
-        try {
-            isotag.connect();
+    /**
+     * Implementation to use a discovered YubiKey
+     */
+    @UiThread
+    private static void doUseYubikey(final YubiKeyDevice device,
+                                     @Nullable
+                                     final Owner<PwsPassword>.Param password,
+                                     final int slotNum,
+                                     final CloseableLiveData<KeyResult> result)
+    {
+        YubiOtpSession.create(device, sessionResult -> {
+            try (var userPassword = (password != null) ? password.use() : null;
+                 var pwbytes = new ClearingByteArrayOutputStream()) {
+                YubiOtpSession otp = sessionResult.getValue();
 
-            ClearingByteArrayOutputStream cmd =
-                    new ClearingByteArrayOutputStream();
-            byte[] resp = null;
-            try (Owner<PwsPassword> userPassword = itsUser.getUserPassword()) {
                 if (userPassword == null) {
                     throw new Exception("No password");
                 }
-
-                resp = isotag.transceive(SELECT_CMD);
-                checkResponse(resp);
-                Util.clearArray(resp);
-
                 PwsPassword pw = userPassword.get();
-                cmd.write(HASH_CMD);
-
-                // Placeholder for length
-                byte datalen;
-                cmd.write(0);
 
                 int pwlen = pw.length();
                 if (pwlen > 0) {
@@ -258,77 +184,122 @@ public class YubikeyMgr
                     }
                     // Chars are encoded as little-endian UTF-16.  A trailing
                     // zero must be skipped as the PC API will skip it.
-                    datalen = 0;
                     for (int i = 0; i < pwlen - 1; ++i) {
-                        datalen += 2;
                         char c = pw.charAt(i);
-                        cmd.write(c & 0xff);
-                        cmd.write((c >> 8) & 0xff);
+                        pwbytes.write(c & 0xff);
+                        pwbytes.write((c >> 8) & 0xff);
                     }
 
                     char c = pw.charAt(pwlen - 1);
-                    cmd.write(c & 0xff);
-                    ++datalen;
+                    pwbytes.write(c & 0xff);
                     int last = (c >> 8) & 0xff;
                     if (last != 0) {
-                        cmd.write(last);
-                        ++datalen;
+                        pwbytes.write(last);
                     }
                 } else {
                     // Empty password needs a single null byte
-                    datalen = 1;
-                    cmd.write(0);
+                    pwbytes.write(0);
                 }
 
-                byte[] cmdbytes = cmd.toByteArray();
+                byte[] resp = otp.calculateHmacSha1(
+                        slotNum == 1 ? Slot.ONE : Slot.TWO,
+                        pwbytes.toByteArray(), null);
                 try {
-                    int slot = itsUser.getSlotNum();
-                    if (slot == 1) {
-                        cmdbytes[2] = SLOT_CHAL_HMAC1;
-                    } else {
-                        cmdbytes[2] = SLOT_CHAL_HMAC2;
+                    // Prune response bytes and convert
+                    char[] pwstr = Util.bytesToHexChars(resp, 0, resp.length);
+                    try (Owner<PwsPassword> newPassword = PwsPassword.create(
+                            pwstr)) {
+                        result.postValue(
+                                new KeyResult(newPassword.pass(), null));
                     }
-                    cmdbytes[HASH_CMD.length] = datalen;
-                    resp = isotag.transceive(cmdbytes);
-                    checkResponse(resp);
-                } finally {
-                    Util.clearArray(cmdbytes);
-                }
-
-                // Prune response bytes and convert
-
-                char[] pwstr = Util.bytesToHexChars(resp, 0, resp.length - 2);
-                try (Owner<PwsPassword> newPassword =
-                             PwsPassword.create(pwstr)) {
-                    stopUser(newPassword.pass(), null);
                 } finally {
                     Util.clearArray(resp);
                 }
-            } finally {
-                if (resp != null) {
-                    Util.clearArray(resp);
-                }
-                Utils.closeStreams(cmd, isotag);
-                Runtime.getRuntime().gc();
+            } catch (Exception e) {
+                PasswdSafeUtil.dbginfo(TAG, e, "Error creating OTP session");
+                result.postValue(new KeyResult(null, e));
             }
-        } catch (Exception e) {
-            PasswdSafeUtil.dbginfo(TAG, e, "handleKeyIntent");
-            stopUser(null, e);
-        }
-
+        });
     }
 
-    /// Check for a valid response
-    private static void checkResponse(byte[] resp) throws Exception
+    /**
+     * Start using the YubiKey
+     */
+    @UiThread
+    private void startYubikey()
     {
-        if ((resp.length >= 2) &&
-            (resp[resp.length - 2] == (byte)0x90) &&
-            (resp[resp.length - 1] == 0x00)) {
-            return;
+        var yubikeyDevice = itsYubikeyModel.getDeviceData().getValue();
+        if (yubikeyDevice != null) {
+            useYubikey(yubikeyDevice);
+        } else {
+            itsYubikeyModel.startNfc(itsUser.getActivity());
         }
+    }
 
-        throw new Exception("Invalid response: " +
-                            Util.bytesToHex(resp));
+    /**
+     * Test using the YubiKey
+     */
+    @UiThread
+    private void testYubikey()
+    {
+        new CountDownTimer(5000, 5000)
+        {
+            @Override
+            public void onTick(long millisUntilFinished)
+            {
+            }
+
+            @Override
+            public void onFinish()
+            {
+                if (itsUser == null) {
+                    return;
+                }
+                try (var password = itsUser.getUserPassword()) {
+                    if (password == null) {
+                        itsResult.postValue(new KeyResult(null, null));
+                        return;
+                    }
+                    String utf8 = "UTF-8";
+                    byte[] bytes = password.get().getBytes(utf8);
+                    String passwordStr = new String(bytes, utf8).toLowerCase();
+                    try (Owner<PwsPassword> newPassword = PwsPassword.create(
+                            passwordStr)) {
+                        itsResult.postValue(
+                                new KeyResult(newPassword.pass(), null));
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    Log.e(TAG, "encode error", e);
+                    itsResult.postValue(new KeyResult(null, e));
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * Handle a change notification for the YubiKey device
+     */
+    private void onYubikeyDeviceChanged(YubiKeyDevice device)
+    {
+        PasswdSafeUtil.dbginfo(TAG, "YubiDevice changed: %s",
+                YubikeyViewModel.toString(device));
+        if ((itsUser != null) && (device != null)) {
+            useYubikey(device);
+        }
+    }
+
+    /**
+     * Handle a change notification for the result of using the YubiKey
+     */
+    private void onYubikeyResultChanged(KeyResult result)
+    {
+        try (result) {
+            if (result != null) {
+                stopUser(
+                        ((result.itsPassword != null) ?
+                                result.itsPassword.pass() : null), result.itsError);
+            }
+        }
     }
 
     /**
@@ -341,6 +312,32 @@ public class YubikeyMgr
         }
         if (itsUser != null) {
             itsUser.finish(password, e);
+        }
+    }
+
+    /**
+     * Result of using the YubiKey to calculate the password
+     */
+    private static class KeyResult implements Closeable
+    {
+        protected final Owner<PwsPassword> itsPassword;
+        protected final Exception itsError;
+
+        /**
+         * Constructor
+         */
+        protected KeyResult(Owner<PwsPassword>.Param password, Exception error)
+        {
+            itsPassword = (password != null) ? password.use() : null;
+            itsError = error;
+        }
+
+        @Override
+        public void close()
+        {
+            if (itsPassword != null) {
+                itsPassword.close();
+            }
         }
     }
 }

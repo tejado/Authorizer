@@ -487,62 +487,54 @@ public class PasswdSafe extends AppCompatActivity
 
         PasswdSafeUtil.dbginfo(TAG, "onNewIntent: %s", intent);
         switch (String.valueOf(intent.getAction())) {
-        case PasswdSafeUtil.VIEW_INTENT:
-        case Intent.ACTION_VIEW: {
-            final Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
-            Boolean reopen = itsFileDataFrag.useFileData(
-                    fileData -> !fileData.getUri().getUri().equals(openUri));
-            if ((reopen == null) || reopen) {
-                // Close and reopen the new file
-                itsFileDataFrag.setFileData(null);
-                doUpdateView(ViewMode.INIT, new PasswdLocation());
-                changeInitialView();
-                changeFileOpenView(intent);
-            }
-            break;
-        }
-        case Intent.ACTION_SEARCH: {
-            setRecordQueryFilter(intent.getStringExtra(SearchManager.QUERY));
-            break;
-        }
-        case PasswdSafeUtil.SEARCH_VIEW_INTENT: {
-            collapseSearch();
-            String data = intent.getStringExtra(SearchManager.EXTRA_DATA_KEY);
-            if (data == null) {
+            case PasswdSafeUtil.VIEW_INTENT:
+            case Intent.ACTION_VIEW: {
+                final Uri openUri = PasswdSafeApp.getOpenUriFromIntent(intent);
+                Boolean reopen = itsFileDataFrag.useFileData(
+                        fileData -> !fileData.getUri().getUri().equals(openUri));
+                if ((reopen == null) || reopen) {
+                    // Close and reopen the new file
+                    itsFileDataFrag.setFileData(null);
+                    doUpdateView(ViewMode.INIT, new PasswdLocation());
+                    changeInitialView();
+                    changeFileOpenView(intent);
+                }
                 break;
             }
-            PasswdLocation loc = null;
-            if (data.startsWith(PasswdRecordFilter.SEARCH_VIEW_RECORD)) {
-                int pfxlen = PasswdRecordFilter.SEARCH_VIEW_RECORD.length();
-                final String uuid = data.substring(pfxlen);
-                loc = useFileData(fileData -> {
-                    PwsRecord rec = fileData.getRecord(uuid);
-                    if (rec == null) {
-                        return null;
-                    }
-                    return new PasswdLocation(rec, fileData);
-                });
-            } else if (data.startsWith(PasswdRecordFilter.SEARCH_VIEW_GROUP)) {
-                int pfxlen = PasswdRecordFilter.SEARCH_VIEW_GROUP.length();
-                loc = new PasswdLocation(data.substring(pfxlen));
+            case Intent.ACTION_SEARCH: {
+                setRecordQueryFilter(intent.getStringExtra(SearchManager.QUERY));
+                break;
             }
-            if (loc != null) {
-                changeLocation(loc);
+            case PasswdSafeUtil.SEARCH_VIEW_INTENT: {
+                collapseSearch();
+                String data = intent.getStringExtra(SearchManager.EXTRA_DATA_KEY);
+                if (data == null) {
+                    break;
+                }
+                PasswdLocation loc = null;
+                if (data.startsWith(PasswdRecordFilter.SEARCH_VIEW_RECORD)) {
+                    int pfxlen = PasswdRecordFilter.SEARCH_VIEW_RECORD.length();
+                    final String uuid = data.substring(pfxlen);
+                    loc = useFileData(fileData -> {
+                        PwsRecord rec = fileData.getRecord(uuid);
+                        if (rec == null) {
+                            return null;
+                        }
+                        return new PasswdLocation(rec, fileData);
+                    });
+                } else if (data.startsWith(PasswdRecordFilter.SEARCH_VIEW_GROUP)) {
+                    int pfxlen = PasswdRecordFilter.SEARCH_VIEW_GROUP.length();
+                    loc = new PasswdLocation(data.substring(pfxlen));
+                }
+                if (loc != null) {
+                    changeLocation(loc);
+                }
+                break;
             }
-            break;
-        }
-        case PasswdSafeUtil.NEW_INTENT: {
-            changeFileNewView(intent);
-            break;
-        }
-        default: {
-            FragmentManager fragMgr = getSupportFragmentManager();
-            Fragment frag = fragMgr.findFragmentById(R.id.content);
-            if (frag instanceof PasswdSafeOpenFileFragment) {
-                ((PasswdSafeOpenFileFragment)frag).onNewIntent(intent);
+            case PasswdSafeUtil.NEW_INTENT: {
+                changeFileNewView(intent);
+                break;
             }
-            break;
-        }
         }
     }
 
@@ -2574,6 +2566,10 @@ public class PasswdSafe extends AppCompatActivity
         } else if (state == BluetoothAdapter.STATE_TURNING_ON) {
             PasswdSafeUtil.dbginfo(TAG, "BluetoothAdapter.STATE_TURNING_ON");
         }
+    }
+
+    public boolean isEditMode() {
+        return (itsCurrViewMode == ViewMode.EDIT_RECORD);
     }
 
     /**

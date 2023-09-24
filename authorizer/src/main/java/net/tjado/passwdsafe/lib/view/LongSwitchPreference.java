@@ -12,6 +12,7 @@ import androidx.preference.PreferenceViewHolder;
 import androidx.preference.SwitchPreferenceCompat;
 import android.util.AttributeSet;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 
 /**
  * The LongSwitchPreference class is a SwitchPreference with support for
@@ -28,7 +29,7 @@ public class LongSwitchPreference extends SwitchPreferenceCompat
     }
 
     @Override
-    public void onBindViewHolder(PreferenceViewHolder holder)
+    public void onBindViewHolder(@NonNull PreferenceViewHolder holder)
     {
         super.onBindViewHolder(holder);
         TextView title = (TextView)holder.findViewById(android.R.id.title);
