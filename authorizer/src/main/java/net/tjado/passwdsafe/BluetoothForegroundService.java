@@ -412,7 +412,7 @@ public class BluetoothForegroundService extends Service {
             }
 
             PasswdSafe activity = ((PasswdSafeApp) getApplication()).getActiveActivity();
-            if (PasswdSafe.mTransactionManager != null && activity != null && activity.isFileOpen()) {
+            if (PasswdSafe.mTransactionManager != null && activity != null && activity.isFileOpen() && !activity.isEditMode()) {
                 openFileStarted = false;
 
                 PasswdSafe.mTransactionManager.handleReport(data, (rawReports) -> {
@@ -421,9 +421,12 @@ public class BluetoothForegroundService extends Service {
                         inputHost.sendReport(device, reportId, report);
                     }
                 });
-
             } else {
-                if(activity != null && !openFileStarted) {
+                if (activity != null && activity.isEditMode()) {
+                    PasswdSafeUtil.dbginfo(TAG, "App is open - notify user inside app");
+                    PasswdSafeUtil.showErrorMsg(getString(R.string.fido_file_closed), new ActContext(activity));
+
+                } else if(activity != null && !openFileStarted) {
                     PasswdSafeUtil.dbginfo(TAG, "App is open - notify user inside app");
 
                     // setting flag that file opening getting triggered on multiple interrupts of
@@ -433,7 +436,7 @@ public class BluetoothForegroundService extends Service {
                     openFileResetHandler.postDelayed(() -> openFileStarted = false, OPEN_FILE_TIMEOUT_MS);
 
                     if (!activity.openDefaultFile()) {
-                        PasswdSafeUtil.showErrorMsg("Incoming FIDO request - please open respective PasswdSafe file!", new ActContext(activity));
+                        PasswdSafeUtil.showErrorMsg(getString(R.string.fido_file_closed), new ActContext(activity));
                     }
                 }
 

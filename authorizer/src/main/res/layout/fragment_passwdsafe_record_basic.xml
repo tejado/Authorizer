@@ -302,7 +302,8 @@
                         android:layout_weight="3"
                         android:gravity="center"
                         android:text="------"
-                        android:textSize="30dp"/>
+                        android:textSize="30dp"
+                        tools:ignore="HardcodedText" />
                 </LinearLayout>
                 <ProgressBar
                     android:id="@+id/otp_time"
@@ -372,6 +373,88 @@
                       style="@style/RecordField"/>
 
         </LinearLayout>
+
+        <LinearLayout android:id="@+id/fido_row"
+            style="@style/RecordRow">
+
+            <TextView style="@style/RecordHeader"
+                android:text="@string/fido_header" />
+
+            <View style="@style/Separator"/>
+
+            <TableLayout style="@style/RecordField.Small"
+                android:shrinkColumns="1"
+                android:stretchColumns="1">
+
+                <TableRow android:id="@+id/rp_id_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                        android:text="@string/rp_id"/>
+
+                    <TextView android:id="@+id/rp_id"
+                        android:layout_width="wrap_content"/>
+
+                </TableRow>
+
+                <TableRow android:id="@+id/rp_name_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                        android:text="@string/rp_name"/>
+
+                    <TextView android:id="@+id/rp_name"
+                        android:layout_width="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/user_handle_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                        android:text="@string/user_handle"/>
+
+                    <TextView android:id="@+id/user_handle"
+                        android:layout_width="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/user_name_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                        android:text="@string/username"/>
+
+                    <TextView android:id="@+id/user_name"
+                        android:layout_width="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/user_displayname_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                        android:text="@string/user_displayname"/>
+
+                    <TextView android:id="@+id/user_displayname"
+                        android:layout_width="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/usage_counter_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                        android:text="@string/usage_counter"/>
+
+                    <TextView android:id="@+id/usage_counter"
+                        android:layout_width="wrap_content"/>
+                </TableRow>
+
+                <TableRow android:id="@+id/u2f_handle_row">
+
+                    <TextView style="@style/TableLabelColumn"
+                        android:text="@string/u2f_handle"/>
+
+                    <TextView android:id="@+id/u2f_handle"
+                        android:layout_width="wrap_content"/>
+                </TableRow>
+
+            </TableLayout>
+            <TextView style="@style/RecordRow"/>
+
+        </LinearLayout>
+
 
         <LinearLayout android:id="@+id/times_row"
                       style="@style/RecordRow">

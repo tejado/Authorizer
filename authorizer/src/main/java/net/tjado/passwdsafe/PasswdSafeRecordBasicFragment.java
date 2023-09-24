@@ -59,6 +59,7 @@ import net.tjado.bluetooth.BluetoothDeviceWrapper;
 import net.tjado.bluetooth.BluetoothUtils;
 import net.tjado.passwdsafe.file.PasswdFileData;
 import net.tjado.passwdsafe.file.PasswdHistory;
+import net.tjado.passwdsafe.file.PasswdRecord;
 import net.tjado.passwdsafe.lib.ActContext;
 import net.tjado.passwdsafe.lib.PasswdSafeUtil;
 import net.tjado.passwdsafe.lib.ObjectHolder;
@@ -162,6 +163,21 @@ public class PasswdSafeRecordBasicFragment
     private View itsProtectedRow;
     private View itsReferencesRow;
     private ListView itsReferences;
+    private View itsFidoRow;
+    private View itsFidoRpIdRow;
+    private TextView itsFidoRpId;
+    private View itsFidoRpNameRow;
+    private TextView itsFidoRpName;
+    private View itsFidoUserHandleRow;
+    private TextView itsFidoUserHandle;
+    private View itsFidoUserNameRow;
+    private TextView itsFidoUserName;
+    private View itsFidoUserDisplayNameRow;
+    private TextView itsFidoUserDisplayName;
+    private View itsFidoUsageCounterRow;
+    private TextView itsFidoUsageCounter;
+    private View itsFidoU2fHandleRow;
+    private TextView itsFidoU2fHandle;
     private Button itsOtpAdd;
     private Button itsOtpAddCamera;
     private TokenCode itsOtp;
@@ -414,6 +430,23 @@ public class PasswdSafeRecordBasicFragment
         itsReferences.setOnItemClickListener(
                 (parent, view, position, id) -> showRefRec(false, position));
 
+        itsFidoRow = root.findViewById(R.id.fido_row);
+        itsFidoRpIdRow = root.findViewById(R.id.rp_id_row);
+        itsFidoRpId = root.findViewById(R.id.rp_id);
+        itsFidoRpNameRow = root.findViewById(R.id.rp_name_row);
+        itsFidoRpName = root.findViewById(R.id.rp_name);
+        itsFidoUserHandleRow = root.findViewById(R.id.user_handle_row);
+        itsFidoUserHandle = root.findViewById(R.id.user_handle);
+        itsFidoUserNameRow = root.findViewById(R.id.user_name_row);
+        itsFidoUserName = root.findViewById(R.id.user_name);
+        itsFidoUserDisplayNameRow = root.findViewById(R.id.user_displayname_row);
+        itsFidoUserDisplayName = root.findViewById(R.id.user_displayname);
+        itsFidoUsageCounterRow = root.findViewById(R.id.usage_counter_row);
+        itsFidoUsageCounter = root.findViewById(R.id.usage_counter);
+        itsFidoU2fHandleRow = root.findViewById(R.id.u2f_handle_row);
+        itsFidoU2fHandle = root.findViewById(R.id.u2f_handle);
+
+
         registerForContextMenu(itsUserRow);
         registerForContextMenu(itsPasswordRow);
         updatePasswordShown(PasswordVisibilityChange.INITIAL, 0, false);
@@ -636,44 +669,59 @@ public class PasswdSafeRecordBasicFragment
         Date lastModTime = null;
         Integer autotypeDelimiter = null;
         Integer autotypeReturnSuffix = null;
-        switch (info.itsPasswdRec.getType()) {
-        case NORMAL: {
+        // init variables for all FIDO fields
+        String fidoSiteId = null;
+        String fidoSiteName = null;
+        String fidoUserHandle = null;
+        String fidoUserName = null;
+        String fidoUserDisplayName = null;
+        Integer fidoUsageCounter = null;
+        String fidoU2fHandle = null;
+
+
+        if (info.itsPasswdRec.getType() == PasswdRecord.Type.NORMAL) {
             itsBaseRow.setVisibility(View.GONE);
-            url = info.itsFileData.getURL(info.itsRec,
-                                          PasswdFileData.UrlStyle.FULL);
-            email = info.itsFileData.getEmail(info.itsRec,
-                                              PasswdFileData.EmailStyle.FULL);
+            url = info.itsFileData.getURL(info.itsRec, PasswdFileData.UrlStyle.FULL);
+            email = info.itsFileData.getEmail(info.itsRec, PasswdFileData.EmailStyle.FULL);
             otp = info.itsFileData.getOtp(info.itsRec);
             creationTime = info.itsFileData.getCreationTime(info.itsRec);
             lastModTime = info.itsFileData.getLastModTime(info.itsRec);
 
-            autotypeDelimiter = info.itsFileData.getAutotypeDelimiter(
-                    info.itsRec);
-            autotypeReturnSuffix = info.itsFileData.getAutotypeReturnSuffix(
-                    info.itsRec);
-            break;
-        }
-        case ALIAS: {
+            autotypeDelimiter = info.itsFileData.getAutotypeDelimiter(info.itsRec);
+            autotypeReturnSuffix = info.itsFileData.getAutotypeReturnSuffix(info.itsRec);
+
+            // get FIDO fields
+            fidoSiteId = info.itsFileData.getFidoRpId(info.itsRec);
+            fidoSiteName = info.itsFileData.getFidoRpName(info.itsRec);
+            fidoUserHandle = info.itsFileData.getFidoUserHandle(info.itsRec);
+            fidoUserName = info.itsFileData.getFidoUserName(info.itsRec);
+            fidoUserDisplayName = info.itsFileData.getFidoUserDisplayName(info.itsRec);
+            fidoUsageCounter = info.itsFileData.getFidoKeyUseCounter(info.itsRec);
+            fidoU2fHandle = info.itsFileData.getFidoU2fRpId(info.itsRec);
+        } else if (info.itsPasswdRec.getType() == PasswdRecord.Type.ALIAS) {
             itsBaseRow.setVisibility(View.VISIBLE);
             itsBaseLabel.setText(R.string.alias_base_record_header);
             itsBase.setText(info.itsFileData.getId(ref));
             hiddenId = R.string.hidden_password_alias;
             recForPassword = ref;
-            url = info.itsFileData.getURL(info.itsRec,
-                                          PasswdFileData.UrlStyle.FULL);
-            email = info.itsFileData.getEmail(info.itsRec,
-                                              PasswdFileData.EmailStyle.FULL);
+            url = info.itsFileData.getURL(info.itsRec, PasswdFileData.UrlStyle.FULL);
+            email = info.itsFileData.getEmail(info.itsRec, PasswdFileData.EmailStyle.FULL);
             otp = info.itsFileData.getOtp(info.itsRec);
             creationTime = info.itsFileData.getCreationTime(recForPassword);
             lastModTime = info.itsFileData.getLastModTime(recForPassword);
 
-            autotypeDelimiter = info.itsFileData.getAutotypeDelimiter(
-                    info.itsRec);
-            autotypeReturnSuffix = info.itsFileData.getAutotypeReturnSuffix(
-                    info.itsRec);
-            break;
-        }
-        case SHORTCUT: {
+            autotypeDelimiter = info.itsFileData.getAutotypeDelimiter(info.itsRec);
+            autotypeReturnSuffix = info.itsFileData.getAutotypeReturnSuffix(info.itsRec);
+
+            // get FIDO fields
+            fidoSiteId = info.itsFileData.getFidoRpId(info.itsRec);
+            fidoSiteName = info.itsFileData.getFidoRpName(info.itsRec);
+            fidoUserHandle = info.itsFileData.getFidoUserHandle(info.itsRec);
+            fidoUserName = info.itsFileData.getFidoUserName(info.itsRec);
+            fidoUserDisplayName = info.itsFileData.getFidoUserDisplayName(info.itsRec);
+            fidoUsageCounter = info.itsFileData.getFidoKeyUseCounter(info.itsRec);
+            fidoU2fHandle = info.itsFileData.getFidoU2fRpId(info.itsRec);
+        } else if (info.itsPasswdRec.getType() == PasswdRecord.Type.SHORTCUT) {
             itsBaseRow.setVisibility(View.VISIBLE);
             itsBaseLabel.setText(R.string.shortcut_base_record_header);
             itsBase.setText(info.itsFileData.getId(ref));
@@ -681,21 +729,17 @@ public class PasswdSafeRecordBasicFragment
             recForPassword = ref;
             creationTime = info.itsFileData.getCreationTime(recForPassword);
             lastModTime = info.itsFileData.getLastModTime(recForPassword);
-            break;
-        }
         }
 
         itsTitle = info.itsFileData.getTitle(info.itsRec);
-        setFieldText(itsGroup, itsGroupRow,
-                     info.itsFileData.getGroup(info.itsRec));
-        setFieldText(itsUser, itsUserRow,
-                     info.itsFileData.getUsername(info.itsRec));
+        setFieldText(itsGroup, itsGroupRow, info.itsFileData.getGroup(info.itsRec));
+        setFieldText(itsUser, itsUserRow, info.itsFileData.getUsername(info.itsRec));
+
 
         itsIsPasswordShown = false;
         itsHiddenPasswordStr = getString(hiddenId);
         String password = info.itsFileData.getPassword(recForPassword);
-        setFieldText(itsPassword, itsPasswordRow,
-                     ((password != null) ? itsHiddenPasswordStr : null));
+        setFieldText(itsPassword, itsPasswordRow, ((password != null && password.length() > 0) ? itsHiddenPasswordStr : null));
         int passwordLen = (password != null) ? password.length() : 0;
         itsPasswordSeek.setMax(passwordLen);
         itsSubsetErrorStr = getString(R.string.password_subset_error,
@@ -716,6 +760,14 @@ public class PasswdSafeRecordBasicFragment
             itsAutoTypeBluetoothUsername.setEnabled(false);
         }
 
+        if (itsPasswordRow.getVisibility() == View.GONE) {
+            itsAutoTypeUsbPassword.setEnabled(false);
+            itsAutoTypeBluetoothPassword.setEnabled(false);
+
+            itsAutoTypeUsbCredentials.setEnabled(false);
+            itsAutoTypeBluetoothCredential.setEnabled(false);
+        }
+
         if (autotypeDelimiter != null && autotypeDelimiter == 1) {
             itsAutoTypeDelimiter.check(R.id.autotype_delimiter_return);
         }
@@ -724,12 +776,20 @@ public class PasswdSafeRecordBasicFragment
             itsAutoTypeReturnSuffix.setChecked(true);
         }
 
-        GuiUtils.setVisible(itsTimesRow,
-                            (creationTime != null) || (lastModTime != null));
+        GuiUtils.setVisible(itsTimesRow, (creationTime != null) || (lastModTime != null));
         setFieldDate(itsCreationTime, itsCreationTimeRow, creationTime);
         setFieldDate(itsLastModTime, itsLastModTimeRow, lastModTime);
-        GuiUtils.setVisible(itsProtectedRow,
-                            info.itsFileData.isProtected(info.itsRec));
+        GuiUtils.setVisible(itsProtectedRow, info.itsFileData.isProtected(info.itsRec));
+
+        GuiUtils.setVisible(itsFidoRow, (fidoSiteId != null));
+        setFieldText(itsFidoRpId, itsFidoRpIdRow, fidoSiteId);
+        setFieldText(itsFidoRpName, itsFidoRpNameRow, fidoSiteName);
+        setFieldText(itsFidoUserHandle, itsFidoUserHandleRow, fidoUserHandle);
+        setFieldText(itsFidoUserName, itsFidoUserNameRow, fidoUserName);
+        setFieldText(itsFidoUserDisplayName, itsFidoUserDisplayNameRow, fidoUserDisplayName);
+        setFieldText(itsFidoUsageCounter, itsFidoUsageCounterRow, String.valueOf((fidoUsageCounter == null) ? 0 : fidoUsageCounter));
+        setFieldText(itsFidoU2fHandle, itsFidoU2fHandleRow, fidoU2fHandle);
+
 
         List<PwsRecord> references = info.itsPasswdRec.getRefsToRecord();
         boolean hasReferences = (references != null) && !references.isEmpty();

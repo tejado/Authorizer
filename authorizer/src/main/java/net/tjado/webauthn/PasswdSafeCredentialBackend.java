@@ -173,7 +173,7 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
         Log.w(TAG, "generateCredential");
         if(!activity.isFileWritable()) {
             Log.w(TAG, "PasswdSafe File is not writeable... exit");
-            return null;
+            throw new VirgilException("PasswdSafe File is not writeable");
         }
 
         KeyPair keyPair = generateNewES256KeyPairLocal();
@@ -225,6 +225,14 @@ public class PasswdSafeCredentialBackend implements ICredentialSafe {
         }
 
         return credentialSource;
+    }
+
+    /**
+     * Check if a file record is currently in edit mode
+     */
+    public boolean isEditMode()
+    {
+        return activity.isEditMode();
     }
 
     /**

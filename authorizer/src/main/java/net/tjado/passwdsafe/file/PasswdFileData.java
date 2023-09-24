@@ -1298,70 +1298,76 @@ public class PasswdFileData
         {
             switch (fieldId)
             {
-            case PwsRecordV3.EMAIL:
-            case PwsRecordV3.GROUP:
-            case PwsRecordV3.NOTES:
-            case PwsRecordV3.TITLE:
-            case PwsRecordV3.URL:
-            case PwsRecordV3.ICON:
-            case PwsRecordV3.OTP:
-            case PwsRecordV3.FIDO_RP_ID:
-            case PwsRecordV3.FIDO_RP_NAME:
-            case PwsRecordV3.FIDO_USER_HANDLE:
-            case PwsRecordV3.FIDO_USER_NAME:
-            case PwsRecordV3.FIDO_USER_DISPLAYNAME:
-            case PwsRecordV3.FIDO_U2F_RP_ID:
-            case PwsRecordV3.FIDO_KEY_PAIR:
-            case PwsRecordV3.FIDO_HMAC_SECRET:
-            case PwsRecordV3.USERNAME:
-            case PwsRecordV3.PASSWORD_HISTORY:
-            case PwsRecordV3.PASSWORD_POLICY:
-            case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
-            case PwsRecordV3.PASSWORD_POLICY_NAME:
-            {
-                String str = (val == null) ? null : val.toString();
-                if (!TextUtils.isEmpty(str)) {
-                    field = new PwsStringUnicodeField(fieldId, str);
+                case PwsRecordV3.EMAIL:
+                case PwsRecordV3.GROUP:
+                case PwsRecordV3.NOTES:
+                case PwsRecordV3.TITLE:
+                case PwsRecordV3.URL:
+                case PwsRecordV3.ICON:
+                case PwsRecordV3.OTP:
+                case PwsRecordV3.FIDO_RP_ID:
+                case PwsRecordV3.FIDO_RP_NAME:
+                case PwsRecordV3.FIDO_USER_HANDLE:
+                case PwsRecordV3.FIDO_USER_NAME:
+                case PwsRecordV3.FIDO_USER_DISPLAYNAME:
+                case PwsRecordV3.FIDO_U2F_RP_ID:
+                case PwsRecordV3.FIDO_KEY_PAIR:
+                case PwsRecordV3.FIDO_HMAC_SECRET:
+                case PwsRecordV3.USERNAME:
+                case PwsRecordV3.PASSWORD_HISTORY:
+                case PwsRecordV3.PASSWORD_POLICY:
+                case PwsRecordV3.OWN_PASSWORD_SYMBOLS:
+                case PwsRecordV3.PASSWORD_POLICY_NAME:
+                {
+                    String str = (val == null) ? null : val.toString();
+                    if (!TextUtils.isEmpty(str)) {
+                        field = new PwsStringUnicodeField(fieldId, str);
+                    }
+                    break;
                 }
-                break;
-            }
-            case PwsRecordV3.PASSWORD:
-            {
-                String str = (val == null) ? null : val.toString();
-                if (!TextUtils.isEmpty(str)) {
-                    field = new PwsPasswdUnicodeField(fieldId, str, itsPwsFile);
+                case PwsRecordV3.PASSWORD:
+                {
+                    String str = (val == null) ? null : val.toString();
+                    if (!TextUtils.isEmpty(str)) {
+                        field = new PwsPasswdUnicodeField(fieldId, str, itsPwsFile);
+                    }
+                    break;
                 }
-                break;
-            }
-            case PwsRecordV3.PROTECTED_ENTRY: {
-                Byte b = (Byte)val;
-                if ((b != null) && (b != 0)) {
-                    field = new PwsByteField(fieldId, b);
+                case PwsRecordV3.PROTECTED_ENTRY: {
+                    Byte b = (Byte)val;
+                    if ((b != null) && (b != 0)) {
+                        field = new PwsByteField(fieldId, b);
+                    }
+                    break;
                 }
-                break;
-            }
-            case PwsRecordV3.PASSWORD_LIFETIME: {
-                Date d = (Date)val;
-                if ((d != null) && (d.getTime() != 0)) {
-                    field = new PwsTimeField(fieldId, d);
+                case PwsRecordV3.PASSWORD_LIFETIME: {
+                    Date d = (Date)val;
+                    if ((d != null) && (d.getTime() != 0)) {
+                        field = new PwsTimeField(fieldId, d);
+                    }
+                    break;
                 }
-                break;
-            }
-            case PwsRecordV3.AUTOTYPE_DELIMITER:
-            case PwsRecordV3.AUTOTYPE_RETURNSUFFIX:
-            case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL:
-            case PwsRecordV3.FIDO_KEY_USE_COUNTER:{
-                Integer ival = (Integer)val;
-                if ((ival != null) && (ival != 0)) {
-                    field = new PwsIntegerField(fieldId, ival);
+                case PwsRecordV3.AUTOTYPE_DELIMITER:
+                case PwsRecordV3.AUTOTYPE_RETURNSUFFIX:
+                case PwsRecordV3.PASSWORD_EXPIRY_INTERVAL:{
+                    Integer ival = (Integer)val;
+                    if ((ival != null) && (ival != 0)) {
+                        field = new PwsIntegerField(fieldId, ival);
+                    }
+                    break;
                 }
-                break;
-            }
-            default:
-            {
-                fieldId = FIELD_UNSUPPORTED;
-                break;
-            }
+                case PwsRecordV3.FIDO_KEY_USE_COUNTER:{
+                    Integer ival = (Integer)val;
+                    if (ival != null) {
+                        field = new PwsIntegerField(fieldId, ival);
+                    }
+                    break;
+                }
+                default:
+                {
+                    fieldId = FIELD_UNSUPPORTED;
+                    break;
+                }
             }
             break;
         }
