@@ -10,7 +10,7 @@
 package net.tjado.authorizer;
 
 import android.util.Log;
-import net.tjado.passwdsafe.BuildConfig;
+import net.tjado.passwdsafe.lib.BuildConfig;
 
 public class Utilities
 {

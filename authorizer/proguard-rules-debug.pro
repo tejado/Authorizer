@@ -18,12 +18,3 @@
 
 -keep,includedescriptorclasses class androidx.** { *; }
 -dontwarn androidx.window.**
-
--keepclassmembers class **.R$* {
-    public static <fields>;
-}
-
-#
-# Needed for tests which use Kotlin
-#
--keep public class kotlin.LazyKt

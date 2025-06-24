@@ -1,0 +1,43 @@
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources>
+    <string name="about">Über</string>
+    <string name="app_name">PasswdSafe LIBRARY</string>
+    <string name="app_settings">App-Einstellungen</string>
+    <string name="box">Box</string>
+    <string name="build_date">Erstellungsdatum</string>
+    <string name="build_id">Erstellungs-ID</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="choose_files">Dateien auswählen</string>
+    <string name="close">Schließen</string>
+    <string name="copy_clipboard_error">%1$s - Fehler beim Kopieren in die Zwischenablage. Grund ist wohl ein Fehler in manchen Samsung-Geräten.</string>
+    <string name="copy_trace_and_close">Trace kopieren und schließen</string>
+    <string name="dropbox">Dropbox</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="info">Info</string>
+    <string name="error">Fehler</string>
+    <string name="error_fmt">Fehler: %1$s</string>
+    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
+    <string name="file_type_icon">Dateitypsymbol</string>
+    <string name="google_drive">Google Drive</string>
+    <string name="licenses">Lizenzen</string>
+    <string name="new_drive_file">Neue Drive-Datei</string>
+    <string name="no_files">Keine Datei</string>
+    <string name="none">Keine</string>
+    <string name="open">Öffnen</string>
+    <string name="onedrive">OneDrive</string>
+    <string name="owncloud">ownCloud</string>
+    <string name="parent_directory">Übergeordneter Ordner</string>
+    <string name="preferences">Einstellungen</string>
+    <string name="release_notes_title">Versionshinweise</string>
+    <string name="release_notes">(Platzhalter)</string>
+    <string name="reload">Neu laden</string>
+    <string name="type">Typ</string>
+    <string name="url">URL</string>
+    <string name="version">Version</string>
+</resources>

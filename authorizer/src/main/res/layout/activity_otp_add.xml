@@ -19,8 +19,7 @@
    - limitations under the License.
    -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+              android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
 
@@ -129,16 +128,14 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:checked="true"
-                            android:text="6"
-                            tools:ignore="HardcodedText" />
+                            android:text="6" />
 
                         <RadioButton
                             android:id="@+id/digits8"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:text="8"
-                            tools:ignore="HardcodedText" />
+                            android:text="8" />
                     </RadioGroup>
                 </TableRow>
 
@@ -180,8 +177,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:inputType="number"
-                        android:text="30"
-                        tools:ignore="HardcodedText" />
+                        android:text="30" />
                 </TableRow>
 
                 <TableRow
@@ -204,8 +200,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:inputType="numberDecimal"
-                        android:text="0"
-                        tools:ignore="HardcodedText" />
+                        android:text="0" />
                 </TableRow>
             </TableLayout>
         </ScrollView>

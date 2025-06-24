@@ -81,11 +81,13 @@ public class GetAssertionOptions extends AuthenticatorOptions {
                 uv = (options.get(new UnicodeString("uv"))).equals(SimpleValue.TRUE);
             } catch (Exception ignore) {}
 
-            if (up == null) {
-                up = true;  // UP is true by default
-            }
-            if (uv == null) {
-                uv = false;  // UV is false by default
+            if (up == null && uv == null) {
+                up = true;
+                uv = false;
+            } else if (up != null) {
+                uv = !up;
+            } else {
+                up = !uv;
             }
 
             requireUserPresence = up;
@@ -126,6 +128,11 @@ public class GetAssertionOptions extends AuthenticatorOptions {
         if (clientDataHash.length != 32) {
             throw new CtapException(CtapError.INVALID_LENGTH,
                     "Client data hash of length: " + clientDataHash.length);
+        }
+
+        if (requireUserPresence == requireUserVerification) { // only one may be set
+            throw new CtapException(CtapError.UNSUPPORTED_OPTION, "Both uv and up are " +
+                        requireUserVerification);
         }
 
         ClientPINOptions.pinOptionsWellFormed(pinProtocol, pinAuth);

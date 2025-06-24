@@ -47,8 +47,6 @@ public abstract class AbstractPasswdSafeOpenNewFileFragment extends Fragment
     {
         super.onPause();
         cancelFragment(false);
-        itsProgressVisible.reset();
-        itsFieldsDisabled.reset();
     }
 
     /**
