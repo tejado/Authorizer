@@ -1,0 +1,44 @@
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+<resources>
+
+    <string name="about">About</string>
+    <string name="app_name">PasswdSafe LIBRARY</string>
+    <string name="app_settings">App Settings</string>
+    <string name="box">Box</string>
+    <string name="build_date">Build date</string>
+    <string name="build_id">Build ID</string>
+    <string name="cancel">Cancel</string>
+    <string name="choose_files">Choose Files</string>
+    <string name="close">Close</string>
+    <string name="copy_clipboard_error">%1$s - Error copying to the clipboard.  The error may be due to a known error in Samsung devices.</string>
+    <string name="copy_trace_and_close">Copy Trace and Close</string>
+    <string name="dropbox">Dropbox</string>
+    <string name="edit">Edit</string>
+    <string name="info">Info</string>
+    <string name="error">Error</string>
+    <string name="error_fmt">Error: %1$s</string>
+    <string name="error_msg">&lt;i&gt;%1$s&lt;/i&gt;</string>
+    <string name="file_type_icon">File type icon</string>
+    <string name="google_drive">Google Drive</string>
+    <string name="licenses">Licenses</string>
+    <string name="new_drive_file">New Drive File</string>
+    <string name="no_files">No Files</string>
+    <string name="none">None</string>
+    <string name="open">Open</string>
+    <string name="onedrive">OneDrive</string>
+    <string name="owncloud">ownCloud</string>
+    <string name="parent_directory">Parent Directory</string>
+    <string name="preferences">Preferences</string>
+    <string name="release_notes_title">Release Notes</string>
+    <string name="release_notes">(placeholder)</string>
+    <string name="reload">Reload</string>
+    <string name="type">Type</string>
+    <string name="url">URL</string>
+    <string name="version">Version</string>
+</resources>

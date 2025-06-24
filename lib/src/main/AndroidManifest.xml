@@ -1,0 +1,15 @@
+<!--
+  ~ Copyright (©) 2016 Jeff Harris <jefftharris@gmail.com>
+  ~ All rights reserved. Use of the code is allowed under the
+  ~ Artistic License 2.0 terms, as specified in the LICENSE file
+  ~ distributed with this code, or available from
+  ~ http://www.opensource.org/licenses/artistic-license-2.0.php
+  -->
+
+<!--suppress XmlUnusedNamespaceDeclaration -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-sdk xmlns:tools="http://schemas.android.com/tools"
+              tools:overrideLibrary="android.support.v14.preference" />
+
+</manifest>

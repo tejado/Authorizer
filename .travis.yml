@@ -1,0 +1,30 @@
+language: android
+jdk: oraclejdk8
+sudo: true
+
+before_cache:
+  # Do not cache a few Gradle files/directories (see https://docs.travis-ci.com/user/languages/java/#Caching)
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    # Gradle dependencies
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+    # Android build cache (see https://developer.android.com/studio/build/build-cache.html)
+    - $HOME/.android/build-cache
+
+before_script:
+  - mkdir -p $ANDROID_HOME/licenses
+  - echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license
+  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> $ANDROID_HOME/licenses/android-sdk-license
+  - mkdir -p $HOME/.android # silence sdkmanager warning
+  - echo 'count=0' > $HOME/.android/repositories.cfg # silence sdkmanager warning
+  - echo y | $ANDROID_HOME/tools/bin/sdkmanager 'tools' 'platform-tools' 'build-tools;27.0.3' > /dev/null
+  - echo y | $ANDROID_HOME/tools/bin/sdkmanager 'platforms;android-27' > /dev/null
+  - echo y | $ANDROID_HOME/tools/bin/sdkmanager 'ndk-bundle' 'cmake;3.6.4111459' 'lldb;3.1' > /dev/null
+  
+script:
+   - ./gradlew clean build
